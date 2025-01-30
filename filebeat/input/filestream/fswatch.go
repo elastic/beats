@@ -18,10 +18,11 @@
 package filestream
 
 import (
-	"bufio"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"hash"
 	"io"
 	"os"
 	"path/filepath"
@@ -32,6 +33,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
+	commonfile "github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -42,6 +44,10 @@ const (
 	DefaultFingerprintSize int64 = 1024 // 1KB
 	scannerDebugKey              = "scanner"
 	watcherDebugKey              = "file_watcher"
+)
+
+var (
+	errFileTooSmall = errors.New("file size is too small for ingestion")
 )
 
 type fileWatcherConfig struct {
@@ -201,7 +207,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	for path, fd := range newFilesByName {
 		// no need to react on empty new files
 		if fd.Info.Size() == 0 {
-			w.log.Warnf("file %q has no content yet, skipping", fd.Filename)
+			w.log.Debugf("file %q has no content yet, skipping", fd.Filename)
 			delete(paths, path)
 			continue
 		}
@@ -272,7 +278,7 @@ func defaultFileScannerConfig() fileScannerConfig {
 		Symlinks:      false,
 		RecursiveGlob: true,
 		Fingerprint: fingerprintConfig{
-			Enabled: false,
+			Enabled: true,
 			Offset:  0,
 			Length:  DefaultFingerprintSize,
 		},
@@ -282,16 +288,19 @@ func defaultFileScannerConfig() fileScannerConfig {
 // fileScanner looks for files which match the patterns in paths.
 // It is able to exclude files and symlinks.
 type fileScanner struct {
-	paths []string
-	cfg   fileScannerConfig
-	log   *logp.Logger
+	paths      []string
+	cfg        fileScannerConfig
+	log        *logp.Logger
+	hasher     hash.Hash
+	readBuffer []byte
 }
 
-func newFileScanner(paths []string, config fileScannerConfig) (loginp.FSScanner, error) {
+func newFileScanner(paths []string, config fileScannerConfig) (*fileScanner, error) {
 	s := fileScanner{
-		paths: paths,
-		cfg:   config,
-		log:   logp.NewLogger(scannerDebugKey),
+		paths:  paths,
+		cfg:    config,
+		log:    logp.NewLogger(scannerDebugKey),
+		hasher: sha256.New(),
 	}
 
 	if s.cfg.Fingerprint.Enabled {
@@ -300,6 +309,7 @@ func newFileScanner(paths []string, config fileScannerConfig) (loginp.FSScanner,
 			return nil, fmt.Errorf("error while reading configuration of fingerprint: %w", err)
 		}
 		s.log.Debugf("fingerprint mode enabled: offset %d, length %d", s.cfg.Fingerprint.Offset, s.cfg.Fingerprint.Length)
+		s.readBuffer = make([]byte, s.cfg.Fingerprint.Length)
 	}
 
 	err := s.resolveRecursiveGlobs(config)
@@ -357,7 +367,8 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	fdByName := map[string]loginp.FileDescriptor{}
 	// used to determine if a symlink resolves in a already known target
 	uniqueIDs := map[string]string{}
-
+	// used to filter out duplicate matches
+	uniqueFiles := map[string]struct{}{}
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -366,6 +377,12 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 		}
 
 		for _, filename := range matches {
+			// in case multiple globs match on the same file we filter out duplicates
+			if _, knownFile := uniqueFiles[filename]; knownFile {
+				continue
+			}
+			uniqueFiles[filename] = struct{}{}
+
 			it, err := s.getIngestTarget(filename)
 			if err != nil {
 				s.log.Debugf("cannot create an ingest target for file %q: %s", filename, err)
@@ -373,6 +390,10 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			}
 
 			fd, err := s.toFileDescriptor(&it)
+			if errors.Is(err, errFileTooSmall) {
+				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
+				continue
+			}
 			if err != nil {
 				s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
 				continue
@@ -395,7 +416,7 @@ type ingestTarget struct {
 	filename         string
 	originalFilename string
 	symlink          bool
-	info             os.FileInfo
+	info             commonfile.ExtendedFileInfo
 }
 
 func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err error) {
@@ -410,10 +431,11 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 	it.filename = filename
 	it.originalFilename = filename
 
-	it.info, err = os.Lstat(it.filename) // to determine if it's a symlink
+	info, err := os.Lstat(it.filename) // to determine if it's a symlink
 	if err != nil {
 		return it, fmt.Errorf("failed to lstat %q: %w", it.filename, err)
 	}
+	it.info = commonfile.ExtendFileInfo(info)
 
 	if it.info.IsDir() {
 		return it, fmt.Errorf("file %q is a directory", it.filename)
@@ -427,14 +449,16 @@ func (s *fileScanner) getIngestTarget(filename string) (it ingestTarget, err err
 		}
 
 		// now we know it's a symlink, we stat with link resolution
-		it.info, err = os.Stat(it.filename)
+		info, err := os.Stat(it.filename)
 		if err != nil {
 			return it, fmt.Errorf("failed to stat the symlink %q: %w", it.filename, err)
 		}
+		it.info = commonfile.ExtendFileInfo(info)
 
 		it.originalFilename, err = filepath.EvalSymlinks(it.filename)
 		if err != nil {
-			return it, fmt.Errorf("failed to resolve the symlink %q: %w", it.filename, err)
+			s.log.Debugf("finding path to original file has failed %s: %+v", it.filename, err)
+			it.originalFilename = it.filename
 		}
 
 		if s.isFileExcluded(it.originalFilename) {
@@ -455,9 +479,10 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 
 	if s.cfg.Fingerprint.Enabled {
 		fileSize := it.info.Size()
+		// we should not open the file if we know it's too small
 		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 		if fileSize < minSize {
-			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting", fd.Filename, fileSize, minSize)
+			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w", fd.Filename, fileSize, minSize, errFileTooSmall)
 		}
 
 		file, err := os.Open(it.originalFilename)
@@ -473,10 +498,9 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 			}
 		}
 
-		bfile := bufio.NewReaderSize(file, int(s.cfg.Fingerprint.Length))
-		r := io.LimitReader(bfile, s.cfg.Fingerprint.Length)
-		h := sha256.New()
-		written, err := io.Copy(h, r)
+		s.hasher.Reset()
+		lr := io.LimitReader(file, s.cfg.Fingerprint.Length)
+		written, err := io.CopyBuffer(s.hasher, lr, s.readBuffer)
 		if err != nil {
 			return fd, fmt.Errorf("failed to compute hash for first %d bytes of %q: %w", s.cfg.Fingerprint.Length, fd.Filename, err)
 		}
@@ -484,7 +508,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 			return fd, fmt.Errorf("failed to read %d bytes from %q to compute fingerprint, read only %d", written, fd.Filename, s.cfg.Fingerprint.Length)
 		}
 
-		fd.Fingerprint = hex.EncodeToString(h.Sum(nil))
+		fd.Fingerprint = hex.EncodeToString(s.hasher.Sum(nil))
 	}
 
 	return fd, nil

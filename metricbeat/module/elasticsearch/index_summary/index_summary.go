@@ -19,10 +19,13 @@ package index_summary
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // init registers the MetricSet with the central registry.
@@ -36,6 +39,8 @@ func init() {
 
 const (
 	statsPath = "/_stats"
+
+	allowClosedIndices = "forbid_closed_indices=false"
 )
 
 var (
@@ -70,15 +75,43 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return nil
 	}
 
-	content, err := m.HTTP.FetchContent()
-	if err != nil {
-		return err
-	}
-
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI+statsPath)
 	if err != nil {
 		return fmt.Errorf("failed to get info from Elasticsearch: %w", err)
 	}
 
+	if err := m.updateServicePath(*info.Version.Number); err != nil {
+		return err
+	}
+
+	content, err := m.HTTP.FetchContent()
+	if err != nil {
+		return err
+	}
+
 	return eventMapping(r, info, content, m.XPackEnabled)
+}
+
+func (m *MetricSet) updateServicePath(esVersion version.V) error {
+	p, err := getServicePath(esVersion)
+	if err != nil {
+		return err
+	}
+
+	m.SetServiceURI(p)
+	return nil
+}
+
+func getServicePath(esVersion version.V) (string, error) {
+	currPath := statsPath
+	u, err := url.Parse(currPath)
+	if err != nil {
+		return "", err
+	}
+
+	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
+		u.RawQuery += allowClosedIndices
+	}
+
+	return u.String(), nil
 }

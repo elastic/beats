@@ -82,11 +82,3 @@ func TestData(t *testing.T) {
 		t.Fatal("error trying to write event:", err)
 	}
 }
-
-func getConfig(host string) map[string]interface{} {
-	return map[string]interface{}{
-		"module":     elasticsearch.ModuleName,
-		"metricsets": []string{"ml_job"},
-		"hosts":      []string{host},
-	}
-}

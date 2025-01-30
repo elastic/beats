@@ -13,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -41,7 +42,7 @@ func TestHomebrew(t *testing.T) {
 
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
-		f := mbtest.NewReportingMetricSetV2(t, getConfig())
+		f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 		defer deleteBucket(t, f)
 
 		events, errs := mbtest.ReportingFetchV2(f)
@@ -95,7 +96,7 @@ func TestHomebrewNotExist(t *testing.T) {
 
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
-		f := mbtest.NewReportingMetricSetV2(t, getConfig())
+		f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 		defer deleteBucket(t, f)
 
 		events, errs := mbtest.ReportingFetchV2(f)

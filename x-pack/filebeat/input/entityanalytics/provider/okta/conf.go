@@ -6,7 +6,10 @@ package okta
 
 import (
 	"errors"
+	"strings"
 	"time"
+
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -20,6 +23,7 @@ func defaultConfig() conf {
 	transport.Timeout = 30 * time.Second
 
 	return conf{
+		EnrichWith:     []string{"groups"},
 		SyncInterval:   24 * time.Hour,
 		UpdateInterval: 15 * time.Minute,
 		LimitWindow:    time.Minute,
@@ -41,6 +45,17 @@ type conf struct {
 	OktaDomain string `config:"okta_domain" validate:"required"`
 	OktaToken  string `config:"okta_token" validate:"required"`
 
+	// Dataset specifies the datasets to collect from
+	// the API. It can be ""/"all", "users", or
+	// "devices".
+	Dataset string `config:"dataset"`
+	// EnrichWith specifies the additional data that
+	// will be used to enrich user data. It can include
+	// "groups", "roles" and "factors".
+	// If it is a single element with "none", no
+	// enrichment is performed.
+	EnrichWith []string `config:"enrich_with"`
+
 	// SyncInterval is the time between full
 	// synchronisation operations.
 	SyncInterval time.Duration `config:"sync_interval"`
@@ -53,9 +68,25 @@ type conf struct {
 	// API limit resets.
 	LimitWindow time.Duration `config:"limit_window"`
 
+	// LimitFixed is a number of requests to allow in each LimitWindow,
+	// overriding the guidance in API responses.
+	LimitFixed *int `config:"limit_fixed"`
+
 	// Request is the configuration for establishing
 	// HTTP requests to the API.
 	Request *requestConfig `config:"request"`
+
+	// Tracer allows configuration of request trace logging.
+	Tracer *tracerConfig `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 type requestConfig struct {
@@ -154,7 +185,42 @@ func (c *conf) Validate() error {
 		return errInvalidUpdateInterval
 	case c.SyncInterval <= c.UpdateInterval:
 		return errSyncBeforeUpdate
+	}
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "users", "devices":
 	default:
+		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
+	}
+
+	if c.Tracer == nil {
 		return nil
+	}
+	if c.Tracer.Filename == "" {
+		return errors.New("request tracer must have a filename if used")
+	}
+	if c.Tracer.MaxSize == 0 {
+		// By default Lumberjack caps file sizes at 100MB which
+		// is excessive for a debugging logger, so default to 1MB
+		// which is the minimum.
+		c.Tracer.MaxSize = 1
+	}
+	return nil
+}
+
+func (c *conf) wantUsers() bool {
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "users":
+		return true
+	default:
+		return false
+	}
+}
+
+func (c *conf) wantDevices() bool {
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "devices":
+		return true
+	default:
+		return false
 	}
 }

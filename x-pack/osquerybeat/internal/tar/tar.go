@@ -24,9 +24,9 @@ func shouldExtract(name string, files ...string) bool {
 	// In the osquery 4.9.0 version the paths started to be prefixed with "./"
 	// which caused the osqueryd binary not found/extracted from the archive.
 	name = filepath.Clean(name)
-
 	for _, f := range files {
-		if strings.HasPrefix(f, name) {
+		if strings.HasPrefix(name, f) ||
+			strings.HasPrefix(f, name) {
 			return true
 		}
 	}
@@ -58,7 +58,8 @@ func Extract(r io.Reader, destinationDir string, files ...string) error {
 			}
 			return err
 		}
-		if !shouldExtract(header.Name, files...) {
+		shouldExtract := shouldExtract(header.Name, files...)
+		if !shouldExtract {
 			continue
 		}
 

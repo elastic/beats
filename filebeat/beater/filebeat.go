@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"path/filepath"
@@ -31,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/filestream"
 	"github.com/elastic/beats/v7/filebeat/input/filestream/takeover"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
@@ -80,7 +82,9 @@ type Filebeat struct {
 type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
 
 type StateStore interface {
-	Access() (*statestore.Store, error)
+	// Access returns the storage registry depending on the type. This is needed for the Elasticsearch state store which
+	// is guarded by the feature.IsElasticsearchStateStoreEnabledForInput(typ) check.
+	Access(typ string) (*statestore.Store, error)
 	CleanupInterval() time.Duration
 }
 
@@ -108,7 +112,13 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 		return nil, err
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, false)
+	enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
+	forceEnableModuleFilesets, _ := b.BeatConfig.Bool("config.modules.force_enable_module_filesets", -1)
+	filesetOverrides := fileset.FilesetOverrides{
+		EnableAllFilesets:         enableAllFilesets,
+		ForceEnableModuleFilesets: forceEnableModuleFilesets,
+	}
+	moduleRegistry, err := fileset.NewModuleRegistry(config.Modules, b.Info, true, filesetOverrides)
 	if err != nil {
 		return nil, err
 	}
@@ -138,6 +148,13 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 				}
 				return data
 			})
+
+		b.Manager.RegisterDiagnosticHook(
+			"registry",
+			"Filebeat's registry",
+			"registry.tar.gz",
+			"application/octet-stream",
+			gzipRegistry)
 	}
 
 	// Add inputs created by the modules
@@ -159,7 +176,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
-		return nil, fmt.Errorf("input configs and -once cannot be used together")
+		return nil, fmt.Errorf("input configs and --once cannot be used together")
 	}
 
 	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {
@@ -183,23 +200,31 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 // setupPipelineLoaderCallback sets the callback function for loading pipelines during setup.
 func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
-	if b.Config.Output.Name() != "elasticsearch" {
+	if b.Config.Output.Name() != "elasticsearch" && !b.Manager.Enabled() {
 		logp.Warn(pipelinesWarning)
 		return nil
 	}
 
 	overwritePipelines := true
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
-		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
+		ctx, cancel := context.WithCancel(context.TODO())
+		defer cancel()
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat")
 		if err != nil {
 			return err
 		}
 
 		// When running the subcommand setup, configuration from modules.d directories
 		// have to be loaded using cfg.Reloader. Otherwise those configurations are skipped.
-		pipelineLoaderFactory := newPipelineLoaderFactory(b.Config.Output.Config())
+		pipelineLoaderFactory := newPipelineLoaderFactory(ctx, b.Config.Output.Config())
 		enableAllFilesets, _ := b.BeatConfig.Bool("config.modules.enable_all_filesets", -1)
-		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, enableAllFilesets)
+		forceEnableModuleFilesets, _ := b.BeatConfig.Bool("config.modules.force_enable_module_filesets", -1)
+		filesetOverrides := fileset.FilesetOverrides{
+			EnableAllFilesets:         enableAllFilesets,
+			ForceEnableModuleFilesets: forceEnableModuleFilesets,
+		}
+
+		modulesFactory := fileset.NewSetupFactory(b.Info, pipelineLoaderFactory, filesetOverrides)
 		if fb.config.ConfigModules.Enabled() {
 			if enableAllFilesets {
 				// All module configs need to be loaded to enable all the filesets
@@ -209,7 +234,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
 			}
-			modulesLoader := cfgfile.NewReloader(fb.pipeline, fb.config.ConfigModules)
+			modulesLoader := cfgfile.NewReloader(logp.L().Named("module.reloader"), fb.pipeline, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
 		}
 
@@ -257,10 +282,18 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitEvents := newSignalWait()
 
 	// count active events for waiting on shutdown
+	var reg *monitoring.Registry
+
+	if b.Info.Monitoring.Namespace != nil {
+		reg = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("stats")
+		if reg == nil {
+			reg = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("stats")
+		}
+	}
 	wgEvents := &eventCounter{
-		count: monitoring.NewInt(nil, "filebeat.events.active"), // Gauge
-		added: monitoring.NewUint(nil, "filebeat.events.added"),
-		done:  monitoring.NewUint(nil, "filebeat.events.done"),
+		count: monitoring.NewInt(reg, "filebeat.events.active"), // Gauge
+		added: monitoring.NewUint(reg, "filebeat.events.added"),
+		done:  monitoring.NewUint(reg, "filebeat.events.done"),
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
@@ -270,13 +303,41 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	stateStore, err := openStateStore(b.Info, logp.NewLogger("filebeat"), config.Registry)
+	// Use context, like normal people do, hooking up to the beat.done channel
+	ctx, cn := context.WithCancel(context.Background())
+	go func() {
+		<-fb.done
+		cn()
+	}()
+
+	stateStore, err := openStateStore(ctx, b.Info, logp.NewLogger("filebeat"), config.Registry)
 	if err != nil {
 		logp.Err("Failed to open state store: %+v", err)
 		return err
 	}
 	defer stateStore.Close()
 
+	// If notifier is set, configure the listener for output configuration
+	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
+	// in order to allow it fully configure
+	if stateStore.notifier != nil {
+		b.OutputConfigReloader = reload.ReloadableFunc(func(r *reload.ConfigWithMeta) error {
+			outCfg := conf.Namespace{}
+			if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
+				logp.Err("Failed to unpack the output config: %v", err)
+				return nil
+			}
+
+			stateStore.notifier.Notify(outCfg.Config())
+			return nil
+		})
+	}
+
+	err = filestream.ValidateInputIDs(config.Inputs, logp.NewLogger("input.filestream"))
+	if err != nil {
+		logp.Err("invalid filestream configuration: %+v", err)
+		return err
+	}
 	err = processLogInputTakeOver(stateStore, config)
 	if err != nil {
 		logp.Err("Failed to attempt filestream state take over: %+v", err)
@@ -311,14 +372,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	outDone := make(chan struct{}) // outDone closes down all active pipeline connections
 	pipelineConnector := channel.NewOutletFactory(outDone).Create
 
-	// Create a ES connection factory for dynamic modules pipeline loading
-	var pipelineLoaderFactory fileset.PipelineLoaderFactory
-	if b.Config.Output.Name() == "elasticsearch" {
-		pipelineLoaderFactory = newPipelineLoaderFactory(b.Config.Output.Config())
-	} else {
-		logp.Warn(pipelinesWarning)
-	}
-
 	inputsLogger := logp.NewLogger("input")
 	v2Inputs := fb.pluginFactory(b.Info, inputsLogger, stateStore)
 	v2InputLoader, err := v2.NewLoader(inputsLogger, v2Inputs, "type", cfg.DefaultType)
@@ -330,7 +383,9 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	defer func() {
 		_ = inputTaskGroup.Stop()
 	}()
-	if err := v2InputLoader.Init(&inputTaskGroup, v2.ModeRun); err != nil {
+
+	// Store needs to be fully configured at this point
+	if err := v2InputLoader.Init(&inputTaskGroup); err != nil {
 		logp.Err("Failed to initialize the input managers: %v", err)
 		return err
 	}
@@ -339,8 +394,22 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader),
 		input.NewRunnerFactory(pipelineConnector, registrar, fb.done),
 	))
-	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 
+	// Create a ES connection factory for dynamic modules pipeline loading
+	var pipelineLoaderFactory fileset.PipelineLoaderFactory
+	// The pipelineFactory needs a context to control the connections to ES,
+	// when the pipelineFactory/ESClient are not needed any more the context
+	// must be cancelled. This pipeline factory will be used by the moduleLoader
+	// that is run by a crawler, whenever this crawler is stopped we also cancel
+	// the context.
+	pipelineFactoryCtx, cancelPipelineFactoryCtx := context.WithCancel(context.Background())
+	defer cancelPipelineFactoryCtx()
+	if b.Config.Output.Name() == "elasticsearch" {
+		pipelineLoaderFactory = newPipelineLoaderFactory(pipelineFactoryCtx, b.Config.Output.Config())
+	} else {
+		logp.Warn(pipelinesWarning)
+	}
+	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
@@ -378,6 +447,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	err = crawler.Start(fb.pipeline, config.ConfigInput, config.ConfigModules)
 	if err != nil {
 		crawler.Stop()
+		cancelPipelineFactoryCtx()
 		return fmt.Errorf("Failed to start crawler: %w", err)
 	}
 
@@ -393,7 +463,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	// Register reloadable list of inputs and modules
 	inputs := cfgfile.NewRunnerList(management.DebugK, inputLoader, fb.pipeline)
-	reload.RegisterV2.MustRegisterInput(inputs)
+	b.Registry.MustRegisterInput(inputs)
 
 	modules := cfgfile.NewRunnerList(management.DebugK, moduleLoader, fb.pipeline)
 
@@ -433,6 +503,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	modules.Stop()
 	adiscover.Stop()
 	crawler.Stop()
+	cancelPipelineFactoryCtx()
 
 	timeout := fb.config.ShutdownTimeout
 	// Checks if on shutdown it should wait for all events to be published
@@ -476,9 +547,9 @@ func (fb *Filebeat) Stop() {
 }
 
 // Create a new pipeline loader (es client) factory
-func newPipelineLoaderFactory(esConfig *conf.C) fileset.PipelineLoaderFactory {
+func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat")
 		if err != nil {
 			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err)
 		}
@@ -490,9 +561,17 @@ func newPipelineLoaderFactory(esConfig *conf.C) fileset.PipelineLoaderFactory {
 // some of the filestreams might want to take over the loginput state
 // if their `take_over` flag is set to `true`.
 func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
-	store, err := stateStore.Access()
+	inputs, err := fetchInputConfiguration(config)
 	if err != nil {
-		return fmt.Errorf("Failed to access state for attempting take over: %w", err)
+		return fmt.Errorf("Failed to fetch input configuration when attempting take over: %w", err)
+	}
+	if len(inputs) == 0 {
+		return nil
+	}
+
+	store, err := stateStore.Access("")
+	if err != nil {
+		return fmt.Errorf("Failed to access state when attempting take over: %w", err)
 	}
 	defer store.Close()
 	logger := logp.NewLogger("filestream-takeover")
@@ -502,5 +581,49 @@ func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
 
 	backuper := backup.NewRegistryBackuper(logger, registryHome)
 
-	return takeover.TakeOverLogInputStates(logger, store, backuper, config)
+	return takeover.TakeOverLogInputStates(logger, store, backuper, inputs)
+}
+
+// fetches all the defined input configuration available at Filebeat startup including external files.
+func fetchInputConfiguration(config *cfg.Config) (inputs []*conf.C, err error) {
+	if len(config.Inputs) == 0 {
+		inputs = []*conf.C{}
+	} else {
+		inputs = config.Inputs
+	}
+
+	// reading external input configuration if defined
+	var dynamicInputCfg cfgfile.DynamicConfig
+	if config.ConfigInput != nil {
+		err = config.ConfigInput.Unpack(&dynamicInputCfg)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unpack the dynamic input configuration: %w", err)
+		}
+	}
+	if dynamicInputCfg.Path == "" {
+		return inputs, nil
+	}
+
+	cfgPaths, err := filepath.Glob(dynamicInputCfg.Path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve external input configuration paths: %w", err)
+	}
+
+	if len(cfgPaths) == 0 {
+		return inputs, nil
+	}
+
+	// making a copy so we can safely extend the slice
+	inputs = make([]*conf.C, len(config.Inputs))
+	copy(inputs, config.Inputs)
+
+	for _, p := range cfgPaths {
+		externalInputs, err := cfgfile.LoadList(p)
+		if err != nil {
+			return nil, fmt.Errorf("failed to load external input configuration: %w", err)
+		}
+		inputs = append(inputs, externalInputs...)
+	}
+
+	return inputs, nil
 }

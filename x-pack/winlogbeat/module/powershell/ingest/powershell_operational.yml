@@ -284,7 +284,7 @@ processors:
         field: Payload
       source: |-
         def parseRawDetail(String raw) {
-            Pattern detailRegex = /^(.+)\((.+)\)\:\s*(.+)?$/;
+            Pattern detailRegex = /^([^:(]+)\(([^)]+)\)\:\s*(.+)?$/;
             Pattern parameterBindingRegex = /name\=(.+);\s*value\=(.+)$/;
 
             def matcher = detailRegex.matcher(raw);

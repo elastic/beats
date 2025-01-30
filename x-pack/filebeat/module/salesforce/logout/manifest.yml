@@ -1,0 +1,25 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: salesforce
+  - name: tags
+    default: [salesforce-logout, forwarded]
+  - name: api_version
+  - name: authentication
+  - name: url
+  - name: event_log_file
+  - name: elf_interval
+    default: 1h
+  - name: real_time
+  - name: real_time_interval
+    default: 5m
+  - name: initial_interval
+  - name: log_file_interval
+    default: Hourly
+
+ingest_pipeline:
+  - ingest/default.yml
+  - ingest/eventlogfile.yml
+  - ingest/object.yml
+input: config/logout.yml

@@ -22,7 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 )
 
 // GenTemplateConfigCmd is the command used to export the elasticsearch template.
@@ -36,10 +36,10 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 			noILM, _ := cmd.Flags().GetBool("noilm")
 
 			if noILM {
-				settings.ILM = ilm.NoopSupport
+				settings.ILM = lifecycle.NoopSupport
 			}
 			if settings.ILM == nil {
-				settings.ILM = ilm.StdSupport
+				settings.ILM = lifecycle.StdSupport
 			}
 
 			b, err := instance.NewInitializedBeat(settings)
@@ -47,7 +47,10 @@ func GenTemplateConfigCmd(settings instance.Settings) *cobra.Command {
 				fatalfInitCmd(err)
 			}
 
-			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
+			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Config.LifecycleConfig)
+			if err != nil {
+				fatalf("error creating file handler: %s", err)
+			}
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
 			if err := idxManager.Setup(idxmgmt.LoadModeForce, idxmgmt.LoadModeDisabled); err != nil {
 				fatalf("Error exporting template: %+v.", err)

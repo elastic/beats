@@ -31,7 +31,7 @@ type managerConfig struct {
 }
 
 // Init initializes any required resources. It is currently a no-op.
-func (m *Manager) Init(grp unison.Group, mode v2.Mode) error {
+func (m *Manager) Init(grp unison.Group) error {
 	return nil
 }
 

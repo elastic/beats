@@ -27,7 +27,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 )
 
@@ -63,7 +63,7 @@ func TestSockTracer(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			sockName, err := uuid.NewRandom()
+			sockName, err := uuid.NewV4()
 			require.NoError(t, err)
 			sockPath := filepath.Join(os.TempDir(), sockName.String())
 
@@ -85,14 +85,16 @@ func TestSockTracerWaitFail(t *testing.T) {
 	started := time.Now()
 	_, err := NewSockTracer(filepath.Join(os.TempDir(), "garbagenonsegarbagenooonseeense"), waitFor)
 	require.Error(t, err)
-	require.GreaterOrEqual(t, time.Now(), started.Add(waitFor))
+	// Compare unix millis because things get a little weird with nanos
+	// with errors like: "2023-09-08 02:27:46.939107458 +0000 UTC m=+1.002235710" is not greater than or equal to "2023-09-08 02:27:46.939868055 +0000 UTC m=+1.001015793"
+	require.GreaterOrEqual(t, time.Now().UnixMilli(), started.Add(waitFor).UnixMilli())
 }
 
 func TestSockTracerWaitSuccess(t *testing.T) {
 	waitFor := 5 * time.Second
 	delay := time.Millisecond * 1500
 
-	sockName, err := uuid.NewRandom()
+	sockName, err := uuid.NewV4()
 	require.NoError(t, err)
 	sockPath := filepath.Join(os.TempDir(), sockName.String())
 
@@ -123,7 +125,8 @@ func listenTilClosed(t *testing.T, sockPath string) []string {
 
 	conn, err := listener.Accept()
 	require.NoError(t, err)
-	var received []string
+	// no need to pre-allocate, but it seems to make the linter happy
+	received := make([]string, 0, 10)
 	scanner := bufio.NewScanner(conn)
 	for scanner.Scan() {
 		received = append(received, scanner.Text())

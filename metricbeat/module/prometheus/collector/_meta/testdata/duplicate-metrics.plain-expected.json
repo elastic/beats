@@ -5,13 +5,14 @@
             "duration": 115000,
             "module": "prometheus"
         },
+        "metrics_count": 1,
         "metricset": {
             "name": "collector",
             "period": 10000
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:44753",
+                "instance": "127.0.0.1:61485",
                 "job": "prometheus",
                 "name": "PS MarkSweep"
             },
@@ -30,18 +31,18 @@
             "duration": 115000,
             "module": "prometheus"
         },
+        "metrics_count": 1,
         "metricset": {
             "name": "collector",
             "period": 10000
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:44753",
-                "job": "prometheus",
-                "name": "PS Scavenge"
+                "instance": "127.0.0.1:61485",
+                "job": "prometheus"
             },
             "metrics": {
-                "base_gc_total_total": 34
+                "up": 1
             }
         },
         "service": {
@@ -55,17 +56,19 @@
             "duration": 115000,
             "module": "prometheus"
         },
+        "metrics_count": 1,
         "metricset": {
             "name": "collector",
             "period": 10000
         },
         "prometheus": {
             "labels": {
-                "instance": "127.0.0.1:44753",
-                "job": "prometheus"
+                "instance": "127.0.0.1:61485",
+                "job": "prometheus",
+                "name": "PS Scavenge"
             },
             "metrics": {
-                "up": 1
+                "base_gc_total_total": 34
             }
         },
         "service": {

@@ -49,8 +49,6 @@ type ClientConfig struct {
 
 	Processing ProcessingConfig
 
-	CloseRef CloseRef
-
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
 	// WaitClose is only effective if one of ACKCount, ACKEvents and ACKLastEvents
@@ -91,13 +89,6 @@ type EventListener interface {
 	ClientClosed()
 }
 
-// CloseRef allows users to close the client asynchronously.
-// A CloseRef implements a subset of function required for context.Context.
-type CloseRef interface {
-	Done() <-chan struct{}
-	Err() error
-}
-
 // ProcessingConfig provides additional event processing settings a client can
 // pass to the publisher pipeline on Connect.
 type ProcessingConfig struct {
@@ -127,6 +118,9 @@ type ProcessingConfig struct {
 	// EventNormalization controls whether the event normalization processor
 	// is applied to events. If nil the Beat's default behavior prevails.
 	EventNormalization *bool
+
+	// Disables the addition of input.type
+	DisableType bool
 
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.

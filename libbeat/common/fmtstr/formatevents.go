@@ -84,7 +84,6 @@ type eventEvalContext struct {
 }
 
 var (
-	errMissingKeys   = errors.New("missing keys")
 	errConvertString = errors.New("can not convert to string")
 )
 
@@ -157,17 +156,22 @@ func CompileEvent(in string) (*EventFormatString, error) {
 func (fs *EventFormatString) Unpack(v interface{}) error {
 	s, err := tryConvString(v)
 	if err != nil {
-		return err
+		return fmt.Errorf("error converting type %T to event formatter: %w", v, err)
 	}
 
 	tmp, err := CompileEvent(s)
 	if err != nil {
-		return err
+		return fmt.Errorf("error compiling event formatter: %w", err)
 	}
 
 	// init fs from tmp
 	*fs = *tmp
 	return nil
+}
+
+// IsInitialized returns true if the underlying event formatter is prepared to format an event
+func (fs *EventFormatString) IsInitialized() bool {
+	return fs.formatter != nil
 }
 
 // NumFields returns number of unique event fields used by the format string.
@@ -190,6 +194,9 @@ func (fs *EventFormatString) Fields() []string {
 // Run executes the format string returning a new expanded string or an error
 // if execution or event field expansion fails.
 func (fs *EventFormatString) Run(event *beat.Event) (string, error) {
+	if !fs.IsInitialized() {
+		return "", fmt.Errorf("event formatter is nil")
+	}
 	ctx := newEventCtx(len(fs.fields))
 	defer releaseCtx(ctx)
 
@@ -296,7 +303,7 @@ func (e *eventFieldCompiler) compileEventField(
 	ops []VariableOp,
 ) (FormatEvaler, error) {
 	if len(ops) > 1 {
-		return nil, errors.New("Too many format modifiers given")
+		return nil, errors.New("too many format modifiers given")
 	}
 
 	defaultValue := ""
@@ -340,12 +347,12 @@ func (e *eventFieldCompiler) compileTimestamp(
 	ops []VariableOp,
 ) (FormatEvaler, error) {
 	if expression[0] != '+' {
-		return nil, errors.New("No timestamp expression")
+		return nil, errors.New("no timestamp expression")
 	}
 
 	formatter, err := dtfmt.NewFormatter(expression[1:])
 	if err != nil {
-		return nil, fmt.Errorf("%v in timestamp expression", err)
+		return nil, fmt.Errorf("%w in timestamp expression", err)
 	}
 
 	e.timestamp = true
@@ -353,10 +360,6 @@ func (e *eventFieldCompiler) compileTimestamp(
 }
 
 func (e *eventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
-	type stringer interface {
-		String() string
-	}
-
 	ctx := c.(*eventEvalContext)
 	s := ctx.keys[e.index]
 	_, err := out.WriteString(s)
@@ -364,10 +367,6 @@ func (e *eventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
 }
 
 func (e *defaultEventFieldEvaler) Eval(c interface{}, out *bytes.Buffer) error {
-	type stringer interface {
-		String() string
-	}
-
 	ctx := c.(*eventEvalContext)
 	s := ctx.keys[e.index]
 	if s == "" {
@@ -385,7 +384,7 @@ func (e *eventTimestampEvaler) Eval(c interface{}, out *bytes.Buffer) error {
 
 func parseEventPath(field string) (string, error) {
 	field = strings.Trim(field, " \n\r\t")
-	var fields []string
+	fields := []string{}
 
 	for len(field) > 0 {
 		if field[0] != '[' {

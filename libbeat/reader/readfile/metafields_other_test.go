@@ -20,23 +20,23 @@
 package readfile
 
 import (
-	"os"
 	"syscall"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func createTestFileInfo() os.FileInfo {
-	return testFileInfo{
+func createTestFileInfo() file.ExtendedFileInfo {
+	return file.ExtendFileInfo(testFileInfo{
 		name: "filename",
 		size: 42,
 		time: time.Now(),
 		sys:  &syscall.Stat_t{Dev: 17, Ino: 999},
-	}
+	})
 }
 
 func checkFields(t *testing.T, expected, actual mapstr.M) {
@@ -44,13 +44,13 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 
 	dev, err := actual.GetValue(deviceIDKey)
 	require.NoError(t, err)
-	require.Equal(t, uint64(17), dev)
+	require.Equal(t, "17", dev)
 	err = actual.Delete(deviceIDKey)
 	require.NoError(t, err)
 
 	inode, err := actual.GetValue(inodeKey)
 	require.NoError(t, err)
-	require.Equal(t, uint64(999), inode)
+	require.Equal(t, "999", inode)
 	err = actual.Delete(inodeKey)
 	require.NoError(t, err)
 

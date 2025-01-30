@@ -36,8 +36,11 @@ func receiveOneEvent(d testing.Driver, events <-chan beat.Event, timeout time.Du
 	go func() {
 		defer close(done)
 
+		ticker := time.NewTicker(timeout)
+		defer ticker.Stop()
+
 		select {
-		case <-time.Tick(timeout):
+		case <-ticker.C:
 			d.Error("error", errors.New("timeout waiting for an event"))
 		case event, ok := <-events:
 			if !ok {

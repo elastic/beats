@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 type runnerGroup struct {
@@ -37,6 +38,14 @@ var _ cfgfile.Runner = new(runnerGroup)
 func newRunnerGroup(runners []cfgfile.Runner) cfgfile.Runner {
 	return &runnerGroup{
 		runners: runners,
+	}
+}
+
+func (rg *runnerGroup) SetStatusReporter(reporter status.StatusReporter) {
+	for _, runner := range rg.runners {
+		if runnerWithStatus, ok := runner.(status.WithStatusReporter); ok {
+			runnerWithStatus.SetStatusReporter(reporter)
+		}
 	}
 }
 
@@ -57,7 +66,7 @@ func (rg *runnerGroup) Stop() {
 }
 
 func (rg *runnerGroup) String() string {
-	var entries []string
+	entries := make([]string, 0, len(rg.runners))
 	for _, runner := range rg.runners {
 		entries = append(entries, runner.String())
 	}

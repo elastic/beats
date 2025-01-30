@@ -1,4 +1,3 @@
-[![Build Status](https://beats-ci.elastic.co/job/Beats/job/beats/job/main/badge/icon)](https://beats-ci.elastic.co/job/Beats/job/beats/job/main/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/elastic/beats)](https://goreportcard.com/report/github.com/elastic/beats)
 [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
@@ -21,7 +20,6 @@ Beat  | Description
 --- | ---
 [Auditbeat](https://github.com/elastic/beats/tree/main/auditbeat) | Collect your Linux audit framework data and monitor the integrity of your files.
 [Filebeat](https://github.com/elastic/beats/tree/main/filebeat) | Tails and ships log files
-[Functionbeat](https://github.com/elastic/beats/tree/main/x-pack/functionbeat) | Read and ships events from serverless infrastructure.
 [Heartbeat](https://github.com/elastic/beats/tree/main/heartbeat) | Ping remote services for availability
 [Metricbeat](https://github.com/elastic/beats/tree/main/metricbeat) | Fetches sets of metrics from the operating system and services
 [Packetbeat](https://github.com/elastic/beats/tree/main/packetbeat) | Monitors the network and applications by sniffing packets
@@ -42,7 +40,6 @@ on the [elastic.co site](https://www.elastic.co/guide/):
 * [Beats platform](https://www.elastic.co/guide/en/beats/libbeat/current/index.html)
 * [Auditbeat](https://www.elastic.co/guide/en/beats/auditbeat/current/index.html)
 * [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
-* [Functionbeat](https://www.elastic.co/guide/en/beats/functionbeat/current/index.html)
 * [Heartbeat](https://www.elastic.co/guide/en/beats/heartbeat/current/index.html)
 * [Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
 * [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
@@ -88,26 +85,9 @@ For testing purposes, we generate snapshot builds that you can find [here](https
 It is possible to trigger some jobs by putting a comment on a GitHub PR.
 (This service is only available for users affiliated with Elastic and not for open-source contributors.)
 
-* [beats][]
-  * `jenkins run the tests please` or `jenkins run tests` or `/test` will kick off a default build.
-  * `/test macos` will kick off a default build with also the `macos` stages.
-  * `/test <beat-name>` will kick off the default build for the given PR in addition to the `<beat-name>` build itself.
-  * `/test <beat-name> for macos` will kick off a default build with also the `macos` stage for the `<beat-name>`.
-* [apm-beats-update][]
-  * `/run apm-beats-update`
-* [apm-beats-packaging][]
-  * `/package` or `/packaging` will kick of a build to generate the packages for beats.
-* [apm-beats-tester][]
-  * `/beats-tester` will kick of a build to validate the generated packages.
+* [beats CI pipeline](https://buildkite.com/elastic/beats)
+  * `/test` will kick off a default build.
 
 ### PR Labels
 
-It's possible to configure the build on a GitHub PR by labelling the PR with the below labels
-
-* `<beat-name>` to force the following builds to run the stages for the `<beat-name>`
-* `macOS` to force the following builds to run the `macos` stages.
-
-[beats]: https://beats-ci.elastic.co/job/Beats/job/beats/
-[apm-beats-update]: https://beats-ci.elastic.co/job/Beats/job/apm-beats-update/
-[apm-beats-packaging]: https://beats-ci.elastic.co/job/Beats/job/packaging/
-[apm-beats-tester]: https://beats-ci.elastic.co/job/Beats/job/beats-tester/
+It's possible to configure the build on a GitHub PR by labeling the PR with certain labels. Elastic users can find more details at https://docs.elastic.dev/ingest-dev-docs/beats/beats-ci.

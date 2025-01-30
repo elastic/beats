@@ -47,27 +47,29 @@ var (
 )
 
 // GetFileOrigin fetches the kMDItemWhereFroms metadata for the given path. This
-// is special metadata in the filesystem that encodes information of an external
-// origin of this file. It is always encoded as a list of strings, with
+// is special metadata in the filesystem that encodes information about the
+// external origin of this file. It is always encoded as a list of strings, with
 // different meanings depending on the origin:
 //
 // For files downloaded from a web browser, the first string is the URL for
 // the source document. The second URL (optional), is the web address where the
 // download link was followed:
-// [ "https://cdn.kernel.org/pub/linux/kernel/v4.x/ChangeLog-4.13.16", "https://www.kernel.org/" ]
+//
+//	["https://cdn.kernel.org/pub/linux/kernel/v4.x/ChangeLog-4.13.16", "https://www.kernel.org/"]
 //
 // For files or directories transferred via Airdrop, the origin is one string
 // with the name of the computer that sent the file:
-// [ "Adrian's MacBook Pro" ]
+//
+//	["Adrian's MacBook Pro"]
 //
 // For files attached to e-mails (using Mail app), three strings are
 // returned: Sender address, subject and e-mail identifier:
-// [ "Adrian Serrano \u003cadrian@elastic.co\u003e",
 //
-//	"Sagrada Familia tickets",
-//	"message:%3CCAMZw10FD4fktC9qdJgLjwW=a8LM4gbJ44jFcaK8.BOWg1t4OwQ@elastic.co%3E"
-//
-// ],
+//	[
+//	 "Adrian Serrano \u003cadrian@elastic.co\u003e",
+//	 "Sagrada Familia tickets",
+//	 "message:%3CCAMZw10FD4fktC9qdJgLjwW=a8LM4gbJ44jFcaK8.BOWg1t4OwQ@elastic.co%3E"
+//	],
 //
 // For all other files the result is an empty (nil) list.
 func GetFileOrigin(path string) ([]string, error) {
@@ -108,8 +110,8 @@ func GetFileOrigin(path string) ([]string, error) {
 		return nil, fmt.Errorf("plist unmarshal failed: %w", err)
 	}
 
-	// The returned list seems to be padded with empty strings when some of
-	// the fields are missing (i.e. no context URL). Get rid of trailing empty
+	// The returned list seems to be padded with empty strings when some
+	// fields are missing (i.e. no context URL). Get rid of trailing empty
 	// strings:
 	n := len(urls)
 	for n > 0 && len(urls[n-1]) == 0 {

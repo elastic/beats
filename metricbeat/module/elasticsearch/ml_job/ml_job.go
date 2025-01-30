@@ -18,6 +18,8 @@
 package ml_job
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
 )
@@ -59,6 +61,13 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if shouldSkip {
 		return nil
 	}
+	mLAvailability, mlErr := m.checkMLAvailability()
+	if mlErr != nil {
+		return mlErr
+	}
+	if !mLAvailability {
+		return nil
+	}
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
 	if err != nil {
@@ -71,4 +80,17 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	return eventsMapping(r, info, content, m.XPackEnabled)
+}
+
+func (m *MetricSet) checkMLAvailability() (isAvailable bool, err error) {
+	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
+	if err != nil {
+		return false, fmt.Errorf("error determining xpack features: %w", err)
+	}
+
+	if !xpack.Features.ML.Enabled {
+		return false, nil
+	}
+
+	return true, nil
 }

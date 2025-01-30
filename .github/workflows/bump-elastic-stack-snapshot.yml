@@ -17,22 +17,47 @@ jobs:
       matrix: ${{ steps.generator.outputs.matrix }}
     steps:
       - id: generator
-        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@current
+        uses: elastic/oblt-actions/elastic/active-branches@v1
 
   bump-elastic-stack:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     needs: [filter]
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
-        with:
-          vaultUrl: ${{ secrets.VAULT_ADDR }}
-          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
-          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          pipeline: ./.ci/bump-elastic-stack-snapshot.yml
+      - name: Install Updatecli in the runner
+        uses: updatecli/updatecli-action@4aca518a70708e38063453d8de9c551af7f48ac3 # v0.76.1
+
+      - name: Run Updatecli in Apply mode
+        run: updatecli --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/values.d/scm.yml
         env:
           BRANCH: ${{ matrix.branch }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: ${{ failure()  }}
+        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            {
+              "channel": "#ingest-notifications",
+              "text": "${{ env.SLACK_MESSAGE }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ env.SLACK_MESSAGE }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_MESSAGE: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"

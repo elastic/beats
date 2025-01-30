@@ -7,17 +7,20 @@ package graph
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"path"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator/mock"
@@ -25,6 +28,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var trace = flag.Bool("request_trace", false, "enable request tracing during tests")
 
 var usersResponse1 = apiUserResponse{
 	Users: []userAPI{
@@ -138,11 +143,11 @@ var deviceUserResponses = map[string]apiUserResponse{
 var groupsResponse1 = apiGroupResponse{
 	Groups: []groupAPI{
 		{
-			ID:          uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+			ID:          uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 			DisplayName: "group1",
 			MembersDelta: []memberAPI{
 				{
-					ID:   uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+					ID:   uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 					Type: apiUserType,
 				},
 			},
@@ -153,15 +158,15 @@ var groupsResponse1 = apiGroupResponse{
 var groupsResponse2 = apiGroupResponse{
 	Groups: []groupAPI{
 		{
-			ID:          uuid.MustParse("d140978f-d641-4f01-802f-4ecc1acf8935"),
+			ID:          uuid.Must(uuid.FromString("d140978f-d641-4f01-802f-4ecc1acf8935")),
 			DisplayName: "group2",
 			MembersDelta: []memberAPI{
 				{
-					ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+					ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 					Type: apiGroupType,
 				},
 				{
-					ID:      uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+					ID:      uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 					Type:    apiGroupType,
 					Removed: &removed{Reason: "changed"},
 				},
@@ -283,25 +288,25 @@ func TestGraph_Groups(t *testing.T) {
 	wantDeltaLink := "http://" + testSrv.addr + "/groups/delta?$deltatoken=test"
 	wantGroups := []*fetcher.Group{
 		{
-			ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+			ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 			Name: "group1",
 			Members: []fetcher.Member{
 				{
-					ID:   uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+					ID:   uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 					Type: fetcher.MemberUser,
 				},
 			},
 		},
 		{
-			ID:   uuid.MustParse("d140978f-d641-4f01-802f-4ecc1acf8935"),
+			ID:   uuid.Must(uuid.FromString("d140978f-d641-4f01-802f-4ecc1acf8935")),
 			Name: "group2",
 			Members: []fetcher.Member{
 				{
-					ID:   uuid.MustParse("331676df-b8fd-4492-82ed-02b927f8dd80"),
+					ID:   uuid.Must(uuid.FromString("331676df-b8fd-4492-82ed-02b927f8dd80")),
 					Type: fetcher.MemberGroup,
 				},
 				{
-					ID:      uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+					ID:      uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 					Type:    fetcher.MemberGroup,
 					Deleted: true,
 				},
@@ -312,11 +317,17 @@ func TestGraph_Groups(t *testing.T) {
 	rawConf := graphConf{
 		APIEndpoint: "http://" + testSrv.addr,
 	}
+	if *trace {
+		// Use legacy behaviour; nil enabled setting.
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+			Filename: "test_trace-*.ndjson",
+		}}
+	}
 	c, err := config.NewConfigFrom(&rawConf)
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -336,7 +347,7 @@ func TestGraph_Users(t *testing.T) {
 	wantDeltaLink := "http://" + testSrv.addr + "/users/delta?$deltatoken=test"
 	wantUsers := []*fetcher.User{
 		{
-			ID: uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+			ID: uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			Fields: map[string]interface{}{
 				"userPrincipalName": "user.one@example.com",
 				"mail":              "user.one@example.com",
@@ -351,7 +362,7 @@ func TestGraph_Users(t *testing.T) {
 			},
 		},
 		{
-			ID: uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
+			ID: uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
 			Fields: map[string]interface{}{
 				"userPrincipalName": "user.two@example.com",
 				"mail":              "user.two@example.com",
@@ -371,11 +382,16 @@ func TestGraph_Users(t *testing.T) {
 	rawConf := graphConf{
 		APIEndpoint: "http://" + testSrv.addr,
 	}
+	if *trace {
+		rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+			Filename: "test_trace-*.ndjson",
+		}}
+	}
 	c, err := config.NewConfigFrom(&rawConf)
 	require.NoError(t, err)
 	auth := mock.New(mock.DefaultTokenValue)
 
-	f, err := New(c, logp.L(), auth)
+	f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
 	require.NoError(t, err)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -395,7 +411,7 @@ func TestGraph_Devices(t *testing.T) {
 	wantDeltaLink := "http://" + testSrv.addr + "/devices/delta?$deltatoken=test"
 	wantDevices := []*fetcher.Device{
 		{
-			ID: uuid.MustParse("6a59ea83-02bd-468f-a40b-f2c3d1821983"),
+			ID: uuid.Must(uuid.FromString("6a59ea83-02bd-468f-a40b-f2c3d1821983")),
 			Fields: map[string]interface{}{
 				"accountEnabled":         true,
 				"deviceId":               "eab73519-780d-4d43-be6d-a4a89af2a348",
@@ -418,15 +434,15 @@ func TestGraph_Devices(t *testing.T) {
 				},
 			},
 			RegisteredOwners: collections.NewUUIDSet(
-				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			),
 			RegisteredUsers: collections.NewUUIDSet(
-				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
-				uuid.MustParse("d897d560-3d17-4dae-81b3-c898fe82bf84"),
+				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
+				uuid.Must(uuid.FromString("d897d560-3d17-4dae-81b3-c898fe82bf84")),
 			),
 		},
 		{
-			ID: uuid.MustParse("adbbe40a-0627-4328-89f1-88cac84dbc7f"),
+			ID: uuid.Must(uuid.FromString("adbbe40a-0627-4328-89f1-88cac84dbc7f")),
 			Fields: map[string]interface{}{
 				"accountEnabled":         true,
 				"deviceId":               "2fbbb8f9-ff67-4a21-b867-a344d18a4198",
@@ -449,36 +465,59 @@ func TestGraph_Devices(t *testing.T) {
 				},
 			},
 			RegisteredOwners: collections.NewUUIDSet(
-				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			),
 			RegisteredUsers: collections.NewUUIDSet(
-				uuid.MustParse("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc"),
+				uuid.Must(uuid.FromString("5ebc6a0f-05b7-4f42-9c8a-682bbc75d0fc")),
 			),
 		},
 	}
 
-	rawConf := graphConf{
-		APIEndpoint: "http://" + testSrv.addr,
+	for _, test := range []struct {
+		name      string
+		selection selection
+	}{
+		{name: "default_selection"},
+		{
+			name: "user_selection",
+			selection: selection{
+				UserQuery:   strings.Split(strings.TrimPrefix(defaultUsersQuery, "$select="), ","),
+				GroupQuery:  strings.Split(strings.TrimPrefix(defaultGroupsQuery, "$select="), ","),
+				DeviceQuery: strings.Split(strings.TrimPrefix(defaultDevicesQuery, "$select="), ","),
+			},
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			rawConf := graphConf{
+				APIEndpoint: "http://" + testSrv.addr,
+				Select:      test.selection,
+			}
+			if *trace {
+				rawConf.Tracer = &tracerConfig{Logger: lumberjack.Logger{
+					Filename: "test_trace-*.ndjson",
+				}}
+			}
+			c, err := config.NewConfigFrom(&rawConf)
+			require.NoError(t, err)
+			auth := mock.New(mock.DefaultTokenValue)
+
+			f, err := New(context.Background(), t.Name(), c, logp.L(), auth)
+			require.NoError(t, err)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			gotDevices, gotDeltaLink, gotErr := f.Devices(ctx, "")
+
+			require.NoError(t, gotErr)
+			// Using go-cmp because testify is too weak for this comparison.
+			// reflect.DeepEqual works, but won't show a reasonable diff.
+			exporter := cmp.Exporter(func(t reflect.Type) bool {
+				return t == reflect.TypeOf(collections.UUIDSet{})
+			})
+			if !cmp.Equal(wantDevices, gotDevices, exporter) {
+				t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(wantDevices, gotDevices, exporter))
+			}
+			require.Equal(t, wantDeltaLink, gotDeltaLink)
+		})
 	}
-	c, err := config.NewConfigFrom(&rawConf)
-	require.NoError(t, err)
-	auth := mock.New(mock.DefaultTokenValue)
-
-	f, err := New(c, logp.L(), auth)
-	require.NoError(t, err)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	gotDevices, gotDeltaLink, gotErr := f.Devices(ctx, "")
-
-	require.NoError(t, gotErr)
-	// Using go-cmp because testify is too weak for this comparison.
-	// reflect.DeepEqual works, but won't show a reasonable diff.
-	exporter := cmp.Exporter(func(t reflect.Type) bool {
-		return t == reflect.TypeOf(collections.UUIDSet{})
-	})
-	if !cmp.Equal(wantDevices, gotDevices, exporter) {
-		t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(wantDevices, gotDevices, exporter))
-	}
-	require.Equal(t, wantDeltaLink, gotDeltaLink)
 }

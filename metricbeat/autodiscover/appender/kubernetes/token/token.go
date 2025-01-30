@@ -30,13 +30,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	autodiscover.Registry.AddAppender("kubernetes.token", NewTokenAppender)
-}
-
 type tokenAppender struct {
 	TokenPath string
 	Condition conditions.Condition
+}
+
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddAppender("kubernetes.token", NewTokenAppender)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `kubernetes.token` appender"))
+	}
 }
 
 // NewTokenAppender creates a token appender that can append a bearer token required to authenticate with

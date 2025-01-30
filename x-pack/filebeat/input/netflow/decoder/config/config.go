@@ -6,28 +6,35 @@ package config
 
 import (
 	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
+type ActiveSessionsMetric interface {
+	Inc()
+	Dec()
+}
+
 // Config stores the configuration used by the NetFlow Collector.
 type Config struct {
-	protocols       []string
-	logOutput       io.Writer
-	expiration      time.Duration
-	detectReset     bool
-	fields          fields.FieldDict
-	sharedTemplates bool
+	protocols            []string
+	logOutput            io.Writer
+	expiration           time.Duration
+	detectReset          bool
+	fields               fields.FieldDict
+	sharedTemplates      bool
+	withCache            bool
+	activeSessionsMetric ActiveSessionsMetric
 }
 
 var defaultCfg = Config{
 	protocols:       []string{},
-	logOutput:       ioutil.Discard,
+	logOutput:       io.Discard,
 	expiration:      time.Hour,
 	detectReset:     true,
 	sharedTemplates: false,
+	withCache:       false,
 }
 
 // Defaults returns a configuration object with defaults settings:
@@ -56,6 +63,17 @@ func (c *Config) WithLogOutput(output io.Writer) *Config {
 func (c *Config) WithExpiration(timeout time.Duration) *Config {
 	c.expiration = timeout
 	return c
+}
+
+// WithCache toggles the packet cache.
+func (c *Config) WithCache(enabled bool) *Config {
+	c.withCache = enabled
+	return c
+}
+
+// Cache returns if the packet cache is enabled.
+func (c *Config) Cache() bool {
+	return c.withCache
 }
 
 // WithSequenceResetEnabled allows to toggle the detection of reset sequences,
@@ -91,6 +109,12 @@ func (c *Config) WithSharedTemplates(enabled bool) *Config {
 	return c
 }
 
+// WithActiveSessionsMetric configures the metric used to report active sessions.
+func (c *Config) WithActiveSessionsMetric(metric ActiveSessionsMetric) *Config {
+	c.activeSessionsMetric = metric
+	return c
+}
+
 // Protocols returns a list of the protocols enabled.
 func (c *Config) Protocols() []string {
 	return c.protocols
@@ -112,10 +136,24 @@ func (c *Config) SequenceResetEnabled() bool {
 	return c.detectReset
 }
 
+// ShareTemplatesEnabled returns if template sharing is enabled.
+func (c *Config) ShareTemplatesEnabled() bool {
+	return c.sharedTemplates
+}
+
 // Fields returns the configured fields.
 func (c *Config) Fields() fields.FieldDict {
 	if c.fields == nil {
 		return fields.GlobalFields
 	}
 	return c.fields
+}
+
+// ActiveSessionsMetric returns the configured metric to track active sessions.
+func (c *Config) ActiveSessionsMetric() ActiveSessionsMetric {
+	if c == nil {
+		return nil
+	}
+
+	return c.activeSessionsMetric
 }

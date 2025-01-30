@@ -63,9 +63,9 @@ func NewLoader(log *logp.Logger, plugins []Plugin, typeField, defaultType string
 }
 
 // Init runs Init on all InputManagers for all plugins known to the loader.
-func (l *Loader) Init(group unison.Group, mode Mode) error {
+func (l *Loader) Init(group unison.Group) error {
 	for _, p := range l.registry {
-		if err := p.Manager.Init(group, mode); err != nil {
+		if err := p.Manager.Init(group); err != nil {
 			return err
 		}
 	}

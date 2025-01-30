@@ -6,10 +6,8 @@ package awscloudwatch
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
-	"sync"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -42,7 +40,7 @@ func Plugin() v2.Plugin {
 type cloudwatchInputManager struct {
 }
 
-func (im *cloudwatchInputManager) Init(grp unison.Group, mode v2.Mode) error {
+func (im *cloudwatchInputManager) Init(grp unison.Group) error {
 	return nil
 }
 
@@ -64,23 +62,11 @@ type cloudwatchInput struct {
 
 func newInput(config config) (*cloudwatchInput, error) {
 	cfgwarn.Beta("aws-cloudwatch input type is used")
+
+	// perform AWS configuration validation
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
-	}
-
-	if config.LogGroupARN != "" {
-		logGroupName, regionName, err := parseARN(config.LogGroupARN)
-		if err != nil {
-			return nil, fmt.Errorf("parse log group ARN failed: %w", err)
-		}
-
-		config.LogGroupName = logGroupName
-		config.RegionName = regionName
-	}
-
-	if config.RegionName != "" {
-		awsConfig.Region = config.RegionName
 	}
 
 	return &cloudwatchInput{
@@ -96,39 +82,35 @@ func (in *cloudwatchInput) Test(ctx v2.TestContext) error {
 }
 
 func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
-	var err error
-
-	// Wrap input Context's cancellation Done channel a context.Context. This
-	// goroutine stops with the parent closes the Done channel.
-	ctx, cancelInputCtx := context.WithCancel(context.Background())
-	go func() {
-		defer cancelInputCtx()
-		select {
-		case <-inputContext.Cancelation.Done():
-		case <-ctx.Done():
-		}
-	}()
-	defer cancelInputCtx()
+	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	// Create client for publishing events and receive notification of their ACKs.
-	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:      inputContext.Cancelation,
-		EventListener: awscommon.NewEventACKHandler(),
-	})
+	client, err := pipeline.ConnectWith(beat.ClientConfig{})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
 	}
 	defer client.Close()
 
+	var logGroupIDs []string
+	logGroupIDs, region, err := fromConfig(in.config, in.awsConfig)
+	if err != nil {
+		return fmt.Errorf("error processing configurations: %w", err)
+	}
+
+	in.awsConfig.Region = region
 	svc := cloudwatchlogs.NewFromConfig(in.awsConfig, func(o *cloudwatchlogs.Options) {
 		if in.config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
 
-	logGroupNames, err := getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.LogGroupName)
-	if err != nil {
-		return fmt.Errorf("failed to get log group names: %w", err)
+	if len(logGroupIDs) == 0 {
+		// We haven't extracted group identifiers directly from the input configurations,
+		// now fallback to provided LogGroupNamePrefix and use derived service client to derive logGroupIDs
+		logGroupIDs, err = getLogGroupNames(svc, in.config.LogGroupNamePrefix, in.config.IncludeLinkedAccountsForPrefixMode)
+		if err != nil {
+			return fmt.Errorf("failed to get log group names from LogGroupNamePrefix: %w", err)
+		}
 	}
 
 	log := inputContext.Logger
@@ -137,113 +119,62 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	cwPoller := newCloudwatchPoller(
 		log.Named("cloudwatch_poller"),
 		in.metrics,
-		in.awsConfig.Region,
-		in.config.APISleep,
-		in.config.NumberOfWorkers,
-		in.config.LogStreams,
-		in.config.LogStreamPrefix)
+		region,
+		in.config)
 	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
-	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
-	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
+	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupIDs)))
+	cwPoller.startWorkers(ctx, svc, logProcessor)
+	cwPoller.receive(ctx, logGroupIDs, time.Now)
+	return nil
 }
 
-func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupNames []string) error {
-	// This loop tries to keep the workers busy as much as possible while
-	// honoring the number in config opposed to a simpler loop that does one
-	// listing, sequentially processes every object and then does another listing
-	start := true
-	workerWg := new(sync.WaitGroup)
-	lastLogGroupOffset := 0
-	for ctx.Err() == nil {
-		if !start {
-			cwPoller.log.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
-			time.Sleep(in.config.ScanFrequency)
-			cwPoller.log.Debug("done sleeping")
-		}
-		start = false
-
-		currentTime := time.Now()
-		cwPoller.startTime, cwPoller.endTime = getStartPosition(in.config.StartPosition, currentTime, cwPoller.endTime, in.config.ScanFrequency, in.config.Latency)
-		cwPoller.log.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(cwPoller.startTime/1000, 0), time.Unix(cwPoller.endTime/1000, 0))
-		availableWorkers, err := cwPoller.workerSem.AcquireContext(in.config.NumberOfWorkers, ctx)
+// fromConfig is a helper to parse input configurations and derive logGroupIDs & aws region
+// Returned logGroupIDs could be empty, which require other fallback mechanisms to derive them.
+// See getLogGroupNames for example.
+func fromConfig(cfg config, awsCfg awssdk.Config) (logGroupIDs []string, region string, err error) {
+	// LogGroupARN has precedence over LogGroupName & RegionName
+	if cfg.LogGroupARN != "" {
+		parsedArn, err := arn.Parse(cfg.LogGroupARN)
 		if err != nil {
-			break
+			return nil, "", fmt.Errorf("failed to parse log group ARN: %w", err)
 		}
 
-		if availableWorkers == 0 {
-			continue
+		if parsedArn.Region == "" {
+			return nil, "", fmt.Errorf("failed to parse log group ARN: missing region")
 		}
 
-		workerWg.Add(availableWorkers)
-		logGroupNamesLength := len(logGroupNames)
-		runningGoroutines := 0
+		// refine to match AWS API parameter regex of logGroupIdentifier
+		groupId := strings.TrimSuffix(cfg.LogGroupARN, ":*")
+		logGroupIDs = append(logGroupIDs, groupId)
 
-		for i := lastLogGroupOffset; i < logGroupNamesLength; i++ {
-			if runningGoroutines >= availableWorkers {
-				break
-			}
-
-			runningGoroutines++
-			lastLogGroupOffset = i + 1
-			if lastLogGroupOffset >= logGroupNamesLength {
-				// release unused workers
-				cwPoller.workerSem.Release(availableWorkers - runningGoroutines)
-				for j := 0; j < availableWorkers-runningGoroutines; j++ {
-					workerWg.Done()
-				}
-				lastLogGroupOffset = 0
-			}
-
-			lg := logGroupNames[i]
-			go func(logGroup string, startTime int64, endTime int64) {
-				defer func() {
-					cwPoller.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroup)
-					workerWg.Done()
-					cwPoller.workerSem.Release(1)
-				}()
-				cwPoller.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", logGroup)
-				cwPoller.run(svc, logGroup, startTime, endTime, logProcessor)
-			}(lg, cwPoller.startTime, cwPoller.endTime)
-		}
+		return logGroupIDs, parsedArn.Region, nil
 	}
 
-	// Wait for all workers to finish.
-	workerWg.Wait()
-	if errors.Is(ctx.Err(), context.Canceled) {
-		// A canceled context is a normal shutdown.
-		return nil
+	// then fallback to LogrGroupName
+	if cfg.LogGroupName != "" {
+		logGroupIDs = append(logGroupIDs, cfg.LogGroupName)
 	}
-	return ctx.Err()
+
+	// finally derive region
+	if cfg.RegionName != "" {
+		region = cfg.RegionName
+	} else {
+		region = awsCfg.Region
+	}
+
+	return logGroupIDs, region, nil
 }
 
-func parseARN(logGroupARN string) (string, string, error) {
-	arnParsed, err := arn.Parse(logGroupARN)
-	if err != nil {
-		return "", "", fmt.Errorf("error Parse arn %s: %w", logGroupARN, err)
-	}
-
-	if strings.Contains(arnParsed.Resource, ":") {
-		resourceARNSplit := strings.Split(arnParsed.Resource, ":")
-		if len(resourceARNSplit) >= 2 && resourceARNSplit[0] == "log-group" {
-			return resourceARNSplit[1], arnParsed.Region, nil
-		}
-	}
-	return "", "", fmt.Errorf("cannot get log group name from log group ARN: %s", logGroupARN)
-}
-
-// getLogGroupNames uses DescribeLogGroups API to retrieve all log group names
-func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, logGroupName string) ([]string, error) {
-	if logGroupNamePrefix == "" {
-		return []string{logGroupName}, nil
-	}
-
+// getLogGroupNames uses DescribeLogGroups API to retrieve LogGroupArn entries that matches the provided logGroupNamePrefix
+func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, withLinkedAccount bool) ([]string, error) {
 	// construct DescribeLogGroupsInput
 	describeLogGroupsInput := &cloudwatchlogs.DescribeLogGroupsInput{
-		LogGroupNamePrefix: awssdk.String(logGroupNamePrefix),
+		LogGroupNamePrefix:    awssdk.String(logGroupNamePrefix),
+		IncludeLinkedAccounts: awssdk.Bool(withLinkedAccount),
 	}
 
 	// make API request
-	var logGroupNames []string
+	var logGroupIDs []string
 	paginator := cloudwatchlogs.NewDescribeLogGroupsPaginator(svc, describeLogGroupsInput)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(context.TODO())
@@ -252,29 +183,8 @@ func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, log
 		}
 
 		for _, lg := range page.LogGroups {
-			logGroupNames = append(logGroupNames, *lg.LogGroupName)
+			logGroupIDs = append(logGroupIDs, *lg.LogGroupArn)
 		}
 	}
-	return logGroupNames, nil
-}
-
-func getStartPosition(startPosition string, currentTime time.Time, endTime int64, scanFrequency time.Duration, latency time.Duration) (int64, int64) {
-	if latency != 0 {
-		// add latency if config is not 0
-		currentTime = currentTime.Add(latency * -1)
-	}
-
-	switch startPosition {
-	case "beginning":
-		if endTime != int64(0) {
-			return endTime, currentTime.UnixNano() / int64(time.Millisecond)
-		}
-		return 0, currentTime.UnixNano() / int64(time.Millisecond)
-	case "end":
-		if endTime != int64(0) {
-			return endTime, currentTime.UnixNano() / int64(time.Millisecond)
-		}
-		return currentTime.Add(-scanFrequency).UnixNano() / int64(time.Millisecond), currentTime.UnixNano() / int64(time.Millisecond)
-	}
-	return 0, 0
+	return logGroupIDs, nil
 }

@@ -1,6 +1,8 @@
 filebeat.inputs:
   - type: filestream
     id: test-fix-global-id
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     enabled: true
     paths:
       - {{path}}

@@ -25,12 +25,10 @@ import (
 	"io"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/Shopify/sarama"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/sarama"
 )
 
 const pluginName = "kafka"
@@ -120,12 +119,12 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 				}
 			}),
 		),
-		CloseRef:  ctx.Cancelation,
 		WaitClose: input.config.WaitClose,
 	})
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	log.Info("Starting Kafka input")
 	defer log.Info("Kafka input stopped")
@@ -392,9 +391,10 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 	timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
 	messages := l.parseMultipleMessages(msg.Value)
 
-	neededAcks := atomic.MakeInt(len(messages))
+	neededAcks := atomic.Int64{}
+	neededAcks.Add(int64(len(messages)))
 	ackHandler := func() {
-		if neededAcks.Dec() == 0 {
+		if neededAcks.Add(-1) == 0 {
 			l.groupHandler.ack(msg)
 		}
 	}

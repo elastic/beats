@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	compute "cloud.google.com/go/compute/apiv1"
 	"cloud.google.com/go/compute/apiv1/computepb"
@@ -22,9 +23,12 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:        projectID,
+		projectName:      projectName,
+		organizationID:   organizationID,
+		organizationName: organizationName,
 		zone:             zone,
 		region:           region,
 		regions:          regions,
@@ -49,6 +53,9 @@ type computeMetadata struct {
 
 type metadataCollector struct {
 	projectID        string
+	projectName      string
+	organizationID   string
+	organizationName string
 	zone             string
 	region           string
 	regions          []string
@@ -63,7 +70,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	if err != nil {
 		return gcp.MetadataCollectorData{}, err
 	}
-	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp)
+	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName, s.projectName)
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
 		return gcp.MetadataCollectorData{}, err
@@ -154,9 +161,6 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*c
 		return computeInstance, nil
 	}
 
-	// Remake the compute instances map to avoid having stale data.
-	s.computeInstances = make(map[uint64]*computepb.Instance)
-
 	return nil, nil
 }
 
@@ -190,6 +194,11 @@ func (s *metadataCollector) getComputeInstances(ctx context.Context) {
 	}
 
 	defer instancesClient.Close()
+
+	start := time.Now()
+	defer func() {
+		s.logger.Debugf("Total time taken for compute AggregatedList request: %s", time.Since(start))
+	}()
 
 	it := instancesClient.AggregatedList(ctx, &computepb.AggregatedListInstancesRequest{
 		Project: s.projectID,

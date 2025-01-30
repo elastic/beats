@@ -9,21 +9,22 @@ package login
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 )
 
 const (
-	moduleName    = "system"
 	metricsetName = "login"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 	)
 }
 
 // New returns an error.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", moduleName, metricsetName)
+	return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", system.ModuleName, metricsetName)
 }

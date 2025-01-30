@@ -46,6 +46,14 @@ var (
 			"distroRelease":   c.Str("distro_release", s.Optional),
 			"platform":        c.Str("platform", s.Optional),
 			"platformRelease": c.Str("platform_release", s.Optional),
+			"cpuacct": c.Dict("cpuacct", s.Schema{
+				"control_group": c.Str("control_group"),
+				"usage_nanos":   c.Int("usage_nanos"),
+			}, c.DictOptional),
+			"cgroup_memory": c.Dict("cgroup_memory", s.Schema{
+				"current_in_bytes":      c.Int("current_bytes"),
+				"swap_current_in_bytes": c.Int("swap_current_bytes"),
+			}, c.DictOptional),
 		}),
 		"kibana": c.Ifc("kibana"),
 		"elasticsearch_client": c.Dict("elasticsearch_client", s.Schema{
@@ -76,6 +84,12 @@ var (
 			"memory": c.Dict("memory", s.Schema{
 				"resident_set_size": s.Object{
 					"bytes": c.Int("resident_set_size_bytes"),
+				},
+				"array_buffers": s.Object{
+					"bytes": c.Int("array_buffers_bytes", s.Optional),
+				},
+				"external": s.Object{
+					"bytes": c.Int("external_bytes", s.Optional),
 				},
 				"heap": c.Dict("heap", s.Schema{
 					"total": s.Object{
@@ -158,6 +172,7 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		return event.Error
 	}
 	_, _ = event.RootFields.Put("service.address", serviceAddress)
+	event.Host = fmt.Sprintf("%v", serviceAddress)
 
 	// Set process PID
 	process, ok := data["process"].(map[string]interface{})

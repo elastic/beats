@@ -91,6 +91,7 @@ type Driver interface {
 	Kill(ctx context.Context, signal string, service string) error
 	KillOld(ctx context.Context, except []string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
+	Remove(ctx context.Context, service string, force bool) error
 	Inspect(ctx context.Context, serviceName string) (string, error)
 
 	LockFile() string
@@ -213,15 +214,24 @@ func (c *Project) Kill(service string) error {
 	return c.Driver.Kill(context.Background(), "KILL", service)
 }
 
-// KillOld kills old containers
+// Remove a container
+func (c *Project) Remove(service string, force bool) error {
+	c.Lock()
+	defer c.Unlock()
+
+	return c.Driver.Remove(context.Background(), service, force)
+}
+
+// KillOld kills and removes old containers.
 func (c *Project) KillOld(except []string) error {
 	// Do not kill ourselves ;)
 	except = append(except, "beat")
 
-	// These services take very long to start up and stop. If they are stopped
-	// it can happen that an other package tries to start them at the same time
-	// which leads to a conflict. We need a better solution long term but that should
-	// solve the problem for now.
+	// These services take very long to start up and stop. If they are stopped, one or more
+	// packages may try to start them at the same time which would lead to a conflict.
+	//
+	// NOTE: We need a better solution long term but the current implementation should solve
+	// the problem for now.
 	except = append(except, "elasticsearch", "kibana", "logstash", "kubernetes", "kafka")
 
 	return c.Driver.KillOld(context.TODO(), except)
@@ -265,7 +275,7 @@ func (c *Project) Lock() {
 	}
 
 	// This should rarely happen as we lock for start only, less than a second
-	panic(errors.New("Timeout waiting for lock"))
+	panic("timeout waiting for lock")
 }
 
 func acquireLock(path string) bool {
@@ -277,7 +287,7 @@ func acquireLock(path string) bool {
 
 	_, err = fmt.Fprintf(file, "%d", os.Getpid())
 	if err != nil {
-		panic(fmt.Errorf("Failed to write pid to lock file: %w", err))
+		panic(fmt.Errorf("failed to write pid to lock file: %w", err))
 	}
 	return true
 }

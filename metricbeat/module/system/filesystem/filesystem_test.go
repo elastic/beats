@@ -32,10 +32,10 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	logp.DevelopmentSetup()
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
-	err := logp.DevelopmentSetup()
-	assert.NoError(t, err)
+
 	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()

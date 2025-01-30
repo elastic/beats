@@ -28,6 +28,67 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func TestGroupErrors(t *testing.T) {
+	reader := Reader{
+		config: Config{
+			GroupMeasurements: true,
+		},
+		query: pdh.Query{},
+		log:   nil,
+		counters: []PerfCounter{
+			{
+				QueryField:   "datagrams_sent_per_sec",
+				QueryName:    `\UDPv4\Datagrams Sent/sec`,
+				Format:       "float",
+				ObjectName:   "UDPv4",
+				ObjectField:  "object",
+				ChildQueries: []string{`\UDPv4\Datagrams Sent/sec`},
+			},
+			{
+				QueryField:    "%_processor_time",
+				QueryName:     `\Processor Information(_Total)\% Processor Time`,
+				Format:        "float",
+				ObjectName:    "Processor Information",
+				ObjectField:   "object",
+				InstanceName:  "_Total",
+				InstanceField: "instance",
+				ChildQueries:  []string{`\Processor Information(_Total)\% Processor Time`},
+			},
+			{
+				QueryField:    "current_disk_queue_length",
+				QueryName:     `\PhysicalDisk(_Total)\Current Disk Queue Length`,
+				Format:        "float",
+				ObjectName:    "PhysicalDisk",
+				ObjectField:   "object",
+				InstanceName:  "_Total",
+				InstanceField: "instance",
+				ChildQueries:  []string{`\PhysicalDisk(_Total)\Current Disk Queue Length`},
+			},
+		},
+	}
+
+	counters := map[string][]pdh.CounterValue{
+		`\UDPv4\Datagrams Sent/sec`: {
+			{Instance: "", Measurement: 23},
+		},
+		`\Processor Information(_Total)\% Processor Time`: {
+			{Instance: "_Total", Measurement: 11},
+		},
+		`\PhysicalDisk(_Total)\Current Disk Queue Length`: {
+			{Instance: "_Total", Measurement: 20},
+		},
+	}
+
+	events := reader.groupToEvents(counters)
+	assert.NotNil(t, events)
+	assert.Equal(t, 3, len(events))
+
+	for _, event := range events {
+		assert.NoError(t, event.Error)
+	}
+
+}
+
 func TestGroupToEvents(t *testing.T) {
 	reader := Reader{
 		config: Config{

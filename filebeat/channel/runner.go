@@ -155,7 +155,9 @@ func newCommonConfigEditor(
 		setOptional(meta, "pipeline", config.Pipeline)
 		setOptional(fields, "fileset.name", config.Fileset)
 		setOptional(fields, "service.type", serviceType)
-		setOptional(fields, "input.type", config.Type)
+		if !clientCfg.Processing.DisableType {
+			setOptional(fields, "input.type", config.Type)
+		}
 		if config.Module != "" {
 			event := mapstr.M{"module": config.Module}
 			if config.Fileset != "" {

@@ -1,4 +1,5 @@
-FROM golang:1.19.10
+FROM golang:1.22.10
+COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
 
 RUN \
     apt update \
@@ -10,18 +11,23 @@ RUN \
          python3-venv \
          libaio-dev \
          unzip \
+         libssl-dev \
+         libffi-dev \
       && rm -rf /var/lib/apt/lists/*
 
 # Use a virtualenv to avoid the PEP668 "externally managed environment" error caused by conflicts
-# with the system Python installation. golang:1.19.10 uses Debian 12 which now enforces PEP668.
+# with the system Python installation. golang:1.20.6 uses Debian 12 which now enforces PEP668.
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN pip3 install --upgrade pip==20.1.1
-RUN pip3 install --upgrade docker-compose==1.23.2
 RUN pip3 install --upgrade setuptools==47.3.2
-RUN pip3 install --upgrade PyYAML==5.3.1
+RUN pip3 install --upgrade PyYAML==6.0.1
+RUN pip3 install requests==2.32.3
+RUN pip3 install urllib3==1.26.19
+RUN pip3 install docker==7.1.0
+RUN pip3 install git+https://github.com/pkoutsovasilis/compose@2c4d825881a624bd87c390a13f362ae76dcd6180
 
 # Oracle instant client
 RUN cd /usr/lib \

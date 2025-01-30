@@ -6,13 +6,10 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "labels": {
-            "uid": "e9b08fcb-fb13-463f-8a59-6a1236a666a8"
-        },
         "namespace": "kube-system",
         "service": {
             "cluster_ip": "10.96.0.10",
-            "created": "2023-01-16T14:32:42.000Z",
+            "created": "2024-04-23T08:49:44.000Z",
             "name": "kube-dns",
             "type": "ClusterIP"
         }

@@ -19,11 +19,15 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+// defaultCgroupRegex captures 64-character lowercase hexadecimal container IDs found in cgroup paths.
+var defaultCgroupRegex = regexp.MustCompile(`[-/]([0-9a-f]{64})(\.scope)?$`)
 
 type config struct {
 	// IgnoreMissing: Ignore errors if event has no PID field.
@@ -50,12 +54,19 @@ type config struct {
 	// CgroupPrefix is the prefix where the container id is inside cgroup
 	CgroupPrefixes []string `config:"cgroup_prefixes"`
 
-	// CgroupRegex is the regular expression that captures the container id from cgroup path
-	CgroupRegex string `config:"cgroup_regex"`
+	// CgroupRegex is the regular expression that captures the container ID from a cgroup path.
+	CgroupRegex *regexp.Regexp `config:"cgroup_regex"`
 
 	// CgroupCacheExpireTime is the length of time before cgroup cache elements expire in seconds,
 	// set to 0 to disable the cgroup cache
 	CgroupCacheExpireTime time.Duration `config:"cgroup_cache_expire_time"`
+}
+
+func (c *config) Validate() error {
+	if c.CgroupRegex != nil && c.CgroupRegex.NumSubexp() != 1 {
+		return fmt.Errorf("cgroup_regexp must contain exactly one capturing group for the container ID")
+	}
+	return nil
 }
 
 // available fields by default
@@ -69,10 +80,21 @@ var defaultFields = mapstr.M{
 		"parent": mapstr.M{
 			"pid": nil,
 		},
+		"entity_id":  nil,
 		"start_time": nil,
 		"owner": mapstr.M{
 			"name": nil,
 			"id":   nil,
+		},
+		"group": mapstr.M{
+			"name": nil,
+			"id":   nil,
+		},
+		"thread": mapstr.M{
+			"capabilities": mapstr.M{
+				"effective": nil,
+				"permitted": nil,
+			},
 		},
 	},
 	"container": mapstr.M{
@@ -99,22 +121,35 @@ func defaultConfig() config {
 		RestrictedFields:      false,
 		MatchPIDs:             []string{"process.pid", "process.parent.pid"},
 		HostPath:              "/",
-		CgroupPrefixes:        []string{"/kubepods", "/docker"},
 		CgroupCacheExpireTime: cacheExpiration,
 	}
 }
 
-func (pf *config) getMappings() (mappings mapstr.M, err error) {
+type ConfigOption func(c *config)
+
+func ConfigOverwriteKeys(overwriteKeys bool) ConfigOption {
+	return func(c *config) {
+		c.OverwriteKeys = overwriteKeys
+	}
+}
+
+func ConfigMatchPIDs(matchPIDs []string) ConfigOption {
+	return func(c *config) {
+		c.MatchPIDs = matchPIDs
+	}
+}
+
+func (c *config) getMappings() (mappings mapstr.M, err error) {
 	mappings = mapstr.M{}
 	validFields := defaultFields
-	if pf.RestrictedFields {
+	if c.RestrictedFields {
 		validFields = restrictedFields
 	}
-	fieldPrefix := pf.Target
+	fieldPrefix := c.Target
 	if len(fieldPrefix) > 0 {
 		fieldPrefix += "."
 	}
-	wantedFields := pf.Fields
+	wantedFields := c.Fields
 	if len(wantedFields) == 0 {
 		wantedFields = []string{"process", "container"}
 	}

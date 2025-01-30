@@ -136,15 +136,15 @@ runLoop:
 			records, err := api.Read()
 			if eventlog.IsRecoverable(err) {
 				log.Errorw("Encountered recoverable error when reading from Windows Event Log", "error", err)
-				if closeErr := api.Close(); closeErr != nil {
-					log.Errorw("Error closing Windows Event Log handle", "error", closeErr)
+				if resetErr := api.Reset(); resetErr != nil {
+					log.Errorw("Error resetting Windows Event Log handle", "error", resetErr)
 				}
 				continue runLoop
 			}
 			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
 				log.Errorw("Encountered channel not found error when reading from Windows Event Log", "error", err)
-				if closeErr := api.Close(); closeErr != nil {
-					log.Errorw("Error closing Windows Event Log handle", "error", closeErr)
+				if resetErr := api.Reset(); resetErr != nil {
+					log.Errorw("Error resetting Windows Event Log handle", "error", resetErr)
 				}
 				continue runLoop
 			}

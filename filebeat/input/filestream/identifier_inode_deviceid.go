@@ -27,7 +27,6 @@ import (
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -93,7 +92,7 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 }
 
 func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
-	osstate := file.GetOSState(e.Descriptor.Info)
+	osstate := e.Descriptor.Info.GetOSState()
 	return fileSource{
 		desc:                e.Descriptor,
 		newPath:             e.NewPath,

@@ -20,11 +20,13 @@
 package wineventlog
 
 import (
+	"encoding/xml"
 	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 	"text/template"
+	"text/template/parse"
 
 	"go.uber.org/multierr"
 
@@ -50,23 +52,32 @@ type PublisherMetadataStore struct {
 	winevent.WinMeta
 
 	// Event ID to event metadata (message and event data param names).
-	Events map[uint16]*EventMetadata
+	// Keeps track of the latest metadata available for each event.
+	EventsNewest map[uint16]*EventMetadata
+	// Event ID to event metadata (message and event data param names).
+	// Keeps track of all available versions for each event.
+	EventsByVersion map[uint32]*EventMetadata
 	// Event ID to map of fingerprints to event metadata. The fingerprint value
 	// is hash of the event data parameters count and types.
-	EventFingerprints map[uint16]map[uint64]*EventMetadata
+	EventFingerprints map[uint32]map[uint64]*EventMetadata
+	// Stores used messages by their ID. Message can be found in events as references
+	// such as %%1111. This need to be formatted the first time, and they are stored
+	// from that point after.
+	MessagesByID map[uint32]string
 
 	mutex sync.RWMutex
 	log   *logp.Logger
 }
 
-func NewPublisherMetadataStore(session EvtHandle, provider string, log *logp.Logger) (*PublisherMetadataStore, error) {
-	md, err := NewPublisherMetadata(session, provider)
+func NewPublisherMetadataStore(session EvtHandle, provider string, locale uint32, log *logp.Logger) (*PublisherMetadataStore, error) {
+	md, err := NewPublisherMetadata(session, provider, locale)
 	if err != nil {
 		return nil, err
 	}
 	store := &PublisherMetadataStore{
 		Metadata:          md,
-		EventFingerprints: map[uint16]map[uint64]*EventMetadata{},
+		EventFingerprints: map[uint32]map[uint64]*EventMetadata{},
+		MessagesByID:      map[uint32]string{},
 		log:               log.With("publisher", provider),
 	}
 
@@ -96,8 +107,10 @@ func NewEmptyPublisherMetadataStore(provider string, log *logp.Logger) *Publishe
 			Levels:   map[uint8]string{},
 			Tasks:    map[uint16]string{},
 		},
-		Events:            map[uint16]*EventMetadata{},
-		EventFingerprints: map[uint16]map[uint64]*EventMetadata{},
+		EventsNewest:      map[uint16]*EventMetadata{},
+		EventsByVersion:   map[uint32]*EventMetadata{},
+		EventFingerprints: map[uint32]map[uint64]*EventMetadata{},
+		MessagesByID:      map[uint32]string{},
 		log:               log.With("publisher", provider, "empty", true),
 	}
 }
@@ -130,7 +143,7 @@ func (s *PublisherMetadataStore) initOpcodes() error {
 		if val == "" {
 			val = opcodeMeta.Name
 		}
-		s.Opcodes[uint8(opcodeMeta.Mask)] = val
+		s.Opcodes[uint8(opcodeMeta.Opcode)] = val
 	}
 	return nil
 }
@@ -175,7 +188,8 @@ func (s *PublisherMetadataStore) initEvents() error {
 	}
 	defer itr.Close()
 
-	s.Events = map[uint16]*EventMetadata{}
+	s.EventsNewest = map[uint16]*EventMetadata{}
+	s.EventsByVersion = map[uint32]*EventMetadata{}
 	for itr.Next() {
 		evt, err := newEventMetadataFromPublisherMetadata(itr, s.Metadata)
 		if err != nil {
@@ -183,15 +197,17 @@ func (s *PublisherMetadataStore) initEvents() error {
 				"error", err)
 			continue
 		}
-		s.Events[evt.EventID] = evt
+		s.EventsNewest[evt.EventID] = evt
+		s.EventsByVersion[getEventCombinedID(evt.EventID, evt.Version)] = evt
 	}
 	return itr.Err()
 }
 
-func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFingerprint uint64, eventHandle EvtHandle) *EventMetadata {
+func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, version uint8, eventDataFingerprint uint64, eventHandle EvtHandle) *EventMetadata {
 	// Use a read lock to get a cached value.
 	s.mutex.RLock()
-	fingerprints, found := s.EventFingerprints[eventID]
+	combinedID := getEventCombinedID(eventID, version)
+	fingerprints, found := s.EventFingerprints[combinedID]
 	if found {
 		em, found := fingerprints[eventDataFingerprint]
 		if found {
@@ -205,10 +221,10 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 
-	fingerprints, found = s.EventFingerprints[eventID]
+	fingerprints, found = s.EventFingerprints[combinedID]
 	if !found {
 		fingerprints = map[uint64]*EventMetadata{}
-		s.EventFingerprints[eventID] = fingerprints
+		s.EventFingerprints[combinedID] = fingerprints
 	}
 
 	em, found := fingerprints[eventDataFingerprint]
@@ -226,8 +242,12 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 	// metadata then we just associate the fingerprint with a pointer to the
 	// providers metadata for the event ID.
 
-	defaultEM := s.Events[eventID]
-
+	defaultEM, found := s.EventsByVersion[combinedID]
+	if !found {
+		// if we do not have a specific metadata for this event version
+		// we fallback to get the newest available one
+		defaultEM = s.EventsNewest[eventID]
+	}
 	// Use XML to get the parameters names.
 	em, err := newEventMetadataFromEventHandle(s.Metadata, eventHandle)
 	if err != nil {
@@ -241,6 +261,15 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 			fingerprints[eventDataFingerprint] = defaultEM
 		}
 		return defaultEM
+	}
+
+	// The first time we need to identify if the event has event data or
+	// user data from a handle, since this information is not available
+	// from the metadata or anywhere else. It is not ideal to update the defaultEM
+	// here but there is no way around it at the moment.
+	if em.EventData.IsUserData {
+		defaultEM.EventData.IsUserData = true
+		defaultEM.EventData.Name = em.EventData.Name
 	}
 
 	// Are the parameters the same as what the provider metadata listed?
@@ -268,6 +297,45 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 	return em
 }
 
+// getMessageByID returns the rendered message from its ID. If it is not cached it will format it.
+// In case of any error this never fails, and will return the original reference instead.
+func (s *PublisherMetadataStore) getMessageByID(messageID uint32) string {
+	// Use a read lock to get a cached value.
+	s.mutex.RLock()
+	message, found := s.MessagesByID[messageID]
+	if found {
+		s.mutex.RUnlock()
+		return message
+	}
+
+	// Elevate to write lock.
+	s.mutex.RUnlock()
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	message, found = s.MessagesByID[messageID]
+	if found {
+		return message
+	}
+
+	handle := NilHandle
+	if s.Metadata != nil {
+		handle = s.Metadata.Handle
+	}
+
+	message, err := evtFormatMessage(handle, NilHandle, messageID, nil, EvtFormatMessageId)
+	if err != nil {
+		s.log.Debugw("Failed to format message. "+
+			"Will not try to format it anymore",
+			"message_id", messageID,
+			"error", err)
+		message = fmt.Sprintf("%%%%%d", messageID)
+	}
+
+	s.MessagesByID[messageID] = message
+	return message
+}
+
 func (s *PublisherMetadataStore) Close() error {
 	if s.Metadata != nil {
 		s.mutex.Lock()
@@ -278,12 +346,18 @@ func (s *PublisherMetadataStore) Close() error {
 	return nil
 }
 
+type EventDataParams struct {
+	IsUserData bool
+	Name       xml.Name
+	Params     []EventData
+}
+
 type EventMetadata struct {
 	EventID     uint16             // Event ID.
 	Version     uint8              // Event format version.
 	MsgStatic   string             // Used when the message has no parameters.
 	MsgTemplate *template.Template `json:"-"` // Template that expects an array of values as its data.
-	EventData   []EventData        // Names of parameters from XML template.
+	EventData   EventDataParams    // Names of parameters from XML template.
 }
 
 // newEventMetadataFromEventHandle collects metadata about an event type using
@@ -307,11 +381,13 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 	}
 	if len(event.EventData.Pairs) > 0 {
 		for _, pair := range event.EventData.Pairs {
-			em.EventData = append(em.EventData, EventData{Name: pair.Key})
+			em.EventData.Params = append(em.EventData.Params, EventData{Name: pair.Key})
 		}
 	} else {
+		em.EventData.IsUserData = true
+		em.EventData.Name = event.UserData.Name
 		for _, pair := range event.UserData.Pairs {
-			em.EventData = append(em.EventData, EventData{Name: pair.Key})
+			em.EventData.Params = append(em.EventData.Params, EventData{Name: pair.Key})
 		}
 	}
 
@@ -387,7 +463,7 @@ func (em *EventMetadata) initEventDataTemplate(itr *EventMetadataIterator) error
 		kv.Name = eventDataNameTransform.Replace(kv.Name)
 	}
 
-	em.EventData = tmpl.Data
+	em.EventData.Params = tmpl.Data
 	return nil
 }
 
@@ -420,14 +496,31 @@ func (em *EventMetadata) setMessage(msg string) error {
 		return fmt.Errorf("failed to parse message template for event ID %v (template='%v'): %w", em.EventID, msg, err)
 	}
 
-	// One node means there were no parameters so this will optimize that case
-	// by using a static string rather than a text/template.
-	if len(tmpl.Root.Nodes) == 1 {
-		em.MsgStatic = msg
-	} else {
+	// If there is no dynamic content in the template then we can use a static message.
+	if containsTemplatedValues(tmpl) {
 		em.MsgTemplate = tmpl
+	} else {
+		em.MsgStatic = msg
 	}
 	return nil
+}
+
+func getEventCombinedID(eventID uint16, version uint8) uint32 {
+	return (uint32(eventID) << 16) | uint32(version)
+}
+
+// containsTemplatedValues traverses the template nodes to check if there are
+// any dynamic values.
+func containsTemplatedValues(tmpl *template.Template) bool {
+	// Walk through the parsed nodes and look for actionable template nodes
+	for _, node := range tmpl.Tree.Root.Nodes {
+		switch node.(type) {
+		case *parse.ActionNode, *parse.CommandNode,
+			*parse.IfNode, *parse.RangeNode, *parse.WithNode:
+			return true
+		}
+	}
+	return false
 }
 
 func (em *EventMetadata) equal(other *EventMetadata) bool {
@@ -452,7 +545,85 @@ func (em *EventMetadata) equal(other *EventMetadata) bool {
 
 	return em.EventID == other.EventID &&
 		em.Version == other.Version &&
-		eventDataNamesEqual(em.EventData, other.EventData)
+		em.EventData.IsUserData == other.EventData.IsUserData &&
+		em.EventData.Name == other.EventData.Name &&
+		eventDataNamesEqual(em.EventData.Params, other.EventData.Params)
+}
+
+type publisherMetadataCache struct {
+	// Mutex to guard the metadataCache. The other members are immutable.
+	mutex sync.RWMutex
+	// Cache of publisher metadata. Maps publisher names to stored metadata.
+	metadataCache map[string]*PublisherMetadataStore
+	locale        uint32
+	session       EvtHandle
+	log           *logp.Logger
+}
+
+func newPublisherMetadataCache(session EvtHandle, locale uint32, log *logp.Logger) *publisherMetadataCache {
+	return &publisherMetadataCache{
+		metadataCache: map[string]*PublisherMetadataStore{},
+		locale:        locale,
+		session:       session,
+		log:           log.Named("publisher_metadata_cache"),
+	}
+}
+
+// getPublisherStore returns a PublisherMetadataStore for the provider. It
+// never returns nil, as if it does not exists it tries to initialise it,
+// but may return an error if it couldn't open a publisher.
+func (c *publisherMetadataCache) getPublisherStore(publisher string) (*PublisherMetadataStore, error) {
+	var err error
+
+	// NOTE: This code uses double-check locking to elevate to a write-lock
+	// when a cache value needs initialized.
+	c.mutex.RLock()
+
+	// Lookup cached value.
+	md, found := c.metadataCache[publisher]
+	if !found {
+		// Elevate to write lock.
+		c.mutex.RUnlock()
+		c.mutex.Lock()
+		defer c.mutex.Unlock()
+
+		// Double-check if the condition changed while upgrading the lock.
+		md, found = c.metadataCache[publisher]
+		if found {
+			return md, nil
+		}
+
+		// Load metadata from the publisher.
+		md, err = NewPublisherMetadataStore(c.session, publisher, c.locale, c.log)
+		if err != nil {
+			// Return an empty store on error (can happen in cases where the
+			// log was forwarded and the provider doesn't exist on collector).
+			md = NewEmptyPublisherMetadataStore(publisher, c.log)
+			err = fmt.Errorf("failed to load publisher metadata for %v "+
+				"(returning an empty metadata store): %w", publisher, err)
+		}
+		c.metadataCache[publisher] = md
+	} else {
+		c.mutex.RUnlock()
+	}
+
+	return md, err
+}
+
+func (c *publisherMetadataCache) close() error {
+	if c == nil {
+		return nil
+	}
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	errs := []error{}
+	for _, md := range c.metadataCache {
+		if err := md.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return multierr.Combine(errs...)
 }
 
 // --- Template Funcs

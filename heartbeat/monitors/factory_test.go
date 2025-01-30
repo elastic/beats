@@ -236,8 +236,8 @@ func TestDisabledMonitor(t *testing.T) {
 		require.NoError(t, err)
 		require.IsType(t, NoopRunner{}, runner)
 
-		require.Equal(t, 0, built.Load())
-		require.Equal(t, 0, closed.Load())
+		require.Equal(t, int64(0), built.Load())
+		require.Equal(t, int64(0), closed.Load())
 	}
 }
 
@@ -325,8 +325,11 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 		}
 	}
 
+	c, err := mockPipeline.Connect()
+	require.NoError(t, err)
+
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, mockPipeline.ConnectSync(), sched.Add, nil, nil)
+	_, m0Err := newMonitor(badConf, reg, c, sched.Add, nil, nil)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id
@@ -350,7 +353,7 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 
 	// Two are counted as built. The bad config is missing a stdfield so it
 	// doesn't complete construction
-	require.Equal(t, 2, built.Load())
+	require.Equal(t, int64(2), built.Load())
 	// Only 2 closes, because the bad config isn't closed
-	require.Equal(t, 2, closed.Load())
+	require.Equal(t, int64(2), closed.Load())
 }

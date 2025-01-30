@@ -6,6 +6,7 @@ package framework
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"sync"
 	"testing"
@@ -15,7 +16,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
@@ -26,11 +27,16 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
-type ScenarioRun func(t *testing.T) (config mapstr.M, close func(), err error)
+type (
+	ScenarioRun     func(t *testing.T) (config mapstr.M, meta ScenarioRunMeta, close func(), err error)
+	ScenarioRunMeta struct {
+		URL    *url.URL
+		Status monitorstate.StateStatus
+	}
+)
 
 type Scenario struct {
 	Name         string
@@ -39,26 +45,35 @@ type Scenario struct {
 	Tags         []string
 	RunFrom      *hbconfig.LocationWithID
 	NumberOfRuns int
+	URL          string
 }
 
-type Twist func(Scenario) Scenario
+type Twist struct {
+	Name string
+	Fn   func(Scenario) Scenario
+}
 
-func MakeTwist(name string, fn Twist) Twist {
-	return func(s Scenario) Scenario {
-		newS := s.clone()
-		newS.Name = fmt.Sprintf("%s~<%s>", s.Name, name)
-		return fn(newS)
+func MakeTwist(name string, fn func(Scenario) Scenario) *Twist {
+	return &Twist{
+		Name: name,
+		Fn: func(s Scenario) Scenario {
+			newS := s.clone()
+			newS.Name = fmt.Sprintf("%s~<%s>", s.Name, name)
+			return fn(newS)
+		},
 	}
 }
 
-func MultiTwist(twists ...Twist) Twist {
-	return func(s Scenario) Scenario {
-		res := s
-		for _, twist := range twists {
-			res = twist(res)
-		}
-		return res
-	}
+func MultiTwist(twists ...*Twist) *Twist {
+	return MakeTwist(
+		"<~MULTI-TWIST~[",
+		func(s Scenario) Scenario {
+			res := s
+			for _, twist := range twists {
+				res = twist.Fn(res)
+			}
+			return res
+		})
 }
 
 func (s Scenario) clone() Scenario {
@@ -70,13 +85,13 @@ func (s Scenario) clone() Scenario {
 	return copy
 }
 
-func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr *MonitorTestRun, err error)) {
+func (s Scenario) Run(t *testing.T, twist *Twist, callback func(t *testing.T, mtr *MonitorTestRun, err error)) {
 	runS := s
 	if twist != nil {
-		runS = twist(s.clone())
+		runS = twist.Fn(s.clone())
 	}
 
-	cfgMap, rClose, err := runS.Runner(t)
+	cfgMap, meta, rClose, err := runS.Runner(t)
 	if rClose != nil {
 		defer rClose()
 	}
@@ -102,23 +117,25 @@ func (s Scenario) Run(t *testing.T, twist Twist, callback func(t *testing.T, mtr
 		var conf mapstr.M
 		for i := 0; i < numberRuns; i++ {
 			var mtr *MonitorTestRun
-			mtr, err = runMonitorOnce(t, cfgMap, runS.RunFrom, loaderDB.StateLoader())
+			mtr, err = runMonitorOnce(t, cfgMap, meta, runS.RunFrom, loaderDB.StateLoader())
 
 			mtr.wait()
 			events = append(events, mtr.Events()...)
+
+			sf = mtr.StdFields
+			conf = mtr.Config
 
 			if lse := LastState(events).State; lse != nil {
 				loaderDB.AddState(mtr.StdFields, lse)
 			}
 
-			sf = mtr.StdFields
-			conf = mtr.Config
 			mtr.close()
 		}
 
 		sumMtr := MonitorTestRun{
 			StdFields: sf,
 			Config:    conf,
+			Meta:      meta,
 			Events: func() []*beat.Event {
 				return events
 			},
@@ -140,18 +157,13 @@ func NewScenarioDB() *ScenarioDB {
 		ByTag:    map[string][]Scenario{},
 		All:      []Scenario{},
 	}
-
 }
 
 func (sdb *ScenarioDB) Init() {
-	var prunedList []Scenario
-	browserCapable := os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") == "true"
-	icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
 	sdb.initOnce.Do(func() {
+		var prunedList []Scenario
+		icmpCapable := os.Getenv("ELASTIC_ICMP_CAPABLE") == "true"
 		for _, s := range sdb.All {
-			if s.Type == "browser" && !browserCapable {
-				continue
-			}
 			if s.Type == "icmp" && !icmpCapable {
 				continue
 			}
@@ -161,8 +173,8 @@ func (sdb *ScenarioDB) Init() {
 				sdb.ByTag[t] = append(sdb.ByTag[t], s)
 			}
 		}
+		sdb.All = prunedList
 	})
-	sdb.All = prunedList
 }
 
 func (sdb *ScenarioDB) Add(s ...Scenario) {
@@ -173,7 +185,16 @@ func (sdb *ScenarioDB) RunAll(t *testing.T, callback func(*testing.T, *MonitorTe
 	sdb.RunAllWithATwist(t, nil, callback)
 }
 
-func (sdb *ScenarioDB) RunAllWithATwist(t *testing.T, twist Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+// RunAllWithSeparateTwists runs a list of twists separately, but not chained together.
+// This is helpful for building up a test matrix by composing twists.
+func (sdb *ScenarioDB) RunAllWithSeparateTwists(t *testing.T, twists []*Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+	twists = append(twists, nil) // we also run once with no twists
+	for _, twist := range twists {
+		sdb.RunAllWithATwist(t, twist, callback)
+	}
+}
+
+func (sdb *ScenarioDB) RunAllWithATwist(t *testing.T, twist *Twist, callback func(*testing.T, *MonitorTestRun, error)) {
 	sdb.Init()
 	for _, s := range sdb.All {
 		s.Run(t, twist, callback)
@@ -184,7 +205,7 @@ func (sdb *ScenarioDB) RunTag(t *testing.T, tagName string, callback func(*testi
 	sdb.RunTagWithATwist(t, tagName, nil, callback)
 }
 
-func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist *Twist, callback func(*testing.T, *MonitorTestRun, error)) {
 	sdb.Init()
 	if len(sdb.ByTag[tagName]) < 1 {
 		require.Failf(t, "no scenarios have tags matching %s", tagName)
@@ -194,8 +215,15 @@ func (sdb *ScenarioDB) RunTagWithATwist(t *testing.T, tagName string, twist Twis
 	}
 }
 
+func (sdb *ScenarioDB) RunTagWithSeparateTwists(t *testing.T, tagName string, twists []*Twist, callback func(*testing.T, *MonitorTestRun, error)) {
+	for _, twist := range twists {
+		sdb.RunTagWithATwist(t, tagName, twist, callback)
+	}
+}
+
 type MonitorTestRun struct {
 	StdFields stdfields.StdMonitorFields
+	Meta      ScenarioRunMeta
 	Config    mapstr.M
 	Events    func() []*beat.Event
 	monitor   *monitors.Monitor
@@ -203,10 +231,13 @@ type MonitorTestRun struct {
 	close     func()
 }
 
-func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (mtr *MonitorTestRun, err error) {
+func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, meta ScenarioRunMeta, location *hbconfig.LocationWithID, stateLoader monitorstate.StateLoader) (mtr *MonitorTestRun, err error) {
 	mtr = &MonitorTestRun{
-		Config:    monitorConfig,
-		StdFields: stdfields.StdMonitorFields{},
+		Config: monitorConfig,
+		Meta:   meta,
+		StdFields: stdfields.StdMonitorFields{
+			RunFrom: location,
+		},
 	}
 
 	// make a pipeline
@@ -220,7 +251,9 @@ func runMonitorOnce(t *testing.T, monitorConfig mapstr.M, location *hbconfig.Loc
 
 	mIface, err := f.Create(pipe, conf)
 	require.NoError(t, err)
-	mtr.monitor = mIface.(*monitors.Monitor)
+	mon, ok := mIface.(*monitors.Monitor)
+	require.True(t, ok, "type assertion didn't succeed")
+	mtr.monitor = mon
 	require.NotNil(t, mtr.monitor, "could not convert to monitor %v", mIface)
 	mtr.Events = pipe.PublishedEvents
 
@@ -251,12 +284,8 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
-		Monitoring: struct {
-			DefaultUsername string
-		}{
-			DefaultUsername: "test",
-		},
 	}
+	info.Monitoring.DefaultUsername = "test"
 
 	sched = scheduler.Create(
 		1,
@@ -271,9 +300,8 @@ func setupFactoryAndSched(location *hbconfig.LocationWithID, stateLoader monitor
 			AddTask:     sched.Add,
 			StateLoader: stateLoader,
 			PluginsReg:  plugin.GlobalPluginsReg,
-			PipelineClientFactory: func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
-				c, _ := pipeline.Connect()
-				return monitors.SyncPipelineClientAdaptor{C: c}, nil
+			PipelineClientFactory: func(pipeline beat.Pipeline) (beat.Client, error) {
+				return pipeline.Connect()
 			},
 			BeatRunFrom: location,
 		}),

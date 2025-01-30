@@ -19,10 +19,10 @@ package pipeline
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -37,15 +37,11 @@ type client struct {
 	mutex      sync.Mutex
 	waiter     *clientCloseWaiter
 
-	eventFlags     publisher.EventFlags
-	canDrop        bool
-	eventWaitGroup *sync.WaitGroup
+	eventFlags publisher.EventFlags
+	canDrop    bool
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
-	isOpen    atomic.Bool   // set to false during shutdown, such that no new events will be accepted anymore.
-	closeOnce sync.Once     // closeOnce ensure that the client shutdown sequence is only executed once
-	closeRef  beat.CloseRef // extern closeRef for sending a signal that the client should be closed.
-	done      chan struct{} // the done channel will be closed if the closeReg gets closed, or Close is run.
+	isOpen atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
 
 	observer       observer
 	eventListener  beat.EventListener
@@ -134,12 +130,8 @@ func (c *client) publish(e beat.Event) {
 }
 
 func (c *client) Close() error {
-	// first stop ack handling. ACK handler might block on wait (with timeout), waiting
-	// for pending events to be ACKed.
-	c.closeOnce.Do(func() {
-		close(c.done)
-
-		c.isOpen.Store(false)
+	if c.isOpen.Swap(false) {
+		// Only do shutdown handling the first time Close is called
 		c.onClosing()
 
 		c.logger.Debug("client: closing acker")
@@ -150,8 +142,8 @@ func (c *client) Close() error {
 		c.logger.Debug("client: done closing acker")
 
 		c.logger.Debug("client: close queue producer")
-		cancelledEventCount := c.producer.Cancel()
-		c.onClosed(cancelledEventCount)
+		c.producer.Close()
+		c.onClosed()
 		c.logger.Debug("client: done producer close")
 
 		if c.processors != nil {
@@ -162,7 +154,7 @@ func (c *client) Close() error {
 			}
 			c.logger.Debug("client: done closing processors")
 		}
-	})
+	}
 	return nil
 }
 
@@ -172,16 +164,7 @@ func (c *client) onClosing() {
 	}
 }
 
-func (c *client) onClosed(cancelledEventCount int) {
-	c.logger.Debugf("client: cancelled %v events", cancelledEventCount)
-
-	if c.eventWaitGroup != nil {
-		c.logger.Debugf("client: remove client events")
-		if cancelledEventCount > 0 {
-			c.eventWaitGroup.Add(-cancelledEventCount)
-		}
-	}
-
+func (c *client) onClosed() {
 	c.observer.clientClosed()
 	if c.clientListener != nil {
 		c.clientListener.Closed()
@@ -193,9 +176,6 @@ func (c *client) onNewEvent() {
 }
 
 func (c *client) onPublished() {
-	if c.eventWaitGroup != nil {
-		c.eventWaitGroup.Add(1)
-	}
 	c.observer.publishedEvent()
 	if c.clientListener != nil {
 		c.clientListener.Published()
@@ -203,12 +183,10 @@ func (c *client) onPublished() {
 }
 
 func (c *client) onFilteredOut(e beat.Event) {
-	c.logger.Debugf("Pipeline client receives callback 'onFilteredOut' for event: %+v", e)
 	c.observer.filteredEvent()
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
-	c.logger.Debugf("Pipeline client receives callback 'onDroppedOnPublish' for event: %+v", e)
 	c.observer.failedPublishEvent()
 	if c.clientListener != nil {
 		c.clientListener.DroppedOnPublish(e)
@@ -225,12 +203,12 @@ func newClientCloseWaiter(timeout time.Duration) *clientCloseWaiter {
 
 func (w *clientCloseWaiter) AddEvent(_ beat.Event, published bool) {
 	if published {
-		w.events.Inc()
+		w.events.Add(1)
 	}
 }
 
 func (w *clientCloseWaiter) ACKEvents(n int) {
-	value := w.events.Sub(uint32(n))
+	value := w.events.Add(^uint32(n - 1))
 	if value != 0 {
 		return
 	}

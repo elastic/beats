@@ -25,6 +25,8 @@ import (
 
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
+	"github.com/digitalocean/go-libvirt/socket"
+	"github.com/digitalocean/go-libvirt/socket/dialers"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -72,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	var (
-		c   net.Conn
+		d   socket.Dialer
 		err error
 	)
 
@@ -80,22 +82,23 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	if u.Scheme == "test" {
 		// when running tests, a mock Libvirt server is used
-		c = libvirttest.New()
+		d = libvirttest.New()
 	} else {
 		address := u.Host
 		if u.Host == "" {
 			address = u.Path
 		}
 
-		c, err = net.DialTimeout(u.Scheme, address, m.Timeout)
+		c, err := net.DialTimeout(u.Scheme, address, m.Timeout)
 		if err != nil {
 			return fmt.Errorf("cannot connect to %v: %w", u, err)
 		}
+
+		d = dialers.NewAlreadyConnected(c)
+		defer c.Close()
 	}
 
-	defer c.Close()
-
-	l := libvirt.New(c)
+	l := libvirt.NewWithDialer(d)
 	if err = l.Connect(); err != nil {
 		return fmt.Errorf("error connecting to libvirtd: %w", err)
 	}
@@ -107,13 +110,18 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 	}()
 
-	domains, err := l.Domains()
+	domains, _, err := l.ConnectListAllDomains(1, libvirt.ConnectListDomainsActive|libvirt.ConnectListDomainsInactive)
 	if err != nil {
 		return fmt.Errorf("error listing domains: %w", err)
 	}
 
 	for _, d := range domains {
-		state, err := l.DomainState(d.Name)
+		d, err := l.DomainLookupByName(d.Name)
+		if err != nil {
+			continue
+		}
+
+		state, _, err := l.DomainGetState(d, 0)
 		if err != nil {
 			continue
 		}
@@ -123,7 +131,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				"name": d.Name,
 			},
 			MetricSetFields: mapstr.M{
-				"state": getDomainStateName(state),
+				"state": getDomainStateName(libvirt.DomainState(state)),
 			},
 		})
 		if !reported {

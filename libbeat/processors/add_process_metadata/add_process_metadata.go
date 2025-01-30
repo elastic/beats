@@ -22,11 +22,11 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/go-sysinfo"
 )
 
 const (
@@ -53,7 +54,10 @@ var (
 
 	procCache = newProcessCache(cacheExpiration, cacheCapacity, cacheEvictionEffort, gosysinfoProvider{})
 
-	processCgroupPaths = cgroup.ProcessCgroupPaths
+	// cgroups resolver, turned to a stub function to make testing easier.
+	initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	}
 
 	instanceID atomic.Uint32
 )
@@ -65,16 +69,19 @@ type addProcessMetadata struct {
 	cidProvider  cidProvider
 	log          *logp.Logger
 	mappings     mapstr.M
+	uniqueID     []byte
 }
 
 type processMetadata struct {
+	entityID                           string
 	name, title, exe, username, userid string
 	args                               []string
 	env                                map[string]string
 	startTime                          time.Time
 	pid, ppid                          int
-	//
-	fields mapstr.M
+	groupname, groupid                 string
+	capEffective, capPermitted         []string
+	fields                             mapstr.M
 }
 
 type processMetadataProvider interface {
@@ -92,25 +99,50 @@ func init() {
 
 // New constructs a new add_process_metadata processor.
 func New(cfg *conf.C) (beat.Processor, error) {
-	return newProcessMetadataProcessorWithProvider(cfg, &procCache, false)
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
+	}
+
+	return newProcessMetadataProcessorWithProvider(config, &procCache, false)
 }
 
 // NewWithCache construct a new add_process_metadata processor with cache for container IDs.
 // Resulting processor implements `Close()` to release the cache resources.
 func NewWithCache(cfg *conf.C) (beat.Processor, error) {
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
+	}
+
+	return newProcessMetadataProcessorWithProvider(config, &procCache, true)
+}
+
+func NewWithConfig(opts ...ConfigOption) (beat.Processor, error) {
+	cfg := defaultConfig()
+
+	for _, o := range opts {
+		o(&cfg)
+	}
+
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetadataProvider, withCache bool) (proc beat.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(config config, provider processMetadataProvider, withCache bool) (proc beat.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
-		id  = int(instanceID.Inc())
+		id  = int(instanceID.Add(1))
 		log = logp.NewLogger(processorName).With("instance_id", id)
 	)
 
-	config := defaultConfig()
-	if err = cfg.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
+	// If neither option is configured, then add a default. A default cgroup_regex
+	// cannot be added to the struct returned by defaultConfig() because if
+	// config_regex is set, it would take precedence over any user-configured
+	// cgroup_prefixes.
+	hasCgroupPrefixes := len(config.CgroupPrefixes) > 0
+	hasCgroupRegex := config.CgroupRegex != nil
+	if !hasCgroupPrefixes && !hasCgroupRegex {
+		config.CgroupRegex = defaultCgroupRegex
 	}
 
 	mappings, err := config.getMappings()
@@ -124,6 +156,20 @@ func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetada
 		log:      log,
 		mappings: mappings,
 	}
+
+	if host, _ := sysinfo.Host(); host != nil {
+		if uniqueID := host.Info().UniqueID; uniqueID != "" {
+			p.uniqueID = []byte(uniqueID)
+		}
+	}
+
+	reader, err := initCgroupPaths(resolve.NewTestResolver(config.HostPath), false)
+	if errors.Is(err, cgroup.ErrCgroupsMissing) {
+		reader = &processors.NilCGReader{}
+	} else if err != nil {
+		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
+	}
+
 	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
 	if ok := containsValue(mappings, "container.id"); ok {
 		if withCache && config.CgroupCacheExpireTime != 0 {
@@ -134,9 +180,9 @@ func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetada
 
 			p.cgroupsCache = common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
 			p.cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
-			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
+			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, p.cgroupsCache)
 		} else {
-			p.cidProvider = newCidProvider(resolve.NewTestResolver(config.HostPath), config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
+			p.cidProvider = newCidProvider(config.CgroupPrefixes, config.CgroupRegex, reader, nil)
 		}
 	}
 
@@ -301,6 +347,7 @@ func (p *addProcessMetadata) String() string {
 
 func (p *processMetadata) toMap() mapstr.M {
 	process := mapstr.M{
+		"entity_id":  p.entityID,
 		"name":       p.name,
 		"title":      p.title,
 		"executable": p.exe,
@@ -321,6 +368,22 @@ func (p *processMetadata) toMap() mapstr.M {
 			user["id"] = p.userid
 		}
 		process["owner"] = user
+	}
+	if len(p.capEffective) > 0 {
+		process.Put("thread.capabilities.effective", p.capEffective)
+	}
+	if len(p.capPermitted) > 0 {
+		process.Put("thread.capabilities.permitted", p.capPermitted)
+	}
+	if p.groupname != "" || p.groupid != "" {
+		group := mapstr.M{}
+		if p.groupname != "" {
+			group["name"] = p.groupname
+		}
+		if p.groupid != "" {
+			group["id"] = p.groupid
+		}
+		process["group"] = group
 	}
 
 	return mapstr.M{

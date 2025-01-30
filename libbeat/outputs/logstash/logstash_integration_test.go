@@ -38,6 +38,8 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -61,6 +63,7 @@ type esConnection struct {
 type testOutputer struct {
 	outputs.NetworkClient
 	*esConnection
+	encoder queue.Encoder
 }
 
 type esSource interface {
@@ -112,6 +115,11 @@ func esConnect(t *testing.T, index string) *esConnection {
 		Password:  password,
 		Transport: transport,
 	})
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to LS: %s:", err)
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -161,7 +169,7 @@ func newTestLogstashOutput(t *testing.T, test string, tls bool) *testOutputer {
 	index := testLogstashIndex(test)
 	connection := esConnect(t, index)
 
-	return &testOutputer{output, connection}
+	return &testOutputer{output, connection, nil}
 }
 
 func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
@@ -201,7 +209,12 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	es := &testOutputer{}
 	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient)
 	es.esConnection = connection
-	es.Connect()
+	// The Elasticsearch output requires events to be encoded
+	// before calling Publish, so create an event encoder.
+	es.encoder = grp.EncoderFactory()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	es.Connect(ctx)
 
 	return es
 }
@@ -552,12 +565,13 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 }
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
-	t.Publish(context.Background(), outest.NewBatch(event))
+	batch := encodeBatch(t.encoder, outest.NewBatch(event))
+	t.Publish(context.Background(), batch)
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 	ok := false
-	batch := outest.NewBatch(events...)
+	batch := encodeBatch(t.encoder, outest.NewBatch(events...))
 
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -569,4 +583,27 @@ func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 	t.Publish(context.Background(), batch)
 	wg.Wait()
 	return ok
+}
+
+// encodeBatch encodes a publisher.Batch so it can be provided to
+// Client.Publish and other helpers.
+// This modifies the batch in place, but also returns its input batch
+// to allow for easy chaining while creating test batches.
+func encodeBatch[B publisher.Batch](encoder queue.Encoder, batch B) B {
+	if encoder != nil {
+		encodeEvents(encoder, batch.Events())
+	}
+	return batch
+}
+
+func encodeEvents(encoder queue.Encoder, events []publisher.Event) []publisher.Event {
+	for i := range events {
+		// Skip encoding if there's already encoded data present
+		if events[i].EncodedEvent == nil {
+			encoded, _ := encoder.EncodeEntry(events[i])
+			event := encoded.(publisher.Event)
+			events[i] = event
+		}
+	}
+	return events
 }

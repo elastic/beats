@@ -1,7 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
+//go:build linux || darwin || synthetics
 
 package browser
 
@@ -125,7 +125,7 @@ func (sj *SourceJob) extraArgs(uiOrigin bool) []string {
 		s, err := json.Marshal(sj.browserCfg.PlaywrightOpts)
 		if err != nil {
 			// This should never happen, if it was parsed as a config it should be serializable
-			logp.L().Warn("could not serialize playwright options '%v': %w", sj.browserCfg.PlaywrightOpts, err)
+			logp.L().Warnf("could not serialize playwright options '%v': %w", sj.browserCfg.PlaywrightOpts, err)
 		} else {
 			extraArgs = append(extraArgs, "--playwright-options", string(s))
 		}

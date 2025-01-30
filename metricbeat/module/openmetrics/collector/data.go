@@ -21,12 +21,12 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/prometheus/prometheus/pkg/textparse"
+	"github.com/prometheus/common/model"
 
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
@@ -35,7 +35,7 @@ type OpenMetricEvent struct {
 	Data      mapstr.M
 	Labels    mapstr.M
 	Help      string
-	Type      textparse.MetricType
+	Type      model.MetricType
 	Unit      string
 	Exemplars mapstr.M
 }
@@ -116,7 +116,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 		if counter != nil {
 			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
 				events = append(events, OpenMetricEvent{
-					Type: textparse.MetricTypeCounter,
+					Type: model.MetricTypeCounter,
 					Help: help,
 					Unit: unit,
 					Data: mapstr.M{
@@ -134,7 +134,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 		if gauge != nil {
 			if !math.IsNaN(gauge.GetValue()) && !math.IsInf(gauge.GetValue(), 0) {
 				events = append(events, OpenMetricEvent{
-					Type: textparse.MetricTypeGauge,
+					Type: model.MetricTypeGauge,
 					Help: help,
 					Unit: unit,
 					Data: mapstr.M{
@@ -151,7 +151,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 		if info != nil {
 			if info.HasValidValue() {
 				events = append(events, OpenMetricEvent{
-					Type: textparse.MetricTypeInfo,
+					Type: model.MetricTypeInfo,
 					Data: mapstr.M{
 						"metrics": mapstr.M{
 							name: info.GetValue(),
@@ -166,7 +166,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 		if stateset != nil {
 			if stateset.HasValidValue() {
 				events = append(events, OpenMetricEvent{
-					Type: textparse.MetricTypeStateset,
+					Type: model.MetricTypeStateset,
 					Data: mapstr.M{
 						"metrics": mapstr.M{
 							name: stateset.GetValue(),
@@ -181,7 +181,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 		if summary != nil {
 			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 				events = append(events, OpenMetricEvent{
-					Type: textparse.MetricTypeSummary,
+					Type: model.MetricTypeSummary,
 					Help: help,
 					Unit: unit,
 					Data: mapstr.M{
@@ -218,11 +218,11 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 				var sum = "_sum"
 				var count = "_count"
 				_, _ = sum, count // skip noisy linter
-				var typ = textparse.MetricTypeHistogram
+				var typ = model.MetricTypeHistogram
 				if histogram.IsGaugeHistogram {
 					sum = "_gsum"
 					count = "_gcount"
-					typ = textparse.MetricTypeGaugeHistogram
+					typ = model.MetricTypeGaugeHistogram
 				}
 
 				events = append(events, OpenMetricEvent{
@@ -275,7 +275,7 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.MetricFamily)
 		if unknown != nil {
 			if !math.IsNaN(unknown.GetValue()) && !math.IsInf(unknown.GetValue(), 0) {
 				events = append(events, OpenMetricEvent{
-					Type: textparse.MetricTypeUnknown,
+					Type: model.MetricTypeUnknown,
 					Help: help,
 					Unit: unit,
 					Data: mapstr.M{

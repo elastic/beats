@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -427,6 +427,105 @@ func TestEmitEvent_Service(t *testing.T) {
 				if test.Expected != nil {
 					t.Fatal("Timeout while waiting for event")
 				}
+			}
+		})
+	}
+}
+
+func TestServiceEventer_NamespaceWatcher(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		cfg         mapstr.M
+		expectedNil bool
+		name        string
+		msg         string
+	}{
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: true,
+			name:        "add_resource_metadata.namespace disabled and hints disabled.",
+			msg:         "Namespace watcher should be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+				},
+				"hints.enabled": true,
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace disabled and hints enabled.",
+			msg:         "Namespace watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "service",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": true,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace enabled and hints disabled.",
+			msg:         "Namespace watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata default and hints default.",
+			msg:         "Watcher should not be nil.",
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			config := conf.MustNewConfigFrom(&test.cfg)
+
+			eventer, err := NewServiceEventer(uuid, config, client, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			namespaceWatcher := eventer.(*service).namespaceWatcher
+
+			if test.expectedNil {
+				assert.Equalf(t, nil, namespaceWatcher, test.msg)
+			} else {
+				assert.NotEqualf(t, nil, namespaceWatcher, test.msg)
 			}
 		})
 	}

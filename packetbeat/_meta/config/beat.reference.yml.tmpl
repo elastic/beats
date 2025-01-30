@@ -78,6 +78,11 @@ packetbeat.interfaces.internal_networks:
 # can stay enabled even after beat is shut down.
 #packetbeat.interfaces.auto_promisc_mode: true
 
+# By default Ingest pipelines are not updated if a pipeline with the same ID
+# already exists. If this option is enabled Packetbeat overwrites pipelines
+# every time a new Elasticsearch connection is established.
+#packetbeat.overwrite_pipelines: false
+
 {{- template "windows_npcap.yml.tmpl" .}}
 
 {{header "Flows"}}

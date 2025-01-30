@@ -5,8 +5,6 @@
 <titleabbrev>translate_sid</titleabbrev>
 ++++
 
-beta[]
-
 The `translate_sid` processor translates a Windows security identifier (SID)
 into an account name. It retrieves the name of the account associated with the
 SID, the first domain on which the SID is found, and the type of account. This

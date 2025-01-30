@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"runtime"
+	"slices"
+	"strings"
 	"testing"
 	"time"
 
@@ -28,20 +31,24 @@ func TestMetrics(t *testing.T) {
 		handler        http.HandlerFunc
 		expectedEvents []string
 		assertMetrics  func(reg *monitoring.Registry) error
+
+		skipReason string // GOOS:reason or GOOS,GOOS,...:reason.
 	}{
 		{
+			skipReason: "windows:flakey test on windows - see https://github.com/elastic/beats/issues/39676",
+
 			name: "Test pagination metrics",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
-				registerPaginationTransforms()
-				registerResponseTransforms()
-				t.Cleanup(func() { registeredTransforms = newRegistry() })
 				server := httptest.NewServer(h)
 				config["request.url"] = server.URL
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
 				"interval":       time.Millisecond,
-				"request.method": http.MethodGet,
+				"request.method": http.MethodPost,
+				"request.body": map[string]interface{}{
+					"field": "value",
+				},
 				"response.split": map[string]interface{}{
 					"target": "body.items",
 					"transforms": []interface{}{
@@ -70,21 +77,20 @@ func TestMetrics(t *testing.T) {
 			},
 			assertMetrics: func(reg *monitoring.Registry) error {
 				checkHasValue := func(v interface{}) bool {
-					var c int64
 					switch t := v.(type) {
 					case int64:
-						c = t
+						return t > 0
 					case map[string]interface{}:
 						h := t["histogram"].(map[string]interface{})
-						c = h["count"].(int64)
+						return h["count"].(int64) > 0 && h["max"].(int64) > 0
 					}
-					return c > 0
+					return false
 				}
 
 				snapshot := monitoring.CollectStructSnapshot(reg, monitoring.Full, true)
 
 				for _, m := range []string{
-					"http_request_body_bytes", "http_request_get_total",
+					"http_request_body_bytes", "http_request_post_total",
 					"http_request_total", "http_response_2xx_total",
 					"http_response_body_bytes", "http_response_total",
 					"http_round_trip_time", "httpjson_interval_execution_time",
@@ -103,6 +109,9 @@ func TestMetrics(t *testing.T) {
 	for _, testCase := range testCases {
 		tc := testCase
 		t.Run(tc.name, func(t *testing.T) {
+			if reason := skipReason(tc.skipReason); reason != "" {
+				t.Skipf("skipping %s", reason)
+			}
 			tc.setupServer(t, tc.handler, tc.baseConfig)
 
 			cfg := conf.MustNewConfigFrom(tc.baseConfig)
@@ -163,4 +172,18 @@ func TestMetrics(t *testing.T) {
 			assert.NoError(t, tc.assertMetrics(reg))
 		})
 	}
+}
+
+func skipReason(s string) string {
+	if s == "" {
+		return ""
+	}
+	goos, reason, ok := strings.Cut(s, ":")
+	if !ok {
+		return s
+	}
+	if slices.Contains(strings.Split(goos, ","), runtime.GOOS) {
+		return reason
+	}
+	return ""
 }

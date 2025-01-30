@@ -12,6 +12,8 @@
   period: 5m
   metricsets:
     - cloudwatch
+  include_linked_accounts: true
+  # owning_account: 111111111111
   metrics:
     - namespace: AWS/EC2
       #name: ["CPUUtilization", "DiskWriteOps"]
@@ -46,6 +48,7 @@
   period: 24h
   metricsets:
     - s3_daily_storage
+    - awshealth
 - module: aws
   period: 1m
   latency: 5m

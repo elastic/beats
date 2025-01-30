@@ -27,6 +27,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -62,9 +63,11 @@ const (
 
 // Module is the common interface for all Module implementations.
 type Module interface {
-	Name() string                      // Name returns the name of the Module.
-	Config() ModuleConfig              // Config returns the ModuleConfig used to create the Module.
-	UnpackConfig(to interface{}) error // UnpackConfig unpacks the raw module config to the given object.
+	Name() string                                           // Name returns the name of the Module.
+	Config() ModuleConfig                                   // Config returns the ModuleConfig used to create the Module.
+	UnpackConfig(to interface{}) error                      // UnpackConfig unpacks the raw module config to the given object.
+	UpdateStatus(status status.Status, msg string)          // UpdateStatus updates the status of the module. Reflected on elastic-agent.
+	SetStatusReporter(statusReporter status.StatusReporter) // SetStatusReporter updates the status reporter for the given module.
 }
 
 // BaseModule implements the Module interface.
@@ -73,9 +76,10 @@ type Module interface {
 // MetricSets, it can embed this type into another struct to satisfy the
 // Module interface requirements.
 type BaseModule struct {
-	name      string
-	config    ModuleConfig
-	rawConfig *conf.C
+	name           string
+	config         ModuleConfig
+	rawConfig      *conf.C
+	statusReporter status.StatusReporter
 }
 
 func (m *BaseModule) String() string {
@@ -93,6 +97,18 @@ func (m *BaseModule) Config() ModuleConfig { return m.config }
 // UnpackConfig unpacks the raw module config to the given object.
 func (m *BaseModule) UnpackConfig(to interface{}) error {
 	return m.rawConfig.Unpack(to)
+}
+
+// UpdateStatus updates the status of the module. Reflected on elastic-agent.
+func (m *BaseModule) UpdateStatus(status status.Status, msg string) {
+	if m.statusReporter != nil {
+		m.statusReporter.UpdateStatus(status, msg)
+	}
+}
+
+// SetStatusReporter sets the status repoter of the module.
+func (m *BaseModule) SetStatusReporter(statusReporter status.StatusReporter) {
+	m.statusReporter = statusReporter
 }
 
 // WithConfig re-configures the module with the given raw configuration and returns a
@@ -362,6 +378,7 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 // the metricset fetches not only the predefined fields but add alls raw data under
 // the raw namespace to the event.
 type ModuleConfig struct {
+	ID          string        `config:"id"` // Optional ID (not guaranteed to be unique).
 	Hosts       []string      `config:"hosts"`
 	Period      time.Duration `config:"period"     validate:"positive"`
 	Timeout     time.Duration `config:"timeout"    validate:"positive"`
@@ -375,8 +392,8 @@ type ModuleConfig struct {
 
 func (c ModuleConfig) String() string {
 	return fmt.Sprintf(`{Module:"%v", MetricSets:%v, Enabled:%v, `+
-		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
-		c.Module, c.MetricSets, c.Enabled, len(c.Hosts), c.Period, c.Timeout,
+		`ID:"%s", Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
+		c.Module, c.MetricSets, c.Enabled, c.ID, len(c.Hosts), c.Period, c.Timeout,
 		c.Raw, c.Query)
 }
 

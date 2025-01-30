@@ -20,11 +20,13 @@
 package process
 
 import (
+	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -33,19 +35,65 @@ import (
 
 func TestFetch(t *testing.T) {
 	logp.DevelopmentSetup()
+
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
-	assert.Empty(t, errs)
+	for _, err := range errs {
+		assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
+	}
 	assert.NotEmpty(t, events)
 
 	time.Sleep(2 * time.Second)
 
 	events, errs = mbtest.ReportingFetchV2Error(f)
-	assert.Empty(t, errs)
+	for _, err := range errs {
+		assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
+	}
 	assert.NotEmpty(t, events)
 
+	t.Logf("fetched %d events, showing events[0]:", len(events))
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("system", "process").Fields.StringToPrint())
+}
+
+func TestFetchDegradeOnPartial(t *testing.T) {
+	logp.DevelopmentSetup()
+	config := getConfig()
+	config["degrade_on_partial"] = true
+
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		for _, err := range errs {
+			assert.NotErrorIsf(t, err, &mb.PartialMetricsError{}, "Expected non-fatal error, got %v", err)
+		}
+	} else {
+		assert.NotEmpty(t, events)
+
+		events, errs = mbtest.ReportingFetchV2Error(f)
+		for _, err := range errs {
+			assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
+		}
+		assert.NotEmpty(t, events)
+
+		t.Logf("fetched %d events, showing events[0]:", len(events))
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+			events[0].BeatEvent("system", "process").Fields.StringToPrint())
+	}
+}
+
+func TestFetchSinglePid(t *testing.T) {
+	logp.DevelopmentSetup()
+
+	cfg := getConfig()
+	cfg["process.pid"] = os.Getpid()
+
+	f := mbtest.NewReportingMetricSetV2Error(t, cfg)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	assert.Empty(t, errs)
+	assert.NotEmpty(t, events)
+	assert.Equal(t, os.Getpid(), events[0].RootFields["process"].(map[string]interface{})["pid"])
+	assert.NotEmpty(t, events[0].MetricSetFields["cpu"])
 }
 
 func TestData(t *testing.T) {

@@ -67,7 +67,7 @@ function process(evt) {
 }
 `
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
 	require.NoError(t, err)
 
@@ -103,7 +103,7 @@ function process(evt) {
 }
 `
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	p, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
 	require.NoError(t, err)
 
@@ -128,7 +128,7 @@ function process(evt) {
 }
 `
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	_, err := javascript.NewFromConfig(javascript.Config{Source: script}, nil)
 	require.Error(t, err, "processor that implements Closer() shouldn't be allowed")
 }

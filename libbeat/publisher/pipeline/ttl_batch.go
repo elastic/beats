@@ -93,10 +93,14 @@ func (b *ttlBatch) Events() []publisher.Event {
 }
 
 func (b *ttlBatch) ACK() {
+	// Help the garbage collector clean up the event data a little faster
+	b.events = nil
 	b.done()
 }
 
 func (b *ttlBatch) Drop() {
+	// Help the garbage collector clean up the event data a little faster
+	b.events = nil
 	b.done()
 }
 
@@ -160,10 +164,6 @@ func (b *ttlBatch) Cancelled() {
 func (b *ttlBatch) RetryEvents(events []publisher.Event) {
 	b.events = events
 	b.Retry()
-}
-
-func (b *ttlBatch) FreeEntries() {
-	b.events = nil
 }
 
 // reduceTTL reduces the time to live for all events that have no 'guaranteed'

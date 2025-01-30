@@ -142,12 +142,42 @@ metricbeat.modules:
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
 
+  # This option enables the use of performance counters to collect data for cpu/core metricset.
+  # Only effective for Windows.
+  # You should use this option if running beats on machins with more than 64 cores.
+  #use_performance_counters: false
+
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
   metricsets: ["namespace"]
   enabled: true
   period: 10s
   hosts: ["localhost:3000"]
+
+  # Aerospike Cluster Name
+  #cluster_name: myclustername
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # Authentication modes: https://aerospike.com/docs/server/guide/security/access-control
+  # Possible values: internal (default), external, pki
+  #auth_mode: internal
+
+  # Optional SSL/TLS (disabled by default)
+  #ssl.enabled: true
+
+  # List of root certificates for SSL/TLS server verification
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+
+  # Certificate for SSL/TLS client authentication
+  #ssl.certificate: "/etc/pki/client/cert.crt"
+
+  # Client certificate key file
+  #ssl.key: "/etc/pki/client/cert.key"
 
 #-------------------------------- Apache Module --------------------------------
 - module: apache
@@ -243,6 +273,9 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
+  # podman: false
+
   # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 
   # or other configurations where virtual disks will sum metrics from other disks.
@@ -282,6 +315,7 @@ metricbeat.modules:
   hosts: ["http://localhost:9200"]
   #username: "elastic"
   #password: "changeme"
+  #api_key: "foo:bar"
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   #index_recovery.active_only: true
@@ -477,6 +511,9 @@ metricbeat.modules:
   hosts: ["localhost:5601"]
   basepath: ""
   enabled: true
+  #username: "user"
+  #password: "secret"
+  #api_key: "foo:bar"
 
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.
@@ -503,11 +540,20 @@ metricbeat.modules:
 
   # Enriching parameters:
   add_metadata: true
-  # When used outside the cluster:
-  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
+  #include_labels: []
+  #exclude_labels: []
+  #include_annotations: []
+  #labels.dedot: true
+  #annotations.dedot: true
+
+  # When used outside the cluster:
+  #node: node_name
+
   # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
@@ -547,13 +593,23 @@ metricbeat.modules:
 
   # Enriching parameters:
   add_metadata: true
-  # When used outside the cluster:
-  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
+  #include_labels: []
+  #exclude_labels: []
+  #include_annotations: []
+  #labels.dedot: true
+  #annotations.dedot: true
+
+  # When used outside the cluster:
+  #node: node_name
+
   # Set the namespace to watch for resources
   #namespace: staging
+
   # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
@@ -582,6 +638,8 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
   # Set the namespace to watch for events
   #namespace: staging
   # Set the sync period of the watchers
@@ -602,6 +660,8 @@ metricbeat.modules:
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
@@ -611,6 +671,8 @@ metricbeat.modules:
     - proxy
   hosts: ["localhost:10249"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes controller manager
 # (URL and deployment method should be adapted to match the controller manager deployment / service / endpoint)
@@ -620,6 +682,8 @@ metricbeat.modules:
     - controllermanager
   hosts: ["http://localhost:10252"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes scheduler
 # (URL and deployment method should be adapted to match scheduler deployment / service / endpoint)
@@ -629,6 +693,8 @@ metricbeat.modules:
     - scheduler
   hosts: ["localhost:10251"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 #--------------------------------- KVM Module ---------------------------------
 - module: kvm
@@ -748,6 +814,18 @@ metricbeat.modules:
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
 
+  # Optional SSL/TLS. By default is false.
+  #ssl.enabled: true
+
+  # List of root certificates for SSL/TLS server verification
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+
+  # Certificate for SSL/TLS client authentication
+  #ssl.certificate: "/etc/pki/client/cert.crt"
+
+  # Client certificate key file
+  #ssl.key: "/etc/pki/client/cert.key"
+
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
   metricsets:
@@ -845,6 +923,9 @@ metricbeat.modules:
   #username: "user"
   #password: "secret"
 
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
   # This can be used for service account based authorization:
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
@@ -856,6 +937,9 @@ metricbeat.modules:
 #  metricsets: ["remote_write"]
 #  host: "localhost"
 #  port: "9201"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
 
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
@@ -964,15 +1048,26 @@ metricbeat.modules:
 #------------------------------- VSphere Module -------------------------------
 - module: vsphere
   enabled: true
-  metricsets: ["datastore", "host", "virtualmachine"]
-  period: 10s
+  metricsets: ["cluster", "datastore", "datastorecluster", "host", "network", "resourcepool", "virtualmachine"]
+  
+  # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds by default.
+  # Supported Periods:
+  # The Datastore and Host metricsets support performance data collection using the vSphere performance API.
+  # Since the performance API has usage restrictions based on data collection intervals,
+  # users should ensure that the period is configured optimally to receive real-time data.
+  # users can still collect summary metrics if performance metrics are not supported for the configured instance.
+  # This configuration can be determined based on the Data Collection Intervals and Data Collection Levels.
+  # Reference Links:
+  # Data Collection Intervals: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html
+  # Data Collection Levels: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-25800DE4-68E5-41CC-82D9-8811E27924BC.html
+  period: 20s
   hosts: ["https://localhost/sdk"]
 
   username: "user"
   password: "password"
   # If insecure is true, don't verify the server's certificate chain
   insecure: false
-  # Get custom fields when using virtualmachine metric set. Default false.
+  # Get custom fields when using virtualmachine metricset. Default false.
   # get_custom_fields: false
 
 #------------------------------- Windows Module -------------------------------
@@ -1034,6 +1129,8 @@ metricbeat.modules:
 #timestamp.precision: millisecond
 
 # Internal queue configuration for buffering events to be published.
+# Queue settings may be overridden by performance presets in the
+# Elasticsearch output. To configure them manually use "preset: custom".
 #queue:
   # Queue type by name (default 'mem')
   # The memory queue will present all available events (up to the outputs
@@ -1041,18 +1138,18 @@ metricbeat.modules:
   # another batch of events.
   #mem:
     # Max number of events the queue can buffer.
-    #events: 4096
+    #events: 3200
 
     # Hints the minimum number of events stored in the queue,
     # before providing a batch of events to the outputs.
     # The default value is set to 2048.
     # A value of 0 ensures events are immediately available
     # to be sent to the outputs.
-    #flush.min_events: 2048
+    #flush.min_events: 1600
 
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
-    #flush.timeout: 1s
+    #flush.timeout: 10s
 
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
@@ -1284,8 +1381,17 @@ output.elasticsearch:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
-  # Set gzip compression level.
-  #compression_level: 0
+  # Performance presets configure other output fields to recommended values
+  # based on a performance priority.
+  # Options are "balanced", "throughput", "scale", "latency" and "custom".
+  # Default if unspecified: "custom"
+  preset: balanced
+
+  # Set gzip compression level. Set to 0 to disable compression.
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 1.
+  #compression_level: 1
 
   # Configure escaping HTML symbols in strings.
   #escape_html: false
@@ -1304,6 +1410,8 @@ output.elasticsearch:
     #param2: value2
 
   # Number of workers per Elasticsearch host.
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
   #worker: 1
 
   # If set to true and multiple hosts are configured, the output plugin load
@@ -1341,8 +1449,10 @@ output.elasticsearch:
   #max_retries: 3
 
   # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-  # The default is 50.
-  #bulk_max_size: 50
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 1600.
+  #bulk_max_size: 1600
 
   # The number of seconds to wait before trying to reconnect to Elasticsearch
   # after a network error. After waiting backoff.init seconds, the Beat
@@ -1355,12 +1465,19 @@ output.elasticsearch:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
+  # The maximum amount of time an idle connection will remain idle
+  # before closing itself.  Zero means use the default of 60s. The
+  # format is a Go language duration (example 60s is 60 seconds).
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 3s.
+  # idle_connection_timeout: 3s
+
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
-  # metricbeat expects Elasticsearch to be the same version or newer than the Beat.
-  # Lift the version restriction by setting allow_older_versions to true.
-  #allow_older_versions: false
+  # Prevents metricbeat from connecting to older Elasticsearch versions when set to `false`
+  #allow_older_versions: true
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
@@ -2163,13 +2280,40 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is true. If
-# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
-# can be installed.
+# Disable the check for an existing lifecycle policy. The default is true.
+# If you set this option to false, lifecycle policy will not be installed,
+# even if setup.ilm.overwrite is set to true.
 #setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
+
+# ======================== Data Stream Lifecycle (DSL) =========================
+
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
+# These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
+
+# Enable DSL support. Valid values are true, or false.
+#setup.dsl.enabled: true
+
+# Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
+# The default data stream pattern is metricbeat-%{[agent.version]}"
+# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The other possible template value is `%{[beat.name]}`.
+#setup.dsl.data_stream_pattern: "metricbeat-%{[agent.version]}"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+# If no custom policy is specified, a default policy with a lifetime of 7 days will be created.
+#setup.dsl.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is true. If
+# you disable this check, set setup.dsl.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.dsl.check_exists: true
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.dsl.overwrite: false
 
 # =================================== Kibana ===================================
 
@@ -2328,6 +2472,54 @@ logging.files:
   # Rotate existing logs on startup rather than appending them to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+#=============================== Events Logging ===============================
+# Some outputs will log raw events on errors like indexing errors in the
+# Elasticsearch output, to prevent logging raw events (that may contain
+# sensitive information) together with other log messages, a different
+# log file, only for log entries containing raw events, is used. It will
+# use the same level, selectors and all other configurations from the
+# default logger, but it will have it's own file configuration.
+#
+# Having a different log file for raw events also prevents event data
+# from drowning out the regular log files.
+#
+# IMPORTANT: No matter the default logger output configuration, raw events
+# will **always** be logged to a file configured by `logging.event_data.files`.
+
+# logging.event_data:
+# Logging to rotating files. Set logging.to_files to false to disable logging to
+# files.
+#logging.event_data.to_files: true
+#logging.event_data:
+  # Configure the path where the logs are written. The default is the logs directory
+  # under the home path (the binary location).
+  #path: /var/log/metricbeat
+
+  # The name of the files where the logs are written to.
+  #name: metricbeat-events-data
+
+  # Configure log file size limit. If the limit is reached, log file will be
+  # automatically rotated.
+  #rotateeverybytes: 5242880 # = 5MB
+
+  # Number of rotated log files to keep. The oldest files will be deleted first.
+  #keepfiles: 2
+
+  # The permissions mask to apply when rotating log files. The default value is 0600.
+  # Must be a valid Unix-style file permissions mask expressed in octal notation.
+  #permissions: 0600
+
+  # Enable log file rotation on time intervals in addition to the size-based rotation.
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # are boundary-aligned with minutes, hours, days, weeks, months, and years as
+  # reported by the local system clock. All other intervals are calculated from the
+  # Unix epoch. Defaults to disabled.
+  #interval: 0
+
+  # Rotate existing logs on startup rather than appending them to the existing
+  # file. Defaults to false.
+  # rotateonstartup: false
 
 # ============================= X-Pack Monitoring ==============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring

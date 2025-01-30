@@ -38,7 +38,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
 
@@ -56,7 +55,7 @@ type RunnerFactory struct {
 	beatLocation          *config.LocationWithID
 }
 
-type PipelineClientFactory func(pipeline beat.Pipeline) (pipeline.ISyncClient, error)
+type PipelineClientFactory func(pipeline beat.Pipeline) (beat.Client, error)
 
 type publishSettings struct {
 	// Fields and tags to add to monitor.

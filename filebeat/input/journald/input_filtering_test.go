@@ -15,19 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && cgo && withjournald
+//go:build linux
 
 package journald
 
 import (
 	"context"
-	"path"
+	"encoding/json"
+	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestInputSyslogIdentifier(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
+
 	tests := map[string]struct {
 		identifiers      []string
 		expectedMessages []string
@@ -51,7 +55,7 @@ func TestInputSyslogIdentifier(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 			inp := env.mustCreateInput(mapstr.M{
-				"paths":              []string{path.Join("testdata", "input-multiline-parser.journal")},
+				"paths":              []string{out},
 				"syslog_identifiers": testCase.identifiers,
 			})
 
@@ -71,6 +75,7 @@ func TestInputSyslogIdentifier(t *testing.T) {
 }
 
 func TestInputUnits(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
 	tests := map[string]struct {
 		units            []string
 		kernel           bool
@@ -108,7 +113,7 @@ func TestInputUnits(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 			inp := env.mustCreateInput(mapstr.M{
-				"paths":  []string{path.Join("testdata", "input-multiline-parser.journal")},
+				"paths":  []string{out},
 				"units":  testCase.units,
 				"kernel": testCase.kernel,
 			})
@@ -129,6 +134,7 @@ func TestInputUnits(t *testing.T) {
 }
 
 func TestInputIncludeMatches(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
 	tests := map[string]struct {
 		includeMatches   map[string]interface{}
 		expectedMessages []string
@@ -160,44 +166,13 @@ func TestInputIncludeMatches(t *testing.T) {
 				"Started Outputs some log lines.",
 			},
 		},
-		"and condition": {
-			includeMatches: map[string]interface{}{
-				"and": []map[string]interface{}{
-					{
-						"match": []string{
-							"syslog.facility=3",
-							"message=6th line",
-						},
-					},
-				},
-			},
-			expectedMessages: []string{
-				"6th line",
-			},
-		},
-		"or condition": {
-			includeMatches: map[string]interface{}{
-				"or": []map[string]interface{}{
-					{
-						"match": []string{
-							"message=5th line",
-							"message=6th line",
-						},
-					},
-				},
-			},
-			expectedMessages: []string{
-				"5th line",
-				"6th line",
-			},
-		},
 	}
 
 	for name, testCase := range tests {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 			inp := env.mustCreateInput(mapstr.M{
-				"paths":           []string{path.Join("testdata", "input-multiline-parser.journal")},
+				"paths":           []string{out},
 				"include_matches": testCase.includeMatches,
 			})
 
@@ -219,24 +194,32 @@ func TestInputIncludeMatches(t *testing.T) {
 // TestInputSeek test the output of various seek modes while reading
 // from input-multiline-parser.journal.
 func TestInputSeek(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "input-multiline-parser.journal.gz"))
+	// Uncomment the following line to see all logs during the test execution
+	// logp.DevelopmentSetup()
+	timeAfterFirstEvent := time.Date(2021, time.November, 22, 17, 10, 20, 0, time.UTC).In(time.Local)
+
+	allMessages := []string{
+		"pam_unix(sudo:session): session closed for user root",
+		"Started Outputs some log lines.",
+		"1st line",
+		"2nd line",
+		"3rd line",
+		"4th line",
+		"5th line",
+		"6th line",
+	}
+
 	tests := map[string]struct {
 		config           mapstr.M
+		cursor           string
 		expectedMessages []string
 	}{
 		"seek head": {
 			config: map[string]any{
 				"seek": "head",
 			},
-			expectedMessages: []string{
-				"pam_unix(sudo:session): session closed for user root",
-				"Started Outputs some log lines.",
-				"1st line",
-				"2nd line",
-				"3rd line",
-				"4th line",
-				"5th line",
-				"6th line",
-			},
+			expectedMessages: allMessages,
 		},
 		"seek tail": {
 			config: map[string]any{
@@ -244,36 +227,49 @@ func TestInputSeek(t *testing.T) {
 			},
 			expectedMessages: nil, // No messages are expected for seek=tail.
 		},
-		"seek cursor": {
+		"seek since": {
 			config: map[string]any{
-				"seek": "cursor",
+				"seek": "since",
+				// Query using one microsecond after the first event so that the first event
+				// is not returned. Note that journald uses microsecond precision for times.
+				"since": -1 * time.Since(timeAfterFirstEvent),
 			},
-			expectedMessages: []string{
-				"pam_unix(sudo:session): session closed for user root",
-				"Started Outputs some log lines.",
-				"1st line",
-				"2nd line",
-				"3rd line",
-				"4th line",
-				"5th line",
-				"6th line",
-			},
+			expectedMessages: allMessages[1:],
 		},
-		"seek cursor fallback": {
+		"seek with cursor": {
 			config: map[string]any{
-				"seek":                 "cursor",
-				"cursor_seek_fallback": "tail",
+				"seek": "since",
+				// Query using one microsecond after the first event so that the first event
+				// is not returned. Note that journald uses microsecond precision for times.
+				"since": -1 * time.Since(timeAfterFirstEvent),
 			},
-			expectedMessages: nil, // No messages are expected because it will fall back to seek=tail.
+			// This cursor points to the previous last entry in the journal.
+			// You can test the cursor by running:
+			// journalctl --file ./input/journald/testdata/input-multiline-parser.journal --after-cursor="s=c358e9ae507b4a9e96832b98b445558c;i=6a9e1;b=a05ba5675e444581b00ac5adf4340819;m=d47e3539b;t=5d163b3ad079e;x=1195c4b85b8135fb"
+			cursor:           `{"cursor":{"position":"s=c358e9ae507b4a9e96832b98b445558c;i=6a9e1;b=a05ba5675e444581b00ac5adf4340819;m=d47e3539b;t=5d163b3ad079e;x=1195c4b85b8135fb","version":1}}`,
+			expectedMessages: allMessages[7:],
 		},
 	}
 
 	for name, testCase := range tests {
 		t.Run(name, func(t *testing.T) {
 			env := newInputTestingEnvironment(t)
-			conf := mapstr.M{
-				"paths": []string{path.Join("testdata", "input-multiline-parser.journal")},
+
+			if testCase.cursor != "" {
+				store, _ := env.stateStore.Access("")
+				tmp := map[string]any{}
+				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
+					t.Fatal(err)
+				}
+				if err := store.Set("journald::"+out, tmp); err != nil {
+					t.Fatal(err)
+				}
 			}
+
+			conf := mapstr.M{
+				"paths": []string{out},
+			}
+
 			conf.DeepUpdate(testCase.config)
 			inp := env.mustCreateInput(conf)
 
@@ -283,9 +279,11 @@ func TestInputSeek(t *testing.T) {
 
 			env.waitUntilEventCount(len(testCase.expectedMessages))
 
-			for idx, event := range env.pipeline.GetAllEvents() {
-				if got, expected := event.Fields["message"], testCase.expectedMessages[idx]; got != expected {
-					t.Fatalf("expecting event message %q, got %q", expected, got)
+			if !t.Failed() {
+				for idx, event := range env.pipeline.GetAllEvents() {
+					if got, expected := event.Fields["message"], testCase.expectedMessages[idx]; got != expected {
+						t.Fatalf("expecting event message %q, got %q", expected, got)
+					}
 				}
 			}
 		})

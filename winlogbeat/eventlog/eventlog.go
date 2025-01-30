@@ -23,18 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-)
-
-// Debug selectors used in this package.
-const (
-	debugSelector = "eventlog"
-)
-
-// Debug logging functions for this package.
-var (
-	debugf = logp.MakeDebug(debugSelector)
 )
 
 // EventLog is an interface to a Windows Event Log.
@@ -47,6 +36,11 @@ type EventLog interface {
 	// Read records from the event log. If io.EOF is returned you should stop
 	// reading and close the log.
 	Read() ([]Record, error)
+
+	// Reset closes the event log channel to allow recovering from recoverable
+	// errors. Open must be successfully called after a Reset before Read may
+	// be called.
+	Reset() error
 
 	// Close the event log. It should not be re-opened after closing.
 	Close() error
@@ -65,7 +59,6 @@ type EventLog interface {
 type Record struct {
 	winevent.Event
 	File   string                   // Source file when event is from a file.
-	API    string                   // The event log API type used to read the record.
 	XML    string                   // XML representation of the event.
 	Offset checkpoint.EventLogState // Position of the record within its source stream.
 }
@@ -75,7 +68,6 @@ func (e Record) ToEvent() beat.Event {
 	win := e.Fields()
 
 	_ = win.Delete("time_created")
-	_, _ = win.Put("api", e.API)
 
 	m := mapstr.M{
 		"winlog": win,

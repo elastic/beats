@@ -31,6 +31,8 @@ var (
 //
 // The lifetime of this should the a scope of the beat Run
 type resetableActionHandler struct {
+	pub actionResultPublisher
+
 	log *logp.Logger
 
 	ah client.Action
@@ -43,8 +45,9 @@ type resetableActionHandler struct {
 
 type optionFunc func(a *resetableActionHandler)
 
-func newResetableActionHandler(log *logp.Logger, opts ...optionFunc) *resetableActionHandler {
+func newResetableActionHandler(pub actionResultPublisher, log *logp.Logger, opts ...optionFunc) *resetableActionHandler {
 	a := &resetableActionHandler{
+		pub:     pub,
 		log:     log,
 		timeout: defaultTimeout,
 	}
@@ -68,6 +71,9 @@ func (a *resetableActionHandler) Execute(ctx context.Context, req map[string]int
 		if err != nil {
 			res = renderResult(res, err)
 			err = nil
+		}
+		if a.pub != nil {
+			a.pub.PublishActionResult(req, res)
 		}
 	}()
 

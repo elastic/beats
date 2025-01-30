@@ -41,8 +41,9 @@ const (
 	expandWildcards = "expand_wildcards=open"
 	statsPath       = "/_stats/" + statsMetrics + "?filter_path=indices&" + expandWildcards
 
-	bulkSuffix   = ",bulk"
-	hiddenSuffix = ",hidden"
+	bulkSuffix         = ",bulk"
+	hiddenSuffix       = ",hidden"
+	allowClosedIndices = "&forbid_closed_indices=false"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -107,6 +108,7 @@ func getServicePath(esVersion version.V) (string, error) {
 
 	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
 		u.Path += bulkSuffix
+		u.RawQuery += allowClosedIndices
 	}
 
 	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {

@@ -19,10 +19,14 @@ package pageinfo
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"regexp"
 	"strconv"
+	"strings"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // zones represents raw pagetypeinfo data
@@ -46,11 +50,28 @@ type pageInfo struct {
 	Zones     map[int64]zones
 }
 
-var pageinfoLine = regexp.MustCompile(`Node\s*(\d), zone\s*([a-zA-z0-9]*), type\s*([a-zA-z0-9]*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)\s*(\d*)`)
+var pageinfoLine = regexp.MustCompile(`Node\s*(\d), zone\s*([a-zA-z0-9]*), type\s*([a-zA-z0-9]*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)\s*(>?\d*)`)
 
 // readPageFile reads a PageTypeInfo file and returns the parsed data
 // This returns a massive representation of all the meaningful data in /proc/pagetypeinfo
-func readPageFile(reader *bufio.Reader) (pageInfo, error) {
+//
+// the actual numbers in pagetypeinfo follow the same format as /proc/buddyinfo,
+// but broken down by node and ability to move
+// see https://www.kernel.org/doc/Documentation/filesystems/proc.txt:
+/*
+> cat /proc/buddyinfo
+
+Node 0, zone      DMA      0      4      5      4      4      3 ...
+Node 0, zone   Normal      1      0      0      1    101      8 ...
+Node 0, zone  HighMem      2      0      0      1      1      0 ...
+
+Each column represents the number of pages of a certain order which are
+available.  In this case, there are 0 chunks of 2^0*PAGE_SIZE available in
+ZONE_DMA, 4 chunks of 2^1*PAGE_SIZE in ZONE_DMA, 101 chunks of 2^4*PAGE_SIZE
+available in ZONE_NORMAL, etc...
+*/
+
+func readPageFile(log *logp.Logger, reader *bufio.Reader) (pageInfo, error) {
 	nodes := make(map[int64]zones)
 
 	buddy := buddyInfo{
@@ -62,7 +83,7 @@ func readPageFile(reader *bufio.Reader) (pageInfo, error) {
 	for {
 		raw, err := reader.ReadString('\n')
 
-		if err == io.EOF || err == io.ErrUnexpectedEOF {
+		if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
 			break
 		}
 
@@ -97,9 +118,28 @@ func readPageFile(reader *bufio.Reader) (pageInfo, error) {
 		migrateType = string(match[3])
 		//Iterate over the order counts
 		for order, count := range match[4:] {
-			zoneOrders[order], err = strconv.ParseInt(string(count), 10, 64)
+			// zone count will produce numbers like this:
+			// >100000
+			// we need to catch that.
+			// for more context on why this happens, see the comment in mm/vmstat.c:
+			/*
+			 * Cap the free_list iteration because it might
+			 * be really large and we are under a spinlock
+			 * so a long time spent here could trigger a
+			 * hard lockup detector. Anyway this is a
+			 * debugging tool so knowing there is a handful
+			 * of pages of this order should be more than
+			 * sufficient.
+			 */
+			strCount := string(count)
+			if strings.Contains(strCount, ">") {
+				log.Debugf("got imprecise value '%s' in node %d", strCount, nodeLevel)
+				// make no assumptions, trim the value and pass it on
+				strCount = strings.Trim(strCount, ">")
+			}
+			zoneOrders[order], err = strconv.ParseInt(strCount, 10, 64)
 			if err != nil {
-				return pageInfo{}, fmt.Errorf("error parsing zone: %s: %w", string(count), err)
+				return pageInfo{}, fmt.Errorf("error parsing zone: %s: %w", strCount, err)
 			}
 			nodes[nodeLevel].OrderSummary[order] += zoneOrders[order]
 			if zoneType == "DMA" {

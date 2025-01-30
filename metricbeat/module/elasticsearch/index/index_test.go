@@ -29,7 +29,7 @@ import (
 
 func TestGetServiceURIExpectedPath(t *testing.T) {
 	path770 := strings.Replace(statsPath, expandWildcards, expandWildcards+hiddenSuffix, 1)
-	path800 := strings.Replace(path770, statsMetrics, statsMetrics+bulkSuffix, 1)
+	path800 := strings.Replace(path770, statsMetrics, statsMetrics+bulkSuffix, 1) + allowClosedIndices
 
 	tests := map[string]struct {
 		esVersion    *version.V
@@ -65,6 +65,7 @@ func TestGetServiceURIExpectedPath(t *testing.T) {
 func TestGetServiceURIMultipleCalls(t *testing.T) {
 	path := strings.Replace(statsPath, expandWildcards, expandWildcards+hiddenSuffix, 1)
 	path = strings.Replace(path, statsMetrics, statsMetrics+bulkSuffix, 1)
+	path += allowClosedIndices
 
 	err := quick.Check(func(r uint) bool {
 		numCalls := 2 + (r % 10) // between 2 and 11

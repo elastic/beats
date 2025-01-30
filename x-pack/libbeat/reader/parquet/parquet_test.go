@@ -14,11 +14,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/apache/arrow/go/v12/arrow"
-	"github.com/apache/arrow/go/v12/arrow/array"
-	"github.com/apache/arrow/go/v12/arrow/memory"
-	"github.com/apache/arrow/go/v12/parquet/pqarrow"
+	"github.com/apache/arrow/go/v17/arrow"
+	"github.com/apache/arrow/go/v17/arrow/array"
+	"github.com/apache/arrow/go/v17/arrow/memory"
+	"github.com/apache/arrow/go/v17/parquet/pqarrow"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // all test files are read from/stored within the "testdata" directory
@@ -55,6 +57,7 @@ func TestParquetWithRandomData(t *testing.T) {
 		},
 	}
 
+	logp.TestingSetup()
 	for i, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with rows=%d, and columns=%d", tc.rows, tc.columns)
 		t.Run(name, func(t *testing.T) {
@@ -109,7 +112,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	// defines a map to store the parquet data for validation
 	data := make(map[string]bool)
 	// creates a new Arrow schema
-	var fields []arrow.Field
+	fields := make([]arrow.Field, 0, numCols)
 	for i := 0; i < numCols; i++ {
 		fieldType := arrow.PrimitiveTypes.Int32
 		field := arrow.Field{Name: fmt.Sprintf("col%d", i), Type: fieldType, Nullable: true}
@@ -189,6 +192,7 @@ func TestParquetWithFiles(t *testing.T) {
 		},
 	}
 
+	logp.TestingSetup()
 	for _, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with source file=%s, and target comparison file=%s", tc.parquetFile, tc.jsonFile)
 		t.Run(name, func(t *testing.T) {

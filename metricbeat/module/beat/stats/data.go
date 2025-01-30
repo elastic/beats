@@ -35,6 +35,7 @@ var (
 		"cgroup":     c.Ifc("beat.cgroup"),
 		"system":     c.Ifc("system"),
 		"apm_server": c.Ifc("apm-server"),
+		"output":     c.Ifc("output"),
 		"cpu":        c.Ifc("beat.cpu"),
 		"info":       c.Ifc("beat.info"),
 		"uptime": c.Dict("beat.info.uptime", s.Schema{
@@ -70,11 +71,39 @@ var (
 				"write": c.Dict("write", s.Schema{
 					"bytes":  c.Int("bytes"),
 					"errors": c.Int("errors"),
+					"latency": c.Dict("latency", s.Schema{
+						"count":  c.Int("count"),
+						"max":    c.Int("max"),
+						"median": c.Float("median"),
+						"p99":    c.Float("p99"),
+					}),
 				}),
 			}),
 			"pipeline": c.Dict("pipeline", s.Schema{
 				"clients": c.Int("clients"),
 				"queue": c.Dict("queue", s.Schema{
+					"max_events": c.Int("max_events"),
+
+					"added": c.Dict("added", s.Schema{
+						"events": c.Int("events"),
+						"bytes":  c.Int("bytes"),
+					}),
+					"consumed": c.Dict("consumed", s.Schema{
+						"events": c.Int("events"),
+						"bytes":  c.Int("bytes"),
+					}),
+					"removed": c.Dict("removed", s.Schema{
+						"events": c.Int("events"),
+						"bytes":  c.Int("bytes"),
+					}),
+					"filled": c.Dict("filled", s.Schema{
+						"events": c.Int("events"),
+						"bytes":  c.Int("bytes"),
+						"pct":    c.Float("pct"),
+					}),
+
+					// Backwards compatibility: "acked" is the old name for
+					// "removed.events" and should not be used by new code/dashboards.
 					"acked": c.Int("acked"),
 				}),
 				"events": c.Dict("events", s.Schema{

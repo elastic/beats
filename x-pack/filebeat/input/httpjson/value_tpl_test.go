@@ -19,6 +19,8 @@ import (
 )
 
 func TestValueTpl(t *testing.T) {
+	logp.TestingSetup()
+
 	cases := []struct {
 		name          string
 		value         string
@@ -136,6 +138,41 @@ func TestValueTpl(t *testing.T) {
 		{
 			name:        "func parseDate with custom layout",
 			value:       `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006") ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 12:25:32 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ with RFC3339Nano and timezone offset",
+			value:       `[[ parseDateInTZ "2020-11-05T12:25:32.1234567Z" "-0700" "RFC3339Nano" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 19:25:32.1234567 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ defaults to RFC3339 with implicit offset and timezone",
+			value:       `[[ parseDateInTZ "2020-11-05T12:25:32+04:00" "-0700" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 19:25:32 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ defaults to RFC3339 with IANA timezone",
+			value:       `[[ parseDateInTZ "2020-11-05T12:25:32Z" "America/New_York" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 17:25:32 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ with custom layout and timezone name",
+			value:       `[[ parseDateInTZ "Thu Nov  5 12:25:32 2020" "Europe/Paris" "Mon Jan _2 15:04:05 2006" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2020-11-05 11:25:32 +0000 UTC",
+		},
+		{
+			name:        "func parseDateInTZ with invalid timezone",
+			value:       `[[ parseDateInTZ "2020-11-05T12:25:32Z" "Invalid/Timezone" ]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
 			expectedVal: "2020-11-05 12:25:32 +0000 UTC",
@@ -764,7 +801,7 @@ func TestValueTpl(t *testing.T) {
 				assert.NoError(t, defTpl.Unpack(tc.paramDefVal))
 			}
 
-			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, "", defTpl, logp.NewLogger(""))
+			got, err := tpl.Execute(tc.paramCtx, tc.paramTr, tc.name, defTpl, logp.NewLogger(""))
 			assert.Equal(t, tc.expectedVal, got)
 			if tc.expectedError == "" {
 				assert.NoError(t, err)

@@ -20,13 +20,9 @@ Obtaining {beatname_uc} for Docker is as simple as issuing a +docker pull+ comma
 against the Elastic Docker registry.
 
 ifeval::["{release-state}"=="unreleased"]
-
-However, version {version} of {beatname_uc} has not yet been
-released, so no Docker image is currently available for this version.
-
+WARNING: Version {version} of {beatname_uc} has not yet been released.
+No Docker image is currently available for {beatname_uc} {version}.
 endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
 
 ["source", "sh", subs="attributes"]
 ------------------------------------------------
@@ -37,34 +33,47 @@ Alternatively, you can download other Docker images that contain only features
 available under the Apache 2.0 license. To download the images, go to
 https://www.docker.elastic.co[www.docker.elastic.co].
 
-endif::[]
-
 ifndef::apm-server[]
+
+As another option, you can use the hardened link:https://wolfi.dev/[Wolfi] image.
+Using Wolfi images requires Docker version 20.10.10 or higher.
+For details about why the Wolfi images have been introduced, refer to our article 
+link:https://www.elastic.co/blog/reducing-cves-in-elastic-container-images[Reducing CVEs in Elastic container images].
+
+[source,terminal,subs="attributes"]
+----
+docker pull {dockerimage-wolfi}
+----
 
 ==== Optional: Verify the image
 
 You can use the https://docs.sigstore.dev/cosign/installation/[Cosign application] to verify the {beatname_uc} Docker image signature.
 
 ifeval::["{release-state}"=="unreleased"]
-
-Version {version} of {beatname_uc} has not yet been
-released, so no Docker image is currently available for this version.
-
+WARNING: Version {version} of {beatname_uc} has not yet been released.
+No Docker image is currently available for {beatname_uc} {version}.
 endif::[]
-
-ifeval::["{release-state}"!="unreleased"]
 
 ["source", "sh", subs="attributes"]
-------------------------------------------------
+----
 wget https://artifacts.elastic.co/cosign.pub
 cosign verify --key cosign.pub {dockerimage}
-------------------------------------------------
+----
 
-For details about this step, refer to {ref}/docker.html#docker-verify-signature[Verify the {es} Docker image signature] in the {es} documentation.
+The `cosign` command prints the check results and the signature payload in JSON format:
 
-endif::[]
+[source,sh,subs="attributes"]
+----
+Verification for {dockerimage} --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The signatures were verified against the specified public key
+----
 
 ==== Run the {beatname_uc} setup
+
+IMPORTANT: A link:https://github.com/elastic/beats/issues/42038[known issue] in version 8.17.0 prevents {beats} Docker images from starting when no options are provided. When running an image on that version, add an `--environment container` parameter to avoid the problem. This is planned to be addressed in issue link:https://github.com/elastic/beats/pull/42060[#42060].
 
 Running {beatname_uc} with the setup command will create the index pattern and
 load visualizations
@@ -76,7 +85,7 @@ and machine learning jobs.  Run this command:
 ifeval::["{beatname_lc}"=="filebeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
 -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
@@ -86,7 +95,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
 -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
@@ -96,7 +105,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
 --cap-add=NET_RAW \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
@@ -107,7 +116,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
 --cap-add=NET_ADMIN \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
@@ -118,7 +127,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
   --cap-add="AUDIT_CONTROL" \
   --cap-add="AUDIT_READ" \
   {dockerimage} \
@@ -139,6 +148,24 @@ using this syntax:
 --------------------------------------------
 
 endif::apm-server[]
+
+==== Run {beatname_uc} on a read-only file system
+
+If you'd like to run {beatname_uc} in a Docker container on a read-only file
+system, you can do so by specifying the `--read-only` option.
+{beatname_uc} requires a stateful directory to store application data, so
+with the `--read-only` option you also need to use the `--mount` option to
+specify a path to where that data can be stored.
+
+For example:
+
+["source", "sh", subs="attributes"]
+--------------------------------------------
+docker run --rm \
+  --mount type=bind,source=$(pwd)/data,destination=/usr/share/{beatname_lc}/data \
+  --read-only \
+  {dockerimage}
+--------------------------------------------
 
 ==== Configure {beatname_uc} on Docker
 
@@ -170,6 +197,7 @@ docker run -d \
   --volume="$(pwd)/{beatname_lc}.docker.yml:/usr/share/{beatname_lc}/{beatname_lc}.yml:ro" \
   --volume="/var/lib/docker/containers:/var/lib/docker/containers:ro" \
   --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
+  --volume="registry:/usr/share/{beatname_lc}/data:rw" \
   {dockerimage} {beatname_lc} -e --strict.perms=false \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 --------------------------------------------

@@ -21,13 +21,18 @@ import (
 	"errors"
 	"math"
 	"os"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -35,52 +40,108 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
+type testCGRsolver struct {
+	res func(pid int) (cgroup.PathList, error)
+}
+
+func (t testCGRsolver) ProcessCgroupPaths(pid int) (cgroup.PathList, error) {
+	return t.res(pid)
+}
+
+func newCGHandlerBuilder(handler testCGRsolver) processors.InitCgroupHandler {
+	return func(_ resolve.Resolver, _ bool) (processors.CGReader, error) {
+		return handler, nil
+	}
+}
+
+func TestNilProcessor(t *testing.T) {
+	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return &processors.NilCGReader{}, nil
+	}
+
+	proc, err := newProcessMetadataProcessorWithProvider(defaultConfig(), &procCache, false)
+	require.NoError(t, err)
+
+	// make sure a nil cgroup reader doesn't blow anything up
+	unwrapped, _ := proc.(*addProcessMetadata)
+	metadata, err := unwrapped.provider.GetProcessMetadata(os.Getpid())
+	require.NoError(t, err)
+	require.NotNil(t, metadata)
+
+}
+
+func TestDefaultProcessorStartup(t *testing.T) {
+	// set initCgroupPaths to system non-test defaults
+	initCgroupPaths = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+		return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+	}
+
+	proc, err := newProcessMetadataProcessorWithProvider(defaultConfig(), &procCache, false)
+	require.NoError(t, err)
+
+	// ensure the underlying provider has been initialized properly
+	unwrapped, _ := proc.(*addProcessMetadata)
+	metadata, err := unwrapped.provider.GetProcessMetadata(os.Getpid())
+	require.NoError(t, err)
+	require.NotNil(t, metadata.fields)
+}
+
 func TestAddProcessMetadata(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
+
+	capMock, err := capabilities.FromUint64(0xabacabb)
+	if err != nil {
+		t.Fatalf("could not instantiate capabilities: %s", err)
+	}
 	startTime := time.Now()
 	testProcs := testProvider{
 		1: {
-			name:  "systemd",
-			title: "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-			exe:   "/usr/lib/systemd/systemd",
-			args:  []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+			name:     "systemd",
+			entityID: "XCOVE56SVVEOKBNX",
+			title:    "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+			exe:      "/usr/lib/systemd/systemd",
+			args:     []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 			env: map[string]string{
 				"HOME":       "/",
 				"TERM":       "linux",
 				"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 				"LANG":       "en_US.UTF-8",
 			},
-			pid:       1,
-			ppid:      0,
-			startTime: startTime,
-			username:  "root",
-			userid:    "0",
+			pid:          1,
+			ppid:         0,
+			startTime:    startTime,
+			username:     "root",
+			userid:       "0",
+			capEffective: capMock,
+			capPermitted: capMock,
 		},
 		3: {
-			name:  "systemd",
-			title: "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-			exe:   "/usr/lib/systemd/systemd",
-			args:  []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+			name:     "systemd",
+			entityID: "XCOVE56SVVEOKBNX",
+			title:    "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+			exe:      "/usr/lib/systemd/systemd",
+			args:     []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 			env: map[string]string{
 				"HOME":       "/",
 				"TERM":       "linux",
 				"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 				"LANG":       "en_US.UTF-8",
 			},
-			pid:       1,
-			ppid:      0,
-			startTime: startTime,
-			username:  "user",
-			userid:    "1001",
+			pid:          1,
+			ppid:         0,
+			startTime:    startTime,
+			username:     "user",
+			userid:       "1001",
+			capEffective: capMock,
+			capPermitted: capMock,
 		},
 	}
 
 	// mock of the cgroup processCgroupPaths
-	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
+	processCgroupPaths := func(pid int) (cgroup.PathList, error) {
 		testMap := map[int]cgroup.PathList{
 			1: {
 				V1: map[string]cgroup.ControllerPath{
-
 					"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -98,7 +159,6 @@ func TestAddProcessMetadata(t *testing.T) {
 			},
 			2: {
 				V1: map[string]cgroup.ControllerPath{
-
 					"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 					"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -114,10 +174,16 @@ func TestAddProcessMetadata(t *testing.T) {
 					"name=systemd": {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 				},
 			},
+			6: {
+				V2: map[string]cgroup.ControllerPath{
+					"Docker": {IsV2: true, ControllerPath: "/custom_path/123456abc"},
+				},
+			},
 		}
 
 		return testMap[pid], nil
 	}
+	initCgroupPaths = newCGHandlerBuilder(testCGRsolver{res: processCgroupPaths})
 
 	for _, test := range []struct {
 		description             string
@@ -144,6 +210,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 				"process": mapstr.M{
 					"name":       "systemd",
+					"entity_id":  "XCOVE56SVVEOKBNX",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -155,6 +222,12 @@ func TestAddProcessMetadata(t *testing.T) {
 					"owner": mapstr.M{
 						"name": "root",
 						"id":   "0",
+					},
+					"thread": mapstr.M{
+						"capabilities": mapstr.M{
+							"effective": capMock,
+							"permitted": capMock,
+						},
 					},
 				},
 				"container": mapstr.M{
@@ -229,6 +302,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				"parent": mapstr.M{
 					"process": mapstr.M{
 						"name":       "systemd",
+						"entity_id":  "XCOVE56SVVEOKBNX",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -240,6 +314,12 @@ func TestAddProcessMetadata(t *testing.T) {
 						"owner": mapstr.M{
 							"name": "root",
 							"id":   "0",
+						},
+						"thread": mapstr.M{
+							"capabilities": mapstr.M{
+								"effective": capMock,
+								"permitted": capMock,
+							},
 						},
 					},
 					"container": mapstr.M{
@@ -263,6 +343,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				"parent": mapstr.M{
 					"process": mapstr.M{
 						"name":       "systemd",
+						"entity_id":  "XCOVE56SVVEOKBNX",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -280,6 +361,12 @@ func TestAddProcessMetadata(t *testing.T) {
 						"owner": mapstr.M{
 							"name": "root",
 							"id":   "0",
+						},
+						"thread": mapstr.M{
+							"capabilities": mapstr.M{
+								"effective": capMock,
+								"permitted": capMock,
+							},
 						},
 					},
 					"container": mapstr.M{
@@ -304,6 +391,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				"parent": mapstr.M{
 					"process": mapstr.M{
 						"name":       "systemd",
+						"entity_id":  "XCOVE56SVVEOKBNX",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -321,6 +409,12 @@ func TestAddProcessMetadata(t *testing.T) {
 						"owner": mapstr.M{
 							"name": "root",
 							"id":   "0",
+						},
+						"thread": mapstr.M{
+							"capabilities": mapstr.M{
+								"effective": capMock,
+								"permitted": capMock,
+							},
 						},
 					},
 				},
@@ -502,6 +596,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 				"process": mapstr.M{
 					"name":       "systemd",
+					"entity_id":  "XCOVE56SVVEOKBNX",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -513,6 +608,12 @@ func TestAddProcessMetadata(t *testing.T) {
 					"owner": mapstr.M{
 						"name": "root",
 						"id":   "0",
+					},
+					"thread": mapstr.M{
+						"capabilities": mapstr.M{
+							"effective": capMock,
+							"permitted": capMock,
+						},
 					},
 				},
 				"container": mapstr.M{
@@ -627,6 +728,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 				"process": mapstr.M{
 					"name":       "systemd",
+					"entity_id":  "XCOVE56SVVEOKBNX",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -638,6 +740,12 @@ func TestAddProcessMetadata(t *testing.T) {
 					"owner": mapstr.M{
 						"name": "user",
 						"id":   "1001",
+					},
+					"thread": mapstr.M{
+						"capabilities": mapstr.M{
+							"effective": capMock,
+							"permitted": capMock,
+						},
 					},
 				},
 			},
@@ -712,19 +820,49 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "invalid cgroup_regex configured",
+			config: mapstr.M{
+				"cgroup_regex": "",
+			},
+			initErr: errors.New("cgroup_regexp must contain exactly one capturing group for the container ID accessing config"),
+		},
+		{
+			description: "cgroup_prefixes configured",
+			config: mapstr.M{
+				"match_pids":      []string{"pid"},
+				"include_fields":  []string{"container.id"},
+				"cgroup_prefixes": []string{"/custom_path"},
+			},
+			event: mapstr.M{
+				"pid": "6",
+			},
+			expected: mapstr.M{
+				"pid": "6",
+				"container": mapstr.M{
+					"id": "123456abc",
+				},
+			},
+		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
-			config, err := conf.NewConfigFrom(test.config)
-			if err != nil {
-				t.Fatal(err)
+			configC, err := conf.NewConfigFrom(test.config)
+			assert.NoError(t, err)
+
+			config := defaultConfig()
+			if err := configC.Unpack(&config); err != nil {
+				if test.initErr == nil {
+					t.Fatal(err)
+				}
+				assert.EqualError(t, err, test.initErr.Error())
+				return
 			}
 
 			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
-			if test.initErr == nil {
-				if err != nil {
+			if err != nil {
+				if test.initErr == nil {
 					t.Fatal(err)
 				}
-			} else {
 				assert.EqualError(t, err, test.initErr.Error())
 				return
 			}
@@ -755,7 +893,11 @@ func TestAddProcessMetadata(t *testing.T) {
 			"include_fields": []string{"process.name"},
 		}
 
-		config, err := conf.NewConfigFrom(c)
+		configC, err := conf.NewConfigFrom(c)
+		assert.NoError(t, err)
+
+		config := defaultConfig()
+		err = configC.Unpack(&config)
 		assert.NoError(t, err)
 
 		proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
@@ -791,10 +933,9 @@ func TestUsingCache(t *testing.T) {
 	selfPID := os.Getpid()
 
 	// mock of the cgroup processCgroupPaths
-	processCgroupPaths = func(_ resolve.Resolver, pid int) (cgroup.PathList, error) {
+	processCgroupPaths := func(pid int) (cgroup.PathList, error) {
 		testStruct := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
-
 				"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 				"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 				"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
@@ -817,11 +958,12 @@ func TestUsingCache(t *testing.T) {
 		// testMap :=
 		return testMap[pid], nil
 	}
-
+	initCgroupPaths = newCGHandlerBuilder(testCGRsolver{res: processCgroupPaths})
 	config, err := conf.NewConfigFrom(mapstr.M{
-		"match_pids":     []string{"system.process.ppid"},
-		"include_fields": []string{"container.id"},
-		"target":         "meta",
+		"match_pids":        []string{"system.process.ppid"},
+		"include_fields":    []string{"container.id", "process.env"},
+		"target":            "meta",
+		"restricted_fields": true,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -853,6 +995,24 @@ func TestUsingCache(t *testing.T) {
 	}
 	assert.Equal(t, "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1", containerID)
 
+	// check environment for GOOSes that support it.
+	switch runtime.GOOS {
+	case "darwin", "linux":
+		env, err := result.Fields.GetValue("meta.process.env")
+		if err != nil {
+			t.Fatal(err)
+		}
+		// The event is for this process, so we can just grab our env to compare.
+		want := make(map[string]string)
+		for _, kv := range os.Environ() {
+			k, v, ok := strings.Cut(kv, "=")
+			if ok {
+				want[k] = v
+			}
+		}
+		assert.Equal(t, want, env)
+	}
+
 	ev = beat.Event{
 		Fields: mapstr.M{
 			"system": mapstr.M{
@@ -878,6 +1038,7 @@ func TestUsingCache(t *testing.T) {
 
 func TestSelf(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
+
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
@@ -911,6 +1072,7 @@ func TestSelf(t *testing.T) {
 
 func TestBadProcess(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
+
 	config, err := conf.NewConfigFrom(mapstr.M{
 		"match_pids": []string{"self_pid"},
 		"target":     "self",
@@ -1089,7 +1251,7 @@ func TestPIDToInt(t *testing.T) {
 }
 
 func TestV2CID(t *testing.T) {
-	processCgroupPaths = func(_ resolve.Resolver, _ int) (cgroup.PathList, error) {
+	processCgroupPaths := func(_ int) (cgroup.PathList, error) {
 		testMap := cgroup.PathList{
 			V1: map[string]cgroup.ControllerPath{
 				"cpu": {IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
@@ -1097,8 +1259,56 @@ func TestV2CID(t *testing.T) {
 		}
 		return testMap, nil
 	}
-	provider := newCidProvider(resolve.NewTestResolver(""), []string{}, "", processCgroupPaths, nil)
+	resolver := testCGRsolver{res: processCgroupPaths}
+	initCgroupPaths = newCGHandlerBuilder(resolver)
+	provider := newCidProvider(nil, defaultCgroupRegex, resolver, nil)
 	result, err := provider.GetCid(1)
 	assert.NoError(t, err)
 	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)
+}
+
+// TestDefaultCgroupRegex verifies that defaultCgroupRegex matches the most common
+// container runtime and container orchestrator cgroup paths.
+func TestDefaultCgroupRegex(t *testing.T) {
+	testCases := []struct {
+		TestName    string
+		CgroupPath  string
+		ContainerID string
+	}{
+		{
+			TestName:    "kubernetes-docker",
+			CgroupPath:  "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/docker-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope",
+			ContainerID: "80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460",
+		},
+		{
+			TestName:    "kubernetes-cri-containerd",
+			CgroupPath:  "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod2d5133c0_65f3_40b2_b375_c04866d418e1.slice/cri-containerd-e01a26336924e2fb8089bcf4cf943954fd9ea616cc5678f38f65928307979459.scope",
+			ContainerID: "e01a26336924e2fb8089bcf4cf943954fd9ea616cc5678f38f65928307979459",
+		},
+		{
+			TestName:    "kubernetes-crio",
+			CgroupPath:  "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/crio-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope",
+			ContainerID: "80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460",
+		},
+		{
+			TestName:    "podman",
+			CgroupPath:  "/user.slice/user-1000.slice/user@1000.service/user.slice/libpod-conmon-ee059a097566fdc5ac9141bfcdfbed0c972163da891de076e0849d7b53597aac.scope",
+			ContainerID: "ee059a097566fdc5ac9141bfcdfbed0c972163da891de076e0849d7b53597aac",
+		},
+		{
+			TestName:    "docker",
+			CgroupPath:  "/docker/485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9",
+			ContainerID: "485776c9f6f2c22e2b44a2239b65471d6a02701b54d1cb5e1c55a09108a1b5b9",
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.TestName, func(t *testing.T) {
+			matches := defaultCgroupRegex.FindStringSubmatch(tc.CgroupPath)
+			if len(matches) < 2 || matches[1] != tc.ContainerID {
+				t.Errorf("container.id not matched in cgroup path %s", tc.CgroupPath)
+			}
+		})
+	}
 }

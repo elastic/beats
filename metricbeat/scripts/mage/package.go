@@ -40,7 +40,7 @@ const (
 // not supported. You must declare a dependency on either
 // PrepareModulePackagingOSS or PrepareModulePackagingXPack.
 func CustomizePackaging() {
-	mg.Deps(customizeLightModulesPackaging)
+	mg.Deps(CustomizeLightModulesPackaging)
 
 	var (
 		modulesDTarget = "modules.d"
@@ -104,7 +104,7 @@ func CustomizePackaging() {
 // PrepareModulePackagingOSS generates build/package/modules and
 // build/package/modules.d directories for use in packaging.
 func PrepareModulePackagingOSS() error {
-	err := prepareLightModulesPackaging("module")
+	err := PrepareLightModulesPackaging("module")
 	if err != nil {
 		return err
 	}
@@ -116,7 +116,7 @@ func PrepareModulePackagingOSS() error {
 // PrepareModulePackagingXPack generates build/package/modules and
 // build/package/modules.d directories for use in packaging.
 func PrepareModulePackagingXPack() error {
-	err := prepareLightModulesPackaging("module", devtools.OSSBeatDir("module"))
+	err := PrepareLightModulesPackaging("module", devtools.OSSBeatDir("module"))
 	if err != nil {
 		return err
 	}
@@ -201,8 +201,8 @@ func GenerateDirModulesD() error {
 	return nil
 }
 
-// customizeLightModulesPackaging customizes packaging to add light modules
-func customizeLightModulesPackaging() error {
+// CustomizeLightModulesPackaging customizes packaging to add light modules
+func CustomizeLightModulesPackaging() error {
 	var (
 		moduleTarget = "module"
 		module       = devtools.PackageFile{
@@ -225,8 +225,8 @@ func customizeLightModulesPackaging() error {
 	return nil
 }
 
-// prepareLightModulesPackaging generates light modules
-func prepareLightModulesPackaging(paths ...string) error {
+// PrepareLightModulesPackaging generates light modules
+func PrepareLightModulesPackaging(paths ...string) error {
 	err := devtools.Clean([]string{dirModulesGenerated})
 	if err != nil {
 		return err

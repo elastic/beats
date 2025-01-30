@@ -22,7 +22,7 @@
 package include
 
 import (
-	// Import packages that need to register themselves.
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/metricbeat/module/docker/container"
 	_ "github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
 	_ "github.com/elastic/beats/v7/metricbeat/module/docker/diskio"
@@ -46,6 +46,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_daemonset"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_deployment"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_job"
+	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_namespace"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_persistentvolume"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes/state_persistentvolumeclaim"

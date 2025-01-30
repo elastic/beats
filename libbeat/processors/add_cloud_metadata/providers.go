@@ -22,9 +22,13 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"slices"
+	"strings"
 	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -32,8 +36,9 @@ type provider struct {
 	// Name contains a long name of provider and service metadata is fetched from.
 	Name string
 
-	// Local Set to true if local IP is accessed only
-	Local bool
+	// DefaultEnabled allows to control whether metadata provider should be enabled by default
+	// Set to true if metadata access is enabled by default for the provider
+	DefaultEnabled bool
 
 	// Create returns an actual metadataFetcher
 	Create func(string, *conf.C) (metadataFetcher, error)
@@ -64,8 +69,16 @@ var cloudMetaProviders = map[string]provider{
 	"nova-ssl":      openstackNovaSSLMetadataFetcher,
 	"qcloud":        qcloudMetadataFetcher,
 	"tencent":       qcloudMetadataFetcher,
-	"huawei":        huaweiMetadataFetcher,
+	"huawei":        openstackNovaMetadataFetcher,
 	"hetzner":       hetznerMetadataFetcher,
+}
+
+// priorityProviders contains providers which has priority over others.
+// Metadata of these are derived using cloud provider SDKs, making them valid over metadata derived over well-known IP
+// or other common endpoints. For example, Openstack supports EC2 compliant metadata endpoint. Thus adding possibility to
+// conflict metadata between EC2/AWS and Openstack.
+var priorityProviders = []string{
+	"aws", "ec2", "azure",
 }
 
 func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
@@ -73,10 +86,25 @@ func selectProviders(configList providerList, providers map[string]provider) map
 }
 
 func providersFilter(configList providerList, allProviders map[string]provider) func(string) bool {
+	if v, ok := os.LookupEnv("BEATS_ADD_CLOUD_METADATA_PROVIDERS"); ok {
+		// We allow users to override the config and defaults with
+		// this environment variable as a workaround in case the
+		// configured/default providers misbehave.
+		configList = nil
+		for _, name := range strings.Split(v, ",") {
+			configList = append(configList, strings.TrimSpace(name))
+		}
+		if len(configList) == 0 {
+			// User explicitly disabled all providers.
+			return func(string) bool {
+				return false
+			}
+		}
+	}
 	if len(configList) == 0 {
 		return func(name string) bool {
 			ff, ok := allProviders[name]
-			return ok && ff.Local
+			return ok && ff.DefaultEnabled
 		}
 	}
 	return func(name string) (ok bool) {
@@ -101,7 +129,7 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 
-	// Iterate over all providers and create an unique meta-data fetcher per provider type.
+	// Iterate over all providers and create a unique meta-data fetcher per provider type.
 	// Some providers might appear twice in the set of providers to support aliases on provider names.
 	// For example aws and ec2 both use the same provider.
 	// The loop tracks already seen providers in the `visited` set, to ensure that we do not create
@@ -123,7 +151,7 @@ func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher,
 }
 
 // fetchMetadata attempts to fetch metadata in parallel from each of the
-// hosting providers supported by this processor. It wait for the results to
+// hosting providers supported by this processor. It will wait for the results to
 // be returned or for a timeout to occur then returns the first result that
 // completed in time.
 func (p *addCloudMetadata) fetchMetadata() *result {
@@ -161,20 +189,54 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 		}()
 	}
 
-	for i := 0; i < len(p.initData.fetchers); i++ {
+	var responses []result
+
+	for ctx.Err() == nil {
 		select {
 		case result := <-results:
 			p.logger.Debugf("add_cloud_metadata: received disposition for %v after %v. %v",
 				result.provider, time.Since(start), result)
-			// Bail out on first success.
+
 			if result.err == nil && result.metadata != nil {
-				return &result
+				responses = append(responses, result)
+			}
+
+			if result.err != nil {
+				p.logger.Debugf("add_cloud_metadata: received error for provider %s: %v", result.provider, result.err)
 			}
 		case <-ctx.Done():
-			p.logger.Debugf("add_cloud_metadata: timed-out waiting for all responses")
-			return nil
+			p.logger.Debugf("add_cloud_metadata: timed-out waiting for responses")
 		}
 	}
 
-	return nil
+	return priorityResult(responses, p.logger)
+}
+
+// priorityResult is a helper to extract correct result (if multiple exist) based on priorityProviders
+func priorityResult(responses []result, logger *logp.Logger) *result {
+	if len(responses) == 0 {
+		return nil
+	}
+
+	if len(responses) == 1 {
+		return &responses[0]
+	}
+
+	logger.Debugf("add_cloud_metadata: multiple responses were received, filtering based on priority")
+	var prioritizedResponses []result
+	for _, r := range responses {
+		if slices.Contains(priorityProviders, r.provider) {
+			prioritizedResponses = append(prioritizedResponses, r)
+		}
+	}
+
+	// simply send the first entry of prioritized response
+	if len(prioritizedResponses) != 0 {
+		pr := prioritizedResponses[0]
+		logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", pr.provider)
+		return &pr
+	}
+
+	// else send the first from bulk of response
+	return &responses[0]
 }

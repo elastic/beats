@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"crypto/sha1"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -29,7 +28,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
@@ -40,19 +41,15 @@ import (
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	go func() {
 		time.Sleep(100 * time.Millisecond)
 		file := filepath.Join(dir, "file.data")
-		ioutil.WriteFile(file, []byte("hello world"), 0o600)
+		require.NoError(t, os.WriteFile(file, []byte("hello world"), 0o600))
 	}()
 
-	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir), ab.Registry)
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
 	for _, e := range events {
 		if e.Error != nil {
@@ -67,6 +64,11 @@ func TestData(t *testing.T) {
 func TestActions(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
 
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
+	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
+
 	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -76,28 +78,10 @@ func TestActions(t *testing.T) {
 	defer bucket.Close()
 
 	// First directory
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	// Second directory (to be reported with "initial_scan")
-	newDir, err := ioutil.TempDir("", "audit-file-new")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(newDir)
-
-	newDir, err = filepath.EvalSymlinks(newDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	newDir := t.TempDir()
 
 	createdFilepath := filepath.Join(dir, "created.txt")
 	updatedFilepath := filepath.Join(dir, "updated.txt")
@@ -136,10 +120,10 @@ func TestActions(t *testing.T) {
 	}
 
 	// Create some files in first directory
-	ioutil.WriteFile(createdFilepath, []byte("hello world"), 0o600)
-	ioutil.WriteFile(updatedFilepath, []byte("hello world"), 0o600)
+	require.NoError(t, os.WriteFile(createdFilepath, []byte("hello world"), 0o600))
+	require.NoError(t, os.WriteFile(updatedFilepath, []byte("hello world"), 0o600))
 
-	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir, newDir), ab.Registry)
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
 	assert.Len(t, events, 5)
 
@@ -177,6 +161,11 @@ func TestActions(t *testing.T) {
 func TestExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
 
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
+	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
+
 	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -185,23 +174,14 @@ func TestExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir), ab.Registry)
 
 	go func() {
 		for _, f := range []string{"FILE.TXT", "FILE.TXT.SWP", "file.txt.swo", ".git/HEAD", ".gitignore"} {
 			file := filepath.Join(dir, f)
-			ioutil.WriteFile(file, []byte("hello world"), 0o600)
+			_ = os.WriteFile(file, []byte("hello world"), 0o600)
 		}
 	}()
 
@@ -233,6 +213,11 @@ func TestExcludedFiles(t *testing.T) {
 func TestIncludedExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
 
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
+	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
+
 	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -241,16 +226,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	}
 	defer bucket.Close()
 
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	err = os.Mkdir(filepath.Join(dir, ".ssh"), 0o700)
 	if err != nil {
@@ -260,14 +236,11 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	config := getConfig(dir)
 	config["include_files"] = []string{`\.ssh`}
 	config["recursive"] = true
-	ms := mbtest.NewPushMetricSetV2(t, config)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 
 	for _, f := range []string{"FILE.TXT", ".ssh/known_hosts", ".ssh/known_hosts.swp"} {
 		file := filepath.Join(dir, f)
-		err := ioutil.WriteFile(file, []byte("hello world"), 0o600)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, os.WriteFile(file, []byte("hello world"), 0o600))
 	}
 
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 3, ms)
@@ -311,16 +284,7 @@ func TestErrorReporting(t *testing.T) {
 	}
 	defer abtest.SetupDataDir(t)()
 
-	dir, err := ioutil.TempDir("", "audit-file")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
-	dir, err = filepath.EvalSymlinks(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	path := filepath.Join(dir, "unreadable.txt")
 	f, err := os.Create(path)
@@ -334,15 +298,18 @@ func TestErrorReporting(t *testing.T) {
 
 	config := getConfig(dir)
 	config["scan_at_start"] = false
-	ms := mbtest.NewPushMetricSetV2(t, config)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 
 	done := make(chan struct{}, 1)
+	ready := make(chan struct{}, 1)
 	go func() {
 		for {
-			f.WriteString("can't read this\n")
-			f.Sync()
+			_, err := f.WriteString("can't read this\n")
+			require.NoError(t, err)
+			require.NoError(t, f.Sync())
 			select {
 			case <-done:
+				close(ready)
 				return
 			default:
 				time.Sleep(time.Second / 10)
@@ -352,6 +319,7 @@ func TestErrorReporting(t *testing.T) {
 
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 10, ms)
 	close(done)
+	<-ready
 
 	getField := func(ev *mb.Event, field string) interface{} {
 		v, _ := ev.MetricSetFields.GetValue(field)
@@ -366,6 +334,7 @@ func TestErrorReporting(t *testing.T) {
 
 	var event *mb.Event
 	for idx, ev := range events {
+		ev := ev
 		t.Log("event[", idx, "] = ", ev)
 		if match(&ev) {
 			event = &ev
@@ -442,6 +411,8 @@ func (t *testReporter) Clear() {
 }
 
 func checkExpectedEvent(t *testing.T, ms *MetricSet, title string, input *Event, expected map[string]interface{}) {
+	t.Helper()
+
 	var reporter testReporter
 	if !ms.reportEvent(&reporter, input) {
 		t.Fatal("reportEvent failed", title)
@@ -487,12 +458,13 @@ func (e expectedEvent) validate(t *testing.T, ms *MetricSet) {
 type expectedEvents []expectedEvent
 
 func (e expectedEvents) validate(t *testing.T) {
-	store, err := ioutil.TempFile("", "bucket")
+	store, err := os.CreateTemp("", "bucket")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer store.Close()
 	defer os.Remove(store.Name())
+
 	ds := datastore.New(store.Name(), 0o644)
 	bucket, err := ds.OpenBucket(bucketName)
 	if err != nil {
@@ -501,7 +473,7 @@ func (e expectedEvents) validate(t *testing.T) {
 	defer bucket.Close()
 	config := getConfig("somepath")
 	config["hash_types"] = []string{"sha1"}
-	ms, ok := mbtest.NewPushMetricSetV2(t, config).(*MetricSet)
+	ms, ok := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry).(*MetricSet)
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
@@ -759,12 +731,13 @@ func TestEventFailedHash(t *testing.T) {
 }
 
 func TestEventDelete(t *testing.T) {
-	store, err := ioutil.TempFile("", "bucket")
+	store, err := os.CreateTemp("", "bucket")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer store.Close()
 	defer os.Remove(store.Name())
+
 	ds := datastore.New(store.Name(), 0o644)
 	bucket, err := ds.OpenBucket(bucketName)
 	if err != nil {
@@ -773,7 +746,7 @@ func TestEventDelete(t *testing.T) {
 	defer bucket.Close()
 	config := getConfig("somepath")
 	config["hash_types"] = []string{"sha1"}
-	ms, ok := mbtest.NewPushMetricSetV2(t, config).(*MetricSet)
+	ms, ok := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry).(*MetricSet)
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
@@ -990,5 +963,17 @@ func getConfig(path ...string) map[string]interface{} {
 func skipOnCIForDarwinAMD64(t testing.TB) {
 	if os.Getenv("CI") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		t.Skip("Skip test on CI for darwin/amd64")
+	}
+}
+
+func skipOnBuildkiteWindows(t testing.TB) {
+	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "windows" {
+		t.Skip("Skip on Buildkite Windows: Shortened TMP problem")
+	}
+}
+
+func skipOnBuildkiteDarwinArm(t testing.TB) {
+	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+		t.Skip("Skip test on Buldkite: unexpected path error")
 	}
 }

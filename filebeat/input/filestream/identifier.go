@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -77,7 +76,7 @@ func (f fileSource) Name() string {
 // newFileIdentifier creates a new state identifier for a log input.
 func newFileIdentifier(ns *conf.Namespace, suffix string) (fileIdentifier, error) {
 	if ns == nil {
-		i, err := newINodeDeviceIdentifier(nil)
+		i, err := newFingerprintIdentifier(nil)
 		if err != nil {
 			return nil, err
 		}
@@ -114,7 +113,7 @@ func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              i.name + identitySep + file.GetOSState(e.Descriptor.Info).String(),
+		fileID:              i.name + identitySep + e.Descriptor.Info.GetOSState().String(),
 		identifierGenerator: i.name,
 	}
 }

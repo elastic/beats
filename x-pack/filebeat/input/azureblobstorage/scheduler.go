@@ -7,9 +7,13 @@ package azureblobstorage
 import (
 	"context"
 	"fmt"
+	"slices"
+	"sort"
 	"sync"
 
+	azruntime "github.com/Azure/azure-sdk-for-go/sdk/azcore/runtime"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	azcontainer "github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -42,7 +46,7 @@ func (l *limiter) release() {
 
 type scheduler struct {
 	publisher  cursor.Publisher
-	client     *azblob.ContainerClient
+	client     *azcontainer.Client
 	credential *serviceCredentials
 	src        *Source
 	cfg        *config
@@ -53,7 +57,7 @@ type scheduler struct {
 }
 
 // newScheduler, returns a new scheduler instance
-func newScheduler(publisher cursor.Publisher, client *azblob.ContainerClient,
+func newScheduler(publisher cursor.Publisher, client *azcontainer.Client,
 	credential *serviceCredentials, src *Source, cfg *config,
 	state *state, serviceURL string, log *logp.Logger,
 ) *scheduler {
@@ -72,7 +76,6 @@ func newScheduler(publisher cursor.Publisher, client *azblob.ContainerClient,
 
 // schedule, is responsible for fetching & scheduling jobs using the workerpool model
 func (s *scheduler) schedule(ctx context.Context) error {
-	defer s.limiter.wait()
 	if !s.src.Poll {
 		return s.scheduleOnce(ctx)
 	}
@@ -91,18 +94,53 @@ func (s *scheduler) schedule(ctx context.Context) error {
 }
 
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
+	defer s.limiter.wait()
 	pager := s.fetchBlobPager(int32(s.src.MaxWorkers))
-	for pager.NextPage(ctx) {
-		jobs, err := s.createJobs(pager)
+	fileSelectorLen := len(s.src.FileSelectors)
+	var numBlobs, numJobs int
+
+	for pager.More() {
+		resp, err := pager.NextPage(ctx)
 		if err != nil {
-			s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
 			return err
+		}
+
+		numBlobs += len(resp.Segment.BlobItems)
+		s.log.Debugf("scheduler: %d blobs fetched for current batch", len(resp.Segment.BlobItems))
+
+		var jobs []*job
+		for _, v := range resp.Segment.BlobItems {
+			// if file selectors are present, then only select the files that match the regex
+			if fileSelectorLen != 0 && !s.isFileSelected(*v.Name) {
+				continue
+			}
+			// date filter is applied on last modified time of the blob
+			if s.src.TimeStampEpoch != nil && v.Properties.LastModified.Unix() < *s.src.TimeStampEpoch {
+				continue
+			}
+			blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
+			blobCreds := &blobCredentials{
+				serviceCreds:  s.credential,
+				blobName:      *v.Name,
+				containerName: s.src.ContainerName,
+			}
+
+			blobClient, err := fetchBlobClient(blobURL, blobCreds, *s.cfg, s.log)
+			if err != nil {
+				s.log.Errorf("Job creation failed for container %s with error %v", s.src.ContainerName, err)
+				return err
+			}
+
+			job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.log)
+			jobs = append(jobs, job)
 		}
 
 		// If previous checkpoint was saved then look up starting point for new jobs
 		if !s.state.checkpoint().LatestEntryTime.IsZero() {
 			jobs = s.moveToLastSeenJob(jobs)
 		}
+
+		s.log.Debugf("scheduler: %d jobs scheduled for current batch", len(jobs))
 
 		// distributes jobs among workers with the help of a limiter
 		for i, job := range jobs {
@@ -114,9 +152,14 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 				job.do(ctx, id)
 			}()
 		}
+
+		s.log.Debugf("scheduler: total objects read till now: %d\nscheduler: total jobs scheduled till now: %d", numBlobs, numJobs)
+		if len(jobs) != 0 {
+			s.log.Debugf("scheduler: first job in current batch: %s\nscheduler: last job in current batch: %s", jobs[0].name(), jobs[len(jobs)-1].name())
+		}
 	}
 
-	return pager.Err()
+	return nil
 }
 
 // fetchJobID returns a job id which is a combination of worker id, container name and blob name
@@ -124,29 +167,6 @@ func fetchJobID(workerId int, containerName string, blobName string) string {
 	jobID := fmt.Sprintf("%s-%s-worker-%d", containerName, blobName, workerId)
 
 	return jobID
-}
-
-func (s *scheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]*job, error) {
-	var jobs []*job
-
-	for _, v := range pager.PageResponse().Segment.BlobItems {
-		blobURL := s.serviceURL + s.src.ContainerName + "/" + *v.Name
-		blobCreds := &blobCredentials{
-			serviceCreds:  s.credential,
-			blobName:      *v.Name,
-			containerName: s.src.ContainerName,
-		}
-
-		blobClient, err := fetchBlobClient(blobURL, blobCreds, s.log)
-		if err != nil {
-			return nil, err
-		}
-
-		job := newJob(blobClient, v, blobURL, s.state, s.src, s.publisher, s.log)
-		jobs = append(jobs, job)
-	}
-
-	return jobs, nil
 }
 
 // fetchBlobPager fetches the current blob page object given a batch size & a page marker.
@@ -157,11 +177,11 @@ func (s *scheduler) createJobs(pager *azblob.ContainerListBlobFlatPager) ([]*job
 // hence disabling it for now, until more feedback is given. Disabling this how ever makes the sheduler loop
 // through all the blobs on every poll action to arrive at the latest checkpoint.
 // [NOTE] : There are no api's / sdk functions that list blobs via timestamp/latest entry, it's always lexicographical order
-func (s *scheduler) fetchBlobPager(batchSize int32) *azblob.ContainerListBlobFlatPager {
-	pager := s.client.ListBlobsFlat(&azblob.ContainerListBlobsFlatOptions{
-		Include: []azblob.ListBlobsIncludeItem{
-			azblob.ListBlobsIncludeItemMetadata,
-			azblob.ListBlobsIncludeItemTags,
+func (s *scheduler) fetchBlobPager(batchSize int32) *azruntime.Pager[azblob.ListBlobsFlatResponse] {
+	pager := s.client.NewListBlobsFlatPager(&azcontainer.ListBlobsFlatOptions{
+		Include: azcontainer.ListBlobsInclude{
+			Metadata: true,
+			Tags:     true,
 		},
 		MaxResults: &batchSize,
 	})
@@ -172,42 +192,26 @@ func (s *scheduler) fetchBlobPager(batchSize int32) *azblob.ContainerListBlobFla
 // moveToLastSeenJob, moves to the latest job position past the last seen job
 // Jobs are stored in lexicographical order always, hence the latest position can be found either on the basis of job name or timestamp
 func (s *scheduler) moveToLastSeenJob(jobs []*job) []*job {
-	var latestJobs []*job
-	jobsToReturn := make([]*job, 0)
-	counter := 0
-	flag := false
-	ignore := false
+	cp := s.state.checkpoint()
+	jobs = slices.DeleteFunc(jobs, func(j *job) bool {
+		return !(j.timestamp().After(cp.LatestEntryTime) || j.name() > cp.BlobName)
+	})
 
-	for _, job := range jobs {
-		switch offset, isPartial := s.state.cp.PartiallyProcessed[*job.blob.Name]; {
-		case isPartial:
-			job.offset = offset
-			latestJobs = append(latestJobs, job)
-		case job.timestamp().After(s.state.checkpoint().LatestEntryTime):
-			latestJobs = append(latestJobs, job)
-		case job.name() == s.state.checkpoint().BlobName:
-			flag = true
-		case job.name() > s.state.checkpoint().BlobName:
-			flag = true
-			counter--
-		case job.name() <= s.state.checkpoint().BlobName && (!ignore):
-			ignore = true
+	// In a scenario where there are some jobs which have a greater timestamp
+	// but lesser lexicographic order and some jobs have greater lexicographic order
+	// than the current checkpoint blob name, we then sort around the pivot checkpoint
+	// timestamp.
+	sort.SliceStable(jobs, func(i, _ int) bool {
+		return jobs[i].timestamp().After(cp.LatestEntryTime)
+	})
+	return jobs
+}
+
+func (s *scheduler) isFileSelected(name string) bool {
+	for _, sel := range s.src.FileSelectors {
+		if sel.Regex == nil || sel.Regex.MatchString(name) {
+			return true
 		}
-		counter++
 	}
-
-	if flag && (counter < len(jobs)-1) {
-		jobsToReturn = jobs[counter+1:]
-	} else if !flag && !ignore {
-		jobsToReturn = jobs
-	}
-
-	// in a senario where there are some jobs which have a later time stamp
-	// but lesser alphanumeric order and some jobs have greater alphanumeric order
-	// than the current checkpoint or partially completed jobs are present
-	if len(jobsToReturn) != len(jobs) && len(latestJobs) > 0 {
-		jobsToReturn = append(latestJobs, jobsToReturn...)
-	}
-
-	return jobsToReturn
+	return false
 }

@@ -11,7 +11,7 @@
         },
         "openmetrics": {
             "labels": {
-                "instance": "127.0.0.1:42911",
+                "instance": "127.0.0.1:45871",
                 "job": "openmetrics"
             },
             "metrics": {
@@ -35,7 +35,7 @@
         },
         "openmetrics": {
             "labels": {
-                "instance": "127.0.0.1:42911",
+                "instance": "127.0.0.1:45871",
                 "job": "openmetrics",
                 "listener_name": "http"
             },

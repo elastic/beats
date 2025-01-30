@@ -37,6 +37,8 @@ const (
 	StatusUp       StateStatus = "up"
 	StatusDown     StateStatus = "down"
 	StatusFlapping StateStatus = "flap"
+	// Nil, essentially
+	StatusEmpty StateStatus = ""
 )
 
 func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int, flappingEnabled bool) *State {
@@ -52,7 +54,7 @@ func newMonitorState(sf stdfields.StdMonitorFields, status StateStatus, ctr int,
 		flappingEnabled: flappingEnabled,
 		ctr:             ctr + 1,
 	}
-	ms.recordCheck(sf, status)
+	ms.recordCheck(sf, status, false)
 
 	return ms
 }
@@ -111,7 +113,7 @@ func (s *State) truncateFlapHistory() {
 // If the current state is continued it just updates counters and other record keeping,
 // if the state ends it actually swaps out the full value the state points to
 // and sets state.Ends.
-func (s *State) recordCheck(sf stdfields.StdMonitorFields, newStatus StateStatus) {
+func (s *State) recordCheck(sf stdfields.StdMonitorFields, newStatus StateStatus, isFinalAttempt bool) {
 	if s.Status == StatusFlapping {
 		s.truncateFlapHistory()
 
@@ -124,14 +126,16 @@ func (s *State) recordCheck(sf stdfields.StdMonitorFields, newStatus StateStatus
 			}
 		}
 
-		if !hasStabilized { // continue flapping
+		if !hasStabilized || !isFinalAttempt { // continue flapping
 			// Use the new flap history as part of the state
 			s.FlapHistory = append(s.FlapHistory, newStatus)
 			s.incrementCounters(newStatus)
 		} else { // flap has ended
 			s.transitionTo(sf, newStatus)
 		}
-	} else if s.Status == newStatus { // stable state, status has not changed
+		// stable state, status has not changed
+		// or this will be retried, so no state change yet
+	} else if s.Status == newStatus || !isFinalAttempt {
 		// The state is stable, no changes needed
 		s.incrementCounters(newStatus)
 	} else if s.Checks < FlappingThreshold && s.flappingEnabled {
@@ -178,5 +182,6 @@ func LoaderDBKey(sf stdfields.StdMonitorFields, at time.Time, ctr int) string {
 		rfid = normalizeRunFromIDRegexp.ReplaceAllString(sf.RunFrom.ID, "_")
 
 	}
-	return fmt.Sprintf("%s-%x-%x", rfid, at.UnixMilli(), ctr)
+	key := fmt.Sprintf("%s-%x-%x", rfid, at.UnixMilli(), ctr)
+	return key
 }

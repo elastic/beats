@@ -13,7 +13,10 @@ Users can make use of the `azure-eventhub` input in order to read messages from 
 The azure-eventhub input implementation is based on the the event processor host (EPH is intended to be run across multiple processes and machines while load balancing message consumers more on this here https://github.com/Azure/azure-event-hubs-go#event-processor-host, https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-event-processor-host).
 State such as leases on partitions and checkpoints in the event stream are shared between receivers using an Azure Storage container. For this reason, as a prerequisite to using this input, users will have to create or use an existing storage account.
 
-
+Users can enable internal logs tracing for this input by setting the environment
+variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true`. When enabled,
+this input will log additional information to the logs. Additional information
+includes partition ownership, blob lease information, and other internal state.
 
 
 Example configuration:
@@ -72,3 +75,22 @@ https://management.azure.com/ for azure PublicCloud
 https://management.usgovcloudapi.net/ for azure USGovernmentCloud
 Users can also use this in case of a Hybrid Cloud model, where one may define their own endpoints.
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                       | Description
+| `received_messages_total`    | Number of messages received from the event hub.
+| `received_bytes_total`       | Number of bytes received from the event hub.
+| `sanitized_messages_total`   | Number of messages that were sanitized successfully.
+| `processed_messages_total`   | Number of messages that were processed successfully.
+| `received_events_total`      | Number of events received decoding messages.
+| `sent_events_total`          | Number of events that were sent successfully. 
+| `processing_time`            | Histogram of the elapsed processing times in nanoseconds.
+| `decode_errors_total`        | Number of errors that occurred while decoding a message.
+|=======

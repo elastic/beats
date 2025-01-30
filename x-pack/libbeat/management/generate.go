@@ -65,13 +65,43 @@ func (r *TransformRegister) Transform(
 // Public config transformation
 // ===========
 
+// handleSimpleConfig perform the necessary checks and transformations in the raw
+// config for the simple configuration case (no `streams` key in the config).
+//
+// Currently only the the `filestream` input is supported for the simple config.
+func handleSimpleConfig(raw *proto.UnitExpectedConfig) (map[string]any, error) {
+	m := raw.Source.AsMap()
+	kind, ok := m["type"].(string)
+	if !ok {
+		return nil, fmt.Errorf("unexpected type for 'type', got %T", m["type"])
+	}
+	if kind != "filestream" {
+		return nil, fmt.Errorf("the only supported type is 'filestream', got: %q", kind)
+	}
+
+	return m, nil
+}
+
 // CreateInputsFromStreams breaks down the raw Expected config into an array of individual inputs/modules from the Streams values
 // that can later be formatted into the reloader's ConfigWithMetaData and sent to an indvidual beat/
 // This also performs the basic task of inserting module-level add_field processors into the inputs/modules.
 func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
-	// should this be an error?
+	// If there are no streams, we fall into the 'simple input config' case,
+	// this means the key configuration values are on the root level instead of
+	// an element in the `streams` array.
 	if raw.GetStreams() == nil {
-		return []map[string]interface{}{}, nil
+		streamSource, err := handleSimpleConfig(raw)
+		if err != nil {
+			return []map[string]interface{}{}, err
+		}
+
+		// Create stream rules with all the defaults and an empty streams struct.
+		streamSource, err = createStreamRules(raw, streamSource, &proto.Stream{}, defaultDataStreamType, agentInfo, defaultProcessors...)
+		if err != nil {
+			return nil, fmt.Errorf("error creating stream rules for a simple config (empty streams array): %w", err)
+		}
+
+		return []map[string]interface{}{streamSource}, nil
 	}
 	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
 
@@ -86,35 +116,6 @@ func CreateInputsFromStreams(raw *proto.UnitExpectedConfig, defaultDataStreamTyp
 	}
 
 	return inputs, nil
-}
-
-// CreateShipperInput is a modified version of CreateInputsFromStreams made for forwarding input units to the shipper beat
-// this does not create separate inputs for each stream, and instead passes it along as a single input, with just the processors added
-func CreateShipperInput(raw *proto.UnitExpectedConfig, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) ([]map[string]interface{}, error) {
-	inputs := make([]map[string]interface{}, len(raw.GetStreams()))
-	for iter, stream := range raw.GetStreams() {
-		streamSource := raw.GetStreams()[iter].GetSource().AsMap()
-		streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
-		// 1. global processors
-		streamSource = injectGlobalProcesssors(raw, streamSource)
-
-		// 2. agentInfo
-		streamSource, err := injectAgentInfoRule(streamSource, agentInfo)
-		if err != nil {
-			return nil, fmt.Errorf("Error injecting agent processors: %w", err)
-		}
-
-		// 3. stream processors
-		streamSource, err = injectStreamProcessors(raw, defaultDataStreamType, stream, streamSource, defaultProcessors)
-		if err != nil {
-			return nil, fmt.Errorf("Error injecting stream processors: %w", err)
-		}
-		inputs[iter] = streamSource
-	}
-	rawMap := raw.Source.AsMap()
-	rawMap["streams"] = inputs
-
-	return []map[string]interface{}{rawMap}, nil
 }
 
 // CreateReloadConfigFromInputs turns a raw input/module list into the ConfigWithMeta type used by the reloader interface
@@ -354,7 +355,7 @@ func groupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, e
 	// We still need to emulate the InjectHeadersRule AST code,
 	// I don't think we can get the `Headers()` data reported by the AgentInfo()
 	sourceMap := outCfg.GetSource().AsMap()
-	outputType := outCfg.GetType() //nolint:typecheck // this is used, linter just doesn't seem to see it
+	outputType := outCfg.GetType()
 	if outputType == "" {
 		return nil, fmt.Errorf("output config does not have a configured type field")
 	}

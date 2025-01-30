@@ -22,13 +22,10 @@ package pipeline
 
 import (
 	"fmt"
-	"reflect"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -65,16 +62,9 @@ type Pipeline struct {
 
 	observer observer
 
-	// wait close support. If eventWaitGroup is non-nil, then publishing
-	// an event through this pipeline will increment it and acknowledging
-	// a published event will decrement it, so the pipeline can wait on
-	// the group on shutdown to allow pending events to be acknowledged.
+	// If waitCloseTimeout is positive, then the pipeline will wait up to the
+	// specified time when it is closed for pending events to be acknowledged.
 	waitCloseTimeout time.Duration
-	eventWaitGroup   *sync.WaitGroup
-
-	// closeRef signal propagation support
-	guardStartSigPropagation sync.Once
-	sigNewClient             chan *client
 
 	processors processing.Supporter
 }
@@ -137,9 +127,7 @@ func New(
 		processors:       settings.Processors,
 	}
 	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
-		// If wait-on-close is enabled, give the pipeline a WaitGroup for
-		// events that have been Published but not yet ACKed.
-		p.eventWaitGroup = &sync.WaitGroup{}
+		p.waitCloseTimeout = settings.WaitClose
 	}
 
 	if monitors.Metrics != nil {
@@ -153,13 +141,12 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(
-		queueType, userQueueConfig.Config(), settings.InputQueueSize)
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config())
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, p.eventWaitGroup, queueFactory)
+	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -178,29 +165,10 @@ func (p *Pipeline) Close() error {
 
 	log.Debug("close pipeline")
 
-	if p.eventWaitGroup != nil {
-		ch := make(chan struct{})
-		go func() {
-			p.eventWaitGroup.Wait()
-			ch <- struct{}{}
-		}()
-
-		select {
-		case <-ch:
-			// all events have been ACKed
-
-		case <-time.After(p.waitCloseTimeout):
-			// timeout -> close pipeline with pending events
-		}
-	}
-
 	// Note: active clients are not closed / disconnected.
-	p.outputController.Close()
+	p.outputController.WaitClose(p.waitCloseTimeout)
 
 	p.observer.cleanup()
-	if p.sigNewClient != nil {
-		close(p.sigNewClient)
-	}
 	return nil
 }
 
@@ -213,6 +181,8 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // The client behavior on close and ACK handling can be configured by setting
 // the appropriate fields in the passed ClientConfig.
 // If not set otherwise the defaut publish mode is OutputChooses.
+//
+// It is responsibility of the caller to close the client.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	var (
 		canDrop    bool
@@ -240,39 +210,19 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	client := &client{
 		logger:         p.monitors.Logger,
-		closeRef:       cfg.CloseRef,
-		done:           make(chan struct{}),
-		isOpen:         atomic.MakeBool(true),
 		clientListener: cfg.ClientListener,
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
-		eventWaitGroup: p.eventWaitGroup,
 		observer:       p.observer,
 	}
+	client.isOpen.Store(true)
 
 	ackHandler := cfg.EventListener
-
-	producerCfg := queue.ProducerConfig{}
-
-	if client.eventWaitGroup != nil || cfg.ClientListener != nil {
-		producerCfg.OnDrop = func(event interface{}) {
-			publisherEvent, _ := event.(publisher.Event)
-			if cfg.ClientListener != nil {
-				cfg.ClientListener.DroppedOnPublish(publisherEvent.Content)
-			}
-			if client.eventWaitGroup != nil {
-				client.eventWaitGroup.Add(-1)
-			}
-		}
-	}
 
 	var waiter *clientCloseWaiter
 	if waitClose > 0 {
 		waiter = newClientCloseWaiter(waitClose)
-	}
-
-	if waiter != nil {
 		if ackHandler == nil {
 			ackHandler = waiter
 		} else {
@@ -280,9 +230,16 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	if ackHandler != nil {
-		producerCfg.ACK = ackHandler.ACKEvents
-	} else {
+	producerCfg := queue.ProducerConfig{
+		ACK: func(count int) {
+			client.observer.eventsACKed(count)
+			if ackHandler != nil {
+				ackHandler.ACKEvents(count)
+			}
+		},
+	}
+
+	if ackHandler == nil {
 		ackHandler = acker.Nil()
 	}
 
@@ -296,91 +253,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	p.observer.clientConnected()
-
-	if client.closeRef != nil {
-		p.registerSignalPropagation(client)
-	}
-
 	return client, nil
-}
-
-func (p *Pipeline) registerSignalPropagation(c *client) {
-	p.guardStartSigPropagation.Do(func() {
-		p.sigNewClient = make(chan *client, 1)
-		go p.runSignalPropagation()
-	})
-	p.sigNewClient <- c
-}
-
-func (p *Pipeline) runSignalPropagation() {
-	var channels []reflect.SelectCase
-	var clients []*client
-
-	channels = append(channels, reflect.SelectCase{
-		Dir:  reflect.SelectRecv,
-		Chan: reflect.ValueOf(p.sigNewClient),
-	})
-
-	for {
-		chosen, recv, recvOK := reflect.Select(channels)
-		if chosen == 0 {
-			if !recvOK {
-				// sigNewClient was closed
-				return
-			}
-
-			// new client -> register client for signal propagation.
-			if client := recv.Interface().(*client); client != nil {
-				channels = append(channels,
-					reflect.SelectCase{
-						Dir:  reflect.SelectRecv,
-						Chan: reflect.ValueOf(client.closeRef.Done()),
-					},
-					reflect.SelectCase{
-						Dir:  reflect.SelectRecv,
-						Chan: reflect.ValueOf(client.done),
-					},
-				)
-				clients = append(clients, client)
-			}
-			continue
-		}
-
-		// find client we received a signal for. If client.done was closed, then
-		// we have to remove the client only. But if closeRef did trigger the signal, then
-		// we have to propagate the async close to the client.
-		// In either case, the client will be removed
-
-		i := (chosen - 1) / 2
-		isSig := (chosen & 1) == 1
-		if isSig {
-			client := clients[i]
-			client.Close()
-		}
-
-		// remove:
-		last := len(clients) - 1
-		ch1 := i*2 + 1
-		ch2 := ch1 + 1
-		lastCh1 := last*2 + 1
-		lastCh2 := lastCh1 + 1
-
-		clients[i], clients[last] = clients[last], nil
-		channels[ch1], channels[lastCh1] = channels[lastCh1], reflect.SelectCase{}
-		channels[ch2], channels[lastCh2] = channels[lastCh2], reflect.SelectCase{}
-
-		clients = clients[:last]
-		channels = channels[:lastCh1]
-		if cap(clients) > 10 && len(clients) <= cap(clients)/2 {
-			clientsTmp := make([]*client, len(clients))
-			copy(clientsTmp, clients)
-			clients = clientsTmp
-
-			channelsTmp := make([]reflect.SelectCase, len(channels))
-			copy(channelsTmp, channels)
-			channels = channelsTmp
-		}
-	}
 }
 
 func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bool) (beat.Processor, error) {
@@ -399,16 +272,13 @@ func (p *Pipeline) OutputReloader() OutputReloader {
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C, inQueueSize int) (queue.QueueFactory, error) {
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.QueueFactory, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
 			return nil, err
 		}
-		// The memory queue has a special override during pipeline
-		// initialization for the size of its API channel buffer.
-		settings.InputQueueSize = inQueueSize
 		return memqueue.FactoryForSettings(settings), nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)

@@ -20,6 +20,7 @@
 package process
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -32,7 +33,7 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-var debugf = logp.MakeDebug("system.process")
+var debugf = logp.NewLogger("system.process").Debugf
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "process", New,
@@ -44,9 +45,10 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats  *process.Stats
-	cgroup *cgroup.Reader
-	perCPU bool
+	stats            *process.Stats
+	perCPU           bool
+	setpid           int
+	degradeOnPartial bool
 }
 
 // New creates and returns a new MetricSet.
@@ -56,7 +58,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("resolver cannot be cast from the module")
+	}
 	enableCgroups := false
 	if runtime.GOOS == "linux" {
 		if config.Cgroups == nil || *config.Cgroups {
@@ -65,6 +70,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 
+	if config.Pid != 0 && config.Procs[0] != ".*" {
+		logp.L().Warnf("`process.pid` set to %d, but `processes` is set to a non-default value. Metricset will only report metrics for pid %d", config.Pid, config.Pid)
+	}
+	degradedConf := struct {
+		DegradeOnPartial bool `config:"degrade_on_partial"`
+	}{}
+	if err := base.Module().UnpackConfig(&degradedConf); err != nil {
+		logp.L().Warnf("Failed to unpack config; degraded mode will be disabled for partial metrics: %v", err)
+	}
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &process.Stats{
@@ -80,8 +94,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 				IgnoreRootCgroups: true,
 			},
 		},
-		perCPU: config.IncludePerCPU,
+		perCPU:           config.IncludePerCPU,
+		degradeOnPartial: degradedConf.DegradeOnPartial,
 	}
+
+	m.setpid = config.Pid
 
 	// If hostfs is set, we may not want to force the hierarchy override, as the user could be expecting a custom path.
 	if !sys.IsSet() {
@@ -101,20 +118,46 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches metrics for all processes. It iterates over each PID and
 // collects process metadata, CPU metrics, and memory metrics.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	procs, roots, err := m.stats.Get()
-	if err != nil {
-		return fmt.Errorf("process stats: %w", err)
-	}
 
-	for evtI := range procs {
-		isOpen := r.Event(mb.Event{
-			MetricSetFields: procs[evtI],
-			RootFields:      roots[evtI],
-		})
-		if !isOpen {
-			return nil
+	// monitor either a single PID, or the configured set of processes.
+	if m.setpid == 0 {
+		procs, roots, err := m.stats.Get()
+		if err != nil && !errors.Is(err, process.NonFatalErr{}) {
+			// return only if the error is fatal in nature
+			return fmt.Errorf("process stats: %w", err)
+		} else if (err != nil && errors.Is(err, process.NonFatalErr{})) {
+			if m.degradeOnPartial {
+				return fmt.Errorf("error fetching process list: %w", err)
+			}
+			err = mb.PartialMetricsError{Err: err}
 		}
-	}
 
-	return nil
+		for evtI := range procs {
+			isOpen := r.Event(mb.Event{
+				MetricSetFields: procs[evtI],
+				RootFields:      roots[evtI],
+			})
+			if !isOpen {
+				return err
+			}
+		}
+		return err
+	} else {
+		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
+		if err != nil && !errors.Is(err, process.NonFatalErr{}) {
+			// return only if the error is fatal in nature
+			return fmt.Errorf("error fetching pid %d: %w", m.setpid, err)
+		} else if (err != nil && errors.Is(err, process.NonFatalErr{})) {
+			if m.degradeOnPartial {
+				return fmt.Errorf("error fetching process list: %w", err)
+			}
+			err = mb.PartialMetricsError{Err: err}
+		}
+		// if error is non-fatal, emit partial metrics.
+		r.Event(mb.Event{
+			MetricSetFields: proc,
+			RootFields:      root,
+		})
+		return err
+	}
 }

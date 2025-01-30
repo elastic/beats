@@ -21,6 +21,9 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+    # Use journald to collect system logs
+    #var.use_journald: false
+
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
     #input:
@@ -32,6 +35,9 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
+
+    # Use journald to collect auth logs
+    #var.use_journald: false
 
     # Input configuration (advanced). Any input configuration option
     # can be added under this section.
@@ -710,7 +716,7 @@ filebeat.inputs:
   # If enabled, instead of relying on the device ID and inode values when comparing files,
   # compare hashes of the given byte ranges in files. A file becomes an ingest target
   # when its size grows larger than offset+length (see below). Until then it's ignored.
-  #prospector.scanner.fingerprint.enabled: false
+  #prospector.scanner.fingerprint.enabled: true
 
   # If fingerprint mode is enabled, sets the offset from the beginning of the file
   # for the byte range used for computing the fingerprint value.
@@ -839,14 +845,15 @@ filebeat.inputs:
 
   # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
-  #clean_inactive: 0
+  #clean_inactive: -1
 
   # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
 
   # Method to determine if two files are the same or not. By default
-  # the Beat considers two files the same if their inode and device id are the same.
-  #file_identity.native: ~
+  # a fingerprint is generated using the first 1024 bytes of the file,
+  # if the fingerprints match, then the files are considered equal.
+  #file_identity.fingerprint: ~
 
   # Optional additional fields. These fields can be freely picked
   # to add additional information to the crawled log files for filtering
@@ -1177,26 +1184,57 @@ filebeat.inputs:
 # Journald input is experimental.
 #- type: journald
   #enabled: true
-  #id: service-foo
 
-  # You may wish to have separate inputs for each service. You can use
-  # include_matches.or to specify a list of filter expressions that are
-  # applied as a logical OR. You may specify filter
-  #include_matches.or:
-    #- equals:
-      #- _SYSTEMD_UNIT=foo.service
+  # Unique ID among all inputs, if the ID changes, all entries
+  # will be re-ingested
+  id: my-journald-id
+
+  # Specify paths to read from custom journal files.
+  # Leave it unset to read the system's journal
+  # Glob based paths.
+  #paths:
+    #- /var/log/custom.journal
+
+  # The position to start reading from the journal, valid options are:
+  #  - head: Starts reading at the beginning of the journal.
+  #  - tail: Starts reading at the end of the journal.
+  #    This means that no events will be sent until a new message is written.
+  #  - since: Use also the `since` option to determine when to start reading from.
+  #seek: head
+
+  # A time offset from the current time to start reading from.
+  # To use since, seek option must be set to since.
+  #since: -24h
+
+  # Collect events from the service and messages about the service,
+  # including coredumps.
+  #units:
+    #- docker.service
 
   # List of syslog identifiers
   #syslog_identifiers: ["audit"]
 
-  # Collect events from the service and messages about the service,
-  # including coredumps.
-  #units: ["docker.service"]
-
   # The list of transports (_TRANSPORT field of journald entries)
   #transports: ["audit"]
 
-  # Parsers are also supported, here is an example of the multiline
+  # Filter logs by facilities, they must be specified using their numeric code.
+  #facilities:
+    #- 1
+    #- 2
+
+  # You may wish to have separate inputs for each service. You can use
+  # include_matches.or to specify a list of filter expressions that are
+  # applied as a logical OR.
+  #include_matches.match:
+    #- _SYSTEMD_UNIT=foo.service
+
+  # Uses the original hostname of the entry instead of the one
+  # from the host running jounrald
+  #save_remote_hostname: false
+
+  # Parsers are also supported, the possible parsers are:
+  # container, include_message, multiline, ndjson, syslog.
+  # Here is an example of the multiline
   # parser.
   #parsers:
   #- multiline:
@@ -1220,6 +1258,30 @@ filebeat.inputs:
 #              paths:
 #                - /var/log/containers/*.log
 
+#Example: for kubernetes container logs autodiscovery
+#  filebeat.autodiscover:
+#    providers:
+#      - type: kubernetes
+#        node: ${NODE_NAME}
+#        hints.enabled: true
+#        # By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+#        use_kubeadm: true
+#        hints.default_config:
+#          type: filestream
+#          id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
+#          paths:
+#          - /var/log/containers/*-${data.kubernetes.container.id}.log
+#          parsers:
+#          - container: ~
+#          prospector:
+#            scanner:
+#              fingerprint.enabled: true
+#              symlinks: true
+#          file_identity.fingerprint: ~
+
+#By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+#  use_kubeadm: true
+
 # ========================== Filebeat global options ===========================
 
 # Registry data path. If a relative path is used, it is considered relative to the
@@ -1237,6 +1299,8 @@ filebeat.inputs:
 # batch of events has been published successfully. The default value is 1s.
 #filebeat.registry.flush: 1s
 
+# The interval which to run the registry clean up
+#filebeat.registry.cleanup_interval: 5m
 
 # Starting with Filebeat 7.0, the registry uses a new directory format to store
 # Filebeat state. After you upgrade, Filebeat will automatically migrate a 6.x
@@ -1296,6 +1360,8 @@ filebeat.inputs:
 #timestamp.precision: millisecond
 
 # Internal queue configuration for buffering events to be published.
+# Queue settings may be overridden by performance presets in the
+# Elasticsearch output. To configure them manually use "preset: custom".
 #queue:
   # Queue type by name (default 'mem')
   # The memory queue will present all available events (up to the outputs
@@ -1303,18 +1369,18 @@ filebeat.inputs:
   # another batch of events.
   #mem:
     # Max number of events the queue can buffer.
-    #events: 4096
+    #events: 3200
 
     # Hints the minimum number of events stored in the queue,
     # before providing a batch of events to the outputs.
     # The default value is set to 2048.
     # A value of 0 ensures events are immediately available
     # to be sent to the outputs.
-    #flush.min_events: 2048
+    #flush.min_events: 1600
 
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
-    #flush.timeout: 1s
+    #flush.timeout: 10s
 
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
@@ -1546,8 +1612,17 @@ output.elasticsearch:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
-  # Set gzip compression level.
-  #compression_level: 0
+  # Performance presets configure other output fields to recommended values
+  # based on a performance priority.
+  # Options are "balanced", "throughput", "scale", "latency" and "custom".
+  # Default if unspecified: "custom"
+  preset: balanced
+
+  # Set gzip compression level. Set to 0 to disable compression.
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 1.
+  #compression_level: 1
 
   # Configure escaping HTML symbols in strings.
   #escape_html: false
@@ -1566,6 +1641,8 @@ output.elasticsearch:
     #param2: value2
 
   # Number of workers per Elasticsearch host.
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
   #worker: 1
 
   # If set to true and multiple hosts are configured, the output plugin load
@@ -1603,8 +1680,10 @@ output.elasticsearch:
   #max_retries: 3
 
   # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-  # The default is 50.
-  #bulk_max_size: 50
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 1600.
+  #bulk_max_size: 1600
 
   # The number of seconds to wait before trying to reconnect to Elasticsearch
   # after a network error. After waiting backoff.init seconds, the Beat
@@ -1617,12 +1696,19 @@ output.elasticsearch:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
+  # The maximum amount of time an idle connection will remain idle
+  # before closing itself.  Zero means use the default of 60s. The
+  # format is a Go language duration (example 60s is 60 seconds).
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 3s.
+  # idle_connection_timeout: 3s
+
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
-  # filebeat expects Elasticsearch to be the same version or newer than the Beat.
-  # Lift the version restriction by setting allow_older_versions to true.
-  #allow_older_versions: false
+  # Prevents filebeat from connecting to older Elasticsearch versions when set to `false`
+  #allow_older_versions: true
 
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
@@ -2425,13 +2511,40 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is true. If
-# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
-# can be installed.
+# Disable the check for an existing lifecycle policy. The default is true.
+# If you set this option to false, lifecycle policy will not be installed,
+# even if setup.ilm.overwrite is set to true.
 #setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
 #setup.ilm.overwrite: false
+
+# ======================== Data Stream Lifecycle (DSL) =========================
+
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
+# These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
+
+# Enable DSL support. Valid values are true, or false.
+#setup.dsl.enabled: true
+
+# Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
+# The default data stream pattern is filebeat-%{[agent.version]}"
+# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The other possible template value is `%{[beat.name]}`.
+#setup.dsl.data_stream_pattern: "filebeat-%{[agent.version]}"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+# If no custom policy is specified, a default policy with a lifetime of 7 days will be created.
+#setup.dsl.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is true. If
+# you disable this check, set setup.dsl.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.dsl.check_exists: true
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.dsl.overwrite: false
 
 # =================================== Kibana ===================================
 
@@ -2590,6 +2703,54 @@ logging.files:
   # Rotate existing logs on startup rather than appending them to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+#=============================== Events Logging ===============================
+# Some outputs will log raw events on errors like indexing errors in the
+# Elasticsearch output, to prevent logging raw events (that may contain
+# sensitive information) together with other log messages, a different
+# log file, only for log entries containing raw events, is used. It will
+# use the same level, selectors and all other configurations from the
+# default logger, but it will have it's own file configuration.
+#
+# Having a different log file for raw events also prevents event data
+# from drowning out the regular log files.
+#
+# IMPORTANT: No matter the default logger output configuration, raw events
+# will **always** be logged to a file configured by `logging.event_data.files`.
+
+# logging.event_data:
+# Logging to rotating files. Set logging.to_files to false to disable logging to
+# files.
+#logging.event_data.to_files: true
+#logging.event_data:
+  # Configure the path where the logs are written. The default is the logs directory
+  # under the home path (the binary location).
+  #path: /var/log/filebeat
+
+  # The name of the files where the logs are written to.
+  #name: filebeat-events-data
+
+  # Configure log file size limit. If the limit is reached, log file will be
+  # automatically rotated.
+  #rotateeverybytes: 5242880 # = 5MB
+
+  # Number of rotated log files to keep. The oldest files will be deleted first.
+  #keepfiles: 2
+
+  # The permissions mask to apply when rotating log files. The default value is 0600.
+  # Must be a valid Unix-style file permissions mask expressed in octal notation.
+  #permissions: 0600
+
+  # Enable log file rotation on time intervals in addition to the size-based rotation.
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # are boundary-aligned with minutes, hours, days, weeks, months, and years as
+  # reported by the local system clock. All other intervals are calculated from the
+  # Unix epoch. Defaults to disabled.
+  #interval: 0
+
+  # Rotate existing logs on startup rather than appending them to the existing
+  # file. Defaults to false.
+  # rotateonstartup: false
 
 # ============================= X-Pack Monitoring ==============================
 # Filebeat can export internal metrics to a central Elasticsearch monitoring

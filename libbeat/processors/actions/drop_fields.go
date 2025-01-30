@@ -61,22 +61,23 @@ func newDropFields(c *conf.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("fail to unpack the drop_fields configuration: %w", err)
 	}
 
-	/* remove read only fields */
-	// TODO: Is this implementation used? If so, there's a fix needed in removal of exported fields
+	// Do not drop manadatory fields
+	var configFields []string
 	for _, readOnly := range processors.MandatoryExportedFields {
-		for i, field := range config.Fields {
-			if readOnly == field {
-				config.Fields = append(config.Fields[:i], config.Fields[i+1:]...)
+		for _, field := range config.Fields {
+			if readOnly == field || strings.HasPrefix(field, readOnly+".") {
+				continue
 			}
+			configFields = append(configFields, field)
 		}
 	}
 
 	// Parse regexp containing fields and removes them from initial config
 	regexpFields := make([]match.Matcher, 0)
-	for i := len(config.Fields) - 1; i >= 0; i-- {
-		field := config.Fields[i]
+	for i := len(configFields) - 1; i >= 0; i-- {
+		field := configFields[i]
 		if strings.HasPrefix(field, "/") && strings.HasSuffix(field, "/") && len(field) > 2 {
-			config.Fields = append(config.Fields[:i], config.Fields[i+1:]...)
+			configFields = append(configFields[:i], configFields[i+1:]...)
 
 			matcher, err := match.Compile(field[1 : len(field)-1])
 			if err != nil {
@@ -87,7 +88,7 @@ func newDropFields(c *conf.C) (beat.Processor, error) {
 		}
 	}
 
-	f := &dropFields{Fields: config.Fields, IgnoreMissing: config.IgnoreMissing, RegexpFields: regexpFields}
+	f := &dropFields{Fields: configFields, IgnoreMissing: config.IgnoreMissing, RegexpFields: regexpFields}
 	return f, nil
 }
 

@@ -9,7 +9,6 @@ package osqd
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,12 +22,12 @@ const (
 func CreateSocketPath() (string, func(), error) {
 	// Try to create socket in /var/run first
 	// This would result in something the directory something like: /var/run/027202467
-	tpath, err := ioutil.TempDir("/var/run", "")
+	tpath, err := os.MkdirTemp("/var/run", "")
 	if err != nil {
 		var perr *os.PathError
 		if errors.As(err, &perr) {
 			if errors.Is(perr.Err, syscall.EACCES) {
-				tpath, err = ioutil.TempDir("", "")
+				tpath, err = os.MkdirTemp("", "")
 				if err != nil {
 					return "", nil, err
 				}

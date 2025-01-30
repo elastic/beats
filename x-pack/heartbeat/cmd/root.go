@@ -7,12 +7,15 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	heartbeatCmd "github.com/elastic/beats/v7/heartbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	_ "github.com/elastic/beats/v7/heartbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 )
@@ -42,8 +45,10 @@ func TransformRawIn(rawIn *proto.UnitExpectedConfig) []map[string]interface{} {
 }
 
 func init() {
-	management.ConfigTransform.SetTransform(heartbeatCfg)
 	settings := heartbeatCmd.HeartbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = heartbeatCmd.Initialize(settings)
+	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		management.ConfigTransform.SetTransform(heartbeatCfg)
+	}
 }

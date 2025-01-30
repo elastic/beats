@@ -22,12 +22,12 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/elastic-agent-libs/config"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -36,7 +36,7 @@ import (
 const logName = "processor.dns"
 
 // instanceID is used to assign each instance a unique monitoring namespace.
-var instanceID = atomic.MakeUint32(0)
+var instanceID atomic.Uint32
 
 func init() {
 	processors.RegisterPlugin("dns", New)
@@ -44,37 +44,37 @@ func init() {
 }
 
 type processor struct {
-	Config
-	resolver PTRResolver
+	config
+	resolver resolver
 	log      *logp.Logger
 }
 
 // New constructs a new DNS processor.
-func New(cfg *config.C) (beat.Processor, error) {
-	c := defaultConfig
+func New(cfg *conf.C) (beat.Processor, error) {
+	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the dns configuration: %w", err)
 	}
 
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
-		id      = int(instanceID.Inc())
+		id      = int(instanceID.Add(1))
 		log     = logp.NewLogger(logName).With("instance_id", id)
 		metrics = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
 	log.Debugf("DNS processor config: %+v", c)
-	resolver, err := NewMiekgResolver(metrics, c.Timeout, c.Transport, c.Nameservers...)
+	resolver, err := newMiekgResolver(metrics, c.Timeout, c.Transport, c.Nameservers...)
 	if err != nil {
 		return nil, err
 	}
 
-	cache, err := NewPTRLookupCache(metrics.NewRegistry("cache"), c.CacheConfig, resolver)
+	cache, err := newLookupCache(metrics.NewRegistry("cache"), c.cacheConfig, resolver)
 	if err != nil {
 		return nil, err
 	}
 
-	return &processor{Config: c, resolver: cache, log: log}, nil
+	return &processor{config: c, resolver: cache, log: log}, nil
 }
 
 func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
@@ -88,32 +88,36 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (p *processor) processField(source, target string, action FieldAction, event *beat.Event) error {
+func (p *processor) processField(source, target string, action fieldAction, event *beat.Event) error {
 	v, err := event.GetValue(source)
 	if err != nil {
 		//nolint:nilerr // an empty source field isn't considered an error for this processor
 		return nil
 	}
 
-	maybeIP, ok := v.(string)
+	strVal, ok := v.(string)
 	if !ok {
 		return nil
 	}
 
-	ptrRecord, err := p.resolver.LookupPTR(maybeIP)
+	result, err := p.resolver.Lookup(strVal, p.Type)
 	if err != nil {
-		return fmt.Errorf("reverse lookup of %v value '%v' failed: %w", source, maybeIP, err)
+		return fmt.Errorf("dns lookup (%s) of %s value '%s' failed: %w", p.Type, source, strVal, err)
 	}
 
-	return setFieldValue(action, event, target, ptrRecord.Host)
+	// PTR lookups return a scalar. All other lookup types return a string slice.
+	if p.Type == typePTR {
+		return setFieldValue(action, event, target, result.Data[0])
+	}
+	return setFieldSliceValue(action, event, target, result.Data)
 }
 
-func setFieldValue(action FieldAction, event *beat.Event, key string, value string) error {
+func setFieldValue(action fieldAction, event *beat.Event, key, value string) error {
 	switch action {
-	case ActionReplace:
+	case actionReplace:
 		_, err := event.PutValue(key, value)
 		return err
-	case ActionAppend:
+	case actionAppend:
 		old, err := event.PutValue(key, value)
 		if err != nil {
 			return err
@@ -129,7 +133,32 @@ func setFieldValue(action FieldAction, event *beat.Event, key string, value stri
 		}
 		return err
 	default:
-		panic(fmt.Errorf("Unexpected dns field action value encountered: %v", action))
+		panic(fmt.Errorf("unexpected dns field action value encountered: %s", action))
+	}
+}
+
+func setFieldSliceValue(action fieldAction, event *beat.Event, key string, value []string) error {
+	switch action {
+	case actionReplace:
+		_, err := event.PutValue(key, value)
+		return err
+	case actionAppend:
+		old, err := event.PutValue(key, value)
+		if err != nil {
+			return err
+		}
+
+		if old != nil {
+			switch v := old.(type) {
+			case string:
+				_, err = event.PutValue(key, append([]string{v}, value...))
+			case []string:
+				_, err = event.PutValue(key, append(v, value...))
+			}
+		}
+		return err
+	default:
+		panic(fmt.Errorf("unexpected dns field action value encountered: %s", action))
 	}
 }
 

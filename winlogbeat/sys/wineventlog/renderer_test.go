@@ -26,27 +26,25 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"text/template"
 	"time"
 
-	"github.com/andrewkroh/sys/windows/svc/eventlog"
-
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestRenderer(t *testing.T) {
-	logp.TestingSetup() //nolint:errcheck // Bad linter! Never returns a non-nil error when called without options.
+	logp.TestingSetup()
 
-	t.Run(filepath.Base(sysmon9File), func(t *testing.T) {
-		log := openLog(t, sysmon9File)
+	t.Run(filepath.Base(security4738File), func(t *testing.T) {
+		log := openLog(t, security4738File)
 		defer log.Close()
 
-		r, err := NewRenderer(NilHandle, logp.L())
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -64,7 +62,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, security4752File)
 		defer log.Close()
 
-		r, err := NewRenderer(NilHandle, logp.L())
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -110,7 +108,7 @@ func TestRenderer(t *testing.T) {
 		log := openLog(t, winErrorReportingFile)
 		defer log.Close()
 
-		r, err := NewRenderer(NilHandle, logp.L())
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -150,6 +148,68 @@ func TestRenderer(t *testing.T) {
 			logAsJSON(t, events)
 		}
 	})
+
+	t.Run(filepath.Base(security4738File), func(t *testing.T) {
+		log := openLog(t, security4738File)
+		defer log.Close()
+
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer r.Close()
+
+		events := renderAllEvents(t, log, r, false)
+		if !assert.Len(t, events, 2) {
+			return
+		}
+		e := events[0]
+
+		assert.EqualValues(t, 4738, e.EventIdentifier.ID)
+		assert.Equal(t, "Microsoft-Windows-Security-Auditing", e.Provider.Name)
+		assertEqualIgnoreCase(t, "{54849625-5478-4994-a5ba-3e3b0328c30d}", e.Provider.GUID)
+		assert.Equal(t, "WIN-41OB2LO92CR", e.Computer)
+		assert.Equal(t, "Security", e.Channel)
+		assert.EqualValues(t, 2866, e.RecordID)
+
+		assert.Equal(t, e.Keywords, []string{"Audit Success"})
+
+		assert.NotNil(t, 0, e.OpcodeRaw)
+		assert.EqualValues(t, 0, *e.OpcodeRaw)
+		assert.Equal(t, "Info", e.Opcode)
+
+		assert.EqualValues(t, 0, e.LevelRaw)
+		assert.Equal(t, "Information", e.Level)
+
+		assert.EqualValues(t, 13824, e.TaskRaw)
+		assert.Equal(t, "User Account Management", e.Task)
+
+		assert.EqualValues(t, 780, e.Execution.ProcessID)
+		assert.EqualValues(t, 808, e.Execution.ThreadID)
+		assert.Len(t, e.EventData.Pairs, 27)
+
+		assert.NotEmpty(t, e.Message)
+
+		// Check for message replacements in form of %%xxxx
+		for _, p := range e.EventData.Pairs {
+			switch p.Key {
+			case "HomeDirectory", "HomePath",
+				"ScriptPath", "ProfilePath", "UserWorkstations",
+				"UserParameters":
+				assert.EqualValues(t, "<value not set>", p.Value)
+			case "AccountExpires":
+				assert.EqualValues(t, "<never>", p.Value)
+			case "Logon Hours":
+				assert.EqualValues(t, "All", p.Value)
+			case "UserAccountControl":
+				assert.EqualValues(t, "\r\n\t\t'Don't Expire Password' - Enabled", p.Value)
+			}
+		}
+
+		if t.Failed() {
+			logAsJSON(t, events)
+		}
+	})
 }
 
 func TestTemplateFunc(t *testing.T) {
@@ -180,9 +240,9 @@ func renderAllEvents(t *testing.T, log EvtHandle, renderer *Renderer, ignoreMiss
 		func() {
 			defer h.Close()
 
-			evt, err := renderer.Render(h)
+			evt, _, err := renderer.Render(h)
 			if err != nil {
-				md := renderer.metadataCache[evt.Provider.Name]
+				md, _ := renderer.metadataCache.getPublisherStore(evt.Provider.Name)
 				if !ignoreMissingMetadataError || md.Metadata != nil {
 					t.Fatalf("Render failed: %+v", err)
 				}
@@ -208,9 +268,9 @@ func BenchmarkRenderer(b *testing.B) {
 	defer teardown()
 
 	const totalEvents = 1000000
-	msg := []string{strings.Repeat("Hello world! ", 21)}
+	msg := strings.Repeat("Hello world! ", 21)
 	for i := 0; i < totalEvents; i++ {
-		safeWriteEvent(b, writer, eventlog.Info, 10, msg)
+		safeWriteEvent(b, writer, 10, msg)
 	}
 
 	setup := func() (*EventIterator, *Renderer) {
@@ -222,7 +282,7 @@ func BenchmarkRenderer(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		r, err := NewRenderer(NilHandle, logp.NewLogger("bench"))
+		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.NewLogger("bench"))
 		if err != nil {
 			log.Close()
 			itr.Close()
@@ -237,7 +297,7 @@ func BenchmarkRenderer(b *testing.B) {
 		defer itr.Close()
 		defer r.Close()
 
-		count := atomic.NewUint64(0)
+		count := atomic.Uint64{}
 		start := time.Now()
 		b.ResetTimer()
 
@@ -249,12 +309,12 @@ func BenchmarkRenderer(b *testing.B) {
 			}
 
 			// Render it.
-			_, err := r.Render(h)
+			_, _, err := r.Render(h)
 			if err != nil {
 				b.Fatal(err)
 			}
 
-			count.Inc()
+			count.Add(1)
 		}
 
 		elapsed := time.Since(start)
@@ -266,7 +326,7 @@ func BenchmarkRenderer(b *testing.B) {
 		defer itr.Close()
 		defer r.Close()
 
-		count := atomic.NewUint64(0)
+		var count atomic.Uint64
 		start := time.Now()
 		b.ResetTimer()
 
@@ -279,11 +339,11 @@ func BenchmarkRenderer(b *testing.B) {
 				}
 
 				// Render it.
-				_, err := r.Render(h)
+				_, _, err := r.Render(h)
 				if err != nil {
 					b.Fatal(err)
 				}
-				count.Inc()
+				count.Add(1)
 			}
 		})
 

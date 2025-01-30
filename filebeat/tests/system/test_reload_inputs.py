@@ -6,6 +6,7 @@ from filebeat import BaseTest
 
 inputConfigTemplate = """
 - type: log
+  allow_deprecated_use: true
   paths:
     - {}
   scan_frequency: 1s
@@ -31,7 +32,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*.log"))
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
@@ -49,6 +50,8 @@ class Test(BaseTest):
         input_config_template = """
 - type: filestream
   id: my-unique-id
+  file_identity.native: ~
+  prospector.scanner.fingerprint.enabled: false
   paths:
     - {}
 """
@@ -91,27 +94,27 @@ class Test(BaseTest):
             inputs=False,
         )
 
-        proc = self.start_beat()
-
         os.mkdir(self.working_dir + "/logs/")
         logfile = self.working_dir + "/logs/test.log"
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*.log"))
 
         with open(logfile, 'w') as f:
             f.write("Hello world\n")
 
+        proc = self.start_beat()
+
         self.wait_until(lambda: self.output_lines() == 1)
 
-        # Remove input
-        with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write("")
+        # Remove input by moving the file
+        # we keep it around to help debugging
+        os.rename(self.working_dir + "/configs/input.yml", self.working_dir + "/configs/input.yml.disabled")
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         with open(logfile, 'a') as f:
@@ -152,12 +155,13 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_lines() == 1)
 
         # Remove input
-        with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write("")
+        # Remove input by moving the file
+        # we keep it around to help debugging
+        os.rename(self.working_dir + "/configs/input.yml", self.working_dir + "/configs/input.yml.disabled")
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
@@ -220,7 +224,7 @@ class Test(BaseTest):
 
         # Wait until input is stopped
         self.wait_until(
-            lambda: self.log_contains("Stopping runner:"),
+            lambda: self.log_contains("Runner: 'input [type=log]' has stopped"),
             max_timeout=15)
 
         # Update both log files, only 1 change should be picked up
@@ -292,8 +296,6 @@ class Test(BaseTest):
         assert output[0]["message"] == first_line
         assert output[1]["message"] == second_line
 
-    # 1/20 build fails https://github.com/elastic/beats/issues/21307
-    @pytest.mark.flaky(reruns=2, reruns_delay=10)
     def test_reload_same_config(self):
         """
         Test reload same config with same file but different config. Makes sure reloading also works on conflicts.
@@ -309,7 +311,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/configs/")
 
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*"))
+            f.write(inputConfigTemplate.format(self.working_dir + "/logs/*.log"))
 
         proc = self.start_beat()
 

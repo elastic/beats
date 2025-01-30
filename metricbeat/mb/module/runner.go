@@ -25,16 +25,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-var (
-	moduleList *monitoring.UniqueList
-)
+var moduleList = monitoring.NewUniqueList()
+var moduleListMetricsOnce sync.Once
 
-func init() {
-	moduleList = monitoring.NewUniqueList()
-	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+// RegisterMonitoringModules registers the modules list with the monitoring system.
+func RegisterMonitoringModules(namespace string) {
+	moduleListMetricsOnce.Do(func() {
+		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), namespace, moduleList.Report, monitoring.Report)
+	})
 }
 
 // Runner is a facade for a Wrapper that provides a simple interface
@@ -121,4 +123,8 @@ func (mr *runner) Diagnostics() []diagnostics.DiagnosticSetup {
 
 func (mr *runner) String() string {
 	return fmt.Sprintf("%s [metricsets=%d]", mr.mod.Name(), len(mr.mod.metricSets))
+}
+
+func (mr *runner) SetStatusReporter(reporter status.StatusReporter) {
+	mr.mod.SetStatusReporter(reporter)
 }

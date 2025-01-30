@@ -22,16 +22,18 @@ import (
 
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/metricbeat/include"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
 	// import modules
-	_ "github.com/elastic/beats/v7/metricbeat/include"
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
@@ -39,9 +41,6 @@ const (
 	// Name of the beat
 	Name = "metricbeat"
 )
-
-// RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
 
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(mapstr.M{
@@ -51,14 +50,23 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 // MetricbeatSettings contains the default settings for metricbeat
-func MetricbeatSettings() instance.Settings {
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
+// moduleNameSpace allows you to override the default setting of
+// "module" for the module metrics to avoid name collisions.
+func MetricbeatSettings(moduleNameSpace string) instance.Settings {
+	if moduleNameSpace == "" {
+		moduleNameSpace = "module"
+	}
+	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Initialize: []func(){
+			include.InitializeModule,
+			func() { module.RegisterMonitoringModules(moduleNameSpace) },
+		},
 	}
 }
 
@@ -68,8 +76,4 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", BuildModulesManager))
 	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
 	return rootCmd
-}
-
-func init() {
-	RootCmd = Initialize(MetricbeatSettings())
 }

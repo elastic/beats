@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"sort"
@@ -33,6 +32,7 @@ import (
 
 	"github.com/prometheus/procfs"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -73,12 +73,14 @@ var (
 )
 
 func TestImmutable(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		// With one extra for SetImmutable
 		returnACK().returnStatus().returnACK().returnACK().
@@ -90,8 +92,14 @@ func TestImmutable(t *testing.T) {
 	config := getConfig()
 	config["immutable"] = true
 
-	ms := mbtest.NewPushMetricSetV2(t, config)
-	auditMetricSet := ms.(*MetricSet)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
+	auditMetricSet, ok := ms.(*MetricSet)
+	if !ok {
+		t.Fatalf("Expected *MetricSet but got %T", ms)
+	}
+
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
@@ -108,12 +116,14 @@ func TestImmutable(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		returnACK().returnStatus().returnACK().returnACK().
 		returnACK().returnACK().returnACK().
@@ -123,8 +133,13 @@ func TestData(t *testing.T) {
 		returnMessage(acceptMsgs...)
 
 	// Replace the default AuditClient with a mock.
-	ms := mbtest.NewPushMetricSetV2(t, getConfig())
-	auditMetricSet := ms.(*MetricSet)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
+	auditMetricSet, ok := ms.(*MetricSet)
+	if !ok {
+		t.Fatalf("Expected *MetricSet but got %T", ms)
+	}
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
@@ -141,12 +156,14 @@ func TestData(t *testing.T) {
 }
 
 func TestLoginType(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		returnACK().returnStatus().returnACK().returnACK().
 		returnACK().returnACK().returnACK().
@@ -156,8 +173,13 @@ func TestLoginType(t *testing.T) {
 		returnMessage(userAuthMsg)
 
 	// Replace the default AuditClient with a mock.
-	ms := mbtest.NewPushMetricSetV2(t, getConfig())
-	auditMetricSet := ms.(*MetricSet)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
+	auditMetricSet, ok := ms.(*MetricSet)
+	if !ok {
+		t.Fatalf("Expected *MetricSet but got %T", ms)
+	}
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
@@ -260,7 +282,7 @@ func TestUnicastClient(t *testing.T) {
 		t.Skip("-audit was not specified")
 	}
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -275,7 +297,7 @@ func TestUnicastClient(t *testing.T) {
 	// PPID filter we applied to the rule.
 	time.AfterFunc(time.Second, func() { _, _ = exec.Command("cat", "/proc/self/status").Output() })
 
-	ms := mbtest.NewPushMetricSetV2(t, c)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, c, ab.Registry)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
 	assertNoErrors(t, events)
 	assertHasBinCatExecve(t, events)
@@ -290,7 +312,7 @@ func TestMulticastClient(t *testing.T) {
 		t.Skip("no multicast support")
 	}
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -305,7 +327,7 @@ func TestMulticastClient(t *testing.T) {
 	// PPID filter we applied to the rule.
 	time.AfterFunc(time.Second, func() { _, _ = exec.Command("cat", "/proc/self/status").Output() })
 
-	ms := mbtest.NewPushMetricSetV2(t, c)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, c, ab.Registry)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
 	assertNoErrors(t, events)
 	assertHasBinCatExecve(t, events)
@@ -350,7 +372,7 @@ func TestBuildMetricbeatEvent(t *testing.T) {
 }
 
 func buildSampleEvent(t testing.TB, lines []string, filename string) {
-	var msgs []*auparse.AuditMessage
+	var msgs []*auparse.AuditMessage //nolint:prealloc // Preallocating doesn't bring improvements.
 	for _, txt := range lines {
 		m, err := auparse.ParseLogLine(txt)
 		if err != nil {
@@ -366,7 +388,7 @@ func buildSampleEvent(t testing.TB, lines []string, filename string) {
 		t.Fatal(err)
 	}
 
-	if err := ioutil.WriteFile(filename, output, 0o644); err != nil {
+	if err := os.WriteFile(filename, output, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }

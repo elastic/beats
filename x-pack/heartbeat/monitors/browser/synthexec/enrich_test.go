@@ -1,26 +1,22 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux
+//go:build linux || synthetics
 
 package synthexec
 
 import (
 	"fmt"
-	"net/url"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
-	"github.com/elastic/go-lookslike/isdef"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
@@ -96,14 +92,9 @@ func TestJourneyEnricher(t *testing.T) {
 			// version of the event
 			v = append(v, lookslike.MustCompile(se.ToMap()))
 		} else {
-			u, _ := url.Parse(url1)
-			// journey end gets a summary
 			v = append(v, lookslike.MustCompile(map[string]interface{}{
-				"event.type":          "heartbeat/summary",
-				"synthetics.type":     "heartbeat/summary",
-				"url":                 wrappers.URLFields(u),
-				"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
-				"monitor.check_group": isdef.IsString,
+				"event.type":      "journey/end",
+				"synthetics.type": "journey/end",
 			}))
 		}
 		return lookslike.Compose(v...)
@@ -125,29 +116,9 @@ func TestJourneyEnricher(t *testing.T) {
 		})
 	}
 
-	tests := []struct {
-		name                  string
-		IsLegacyBrowserSource bool
-	}{
-		{
-			name:                  "legacy project monitor",
-			IsLegacyBrowserSource: true,
-		},
-		{
-			name:                  "modern monitor",
-			IsLegacyBrowserSource: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			sFields.IsLegacyBrowserSource = tt.IsLegacyBrowserSource
-
-			je := makeTestJourneyEnricher(sFields)
-			for _, se := range synthEvents {
-				check(t, se, je)
-			}
-		})
+	je := makeTestJourneyEnricher(sFields)
+	for _, se := range synthEvents {
+		check(t, se, je)
 	}
 }
 
@@ -231,11 +202,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			},
 			true,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(mapstr.M{
-					"event": map[string]string{
-						"type": "heartbeat/summary",
-					},
-				})
+				v := lookslike.MustCompile(mapstr.M{})
 				testslike.Test(t, v, e.Fields)
 			},
 		},
@@ -247,36 +214,20 @@ func TestEnrichSynthEvent(t *testing.T) {
 				Type:  CmdStatus,
 				Error: nil,
 			},
-			true,
-			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(mapstr.M{
-					"event": map[string]string{
-						"type": "heartbeat/summary",
-					},
-				})
-				testslike.Test(t, v, e.Fields)
-			},
+			false,
+			nil,
 		},
 		{
 			"journey/end",
 			&SynthEvent{Type: JourneyEnd},
 			false,
-			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				v := lookslike.MustCompile(mapstr.M{
-					"event": map[string]string{
-						"type": "heartbeat/summary",
-					},
-				})
-				testslike.Test(t, v, e.Fields)
-			},
+			nil,
 		},
 		{
 			"step/end",
 			&SynthEvent{Type: "step/end"},
 			false,
-			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				require.Equal(t, 1, je.stepCount)
-			},
+			nil,
 		},
 		{
 			"step/screenshot",
@@ -321,242 +272,9 @@ func TestEnrichSynthEvent(t *testing.T) {
 			if err := je.enrichSynthEvent(e, tt.se); (err == nil && tt.wantErr) || (err != nil && !tt.wantErr) {
 				t.Errorf("journeyEnricher.enrichSynthEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			tt.check(t, e, je)
-		})
-	}
-}
-
-func TestNoSummaryOnAfterHook(t *testing.T) {
-	journey := &Journey{
-		Name: "A journey that fails after completing",
-		ID:   "my-bad-after-all-hook",
-	}
-	journeyStart := &SynthEvent{
-		Type:                 JourneyStart,
-		TimestampEpochMicros: 1000,
-		PackageVersion:       "1.0.0",
-		Journey:              journey,
-		Payload:              mapstr.M{},
-	}
-	syntherr := &SynthError{
-		Message: "my-errmsg",
-		Name:    "my-errname",
-		Stack:   "my\nerr\nstack",
-	}
-	journeyEnd := &SynthEvent{
-		Type:                 JourneyEnd,
-		TimestampEpochMicros: 2000,
-		PackageVersion:       "1.0.0",
-		Journey:              journey,
-		Payload:              mapstr.M{},
-	}
-	cmdStatus := &SynthEvent{
-		Type:                 CmdStatus,
-		Error:                &SynthError{Name: "cmdexit", Message: "cmd err msg"},
-		TimestampEpochMicros: 3000,
-	}
-
-	badStepUrl := "https://example.com/bad-step"
-	synthEvents := []*SynthEvent{
-		journeyStart,
-		makeStepEvent("step/start", 10, "Step1", 1, "", "", nil),
-		makeStepEvent("step/end", 20, "Step1", 2, "failed", badStepUrl, syntherr),
-		journeyEnd,
-		cmdStatus,
-	}
-
-	stdFields := stdfields.StdMonitorFields{}
-	je := makeTestJourneyEnricher(stdFields)
-	for idx, se := range synthEvents {
-		e := &beat.Event{}
-
-		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se)
-
-			if se != nil && se.Type == CmdStatus {
-				t.Run("no summary in cmd/status", func(t *testing.T) {
-					require.NotContains(t, e.Fields, "summary")
-				})
+			if tt.check != nil {
+				tt.check(t, e, je)
 			}
-
-			// Only the journey/end event should get a summary when
-			// it's emitted before the cmd/status (when an afterX hook fails).
-			if se != nil && se.Type == JourneyEnd {
-				require.Equal(t, stepError(syntherr), enrichErr)
-
-				u, _ := url.Parse(badStepUrl)
-				t.Run("summary in journey/end", func(t *testing.T) {
-					v := lookslike.MustCompile(mapstr.M{
-						"synthetics.type":     "heartbeat/summary",
-						"url":                 wrappers.URLFields(u),
-						"monitor.duration.us": int64(journeyEnd.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
-					})
-
-					testslike.Test(t, v, e.Fields)
-				})
-			}
-		})
-	}
-}
-
-func TestSummaryWithoutJourneyEnd(t *testing.T) {
-	journey := &Journey{
-		Name: "A journey that never emits journey/end but exits successfully",
-		ID:   "no-journey-end-but-success",
-	}
-	journeyStart := &SynthEvent{
-		Type:                 "journey/start",
-		TimestampEpochMicros: 1000,
-		PackageVersion:       "1.0.0",
-		Journey:              journey,
-		Payload:              mapstr.M{},
-	}
-
-	cmdStatus := &SynthEvent{
-		Type:                 CmdStatus,
-		Error:                nil,
-		TimestampEpochMicros: 3000,
-	}
-
-	url1 := "http://example.net/url1"
-	synthEvents := []*SynthEvent{
-		journeyStart,
-		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
-		cmdStatus,
-	}
-
-	hasCmdStatus := false
-
-	stdFields := stdfields.StdMonitorFields{}
-	je := makeTestJourneyEnricher(stdFields)
-	for idx, se := range synthEvents {
-		e := &beat.Event{}
-		t.Run(fmt.Sprintf("event %d", idx), func(t *testing.T) {
-			enrichErr := je.enrich(e, se)
-
-			if se != nil && se.Type == CmdStatus {
-				hasCmdStatus = true
-				require.Error(t, enrichErr, "journey did not finish executing, 1 steps ran")
-
-				u, _ := url.Parse(url1)
-
-				v := lookslike.MustCompile(mapstr.M{
-					"synthetics.type":     "heartbeat/summary",
-					"url":                 wrappers.URLFields(u),
-					"monitor.duration.us": int64(cmdStatus.Timestamp().Sub(journeyStart.Timestamp()) / time.Microsecond),
-				})
-
-				testslike.Test(t, v, e.Fields)
-			}
-		})
-	}
-
-	require.True(t, hasCmdStatus)
-}
-
-func TestCreateSummaryEvent(t *testing.T) {
-	baseTime := time.Now()
-
-	testJourney := Journey{
-		ID:   "my-monitor",
-		Name: "My Monitor",
-	}
-
-	tests := []struct {
-		name     string
-		je       *journeyEnricher
-		expected mapstr.M
-		wantErr  bool
-	}{{
-		name: "completed without errors",
-		je: &journeyEnricher{
-			journey:         &testJourney,
-			start:           baseTime,
-			end:             baseTime.Add(10 * time.Microsecond),
-			journeyComplete: true,
-			stepCount:       3,
-		},
-		expected: mapstr.M{
-			"monitor.duration.us": int64(10),
-			"event": mapstr.M{
-				"type": "heartbeat/summary",
-			},
-		},
-		wantErr: false,
-	}, {
-		name: "completed with error",
-		je: &journeyEnricher{
-			journey:         &testJourney,
-			start:           baseTime,
-			end:             baseTime.Add(10 * time.Microsecond),
-			journeyComplete: true,
-			errorCount:      1,
-			error:           fmt.Errorf("journey errored"),
-		},
-		expected: mapstr.M{
-			"monitor.duration.us": int64(10),
-			"event": mapstr.M{
-				"type": "heartbeat/summary",
-			},
-		},
-		wantErr: true,
-	}, {
-		name: "started, but exited without running steps",
-		je: &journeyEnricher{
-			journey:         &testJourney,
-			start:           baseTime,
-			end:             baseTime.Add(10 * time.Microsecond),
-			stepCount:       0,
-			journeyComplete: false,
-			streamEnricher:  newStreamEnricher(stdfields.StdMonitorFields{}),
-		},
-		expected: mapstr.M{
-			"monitor.duration.us": int64(10),
-			"event": mapstr.M{
-				"type": "heartbeat/summary",
-			},
-		},
-		wantErr: true,
-	}, {
-		name: "syntax error - exited without starting",
-		je: &journeyEnricher{
-			journey:         &testJourney,
-			end:             time.Now().Add(10 * time.Microsecond),
-			journeyComplete: false,
-			errorCount:      1,
-			streamEnricher:  newStreamEnricher(stdfields.StdMonitorFields{}),
-		},
-		expected: mapstr.M{
-			"event": mapstr.M{
-				"type": "heartbeat/summary",
-			},
-		},
-		wantErr: true,
-	}}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			monitorField := mapstr.M{"id": "my-monitor", "type": "browser"}
-
-			e := &beat.Event{
-				Fields: mapstr.M{"monitor": monitorField},
-			}
-			err := tt.je.createSummary(e)
-			if tt.wantErr {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-			}
-			// linter has been activated in the meantime. We'll cleanup separately.
-			err = mapstr.MergeFields(tt.expected, mapstr.M{
-				"monitor":            monitorField,
-				"url":                mapstr.M{},
-				"event.type":         "heartbeat/summary",
-				"synthetics.type":    "heartbeat/summary",
-				"synthetics.journey": testJourney,
-			}, true)
-			require.NoError(t, err)
-			testslike.Test(t, lookslike.Strict(lookslike.MustCompile(tt.expected)), e.Fields)
 		})
 	}
 }

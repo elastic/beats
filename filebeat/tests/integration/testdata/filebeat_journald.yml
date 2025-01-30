@@ -1,0 +1,21 @@
+filebeat.inputs:
+  - type: journald
+    id: filestream-input-id
+    enabled: true
+    syslog_identifiers:
+      - "%s"
+
+path.home: %s
+
+queue.mem:
+  flush.timeout: 0
+
+output:
+  file:
+    path: ${path.home}
+    filename: "output"
+
+logging:
+  level: debug
+  selectors:
+    - "*"

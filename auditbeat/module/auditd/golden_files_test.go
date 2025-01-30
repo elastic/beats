@@ -24,7 +24,6 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -38,6 +37,7 @@ import (
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
@@ -87,7 +87,7 @@ func readLines(path string) (lines []string, err error) {
 }
 
 func readGoldenFile(t testing.TB, path string) (events []mapstr.M) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("can't read golden file '%s': %v", path, err)
 	}
@@ -191,9 +191,11 @@ func TestGoldenFiles(t *testing.T) {
 			if err != nil {
 				t.Fatalf("error reading log file '%s': %v", file, err)
 			}
-			mock := NewMock().
+			// Create mocks of netlink client and control that provide the expected responses.
+			controlMock := NewMock().
 				// Get Status response for initClient
-				returnACK().returnStatus().
+				returnACK().returnStatus()
+			mock := NewMock().
 				// Send expected ACKs for initialization
 				returnACK().returnStatus().returnACK().returnACK().
 				returnACK().returnACK().returnACK().
@@ -202,8 +204,13 @@ func TestGoldenFiles(t *testing.T) {
 				// Send stream terminator
 				returnMessage(terminator)
 
-			ms := mbtest.NewPushMetricSetV2(t, configForGolden())
-			auditMetricSet := ms.(*MetricSet)
+			ms := mbtest.NewPushMetricSetV2WithRegistry(t, configForGolden(), ab.Registry)
+			auditMetricSet, ok := ms.(*MetricSet)
+			if !ok {
+				t.Fatalf("Expected *MetricSet but got %T", ms)
+			}
+			auditMetricSet.control.Close()
+			auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 			auditMetricSet.client.Close()
 			auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 			mbEvents := runTerminableReporter(fileTimeout, ms, isTestEvent)
@@ -216,7 +223,7 @@ func TestGoldenFiles(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if err = ioutil.WriteFile(goldenPath, data, 0o644); err != nil {
+				if err = os.WriteFile(goldenPath, data, 0o644); err != nil {
 					t.Fatalf("failed writing golden file '%s': %v", goldenPath, err)
 				}
 			}

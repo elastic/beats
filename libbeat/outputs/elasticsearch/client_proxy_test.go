@@ -22,18 +22,19 @@ package elasticsearch
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"os/exec"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -165,7 +166,9 @@ func TestProxyDisableOverridesProxySettings(t *testing.T) {
 func execClient(t *testing.T, env ...string) {
 	// The child process always runs only the TestClientPing test, which pings
 	// the server at TEST_SERVER_URL and then terminates.
-	cmd := exec.Command(os.Args[0], "-test.run=TestClientPing")
+	executable, err := os.Executable()
+	require.NoError(t, err, "couldn't get current executable")
+	cmd := exec.Command(executable, "-test.run=TestClientPing")
 	cmd.Env = append(append(os.Environ(),
 		"TEST_START_CLIENT=1"),
 		env...)
@@ -173,7 +176,7 @@ func execClient(t *testing.T, env ...string) {
 	cmd.Stderr = cmdOutput
 	cmd.Stdout = cmdOutput
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		t.Error("Error executing client:\n" + cmdOutput.String())
 	}
@@ -185,8 +188,8 @@ func doClientPing(t *testing.T) {
 	proxy := os.Getenv("TEST_PROXY_URL")
 	// if TEST_PROXY_DISABLE is nonempty, set ClientSettings.ProxyDisable.
 	proxyDisable := os.Getenv("TEST_PROXY_DISABLE")
-	clientSettings := ClientSettings{
-		ConnectionSettings: eslegclient.ConnectionSettings{
+	clientSettings := clientSettings{
+		connection: eslegclient.ConnectionSettings{
 			URL:     serverURL,
 			Headers: map[string]string{headerTestField: headerTestValue},
 			Transport: httpcommon.HTTPTransportSettings{
@@ -195,22 +198,24 @@ func doClientPing(t *testing.T) {
 				},
 			},
 		},
-		Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
+		indexSelector: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
 	}
 	if proxy != "" {
 		u, err := url.Parse(proxy)
 		require.NoError(t, err)
 		proxyURL := httpcommon.ProxyURI(*u)
 
-		clientSettings.Transport.Proxy.URL = &proxyURL
+		clientSettings.connection.Transport.Proxy.URL = &proxyURL
 	}
 	client, err := NewClient(clientSettings, nil)
 	require.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	// This ping won't succeed; we aren't testing end-to-end communication
 	// (which would require a lot more setup work), we just want to make sure
 	// the client is pointed at the right server or proxy.
-	client.Connect()
+	_ = client.Connect(ctx)
 }
 
 // serverState contains the state of the http listeners for proxy tests,
@@ -219,17 +224,17 @@ type serverState struct {
 	serverURL string
 	proxyURL  string
 
-	_serverRequestCount atomic.Int // Requests directly to the server
-	_proxyRequestCount  atomic.Int // Requests via the proxy
+	_serverRequestCount atomic.Int64 // Requests directly to the server
+	_proxyRequestCount  atomic.Int64 // Requests via the proxy
 }
 
 // Convenience functions to unwrap the atomic primitives
-func (s serverState) serverRequestCount() int {
-	return s._serverRequestCount.Load()
+func (s *serverState) serverRequestCount() int {
+	return int(s._serverRequestCount.Load())
 }
 
-func (s serverState) proxyRequestCount() int {
-	return s._proxyRequestCount.Load()
+func (s *serverState) proxyRequestCount() int {
+	return int(s._proxyRequestCount.Load())
 }
 
 // startServers starts endpoints representing a backend server and a proxy,
@@ -241,13 +246,13 @@ func startServers(t *testing.T) (*serverState, func()) {
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, headerTestValue, r.Header.Get(headerTestField))
 			fmt.Fprintln(w, "Hello, client")
-			state._serverRequestCount.Inc()
+			state._serverRequestCount.Add(1)
 		}))
 	proxy := httptest.NewServer(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, headerTestValue, r.Header.Get(headerTestField))
 			fmt.Fprintln(w, "Hello, client")
-			state._proxyRequestCount.Inc()
+			state._proxyRequestCount.Add(1)
 		}))
 	state.serverURL = server.URL
 	state.proxyURL = proxy.URL

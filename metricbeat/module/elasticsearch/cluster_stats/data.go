@@ -76,7 +76,8 @@ var (
 				"primaries": c.Int("primaries"),
 			}),
 			"store": c.Dict("store", s.Schema{
-				"size": s.Object{"bytes": c.Int("size_in_bytes")},
+				"size":                s.Object{"bytes": c.Int("size_in_bytes")},
+				"total_data_set_size": s.Object{"bytes": c.Int("total_data_set_size_in_bytes", s.Optional)},
 			}),
 			"fielddata": c.Dict("fielddata", s.Schema{
 				"memory": s.Object{
@@ -230,7 +231,7 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 	}
 
 	clusterStateMetrics := []string{"version", "master_node", "nodes", "routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
+	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, []string{})
 	if err != nil {
 		return fmt.Errorf("failed to get cluster state from Elasticsearch: %w", err)
 	}

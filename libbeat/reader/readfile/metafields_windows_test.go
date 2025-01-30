@@ -18,12 +18,12 @@
 package readfile
 
 import (
-	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -34,8 +34,8 @@ type winTestInfo struct {
 	vol   uint32
 }
 
-func createTestFileInfo() os.FileInfo {
-	return &winTestInfo{
+func createTestFileInfo() file.ExtendedFileInfo {
+	return file.ExtendFileInfo(&winTestInfo{
 		testFileInfo: testFileInfo{
 			name: "filename",
 			size: 42,
@@ -44,7 +44,7 @@ func createTestFileInfo() os.FileInfo {
 		idxhi: 100,
 		idxlo: 200,
 		vol:   300,
-	}
+	})
 }
 
 func checkFields(t *testing.T, expected, actual mapstr.M) {
@@ -52,19 +52,19 @@ func checkFields(t *testing.T, expected, actual mapstr.M) {
 
 	idxhi, err := actual.GetValue(idxhiKey)
 	require.NoError(t, err)
-	require.Equal(t, uint64(100), idxhi)
+	require.Equal(t, "100", idxhi)
 	err = actual.Delete(idxhiKey)
 	require.NoError(t, err)
 
 	idxlo, err := actual.GetValue(idxloKey)
 	require.NoError(t, err)
-	require.Equal(t, uint64(200), idxlo)
+	require.Equal(t, "200", idxlo)
 	err = actual.Delete(idxloKey)
 	require.NoError(t, err)
 
 	vol, err := actual.GetValue(volKey)
 	require.NoError(t, err)
-	require.Equal(t, uint64(300), vol)
+	require.Equal(t, "300", vol)
 	err = actual.Delete(volKey)
 	require.NoError(t, err)
 

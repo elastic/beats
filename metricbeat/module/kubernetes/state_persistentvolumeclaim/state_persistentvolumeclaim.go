@@ -29,6 +29,7 @@ var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
 
 		"kube_persistentvolumeclaim_access_mode": p.LabelMetric("access_mode", "access_mode"),
+		"kube_persistentvolumeclaim_created":     p.Metric("created", p.OpUnixTimestampValue()),
 		"kube_persistentvolumeclaim_info":        p.InfoMetric(),
 		"kube_persistentvolumeclaim_labels": p.ExtendedInfoMetric(
 			p.Configuration{

@@ -177,7 +177,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	if len(errs) > 0 {
-		return event, fmt.Errorf(strings.Join(errs, ", "))
+		return event, errors.New(strings.Join(errs, ", "))
 	}
 	return event, nil
 }

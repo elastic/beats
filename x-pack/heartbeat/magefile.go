@@ -74,9 +74,16 @@ func TestPackages() error {
 	return devtools.TestPackages(devtools.WithMonitorsD())
 }
 
+func GenerateModuleIncludeListGo() error {
+	opts := devtools.DefaultIncludeListOptions()
+	opts.ImportDirs = append(opts.ImportDirs, "monitors/*")
+	opts.BuildTags = "\n//go:build linux || darwin || synthetics\n"
+	return devtools.GenerateIncludeListGo(opts)
+}
+
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Fields, FieldDocs, Config)
+	mg.SerialDeps(Fields, FieldDocs, Config, GenerateModuleIncludeListGo)
 }
 
 func IntegTest() {

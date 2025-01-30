@@ -5,18 +5,17 @@
 package awss3
 
 import (
-	"context"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
-
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/stretchr/testify/require"
 )
 
 type testInputStore struct {
@@ -33,7 +32,7 @@ func (s *testInputStore) Close() {
 	_ = s.registry.Close()
 }
 
-func (s *testInputStore) Access() (*statestore.Store, error) {
+func (s *testInputStore) Access(_ string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
@@ -41,292 +40,233 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 	return 24 * time.Hour
 }
 
-var inputCtx = v2.Context{
-	Logger:      logp.NewLogger("test"),
-	Cancelation: context.Background(),
-}
-
-func TestStatesIsNewAndMustSkip(t *testing.T) {
+func TestStatesAddStateAndIsProcessed(t *testing.T) {
 	type stateTestCase struct {
-		states            func() *states
-		state             state
-		mustBeNew         bool
-		persistentStoreKV map[string]interface{}
-		expectedMustSkip  bool
-		expectedIsNew     bool
+		// An initialization callback to invoke on the (initially empty) states.
+		statesEdit func(states *states) error
+
+		// The state to call IsProcessed on and the expected result
+		state               state
+		expectedIsProcessed bool
+
+		// If true, the test will run statesEdit, then create a new states
+		// object from the same persistent store before calling IsProcessed
+		// (to test persistence between restarts).
+		shouldReload bool
 	}
 	lastModified := time.Date(2022, time.June, 30, 14, 13, 00, 0, time.UTC)
+	testState1 := newState("bucket", "key", "etag", lastModified)
+	testState2 := newState("bucket1", "key1", "etag1", lastModified)
 	tests := map[string]stateTestCase{
 		"with empty states": {
-			states: func() *states {
-				return newStates(inputCtx)
-			},
-			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
-			expectedMustSkip: false,
-			expectedIsNew:    true,
+			state:               testState1,
+			expectedIsProcessed: false,
 		},
 		"not existing state": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
+			statesEdit: func(states *states) error {
+				return states.AddState(testState2)
 			},
-			state:            newState("bucket1", "key1", "etag1", "listPrefix1", lastModified),
-			expectedMustSkip: false,
-			expectedIsNew:    true,
+			state:               testState1,
+			expectedIsProcessed: false,
 		},
 		"existing state": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
+			statesEdit: func(states *states) error {
+				return states.AddState(testState1)
 			},
-			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
-			expectedMustSkip: true,
-			expectedIsNew:    false,
+			state:               testState1,
+			expectedIsProcessed: true,
 		},
-		"with different etag": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag1", "listPrefix", lastModified), "")
-				return states
+		"existing stored state is persisted": {
+			statesEdit: func(states *states) error {
+				state := testState1
+				state.Stored = true
+				return states.AddState(state)
 			},
-			state:            newState("bucket", "key", "etag2", "listPrefix", lastModified),
-			expectedMustSkip: false,
-			expectedIsNew:    true,
+			state:               testState1,
+			shouldReload:        true,
+			expectedIsProcessed: true,
 		},
-		"with different lastmodified": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
+		"existing failed state is persisted": {
+			statesEdit: func(states *states) error {
+				state := testState1
+				state.Failed = true
+				return states.AddState(state)
 			},
-			state:            newState("bucket", "key", "etag", "listPrefix", lastModified.Add(1*time.Second)),
-			expectedMustSkip: false,
-			expectedIsNew:    true,
+			state:               testState1,
+			shouldReload:        true,
+			expectedIsProcessed: true,
 		},
-		"with stored state": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				aState := newState("bucket", "key", "etag", "listPrefix", lastModified)
-				aState.Stored = true
-				states.Update(aState, "")
-				return states
+		"existing unprocessed state is not persisted": {
+			statesEdit: func(states *states) error {
+				return states.AddState(testState1)
 			},
-			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
-			mustBeNew:        true,
-			expectedMustSkip: true,
-			expectedIsNew:    true,
-		},
-		"with error state": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				aState := newState("bucket", "key", "etag", "listPrefix", lastModified)
-				aState.Error = true
-				states.Update(aState, "")
-				return states
-			},
-			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
-			mustBeNew:        true,
-			expectedMustSkip: true,
-			expectedIsNew:    true,
-		},
-		"before commit write": {
-			states: func() *states {
-				return newStates(inputCtx)
-			},
-			persistentStoreKV: map[string]interface{}{
-				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
-			},
-			state:            newState("bucket", "key", "etag", "listPrefix", lastModified.Add(-1*time.Second)),
-			expectedMustSkip: true,
-			expectedIsNew:    true,
-		},
-		"same commit write": {
-			states: func() *states {
-				return newStates(inputCtx)
-			},
-			persistentStoreKV: map[string]interface{}{
-				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
-			},
-			state:            newState("bucket", "key", "etag", "listPrefix", lastModified),
-			expectedMustSkip: true,
-			expectedIsNew:    true,
-		},
-		"after commit write": {
-			states: func() *states {
-				return newStates(inputCtx)
-			},
-			persistentStoreKV: map[string]interface{}{
-				awsS3WriteCommitPrefix + "bucket" + "listPrefix": &commitWriteState{lastModified},
-			},
-			state:            newState("bucket", "key", "etag", "listPrefix", lastModified.Add(time.Second)),
-			expectedMustSkip: false,
-			expectedIsNew:    true,
+			state:               testState1,
+			shouldReload:        true,
+			expectedIsProcessed: false,
 		},
 	}
 
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			states := test.states()
 			store := openTestStatestore()
-			persistentStore, err := store.Access()
-			if err != nil {
-				t.Fatalf("unexpected err: %v", err)
+			states, err := newStates(nil, store, "")
+			require.NoError(t, err, "states creation must succeed")
+			if test.statesEdit != nil {
+				err = test.statesEdit(states)
+				require.NoError(t, err, "states edit must succeed")
 			}
-			for key, value := range test.persistentStoreKV {
-				_ = persistentStore.Set(key, value)
+			if test.shouldReload {
+				states, err = newStates(nil, store, "")
+				require.NoError(t, err, "states creation must succeed")
 			}
 
-			if test.mustBeNew {
-				test.state.LastModified = test.state.LastModified.Add(1 * time.Second)
-			}
-
-			isNew := states.IsNew(test.state)
-			assert.Equal(t, test.expectedIsNew, isNew)
-
-			mustSkip := states.MustSkip(test.state, persistentStore)
-			assert.Equal(t, test.expectedMustSkip, mustSkip)
+			isProcessed := states.IsProcessed(test.state)
+			assert.Equal(t, test.expectedIsProcessed, isProcessed)
 		})
 	}
 }
 
-func TestStatesDelete(t *testing.T) {
-	type stateTestCase struct {
-		states   func() *states
-		deleteID string
-		expected []state
-	}
+func TestStatesCleanUp(t *testing.T) {
+	bucketName := "test-bucket"
+	lModifiedTime := time.Unix(0, 0)
+	stateA := newState(bucketName, "a", "a-etag", lModifiedTime)
+	stateB := newState(bucketName, "b", "b-etag", lModifiedTime)
+	stateC := newState(bucketName, "c", "c-etag", lModifiedTime)
 
-	lastModified := time.Date(2021, time.July, 22, 18, 38, 00, 0, time.UTC)
-	tests := map[string]stateTestCase{
-		"delete empty states": {
-			states: func() *states {
-				return newStates(inputCtx)
-			},
-			deleteID: "an id",
-			expected: []state{},
+	tests := []struct {
+		name       string
+		initStates []state
+		knownIDs   []string
+		expectIDs  []string
+	}{
+		{
+			name:       "No cleanup if not missing from known list",
+			initStates: []state{stateA, stateB, stateC},
+			knownIDs:   []string{stateA.ID(), stateB.ID(), stateC.ID()},
+			expectIDs:  []string{stateA.ID(), stateB.ID(), stateC.ID()},
 		},
-		"delete not existing state": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
-			},
-			deleteID: "an id",
-			expected: []state{
-				{
-					ID:           stateID("bucket", "key", "etag", lastModified),
-					Bucket:       "bucket",
-					Key:          "key",
-					Etag:         "etag",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-			},
+		{
+			name:       "Clean up if missing from known list",
+			initStates: []state{stateA, stateB, stateC},
+			knownIDs:   []string{stateA.ID()},
+			expectIDs:  []string{stateA.ID()},
 		},
-		"delete only one existing": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key", "etag", "listPrefix", lastModified), "")
-				return states
-			},
-			deleteID: stateID("bucket", "key", "etag", lastModified),
-			expected: []state{},
+		{
+			name:       "Clean up everything",
+			initStates: []state{stateA, stateC}, // given A, C
+			knownIDs:   []string{stateB.ID()},   // but known B
+			expectIDs:  []string{},              // empty state & store
 		},
-		"delete first": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
-				return states
-			},
-			deleteID: "bucketkey1etag1" + lastModified.String(),
-			expected: []state{
-				{
-					ID:           stateID("bucket", "key3", "etag3", lastModified),
-					Bucket:       "bucket",
-					Key:          "key3",
-					Etag:         "etag3",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-				{
-					ID:           stateID("bucket", "key2", "etag2", lastModified),
-					Bucket:       "bucket",
-					Key:          "key2",
-					Etag:         "etag2",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-			},
-		},
-		"delete last": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
-				return states
-			},
-			deleteID: "bucketkey3etag3" + lastModified.String(),
-			expected: []state{
-				{
-					ID:           stateID("bucket", "key1", "etag1", lastModified),
-					Bucket:       "bucket",
-					Key:          "key1",
-					Etag:         "etag1",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-				{
-					ID:           stateID("bucket", "key2", "etag2", lastModified),
-					Bucket:       "bucket",
-					Key:          "key2",
-					Etag:         "etag2",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-			},
-		},
-		"delete any": {
-			states: func() *states {
-				states := newStates(inputCtx)
-				states.Update(newState("bucket", "key1", "etag1", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key2", "etag2", "listPrefix", lastModified), "")
-				states.Update(newState("bucket", "key3", "etag3", "listPrefix", lastModified), "")
-				return states
-			},
-			deleteID: "bucketkey2etag2" + lastModified.String(),
-			expected: []state{
-				{
-					ID:           stateID("bucket", "key1", "etag1", lastModified),
-					Bucket:       "bucket",
-					Key:          "key1",
-					Etag:         "etag1",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-				{
-					ID:           stateID("bucket", "key3", "etag3", lastModified),
-					Bucket:       "bucket",
-					Key:          "key3",
-					Etag:         "etag3",
-					ListPrefix:   "listPrefix",
-					LastModified: lastModified,
-				},
-			},
+		{
+			name:       "Empty known IDs are valid",
+			initStates: []state{stateA}, // given A
+			knownIDs:   []string{},      // Known nothing
+			expectIDs:  []string{},      // empty state & store
 		},
 	}
 
-	for name, test := range tests {
-		test := test
-		t.Run(name, func(t *testing.T) {
-			states := test.states()
-			states.Delete(test.deleteID)
-			assert.Equal(t, test.expected, states.GetStates())
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			store := openTestStatestore()
+			statesInstance, err := newStates(nil, store, "")
+			require.NoError(t, err, "states creation must succeed")
+
+			for _, s := range test.initStates {
+				err := statesInstance.AddState(s)
+				require.NoError(t, err, "state initialization must succeed")
+			}
+
+			// perform cleanup
+			err = statesInstance.CleanUp(test.knownIDs)
+			require.NoError(t, err, "state cleanup must succeed")
+
+			// validate
+			for _, id := range test.expectIDs {
+				// must be in local state
+				_, ok := statesInstance.states[id]
+				require.True(t, ok, fmt.Errorf("expected id %s in state, but got missing", id))
+
+				// must be in store
+				ok, err := statesInstance.store.Has(getStoreKey(id))
+				require.NoError(t, err, "state has must succeed")
+				require.True(t, ok, fmt.Errorf("expected id %s in store, but got missing", id))
+			}
 		})
 	}
+
+}
+
+func TestStatesPrefixHandling(t *testing.T) {
+	logger := logp.NewLogger("state-prefix-testing")
+
+	t.Run("if prefix was set, accept only states with prefix", func(t *testing.T) {
+		// given
+		registry := openTestStatestore()
+
+		// when - registry with prefix
+		st, err := newStates(logger, registry, "staging-")
+		require.NoError(t, err)
+
+		// then - fail for non prefixed
+		err = st.AddState(newState("bucket", "production-logA", "etag", time.Now()))
+		require.Error(t, err)
+
+		// then - pass for correctly prefixed
+		err = st.AddState(newState("bucket", "staging-logA", "etag", time.Now()))
+		require.NoError(t, err)
+	})
+
+	t.Run("states store only load entries matching the given prefix", func(t *testing.T) {
+		// given
+		registry := openTestStatestore()
+
+		sA := newState("bucket", "A", "etag", time.Unix(1733221244, 0))
+		sA.Stored = true
+		sStagingA := newState("bucket", "staging-A", "etag", time.Unix(1733224844, 0))
+		sStagingA.Stored = true
+		sProdB := newState("bucket", "production/B", "etag", time.Unix(1733228444, 0))
+		sProdB.Stored = true
+		sSpace := newState("bucket", "  B", "etag", time.Unix(1733230444, 0))
+		sSpace.Stored = true
+
+		// add various states first with no prefix
+		st, err := newStates(logger, registry, "")
+		require.NoError(t, err)
+
+		_ = st.AddState(sA)
+		_ = st.AddState(sStagingA)
+		_ = st.AddState(sProdB)
+		_ = st.AddState(sSpace)
+
+		// Reload states and validate
+
+		// when - no prefix reload
+		stNoPrefix, err := newStates(logger, registry, "")
+		require.NoError(t, err)
+
+		require.True(t, stNoPrefix.IsProcessed(sA))
+		require.True(t, stNoPrefix.IsProcessed(sStagingA))
+		require.True(t, stNoPrefix.IsProcessed(sProdB))
+		require.True(t, stNoPrefix.IsProcessed(sSpace))
+
+		// when - with prefix `staging-`
+		st, err = newStates(logger, registry, "staging-")
+		require.NoError(t, err)
+
+		require.False(t, st.IsProcessed(sA))
+		require.True(t, st.IsProcessed(sStagingA))
+		require.False(t, st.IsProcessed(sProdB))
+		require.False(t, st.IsProcessed(sSpace))
+
+		// when - with prefix `production/`
+		st, err = newStates(logger, registry, "production/")
+		require.NoError(t, err)
+
+		require.False(t, st.IsProcessed(sA))
+		require.False(t, st.IsProcessed(sStagingA))
+		require.True(t, st.IsProcessed(sProdB))
+		require.False(t, st.IsProcessed(sSpace))
+	})
+
 }

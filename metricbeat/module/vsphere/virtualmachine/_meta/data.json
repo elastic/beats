@@ -1,5 +1,5 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "@timestamp": "2024-08-12T04:51:25.851Z",
     "event": {
         "dataset": "vsphere.virtualmachine",
         "duration": 115000,
@@ -15,35 +15,80 @@
     },
     "vsphere": {
         "virtualmachine": {
+            "id": "vm-51",
+            "name": "xt0nmfpv9",
+            "uptime": 5348978,
+            "status": "green",
+            "host": {
+                "id": "host-32",
+                "hostname": "phx-w1c1-esxi04.com"
+            },
             "cpu": {
+                "free": {
+                    "mhz": 0
+                },
                 "used": {
+                    "mhz": 161
+                },
+                "total": {
                     "mhz": 0
                 }
             },
-            "host.hostname": "localhost.localdomain",
-            "host.id": "ha-host",
+            "network": {
+                "names": [
+                    "PROD_VCF_VMS"
+                ],
+                "count": 1
+            },
             "memory": {
-                "free": {
+                "used": {
                     "guest": {
-                        "bytes": 33554432
+                        "bytes": 686817280
+                    },
+                    "host": {
+                        "bytes": 29027729408
                     }
                 },
                 "total": {
                     "guest": {
-                        "bytes": 33554432
+                        "bytes": 68719476736
                     }
                 },
-                "used": {
+                "free": {
                     "guest": {
-                        "bytes": 0
-                    },
-                    "host": {
-                        "bytes": 0
+                        "bytes": 68032659456
                     }
                 }
             },
-            "name": "ha-host_VM0",
-            "os": "otherGuest"
+            "network_names": [
+                "PROD_VCF_VMS"
+            ],
+            "datastore": {
+                "count": 1,
+                "names": [
+                    "VxRailtoup-Virtual-Datastore-bc1d-5aa310fb"
+                ]
+            },
+            "os": "CentOS 4/5/6/7 (64-bit)",
+            "snapshot": {
+                "info": [
+                    {
+                        "id": 1,
+                        "name": "VM Snapshot 7%2f3%2f2024, 4:01:21 PM",
+                        "description": "Created to demo",
+                        "createtime": "2024-07-03T20:01:34.329Z",
+                        "state": "poweredOn"
+                    },
+                    {
+                        "createtime": "2024-07-05T23:35:40.859Z",
+                        "state": "poweredOn",
+                        "id": 2,
+                        "name": "VM Snapshot 7%2f5%2f2024, 7:35:37 PM",
+                        "description": "backup"
+                    }
+                ],
+                "count": 2
+            }
         }
     }
 }

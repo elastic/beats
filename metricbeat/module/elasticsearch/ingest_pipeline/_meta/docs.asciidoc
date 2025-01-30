@@ -17,6 +17,6 @@ processor-level metrics will be collected during 25% of the time. This can be co
 - module: elasticsearch
   period: 10s
   metricsets:
-    - ingest
+    - ingest_pipeline
   ingest.processor_sample_rate: 0.1 # decrease to 10% of fetches
 ----

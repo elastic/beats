@@ -15,3 +15,26 @@
   - name: total
     type: float
     description: Total billing amount.
+  - name: sku_id
+    type: keyword
+    description: The ID of the resource used by the service.
+  - name: sku_description
+    type: keyword
+    description: A description of the resource type used by the service. For example, a resource type for Cloud Storage is Standard Storage US.
+  - name: service_id
+    type: keyword
+    description: The ID of the service that the usage is associated with.
+  - name: service_description
+    type: keyword
+    description: The Google Cloud service that reported the Cloud Billing data.
+  - name: tags
+    type: nested
+    description: A collection of key-value pairs that provide additional metadata.
+    fields:
+      - name: key
+        type: keyword
+      - name: value
+        type: keyword
+  - name: effective_price
+    type: float
+    description: The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it's the list price.

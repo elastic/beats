@@ -33,13 +33,15 @@ import (
 
 // Decoders functions return a Decoder able to process the provided network
 // link type for use with a Sniffer. The cleanup closure should be called after
-// the decoders are no longer needed to clean up resources.
-type Decoders func(_ layers.LinkType, device string) (decoders *decoder.Decoder, cleanup func(), err error)
+// the decoders are no longer needed to clean up resources. The idx parameter
+// is the index into the list of devices obtained from the interfaces provided
+// to New.
+type Decoders func(_ layers.LinkType, device string, idx int) (decoders *decoder.Decoder, cleanup func(), err error)
 
 // DecodersFor returns a source of Decoders using the provided configuration
 // components. The id string is expected to be the ID of the beat.
 func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *protos.ProtocolsStruct, watcher *procs.ProcessesWatcher, flows *flows.Flows, cfg config.Config) Decoders {
-	return func(dl layers.LinkType, device string) (*decoder.Decoder, func(), error) {
+	return func(dl layers.LinkType, device string, idx int) (*decoder.Decoder, func(), error) {
 		var icmp4 icmp.ICMPv4Processor
 		var icmp6 icmp.ICMPv6Processor
 		icmpCfg, err := cfg.ICMP()
@@ -61,12 +63,12 @@ func DecodersFor(id string, publisher *publish.TransactionPublisher, protocols *
 			icmp6 = icmp
 		}
 
-		tcp, err := tcp.NewTCP(protocols, id, device)
+		tcp, err := tcp.NewTCP(protocols, id, device, idx)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		udp, err := udp.NewUDP(protocols, id, device)
+		udp, err := udp.NewUDP(protocols, id, device, idx)
 		if err != nil {
 			return nil, nil, err
 		}

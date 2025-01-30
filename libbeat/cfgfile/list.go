@@ -22,13 +22,13 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -70,8 +70,7 @@ func (r *RunnerList) Runners() []Runner {
 //
 // Runners might fail to start, it's the callers responsibility to
 // handle any error. During execution, any encountered errors are
-// accumulated in a `multierror.Errors` and returned as
-// a `multierror.MultiError` upon completion.
+// accumulated in a []errors and returned as errors.Join(errs) upon completion.
 //
 // While the stopping of runners occurs on separate goroutines,
 // Reload will wait for all runners to finish before starting any new runners.
@@ -84,7 +83,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	var errs multierror.Errors
+	var errs []error
 
 	startList := map[uint64]*reload.ConfigWithMeta{}
 	stopList := r.copyRunnerList()
@@ -130,19 +129,34 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, config := range startList {
 		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			errors.Is(err, &common.ErrInputNotFinished{})
-			if _, ok := err.(*common.ErrInputNotFinished); ok { //nolint:errorlint // ErrInputNotFinished is a struct type, not an expression/error value
+			if errors.As(err, new(*common.ErrInputNotFinished)) {
 				// error is related to state, we should not log at error level
 				r.logger.Debugf("Error creating runner from config: %s", err)
 			} else {
 				r.logger.Errorf("Error creating runner from config: %s", err)
 			}
+
+			// If InputUnitID is not empty, then we're running under Elastic-Agent
+			// and we need to report the errors per unit.
+			if config.InputUnitID != "" {
+				err = UnitError{
+					Err:    err,
+					UnitID: config.InputUnitID,
+				}
+			}
+
 			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
 
 		r.logger.Debugf("Starting runner: %s", runner)
 		r.runners[hash] = runner
+		if config.StatusReporter != nil {
+			if runnerWithStatus, ok := runner.(status.WithStatusReporter); ok {
+				runnerWithStatus.SetStatusReporter(config.StatusReporter)
+			}
+		}
+
 		runner.Start()
 		moduleStarts.Add(1)
 		if config.DiagCallback != nil {
@@ -163,7 +177,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// above it is done asynchronously.
 	moduleRunning.Set(int64(len(r.runners)))
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Stop all runners
@@ -225,4 +239,17 @@ func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, cfg *r
 	// that doesn't affect the hash of the original one.
 	c, _ := config.NewConfigFrom(cfg.Config)
 	return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
+}
+
+type UnitError struct {
+	UnitID string
+	Err    error
+}
+
+func (u UnitError) Error() string {
+	return u.Err.Error()
+}
+
+func (u UnitError) Unwrap() error {
+	return u.Err
 }

@@ -26,6 +26,8 @@
 #timestamp.precision: millisecond
 
 # Internal queue configuration for buffering events to be published.
+# Queue settings may be overridden by performance presets in the
+# Elasticsearch output. To configure them manually use "preset: custom".
 #queue:
   # Queue type by name (default 'mem')
   # The memory queue will present all available events (up to the outputs
@@ -33,18 +35,18 @@
   # another batch of events.
   #mem:
     # Max number of events the queue can buffer.
-    #events: 4096
+    #events: 3200
 
     # Hints the minimum number of events stored in the queue,
     # before providing a batch of events to the outputs.
     # The default value is set to 2048.
     # A value of 0 ensures events are immediately available
     # to be sent to the outputs.
-    #flush.min_events: 2048
+    #flush.min_events: 1600
 
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
-    #flush.timeout: 1s
+    #flush.timeout: 10s
 
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only

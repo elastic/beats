@@ -25,6 +25,8 @@ func TestEventMapping(t *testing.T) {
 	name := "test"
 	billingAccountId := "123"
 	startDate := time.Time{}
+	tagName := "team"
+	tagValue := "obs-cloud-monitoring"
 
 	//
 	// Usage Details
@@ -49,6 +51,9 @@ func TestEventMapping(t *testing.T) {
 		ID:         &ID,
 		Kind:       &kind,
 		Properties: &props,
+		Tags: map[string]*string{
+			tagName: &tagValue,
+		},
 	}
 
 	//
@@ -102,15 +107,23 @@ func TestEventMapping(t *testing.T) {
 	// Check the results
 	//
 	for _, event := range events {
-		// if is an usage event
 		if ok, _ := event.MetricSetFields.HasKey("department_name"); ok {
+			//
+			// The event is a usage detail
+			//
 			val1, _ := event.MetricSetFields.GetValue("account_name")
 			assert.Equal(t, val1, &name)
 			val2, _ := event.MetricSetFields.GetValue("product")
 			assert.Equal(t, val2, &name)
 			val3, _ := event.MetricSetFields.GetValue("department_name")
 			assert.Equal(t, val3, &name)
+			tags, _ := event.ModuleFields.GetValue("resource.tags")
+			assert.Equal(t, tags, map[string]*string{tagName: &tagValue})
+
 		} else {
+			//
+			// The event is a forecast
+			//
 
 			// Check the actual cost
 			isActual, _ := event.MetricSetFields.HasKey("actual_cost")

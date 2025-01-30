@@ -133,3 +133,21 @@ heartbeat.run_once: true
 heartbeat.monitors:
 # your monitor config here...
 ----------------------------------------------------------------------
+
+[float]
+[[publish-timeout]]
+=== Publish timeout (Experimental)
+
+You can configure {beatname_uc} to exit after an elapsed timeout if unable to publish pending events.
+This is an experimental feature and is subject to change. 
+
+Note, the `heartbeat.run_once` flag is required for `publish_timeout` to take effect.
+
+[source,yaml]
+----------------------------------------------------------------------
+# heartbeat.yml
+heartbeat.publish_timeout: 30s
+heartbeat.run_once: true
+heartbeat.monitors:
+# your monitor config here...
+----------------------------------------------------------------------

@@ -46,6 +46,9 @@ var indexSummaryDict = s.Schema{
 		"size": s.Object{
 			"bytes": c.Int("size_in_bytes"),
 		},
+		"total_data_set_size": s.Object{
+			"bytes": c.Int("total_data_set_size_in_bytes", s.Optional),
+		},
 	}),
 	"segments": c.Dict("segments", s.Schema{
 		"count": c.Int("count"),

@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,12 +42,15 @@ var _ provider.Provider = &azure{}
 type azure struct {
 	*kvstore.Manager
 
+	cfg  *config.C
 	conf conf
 
 	metrics *inputMetrics
 	logger  *logp.Logger
 	auth    authenticator.Authenticator
 	fetcher fetcher.Fetcher
+
+	ctx v2.Context
 }
 
 // Name returns the name of this provider.
@@ -71,8 +74,21 @@ func (p *azure) Test(testCtx v2.TestContext) error {
 // Run will start data collection on this provider.
 func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
+	p.ctx = inputCtx
+
+	var err error
+	p.auth, err = oauth2.New(p.cfg, p.Manager.Logger)
+	if err != nil {
+		return fmt.Errorf("unable to create authenticator: %w", err)
+	}
 	p.auth.SetLogger(p.logger)
+
+	p.fetcher, err = graph.New(ctxtool.FromCanceller(p.ctx.Cancelation), p.ctx.ID, p.cfg, p.Manager.Logger, p.auth)
+	if err != nil {
+		return fmt.Errorf("unable to create fetcher: %w", err)
+	}
 	p.fetcher.SetLogger(p.logger)
+
 	p.metrics = newMetrics(inputCtx.ID, nil)
 	defer p.metrics.Close()
 
@@ -150,21 +166,22 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 		return err
 	}
 
-	if len(state.users) != 0 || len(state.devices) != 0 {
+	wantUsers := p.conf.wantUsers()
+	wantDevices := p.conf.wantDevices()
+	if (len(state.users) != 0 && wantUsers) || (len(state.devices) != 0 && wantDevices) {
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 
-		if len(state.users) != 0 {
+		if len(state.users) != 0 && wantUsers {
 			p.logger.Debugw("publishing users", "count", len(state.devices))
 			for _, u := range state.users {
 				p.publishUser(u, state, inputCtx.ID, client, tracker)
 			}
-
 		}
 
-		if len(state.devices) != 0 {
+		if len(state.devices) != 0 && wantDevices {
 			p.logger.Debugw("publishing devices", "count", len(state.devices))
 			for _, d := range state.devices {
 				p.publishDevice(d, state, inputCtx.ID, client, tracker)
@@ -223,7 +240,6 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 				}
 				p.publishUser(u, state, inputCtx.ID, client, tracker)
 			})
-
 		}
 
 		if updatedDevices.Len() != 0 {
@@ -235,7 +251,6 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 				}
 				p.publishDevice(d, state, inputCtx.ID, client, tracker)
 			})
-
 		}
 
 		tracker.Wait()
@@ -267,19 +282,38 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		groupsDeltaLink = state.groupsLink
 	}
 
-	changedUsers, userLink, err := p.fetcher.Users(ctx, usersDeltaLink)
-	if err != nil {
-		return updatedUsers, updatedDevices, err
+	var (
+		wantUsers    = p.conf.wantUsers()
+		changedUsers []*fetcher.User
+		userLink     string
+	)
+	if wantUsers {
+		changedUsers, userLink, err = p.fetcher.Users(ctx, usersDeltaLink)
+		if err != nil {
+			return updatedUsers, updatedDevices, err
+		}
+		p.logger.Debugf("Received %d users from API", len(changedUsers))
+	} else {
+		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.conf.Dataset)
 	}
-	p.logger.Debugf("Received %d users from API", len(changedUsers))
 
-	changedDevices, deviceLink, err := p.fetcher.Devices(ctx, devicesDeltaLink)
-	if err != nil {
-		return updatedUsers, updatedDevices, err
+	var (
+		wantDevices    = p.conf.wantDevices()
+		changedDevices []*fetcher.Device
+		deviceLink     string
+	)
+	if wantDevices {
+		changedDevices, deviceLink, err = p.fetcher.Devices(ctx, devicesDeltaLink)
+		if err != nil {
+			return updatedUsers, updatedDevices, err
+		}
+		p.logger.Debugf("Received %d devices from API", len(changedDevices))
+	} else {
+		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.conf.Dataset)
 	}
-	p.logger.Debugf("Received %d devices from API", len(changedUsers))
 
-	// Get group changes.
+	// Get group changes. Groups are required for both users and devices.
+	// So always collect these.
 	changedGroups, groupLink, err := p.fetcher.Groups(ctx, groupsDeltaLink)
 	if err != nil {
 		return updatedUsers, updatedDevices, err
@@ -317,6 +351,9 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		for _, member := range g.Members {
 			switch member.Type {
 			case fetcher.MemberGroup:
+				if !wantUsers {
+					break
+				}
 				for _, u := range state.users {
 					if u.TransitiveMemberOf.Contains(member.ID) {
 						updatedUsers.Add(u.ID)
@@ -329,6 +366,9 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 				}
 
 			case fetcher.MemberUser:
+				if !wantUsers {
+					break
+				}
 				if u, ok := state.users[member.ID]; ok {
 					updatedUsers.Add(u.ID)
 					if member.Deleted {
@@ -339,6 +379,9 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 				}
 
 			case fetcher.MemberDevice:
+				if !wantDevices {
+					break
+				}
 				if d, ok := state.devices[member.ID]; ok {
 					updatedDevices.Add(d.ID)
 					if member.Deleted {
@@ -352,42 +395,46 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 	}
 
 	// Expand user group memberships.
-	updatedUsers.ForEach(func(userID uuid.UUID) {
-		u, ok := state.users[userID]
-		if !ok {
-			p.logger.Errorf("Unable to find user %q in state", userID)
-			return
-		}
-		u.Modified = true
-		if u.Deleted {
-			p.logger.Debugw("not expanding membership for deleted user", "user", userID)
-			return
-		}
+	if wantUsers {
+		updatedUsers.ForEach(func(userID uuid.UUID) {
+			u, ok := state.users[userID]
+			if !ok {
+				p.logger.Errorf("Unable to find user %q in state", userID)
+				return
+			}
+			u.Modified = true
+			if u.Deleted {
+				p.logger.Debugw("not expanding membership for deleted user", "user", userID)
+				return
+			}
 
-		u.TransitiveMemberOf = u.MemberOf
-		state.relationships.ExpandFromSet(u.MemberOf).ForEach(func(elem uuid.UUID) {
-			u.TransitiveMemberOf.Add(elem)
+			u.TransitiveMemberOf = u.MemberOf
+			state.relationships.ExpandFromSet(u.MemberOf).ForEach(func(elem uuid.UUID) {
+				u.TransitiveMemberOf.Add(elem)
+			})
 		})
-	})
+	}
 
 	// Expand device group memberships.
-	updatedDevices.ForEach(func(devID uuid.UUID) {
-		d, ok := state.devices[devID]
-		if !ok {
-			p.logger.Errorf("Unable to find device %q in state", devID)
-			return
-		}
-		d.Modified = true
-		if d.Deleted {
-			p.logger.Debugw("not expanding membership for deleted device", "device", devID)
-			return
-		}
+	if wantDevices {
+		updatedDevices.ForEach(func(devID uuid.UUID) {
+			d, ok := state.devices[devID]
+			if !ok {
+				p.logger.Errorf("Unable to find device %q in state", devID)
+				return
+			}
+			d.Modified = true
+			if d.Deleted {
+				p.logger.Debugw("not expanding membership for deleted device", "device", devID)
+				return
+			}
 
-		d.TransitiveMemberOf = d.MemberOf
-		state.relationships.ExpandFromSet(d.MemberOf).ForEach(func(elem uuid.UUID) {
-			d.TransitiveMemberOf.Add(elem)
+			d.TransitiveMemberOf = d.MemberOf
+			state.relationships.ExpandFromSet(d.MemberOf).ForEach(func(elem uuid.UUID) {
+				d.TransitiveMemberOf.Add(elem)
+			})
 		})
-	})
+	}
 
 	return updatedUsers, updatedDevices, nil
 }
@@ -535,19 +582,10 @@ func (p *azure) publishDevice(d *fetcher.Device, state *stateStore, inputID stri
 
 // configure configures this provider using the given configuration.
 func (p *azure) configure(cfg *config.C) (kvstore.Input, error) {
-	var err error
-
-	if err = cfg.Unpack(&p.conf); err != nil {
+	if err := cfg.Unpack(&p.conf); err != nil {
 		return nil, fmt.Errorf("unable to unpack %s input config: %w", Name, err)
 	}
-
-	if p.auth, err = oauth2.New(cfg, p.Manager.Logger); err != nil {
-		return nil, fmt.Errorf("unable to create authenticator: %w", err)
-	}
-	if p.fetcher, err = graph.New(cfg, p.Manager.Logger, p.auth); err != nil {
-		return nil, fmt.Errorf("unable to create fetcher: %w", err)
-	}
-
+	p.cfg = cfg
 	return p, nil
 }
 
