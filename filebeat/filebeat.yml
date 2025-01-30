@@ -158,14 +158,18 @@ setup.kibana:
 
 # Configure what output to use when sending the data collected by the beat.
 
-# ---------------------------- Elasticsearch Output ----------------------------
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+output.file:
+  path: "/tmp/filebeat"
+  filename: filebeat.output
 
-  # Performance preset - one of "balanced", "throughput", "scale",
-  # "latency", or "custom".
-  preset: balanced
+# ---------------------------- Elasticsearch Output ----------------------------
+#output.elasticsearch:
+#  # Array of hosts to connect to.
+#  hosts: ["localhost:9200"]
+#
+#  # Performance preset - one of "balanced", "throughput", "scale",
+#  # "latency", or "custom".
+#  preset: balanced
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -215,7 +219,7 @@ processors:
 # reporting is disabled by default.
 
 # Set to true to enable the monitoring reporter.
-#monitoring.enabled: false
+#monitoring.enabled: true
 
 # Sets the UUID of the Elasticsearch cluster under which monitoring data for this
 # Filebeat instance will appear in the Stack Monitoring UI. If output.elasticsearch

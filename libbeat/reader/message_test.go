@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -78,4 +79,12 @@ func TestToEvent(t *testing.T) {
 		})
 	}
 
+}
+
+func TestEventMetricPropagation(t *testing.T) {
+	m := Message{}
+	ev := m.ToEvent()
+
+	ev.SetPublishStatus("published")
+	assert.Equal(t, "published", ev.PublishStatus())
 }
