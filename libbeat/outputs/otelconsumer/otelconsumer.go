@@ -99,12 +99,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
-		meta := event.Content.Meta.Clone()
-		meta["beat"] = out.beatInfo.Beat
-		meta["version"] = out.beatInfo.Version
-		meta["type"] = "_doc"
 
-		if id, ok := meta["_id"]; ok {
+		if id, ok := event.Content.Meta["_id"]; ok {
 			// Specify the id as an attribute used by the elasticsearchexporter
 			// to set the final document ID in Elasticsearch.
 			// When using the bodymap encoding in the exporter all attributes
@@ -119,7 +115,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp
-		beatEvent["@metadata"] = meta
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 		pcommonEvent := mapstrToPcommonMap(beatEvent)
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
@@ -285,12 +280,12 @@ func mapstrToPcommonMap(m mapstr.M) pcommon.Map {
 				newMap.CopyTo(newVal.SetEmptyMap())
 			}
 		case time.Time:
-			out.PutInt(k, x.UnixMilli())
+			out.PutStr(k, x.Format("2006-01-02T15:04:05.000Z"))
 		case []time.Time:
 			dest := out.PutEmptySlice(k)
 			for _, i := range v.([]time.Time) {
 				newVal := dest.AppendEmpty()
-				newVal.SetInt(i.UnixMilli())
+				newVal.SetStr(i.Format("2006-01-02T15:04:05.000Z"))
 			}
 		default:
 			out.PutStr(k, fmt.Sprintf("unknown type: %T", x))

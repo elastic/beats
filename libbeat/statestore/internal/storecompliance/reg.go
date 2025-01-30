@@ -25,7 +25,7 @@ import (
 
 // Registry helper for writing tests.
 // The registry uses a testing.T and provides some MustX methods that fail if
-// an error occured.
+// an error occurred.
 type Registry struct {
 	T testing.TB
 	backend.Registry
@@ -34,7 +34,7 @@ type Registry struct {
 // Store helper for writing tests.
 // The store needs a reference to the Registry with the current test context.
 // The Store provides additional helpers for reopening the store, MustX methods
-// that will fail the test if an error has occured.
+// that will fail the test if an error has occurred.
 type Store struct {
 	backend.Store
 
@@ -51,7 +51,7 @@ func (r *Registry) Access(name string) (*Store, error) {
 	return &Store{Store: s, Registry: r, name: name}, nil
 }
 
-// MustAccess opens a Store. It fails the test if an error has occured.
+// MustAccess opens a Store. It fails the test if an error has occurred.
 func (r *Registry) MustAccess(name string) *Store {
 	store, err := r.Access(name)
 	must(r.T, err, "open store")
@@ -87,26 +87,26 @@ func (s *Store) Reopen() {
 	s.Store = store
 }
 
-// MustHave fails the test if an error occured in a call to Has.
+// MustHave fails the test if an error occurred in a call to Has.
 func (s *Store) MustHave(key string) bool {
 	b, err := s.Has(key)
 	must(s.Registry.T, err, "unexpected error on store/has call")
 	return b
 }
 
-// MustGet fails the test if an error occured in a call to Get.
+// MustGet fails the test if an error occurred in a call to Get.
 func (s *Store) MustGet(key string, into interface{}) {
 	err := s.Get(key, into)
 	must(s.Registry.T, err, "unexpected error on store/get call")
 }
 
-// MustSet fails the test if an error occured in a call to Set.
+// MustSet fails the test if an error occurred in a call to Set.
 func (s *Store) MustSet(key string, from interface{}) {
 	err := s.Set(key, from)
 	must(s.Registry.T, err, "unexpected error on store/set call")
 }
 
-// MustRemove fails the test if an error occured in a call to Remove.
+// MustRemove fails the test if an error occurred in a call to Remove.
 func (s *Store) MustRemove(key string) {
 	err := s.Store.Remove(key)
 	must(s.Registry.T, err, "unexpected error remove key")
