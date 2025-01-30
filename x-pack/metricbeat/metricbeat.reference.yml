@@ -1745,6 +1745,7 @@ metricbeat.modules:
       # Override the WMI namespace for this specific query (optional).
       # If set, this takes precedence over the default namespace above.
       # namespace: "root\\cimv2" # Overrides the metric
+
 #------------------------------ ZooKeeper Module ------------------------------
 - module: zookeeper
   enabled: true
