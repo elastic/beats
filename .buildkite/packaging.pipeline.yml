@@ -73,7 +73,7 @@ steps:
         retry:
           automatic:
             - limit: 1
-        commands:
+        commands: |
           source .buildkite/scripts/version_qualifier.sh
           make build/distributions/dependencies.csv
           make beats-dashboards
