@@ -385,8 +385,6 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
-<<<<<<< HEAD
-=======
   - name: backport patches to 8.18 branch
     conditions:
       - merged
@@ -413,4 +411,3 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
->>>>>>> f7e951cee ([Release] add-backport-next (#42491))
