@@ -99,7 +99,7 @@ func TestCompileQueries(t *testing.T) {
 		{
 			name:          "No queries defined",
 			config:        Config{},
-			expectedError: "at least a query is needed",
+			expectedError: "at least one query is needed",
 		},
 	}
 
