@@ -731,6 +731,8 @@
                           type: float
                         - name: median
                           type: long
+                        - name: p95
+                          type: float
                         - name: p99
                           type: float
     - name: output
