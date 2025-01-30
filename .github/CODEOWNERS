@@ -105,7 +105,7 @@ CHANGELOG*
 /metricbeat/module/redis @elastic/obs-infraobs-integrations
 /metricbeat/module/system/ @elastic/elastic-agent-data-plane
 /metricbeat/module/vsphere @elastic/obs-infraobs-integrations
-/metricbeat/module/windows @elastic/obs-infraobs-integrations
+/metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
 /packetbeat/ @elastic/sec-linux-platform
 /script/ @elastic/elastic-agent-data-plane
