@@ -232,6 +232,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Packetbeat*
 
+- Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names {pull}42116[42116]
+
 
 *Winlogbeat*
 
