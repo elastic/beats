@@ -260,6 +260,15 @@ Set `max_retries` to a value less than 0 to retry until all events are published
 The default is 3.
 endif::[]
 
+===== `max_open_requests`
+
+The maximum number of unacknowledged requests the client will send on a single connection before blocking.
+Throughput can improve but message ordering is not guaranteed if Idempotent is disabled, see:
+https://kafka.apache.org/protocol#protocol_network
+https://kafka.apache.org/28/documentation.html#producerconfigs_max.in.flight.requests.per.connection
+
+The default is 5.
+
 ===== `backoff.init`
 
 The number of seconds to wait before trying to republish to Kafka
