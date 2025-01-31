@@ -54,7 +54,6 @@ type msgRef struct {
 	win              *window
 	batchSize        int
 	deadlockListener *deadlockListener
-	start            time.Time
 }
 
 func newAsyncClient(
@@ -155,7 +154,6 @@ func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		win:              c.win,
 		err:              nil,
 		deadlockListener: newDeadlockListener(c.log, logstashDeadlockTimeout),
-		start:            time.Time{},
 	}
 	ref.count.Store(1)
 	defer ref.dec()
@@ -223,8 +221,8 @@ func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 		window[i] = &events[i].Content
 	}
 	ref.count.Add(1)
-	ref.start = time.Now()
-	return client.Send(ref.callback, window)
+
+	return client.Send(ref.customizedCallback(), window)
 }
 
 func (c *asyncClient) getClient() *v2.AsyncClient {
@@ -234,7 +232,15 @@ func (c *asyncClient) getClient() *v2.AsyncClient {
 	return client
 }
 
-func (r *msgRef) callback(n uint32, err error) {
+func (r *msgRef) customizedCallback() func(uint32, error) {
+	start := time.Now()
+
+	return func(n uint32, err error) {
+		r.callback(start, n, err)
+	}
+}
+
+func (r *msgRef) callback(start time.Time, n uint32, err error) {
 	r.client.observer.AckedEvents(int(n))
 	r.slice = r.slice[n:]
 	r.deadlockListener.ack(int(n))
@@ -251,7 +257,8 @@ func (r *msgRef) callback(n uint32, err error) {
 	}
 
 	// Report the latency for the batch of events
-	r.client.observer.ReportLatency(time.Since(r.start))
+	duration := time.Since(start)
+	r.client.observer.ReportLatency(duration)
 
 	r.dec()
 }
