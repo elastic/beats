@@ -142,7 +142,7 @@ func TestInputIncludeMatches(t *testing.T) {
 		"single match condition": {
 			includeMatches: map[string]interface{}{
 				"match": []string{
-					"syslog.facility=3",
+					"log.syslog.facility.code=3",
 				},
 			},
 			expectedMessages: []string{
@@ -159,7 +159,7 @@ func TestInputIncludeMatches(t *testing.T) {
 			includeMatches: map[string]interface{}{
 				"match": []string{
 					"journald.process.name=systemd",
-					"syslog.facility=3",
+					"log.syslog.facility.code=3",
 				},
 			},
 			expectedMessages: []string{

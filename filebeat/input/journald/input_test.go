@@ -119,6 +119,12 @@ func TestInputFieldsTranslation(t *testing.T) {
 // events in the same format as the original one. We use the events from the
 // already existing journal file 'input-multiline-parser.journal'
 //
+// Generating golden file: to generate the golden file you need to copy
+// and run this test on a older version that still uses go-systemd,
+// like 8.16.0, so the input run on this older version, call
+// `env.pipeline.GetAllEvents()`, get the events, marshal them as
+// JSON with "  " as the indent argument and write it to the file.
+//
 // The following fields are not currently tested:
 // __CURSOR - it is added to the registry and there are other tests for it
 // __MONOTONIC_TIMESTAMP - it is part of the cursor
