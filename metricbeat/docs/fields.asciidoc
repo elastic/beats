@@ -69716,6 +69716,12 @@ format: duration
 
 --
 
+[float]
+=== wmi
+
+wmi
+
+
 [[exported-fields-zookeeper]]
 == ZooKeeper fields
 
