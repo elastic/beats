@@ -318,9 +318,14 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 	wantUsers := p.cfg.wantUsers()
 	wantDevices := p.cfg.wantDevices()
 	if wantUsers || wantDevices {
-
 		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 		p.logger.Debugf("Starting fetch...")
+
+		tracker := kvstore.NewTxTracker(ctx)
+
+		start := time.Now()
+		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
+
 		_, err = p.doFetchUsers(ctx, state, true)
 		if err != nil {
 			return err
@@ -330,10 +335,6 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 			return err
 		}
 
-		tracker := kvstore.NewTxTracker(ctx)
-
-		start := time.Now()
-		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 		if wantUsers {
 			for _, u := range state.users {
 				p.publishUser(u, state, inputCtx.ID, client, tracker)
