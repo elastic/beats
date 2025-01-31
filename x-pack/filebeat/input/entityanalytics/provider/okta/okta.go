@@ -326,23 +326,20 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 
-		_, err = p.doFetchUsers(ctx, state, true)
-		if err != nil {
-			return err
-		}
-		_, err = p.doFetchDevices(ctx, state, true)
-		if err != nil {
-			return err
-		}
-
 		if wantUsers {
-			for _, u := range state.users {
+			_, err = p.doFetchUsers(ctx, state, true, func(u *User) {
 				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			})
+			if err != nil {
+				return err
 			}
 		}
 		if wantDevices {
-			for _, d := range state.devices {
+			_, err = p.doFetchDevices(ctx, state, true, func(d *Device) {
 				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			})
+			if err != nil {
+				return err
 			}
 		}
 
@@ -383,27 +380,28 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 	}()
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	updatedUsers, err := p.doFetchUsers(ctx, state, false)
-	if err != nil {
-		return err
-	}
-	updatedDevices, err := p.doFetchDevices(ctx, state, false)
-	if err != nil {
-		return err
-	}
+	tracker := kvstore.NewTxTracker(ctx)
 
-	var tracker *kvstore.TxTracker
-	if len(updatedUsers) != 0 || len(updatedDevices) != 0 {
-		tracker = kvstore.NewTxTracker(ctx)
-		for _, u := range updatedUsers {
+	if p.cfg.wantUsers() {
+		p.logger.Debugf("Fetching changed users...")
+		_, err = p.doFetchUsers(ctx, state, false, func(u *User) {
 			p.publishUser(u, state, inputCtx.ID, client, tracker)
+		})
+		if err != nil {
+			return err
 		}
-		for _, d := range updatedDevices {
+	}
+	if p.cfg.wantDevices() {
+		p.logger.Debugf("Fetching changed devices...")
+		_, err = p.doFetchDevices(ctx, state, false, func(d *Device) {
 			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		})
+		if err != nil {
+			return err
 		}
-		tracker.Wait()
 	}
 
+	tracker.Wait()
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -419,7 +417,7 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 // doFetchUsers handles fetching user identities from Okta. If fullSync is true, then
 // any existing deltaLink will be ignored, forcing a full synchronization from Okta.
 // Returns a set of modified users by ID.
-func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool, publish func(u *User)) ([]*User, error) {
 	if !p.cfg.wantUsers() {
 		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.cfg.Dataset)
 		return nil, nil
@@ -461,7 +459,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 
 		if fullSync {
 			for _, u := range batch {
-				p.addUserMetadata(ctx, u, state)
+				publish(p.addUserMetadata(ctx, u, state))
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
@@ -470,6 +468,7 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 			users = grow(users, len(batch))
 			for _, u := range batch {
 				su := p.addUserMetadata(ctx, u, state)
+				publish(su)
 				users = append(users, su)
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
@@ -543,7 +542,7 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 // If fullSync is true, then any existing deltaLink will be ignored, forcing a full
 // synchronization from Okta.
 // Returns a set of modified devices by ID.
-func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool) ([]*Device, error) {
+func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool, publish func(d *Device)) ([]*Device, error) {
 	if !p.cfg.wantDevices() {
 		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.cfg.Dataset)
 		return nil, nil
@@ -628,7 +627,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 		if fullSync {
 			for _, d := range batch {
-				state.storeDevice(d)
+				publish(state.storeDevice(d))
 				if d.LastUpdated.After(lastUpdated) {
 					lastUpdated = d.LastUpdated
 				}
@@ -636,7 +635,9 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 		} else {
 			devices = grow(devices, len(batch))
 			for _, d := range batch {
-				devices = append(devices, state.storeDevice(d))
+				sd := state.storeDevice(d)
+				publish(sd)
+				devices = append(devices, sd)
 				if d.LastUpdated.After(lastUpdated) {
 					lastUpdated = d.LastUpdated
 				}

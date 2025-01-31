@@ -211,14 +211,18 @@ func TestOktaDoFetch(t *testing.T) {
 
 			t.Run("users", func(t *testing.T) {
 				n = 0
+				published := make(map[string]struct{})
 
-				got, err := a.doFetchUsers(ctx, ss, false)
+				got, err := a.doFetchUsers(ctx, ss, false, func(u *User) { published[u.ID] = struct{}{} })
 				if err != nil {
 					t.Fatalf("unexpected error from doFetch: %v", err)
 				}
 
 				if len(got) != wantCount(repeats, test.wantUsers) {
 					t.Errorf("unexpected number of results: got:%d want:%d", len(got), wantCount(repeats, test.wantUsers))
+				}
+				if len(published) != len(got) {
+					t.Errorf("unexpected number of distinct users published: got:%d want:%d", len(published), len(got))
 				}
 				for i, g := range got {
 					wantID := fmt.Sprintf("userid%d", i+1)
@@ -244,14 +248,18 @@ func TestOktaDoFetch(t *testing.T) {
 
 			t.Run("devices", func(t *testing.T) {
 				n = 0
+				published := make(map[string]struct{})
 
-				got, err := a.doFetchDevices(ctx, ss, false)
+				got, err := a.doFetchDevices(ctx, ss, false, func(d *Device) { published[d.ID] = struct{}{} })
 				if err != nil {
 					t.Fatalf("unexpected error from doFetch: %v", err)
 				}
 
 				if len(got) != wantCount(repeats, test.wantDevices) {
 					t.Errorf("unexpected number of results: got:%d want:%d", len(got), wantCount(repeats, test.wantDevices))
+				}
+				if len(published) != len(got) {
+					t.Errorf("unexpected number of distinct devices published: got:%d want:%d", len(published), len(got))
 				}
 				for i, g := range got {
 					if wantID := fmt.Sprintf("deviceid%d", i+1); g.ID != wantID {
