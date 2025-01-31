@@ -241,7 +241,6 @@ func (client *Client) Clone() *Client {
 }
 
 func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error {
-
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
 	span.Context.SetLabel("events_original", len(batch.Events()))
