@@ -26,6 +26,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -65,7 +66,10 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 	}
 
 	filtered := filteredSnapshot(h.registry, requestedType)
+	global := filteredSnapshot(globalRegistry(), "")
 
+	logp.L().Info("global:", global)
+	logp.L().Info("filtered:", filtered)
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
@@ -85,7 +89,8 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 			continue
 		}
 
-		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+		if inputType, ok := m["input"].(string); !ok || (requestedType != "" &&
+			!strings.EqualFold(inputType, requestedType)) {
 			continue
 		}
 

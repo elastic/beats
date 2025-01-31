@@ -35,7 +35,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
-	//"github.com/elastic/beats/v7/libbeat/tests/resources"
+	// "github.com/elastic/beats/v7/libbeat/tests/resources"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -52,8 +52,8 @@ func TestOutputReload(t *testing.T) {
 			testutil.SeedPRNG(t)
 
 			// Flaky check: https://github.com/elastic/beats/issues/21656
-			//goroutines := resources.NewGoroutinesChecker()
-			//defer goroutines.Check(t)
+			// goroutines := resources.NewGoroutinesChecker()
+			// defer goroutines.Check(t)
 
 			err := quick.Check(func(q uint) bool {
 				numEventsToPublish := 15000 + (q % 5000) // 15000 to 19999
@@ -88,7 +88,7 @@ func TestOutputReload(t *testing.T) {
 					// Connect calls will block until the pipeline has an
 					// output.
 					pipelineClient, err := pipeline.Connect()
-					require.NoError(t, err)
+					require.NoError(t, err) // TODO: require cannot be used here
 					defer pipelineClient.Close()
 					for i := uint(0); i < numEventsToPublish; i++ {
 						pipelineClient.Publish(beat.Event{})

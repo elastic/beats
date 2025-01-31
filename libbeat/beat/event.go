@@ -41,6 +41,9 @@ const (
 	TimestampFieldKey = "@timestamp"
 	MetadataFieldKey  = "@metadata"
 	ErrorFieldKey     = "error"
+
+	MetadataKeyInputID = "input_id"
+
 	metadataKeyPrefix = MetadataFieldKey + "."
 	metadataKeyOffset = len(metadataKeyPrefix)
 )
@@ -56,6 +59,8 @@ type Event struct {
 	Private    interface{} // for beats private use
 	TimeSeries bool        // true if the event contains timeseries data
 
+	// TODO: make it safe, make the methods to be sure the channel isn't nil
+	// before using it
 	PublishStatusCh chan string // the "publish status", if it was published, dropped, filtered and so on
 }
 
