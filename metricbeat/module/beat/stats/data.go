@@ -71,8 +71,6 @@ var (
 				"write": c.Dict("write", s.Schema{
 					"bytes":  c.Int("bytes"),
 					"errors": c.Int("errors"),
-<<<<<<< HEAD
-=======
 					"latency": c.Dict("latency", s.Schema{
 						"histogram": c.Dict("histogram", s.Schema{
 							"count":  c.Int("count"),
@@ -82,7 +80,6 @@ var (
 							"p99":    c.Float("p99"),
 						}),
 					}),
->>>>>>> 0ff52ebd4 (Write latency statistics go under a histogram key (#42514))
 				}),
 			}),
 			"pipeline": c.Dict("pipeline", s.Schema{
