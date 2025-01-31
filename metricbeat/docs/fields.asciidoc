@@ -10182,16 +10182,113 @@ type: long
 
 --
 
+
 *`beat.stats.libbeat.pipeline.queue.acked`*::
 +
 --
+Number of acknowledged events
+
+
 type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.added.bytes`*::
++
+--
+Number of bytes added to the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.added.events`*::
++
+--
+Number of events added to the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.consumed.bytes`*::
++
+--
+Number of bytes consumed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.consumed.events`*::
++
+--
+Number of events consumed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.bytes`*::
++
+--
+Number of bytes filled in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.events`*::
++
+--
+Number of events filled in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.pct`*::
++
+--
+Percentage of the queue filled
+
+
+type: float
 
 --
 
 *`beat.stats.libbeat.pipeline.queue.max_events`*::
 +
 --
+Maximum number of events allowed in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.removed.bytes`*::
++
+--
+Number of bytes removed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.removed.events`*::
++
+--
+Number of events removed from the queue
+
+
 type: long
 
 --
@@ -10430,6 +10527,43 @@ Number of write errors
 
 
 type: long
+
+--
+
+
+
+*`beat.stats.libbeat.output.write.latency.histogram.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.max`*::
++
+--
+type: float
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.median`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.p95`*::
++
+--
+type: float
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.p99`*::
++
+--
+type: float
 
 --
 
