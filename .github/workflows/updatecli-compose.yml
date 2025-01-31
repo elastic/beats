@@ -27,12 +27,14 @@ jobs:
 
       - uses: elastic/oblt-actions/updatecli/run@v1
         with:
+          version: "0.93.0"
           command: --experimental compose diff
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: elastic/oblt-actions/updatecli/run@v1
         with:
+          version: "0.93.0"
           command: --experimental compose apply
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,4 +61,3 @@ jobs:
             }
         env:
           SLACK_MESSAGE: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
-  
