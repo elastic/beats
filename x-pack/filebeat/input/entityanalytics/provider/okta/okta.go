@@ -315,20 +315,21 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	p.logger.Debugf("Starting fetch...")
-	_, err = p.doFetchUsers(ctx, state, true)
-	if err != nil {
-		return err
-	}
-	_, err = p.doFetchDevices(ctx, state, true)
-	if err != nil {
-		return err
-	}
-
 	wantUsers := p.cfg.wantUsers()
 	wantDevices := p.cfg.wantDevices()
-	if (len(state.users) != 0 && wantUsers) || (len(state.devices) != 0 && wantDevices) {
+	if wantUsers || wantDevices {
+
+		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+		p.logger.Debugf("Starting fetch...")
+		_, err = p.doFetchUsers(ctx, state, true)
+		if err != nil {
+			return err
+		}
+		_, err = p.doFetchDevices(ctx, state, true)
+		if err != nil {
+			return err
+		}
+
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
@@ -348,10 +349,10 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
 
 		tracker.Wait()
-	}
 
-	if ctx.Err() != nil {
-		return ctx.Err()
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
 	}
 
 	state.lastSync = time.Now()
