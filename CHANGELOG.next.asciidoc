@@ -25,7 +25,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Filebeat*
-
+- Added MaxOpenRequests to kafka output config {pull}42515[42515]
 - Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
 - Removed deprecated Squid from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Removed deprecated Sonicwall from Beats. Use the https://docs.elastic.co/integrations/sonicwall[SonicWall Firewall] Elastic integration instead. {pull}38037[38037]
