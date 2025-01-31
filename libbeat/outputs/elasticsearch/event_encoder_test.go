@@ -130,13 +130,15 @@ func encodeEvents(client *Client, events []publisher.Event) []publisher.Event {
 		// Skip encoding if there's already encoded data present
 		if events[i].EncodedEvent == nil {
 			encoded, _ := encoder.EncodeEntry(events[i])
-			event := encoded.(publisher.Event)
+			event, ok := encoded.(publisher.Event)
+			require.True(t, ok, "EncodeEntry should return a publisher.Event")
 			events[i] = event
 		}
 	}
 	return events
 }
 
+//nolint:unused // False positive caused by varying build tags, this is used in client_test
 func encodeEvent(client *Client, event publisher.Event) publisher.Event {
 	encoder := newEventEncoder(
 		client.conn.EscapeHTML,
