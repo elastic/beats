@@ -130,8 +130,7 @@ func encodeEvents(client *Client, events []publisher.Event) []publisher.Event {
 		// Skip encoding if there's already encoded data present
 		if events[i].EncodedEvent == nil {
 			encoded, _ := encoder.EncodeEntry(events[i])
-			event, ok := encoded.(publisher.Event)
-			require.True(t, ok, "EncodeEntry should return a publisher.Event")
+			event, _ := encoded.(publisher.Event)
 			events[i] = event
 		}
 	}
