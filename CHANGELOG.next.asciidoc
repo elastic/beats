@@ -409,6 +409,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added OAuth2 support with auto token refresh for websocket streaming input. {issue}41989[41989] {pull}42212[42212]
 - Added infinite & blanket retry options to websockets and improved logging and retry logic. {pull}42225[42225]
 - Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+- Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
 
 *Auditbeat*
 
