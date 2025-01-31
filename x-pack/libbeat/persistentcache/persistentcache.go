@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/libbeat/kv"
+	boltKvStore "github.com/elastic/beats/v7/x-pack/libbeat/kv/bbolt"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -23,7 +25,7 @@ const (
 type PersistentCache struct {
 	log *logp.Logger
 
-	store *Store
+	store kv.Kv
 	codec codec
 
 	refreshOnAccess bool
@@ -53,7 +55,12 @@ func New(name string, opts Options) (*PersistentCache, error) {
 	if rootPath == "" {
 		rootPath = paths.Resolve(paths.Data, cacheFile)
 	}
-	store, err := newStore(logger, rootPath, name)
+
+	store := boltKvStore.New(
+		boltKvStore.WithDbPath(rootPath),
+		boltKvStore.WithBucketName(name))
+
+	err := store.Connect()
 	if err != nil {
 		return nil, err
 	}
