@@ -126,7 +126,7 @@ func (r *Renderer) Render(handle EvtHandle) (*winevent.Event, string, error) {
 	}
 
 	// Load cached event metadata or try to bootstrap it from the event's XML.
-	eventMeta := md.getEventMetadata(uint16(event.EventIdentifier.ID), fingerprint, handle)
+	eventMeta := md.getEventMetadata(uint16(event.EventIdentifier.ID), uint8(event.Version), fingerprint, handle)
 
 	// Associate key names with the event data values.
 	r.addEventData(eventMeta, eventData, event)
@@ -304,13 +304,13 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 		r.log.Warnw("Event metadata not found.",
 			"provider", event.Provider.Name,
 			"event_id", event.EventIdentifier.ID)
-	} else if len(values) != len(evtMeta.EventData) {
+	} else if len(values) != len(evtMeta.EventData.Params) {
 		r.log.Warnw("The number of event data parameters doesn't match the number "+
 			"of parameters in the template.",
 			"provider", event.Provider.Name,
 			"event_id", event.EventIdentifier.ID,
 			"event_parameter_count", len(values),
-			"template_parameter_count", len(evtMeta.EventData),
+			"template_parameter_count", len(evtMeta.EventData.Params),
 			"template_version", evtMeta.Version,
 			"event_version", event.Version)
 	}
@@ -322,8 +322,8 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 	// updated). If software was updated it could also be that this cached
 	// template is now stale.
 	paramName := func(idx int) string {
-		if evtMeta != nil && idx < len(evtMeta.EventData) {
-			return evtMeta.EventData[idx].Name
+		if evtMeta != nil && idx < len(evtMeta.EventData.Params) {
+			return evtMeta.EventData.Params[idx].Name
 		}
 		return "param" + strconv.Itoa(idx)
 	}
@@ -346,7 +346,8 @@ func (r *Renderer) addEventData(evtMeta *EventMetadata, values []interface{}, ev
 		}
 	}
 
-	if evtMeta != nil && evtMeta.HasUserData {
+	if evtMeta != nil && evtMeta.EventData.IsUserData {
+		event.UserData.Name = evtMeta.EventData.Name
 		event.UserData.Pairs = pairs
 	} else {
 		event.EventData.Pairs = pairs

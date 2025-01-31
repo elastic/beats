@@ -17,14 +17,16 @@ steps:
   # this prevents parallel builds and possibility of publishing out of order DRA artifacts if the first job takes longer than the second
 
   - name: Start of concurrency group for DRA Snapshot
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     command: echo "--> Start of concurrency gate dra-snapshot"
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: start-gate-snapshot
 
   - name: Start of concurrency group for DRA Staging
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+    # exceptionally allow building staging from main when VERSION_QUALIFIER is set, to allow prerelease testing
+    # TODO remove OR clause below and above comment, and only allow matching /^[0-9]+\.[0-9x]+\$/ for build.branch
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
     command: echo "--> Start of concurrency gate dra-staging"
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
@@ -36,7 +38,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
         depends_on: start-gate-snapshot
         key: dashboards-snapshot
         # TODO: container with go and make
@@ -58,7 +60,8 @@ steps:
           - build/distributions/**/*
 
       - label: Staging dashboards
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+        # TODO remove OR clause below (see earlier comment)
+        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         depends_on: start-gate-staging
         key: dashboards-staging
         # TODO: container with go and make
@@ -70,9 +73,10 @@ steps:
         retry:
           automatic:
             - limit: 1
-        commands:
-          - make build/distributions/dependencies.csv
-          - make beats-dashboards
+        commands: |
+          source .buildkite/scripts/version_qualifier.sh
+          make build/distributions/dependencies.csv
+          make beats-dashboards
         env:
           SNAPSHOT: false
           DEV: false
@@ -80,7 +84,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     key: packaging-snapshot
     depends_on: start-gate-snapshot
     steps:
@@ -170,15 +174,17 @@ steps:
   - group: Packaging Staging
     key: packaging-staging
     depends_on: start-gate-staging
-    ## Only for release
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+    # TODO remove OR clause below (see earlier comment)
+    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
     steps:
       - label: "STAGING: {{matrix}}"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -211,7 +217,9 @@ steps:
           PACKAGES: "docker"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -241,7 +249,9 @@ steps:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -258,7 +268,7 @@ steps:
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
@@ -276,8 +286,8 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
 
       - label: DRA Staging
-        ## Only for release branches
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+        # TODO remove OR clause below (see earlier comment)
+        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
@@ -286,6 +296,7 @@ steps:
           - packaging-staging
           - dashboards-staging
         command: |
+          source .buildkite/scripts/version_qualifier.sh
           buildkite-agent artifact download "build/**" .
           .buildkite/scripts/packaging/prepare-release-manager.sh staging
           .buildkite/scripts/dra.sh
@@ -297,13 +308,13 @@ steps:
   - wait
 
   - command: echo "End of concurrency gate dra-snapshot <--"
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-snapshot
 
   - command: echo "End of concurrency gate dra-staging <--"
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/
+    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-staging

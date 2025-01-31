@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -33,13 +32,12 @@ import (
 
 // Evil package level globals
 var (
-	once                            sync.Once
-	configfiles                     *config.StringsFlag
-	overwrites                      *config.C
-	defaults                        *config.C
-	homePath                        *string
-	configPath                      *string
-	allowedBackwardsCompatibleFlags []string
+	once        sync.Once
+	configfiles *config.StringsFlag
+	overwrites  *config.C
+	defaults    *config.C
+	homePath    *string
+	configPath  *string
 )
 
 func Initialize() {
@@ -49,9 +47,7 @@ func Initialize() {
 		// created. See ChangeDefaultCfgfileFlag which should
 		// be called prior to flags.Parse().
 		configfiles = config.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
-		AddAllowedBackwardsCompatibleFlag("c")
 		overwrites = config.SettingFlag(nil, "E", "Configuration overwrite")
-		AddAllowedBackwardsCompatibleFlag("E")
 		defaults = config.MustNewConfigFrom(map[string]interface{}{
 			"path": map[string]interface{}{
 				"home":   ".", // to be initialized by beat
@@ -61,42 +57,10 @@ func Initialize() {
 			},
 		})
 		homePath = config.ConfigOverwriteFlag(nil, overwrites, "path.home", "path.home", "", "Home path")
-		AddAllowedBackwardsCompatibleFlag("path.home")
 		configPath = config.ConfigOverwriteFlag(nil, overwrites, "path.config", "path.config", "", "Configuration path")
-		AddAllowedBackwardsCompatibleFlag("path.config")
 		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path")
-		AddAllowedBackwardsCompatibleFlag("path.data")
 		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.logs", "path.logs", "", "Logs path")
-		AddAllowedBackwardsCompatibleFlag("path.logs")
 	})
-}
-
-func isAllowedBackwardsCompatibleFlag(f string) bool {
-	for _, existing := range allowedBackwardsCompatibleFlags {
-		if existing == f {
-			return true
-		}
-	}
-	return false
-}
-
-func AddAllowedBackwardsCompatibleFlag(f string) {
-	if isAllowedBackwardsCompatibleFlag(f) {
-		return
-	}
-	allowedBackwardsCompatibleFlags = append(allowedBackwardsCompatibleFlags, f)
-}
-
-func ConvertFlagsForBackwardsCompatibility() {
-	// backwards compatibility workaround, convert -flags to --flags:
-	for i, arg := range os.Args[1:] {
-		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") {
-			candidate, _, _ := strings.Cut(strings.TrimPrefix(arg, "-"), "=")
-			if isAllowedBackwardsCompatibleFlag(candidate) {
-				os.Args[1+i] = "-" + arg
-			}
-		}
-	}
 }
 
 // OverrideChecker checks if a config should be overwritten.
