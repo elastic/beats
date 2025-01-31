@@ -20,6 +20,7 @@
 package journalfield
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -41,9 +42,7 @@ type MatcherBuilder struct {
 // IncludeMatches stores the advanced matching configuratio
 // provided by the user.
 type IncludeMatches struct {
-	Matches []Matcher        `config:"match"`
-	AND     []IncludeMatches `config:"and"`
-	OR      []IncludeMatches `config:"or"`
+	Matches []Matcher `config:"match"`
 }
 
 var (
@@ -51,6 +50,31 @@ var (
 )
 
 func (i IncludeMatches) Validate() error {
+	errs := []error{}
+	for _, m := range i.Matches {
+		if err := m.validate(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
+	return errors.Join(errs...)
+}
+
+var errInvalidMatcher = errors.New("expression must be '+' or in the format 'field=value'")
+
+func (m Matcher) validate() error {
+	if len(m.str) == 1 {
+		if m.str != "+" {
+			return fmt.Errorf("'%s' is invalid, %w", m.str, errInvalidMatcher)
+		}
+
+		return nil
+	}
+
+	elems := strings.Split(m.str, "=")
+	if len(elems) != 2 {
+		return fmt.Errorf("'%s' is invalid, %w", m.str, errInvalidMatcher)
+	}
 
 	return nil
 }
