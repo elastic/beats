@@ -32,6 +32,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/iobuf"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
 
 func TestCAPinning(t *testing.T) {
@@ -83,10 +84,10 @@ func TestCAPinning(t *testing.T) {
 			t.Run(mode.String(), func(t *testing.T) {
 				msg := []byte("OK received message")
 
-				ca, err := genCA()
+				ca, err := tlscommontest.GenCA()
 				require.NoError(t, err)
 
-				serverCert, err := genSignedCert(ca, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
+				serverCert, err := tlscommontest.GenSignedCert(ca, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
 				require.NoError(t, err)
 
 				mux := http.NewServeMux()
@@ -161,13 +162,13 @@ func TestCAPinning(t *testing.T) {
 	t.Run("CA Root -> Intermediate -> Certificate and we receive the CA Root Pin", func(t *testing.T) {
 		msg := []byte("OK received message")
 
-		ca, err := genCA()
+		ca, err := tlscommontest.GenCA()
 		require.NoError(t, err)
 
-		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil, false)
+		intermediate, err := tlscommontest.GenSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil, false)
 		require.NoError(t, err)
 
-		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
+		serverCert, err := tlscommontest.GenSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
 		require.NoError(t, err)
 
 		mux := http.NewServeMux()
@@ -235,13 +236,13 @@ func TestCAPinning(t *testing.T) {
 	t.Run("When we have the wrong pin we refuse to connect", func(t *testing.T) {
 		msg := []byte("OK received message")
 
-		ca, err := genCA()
+		ca, err := tlscommontest.GenCA()
 		require.NoError(t, err)
 
-		intermediate, err := genSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil, false)
+		intermediate, err := tlscommontest.GenSignedCert(ca, x509.KeyUsageDigitalSignature|x509.KeyUsageCertSign, true, "localhost", []string{"localhost"}, nil, false)
 		require.NoError(t, err)
 
-		serverCert, err := genSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
+		serverCert, err := tlscommontest.GenSignedCert(intermediate, x509.KeyUsageDigitalSignature, false, "localhost", []string{"localhost"}, nil, false)
 		require.NoError(t, err)
 
 		mux := http.NewServeMux()

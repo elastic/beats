@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package tlscommon
+package tlscommontest
 
 import (
 	"bytes"
@@ -49,12 +49,12 @@ func GetCertFingerprint(cert *x509.Certificate) string {
 
 func GenTestCerts(t *testing.T) map[string]*x509.Certificate {
 	t.Helper()
-	ca, err := genCA()
+	ca, err := GenCA()
 	if err != nil {
 		t.Fatalf("cannot generate root CA: %s", err)
 	}
 
-	unknownCA, err := genCA()
+	unknownCA, err := GenCA()
 	if err != nil {
 		t.Fatalf("cannot generate second root CA: %s", err)
 	}
@@ -106,7 +106,7 @@ func GenTestCerts(t *testing.T) map[string]*x509.Certificate {
 
 	tmpDir := t.TempDir()
 	for certName, data := range certData {
-		cert, err := genSignedCert(
+		cert, err := GenSignedCert(
 			data.ca,
 			data.keyUsage,
 			data.isCA,
@@ -156,7 +156,7 @@ func GenTestCerts(t *testing.T) map[string]*x509.Certificate {
 	return certs
 }
 
-func genCA() (tls.Certificate, error) {
+func GenCA() (tls.Certificate, error) {
 	ca := &x509.Certificate{
 		SerialNumber: serial(),
 		Subject: pkix.Name{
@@ -225,7 +225,7 @@ func generateSubjectKeyID(publicKey *rsa.PublicKey) []byte {
 }
 
 // genSignedCert generates a CA and KeyPair and remove the need to depends on code of agent.
-func genSignedCert(
+func GenSignedCert(
 	ca tls.Certificate,
 	keyUsage x509.KeyUsage,
 	isCA bool,
