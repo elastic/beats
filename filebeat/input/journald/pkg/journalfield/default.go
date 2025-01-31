@@ -38,10 +38,10 @@ var journaldEventFields = FieldConversion{
 	"OBJECT_SYSTEMD_UNIT":      text("journald.object.systemd.unit"),
 	"OBJECT_SYSTEMD_USER_UNIT": text("journald.object.systemd.user_unit"),
 	"OBJECT_UID":               integer("journald.object.uid"),
-	"PRIORITY":                 integer("syslog.priority", "log.syslog.priority"),
-	"SYSLOG_FACILITY":          integer("syslog.facility", "log.syslog.facility.code"),
-	"SYSLOG_IDENTIFIER":        text("syslog.identifier"),
-	"SYSLOG_PID":               integer("syslog.pid"),
+	"PRIORITY":                 integer("log.syslog.priority"),
+	"SYSLOG_FACILITY":          integer("log.syslog.facility.code"),
+	"SYSLOG_IDENTIFIER":        text("log.syslog.appname"),
+	"SYSLOG_PID":               integer("log.syslog.procid"),
 	"UNIT":                     text("journald.unit"),
 	"_AUDIT_LOGINUID":          integer("journald.audit.login_uid"),
 	"_AUDIT_SESSION":           text("journald.audit.session"),
@@ -74,14 +74,14 @@ var journaldEventFields = FieldConversion{
 	"_UID":                     integer("journald.uid"),
 
 	// docker journald fields from: https://docs.docker.com/config/containers/logging/journald/
-	"CONTAINER_ID":              text("container.id_truncated"),
 	"CONTAINER_ID_FULL":         text("container.id"),
 	"CONTAINER_NAME":            text("container.name"),
-	"CONTAINER_TAG":             text("container.log.tag"),
 	"CONTAINER_PARTIAL_MESSAGE": text("container.partial"),
 	"IMAGE_NAME":                text("container.image.name"),
 
 	// dropped fields
+	"CONTAINER_ID":                ignoredField,
+	"CONTAINER_TAG":               ignoredField,
 	"_SOURCE_MONOTONIC_TIMESTAMP": ignoredField, // saved in the registry
 	"_SOURCE_REALTIME_TIMESTAMP":  ignoredField, // saved in the registry
 	"__CURSOR":                    ignoredField, // saved in the registry

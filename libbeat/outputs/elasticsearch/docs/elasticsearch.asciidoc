@@ -467,6 +467,9 @@ output.elasticsearch:
   pipeline: my_pipeline_id
 ------------------------------------------------------------------------------
 
+IMPORTANT: The `pipeline` is always lowercased. If `pipeline: Foo-Bar`, then
+the pipeline name in {es} needs to be defined as `foo-bar`.
+
 For more information, see <<configuring-ingest-node>>.
 
 ifndef::apm-server[]
