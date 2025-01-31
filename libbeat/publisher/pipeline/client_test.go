@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
@@ -297,7 +296,7 @@ func TestMonitoring(t *testing.T) {
 			Telemetry: telemetry,
 		},
 		config,
-		processing.Supporter(nil),
+		testSupporter{},
 		func(outputs.Observer) (string, outputs.Group, error) {
 			clients := make([]outputs.Client, numClients)
 			for i := range clients {
@@ -311,16 +310,42 @@ func TestMonitoring(t *testing.T) {
 			}, nil
 		},
 	)
+
 	require.NoError(t, err)
 	defer pipeline.Close()
 
 	telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
+	metricsSnapshot := monitoring.CollectStructSnapshot(metrics, monitoring.Full, true)
+	_ = metricsSnapshot
 	assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
 	assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
 	assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
 }
 
-type testProcessor struct{ error bool }
+type testSupporter struct {
+	processors []testProcessor
+}
+
+func (t testSupporter) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
+	processors.Processors{}
+}
+
+func (t testSupporter) Processors() []string {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (t testSupporter) Close() error {
+	// TODO implement me
+	panic("implement me")
+}
+
+type testProcessor struct {
+	error bool
+
+	filterFn  func(beat.Event) bool
+	addMetaFn func(beat.Event) beat.Event
+}
 
 func (p *testProcessor) String() string {
 	return "testProcessor"
@@ -329,8 +354,21 @@ func (p *testProcessor) Run(in *beat.Event) (event *beat.Event, err error) {
 	if p.error {
 		return nil, errors.New("test error")
 	}
-	_, err = in.Fields.Put("test", "value")
-	return in, err
+
+	ev := *in
+	_, err = ev.Fields.Put("test", "value")
+
+	if p.addMetaFn != nil {
+		ev = p.addMetaFn(ev)
+	}
+
+	if p.filterFn != nil {
+		if p.filterFn(ev) {
+			return nil, nil
+		}
+	}
+
+	return &ev, err
 }
 
 func (p *testProcessor) ErrorSwitch() {
