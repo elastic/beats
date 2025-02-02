@@ -198,6 +198,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+- Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
+- Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
 
 *Auditbeat*
 
