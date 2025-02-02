@@ -211,9 +211,13 @@ func TestOktaDoFetch(t *testing.T) {
 
 			t.Run("users", func(t *testing.T) {
 				n = 0
+				var got []*User
 				published := make(map[string]struct{})
 
-				got, err := a.doFetchUsers(ctx, ss, false, func(u *User) { published[u.ID] = struct{}{} })
+				err := a.doFetchUsers(ctx, ss, false, func(u *User) {
+					got = append(got, u)
+					published[u.ID] = struct{}{}
+				})
 				if err != nil {
 					t.Fatalf("unexpected error from doFetch: %v", err)
 				}
@@ -248,9 +252,13 @@ func TestOktaDoFetch(t *testing.T) {
 
 			t.Run("devices", func(t *testing.T) {
 				n = 0
+				var got []*Device
 				published := make(map[string]struct{})
 
-				got, err := a.doFetchDevices(ctx, ss, false, func(d *Device) { published[d.ID] = struct{}{} })
+				err := a.doFetchDevices(ctx, ss, false, func(d *Device) {
+					got = append(got, d)
+					published[d.ID] = struct{}{}
+				})
 				if err != nil {
 					t.Fatalf("unexpected error from doFetch: %v", err)
 				}
