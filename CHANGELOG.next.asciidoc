@@ -239,6 +239,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+- Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
+- Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
 
 *Auditbeat*
 
