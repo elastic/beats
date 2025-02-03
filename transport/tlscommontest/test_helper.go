@@ -29,7 +29,7 @@ import (
 	"encoding/pem"
 	"fmt"
 	"math/big"
-	"math/rand"
+	"math/rand/v2"
 	"net"
 	"os"
 	"path/filepath"
