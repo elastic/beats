@@ -44,6 +44,9 @@ const (
 
 	MetadataKeyInputID = "input_id"
 
+	FieldsKeyInput     = "input"
+	FieldsKeyInputType = "type"
+
 	metadataKeyPrefix = MetadataFieldKey + "."
 	metadataKeyOffset = len(metadataKeyPrefix)
 )
@@ -59,9 +62,9 @@ type Event struct {
 	Private    interface{} // for beats private use
 	TimeSeries bool        // true if the event contains timeseries data
 
-	// TODO: make it safe, make the methods to be sure the channel isn't nil
-	// before using it
-	PublishStatusCh chan string // the "publish status", if it was published, dropped, filtered and so on
+	// // TODO: make it safe, make the methods to be sure the channel isn't nil
+	// // before using it
+	// PublishStatusCh chan string // the "publish status", if it was published, dropped, filtered and so on
 }
 
 var (
@@ -72,21 +75,21 @@ var (
 	ErrDeleteTimestamp   = fmt.Errorf("deleting %q key is not supported", TimestampFieldKey)
 )
 
-func (e *Event) SetPublishStatus(s string) {
-	select {
-	case e.PublishStatusCh <- s:
-	default:
-	}
-}
-
-func (e *Event) PublishStatus() string {
-	select {
-	case s := <-e.PublishStatusCh:
-		return s
-	default:
-		return ""
-	}
-}
+// func (e *Event) SetPublishStatus(s string) {
+// 	select {
+// 	case e.PublishStatusCh <- s:
+// 	default:
+// 	}
+// }
+//
+// func (e *Event) PublishStatus() string {
+// 	select {
+// 	case s := <-e.PublishStatusCh:
+// 		return s
+// 	default:
+// 		return ""
+// 	}
+// }
 
 // SetID overwrites the "id" field in the events metadata.
 // If Meta is nil, a new Meta dictionary is created.

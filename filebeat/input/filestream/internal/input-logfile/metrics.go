@@ -81,9 +81,9 @@ func NewMetrics(id string) *Metrics {
 		ProcessingErrors:  monitoring.NewUint(reg, "processing_errors_total"),
 		ProcessingTime:    metrics.NewUniformSample(1024),
 
-		EventsPublished: monitoring.NewUint(reg, "events_published_total"),
-		EventsFiltered:  monitoring.NewUint(reg, "events_filtered_total"),
-		EventsDropped:   monitoring.NewUint(reg, "events_dropped_total"),
+		EventsPublished: monitoring.NewUint(reg, "eventsAnderson_published_total"),
+		EventsFiltered:  monitoring.NewUint(reg, "eventsAnderson_filtered_total"),
+		EventsDropped:   monitoring.NewUint(reg, "eventsAnderson_dropped_total"),
 
 		HarvesterStarted:   monitoring.NewInt(harvesterMetrics, "started"),
 		HarvesterClosed:    monitoring.NewInt(harvesterMetrics, "closed"),
