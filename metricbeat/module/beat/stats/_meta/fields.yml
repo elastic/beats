@@ -358,8 +358,38 @@
                       type: long
             - name: unset
               type: long
-        - name: sampling.transactions_dropped
-          type: long
+        - name: sampling
+          type: group
+          fields:
+            - name: tail
+              type: group
+              fields:
+                - name: dynamic_service_groups
+                  type: long
+                - name: events
+                  type: group
+                  fields:
+                    - name: dropped
+                      type: long
+                    - name: failed_writes
+                      type: long
+                    - name: head_unsampled
+                      type: long
+                    - name: processed
+                      type: long
+                    - name: sampled
+                      type: long
+                    - name: stored
+                      type: long
+                - name: storage
+                  type: group
+                  fields:
+                    - name: lsm_size
+                      type: long
+                    - name: value_log_size
+                      type: long
+            - name: transactions_dropped
+              type: long
         - name: server
           type: group
           fields:
