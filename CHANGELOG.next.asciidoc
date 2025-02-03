@@ -410,6 +410,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added infinite & blanket retry options to websockets and improved logging and retry logic. {pull}42225[42225]
 - Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
 - Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
+- Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
+- The journald input is now generally available. {pull}42107[42107]
 
 *Auditbeat*
 
@@ -469,6 +471,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
 - Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
 - Add new metricset wmi for the windows module. {pull}42017[42017]
+- Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
