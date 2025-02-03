@@ -166,9 +166,13 @@ func getMarshalledBboltValue(value []byte, ttl time.Duration) ([]byte, error) {
 }
 
 func newBboltValue(value []byte, ttl time.Duration) BboltValue {
+	var expireAt int64
+	if ttl > 0 {
+		expireAt = time.Now().UnixNano() + ttl.Nanoseconds()
+	}
 	return BboltValue{
 		RawValue: value,
-		ExpireAt: time.Now().UnixNano() + ttl.Nanoseconds(),
+		ExpireAt: expireAt,
 		Ttl:      ttl,
 	}
 }
