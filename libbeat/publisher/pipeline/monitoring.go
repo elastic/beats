@@ -18,7 +18,11 @@
 package pipeline
 
 import (
+	"strings"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -164,7 +168,7 @@ func (o *metricsObserver) filteredEvent(e beat.Event) {
 	o.vars.eventsFiltered.Inc()
 	o.vars.activeEvents.Dec()
 
-	input := o.ensureInputMetric(e)
+	input := o.ensureInputMetric(e, "eventsAnderson_filtered_total")
 	if input == nil {
 		return // irrecoverable error happened, nothing to do.
 	}
@@ -175,7 +179,7 @@ func (o *metricsObserver) filteredEvent(e beat.Event) {
 func (o *metricsObserver) publishedEvent(e beat.Event) {
 	o.vars.eventsPublished.Inc()
 
-	input := o.ensureInputMetric(e)
+	input := o.ensureInputMetric(e, "eventsAnderson_published_total")
 	if input == nil {
 		return // irrecoverable error happened, nothing to do.
 	}
@@ -192,17 +196,14 @@ func (o *metricsObserver) failedPublishEvent(e beat.Event) {
 	o.vars.eventsFailed.Inc()
 	o.vars.activeEvents.Dec()
 
-	input := o.ensureInputMetric(e)
+	input := o.ensureInputMetric(e, "eventsAnderson_dropped_total")
 	if input == nil {
 		return // irrecoverable error happened, nothing to do.
 	}
 	input.inputEventsDropped.Inc()
 }
 
-func (o *metricsObserver) ensureInputMetric(e beat.Event) *inputVars {
-	datasetReg := monitoring.GetNamespace("dataset").GetRegistry()
-	_ = datasetReg
-
+func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *inputVars {
 	// TODO:
 	// - find the right global registry to add the metrics to. dataset.inputID sanitized. See inputmon.NewInputRegistry()
 	// add the metrics there instead of under pipeline
@@ -218,6 +219,34 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event) *inputVars {
 		return nil
 	}
 
+	rawFieldInput, err := e.Fields.GetValue(beat.FieldsKeyInput)
+	if err != nil {
+		return nil // again, nothing we can do about it
+	}
+	fieldInput, ok := rawFieldInput.(mapstr.M)
+	if !ok {
+		// again, nothing we can do about it
+		return nil
+	}
+	rawType, err := fieldInput.GetValue("type")
+	if err != nil {
+		return nil // again, nothing we can do about it
+	}
+	fieldType, ok := rawType.(string)
+	if !ok {
+		return nil // again, nothing we can do about it
+	}
+	logp.L().Infof("input type:%s, ID:%s", fieldType, inputID)
+
+	datasetReg := monitoring.GetNamespace("dataset").GetRegistry()
+	sanatizedID := strings.ReplaceAll(inputID, ".", "_")
+	inputReg := datasetReg.GetRegistry(sanatizedID)
+	metricVar := inputReg.Get(metricName)
+	metricUint, ok := metricVar.(*monitoring.Uint)
+	metricUint.Add(1)
+
+	logp.L().Infof("metrics.GetRegistry(dataset).Get(%s): %v", inputID, inputReg)
+	logp.L().Infof("added 1 to dataset.%s.%s", sanatizedID, metricName)
 	input, found := o.vars.inputs[inputID]
 	if !found {
 		reg := o.metrics.GetRegistry("pipeline")
