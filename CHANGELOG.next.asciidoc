@@ -411,6 +411,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
 - Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
 - Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
+- Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 
 *Auditbeat*
 
