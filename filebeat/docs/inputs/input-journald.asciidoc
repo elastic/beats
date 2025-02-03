@@ -490,10 +490,10 @@ journald fields:
 `_MACHINE_ID`::               `host.id`
 `_MESSAGE`::                  `message`
 `_PID`::                      `process.pid`
-`_PRIORITY`::                 `syslog.priority`
-`_SYSLOG_FACILITY`::          `syslog.facility`
-`_SYSLOG_IDENTIFIER`::        `syslog.identifier`
-`_SYSLOG_PID`::               `syslog.pid`
+`_PRIORITY`::                 `log.syslog.priority`
+`_SYSLOG_FACILITY`::          `log.syslog.facility.code`
+`_SYSLOG_IDENTIFIER`::        `log.syslog.appname`
+`_SYSLOG_PID`::               `log.syslog.procid`
 `_SYSTEMD_CGROUP`::           `systemd.cgroup`
 `_SYSTEMD_INVOCATION_ID`::    `systemd.invocation_id`
 `_SYSTEMD_OWNER_UID`::        `systemd.owner_uid`
@@ -513,12 +513,12 @@ https://docs.docker.com/config/containers/logging/journald/[Docker] are also
 available:
 
 [horizontal]
-`CONTAINER_ID`::              `container.id_truncated`
 `CONTAINER_ID_FULL`::         `container.id`
 `CONTAINER_NAME`::            `container.name`
-`CONTAINER_PARTIAL_MESSAGE`:: `container.partial`
-`CONTAINER_TAG`::             `container.log.tag`
 `IMAGE_NAME`::		      `container.image.name`
+
+If `CONTAINER_PARTIAL_MESSAGE` is present and it is true, then the tag
+`partial_message` is added to the final event.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
