@@ -18,8 +18,7 @@ import (
 func main() {
 	logger := logp.L().Named("netflow")
 
-	decoder, err := decoder.NewDecoder(decoder.NewConfig().
-		WithLogOutput(logger).
+	decoder, err := decoder.NewDecoder(decoder.NewConfig(logger).
 		WithProtocols("v1", "v5", "v9", "ipfix"))
 	if err != nil {
 		logger.Fatal("Failed creating decoder:", err)

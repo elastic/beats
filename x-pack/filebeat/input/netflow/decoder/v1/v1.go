@@ -59,11 +59,13 @@ type NetflowProtocol struct {
 }
 
 func init() {
-	_ := protocol.Registry.Register(ProtocolName, New)
+	if err := protocol.Registry.Register(ProtocolName, New); err != nil {
+		panic(err)
+	}
 }
 
 func New(config config.Config) protocol.Protocol {
-	return NewProtocol(ProtocolID, &templateV1, readV1Header, logp.L().Named(LogPrefix))
+	return NewProtocol(ProtocolID, &templateV1, readV1Header, config.LogOutput().Named(LogPrefix))
 }
 
 func NewProtocol(version uint16, template *template.Template, readHeader ReadHeaderFn, logger *logp.Logger) protocol.Protocol {

@@ -30,8 +30,11 @@ type Config struct {
 
 // Defaults returns a configuration object with defaults settings:
 // - no protocols are enabled.
-// - log output is discarded
+// - log output is set to the logger that is passed in.
 // - session expiration is checked once every hour.
+// - resets are detected.
+// - templates are not shared.
+// - cache is disabled.
 func Defaults(logger *logp.Logger) Config {
 	return Config{
 		protocols:       []string{},
@@ -47,12 +50,6 @@ func Defaults(logger *logp.Logger) Config {
 // passed-in protocols.
 func (c *Config) WithProtocols(protos ...string) *Config {
 	c.protocols = protos
-	return c
-}
-
-// WithLogOutput sets the output io.Writer for logging.
-func (c *Config) WithLogOutput(output *logp.Logger) *Config {
-	c.logOutput = output
 	return c
 }
 

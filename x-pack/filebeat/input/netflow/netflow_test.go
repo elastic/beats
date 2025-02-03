@@ -49,6 +49,10 @@ const (
 	datSourceIP = "192.0.2.1"
 )
 
+func init() {
+	logp.TestingSetup()
+}
+
 // DatTests specifies the .dat files associated with test cases.
 type DatTests struct {
 	Tests map[string]TestCase `yaml:"tests"`
@@ -289,11 +293,10 @@ func readDatTests(t testing.TB) *DatTests {
 func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 	t.Helper()
 
-	config := decoder.NewConfig().
+	config := decoder.NewConfig(logp.NewLogger("netflow_test")).
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
-		WithExpiration(0).
-		WithLogOutput(logp.NewLogger("netflow_test"))
+		WithExpiration(0)
 
 	for _, fieldFile := range testCase.Fields {
 		fields, err := LoadFieldDefinitionsFromFile(filepath.Join(fieldsDir, fieldFile))
@@ -351,12 +354,11 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 	r, err := pcapgo.NewReader(f)
 	require.NoError(t, err)
 
-	config := decoder.NewConfig().
+	config := decoder.NewConfig(logp.NewLogger("netflow_test")).
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
-		WithCache(strings.HasSuffix(pcapFile, ".reversed.pcap")).
-		WithLogOutput(logp.NewLogger("netflow_test"))
+		WithCache(strings.HasSuffix(pcapFile, ".reversed.pcap"))
 
 	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {

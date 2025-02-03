@@ -18,15 +18,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
-var logerr = logp.DevelopmentSetup(logp.ToDiscardOutput())
-var glogger = logp.NewLogger("")
+func init() {
+	logp.TestingSetup()
+}
 
 func makeSessionKey(t testing.TB, ipPortPair string, domain uint32) SessionKey {
 	return MakeSessionKey(test.MakeAddress(t, ipPortPair), domain, false)
 }
 
 func TestSessionMap_GetOrCreate(t *testing.T) {
-	var logger = glogger.Named("session_map")
+	var logger = logp.NewLogger("session_map")
 	t.Run("consistent behavior", func(t *testing.T) {
 		sm := NewSessionMap(logger, nil)
 
@@ -103,7 +104,7 @@ func testTemplate(id uint16) *template.Template {
 }
 
 func TestSessionState(t *testing.T) {
-	var logger = glogger.Named("session_state")
+	var logger = logp.NewLogger("session_state")
 	t.Run("create and get", func(t *testing.T) {
 		s := NewSession(logger)
 		t1 := testTemplate(1)
@@ -135,7 +136,7 @@ func TestSessionState(t *testing.T) {
 }
 
 func TestSessionMap_Cleanup(t *testing.T) {
-	sm := NewSessionMap(glogger, nil)
+	sm := NewSessionMap(logp.L(), nil)
 
 	// Session is created
 	k1 := makeSessionKey(t, "127.0.0.1:1234", 1)
@@ -182,7 +183,7 @@ func TestSessionMap_Cleanup(t *testing.T) {
 
 func TestSessionMap_CleanupLoop(t *testing.T) {
 	timeout := time.Millisecond * 100
-	sm := NewSessionMap(glogger.Named(""), nil)
+	sm := NewSessionMap(logp.NewLogger(""), nil)
 	key := makeSessionKey(t, "127.0.0.1:1", 42)
 	s := sm.GetOrCreate(key)
 
@@ -203,7 +204,7 @@ func TestSessionMap_CleanupLoop(t *testing.T) {
 }
 
 func TestTemplateExpiration(t *testing.T) {
-	s := NewSession(glogger)
+	s := NewSession(logp.L())
 	assert.Nil(t, s.GetTemplate(256))
 	assert.Nil(t, s.GetTemplate(257))
 	s.AddTemplate(testTemplate(256))
@@ -265,7 +266,7 @@ func TestSessionCheckReset(t *testing.T) {
 		},
 	} {
 		t.Run(testCase.title, func(t *testing.T) {
-			s := NewSession(glogger)
+			s := NewSession(logp.L())
 			s.lastSequence = testCase.current
 			prev, isReset := s.CheckReset(testCase.next)
 			assert.Equal(t, prev, testCase.current)

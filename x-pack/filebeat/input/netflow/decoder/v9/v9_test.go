@@ -17,12 +17,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
+func init() {
+	logp.TestingSetup()
+}
+
 func TestNetflowV9Protocol_ID(t *testing.T) {
-	assert.Equal(t, ProtocolID, New(config.Defaults()).Version())
+	assert.Equal(t, ProtocolID, New(config.Defaults(logp.L())).Version())
 }
 
 func TestNetflowProtocol_New(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	assert.Nil(t, proto.Start())
 	assert.Equal(t, uint16(9), proto.Version())
@@ -35,7 +39,7 @@ func TestOptionTemplates(t *testing.T) {
 	key := MakeSessionKey(addr, sourceID, false)
 
 	t.Run("Single options template", func(t *testing.T) {
-		proto := New(config.Defaults())
+		proto := New(config.Defaults(logp.L()))
 		flows, err := proto.OnPacket(test.MakePacket([]uint16{
 			// Header
 			// Version, Count, Uptime, Ts, SeqNo, Source
@@ -64,7 +68,7 @@ func TestOptionTemplates(t *testing.T) {
 	})
 
 	t.Run("Multiple options template", func(t *testing.T) {
-		proto := New(config.Defaults())
+		proto := New(config.Defaults(logp.L()))
 		raw := test.MakePacket([]uint16{
 			// Header
 			// Version, Count, Uptime, Ts, SeqNo, Source
@@ -101,7 +105,7 @@ func TestOptionTemplates(t *testing.T) {
 	})
 
 	t.Run("records discarded", func(t *testing.T) {
-		proto := New(config.Defaults())
+		proto := New(config.Defaults(logp.L()))
 		raw := test.MakePacket([]uint16{
 			// Header
 			// Version, Count, Uptime, Ts, SeqNo, Source
@@ -163,8 +167,8 @@ func TestSessionReset(t *testing.T) {
 		3, 3,
 	}
 	t.Run("Reset disabled", func(t *testing.T) {
-		cfg := config.Defaults()
-		cfg.WithSequenceResetEnabled(false).WithLogOutput(logp.NewLogger("v9_test"))
+		cfg := config.Defaults(logp.NewLogger("v9_test"))
+		cfg.WithSequenceResetEnabled(false)
 		proto := New(cfg)
 		flows, err := proto.OnPacket(test.MakePacket(templatePacket), addr)
 		assert.NoError(t, err)
@@ -174,8 +178,8 @@ func TestSessionReset(t *testing.T) {
 		assert.Len(t, flows, 1)
 	})
 	t.Run("Reset enabled", func(t *testing.T) {
-		cfg := config.Defaults()
-		cfg.WithSequenceResetEnabled(true).WithLogOutput(logp.NewLogger("v9_test"))
+		cfg := config.Defaults(logp.NewLogger("v9_test"))
+		cfg.WithSequenceResetEnabled(true)
 		proto := New(cfg)
 		flows, err := proto.OnPacket(test.MakePacket(templatePacket), addr)
 		assert.NoError(t, err)
@@ -194,8 +198,8 @@ func TestSessionReset(t *testing.T) {
 			tmp[9] = uint16(sourceID & 0xffff)
 			return test.MakePacket(tmp)
 		}
-		cfg := config.Defaults()
-		cfg.WithSequenceResetEnabled(true).WithLogOutput(logp.NewLogger("v9_test"))
+		cfg := config.Defaults(logp.NewLogger("v9_test"))
+		cfg.WithSequenceResetEnabled(true)
 		proto := New(cfg)
 		flows, err := proto.OnPacket(mkPack(templatePacket, 1, 1000), addr)
 		assert.NoError(t, err)
@@ -215,7 +219,7 @@ func TestSessionReset(t *testing.T) {
 func TestCustomFields(t *testing.T) {
 	addr := test.MakeAddress(t, "127.0.0.1:12345")
 
-	conf := config.Defaults()
+	conf := config.Defaults(logp.L())
 	conf.WithCustomFields(fields.FieldDict{
 		fields.Key{FieldID: 33333}: &fields.Field{Name: "customField", Decoder: fields.String},
 	})
@@ -278,7 +282,7 @@ func TestSharedTemplates(t *testing.T) {
 	}
 
 	t.Run("Template sharing enabled", func(t *testing.T) {
-		cfg := config.Defaults()
+		cfg := config.Defaults(logp.L())
 		cfg.WithSharedTemplates(true)
 		proto := New(cfg)
 		flows, err := proto.OnPacket(test.MakePacket(templatePacket), templateAddr)
@@ -290,7 +294,7 @@ func TestSharedTemplates(t *testing.T) {
 	})
 
 	t.Run("Template sharing disabled", func(t *testing.T) {
-		cfg := config.Defaults()
+		cfg := config.Defaults(logp.L())
 		cfg.WithSharedTemplates(false)
 		proto := New(cfg)
 		flows, err := proto.OnPacket(test.MakePacket(templatePacket), templateAddr)

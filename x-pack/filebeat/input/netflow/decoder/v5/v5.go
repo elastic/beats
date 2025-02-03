@@ -53,7 +53,9 @@ var templateV5 = template.Template{
 }
 
 func init() {
-	_ := protocol.Registry.Register(ProtocolName, New)
+	if err := protocol.Registry.Register(ProtocolName, New); err != nil {
+		panic(err)
+	}
 }
 
 func New(config config.Config) protocol.Protocol {
