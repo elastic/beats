@@ -7573,6 +7573,91 @@ alias to: beat.stats.apm_server.root.unset
 
 --
 
+
+
+*`beats_stats.apm-server.sampling.tail.dynamic_service_groups`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.dynamic_service_groups
+
+--
+
+
+*`beats_stats.apm-server.sampling.tail.events.dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.dropped
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.failed_writes`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.failed_writes
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.head_unsampled`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.head_unsampled
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.processed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.processed
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.sampled`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.sampled
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.stored`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.stored
+
+--
+
+
+*`beats_stats.apm-server.sampling.tail.storage.lsm_size`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.lsm_size
+
+--
+
+*`beats_stats.apm-server.sampling.tail.storage.value_log_size`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
+
+--
+
 *`beats_stats.apm-server.sampling.transactions_dropped`*::
 +
 --
@@ -9657,6 +9742,73 @@ type: long
 --
 
 *`beat.stats.apm_server.root.unset`*::
++
+--
+type: long
+
+--
+
+
+
+*`beat.stats.apm_server.sampling.tail.dynamic_service_groups`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.sampling.tail.events.dropped`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.failed_writes`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.head_unsampled`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.processed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.sampled`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.stored`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.sampling.tail.storage.lsm_size`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.storage.value_log_size`*::
 +
 --
 type: long
