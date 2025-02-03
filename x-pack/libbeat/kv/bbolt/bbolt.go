@@ -2,7 +2,9 @@ package bbolt
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
+	"path"
 	"time"
 
 	bolt "go.etcd.io/bbolt"
@@ -11,12 +13,13 @@ import (
 const (
 	defaultDbPath     = "beat.db" // @TODO define value
 	defaultBucketName = "kv"
-	defaultDbFileMode = 0o644
+	defaultDbFileMode = 0600
 )
 
 type BboltValue struct {
-	RawValue []byte `json:"rawValue"`
-	ExpireAt int64  `json:"expireAt"`
+	RawValue []byte        `json:"rawValue"`
+	ExpireAt int64         `json:"expireAt"`
+	Ttl      time.Duration `json:"ttl"`
 }
 
 type Option func(bbolt *Bbolt)
@@ -26,8 +29,7 @@ type Bbolt struct {
 	dbFileMode os.FileMode
 	bucketName string
 
-	db     *bolt.DB
-	bucket *bolt.Bucket
+	db *bolt.DB
 }
 
 func New(options ...Option) *Bbolt {
@@ -63,9 +65,16 @@ func WithBucketName(name string) Option {
 
 func (b *Bbolt) Connect() error {
 	var err error
-	b.db, err = initDb(b.dbPath, b.dbFileMode)
+
+	dbDir := path.Dir(b.dbPath)
+	err = os.MkdirAll(dbDir, os.ModePerm)
 	if err != nil {
 		return err
+	}
+
+	b.db, err = initDb(b.dbPath, b.dbFileMode)
+	if err != nil {
+		return fmt.Errorf("initDb error: %w", err)
 	}
 	err = b.openBucket()
 	if err != nil {
@@ -87,7 +96,7 @@ func (b *Bbolt) Get(key []byte) ([]byte, error) {
 		if err != nil {
 			return err
 		}
-		if bboltVal.ExpireAt <= time.Now().UnixNano() { // value expired
+		if bboltVal.Ttl > 0 && bboltVal.ExpireAt <= time.Now().UnixNano() { // value expired
 			//err = bucket.Delete(key) // since value has expired - no need to keep it in DB
 			//if err != nil {
 			//	return err
@@ -162,5 +171,6 @@ func newBboltValue(value []byte, ttl time.Duration) BboltValue {
 	return BboltValue{
 		RawValue: value,
 		ExpireAt: time.Now().UnixNano() + ttl.Nanoseconds(),
+		Ttl:      ttl,
 	}
 }
