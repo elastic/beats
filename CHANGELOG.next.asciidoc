@@ -227,6 +227,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
+- Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 
 *Metricbeat*
 
