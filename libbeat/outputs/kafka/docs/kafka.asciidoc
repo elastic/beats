@@ -263,7 +263,7 @@ endif::[]
 ===== `max_open_requests`
 
 The maximum number of unacknowledged requests the client will send on a single connection before blocking.
-This can improve throughput, but message ordering is not guaranteed. 
+Increasing this can improve throughput. If max_open_requests is not 1, there is a risk of message re-ordering due to retries. 
 https://kafka.apache.org/protocol#protocol_network
 https://kafka.apache.org/28/documentation.html#producerconfigs_max.in.flight.requests.per.connection
 
