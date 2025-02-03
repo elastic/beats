@@ -63,22 +63,23 @@ func WithBucketName(name string) Option {
 	}
 }
 
+// Connect - creates directories of a given path for bbolt DB file (if directories not already exist), creates DB file with given file permissions, creates bucket to store cache data.
 func (b *Bbolt) Connect() error {
 	var err error
 
 	dbDir := path.Dir(b.dbPath)
-	err = os.MkdirAll(dbDir, os.ModePerm)
+	err = os.MkdirAll(dbDir, os.ModePerm) // @TODO: revise the mode
 	if err != nil {
-		return err
+		return fmt.Errorf("bbolt: creation of the directory for DB failed: %w", err)
 	}
 
-	b.db, err = initDb(b.dbPath, b.dbFileMode)
+	b.db, err = openDbFile(b.dbPath, b.dbFileMode)
 	if err != nil {
-		return fmt.Errorf("initDb error: %w", err)
+		return fmt.Errorf("bbolt: openDbFile error: %w", err)
 	}
-	err = b.openBucket()
+	err = b.ensureBucketExists()
 	if err != nil {
-		return err
+		return fmt.Errorf("bbolt: bucket opening error: %w", err)
 	}
 	return nil
 }
@@ -108,7 +109,6 @@ func (b *Bbolt) Get(key []byte) ([]byte, error) {
 		return nil, nil
 	}
 	return bboltVal.RawValue, nil
-
 }
 
 func (b *Bbolt) Set(key []byte, value []byte, ttl time.Duration) error {
@@ -143,8 +143,7 @@ func (b *Bbolt) Close() error {
 	return b.db.Close()
 }
 
-func (b *Bbolt) openBucket() error {
-	// Ensure the name exists.
+func (b *Bbolt) ensureBucketExists() error {
 	err := b.db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(b.bucketName))
 		return err
@@ -152,7 +151,7 @@ func (b *Bbolt) openBucket() error {
 	return err
 }
 
-func initDb(path string, mode os.FileMode) (*bolt.DB, error) {
+func openDbFile(path string, mode os.FileMode) (*bolt.DB, error) {
 	db, err := bolt.Open(path, mode, nil)
 	if err != nil {
 		return nil, err
