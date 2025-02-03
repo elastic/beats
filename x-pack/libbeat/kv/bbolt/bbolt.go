@@ -84,33 +84,31 @@ func (b *Bbolt) Connect() error {
 }
 
 func (b *Bbolt) Get(key []byte) ([]byte, error) {
-	var returnValue []byte
-	err := b.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(b.bucketName))
-		bboltValEncoded := bucket.Get(key)
-		if bboltValEncoded == nil { // no value in store
-			return nil
-		}
-		var bboltVal BboltValue
-		err := json.Unmarshal(bboltValEncoded, &bboltVal)
-		if err != nil {
-			return err
-		}
-		if bboltVal.Ttl > 0 && bboltVal.ExpireAt <= time.Now().UnixNano() { // value expired
-			//err = bucket.Delete(key) // since value has expired - no need to keep it in DB
-			//if err != nil {
-			//	return err
-			//}
-			return nil
-		}
-		returnValue = bboltVal.RawValue
-		return nil
-	})
+	tx, err := b.db.Begin(true)
 	if err != nil {
 		return nil, err
 	}
+	defer tx.Rollback()
+	bucket := tx.Bucket([]byte(b.bucketName))
 
-	return returnValue, nil
+	bboltValEncoded := bucket.Get(key)
+	if bboltValEncoded == nil { // no value in store
+		return nil, nil
+	}
+	var bboltVal BboltValue
+	err = json.Unmarshal(bboltValEncoded, &bboltVal)
+	if err != nil {
+		return nil, err
+	}
+	if bboltVal.Ttl > 0 && bboltVal.ExpireAt <= time.Now().UnixNano() { // value expired
+		err = bucket.Delete(key) // since value has expired - no need to keep it in DB
+		if err != nil {
+			return nil, err
+		}
+		return nil, nil
+	}
+	return bboltVal.RawValue, nil
+
 }
 
 func (b *Bbolt) Set(key []byte, value []byte, ttl time.Duration) error {
