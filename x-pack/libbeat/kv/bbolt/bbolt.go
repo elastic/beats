@@ -93,7 +93,9 @@ func (b *Bbolt) Get(key []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
 	bucket := tx.Bucket([]byte(b.bucketName))
 
 	bboltValEncoded := bucket.Get(key)
@@ -120,7 +122,9 @@ func (b *Bbolt) Set(key []byte, value []byte, ttl time.Duration) error {
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
+	defer func() {
+		_ = tx.Rollback()
+	}()
 
 	bucket := tx.Bucket([]byte(b.bucketName))
 

@@ -104,7 +104,7 @@ func (c *PersistentCache) Get(k string, v interface{}) error {
 		return err
 	}
 	if c.refreshOnAccess && c.timeout > 0 {
-		c.store.Set([]byte(k), d, c.timeout)
+		_ = c.store.Set([]byte(k), d, c.timeout)
 	}
 	err = c.codec.Decode(d, v)
 	if err != nil {
