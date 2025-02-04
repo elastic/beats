@@ -1066,6 +1066,58 @@ image:images/input-httpjson-lifecycle.png[Request lifecycle]
 . Each resulting event is published to the output.
 . If a `response.pagination` is configured and there are more pages, a new request is created using it, otherwise the process ends until the next interval.
 
+<<<<<<< HEAD
+=======
+image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
+
+. Response from regular call will be processed.
+. Extract data from response and generate new requests from responses.
+. Process generated requests and collect responses from server.
+. Go back to step-2 for the next step.
+. Publish collected responses from the last chain step.
+
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                                     | Description
+| `events_published_total`                   | Total number of events published.
+| `pages_published_total`                    | Total number of pages of event published.
+| `http_request_total`                       | Total number of processed requests.
+| `http_request_errors_total`                | Total number of request errors.
+| `http_request_delete_total`                | Total number of `DELETE` requests.
+| `http_request_get_total`                   | Total number of `GET` requests.
+| `http_request_head_total`                  | Total number of `HEAD` requests.
+| `http_request_options_total`               | Total number of `OPTIONS` requests.
+| `http_request_patch_total`                 | Total number of `PATCH` requests.
+| `http_request_post_total`                  | Total number of `POST` requests.
+| `http_request_put_total`                   | Total number of `PUT` requests.
+| `http_request_body_bytes_total`            | Total of the requests body size.
+| `http_request_body_bytes`                  | Histogram of the requests body size.
+| `http_response_total`                      | Total number of responses received.
+| `http_response_errors_total`               | Total number of response errors.
+| `http_response_1xx_total`                  | Total number of `1xx` responses.
+| `http_response_2xx_total`                  | Total number of `2xx` responses.
+| `http_response_3xx_total`                  | Total number of `3xx` responses.
+| `http_response_4xx_total`                  | Total number of `4xx` responses.
+| `http_response_5xx_total`                  | Total number of `5xx` responses.
+| `http_response_body_bytes_total`           | Total of the responses body size.
+| `http_response_body_bytes`                 | Histogram of the responses body size.
+| `http_round_trip_time`                     | Histogram of the round trip time.
+| `httpjson_interval_total`                  | Total number of intervals executed.
+| `httpjson_interval_errors_total`           | Total number of interval errors.
+| `httpjson_interval_execution_time`         | Histogram of the interval execution time.
+| `httpjson_interval_pages`                  | Histogram of the total number of pages per interval.
+| `httpjson_interval_pages_execution_time`   | Histogram of the interval pages execution time.
+|=======
+
+>>>>>>> 71900c4d8 (x-pack/filebeat/input/httpjson: add metrics for number of events and pages published (#42442))
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 

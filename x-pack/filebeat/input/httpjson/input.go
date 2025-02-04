@@ -143,6 +143,31 @@ func run(
 	if config.Interval == 0 {
 		return requester.processHTTPRequest(stdCtx, publisher)
 	}
+<<<<<<< HEAD
+=======
+	var xmlDetails map[string]xml.Detail
+	if cfg.Response.XSD != "" {
+		xmlDetails, err = xml.Details([]byte(cfg.Response.XSD))
+		if err != nil {
+			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			return err
+		}
+	}
+	pagination := newPagination(cfg, client, log)
+	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
+	requester := newRequester(client, requestFactory, responseProcessor, metrics, log)
+
+	trCtx := emptyTransformContext()
+	trCtx.cursor = newCursor(cfg.Cursor, log)
+	trCtx.cursor.load(crsr)
+
+	doFunc := func() error {
+		defer func() {
+			// Clear response bodies between evaluations.
+			trCtx.firstResponse.body = nil
+			trCtx.lastResponse.body = nil
+		}()
+>>>>>>> 71900c4d8 (x-pack/filebeat/input/httpjson: add metrics for number of events and pages published (#42442))
 
 	err = timed.Periodic(stdCtx, config.Interval, func() error {
 		log.Info("Process another repeated request.")
