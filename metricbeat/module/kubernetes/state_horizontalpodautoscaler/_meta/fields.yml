@@ -1,35 +1,40 @@
-- name: pod
+- name: horizontalpodautoscaler
   type: group
   description: >
-    kubernetes pod metrics
-  release: ga
+    kubernetes horizontalpodautoscaler metrics
+  release: beta
   fields:
-    - name: host_ip
-      type: ip
+    - name: name
+      type: keyword
       description: >
-        Kubernetes pod host IP
+        Foobar
+    - name: replicas
+      type: group
+      description: >
+        Kubernetes HPA replicas metrics
+      fields:
+        - name: max
+          type: integer
+          description: >
+            Kubernetes pod phase (Running, Pending...)
+        - name: min
+          type: integer
+          description: >
+            Kubernetes pod phase (Running, Pending...)
+        - name: current
+          type: integer
+          description: >
+            Kubernetes pod phase (Running, Pending...)
+        - name: desired
+          type: integer
+          description: >
+            Kubernetes pod phase (Running, Pending...)
     - name: status
       type: group
       description: >
         Kubernetes pod status metrics
       fields:
-        - name: phase
+        - name: condition
           type: keyword
           description: >
             Kubernetes pod phase (Running, Pending...)
-        - name: ready
-          type: keyword
-          description: >
-            Kubernetes pod ready status (true, false or unknown)
-        - name: scheduled
-          type: keyword
-          description: >
-            Kubernetes pod scheduled status (true, false, unknown)
-        - name: reason
-          type: keyword
-          description: >
-            The reason the pod is in its current state (Evicted, NodeAffinity, NodeLost, Shutdown or UnexpectedAdmissionError)
-        - name: ready_time
-          type: double
-          description: >
-            Readiness achieved time in unix timestamp for a pod 
