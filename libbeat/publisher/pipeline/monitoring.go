@@ -238,9 +238,12 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *in
 	datasetReg := monitoring.GetNamespace("dataset").GetRegistry()
 	sanatizedID := strings.ReplaceAll(inputID, ".", "_")
 	inputReg := datasetReg.GetRegistry(sanatizedID)
-	metricVar := inputReg.Get(metricName)
-	metricUint, ok := metricVar.(*monitoring.Uint)
-	metricUint.Add(1)
+	if inputReg != nil {
+		metricVar := inputReg.Get(metricName)
+		if metricUint, ok := metricVar.(*monitoring.Uint); ok {
+			metricUint.Add(1)
+		}
+	}
 
 	input, found := o.vars.inputs[inputID]
 	if !found {
