@@ -27,12 +27,12 @@ import (
 // mapping stores the state metrics we want to fetch and will be used by this metricset
 var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
-		"kube_horizontalpodautoscaler_metadata_generation": p.InfoMetric(),
-		"kube_horizontalpodautoscaler_spec_max_replicas": p.Metric("max_replicas"),
-		"kube_horizontalpodautoscaler_spec_min_replicas": p.Metric("min_replicas"),
-		"kube_horizontalpodautoscaler_status_condition": p.LabelMetric("status.condition", "condition", p.OpLowercaseValue()),
-		"kube_horizontalpodautoscaler_status_current_replicas": p.Metric("status.current_replicas"),
-		"kube_horizontalpodautoscaler_status_desired_replicas": p.Metric("status.desired_replicas"),
+		"kube_horizontalpodautoscaler_metadata_generation":     p.InfoMetric(),
+		"kube_horizontalpodautoscaler_spec_max_replicas":       p.Metric("replicas.max"),
+		"kube_horizontalpodautoscaler_spec_min_replicas":       p.Metric("replicas.min"),
+		"kube_horizontalpodautoscaler_status_current_replicas": p.Metric("replicas.current"),
+		"kube_horizontalpodautoscaler_status_desired_replicas": p.Metric("replicas.desired"),
+		"kube_horizontalpodautoscaler_status_condition":        p.LabelMetric("status.condition", "condition", p.OpLowercaseValue()),
 	},
 
 	Labels: map[string]p.LabelMap{
