@@ -37,11 +37,11 @@ var mapping = &p.MetricsMapping{
 
 	Labels: map[string]p.LabelMap{
 		"horizontalpodautoscaler": p.KeyLabel("name"),
-		"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+		"namespace":               p.KeyLabel(mb.ModuleDataKey + ".namespace"),
 	},
 }
 
 // Register metricset
 func init() {
-	kubernetes.Init(util.PodResource, mapping)
+	kubernetes.Init(util.HorizontalPodAutoscalerResource, mapping)
 }

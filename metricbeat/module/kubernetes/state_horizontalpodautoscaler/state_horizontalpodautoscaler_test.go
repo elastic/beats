@@ -35,7 +35,7 @@ import (
 var filesFolder = "../_meta/test/KSM"
 var expectedFolder = "./_meta/test"
 
-const name = "state_pod"
+const name = "state_horizontalpodautoscaler"
 
 func TestEventMapping(t *testing.T) {
 	testCases, err := k.GetTestCases(filesFolder, expectedFolder)
