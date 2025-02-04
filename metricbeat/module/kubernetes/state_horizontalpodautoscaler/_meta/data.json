@@ -1,28 +1,27 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "event": {
-        "dataset": "kubernetes.pod",
+        "dataset": "kubernetes.horizontalpodautoscaler",
         "duration": 115000,
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "default",
-        "node": {
-            "name": "kind-control-plane"
-        },
-        "pod": {
-            "host_ip": "172.21.0.2",
-            "ip": "10.244.0.173",
-            "name": "hello-28564555-zdfjz",
+        "horizontalpodautoscaler": {
+            "name": "cpu",
+            "replicas": {
+                "current": 1,
+                "desired": 1,
+                "max": 5,
+                "min": 1
+            },
             "status": {
-                "phase": "succeeded",
-                "ready": "false",
-                "scheduled": "true"
+                "condition": "scalinglimited"
             }
-        }
+        },
+        "namespace": "default"
     },
     "metricset": {
-        "name": "state_pod",
+        "name": "state_horizontalpodautoscaler",
         "period": 10000
     },
     "service": {
