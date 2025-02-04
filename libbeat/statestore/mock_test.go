@@ -93,3 +93,6 @@ func (m *mockStore) Each(fn func(string, backend.ValueDecoder) (bool, error)) er
 	args := m.Called(fn)
 	return args.Error(0)
 }
+
+func (m *mockStore) SetID(_ string) {
+}
