@@ -45,9 +45,8 @@ func TestProcessOrphanResolve(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), time.Minute, false)
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), -1, false)
 	require.NoError(t, err)
-	testDB.reaperPeriod = -1
 	removalFuncTimeoutWaiting = testAlwaysTimeout
 
 	pid1 := types.PIDInfo{Tgid: 10, StartTimeNS: 19}
@@ -91,9 +90,8 @@ func TestReapExitOrphans(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), time.Minute, false)
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), -1, false)
 	require.NoError(t, err)
-	testDB.reaperPeriod = -1
 	removalFuncTimeoutWaiting = testAlwaysTimeout
 	orphanFuncTimeoutWaiting = testAlwaysTimeout
 
@@ -112,9 +110,8 @@ func TestReapProcesses(t *testing.T) {
 	reader := procfs.NewProcfsReader(*logger)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), time.Minute, false)
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), -1, true)
 	require.NoError(t, err)
-	testDB.reaperPeriod = -1
 	testDB.processReapAfter = time.Duration(0)
 	removalFuncTimeoutWaiting = testNeverTimeout
 
@@ -151,9 +148,8 @@ func TestReapProcessesWithProcFS(t *testing.T) {
 	mockReader := procfs.NewMockReader()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	testDB, err := NewDB(ctx, monitoring.NewRegistry(), mockReader, logp.L(), time.Minute, false)
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), mockReader, logp.L(), -1, false)
 	require.NoError(t, err)
-	testDB.reaperPeriod = -1
 	testDB.reapProcesses = true
 	testDB.processReapAfter = time.Duration(0)
 	removalFuncTimeoutWaiting = testNeverTimeout
@@ -194,9 +190,8 @@ func TestReapingProcessesOrphanResolvedRace(t *testing.T) {
 	mockReader := procfs.NewMockReader()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	testDB, err := NewDB(ctx, monitoring.NewRegistry(), mockReader, logp.L(), time.Minute, false)
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), mockReader, logp.L(), -1, false)
 	require.NoError(t, err)
-	testDB.reaperPeriod = -1
 	testDB.reapProcesses = true
 	testDB.processReapAfter = time.Duration(0)
 	removalFuncTimeoutWaiting = testNeverTimeout
