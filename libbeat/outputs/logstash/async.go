@@ -218,14 +218,8 @@ func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 	for i := range events {
 		window[i] = &events[i].Content
 	}
-<<<<<<< HEAD
 	ref.count.Inc()
-	return client.Send(ref.callback, window)
-=======
-	ref.count.Add(1)
-
 	return client.Send(ref.customizedCallback(), window)
->>>>>>> accc5e147 (Add latency metrics for logstash async output (#42565))
 }
 
 func (c *asyncClient) getClient() *v2.AsyncClient {
