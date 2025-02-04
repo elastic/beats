@@ -47751,7 +47751,7 @@ kubernetes horizontalpodautoscaler metrics
 *`kubernetes.horizontalpodautoscaler.name`*::
 +
 --
-Foobar
+The Kubernetes Horizontal Pod Autoscaler name
 
 
 type: keyword
@@ -47768,7 +47768,7 @@ Kubernetes HPA replicas metrics
 *`kubernetes.horizontalpodautoscaler.replicas.max`*::
 +
 --
-Kubernetes pod phase (Running, Pending...)
+Kubernetes HPA maximum replicas from spec
 
 
 type: integer
@@ -47778,7 +47778,7 @@ type: integer
 *`kubernetes.horizontalpodautoscaler.replicas.min`*::
 +
 --
-Kubernetes pod phase (Running, Pending...)
+Kubernetes HPA minimum replicas from spec
 
 
 type: integer
@@ -47788,7 +47788,7 @@ type: integer
 *`kubernetes.horizontalpodautoscaler.replicas.current`*::
 +
 --
-Kubernetes pod phase (Running, Pending...)
+Kubernetes HPA current replicas from status
 
 
 type: integer
@@ -47798,7 +47798,7 @@ type: integer
 *`kubernetes.horizontalpodautoscaler.replicas.desired`*::
 +
 --
-Kubernetes pod phase (Running, Pending...)
+Kubernetes HPA desired replicas from status
 
 
 type: integer
@@ -47808,14 +47808,14 @@ type: integer
 [float]
 === status
 
-Kubernetes pod status metrics
+Kubernetes HPA status metrics
 
 
 
 *`kubernetes.horizontalpodautoscaler.status.condition`*::
 +
 --
-Kubernetes pod phase (Running, Pending...)
+Kubernetes HPA scaling condition
 
 
 type: keyword
