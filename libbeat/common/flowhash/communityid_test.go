@@ -178,7 +178,7 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) []string {
 					}
 				}
 			}
-			flowID = CommunityID.Hash(flow)
+			flowID = Hash(flow)
 			flowStr = flowToString(flow)
 		}
 
