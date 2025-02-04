@@ -7,6 +7,7 @@
 package processdb
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -63,7 +64,6 @@ const (
 )
 
 type Process struct {
-	Tgid     int
 	PIDs     types.PIDInfo
 	Creds    types.CredInfo
 	CTTY     tty.TTYDev
@@ -72,9 +72,9 @@ type Process struct {
 	Filename string
 	ExitCode int32
 
-	// ProcfsLookupFail is true if procfs couldn't find a matching PID for us
-	ProcfsLookupFail bool
-	InsertTime       time.Time
+	// procfsLookupFail is true if procfs couldn't find a matching PID in /proc.
+	procfsLookupFail bool
+	insertTime       time.Time
 }
 
 var (
@@ -179,30 +179,38 @@ type DB struct {
 	entryLeaderRelationships map[uint32]uint32
 	procfs                   procfs.Reader
 	stopChan                 chan struct{}
-	removalMap               map[uint32]removalCandidate
+	// map of processes that we can remove during the next reaper run, if the exit event is older than `removalCandidateTimeout`
+	removalMap map[uint32]removalCandidate
+	ctx        context.Context
 
 	// used for metrics reporting
 	stats *Stats
 
 	// knobs for the reaper thread follows
 
-	// how often the reaper runs
+	// how often the reaper checks for expired or orphaned events.
+	// A negative value disables the reaper.
 	reaperPeriod time.Duration
-	// used for testing
-	skipReaper bool
-	// the reaper will remove processes events, an well as exit events
+	// Tells the reaper to remove orphaned process exec events.
+	// If true, exec events for which no /proc entry can be found will be removed after their insertion time has passed `orphanTimeout`.
+	// If disabled, the reaper will only remove exec events if they are matched with a exit event.
 	reapProcesses bool
-	// the age at which we'll reap a process that has no procfs data
+	// The duration after which we'll reap an orphaned process exec event for which no /proc data exists. Measured from the time the event is inserted.
 	processReapAfter time.Duration
 }
 
-func NewDB(metrics *monitoring.Registry, reader procfs.Reader, logger logp.Logger, reaperPeriod time.Duration, reapProcesses bool) (*DB, error) {
+// NewDB creates a new DB for tracking processes.
+// metrics: monitoring registry for exporting DB metrics
+// reader: handler for /proc data and events.
+// reaperPeriod: tells the reaper to update its tracking of deat and orphaned processes every at every `n` period.
+// reapProcesses: optionally tell the reaper to also reap orphan processes from the DB, if no matching exit event can be found. May result in data loss if the DB in under load and events do not arrive in a timely fashion.
+func NewDB(ctx context.Context, metrics *monitoring.Registry, reader procfs.Reader, logger *logp.Logger, reaperPeriod time.Duration, reapProcesses bool) (*DB, error) {
 	once.Do(initialize)
 	if initError != nil {
 		return &DB{}, initError
 	}
 	db := DB{
-		logger:                   logp.NewLogger("processdb"),
+		logger:                   logger.Named("processdb"),
 		processes:                make(map[uint32]Process),
 		entryLeaders:             make(map[uint32]EntryType),
 		entryLeaderRelationships: make(map[uint32]uint32),
@@ -210,12 +218,12 @@ func NewDB(metrics *monitoring.Registry, reader procfs.Reader, logger logp.Logge
 		stopChan:                 make(chan struct{}),
 		removalMap:               make(map[uint32]removalCandidate),
 		reaperPeriod:             reaperPeriod,
-		skipReaper:               false,
 		stats:                    NewStats(metrics),
 		reapProcesses:            reapProcesses,
 		processReapAfter:         time.Minute * 10,
+		ctx:                      ctx,
 	}
-	logger.Infof("starting sessionDB reaper with interval %s", db.reaperPeriod)
+	logger.Infof("starting processDB reaper with interval %s", db.reaperPeriod)
 	if db.reapProcesses {
 		logger.Info("WARNING: reaping orphaned processes. May result in data loss.")
 	}
@@ -299,10 +307,10 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 		Argv:             exec.Argv,
 		Cwd:              exec.CWD,
 		Filename:         exec.Filename,
-		ProcfsLookupFail: exec.ProcfsLookupFail,
-		InsertTime:       time.Now(),
+		procfsLookupFail: exec.ProcfsLookupFail,
+		insertTime:       time.Now(),
 	}
-	if proc.ProcfsLookupFail {
+	if proc.procfsLookupFail {
 		db.stats.procfsLookupFail.Add(1)
 	}
 
@@ -313,7 +321,6 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 		proc.ExitCode = evt.exitCode
 		db.stats.resolvedOrphanExits.Add(1)
 		db.logger.Debugf("resolved orphan exit for pid %d", proc.PIDs.Tgid)
-		//evt.orphanTime // set it to remove on the next reaper pass
 		evt.startTime = proc.PIDs.StartTimeNS
 		db.removalMap[proc.PIDs.Tgid] = evt
 	}
@@ -330,7 +337,7 @@ func (db *DB) createEntryLeader(pid uint32, entryType EntryType) {
 	db.logger.Debugf("created entry leader %d: %s, name: %s", pid, string(entryType), db.processes[pid].Filename)
 }
 
-// pid returned is a pointer type because its possible for no
+// pid returned is a pointer type because its possible for no matching PID is found.
 func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 	pid := p.PIDs.Tgid
 
@@ -703,6 +710,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 		}
 	} else {
 		db.logger.Debugf("failed to find entry leader for %d (%s)", pid, db.processes[pid].Filename)
+		db.stats.entryLeaderLookupFail.Add(1)
 	}
 
 	db.setEntityID(&ret)

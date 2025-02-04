@@ -7,6 +7,7 @@
 package sessionmd
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -339,10 +340,12 @@ var (
 )
 
 func TestEnrich(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
 	for _, tt := range enrichTests {
 		t.Run(tt.testName, func(t *testing.T) {
 			reader := procfs.NewMockReader()
-			db, err := processdb.NewDB(monitoring.NewRegistry(), reader, *logger, time.Second*30, false)
+			db, err := processdb.NewDB(ctx, monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 			require.Nil(t, err)
 
 			for _, ev := range tt.mockProcesses {

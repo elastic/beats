@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -38,6 +39,9 @@ func InitializeModule() {
 	processors.RegisterPlugin(processorName, New)
 }
 
+// instanceID assigns a uniqueID to every instance of the metrics handler for the procfs DB
+var instanceID atomic.Uint32
+
 type addSessionMetadata struct {
 	ctx          context.Context
 	cancel       context.CancelFunc
@@ -57,9 +61,17 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	logger := logp.NewLogger(logName)
 
+	id := int(instanceID.Add(1))
+	regName := "processor.add_session_metadata.processdb"
+	// if more than one instance of the DB is running, start to increment the metrics keys.
+	if id > 1 {
+		regName = fmt.Sprintf("%s.%d", regName, id)
+	}
+	metricsReg := monitoring.Default.NewRegistry(regName)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
-	db, err := processdb.NewDB(monitoring.Default, reader, *logger, c.DBReaperPeriod, c.ReapProcesses)
+	db, err := processdb.NewDB(ctx, metricsReg, reader, logger, c.DBReaperPeriod, c.ReapProcesses)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("failed to create DB: %w", err)

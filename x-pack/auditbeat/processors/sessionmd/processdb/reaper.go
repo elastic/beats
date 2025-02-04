@@ -13,7 +13,6 @@ import (
 const (
 	removalCandidateTimeout = 10 * time.Second // remove processes that have been exited longer than this
 	orphanTimeout           = 90 * time.Second // remove orphan exit events that have been around longer than this
-	exitRemoveAttempts      = 2                // Number of times to run the reaper before we remove an orphaned exit event
 )
 
 // the reaper logic for removing a process.
@@ -46,27 +45,32 @@ type removalCandidate struct {
 // it cannot have a relation with any other longer-lived processes. If this processor is ported to other OSs, this
 // assumption will need to be revisited.
 func (db *DB) startReaper() {
-	go func(db *DB) {
-		ticker := time.NewTicker(db.reaperPeriod)
-		defer ticker.Stop()
+	if db.reaperPeriod > 0 {
+		go func(db *DB) {
+			ticker := time.NewTicker(db.reaperPeriod)
+			defer ticker.Stop()
 
-		for {
-			select {
-			case <-ticker.C:
-				if !db.skipReaper {
+			for {
+				select {
+				case <-db.ctx.Done():
+					db.logger.Infof("got context done, closing reaper")
+					return
+				case <-ticker.C:
 					db.reapProcs()
+				case <-db.stopChan:
+					return
 				}
-			case <-db.stopChan:
-				return
 			}
-		}
-	}(db)
+		}(db)
+	}
+
 }
 
 // run as a separate function to make testing easier
 func (db *DB) reapProcs() {
-	now := time.Now()
+
 	db.mutex.Lock()
+	now := time.Now()
 	db.logger.Debugf("REAPER: processes: %d removal candidates: %d", len(db.processes), len(db.removalMap))
 
 	for pid, cand := range db.removalMap {
@@ -98,13 +102,14 @@ func (db *DB) reapProcs() {
 		delete(db.processes, pid)
 		delete(db.entryLeaders, pid)
 		delete(db.entryLeaderRelationships, pid)
+
 	}
 
 	// We also need to go through and reap suspect processes;
 	// this processor can't rely on any sort of guarantee that we'll get every event,
 	// as the audit netlink socket may drop events, and the user may misconfigure the auditd rules so we don't catch every event.
 	// as a result, we may need to drop processes that appear orphaned
-	procsToTest := []uint32{}
+	var procsToTest []uint32
 	if db.reapProcesses {
 		for pid, proc := range db.processes {
 			// if a process can't be found in procFS, that may mean it's already exited,
@@ -112,10 +117,14 @@ func (db *DB) reapProcs() {
 			// however this is still a tad risky, as if the user is running in some kind of
 			// container environment where they have access to netlink but not to procfs,
 			// we'll remove live processes.
-			if proc.ProcfsLookupFail {
+			if proc.procfsLookupFail {
 				_, matchingExit := db.removalMap[pid]
-				if now.Sub(proc.InsertTime) > db.processReapAfter && !matchingExit {
+				if now.Sub(proc.insertTime) > db.processReapAfter && !matchingExit {
 					delete(db.processes, pid)
+					// more potential for data loss; if we don't reap these, they can leak, but we may break relationships if a later child PID comes along looking for
+					// an entry leader that matches the our orphaned exec event.
+					delete(db.entryLeaders, pid)
+					delete(db.entryLeaderRelationships, pid)
 					db.stats.reapedOrphanProcesses.Add(1)
 				}
 			} else {
@@ -131,6 +140,8 @@ func (db *DB) reapProcs() {
 
 	db.stats.currentExit.Set(uint64(len(db.removalMap)))
 	db.stats.currentProcs.Set(uint64(len(db.processes)))
+	db.stats.entryLeaders.Set(uint64(len(db.entryLeaders)))
+	db.stats.entryLeaderRelationships.Set(uint64(len(db.entryLeaderRelationships)))
 
 	db.mutex.Unlock()
 
@@ -148,7 +159,7 @@ func (db *DB) reapProcs() {
 		for _, deadProc := range deadProcs {
 			if proc, ok := db.processes[deadProc]; ok {
 				// set the lookup fail flag, let the rest of the reaper deal with it
-				proc.ProcfsLookupFail = true
+				proc.procfsLookupFail = true
 				db.processes[deadProc] = proc
 			}
 		}

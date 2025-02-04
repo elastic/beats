@@ -187,7 +187,7 @@ func (r ProcfsReader) GetProcess(pid uint32) (ProcessInfo, error) {
 	return r.getProcessInfo(proc)
 }
 
-func (r ProcfsReader) ProcessExists(pid uint32) bool {
+func (ProcfsReader) ProcessExists(pid uint32) bool {
 	_, err := procfs.NewProc(int(pid))
 	return err == nil
 }

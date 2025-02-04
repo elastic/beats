@@ -7,6 +7,7 @@
 package processdb
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -41,10 +42,12 @@ func TestProcessOrphanResolve(t *testing.T) {
 
 	// uncomment if you want some logs
 	//_ = logp.DevelopmentSetup()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute, false)
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), time.Minute, false)
 	require.NoError(t, err)
-	testDB.skipReaper = true
+	testDB.reaperPeriod = -1
 	removalFuncTimeoutWaiting = testAlwaysTimeout
 
 	pid1 := types.PIDInfo{Tgid: 10, StartTimeNS: 19}
@@ -85,11 +88,12 @@ func TestProcessOrphanResolve(t *testing.T) {
 
 func TestReapExitOrphans(t *testing.T) {
 	//test to make sure that orphaned exit events are still cleaned up
-
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute, false)
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), time.Minute, false)
 	require.NoError(t, err)
-	testDB.skipReaper = true
+	testDB.reaperPeriod = -1
 	removalFuncTimeoutWaiting = testAlwaysTimeout
 	orphanFuncTimeoutWaiting = testAlwaysTimeout
 
@@ -106,10 +110,11 @@ func TestReapExitOrphans(t *testing.T) {
 
 func TestReapProcesses(t *testing.T) {
 	reader := procfs.NewProcfsReader(*logger)
-	testDB, err := NewDB(monitoring.NewRegistry(), reader, *logp.L(), time.Minute, false)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), reader, logp.L(), time.Minute, false)
 	require.NoError(t, err)
-	testDB.skipReaper = true
-	testDB.reapProcesses = true
+	testDB.reaperPeriod = -1
 	testDB.processReapAfter = time.Duration(0)
 	removalFuncTimeoutWaiting = testNeverTimeout
 
@@ -144,9 +149,11 @@ func TestReapProcesses(t *testing.T) {
 
 func TestReapProcessesWithProcFS(t *testing.T) {
 	mockReader := procfs.NewMockReader()
-	testDB, err := NewDB(monitoring.NewRegistry(), mockReader, *logp.L(), time.Minute, false)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), mockReader, logp.L(), time.Minute, false)
 	require.NoError(t, err)
-	testDB.skipReaper = true
+	testDB.reaperPeriod = -1
 	testDB.reapProcesses = true
 	testDB.processReapAfter = time.Duration(0)
 	removalFuncTimeoutWaiting = testNeverTimeout
@@ -170,9 +177,9 @@ func TestReapProcessesWithProcFS(t *testing.T) {
 
 	testDB.reapProcs()
 	// after one iteration, 3 should be marked as `LookupFail`, others should be fine
-	require.True(t, testDB.processes[pid3.Tgid].ProcfsLookupFail)
-	require.False(t, testDB.processes[pid2.Tgid].ProcfsLookupFail)
-	require.False(t, testDB.processes[pid1.Tgid].ProcfsLookupFail)
+	require.True(t, testDB.processes[pid3.Tgid].procfsLookupFail)
+	require.False(t, testDB.processes[pid2.Tgid].procfsLookupFail)
+	require.False(t, testDB.processes[pid1.Tgid].procfsLookupFail)
 
 	// after a second reap, they should be removed
 	testDB.reapProcs()
@@ -185,9 +192,11 @@ func TestReapProcessesWithProcFS(t *testing.T) {
 func TestReapingProcessesOrphanResolvedRace(t *testing.T) {
 	// test to make sure that if we resolve a process in between mutex holds, we won't prematurely reap it
 	mockReader := procfs.NewMockReader()
-	testDB, err := NewDB(monitoring.NewRegistry(), mockReader, *logp.L(), time.Minute, false)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	testDB, err := NewDB(ctx, monitoring.NewRegistry(), mockReader, logp.L(), time.Minute, false)
 	require.NoError(t, err)
-	testDB.skipReaper = true
+	testDB.reaperPeriod = -1
 	testDB.reapProcesses = true
 	testDB.processReapAfter = time.Duration(0)
 	removalFuncTimeoutWaiting = testNeverTimeout
@@ -200,7 +209,7 @@ func TestReapingProcessesOrphanResolvedRace(t *testing.T) {
 
 	testDB.reapProcs()
 	// should now be marked as lookup fail
-	require.True(t, testDB.processes[pid1.Tgid].ProcfsLookupFail)
+	require.True(t, testDB.processes[pid1.Tgid].procfsLookupFail)
 
 	// now we get our exit
 	testDB.InsertExit(types.ProcessExitEvent{PIDs: pid1})
