@@ -83,15 +83,15 @@ func TestProviderLoadMetrics(t *testing.T) {
 
 	// wait for the maps to empty to the correct amount as the reaper runs
 	require.EventuallyWithT(t, func(collect *assert.CollectT) {
-		assertRegistryUint(collect, testReg, "processdb.processes", 0, "processdb.processes")
-		assertRegistryUint(collect, testReg, "processdb.exit_events", 0, "processdb.exit_events")
+		assertRegistryUint(collect, testReg, "processes_gauge", 0, "processes_gauge")
+		assertRegistryUint(collect, testReg, "exit_events_gauge", 0, "exit_events_gauge")
 	}, time.Minute*5, time.Second*10)
 
 	// ensure processes are getting resolved properly
-	assertRegistryUint(t, testReg, "processdb.resolved_orphan_exits", 0, "resolved_orphan_exits")
-	assertRegistryUint(t, testReg, "processdb.reaped_orphan_exits", 0, "reaped_orphan_exits")
-	assertRegistryUint(t, testReg, "processdb.failed_process_lookup_count", 0, "processdb.failed_process_lookup_count")
-	assertRegistryUint(t, testReg, "processdb.procfs_lookup_fail", 0, "processdb.procfs_lookup_fail")
+	assertRegistryUint(t, testReg, "resolved_orphan_exits", 0, "resolved_orphan_exits")
+	assertRegistryUint(t, testReg, "reaped_orphan_exits", 0, "reaped_orphan_exits")
+	assertRegistryUint(t, testReg, "failed_process_lookup_count", 0, "failed_process_lookup_count")
+	assertRegistryUint(t, testReg, "procfs_lookup_fail", 0, "procfs_lookup_fail")
 
 }
 
