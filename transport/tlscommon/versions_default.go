@@ -59,20 +59,6 @@ var tlsProtocolVersions = map[string]TLSVersion{
 	"TLSv1.3": TLSVersion13,
 }
 
-// SetInsecureDefaults is currently a nop as the default versions have not changed.
-//
-// This function is used to avoid a breaking change on previous releases.
-// We plan on the default minimum versions list to exclude TLS1.1, and not allow TLS1.0 in a future library update.
-func SetInsecureDefaults() {
-	TLSVersionMin = TLSVersion10
-	TLSVersionDefaultMin = TLSVersion11
-	TLSDefaultVersions = []TLSVersion{
-		TLSVersion11,
-		TLSVersion12,
-		TLSVersion13,
-	}
-}
-
 // Intended for ECS's tls.version_protocol_field, which does not include
 // numeric version and should be lower case
 type TLSVersionDetails struct {
