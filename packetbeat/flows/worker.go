@@ -443,9 +443,11 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 		}
 
 		if v, found := stats["bytes"]; found {
+			//nolint:errcheck // ignore
 			totalBytes += v.(uint64)
 		}
 		if v, found := stats["packets"]; found {
+			//nolint:errcheck // ignore
 			totalPackets += v.(uint64)
 		}
 	}
@@ -461,9 +463,11 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 		}
 
 		if v, found := stats["bytes"]; found {
+			//nolint:errcheck // ignore
 			totalBytes += v.(uint64)
 		}
 		if v, found := stats["packets"]; found {
+			//nolint:errcheck // ignore
 			totalPackets += v.(uint64)
 		}
 	}
