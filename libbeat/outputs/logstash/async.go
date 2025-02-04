@@ -235,17 +235,6 @@ func (c *asyncClient) getClient() *v2.AsyncClient {
 	return client
 }
 
-<<<<<<< HEAD
-func (r *msgRef) callback(seq uint32, err error) {
-	if err != nil {
-		r.fail(seq, err)
-	} else {
-		r.done(seq)
-	}
-}
-
-func (r *msgRef) done(n uint32) {
-=======
 func (r *msgRef) customizedCallback() func(uint32, error) {
 	start := time.Now()
 
@@ -255,7 +244,14 @@ func (r *msgRef) customizedCallback() func(uint32, error) {
 }
 
 func (r *msgRef) callback(start time.Time, n uint32, err error) {
->>>>>>> accc5e147 (Add latency metrics for logstash async output (#42565))
+	if err != nil {
+		r.fail(seq, err)
+	} else {
+		r.done(seq)
+	}
+}
+
+func (r *msgRef) done(n uint32) {
 	r.client.observer.AckedEvents(int(n))
 	r.slice = r.slice[n:]
 	if r.win != nil {
