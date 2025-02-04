@@ -27,8 +27,8 @@ type BboltValue struct {
 	// ExpireAt - Unix timestamp (in nanoseconds) of time when value expires.
 	ExpireAt int64 `json:"expireAt"`
 
-	// Ttl - Time To Live used for value. If 0 then the value doesn't expire
-	Ttl time.Duration `json:"ttl"`
+	// TTL - Time To Live used for value. If 0 then the value doesn't expire
+	TTL time.Duration `json:"ttl"`
 }
 
 type Option func(bbolt *Bbolt)
@@ -115,7 +115,7 @@ func (b *Bbolt) Get(key []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if bboltVal.Ttl > 0 && bboltVal.ExpireAt <= time.Now().UnixNano() { // value expired
+	if bboltVal.TTL > 0 && bboltVal.ExpireAt <= time.Now().UnixNano() { // value expired
 		err = bucket.Delete(key) // since value has expired - no need to keep it in DB
 		if err != nil {
 			return nil, err
@@ -193,6 +193,6 @@ func newBboltValue(value []byte, ttl time.Duration) BboltValue {
 	return BboltValue{
 		RawValue: value,
 		ExpireAt: expireAt,
-		Ttl:      ttl,
+		TTL:      ttl,
 	}
 }
