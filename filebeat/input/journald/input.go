@@ -22,6 +22,7 @@ package journald
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalctl"
@@ -288,6 +289,20 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 	fields := r.converter.Convert(data.Fields)
 	fields.Put("event.kind", "event")
 	fields.Put("event.created", created)
+
+	// IF 'container.partial' is present, we can parse it and it's true, then
+	// add 'partial_message' to tags.
+	if partialMessageRaw, err := fields.GetValue("container.partial"); err == nil {
+		partialMessage, err := strconv.ParseBool(fmt.Sprint(partialMessageRaw))
+		if err == nil && partialMessage {
+			// 'fields' came directly from the journal,
+			// so there is no chance tags already exist
+			fields.Put("tags", []string{"partial_message"})
+		}
+	}
+
+	// Delete 'container.partial', if there are any errors, ignore it
+	_ = fields.Delete("container.partial")
 
 	// if entry is coming from a remote journal, add_host_metadata overwrites
 	// the source hostname, so it has to be copied to a different field

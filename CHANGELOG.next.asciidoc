@@ -41,6 +41,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
 - Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
 - Add kafka compression support for ZSTD.
+- The fields produced by the Journald input are updated to better match ECS. Renamed fields:
+Dropped fields: `syslog.priority` and `syslog.facility` while keeping their duplicated equivalent:
+`log.syslog.priority`,`log.syslog.facility.code`. Renamed fields: `syslog.identifier` -> `log.syslog.appname`,
+`syslog.pid` -> `log.syslog.procid`. `container.id_truncated` is dropped because the full container ID is
+already present as `container.id` and `container.log.tag` is dropped because it is already present as
+`log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
+otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Heartbeat*
 
