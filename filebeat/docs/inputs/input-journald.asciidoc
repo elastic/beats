@@ -7,8 +7,6 @@
 <titleabbrev>journald</titleabbrev>
 ++++
 
-experimental[]
-
 https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html[`journald`]
 is a system service that collects and stores logging data. The `journald` input
 reads this log data and the metadata associated with it. To read this
