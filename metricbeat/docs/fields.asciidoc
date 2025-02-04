@@ -47742,6 +47742,87 @@ type: integer
 --
 
 [float]
+=== horizontalpodautoscaler
+
+kubernetes horizontalpodautoscaler metrics
+
+
+
+*`kubernetes.horizontalpodautoscaler.name`*::
++
+--
+Foobar
+
+
+type: keyword
+
+--
+
+[float]
+=== replicas
+
+Kubernetes HPA replicas metrics
+
+
+
+*`kubernetes.horizontalpodautoscaler.replicas.max`*::
++
+--
+Kubernetes pod phase (Running, Pending...)
+
+
+type: integer
+
+--
+
+*`kubernetes.horizontalpodautoscaler.replicas.min`*::
++
+--
+Kubernetes pod phase (Running, Pending...)
+
+
+type: integer
+
+--
+
+*`kubernetes.horizontalpodautoscaler.replicas.current`*::
++
+--
+Kubernetes pod phase (Running, Pending...)
+
+
+type: integer
+
+--
+
+*`kubernetes.horizontalpodautoscaler.replicas.desired`*::
++
+--
+Kubernetes pod phase (Running, Pending...)
+
+
+type: integer
+
+--
+
+[float]
+=== status
+
+Kubernetes pod status metrics
+
+
+
+*`kubernetes.horizontalpodautoscaler.status.condition`*::
++
+--
+Kubernetes pod phase (Running, Pending...)
+
+
+type: keyword
+
+--
+
+[float]
 === job
 
 Kubernetes job metrics
