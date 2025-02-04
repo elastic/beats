@@ -19,8 +19,6 @@ package flowhash
 
 import (
 	"crypto"
-	// import crypto/sha1 so that the SHA1 algorithm is available.
-	_ "crypto/sha1"
 	"encoding/binary"
 	"net"
 )
@@ -31,9 +29,12 @@ type communityIDHasher struct {
 	hash    crypto.Hash
 }
 
-// CommunityID is a flow hasher instance using the default values
-// in the community ID specification.
-var CommunityID = NewCommunityID(0, Base64Encoding, crypto.SHA1)
+// Hash returns the hash of the given flow.
+// It uses an hasher with the default values in the community ID specification.
+// An empty string is returned if the hasher is not available.
+func Hash(flow Flow) string {
+	return hashFlow(flow)
+}
 
 // NewCommunityID allows to instantiate a flow hasher with custom settings.
 func NewCommunityID(seed uint16, encoder Encoding, hash crypto.Hash) Hasher {
