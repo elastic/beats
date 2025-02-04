@@ -254,6 +254,12 @@ func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddReso
 		return []string{}
 	case NamespaceResource:
 		return []string{}
+	case HorizontalPodAutoscalerResource:
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	default:
 		return []string{}
 	}
