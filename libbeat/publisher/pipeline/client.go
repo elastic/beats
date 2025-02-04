@@ -105,6 +105,8 @@ func (c *client) publish(e beat.Event) {
 
 	c.eventListener.AddEvent(e, publish)
 	if !publish {
+		// TODO: double check even filtered events get a Meta, thus it can be
+		//  tracked per input
 		c.onFilteredOut(e)
 		return
 	}
