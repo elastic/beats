@@ -21,8 +21,6 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -219,24 +217,23 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *in
 		return nil
 	}
 
-	rawFieldInput, err := e.Fields.GetValue(beat.FieldsKeyInput)
-	if err != nil {
-		return nil // again, nothing we can do about it
-	}
-	fieldInput, ok := rawFieldInput.(mapstr.M)
-	if !ok {
-		// again, nothing we can do about it
-		return nil
-	}
-	rawType, err := fieldInput.GetValue("type")
-	if err != nil {
-		return nil // again, nothing we can do about it
-	}
-	fieldType, ok := rawType.(string)
-	if !ok {
-		return nil // again, nothing we can do about it
-	}
-	logp.L().Infof("input type:%s, ID:%s", fieldType, inputID)
+	// rawFieldInput, err := e.Fields.GetValue(beat.FieldsKeyInput)
+	// if err != nil {
+	// 	return nil // again, nothing we can do about it
+	// }
+	// fieldInput, ok := rawFieldInput.(mapstr.M)
+	// if !ok {
+	// 	// again, nothing we can do about it
+	// 	return nil
+	// }
+	// rawType, err := fieldInput.GetValue("type")
+	// if err != nil {
+	// 	return nil // again, nothing we can do about it
+	// }
+	// fieldType, ok := rawType.(string)
+	// if !ok {
+	// 	return nil // again, nothing we can do about it
+	// }
 
 	datasetReg := monitoring.GetNamespace("dataset").GetRegistry()
 	sanatizedID := strings.ReplaceAll(inputID, ".", "_")
@@ -245,8 +242,6 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *in
 	metricUint, ok := metricVar.(*monitoring.Uint)
 	metricUint.Add(1)
 
-	logp.L().Infof("metrics.GetRegistry(dataset).Get(%s): %v", inputID, inputReg)
-	logp.L().Infof("added 1 to dataset.%s.%s", sanatizedID, metricName)
 	input, found := o.vars.inputs[inputID]
 	if !found {
 		reg := o.metrics.GetRegistry("pipeline")

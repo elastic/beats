@@ -660,6 +660,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// set the appropriate permission on the unix domain file without having to whitelist anything
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
+		// enables monitoring API
 		var err error
 		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
 		if err != nil {
