@@ -330,8 +330,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-vsphere-resourcepool,resourcepool>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>   
 |<<metricbeat-module-windows,Windows>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
+.3+| .3+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
 |<<metricbeat-metricset-windows-service,service>>   
+|<<metricbeat-metricset-windows-wmi,wmi>> beta[]  
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>>   
 |<<metricbeat-metricset-zookeeper-mntr,mntr>>   

@@ -35,6 +35,11 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 )
 
+const (
+	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
+	esDocumentIDAttribute = "elasticsearch.document_id"
+)
+
 func init() {
 	outputs.RegisterType("otelconsumer", makeOtelConsumer)
 }
@@ -84,17 +89,32 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
 	logRecords := sourceLogs.LogRecords()
 
+	// Convert the batch of events to Otel plog.Logs. The encoding we
+	// choose here is to set all fields in a Map in the Body of the log
+	// record. Each log record encodes a single beats event.
+	// This way we have full control over the final structure of the log in the
+	// destination, as long as the exporter allows it.
+	// For example, the elasticsearchexporter has an encoding specifically for this.
+	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
 	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
-		meta := event.Content.Meta.Clone()
-		meta["beat"] = out.beatInfo.Beat
-		meta["version"] = out.beatInfo.Version
-		meta["type"] = "_doc"
+
+		if id, ok := event.Content.Meta["_id"]; ok {
+			// Specify the id as an attribute used by the elasticsearchexporter
+			// to set the final document ID in Elasticsearch.
+			// When using the bodymap encoding in the exporter all attributes
+			// are stripped out of the final Elasticsearch document.
+			//
+			// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36882.
+			switch id := id.(type) {
+			case string:
+				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+			}
+		}
 
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp
-		beatEvent["@metadata"] = meta
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 		pcommonEvent := mapstrToPcommonMap(beatEvent)
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
@@ -260,12 +280,12 @@ func mapstrToPcommonMap(m mapstr.M) pcommon.Map {
 				newMap.CopyTo(newVal.SetEmptyMap())
 			}
 		case time.Time:
-			out.PutInt(k, x.UnixMilli())
+			out.PutStr(k, x.Format("2006-01-02T15:04:05.000Z"))
 		case []time.Time:
 			dest := out.PutEmptySlice(k)
 			for _, i := range v.([]time.Time) {
 				newVal := dest.AppendEmpty()
-				newVal.SetInt(i.UnixMilli())
+				newVal.SetStr(i.Format("2006-01-02T15:04:05.000Z"))
 			}
 		default:
 			out.PutStr(k, fmt.Sprintf("unknown type: %T", x))
