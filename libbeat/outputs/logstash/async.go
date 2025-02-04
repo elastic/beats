@@ -218,8 +218,14 @@ func (c *asyncClient) sendEvents(ref *msgRef, events []publisher.Event) error {
 	for i := range events {
 		window[i] = &events[i].Content
 	}
+<<<<<<< HEAD
 	ref.count.Inc()
 	return client.Send(ref.callback, window)
+=======
+	ref.count.Add(1)
+
+	return client.Send(ref.customizedCallback(), window)
+>>>>>>> accc5e147 (Add latency metrics for logstash async output (#42565))
 }
 
 func (c *asyncClient) getClient() *v2.AsyncClient {
@@ -229,6 +235,7 @@ func (c *asyncClient) getClient() *v2.AsyncClient {
 	return client
 }
 
+<<<<<<< HEAD
 func (r *msgRef) callback(seq uint32, err error) {
 	if err != nil {
 		r.fail(seq, err)
@@ -238,11 +245,27 @@ func (r *msgRef) callback(seq uint32, err error) {
 }
 
 func (r *msgRef) done(n uint32) {
+=======
+func (r *msgRef) customizedCallback() func(uint32, error) {
+	start := time.Now()
+
+	return func(n uint32, err error) {
+		r.callback(start, n, err)
+	}
+}
+
+func (r *msgRef) callback(start time.Time, n uint32, err error) {
+>>>>>>> accc5e147 (Add latency metrics for logstash async output (#42565))
 	r.client.observer.AckedEvents(int(n))
 	r.slice = r.slice[n:]
 	if r.win != nil {
 		r.win.tryGrowWindow(r.batchSize)
 	}
+
+	// Report the latency for the batch of events
+	duration := time.Since(start)
+	r.client.observer.ReportLatency(duration)
+
 	r.dec()
 }
 
