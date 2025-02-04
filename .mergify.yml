@@ -146,6 +146,8 @@ pull_request_rules:
           To fixup this pull request, you need to add the backport labels for the needed
           branches, such as:
           * `backport-8./d` is the label to automatically backport to the `8./d` branch. `/d` is the digit
+          * `backport-active-branches` is the label to automatically backport to all active branches
+          * `backport-active-minors` is the label to automatically backport to all active minor branches
 
   - name: notify the backport has not been merged yet
     conditions:
