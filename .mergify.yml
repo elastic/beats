@@ -406,3 +406,42 @@ pull_request_rules:
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+
+  - name: backport patches to all active minor branches
+    conditions:
+      - merged
+      - label=backport-active-minors
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        # NOTE: this list needs to be changed when a new minor branch is created
+        #       or an existing minor branch reached EOL.
+        branches:
+          - "9.0"
+          - "8.18"
+          - "8.17"
+          - "8.16"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to all active branches
+    conditions:
+      - merged
+      - label=backport-active-branches
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        # NOTE: this list needs to be changed when a new minor branch is created
+        #       or an existing release branch reached EOL.
+        branches:
+          - "9.0"
+          - "8.18"
+          - "8.17"
+          - "8.16"
+          - "8.x"
+          - "7.17"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
