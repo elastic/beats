@@ -82,7 +82,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
-				p := newPublisher(trCtx, publisher, true, r.log)
+				p := newPublisher(trCtx, publisher, true, r.metrics, r.log)
 				r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, true, p)
 				n = p.eventCount()
 				continue
@@ -119,7 +119,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				return err
 			}
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
-			p := newPublisher(trCtx, publisher, false, r.log)
+			p := newPublisher(trCtx, publisher, false, r.metrics, r.log)
 			r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, false, p)
 			n = p.eventCount()
 		} else {
@@ -189,7 +189,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				resps = intermediateResps
 			}
 
-			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
+			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.log)
 			if rf.isChain {
 				rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 			} else {
@@ -474,14 +474,16 @@ type requester struct {
 	client             *httpClient
 	requestFactories   []*requestFactory
 	responseProcessors []*responseProcessor
+	metrics            *inputMetrics
 	log                *logp.Logger
 }
 
-func newRequester(client *httpClient, reqs []*requestFactory, resps []*responseProcessor, log *logp.Logger) *requester {
+func newRequester(client *httpClient, reqs []*requestFactory, resps []*responseProcessor, metrics *inputMetrics, log *logp.Logger) *requester {
 	return &requester{
 		client:             client,
 		requestFactories:   reqs,
 		responseProcessors: resps,
+		metrics:            metrics,
 		log:                log,
 	}
 }
@@ -716,7 +718,7 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			}
 			resps = intermediateResps
 		}
-		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.log)
+		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.log)
 		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
@@ -752,13 +754,14 @@ func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
 
 // publisher is an event publication handler.
 type publisher struct {
-	trCtx *transformContext
-	pub   inputcursor.Publisher
-	n     int
-	log   *logp.Logger
+	trCtx   *transformContext
+	pub     inputcursor.Publisher
+	n       int
+	log     *logp.Logger
+	metrics *inputMetrics
 }
 
-func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, log *logp.Logger) *publisher {
+func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, metrics *inputMetrics, log *logp.Logger) *publisher {
 	if !publish {
 		pub = nil
 	}
@@ -789,6 +792,7 @@ func (p *publisher) handleEvent(_ context.Context, msg mapstr.M) {
 	p.trCtx.updateLastEvent(msg)
 	p.trCtx.updateCursor()
 
+	p.metrics.addEventsPublished(1)
 	p.n++
 }
 
