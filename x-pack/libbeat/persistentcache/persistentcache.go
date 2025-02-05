@@ -25,7 +25,7 @@ const (
 type PersistentCache struct {
 	log *logp.Logger
 
-	store kv.Kv
+	store kv.KV
 	codec codec
 
 	refreshOnAccess bool

@@ -6,7 +6,7 @@ package kv
 
 import "time"
 
-type Kv interface {
+type KV interface {
 	Connect() error
 	Get([]byte) ([]byte, error)
 	Set([]byte, []byte, time.Duration) error
