@@ -50,7 +50,7 @@ var (
 )
 
 func (i IncludeMatches) Validate() error {
-	errs := []error{}
+	var errs []error
 	for _, m := range i.Matches {
 		if err := m.validate(); err != nil {
 			errs = append(errs, err)
