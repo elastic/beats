@@ -707,6 +707,11 @@ filebeat.inputs:
 === Beats version 8.14.3
 https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - Filestream input will resend files that have been inactive for 30min or more. Workaround: set `clean_inactive` to a very high value, like 5 years: `clean_inactive: 43800h0m0s`. {issue}40178[40178]
+
 ==== Bugfixes
 
 *Filebeat*
@@ -736,6 +741,11 @@ https://github.com/elastic/beats/compare/v8.14.2\...v8.14.3[View commits]
 [[release-notes-8.14.2]]
 === Beats version 8.14.2
 https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - Filestream input will resend files that have been inactive for 30min or more. Workaround: set `clean_inactive` to a very high value, like 5 years: `clean_inactive: 43800h0m0s`. {issue}40178[40178]
 
 ==== Breaking changes
 
@@ -773,6 +783,11 @@ https://github.com/elastic/beats/compare/v8.14.1\...v8.14.2[View commits]
 === Beats version 8.14.1
 https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
 
+==== Known Issues
+
+*Filebeat*
+ - Filestream input will resend files that have been inactive for 30min or more. Workaround: set `clean_inactive` to a very high value, like 5 years: `clean_inactive: 43800h0m0s`. {issue}40178[40178]
+
 ==== Bugfixes
 
 *Heartbeat*
@@ -783,6 +798,11 @@ https://github.com/elastic/beats/compare/v8.14.0\...v8.14.1[View commits]
 [[release-notes-8.14.0]]
 === Beats version 8.14.0
 https://github.com/elastic/beats/compare/v8.13.4\...v8.14.0[View commits]
+
+==== Known Issues
+
+*Filebeat*
+ - Filestream input will resend files that have been inactive for 30min or more. Workaround: set `clean_inactive` to a very high value, like 5 years: `clean_inactive: 43800h0m0s`. {issue}40178[40178]
 
 ==== Breaking changes
 
