@@ -146,6 +146,9 @@ pull_request_rules:
           To fixup this pull request, you need to add the backport labels for the needed
           branches, such as:
           * `backport-8./d` is the label to automatically backport to the `8./d` branch. `/d` is the digit
+          * `backport-active-all` is the label that automatically backports to all active branches.
+          * `backport-active-8` is the label that automatically backports to all active minor branches for the 8 major.
+          * `backport-active-9` is the label that automatically backports to all active minor branches for the 9 major.
 
   - name: notify the backport has not been merged yet
     conditions:
@@ -403,6 +406,59 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "9.0"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+
+  - name: backport patches to all active minor branches for the 8 major.
+    conditions:
+      - merged
+      - label=backport-active-8
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        # NOTE: this list needs to be changed when a new minor branch is created
+        #       or an existing minor branch reached EOL.
+        branches:
+          - "8.18"
+          - "8.17"
+          - "8.16"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to all active minor branches for the 9 major.
+    conditions:
+      - merged
+      - label=backport-active-9
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        # NOTE: this list needs to be changed when a new minor branch is created
+        #       or an existing minor branch reached EOL.
+        branches:
+          - "9.0"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to all active branches
+    conditions:
+      - merged
+      - label=backport-active-all
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        # NOTE: this list needs to be changed when a new minor branch is created
+        #       or an existing release branch reached EOL.
+        branches:
+          - "9.0"
+          - "8.18"
+          - "8.17"
+          - "8.16"
+          - "8.x"
+          - "7.17"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
