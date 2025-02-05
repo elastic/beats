@@ -135,7 +135,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 
 	if b.API != nil {
 		// add /inputs
-		if err = inputmon.AttachHandler(b.API.Router()); err != nil {
+		if err = inputmon.AttachHandler(b.Info, b.API.Router()); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
@@ -143,7 +143,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON()
+				data, err := inputmon.MetricSnapshotJSON(b.Info)
 				if err != nil {
 					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())

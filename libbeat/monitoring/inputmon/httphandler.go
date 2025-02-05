@@ -26,6 +26,10 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	monitoring2 "github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -36,20 +40,31 @@ const (
 )
 
 type handler struct {
+	beatInfo beat.Info
+
+	logger           *logp.Logger
 	registryDataset  *monitoring.Registry
 	registryInternal *monitoring.Registry
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
 // requests to /inputs.
-func AttachHandler(r *mux.Router) error {
-	return attachHandler(r, globalDatasetRegistry(), globalInternalRegistry())
+func AttachHandler(beatInfo beat.Info, r *mux.Router) error {
+	internalReg := monitoring2.BeatInternalInputsRegistry(beatInfo)
+
+	return attachHandler(beatInfo, r, globalRegistry(), internalReg)
 }
 
-func attachHandler(r *mux.Router, datasetReg, internalReg *monitoring.Registry) error {
-	h := &handler{registryDataset: datasetReg, registryInternal: internalReg}
+func attachHandler(beatInfo beat.Info, r *mux.Router, datasetReg, internalReg *monitoring.Registry) error {
 	r = r.PathPrefix(route).Subrouter()
-	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
+
+	h := &handler{
+		beatInfo:         beatInfo,
+		registryDataset:  datasetReg,
+		registryInternal: internalReg,
+		logger:           logp.NewLogger("inputmon"),
+	}
+	return r.StrictSlash(true).Handle("/", validationHandler(http.MethodGet, []string{"pretty", "type"}, h.allInputs)).GetError()
 }
 
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
@@ -101,16 +116,19 @@ func filteredSnapshot(dataset, internal *monitoring.Registry, requestedType stri
 	return filtered
 }
 
-// mergeInternalMetrics looks
+// mergeInternalMetrics looks for a registry 'id' in the 'internal' registry. If
+// found, all the metrics are merged into m, if not, m is not changed. If there
+// already is a
+// The internal registry should be globalInternalRegistry()
 func mergeInternalMetrics(internal *monitoring.Registry, id string, m map[string]any) {
-	intInput := monitoring.CollectStructSnapshot(internal, monitoring.Full, false)
-	if rawInputPublishMetrics, found := intInput[id]; found {
-		inputPublishMetrics, inputMetrincsOk := rawInputPublishMetrics.(map[string]any)
-		if inputMetrincsOk {
-			for k, v := range inputPublishMetrics {
-				m[k] = v
-			}
-		}
+	reg := internal.GetRegistry(id)
+	if reg == nil {
+		return
+	}
+
+	intInput := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
+	for k, v := range intInput {
+		m[k] = v
 	}
 }
 
