@@ -95,48 +95,32 @@ func (b *Bbolt) Connect() error {
 }
 
 // Get - fetches value by key from bolt DB (returns nil if key is not present or expired)
-func (b *Bbolt) Get(key []byte) ([]byte, error) {
-	// we need writable transaction here because if value is present in DB but expired we need to delete it.
-	tx, err := b.db.Begin(true)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
-	bucket := tx.Bucket([]byte(b.bucketName))
+func (b *Bbolt) Get(key []byte) (data []byte, err error) {
+	// we need writable transaction here in order to delete expired keys
+	err = b.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(b.bucketName))
 
-	bboltValEncoded := bucket.Get(key)
-	if bboltValEncoded == nil { // no value in store
-		return nil, nil
-	}
-	var bboltVal BboltValue
-	err = json.Unmarshal(bboltValEncoded, &bboltVal)
-	if err != nil {
-		return nil, err
-	}
-	if bboltVal.TTL > 0 && bboltVal.ExpireAt <= time.Now().UnixNano() { // value expired
-		err = bucket.Delete(key) // since value has expired - no need to keep it in DB
-		if err != nil {
-			return nil, err
+		jsonVal := bucket.Get(key)
+		if jsonVal == nil { // no value in store
+			return nil
 		}
-		return nil, nil
-	}
-	return bboltVal.RawValue, nil
+
+		var val BboltValue
+		if err := json.Unmarshal(jsonVal, &val); err != nil {
+			return err
+		}
+		if val.TTL > 0 && val.ExpireAt <= time.Now().UnixNano() { // value expired
+			return bucket.Delete(key)
+		}
+		data = val.RawValue
+		return nil
+	})
+	return data, err
 }
 
 // Set - stores value by key in bolt DB. If TTL is 0 then value doesn't expire
 func (b *Bbolt) Set(key []byte, value []byte, ttl time.Duration) error {
-	return b.db.Update(b.createSetClosure(key, value, ttl))
-}
-
-// Close - closes bolt DB file.
-func (b *Bbolt) Close() error {
-	return b.db.Close()
-}
-
-func (b *Bbolt) createSetClosure(key []byte, value []byte, ttl time.Duration) func(tx *bolt.Tx) error {
-	return func(tx *bolt.Tx) error {
+	return b.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(b.bucketName))
 
 		bboltValEncoded, err := getMarshalledBboltValue(value, ttl)
@@ -149,7 +133,12 @@ func (b *Bbolt) createSetClosure(key []byte, value []byte, ttl time.Duration) fu
 		}
 
 		return nil
-	}
+	})
+}
+
+// Close - closes bolt DB file.
+func (b *Bbolt) Close() error {
+	return b.db.Close()
 }
 
 // ensureBucketExists - creates bolt bucket if it doesn't already exist.
