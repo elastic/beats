@@ -17,7 +17,7 @@ func ExampleCommunityIDHash() {
 		DestinationPort: 53,
 		Protocol:        17,
 	}
-	fmt.Println(flowhash.CommunityID.Hash(flow))
+	fmt.Println(flowhash.Hash(flow))
 	// Output: 1:R7iR6vkxw+jaz3wjDfWMWooBdfc=
 }
 ```
