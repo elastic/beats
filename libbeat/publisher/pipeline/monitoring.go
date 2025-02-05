@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -201,6 +202,7 @@ func (o *metricsObserver) failedPublishEvent(e beat.Event) {
 	input.inputEventsDropped.Inc()
 }
 
+// TODO: remove metricName
 func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *inputVars {
 	// TODO:
 	// - find the right global registry to add the metrics to. dataset.inputID sanitized. See inputmon.NewInputRegistry()
@@ -217,24 +219,7 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *in
 		return nil
 	}
 
-	// rawFieldInput, err := e.Fields.GetValue(beat.FieldsKeyInput)
-	// if err != nil {
-	// 	return nil // again, nothing we can do about it
-	// }
-	// fieldInput, ok := rawFieldInput.(mapstr.M)
-	// if !ok {
-	// 	// again, nothing we can do about it
-	// 	return nil
-	// }
-	// rawType, err := fieldInput.GetValue("type")
-	// if err != nil {
-	// 	return nil // again, nothing we can do about it
-	// }
-	// fieldType, ok := rawType.(string)
-	// if !ok {
-	// 	return nil // again, nothing we can do about it
-	// }
-
+	// for debug, remove it
 	datasetReg := monitoring.GetNamespace("dataset").GetRegistry()
 	sanatizedID := strings.ReplaceAll(inputID, ".", "_")
 	inputReg := datasetReg.GetRegistry(sanatizedID)
@@ -247,14 +232,25 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *in
 
 	input, found := o.vars.inputs[inputID]
 	if !found {
-		reg := o.metrics.GetRegistry("pipeline")
+		intReg := monitoring.
+			GetNamespace(libbeatmonitoring.RegistryNameInternalInputs).
+			GetRegistry()
+		reg := intReg.GetRegistry(inputID)
+		if reg == nil {
+			reg = intReg.NewRegistry(inputID)
+		}
+
 		input = inputVars{
-			inputEventsFiltered:  monitoring.NewUint(reg, "inputs."+inputID+".events.filtered"),
-			inputEventsPublished: monitoring.NewUint(reg, "inputs."+inputID+".events.published"),
+			inputEventsDropped:   monitoring.NewUint(reg, "events_dropped_total"),
+			inputEventsFiltered:  monitoring.NewUint(reg, "events_filtered_total"),
+			inputEventsPublished: monitoring.NewUint(reg, "events_published_total"),
 		}
 		o.vars.inputs[inputID] = input
 	}
-
+	reg := monitoring.GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	if reg != nil {
+		_ = reg
+	}
 	return &input
 }
 

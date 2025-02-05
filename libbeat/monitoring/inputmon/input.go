@@ -23,12 +23,13 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // NewInputRegistry returns a new monitoring.Registry for metrics related to
-// an input instance. The returned registry will be initialized with a static
+// an input instance. The returned registryDataset will be initialized with a static
 // string values for the input and id. When the input stops it should invoke
 // the returned cancel function to unregister the metrics. For testing purposes
 // an optional monitoring.Registry may be provided as an alternative to using
@@ -39,12 +40,12 @@ func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry)
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
 	if parentRegistry == nil {
-		parentRegistry = globalRegistry()
+		parentRegistry = globalDatasetRegistry()
 	}
 
 	// If an ID has not been assigned to an input then metrics cannot be exposed
 	// in the global metric registry. The returned registry still behaves the same.
-	if (id == "" || inputType == "") && parentRegistry == globalRegistry() {
+	if (id == "" || inputType == "") && parentRegistry == globalDatasetRegistry() {
 		// Null route metrics without ID or input type.
 		parentRegistry = monitoring.NewRegistry()
 	}
@@ -76,12 +77,21 @@ func sanitizeID(id string) string {
 	return strings.ReplaceAll(id, ".", "_")
 }
 
-func globalRegistry() *monitoring.Registry {
-	return monitoring.GetNamespace("dataset").GetRegistry()
+func globalDatasetRegistry() *monitoring.Registry {
+	return globalRegistry("dataset")
+}
+
+func globalInternalRegistry() *monitoring.Registry {
+	return globalRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+}
+
+func globalRegistry(namespace string) *monitoring.Registry {
+	return monitoring.GetNamespace(namespace).GetRegistry()
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' monitoring namespace encoded as a JSON array (pretty formatted).
+// global 'dataset' and 'internal' monitoring namespace merged and encoded as a
+// JSON array (pretty formatted).
 func MetricSnapshotJSON() ([]byte, error) {
-	return json.MarshalIndent(filteredSnapshot(globalRegistry(), ""), "", "  ")
+	return json.MarshalIndent(filteredSnapshot(globalDatasetRegistry(), globalInternalRegistry(), ""), "", "  ")
 }
