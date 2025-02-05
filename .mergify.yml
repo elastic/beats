@@ -421,6 +421,7 @@ pull_request_rules:
         # NOTE: this list needs to be changed when a new minor branch is created
         #       or an existing minor branch reached EOL.
         branches:
+          - "8.x"
           - "8.18"
           - "8.17"
           - "8.16"
