@@ -23,7 +23,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"sync"
@@ -57,7 +57,7 @@ type eventInfo struct {
 func TestKafkaPublish(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("kafka"))
 
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
 	logType := fmt.Sprintf("log-type-%s", id)
 
