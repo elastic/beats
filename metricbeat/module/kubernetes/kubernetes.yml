@@ -142,9 +142,17 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hellobusybox
+  name: hellohpa
+  labels:
+    app: hello-hpa
 spec:
+  selector:
+    matchLabels:
+      app: hello-hpa
   template:
+    metadata:
+      labels:
+        app: hello-hpa
     spec:
       containers:
       - name: hello-app
@@ -167,7 +175,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: hellobusybox
+    name: hellohpa
   minReplicas: 1
   maxReplicas: 2
   metrics:
