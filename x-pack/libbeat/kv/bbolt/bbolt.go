@@ -127,37 +127,29 @@ func (b *Bbolt) Get(key []byte) ([]byte, error) {
 
 // Set - stores value by key in bolt DB. If TTL is 0 then value doesn't expire
 func (b *Bbolt) Set(key []byte, value []byte, ttl time.Duration) error {
-	tx, err := b.db.Begin(true)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = tx.Rollback()
-	}()
-
-	bucket := tx.Bucket([]byte(b.bucketName))
-
-	bboltValEncoded, err := getMarshalledBboltValue(value, ttl)
-	if err != nil {
-		return err
-	}
-
-	err = bucket.Put(key, bboltValEncoded)
-	if err != nil {
-		return err
-	}
-
-	// Commit the transaction.
-	if err := tx.Commit(); err != nil {
-		return err
-	}
-
-	return nil
+	return b.db.Update(b.createSetClosure(key, value, ttl))
 }
 
 // Close - closes bolt DB file.
 func (b *Bbolt) Close() error {
 	return b.db.Close()
+}
+
+func (b *Bbolt) createSetClosure(key []byte, value []byte, ttl time.Duration) func(tx *bolt.Tx) error {
+	return func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(b.bucketName))
+
+		bboltValEncoded, err := getMarshalledBboltValue(value, ttl)
+		if err != nil {
+			return err
+		}
+		err = bucket.Put(key, bboltValEncoded)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
 }
 
 // ensureBucketExists - creates bolt bucket if it doesn't already exist.
