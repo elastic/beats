@@ -23,6 +23,7 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -40,12 +41,12 @@ func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry)
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
 	if parentRegistry == nil {
-		parentRegistry = globalDatasetRegistry()
+		parentRegistry = globalRegistry()
 	}
 
 	// If an ID has not been assigned to an input then metrics cannot be exposed
 	// in the global metric registry. The returned registry still behaves the same.
-	if (id == "" || inputType == "") && parentRegistry == globalDatasetRegistry() {
+	if (id == "" || inputType == "") && parentRegistry == globalRegistry() {
 		// Null route metrics without ID or input type.
 		parentRegistry = monitoring.NewRegistry()
 	}
@@ -77,21 +78,19 @@ func sanitizeID(id string) string {
 	return strings.ReplaceAll(id, ".", "_")
 }
 
-func globalDatasetRegistry() *monitoring.Registry {
-	return globalRegistry("dataset")
-}
-
-func globalInternalRegistry() *monitoring.Registry {
-	return globalRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-}
-
-func globalRegistry(namespace string) *monitoring.Registry {
-	return monitoring.GetNamespace(namespace).GetRegistry()
+func globalRegistry() *monitoring.Registry {
+	return monitoring.GetNamespace("dataset").GetRegistry()
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' and 'internal' monitoring namespace merged and encoded as a
+// global 'dataset' and beat 'internal' monitoring namespace merged and encoded as a
 // JSON array (pretty formatted).
-func MetricSnapshotJSON() ([]byte, error) {
-	return json.MarshalIndent(filteredSnapshot(globalDatasetRegistry(), globalInternalRegistry(), ""), "", "  ")
+func MetricSnapshotJSON(beatInfo beat.Info) ([]byte, error) {
+	return json.MarshalIndent(
+		filteredSnapshot(
+			globalRegistry(),
+			libbeatmonitoring.BeatInternalInputsRegistry(beatInfo),
+			""),
+		"",
+		"  ")
 }

@@ -31,6 +31,8 @@ import (
 
 // client connects a beat with the processors and pipeline queue.
 type client struct {
+	beatInfo beat.Info
+	
 	logger     *logp.Logger
 	processors beat.Processor
 	producer   queue.Producer

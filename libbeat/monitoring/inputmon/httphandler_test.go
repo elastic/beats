@@ -68,7 +68,7 @@ func TestHandler(t *testing.T) {
 	s := httptest.NewServer(r)
 	defer s.Close()
 
-	if err := attachHandler(r, parent); err != nil {
+	if err := attachHandler(beatInfo, r, parent); err != nil {
 		t.Fatal(err)
 	}
 

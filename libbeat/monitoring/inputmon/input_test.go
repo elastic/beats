@@ -91,7 +91,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	defer cancel()
 	monitoring.NewInt(r, "foo_total").Set(100)
 
-	jsonBytes, err := MetricSnapshotJSON()
+	jsonBytes, err := MetricSnapshotJSON(b.Info)
 	require.NoError(t, err)
 
 	const expected = `[

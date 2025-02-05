@@ -66,6 +66,9 @@ type retryObserver interface {
 // are defined by observer. The components are only allowed to serve localized
 // event-handlers only (e.g. the client centric events callbacks)
 type metricsObserver struct {
+	// the registry scoped to the beat/libbeat/beatreceiver instance it belongs to
+	beatInternalRegistry *monitoring.Registry
+
 	metrics *monitoring.Registry
 	vars    metricsObserverVars
 }
@@ -93,14 +96,16 @@ type metricsObserverVars struct {
 	inputs map[string]inputVars // TODO: do it need to be thread safe?
 }
 
-func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
+func newMetricsObserver(metrics, beatRegistry *monitoring.Registry) *metricsObserver {
 	reg := metrics.GetRegistry("pipeline")
 	if reg == nil {
 		reg = metrics.NewRegistry("pipeline")
 	}
 
 	return &metricsObserver{
-		metrics: metrics,
+		beatInternalRegistry: beatRegistry,
+		metrics:              metrics,
+
 		vars: metricsObserverVars{
 			// (Gauge) clients measures the number of open pipeline clients.
 			clients: monitoring.NewUint(reg, "clients"),
@@ -232,12 +237,9 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *in
 
 	input, found := o.vars.inputs[inputID]
 	if !found {
-		intReg := monitoring.
-			GetNamespace(libbeatmonitoring.RegistryNameInternalInputs).
-			GetRegistry()
-		reg := intReg.GetRegistry(inputID)
+		reg := o.beatInternalRegistry.GetRegistry(inputID)
 		if reg == nil {
-			reg = intReg.NewRegistry(inputID)
+			reg = o.beatInternalRegistry.NewRegistry(inputID)
 		}
 
 		input = inputVars{
