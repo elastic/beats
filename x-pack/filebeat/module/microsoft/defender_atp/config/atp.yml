@@ -25,7 +25,7 @@ request.transforms:
   - set:
       target: "url.params.$filter"
       value: 'lastUpdateTime gt [[formatDate .cursor.lastUpdateTime "2006-01-02T15:04:05.9999999Z"]]'
-      default: 'lastUpdateTime gt [[formatDate (now (parseDuration "-5m")) "2006-01-02T15:04:05.9999999Z"]]'
+      default: 'lastUpdateTime gt [[formatDate (now (parseDuration "-{{.initial_interval}}")) "2006-01-02T15:04:05.9999999Z"]]'
 
 response.split:
   target: body.value
