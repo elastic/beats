@@ -140,7 +140,7 @@ USER root
 # Install required dependencies from wolfi repository
 RUN for iter in {1..10}; do \
         apk update && \
-        apk add --no-interactive --no-progress --no-cache nodejs-18=18.20.4-r0 npm=10.8.3-r0 glib dbus-glib libatk-1.0 \
+        apk add --no-interactive --no-progress --no-cache nodejs-18=18.20.6-r0 npm=11.1.0-r0 glib dbus-glib libatk-1.0 \
         libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxrandr libxkbcommon pango alsa-lib \
         font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
         exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
@@ -179,7 +179,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV NODE_VERSION=18.20.4
+ENV NODE_VERSION=18.20.6
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
