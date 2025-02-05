@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
@@ -131,7 +132,9 @@ func New(
 	}
 
 	if monitors.Metrics != nil {
-		p.observer = newMetricsObserver(monitors.Metrics)
+		p.observer = newMetricsObserver(
+			monitors.Metrics,
+			monitoring.BeatInternalInputsRegistry(beat))
 	}
 
 	// Convert the raw queue config to a parsed Settings object that will
@@ -209,6 +212,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client := &client{
+		beatInfo:       p.beatInfo,
 		logger:         p.monitors.Logger,
 		clientListener: cfg.ClientListener,
 		processors:     processors,
