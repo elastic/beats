@@ -41,7 +41,7 @@ type Bbolt struct {
 	db *bolt.DB
 }
 
-// New - creates and returns instance of bolt key-value cache implementation
+// New creates and returns instance of bolt key-value cache implementation
 func New(options ...Option) *Bbolt {
 	b := &Bbolt{
 		dbPath:     defaultDbPath,
@@ -73,7 +73,7 @@ func WithBucketName(name string) Option {
 	}
 }
 
-// Connect - creates directories of a given path for bbolt DB file (if directories not already exist), creates DB file with given file permissions, creates bucket to store cache data.
+// Connect creates directories of a given path for bbolt DB file (if directories not already exist), creates DB file with given file permissions, creates bucket to store cache data.
 func (b *Bbolt) Connect() error {
 	var err error
 
@@ -94,7 +94,7 @@ func (b *Bbolt) Connect() error {
 	return nil
 }
 
-// Get - fetches value by key from bolt DB (returns nil if key is not present or expired)
+// Get fetches value by key from bolt DB (returns nil if key is not present or expired)
 func (b *Bbolt) Get(key []byte) (data []byte, err error) {
 	// we need writable transaction here in order to delete expired keys
 	err = b.db.Update(func(tx *bolt.Tx) error {
@@ -118,7 +118,7 @@ func (b *Bbolt) Get(key []byte) (data []byte, err error) {
 	return data, err
 }
 
-// Set - stores value by key in bolt DB. If TTL is 0 then value doesn't expire
+// Set stores a key-value pair in the database. If TTL is 0, the key does not expire.
 func (b *Bbolt) Set(key []byte, value []byte, ttl time.Duration) error {
 	return b.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(b.bucketName))
@@ -150,7 +150,7 @@ func (b *Bbolt) ensureBucketExists() error {
 	return err
 }
 
-// openDbFile - opens bolt DB file and returns *bolt.DB instance
+// openDbFile opens bolt DB file and returns *bolt.DB instance
 func openDbFile(path string, mode os.FileMode) (*bolt.DB, error) {
 	db, err := bolt.Open(path, mode, nil)
 	if err != nil {
@@ -160,12 +160,12 @@ func openDbFile(path string, mode os.FileMode) (*bolt.DB, error) {
 	return db, nil
 }
 
-// getMarshalledBboltValue - returns json encoded BboltValue constructed from raw value and TTL.
+// getMarshalledBboltValue returns json encoded BboltValue constructed from raw value and TTL.
 func getMarshalledBboltValue(value []byte, ttl time.Duration) ([]byte, error) {
 	return json.Marshal(newBboltValue(value, ttl))
 }
 
-// newBboltValue - creates BboltValue from raw value and TTL
+// newBboltValue creates BboltValue from raw value and TTL
 func newBboltValue(value []byte, ttl time.Duration) BboltValue {
 	var expireAt int64
 	if ttl > 0 {

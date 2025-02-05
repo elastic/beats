@@ -5,7 +5,6 @@
 package bbolt
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -50,9 +49,9 @@ func TestNew(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(tInner *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			boltCache := tt.testCase()
-			assert.Equal(tInner, tt.expected, boltCache)
+			assert.Equal(t, tt.expected, boltCache)
 		})
 	}
 }
@@ -108,13 +107,8 @@ func TestGetSet(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(tInner *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			dbPath := filepath.Join(t.TempDir(), "test.db")
-
-			tInner.Cleanup(func() {
-				// Remove test DB file after test is done to not interfere with other tests
-				_ = os.Remove(dbPath)
-			})
 
 			bolt := &Bbolt{
 				dbPath:     dbPath,
