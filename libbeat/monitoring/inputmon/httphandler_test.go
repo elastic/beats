@@ -116,7 +116,7 @@ func BenchmarkHandlers(b *testing.B) {
 		monitoring.NewInt(reg, "gauge").Set(int64(i))
 	}
 
-	h := &handler{registry: reg}
+	h := &handler{registryDataset: reg}
 
 	b.Run("allInputs", func(b *testing.B) {
 		req := httptest.NewRequest(http.MethodGet, "/inputs/", nil)

@@ -44,10 +44,10 @@ func TestNewInputMonitor(t *testing.T) {
 		{Input: inputType, ID: "", PublicMetrics: false},
 		{Input: "", ID: "", PublicMetrics: false},
 
-		{Input: inputType, ID: id, OptionalParent: globalRegistry(), PublicMetrics: true},
-		{Input: "", ID: id, OptionalParent: globalRegistry(), PublicMetrics: false},
-		{Input: inputType, ID: "", OptionalParent: globalRegistry(), PublicMetrics: false},
-		{Input: "", ID: "", OptionalParent: globalRegistry(), PublicMetrics: false},
+		{Input: inputType, ID: id, OptionalParent: globalDatasetRegistry(), PublicMetrics: true},
+		{Input: "", ID: id, OptionalParent: globalDatasetRegistry(), PublicMetrics: false},
+		{Input: inputType, ID: "", OptionalParent: globalDatasetRegistry(), PublicMetrics: false},
+		{Input: "", ID: "", OptionalParent: globalDatasetRegistry(), PublicMetrics: false},
 
 		{Input: inputType, ID: id, OptionalParent: monitoring.NewRegistry(), PublicMetrics: false},
 		{Input: "", ID: id, OptionalParent: monitoring.NewRegistry(), PublicMetrics: false},
@@ -66,12 +66,12 @@ func TestNewInputMonitor(t *testing.T) {
 			assert.NotNil(t, reg)
 
 			// Verify that metrics are registered when a custom parent registry is given.
-			if tc.OptionalParent != nil && tc.OptionalParent != globalRegistry() {
+			if tc.OptionalParent != nil && tc.OptionalParent != globalDatasetRegistry() {
 				assert.NotNil(t, tc.OptionalParent.Get(tc.ID))
 			}
 
 			// Verify whether the metrics are exposed in the global registry which makes the public.
-			parent := globalRegistry().GetRegistry(tc.ID)
+			parent := globalDatasetRegistry().GetRegistry(tc.ID)
 			if tc.PublicMetrics {
 				assert.NotNil(t, parent)
 			} else {
@@ -82,9 +82,9 @@ func TestNewInputMonitor(t *testing.T) {
 }
 
 func TestMetricSnapshotJSON(t *testing.T) {
-	require.NoError(t, globalRegistry().Clear())
+	require.NoError(t, globalDatasetRegistry().Clear())
 	t.Cleanup(func() {
-		require.NoError(t, globalRegistry().Clear())
+		require.NoError(t, globalDatasetRegistry().Clear())
 	})
 
 	r, cancel := NewInputRegistry("test", "my-id", nil)

@@ -36,17 +36,18 @@ const (
 )
 
 type handler struct {
-	registry *monitoring.Registry
+	registryDataset  *monitoring.Registry
+	registryInternal *monitoring.Registry
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
 // requests to /inputs.
 func AttachHandler(r *mux.Router) error {
-	return attachHandler(r, globalRegistry())
+	return attachHandler(r, globalDatasetRegistry(), globalInternalRegistry())
 }
 
-func attachHandler(r *mux.Router, registry *monitoring.Registry) error {
-	h := &handler{registry: registry}
+func attachHandler(r *mux.Router, datasetReg, internalReg *monitoring.Registry) error {
+	h := &handler{registryDataset: datasetReg, registryInternal: internalReg}
 	r = r.PathPrefix(route).Subrouter()
 	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
 }
@@ -64,17 +65,15 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	filtered := filteredSnapshot(h.registry, requestedType)
-	// global := filteredSnapshot(globalRegistry(), "")
-	//
-	// logp.L().Info("global:", global)
-	// logp.L().Info("filtered:", filtered)
+	filtered := filteredSnapshot(
+		h.registryDataset, h.registryInternal, requestedType)
+
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
 
-func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
-	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
+func filteredSnapshot(dataset, internal *monitoring.Registry, requestedType string) []map[string]any {
+	metrics := monitoring.CollectStructSnapshot(dataset, monitoring.Full, false)
 
 	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
@@ -84,7 +83,8 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		if id, ok := m["id"].(string); !ok || id == "" {
+		id, ok := m["id"].(string)
+		if !ok || id == "" {
 			continue
 		}
 
@@ -93,9 +93,25 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 			continue
 		}
 
+		// merge the internal namespace if found
+		mergeInternalMetrics(internal, id, m)
+
 		filtered = append(filtered, m)
 	}
 	return filtered
+}
+
+// mergeInternalMetrics looks
+func mergeInternalMetrics(internal *monitoring.Registry, id string, m map[string]any) {
+	intInput := monitoring.CollectStructSnapshot(internal, monitoring.Full, false)
+	if rawInputPublishMetrics, found := intInput[id]; found {
+		inputPublishMetrics, inputMetrincsOk := rawInputPublishMetrics.(map[string]any)
+		if inputMetrincsOk {
+			for k, v := range inputPublishMetrics {
+				m[k] = v
+			}
+		}
+	}
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {
