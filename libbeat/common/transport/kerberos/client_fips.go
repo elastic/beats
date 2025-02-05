@@ -15,14 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build requirefips
+
 package kerberos
 
 import (
+	"errors"
 	"net/http"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+func NewClient(config *Config, httpClient *http.Client, esurl string) (Client, error) {
+	return nil, errors.New("kerberos is not supported in fips mode")
 }
