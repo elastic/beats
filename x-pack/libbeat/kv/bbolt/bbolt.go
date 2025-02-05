@@ -136,7 +136,7 @@ func (b *Bbolt) Set(key []byte, value []byte, ttl time.Duration) error {
 	})
 }
 
-// Close - closes bolt DB file.
+// Close closes the database.
 func (b *Bbolt) Close() error {
 	return b.db.Close()
 }
