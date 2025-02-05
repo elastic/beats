@@ -21,13 +21,13 @@ package file_integrity
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"os/user"
 	"strconv"
 	"syscall"
 
-	"github.com/joeshaw/multierror"
 	"github.com/pkg/xattr"
 )
 
@@ -61,7 +61,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	}
 
 	// Lookup UID and GID
-	var errs multierror.Errors
+	var errs []error
 	owner, err := user.LookupId(strconv.Itoa(int(fileInfo.UID)))
 	if err != nil {
 		errs = append(errs, err)
@@ -81,7 +81,7 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		errs = append(errs, err)
 	}
 
-	return fileInfo, errs.Err()
+	return fileInfo, errors.Join(errs...)
 }
 
 func fillExtendedAttributes(md *Metadata, path string) {
