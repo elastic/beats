@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNew(t *testing.T) {
@@ -117,7 +118,7 @@ func TestGetSet(t *testing.T) {
 			}
 
 			err := bolt.Connect()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			defer bolt.Close()
 
 			tt.testCase(t, bolt)
