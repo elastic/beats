@@ -30,6 +30,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -74,7 +75,7 @@ const pluginName = "journald"
 func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "journald input",
 		Doc:        "The journald input collects logs from the local journald service",
@@ -155,6 +156,8 @@ func (inp *journald) Run(
 	logger := ctx.Logger.
 		With("path", src.Name()).
 		With("input_id", inp.ID)
+
+	ctx.UpdateStatus(status.Starting, "Starting")
 	currentCheckpoint := initCheckpoint(logger, cursor)
 
 	mode := inp.Seek
@@ -174,7 +177,9 @@ func (inp *journald) Run(
 		journalctl.Factory,
 	)
 	if err != nil {
-		return fmt.Errorf("could not start journal reader: %w", err)
+		wrappedErr := fmt.Errorf("could not start journal reader: %w", err)
+		ctx.UpdateStatus(status.Failed, wrappedErr.Error())
+		return wrappedErr
 	}
 
 	defer reader.Close()
@@ -187,6 +192,7 @@ func (inp *journald) Run(
 			saveRemoteHostname: inp.SaveRemoteHostname,
 		})
 
+	ctx.UpdateStatus(status.Running, "Running")
 	for {
 		entry, err := parser.Next()
 		if err != nil {
@@ -198,14 +204,18 @@ func (inp *journald) Run(
 			case errors.Is(err, journalctl.ErrRestarting):
 				continue
 			default:
-				logger.Errorf("could not read event: %s", err)
+				msg := fmt.Sprintf("could not read event: %s", err)
+				ctx.UpdateStatus(status.Failed, msg)
+				logger.Error(msg)
 				return err
 			}
 		}
 
 		event := entry.ToEvent()
 		if err := publisher.Publish(event, event.Private); err != nil {
-			logger.Errorf("could not publish event: %s", err)
+			msg := fmt.Sprintf("could not publish event: %s", err)
+			ctx.UpdateStatus(status.Failed, msg)
+			logger.Errorf(msg)
 			return err
 		}
 	}
