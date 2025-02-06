@@ -95,6 +95,5 @@ func (m *Message) ToEvent() beat.Event {
 		Meta:      m.Meta,
 		Fields:    m.Fields,
 		Private:   m.Private,
-		// PublishStatusCh: make(chan string, 1),
 	}
 }
