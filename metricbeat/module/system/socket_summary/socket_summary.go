@@ -18,10 +18,11 @@
 package socket_summary
 
 import (
+	"errors"
 	"fmt"
 	"syscall"
 
-	"github.com/shirou/gopsutil/v3/net"
+	"github.com/shirou/gopsutil/v4/net"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -45,14 +46,16 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	sockstat string
-	mod      resolve.Resolver
+	mod resolve.Resolver
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, errors.New("base.Module is not resolve.Resolver")
+	}
 	return &MetricSet{
 		mod:           sys,
 		BaseMetricSet: base,

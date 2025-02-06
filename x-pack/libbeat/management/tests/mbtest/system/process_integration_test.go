@@ -37,7 +37,8 @@ func TestProcessStatusReporter(t *testing.T) {
 	unitOutID := mock.NewID()
 	token := mock.NewID()
 
-	tests.InitBeatsForTest(t, cmd.RootCmd)
+	mbCmd := cmd.Initialize()
+	tests.InitBeatsForTest(t, mbCmd)
 
 	filename := fmt.Sprintf("test-%d", time.Now().Unix())
 	outPath := filepath.Join(t.TempDir(), filename)
@@ -122,7 +123,7 @@ func TestProcessStatusReporter(t *testing.T) {
 
 	go func() {
 		t.Logf("Running beats...")
-		err := cmd.RootCmd.Execute()
+		err := mbCmd.Execute()
 		require.NoError(t, err)
 	}()
 

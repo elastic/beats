@@ -89,7 +89,7 @@ The Kafka client id (optional).
 [float]
 ===== `version`
 
-The version of the Kafka protocol to use (defaults to `"1.0.0"`).
+The version of the Kafka protocol to use (defaults to `"2.1.0"`). When using Kafka 4.0 and newer, the version must be set to at least `"2.1.0"`.
 
 [float]
 ===== `initial_offset`

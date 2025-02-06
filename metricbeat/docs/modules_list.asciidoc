@@ -51,6 +51,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   
+|<<metricbeat-module-benchmark,Benchmark>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-benchmark-info,info>> beta[]  
 |<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .13+| .13+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
@@ -240,6 +242,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-nats-subscriptions,subscriptions>>   
 |<<metricbeat-module-nginx,Nginx>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
+|<<metricbeat-module-openai,openai>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-openai-usage,usage>> beta[]  
 |<<metricbeat-module-openmetrics,Openmetrics>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-openmetrics-collector,collector>> beta[]  
 |<<metricbeat-module-oracle,Oracle>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -326,8 +330,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-vsphere-resourcepool,resourcepool>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>   
 |<<metricbeat-module-windows,Windows>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
+.3+| .3+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
 |<<metricbeat-metricset-windows-service,service>>   
+|<<metricbeat-metricset-windows-wmi,wmi>> beta[]  
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>>   
 |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
@@ -344,6 +349,7 @@ include::modules/aws.asciidoc[]
 include::modules/awsfargate.asciidoc[]
 include::modules/azure.asciidoc[]
 include::modules/beat.asciidoc[]
+include::modules/benchmark.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/cloudfoundry.asciidoc[]
 include::modules/cockroachdb.asciidoc[]
@@ -381,6 +387,7 @@ include::modules/munin.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/nginx.asciidoc[]
+include::modules/openai.asciidoc[]
 include::modules/openmetrics.asciidoc[]
 include::modules/oracle.asciidoc[]
 include::modules/panw.asciidoc[]

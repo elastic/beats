@@ -43,6 +43,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
+const (
+	moduleNameField  = "_module_name"
+	filesetNameField = "_fileset_name"
+)
+
 // Fileset struct is the representation of a fileset.
 type Fileset struct {
 	name        string
@@ -57,6 +62,11 @@ type Fileset struct {
 type pipeline struct {
 	id       string
 	contents map[string]interface{}
+}
+
+// CheckIfModuleInput checks if the input configuration was created by a module
+func CheckIfModuleInput(cfg *conf.C) bool {
+	return cfg.HasField(moduleNameField)
 }
 
 // New allocates a new Fileset object with the given configuration.
@@ -393,11 +403,11 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	}
 
 	// force our the module/fileset name
-	err = cfg.SetString("_module_name", -1, fs.mname)
+	err = cfg.SetString(moduleNameField, -1, fs.mname)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting the _module_name cfg in the input config: %w", err)
 	}
-	err = cfg.SetString("_fileset_name", -1, fs.name)
+	err = cfg.SetString(filesetNameField, -1, fs.name)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %w", err)
 	}

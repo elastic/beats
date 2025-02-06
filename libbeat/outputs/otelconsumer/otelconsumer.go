@@ -20,7 +20,6 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -34,6 +33,11 @@ import (
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+)
+
+const (
+	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
+	esDocumentIDAttribute = "elasticsearch.document_id"
 )
 
 func init() {
@@ -85,17 +89,32 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
 	logRecords := sourceLogs.LogRecords()
 
+	// Convert the batch of events to Otel plog.Logs. The encoding we
+	// choose here is to set all fields in a Map in the Body of the log
+	// record. Each log record encodes a single beats event.
+	// This way we have full control over the final structure of the log in the
+	// destination, as long as the exporter allows it.
+	// For example, the elasticsearchexporter has an encoding specifically for this.
+	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
 	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
-		meta := event.Content.Meta.Clone()
-		meta["beat"] = out.beatInfo.Beat
-		meta["version"] = out.beatInfo.Version
-		meta["type"] = "_doc"
+
+		if id, ok := event.Content.Meta["_id"]; ok {
+			// Specify the id as an attribute used by the elasticsearchexporter
+			// to set the final document ID in Elasticsearch.
+			// When using the bodymap encoding in the exporter all attributes
+			// are stripped out of the final Elasticsearch document.
+			//
+			// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36882.
+			switch id := id.(type) {
+			case string:
+				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+			}
+		}
 
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp
-		beatEvent["@metadata"] = meta
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 		pcommonEvent := mapstrToPcommonMap(beatEvent)
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
@@ -103,30 +122,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
 	if err != nil {
-		// If the batch is too large, the elasticsearchexporter will
-		// return a 413 error.
-		//
-		// At the moment, the exporter does not support batch splitting
-		// on error so we do it here.
-		//
-		// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36163.
-		if strings.Contains(err.Error(), "Request Entity Too Large") {
-			// Try and split the batch into smaller batches and retry
-			if batch.SplitRetry() {
-				st.BatchSplit()
-				st.RetryableErrors(len(events))
-			} else {
-				// If the batch could not be split, there is no option left but
-				// to drop it and log the error state.
-				batch.Drop()
-				st.PermanentErrors(len(events))
-				out.log.Errorf("the batch is too large to be sent: %v", err)
-			}
-
-			// Don't propagate the error, the batch was split and retried.
-			return nil
-		}
-
 		// Permanent errors shouldn't be retried. This tipically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
@@ -285,12 +280,12 @@ func mapstrToPcommonMap(m mapstr.M) pcommon.Map {
 				newMap.CopyTo(newVal.SetEmptyMap())
 			}
 		case time.Time:
-			out.PutInt(k, x.UnixMilli())
+			out.PutStr(k, x.Format("2006-01-02T15:04:05.000Z"))
 		case []time.Time:
 			dest := out.PutEmptySlice(k)
 			for _, i := range v.([]time.Time) {
 				newVal := dest.AppendEmpty()
-				newVal.SetInt(i.UnixMilli())
+				newVal.SetStr(i.Format("2006-01-02T15:04:05.000Z"))
 			}
 		default:
 			out.PutStr(k, fmt.Sprintf("unknown type: %T", x))

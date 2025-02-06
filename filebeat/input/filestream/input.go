@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -34,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/debug"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
@@ -165,11 +165,9 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	if err := inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics); err != nil {
-		ctx.UpdateStatus(status.Degraded, fmt.Sprintf("error while reading from source: %v", err))
-		return err
-	}
-	return nil
+	// The caller of Run already reports the error and filters out errors that
+	// must not be reported, like 'context cancelled'.
+	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -379,6 +377,15 @@ func (inp *filestream) readFromSource(
 		}
 
 		s.Offset += int64(message.Bytes) + int64(message.Offset)
+
+		flags, err := message.Fields.GetValue("log.flags")
+		if err == nil {
+			if flags, ok := flags.([]string); ok {
+				if slices.Contains(flags, "truncated") { //nolint:typecheck,nolintlint // linter fails to infer generics
+					metrics.MessagesTruncated.Add(1)
+				}
+			}
+		}
 
 		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {

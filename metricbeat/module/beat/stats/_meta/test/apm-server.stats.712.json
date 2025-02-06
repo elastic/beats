@@ -36,7 +36,7 @@
             "elasticsearch": {
                 "cache.entries.count": 0,
                 "cache.refresh.failures": 0,
-                "cache.refresh.successes": 220,
+                "cache.refresh.successes": 6,
                 "fetch.es": 0,
                 "fetch.fallback": 0,
                 "fetch.invalid": 0,
@@ -199,23 +199,23 @@
         },
         "processor": {
             "error": {
-                "transformations": 2563
+                "transformations": 782
             },
             "metric": {
-                "transformations": 13792
+                "transformations": 8295
             },
             "span": {
-                "transformations": 66999
+                "transformations": 10234
             },
             "stream": {
-                "accepted": 111954,
+                "accepted": 41772,
                 "errors": {
                     "invalid": 0,
                     "toolarge": 0
                 }
             },
             "transaction": {
-                "transformations": 29994
+                "transformations": 3004
             }
         },
         "root": {
@@ -224,6 +224,56 @@
             },
             "response": {
                 "count": 1,
+                "errors": {
+                    "closed": 0,
+                    "count": 1,
+                    "decode": 0,
+                    "forbidden": 0,
+                    "internal": 0,
+                    "invalidquery": 0,
+                    "method": 0,
+                    "notfound": 0,
+                    "queue": 0,
+                    "ratelimit": 0,
+                    "timeout": 1,
+                    "toolarge": 0,
+                    "unauthorized": 0,
+                    "unavailable": 0,
+                    "validate": 0
+                },
+                "valid": {
+                    "accepted": 0,
+                    "count": 0,
+                    "notmodified": 0,
+                    "ok": 0
+                }
+            },
+            "unset": 0
+        },
+        "sampling": {
+            "tail": {
+                "dynamic_service_groups": 4,
+                "events": {
+                    "dropped": 2149,
+                    "failed_writes": 0,
+                    "head_unsampled": 0,
+                    "processed": 34538,
+                    "sampled": 13238,
+                    "stored": 32389
+                },
+                "storage": {
+                    "lsm_size": 525060325,
+                    "value_log_size": 12058435
+                }
+            },
+            "transactions_dropped": 0
+        },
+        "server": {
+            "request": {
+                "count": 605
+            },
+            "response": {
+                "count": 605,
                 "errors": {
                     "closed": 0,
                     "count": 0,
@@ -242,43 +292,8 @@
                     "validate": 0
                 },
                 "valid": {
-                    "accepted": 0,
-                    "count": 1,
-                    "notmodified": 0,
-                    "ok": 1
-                }
-            },
-            "unset": 0
-        },
-        "sampling": {
-            "transactions_dropped": 0
-        },
-        "server": {
-            "request": {
-                "count": 1492
-            },
-            "response": {
-                "count": 1492,
-                "errors": {
-                    "closed": 0,
-                    "count": 1,
-                    "decode": 0,
-                    "forbidden": 0,
-                    "internal": 1,
-                    "invalidquery": 0,
-                    "method": 0,
-                    "notfound": 0,
-                    "queue": 0,
-                    "ratelimit": 0,
-                    "timeout": 0,
-                    "toolarge": 0,
-                    "unauthorized": 0,
-                    "unavailable": 0,
-                    "validate": 0
-                },
-                "valid": {
-                    "accepted": 1491,
-                    "count": 1491,
+                    "accepted": 605,
+                    "count": 605,
                     "notmodified": 0,
                     "ok": 0
                 }
@@ -302,29 +317,29 @@
                 "id": "session-c2.scope",
                 "mem": {
                     "usage": {
-                        "bytes": 37939621888
+                        "bytes": 30244999168
                     }
                 }
             }
         },
         "cpu": {
             "system": {
-                "ticks": 1720,
+                "ticks": 2360,
                 "time": {
-                    "ms": 1720
+                    "ms": 2360
                 }
             },
             "total": {
-                "ticks": 16100,
+                "ticks": 12850,
                 "time": {
-                    "ms": 16100
+                    "ms": 12850
                 },
-                "value": 16100
+                "value": 12850
             },
             "user": {
-                "ticks": 14380,
+                "ticks": 10490,
                 "time": {
-                    "ms": 14380
+                    "ms": 10490
                 }
             }
         },
@@ -333,53 +348,53 @@
                 "hard": 1048576,
                 "soft": 1048576
             },
-            "open": 18
+            "open": 56
         },
         "info": {
-            "ephemeral_id": "87279482-5cbc-4232-b90e-a08d2d2f0ec9",
+            "ephemeral_id": "d57303bc-7918-4832-a917-e8f2467ca5fd",
             "name": "apm-server",
             "uptime": {
-                "ms": 6589405
+                "ms": 179556
             },
-            "version": "8.14.3"
+            "version": "8.18.0"
         },
         "memstats": {
-            "gc_next": 204429288,
-            "memory_alloc": 102433408,
-            "memory_sys": 267778360,
-            "memory_total": 1392024448,
-            "rss": 164769792
+            "gc_next": 178933328,
+            "memory_alloc": 129688560,
+            "memory_sys": 226933048,
+            "memory_total": 1972011464,
+            "rss": 762793984
         },
         "runtime": {
-            "goroutines": 52
+            "goroutines": 33
         }
     },
     "libbeat": {
         "output": {
             "events": {
-                "acked": 70666,
-                "active": 0,
-                "batches": 26,
-                "failed": 42682,
-                "toomany": 42682,
-                "total": 113348
+                "acked": 18441,
+                "active": 3874,
+                "batches": 7,
+                "failed": 0,
+                "toomany": 0,
+                "total": 22315
             },
             "type": "elasticsearch",
             "write": {
-                "bytes": 24728235
+                "bytes": 3220280
             }
         },
         "pipeline": {
             "events": {
-                "total": 113348
+                "total": 22315
             }
         }
     },
     "output": {
         "elasticsearch": {
             "bulk_requests": {
-                "available": 60,
-                "completed": 26
+                "available": 37,
+                "completed": 7
             },
             "indexers": {
                 "active": 1,
@@ -393,13 +408,13 @@
             "cores": 16
         },
         "load": {
-            "1": 2.88,
-            "15": 1.86,
-            "5": 1.87,
+            "1": 14.04,
+            "15": 5.22,
+            "5": 8.9,
             "norm": {
-                "1": 0.18,
-                "15": 0.1163,
-                "5": 0.1169
+                "1": 0.8775,
+                "15": 0.3263,
+                "5": 0.5563
             }
         }
     }

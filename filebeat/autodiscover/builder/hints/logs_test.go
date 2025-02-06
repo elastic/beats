@@ -18,6 +18,7 @@
 package hints
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -30,8 +31,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-func TestMain(t *testing.M) {
+func TestMain(m *testing.M) {
 	InitializeModule()
+
+	os.Exit(m.Run())
 }
 
 func TestGenerateHints(t *testing.T) {

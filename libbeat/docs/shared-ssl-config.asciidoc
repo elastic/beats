@@ -66,7 +66,7 @@ heartbeat.monitors:
   ports: [80, 9200, 5044]
   ssl:
     certificate_authorities: ['/etc/ca.crt']
-    supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+    supported_protocols: ["TLSv1.1", "TLSv1.2"]
 -------------------------------------------------------------------------------
 endif::[]
 
@@ -120,10 +120,9 @@ SSL settings are disabled if either `enabled` is set to `false` or the
 List of allowed SSL/TLS versions. If SSL/TLS server decides for protocol versions
 not configured, the connection will be dropped during or after the handshake. The
 setting is a list of allowed protocol versions:
-`TLSv1` for TLS version 1.0, `TLSv1.0`, `TLSv1.1`, `TLSv1.2`, and
-`TLSv1.3`.
+`TLSv1.1`, `TLSv1.2`, and `TLSv1.3`.
 
-The default value is `[TLSv1.1, TLSv1.2, TLSv1.3]`.
+The default value is `[TLSv1.2, TLSv1.3]`.
 
 [float]
 [[cipher-suites]]
@@ -406,7 +405,7 @@ supports SSL.
 [[server-certificate-authorities]]
 ==== `certificate_authorities`
 
-The list of root certificates for client verifications is only required if 
+The list of root certificates for client verifications is only required if
 `client_authentication` is configured. If `certificate_authorities` is empty or not set, and
 `client_authentication` is configured, the system keystore is used.
 
