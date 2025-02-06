@@ -32,7 +32,7 @@ import (
 // client connects a beat with the processors and pipeline queue.
 type client struct {
 	beatInfo beat.Info
-	
+
 	logger     *logp.Logger
 	processors beat.Processor
 	producer   queue.Producer
@@ -128,7 +128,6 @@ func (c *client) publish(e beat.Event) {
 
 	if published {
 		c.onPublished(e)
-		// e.SetPublishStatus("published")
 	} else {
 		c.onDroppedOnPublish(e)
 	}
@@ -188,12 +187,10 @@ func (c *client) onPublished(e beat.Event) {
 }
 
 func (c *client) onFilteredOut(e beat.Event) {
-	// e.SetPublishStatus("filtered")
 	c.observer.filteredEvent(e)
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
-	// e.SetPublishStatus("dropped")
 	c.observer.failedPublishEvent(e)
 	if c.clientListener != nil {
 		c.clientListener.DroppedOnPublish(e)

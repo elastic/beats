@@ -30,7 +30,7 @@ import (
 )
 
 // NewInputRegistry returns a new monitoring.Registry for metrics related to
-// an input instance. The returned registryDataset will be initialized with a static
+// an input instance. The returned registry will be initialized with a static
 // string values for the input and id. When the input stops it should invoke
 // the returned cancel function to unregister the metrics. For testing purposes
 // an optional monitoring.Registry may be provided as an alternative to using
