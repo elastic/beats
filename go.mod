@@ -210,6 +210,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.54.1
 	github.com/shirou/gopsutil/v4 v4.24.10
+	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.12
 	github.com/xdg-go/scram v1.1.2
 	github.com/zyedidia/generic v1.2.1
@@ -389,7 +390,6 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/teambition/rrule-go v1.8.2 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
