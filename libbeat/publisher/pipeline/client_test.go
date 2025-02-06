@@ -287,10 +287,12 @@ func TestMonitoring(t *testing.T) {
 	}).Unpack(&config)
 	require.NoError(t, err)
 
-	metrics := monitoring.NewRegistry()
-	telemetry := monitoring.NewRegistry()
+	beatInfo := beat.Info{}
+	beatInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMonitoring")
+	metrics := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry("metrics")
+	telemetry := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry("telemetry")
 	pipeline, err := Load(
-		beat.Info{},
+		beatInfo,
 		Monitors{
 			Metrics:   metrics,
 			Telemetry: telemetry,
