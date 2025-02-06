@@ -30,6 +30,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -53,7 +54,9 @@ var testCases = []TestCase{
 }
 
 func TestHandler(t *testing.T) {
+	namespace := monitoring.GetNamespace("TestHandler")
 	parent := monitoring.NewRegistry()
+
 	reg, _ := NewInputRegistry("foo", "123abc", parent)
 	monitoring.NewInt(reg, "gauge").Set(13344)
 
@@ -68,7 +71,9 @@ func TestHandler(t *testing.T) {
 	s := httptest.NewServer(r)
 	defer s.Close()
 
-	if err := attachHandler(beatInfo, r, parent); err != nil {
+	beatInfo := beat.Info{}
+	beatInfo.Monitoring.Namespace = namespace
+	if err := attachHandler(beatInfo, r, parent, monitoring.NewRegistry()); err != nil {
 		t.Fatal(err)
 	}
 
