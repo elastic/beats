@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -44,10 +45,10 @@ func TestNewInputMonitor(t *testing.T) {
 		{Input: inputType, ID: "", PublicMetrics: false},
 		{Input: "", ID: "", PublicMetrics: false},
 
-		{Input: inputType, ID: id, OptionalParent: globalDatasetRegistry(), PublicMetrics: true},
-		{Input: "", ID: id, OptionalParent: globalDatasetRegistry(), PublicMetrics: false},
-		{Input: inputType, ID: "", OptionalParent: globalDatasetRegistry(), PublicMetrics: false},
-		{Input: "", ID: "", OptionalParent: globalDatasetRegistry(), PublicMetrics: false},
+		{Input: inputType, ID: id, OptionalParent: globalRegistry(), PublicMetrics: true},
+		{Input: "", ID: id, OptionalParent: globalRegistry(), PublicMetrics: false},
+		{Input: inputType, ID: "", OptionalParent: globalRegistry(), PublicMetrics: false},
+		{Input: "", ID: "", OptionalParent: globalRegistry(), PublicMetrics: false},
 
 		{Input: inputType, ID: id, OptionalParent: monitoring.NewRegistry(), PublicMetrics: false},
 		{Input: "", ID: id, OptionalParent: monitoring.NewRegistry(), PublicMetrics: false},
@@ -66,12 +67,12 @@ func TestNewInputMonitor(t *testing.T) {
 			assert.NotNil(t, reg)
 
 			// Verify that metrics are registered when a custom parent registry is given.
-			if tc.OptionalParent != nil && tc.OptionalParent != globalDatasetRegistry() {
+			if tc.OptionalParent != nil && tc.OptionalParent != globalRegistry() {
 				assert.NotNil(t, tc.OptionalParent.Get(tc.ID))
 			}
 
 			// Verify whether the metrics are exposed in the global registry which makes the public.
-			parent := globalDatasetRegistry().GetRegistry(tc.ID)
+			parent := globalRegistry().GetRegistry(tc.ID)
 			if tc.PublicMetrics {
 				assert.NotNil(t, parent)
 			} else {
@@ -82,16 +83,19 @@ func TestNewInputMonitor(t *testing.T) {
 }
 
 func TestMetricSnapshotJSON(t *testing.T) {
-	require.NoError(t, globalDatasetRegistry().Clear())
+	require.NoError(t, globalRegistry().Clear())
 	t.Cleanup(func() {
-		require.NoError(t, globalDatasetRegistry().Clear())
+		require.NoError(t, globalRegistry().Clear())
 	})
 
 	r, cancel := NewInputRegistry("test", "my-id", nil)
 	defer cancel()
 	monitoring.NewInt(r, "foo_total").Set(100)
 
-	jsonBytes, err := MetricSnapshotJSON(b.Info)
+	bInfo := beat.Info{}
+	bInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMetricSnapshotJSON")
+
+	jsonBytes, err := MetricSnapshotJSON(bInfo)
 	require.NoError(t, err)
 
 	const expected = `[
