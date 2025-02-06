@@ -36,8 +36,9 @@ import (
 // sourceStore is a store which can access resources using the Source
 // from an input.
 type sourceStore struct {
-	identifier *sourceIdentifier
-	store      *store
+	identifier          *sourceIdentifier
+	previousIdentifiers []*sourceIdentifier
+	store               *store
 }
 
 // store encapsulates the persistent store and the in memory state store, that
@@ -163,10 +164,11 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}, nil
 }
 
-func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
+func newSourceStore(s *store, identifier *sourceIdentifier, previousIdentifiers []*sourceIdentifier) *sourceStore {
 	return &sourceStore{
-		store:      s,
-		identifier: identifier,
+		store:               s,
+		identifier:          identifier,
+		previousIdentifiers: previousIdentifiers,
 	}
 }
 
@@ -212,9 +214,10 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 	}
 }
 
-// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
-// for removal.
-func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
+type newIDFn func(v Value) (string, interface{})
+type matchesInputFn func(string) bool
+
+func (s *sourceStore) updateIdentifiers(matchesInput matchesInputFn, getNewID newIDFn) {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
@@ -234,7 +237,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			continue
 		}
 
-		if !s.identifier.MatchesInput(key) {
+		if !matchesInput(key) {
 			continue
 		}
 
@@ -272,6 +275,28 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 
 		res.lock.Unlock()
 	}
+}
+
+// UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
+// for removal.
+func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
+	s.updateIdentifiers(s.identifier.MatchesInput, getNewID)
+}
+
+func (s *sourceStore) CopyStatesFromPreviousIDs(getNewID func(v Value) (string, interface{})) error {
+	matchPreviousIdentifier := func(key string) bool {
+		for _, identifier := range s.previousIdentifiers {
+			if identifier.MatchesInput(key) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	s.updateIdentifiers(matchPreviousIdentifier, getNewID)
+
+	return nil
 }
 
 func (s *store) Retain() { s.refCount.Retain() }

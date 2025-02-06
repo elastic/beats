@@ -156,7 +156,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	}
 
 	settings := struct {
+		// All those values are duplicated from the Filestream configuration
 		ID                 string        `config:"id"`
+		PreviousIDs        []string      `config:"previous_ids"`
 		CleanInactive      time.Duration `config:"clean_inactive"`
 		HarvesterLimit     uint64        `config:"harvester_limit"`
 		AllowIDDuplication bool          `config:"allow_deprecated_id_duplication"`
@@ -219,15 +221,28 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, errNoInputRunner
 	}
 
-	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
+	srcIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating source identifier for input: %w", err)
+	}
+
+	var previousSrcIdentifiers []*sourceIdentifier
+	for _, id := range settings.PreviousIDs {
+		si, err := newSourceIdentifier(cim.Type, id)
+		if err != nil {
+			return nil,
+				fmt.Errorf(
+					"[ID: %q] error while creating source identifier for previous ID %q: %w",
+					settings.ID, id, err)
+		}
+
+		previousSrcIdentifiers = append(previousSrcIdentifiers, si)
 	}
 
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
 
-	prospectorStore := newSourceStore(pStore, sourceIdentifier)
+	prospectorStore := newSourceStore(pStore, srcIdentifier, previousSrcIdentifiers)
 
 	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
@@ -235,23 +250,24 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
-	globalStore := newSourceStore(pStore, globalIdentifier)
+	defaultIDStore := newSourceStore(pStore, globalIdentifier, nil)
 
-	err = prospector.Init(prospectorStore, globalStore, sourceIdentifier.ID)
+	err = prospector.Init(prospectorStore, defaultIDStore, srcIdentifier.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &managedInput{
-		manager:          cim,
-		ackCH:            cim.ackCH,
-		userID:           settings.ID,
-		metricsID:        metricsID,
-		prospector:       prospector,
-		harvester:        harvester,
-		sourceIdentifier: sourceIdentifier,
-		cleanTimeout:     settings.CleanInactive,
-		harvesterLimit:   settings.HarvesterLimit,
+		manager:                   cim,
+		ackCH:                     cim.ackCH,
+		userID:                    settings.ID,
+		metricsID:                 metricsID,
+		prospector:                prospector,
+		harvester:                 harvester,
+		sourceIdentifier:          srcIdentifier,
+		previousSourceIdentifiers: previousSrcIdentifiers,
+		cleanTimeout:              settings.CleanInactive,
+		harvesterLimit:            settings.HarvesterLimit,
 	}, nil
 }
 

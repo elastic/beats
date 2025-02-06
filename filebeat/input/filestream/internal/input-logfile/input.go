@@ -30,15 +30,16 @@ import (
 )
 
 type managedInput struct {
-	userID           string
-	metricsID        string
-	manager          *InputManager
-	ackCH            *updateChan
-	sourceIdentifier *sourceIdentifier
-	prospector       Prospector
-	harvester        Harvester
-	cleanTimeout     time.Duration
-	harvesterLimit   uint64
+	userID                    string
+	metricsID                 string
+	manager                   *InputManager
+	ackCH                     *updateChan
+	sourceIdentifier          *sourceIdentifier
+	previousSourceIdentifiers []*sourceIdentifier
+	prospector                Prospector
+	harvester                 Harvester
+	cleanTimeout              time.Duration
+	harvesterLimit            uint64
 }
 
 // Name is required to implement the v2.Input interface
@@ -85,7 +86,7 @@ func (inp *managedInput) Run(
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, nil)
 
 	// Mark it as running for now.
 	// Any errors encountered by harverter will change state to Degraded
