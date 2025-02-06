@@ -327,7 +327,7 @@ type testSupporter struct {
 }
 
 func (t testSupporter) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error) {
-	processors.Processors{}
+	return &processors.Processors{}, nil
 }
 
 func (t testSupporter) Processors() []string {

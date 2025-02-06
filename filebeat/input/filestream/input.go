@@ -399,32 +399,17 @@ func (inp *filestream) readFromSource(
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
-		// one of several calls to publish
 		ev := message.ToEvent()
 		if err := p.Publish(ev, s); err != nil {
-			// setEventPublishedStatus(metrics, ev)
 			metrics.ProcessingErrors.Inc()
 			return err
 		}
 
-		// setEventPublishedStatus(metrics, ev)
 		metrics.EventsProcessed.Inc()
 		metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
 	}
 	return nil
 }
-
-// func setEventPublishedStatus(m *loginp.Metrics, ev beat.Event) {
-// 	status := ev.PublishStatus()
-// 	switch status {
-// 	case "publishes":
-// 		m.EventsPublished.Inc()
-// 	case "dropped":
-// 		m.EventsDropped.Inc()
-// 	case "filtered":
-// 		m.EventsFiltered.Inc()
-// 	}
-// }
 
 // isDroppedLine decides if the line is exported or not based on
 // the include_lines and exclude_lines options.

@@ -27,9 +27,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	monitoring2 "github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/elastic-agent-libs/logp"
-
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -42,7 +40,6 @@ const (
 type handler struct {
 	beatInfo beat.Info
 
-	logger           *logp.Logger
 	registryDataset  *monitoring.Registry
 	registryInternal *monitoring.Registry
 }
@@ -50,7 +47,7 @@ type handler struct {
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
 // requests to /inputs.
 func AttachHandler(beatInfo beat.Info, r *mux.Router) error {
-	internalReg := monitoring2.BeatInternalInputsRegistry(beatInfo)
+	internalReg := libbeatmonitoring.BeatInternalInputsRegistry(beatInfo)
 
 	return attachHandler(beatInfo, r, globalRegistry(), internalReg)
 }
@@ -62,7 +59,6 @@ func attachHandler(beatInfo beat.Info, r *mux.Router, datasetReg, internalReg *m
 		beatInfo:         beatInfo,
 		registryDataset:  datasetReg,
 		registryInternal: internalReg,
-		logger:           logp.NewLogger("inputmon"),
 	}
 	return r.StrictSlash(true).Handle("/", validationHandler(http.MethodGet, []string{"pretty", "type"}, h.allInputs)).GetError()
 }
@@ -126,6 +122,7 @@ func mergeInternalMetrics(internal *monitoring.Registry, id string, m map[string
 		return
 	}
 
+	// TODO: decide how to handle possible collisions
 	intInput := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
 	for k, v := range intInput {
 		m[k] = v

@@ -18,10 +18,7 @@
 package pipeline
 
 import (
-	"strings"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -172,7 +169,7 @@ func (o *metricsObserver) filteredEvent(e beat.Event) {
 	o.vars.eventsFiltered.Inc()
 	o.vars.activeEvents.Dec()
 
-	input := o.ensureInputMetric(e, "eventsAnderson_filtered_total")
+	input := o.inputMetrics(e)
 	if input == nil {
 		return // irrecoverable error happened, nothing to do.
 	}
@@ -183,7 +180,7 @@ func (o *metricsObserver) filteredEvent(e beat.Event) {
 func (o *metricsObserver) publishedEvent(e beat.Event) {
 	o.vars.eventsPublished.Inc()
 
-	input := o.ensureInputMetric(e, "eventsAnderson_published_total")
+	input := o.inputMetrics(e)
 	if input == nil {
 		return // irrecoverable error happened, nothing to do.
 	}
@@ -200,20 +197,14 @@ func (o *metricsObserver) failedPublishEvent(e beat.Event) {
 	o.vars.eventsFailed.Inc()
 	o.vars.activeEvents.Dec()
 
-	input := o.ensureInputMetric(e, "eventsAnderson_dropped_total")
+	input := o.inputMetrics(e)
 	if input == nil {
 		return // irrecoverable error happened, nothing to do.
 	}
 	input.inputEventsDropped.Inc()
 }
 
-// TODO: remove metricName
-func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *inputVars {
-	// TODO:
-	// - find the right global registry to add the metrics to. dataset.inputID sanitized. See inputmon.NewInputRegistry()
-	// add the metrics there instead of under pipeline
-	// in the /inputs/ endpoint find the metrics and add to the reporting
-
+func (o *metricsObserver) inputMetrics(e beat.Event) *inputVars {
 	rawInputID, err := e.Meta.GetValue(beat.MetadataKeyInputID)
 	if err != nil {
 		return nil // no input_id, nothing we can do
@@ -222,17 +213,6 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *in
 	if !ok {
 		// again, nothing we can do about it
 		return nil
-	}
-
-	// for debug, remove it
-	datasetReg := monitoring.GetNamespace("dataset").GetRegistry()
-	sanatizedID := strings.ReplaceAll(inputID, ".", "_")
-	inputReg := datasetReg.GetRegistry(sanatizedID)
-	if inputReg != nil {
-		metricVar := inputReg.Get(metricName)
-		if metricUint, ok := metricVar.(*monitoring.Uint); ok {
-			metricUint.Add(1)
-		}
 	}
 
 	input, found := o.vars.inputs[inputID]
@@ -249,10 +229,7 @@ func (o *metricsObserver) ensureInputMetric(e beat.Event, metricName string) *in
 		}
 		o.vars.inputs[inputID] = input
 	}
-	reg := monitoring.GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-	if reg != nil {
-		_ = reg
-	}
+
 	return &input
 }
 
