@@ -25,7 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/teambition/rrule-go"
-
 )
 
 func TestMaintWin(t *testing.T) {
@@ -38,11 +37,11 @@ func TestMaintWin(t *testing.T) {
 		{
 			"Every sunday at midnight to 1 AM",
 			MaintWin{
-				Freq:     3,
-				Dtstart:  time.Now().Format(time.RFC3339),
-				Duration: mustParseDuration("2h"),
+				Freq:      3,
+				Dtstart:   time.Now().Format(time.RFC3339),
+				Duration:  mustParseDuration("2h"),
 				Byweekday: []string{"SU", "MO", "TU", "WE", "TH", "FR", "SA"},
-				Count:   10,
+				Count:     10,
 			},
 			// add 30 minutes, 1 hour, 1 hour 30 minutes to the start time
 			[]string{time.Now().Add(30 * time.Minute).Format(time.RFC3339), time.Now().Add(60 * time.Minute).Format(time.RFC3339), time.Now().Add(90 * time.Minute).Format(time.RFC3339)},

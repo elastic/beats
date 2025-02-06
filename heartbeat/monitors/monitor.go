@@ -50,14 +50,14 @@ const (
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
-	stdFields          stdfields.StdMonitorFields
-	parsedMaintWindow  maintwin.ParsedMaintWin
-	pluginName         string
-	config             *conf.C
-	addTask            scheduler.AddTask
-	configuredJobs     []*configuredJob
-	enabled            bool
-	state              int
+	stdFields         stdfields.StdMonitorFields
+	parsedMaintWindow maintwin.ParsedMaintWin
+	pluginName        string
+	config            *conf.C
+	addTask           scheduler.AddTask
+	configuredJobs    []*configuredJob
+	enabled           bool
+	state             int
 	// endpoints is a count of endpoints this monitor measures.
 	endpoints int
 	// internalsMtx is used to synchronize access to critical

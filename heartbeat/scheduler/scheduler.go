@@ -194,7 +194,7 @@ func (s *Scheduler) Add(sched Schedule, pmw maintwin.ParsedMaintWin, id string, 
 		if pmw.IsActive(now) {
 			inMaintWin = true
 		}
-		
+
 		var lastRanAt time.Time
 		if !inMaintWin {
 			lastRanAt = sj.run()
@@ -213,11 +213,12 @@ func (s *Scheduler) Add(sched Schedule, pmw maintwin.ParsedMaintWin, id string, 
 		debugf("Job '%v' returned at %v", id, time.Now())
 	}
 
-	if s.runOnce && pmw.IsActive(time.Now()){
+	if s.runOnce && pmw.IsActive(time.Now()) {
 		return func() {
 			debugf("Remove scheduler job '%v'", id)
 			jobCtxCancel()
-		}, nil	}
+		}, nil
+	}
 
 	if s.runOnce {
 		s.runOnceWg.Add(1)
