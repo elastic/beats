@@ -660,6 +660,12 @@ filebeat.inputs:
   # Change to true to enable this input configuration.
   enabled: false
 
+  # Previous IDs from this input. This allows migrating the state from files
+  # ingested when running this input with a different ID.
+  # Only the state of files currently being harvested by the input will be migrated.
+  #previous_ids:
+    #- "old-id"
+
   # Paths that should be crawled and fetched. Glob based paths.
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.

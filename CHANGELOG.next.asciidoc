@@ -413,6 +413,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
+- Filestram input now supports migrating state when changing its ID, for that set `previous_ids`. {issue}42472[42472] {pull}42624[42624]
 
 *Auditbeat*
 

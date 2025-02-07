@@ -41,6 +41,32 @@ WARNING: Duplicated IDs will lead to data duplication and some input
 instances will not produce any metrics.
 
 [float]
+[id="{beatname_lc}-input-{type}-previous_ids"]
+===== `previous_ids`
+
+This allows {beatname_uc} to migrate the state of the files harvested
+under a different ID before the input starts. Only the state of files
+currently being harvested by the input are migrated.
+
+The file state from the old ID will be removed from the registry after
+the migration.
+
+WARNING: Ensure there are no duplicated Filestream input IDs before
+using `previous_ids` and that different input instances do not share
+any `previous_ids`.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  id: "current-id"
+  paths:
+    - /var/log/*.log
+  previous_ids:
+    - "old-id"
+----
+
+[float]
 [[filestream-input-paths]]
 ===== `paths`
 
