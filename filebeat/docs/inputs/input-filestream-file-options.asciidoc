@@ -45,10 +45,10 @@ instances will not produce any metrics.
 ===== `previous_ids`
 
 This allows {beatname_uc} to migrate the state of the files harvested
-under a different ID before the input starts. Only the state of files
-currently being harvested by the input are migrated.
+under a different ID before the input starts. Only the state of
+existing files currently being harvested by the input are migrated.
 
-The file state from the old ID will be removed from the registry after
+The file state with the old ID will be removed from the registry after
 the migration.
 
 WARNING: Ensure there are no duplicated Filestream input IDs before
