@@ -97,7 +97,13 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		beatEvent["@metadata"] = meta
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 		pcommonEvent := mapstrToPcommonMap(beatEvent)
+		// if data_stream field is set on beats.Event. Add it to logrecord.Attributes to support dynamic indexing
+		if data, ok := pcommonEvent.Get("data_stream"); ok {
+			value := logRecord.Attributes().PutEmpty("data_stream")
+			data.CopyTo(value)
+		}
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
+
 	}
 
 	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
