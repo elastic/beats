@@ -82,14 +82,16 @@ func ConfigToStdMonitorFields(conf *config.C) (StdMonitorFields, error) {
 		sFields.IsLegacyBrowserSource = true
 	}
 	rules := []*rrule.RRule{}
+	durations := []time.Duration{}
 	for _, mw := range sFields.MaintenanceWindows {
 		parsed, err := mw.Parse()
 		if err != nil {
 			return StdMonitorFields{}, fmt.Errorf("could not parse maintenance window for monitor (id:%s name:%s): %w", sFields.ID, sFields.Name, err)
 		}
 		rules = append(rules, parsed)
+		durations = append(durations, mw.Duration)
 	}
-	sFields.ParsedMaintenanceWindow = maintwin.ParsedMaintWin{Rules: rules}
+	sFields.ParsedMaintenanceWindow = maintwin.ParsedMaintWin{Rules: rules, Durations: durations}
 
 	return sFields, nil
 }

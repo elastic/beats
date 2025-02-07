@@ -28,22 +28,22 @@ var weekdayLookup = map[string]rrule.Weekday{
 }
 
 type MaintWin struct {
-	Freq       int           `config:"freq" validate:"required"`
-	Dtstart    string        `config:"dtstart" validate:"required"`
-	Interval   int           `config:"interval" validate:"required"`
-	Duration   time.Duration `config:"duration" validate:"required"`
-	Wkst       rrule.Weekday `config:"wkst"`
-	Count      int           `config:"count"`
-	Bysetpos   []int         `config:"bysetpos"`
-	Bymonth    []int         `config:"bymonth"`
-	Bymonthday []int         `config:"bymonthday"`
-	Byyearday  []int         `config:"byyearday"`
-	Byweekno   []int         `config:"byweekno"`
-	Byweekday  []string      `config:"byweekday"`
-	Byhour     []int         `config:"byhour"`
-	Byminute   []int         `config:"byminute"`
-	Bysecond   []int         `config:"bysecond"`
-	Byeaster   []int         `config:"byeaster"`
+	Freq       rrule.Frequency `config:"freq" validate:"required"`
+	Dtstart    string          `config:"dtstart" validate:"required"`
+	Interval   int             `config:"interval" validate:"required"`
+	Duration   time.Duration   `config:"duration" validate:"required"`
+	Wkst       rrule.Weekday   `config:"wkst"`
+	Count      int             `config:"count"`
+	Bysetpos   []int           `config:"bysetpos"`
+	Bymonth    []int           `config:"bymonth"`
+	Bymonthday []int           `config:"bymonthday"`
+	Byyearday  []int           `config:"byyearday"`
+	Byweekno   []int           `config:"byweekno"`
+	Byweekday  []string        `config:"byweekday"`
+	Byhour     []int           `config:"byhour"`
+	Byminute   []int           `config:"byminute"`
+	Bysecond   []int           `config:"bysecond"`
+	Byeaster   []int           `config:"byeaster"`
 }
 
 func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
@@ -56,12 +56,18 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 		weekdays = append(weekdays, weekdayLookup[wd])
 	}
 
+	dtstart = dtstart.UTC()
+
+	count := mw.Count
+	if count == 0 {
+		count = 1000
+	}
+
 	r, _ = rrule.NewRRule(rrule.ROption{
 		Freq:       rrule.Frequency(mw.Freq),
-		Count:      mw.Count,
+		Count:      count,
 		Dtstart:    dtstart,
 		Interval:   mw.Interval,
-		Until:      dtstart.Add(mw.Duration),
 		Byweekday:  weekdays,
 		Byhour:     mw.Byhour,
 		Byminute:   mw.Byminute,
@@ -79,17 +85,29 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 }
 
 type ParsedMaintWin struct {
-	Rules []*rrule.RRule
+	Rules     []*rrule.RRule
+	Durations []time.Duration // Store durations in parallel
 }
 
 func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
 	matched := false
-	for _, r := range pmw.Rules {
-		nextOccurance := r.After(tOrig, true)
+	for i, r := range pmw.Rules {
+		all := r.All()
 
-		if tOrig.Equal(nextOccurance) || tOrig.After(nextOccurance) && tOrig.Before(r.GetUntil()) {
-			matched = true
-			break
+		for _, occ := range all {
+
+			duration := pmw.Durations[i]
+			endTime := occ.Add(duration)
+
+			if tOrig.Equal(occ) {
+				matched = true
+				break
+			}
+
+			if tOrig.After(occ) && tOrig.Before(endTime) {
+				matched = true
+				break
+			}
 		}
 
 	}
