@@ -399,8 +399,7 @@ func (inp *filestream) readFromSource(
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 
-		ev := message.ToEvent()
-		if err := p.Publish(ev, s); err != nil {
+		if err := p.Publish(message.ToEvent(), s); err != nil {
 			metrics.ProcessingErrors.Inc()
 			return err
 		}
