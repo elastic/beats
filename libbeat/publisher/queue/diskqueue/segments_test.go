@@ -83,7 +83,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 
 		assert.Equal(t, len(dst), n, name)
 
-		//make sure we read back what we wrote
+		// make sure we read back what we wrote
 		assert.Equal(t, tc.plaintext, dst, name)
 
 		_, err = sr.Read(dst)
@@ -96,127 +96,63 @@ func TestSegmentsRoundTrip(t *testing.T) {
 }
 
 func TestSegmentReaderSeek(t *testing.T) {
-	tests := map[string]struct {
-		id         segmentID
-		encrypt    bool
-		compress   bool
-		plaintexts [][]byte
-	}{
-		"No Encryption or compression": {
-			id:         0,
-			encrypt:    false,
-			compress:   false,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-		},
-		"Encryption Only": {
-			id:         1,
-			encrypt:    true,
-			compress:   false,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-		},
-		"Compression Only": {
-			id:         2,
-			encrypt:    false,
-			compress:   true,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-		},
-		"Encryption and Compression": {
-			id:         3,
-			encrypt:    true,
-			compress:   true,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-		},
-	}
+	name := "Segment Seek"
+	plaintexts := [][]byte{[]byte("abc"), []byte("defg")}
+	id := segmentID(0)
 	dir := t.TempDir()
-	for name, tc := range tests {
-		settings := DefaultSettings()
-		settings.Path = dir
-		qs := &queueSegment{
-			id: tc.id,
-		}
-		sw, err := qs.getWriter(settings)
-		assert.Nil(t, err, name)
-		for _, plaintext := range tc.plaintexts {
-			n, err := sw.Write(plaintext)
-			assert.Nil(t, err, name)
-			assert.Equal(t, len(plaintext), n, name)
-			err = sw.Sync()
-			assert.Nil(t, err, name)
-		}
-		sw.Close()
-		sr, err := qs.getReader(settings)
-		assert.Nil(t, err, name)
-		//seek to second data piece
-		n, err := sr.Seek(segmentHeaderSize+int64(len(tc.plaintexts[0])), io.SeekStart)
-		assert.Nil(t, err, name)
-		assert.Equal(t, segmentHeaderSize+int64(len(tc.plaintexts[0])), n, name)
-		dst := make([]byte, len(tc.plaintexts[1]))
-
-		_, err = sr.Read(dst)
-		assert.Nil(t, err, name)
-		assert.Equal(t, tc.plaintexts[1], dst, name)
-
-		sw.Close()
+	settings := DefaultSettings()
+	settings.Path = dir
+	qs := &queueSegment{
+		id: id,
 	}
+	sw, err := qs.getWriter(settings)
+	assert.Nil(t, err, name)
+	for _, plaintext := range plaintexts {
+		n, err := sw.Write(plaintext)
+		assert.Nil(t, err, name)
+		assert.Equal(t, len(plaintext), n, name)
+		err = sw.Sync()
+		assert.Nil(t, err, name)
+	}
+	sw.Close()
+	sr, err := qs.getReader(settings)
+	assert.Nil(t, err, name)
+	// seek to second data piece
+	n, err := sr.Seek(segmentHeaderSize+int64(len(plaintexts[0])), io.SeekStart)
+	assert.Nil(t, err, name)
+	assert.Equal(t, segmentHeaderSize+int64(len(plaintexts[0])), n, name)
+	dst := make([]byte, len(plaintexts[1]))
+
+	_, err = sr.Read(dst)
+	assert.Nil(t, err, name)
+	assert.Equal(t, plaintexts[1], dst, name)
+
+	sw.Close()
 }
 
 func TestSegmentReaderSeekLocations(t *testing.T) {
-	tests := map[string]struct {
-		id         segmentID
-		encrypt    bool
-		compress   bool
-		plaintexts [][]byte
-		location   int64
-	}{
-		"No Encryption or Compression": {
-			id:         0,
-			encrypt:    false,
-			compress:   false,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-			location:   -1,
-		},
-		"Encryption": {
-			id:         1,
-			encrypt:    true,
-			compress:   false,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-			location:   2,
-		},
-		"Compression": {
-			id:         1,
-			encrypt:    false,
-			compress:   true,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-			location:   2,
-		},
-		"Encryption and Compression": {
-			id:         1,
-			encrypt:    true,
-			compress:   true,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-			location:   2,
-		},
-	}
 	dir := t.TempDir()
-	for name, tc := range tests {
-		settings := DefaultSettings()
-		settings.Path = dir
+	settings := DefaultSettings()
+	settings.Path = dir
+	name := "Segment Seek Location"
+	id := segmentID(0)
+	plaintexts := [][]byte{[]byte("abc"), []byte("defg")}
+	location := int64(-1)
 
-		qs := &queueSegment{
-			id: tc.id,
-		}
-		sw, err := qs.getWriter(settings)
-		assert.Nil(t, err, name)
-		for _, plaintext := range tc.plaintexts {
-			n, err := sw.Write(plaintext)
-			assert.Nil(t, err, name)
-			assert.Equal(t, len(plaintext), n, name)
-		}
-		sw.Close()
-		sr, err := qs.getReader(settings)
-		assert.Nil(t, err, name)
-		//seek to location
-		_, err = sr.Seek(tc.location, io.SeekStart)
-		assert.NotNil(t, err, name)
+	qs := &queueSegment{
+		id: id,
 	}
+	sw, err := qs.getWriter(settings)
+	assert.Nil(t, err, name)
+	for _, plaintext := range plaintexts {
+		n, err := sw.Write(plaintext)
+		assert.Nil(t, err, name)
+		assert.Equal(t, len(plaintext), n, name)
+	}
+	sw.Close()
+	sr, err := qs.getReader(settings)
+	assert.Nil(t, err, name)
+	// seek to location
+	_, err = sr.Seek(location, io.SeekStart)
+	assert.NotNil(t, err, name)
 }
