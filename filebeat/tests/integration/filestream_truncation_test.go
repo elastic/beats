@@ -177,6 +177,8 @@ type registryEntry struct {
 	Offset   int
 	Filename string
 	TTL      time.Duration
+	Op       string
+	Removed  bool
 }
 
 func readFilestreamRegistryLog(t *testing.T, path string) []registryEntry {
@@ -188,6 +190,7 @@ func readFilestreamRegistryLog(t *testing.T, path string) []registryEntry {
 	entries := []registryEntry{}
 	s := bufio.NewScanner(file)
 
+	var lastOperation string
 	for s.Scan() {
 		line := s.Bytes()
 
@@ -199,6 +202,7 @@ func readFilestreamRegistryLog(t *testing.T, path string) []registryEntry {
 		// Skips registry log entries containing the operation ID like:
 		// '{"op":"set","id":46}'
 		if e.Key == "" {
+			lastOperation = e.Op
 			continue
 		}
 
@@ -207,6 +211,8 @@ func readFilestreamRegistryLog(t *testing.T, path string) []registryEntry {
 			Offset:   e.Value.Cursor.Offset,
 			TTL:      e.Value.TTL,
 			Filename: e.Value.Meta.Source,
+			Removed:  lastOperation == "remove",
+			Op:       lastOperation,
 		})
 	}
 
@@ -224,4 +230,9 @@ type entry struct {
 		} `json:"meta"`
 		TTL time.Duration `json:"ttl"`
 	} `json:"v"`
+
+	// Keys to read the "operation"
+	// e.g: {"op":"set","id":46}
+	Op string `json:"op"`
+	ID int    `json:"id"`
 }
