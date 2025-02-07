@@ -89,7 +89,8 @@ func MetricSnapshotJSON(beatInfo beat.Info) ([]byte, error) {
 	return json.MarshalIndent(
 		filteredSnapshot(
 			globalRegistry(),
-			libbeatmonitoring.BeatInternalInputsRegistry(beatInfo),
+			beatInfo.Monitoring.Namespace.GetRegistry().
+				GetRegistry(libbeatmonitoring.RegistryNameInternalInputs),
 			""),
 		"",
 		"  ")
