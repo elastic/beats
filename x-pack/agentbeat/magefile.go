@@ -74,6 +74,10 @@ func BuildSystemTestBinary() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	if err := xpacketbeat.CopyNPCAPInstaller("../packetbeat/npcap/installer/"); err != nil {
+		return err
+	}
+
 	// need packetbeat build arguments as it address the requirements for libpcap
 	args := packetbeat.GolangCrossBuildArgs()
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
