@@ -220,3 +220,13 @@ func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
+
+func SystemTest(ctx context.Context) error {
+	mg.SerialDeps(xpacketbeat.GetNpcapInstaller, devtools.BuildSystemTestBinary)
+
+	args := devtools.DefaultGoTestIntegrationArgs()
+	args.Packages = []string{"../packetbeat/tests/system/..."}
+	args.Tags = append(args.Tags, "agentbeat")
+
+	return devtools.GoTest(ctx, args)
+}
