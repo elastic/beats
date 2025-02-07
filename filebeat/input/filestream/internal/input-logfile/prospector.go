@@ -58,8 +58,11 @@ type StoreUpdater interface {
 	// The function passed to UpdateIdentifiers must return an empty string if the key
 	// remains the same.
 	UpdateIdentifiers(func(v Value) (string, interface{}))
-	// CopyStatesFromPreviousIDs TODO
-	CopyStatesFromPreviousIDs(getNewID func(v Value) (string, interface{}))
+	// CopyStatesFromPreviousIDs copies the state from a previous input ID to the
+	// current input ID.
+	// The function passed to CopyStatesFromPreviousIDs must return an empty
+	// string if the entry should not be copied.
+	CopyStatesFromPreviousIDs(func(v Value) (string, interface{}))
 }
 
 // Value contains the cursor metadata.

@@ -30,16 +30,15 @@ import (
 )
 
 type managedInput struct {
-	userID                    string
-	metricsID                 string
-	manager                   *InputManager
-	ackCH                     *updateChan
-	sourceIdentifier          *sourceIdentifier
-	previousSourceIdentifiers []*sourceIdentifier
-	prospector                Prospector
-	harvester                 Harvester
-	cleanTimeout              time.Duration
-	harvesterLimit            uint64
+	userID           string
+	metricsID        string
+	manager          *InputManager
+	ackCH            *updateChan
+	sourceIdentifier *sourceIdentifier
+	prospector       Prospector
+	harvester        Harvester
+	cleanTimeout     time.Duration
+	harvesterLimit   uint64
 }
 
 // Name is required to implement the v2.Input interface

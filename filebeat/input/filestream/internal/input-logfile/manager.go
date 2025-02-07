@@ -258,16 +258,15 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	}
 
 	return &managedInput{
-		manager:                   cim,
-		ackCH:                     cim.ackCH,
-		userID:                    settings.ID,
-		metricsID:                 metricsID,
-		prospector:                prospector,
-		harvester:                 harvester,
-		sourceIdentifier:          srcIdentifier,
-		previousSourceIdentifiers: previousSrcIdentifiers,
-		cleanTimeout:              settings.CleanInactive,
-		harvesterLimit:            settings.HarvesterLimit,
+		manager:          cim,
+		ackCH:            cim.ackCH,
+		userID:           settings.ID,
+		metricsID:        metricsID,
+		prospector:       prospector,
+		harvester:        harvester,
+		sourceIdentifier: srcIdentifier,
+		cleanTimeout:     settings.CleanInactive,
+		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
 }
 
