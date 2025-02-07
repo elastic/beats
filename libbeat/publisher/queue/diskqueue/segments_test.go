@@ -61,10 +61,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 		dst := make([]byte, len(tc.plaintext))
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
-		settings.UseCompression = tc.compress
+
 		qs := &queueSegment{
 			id: tc.id,
 		}
@@ -134,11 +131,6 @@ func TestSegmentReaderSeek(t *testing.T) {
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
-		settings.UseCompression = tc.compress
-
 		qs := &queueSegment{
 			id: tc.id,
 		}
@@ -209,10 +201,7 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
-		settings.UseCompression = tc.compress
+
 		qs := &queueSegment{
 			id: tc.id,
 		}

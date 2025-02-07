@@ -70,7 +70,7 @@ func setup() (*diskQueue, queue.Producer) {
 	}
 	s := DefaultSettings()
 	s.Path = dir
-	q, err := NewQueue(logp.NewLogger("benchmark"), s)
+	q, err := NewQueue(logp.NewLogger("benchmark"), nil, s, nil)
 	if err != nil {
 		panic(err)
 	}
