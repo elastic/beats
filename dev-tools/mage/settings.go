@@ -44,8 +44,6 @@ const (
 	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
 	// BeatsCrossBuildImage is the image used for crossbuilding Beats.
 	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
-	//FIPSBuildImage is the image used for building FIPS compliant artifacts
-	FIPSBuildImage = "mcr.microsoft.com/oss/go/microsoft/golang"
 
 	elasticBeatsImportPath = "github.com/elastic/beats"
 
