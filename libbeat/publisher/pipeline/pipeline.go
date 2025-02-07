@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
@@ -132,9 +132,15 @@ func New(
 	}
 
 	if monitors.Metrics != nil {
+		beatsIntReg := beat.Monitoring.Namespace.GetRegistry().
+			GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+		if beatsIntReg == nil {
+			beatsIntReg = beat.Monitoring.Namespace.GetRegistry().
+				NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+		}
 		p.observer = newMetricsObserver(
 			monitors.Metrics,
-			monitoring.BeatInternalInputsRegistry(beat))
+			beatsIntReg)
 	}
 
 	// Convert the raw queue config to a parsed Settings object that will
