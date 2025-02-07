@@ -73,7 +73,7 @@ func TestHandler(t *testing.T) {
 
 	beatInfo := beat.Info{}
 	beatInfo.Monitoring.Namespace = namespace
-	if err := attachHandler(beatInfo, r, parent, monitoring.NewRegistry()); err != nil {
+	if err := attachHandler(r, parent, monitoring.NewRegistry()); err != nil {
 		t.Fatal(err)
 	}
 

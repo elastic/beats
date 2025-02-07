@@ -38,8 +38,6 @@ const (
 )
 
 type handler struct {
-	beatInfo beat.Info
-
 	registryDataset  *monitoring.Registry
 	registryInternal *monitoring.Registry
 }
@@ -50,14 +48,13 @@ func AttachHandler(beatInfo beat.Info, r *mux.Router) error {
 	internalReg := beatInfo.Monitoring.Namespace.GetRegistry().
 		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
 
-	return attachHandler(beatInfo, r, globalRegistry(), internalReg)
+	return attachHandler(r, globalRegistry(), internalReg)
 }
 
-func attachHandler(beatInfo beat.Info, r *mux.Router, datasetReg, internalReg *monitoring.Registry) error {
+func attachHandler(r *mux.Router, datasetReg, internalReg *monitoring.Registry) error {
 	r = r.PathPrefix(route).Subrouter()
 
 	h := &handler{
-		beatInfo:         beatInfo,
 		registryDataset:  datasetReg,
 		registryInternal: internalReg,
 	}

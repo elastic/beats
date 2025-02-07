@@ -86,11 +86,16 @@ func globalRegistry() *monitoring.Registry {
 // global 'dataset' and beat 'internal' monitoring namespace merged and encoded as a
 // JSON array (pretty formatted).
 func MetricSnapshotJSON(beatInfo beat.Info) ([]byte, error) {
+	intReg := beatInfo.Monitoring.Namespace.GetRegistry().
+		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	if intReg == nil {
+		intReg = beatInfo.Monitoring.Namespace.GetRegistry().
+			NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	}
 	return json.MarshalIndent(
 		filteredSnapshot(
 			globalRegistry(),
-			beatInfo.Monitoring.Namespace.GetRegistry().
-				GetRegistry(libbeatmonitoring.RegistryNameInternalInputs),
+			intReg,
 			""),
 		"",
 		"  ")
