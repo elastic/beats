@@ -776,8 +776,7 @@ func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (strin
 	}
 }
 
-func (m *mockStoreUpdater) CopyStatesFromPreviousIDs(getNewID func(v loginp.Value) (string, interface{})) error {
-	return nil
+func (m *mockStoreUpdater) CopyStatesFromPreviousIDs(getNewID func(v loginp.Value) (string, interface{})) {
 }
 
 type renamedPathIdentifier struct {

@@ -59,7 +59,7 @@ type StoreUpdater interface {
 	// remains the same.
 	UpdateIdentifiers(func(v Value) (string, interface{}))
 	// CopyStatesFromPreviousIDs TODO
-	CopyStatesFromPreviousIDs(getNewID func(v Value) (string, interface{})) error
+	CopyStatesFromPreviousIDs(getNewID func(v Value) (string, interface{}))
 }
 
 // Value contains the cursor metadata.

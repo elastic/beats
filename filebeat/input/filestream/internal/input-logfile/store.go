@@ -283,7 +283,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 	s.updateIdentifiers(s.identifier.MatchesInput, getNewID)
 }
 
-func (s *sourceStore) CopyStatesFromPreviousIDs(getNewID func(v Value) (string, interface{})) error {
+func (s *sourceStore) CopyStatesFromPreviousIDs(getNewID func(v Value) (string, interface{})) {
 	matchPreviousIdentifier := func(key string) bool {
 		for _, identifier := range s.previousIdentifiers {
 			if identifier.MatchesInput(key) {
@@ -295,8 +295,6 @@ func (s *sourceStore) CopyStatesFromPreviousIDs(getNewID func(v Value) (string, 
 	}
 
 	s.updateIdentifiers(matchPreviousIdentifier, getNewID)
-
-	return nil
 }
 
 func (s *store) Retain() { s.refCount.Retain() }
