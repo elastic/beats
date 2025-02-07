@@ -132,6 +132,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
 - In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
 
 *Heartbeat*
 
