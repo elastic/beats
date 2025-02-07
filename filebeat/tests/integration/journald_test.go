@@ -167,7 +167,7 @@ func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
 	// Wait for journalctl to start
 	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
 
-	// Wait for last even in the debug logs
+	// Wait for last event in the debug logs
 	filebeat.WaitForLogs("Count: 005", time.Second, "expected log message not found in published events SECOND")
 
 	eventsPublished := filebeat.CountFileLines(filepath.Join(filebeat.TempDir(), "output-*.ndjson"))
