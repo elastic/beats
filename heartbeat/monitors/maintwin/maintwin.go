@@ -91,6 +91,7 @@ type ParsedMaintWin struct {
 
 func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
 	matched := false
+	tOrig = tOrig.UTC()
 	for i, r := range pmw.Rules {
 		all := r.All()
 
