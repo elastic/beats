@@ -52,12 +52,13 @@ type eventDecoder struct {
 	jsonParser          *json.Parser
 	cborlParser         *cborl.Parser
 	unfolder            *gotype.Unfolder
+	useJSON             bool
 	serializationFormat SerializationFormat
 }
 
 type entry struct {
 	Timestamp int64
-	Flags     uint32
+	Flags     uint8
 	Meta      mapstr.M
 	Fields    mapstr.M
 }
@@ -104,7 +105,7 @@ func (e *eventEncoder) encode_publisher_event(event publisher.Event) ([]byte, er
 
 	err := e.folder.Fold(entry{
 		Timestamp: event.Content.Timestamp.UTC().UnixNano(),
-		Flags:     uint32(event.Flags),
+		Flags:     uint8(event.Flags),
 		Meta:      event.Content.Meta,
 		Fields:    event.Content.Fields,
 	})
