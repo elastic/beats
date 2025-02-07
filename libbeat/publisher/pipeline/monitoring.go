@@ -205,7 +205,7 @@ func (o *metricsObserver) failedPublishEvent(e beat.Event) {
 }
 
 func (o *metricsObserver) inputMetrics(e beat.Event) *inputVars {
-	rawInputID, err := e.Meta.GetValue(beat.MetadataKeyInputID)
+	rawInputID, err := e.Meta.GetValue(beat.MetadataKeyStreamID)
 	if err != nil {
 		return nil // no input_id, nothing we can do
 	}

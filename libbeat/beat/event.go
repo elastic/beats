@@ -42,7 +42,7 @@ const (
 	MetadataFieldKey  = "@metadata"
 	ErrorFieldKey     = "error"
 
-	MetadataKeyInputID = "input_id"
+	MetadataKeyStreamID = "stream_id"
 
 	metadataKeyPrefix = MetadataFieldKey + "."
 	metadataKeyOffset = len(metadataKeyPrefix)
