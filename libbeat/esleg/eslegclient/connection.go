@@ -28,6 +28,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/klauspost/compress/gzip"
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -55,7 +56,8 @@ type Connection struct {
 	ConnectionSettings
 
 	Encoder BodyEncoder
-	HTTP    esHTTPClient
+
+	HTTP esHTTPClient
 
 	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
 	version          libversion.V
@@ -498,6 +500,10 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 		req.Host = host
 	}
 
+	if conn.CompressionLevel != 0 {
+		req.Header.Add("Accept-Encoding", "gzip")
+	}
+
 	resp, err := conn.HTTP.Do(req)
 	if err != nil {
 		return 0, nil, err
@@ -505,8 +511,19 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body, conn.log)
 
 	status := resp.StatusCode
+
+	// Check that the server actually sent compressed data
+	var reader io.ReadCloser
+	switch resp.Header.Get("Content-Encoding") {
+	case "gzip":
+		reader, err = gzip.NewReader(resp.Body)
+		defer reader.Close()
+	default:
+		reader = resp.Body
+	}
+
 	conn.responseBuffer.Reset()
-	_, err = io.Copy(conn.responseBuffer, resp.Body)
+	_, err = io.Copy(conn.responseBuffer, reader)
 	if err != nil {
 		return status, nil, err
 	}
