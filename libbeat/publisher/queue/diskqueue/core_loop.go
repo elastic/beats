@@ -285,8 +285,12 @@ func (dq *diskQueue) handleShutdown() {
 	dq.acks.lock.Lock()
 	finalPosition := dq.acks.nextPosition
 	// We won't be updating the position anymore, so we can close the file.
-	dq.acks.positionFile.Sync() //nolint:errcheck
-	dq.acks.positionFile.Close()
+	if err := dq.acks.positionFile.Sync(); err != nil {
+		dq.logger.Errorf("error when calling Sync() on positionFile: %w", err)
+	}
+	if err := dq.acks.positionFile.Close(); err != nil {
+		dq.logger.Errorf("error when closing positionFile: %w", err)
+	}
 	dq.acks.lock.Unlock()
 
 	// First check for the rare and fortunate case that every single event we
