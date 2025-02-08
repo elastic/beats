@@ -143,8 +143,7 @@ func (dq *diskQueue) handleWriterLoopResponse(response writerLoopResponse) {
 		// Remove the prefix of the writing array and append to to reading.
 		closedSegments := dq.segments.writing[:closedCount]
 		dq.segments.writing = dq.segments.writing[closedCount:]
-		dq.segments.reading =
-			append(dq.segments.reading, closedSegments...)
+		dq.segments.reading = append(dq.segments.reading, closedSegments...)
 	}
 }
 
@@ -221,8 +220,7 @@ func (dq *diskQueue) handleSegmentACK(ackedSegmentID segmentID) {
 	if ackedSegmentCount > 0 {
 		// Move fully acked segments to the acked list and remove them
 		// from the acking list.
-		dq.segments.acked =
-			append(dq.segments.acked, acking[:ackedSegmentCount]...)
+		dq.segments.acked = append(dq.segments.acked, acking[:ackedSegmentCount]...)
 		dq.segments.acking = acking[ackedSegmentCount:]
 	}
 }
@@ -287,7 +285,7 @@ func (dq *diskQueue) handleShutdown() {
 	dq.acks.lock.Lock()
 	finalPosition := dq.acks.nextPosition
 	// We won't be updating the position anymore, so we can close the file.
-	dq.acks.positionFile.Sync()
+	dq.acks.positionFile.Sync() //nolint:errcheck
 	dq.acks.positionFile.Close()
 	dq.acks.lock.Unlock()
 
@@ -403,7 +401,8 @@ func (dq *diskQueue) maybeReadPending() {
 func (dq *diskQueue) maybeDeleteACKed() {
 	if !dq.deleting && len(dq.segments.acked) > 0 {
 		dq.deleterLoop.requestChan <- deleterLoopRequest{
-			segments: dq.segments.acked}
+			segments: dq.segments.acked,
+		}
 		dq.deleting = true
 	}
 }

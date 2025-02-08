@@ -126,7 +126,7 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 		return readerLoopResponse{err: err}
 	}
 
-	targetLength := uint64(request.endPosition - request.startPosition)
+	targetLength := request.endPosition - request.startPosition
 	for {
 		remainingLength := targetLength - byteCount
 

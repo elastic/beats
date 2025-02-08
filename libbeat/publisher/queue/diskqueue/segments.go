@@ -19,6 +19,7 @@ package diskqueue
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -32,7 +33,6 @@ import (
 
 // diskQueueSegments encapsulates segment-related queue metadata.
 type diskQueueSegments struct {
-
 	// A list of the segments that have not yet been completely written, sorted
 	// by increasing segment ID. When the first entry has been completely
 	// written, it is removed from this list and appended to reading.
@@ -311,7 +311,7 @@ func readSegmentHeaderWithFrameCount(path string) (*segmentHeader, error) {
 		err = binary.Read(reader, binary.LittleEndian, &frameLength)
 		if err != nil {
 			// EOF at a frame boundary means we successfully scanned all frames.
-			if err == io.EOF && header.frameCount > 0 {
+			if errors.Is(err, io.EOF) && header.frameCount > 0 {
 				return header, nil
 			}
 			// All other errors mean we are done scanning, exit the loop.
