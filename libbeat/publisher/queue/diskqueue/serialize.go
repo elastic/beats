@@ -52,7 +52,6 @@ type eventDecoder struct {
 	jsonParser          *json.Parser
 	cborlParser         *cborl.Parser
 	unfolder            *gotype.Unfolder
-	useJSON             bool
 	serializationFormat SerializationFormat
 }
 
@@ -158,7 +157,6 @@ func (d *eventDecoder) Decode() (interface{}, error) {
 }
 
 func (d *eventDecoder) decodeJSONAndCBOR() (publisher.Event, error) {
-
 	var to entry
 
 	err := d.unfolder.SetTarget(&to)
