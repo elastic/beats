@@ -19,7 +19,7 @@
 package diskqueue
 
 import (
-	"math/rand"
+	rand "math/rand/v2"
 	"os"
 	"testing"
 	"time"
@@ -35,7 +35,7 @@ var (
 	// constant event time
 	eventTime = time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 
-	//sample event messages, so size of every frame isn't identical
+	// sample event messages, so size of every frame isn't identical
 	msgs = []string{
 		"192.168.33.1 - - [26/Dec/2016:16:22:00 +0000] \"GET / HTTP/1.1\" 200 484 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
 		"{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EXAMPLE_ID\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\",\"sessionContext\":{\"sessionIssuer\":{},\"webIdFederationData\":{},\"attributes\":{\"mfaAuthenticated\":\"true\",\"creationDate\":\"2020-01-08T15:12:16Z\"}},\"invokedBy\":\"signin.amazonaws.com\"},\"eventTime\":\"2020-01-08T20:58:45Z\",\"eventSource\":\"cloudtrail.amazonaws.com\",\"eventName\":\"UpdateTrail\",\"awsRegion\":\"us-west-2\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"signin.amazonaws.com\",\"requestParameters\":{\"name\":\"arn:aws:cloudtrail:us-west-2:0123456789012:trail/TEST-trail\",\"s3BucketName\":\"test-cloudtrail-bucket\",\"snsTopicName\":\"\",\"isMultiRegionTrail\":true,\"enableLogFileValidation\":false,\"kmsKeyId\":\"\"},\"responseElements\":{\"name\":\"TEST-trail\",\"s3BucketName\":\"test-cloudtrail-bucket\",\"snsTopicName\":\"\",\"snsTopicARN\":\"\",\"includeGlobalServiceEvents\":true,\"isMultiRegionTrail\":true,\"trailARN\":\"arn:aws:cloudtrail:us-west-2:0123456789012:trail/TEST-trail\",\"logFileValidationEnabled\":false,\"isOrganizationTrail\":false},\"requestID\":\"EXAMPLE-f3da-42d1-84f5-EXAMPLE\",\"eventID\":\"EXAMPLE-b5e9-4846-8407-EXAMPLE\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
@@ -46,18 +46,6 @@ var (
 		"2018-08-28 18:24:25 [10.100.220.70](http://10.100.220.70) GET / - 80 - [10.100.118.31](http://10.100.118.31) Mozilla/4.0+(compatible;+MSIE+7.0;+Windows+NT+6.3;+WOW64;+Trident/7.0;+.NET4.0E;+.NET4.0C;+.NET+CLR+3.5.30729;+.NET+CLR[+2.0.50727](tel:+2050727);+.NET+CLR+3.0.30729) 404 4 2 792",
 	}
 )
-
-// makePublisherEvent creates a sample publisher.Event, using a random message from msgs list
-func makePublisherEvent(r *rand.Rand) publisher.Event {
-	return publisher.Event{
-		Content: beat.Event{
-			Timestamp: eventTime,
-			Fields: mapstr.M{
-				"message": msgs[r.Intn(len(msgs))],
-			},
-		},
-	}
-}
 
 // setup creates the disk queue, including a temporary directory to
 // hold the queue.  Location of the temporary directory is stored in
@@ -92,7 +80,7 @@ func makeEvent() publisher.Event {
 		Content: beat.Event{
 			Timestamp: eventTime,
 			Fields: mapstr.M{
-				"message": msgs[rand.Intn(len(msgs))],
+				"message": msgs[rand.IntN(len(msgs))],
 			},
 		},
 	}
@@ -125,7 +113,6 @@ func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_siz
 // timers to just produceAndConsume
 func benchmarkQueue(num_events int, batch_size int, b *testing.B) {
 	var err error
-	rand.Seed(1)
 	q, p := setup()
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
