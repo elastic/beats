@@ -41,11 +41,11 @@ type clientObserver interface {
 	// The client received a Publish call
 	newEvent(beat.Event)
 	// An event was filtered by processors before being published
-	filteredEvent(beat.Event)
+	filteredEvent(beat.Event, string)
 	// An event was published to the queue
-	publishedEvent(beat.Event)
+	publishedEvent(beat.Event, string)
 	// An event was rejected by the queue
-	failedPublishEvent(beat.Event)
+	failedPublishEvent(beat.Event, string)
 	eventsACKed(count int)
 }
 
@@ -165,11 +165,11 @@ func (o *metricsObserver) newEvent(e beat.Event) {
 }
 
 // (client) event is filtered out (on purpose or failed)
-func (o *metricsObserver) filteredEvent(e beat.Event) {
+func (o *metricsObserver) filteredEvent(e beat.Event, inputID string) {
 	o.vars.eventsFiltered.Inc()
 	o.vars.activeEvents.Dec()
 
-	input := o.inputMetrics(e)
+	input := o.inputMetrics(inputID)
 	if input == nil {
 		return // irrecoverable error happened, nothing to do.
 	}
@@ -177,10 +177,10 @@ func (o *metricsObserver) filteredEvent(e beat.Event) {
 }
 
 // (client) managed to push an event into the publisher pipeline
-func (o *metricsObserver) publishedEvent(e beat.Event) {
+func (o *metricsObserver) publishedEvent(e beat.Event, inputID string) {
 	o.vars.eventsPublished.Inc()
 
-	input := o.inputMetrics(e)
+	input := o.inputMetrics(inputID)
 	if input == nil {
 		return // irrecoverable error happened, nothing to do.
 	}
@@ -193,25 +193,21 @@ func (o *metricsObserver) eventsACKed(n int) {
 }
 
 // (client) client closing down or DropIfFull is set
-func (o *metricsObserver) failedPublishEvent(e beat.Event) {
+func (o *metricsObserver) failedPublishEvent(e beat.Event, inputID string) {
 	o.vars.eventsFailed.Inc()
 	o.vars.activeEvents.Dec()
 
-	input := o.inputMetrics(e)
+	input := o.inputMetrics(inputID)
 	if input == nil {
-		return // irrecoverable error happened, nothing to do.
+		return // nothing to do.
 	}
 	input.inputEventsDropped.Inc()
 }
 
-func (o *metricsObserver) inputMetrics(e beat.Event) *inputVars {
-	rawInputID, err := e.Meta.GetValue(beat.MetadataKeyStreamID)
-	if err != nil {
-		return nil // no input_id, nothing we can do
-	}
-	inputID, ok := rawInputID.(string)
-	if !ok {
-		// again, nothing we can do about it
+func (o *metricsObserver) inputMetrics(inputID string) *inputVars {
+	if inputID == "" {
+		// without an inputID it's not possible to aggregate
+		// the metrics
 		return nil
 	}
 
@@ -251,13 +247,13 @@ type emptyObserver struct{}
 
 var nilObserver observer = (*emptyObserver)(nil)
 
-func (*emptyObserver) cleanup()                      {}
-func (*emptyObserver) clientConnected()              {}
-func (*emptyObserver) clientClosed()                 {}
-func (*emptyObserver) newEvent(beat.Event)           {}
-func (*emptyObserver) filteredEvent(beat.Event)      {}
-func (*emptyObserver) publishedEvent(beat.Event)     {}
-func (*emptyObserver) failedPublishEvent(beat.Event) {}
-func (*emptyObserver) eventsACKed(n int)             {}
-func (*emptyObserver) eventsDropped(int)             {}
-func (*emptyObserver) eventsRetry(int)               {}
+func (*emptyObserver) cleanup()                              {}
+func (*emptyObserver) clientConnected()                      {}
+func (*emptyObserver) clientClosed()                         {}
+func (*emptyObserver) newEvent(beat.Event)                   {}
+func (*emptyObserver) filteredEvent(beat.Event, string)      {}
+func (*emptyObserver) publishedEvent(beat.Event, string)     {}
+func (*emptyObserver) failedPublishEvent(beat.Event, string) {}
+func (*emptyObserver) eventsACKed(n int)                     {}
+func (*emptyObserver) eventsDropped(int)                     {}
+func (*emptyObserver) eventsRetry(int)                       {}

@@ -218,6 +218,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client := &client{
+		inputID:        cfg.InputID,
 		logger:         p.monitors.Logger,
 		clientListener: cfg.ClientListener,
 		processors:     processors,
