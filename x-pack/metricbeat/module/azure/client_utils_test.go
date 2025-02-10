@@ -77,9 +77,15 @@ func TestMatchMetrics(t *testing.T) {
 		Values:       []MetricValue{},
 		TimeGrain:    "1PM",
 	}
+	// match
 	result := matchMetrics(prev, current)
 	assert.True(t, result)
+	// different resourceId, not match
 	current.ResourceId = "id1"
+	result = matchMetrics(prev, current)
+	assert.False(t, result)
+	// different dimension, not match
+	current.Dimensions = []Dimension{{Name: "location", Value: "East Europe"}}
 	result = matchMetrics(prev, current)
 	assert.False(t, result)
 }
