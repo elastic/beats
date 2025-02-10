@@ -41,7 +41,9 @@ steps:
           AGENTBEAT_TEST: true
         command: |
           .buildkite/scripts/gcp_auth.ps1
-          Set-Location -Path x-pack/packetbeat
+          Set-Location -Path x-pack/agentbeat
+          mage systemTest
+          Set-Location -Path ../packetbeat
           mage systemTest
         retry:
           automatic:
