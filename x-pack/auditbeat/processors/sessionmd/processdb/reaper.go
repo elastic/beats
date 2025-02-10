@@ -103,9 +103,10 @@ func (db *DB) reapProcs() {
 
 	}
 
-	// We also need to go through and reap suspect processes;
-	// this processor can't rely on any sort of guarantee that we'll get every event,
-	// as the audit netlink socket may drop events, and the user may misconfigure the auditd rules so we don't catch every event.
+	// We also need to go through and reap suspect processes.
+	// This processor can't rely on any sort of guarantee that we'll get every event,
+	// as the audit netlink socket may drop events, and the user may misconfigure
+	// the auditd rules so we don't catch every event.
 	// as a result, we may need to drop processes that appear orphaned
 	var procsToTest []uint32
 	if db.reapProcesses {
@@ -144,7 +145,7 @@ func (db *DB) reapProcs() {
 
 	// check to make sure that the process still exists.
 	if db.reapProcesses && len(procsToTest) > 0 {
-		deadProcs := []uint32{}
+		var deadProcs []uint32
 		for _, proc := range procsToTest {
 			if !db.procfs.ProcessExists(proc) {
 				deadProcs = append(deadProcs, proc)

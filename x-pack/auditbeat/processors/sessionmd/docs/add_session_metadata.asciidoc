@@ -97,7 +97,7 @@ auditbeat.modules:
 sudo systemctl restart auditbeat
 -------------------------------------
 
-===== Configuring The Process Datadbase 
+===== Configuring the Process Database 
 
 When using the `procfs` backend, `add_session_metadata` will use an in-memory database to store and match events as they arrive to the processor.
 This processor has a number of additional config values:

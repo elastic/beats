@@ -200,10 +200,12 @@ type DB struct {
 }
 
 // NewDB creates a new DB for tracking processes.
-// metrics: monitoring registry for exporting DB metrics
-// reader: handler for /proc data and events.
-// reaperPeriod: tells the reaper to update its tracking of deat and orphaned processes every at every `n` period.
-// reapProcesses: optionally tell the reaper to also reap orphan processes from the DB, if no matching exit event can be found. May result in data loss if the DB in under load and events do not arrive in a timely fashion.
+//
+//   - metrics: monitoring registry for exporting DB metrics
+//   - reader: handler for /proc data and events.
+//   - reaperPeriod: tells the reaper to update its tracking of deat and orphaned processes every at every `n` period.
+//   - reapProcesses: optionally tell the reaper to also reap orphan processes from the DB, if no matching exit event can be found.
+//     May result in data loss if the DB in under load and events do not arrive in a timely fashion.
 func NewDB(ctx context.Context, metrics *monitoring.Registry, reader procfs.Reader, logger *logp.Logger, reaperPeriod time.Duration, reapProcesses bool) (*DB, error) {
 	once.Do(initialize)
 	if initError != nil {
@@ -341,7 +343,7 @@ func (db *DB) createEntryLeader(pid uint32, entryType EntryType) {
 	db.logger.Debugf("created entry leader %d: %s, name: %s", pid, string(entryType), db.processes[pid].Filename)
 }
 
-// pid returned is a pointer type because its possible for no matching PID is found.
+// pid returned is a pointer type because it is possible no matching PID is found.
 func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 	pid := p.PIDs.Tgid
 
