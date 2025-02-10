@@ -113,7 +113,7 @@ func TestPublish(t *testing.T) {
 		require.True(t, ok)
 		got, ok := attributes.Get("data_stream")
 		require.True(t, ok)
-		assert.Equal(t, want, got)
+		assert.ElementsMatch(t, []pcommon.Value{want}, []pcommon.Value{got})
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
