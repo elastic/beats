@@ -59,6 +59,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
 - The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
 - Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be using while setting `allow_deprecated_use: true` in their configuration {pull}42295[42295]
+- The fields produced by the Journald input are updated to better match ECS. Renamed fields:
+Dropped fields: `syslog.priority` and `syslog.facility` while keeping their duplicated equivalent:
+`log.syslog.priority`,`log.syslog.facility.code`. Renamed fields: `syslog.identifier` -> `log.syslog.appname`,
+`syslog.pid` -> `log.syslog.procid`. `container.id_truncated` is dropped because the full container ID is
+already present as `container.id` and `container.log.tag` is dropped because it is already present as
+`log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
+otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Heartbeat*
 
@@ -129,6 +136,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix setting unique registry for non beat receivers {issue}42288[42288] {pull}42292[42292]
 - The Kafka output now drops events when there is an authorisation error {issue}42343[42343] {pull}42401[42401]
 - Fix autodiscovery memory leak related to metadata of start events {pull}41748[41748]
+- All standard queue metrics are now included in metrics monitoring, including: `added.{events, bytes}`, `consumed.{events, bytes}`, `removed.{events, bytes}`, and `filled.{events, bytes, pct}`. {pull}42439[42439]
+- The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
 
 *Auditbeat*
 
@@ -210,7 +219,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
 - Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
 - In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
+- Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size. {pull}42327[42327]
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
 
 *Heartbeat*
 
@@ -248,6 +259,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
 - Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
+- Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
+- Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
 
 *Osquerybeat*
 
@@ -397,6 +410,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added OAuth2 support with auto token refresh for websocket streaming input. {issue}41989[41989] {pull}42212[42212]
 - Added infinite & blanket retry options to websockets and improved logging and retry logic. {pull}42225[42225]
 - Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+- Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
+- Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
+- Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
+- The journald input is now generally available. {pull}42107[42107]
+- Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
 
 *Auditbeat*
 
@@ -455,6 +473,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add support of additional `collstats` metrics in mongodb module. {pull}42171[42171]
 - Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
 - Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
+- Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
+- Add new metricset wmi for the windows module. {pull}42017[42017]
+- Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]

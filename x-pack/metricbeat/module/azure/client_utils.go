@@ -94,7 +94,7 @@ func metricIsEmpty(metric armmonitor.MetricValue) bool {
 // matchMetrics will compare current metrics
 func matchMetrics(prevMet Metric, met Metric) bool {
 	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.ResourceId == met.ResourceId &&
-		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain {
+		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain && reflect.DeepEqual(prevMet.Dimensions, met.Dimensions) {
 		return true
 	}
 	return false

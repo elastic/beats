@@ -215,7 +215,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 	pagination := newPagination(cfg, client, log)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
-	requester := newRequester(client, requestFactory, responseProcessor, log)
+	requester := newRequester(client, requestFactory, responseProcessor, metrics, log)
 
 	trCtx := emptyTransformContext()
 	trCtx.cursor = newCursor(cfg.Cursor, log)

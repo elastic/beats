@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -34,7 +35,6 @@ import (
 // ssl.curve_types
 // ssl.ca_sha256
 // ssl.ca_trustred_fingerprint
-
 // ssl.supported_protocols -> partially supported
 // ssl.restart_on_cert_change.*
 // ssl.renegotiation
@@ -75,6 +75,15 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	// validate the beats config before proceeding
 	if err := tlscfg.Validate(); err != nil {
 		return nil, err
+	}
+
+	//unpacks -> ssl.verification_mode
+	// not fully supported yet
+	switch tlscfg.VerificationMode {
+	case tlscommon.VerifyNone:
+		insecureSkipVerify = true
+	default:
+		// Handle all other cases, including VerifyFull, VerifyCertificate, or VerifyStrict
 	}
 
 	// unpacks -> ssl.certificate_authorities
@@ -129,19 +138,25 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 	}
 
 	otelTLSConfig := map[string]any{
-		"insecure_skip_verify": insecureSkipVerify, // ssl.verirication_mode,
-
-		// Config
+		"insecure_skip_verify":         insecureSkipVerify, // ssl.verification_mode:none
 		"include_system_ca_certs_pool": includeSystemCACertsPool,
-		"ca_pem":                       strings.Join(caCerts, ""), // ssl.certificate_authorities
-		"cert_pem":                     certPem,                   // ssl.certificate
-		"key_pem":                      certKeyPem,                // ssl.key
-		"cipher_suites":                ciphersuites,              // ssl.cipher_suites
 	}
 
-	// For type safety check only
+	setIfNotNil(otelTLSConfig, "ca_pem", strings.Join(caCerts, "")) // ssl.certificate_authorities
+	setIfNotNil(otelTLSConfig, "cert_pem", certPem)                 // ssl.certificate
+	setIfNotNil(otelTLSConfig, "key_pem", certKeyPem)               // ssl.key
+	setIfNotNil(otelTLSConfig, "cipher_suites", ciphersuites)       // ssl.cipher_suites"
+
+	if err := typeSafetyCheck(otelTLSConfig); err != nil {
+		return nil, err
+	}
+	return otelTLSConfig, nil
+}
+
+// For type safety check
+func typeSafetyCheck(value map[string]any) error {
 	// the returned valued should match `clienttls.Config` type.
-	// it throws an error if non existing key name is used in the returned map structure
+	// it throws an error if non existing key names  are set
 	var result configtls.ClientConfig
 	d, _ := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		Squash:      true,
@@ -149,9 +164,31 @@ func TLSCommonToOTel(tlscfg *tlscommon.Config) (map[string]any, error) {
 		ErrorUnused: true,
 	})
 
-	if err := d.Decode(otelTLSConfig); err != nil {
-		return nil, err
+	err := d.Decode(value)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+// Helper function to conditionally add fields to the map
+func setIfNotNil(m map[string]any, key string, value any) {
+	if value == nil {
+		return
 	}
 
-	return otelTLSConfig, nil
+	v := reflect.ValueOf(value)
+
+	switch v.Kind() {
+	case reflect.String:
+		if v.String() != "" {
+			m[key] = value
+		}
+	case reflect.Map, reflect.Slice:
+		if v.Len() > 0 {
+			m[key] = value
+		}
+	default:
+		m[key] = value
+	}
 }
