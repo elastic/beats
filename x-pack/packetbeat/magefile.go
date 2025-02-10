@@ -141,8 +141,5 @@ func SystemTest(ctx context.Context) error {
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"./tests/system/..."}
-	if os.Getenv("AGENTBEAT_TEST") == "true" {
-		args.Tags = append(args.Tags, "agentbeat")
-	}
 	return devtools.GoTest(ctx, args)
 }

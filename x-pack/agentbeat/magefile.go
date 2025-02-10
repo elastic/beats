@@ -225,7 +225,7 @@ func SystemTest(ctx context.Context) error {
 	mg.SerialDeps(xpacketbeat.GetNpcapInstaller, devtools.BuildSystemTestBinary)
 
 	args := devtools.DefaultGoTestIntegrationArgs()
-	args.Packages = []string{}
+	args.Packages = []string{"../packetbeat/tests/system/..."}
 	args.Tags = append(args.Tags, "agentbeat")
 
 	return devtools.GoTest(ctx, args)
