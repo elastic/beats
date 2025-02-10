@@ -1,19 +1,21 @@
-The `wmi` metricset of the Windows module reads metrics via Windows Management Instrumentation  link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi[(WMI)], a core management technology in the Windows Operating system.
+The `wmi` metricset of the Windows module collect metrics via link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi[Windows Management Instrumentation (WMI)], a core management technology in the Windows Operating system.
 
 By leveraging WMI Query Language (WQL), this metricset allows you to extract detailed
 system information and metrics to monitor the health and performance of Windows
 Systems.
 
-This metricset leverages the link:https://github.com/microsoft/wmi[Microsoft WMI], library a
-convenient wrapper around the link:https://github.com/go-ole[GO-OLE] library which allows to
-invoke the WMI Api.
+This metricset leverages the link:https://github.com/microsoft/wmi[Microsoft WMI] library, a
+convenient wrapper around the link:https://github.com/go-ole[Go-OLE]. This allows invoking the
+link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/scripting-api-for-wmi[Scripting API for WMI].
 
+[float]
 === WMI Query Language (WQL) Support
 
 This metricset supports the execution of link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/wql-sql-for-wmi[WQL] queries, a SQL-like query language for retrieving information from WMI namespaces.
 
 As of now, we only support and execute queries with `SELECT`, `FROM` and `WHERE` clauses.
 
+[float]
 === Configuration
 
 [source,yaml]
@@ -21,15 +23,92 @@ As of now, we only support and execute queries with `SELECT`, `FROM` and `WHERE`
 - module: windows
   metricsets: ["wmi"]
   period: 60s
-  namespace: "root\\cimv2" # Namespace
-  queries:
-  - class: Win32_OperatingSystem
-    fields:
-    - FreePhysicalMemory
-    - FreeSpaceInPaginFiles
-    - NumberOfUsers
-    # Where Clasue
-    where: ""
+  wmi:
+    # host: localhost
+    # domain: ""
+    # username: test
+    # password: foo
+    namespace: "root\\cimv2" # Default Namespace
+    warning_threshold: 60s
+    include_queries: true
+    include_null: false
+    include_empty_strings: false
+    queries:
+    - class: Win32_OperatingSystem
+      fields:
+      - FreePhysicalMemory
+      - FreeSpaceInPagingFiles
+      - NumberOfUsers
+      # Where Clasue
+      where: ""
+    - class: Win32_PowerPlan
+      fields: []
+      where: "IsActive = True"
+      namespace: "root\\cimv2\\power" # Overwrites the module namespace in this query
+----
+
+
+*`wmi.host`*:: The host for the remote WMI Connection. By default is localhost.
+
+*`wmi.domain`*:: The domain for the remote WMI Connection. By default is the empty string.
+
+*`wmi.username`*:: The username for the remote WMI Connection. By default is empty string.
+
+*`wmi.password`*:: The password for the remote WMI Connection. By default is empty string.
+
+*`wmi.warning_threshold`*:: The time threshold after which Metricbeat will stop
+waiting for the query result and return control to the main flow of the program.
+A warning is logged indicating that the query execution has exceeded the threshold.
+By default is equal to the period.
+
+*`wmi.queries`*:: The list of queries to execute. The list cannot be empty. See <<query-configuration, Query Configuration>> for the format of the queries.
+
+*`wmi.include_queries`*:: A boolean option that causes the metricset to include the
+query in the output document. False by default.
+
+*`wmi.include_null`*:: A boolean option that causes the metricset to include the
+properties that have a null value in the output document. False by default.
+
+*`wmi.include_empty_string`*:: A boolean option that causes the metricset to include
+the properties that are empty string. False by default.
+
+
+[float]
+[[query-configuration]]
+==== Query Configuration
+
+Each item in the `queries` list specifies a wmi query to perform.
+
+*`class`*:: The wmi class. In the query it specifies the `FROM` clause. Required
+
+*`fields`*:: List of fields to return. In the query it specifies the `SELECT` clause. Set it to the empty list (default value) to retrieve all available properties.
+
+*`where`*:: The where clause. In the query it specifies the `WHERE` clause. Read more about the format https://learn.microsoft.com/en-us/windows/win32/wmisdk/where-clause.
+
+*`namespace`*:: The WMI Namespace for this particular query (it overwrites the module's `namespace` value)
+
+[float]
+===== Example
+
+Example WQL Query:
+
+[source,sql]
+----
+SELECT Name, ProcessId, WorkingSetSize
+FROM Win32_Process
+WHERE Name = 'lsass.exe' AND WorkingSetSize > 104857600
+----
+
+Equivalent YAML Configuration:
+
+[source,yaml]
+----
+- class: Win32_Process
+  fields:
+  - Name
+  - ProcessId
+  - WorkingSetSize
+  where: "Name = 'lsass.exe' AND WorkingSetSize > 104857600"
 ----
 
 [float]
