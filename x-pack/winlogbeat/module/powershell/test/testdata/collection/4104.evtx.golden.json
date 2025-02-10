@@ -15,8 +15,7 @@
     },
     "message": "Creating Scriptblock text (1 of 1):\n.\\patata.ps1\n\nScriptBlock ID: 50d2dbda-7361-4926-a94d-d9eadfdb43fa\nPath: ",
     "winlog": {
-      "activity_id": "{fb13c9de-29f7-0001-18e0-13fbf729d601}",
-      "api": "wineventlog",
+      "activity_id": "{FB13C9DE-29F7-0001-18E0-13FBF729D601}",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -33,7 +32,7 @@
           "id": 4428
         }
       },
-      "provider_guid": "{a0c1853b-5c40-4b15-8766-3cf1c58f985a}",
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
       "provider_name": "Microsoft-Windows-PowerShell",
       "record_id": 3580,
       "task": "Execute a Remote Command",
@@ -59,8 +58,7 @@
     },
     "message": "Creating Scriptblock text (1 of 1):\n\n\nScriptBlock ID: f5521cbd-656e-4296-b74d-9ffb4eec23b0\nPath: C:\\Users\\vagrant\\Desktop\\patata.ps1",
     "winlog": {
-      "activity_id": "{fb13c9de-29f7-0000-79db-13fbf729d601}",
-      "api": "wineventlog",
+      "activity_id": "{FB13C9DE-29F7-0000-79DB-13FBF729D601}",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -77,7 +75,7 @@
           "id": 4428
         }
       },
-      "provider_guid": "{a0c1853b-5c40-4b15-8766-3cf1c58f985a}",
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
       "provider_name": "Microsoft-Windows-PowerShell",
       "record_id": 3582,
       "task": "Execute a Remote Command",
