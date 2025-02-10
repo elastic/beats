@@ -40,6 +40,7 @@ https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
 - Add support of additional `collstats` metrics in mongodb module. {pull}42171[42171]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 
+
 [[release-notes-8.17.1]]
 === Beats version 8.17.1
 https://github.com/elastic/beats/compare/v8.17.0\...v8.17.1[View commits]
