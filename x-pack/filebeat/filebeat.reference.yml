@@ -2346,7 +2346,8 @@ filebeat.inputs:
 
   # Previous IDs from this input. This allows migrating the state from files
   # ingested when running this input with a different ID.
-  # Only the state of files currently being harvested by the input will be migrated.
+  # Only the state of existing files currently being harvested by the
+  # input will be migrated.
   #previous_ids:
     #- "old-id"
 
