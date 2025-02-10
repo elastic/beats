@@ -83,7 +83,7 @@ func requireProcess(t *testing.T, db *DB, pid uint32, processPath string) {
 	}
 }
 
-func requireParent(t *testing.T, db *DB, pid uint32, ppid uint32) {
+func requireParent(t *testing.T, db *DB, pid, ppid uint32) {
 	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
@@ -97,7 +97,7 @@ func requireParentUnset(t *testing.T, process types.Process) {
 	require.Nil(t, process.Parent.Start)
 }
 
-func requireSessionLeader(t *testing.T, db *DB, pid uint32, sid uint32) {
+func requireSessionLeader(t *testing.T, db *DB, pid, sid uint32) {
 	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
@@ -113,7 +113,7 @@ func requireSessionLeaderUnset(t *testing.T, process types.Process) {
 	require.Nil(t, process.SessionLeader.Start)
 }
 
-func requireGroupLeader(t *testing.T, db *DB, pid uint32, pgid uint32) {
+func requireGroupLeader(t *testing.T, db *DB, pid, pgid uint32) {
 	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
@@ -122,7 +122,7 @@ func requireGroupLeader(t *testing.T, db *DB, pid uint32, pgid uint32) {
 	require.Equal(t, pid == pgid, *process.GroupLeader.SameAsProcess)
 }
 
-func requireEntryLeader(t *testing.T, db *DB, pid uint32, entryPID uint32, expectedEntryType EntryType) {
+func requireEntryLeader(t *testing.T, db *DB, pid, entryPID uint32, expectedEntryType EntryType) {
 	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)

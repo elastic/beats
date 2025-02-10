@@ -92,7 +92,6 @@ func TestProviderLoadMetrics(t *testing.T) {
 	assertRegistryUint(t, testReg, "reaped_orphan_exits", 0, "reaped_orphan_exits")
 	assertRegistryUint(t, testReg, "failed_process_lookup_count", 0, "failed_process_lookup_count")
 	assertRegistryUint(t, testReg, "procfs_lookup_fail", 0, "procfs_lookup_fail")
-
 }
 
 func TestExecveEvent(t *testing.T) {

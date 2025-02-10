@@ -223,7 +223,11 @@ func NewDB(ctx context.Context, metrics *monitoring.Registry, reader procfs.Read
 		processReapAfter:         time.Minute * 10,
 		ctx:                      ctx,
 	}
-	logger.Infof("starting processDB reaper with interval %s", db.reaperPeriod)
+
+	if db.reaperPeriod > 0 {
+		logger.Infof("starting processDB reaper with interval %s", db.reaperPeriod)
+	}
+
 	if db.reapProcesses {
 		logger.Info("WARNING: reaping orphaned processes. May result in data loss.")
 	}

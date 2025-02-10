@@ -63,12 +63,10 @@ func (db *DB) startReaper() {
 			}
 		}(db)
 	}
-
 }
 
 // run as a separate function to make testing easier
 func (db *DB) reapProcs() {
-
 	db.mutex.Lock()
 	now := time.Now()
 	db.logger.Debugf("REAPER: processes: %d removal candidates: %d", len(db.processes), len(db.removalMap))
@@ -134,7 +132,6 @@ func (db *DB) reapProcs() {
 				// so gather a list now, then check them later
 				procsToTest = append(procsToTest, pid)
 			}
-
 		}
 	}
 

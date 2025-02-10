@@ -37,8 +37,9 @@ func TestGetTTYType(t *testing.T) {
 	require.Equal(t, tty.TTY, tty.GetTTYType(4, 64))
 	require.Equal(t, tty.TTYUnknown, tty.GetTTYType(1000, 1000))
 }
+
 func TestProcessOrphanResolve(t *testing.T) {
-	//test to make sure that if we get an exit event before a exec event, we still match up the two
+	// test to make sure that if we get an exit event before a exec event, we still match up the two
 
 	// uncomment if you want some logs
 	//_ = logp.DevelopmentSetup()
@@ -82,11 +83,10 @@ func TestProcessOrphanResolve(t *testing.T) {
 	testDB.reapProcs()
 	require.Len(t, testDB.processes, 0)
 	require.Len(t, testDB.removalMap, 0)
-
 }
 
 func TestReapExitOrphans(t *testing.T) {
-	//test to make sure that orphaned exit events are still cleaned up
+	// test to make sure that orphaned exit events are still cleaned up
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	reader := procfs.NewProcfsReader(*logger)
@@ -141,7 +141,6 @@ func TestReapProcesses(t *testing.T) {
 	require.NotContains(t, testDB.processes, pid2.Tgid)
 	require.Contains(t, testDB.processes, pid3.Tgid)
 	require.Contains(t, testDB.processes, pid4.Tgid)
-
 }
 
 func TestReapProcessesWithProcFS(t *testing.T) {

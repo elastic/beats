@@ -44,7 +44,6 @@ func (r *MockReader) ProcessExists(pid uint32) bool {
 	defer r.mut.Unlock()
 	_, ok := r.entries[pid]
 	return ok
-
 }
 
 func (r *MockReader) GetAllProcesses() ([]ProcessInfo, error) {
