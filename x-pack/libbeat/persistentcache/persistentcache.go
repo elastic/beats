@@ -97,7 +97,7 @@ func (c *PersistentCache) PutWithTimeout(k string, v interface{}, timeout time.D
 }
 
 // Get the current value associated with a key or nil if the key is not
-// present. The last access time of the element is updated.
+// present. The last access time of the element is updated. It might fail to refresh TTL and still return `nil` error.
 func (c *PersistentCache) Get(k string, v interface{}) error {
 	d, err := c.store.Get([]byte(k))
 	if err != nil {
