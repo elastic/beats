@@ -106,7 +106,7 @@ func (c *PersistentCache) Get(k string, v interface{}) error {
 	if c.refreshOnAccess && c.timeout > 0 {
 		err = c.store.Set([]byte(k), d, c.timeout)
 		if err != nil {
-			c.log.Debugf("Key '%s' not found in key-value store", k)
+			c.log.Debugf("Error occurred fetching '%s' key: %v", k, err)
 		}
 	}
 	err = c.codec.Decode(d, v)
