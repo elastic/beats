@@ -449,6 +449,37 @@ func TestMonitoring(t *testing.T) {
 	})
 }
 
+func getMetrics(t *testing.T, beatInfo beat.Info, inputID string, ok bool) (
+	*monitoring.Uint, *monitoring.Uint, *monitoring.Uint) {
+	t.Helper()
+
+	reg := beatInfo.Monitoring.Namespace.GetRegistry().
+		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+
+	filteredMetricName := inputID + "." + "events_filtered_total"
+	filteredRaw := reg.Get(filteredMetricName)
+	filtered, ok := filteredRaw.(*monitoring.Uint)
+	require.Truef(t, ok,
+		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
+		filteredMetricName, filteredRaw)
+
+	droppedMetricName := inputID + "." + "events_dropped_total"
+	droppedRaw := reg.Get(droppedMetricName)
+	dropped, ok := droppedRaw.(*monitoring.Uint)
+	require.Truef(t, ok,
+		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
+		droppedMetricName, droppedRaw)
+
+	publishedMetricName := inputID + "." + "events_published_total"
+	publishedRaw := reg.Get(publishedMetricName)
+	published, ok := publishedRaw.(*monitoring.Uint)
+	require.Truef(t, ok,
+		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
+		publishedMetricName, publishedRaw)
+
+	return filtered, dropped, published
+}
+
 func BenchInputMetrics(ns *monitoring.Namespace) {
 	NoError(logp.ConfigureWithCore(logp.Config{}, zapcore.NewNopCore()), "could not setup logger")
 
@@ -569,37 +600,6 @@ func BenchmarkClientMetrics(b *testing.B) {
 		BenchInputMetrics(
 			ns)
 	}
-}
-
-func getMetrics(t *testing.T, beatInfo beat.Info, inputID string, ok bool) (
-	*monitoring.Uint, *monitoring.Uint, *monitoring.Uint) {
-	t.Helper()
-
-	reg := beatInfo.Monitoring.Namespace.GetRegistry().
-		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-
-	filteredMetricName := inputID + "." + "events_filtered_total"
-	filteredRaw := reg.Get(filteredMetricName)
-	filtered, ok := filteredRaw.(*monitoring.Uint)
-	require.Truef(t, ok,
-		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
-		filteredMetricName, filteredRaw)
-
-	droppedMetricName := inputID + "." + "events_dropped_total"
-	droppedRaw := reg.Get(droppedMetricName)
-	dropped, ok := droppedRaw.(*monitoring.Uint)
-	require.Truef(t, ok,
-		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
-		droppedMetricName, droppedRaw)
-
-	publishedMetricName := inputID + "." + "events_published_total"
-	publishedRaw := reg.Get(publishedMetricName)
-	published, ok := publishedRaw.(*monitoring.Uint)
-	require.Truef(t, ok,
-		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
-		publishedMetricName, publishedRaw)
-
-	return filtered, dropped, published
 }
 
 type testProcessor struct {
