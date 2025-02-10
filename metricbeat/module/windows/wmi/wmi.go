@@ -113,7 +113,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// for each unique WMI namespace. This minimizes the number of session creations
 	for namespace, queries := range m.config.NamespaceQueryIndex {
 
-		session, err := sm.GetSession(namespace, m.config.Host, "", m.config.User, m.config.Password)
+		session, err := sm.GetSession(namespace, m.config.Host, m.config.Domain, m.config.User, m.config.Password)
 
 		if err != nil {
 			return fmt.Errorf("could not initialize session %w", err)

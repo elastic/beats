@@ -34,7 +34,8 @@ type Config struct {
 	IncludeQueries      bool                     `config:"wmi.include_queries"`      // Determines if the query string should be included in the output document
 	IncludeNull         bool                     `config:"wmi.include_null"`         // Specifies whether to include fields with nil values in the final document
 	IncludeEmptyString  bool                     `config:"wmi.include_empty_string"` // Specifies whether to include fields with empty string values in the final document
-	Host                string                   `config:"wmi.host"`                 // Hostname or IP address of the remote WMI server
+	Host                string                   `config:"wmi.host"`                 // Hostname of the remote WMI server
+	Domain              string                   `config:"wmi.domain"`               // Domain of the remote WMI Server
 	User                string                   `config:"wmi.username"`             // Username for authentication on the remote WMI server
 	Password            string                   `config:"wmi.password"`             // Password for authentication on the remote WMI server
 	Namespace           string                   `config:"wmi.namespace"`            // Default WMI namespace for executing queries, used if not overridden by individual query configurations
