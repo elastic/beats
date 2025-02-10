@@ -33,7 +33,7 @@ func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err err
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 
-	confDir, err := filepath.Abs("../../")
+	confDir, err := filepath.Abs("../../../agentbeat/test/system")
 	if err != nil {
 		return "", "", err
 	}

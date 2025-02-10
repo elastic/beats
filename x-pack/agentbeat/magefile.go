@@ -139,6 +139,9 @@ func Package() error {
 	// Add osquery distro binaries, required for the osquerybeat subcommand.
 	osquerybeat.CustomizePackaging()
 
+	// customize packetbeat package to reflect os
+	packetbeat.CustomizePackaging()
+
 	// Add metricbeat lightweight modules.
 	if err := metricbeat.CustomizeLightModulesPackaging(); err != nil {
 		return err
@@ -222,7 +225,7 @@ func PythonIntegTest(ctx context.Context) error {
 }
 
 func SystemTest(ctx context.Context) error {
-	mg.SerialDeps(xpacketbeat.GetNpcapInstaller, devtools.BuildSystemTestBinary)
+	mg.SerialDeps(xpacketbeat.GetNpcapInstaller, Update, devtools.BuildSystemTestBinary)
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"../packetbeat/tests/system/..."}
