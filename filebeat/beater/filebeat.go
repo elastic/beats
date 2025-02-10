@@ -81,8 +81,9 @@ type Filebeat struct {
 type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
 
 type StateStore interface {
-	// Access returns the storage registry depending on the type. This is needed for the Elasticsearch state store which
-	// is guarded by the feature.IsElasticsearchStateStoreEnabledForInput(typ) check.
+	// Access returns the storage registry depending on the type.
+	// The value of typ is expected to have been obtained from
+	// cursor.InputManager.Type and represents the input type.
 	Access(typ string) (*statestore.Store, error)
 	CleanupInterval() time.Duration
 }
