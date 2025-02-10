@@ -154,6 +154,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					},
 				}
 
+				if m.config.Domain != "" {
+					event.MetricSetFields.Put("domain", m.config.Domain)
+				}
+
 				if m.config.IncludeQueries {
 					event.MetricSetFields.Put("query", query)
 				}
