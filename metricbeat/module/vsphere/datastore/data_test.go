@@ -37,6 +37,11 @@ func TestEventMapping(t *testing.T) {
 		},
 		ManagedEntity: mo.ManagedEntity{
 			OverallStatus: "green",
+			ExtensibleManagedObject: mo.ExtensibleManagedObject{
+				Self: types.ManagedObjectReference{
+					Value: "DS_1",
+				},
+			},
 		},
 		Host: []types.DatastoreHostMount{},
 		Vm: []types.ManagedObjectReference{
@@ -61,6 +66,7 @@ func TestEventMapping(t *testing.T) {
 	outputEvent := (&DataStoreMetricSet{}).mapEvent(datastoreTest, &metricDataTest)
 	testEvent := mapstr.M{
 		"fstype": "local",
+		"id":     "DS_1",
 		"status": types.ManagedEntityStatus("green"),
 		"name":   "datastore-test",
 		"host": mapstr.M{

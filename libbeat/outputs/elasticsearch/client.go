@@ -133,7 +133,7 @@ func NewClient(
 		return nil, err
 	}
 
-	conn.OnConnectCallback = func() error {
+	conn.OnConnectCallback = func(conn *eslegclient.Connection) error {
 		globalCallbackRegistry.mutex.Lock()
 		defer globalCallbackRegistry.mutex.Unlock()
 
@@ -532,8 +532,8 @@ func (client *Client) applyItemStatus(
 	return true
 }
 
-func (client *Client) Connect() error {
-	return client.conn.Connect()
+func (client *Client) Connect(ctx context.Context) error {
+	return client.conn.Connect(ctx)
 }
 
 func (client *Client) Close() error {

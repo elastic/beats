@@ -13,17 +13,18 @@ import (
 	"github.com/prometheus/procfs"
 	"golang.org/x/sys/unix"
 
+	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func MajorTTY(ttyNr uint32) uint16 {
-	return uint16((ttyNr >> 8) & 0xff)
+func MajorTTY(ttyNr uint32) uint32 {
+	return (ttyNr >> 8) & 0xff
 }
 
-func MinorTTY(ttyNr uint32) uint16 {
-	return uint16(((ttyNr & 0xfff00000) >> 20) | (ttyNr & 0xff))
+func MinorTTY(ttyNr uint32) uint32 {
+	return ((ttyNr >> 12) & 0xfff00) | (ttyNr & 0xff)
 }
 
 // this interface exists so that we can inject a mock procfs reader for deterministic testing
@@ -47,7 +48,7 @@ type Stat procfs.ProcStat
 type ProcessInfo struct {
 	PIDs       types.PIDInfo
 	Creds      types.CredInfo
-	CTTY       types.TTYDev
+	CTTY       tty.TTYDev
 	Argv       []string
 	Cwd        string
 	Env        map[string]string
@@ -165,7 +166,7 @@ func (r ProcfsReader) getProcessInfo(proc procfs.Proc) (ProcessInfo, error) {
 			Sid:         uint32(stat.Session),
 		},
 		Creds: creds,
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: MajorTTY(uint32(stat.TTY)),
 			Minor: MinorTTY(uint32(stat.TTY)),
 		},
@@ -196,7 +197,7 @@ func (r ProcfsReader) GetAllProcesses() ([]ProcessInfo, error) {
 	for _, proc := range procs {
 		process_info, err := r.getProcessInfo(proc)
 		if err != nil {
-			r.logger.Warnf("failed to read process info for %v", proc.PID)
+			r.logger.Debugf("failed to read process info for %v", proc.PID)
 		}
 		ret = append(ret, process_info)
 	}

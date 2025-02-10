@@ -26,11 +26,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 	"go.opentelemetry.io/collector/pdata/plog"
+)
+
+const (
+	// esDocumentIDAttribute is the attribute key used to store the document ID in the log record.
+	esDocumentIDAttribute = "elasticsearch.document_id"
 )
 
 func init() {
@@ -41,6 +48,7 @@ type otelConsumer struct {
 	observer     outputs.Observer
 	logsConsumer consumer.Logs
 	beatInfo     beat.Info
+	log          *logp.Logger
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
@@ -49,6 +57,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		observer:     observer,
 		logsConsumer: beat.LogConsumer,
 		beatInfo:     beat,
+		log:          logp.NewLogger("otelconsumer"),
 	}
 
 	ocConfig := defaultConfig()
@@ -63,7 +72,7 @@ func (out *otelConsumer) Close() error {
 	return nil
 }
 
-// Publish converts Beat events to Otel format and send to the next otel consumer
+// Publish converts Beat events to Otel format and sends them to the Otel collector
 func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) error {
 	switch {
 	case out.logsConsumer != nil:
@@ -73,34 +82,64 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 	}
 }
 
-func (out *otelConsumer) logsPublish(_ context.Context, batch publisher.Batch) error {
-	defer batch.ACK()
+func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
 	st := out.observer
 	pLogs := plog.NewLogs()
 	resourceLogs := pLogs.ResourceLogs().AppendEmpty()
 	sourceLogs := resourceLogs.ScopeLogs().AppendEmpty()
 	logRecords := sourceLogs.LogRecords()
 
+	// Convert the batch of events to Otel plog.Logs. The encoding we
+	// choose here is to set all fields in a Map in the Body of the log
+	// record. Each log record encodes a single beats event.
+	// This way we have full control over the final structure of the log in the
+	// destination, as long as the exporter allows it.
+	// For example, the elasticsearchexporter has an encoding specifically for this.
+	// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/35444.
 	events := batch.Events()
 	for _, event := range events {
 		logRecord := logRecords.AppendEmpty()
-		meta := event.Content.Meta.Clone()
-		meta["beat"] = out.beatInfo.Beat
-		meta["version"] = out.beatInfo.Version
-		meta["type"] = "_doc"
+
+		if id, ok := event.Content.Meta["_id"]; ok {
+			// Specify the id as an attribute used by the elasticsearchexporter
+			// to set the final document ID in Elasticsearch.
+			// When using the bodymap encoding in the exporter all attributes
+			// are stripped out of the final Elasticsearch document.
+			//
+			// See https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/36882.
+			switch id := id.(type) {
+			case string:
+				logRecord.Attributes().PutStr(esDocumentIDAttribute, id)
+			}
+		}
 
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp
-		beatEvent["@metadata"] = meta
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 		pcommonEvent := mapstrToPcommonMap(beatEvent)
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
 	}
 
-	if err := out.logsConsumer.ConsumeLogs(context.TODO(), pLogs); err != nil {
-		return fmt.Errorf("error otel log consumer: %w", err)
+	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
+	if err != nil {
+		// Permanent errors shouldn't be retried. This tipically means
+		// the data cannot be serialized by the exporter that is attached
+		// to the pipeline or when the destination refuses the data because
+		// it cannot decode it. Retrying in this case is useless.
+		//
+		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
+		if consumererror.IsPermanent(err) {
+			st.PermanentErrors(len(events))
+			batch.Drop()
+		} else {
+			st.RetryableErrors(len(events))
+			batch.Retry()
+		}
+
+		return fmt.Errorf("failed to send batch events to otel collector: %w", err)
 	}
 
+	batch.ACK()
 	st.NewBatch(len(events))
 	st.AckedEvents(len(events))
 	return nil
@@ -241,12 +280,12 @@ func mapstrToPcommonMap(m mapstr.M) pcommon.Map {
 				newMap.CopyTo(newVal.SetEmptyMap())
 			}
 		case time.Time:
-			out.PutInt(k, x.UnixMilli())
+			out.PutStr(k, x.Format("2006-01-02T15:04:05.000Z"))
 		case []time.Time:
 			dest := out.PutEmptySlice(k)
 			for _, i := range v.([]time.Time) {
 				newVal := dest.AppendEmpty()
-				newVal.SetInt(i.UnixMilli())
+				newVal.SetStr(i.Format("2006-01-02T15:04:05.000Z"))
 			}
 		default:
 			out.PutStr(k, fmt.Sprintf("unknown type: %T", x))

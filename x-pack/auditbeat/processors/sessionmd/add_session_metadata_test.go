@@ -361,7 +361,7 @@ func TestEnrich(t *testing.T) {
 				require.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
 				require.NotNil(t, actual, "%s: returned nil event", tt.testName)
 
-				//Validate output
+				// Validate output
 				if diff := cmp.Diff(tt.expected.Fields, actual.Fields, ignoreMissingFrom(tt.expected.Fields)); diff != "" {
 					t.Errorf("field mismatch:\n%s", diff)
 				}

@@ -221,11 +221,11 @@ func CrossBuildImage(platform string) (string, error) {
 
 	switch {
 	case platform == "darwin/amd64":
-		tagSuffix = "darwin-debian10"
+		tagSuffix = "darwin-debian11"
 	case platform == "darwin/arm64":
-		tagSuffix = "darwin-arm64-debian10"
+		tagSuffix = "darwin-arm64-debian11"
 	case platform == "darwin/universal":
-		tagSuffix = "darwin-arm64-debian10"
+		tagSuffix = "darwin-arm64-debian11"
 	case platform == "linux/arm64":
 		tagSuffix = "arm"
 	case platform == "linux/armv5":
@@ -235,13 +235,13 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "linux/armv7":
 		tagSuffix = "armhf"
 	case strings.HasPrefix(platform, "linux/mips"):
-		tagSuffix = "mips-debian10"
+		tagSuffix = "mips-debian11"
 	case strings.HasPrefix(platform, "linux/ppc"):
-		tagSuffix = "ppc-debian10"
+		tagSuffix = "ppc-debian11"
 	case platform == "linux/s390x":
-		tagSuffix = "s390x-debian10"
+		tagSuffix = "s390x-debian11"
 	case strings.HasPrefix(platform, "linux"):
-		tagSuffix = "main-debian10"
+		tagSuffix = "main-debian11"
 	}
 
 	goVersion, err := GoVersion()

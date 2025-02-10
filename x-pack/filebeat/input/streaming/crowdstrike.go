@@ -156,7 +156,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	if err != nil {
 		return state, Warning{fmt.Errorf("failed to decode discover body: %w", err)}
 	}
-	s.log.Debugw("stream discover metadata", "meta", mapstr.M(body.Meta))
+	s.log.Debugw("stream discover metadata", logp.Namespace(s.ns), "meta", mapstr.M(body.Meta))
 
 	var offset int
 	if cursor, ok := state["cursor"].(map[string]any); ok {
@@ -233,6 +233,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 			err := dec.Decode(&msg)
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
+				//nolint:errorlint // will not be a wrapped error here.
 				if err == io.EOF {
 					s.log.Info("stream ended, restarting")
 					return state, nil
@@ -241,7 +242,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 			}
 			s.metrics.receivedBytesTotal.Add(uint64(len(msg)))
 			state["response"] = []byte(msg)
-			s.log.Debugw("received firehose message", logp.Namespace("falcon_hose"), debugMsg(msg))
+			s.log.Debugw("received firehose message", logp.Namespace(s.ns), "msg", debugMsg(msg))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.log.Errorw("failed to process and publish data", "error", err)

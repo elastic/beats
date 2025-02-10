@@ -118,7 +118,6 @@ func ParseURL(module mb.Module, host string) (mb.HostData, error) {
 }
 
 func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode readpref.Mode) (*mongo.Client, error) {
-
 	clientOptions := options.Client()
 
 	// options.Credentials must be nil for the driver to work properly if no auth is provided. Zero values breaks
@@ -143,12 +142,12 @@ func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode read
 	if mode == 0 {
 		mode = readpref.NearestMode
 	}
-
 	readPreference, err := readpref.New(mode)
 	if err != nil {
 		return nil, err
 	}
 	clientOptions.SetReadPreference(readPreference)
+
 	clientOptions.SetConnectTimeout(timeout)
 
 	if config.TLS.IsEnabled() {
@@ -160,13 +159,10 @@ func NewClient(config ModuleConfig, uri string, timeout time.Duration, mode read
 		clientOptions.SetTLSConfig(tlsConfig.ToConfig())
 	}
 
-	client, err := mongo.NewClient(clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("could not create mongodb client: %w", err)
 	}
 
-	if err = client.Connect(context.Background()); err != nil {
-		return client, fmt.Errorf("could not connect to mongodb: %w", err)
-	}
 	return client, nil
 }

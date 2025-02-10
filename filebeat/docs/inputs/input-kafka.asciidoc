@@ -60,6 +60,9 @@ might work as well, but are not supported.
 The `kafka` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
+NOTE: If you're using {agent} with a Kafka input and need to increase throughput, we recommend scaling horizontally by additional {agents} to read from the Kafka topic.
+Note that each {agent} reads concurrently from each of the partitions it has been assigned. 
+
 [float]
 [[kafka-hosts]]
 ===== `hosts`
@@ -86,7 +89,7 @@ The Kafka client id (optional).
 [float]
 ===== `version`
 
-The version of the Kafka protocol to use (defaults to `"1.0.0"`).
+The version of the Kafka protocol to use (defaults to `"2.1.0"`). When using Kafka 4.0 and newer, the version must be set to at least `"2.1.0"`.
 
 [float]
 ===== `initial_offset`

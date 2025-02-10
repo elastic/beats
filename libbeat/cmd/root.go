@@ -20,27 +20,15 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/cmd/platformcheck"
 	"github.com/elastic/beats/v7/libbeat/licenser"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
-
-func init() {
-	// backwards compatibility workaround, convert -flags to --flags:
-	for i, arg := range os.Args[1:] {
-		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 {
-			os.Args[1+i] = "-" + arg
-		}
-	}
-}
 
 // BeatsRootCmd handles all application command line interface, parses user
 // flags and runs subcommands
@@ -63,11 +51,6 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	// Check we are actually talking with Elasticsearch, to ensure that used features actually exist.
 	_, _ = elasticsearch.RegisterGlobalCallback(licenser.FetchAndVerify)
 
-	if err := platformcheck.CheckNativePlatformCompat(); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to initialize: %v\n", err)
-		os.Exit(1)
-	}
-
 	if settings.IndexPrefix == "" {
 		settings.IndexPrefix = settings.Name
 	}
@@ -76,13 +59,11 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.Use = settings.Name
 
 	// Due to a dependence upon the beat name, the default config file path
+	cfgfile.Initialize()
 	err := cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 	if err != nil {
 		panic(fmt.Errorf("failed to set default config file path: %w", err))
 	}
-
-	// Initialize the configuration flags.
-	cfgfile.InitFlags()
 
 	// must be updated prior to CLI flag handling.
 

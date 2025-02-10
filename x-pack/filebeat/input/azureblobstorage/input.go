@@ -71,6 +71,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			TimeStampEpoch:           container.TimeStampEpoch,
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
+			ReaderConfig:             container.ReaderConfig,
 		})
 	}
 
@@ -120,6 +121,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
+	c.ReaderConfig = cfg.ReaderConfig
 	return c
 }
 

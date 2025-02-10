@@ -33,16 +33,16 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type BeatProc struct {
@@ -188,7 +188,7 @@ func (b *BeatProc) Start(args ...string) {
 	b.fullPath = fullPath
 	b.Args = append(b.baseArgs, args...)
 
-	done := atomic.MakeBool(false)
+	var done atomic.Bool
 	wg := sync.WaitGroup{}
 	if b.RestartOnBeatOnExit {
 		wg.Add(1)
@@ -282,8 +282,6 @@ func (b *BeatProc) waitBeatToExit() {
 		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
 			b.beatName, err, exitCode)
 	}
-
-	return
 }
 
 // Stop stops the Beat process
@@ -312,10 +310,10 @@ func (b *BeatProc) stopNonsynced() {
 	defer b.waitingMutex.Unlock()
 	ps, err := b.Process.Wait()
 	if err != nil {
-		b.t.Logf("[WARN] got an error waiting mockbeat to top: %v", err)
+		b.t.Logf("[WARN] got an error waiting %s to top: %v", b.beatName, err)
 	}
 	if !ps.Success() {
-		b.t.Logf("[WARN] mockbeat did not stopped successfully: %v", ps.String())
+		b.t.Logf("[WARN] %s did not stopped successfully: %v", b.beatName, ps.String())
 	}
 }
 
@@ -430,6 +428,29 @@ func (b *BeatProc) GetLogLine(s string) string {
 	return line
 }
 
+// GetLastLogLine search for the string s starting at the end
+// of the logs, if it is found the whole log line is returned, otherwise
+// an empty string is returned. GetLastLogLine does not keep track of
+// any offset.
+func (b *BeatProc) GetLastLogLine(s string) string {
+	logFile := b.openLogFile()
+	defer logFile.Close()
+
+	found, line := b.searchStrInLogsReversed(logFile, s)
+	if found {
+		return line
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return ""
+	}
+	defer eventLogFile.Close()
+	_, line = b.searchStrInLogsReversed(eventLogFile, s)
+
+	return line
+}
+
 // searchStrInLogs search for s as a substring of any line in logFile starting
 // from offset.
 //
@@ -469,6 +490,44 @@ func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bo
 	}
 
 	return false, offset, ""
+}
+
+// searchStrInLogs search for s as a substring of any line in logFile starting
+// from offset.
+//
+// It will close logFile and return the current offset.
+func (b *BeatProc) searchStrInLogsReversed(logFile *os.File, s string) (bool, string) {
+	t := b.t
+
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			// That's not quite a test error, but it can impact
+			// next executions of LogContains, so treat it as an error
+			t.Errorf("could not close log file: %s", err)
+		}
+	}()
+
+	r := bufio.NewReader(logFile)
+	lines := []string{}
+	for {
+		line, err := r.ReadString('\n')
+		if err != nil {
+			if err != io.EOF {
+				t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
+			}
+			break
+		}
+		lines = append(lines, line)
+	}
+
+	slices.Reverse(lines)
+	for _, line := range lines {
+		if strings.Contains(line, s) {
+			return true, line
+		}
+	}
+
+	return false, ""
 }
 
 // WaitForLogs waits for the specified string s to be present in the logs within
@@ -933,4 +992,9 @@ func (b *BeatProc) CountFileLines(glob string) int {
 	}
 
 	return bytes.Count(data, []byte{'\n'})
+}
+
+// ConfigFilePath returns the config file path
+func (b *BeatProc) ConfigFilePath() string {
+	return b.configFile
 }

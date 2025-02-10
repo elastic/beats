@@ -20,12 +20,13 @@
 package template
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -43,10 +44,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 type testTemplate struct {
 	t      *testing.T
@@ -66,7 +63,9 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
 	client := getTestingElasticsearch(t)
-	if err := client.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
 		t.Fatal(err)
 	}
 	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
@@ -270,7 +269,7 @@ func TestESLoader_Load(t *testing.T) {
 		})
 
 		t.Run("preserve existing data stream even if overwriting templates is allowed", func(t *testing.T) {
-			fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+			fields, err := os.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
 			require.NoError(t, err)
 			setup := newTestSetup(t, TemplateConfig{Enabled: true, Overwrite: true})
 			setup.mustLoad(fields)
@@ -310,7 +309,7 @@ func TestESLoader_Load(t *testing.T) {
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
-		fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+		fields, err := os.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
 		require.NoError(t, err)
 		for run, data := range map[string]struct {
 			cfg        TemplateConfig
@@ -474,7 +473,8 @@ func TestTemplateWithData(t *testing.T) {
 	setup := newTestSetup(t, TemplateConfig{Enabled: true})
 	setup.mustLoadFromFile([]string{"testdata", "fields.yml"})
 
-	esClient := setup.client.(*eslegclient.Connection)
+	esClient, ok := setup.client.(*eslegclient.Connection)
+	assert.True(t, ok)
 	for _, test := range dataTests {
 		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
 		if test.error {
@@ -498,7 +498,8 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 
 	templates, _ := response.GetValue("index_templates")
 	templatesList, _ := templates.([]interface{})
-	templateElem := templatesList[0].(map[string]interface{})
+	templateElem, ok := templatesList[0].(map[string]interface{})
+	require.True(t, ok)
 
 	return testTemplate{
 		t:      t,
@@ -554,7 +555,9 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 
 	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test
@@ -586,7 +589,9 @@ func getMockElasticsearchClient(t *testing.T, method, endpoint string, code int,
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	})
 	require.NoError(t, err)
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	require.NoError(t, err)
 	return conn
 }

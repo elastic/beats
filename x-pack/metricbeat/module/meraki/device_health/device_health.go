@@ -98,10 +98,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return fmt.Errorf("getDeviceStatuses failed; %w", err)
 		}
 
-		err = getDevicePerformanceScores(m.client, devices)
-		if err != nil {
-			return fmt.Errorf("getDevicePerformanceScores failed; %w", err)
-		}
+		getDevicePerformanceScores(m.logger, m.client, devices)
 
 		err = getDeviceChannelUtilization(m.client, devices, collectionPeriod)
 		if err != nil {

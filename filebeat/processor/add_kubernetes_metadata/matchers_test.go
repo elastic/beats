@@ -19,6 +19,7 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 	"testing"
 
@@ -36,6 +37,8 @@ const puid = "005f3b90-4b9d-12f8-acf0-31020a840133"
 
 func TestMain(m *testing.M) {
 	InitializeModule()
+
+	os.Exit(m.Run())
 }
 
 func TestLogsPathMatcher_InvalidSource1(t *testing.T) {

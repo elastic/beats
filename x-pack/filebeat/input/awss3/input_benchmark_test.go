@@ -27,8 +27,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -164,10 +162,17 @@ func (c constantS3) ListObjectsPaginator(string, string) s3Pager {
 var _ beat.Pipeline = (*fakePipeline)(nil)
 
 // fakePipeline returns new ackClients.
-type fakePipeline struct{}
+type fakePipeline struct {
+}
 
-func (c *fakePipeline) ConnectWith(beat.ClientConfig) (beat.Client, error) {
-	return &ackClient{}, nil
+func newFakePipeline() *fakePipeline {
+	return &fakePipeline{}
+}
+
+func (c *fakePipeline) ConnectWith(config beat.ClientConfig) (beat.Client, error) {
+	return &ackClient{
+		eventListener: config.EventListener,
+	}, nil
 }
 
 func (c *fakePipeline) Connect() (beat.Client, error) {
@@ -177,13 +182,15 @@ func (c *fakePipeline) Connect() (beat.Client, error) {
 var _ beat.Client = (*ackClient)(nil)
 
 // ackClient is a fake beat.Client that ACKs the published messages.
-type ackClient struct{}
+type ackClient struct {
+	eventListener beat.EventListener
+}
 
 func (c *ackClient) Close() error { return nil }
 
 func (c *ackClient) Publish(event beat.Event) {
-	// Fake the ACK handling.
-	event.Private.(*awscommon.EventACKTracker).ACK()
+	c.eventListener.AddEvent(event, true)
+	go c.eventListener.ACKEvents(1)
 }
 
 func (c *ackClient) PublishAll(event []beat.Event) {
@@ -208,20 +215,20 @@ file_selectors:
 	return inputConfig
 }
 
-func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
+func benchmarkInputSQS(t *testing.T, workerCount int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		var err error
-		pipeline := &fakePipeline{}
 
 		config := makeBenchmarkConfig(t)
-		config.MaxNumberOfMessages = maxMessagesInflight
+		config.NumberOfWorkers = workerCount
 		sqsReader := newSQSReaderInput(config, aws.Config{})
 		sqsReader.log = log.Named("sqs")
-		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), maxMessagesInflight)
+		sqsReader.pipeline = newFakePipeline()
+		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), workerCount)
 		sqsReader.sqs, err = newConstantSQS()
 		require.NoError(t, err)
 		sqsReader.s3 = newConstantS3(t)
-		sqsReader.msgHandler, err = sqsReader.createEventProcessor(pipeline)
+		sqsReader.msgHandler, err = sqsReader.createEventProcessor()
 		require.NoError(t, err, "createEventProcessor must succeed")
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -240,7 +247,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		b.StopTimer()
 		elapsed := time.Since(start)
 
-		b.ReportMetric(float64(maxMessagesInflight), "max_messages_inflight")
+		b.ReportMetric(float64(workerCount), "number_of_workers")
 		b.ReportMetric(elapsed.Seconds(), "sec")
 
 		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get()), "events")
@@ -303,14 +310,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 
 		metricRegistry := monitoring.NewRegistry()
 		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
-
-		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		})
-
-		defer func() {
-			_ = client.Close()
-		}()
+		pipeline := newFakePipeline()
 
 		config := makeBenchmarkConfig(t)
 		config.NumberOfWorkers = numberOfWorkers
@@ -339,19 +339,20 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
 				store := openTestStatestore()
 
-				states, err := newStates(nil, store)
+				states, err := newStates(nil, store, "")
 				assert.NoError(t, err, "states creation should succeed")
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(metrics, s3API, config.FileSelectors, backupConfig{})
 				s3Poller := &s3PollerInput{
 					log:             logp.NewLogger(inputName),
 					config:          config,
 					metrics:         metrics,
 					s3:              s3API,
-					client:          client,
+					pipeline:        pipeline,
 					s3ObjectHandler: s3EventHandlerFactory,
 					states:          states,
 					provider:        "provider",
+					filterProvider:  newFilterProvider(&config),
 				}
 
 				s3Poller.run(ctx)

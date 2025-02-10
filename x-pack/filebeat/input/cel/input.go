@@ -10,6 +10,7 @@ package cel
 import (
 	"compress/gzip"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -166,7 +167,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, ast, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace)
+	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
+	doCov := cfg.RecordCoverage && log.IsDebug()
+	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace, wantDump, doCov)
 	if err != nil {
 		return err
 	}
@@ -226,6 +229,14 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		)
 		// Keep track of whether CEL is degraded for this periodic run.
 		var isDegraded bool
+		if doCov {
+			defer func() {
+				// If doCov is true, log the updated coverage details.
+				// Updates are a running aggregate for each call to run
+				// as cov is shared via the program compilation.
+				log.Debugw("coverage", "details", cov.Details())
+			}()
+		}
 		for {
 			if wait := time.Until(waitUntil); wait > 0 {
 				// We have a special-case wait for when we have a zero limit.
@@ -251,12 +262,25 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
 			start := i.now().In(time.UTC)
-			state, err = evalWith(ctx, prg, ast, state, start)
+			state, err = evalWith(ctx, prg, ast, state, start, wantDump)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
+				var dump dumpError
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 					return err
+				case errors.As(err, &dump):
+					path := strings.ReplaceAll(cfg.FailureDump.Filename, "*", sanitizeFileName(env.IDWithoutName))
+					dir := filepath.Dir(path)
+					base := filepath.Base(path)
+					ext := filepath.Ext(base)
+					prefix := strings.TrimSuffix(base, ext)
+					path = filepath.Join(dir, prefix+"-"+i.now().In(time.UTC).Format("2006-01-02T15-04-05.000")+ext)
+					log.Debugw("writing failure dump file", "path", path)
+					err := dump.writeToFile(path)
+					if err != nil {
+						log.Errorw("failed to write failure dump", "path", path, "error", err)
+					}
 				}
 				log.Errorw("failed evaluation", "error", err)
 				env.UpdateStatus(status.Degraded, "failed evaluation: "+err.Error())
@@ -761,9 +785,8 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
-		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
-		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
+		maxBodyLen := cfg.Resource.Tracer.MaxSize * 1e6 / 10 // 10% of file max
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, log)
 		c.Transport = trace
 	} else if cfg.Resource.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
@@ -774,6 +797,26 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		}
 		ext := filepath.Ext(cfg.Resource.Tracer.Filename)
 		base := strings.TrimSuffix(cfg.Resource.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
+	}
+	if !cfg.FailureDump.enabled() && cfg.FailureDump != nil && cfg.FailureDump.Filename != "" {
+		// We have a fail-dump name, but we are not enabled,
+		// so remove all dumps we own.
+		err = os.Remove(cfg.FailureDump.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.FailureDump.Filename, "error", err)
+		}
+		ext := filepath.Ext(cfg.FailureDump.Filename)
+		base := strings.TrimSuffix(cfg.FailureDump.Filename, ext)
 		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
 		if err != nil {
 			log.Errorw("failed to collect request trace log path names", "error", err)
@@ -1004,10 +1047,10 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, *cel.Ast, error) {
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
+		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
 	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
@@ -1016,6 +1059,7 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 		lib.Crypto(),
 		lib.JSON(nil),
 		xml,
+		lib.Printf(),
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
@@ -1034,19 +1078,30 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 	}
 	env, err := cel.NewEnv(opts...)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create env: %w", err)
+		return nil, nil, nil, fmt.Errorf("failed to create env: %w", err)
 	}
 
 	ast, iss := env.Compile(src)
 	if iss.Err() != nil {
-		return nil, nil, fmt.Errorf("failed compilation: %w", iss.Err())
+		return nil, nil, nil, fmt.Errorf("failed compilation: %w", iss.Err())
 	}
 
-	prg, err := env.Program(ast)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed program instantiation: %w", err)
+	var (
+		progOpts []cel.ProgramOption
+		cov      *lib.Coverage
+	)
+	if coverage {
+		cov = lib.NewCoverage(ast)
+		progOpts = []cel.ProgramOption{cov.ProgramOption()}
 	}
-	return prg, ast, nil
+	if details {
+		progOpts = []cel.ProgramOption{cel.EvalOptions(cel.OptTrackState)}
+	}
+	prg, err := env.Program(ast, progOpts...)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("failed program instantiation: %w", err)
+	}
+	return prg, ast, cov, nil
 }
 
 func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, any) {
@@ -1064,8 +1119,8 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
-	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
+func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time, details bool) (map[string]interface{}, error) {
+	out, det, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
 		// which will persist over multiple evaluations. The lib.Time behaviour
@@ -1080,6 +1135,9 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 	})
 	if err != nil {
 		err = lib.DecoratedError{AST: ast, Err: err}
+		if details {
+			err = dumpError{error: err, dump: lib.NewDump(ast, det)}
+		}
 	}
 	if e := ctx.Err(); e != nil {
 		err = e
@@ -1106,6 +1164,36 @@ func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[stri
 		clearWantMore(state)
 		return state, errors.New(errMsg)
 	}
+}
+
+// dumpError is an evaluation state dump associated with an error.
+type dumpError struct {
+	error
+	dump *lib.Dump
+}
+
+func (e dumpError) writeToFile(path string) (err error) {
+	err = os.MkdirAll(filepath.Dir(path), 0o700)
+	if err != nil {
+		return err
+	}
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = errors.Join(err, f.Sync(), f.Close())
+	}()
+	enc := json.NewEncoder(f)
+	enc.SetEscapeHTML(false)
+	type dump struct {
+		Error string          `json:"error"`
+		State []lib.NodeValue `json:"state"`
+	}
+	return enc.Encode(dump{
+		Error: e.Error(),
+		State: e.dump.NodeValues(),
+	})
 }
 
 // clearWantMore sets the state to not request additional work in a periodic evaluation.

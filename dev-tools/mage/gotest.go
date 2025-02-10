@@ -217,6 +217,7 @@ func goTestIntegrationForSingleModule(ctx context.Context, module string) error 
 			return nil
 		})
 		if err != nil {
+			fmt.Printf("Error: failed to run integration tests for module %s:\n%v\n", fi.Name(), err)
 			// err will already be report to stdout, collect failed module to report at end
 			failedModules = append(failedModules, fi.Name())
 		}

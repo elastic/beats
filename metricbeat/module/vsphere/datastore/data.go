@@ -26,6 +26,7 @@ import (
 func (m *DataStoreMetricSet) mapEvent(ds mo.Datastore, data *metricData) mapstr.M {
 	event := mapstr.M{
 		"name":   ds.Summary.Name,
+		"id":     ds.Self.Value,
 		"fstype": ds.Summary.Type,
 		"status": ds.OverallStatus,
 		"host": mapstr.M{

@@ -659,6 +659,7 @@ filename and will be replaced with the input instance id. For Example, `http-req
 
 This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
 logs are allowed to reach 1MB before rotation.
+Individual request/response bodies will be truncated to 10% of this size.
 
 [float]
 ==== `request.tracer.maxage`
@@ -782,6 +783,8 @@ Valid when used with `type: map`. When not empty, defines a new field where the 
 ==== `response.split[].ignore_empty_value`
 
 If set to true, empty or missing value will be ignored and processing will pass on to the next nested split operation instead of failing with an error. Default: `false`.
+
+Note that if `ignore_empty_value` is `true` and the final result is empty, no event will be published, and no cursor update will be made. If a cursor update must be made for all responses, this should be set to `false` and the ingest pipeline must be configured to tolerate empty event sets.
 
 [float]
 ==== `response.split[].split`
@@ -1556,6 +1559,8 @@ See  <<chain-step-replace_with, chain[].step.replace_with>> .
 
 Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
 
+If no event is published, no cursor update is made. This can have implications on how cursor updates should be performed when the target API returns empty response sets.
+
 Each cursor entry is formed by:
 
 - A `value` template, which will define the value to store when evaluated.
@@ -1618,6 +1623,8 @@ observe the activity of the input.
 [options="header"]
 |=======
 | Metric                                     | Description
+| `events_published_total`                   | Total number of events published.
+| `pages_published_total`                    | Total number of pages of event published.
 | `http_request_total`                       | Total number of processed requests.
 | `http_request_errors_total`                | Total number of request errors.
 | `http_request_delete_total`                | Total number of `DELETE` requests.

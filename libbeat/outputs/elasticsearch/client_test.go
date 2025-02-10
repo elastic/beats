@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -713,6 +714,83 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	}
 }
 
+func BenchmarkPublish(b *testing.B) {
+	tests := []struct {
+		Name   string
+		Events []beat.Event
+	}{
+		{
+			Name:   "5 events",
+			Events: testutil.GenerateEvents(50, 5, 3),
+		},
+		{
+			Name:   "50 events",
+			Events: testutil.GenerateEvents(500, 5, 3),
+		},
+		{
+			Name:   "500 events",
+			Events: testutil.GenerateEvents(500, 5, 3),
+		},
+	}
+
+	levels := []int{1, 4, 7, 9}
+
+	requestCount := 0
+
+	// start a mock HTTP server
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(b, "testing value", r.Header.Get("X-Test"))
+		// from the documentation: https://golang.org/pkg/net/http/
+		// For incoming requests, the Host header is promoted to the
+		// Request.Host field and removed from the Header map.
+		assert.Equal(b, "myhost.local", r.Host)
+
+		var response string
+		if r.URL.Path == "/" {
+			response = `{ "version": { "number": "7.6.0" } }`
+		} else {
+			response = `{"items":[{"index":{}},{"index":{}},{"index":{}}]}`
+
+		}
+		fmt.Fprintln(w, response)
+		requestCount++
+	}))
+	defer ts.Close()
+
+	// Indexing to _bulk api
+	for _, test := range tests {
+		for _, l := range levels {
+			b.Run(fmt.Sprintf("%s with compression level %d", test.Name, l), func(b *testing.B) {
+				client, err := NewClient(
+					clientSettings{
+						connection: eslegclient.ConnectionSettings{
+							URL: ts.URL,
+							Headers: map[string]string{
+								"host":   "myhost.local",
+								"X-Test": "testing value",
+							},
+							CompressionLevel: l,
+						},
+					},
+
+					nil,
+				)
+				assert.NoError(b, err)
+				batch := encodeBatch(client, outest.NewBatch(test.Events...))
+
+				// It uses gzip encoder internally for encoding data
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					err := client.Publish(context.Background(), batch)
+					assert.NoError(b, err)
+				}
+			})
+
+		}
+	}
+
+}
+
 func TestClientWithHeaders(t *testing.T) {
 	requestCount := 0
 	// start a mock HTTP server
@@ -748,8 +826,10 @@ func TestClientWithHeaders(t *testing.T) {
 	}, nil)
 	assert.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	// simple ping
-	err = client.Connect()
+	err = client.Connect(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, requestCount)
 
@@ -943,11 +1023,13 @@ func TestClientWithAPIKey(t *testing.T) {
 	}, nil)
 	assert.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	// This connection will fail since the server doesn't return a valid
 	// response. This is fine since we're just testing the headers in the
 	// original client request.
 	//nolint:errcheck // connection doesn't need to succeed
-	client.Connect()
+	client.Connect(ctx)
 	assert.Equal(t, "ApiKey aHlva0hHNEJmV2s1dmlLWjE3Mlg6bzQ1SlVreXVTLS15aVNBdXV4bDhVdw==", headers.Get("Authorization"))
 }
 

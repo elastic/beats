@@ -6,10 +6,12 @@ package device_health
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
@@ -67,7 +69,7 @@ func getDeviceStatuses(client *meraki.Client, organizationID string, devices map
 	return nil
 }
 
-func getDevicePerformanceScores(client *meraki.Client, devices map[Serial]*Device) error {
+func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devices map[Serial]*Device) {
 	for _, device := range devices {
 		// attempting to get a performance score for a non-MX device returns a 400
 		if strings.Index(device.details.Model, "MX") != 0 {
@@ -76,7 +78,11 @@ func getDevicePerformanceScores(client *meraki.Client, devices map[Serial]*Devic
 
 		val, res, err := client.Appliance.GetDeviceAppliancePerformance(device.details.Serial)
 		if err != nil {
-			return fmt.Errorf("GetDeviceAppliancePerformance failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+			if !(res.StatusCode() != http.StatusBadRequest && strings.Contains(string(res.Body()), "Feature not supported")) {
+				logger.Errorf("GetDeviceAppliancePerformance failed; [%d] %s. %v", res.StatusCode(), res.Body(), err)
+			}
+
+			continue
 		}
 
 		// 204 indicates there is no data for the device, it's likely 'offline' or 'dormant'
@@ -84,8 +90,6 @@ func getDevicePerformanceScores(client *meraki.Client, devices map[Serial]*Devic
 			device.performanceScore = val
 		}
 	}
-
-	return nil
 }
 
 func getDeviceChannelUtilization(client *meraki.Client, devices map[Serial]*Device, period time.Duration) error {
@@ -146,6 +150,10 @@ func getDeviceChannelUtilization(client *meraki.Client, devices map[Serial]*Devi
 func getDeviceLicenses(client *meraki.Client, organizationID string, devices map[Serial]*Device) error {
 	val, res, err := client.Organizations.GetOrganizationLicenses(organizationID, &meraki.GetOrganizationLicensesQueryParams{})
 	if err != nil {
+		// Ignore 400 error for per-device licensing not supported
+		if res.StatusCode() == 400 && strings.Contains(string(res.Body()), "does not support per-device licensing") {
+			return nil
+		}
 		return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 	}
 

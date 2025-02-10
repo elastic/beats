@@ -34,11 +34,10 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 }
 
 func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
-	src := &source{cfg: config{}}
+	src := &source{cfg: defaultConfig()}
 	if err := cfg.Unpack(&src.cfg); err != nil {
 		return nil, nil, err
 	}
-
 	if src.cfg.Program == "" {
 		// set default program
 		src.cfg.Program = `

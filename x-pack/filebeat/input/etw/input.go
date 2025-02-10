@@ -79,7 +79,7 @@ type etwInput struct {
 func Plugin() input.Plugin {
 	return input.Plugin{
 		Name:      inputName,
-		Stability: feature.Beta,
+		Stability: feature.Stable,
 		Info:      "Collect ETW logs.",
 		Manager:   stateless.NewInputManager(configure),
 	}

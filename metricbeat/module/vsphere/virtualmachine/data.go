@@ -33,6 +33,7 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 
 	event := mapstr.M{
 		"name":   data.VM.Summary.Config.Name,
+		"id":     data.VM.Self.Value,
 		"os":     data.VM.Summary.Config.GuestFullName,
 		"uptime": data.VM.Summary.QuickStats.UptimeSeconds,
 		"status": data.VM.Summary.OverallStatus,

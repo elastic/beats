@@ -30,51 +30,36 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Command line flags.
+// Evil package level globals
 var (
-	// The default config cannot include the beat name as it is not initialized
-	// when this variable is created. See ChangeDefaultCfgfileFlag which should
-	// be called prior to flags.Parse().
-	commandLine     flag.FlagSet
-	commandLineOnce sync.Once
-	configfiles     = config.StringArrFlag(&commandLine, "c", "beat.yml", "Configuration file, relative to path.config")
-	overwrites      = config.SettingFlag(&commandLine, "E", "Configuration overwrite")
-
-	// Additional default settings, that must be available for variable expansion
-	defaults = config.MustNewConfigFrom(map[string]interface{}{
-		"path": map[string]interface{}{
-			"home":   ".", // to be initialized by beat
-			"config": "${path.home}",
-			"data":   fmt.Sprint("${path.home}", string(os.PathSeparator), "data"),
-			"logs":   fmt.Sprint("${path.home}", string(os.PathSeparator), "logs"),
-		},
-	})
-
-	// home-path CLI flag (initialized in init)
-	homePath   *string
-	configPath *string
+	once        sync.Once
+	configfiles *config.StringsFlag
+	overwrites  *config.C
+	defaults    *config.C
+	homePath    *string
+	configPath  *string
 )
 
-func init() {
-	// add '-path.x' options overwriting paths in 'overwrites' config
-	makePathFlag := func(name, usage string) *string {
-		return config.ConfigOverwriteFlag(&commandLine, overwrites, name, name, "", usage)
-	}
-
-	homePath = makePathFlag("path.home", "Home path")
-	configPath = makePathFlag("path.config", "Configuration path")
-	makePathFlag("path.data", "Data path")
-	makePathFlag("path.logs", "Logs path")
-}
-
-// InitFlags is for explicitly initializing the flags.
-// It may get called repeatedly for different flagsets, but not
-// twice for the same one.
-func InitFlags() {
-	commandLineOnce.Do(func() {
-		commandLine.VisitAll(func(f *flag.Flag) {
-			flag.CommandLine.Var(f.Value, f.Name, f.Usage)
+func Initialize() {
+	once.Do(func() {
+		// The default config cannot include the beat name as
+		// it is not initialized when this variable is
+		// created. See ChangeDefaultCfgfileFlag which should
+		// be called prior to flags.Parse().
+		configfiles = config.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
+		overwrites = config.SettingFlag(nil, "E", "Configuration overwrite")
+		defaults = config.MustNewConfigFrom(map[string]interface{}{
+			"path": map[string]interface{}{
+				"home":   ".", // to be initialized by beat
+				"config": "${path.home}",
+				"data":   filepath.Join("${path.home}", "data"),
+				"logs":   filepath.Join("${path.home}", "logs"),
+			},
 		})
+		homePath = config.ConfigOverwriteFlag(nil, overwrites, "path.home", "path.home", "", "Home path")
+		configPath = config.ConfigOverwriteFlag(nil, overwrites, "path.config", "path.config", "", "Configuration path")
+		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.data", "path.data", "", "Data path")
+		_ = config.ConfigOverwriteFlag(nil, overwrites, "path.logs", "path.logs", "", "Logs path")
 	})
 }
 
@@ -88,9 +73,11 @@ type ConditionalOverride struct {
 	Config *config.C
 }
 
-// ChangeDefaultCfgfileFlag replaces the value and default value for the `-c`
-// flag so that it reflects the beat name.
+// ChangeDefaultCfgfileFlag replaces the value and default value for
+// the `-c` flag so that it reflects the beat name.  It will call
+// Initialize() to register the `-c` flags
 func ChangeDefaultCfgfileFlag(beatName string) error {
+	Initialize()
 	configfiles.SetDefault(beatName + ".yml")
 	return nil
 }
@@ -111,10 +98,12 @@ func GetDefaultCfgfile() string {
 	return cfg
 }
 
-// HandleFlags adapts default config settings based on command line flags.
-// This also stores if -E management.enabled=true was set on command line
-// to determine if running the Beat under agent.
+// HandleFlags adapts default config settings based on command line
+// flags.  This also stores if -E management.enabled=true was set on
+// command line to determine if running the Beat under agent.  It will
+// call Initialize() to register the flags like `-E`.
 func HandleFlags() error {
+	Initialize()
 	// default for the home path is the binary location
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
@@ -258,8 +247,11 @@ func SetConfigPath(path string) {
 	*configPath = path
 }
 
-// GetPathConfig returns ${path.config}. If ${path.config} is not set, ${path.home} is returned.
+// GetPathConfig returns ${path.config}. If ${path.config} is not set,
+// ${path.home} is returned.  It will call Initialize to ensure that
+// `path.config` and `path.home` are set.
 func GetPathConfig() string {
+	Initialize()
 	if *configPath != "" {
 		return *configPath
 	} else if *homePath != "" {

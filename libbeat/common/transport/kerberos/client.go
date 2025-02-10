@@ -21,10 +21,10 @@ import (
 	"fmt"
 	"net/http"
 
-	krbclient "gopkg.in/jcmturner/gokrb5.v7/client"
-	krbconfig "gopkg.in/jcmturner/gokrb5.v7/config"
-	"gopkg.in/jcmturner/gokrb5.v7/keytab"
-	"gopkg.in/jcmturner/gokrb5.v7/spnego"
+	krbclient "github.com/jcmturner/gokrb5/v8/client"
+	krbconfig "github.com/jcmturner/gokrb5/v8/config"
+	"github.com/jcmturner/gokrb5/v8/keytab"
+	"github.com/jcmturner/gokrb5/v8/spnego"
 )
 
 type Client struct {
@@ -35,18 +35,18 @@ func NewClient(config *Config, httpClient *http.Client, esurl string) (*Client, 
 	var krbClient *krbclient.Client
 	krbConf, err := krbconfig.Load(config.ConfigPath)
 	if err != nil {
-		return nil, fmt.Errorf("error creating Kerberos client: %+v", err)
+		return nil, fmt.Errorf("error creating Kerberos client: %w", err)
 	}
 
 	switch config.AuthType {
 	case authKeytab:
 		kTab, err := keytab.Load(config.KeyTabPath)
 		if err != nil {
-			return nil, fmt.Errorf("cannot load keytab file %s: %+v", config.KeyTabPath, err)
+			return nil, fmt.Errorf("cannot load keytab file %s: %w", config.KeyTabPath, err)
 		}
-		krbClient = krbclient.NewClientWithKeytab(config.Username, config.Realm, kTab, krbConf)
+		krbClient = krbclient.NewWithKeytab(config.Username, config.Realm, kTab, krbConf)
 	case authPassword:
-		krbClient = krbclient.NewClientWithPassword(config.Username, config.Realm, config.Password, krbConf)
+		krbClient = krbclient.NewWithPassword(config.Username, config.Realm, config.Password, krbConf)
 	default:
 		return nil, InvalidAuthType
 	}

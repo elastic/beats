@@ -15,14 +15,18 @@
           type: keyword
           description: >
             Hostname of the host.
+    - name: id
+      type: keyword
+      description: >
+        Unique virtual machine ID.
     - name: name
       type: keyword
       description: >
-        Virtual Machine name.
+        Virtual machine name.
     - name: os
       type: keyword
       description: >
-        Virtual Machine Operating System name.
+        Virtual machine Operating System name.
     - name: cpu.used.mhz
       type: long
       description: >
@@ -38,22 +42,22 @@
     - name: memory.used.guest.bytes
       type: long
       description: >
-        Used Memory of Guest in bytes.
+        Used memory of Guest in bytes.
       format: bytes
     - name: memory.used.host.bytes
       type: long
       description: >
-        Used Memory of Host in bytes.
+        Used memory of Host in bytes.
       format: bytes
     - name: memory.total.guest.bytes
       type: long
       description: >
-        Total Memory of Guest in bytes.
+        Total memory of Guest in bytes.
       format: bytes
     - name: memory.free.guest.bytes
       type: long
       description: >
-        Free Memory of Guest in bytes.
+        Free memory of Guest in bytes.
       format: bytes
     - name: custom_fields
       type: object

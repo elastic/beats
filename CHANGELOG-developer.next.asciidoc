@@ -70,6 +70,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Debug log entries from the acker (`stateful ack ...` or `stateless ack ...`) removed. {pull}39672[39672]
 - Rename x-pack/filebeat websocket input to streaming. {issue}40264[40264] {pull}40421[40421]
 - Journald input now calls `journalctl` instead of using `github.com/coreos/go-systemd/v22@v22.5.0/sdjournal`, the CGO dependency has been removed from Filebeat {pull}40061[40061]
+- System module events now contain `input.type: systemlogs` instead of `input.type: log` when harvesting log files, however the ingest pipeline sets it back to the original input (log or journald). {pull}41246[41246]
+- The system-logs input is removed because it's not used anymore {pull}42328[42328]
 
 ==== Bugfixes
 
@@ -105,6 +107,10 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Close connections properly in Filbeat's HTTPJSON input. {pull}39790[39790]
 - Add the Offset property to libbeat/reader.Message to store the total number of bytes read and discarded before generating the message. This enables inputs to accurately determine how much data has been read up to the message, using Message.Bytes + Message.Offset. {pull}39873[39873] {issue}39653[39653]
 - AWS CloudWatch Metrics record previous endTime to use for next collection period and change log.logger from cloudwatch to aws.cloudwatch. {pull}40870[40870]
+- Fix flaky test in cel and httpjson inputs of filebeat. {issue}40503[40503] {pull}41358[41358]
+- Fix documentation and implementation of raw message handling in Filebeat http_endpoint by removing it. {pull}41498[41498]
+- Fix flaky test in filebeat Okta entity analytics provider. {issue}42059[42059] {pull}42123[42123]
+- Fix IIS module logging errors in case application pool PDH counter is not found. {pull}42274[42274]
 
 ==== Added
 
@@ -207,6 +213,10 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Added filebeat debug histograms for s3 object size and events per processed s3 object. {pull}40775[40775]
 - Simplified GCS input state checkpoint calculation logic. {issue}40878[40878] {pull}40937[40937] 
 - Simplified Azure Blob Storage input state checkpoint calculation logic. {issue}40674[40674] {pull}40936[40936]
+- Add field redaction package. {pull}40997[40997]
+- Add support for marked redaction to x-pack/filebeat/input/internal/private {pull}41212[41212]
+- Add support for collecting Okta role and factor data for users with filebeat entityanalytics input. {pull}41044[41044]
+- Add CEL input program evaluation coverage collection support. {pull}41884[41884]
 
 ==== Deprecated
 

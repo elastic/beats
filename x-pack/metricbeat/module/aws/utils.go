@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/apigateway"
 	"github.com/aws/aws-sdk-go-v2/service/apigatewayv2"
@@ -19,7 +20,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	resourcegroupstaggingapitypes "github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/types"
-	"github.com/aws/aws-sdk-go/aws"
 )
 
 const DefaultApiTimeout = 5 * time.Second
@@ -131,7 +131,7 @@ func GetAPIGatewayRestAPIOutput(svcRestApi *apigateway.Client, limit *int32) (ma
 	// Iterate and display the APIs
 	infoRestAPImap := make(map[string]string, len(result.Items))
 	for _, api := range result.Items {
-		infoRestAPImap[aws.StringValue(api.Name)] = aws.StringValue(api.Id)
+		infoRestAPImap[aws.ToString(api.Name)] = aws.ToString(api.Id)
 	}
 	return infoRestAPImap, nil
 }
@@ -152,7 +152,7 @@ func GetAPIGatewayAPIOutput(svcHttpApi *apigatewayv2.Client) (map[string]string,
 	// Iterate and display the APIs
 	infoAPImap := make(map[string]string, len(result.Items))
 	for _, api := range result.Items {
-		infoAPImap[aws.StringValue(api.Name)] = aws.StringValue(api.ApiId)
+		infoAPImap[aws.ToString(api.Name)] = aws.ToString(api.ApiId)
 	}
 	return infoAPImap, nil
 }

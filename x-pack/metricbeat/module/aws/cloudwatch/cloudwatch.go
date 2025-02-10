@@ -194,10 +194,22 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 
-		// retrieve all the details for all the metrics available in the current region
-		listMetricsOutput, err := aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
-		if err != nil {
-			m.Logger().Errorf("Error while retrieving the list of metrics for region %s: %w", regionName, err)
+		// retrieve all the details for all the metrics available in the current region when no namespace is specified
+		// otherwise only retrieve metrics from the specific namespaces from the config
+		var listMetricsOutput []aws.MetricWithID
+		if len(namespaceDetailTotal) == 0 {
+			listMetricsOutput, err = aws.GetListMetricsOutput("*", regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
+			if err != nil {
+				m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, "*", err)
+			}
+		} else {
+			for namespace := range namespaceDetailTotal {
+				listMetricsOutputPerNamespace, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, APIClients.CloudWatchClient)
+				if err != nil {
+					m.Logger().Errorf("Error while retrieving the list of metrics for region %s and namespace %s: %w", regionName, namespace, err)
+				}
+				listMetricsOutput = append(listMetricsOutput, listMetricsOutputPerNamespace...)
+			}
 		}
 
 		if len(listMetricsOutput) == 0 {

@@ -40,6 +40,7 @@ These are the possible response codes from the server.
 | 406                 | Not Acceptable          | Returned if the POST request does not contain a body.
 | 415                 | Unsupported Media Type  | Returned if the Content-Type is not application/json. Or if Content-Encoding is present and is not gzip.
 | 500                 | Internal Server Error   | Returned if an I/O error occurs reading the request.
+| 503                 | Service Unavailable     | Returned if the length of the request body would take the total number of in-flight bytes above the configured `max_in_flight_bytes` value.
 | 504                 | Gateway Timeout         | Returned if a request publication cannot be ACKed within the required timeout.
 |=========================================================================================================================================================
 
@@ -286,6 +287,16 @@ By default the input expects the incoming POST to include a Content-Type of `app
 In certain scenarios when the source of the request is not able to do that, it can be overwritten with another value or set to null.
 
 [float]
+==== `max_in_flight_bytes`
+
+The total sum of request body lengths that are allowed at any given time. If non-zero, the input will compare this value to the sum of in-flight request body lengths from requests that include a `wait_for_completion_timeout` request query and will return a 503 HTTP status code, along with a Retry-After header configured with the `retry_after` option. The default value for this option is zero, no limit.
+
+[float]
+==== `retry_after`
+
+If a request has exceeded the `max_in_flight_bytes` limit, the response to the client will include a Retry-After header specifying how many seconds the client should wait to retry again. The default value for this option is 10 seconds.
+
+[float]
 ==== `program`
 
 The normal operation of the input treats the body either as a single event when the body is an object, or as a set of events when the body is an array. If the body should be handled differently, for example a set of events in an array field of an object to be handled as a set of events, then a https://opensource.google.com/projects/cel[Common Expression Language (CEL)] program can be provided through this configuration field. The name of the object in the CEL program is `obj`. No CEL extensions are provided beyond the function in the CEL https://github.com/google/cel-spec/blob/master/doc/langdef.md#standard[standard library]. CEL https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] are supported.
@@ -332,7 +343,7 @@ For example, `["content-type"]` will become `["Content-Type"]` when the filebeat
 [float]
 ==== `preserve_original_event`
 
-This option copies the raw unmodified body of the incoming request to the event.original field as a string before sending the event to Elasticsearch.
+This option includes the JSON representation of the incoming request in the `event.original` field as a string before sending the event to Elasticsearch. The representation may not be a verbatim copy of the original message, but is guaranteed to be an [RFC7493](https://datatracker.ietf.org/doc/html/rfc7493) compliant message.
 
 [float]
 ==== `crc.provider`
@@ -371,6 +382,7 @@ filename and will be replaced with the input instance id. For Example, `http-req
 
 This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
 logs are allowed to reach 1MB before rotation.
+Individual request bodies will be truncated to a maximum size of 10kiB.
 
 [float]
 ==== `tracer.maxage`

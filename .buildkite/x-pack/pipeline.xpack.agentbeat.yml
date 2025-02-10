@@ -80,6 +80,12 @@ steps:
           - x-pack/agentbeat/build/distributions/**/*
           - "x-pack/agentbeat/build/*.xml"
           - "x-pack/agentbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/agentbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         retry:
           automatic:
             - limit: 1

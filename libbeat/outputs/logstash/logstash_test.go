@@ -116,7 +116,9 @@ func testConnectionType(
 		output := makeOutputer()
 		t.Logf("new outputter: %v", output)
 
-		err := output.Connect()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		err := output.Connect(ctx)
 		if err != nil {
 			t.Error("test client failed to connect: ", err)
 			return
@@ -186,8 +188,10 @@ func newTestLumberjackOutput(
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	client := grp.Clients[0].(outputs.NetworkClient)
-	if err := client.Connect(); err != nil {
+	if err := client.Connect(ctx); err != nil {
 		t.Fatalf("Client failed to connected: %v", err)
 	}
 

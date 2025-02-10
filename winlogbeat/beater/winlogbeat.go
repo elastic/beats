@@ -108,7 +108,9 @@ func (eb *Winlogbeat) init(b *beat.Beat) error {
 	}
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		overwritePipelines := config.OverwritePipelines
-		esClient, err := eslegclient.NewConnectedClient(esConfig, "Winlogbeat")
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Winlogbeat")
 		if err != nil {
 			return err
 		}

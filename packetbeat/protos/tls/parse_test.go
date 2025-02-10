@@ -302,7 +302,7 @@ func TestCertificates(t *testing.T) {
 		"not_before":                  "2015-11-03 00:00:00 +0000 UTC",
 		"public_key_algorithm":        "RSA",
 		"public_key_size":             "2048",
-		"serial_number":               "19132437207909210467858529073412672688",
+		"serial_number":               "E64C5FBC236ADE14B172AEB41C78CB0",
 		"signature_algorithm":         "SHA256-RSA",
 		"issuer.common_name":          "DigiCert SHA2 High Assurance Server CA",
 		"issuer.country":              "US",

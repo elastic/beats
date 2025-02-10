@@ -32,6 +32,7 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 	event := mapstr.M{
 		"name":   rp.Name,
 		"status": rp.OverallStatus,
+		"id":     rp.Self.Value,
 	}
 
 	quickStats := rp.Summary.GetResourcePoolSummary().QuickStats

@@ -162,7 +162,9 @@ func TestUserAgentHeader(t *testing.T) {
 			testCase.connSettings.URL = server.URL
 			conn, err := NewConnection(testCase.connSettings)
 			require.NoError(t, err)
-			require.NoError(t, conn.Connect(), "conn.Connect must not return an error")
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			require.NoError(t, conn.Connect(ctx), "conn.Connect must not return an error")
 		})
 	}
 }

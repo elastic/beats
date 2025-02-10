@@ -18,9 +18,10 @@
 package elasticsearch
 
 import (
+	"context"
 	"errors"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 	"time"
 
@@ -214,8 +215,10 @@ func (r *reporter) initLoop(c config) {
 
 	for {
 		// Select one configured endpoint by random and check if xpack is available
-		client := r.out[rand.Intn(len(r.out))]
-		err := client.Connect()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		client := r.out[rand.IntN(len(r.out))]
+		err := client.Connect(ctx)
 		if err == nil {
 			closing(log, client)
 			break

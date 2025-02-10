@@ -34,7 +34,7 @@ func ReadInput(prompt string) (string, error) {
 
 func input(r io.Reader, out io.Writer, prompt string) (string, error) {
 	reader := bufio.NewScanner(r)
-	fmt.Fprintf(out, prompt+" ")
+	fmt.Fprintf(out, "%s ", prompt)
 
 	if !reader.Scan() {
 		return "", errors.New("error reading user input")

@@ -88,7 +88,7 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
 		// Note this, intentionally, blocks until connected or max attempts reached
-		esClient, err := makeESClient(b.Config.Output.Config(), 3, 2*time.Second)
+		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second)
 		if err != nil {
 			if parsedConfig.RunOnce {
 				trace.Abort()
@@ -184,7 +184,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
-		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
+		bt.monitorReloader = cfgfile.NewReloader(logp.L().Named("module.reload"), b.Publisher, bt.config.ConfigMonitors)
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors()
@@ -275,7 +275,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		}
 
 		// Backoff panics with 0 duration, set to smallest unit
-		esClient, err := makeESClient(outCfg.Config(), 1, 1*time.Nanosecond)
+		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond)
 		if err != nil {
 			logp.L().Warnf("skipping monitor state management during managed reload: %w", err)
 		} else {
@@ -324,7 +324,7 @@ func (bt *Heartbeat) Stop() {
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
-func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
+func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
 	var (
 		esClient *eslegclient.Connection
 		err      error
@@ -353,7 +353,7 @@ func makeESClient(cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.C
 	}
 
 	for i := 0; i < attempts; i++ {
-		esClient, err = eslegclient.NewConnectedClient(newCfg, "Heartbeat")
+		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat")
 		if err == nil {
 			connectDelay.Reset()
 			return esClient, nil

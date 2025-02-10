@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"k8s.io/apimachinery/pkg/runtime/schema"
+
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
@@ -235,11 +237,23 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		// Deployment -> Replicaset -> Pod
 		// CronJob -> job -> Pod
 		if metaConf.Deployment {
-			replicaSetWatcher, err = kubernetes.NewNamedWatcher("resource_metadata_enricher_rs", client, &kubernetes.ReplicaSet{}, kubernetes.WatchOptions{
-				SyncTimeout:  config.SyncPeriod,
-				Namespace:    config.Namespace,
-				HonorReSyncs: true,
-			}, nil)
+			metadataClient, err := kubernetes.GetKubernetesMetadataClient(config.KubeConfig, config.KubeClientOptions)
+			if err != nil {
+				k.log.Errorf("Error creating metadata client due to error %+v", err)
+			}
+			replicaSetWatcher, err = kubernetes.NewNamedMetadataWatcher(
+				"resource_metadata_enricher_rs",
+				client,
+				metadataClient,
+				schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"},
+				kubernetes.WatchOptions{
+					SyncTimeout:  config.SyncPeriod,
+					Namespace:    config.Namespace,
+					HonorReSyncs: true,
+				},
+				nil,
+				metadata.RemoveUnnecessaryReplicaSetData,
+			)
 			if err != nil {
 				k.log.Errorf("Error creating watcher for %T due to error %+v", &kubernetes.ReplicaSet{}, err)
 			}
@@ -268,15 +282,15 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 
 		watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.addPod(pod)
 			},
 			UpdateFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.updatePod(pod)
 			},
 			DeleteFunc: func(obj interface{}) {
-				pod := obj.(*kubernetes.Pod)
+				pod, _ := obj.(*kubernetes.Pod)
 				k.removePod(pod)
 			},
 		})

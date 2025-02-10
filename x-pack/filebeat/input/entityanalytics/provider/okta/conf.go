@@ -23,6 +23,7 @@ func defaultConfig() conf {
 	transport.Timeout = 30 * time.Second
 
 	return conf{
+		EnrichWith:     []string{"groups"},
 		SyncInterval:   24 * time.Hour,
 		UpdateInterval: 15 * time.Minute,
 		LimitWindow:    time.Minute,
@@ -48,6 +49,12 @@ type conf struct {
 	// the API. It can be ""/"all", "users", or
 	// "devices".
 	Dataset string `config:"dataset"`
+	// EnrichWith specifies the additional data that
+	// will be used to enrich user data. It can include
+	// "groups", "roles" and "factors".
+	// If it is a single element with "none", no
+	// enrichment is performed.
+	EnrichWith []string `config:"enrich_with"`
 
 	// SyncInterval is the time between full
 	// synchronisation operations.
@@ -60,6 +67,10 @@ type conf struct {
 	// LimitWindow is the time between Okta
 	// API limit resets.
 	LimitWindow time.Duration `config:"limit_window"`
+
+	// LimitFixed is a number of requests to allow in each LimitWindow,
+	// overriding the guidance in API responses.
+	LimitFixed *int `config:"limit_fixed"`
 
 	// Request is the configuration for establishing
 	// HTTP requests to the API.

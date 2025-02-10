@@ -1,4 +1,12 @@
 version: 2
+component_files:
+ - certs/*
+ - lenses/*
+ - module/*
+ - "osquery-extension.ext"
+ - "osquery-extension.exe"
+ - osqueryd 
+ - "osqueryd.exe"
 inputs:
   - name: audit/auditd
     description: "Auditd"
@@ -230,6 +238,11 @@ inputs:
     aliases:
       - event/udp
     description: "UDP"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: unifiedlogs
+    description: "macOS Unified logs"
     platforms: *platforms
     outputs: *outputs
     command: *filebeat_command
@@ -504,6 +517,11 @@ inputs:
     command: *metricbeat_command
   - name: nginx/metrics
     description: "NGINX metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: openai/metrics
+    description: "OpenAI metrics"
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command

@@ -18,6 +18,7 @@
 package eslegtest
 
 import (
+	"context"
 	"fmt"
 	"os"
 )
@@ -32,20 +33,23 @@ const (
 // TestLogger is used to report fatal errors to the testing framework.
 type TestLogger interface {
 	Fatal(args ...interface{})
+	Cleanup(f func())
 }
 
 // Connectable defines the minimum interface required to initialize a connected
 // client.
 type Connectable interface {
-	Connect() error
+	Connect(context.Context) error
 }
 
 // InitConnection initializes a new connection if the no error value from creating the
 // connection instance is reported.
 // The test logger will be used if an error is found.
 func InitConnection(t TestLogger, conn Connectable, err error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
 	if err == nil {
-		err = conn.Connect()
+		err = conn.Connect(ctx)
 	}
 
 	if err != nil {
