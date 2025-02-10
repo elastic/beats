@@ -34,8 +34,38 @@ steps:
     key: "agentbeat-mandatory-tests"
 
     steps:
+
+      - label: ":windows: x-pack/agentbeat: Win 2022 System Tests"
+        key: "mandatory-win-2022-system-tests"
+        command: |
+          .buildkite/scripts/gcp_auth.ps1
+          Set-Location -Path x-pack/agentbeat
+          mage systemTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/agentbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/agentbeat: Win 2022 System Tests"
       - label: ":linux: Agentbeat packaging Linux"
         key: "agentbeat-package-linux"
+        depends_on:
+          - mandatory-win-2022-system-tests
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
@@ -102,31 +132,3 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: Integration tests"
-
-      - label: ":windows: x-pack/agentbeat: Win 2022 System Tests"
-        key: "mandatory-win-2022-system-tests"
-        command: |
-          .buildkite/scripts/gcp_auth.ps1
-          Set-Location -Path x-pack/agentbeat
-          mage systemTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/agentbeat/build/*.xml"
-          - "x-pack/agentbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/agentbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/agentbeat: Win 2022 System Tests"    
