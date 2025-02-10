@@ -70,8 +70,8 @@ func WithBucketName(name string) Option {
 	}
 }
 
-// Connect creates directories of a given path for bbolt DB file (if directories not already exist), creates DB file with given file permissions, creates bucket to store cache data.
-func (b *Bbolt) Connect() error {
+// Open creates directories of a given path for bbolt DB file (if directories not already exist), creates DB file with given file permissions, creates bucket to store cache data.
+func (b *Bbolt) Open() error {
 	var err error
 
 	dbDir := path.Dir(b.dbPath)

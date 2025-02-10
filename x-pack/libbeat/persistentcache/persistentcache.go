@@ -60,7 +60,7 @@ func New(name string, opts Options) (*PersistentCache, error) {
 		boltKvStore.WithDbPath(rootPath),
 		boltKvStore.WithBucketName(name))
 
-	err := store.Connect()
+	err := store.Open()
 	if err != nil {
 		return nil, err
 	}

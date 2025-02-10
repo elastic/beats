@@ -117,7 +117,7 @@ func TestGetSet(t *testing.T) {
 				bucketName: "test_bucket",
 			}
 
-			err := bolt.Connect()
+			err := bolt.Open()
 			require.NoError(t, err)
 			defer bolt.Close()
 
