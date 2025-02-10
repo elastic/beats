@@ -304,8 +304,10 @@ func TestMonitoring(t *testing.T) {
 		metrics := monitoring.NewRegistry()
 		telemetry := monitoring.NewRegistry()
 
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMonitoring.inputMetrics")
 		pipeline, err := Load(
-			beat.Info{},
+			beatInfo,
 			Monitors{
 				Metrics:   metrics,
 				Telemetry: telemetry,
@@ -406,7 +408,7 @@ func TestMonitoring(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		c, err := pipeline.ConnectWith(beat.ClientConfig{})
+		c, err := pipeline.ConnectWith(beat.ClientConfig{InputID: inputID})
 		require.NoError(t, err, "pipeline.ConnectWith failed")
 
 		cc, ok := c.(*client)
