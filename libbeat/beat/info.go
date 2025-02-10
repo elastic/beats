@@ -57,3 +57,7 @@ func (i Info) FQDNAwareHostname(useFQDN bool) string {
 
 	return i.Hostname
 }
+
+func (i Info) IsOTelReceiver() bool {
+	return i.LogConsumer != nil
+}
