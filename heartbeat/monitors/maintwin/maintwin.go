@@ -30,7 +30,7 @@ var weekdayLookup = map[string]rrule.Weekday{
 type MaintWin struct {
 	Freq       rrule.Frequency `config:"freq" validate:"required"`
 	Dtstart    string          `config:"dtstart" validate:"required"`
-	Interval   int             `config:"interval" validate:"required"`
+	Interval   int             `config:"interval"`
 	Duration   time.Duration   `config:"duration" validate:"required"`
 	Wkst       rrule.Weekday   `config:"wkst"`
 	Count      int             `config:"count"`
@@ -64,7 +64,7 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 	}
 
 	r, _ = rrule.NewRRule(rrule.ROption{
-		Freq:       rrule.Frequency(mw.Freq),
+		Freq:       mw.Freq,
 		Count:      count,
 		Dtstart:    dtstart,
 		Interval:   mw.Interval,
