@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/kv"
-	boltKvStore "github.com/elastic/beats/v7/x-pack/libbeat/kv/bbolt"
+	bboltkv "github.com/elastic/beats/v7/x-pack/libbeat/kv/bbolt"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -56,9 +56,9 @@ func New(name string, opts Options) (*PersistentCache, error) {
 		rootPath = paths.Resolve(paths.Data, cacheFile)
 	}
 
-	store := boltKvStore.New(
-		boltKvStore.WithDbPath(rootPath),
-		boltKvStore.WithBucketName(name))
+	store := bboltkv.New(
+		bboltkv.WithDbPath(rootPath),
+		bboltkv.WithBucketName(name))
 
 	err := store.Open()
 	if err != nil {
