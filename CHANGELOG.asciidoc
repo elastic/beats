@@ -3,8 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
-=======
 [[release-notes-8.17.2]]
 === Beats version 8.17.2
 https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
@@ -96,7 +94,6 @@ https://github.com/elastic/beats/compare/v8.17.0\...v8.17.1[View commits]
 - Removed `bucket_timeout` config option for GCS input and replaced bucket context with parent program context. {issue}41107[41107] {pull}41970[41970]
 
 
->>>>>>> e18271240 (docs: Prepare Changelog for 8.17.2 (#42654))
 [[release-notes-8.17.0]]
 === Beats version 8.17.0
 https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
