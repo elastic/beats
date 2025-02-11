@@ -101,7 +101,7 @@ Users can also use this in case of a Hybrid Cloud model, where one may define th
 _boolean_
 Optional, by default is set to False. Set this to True when facing scalability issues. When configured, the azure batch api will be used
 to fetch metrics of multiple resources in one api call. 
-Currently supported metricsets are monitor, container_registry, container_instance, container_service, compute_vm, compute_vm_scaleset, database_account.
+Currently supported metricsets are monitor, container_registry, container_instance, container_service, compute_vm, compute_vm_scaleset, database_account and storage.
 
 [float]
 == Metricsets
