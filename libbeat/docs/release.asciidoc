@@ -9,11 +9,8 @@ This section summarizes the changes in each release. Also read
 upgrade.
 
 * <<release-notes-8.17.0>>
-<<<<<<< HEAD
-=======
 * <<release-notes-8.16.4>>
 * <<release-notes-8.16.3>>
->>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 * <<release-notes-8.16.2>>
 * <<release-notes-8.16.1>>
 * <<release-notes-8.16.0>>
