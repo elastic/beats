@@ -222,7 +222,6 @@ func (b *beatTest) ExpectOutput(lines ...string) BeatTest {
 	watchers := make([]OutputWatcher, 0, len(lines))
 	for _, l := range lines {
 		escaped := escapeJSONCharacters(l)
-		b.t.Log(escaped)
 		watchers = append(watchers, NewStringWatcher(escaped))
 	}
 	b.expectations = append(b.expectations, NewInOrderWatcher(watchers))
