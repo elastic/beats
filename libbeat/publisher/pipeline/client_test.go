@@ -305,7 +305,7 @@ func TestMonitoring(t *testing.T) {
 		telemetry := monitoring.NewRegistry()
 
 		beatInfo := beat.Info{}
-		beatInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMonitoring.inputMetrics")
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMonitoring.outputMetrics")
 		pipeline, err := Load(
 			beatInfo,
 			Monitors{
