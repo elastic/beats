@@ -88,30 +88,32 @@ func (in *s3PollerInput) Run(
 		in.config.getFileSelectors(),
 		in.config.BackupConfig)
 
-	in.run(ctx)
+	in.run(inputContext)
 
 	return nil
 }
 
-func (in *s3PollerInput) run(ctx context.Context) {
+func (in *s3PollerInput) run(ctx v2.Context) {
 	// Scan the bucket in a loop, delaying by the configured interval each
 	// iteration.
-	for ctx.Err() == nil {
+	goctx := v2.GoContextFromCanceler(ctx.Cancelation)
+	for goctx.Err() == nil {
 		in.runPoll(ctx)
-		_ = timed.Wait(ctx, in.config.BucketListInterval)
+		_ = timed.Wait(goctx, in.config.BucketListInterval)
 	}
 }
 
-func (in *s3PollerInput) runPoll(ctx context.Context) {
+func (in *s3PollerInput) runPoll(inputCtx v2.Context) {
 	var workerWg sync.WaitGroup
 	workChan := make(chan state)
+	ctx := v2.GoContextFromCanceler(inputCtx.Cancelation)
 
 	// Start the worker goroutines to listen on the work channel
 	for i := 0; i < in.config.NumberOfWorkers; i++ {
 		workerWg.Add(1)
 		go func() {
 			defer workerWg.Done()
-			in.workerLoop(ctx, workChan)
+			in.workerLoop(inputCtx, workChan)
 		}()
 	}
 
@@ -131,10 +133,20 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 }
 
-func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) {
+func (in *s3PollerInput) workerLoop(inputCtx v2.Context, workChan <-chan state) {
+	ctx := v2.GoContextFromCanceler(inputCtx.Cancelation)
+
 	acks := newAWSACKHandler()
 	// Create client for publishing events and receive notification of their ACKs.
-	client, err := createPipelineClient(in.pipeline, acks)
+	client, err := in.pipeline.ConnectWith(beat.ClientConfig{
+		InputID:       inputCtx.ID,
+		EventListener: acks.pipelineEventListener(),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+	})
 	if err != nil {
 		in.log.Errorf("failed to create pipeline client: %v", err.Error())
 		return
