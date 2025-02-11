@@ -345,6 +345,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added infinite & blanket retry options to websockets and improved logging and retry logic. {pull}42225[42225]
 - Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
 - Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
+- Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
 
