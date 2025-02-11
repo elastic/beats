@@ -127,10 +127,10 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 	t.Logf("preparing to run %s...", opts.Beatname)
 
 	binaryFilename := findBeatBinaryPath(t, opts.Beatname)
-
+	dir := t.TempDir()
 	// create a temporary Beat config
-	cfgPath := filepath.Join(t.TempDir(), fmt.Sprintf("%s.yml", opts.Beatname))
-	homePath := filepath.Join(t.TempDir(), "home")
+	cfgPath := filepath.Join(dir, fmt.Sprintf("%s.yml", opts.Beatname))
+	homePath := filepath.Join(dir, "home")
 
 	err := os.WriteFile(cfgPath, []byte(opts.Config), 0777)
 	if err != nil {

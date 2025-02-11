@@ -90,7 +90,6 @@ func (g jsonGenerator) FileExtension() string {
 // Returns the path value to put in the Filebeat configuration and
 // filenames for all created files.
 func GenerateLogFiles(t *testing.T, files, lines int, generator LogGenerator) (path string, filenames []string) {
-	t.Helper()
 	t.Logf("generating %d log files with %d lines each...", files, lines)
 	logsPath := filepath.Join(t.TempDir(), "logs")
 	err := os.MkdirAll(logsPath, 0777)
@@ -120,7 +119,6 @@ func GenerateLogFiles(t *testing.T, files, lines int, generator LogGenerator) (p
 // filename, amount of lines using the given generator
 // to create each line.
 func GenerateLogFile(t *testing.T, filename string, lines int, generator LogGenerator) {
-	t.Helper()
 	file, err := os.Create(filename)
 	if err != nil {
 		t.Fatalf("failed to create a log file: %q", filename)
