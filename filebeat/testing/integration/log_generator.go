@@ -32,7 +32,8 @@ type LogGenerator interface {
 	// GenerateLine generates a single line for a log file.
 	// Expected no new line character at the end.
 	GenerateLine(filename string, index int) string
-	// FileExtension sets the extension of the file where lines are written.
+	// FileExtension defines the extension of the new file where
+	// the generated lines are written.
 	FileExtension() string
 }
 
