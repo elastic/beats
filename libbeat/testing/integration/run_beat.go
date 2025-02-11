@@ -198,12 +198,12 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 	go func() {
 		wg.Wait()
 		close(output)
-		close(b.outputDone)
 	}()
 	go func() {
 		for line := range output {
 			b.writeOutputLine(line)
 		}
+		close(b.outputDone)
 	}()
 
 	err = c.Start()
