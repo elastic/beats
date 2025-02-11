@@ -41,9 +41,6 @@ const (
 	TimestampFieldKey = "@timestamp"
 	MetadataFieldKey  = "@metadata"
 	ErrorFieldKey     = "error"
-
-	MetadataKeyStreamID = "stream_id"
-
 	metadataKeyPrefix = MetadataFieldKey + "."
 	metadataKeyOffset = len(metadataKeyPrefix)
 )

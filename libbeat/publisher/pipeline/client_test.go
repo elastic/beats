@@ -19,17 +19,14 @@ package pipeline
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
@@ -440,168 +437,62 @@ func TestMonitoring(t *testing.T) {
 		c.Publish(beat.Event{Meta: mapstr.M{}})
 		require.NoError(t, c.Close())
 
-		filtered, dropped, published := getMetrics(t, beatInfo, inputID, ok)
+		total, filtered, dropped, published := getMetrics(t, beatInfo, inputID)
 
+		assert.Equal(t,
+			int(total.Get()),
+			int(filtered.Get()+dropped.Get()+published.Get()),
+			"total events should be them sum of filtered, dropped and published"+
+				"events")
 		assert.Equal(t, 3, int(filtered.Get()),
-			"should have 1 filtered event")
+			"should have 3 filtered events")
 		assert.Equal(t, 2, int(dropped.Get()),
-			"should have 1 dropped event")
+			"should have 2 dropped events")
 		assert.Equal(t, 1, int(published.Get()),
 			"should have 1 published event")
 	})
 }
 
-func getMetrics(t *testing.T, beatInfo beat.Info, inputID string, ok bool) (
-	*monitoring.Uint, *monitoring.Uint, *monitoring.Uint) {
+func getMetrics(t *testing.T, beatInfo beat.Info, inputID string) (
+	*monitoring.Uint, *monitoring.Uint, *monitoring.Uint, *monitoring.Uint) {
 	t.Helper()
 
 	reg := beatInfo.Monitoring.Namespace.GetRegistry().
 		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
 
-	filteredMetricName := inputID + "." + "events_filtered_total"
+	totalMetricName := inputID + "." + "events_pipeline_total"
+	totalRaw := reg.Get(totalMetricName)
+	total, ok := totalRaw.(*monitoring.Uint)
+	require.Truef(t, ok,
+		"did not find metric '%s': "+
+			"could not cast metric to *monitoring.Uint, got: %T",
+		totalMetricName, totalRaw)
+
+	filteredMetricName := inputID + "." + "events_pipeline_filtered_total"
 	filteredRaw := reg.Get(filteredMetricName)
 	filtered, ok := filteredRaw.(*monitoring.Uint)
 	require.Truef(t, ok,
-		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
+		"did not find metric '%s': "+
+			"could not cast metric to *monitoring.Uint, got: %T",
 		filteredMetricName, filteredRaw)
 
-	droppedMetricName := inputID + "." + "events_dropped_total"
+	droppedMetricName := inputID + "." + "events_pipeline_dropped_total"
 	droppedRaw := reg.Get(droppedMetricName)
 	dropped, ok := droppedRaw.(*monitoring.Uint)
 	require.Truef(t, ok,
-		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
+		"did not find metric '%s': "+
+			"could not cast metric to *monitoring.Uint, got: %T",
 		droppedMetricName, droppedRaw)
 
-	publishedMetricName := inputID + "." + "events_published_total"
+	publishedMetricName := inputID + "." + "events_pipeline_published_total"
 	publishedRaw := reg.Get(publishedMetricName)
 	published, ok := publishedRaw.(*monitoring.Uint)
 	require.Truef(t, ok,
-		"did not find metric '%s': could not cast metric to *monitoring.Uint, got: %T",
+		"did not find metric '%s': "+
+			"could not cast metric to *monitoring.Uint, got: %T",
 		publishedMetricName, publishedRaw)
 
-	return filtered, dropped, published
-}
-
-func BenchInputMetrics(ns *monitoring.Namespace) {
-	NoError(logp.ConfigureWithCore(logp.Config{}, zapcore.NewNopCore()), "could not setup logger")
-
-	var config Config
-	err := conf.MustNewConfigFrom(map[string]interface{}{
-		"queue.mem.events":           32,
-		"queue.mem.flush.min_events": 1,
-		"queue.mem.flush.timeout":    time.Millisecond,
-	}).Unpack(&config)
-	NoError(err, "failed creating config")
-
-	beatInfo := beat.Info{}
-	beatInfo.Monitoring.Namespace = ns
-	metrics := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry("metrics")
-	telemetry := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry("telemetry")
-
-	inputID := "a-input-id"
-	publishErrKey := "publish_err"
-	filterMeKey := "filter_me"
-
-	pipeline, err := Load(
-		beatInfo,
-		Monitors{
-			Metrics:   metrics,
-			Telemetry: telemetry,
-		},
-		config,
-		testProcessorSupporter{
-			Processor: processorList{
-				processors: []beat.Processor{
-					&testProcessor{
-						name: "addMeta",
-						processorFn: func(in *beat.Event) (*beat.Event, error) {
-							var err error
-							if in.Meta == nil {
-								in.Meta = mapstr.M{}
-							}
-							_, err = in.Meta.Put("input_id", inputID)
-							NoError(err, "add meta processor failed")
-							return in, nil
-						},
-					},
-					&testProcessor{
-						name: "filterProcessor",
-						processorFn: func(in *beat.Event) (*beat.Event, error) {
-							rawFilterMe, err := in.Fields.GetValue(filterMeKey)
-							if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
-								NoError(err, "could not get filter_me from Fields")
-							}
-
-							filterMe, ok := rawFilterMe.(bool)
-							if filterMe && ok {
-								return nil, nil
-							}
-							return in, nil
-						},
-					},
-				},
-			},
-		},
-		func(outputs.Observer) (string, outputs.Group, error) {
-			return "output_name", outputs.Group{Clients: []outputs.Client{
-				newMockClient(func(publisher.Batch) error { return nil })},
-			}, nil
-		},
-	)
-	NoError(err, "pipeline Load failed")
-
-	c, err := pipeline.ConnectWith(beat.ClientConfig{})
-	NoError(err, "pipeline.ConnectWith failed")
-
-	cc, ok := c.(*client)
-	if !ok {
-		panic("pipeline.ConnectWith return value cannot be cast to client")
-	}
-	cc.producer = &testProducer{publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
-		e, ok := event.(publisher.Event)
-		if !ok {
-			panic("queue.Entry cannot be cast to publisher.Event")
-		}
-
-		rawFail, err := e.Content.Fields.GetValue(publishErrKey)
-		if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
-			NoError(err, "failed getting 'publish_err' from event Meta")
-		}
-		fail, ok := rawFail.(bool)
-		if fail && ok {
-			return queue.EntryID(1), false
-		}
-		return queue.EntryID(1), true
-	}}
-
-	c.PublishAll([]beat.Event{
-		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
-		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
-		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
-	})
-	c.PublishAll([]beat.Event{
-		{Fields: mapstr.M{publishErrKey: true}, Meta: mapstr.M{}},
-		{Fields: mapstr.M{publishErrKey: true}, Meta: mapstr.M{}},
-	})
-	c.Publish(beat.Event{Meta: mapstr.M{}})
-	NoError(c.Close(), "client Close failed")
-}
-
-func NoError(err error, msg string) {
-	if err != nil {
-		panic(fmt.Sprintf("%s: %v", msg, err))
-	}
-}
-
-func BenchmarkClientMetrics(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		ns := monitoring.GetNamespace(
-			fmt.Sprintf("TestMonitoring.inputMetrics-%s", uuid.Must(uuid.NewV4()).String()))
-		// metrics := ns.GetRegistry().NewRegistry(fmt.Sprintf("metrics-%d", b.N))
-		// telemetry := ns.GetRegistry().NewRegistry(fmt.Sprintf("telemetry-%d", b.N))
-		BenchInputMetrics(
-			ns)
-	}
+	return total, filtered, dropped, published
 }
 
 type testProcessor struct {

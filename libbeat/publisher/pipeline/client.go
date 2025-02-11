@@ -44,7 +44,7 @@ type client struct {
 	isOpen atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
 
 	// inputID of the input this client belongs to. It's used to aggregate
-	// metrics by input
+	// metrics by input.
 	inputID        string
 	observer       observer
 	eventListener  beat.EventListener
@@ -82,11 +82,11 @@ func (c *client) publish(e beat.Event) {
 		publish = true
 	)
 
-	c.onNewEvent(e)
+	c.onNewEvent()
 
 	if !c.isOpen.Load() {
 		// client is closing down -> report event as dropped and return
-		c.onDroppedOnPublish(e, "")
+		c.onDroppedOnPublish(e)
 		return
 	}
 
@@ -108,7 +108,7 @@ func (c *client) publish(e beat.Event) {
 
 	c.eventListener.AddEvent(e, publish)
 	if !publish {
-		c.onFilteredOut(e, c.inputID)
+		c.onFilteredOut()
 		return
 	}
 
@@ -126,9 +126,9 @@ func (c *client) publish(e beat.Event) {
 	}
 
 	if published {
-		c.onPublished(e, c.inputID)
+		c.onPublished()
 	} else {
-		c.onDroppedOnPublish(e, c.inputID)
+		c.onDroppedOnPublish(e)
 	}
 }
 
@@ -174,23 +174,23 @@ func (c *client) onClosed() {
 	}
 }
 
-func (c *client) onNewEvent(e beat.Event) {
-	c.observer.newEvent(e)
+func (c *client) onNewEvent() {
+	c.observer.newEvent(c.inputID)
 }
 
-func (c *client) onPublished(e beat.Event, inputID string) {
-	c.observer.publishedEvent(e, inputID)
+func (c *client) onPublished() {
+	c.observer.publishedEvent(c.inputID)
 	if c.clientListener != nil {
 		c.clientListener.Published()
 	}
 }
 
-func (c *client) onFilteredOut(e beat.Event, inputID string) {
-	c.observer.filteredEvent(e, inputID)
+func (c *client) onFilteredOut() {
+	c.observer.filteredEvent(c.inputID)
 }
 
-func (c *client) onDroppedOnPublish(e beat.Event, inputID string) {
-	c.observer.failedPublishEvent(e, inputID)
+func (c *client) onDroppedOnPublish(e beat.Event) {
+	c.observer.failedPublishEvent(c.inputID)
 	if c.clientListener != nil {
 		c.clientListener.DroppedOnPublish(e)
 	}

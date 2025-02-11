@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -39,13 +38,13 @@ type pipelineObserver interface {
 
 type clientObserver interface {
 	// The client received a Publish call
-	newEvent(beat.Event)
+	newEvent(string)
 	// An event was filtered by processors before being published
-	filteredEvent(beat.Event, string)
+	filteredEvent(string)
 	// An event was published to the queue
-	publishedEvent(beat.Event, string)
+	publishedEvent(string)
 	// An event was rejected by the queue
-	failedPublishEvent(beat.Event, string)
+	failedPublishEvent(string)
 	eventsACKed(count int)
 }
 
@@ -63,8 +62,9 @@ type retryObserver interface {
 // are defined by observer. The components are only allowed to serve localized
 // event-handlers only (e.g. the client centric events callbacks)
 type metricsObserver struct {
-	// the registry scoped to the beat/libbeat/beatreceiver instance it belongs to
-	beatInternalRegistry *monitoring.Registry
+	// beatInternalInputRegistry is the libbeat/monitoring.RegistryNameInternalInputs
+	// registry from the beat.Info.Monitoring.Namespace.
+	beatInternalInputRegistry *monitoring.Registry
 
 	metrics *monitoring.Registry
 	vars    metricsObserverVars
@@ -74,6 +74,7 @@ type inputVars struct {
 	// there is no total events because when the observer is called for a new
 	// event the processors haven't run yet and therefore the inputID isn't
 	// available yet.
+	inputEventsTotal,
 	inputEventsDropped,
 	inputEventsFiltered,
 	inputEventsPublished *monitoring.Uint
@@ -93,15 +94,15 @@ type metricsObserverVars struct {
 	inputs map[string]inputVars // TODO: do it need to be thread safe?
 }
 
-func newMetricsObserver(metrics, beatRegistry *monitoring.Registry) *metricsObserver {
+func newMetricsObserver(metrics, beatInternalInputRegistry *monitoring.Registry) *metricsObserver {
 	reg := metrics.GetRegistry("pipeline")
 	if reg == nil {
 		reg = metrics.NewRegistry("pipeline")
 	}
 
 	return &metricsObserver{
-		beatInternalRegistry: beatRegistry,
-		metrics:              metrics,
+		beatInternalInputRegistry: beatInternalInputRegistry,
+		metrics:                   metrics,
 
 		vars: metricsObserverVars{
 			// (Gauge) clients measures the number of open pipeline clients.
@@ -159,32 +160,35 @@ func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 //
 
 // (client) client is trying to publish a new event
-func (o *metricsObserver) newEvent(e beat.Event) {
+func (o *metricsObserver) newEvent(inputID string) {
 	o.vars.eventsTotal.Inc()
 	o.vars.activeEvents.Inc()
+
+	input := o.inputMetrics(inputID)
+	if input != nil {
+		input.inputEventsTotal.Inc()
+	}
 }
 
 // (client) event is filtered out (on purpose or failed)
-func (o *metricsObserver) filteredEvent(e beat.Event, inputID string) {
+func (o *metricsObserver) filteredEvent(inputID string) {
 	o.vars.eventsFiltered.Inc()
 	o.vars.activeEvents.Dec()
 
 	input := o.inputMetrics(inputID)
-	if input == nil {
-		return // irrecoverable error happened, nothing to do.
+	if input != nil {
+		input.inputEventsFiltered.Inc()
 	}
-	input.inputEventsFiltered.Inc()
 }
 
 // (client) managed to push an event into the publisher pipeline
-func (o *metricsObserver) publishedEvent(e beat.Event, inputID string) {
+func (o *metricsObserver) publishedEvent(inputID string) {
 	o.vars.eventsPublished.Inc()
 
 	input := o.inputMetrics(inputID)
-	if input == nil {
-		return // irrecoverable error happened, nothing to do.
+	if input != nil {
+		input.inputEventsPublished.Inc()
 	}
-	input.inputEventsPublished.Inc()
 }
 
 // (client) number of ACKed events from this client
@@ -193,35 +197,34 @@ func (o *metricsObserver) eventsACKed(n int) {
 }
 
 // (client) client closing down or DropIfFull is set
-func (o *metricsObserver) failedPublishEvent(e beat.Event, inputID string) {
+func (o *metricsObserver) failedPublishEvent(inputID string) {
 	o.vars.eventsFailed.Inc()
 	o.vars.activeEvents.Dec()
 
 	input := o.inputMetrics(inputID)
-	if input == nil {
-		return // nothing to do.
+	if input != nil {
+		input.inputEventsDropped.Inc()
 	}
-	input.inputEventsDropped.Inc()
 }
 
 func (o *metricsObserver) inputMetrics(inputID string) *inputVars {
 	if inputID == "" {
-		// without an inputID it's not possible to aggregate
-		// the metrics
+		// without an inputID it's not possible to aggregate metrics by input.
 		return nil
 	}
 
 	input, found := o.vars.inputs[inputID]
 	if !found {
-		reg := o.beatInternalRegistry.GetRegistry(inputID)
+		reg := o.beatInternalInputRegistry.GetRegistry(inputID)
 		if reg == nil {
-			reg = o.beatInternalRegistry.NewRegistry(inputID)
+			reg = o.beatInternalInputRegistry.NewRegistry(inputID)
 		}
 
 		input = inputVars{
-			inputEventsDropped:   monitoring.NewUint(reg, "events_dropped_total"),
-			inputEventsFiltered:  monitoring.NewUint(reg, "events_filtered_total"),
-			inputEventsPublished: monitoring.NewUint(reg, "events_published_total"),
+			inputEventsTotal:     monitoring.NewUint(reg, "events_pipeline_total"),
+			inputEventsDropped:   monitoring.NewUint(reg, "events_pipeline_dropped_total"),
+			inputEventsFiltered:  monitoring.NewUint(reg, "events_pipeline_filtered_total"),
+			inputEventsPublished: monitoring.NewUint(reg, "events_pipeline_published_total"),
 		}
 		o.vars.inputs[inputID] = input
 	}
@@ -247,13 +250,13 @@ type emptyObserver struct{}
 
 var nilObserver observer = (*emptyObserver)(nil)
 
-func (*emptyObserver) cleanup()                              {}
-func (*emptyObserver) clientConnected()                      {}
-func (*emptyObserver) clientClosed()                         {}
-func (*emptyObserver) newEvent(beat.Event)                   {}
-func (*emptyObserver) filteredEvent(beat.Event, string)      {}
-func (*emptyObserver) publishedEvent(beat.Event, string)     {}
-func (*emptyObserver) failedPublishEvent(beat.Event, string) {}
-func (*emptyObserver) eventsACKed(n int)                     {}
-func (*emptyObserver) eventsDropped(int)                     {}
-func (*emptyObserver) eventsRetry(int)                       {}
+func (*emptyObserver) cleanup()                  {}
+func (*emptyObserver) clientConnected()          {}
+func (*emptyObserver) clientClosed()             {}
+func (*emptyObserver) newEvent(string)           {}
+func (*emptyObserver) filteredEvent(string)      {}
+func (*emptyObserver) publishedEvent(string)     {}
+func (*emptyObserver) failedPublishEvent(string) {}
+func (*emptyObserver) eventsACKed(n int)         {}
+func (*emptyObserver) eventsDropped(int)         {}
+func (*emptyObserver) eventsRetry(int)           {}

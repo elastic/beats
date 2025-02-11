@@ -45,8 +45,8 @@ type Client interface {
 // ClientConfig defines common configuration options one can pass to
 // Pipeline.ConnectWith to control the clients behavior and provide ACK support.
 type ClientConfig struct {
-	// InputID is the inout ID of the input using the client. The InputID is
-	// used to aggregate pipeline metrics per input. See TODO: add github issue
+	// InputID is the input ID of the input using the client. The InputID is
+	// used to aggregate pipeline metrics per input.
 	InputID string
 
 	PublishMode PublishMode

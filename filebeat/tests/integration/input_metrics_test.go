@@ -101,12 +101,13 @@ logging.level: debug
 	defer resp.Body.Close()
 
 	var inputMetrics []struct {
-		EventsDroppedTotal   int    `json:"events_dropped_total"`
-		EventsFilteredTotal  int    `json:"events_filtered_total"`
-		EventsProcessedTotal int    `json:"events_processed_total"`
-		EventsPublishedTotal int    `json:"events_published_total"`
-		ID                   string `json:"id"`
-		Input                string `json:"input"`
+		EventsPipelineTotal          int    `json:"events_pipeline_total"`
+		EventsPipelineDroppedTotal   int    `json:"events_pipeline_dropped_total"`
+		EventsPipelineFilteredTotal  int    `json:"events_pipeline_filtered_total"`
+		EventsPipelinePublishedTotal int    `json:"events_pipeline_published_total"`
+		EventsProcessedTotal         int    `json:"events_processed_total"`
+		ID                           string `json:"id"`
+		Input                        string `json:"input"`
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -117,9 +118,15 @@ logging.level: debug
 	require.Len(t, inputMetrics, 1)
 	assert.Equal(t, "a-filestream-id", inputMetrics[0].ID)
 	assert.Equal(t, "filestream", inputMetrics[0].Input)
+	assert.Equal(t,
+		inputMetrics[0].EventsPipelineTotal,
+		inputMetrics[0].EventsPipelinePublishedTotal+
+			inputMetrics[0].EventsPipelineFilteredTotal+
+			inputMetrics[0].EventsPipelineDroppedTotal)
+	assert.Equal(t, inputMetrics[0].EventsProcessedTotal, inputMetrics[0].EventsPipelineTotal)
 	assert.Equal(t, 10, inputMetrics[0].EventsProcessedTotal)
-	assert.Equal(t, 9, inputMetrics[0].EventsPublishedTotal)
-	assert.Equal(t, 1, inputMetrics[0].EventsFilteredTotal)
+	assert.Equal(t, 9, inputMetrics[0].EventsPipelinePublishedTotal)
+	assert.Equal(t, 1, inputMetrics[0].EventsPipelineFilteredTotal)
 
 	assert.Falsef(t, t.Failed(), "test faild: input metrics response used for the assertions: %s", body)
 }
