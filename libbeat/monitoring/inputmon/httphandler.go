@@ -114,17 +114,15 @@ func filteredSnapshot(dataset, intInputs *monitoring.Registry, requestedType str
 	return filtered
 }
 
-// mergeInternalMetrics looks for a registry identified by in the internal
+// mergeInternalMetrics looks for a registry identified by id in the internal
 // registry. If found, all the metrics are merged into m, if not, m is not
 // changed.
-// TODO: add tests
 func mergeInternalMetrics(internal *monitoring.Registry, id string, m map[string]any) {
 	reg := internal.GetRegistry(id)
 	if reg == nil {
 		return
 	}
 
-	// TODO: decide how to handle possible collisions
 	intInput := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
 	for k, v := range intInput {
 		m[k] = v
