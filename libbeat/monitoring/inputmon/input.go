@@ -83,8 +83,9 @@ func globalRegistry() *monitoring.Registry {
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' and beat 'internal' monitoring namespace merged and encoded as a
-// JSON array (pretty formatted).
+// global 'dataset' and libbeatmonitoring.RegistryNameInternalInputs monitoring
+// namespace from the beatInfo instance. It returns a pretty formated JSON array
+// as a byte slice.
 func MetricSnapshotJSON(beatInfo beat.Info) ([]byte, error) {
 	intReg := beatInfo.Monitoring.Namespace.GetRegistry().
 		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)

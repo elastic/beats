@@ -255,11 +255,6 @@ func injectStreamProcessors(expected *proto.UnitExpectedConfig, defaultDataStrea
 	processors = append(processors, event)
 
 	// source stream
-	// This stream_id is used by the pipeline client to aggregate events metrics
-	// per input. It's the "stream_id" which actually matches the inputID which
-	// is used to aggregate input metrics reported by the
-	// libbeat/monitoring/inputmon package and available thorough the
-	// /inputs/ endpoint.
 	if streamID := streamExpected.GetId(); streamID != "" {
 		sourceStream := generateAddFieldsProcessor(mapstr.M{"stream_id": streamID}, "@metadata")
 		processors = append(processors, sourceStream)
