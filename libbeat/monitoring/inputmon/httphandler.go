@@ -38,25 +38,29 @@ const (
 )
 
 type handler struct {
-	registryDataset  *monitoring.Registry
-	registryInternal *monitoring.Registry
+	registryDataset        *monitoring.Registry
+	registryInternalInputs *monitoring.Registry
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
 // requests to /inputs.
 func AttachHandler(beatInfo beat.Info, r *mux.Router) error {
-	internalReg := beatInfo.Monitoring.Namespace.GetRegistry().
+	intInputsReg := beatInfo.Monitoring.Namespace.GetRegistry().
 		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	if intInputsReg == nil {
+		intInputsReg = beatInfo.Monitoring.Namespace.GetRegistry().
+			NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	}
 
-	return attachHandler(r, globalRegistry(), internalReg)
+	return attachHandler(r, globalRegistry(), intInputsReg)
 }
 
-func attachHandler(r *mux.Router, datasetReg, internalReg *monitoring.Registry) error {
+func attachHandler(r *mux.Router, datasetReg, intInputsReg *monitoring.Registry) error {
 	r = r.PathPrefix(route).Subrouter()
 
 	h := &handler{
-		registryDataset:  datasetReg,
-		registryInternal: internalReg,
+		registryDataset:        datasetReg,
+		registryInternalInputs: intInputsReg,
 	}
 	return r.StrictSlash(true).Handle("/", validationHandler(http.MethodGet, []string{"pretty", "type"}, h.allInputs)).GetError()
 }
@@ -75,13 +79,13 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 	}
 
 	filtered := filteredSnapshot(
-		h.registryDataset, h.registryInternal, requestedType)
+		h.registryDataset, h.registryInternalInputs, requestedType)
 
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
 
-func filteredSnapshot(dataset, internal *monitoring.Registry, requestedType string) []map[string]any {
+func filteredSnapshot(dataset, intInputs *monitoring.Registry, requestedType string) []map[string]any {
 	metrics := monitoring.CollectStructSnapshot(dataset, monitoring.Full, false)
 
 	filtered := make([]map[string]any, 0, len(metrics))
@@ -102,18 +106,18 @@ func filteredSnapshot(dataset, internal *monitoring.Registry, requestedType stri
 			continue
 		}
 
-		// merge the internal namespace if found
-		mergeInternalMetrics(internal, id, m)
+		// merge metrics stored in the internal namespace if any is found
+		mergeInternalMetrics(intInputs, id, m)
 
 		filtered = append(filtered, m)
 	}
 	return filtered
 }
 
-// mergeInternalMetrics looks for a registry 'id' in the 'internal' registry. If
-// found, all the metrics are merged into m, if not, m is not changed. If there
-// already is a
-// The internal registry should be globalInternalRegistry()
+// mergeInternalMetrics looks for a registry identified by in the internal
+// registry. If found, all the metrics are merged into m, if not, m is not
+// changed.
+// TODO: add tests
 func mergeInternalMetrics(internal *monitoring.Registry, id string, m map[string]any) {
 	reg := internal.GetRegistry(id)
 	if reg == nil {
