@@ -20,9 +20,11 @@ package integration
 import (
 	"bufio"
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -34,6 +36,9 @@ import (
 
 var (
 	compiling sync.Mutex
+	// map of Beat names to binary hashes that `EnsureCompiled` function built
+	compiled = map[string]string{}
+	hash     = sha256.New()
 )
 
 // RunningBeat describes the running Beat binary.
@@ -194,22 +199,37 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 
 // EnsureCompiled ensures that the given Beat is compiled and ready
 // to run.
+// This functions allows to use binaries only built by this function.
+// Externally created binaries will be removed and rebuilt.
 func EnsureCompiled(ctx context.Context, t *testing.T, beatname string) (path string) {
 	compiling.Lock()
 	defer compiling.Unlock()
 
 	t.Logf("ensuring the %s binary is available...", beatname)
-
 	binaryFilename := findBeatBinaryPath(t, beatname)
+	// empty if the binary was not compiled before
+	expectedHash := compiled[beatname]
+	// we allow to use binaries only built by this function.
+	// binaries from different origins are marked as outdated
 	_, err := os.Stat(binaryFilename)
-	if err == nil {
-		t.Logf("found existing %s binary at %s", beatname, binaryFilename)
-		return binaryFilename
-	}
-
-	if !errors.Is(err, os.ErrNotExist) {
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		t.Fatalf("failed to check for compiled binary %s: %s", binaryFilename, err)
 		return ""
+	}
+	if err == nil {
+		actualHash := hashBinary(t, binaryFilename)
+		if actualHash == expectedHash {
+			t.Logf("%s binary has been compiled before at %s, using...", beatname, binaryFilename)
+			return binaryFilename
+		}
+		t.Logf("found outdated %s binary at %s, removing...", beatname, binaryFilename)
+		err := os.Remove(binaryFilename)
+		if err != nil {
+			t.Fatalf("failed to remove outdated %s binary at %s: %s", beatname, binaryFilename, err)
+			return ""
+		}
+	} else {
+		t.Logf("%s binary was not found at %s", beatname, binaryFilename)
 	}
 
 	mageCommand := "mage"
@@ -217,7 +237,7 @@ func EnsureCompiled(ctx context.Context, t *testing.T, beatname string) (path st
 		mageCommand += ".exe"
 	}
 	args := []string{"build"}
-	t.Logf("existing %s binary not found, building with \"%s %s\"... ", mageCommand, binaryFilename, strings.Join(args, " "))
+	t.Logf("building %s binary with \"%s %s\"... ", binaryFilename, mageCommand, strings.Join(args, " "))
 	c := exec.CommandContext(ctx, mageCommand, args...)
 	c.Dir = filepath.Dir(binaryFilename)
 	output, err := c.CombinedOutput()
@@ -229,6 +249,7 @@ func EnsureCompiled(ctx context.Context, t *testing.T, beatname string) (path st
 	_, err = os.Stat(binaryFilename)
 	if err == nil {
 		t.Logf("%s binary has been successfully built ", binaryFilename)
+		compiled[beatname] = hashBinary(t, binaryFilename)
 		return binaryFilename
 	}
 	if !errors.Is(err, os.ErrNotExist) {
@@ -237,6 +258,22 @@ func EnsureCompiled(ctx context.Context, t *testing.T, beatname string) (path st
 	}
 
 	return ""
+}
+
+func hashBinary(t *testing.T, filename string) string {
+	f, err := os.Open(filename)
+	if err != nil {
+		t.Fatalf("failed to open %s: %s", filename, err)
+		return ""
+	}
+	defer f.Close()
+	hash.Reset()
+	if _, err := io.Copy(hash, f); err != nil {
+		t.Fatalf("failed to hash %s: %s", filename, err)
+		return ""
+	}
+
+	return fmt.Sprintf("%x", hash.Sum(nil))
 }
 
 func findBeatDir(t *testing.T, beatName string) string {
