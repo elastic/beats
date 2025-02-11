@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -88,20 +89,45 @@ func TestMetricSnapshotJSON(t *testing.T) {
 		require.NoError(t, globalRegistry().Clear())
 	})
 
-	r, cancel := NewInputRegistry("test", "my-id", nil)
-	defer cancel()
-	monitoring.NewInt(r, "foo_total").Set(100)
+	inputID := "input-with-pipeline-metrics"
+	r1, cancel1 := NewInputRegistry("test", inputID, nil)
+	defer cancel1()
+	monitoring.NewInt(r1, "foo1_total").Set(100)
+
+	r2, cancel2 := NewInputRegistry(
+		"test", "input-without-pipeline-metrics", nil)
+	defer cancel2()
+	monitoring.NewInt(r2, "foo2_total").Set(100)
+
+	// this metric should not be reported
+	r3 := globalRegistry().NewRegistry("another-registry")
+	monitoring.NewInt(r3, "foo3_total").Set(100)
+
+	// this metric should not be reported
+	r4 := globalRegistry().NewRegistry("yet-another-registry")
+	monitoring.NewString(r4, "id").Set("some-id")
+	monitoring.NewInt(r3, "foo3_total").Set(100)
 
 	bInfo := beat.Info{}
 	bInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMetricSnapshotJSON")
+	intInputReg := bInfo.Monitoring.Namespace.GetRegistry().
+		NewRegistry(libbeatmonitoring.RegistryNameInternalInputs).
+		NewRegistry(inputID)
+	monitoring.NewInt(intInputReg, "events_pipeline_total").Set(100)
 
 	jsonBytes, err := MetricSnapshotJSON(bInfo)
 	require.NoError(t, err)
 
 	const expected = `[
   {
-    "foo_total": 100,
-    "id": "my-id",
+    "events_pipeline_total": 100,
+    "foo1_total": 100,
+    "id": "input-with-pipeline-metrics",
+    "input": "test"
+  },
+  {
+    "foo2_total": 100,
+    "id": "input-without-pipeline-metrics",
     "input": "test"
   }
 ]`
