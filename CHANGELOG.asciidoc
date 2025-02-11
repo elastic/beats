@@ -89,12 +89,82 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 
 
+<<<<<<< HEAD
+=======
+[[release-notes-8.16.4]]
+=== Beats version 8.16.4
+https://github.com/elastic/beats/compare/v8.16.3\...v8.16.4[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
+- In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
+- Remove erroneous status reporting to Elastic-Agent from the Filestream input. {pull}42435[42435]
+
+==== Added
+
+*Filebeat*
+
+- Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
+
+*Metricbeat*
+
+- Update beat module with apm-server tail sampling monitoring metrics fields. {pull}42569[42569]
+
+
+[[release-notes-8.16.3]]
+=== Beats version 8.16.3
+https://github.com/elastic/beats/compare/v8.16.2\...v8.16.3[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Default Docker base image was reverted to Ubuntu 20.04 due to incompatability issues with glibc. {pull}42144[42144]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
+- Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
+- Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
+
+*Metricbeat*
+
+- [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets. {issue}41910[41910] {pull}42016[42016]
+
+==== Added
+
+*Affecting all Beats*
+
+- When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field. {pull}40415[40415]
+- The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
+- Update Go version to 1.22.10. {pull}42095[42095]
+- Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
+- Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
+- Add `uppercase` processor. {issue}22254[22254] {pull}41535[41535]
+- Replace `compress/gzip` with https://github.com/klauspost/compress/gzip library for gzip compression. {pull}41584[41584]
+- Add regex pattern matching to add_kubernetes_metadata processor. {pull}41903[41903]
+
+*Filebeat*
+
+- Added OAuth2 support with auto token refresh for websocket streaming input. {issue}41989[41989] {pull}42212[42212]
+- Added infinite & blanket retry options to websockets and improved logging and retry logic. {pull}42225[42225]
+
+*Metricbeat*
+
+- Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
+>>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 
 
 [[release-notes-8.16.2]]
 === Beats version 8.16.2
 https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 
+<<<<<<< HEAD
 ==== Breaking changes
 
 ==== Added
@@ -137,27 +207,41 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 *Elastic Logging Plugin*
 
 
+=======
+>>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 ==== Bugfixes
 
 *Affecting all Beats*
 
+<<<<<<< HEAD
 - Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil {pull}41794[41794]
 - Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
 
 *Auditbeat*
 
 - auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+=======
+- Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil. {pull}41794[41794]
+- Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism. {pull}41636[41636]
+
+*Auditbeat*
+
+>>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 - auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
 - auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
 - hasher: Geneneral improvements and fixes. {pull}41863[41863]
 
 *Filebeat*
 
+<<<<<<< HEAD
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+=======
+>>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 - Fix missing key in streaming input logging. {pull}41600[41600]
 - Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
 - Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
 - Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
+<<<<<<< HEAD
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
 - The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
@@ -182,22 +266,38 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 
 *Elastic Logging Plugin*
 
+=======
+- Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
+- Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
+- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
+
+*Metricbeat*
+
+- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+>>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 
 ==== Added
 
 *Affecting all Beats*
 
+<<<<<<< HEAD
+=======
+- In this release we've introduced an image based on the hardened https://wolfi.dev/[Wolfi] image to provide secure containers to our self-managed customers, help with compliance regulations, and improve our supply chain security posture.
+>>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 
 *Auditbeat*
 
 - Split module/system/process into common and provider bits. {pull}41868[41868]
 
+<<<<<<< HEAD
 *Auditbeat*
 
 
 *Auditbeat*
 
 
+=======
+>>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 *Filebeat*
 
 - Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
@@ -206,6 +306,7 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 - The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
 - Added default values in the streaming input for websocket retries and put a cap on retry wait time to be lesser than equal to the maximum defined wait time. {pull}42012[42012]
 
+<<<<<<< HEAD
 *Auditbeat*
 
 
@@ -285,6 +386,13 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 
 
 
+=======
+*Metricbeat*
+
+- Add `id` field to all the vSphere metricsets. {pull}41097[41097]
+- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
+
+>>>>>>> 6d6067288 ([main](backport #42653) docs: Prepare Changelog for 8.16.4 (#42667))
 
 [[release-notes-8.16.1]]
 === Beats version 8.16.1
