@@ -161,12 +161,19 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 	t.Logf("running %s %s", binaryFilename, strings.Join(execArgs, " "))
 	c := exec.CommandContext(ctx, binaryFilename, execArgs...)
 
-	output, err := c.StdoutPipe()
+	// we must use 2 pipes since writes are not aligned by lines
+	// part of the stdout output can end up in the middle of the stderr line
+	stdout, err := c.StdoutPipe()
 	if err != nil {
 		t.Fatalf("failed to create the stdout pipe: %s", err)
 		return nil
 	}
-	c.Stderr = c.Stdout
+
+	stderr, err := c.StderrPipe()
+	if err != nil {
+		t.Fatalf("failed to create the stdout pipe: %s", err)
+		return nil
+	}
 
 	b := &RunningBeat{
 		c:           c,
@@ -175,15 +182,28 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 		outputDone:  make(chan struct{}),
 	}
 
+	var wg sync.WaitGroup
+	// arbitrary buffer size
+	output := make(chan string, 128)
+
+	wg.Add(2)
 	go func() {
-		scanner := bufio.NewScanner(output)
-		for scanner.Scan() {
-			b.writeOutputLine(scanner.Text())
-		}
-		if scanner.Err() != nil {
-			t.Logf("error while reading from stdout/stderr: %s", scanner.Err())
-		}
+		processPipe(t, stdout, output)
+		wg.Done()
+	}()
+	go func() {
+		processPipe(t, stderr, output)
+		wg.Done()
+	}()
+	go func() {
+		wg.Wait()
+		close(output)
 		close(b.outputDone)
+	}()
+	go func() {
+		for line := range output {
+			b.writeOutputLine(line)
+		}
 	}()
 
 	err = c.Start()
@@ -195,6 +215,16 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 	t.Logf("%s is running (pid: %d)", binaryFilename, c.Process.Pid)
 
 	return b
+}
+
+func processPipe(t *testing.T, r io.Reader, output chan<- string) {
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		output <- scanner.Text()
+	}
+	if scanner.Err() != nil {
+		t.Logf("error while reading from stdout/stderr: %s", scanner.Err())
+	}
 }
 
 // EnsureCompiled ensures that the given Beat is compiled and ready
