@@ -66,7 +66,7 @@ By default is equal to the period.
 *`wmi.include_queries`*:: If set to true the metricset includes the query in the output document.
 query in the output document. False by default.
 
-*`wmi.include_null`*:: A boolean option that causes the metricset to include the
+*`wmi.include_null`*:: If set to true the metricset includes the properties that have null value in the output document.
 properties that have a null value in the output document. False by default.
 
 *`wmi.include_empty_string`*:: A boolean option that causes the metricset to include
