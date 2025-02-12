@@ -67,6 +67,10 @@ func Build() error {
 
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
+	if err := xpacketbeat.CopyNPCAPInstaller("../packetbeat/npcap/installer/"); err != nil {
+		return err
+	}
+
 	args := devtools.DefaultTestBinaryArgs()
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	return devtools.BuildSystemTestGoBinary(args)
