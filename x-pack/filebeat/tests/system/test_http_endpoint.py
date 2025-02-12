@@ -154,7 +154,7 @@ class Test(BaseTest):
         for i in range(N):
             assert output[i]["input.type"] == "http_endpoint"
             assert output[i]["json.{}".format(
-                self.prefix)] == message.format(i)+'_'+message.format(i)
+                self.prefix)] == message.format(i) + '_' + message.format(i)
 
     def test_http_endpoint_request_multiple_documents(self):
         """

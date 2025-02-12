@@ -103,7 +103,7 @@ class TestExportsMixin:
 class TestDashboardMixin:
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.timeout(5*60, func_only=True)
+    @pytest.mark.timeout(5 * 60, func_only=True)
     def test_dashboards(self):
         """
         Test that the dashboards can be loaded with `setup --dashboards`
