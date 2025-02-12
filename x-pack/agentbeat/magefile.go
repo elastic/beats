@@ -229,7 +229,7 @@ func PythonIntegTest(ctx context.Context) error {
 }
 
 func SystemTest(ctx context.Context) error {
-	mg.SerialDeps(xpacketbeat.GetNpcapInstaller, Update, devtools.BuildSystemTestBinary)
+	mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("../packetbeat"), devtools.BuildSystemTestBinary)
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"../packetbeat/tests/system/..."}
