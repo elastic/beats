@@ -143,9 +143,6 @@ func Package() error {
 	// Add osquery distro binaries, required for the osquerybeat subcommand.
 	osquerybeat.CustomizePackaging()
 
-	// customize packetbeat package to reflect os
-	packetbeat.CustomizePackaging()
-
 	// Add metricbeat lightweight modules.
 	if err := metricbeat.CustomizeLightModulesPackaging(); err != nil {
 		return err
