@@ -114,7 +114,7 @@ func MakeDefaultSupport(
 		// don't try to "merge" the two lists somehow, if the supportFactory caller requests its own processors, use those
 		// also makes it easier to disable global processors if needed, since they're otherwise hardcoded
 		var rawProcessors processors.PluginConfig
-		shouldLoadDefaultProcessors := info.IsOTelReceiver() || fleetmode.Enabled()
+		shouldLoadDefaultProcessors := info.UseDefaultProcessors || fleetmode.Enabled()
 
 		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
 		if shouldLoadDefaultProcessors && !beatCfg.HasField("processors") {
