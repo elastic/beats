@@ -217,7 +217,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add support for marked redaction to x-pack/filebeat/input/internal/private {pull}41212[41212]
 - Add support for collecting Okta role and factor data for users with filebeat entityanalytics input. {pull}41044[41044]
 - Add CEL input program evaluation coverage collection support. {pull}41884[41884]
-- Switch persistent storage from dgraph-io/badger to etcd-io/bbolt in x-pack/libbeat/persistentcache/persistentcache.go. {pull}42571[42571]
+- Switch persistent storage from dgraph-io/badger to etcd-io/bbolt in x-pack/libbeat/persistentcache/persistentcache.go. This change affects only Cloudfoundry related functionality. {pull}42571[42571]
 
 ==== Deprecated
 
