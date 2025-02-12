@@ -63,7 +63,7 @@ By default is equal to the period.
 
 *`wmi.queries`*:: The list of queries to execute. The list cannot be empty. See <<query-configuration, Query Configuration>> for the format of the queries.
 
-*`wmi.include_queries`*:: A boolean option that causes the metricset to include the
+*`wmi.include_queries`*:: If set to true the metricset includes the query in the output document.
 query in the output document. False by default.
 
 *`wmi.include_null`*:: A boolean option that causes the metricset to include the
