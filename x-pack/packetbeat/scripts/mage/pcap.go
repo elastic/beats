@@ -58,7 +58,7 @@ func CopyNPCAPInstaller(dir string) error {
 // obtained from the cloud storage. This behaviour requires access to the private store.
 // If NPCAP_LOCAL is set to "true" and the file is in the npcap/installer directory, no
 // fetch will be made.
-func GetNpcapInstallerFn(dir string) func()error {
+func GetNpcapInstallerFn(dir string) func() error {
 	if dir == "" {
 		dir = "./"
 	}
@@ -70,7 +70,7 @@ func GetNpcapInstallerFn(dir string) func()error {
 		if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
 			return errors.New("only available if running in the CI or with NPCAP_LOCAL=true")
 		}
-		dstPath := filepath.Join(dir,"npcap/installer", installer)
+		dstPath := filepath.Join(dir, "npcap/installer", installer)
 		if os.Getenv("NPCAP_LOCAL") == "true" {
 			fi, err := os.Stat(dstPath)
 			if err == nil && !fi.IsDir() {
