@@ -258,7 +258,7 @@ func TestCheckinV2(t *testing.T) {
 	initialOSArgs := os.Args
 	os.Args = []string{
 		"filebeat",
-		// TODO: enable http.metrics
+		// TODO: enable http.metrics2
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 		"-E", "management.restart_on_output_change=true",
