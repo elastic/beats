@@ -66,7 +66,7 @@ func GetNpcapInstaller() error {
 	if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
 		return errors.New("only available if running in the CI or with NPCAP_LOCAL=true")
 	}
-	dstPath := filepath.Join("./npcap/installer", installer)
+	dstPath, _ := filepath.Abs(filepath.Join("./npcap/installer", installer))
 	if os.Getenv("NPCAP_LOCAL") == "true" {
 		fi, err := os.Stat(dstPath)
 		if err == nil && !fi.IsDir() {
