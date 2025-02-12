@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/magefile/mage/sh"
@@ -230,7 +229,6 @@ func PythonIntegTest(ctx context.Context) error {
 }
 
 func SystemTest(ctx context.Context) error {
-	os.Setenv("DEV_OS", runtime.GOOS)
 	mg.SerialDeps(xpacketbeat.GetNpcapInstaller, Update, devtools.BuildSystemTestBinary)
 
 	args := devtools.DefaultGoTestIntegrationArgs()

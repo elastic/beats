@@ -79,7 +79,7 @@ func GetNpcapInstaller() error {
 	}
 	ciBucketName := getBucketName()
 
-	fmt.Printf("getting %s from private cache\n", installer) //nolint:forbidigo // fmt.Println is ok here
+	fmt.Printf("getting %s from private cache to %q\n", installer, dstPath) //nolint:forbidigo // fmt.Println is ok here
 	return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
 }
 
