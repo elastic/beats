@@ -96,7 +96,6 @@ type ParsedMaintWin struct {
 }
 
 func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
-	matched := false
 	tOrig = tOrig.UTC()
 	for i, r := range pmw.Rules {
 		all := r.All()
@@ -106,18 +105,11 @@ func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
 			duration := pmw.Durations[i]
 			endTime := occ.Add(duration)
 
-			if tOrig.Equal(occ) {
-				matched = true
-				break
-			}
-
-			if tOrig.After(occ) && tOrig.Before(endTime) {
-				matched = true
-				break
+			if tOrig.Equal(occ) || (tOrig.After(occ) && tOrig.Before(endTime)) {
+				return true
 			}
 		}
 
 	}
-
-	return matched
+	return false
 }
