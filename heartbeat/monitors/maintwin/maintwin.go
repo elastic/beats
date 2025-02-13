@@ -48,7 +48,10 @@ type MaintWin struct {
 
 func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 
-	dtstart, _ := time.Parse(time.RFC3339, mw.Dtstart)
+	dtstart, err := time.Parse(time.RFC3339, mw.Dtstart)
+	if err != nil {
+		return nil, err
+	}
 
 	// Convert the string weekdays to rrule.Weekday
 	weekdays := []rrule.Weekday{}
@@ -63,7 +66,7 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 		count = 1000
 	}
 
-	r, _ = rrule.NewRRule(rrule.ROption{
+	r, err = rrule.NewRRule(rrule.ROption{
 		Freq:       mw.Freq,
 		Count:      count,
 		Dtstart:    dtstart,
@@ -80,6 +83,9 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 		Bymonthday: mw.Bymonthday,
 		Wkst:       mw.Wkst,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	return r, nil
 }
