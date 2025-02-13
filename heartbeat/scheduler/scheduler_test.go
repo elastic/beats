@@ -85,11 +85,12 @@ func TestSchedulerRun(t *testing.T) {
 	defer s.Stop()
 
 	mainWin := maintwin.ParsedMaintWin{}
+	mainWins := []maintwin.ParsedMaintWin{mainWin}
 
 	executed := make(chan string)
 
 	initialEvents := uint32(10)
-	_, err := s.Add(testSchedule{0}, mainWin, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{0}, mainWins, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
 		executed <- "initial"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "initialCont"
@@ -112,13 +113,13 @@ func TestSchedulerRun(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err = s.Add(testSchedule{}, mainWin, "removed", testTaskTimes(removedEvents+1, testFn), "http")
+	remove, err = s.Add(testSchedule{}, mainWins, "removed", testTaskTimes(removedEvents+1, testFn), "http")
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
 
 	postRemoveEvents := uint32(10)
-	_, err = s.Add(testSchedule{}, mainWin, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
+	_, err = s.Add(testSchedule{}, mainWins, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
 		executed <- "postRemove"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "postRemoveCont"
@@ -163,10 +164,11 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 	defer s.Stop()
 
 	mainWin := maintwin.ParsedMaintWin{}
+	mainWins := []maintwin.ParsedMaintWin{mainWin}
 
 	executed := new(uint32)
 
-	_, err := s.Add(testSchedule{0}, mainWin, "runOnce", func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{0}, mainWins, "runOnce", func(_ context.Context) []TaskFunc {
 		cont := func(_ context.Context) []TaskFunc {
 			// Make sure we actually wait for the task!
 			time.Sleep(time.Millisecond * 250)
@@ -186,10 +188,11 @@ func TestScheduler_Stop(t *testing.T) {
 
 	executed := make(chan struct{})
 	mainWin := maintwin.ParsedMaintWin{}
+	mainWins := []maintwin.ParsedMaintWin{mainWin}
 
 	s.Stop()
 
-	_, err := s.Add(testSchedule{}, mainWin, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{}, mainWins, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
 		return nil
 	}), "http")
@@ -286,10 +289,11 @@ func BenchmarkScheduler(b *testing.B) {
 
 	sched := testSchedule{0}
 	mainWin := maintwin.ParsedMaintWin{}
+	mainWins := []maintwin.ParsedMaintWin{mainWin}
 
 	executed := make(chan struct{})
 	for i := 0; i < 1024; i++ {
-		_, err := s.Add(sched, mainWin, "testPostStop", func(_ context.Context) []TaskFunc {
+		_, err := s.Add(sched, mainWins, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil
 		}, "http")

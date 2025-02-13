@@ -159,12 +159,9 @@ func TestMaintWin(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			rules := []*rrule.RRule{}
 			r, err := c.mw.Parse()
 			require.NoError(t, err)
-			rules = append(rules, r)
-			durations := []time.Duration{c.mw.Duration}
-			pmw := ParsedMaintWin{Rules: rules, Durations: durations}
+			pmw := ParsedMaintWin{Rule: r, Duration: c.mw.Duration}
 			for _, m := range c.positiveMatches {
 				t.Run(fmt.Sprintf("does match %s", m), func(t *testing.T) {
 					pt, err := time.Parse(time.RFC3339, m)

@@ -162,11 +162,11 @@ func (s *Scheduler) WaitForRunOnce() {
 // has already stopped.
 var ErrAlreadyStopped = errors.New("attempted to add job to already stopped scheduler")
 
-type AddTask func(sched Schedule, pmw maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error)
+type AddTask func(sched Schedule, pmws []maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error)
 
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, pmw maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
+func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
 	if errors.Is(s.ctx.Err(), context.Canceled) {
 		return nil, ErrAlreadyStopped
 	}
@@ -191,8 +191,12 @@ func (s *Scheduler) Add(sched Schedule, pmw maintwin.ParsedMaintWin, id string, 
 		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint)
 
 		inMaintWin := false
-		if pmw.IsActive(now) {
-			inMaintWin = true
+
+		for _, pmw := range pmws {
+			if pmw.IsActive(now) {
+				inMaintWin = true
+				break
+			}
 		}
 
 		var lastRanAt time.Time
@@ -212,8 +216,15 @@ func (s *Scheduler) Add(sched Schedule, pmw maintwin.ParsedMaintWin, id string, 
 		}
 		debugf("Job '%v' returned at %v", id, time.Now())
 	}
+	isActive := false
+	for _, pmw := range pmws {
+		if pmw.IsActive(time.Now()) {
+			isActive = true
+			break
+		}
+	}
 
-	if s.runOnce && pmw.IsActive(time.Now()) {
+	if s.runOnce && isActive {
 		return func() {
 			debugf("Remove scheduler job '%v'", id)
 			jobCtxCancel()

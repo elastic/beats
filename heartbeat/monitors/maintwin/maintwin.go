@@ -90,18 +90,19 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 	return r, nil
 }
 
+
 type ParsedMaintWin struct {
-	Rules     []*rrule.RRule
-	Durations []time.Duration // Store durations in parallel
+    Rule *rrule.RRule
+    Duration time.Duration
 }
 
 func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
 	tOrig = tOrig.UTC()
-	for i, r := range pmw.Rules {
-		window := r.Before(tOrig, true)
-		if tOrig.Before(window.Add(pmw.Durations[i])) {
-			return true
-		}
+	r := pmw.Rule 
+	window := r.Before(tOrig, true)
+	if tOrig.Before(window.Add(pmw.Duration)) {
+		return true
 	}
+	
 	return false
 }
