@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/pdata/pcommon"
 )
