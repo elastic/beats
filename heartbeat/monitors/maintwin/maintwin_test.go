@@ -155,6 +155,17 @@ func TestMaintWin(t *testing.T) {
 			positiveMatches: []string{"2025-02-08T09:30:00Z", "2025-02-10T11:00:00Z"},
 			negativeMatches: []string{"2025-02-07T09:30:00Z", "2025-02-06T13:00:00Z"},
 		},
+		{
+			name: "Every other hour",
+			mw: MaintWin{
+				Freq:     rrule.HOURLY,
+				Dtstart:  "2015-02-06T08:00:00Z",
+				Duration: mustParseDuration("1h"),
+				Interval: 2, // Every other day
+			},
+			positiveMatches: []string{"2025-02-08T10:30:00Z"},
+			negativeMatches: []string{"2025-02-07T09:30:00Z"},
+		},
 	}
 
 	for _, c := range cases {

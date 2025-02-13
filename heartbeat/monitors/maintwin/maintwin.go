@@ -63,14 +63,9 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 
 	dtstart = dtstart.UTC()
 
-	count := mw.Count
-	if count == 0 {
-		count = 1000
-	}
-
 	r, err = rrule.NewRRule(rrule.ROption{
 		Freq:       mw.Freq,
-		Count:      count,
+		Count:      mw.Count,
 		Dtstart:    dtstart,
 		Interval:   mw.Interval,
 		Byweekday:  weekdays,
