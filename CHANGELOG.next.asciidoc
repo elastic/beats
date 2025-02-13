@@ -131,6 +131,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix autodiscovery memory leak related to metadata of start events {pull}41748[41748]
 - All standard queue metrics are now included in metrics monitoring, including: `added.{events, bytes}`, `consumed.{events, bytes}`, `removed.{events, bytes}`, and `filled.{events, bytes, pct}`. {pull}42439[42439]
 - The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
+- Restored event Meta fields in the Elasticsearch output's error logs. {pull}42559[42559]
 
 *Auditbeat*
 
