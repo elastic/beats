@@ -216,15 +216,8 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		}
 		debugf("Job '%v' returned at %v", id, time.Now())
 	}
-	isActive := false
-	for _, pmw := range pmws {
-		if pmw.IsActive(time.Now()) {
-			isActive = true
-			break
-		}
-	}
 
-	if s.runOnce && isActive {
+	if s.runOnce {
 		return func() {
 			debugf("Remove scheduler job '%v'", id)
 			jobCtxCancel()
