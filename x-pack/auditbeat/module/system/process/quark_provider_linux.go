@@ -248,7 +248,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 			}
 		}
 	} else {
-		ms.log.Debugf("skipping hash %s (inonum %d vs %d)\n", process.Filename, process.Proc.MntInonum, ms.selfMntNsIno)
+		ms.log.Debugf("skipping hash %s (inonum %d vs %d)", process.Filename, process.Proc.MntInonum, ms.selfMntNsIno)
 	}
 	event.RootFields.Put("quark", true) // XXX REMOVE ME
 
