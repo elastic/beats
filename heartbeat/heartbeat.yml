@@ -36,13 +36,6 @@ heartbeat.monitors:
   #timeout: 16s
   # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
   #service.name: my-apm-service-name
-  maintenance_windows:
-  - freq: 3
-    dtstart: "2020-11-04T01:00:00.000Z"
-    interval: 1
-    byweekday: [MO, TU, WE, TH, FR]
-    duration: 3600000
-    count: 10
 
 # Experimental: Set this to true to run heartbeat monitors exactly once at startup
 #heartbeat.run_once: true
