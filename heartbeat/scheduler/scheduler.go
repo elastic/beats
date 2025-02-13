@@ -218,13 +218,6 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 	}
 
 	if s.runOnce {
-		return func() {
-			debugf("Remove scheduler job '%v'", id)
-			jobCtxCancel()
-		}, nil
-	}
-
-	if s.runOnce {
 		s.runOnceWg.Add(1)
 	}
 
