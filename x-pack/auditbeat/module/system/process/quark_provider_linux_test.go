@@ -275,7 +275,7 @@ func firstEventOfPid(t *testing.T, events []mb.Event, pid int) mb.Event {
 }
 
 // makeSelfEvent builds what should be the event that quark will
-// generate as a initial snapshot of the current process
+// generate as an initial snapshot of the current process
 func makeSelfEvent(t *testing.T, qp quark.Process, be backend) mb.Event {
 	exe, err := os.Executable()
 	require.NoError(t, err)
