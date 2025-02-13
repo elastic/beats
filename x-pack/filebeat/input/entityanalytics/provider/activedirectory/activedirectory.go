@@ -215,6 +215,7 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		return err
 	}
 
+<<<<<<< HEAD
 	if len(state.users) != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
 
@@ -222,6 +223,55 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 		for _, u := range state.users {
 			p.publishUser(u, state, inputCtx.ID, client, tracker)
+=======
+	if len(users) != 0 || state.len() != 0 {
+		// Active Directory does not have a notion of deleted users
+		// beyond absence from the directory, so compare found users
+		// with users already known by the state store and if any
+		// are in the store but not returned in the previous fetch,
+		// mark them as deleted and publish the deletion. We do not
+		// have the time of the deletion, so use now.
+		if state.len() != 0 {
+			found := make(map[string]bool)
+			for _, u := range users {
+				found[u.ID] = true
+			}
+			deleted := make(map[string]*User)
+			now := time.Now()
+			state.forEach(func(u *User) {
+				if u.State == Deleted {
+					// We have already seen that this is deleted
+					// so we do not need to publish again. The
+					// user will be deleted from the store when
+					// the state is closed.
+					return
+				}
+				if found[u.ID] {
+					// We have the user, so we do not need to
+					// mark it as deleted.
+					return
+				}
+				// This modifies the state store's copy since u
+				// is a pointer held by the state store map.
+				u.State = Deleted
+				u.WhenChanged = now
+				deleted[u.ID] = u
+			})
+			for _, u := range deleted {
+				users = append(users, u)
+			}
+		}
+		if len(users) != 0 {
+			start := time.Now()
+			tracker := kvstore.NewTxTracker(ctx)
+			p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
+			for _, u := range users {
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			}
+			end := time.Now()
+			p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
+			tracker.Wait()
+>>>>>>> 1473ae916 (x-pack/filebeat/input/entityanalytics/provider/activedirectory: fix use before init bug (#42682))
 		}
 
 		end := time.Now()
