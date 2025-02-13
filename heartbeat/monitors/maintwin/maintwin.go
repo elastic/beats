@@ -98,6 +98,9 @@ type ParsedMaintWin struct {
 }
 
 func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
+	if pmw.Rule == nil {
+		return false
+	}
 	tOrig = tOrig.UTC()
 	r := pmw.Rule
 	window := r.Before(tOrig, true)
