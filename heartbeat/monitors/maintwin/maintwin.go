@@ -56,7 +56,9 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 	// Convert the string weekdays to rrule.Weekday
 	weekdays := []rrule.Weekday{}
 	for _, wd := range mw.Byweekday {
-		weekdays = append(weekdays, weekdayLookup[wd])
+		if weekday, exists := weekdayLookup[wd]; exists {
+			weekdays = append(weekdays, weekday)
+		}
 	}
 
 	dtstart = dtstart.UTC()
