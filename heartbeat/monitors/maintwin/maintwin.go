@@ -18,6 +18,7 @@
 package maintwin
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/teambition/rrule-go"
@@ -47,6 +48,11 @@ type MaintWin struct {
 }
 
 func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
+
+	// validate the frequency, we don't support less than daily
+	if mw.Freq > rrule.DAILY {
+		return nil, fmt.Errorf("invalid frequency: only yearly, monthly, weekly, and daily are supported")
+	}
 
 	dtstart, err := time.Parse(time.RFC3339, mw.Dtstart)
 	if err != nil {

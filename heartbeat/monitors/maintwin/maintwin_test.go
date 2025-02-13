@@ -84,17 +84,6 @@ func TestMaintWin(t *testing.T) {
 		},
 
 		{
-			name: "Hourly maintenance for 15 minutes",
-			mw: MaintWin{
-				Freq:     rrule.HOURLY,
-				Dtstart:  "2025-02-06T00:00:00Z",
-				Duration: mustParseDuration("15m"),
-			},
-			positiveMatches: []string{"2025-02-06T00:05:00Z", "2025-02-06T01:10:00Z"},
-			negativeMatches: []string{"2025-02-06T00:16:00Z", "2025-02-06T01:30:00Z"},
-		},
-
-		{
 			name: "First Friday of every month",
 			mw: MaintWin{
 				Freq:      rrule.MONTHLY,
@@ -156,14 +145,13 @@ func TestMaintWin(t *testing.T) {
 			negativeMatches: []string{"2025-02-07T09:30:00Z", "2025-02-06T13:00:00Z"},
 		},
 		{
-			name: "Every other hour",
+			name: "Every day",
 			mw: MaintWin{
-				Freq:     rrule.HOURLY,
-				Dtstart:  "2015-02-06T08:00:00Z",
+				Freq:     rrule.DAILY,
+				Dtstart:  "2005-02-06T08:00:00Z",
 				Duration: mustParseDuration("1h"),
-				Interval: 2, // Every other day
 			},
-			positiveMatches: []string{"2025-02-08T10:30:00Z"},
+			positiveMatches: []string{"2025-02-08T08:30:00Z"},
 			negativeMatches: []string{"2025-02-07T09:30:00Z"},
 		},
 	}
