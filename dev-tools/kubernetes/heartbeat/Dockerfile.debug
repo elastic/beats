@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-FROM golang:1.22.8 as builder
-=======
 FROM golang:1.22.12 as builder
->>>>>>> c156390a7 ([Automation] Bump Golang version to 1.22.12 (#42681))
 
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
 
