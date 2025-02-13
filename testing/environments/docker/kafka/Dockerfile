@@ -6,13 +6,10 @@ ENV KAFKA_HOME /kafka
 ENV KAFKA_ADVERTISED_HOST kafka
 
 ENV KAFKA_LOGS_DIR="/kafka-logs"
-<<<<<<< HEAD
-ENV KAFKA_VERSION 2.2.2
-ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true"
-=======
+
 ENV KAFKA_VERSION=3.6.0
 ENV _JAVA_OPTIONS="-Djava.net.preferIPv4Stack=true"
->>>>>>> fb79d4957 (update kafka version used in testing to 3.6.0 (#42286))
+
 ENV TERM=linux
 
 RUN apt-get update && apt-get install -y curl openjdk-11-jre-headless netcat-openbsd
