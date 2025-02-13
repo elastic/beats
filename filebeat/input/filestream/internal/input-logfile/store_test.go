@@ -508,7 +508,7 @@ func createSampleStore(t *testing.T, data map[string]state) testStateStore {
 
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) Access() (*statestore.Store, error) {
+func (ts testStateStore) Access(string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}
