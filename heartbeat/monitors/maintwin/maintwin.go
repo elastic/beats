@@ -90,19 +90,14 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 	return r, nil
 }
 
-
 type ParsedMaintWin struct {
-    Rule *rrule.RRule
-    Duration time.Duration
+	Rule     *rrule.RRule
+	Duration time.Duration
 }
 
 func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
 	tOrig = tOrig.UTC()
-	r := pmw.Rule 
+	r := pmw.Rule
 	window := r.Before(tOrig, true)
-	if tOrig.Before(window.Add(pmw.Duration)) {
-		return true
-	}
-	
-	return false
+	return tOrig.Before(window.Add(pmw.Duration))
 }
