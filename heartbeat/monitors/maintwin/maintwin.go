@@ -47,7 +47,7 @@ type MaintWin struct {
 	Byeaster   []int           `config:"byeaster"`
 }
 
-func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
+func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 
 	// validate the frequency, we don't support less than daily
 	if mw.Freq > rrule.DAILY {
@@ -57,6 +57,15 @@ func (mw *MaintWin) Parse() (r *rrule.RRule, err error) {
 	dtstart, err := time.Parse(time.RFC3339, mw.Dtstart)
 	if err != nil {
 		return nil, err
+	}
+
+	// validate DTSTART and make sure it's not older than 2 years
+	if dtstart.Before(time.Now().Add(-2 * 365 * 24 * time.Hour)) && validateDtStart {
+		return nil, fmt.Errorf(
+			"invalid dtstart: %s is more than 2 years in the past. "+
+				"To prevent excessive iterations, please use a more recent date.",
+			dtstart.Format(time.RFC3339),
+		)
 	}
 
 	// Convert the string weekdays to rrule.Weekday

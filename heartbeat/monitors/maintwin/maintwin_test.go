@@ -158,7 +158,7 @@ func TestMaintWin(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			r, err := c.mw.Parse()
+			r, err := c.mw.Parse(false)
 			require.NoError(t, err)
 			pmw := ParsedMaintWin{Rule: r, Duration: c.mw.Duration}
 			for _, m := range c.positiveMatches {
