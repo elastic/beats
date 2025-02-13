@@ -96,7 +96,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 }
 
 // Run reads events from quark's queue and pushes them into output.
-// The queue is owned by this go-routine and should not be touched
+// The queue is owned by this goroutine and should not be touched
 // from outside as there is no synchronization.
 func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
 	ms.log.Info("Quark running")
