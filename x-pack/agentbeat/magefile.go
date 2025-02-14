@@ -66,6 +66,10 @@ func Build() error {
 
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
+	if err := xpacketbeat.CopyNPCAPInstaller("../packetbeat/npcap/installer/"); err != nil {
+		return err
+	}
+
 	args := devtools.DefaultTestBinaryArgs()
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	return devtools.BuildSystemTestGoBinary(args)
@@ -74,6 +78,10 @@ func BuildSystemTestBinary() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	if err := xpacketbeat.CopyNPCAPInstaller("../packetbeat/npcap/installer/"); err != nil {
+		return err
+	}
+
 	// need packetbeat build arguments as it address the requirements for libpcap
 	args := packetbeat.GolangCrossBuildArgs()
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
@@ -205,4 +213,14 @@ func GoIntegTest(ctx context.Context) error {
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+}
+
+func SystemTest(ctx context.Context) error {
+	mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("../packetbeat"), Update, devtools.BuildSystemTestBinary)
+
+	args := devtools.DefaultGoTestIntegrationArgs()
+	args.Packages = []string{"../packetbeat/tests/system/..."}
+	args.Tags = append(args.Tags, "agentbeat")
+
+	return devtools.GoTest(ctx, args)
 }
