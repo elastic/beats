@@ -20,6 +20,7 @@ package otelconsumer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -109,12 +110,14 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-		pcommonFields := mapstrToPcommonMap(event1.Fields)
-		want, ok := pcommonFields.Get("data_stream")
-		require.True(t, ok)
-		got, ok := attributes.Get("data_stream")
-		require.True(t, ok)
-		assert.EqualValues(t, want.AsRaw(), got.AsRaw())
+
+		var subFields = []string{"dataset", "namespace", "type"}
+		for _, subField := range subFields {
+			gotValue, ok := attributes.Get("data_stream." + subField)
+			require.Truef(t, ok, "data_stream.%s not found on log record attribute", subField)
+			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
+		}
+
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
