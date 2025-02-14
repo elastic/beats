@@ -26,7 +26,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -36,7 +38,7 @@ import (
 )
 
 func TestInputMetricsFromPipeline_Filestream(t *testing.T) {
-	var filestreamCfg = `
+	var tmplCfg = `
 http:
   enabled: true
 filebeat.inputs:
@@ -44,7 +46,7 @@ filebeat.inputs:
     id: a-filestream-id
     enabled: true
     paths:
-      - %s
+      - {{.log_path}}
     processors:
       - drop_event:
           when:
@@ -55,7 +57,7 @@ filebeat.inputs:
   - type: cel
     id: a-cel-input-id
     interval: 1s
-    resource.url: %s
+    resource.url: {{.cel_resource_url}}
     program: bytes(get(state.url).Body).as(body,{"events":[body.decode_json()]})
     publisher_pipeline.disable_host: true
     processors:
@@ -64,12 +66,22 @@ filebeat.inputs:
             equals:
               ip: "1.1.1.1"
 
+  - type: httpjson
+    id: a-httpjson-input-id
+    interval: 1s
+    request.url: {{.httpjson_requestURL}}
+    processors:
+      - drop_event:
+          when:
+            contains:
+              message: "1.1.1.1"
+
 queue.mem:
   events: 32
   flush.min_events: 8
   flush.timeout: 0.1s
 
-path.home: %s
+path.home: {{.path_home}}
 
 output.file:
   path: ${path.home}
@@ -78,8 +90,10 @@ output.file:
 
 logging.level: debug
 `
-	celSrv := makeCelServer()
+	celSrv := makeServer()
 	defer celSrv.Close()
+	httpjsonSrv := makeServer()
+	defer httpjsonSrv.Close()
 
 	filebeat := integration.NewBeat(
 		t,
@@ -95,8 +109,19 @@ logging.level: debug
 	require.NoError(t, err, "Failed to get absolute path for", relativePath)
 
 	// 2. Write configuration file and start Filebeat
-	filebeat.WriteConfigFile(fmt.Sprintf(filestreamCfg, logFilePath, celSrv.URL, tempDir))
-	// filebeat.WriteConfigFile(filestreamCfg)
+	cgfSB := strings.Builder{}
+	tmpl, err := template.New("filebeatConfig").Parse(tmplCfg)
+	require.NoErrorf(t, err, "Failed to parse config template")
+
+	require.NoError(t, tmpl.Execute(&cgfSB, map[string]string{
+		"log_path":            logFilePath,
+		"cel_resource_url":    celSrv.URL,
+		"httpjson_requestURL": httpjsonSrv.URL,
+		"path_home":           tempDir,
+	}), "failed to execute config template")
+
+	filebeat.WriteConfigFile(cgfSB.String())
+	// filebeat.WriteConfigFile(tmplCfg)
 	filebeat.Start()
 
 	// 4. Wait for Filebeat to start scanning for files
@@ -109,7 +134,15 @@ logging.level: debug
 		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
-	// 5. Now that the reader has been closed, the file is ingested.// todo: is it?
+	// 5. Now that the reader has been closed, the file is ingested.
+	// TODO: fix that. how to know every input finished? or better to have a
+	//  test per input?
+	// filebeat.WaitForLogs(
+	// 	"Error while processing http request: failed to collect first response: failed to execute http GET:",
+	// 	30*time.Second, "")
+	// httpjson
+	// request finished: 1 events published
+
 	time.Sleep(5 * time.Second)
 	resp, err := http.Get("http://localhost:5066/inputs/")
 	require.NoError(t, err, "failed fetching input metrics")
@@ -159,7 +192,16 @@ logging.level: debug
 			assert.Equal(t, 2, metrics.EventsPublishedTotal)
 			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal)
 			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal)
-
+		},
+		"a-httpjson-input-id": func(t *testing.T, metrics inputMetric) {
+			assert.Equal(t, "httpjson", metrics.Input)
+			assert.Equal(t,
+				metrics.EventsPipelineTotal,
+				metrics.EventsPipelinePublishedTotal+
+					metrics.EventsPipelineFilteredTotal+
+					metrics.EventsPipelineDroppedTotal)
+			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal)
+			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal)
 		},
 	}
 
@@ -179,21 +221,20 @@ logging.level: debug
 	assert.Falsef(t, t.Failed(), "test faild: input metrics response used for the assertions: %s", body)
 }
 
-// makeCelServer returns a *httptest.Server to mock a server called by the 'cel'
-// input. It reruns 2 successful responses then all following responses are a
-// HTTP 500.
-func makeCelServer() *httptest.Server {
-	celEventsTotal := 2
-	celEventsIdx := 0
-	celResponses := []string{"{\"ip\":\"0.0.0.0\"}", "{\"ip\":\"1.1.1.1\"}"}
-	celSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if celEventsIdx >= celEventsTotal {
+// makeServer returns a *httptest.Server to mock a server called by an input.
+// It reruns 2 successful responses then all following responses are an HTTP 500.
+func makeServer() *httptest.Server {
+	eventsTotal := 2
+	eventsIdx := 0
+	responses := []string{"{\"ip\":\"0.0.0.0\"}", "{\"ip\":\"1.1.1.1\"}"}
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if eventsIdx >= eventsTotal {
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("won't send any more events"))
 			return
 		}
-		_, _ = w.Write([]byte(celResponses[celEventsIdx]))
-		celEventsIdx++
+		_, _ = w.Write([]byte(responses[eventsIdx]))
+		eventsIdx++
 	}))
-	return celSrv
+	return srv
 }
