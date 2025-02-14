@@ -19,6 +19,7 @@ package maintwin
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/teambition/rrule-go"
@@ -29,29 +30,30 @@ var weekdayLookup = map[string]rrule.Weekday{
 }
 
 type MaintWin struct {
-	Freq       rrule.Frequency `config:"freq" validate:"required"`
-	Dtstart    string          `config:"dtstart" validate:"required"`
-	Interval   int             `config:"interval"`
-	Duration   time.Duration   `config:"duration" validate:"required"`
-	Wkst       rrule.Weekday   `config:"wkst"`
-	Count      int             `config:"count"`
-	Bysetpos   []int           `config:"bysetpos"`
-	Bymonth    []int           `config:"bymonth"`
-	Bymonthday []int           `config:"bymonthday"`
-	Byyearday  []int           `config:"byyearday"`
-	Byweekno   []int           `config:"byweekno"`
-	Byweekday  []string        `config:"byweekday"`
-	Byhour     []int           `config:"byhour"`
-	Byminute   []int           `config:"byminute"`
-	Bysecond   []int           `config:"bysecond"`
-	Byeaster   []int           `config:"byeaster"`
+	Freq       string        `config:"freq" validate:"required"`
+	Dtstart    string        `config:"dtstart" validate:"required"`
+	Interval   int           `config:"interval"`
+	Duration   time.Duration `config:"duration" validate:"required"`
+	Wkst       rrule.Weekday `config:"wkst"`
+	Count      int           `config:"count"`
+	Bysetpos   []int         `config:"bysetpos"`
+	Bymonth    []int         `config:"bymonth"`
+	Bymonthday []int         `config:"bymonthday"`
+	Byyearday  []int         `config:"byyearday"`
+	Byweekno   []int         `config:"byweekno"`
+	Byweekday  []string      `config:"byweekday"`
+	Byhour     []int         `config:"byhour"`
+	Byminute   []int         `config:"byminute"`
+	Bysecond   []int         `config:"bysecond"`
+	Byeaster   []int         `config:"byeaster"`
 }
 
 func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 
 	// validate the frequency, we don't support less than daily
-	if mw.Freq > rrule.DAILY {
-		return nil, fmt.Errorf("invalid frequency: only yearly, monthly, weekly, and daily are supported")
+	freq, err := rrule.StrToFreq(strings.ToUpper(mw.Freq))
+	if err != nil || freq > rrule.DAILY {
+		return nil, fmt.Errorf("Invalid frequency %s: only yearly, monthly, weekly, and daily are supported", mw.Freq)
 	}
 
 	dtstart, err := time.Parse(time.RFC3339, mw.Dtstart)
@@ -79,7 +81,7 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 	dtstart = dtstart.UTC()
 
 	r, err = rrule.NewRRule(rrule.ROption{
-		Freq:       mw.Freq,
+		Freq:       freq,
 		Count:      mw.Count,
 		Dtstart:    dtstart,
 		Interval:   mw.Interval,

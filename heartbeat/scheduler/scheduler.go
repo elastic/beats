@@ -190,20 +190,19 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		debugf("Job '%s' started", id)
 		sj := newSchedJob(jobCtx, s, id, jobType, entrypoint)
 
-		inMaintWin := false
-
+		var activeMainWin *maintwin.ParsedMaintWin
 		for _, pmw := range pmws {
 			if pmw.IsActive(now) {
-				inMaintWin = true
+				activeMainWin = &pmw
 				break
 			}
 		}
 
 		var lastRanAt time.Time
-		if !inMaintWin {
+		if activeMainWin == nil {
 			lastRanAt = sj.run()
 		} else {
-			logp.L().Infof("Job '%s' is in maintenance window, skipping", id)
+			logp.L().Infof("Job '%s' is in maintenance window '%s' , skipping", id, activeMainWin.Rule)
 			lastRanAt = now
 		}
 		s.stats.activeJobs.Dec()

@@ -24,7 +24,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/teambition/rrule-go"
 )
 
 func TestMaintWin(t *testing.T) {
@@ -37,7 +36,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			"Every sunday at midnight to 1 AM",
 			MaintWin{
-				Freq:      3,
+				Freq:      "daily",
 				Dtstart:   time.Now().Format(time.RFC3339),
 				Duration:  mustParseDuration("2h"),
 				Byweekday: []string{"SU", "MO", "TU", "WE", "TH", "FR", "SA"},
@@ -51,7 +50,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "Daily maintenance window for 2 hours",
 			mw: MaintWin{
-				Freq:     rrule.DAILY,
+				Freq:     "daily",
 				Dtstart:  "2025-02-06T21:00:00Z",
 				Duration: mustParseDuration("2h"),
 			},
@@ -62,7 +61,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "Monthly maintenance window on the 1st",
 			mw: MaintWin{
-				Freq:       rrule.MONTHLY,
+				Freq:       "monthly",
 				Dtstart:    "2025-02-01T10:00:00Z",
 				Duration:   mustParseDuration("2h"),
 				Bymonthday: []int{1},
@@ -74,7 +73,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "Weekly on Monday and Wednesday from 8 AM to 10 AM",
 			mw: MaintWin{
-				Freq:      rrule.WEEKLY,
+				Freq:      "weekly",
 				Dtstart:   "2025-02-03T08:00:00Z",
 				Duration:  mustParseDuration("2h"),
 				Byweekday: []string{"MO", "WE"},
@@ -86,7 +85,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "First Friday of every month",
 			mw: MaintWin{
-				Freq:      rrule.MONTHLY,
+				Freq:      "monthly",
 				Dtstart:   "2025-02-07T12:00:00Z",
 				Duration:  mustParseDuration("2h"),
 				Byweekday: []string{"FR"},
@@ -99,7 +98,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "Every Saturday and Sunday from 5 PM to 8 PM",
 			mw: MaintWin{
-				Freq:      rrule.WEEKLY,
+				Freq:      "weekly",
 				Dtstart:   "2025-02-08T17:00:00Z",
 				Duration:  mustParseDuration("3h"),
 				Byweekday: []string{"SA", "SU"},
@@ -111,7 +110,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "Monthly on the 15th from 6 AM to 9 AM",
 			mw: MaintWin{
-				Freq:       rrule.MONTHLY,
+				Freq:       "monthly",
 				Dtstart:    "2025-02-15T06:00:00Z",
 				Duration:   mustParseDuration("3h"),
 				Bymonthday: []int{15},
@@ -123,7 +122,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "Yearly maintenance on Jan 1 from Midnight to 3 AM",
 			mw: MaintWin{
-				Freq:       rrule.YEARLY,
+				Freq:       "yearly",
 				Dtstart:    "2025-01-01T00:00:00Z",
 				Duration:   mustParseDuration("3h"),
 				Bymonthday: []int{1},
@@ -135,7 +134,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "Every other day for 4 hours",
 			mw: MaintWin{
-				Freq:     rrule.DAILY,
+				Freq:     "daily",
 				Dtstart:  "2025-02-06T08:00:00Z",
 				Duration: mustParseDuration("4h"),
 				Interval: 2, // Every other day
@@ -147,7 +146,7 @@ func TestMaintWin(t *testing.T) {
 		{
 			name: "Every day",
 			mw: MaintWin{
-				Freq:     rrule.DAILY,
+				Freq:     "daily",
 				Dtstart:  "2005-02-06T08:00:00Z",
 				Duration: mustParseDuration("1h"),
 			},
