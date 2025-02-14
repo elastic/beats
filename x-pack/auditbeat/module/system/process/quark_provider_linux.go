@@ -240,7 +240,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 		if err != nil {
 			processErr = fmt.Errorf("failed to hash executable %v for PID %v: %w",
 				process.Filename, process.Pid, err)
-			ms.log.Error(processErr.Error())
+			ms.log.Warn(processErr.Error())
 		} else {
 			for hashType, digest := range hashes {
 				fieldName := "process.hash." + string(hashType)
