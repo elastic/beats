@@ -421,6 +421,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>
 
+* <<metricbeat-metricset-kubernetes-state_horizontalpodautoscaler,state_horizontalpodautoscaler>>
+
 * <<metricbeat-metricset-kubernetes-state_job,state_job>>
 
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
@@ -466,6 +468,8 @@ include::kubernetes/state_cronjob.asciidoc[]
 include::kubernetes/state_daemonset.asciidoc[]
 
 include::kubernetes/state_deployment.asciidoc[]
+
+include::kubernetes/state_horizontalpodautoscaler.asciidoc[]
 
 include::kubernetes/state_job.asciidoc[]
 
