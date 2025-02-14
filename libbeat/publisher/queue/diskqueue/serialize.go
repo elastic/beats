@@ -57,7 +57,7 @@ type eventDecoder struct {
 
 type entry struct {
 	Timestamp int64
-	Flags     uint32
+	Flags     uint8
 	Meta      mapstr.M
 	Fields    mapstr.M
 }
@@ -104,7 +104,7 @@ func (e *eventEncoder) encode_publisher_event(event publisher.Event) ([]byte, er
 
 	err := e.folder.Fold(entry{
 		Timestamp: event.Content.Timestamp.UTC().UnixNano(),
-		Flags:     uint32(event.Flags),
+		Flags:     uint8(event.Flags),
 		Meta:      event.Content.Meta,
 		Fields:    event.Content.Fields,
 	})
@@ -157,7 +157,6 @@ func (d *eventDecoder) Decode() (interface{}, error) {
 }
 
 func (d *eventDecoder) decodeJSONAndCBOR() (publisher.Event, error) {
-
 	var to entry
 
 	err := d.unfolder.SetTarget(&to)

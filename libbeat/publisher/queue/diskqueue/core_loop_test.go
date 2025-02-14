@@ -490,9 +490,11 @@ func TestMaybeReadPending(t *testing.T) {
 				nextReadFrameID: 5,
 			},
 			expectedRequest: &readerLoopRequest{
-				segment:       &queueSegment{id: 1},
-				startFrameID:  5,
-				startPosition: segmentHeaderSize,
+				segment:      &queueSegment{id: 1},
+				startFrameID: 5,
+				// startPosition is 8, the end of the segment header in the
+				// current file schema.
+				startPosition: 8,
 				endPosition:   1000,
 			},
 		},
@@ -535,7 +537,7 @@ func TestMaybeReadPending(t *testing.T) {
 			},
 			expectedRequest: &readerLoopRequest{
 				segment:       &queueSegment{id: 1},
-				startPosition: segmentHeaderSize,
+				startPosition: 8,
 				endPosition:   1000,
 			},
 		},
@@ -575,7 +577,7 @@ func TestMaybeReadPending(t *testing.T) {
 			},
 			expectedRequest: &readerLoopRequest{
 				segment:       &queueSegment{id: 2},
-				startPosition: segmentHeaderSize,
+				startPosition: 8,
 				endPosition:   500,
 			},
 			expectedACKingSegment: segmentIDRef(1),

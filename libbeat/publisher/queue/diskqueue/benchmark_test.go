@@ -15,22 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// Usage:
-//
-// go test -bench=100k -benchtime 1x -count 10 -timeout 10m -benchmem | tee results.txt && benchstat results.txt
-//
-// then
-//
-// benchstat results.txt
-//
-// you can give benchstat multiple files to analyse and it will
-// compare the results between them.
-// https://pkg.go.dev/golang.org/x/perf/cmd/benchstat
-
+// example: go test -bench=. -benchtime 3x -timeout 60m
 package diskqueue
 
 import (
-	"math/rand"
+	rand "math/rand/v2"
+	"os"
 	"testing"
 	"time"
 
@@ -45,7 +35,7 @@ var (
 	// constant event time
 	eventTime = time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)
 
-	//sample event messages, so size of every frame isn't identical
+	// sample event messages, so size of every frame isn't identical
 	msgs = []string{
 		"192.168.33.1 - - [26/Dec/2016:16:22:00 +0000] \"GET / HTTP/1.1\" 200 484 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36\"",
 		"{\"eventVersion\":\"1.05\",\"userIdentity\":{\"type\":\"IAMUser\",\"principalId\":\"EXAMPLE_ID\",\"arn\":\"arn:aws:iam::0123456789012:user/Alice\",\"accountId\":\"0123456789012\",\"accessKeyId\":\"EXAMPLE_KEY\",\"userName\":\"Alice\",\"sessionContext\":{\"sessionIssuer\":{},\"webIdFederationData\":{},\"attributes\":{\"mfaAuthenticated\":\"true\",\"creationDate\":\"2020-01-08T15:12:16Z\"}},\"invokedBy\":\"signin.amazonaws.com\"},\"eventTime\":\"2020-01-08T20:58:45Z\",\"eventSource\":\"cloudtrail.amazonaws.com\",\"eventName\":\"UpdateTrail\",\"awsRegion\":\"us-west-2\",\"sourceIPAddress\":\"127.0.0.1\",\"userAgent\":\"signin.amazonaws.com\",\"requestParameters\":{\"name\":\"arn:aws:cloudtrail:us-west-2:0123456789012:trail/TEST-trail\",\"s3BucketName\":\"test-cloudtrail-bucket\",\"snsTopicName\":\"\",\"isMultiRegionTrail\":true,\"enableLogFileValidation\":false,\"kmsKeyId\":\"\"},\"responseElements\":{\"name\":\"TEST-trail\",\"s3BucketName\":\"test-cloudtrail-bucket\",\"snsTopicName\":\"\",\"snsTopicARN\":\"\",\"includeGlobalServiceEvents\":true,\"isMultiRegionTrail\":true,\"trailARN\":\"arn:aws:cloudtrail:us-west-2:0123456789012:trail/TEST-trail\",\"logFileValidationEnabled\":false,\"isOrganizationTrail\":false},\"requestID\":\"EXAMPLE-f3da-42d1-84f5-EXAMPLE\",\"eventID\":\"EXAMPLE-b5e9-4846-8407-EXAMPLE\",\"readOnly\":false,\"eventType\":\"AwsApiCall\",\"recipientAccountId\":\"0123456789012\"}",
@@ -57,56 +47,53 @@ var (
 	}
 )
 
-// makePublisherEvent creates a sample publisher.Event, using a random message from msgs list
-func makePublisherEvent(r *rand.Rand) publisher.Event {
-	return publisher.Event{
-		Content: beat.Event{
-			Timestamp: eventTime,
-			Fields: mapstr.M{
-				"message": msgs[r.Intn(len(msgs))],
-			},
-		},
-	}
-}
-
 // setup creates the disk queue, including a temporary directory to
 // hold the queue.  Location of the temporary directory is stored in
 // the queue settings.  Call `cleanup` when done with the queue to
 // close the queue and remove the temp dir.
-func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue, queue.Producer) {
-	s := DefaultSettings()
-	s.Path = b.TempDir()
-	if encrypt {
-		s.EncryptionKey = []byte("testtesttesttest")
+func setup() (*diskQueue, queue.Producer) {
+	dir, err := os.MkdirTemp("", "benchmark")
+	if err != nil {
+		panic(err)
 	}
-	s.UseCompression = compress
-	q, err := NewQueue(logp.L(), nil, s, nil)
+	s := DefaultSettings()
+	s.Path = dir
+	q, err := NewQueue(logp.NewLogger("benchmark"), nil, s, nil)
 	if err != nil {
 		panic(err)
 	}
 	p := q.Producer(queue.ProducerConfig{})
 
-	b.Cleanup(func() {
-		err := q.Close()
-		if err != nil {
-			panic(err)
-		}
-	})
-
 	return q, p
 }
 
-func publishEvents(r *rand.Rand, p queue.Producer, num int) {
-	for i := 0; i < num; i++ {
-		e := makePublisherEvent(r)
-		_, ok := p.Publish(e)
-		if !ok {
-			panic("didn't publish")
-		}
+// clean closes the queue and deletes the temporory directory that
+// holds the queue.
+func cleanup(q *diskQueue) {
+	q.Close()
+	os.RemoveAll(q.settings.directoryPath())
+}
+
+// makeEvent creates a sample event, using a random message from msg above
+func makeEvent() publisher.Event {
+	return publisher.Event{
+		Content: beat.Event{
+			Timestamp: eventTime,
+			Fields: mapstr.M{
+				"message": msgs[rand.IntN(len(msgs))],
+			},
+		},
 	}
 }
 
-func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
+// produceAndConsume does the interesting work.  It generates events,
+// publishes them, consumes them, and ACKS them.
+func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+	go func() {
+		for i := 0; i < num_events; i++ {
+			p.Publish(makeEvent())
+		}
+	}()
 	var received int
 	for {
 		batch, err := q.Get(batch_size)
@@ -116,124 +103,32 @@ func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 		batch.Done()
 		received = received + batch.Count()
 		if received == num_events {
-			return nil
+			break
 		}
 	}
-}
-
-// produceAndConsume generates and publishes events in a go routine, in
-// the main go routine it consumes and acks them.  This interleaves
-// publish and consume.
-func produceAndConsume(r *rand.Rand, p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
-	go publishEvents(r, p, num_events)
-	return getAndAckEvents(q, num_events, batch_size)
-}
-
-// produceThenConsume generates and publishes events, when all events
-// are published it consumes and acks them.
-func produceThenConsume(r *rand.Rand, p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
-	publishEvents(r, p, num_events)
-	return getAndAckEvents(q, num_events, batch_size)
+	return nil
 }
 
 // benchmarkQueue is a wrapper for produceAndConsume, it tries to limit
 // timers to just produceAndConsume
-func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool, async bool, protobuf bool, b *testing.B) {
-	b.ResetTimer()
+func benchmarkQueue(num_events int, batch_size int, b *testing.B) {
 	var err error
-
+	q, p := setup()
+	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		b.StopTimer()
-		r := rand.New(rand.NewSource(1))
-		q, p := setup(b, encrypt, compress, protobuf)
-		b.StartTimer()
-		if async {
-			if err = produceAndConsume(r, p, q, num_events, batch_size); err != nil {
-				break
-			}
-		} else {
-			if err = produceThenConsume(r, p, q, num_events, batch_size); err != nil {
-				break
-			}
+		if err = produceAndConsume(p, q, num_events, batch_size); err != nil {
+			break
 		}
 	}
+	b.StopTimer()
+	cleanup(q)
 	if err != nil {
 		b.Errorf("Error producing/consuming events: %v", err)
 	}
 }
 
-// Async benchmarks
-func BenchmarkAsync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, false, false, true, false, b)
-}
-func BenchmarkAsync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, false, false, true, false, b)
-}
-func BenchmarkEncryptAsync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, true, false, true, false, b)
-}
-func BenchmarkEncryptAsync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, true, false, true, false, b)
-}
-func BenchmarkCompressAsync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, false, true, true, false, b)
-}
-func BenchmarkCompressAsync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, false, true, true, false, b)
-}
-func BenchmarkEncryptCompressAsync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, true, true, true, false, b)
-}
-func BenchmarkEncryptCompressAsync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, true, true, true, false, b)
-}
-func BenchmarkProtoAsync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, false, false, true, true, b)
-}
-func BenchmarkProtoAsync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, false, false, true, true, b)
-}
-func BenchmarkEncCompProtoAsync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, true, true, true, true, b)
-}
-func BenchmarkEncCompProtoAsync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, true, true, true, true, b)
-}
-
-// Sync Benchmarks
-func BenchmarkSync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, false, false, false, false, b)
-}
-func BenchmarkSync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, false, false, false, false, b)
-}
-func BenchmarkEncryptSync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, true, false, false, false, b)
-}
-func BenchmarkEncryptSync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, true, false, false, false, b)
-}
-func BenchmarkCompressSync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, false, true, false, false, b)
-}
-func BenchmarkCompressSync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, false, true, false, false, b)
-}
-func BenchmarkEncryptCompressSync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, true, true, false, false, b)
-}
-func BenchmarkEncryptCompressSync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, true, true, false, false, b)
-}
-func BenchmarkProtoSync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, false, false, false, true, b)
-}
-func BenchmarkProtoSync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, false, false, false, true, b)
-}
-func BenchmarkEncCompProtoSync1k(b *testing.B) {
-	benchmarkQueue(1000, 10, true, true, false, true, b)
-}
-func BenchmarkEncCompProtoSync100k(b *testing.B) {
-	benchmarkQueue(100000, 1000, true, true, false, true, b)
-}
+// Actual benchmark calls follow
+func Benchmark1M_10(b *testing.B)  { benchmarkQueue(1000000, 10, b) }
+func Benchmark1M_100(b *testing.B) { benchmarkQueue(1000000, 100, b) }
+func Benchmark1M_1k(b *testing.B)  { benchmarkQueue(1000000, 1000, b) }
+func Benchmark1M_10k(b *testing.B) { benchmarkQueue(1000000, 10000, b) }

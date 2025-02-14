@@ -143,8 +143,7 @@ func (dq *diskQueue) handleWriterLoopResponse(response writerLoopResponse) {
 		// Remove the prefix of the writing array and append to to reading.
 		closedSegments := dq.segments.writing[:closedCount]
 		dq.segments.writing = dq.segments.writing[closedCount:]
-		dq.segments.reading =
-			append(dq.segments.reading, closedSegments...)
+		dq.segments.reading = append(dq.segments.reading, closedSegments...)
 	}
 }
 
@@ -221,8 +220,7 @@ func (dq *diskQueue) handleSegmentACK(ackedSegmentID segmentID) {
 	if ackedSegmentCount > 0 {
 		// Move fully acked segments to the acked list and remove them
 		// from the acking list.
-		dq.segments.acked =
-			append(dq.segments.acked, acking[:ackedSegmentCount]...)
+		dq.segments.acked = append(dq.segments.acked, acking[:ackedSegmentCount]...)
 		dq.segments.acking = acking[ackedSegmentCount:]
 	}
 }
@@ -287,8 +285,12 @@ func (dq *diskQueue) handleShutdown() {
 	dq.acks.lock.Lock()
 	finalPosition := dq.acks.nextPosition
 	// We won't be updating the position anymore, so we can close the file.
-	_ = dq.acks.positionFile.Sync()
-	dq.acks.positionFile.Close()
+	if err := dq.acks.positionFile.Sync(); err != nil {
+		dq.logger.Errorf("error when calling Sync() on positionFile: %w", err)
+	}
+	if err := dq.acks.positionFile.Close(); err != nil {
+		dq.logger.Errorf("error when closing positionFile: %w", err)
+	}
 	dq.acks.lock.Unlock()
 
 	// First check for the rare and fortunate case that every single event we
@@ -403,7 +405,8 @@ func (dq *diskQueue) maybeReadPending() {
 func (dq *diskQueue) maybeDeleteACKed() {
 	if !dq.deleting && len(dq.segments.acked) > 0 {
 		dq.deleterLoop.requestChan <- deleterLoopRequest{
-			segments: dq.segments.acked}
+			segments: dq.segments.acked,
+		}
 		dq.deleting = true
 	}
 }

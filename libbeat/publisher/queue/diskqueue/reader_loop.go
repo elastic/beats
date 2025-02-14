@@ -21,6 +21,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -108,7 +109,13 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 
 	// Open the file and seek to the starting position.
 	handle, err := request.segment.getReader(rl.settings)
-	rl.decoder.serializationFormat = handle.serializationFormat
+
+	if request.segment.shouldUseJSON() {
+		rl.decoder.serializationFormat = SerializationJSON
+	} else {
+		rl.decoder.serializationFormat = SerializationCBOR
+	}
+
 	if err != nil {
 		return readerLoopResponse{err: err}
 	}
@@ -185,7 +192,9 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 // it does not exceed the given length bound. The returned frame leaves the
 // segment and frame IDs unset.
 // The returned error will be set if and only if the returned frame is nil.
-func (rl *readerLoop) nextFrame(handle *segmentReader, maxLength uint64) (*readFrame, error) {
+func (rl *readerLoop) nextFrame(
+	handle *os.File, maxLength uint64,
+) (*readFrame, error) {
 	// Ensure we are allowed to read the frame header.
 	if maxLength < frameHeaderSize {
 		return nil, fmt.Errorf(
