@@ -7,6 +7,7 @@ package process
 import (
 	"encoding/binary"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
@@ -26,6 +27,7 @@ const (
 
 // MetricSet collects data about the host.
 type MetricSet struct {
+	system.SystemMetricSet
 	config Config
 	log    *logp.Logger
 }
@@ -36,6 +38,8 @@ const (
 	eventActionExistingProcess eventAction = iota
 	eventActionProcessStarted
 	eventActionProcessStopped
+	eventActionProcessRan
+	eventActionProcessChangedImage
 	eventActionProcessError
 )
 
@@ -47,6 +51,10 @@ func (action eventAction) String() string {
 		return "process_started"
 	case eventActionProcessStopped:
 		return "process_stopped"
+	case eventActionProcessRan:
+		return "process_ran"
+	case eventActionProcessChangedImage:
+		return "process_changed_image"
 	case eventActionProcessError:
 		return "process_error"
 	default:
@@ -62,6 +70,8 @@ func (action eventAction) Type() string {
 		return "start"
 	case eventActionProcessStopped:
 		return "end"
+	case eventActionProcessChangedImage:
+		return "change"
 	case eventActionProcessError:
 		return "info"
 	default:
@@ -84,12 +94,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	ms.config = defaultConfig
 	ms.log = logp.NewLogger(metricsetName)
+	ms.SystemMetricSet = system.NewSystemMetricSet(base)
 
 	if err := base.Module().UnpackConfig(&ms.config); err != nil {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
-	return NewFromSysInfo(base, ms)
+	if runtime.GOOS == "linux" && ms.config.Backend == "kernel_tracing" {
+		if qm, err := NewFromQuark(ms); err == nil {
+			return qm, nil
+		} else {
+			ms.log.Errorf("can't use kernel_tracing, falling back to procfs: %v", err)
+		}
+	}
+
+	return NewFromSysInfo(ms)
 }
 
 // entityID creates an ID that uniquely identifies this process across machines.
@@ -101,4 +120,34 @@ func entityID(hostID string, pid int, startTime time.Time) string {
 	//nolint:errcheck // no error handling
 	binary.Write(h, binary.LittleEndian, int64(startTime.Nanosecond()))
 	return h.Sum()
+}
+
+func makeMessage(pid int, action eventAction, name string, username string, err error) string {
+	if err != nil {
+		return fmt.Sprintf("ERROR for PID %d: %v", pid, err)
+	}
+
+	var actionString string
+	switch action {
+	case eventActionProcessStarted:
+		actionString = "STARTED"
+	case eventActionProcessStopped:
+		actionString = "STOPPED"
+	case eventActionExistingProcess:
+		actionString = "is RUNNING"
+	case eventActionProcessRan:
+		actionString = "RAN"
+	case eventActionProcessChangedImage:
+		actionString = "CHANGED IMAGE"
+	case eventActionProcessError: // NOTREACHABLE as err != nil if action is ProcessError
+		actionString = "ERROR"
+	}
+
+	var userString string
+	if len(username) > 0 {
+		userString = fmt.Sprintf(" by user %v", username)
+	}
+
+	return fmt.Sprintf("Process %v (PID: %d)%v %v",
+		name, pid, userString, actionString)
 }
