@@ -16,13 +16,6 @@ echo "Starting ZooKeeper"
 ${KAFKA_HOME}/bin/zookeeper-server-start.sh ${KAFKA_HOME}/config/zookeeper.properties &
 wait_for_port 2181
 
-# create a user beats with password KafkaTest, for use in client SASL authentication
-/kafka/bin/kafka-configs.sh \
-	--zookeeper localhost:2181 \
-	--alter --add-config 'SCRAM-SHA-512=[password=KafkaTest]' \
-	--entity-type users \
-	--entity-name beats
-
 # Start Kafka with three listeners. The INSIDE listener makes Kafka reachable inside of docker
 # networks when the container hostname matches KAFKA_ADVERTISED_HOST. The OUTSIDE and SASL_SSL both
 # bind to localhost and are reachable from the host machine on the loopback interface.
@@ -48,6 +41,13 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
 wait_for_port 9092
 
 echo "Kafka load status code $?"
+
+# create a user beats with password KafkaTest, for use in client SASL authentication
+/kafka/bin/kafka-configs.sh \
+	--bootstrap-server localhost:9092 \
+	--alter --add-config 'SCRAM-SHA-512=[password=KafkaTest]' \
+	--entity-type users \
+	--entity-name beats
 
 # Make sure the container keeps running
 tail -f /dev/null
