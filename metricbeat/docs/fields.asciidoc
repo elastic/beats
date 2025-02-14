@@ -7573,6 +7573,91 @@ alias to: beat.stats.apm_server.root.unset
 
 --
 
+
+
+*`beats_stats.apm-server.sampling.tail.dynamic_service_groups`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.dynamic_service_groups
+
+--
+
+
+*`beats_stats.apm-server.sampling.tail.events.dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.dropped
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.failed_writes`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.failed_writes
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.head_unsampled`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.head_unsampled
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.processed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.processed
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.sampled`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.sampled
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.stored`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.stored
+
+--
+
+
+*`beats_stats.apm-server.sampling.tail.storage.lsm_size`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.lsm_size
+
+--
+
+*`beats_stats.apm-server.sampling.tail.storage.value_log_size`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
+
+--
+
 *`beats_stats.apm-server.sampling.transactions_dropped`*::
 +
 --
@@ -9663,6 +9748,73 @@ type: long
 
 --
 
+
+
+*`beat.stats.apm_server.sampling.tail.dynamic_service_groups`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.sampling.tail.events.dropped`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.failed_writes`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.head_unsampled`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.processed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.sampled`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.stored`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.sampling.tail.storage.lsm_size`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.storage.value_log_size`*::
++
+--
+type: long
+
+--
+
 *`beat.stats.apm_server.sampling.transactions_dropped`*::
 +
 --
@@ -10184,16 +10336,113 @@ type: long
 
 --
 
+
 *`beat.stats.libbeat.pipeline.queue.acked`*::
 +
 --
+Number of acknowledged events
+
+
 type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.added.bytes`*::
++
+--
+Number of bytes added to the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.added.events`*::
++
+--
+Number of events added to the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.consumed.bytes`*::
++
+--
+Number of bytes consumed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.consumed.events`*::
++
+--
+Number of events consumed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.bytes`*::
++
+--
+Number of bytes filled in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.events`*::
++
+--
+Number of events filled in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.pct`*::
++
+--
+Percentage of the queue filled
+
+
+type: float
 
 --
 
 *`beat.stats.libbeat.pipeline.queue.max_events`*::
 +
 --
+Maximum number of events allowed in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.removed.bytes`*::
++
+--
+Number of bytes removed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.removed.events`*::
++
+--
+Number of events removed from the queue
+
+
 type: long
 
 --
@@ -10432,6 +10681,43 @@ Number of write errors
 
 
 type: long
+
+--
+
+
+
+*`beat.stats.libbeat.output.write.latency.histogram.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.max`*::
++
+--
+type: float
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.median`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.p95`*::
++
+--
+type: float
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.p99`*::
++
+--
+type: float
 
 --
 
@@ -33642,12 +33928,49 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.indices.fielddata.evictions.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.indices.fielddata.memory.bytes`*::
 +
 --
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.flush.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.flush.total.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.get.time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.get.total.count`*::
++
+--
+type: long
 
 --
 
@@ -33674,12 +33997,42 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.indices.merges.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.merges.total.count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.indices.query_cache.memory.bytes`*::
 +
 --
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.refresh.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.refresh.total.count`*::
++
+--
+type: long
 
 --
 
@@ -33702,6 +34055,20 @@ type: long
 --
 
 *`elasticsearch.node.stats.indices.search.query_total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.search.fetch_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.search.fetch_total.count`*::
 +
 --
 type: long
@@ -33799,6 +34166,21 @@ format: bytes
 --
 
 
+*`elasticsearch.node.stats.indices.translog.size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.translog.operations.count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.jvm.mem.heap.max.bytes`*::
 +
 --
@@ -33824,6 +34206,13 @@ format: bytes
 type: double
 
 format: percent
+
+--
+
+*`elasticsearch.node.stats.jvm.threads.count`*::
++
+--
+type: long
 
 --
 
@@ -34157,7 +34546,59 @@ format: percent
 
 --
 
+*`elasticsearch.node.stats.process.mem.total_virtual.bytes`*::
++
+--
+type: long
 
+--
+
+*`elasticsearch.node.stats.process.open_file_descriptors`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.transport.rx.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.transport.rx.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.transport.tx.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.transport.tx.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.thread_pool.bulk.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.bulk.queue.count`*::
 +
@@ -34174,6 +34615,35 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.esql_worker.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.esql_worker.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.esql_worker.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.force_merge.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.force_merge.queue.count`*::
 +
 --
@@ -34188,6 +34658,35 @@ type: long
 
 --
 
+
+*`elasticsearch.node.stats.thread_pool.flush.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.flush.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.flush.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.get.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.get.queue.count`*::
 +
@@ -34204,6 +34703,13 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.index.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.index.queue.count`*::
 +
 --
@@ -34219,6 +34725,13 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.search.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.search.queue.count`*::
 +
 --
@@ -34233,6 +34746,101 @@ type: long
 
 --
 
+
+*`elasticsearch.node.stats.thread_pool.search_worker.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search_worker.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search_worker.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.snapshot.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.snapshot.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.snapshot.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.system_read.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_read.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_read.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.system_write.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_write.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_write.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.write.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.write.queue.count`*::
 +
@@ -40942,6 +41550,160 @@ type: long
 +
 --
 Number of filters per sec.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.exceptions_thrown_per_sec`*::
++
+--
+Number of Exceptions Thrown / sec.
+
+
+type: float
+
+--
+
+[float]
+=== memory
+
+Memory overview.
+
+
+
+*`iis.application_pool.net_clr.memory.bytes_in_all_heaps`*::
++
+--
+Number of bytes in all heaps.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_0_collections`*::
++
+--
+Number of Gen 0 Collections.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_1_collections`*::
++
+--
+Number of Gen 1 Collections.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_2_collections`*::
++
+--
+Number of Gen 2 Collections.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.total_committed_bytes`*::
++
+--
+Number of total committed bytes.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.allocated_bytes_per_sec`*::
++
+--
+Allocated Bytes/sec.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_0_heap_size`*::
++
+--
+Gen 0 heap size.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_1_heap_size`*::
++
+--
+Gen 1 heap size.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.gen_2_heap_size`*::
++
+--
+Gen 2 heap size.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.large_object_heap_size`*::
++
+--
+Large Object Heap size.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.memory.time_in_gc_perc`*::
++
+--
+% Time in GC.
+
+
+type: float
+
+--
+
+[float]
+=== locks_and_threads
+
+LocksAndThreads overview.
+
+
+
+*`iis.application_pool.net_clr.locks_and_threads.contention_rate_per_sec`*::
++
+--
+Contention Rate / sec.
+
+
+type: float
+
+--
+
+*`iis.application_pool.net_clr.locks_and_threads.current_queue_length`*::
++
+--
+Current Queue Length.
 
 
 type: float
@@ -50843,6 +51605,87 @@ type: long
 +
 --
 Number of database commands executed.
+
+
+type: long
+
+--
+
+
+*`mongodb.collstats.stats.stats.size`*::
++
+--
+The total uncompressed size in memory of all records in a collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.count`*::
++
+--
+The number of objects or documents in this collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.avgObjSize`*::
++
+--
+The average size of an object in the collection (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.storageSize`*::
++
+--
+The total amount of storage allocated to this collection for document storage (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.totalIndexSize`*::
++
+--
+The total size of all indexes (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.totalSize`*::
++
+--
+The sum of the storageSize and totalIndexSize (in bytes).
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.max`*::
++
+--
+Shows the maximum number of documents that may be present in a capped collection.
+
+
+type: long
+
+--
+
+*`mongodb.collstats.stats.stats.nindexes`*::
++
+--
+The number of indexes on the collection. All collections have at least one index on the _id field.
 
 
 type: long
@@ -69025,6 +69868,12 @@ format: duration
 
 --
 
+[float]
+=== wmi
+
+wmi
+
+
 [[exported-fields-zookeeper]]
 == ZooKeeper fields
 
@@ -69092,16 +69941,6 @@ type: long
 `mntr` contains the metrics reported by the four-letter `mntr` command.
 
 
-
-*`zookeeper.mntr.hostname`*::
-+
---
-ZooKeeper hostname.
-
-
-type: keyword
-
---
 
 *`zookeeper.mntr.approximate_data_size`*::
 +

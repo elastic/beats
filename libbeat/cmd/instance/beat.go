@@ -19,15 +19,11 @@ package instance
 
 import (
 	"context"
-	cryptRand "crypto/rand"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
-	"math"
-	"math/big"
-	"math/rand"
 	"net"
 	"os"
 	"os/user"
@@ -182,27 +178,6 @@ func defaultCertReloadConfig() certReloadConfig {
 }
 
 var debugf = logp.MakeDebug("beat")
-
-func init() {
-	initRand()
-}
-
-// initRand initializes the runtime random number generator seed using
-// global, shared cryptographically strong pseudo random number generator.
-//
-// On linux Reader might use getrandom(2) or /udev/random. On windows systems
-// CryptGenRandom is used.
-func initRand() {
-	n, err := cryptRand.Int(cryptRand.Reader, big.NewInt(math.MaxInt64))
-	var seed int64
-	if err != nil {
-		// fallback to current timestamp
-		seed = time.Now().UnixNano()
-	} else {
-		seed = n.Int64()
-	}
-	rand.Seed(seed) //nolint:staticcheck // need seed from cryptographically strong PRNG.
-}
 
 // Run initializes and runs a Beater implementation. name is the name of the
 // Beat (e.g. packetbeat or metricbeat). version is version number of the Beater
@@ -361,6 +336,10 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 	logpConfig := logp.Config{}
 	logpConfig.Beat = b.Info.Name
 	logpConfig.Files.MaxSize = 1
+
+	if b.Config.Logging == nil {
+		b.Config.Logging = config.NewConfig()
+	}
 
 	if err := b.Config.Logging.Unpack(&logpConfig); err != nil {
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
@@ -994,7 +973,6 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 // flags, and it invokes the HandleFlags callback if implemented by
 // the Beat.
 func (b *Beat) handleFlags() error {
-	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	flag.Parse()
 	return cfgfile.HandleFlags()
 }
@@ -1138,6 +1116,8 @@ func (b *Beat) configure(settings Settings) error {
 		logp.Info("Set gc percentage to: %v", gcPercent)
 		debug.SetGCPercent(gcPercent)
 	}
+
+	b.Info.Monitoring.Namespace = monitoring.GetNamespace("dataset")
 
 	b.Beat.BeatConfig, err = b.BeatConfig()
 	if err != nil {

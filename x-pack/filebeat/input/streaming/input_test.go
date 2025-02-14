@@ -43,7 +43,9 @@ var inputTests = []struct {
 	name          string
 	server        func(*testing.T, WebSocketHandler, map[string]interface{}, []string)
 	proxyServer   func(*testing.T, WebSocketHandler, map[string]interface{}, []string) *httptest.Server
+	oauth2Server  func(*testing.T, http.HandlerFunc, map[string]interface{})
 	handler       WebSocketHandler
+	oauth2Handler http.HandlerFunc
 	config        map[string]interface{}
 	response      []string
 	time          func() time.Time
@@ -417,13 +419,13 @@ var inputTests = []struct {
 			},
 		},
 		response: []string{`
-         {
-            "pps": {
-                "agent": "example.proofpoint.com",
-                "cid": "mmeng_uivm071"
-            },
-            "ts": 1502908200
-        }`,
+	       {
+	          "pps": {
+	              "agent": "example.proofpoint.com",
+	              "cid": "mmeng_uivm071"
+	          },
+	          "ts": 1502908200
+	      }`,
 		},
 		want: []map[string]interface{}{
 			{
@@ -450,7 +452,7 @@ var inputTests = []struct {
 				"wait_max":     "2s",
 			},
 		},
-		wantErr: fmt.Errorf("failed to establish WebSocket connection after 2 attempts with error websocket: bad handshake"),
+		wantErr: fmt.Errorf("failed to establish WebSocket connection after 2 attempts with error websocket: bad handshake and (status 403)"),
 	},
 	{
 		name:    "single_event_tls",
@@ -527,6 +529,171 @@ var inputTests = []struct {
 		proxyServer: newWebSocketProxyTestServer,
 		handler:     defaultHandler,
 		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+		},
+		response: []string{`
+			{
+				"pps": {
+					"agent": "example.proofpoint.com",
+					"cid": "mmeng_uivm071"
+				},
+				"ts": "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": {
+					"tls": {
+						"verify": "NONE"
+					},
+					"stat": "Sent",
+					"qid": "v7HLqYbx029423",
+					"dsn": "2.0.0",
+					"mailer": "*file*",
+					"to": [
+						"/dev/null"
+					],
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay": "00:00:00",
+					"xdelay": "00:00:00",
+					"pri": 35342
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA"
+			 }`},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts":   "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": map[string]interface{}{
+					"tls": map[string]interface{}{
+						"verify": "NONE",
+					},
+					"stat":   "Sent",
+					"qid":    "v7HLqYbx029423",
+					"dsn":    "2.0.0",
+					"mailer": "*file*",
+					"to": []interface{}{
+						"/dev/null",
+					},
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay":   "00:00:00",
+					"xdelay":  "00:00:00",
+					"pri":     float64(35342),
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA",
+			},
+		},
+	},
+	{
+		name: "oauth2_blank_auth_style",
+		oauth2Server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["auth.token_url"] = s.URL + "/token"
+			config["url"] = "ws://placeholder"
+			t.Cleanup(s.Close)
+		},
+		oauth2Handler: oauth2TokenHandler,
+		server:        webSocketTestServerWithAuth(httptest.NewServer),
+		handler:       defaultHandler,
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"scopes": []string{
+					"scope1",
+					"scope2",
+				},
+				"endpoint_params": map[string]string{
+					"param1": "v1",
+				},
+			},
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+		},
+		response: []string{`
+			{
+				"pps": {
+					"agent": "example.proofpoint.com",
+					"cid": "mmeng_uivm071"
+				},
+				"ts": "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": {
+					"tls": {
+						"verify": "NONE"
+					},
+					"stat": "Sent",
+					"qid": "v7HLqYbx029423",
+					"dsn": "2.0.0",
+					"mailer": "*file*",
+					"to": [
+						"/dev/null"
+					],
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay": "00:00:00",
+					"xdelay": "00:00:00",
+					"pri": 35342
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA"
+			 }`},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts":   "2017-08-17T14:54:12.949180-07:00",
+				"data": "2017-08-17T14:54:12.949180-07:00 example sendmail[30641]:v7HLqYbx029423: to=/dev/null, ctladdr=<user1@example.com> (8/0),delay=00:00:00, xdelay=00:00:00, mailer=*file*, tls_verify=NONE, pri=35342,dsn=2.0.0, stat=Sent",
+				"sm": map[string]interface{}{
+					"tls": map[string]interface{}{
+						"verify": "NONE",
+					},
+					"stat":   "Sent",
+					"qid":    "v7HLqYbx029423",
+					"dsn":    "2.0.0",
+					"mailer": "*file*",
+					"to": []interface{}{
+						"/dev/null",
+					},
+					"ctladdr": "<user1@example.com> (8/0)",
+					"delay":   "00:00:00",
+					"xdelay":  "00:00:00",
+					"pri":     float64(35342),
+				},
+				"id": "ZeYGULpZmL5N0151HN1OyA",
+			},
+		},
+	},
+	{
+		name: "oauth2_in_params_auth_style",
+		oauth2Server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["auth.token_url"] = s.URL + "/token"
+			config["url"] = "ws://placeholder"
+			t.Cleanup(s.Close)
+		},
+		oauth2Handler: oauth2TokenHandler,
+		server:        webSocketTestServerWithAuth(httptest.NewServer),
+		handler:       defaultHandler,
+		config: map[string]interface{}{
+			"auth": map[string]interface{}{
+				"auth_style":    "in_params",
+				"client_id":     "a_client_id",
+				"client_secret": "a_client_secret",
+				"scopes": []string{
+					"scope1",
+					"scope2",
+				},
+				"endpoint_params": map[string]string{
+					"param1": "v1",
+				},
+			},
 			"program": `
 					bytes(state.response).decode_json().as(inner_body,{
 					"events": [inner_body],
@@ -693,6 +860,9 @@ func TestInput(t *testing.T) {
 	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
+			if test.oauth2Server != nil {
+				test.oauth2Server(t, test.oauth2Handler, test.config)
+			}
 			if test.server != nil {
 				test.server(t, test.handler, test.config, test.response)
 			}
@@ -870,7 +1040,7 @@ func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func
 			handler(t, conn, response)
 		}))
 		// only set the resource URL if it is not already set
-		if config["url"] == nil {
+		if config["url"] == nil || config["url"] == "ws://placeholder" {
 			config["url"] = "ws" + server.URL[4:]
 		}
 		t.Cleanup(server.Close)
@@ -1028,4 +1198,35 @@ func newWebSocketProxyTestServer(t *testing.T, handler WebSocketHandler, config 
 	config["url"] = "ws" + backendServer.URL[4:]
 	config["proxy_url"] = "ws" + backendServer.URL[4:]
 	return httptest.NewServer(webSocketProxyHandler(config["url"].(string)))
+}
+
+//nolint:errcheck // no point checking errors in test server.
+func oauth2TokenHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/token" {
+		return
+	}
+	w.Header().Set("content-type", "application/json")
+	r.ParseForm()
+	switch {
+	case r.Method != http.MethodPost:
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong method"}`))
+	case r.FormValue("grant_type") != "client_credentials":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong grant_type"}`))
+	case r.FormValue("client_id") != "a_client_id":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong client_id"}`))
+	case r.FormValue("client_secret") != "a_client_secret":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong client_secret"}`))
+	case r.FormValue("scope") != "scope1 scope2":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong scope"}`))
+	case r.FormValue("param1") != "v1":
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(`{"error":"wrong param1"}`))
+	default:
+		w.Write([]byte(`{"token_type": "Bearer", "expires_in": "3600", "access_token": "` + bearerToken + `"}`))
+	}
 }

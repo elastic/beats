@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
@@ -88,4 +89,48 @@ func TestNewReceiver(t *testing.T) {
 found:
 	err = r.Shutdown(context.Background())
 	assert.NoError(t, err, "Error shutting down filebeatreceiver")
+}
+
+func BenchmarkFactory(b *testing.B) {
+	tmpDir := b.TempDir()
+
+	cfg := &Config{
+		Beatconfig: map[string]interface{}{
+			"filebeat": map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   10,
+					},
+				},
+			},
+			"output": map[string]interface{}{
+				"otelconsumer": map[string]interface{}{},
+			},
+			"logging": map[string]interface{}{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": tmpDir,
+		},
+	}
+
+	var zapLogs bytes.Buffer
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.AddSync(&zapLogs),
+		zapcore.DebugLevel)
+
+	receiverSettings := receiver.Settings{}
+	receiverSettings.Logger = zap.New(core)
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := NewFactory().CreateLogs(context.Background(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+	}
 }

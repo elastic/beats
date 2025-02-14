@@ -29,7 +29,6 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/common/terminal"
@@ -75,7 +74,6 @@ func genCreateKeystoreCmd(settings instance.Settings) *cobra.Command {
 		}),
 	}
 	command.Flags().BoolVar(&flagForce, "force", false, "override the existing keystore")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("force")
 	return command
 }
 
@@ -94,9 +92,7 @@ func genAddKeystoreCmd(settings instance.Settings) *cobra.Command {
 		}),
 	}
 	command.Flags().BoolVar(&flagStdin, "stdin", false, "Use the stdin as the source of the secret")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("stdin")
 	command.Flags().BoolVar(&flagForce, "force", false, "Override the existing key")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("force")
 	return command
 }
 

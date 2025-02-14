@@ -6,6 +6,7 @@ from filebeat import BaseTest
 
 inputConfigTemplate = """
 - type: log
+  allow_deprecated_use: true
   paths:
     - {}
   scan_frequency: 1s
@@ -49,6 +50,8 @@ class Test(BaseTest):
         input_config_template = """
 - type: filestream
   id: my-unique-id
+  file_identity.native: ~
+  prospector.scanner.fingerprint.enabled: false
   paths:
     - {}
 """
