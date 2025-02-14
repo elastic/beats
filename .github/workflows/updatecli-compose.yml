@@ -59,4 +59,3 @@ jobs:
             }
         env:
           SLACK_MESSAGE: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
-  
