@@ -52,7 +52,7 @@ var debugf = logp.MakeDebug("kafka")
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	opts := kafka.MetricSetOptions{
-		Version: "3.6.0",
+		Version: "0.9.0.0",
 	}
 
 	ms, err := kafka.NewMetricSet(base, opts)
