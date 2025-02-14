@@ -161,6 +161,26 @@ func TestS3ObjectProcessor(t *testing.T) {
 		assert.True(t, errors.Is(err, errS3DownloadFailed), "expected errS3DownloadFailed")
 	})
 
+	t.Run("unexpected EOF error", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+
+		s3Event := newS3Event("log.txt")
+
+		mockS3API.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq("us-east-1"), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+			Return(nil, errUnexpectedEOF)
+
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3API, nil, backupConfig{})
+		err := s3ObjProc.Create(ctx, s3Event).ProcessS3Object(logp.NewLogger(inputName), func(_ beat.Event) {})
+		require.Error(t, err)
+		assert.True(t, errors.Is(err, errUnexpectedEOF), "expected errUnexpectedEOF")
+	})
+
 	t.Run("no error empty result in download", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
