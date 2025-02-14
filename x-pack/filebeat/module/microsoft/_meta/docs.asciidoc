@@ -37,7 +37,8 @@ The procedure to create an application is found on the below link:
 
 https://docs.microsoft.com/en-us/microsoft-365/security/mtp/api-create-app-web?view=o365-worldwide#create-an-app[Create a new Azure Application]
 
-When giving the application the API permissions described in the documentation (Incident.Read.All) it will only grant access to read Incidents from 365 Defender and nothing else in the Azure Domain.
+When giving the application the API permissions described in the documentation (`Incident.Read.All`) it will only grant access to read Incidents from 365 Defender and nothing else in the Azure Domain.
+For the first setup, the application will require permission to set the default paths and create folders on your system. Therefore the permission `Incident.ReadWrite.All` is required for the first setup.
 
 After the application has been created, it should contain 3 values that you need to apply to the module configuration.
 
