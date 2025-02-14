@@ -20,11 +20,11 @@
 package socket
 
 import (
+	"errors"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/joeshaw/multierror"
 	"github.com/prometheus/procfs"
 )
 
@@ -86,7 +86,7 @@ func (t *ProcTable) Refresh() error {
 		return err
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	inodes := map[uint32]*Proc{}
 	cachedProcs := make(map[int]*Proc, len(procs))
 	for _, pi := range procs {
@@ -125,7 +125,7 @@ func (t *ProcTable) Refresh() error {
 
 	t.procs = cachedProcs
 	t.inodes = inodes
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (t *ProcTable) accessibleProcs() ([]procfs.Proc, error) {
