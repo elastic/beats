@@ -104,7 +104,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		if qm, err := NewFromQuark(ms); err == nil {
 			return qm, nil
 		} else {
-			ms.log.Errorf("can't use kernel_tracing, falling back to procfs: %w", err)
+			ms.log.Errorf("can't use kernel_tracing, falling back to procfs: %v", err)
 		}
 	}
 
