@@ -15,43 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package fingerprint
 
 import (
-	"hash"
-	"strings"
-
-	"github.com/cespare/xxhash/v2"
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
 )
 
-type namedHashMethod struct {
-	Name string
-	Hash hashMethod
-}
-type hashMethod func() hash.Hash
-
-var hashes = map[string]namedHashMethod{}
-
-func init() {
-	for _, h := range namedHashMethods {
-		hashes[h.Name] = h
-	}
-}
-
-// Unpack creates the hashMethod from the given string
-func (f *namedHashMethod) Unpack(str string) error {
-	str = strings.ToLower(str)
-
-	m, found := hashes[str]
-	if !found {
-		return makeErrUnknownMethod(str)
-	}
-
-	*f = m
-	return nil
-}
-
-// newXxHash returns a hash.Hash instead of the *Digest which implements the same
-func newXxHash() hash.Hash {
-	return xxhash.New()
+var namedHashMethods = []namedHashMethod{
+	{Name: "md5", Hash: md5.New},
+	{Name: "sha1", Hash: sha1.New},
+	{Name: "sha256", Hash: sha256.New},
+	{Name: "sha384", Hash: sha512.New384},
+	{Name: "sha512", Hash: sha512.New},
+	{Name: "xxhash", Hash: newXxHash},
 }
