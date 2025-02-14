@@ -96,12 +96,7 @@ checking for the gzip file magic header.
 The `aws-s3` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
-<<<<<<< HEAD
-NOTE: For time durations, valid time units are - "ns", "us" (or "µs"), "ms",
-"s", "m", "h". For example, "2h"
-=======
 NOTE: For time durations, valid time units are - "ns", "us" (or "µs"), "ms", "s", "m", "h". For example, "2h"
->>>>>>> 4ba7d1c9a ([aws] [s3] Introduce ignore_older & start_timestamp for S3 input allowing better registry cleanups (#41817))
 
 [float]
 ==== `api_timeout`
