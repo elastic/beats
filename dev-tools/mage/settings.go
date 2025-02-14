@@ -79,8 +79,9 @@ var (
 
 	BeatProjectType ProjectType
 
-	Snapshot bool
-	DevBuild bool
+	Snapshot  bool
+	DevBuild  bool
+	FIPSBuild bool
 
 	versionQualified bool
 	versionQualifier string
@@ -126,6 +127,11 @@ func init() {
 	DevBuild, err = strconv.ParseBool(EnvOr("DEV", "false"))
 	if err != nil {
 		panic(fmt.Errorf("failed to parse DEV env value: %w", err))
+	}
+
+	FIPSBuild, err = strconv.ParseBool(EnvOr("FIPS", "false"))
+	if err != nil {
+		panic(fmt.Errorf("failed to parse FIPS env value: %w", err))
 	}
 
 	versionQualifier, versionQualified = os.LookupEnv("VERSION_QUALIFIER")
@@ -179,6 +185,7 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 		"BeatUser":        BeatUser,
 		"Snapshot":        Snapshot,
 		"DEV":             DevBuild,
+		"FIPS":            FIPSBuild,
 		"Qualifier":       versionQualifier,
 		"CI":              CI,
 	}
