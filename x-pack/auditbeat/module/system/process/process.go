@@ -139,6 +139,8 @@ func makeMessage(pid int, action eventAction, name string, username string, err 
 		actionString = "RAN"
 	case eventActionProcessChangedImage:
 		actionString = "CHANGED IMAGE"
+	case eventActionProcessError: // NOTREACHABLE as err != nil if action is ProcessError
+		actionString = "ERROR"
 	}
 
 	var userString string
