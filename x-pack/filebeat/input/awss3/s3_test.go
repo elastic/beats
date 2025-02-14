@@ -17,9 +17,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/mock/gomock"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestS3Poller(t *testing.T) {
