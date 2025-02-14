@@ -209,6 +209,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.54.1
 	github.com/shirou/gopsutil/v4 v4.24.10
+	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.12
 	github.com/xdg-go/scram v1.1.2
 	github.com/zyedidia/generic v1.2.1
