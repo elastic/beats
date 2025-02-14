@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/libbeat/kv"
+	bboltkv "github.com/elastic/beats/v7/x-pack/libbeat/kv/bbolt"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -23,7 +25,7 @@ const (
 type PersistentCache struct {
 	log *logp.Logger
 
-	store *Store
+	store kv.KV
 	codec codec
 
 	refreshOnAccess bool
@@ -53,7 +55,12 @@ func New(name string, opts Options) (*PersistentCache, error) {
 	if rootPath == "" {
 		rootPath = paths.Resolve(paths.Data, cacheFile)
 	}
-	store, err := newStore(logger, rootPath, name)
+
+	store := bboltkv.New(
+		bboltkv.WithDbPath(rootPath),
+		bboltkv.WithBucketName(name))
+
+	err := store.Open()
 	if err != nil {
 		return nil, err
 	}
@@ -90,14 +97,17 @@ func (c *PersistentCache) PutWithTimeout(k string, v interface{}, timeout time.D
 }
 
 // Get the current value associated with a key or nil if the key is not
-// present. The last access time of the element is updated.
+// present. The last access time of the element is updated. It might fail to refresh TTL and still return `nil` error.
 func (c *PersistentCache) Get(k string, v interface{}) error {
 	d, err := c.store.Get([]byte(k))
 	if err != nil {
 		return err
 	}
 	if c.refreshOnAccess && c.timeout > 0 {
-		c.store.Set([]byte(k), d, c.timeout)
+		err = c.store.Set([]byte(k), d, c.timeout)
+		if err != nil {
+			c.log.Debugf("Error occurred fetching '%s' key: %v", k, err)
+		}
 	}
 	err = c.codec.Decode(d, v)
 	if err != nil {
