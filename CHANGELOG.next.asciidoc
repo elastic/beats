@@ -238,6 +238,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
 
 *Auditbeat*
 
