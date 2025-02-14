@@ -13,6 +13,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
@@ -20,7 +22,7 @@ import (
 )
 
 func TestNetflowProtocol_New(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	assert.Nil(t, proto.Start())
 	assert.Equal(t, uint16(7), proto.Version())
@@ -28,7 +30,7 @@ func TestNetflowProtocol_New(t *testing.T) {
 }
 
 func TestNetflowProtocol_OnPacket(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	rawS := "00070002000000015bf68d8b35fcb9780000000000000000" +
 		"acd910e5c0a8017b00000000000000000000000e00002cfa" +
@@ -119,7 +121,7 @@ func TestNetflowProtocol_OnPacket(t *testing.T) {
 }
 
 func TestNetflowProtocol_BadPacket(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	rawS := "00060002000000015bf689f605"
 	raw, err := hex.DecodeString(rawS)
