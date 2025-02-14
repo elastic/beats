@@ -258,6 +258,7 @@ func TestCheckinV2(t *testing.T) {
 	initialOSArgs := os.Args
 	os.Args = []string{
 		"filebeat",
+		// TODO: enable http.metrics
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 		"-E", "management.restart_on_output_change=true",
@@ -276,6 +277,7 @@ func TestCheckinV2(t *testing.T) {
 	// slice of funcs that check if the observed states match the expected ones.
 	// They return true if they match and false if they don't as well as a slice
 	// of units expected for the server to respond with.
+	// TODO: add a check to fetch the metrics
 	checks := []func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected){
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
 			// Wait for all healthy.

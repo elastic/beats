@@ -26,6 +26,8 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -36,19 +38,31 @@ const (
 )
 
 type handler struct {
-	registry *monitoring.Registry
+	registryDataset        *monitoring.Registry
+	registryInternalInputs *monitoring.Registry
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
 // requests to /inputs.
-func AttachHandler(r *mux.Router) error {
-	return attachHandler(r, globalRegistry())
+func AttachHandler(beatInfo beat.Info, r *mux.Router) error {
+	intInputsReg := beatInfo.Monitoring.Namespace.GetRegistry().
+		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	if intInputsReg == nil {
+		intInputsReg = beatInfo.Monitoring.Namespace.GetRegistry().
+			NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	}
+
+	return attachHandler(r, globalRegistry(), intInputsReg)
 }
 
-func attachHandler(r *mux.Router, registry *monitoring.Registry) error {
-	h := &handler{registry: registry}
+func attachHandler(r *mux.Router, datasetReg, intInputsReg *monitoring.Registry) error {
 	r = r.PathPrefix(route).Subrouter()
-	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
+
+	h := &handler{
+		registryDataset:        datasetReg,
+		registryInternalInputs: intInputsReg,
+	}
+	return r.StrictSlash(true).Handle("/", validationHandler(http.MethodGet, []string{"pretty", "type"}, h.allInputs)).GetError()
 }
 
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
@@ -64,14 +78,15 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	filtered := filteredSnapshot(h.registry, requestedType)
+	filtered := filteredSnapshot(
+		h.registryDataset, h.registryInternalInputs, requestedType)
 
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
 
-func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
-	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
+func filteredSnapshot(dataset, intInputs *monitoring.Registry, requestedType string) []map[string]any {
+	metrics := monitoring.CollectStructSnapshot(dataset, monitoring.Full, false)
 
 	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
@@ -81,17 +96,37 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		if id, ok := m["id"].(string); !ok || id == "" {
+		id, ok := m["id"].(string)
+		if !ok || id == "" {
 			continue
 		}
 
-		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+		if inputType, ok := m["input"].(string); !ok || (requestedType != "" &&
+			!strings.EqualFold(inputType, requestedType)) {
 			continue
 		}
+
+		// merge metrics stored in the internal namespace if any is found
+		mergeInternalMetrics(intInputs, id, m)
 
 		filtered = append(filtered, m)
 	}
 	return filtered
+}
+
+// mergeInternalMetrics looks for a registry identified by id in the internal
+// registry. If found, all the metrics are merged into m, if not, m is not
+// changed.
+func mergeInternalMetrics(internal *monitoring.Registry, id string, m map[string]any) {
+	reg := internal.GetRegistry(id)
+	if reg == nil {
+		return
+	}
+
+	intInput := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
+	for k, v := range intInput {
+		m[k] = v
+	}
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {

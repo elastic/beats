@@ -145,7 +145,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	}()
 
 	if b.API != nil {
-		err := inputmon.AttachHandler(b.API.Router())
+		err := inputmon.AttachHandler(b.Info, b.API.Router())
 		if err != nil {
 			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
@@ -154,7 +154,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON()
+				data, err := inputmon.MetricSnapshotJSON(b.Info)
 				if err != nil {
 					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
