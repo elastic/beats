@@ -19,11 +19,7 @@ package controllermanager
 
 import (
 	"fmt"
-	"net/http"
-	"strings"
-	"time"
 
-	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
@@ -79,7 +75,6 @@ func init() {
 // MetricSet implements the mb.PushMetricSet interface, and therefore does not rely on polling.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http               *helper.HTTP
 	prometheusClient   prometheus.Prometheus
 	prometheusMappings *prometheus.MetricsMapping
 	clusterMeta        mapstr.M
@@ -100,13 +95,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
 
-	http, err := pc.GetHttp()
-	if err != nil {
-		return nil, fmt.Errorf("the http connection is not valid")
-	}
 	ms := &MetricSet{
 		BaseMetricSet:      base,
-		http:               http,
 		prometheusClient:   pc,
 		prometheusMappings: mapping,
 		clusterMeta:        util.AddClusterECSMeta(base),
@@ -118,37 +108,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch gathers information from the apiserver and reports events with this information.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
-	errorString := fmt.Sprintf("%s", err)
-	errorUnauthorisedMsg := fmt.Sprintf("unexpected status code %d", http.StatusUnauthorized)
-	if err != nil && strings.Contains(errorString, errorUnauthorisedMsg) {
-		count := 2 // We retry twice to refresh the Authorisation token in case of http.StatusUnauthorize = 401 Error
-		for count > 0 {
-			if _, errAuth := m.http.RefreshAuthorizationHeader(); errAuth == nil {
-				events, err = m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
-			}
-			if err != nil {
-				time.Sleep(m.mod.Config().Period)
-				count--
-			} else {
-				break
-			}
-		}
-	}
-	// We need to check for err again in case error is not 401 or RefreshAuthorizationHeader has failed
 	if err != nil {
 		return fmt.Errorf("error getting metrics: %w", err)
-	} else {
-		for _, e := range events {
-			event := mb.TransformMapStrToEvent("kubernetes", e, nil)
-			if len(m.clusterMeta) != 0 {
-				event.RootFields.DeepUpdate(m.clusterMeta)
-			}
-			isOpen := reporter.Event(event)
-			if !isOpen {
-				return nil
-			}
+	}
+
+	for _, e := range events {
+		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
+		if len(m.clusterMeta) != 0 {
+			event.RootFields.DeepUpdate(m.clusterMeta)
+		}
+		isOpen := reporter.Event(event)
+		if !isOpen {
+			return nil
 		}
 
-		return nil
 	}
+	return nil
 }
