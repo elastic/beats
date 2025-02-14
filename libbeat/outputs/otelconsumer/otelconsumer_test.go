@@ -20,6 +20,7 @@ package otelconsumer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -113,7 +114,7 @@ func TestPublish(t *testing.T) {
 		var subFields = []string{"dataset", "namespace", "type"}
 		for _, subField := range subFields {
 			gotValue, ok := attributes.Get("data_stream." + subField)
-			require.True(t, ok)
+			require.True(t, ok, fmt.Sprintf("data_stream.%s not found on log record attribute", subField))
 			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
 		}
 
