@@ -81,8 +81,8 @@ type fileProspector struct {
 }
 
 func (p *fileProspector) Init(
-	cleaner,
-	globalCleaner loginp.ProspectorCleaner,
+	prospectorStore,
+	defaultIDStore loginp.StoreUpdater,
 	newID func(loginp.Source) string,
 ) error {
 	files := p.filewatcher.GetFiles()
@@ -90,7 +90,7 @@ func (p *fileProspector) Init(
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
-	globalCleaner.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+	defaultIDStore.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -107,7 +107,7 @@ func (p *fileProspector) Init(
 	})
 
 	if p.cleanRemoved {
-		cleaner.CleanIf(func(v loginp.Value) bool {
+		prospectorStore.CleanIf(func(v loginp.Value) bool {
 			var fm fileMeta
 			err := v.UnpackCursorMeta(&fm)
 			if err != nil {
@@ -131,7 +131,7 @@ func (p *fileProspector) Init(
 		p.logger.Debugf("file identity is '%s', will not migrate registry", identifierName)
 		return nil
 	}
-	cleaner.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
+	prospectorStore.UpdateIdentifiers(func(v loginp.Value) (string, interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -194,6 +194,24 @@ func (p *fileProspector) Init(
 		p.logger.Infof("registry key: '%s' and previous file identity key: '%s', are the same, migrating. Source: '%s'",
 			registryKey, previousIdentifierKey, fm.Source)
 
+		return newKey, fm
+	})
+
+	// Last, but not least: migrate the state from an old ID to the current ID
+	prospectorStore.CopyStatesFromPreviousIDs(func(v loginp.Value) (string, interface{}) {
+		var fm fileMeta
+		err := v.UnpackCursorMeta(&fm)
+		if err != nil {
+			return "", nil
+		}
+
+		fd, ok := files[fm.Source]
+		if !ok {
+			return "", fm
+		}
+
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+		p.logger.Infof("Migrating input ID: '%s' -> '%s'", v.Key(), newKey)
 		return newKey, fm
 	})
 
