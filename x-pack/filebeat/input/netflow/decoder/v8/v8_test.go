@@ -14,11 +14,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	template2 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
+
+func init() {
+	logp.TestingSetup()
+}
 
 func TestTemplates(t *testing.T) {
 	for code, template := range templates {
@@ -29,7 +35,7 @@ func TestTemplates(t *testing.T) {
 }
 
 func TestNetflowProtocol_New(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	assert.Nil(t, proto.Start())
 	assert.Equal(t, uint16(8), proto.Version())
@@ -37,7 +43,7 @@ func TestNetflowProtocol_New(t *testing.T) {
 }
 
 func TestNetflowProtocol_BadPacket(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	rawS := "00080002000000015bf689f605"
 	raw, err := hex.DecodeString(rawS)
@@ -50,7 +56,7 @@ func TestNetflowProtocol_BadPacket(t *testing.T) {
 }
 
 func TestNetflowV8Protocol_OnPacket(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 	address := test.MakeAddress(t, "127.0.0.1:11111")
 	captureTime, err := time.Parse(time.RFC3339Nano, "2018-11-22T20:53:03.987654321Z")
 	if !assert.NoError(t, err) {
