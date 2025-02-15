@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type eventEncoder struct {
@@ -53,6 +54,10 @@ type encodedEvent struct {
 	// but it avoids deserializing the encoded event to recover one field if
 	// there's an ingestion error.
 	timestamp time.Time
+
+	// The meta fields from the original event (which aren't included in the
+	// encoding but may still need to be logged if there is an error).
+	meta mapstr.M
 
 	id       string
 	opType   events.OpType
@@ -129,10 +134,37 @@ func (pe *eventEncoder) encodeRawEvent(e *beat.Event) *encodedEvent {
 	copy(bytes, bufBytes)
 	return &encodedEvent{
 		id:        id,
+		meta:      e.Meta,
 		timestamp: e.Timestamp,
 		opType:    opType,
 		pipeline:  pipeline,
 		index:     index,
 		encoding:  bytes,
 	}
+}
+
+func (e *encodedEvent) setDeadLetter(
+	deadLetterIndex string, errType int, errMsg string,
+) {
+	e.deadLetter = true
+	e.index = deadLetterIndex
+	deadLetterReencoding := mapstr.M{
+		"@timestamp":    e.timestamp,
+		"message":       string(e.encoding),
+		"error.type":    errType,
+		"error.message": errMsg,
+	}
+	e.encoding = []byte(deadLetterReencoding.String())
+}
+
+// String converts e.encoding (and meta fields if present)
+// to string and returns it.
+// The goal of this method is to provide an easy way to log
+// the event encoded.
+func (e *encodedEvent) String() string {
+	metaString := "none"
+	if e.meta != nil {
+		metaString = e.meta.String()
+	}
+	return string(e.encoding) + ", Meta: " + metaString
 }

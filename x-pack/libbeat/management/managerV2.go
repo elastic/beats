@@ -14,7 +14,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -102,10 +101,14 @@ type BeatV2Manager struct {
 	// set with the last applied input configs
 	lastInputCfgs map[string]*proto.UnitExpectedConfig
 
+	// set with the last applied APM config
+	lastAPMCfg *proto.APMConfig
+
 	// used for the debug callback to report as-running config
 	lastBeatOutputCfg   *reload.ConfigWithMeta
 	lastBeatInputCfgs   []*reload.ConfigWithMeta
 	lastBeatFeaturesCfg *conf.C
+	lastBeatAPMCfg      *reload.ConfigWithMeta
 
 	// changeDebounce is the debounce time for a configuration change
 	changeDebounce time.Duration
@@ -669,14 +672,27 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 		cm.logger.Errorw("setting output state", "error", err)
 	}
 
+	// reload APM tracing configuration
+	// all error handling is handled inside of reloadAPM
+	cm.reloadAPM(outputUnit)
+
 	// compute the input configuration
 	//
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
-	if err := cm.reloadInputs(inputUnits); err != nil {
-		merror := &multierror.MultiError{}
-		if errors.As(err, &merror) {
-			for _, err := range merror.Errors {
+	if err := cm.reloadInputs(inputUnits); err != nil { // HERE
+		// cm.reloadInputs will use fmt.Errorf and join an error slice
+		// using errors.Join, so we need to unwrap the fmt wrapped error,
+		// then we can iterate over the errors list.
+		err = errors.Unwrap(err)
+		type unwrapList interface {
+			Unwrap() []error
+		}
+
+		//nolint:errorlint // That's a custom logic based on how reloadInputs builds the error
+		errList, isErrList := err.(unwrapList)
+		if isErrList {
+			for _, err := range errList.Unwrap() {
 				unitErr := cfgfile.UnitError{}
 				if errors.As(err, &unitErr) {
 					unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
@@ -816,8 +832,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	}
 
 	if err := obj.Reload(inputBeatCfgs); err != nil {
-		merror := &multierror.MultiError{}
-		realErrors := multierror.Errors{}
+		realErrors := []error{}
 
 		// At the moment this logic is tightly bound to the current RunnerList
 		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
@@ -825,8 +840,12 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		// If they change the way they report errors, this will break.
 		// TODO (Tiago): update all layers to use the most recent features from
 		// the standard library errors package.
-		if errors.As(err, &merror) {
-			for _, err := range merror.Errors {
+		type unwrapList interface {
+			Unwrap() []error
+		}
+		errList, isErrList := err.(unwrapList) //nolint:errorlint // see the comment above
+		if isErrList {
+			for _, err := range errList.Unwrap() {
 				causeErr := errors.Unwrap(err)
 				// A Log input is only marked as finished when all events it
 				// produced are acked by the acker so when we see this error,
@@ -847,7 +866,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		}
 
 		if len(realErrors) != 0 {
-			return fmt.Errorf("failed to reload inputs: %w", realErrors.Err())
+			return fmt.Errorf("failed to reload inputs: %w", errors.Join(realErrors...))
 		}
 	} else {
 		// If there was no error reloading input and forceReload was
@@ -863,6 +882,64 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	cm.lastInputCfgs = inputCfgs
 	cm.lastBeatInputCfgs = inputBeatCfgs
 	return nil
+}
+
+// reloadAPM reloads APM tracing
+//
+// An error is not returned from this function, because in no case do we want APM trace configuration
+// to cause the beat to fail. The error is logged appropriately in the case of a failure on reload.
+func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
+	// Assuming that the output reloadable isn't a list, see createBeater() in cmd/instance/beat.go
+	apm := cm.registry.GetReloadableAPM()
+	if apm == nil {
+		// no APM reloadable, nothing to do
+		cm.logger.Debug("Unable to reload APM tracing; no APM reloadable registered")
+		return
+	}
+
+	var apmConfig *proto.APMConfig
+	if unit != nil {
+		expected := unit.Expected()
+		if expected.APMConfig != nil {
+			apmConfig = expected.APMConfig
+		}
+	}
+
+	if (cm.lastAPMCfg == nil && apmConfig == nil) || (cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig)) {
+		// configuration for the APM tracing did not change; do nothing
+		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
+		return
+	}
+
+	if apmConfig == nil {
+		// APM tracing is being stopped
+		cm.logger.Debug("Stopping APM tracing")
+		err := apm.Reload(nil)
+		if err != nil {
+			cm.logger.Errorf("Error stopping APM tracing: %s", err)
+			return
+		}
+		cm.lastAPMCfg = nil
+		cm.lastBeatAPMCfg = nil
+		cm.logger.Debug("Stopped APM tracing")
+		return
+	}
+
+	uconfig, err := conf.NewConfigFrom(apmConfig)
+	if err != nil {
+		cm.logger.Errorf("Failed to create uconfig from APM configuration: %s", err)
+		return
+	}
+	reloadConfig := &reload.ConfigWithMeta{Config: uconfig}
+	cm.logger.Debug("Reloading APM tracing")
+	err = apm.Reload(reloadConfig)
+	if err != nil {
+		cm.logger.Debugf("Error reloading APM tracing: %s", err)
+		return
+	}
+	cm.lastAPMCfg = apmConfig
+	cm.lastBeatAPMCfg = reloadConfig
+	cm.logger.Debugf("Reloaded APM tracing")
 }
 
 // this function is registered as a debug hook
@@ -899,6 +976,15 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 		}
 	}
 
+	// generate APM
+	var apmCfg map[string]interface{}
+	if cm.lastBeatAPMCfg != nil {
+		if err := cm.lastBeatAPMCfg.Config.Unpack(&apmCfg); err != nil {
+			cm.logger.Errorf("error unpacking APM tracing config for debug callback: %s", err)
+			return nil
+		}
+	}
+
 	// combine all of the above in a somewhat coherent way
 	// This isn't perfect, but generating a config that can actually be fed back into the beat
 	// would require
@@ -906,10 +992,12 @@ func (cm *BeatV2Manager) handleDebugYaml() []byte {
 		Inputs   []map[string]interface{}
 		Outputs  map[string]interface{}
 		Features map[string]interface{}
+		APM      map[string]interface{}
 	}{
 		Inputs:   inputList,
 		Outputs:  outputCfg,
 		Features: featuresCfg,
+		APM:      apmCfg,
 	}
 
 	data, err := yaml.Marshal(beatCfg)

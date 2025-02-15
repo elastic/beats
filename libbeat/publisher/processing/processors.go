@@ -199,6 +199,10 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		EscapeHTML: false,
 	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
+		if !log.IsDebug() {
+			return event, nil
+		}
+
 		mux.Lock()
 		defer mux.Unlock()
 

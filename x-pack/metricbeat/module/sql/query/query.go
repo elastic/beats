@@ -9,8 +9,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jmoiron/sqlx"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,7 +61,6 @@ type config struct {
 type MetricSet struct {
 	mb.BaseMetricSet
 	Config config
-	db     *sqlx.DB
 }
 
 // rawData is the minimum required set of fields to generate fully customized events with their own module key space
@@ -149,7 +146,9 @@ func dbSelector(driver, dbName string) string {
 func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.ReporterV2, queries []query) (bool, error) {
 	var ok bool
 	merged := make(mapstr.M, 0)
+	storeQueries := make([]string, 0, len(queries))
 	for _, q := range queries {
+		storeQueries = append(storeQueries, q.Query)
 		if q.ResponseFormat == tableResponseFormat {
 			// Table format
 			mss, err := db.FetchTableMode(ctx, q.Query)
@@ -199,7 +198,7 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 
 	if m.Config.MergeResults {
 		// Report here for merged case.
-		ok = m.reportEvent(merged, reporter, "")
+		ok = m.reportEvent(merged, reporter, storeQueries...)
 	}
 
 	return ok, nil
@@ -299,7 +298,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 // reportEvent using 'user' mode with keys under `sql.metrics.*` or using Raw data mode (module and metricset key spaces
 // provided by the user)
-func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry string) bool {
+func (m *MetricSet) reportEvent(ms mapstr.M, reporter mb.ReporterV2, qry ...string) bool {
 	var ok bool
 	if m.Config.RawData.Enabled {
 		// New usage.
@@ -348,18 +347,27 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 
 	for k, v := range ms {
 		switch v.(type) {
-		case float64:
+		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
 			numericMetrics[k] = v
 		case string:
 			stringMetrics[k] = v
 		case bool:
 			boolMetrics[k] = v
 		case nil:
-		// Ignore because a nil has no data type and thus cannot be indexed
+			// Ignore nil values as they cannot be indexed
+
+		// TODO: Handle []interface{} properly; for now it is going to "string" field.
+		// Keeping the behaviour as it is for now.
+		//
+		// case []interface{}:
+
 		default:
 			stringMetrics[k] = v
 		}
 	}
+
+	// TODO: Ideally the field keys should have in sync with ES types like s/bool/boolean, etc.
+	// But changing the field keys will be a breaking change. So, we are leaving it as it is.
 
 	if len(numericMetrics) > 0 {
 		ret["numeric"] = numericMetrics
@@ -374,12 +382,4 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	}
 
 	return ret
-}
-
-// Close closes the connection pool releasing its resources
-func (m *MetricSet) Close() (err error) {
-	if m.db == nil {
-		return nil
-	}
-	return m.db.Close()
 }

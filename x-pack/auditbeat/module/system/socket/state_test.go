@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -23,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type logWrapper testing.T
@@ -88,6 +90,76 @@ func makeTestingState(t *testing.T, inactiveTimeout, socketTimeout, closeTimeout
 	return ts
 }
 
+func TestDNSMemoryUsage(t *testing.T) {
+	logp.DevelopmentSetup()
+	rootPID := uint32(1234)
+	childThread1 := uint32(1235)
+	childThread2 := uint32(1236)
+	st := makeTestingState(t, time.Second, time.Second, 0, time.Second)
+	// construct a fake series of DNS events process events
+	err := st.OnDNSTransaction(dns.Transaction{
+		Client:    net.UDPAddr{IP: net.ParseIP("192.168.1.2"), Port: 34074},
+		Server:    net.UDPAddr{IP: net.ParseIP("192.168.1.53"), Port: 53},
+		Domain:    "example.com",
+		Addresses: []net.IP{net.ParseIP("10.10.10.10")},
+	})
+	require.NoError(t, err)
+	err = st.OnDNSTransaction(dns.Transaction{
+		Client:    net.UDPAddr{IP: net.ParseIP("192.168.1.2"), Port: 34074},
+		Server:    net.UDPAddr{IP: net.ParseIP("192.168.1.53"), Port: 53},
+		Domain:    "elastic.co",
+		Addresses: []net.IP{net.ParseIP("10.10.10.11")},
+	})
+	require.NoError(t, err)
+	events1 := []event{
+		callExecve(meta(rootPID, rootPID, 1), []string{"/usr/bin/curl"}),
+		&execveRet{Meta: meta(rootPID, rootPID, 2), Retval: int32(rootPID)},
+		&udpSendMsgCall{
+			Meta:  meta(rootPID, rootPID, 2),
+			LAddr: 33663168,
+			RAddr: 889301184,
+			LPort: 6789, // ports are in network byte order
+			RPort: 13568,
+			Size:  55,
+			SIPtr: uintptr(1),
+			SIAF:  unix.AF_INET,
+		},
+		&udpQueueRcvSkb{
+			Meta:   meta(rootPID, rootPID, 2),
+			LAddr:  33663168,
+			LPort:  6789,
+			Size:   55,
+			IPHdr:  1,
+			UDPHdr: 21,
+			Packet: [256]byte{
+				// network body, starting with IP header
+				0x00,
+				0x40, 0x00, 0x00, 0x20,
+				0x00, 0x01, 0x00, 0x00,
+				0xff, 0x11, 0xff, 0xff,
+				0xc0, 0xa8, 0x1, 0x35,
+				0xc0, 0xa8, 0x1, 0x2,
+				0x00, 0x35,
+			},
+		}, &forkRet{Meta: meta(rootPID, rootPID, 2), Retval: int(childThread1)},
+		&forkRet{Meta: meta(rootPID, rootPID, 2), Retval: int(childThread2)},
+
+		&doExit{Meta: meta(rootPID, childThread1, 2)},
+		&doExit{Meta: meta(rootPID, childThread2, 2)},
+	}
+	st.feedEvents(events1)
+
+	// ensure that we only have one PID in the map,
+	// and that's the root pid
+	t.Logf("Got procs: %d", len(st.processes))
+	require.Equal(t, 1, len(st.processes))
+	require.NotNil(t, st.processes[rootPID])
+
+	// now close the final process, make sure we've cleaned up the final process
+	st.feedEvents([]event{&doExit{Meta: meta(rootPID, rootPID, 2)}})
+	require.Equal(t, 0, len(st.processes))
+}
+
 func TestTCPConnWithProcess(t *testing.T) {
 	const (
 		localIP            = "192.168.33.10"
@@ -97,6 +169,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 		sock       uintptr = 0xff1234
 	)
 	st := makeTestingState(t, time.Second, time.Second, 0, time.Second)
+
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{

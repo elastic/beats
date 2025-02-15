@@ -29,6 +29,9 @@ import (
 type runLoop struct {
 	broker *broker
 
+	// observer is a metrics observer used to report internal queue state.
+	observer queue.Observer
+
 	// The index of the beginning of the current ring buffer within its backing
 	// array. If the queue isn't empty, bufPos points to the oldest remaining
 	// event.
@@ -57,13 +60,18 @@ type runLoop struct {
 	// It is active if and only if pendingGetRequest is non-nil.
 	getTimer *time.Timer
 
+	// closing is set when a close request is received. Once closing is true,
+	// the queue will not accept any new events, but will continue responding
+	// to Gets and Acks to allow pending events to complete on shutdown.
+	closing bool
+
 	// TODO (https://github.com/elastic/beats/issues/37893): entry IDs were a
 	// workaround for an external project that no longer exists. At this point
 	// they just complicate the API and should be removed.
 	nextEntryID queue.EntryID
 }
 
-func newRunLoop(broker *broker) *runLoop {
+func newRunLoop(broker *broker, observer queue.Observer) *runLoop {
 	var timer *time.Timer
 
 	// Create the timer we'll use for get requests, but stop it until a
@@ -76,6 +84,7 @@ func newRunLoop(broker *broker) *runLoop {
 	}
 	return &runLoop{
 		broker:   broker,
+		observer: observer,
 		getTimer: timer,
 	}
 }
@@ -90,8 +99,8 @@ func (l *runLoop) run() {
 // standalone helper function to allow testing of loop invariants.
 func (l *runLoop) runIteration() {
 	var pushChan chan pushRequest
-	// Push requests are enabled if the queue isn't yet full.
-	if l.eventCount < len(l.broker.buf) {
+	// Push requests are enabled if the queue isn't full or closing.
+	if l.eventCount < len(l.broker.buf) && !l.closing {
 		pushChan = l.broker.pushChan
 	}
 
@@ -116,14 +125,18 @@ func (l *runLoop) runIteration() {
 	}
 
 	select {
+	case <-l.broker.closeChan:
+		l.closing = true
+		close(l.broker.closingChan)
+		// Get requests are handled immediately during shutdown
+		l.maybeUnblockGetRequest()
+
 	case <-l.broker.ctx.Done():
+		// The queue is fully shut down, do nothing
 		return
 
 	case req := <-pushChan: // producer pushing new event
 		l.handleInsert(&req)
-
-	case req := <-l.broker.cancelChan: // producer cancelling active events
-		l.handleCancel(&req)
 
 	case req := <-getChan: // consumer asking for next batch
 		l.handleGetRequest(&req)
@@ -135,9 +148,6 @@ func (l *runLoop) runIteration() {
 
 	case count := <-l.broker.deleteChan:
 		l.handleDelete(count)
-
-	case req := <-l.broker.metricChan: // asking broker for queue metrics
-		l.handleMetricsRequest(&req)
 
 	case <-timeoutChan:
 		// The get timer has expired, handle the blocked request
@@ -160,8 +170,8 @@ func (l *runLoop) handleGetRequest(req *getRequest) {
 }
 
 func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
-	if l.broker.settings.FlushTimeout <= 0 {
-		// Never block if the flush timeout isn't positive
+	if l.broker.settings.FlushTimeout <= 0 || l.closing {
+		// Never block if the flush timeout isn't positive, or during shutdown
 		return false
 	}
 	eventsAvailable := l.eventCount - l.consumedCount
@@ -180,31 +190,46 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 	startIndex := l.bufPos + l.consumedCount
 	batch := newBatch(l.broker, startIndex, batchSize)
 
+	batchBytes := 0
+	for i := 0; i < batchSize; i++ {
+		batchBytes += batch.rawEntry(i).eventSize
+	}
+
 	// Send the batch to the caller and update internal state
 	req.responseChan <- batch
 	l.consumedBatches.append(batch)
 	l.consumedCount += batchSize
+	l.observer.ConsumeEvents(batchSize, batchBytes)
 }
 
 func (l *runLoop) handleDelete(count int) {
+	byteCount := 0
+	for i := 0; i < count; i++ {
+		entry := l.broker.buf[(l.bufPos+i)%len(l.broker.buf)]
+		byteCount += entry.eventSize
+	}
 	// Advance position and counters. Event data was already cleared in
 	// batch.FreeEntries when the events were vended.
 	l.bufPos = (l.bufPos + count) % len(l.broker.buf)
 	l.eventCount -= count
 	l.consumedCount -= count
+	l.observer.RemoveEvents(count, byteCount)
+	if l.closing && l.eventCount == 0 {
+		// Our last events were acknowledged during shutdown, signal final shutdown
+		l.broker.ctxCancel()
+	}
 }
 
 func (l *runLoop) handleInsert(req *pushRequest) {
-	if l.insert(req, l.nextEntryID) {
-		// Send back the new event id.
-		req.resp <- l.nextEntryID
+	l.insert(req, l.nextEntryID)
+	// Send back the new event id.
+	req.resp <- l.nextEntryID
 
-		l.nextEntryID++
-		l.eventCount++
+	l.nextEntryID++
+	l.eventCount++
 
-		// See if this gave us enough for a new batch
-		l.maybeUnblockGetRequest()
-	}
+	// See if this gave us enough for a new batch
+	l.maybeUnblockGetRequest()
 }
 
 // Checks if we can handle pendingGetRequest yet, and handles it if so
@@ -212,8 +237,7 @@ func (l *runLoop) maybeUnblockGetRequest() {
 	// If a get request is blocked waiting for more events, check if
 	// we should unblock it.
 	if getRequest := l.pendingGetRequest; getRequest != nil {
-		available := l.eventCount - l.consumedCount
-		if available >= getRequest.entryCount {
+		if !l.getRequestShouldBlock(getRequest) {
 			l.pendingGetRequest = nil
 			if !l.getTimer.Stop() {
 				<-l.getTimer.C
@@ -223,80 +247,14 @@ func (l *runLoop) maybeUnblockGetRequest() {
 	}
 }
 
-// Returns true if the event was inserted, false if insertion was cancelled.
-func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
-	if req.producer != nil && req.producer.state.cancelled {
-		reportCancelledState(req)
-		return false
-	}
-
+func (l *runLoop) insert(req *pushRequest, id queue.EntryID) {
 	index := (l.bufPos + l.eventCount) % len(l.broker.buf)
 	l.broker.buf[index] = queueEntry{
 		event:      req.event,
+		eventSize:  req.eventSize,
 		id:         id,
 		producer:   req.producer,
 		producerID: req.producerID,
 	}
-	return true
-}
-
-func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
-	oldestEntryID := l.nextEntryID
-	if l.eventCount > 0 {
-		index := l.bufPos % len(l.broker.buf)
-		oldestEntryID = l.broker.buf[index].id
-	}
-
-	req.responseChan <- memQueueMetrics{
-		currentQueueSize: l.eventCount,
-		occupiedRead:     l.consumedCount,
-		oldestEntryID:    oldestEntryID,
-	}
-}
-
-func (l *runLoop) handleCancel(req *producerCancelRequest) {
-	var removedCount int
-
-	// Traverse all unconsumed events in the buffer, removing any with
-	// the specified producer. As we go we condense all the remaining
-	// events to be sequential.
-	buf := l.broker.buf
-	startIndex := l.bufPos + l.consumedCount
-	unconsumedEventCount := l.eventCount - l.consumedCount
-	for i := 0; i < unconsumedEventCount; i++ {
-		readIndex := (startIndex + i) % len(buf)
-		if buf[readIndex].producer == req.producer {
-			// The producer matches, skip this event
-			removedCount++
-		} else {
-			// Move the event to its final position after accounting for any
-			// earlier indices that were removed.
-			// (Count backwards from (startIndex + i), not from readIndex, to avoid
-			// sign issues when the buffer wraps.)
-			writeIndex := (startIndex + i - removedCount) % len(buf)
-			buf[writeIndex] = buf[readIndex]
-		}
-	}
-
-	// Clear the event pointers at the end of the buffer so we don't keep
-	// old events in memory by accident.
-	for i := 0; i < removedCount; i++ {
-		index := (l.bufPos + l.eventCount - removedCount + i) % len(buf)
-		buf[index].event = nil
-	}
-
-	// Subtract removed events from the internal event count
-	l.eventCount -= removedCount
-
-	// signal cancel request being finished
-	if req.resp != nil {
-		req.resp <- producerCancelResponse{removed: removedCount}
-	}
-}
-
-func reportCancelledState(req *pushRequest) {
-	// do not add waiting events if producer did send cancel signal
-	if cb := req.producer.state.dropCB; cb != nil {
-		cb(req.event)
-	}
+	l.observer.AddEvent(req.eventSize)
 }

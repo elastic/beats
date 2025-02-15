@@ -8,7 +8,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/g8rswimmer/go-sfdc/soql"
+	"github.com/elastic/go-sfdc/soql"
 )
 
 // compile-time check if querier implements soql.QueryFormatter

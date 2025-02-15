@@ -19,6 +19,7 @@ type appendConfig struct {
 	Value               *valueTpl `config:"value"`
 	Default             *valueTpl `config:"default"`
 	FailOnTemplateError bool      `config:"fail_on_template_error"`
+	DoNotLogFailure     bool      `config:"do_not_log_failure"`
 	ValueType           string    `config:"value_type"`
 }
 
@@ -27,6 +28,7 @@ type appendt struct {
 	value               *valueTpl
 	defaultValue        *valueTpl
 	failOnTemplateError bool
+	doNotLogFailure     bool
 	valueType           valueType
 
 	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
@@ -114,6 +116,7 @@ func newAppend(cfg *conf.C, log *logp.Logger) (appendt, error) {
 		value:               c.Value,
 		defaultValue:        c.Default,
 		failOnTemplateError: c.FailOnTemplateError,
+		doNotLogFailure:     c.DoNotLogFailure,
 		valueType:           vt,
 	}, nil
 }
@@ -121,6 +124,9 @@ func newAppend(cfg *conf.C, log *logp.Logger) (appendt, error) {
 func (append *appendt) run(ctx *transformContext, tr transformable) (transformable, error) {
 	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, append.log)
 	if err != nil && append.failOnTemplateError {
+		if append.doNotLogFailure {
+			err = notLogged{err}
+		}
 		return transformable{}, err
 	}
 	if value == "" {

@@ -7,12 +7,13 @@ package nomad
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/hashicorp/nomad/api"
-	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -148,12 +149,10 @@ func TestEmitEvent(t *testing.T) {
 									},
 									Services: []*api.Service{
 										{
-											Id:   "service-a",
 											Name: "web",
 											Tags: []string{"tag-a", "tag-b"},
 										},
 										{
-											Id:   "service-b",
 											Name: "nginx",
 											Tags: []string{"tag-c", "tag-d"},
 										},
@@ -256,12 +255,10 @@ func TestEmitEvent(t *testing.T) {
 									},
 									Services: []*api.Service{
 										{
-											Id:   "service-a",
 											Name: "web",
 											Tags: []string{"tag-a", "tag-b"},
 										},
 										{
-											Id:   "service-b",
 											Name: "nginx",
 											Tags: []string{"tag-c", "tag-d"},
 										},
@@ -276,22 +273,20 @@ func TestEmitEvent(t *testing.T) {
 		},
 	}
 
+	var count atomic.Int64
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/v1/node/5456bd7a":
+			count.Add(1)
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	defer s.Close()
+
 	config := &api.Config{
-		Address:  "http://127.0.0.1",
+		Address:  s.URL,
 		SecretID: "",
 	}
-
-	httpmock.Activate()
-	defer httpmock.DeactivateAndReset()
-
-	// use the httpmock patched client
-	config.HttpClient = http.DefaultClient
-
-	httpmock.RegisterResponder(http.MethodGet, "http://127.0.0.1/v1/node/5456bd7a",
-		func(req *http.Request) (*http.Response, error) {
-			return httpmock.NewStringResponse(http.StatusNotFound, ""), nil
-		},
-	)
 
 	client, err := api.NewClient(config)
 	if err != nil {
@@ -299,6 +294,7 @@ func TestEmitEvent(t *testing.T) {
 	}
 
 	for _, test := range tests {
+		test := test
 		t.Run(test.Message, func(t *testing.T) {
 			mapper, err := template.NewConfigMapper(nil, nil, nil)
 			if err != nil {
@@ -337,7 +333,7 @@ func TestEmitEvent(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	assert.Equal(t, httpmock.GetCallCountInfo()["GET http://127.0.0.1/v1/node/5456bd7a"], 1)
+	assert.Equal(t, int64(1), count.Load())
 }
 
 func getNestedAnnotations(in mapstr.M) mapstr.M {

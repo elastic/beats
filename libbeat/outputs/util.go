@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Fail helper can be used by output factories, to create a failure response when
@@ -47,7 +48,8 @@ func Success(cfg config.Namespace, batchSize, retry int, encoderFactory queue.En
 			q = memqueue.FactoryForSettings(settings)
 		case diskqueue.QueueType:
 			if management.UnderAgent() {
-				return Group{}, fmt.Errorf("disk queue not supported under agent")
+				logger := logp.NewLogger("output")
+				logger.Warn("Disk queue configuration found while running under agent: this configuration is unsupported and in technical preview.")
 			}
 			settings, err := diskqueue.SettingsForUserConfig(cfg.Config())
 			if err != nil {

@@ -25,7 +25,7 @@ import (
 )
 
 const rfc5424_start int = 1
-const rfc5424_first_final int = 23
+const rfc5424_first_final int = 24
 const rfc5424_error int = 0
 
 const rfc5424_en_main int = 1
@@ -90,32 +90,28 @@ func parseRFC5424(data string) (message, error) {
 			goto st_case_15
 		case 16:
 			goto st_case_16
-		case 23:
-			goto st_case_23
 		case 24:
 			goto st_case_24
 		case 25:
 			goto st_case_25
+		case 26:
+			goto st_case_26
 		case 17:
 			goto st_case_17
 		case 18:
 			goto st_case_18
-		case 26:
-			goto st_case_26
-		case 27:
-			goto st_case_27
-		case 28:
-			goto st_case_28
-		case 29:
-			goto st_case_29
 		case 19:
 			goto st_case_19
+		case 27:
+			goto st_case_27
 		case 20:
 			goto st_case_20
 		case 21:
 			goto st_case_21
 		case 22:
 			goto st_case_22
+		case 23:
+			goto st_case_23
 		}
 		goto st_out
 	st_case_1:
@@ -226,7 +222,7 @@ func parseRFC5424(data string) (message, error) {
 			goto st8
 		}
 		goto tr0
-	tr31:
+	tr32:
 
 		if err := m.setTimestampRFC3339(data[tok:p]); err != nil {
 			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
@@ -364,18 +360,9 @@ func parseRFC5424(data string) (message, error) {
 	st_case_16:
 		switch data[p] {
 		case 45:
-			goto st23
+			goto st24
 		case 91:
 			goto tr26
-		}
-		goto tr0
-	st23:
-		if p++; p == pe {
-			goto _test_eof23
-		}
-	st_case_23:
-		if data[p] == 32 {
-			goto st24
 		}
 		goto tr0
 	st24:
@@ -383,10 +370,13 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof24
 		}
 	st_case_24:
-		goto tr34
-	tr34:
+		if data[p] == 32 {
+			goto st25
+		}
+		goto tr0
+	tr37:
 
-		tok = p
+		m.setRawSDValue(data[tok:p])
 
 		goto st25
 	st25:
@@ -394,7 +384,18 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof25
 		}
 	st_case_25:
-		goto st25
+		goto tr35
+	tr35:
+
+		tok = p
+
+		goto st26
+	st26:
+		if p++; p == pe {
+			goto _test_eof26
+		}
+	st_case_26:
+		goto st26
 	tr26:
 
 		tok = p
@@ -405,117 +406,78 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof17
 		}
 	st_case_17:
+		switch data[p] {
+		case 92:
+			goto st19
+		case 93:
+			goto tr0
+		}
 		goto st18
 	st18:
 		if p++; p == pe {
 			goto _test_eof18
 		}
 	st_case_18:
-		if data[p] == 93 {
-			goto st26
+		switch data[p] {
+		case 92:
+			goto st19
+		case 93:
+			goto st27
 		}
 		goto st18
-	st26:
-		if p++; p == pe {
-			goto _test_eof26
-		}
-	st_case_26:
-		switch data[p] {
-		case 32:
-			goto tr36
-		case 93:
-			goto st26
-		}
-		goto st18
-	tr36:
-
-		m.setRawSDValue(data[tok:p])
-
-		goto st27
-	st27:
-		if p++; p == pe {
-			goto _test_eof27
-		}
-	st_case_27:
-		if data[p] == 93 {
-			goto tr38
-		}
-		goto tr37
-	tr37:
-
-		tok = p
-
-		goto st28
-	st28:
-		if p++; p == pe {
-			goto _test_eof28
-		}
-	st_case_28:
-		if data[p] == 93 {
-			goto st29
-		}
-		goto st28
-	tr38:
-
-		tok = p
-
-		goto st29
-	st29:
-		if p++; p == pe {
-			goto _test_eof29
-		}
-	st_case_29:
-		switch data[p] {
-		case 32:
-			goto tr36
-		case 93:
-			goto st29
-		}
-		goto st28
-	tr11:
-
-		tok = p
-
-		goto st19
 	st19:
 		if p++; p == pe {
 			goto _test_eof19
 		}
 	st_case_19:
-		switch data[p] {
-		case 43:
-			goto st20
-		case 58:
-			goto st20
-		}
-		switch {
-		case data[p] < 48:
-			if 45 <= data[p] && data[p] <= 46 {
-				goto st20
-			}
-		case data[p] > 57:
-			switch {
-			case data[p] > 90:
-				if 97 <= data[p] && data[p] <= 122 {
-					goto st20
-				}
-			case data[p] >= 65:
-				goto st20
-			}
-		default:
-			goto st21
+		if data[p] == 93 {
+			goto st18
 		}
 		goto tr0
+	st27:
+		if p++; p == pe {
+			goto _test_eof27
+		}
+	st_case_27:
+		switch data[p] {
+		case 32:
+			goto tr37
+		case 91:
+			goto st17
+		}
+		goto tr0
+	tr11:
+
+		tok = p
+
+		goto st20
 	st20:
 		if p++; p == pe {
 			goto _test_eof20
 		}
 	st_case_20:
-		if data[p] == 32 {
-			goto tr31
+		switch data[p] {
+		case 43:
+			goto st21
+		case 58:
+			goto st21
 		}
-		if 48 <= data[p] && data[p] <= 57 {
-			goto st19
+		switch {
+		case data[p] < 48:
+			if 45 <= data[p] && data[p] <= 46 {
+				goto st21
+			}
+		case data[p] > 57:
+			switch {
+			case data[p] > 90:
+				if 97 <= data[p] && data[p] <= 122 {
+					goto st21
+				}
+			case data[p] >= 65:
+				goto st21
+			}
+		default:
+			goto st22
 		}
 		goto tr0
 	st21:
@@ -523,30 +485,42 @@ func parseRFC5424(data string) (message, error) {
 			goto _test_eof21
 		}
 	st_case_21:
+		if data[p] == 32 {
+			goto tr32
+		}
+		if 48 <= data[p] && data[p] <= 57 {
+			goto st20
+		}
+		goto tr0
+	st22:
+		if p++; p == pe {
+			goto _test_eof22
+		}
+	st_case_22:
 		switch data[p] {
 		case 32:
-			goto tr31
+			goto tr32
 		case 43:
-			goto st20
+			goto st21
 		case 58:
-			goto st20
+			goto st21
 		}
 		switch {
 		case data[p] < 48:
 			if 45 <= data[p] && data[p] <= 46 {
-				goto st20
+				goto st21
 			}
 		case data[p] > 57:
 			switch {
 			case data[p] > 90:
 				if 97 <= data[p] && data[p] <= 122 {
-					goto st20
+					goto st21
 				}
 			case data[p] >= 65:
-				goto st20
+				goto st21
 			}
 		default:
-			goto st21
+			goto st22
 		}
 		goto tr0
 	tr9:
@@ -555,7 +529,7 @@ func parseRFC5424(data string) (message, error) {
 			errs = multierr.Append(errs, &ValidationError{Err: err, Pos: tok + 1})
 		}
 
-		goto st22
+		goto st23
 	tr6:
 
 		if err := m.setPriority(data[tok:p]); err != nil {
@@ -564,12 +538,12 @@ func parseRFC5424(data string) (message, error) {
 
 		tok = p
 
-		goto st22
-	st22:
+		goto st23
+	st23:
 		if p++; p == pe {
-			goto _test_eof22
+			goto _test_eof23
 		}
-	st_case_22:
+	st_case_23:
 		switch data[p] {
 		case 32:
 			goto tr7
@@ -626,14 +600,14 @@ func parseRFC5424(data string) (message, error) {
 	_test_eof16:
 		cs = 16
 		goto _test_eof
-	_test_eof23:
-		cs = 23
-		goto _test_eof
 	_test_eof24:
 		cs = 24
 		goto _test_eof
 	_test_eof25:
 		cs = 25
+		goto _test_eof
+	_test_eof26:
+		cs = 26
 		goto _test_eof
 	_test_eof17:
 		cs = 17
@@ -641,20 +615,11 @@ func parseRFC5424(data string) (message, error) {
 	_test_eof18:
 		cs = 18
 		goto _test_eof
-	_test_eof26:
-		cs = 26
+	_test_eof19:
+		cs = 19
 		goto _test_eof
 	_test_eof27:
 		cs = 27
-		goto _test_eof
-	_test_eof28:
-		cs = 28
-		goto _test_eof
-	_test_eof29:
-		cs = 29
-		goto _test_eof
-	_test_eof19:
-		cs = 19
 		goto _test_eof
 	_test_eof20:
 		cs = 20
@@ -665,34 +630,31 @@ func parseRFC5424(data string) (message, error) {
 	_test_eof22:
 		cs = 22
 		goto _test_eof
+	_test_eof23:
+		cs = 23
+		goto _test_eof
 
 	_test_eof:
 		{
 		}
 		if p == eof {
 			switch cs {
-			case 25, 28:
+			case 26:
 
 				m.setMsg(data[tok:p])
 
-			case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22:
+			case 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23:
 
 				errs = multierr.Append(errs, &ParseError{Err: io.ErrUnexpectedEOF, Pos: p + 1})
 				p--
 
-			case 26:
+			case 27:
 
 				m.setRawSDValue(data[tok:p])
 
-			case 24, 27:
+			case 25:
 
 				tok = p
-
-				m.setMsg(data[tok:p])
-
-			case 29:
-
-				m.setRawSDValue(data[tok:p])
 
 				m.setMsg(data[tok:p])
 
@@ -1842,7 +1804,7 @@ func parseStructuredData(data string) map[string]interface{} {
 	tr43:
 
 		if subMap, ok := structuredData[s.sdID].(map[string]interface{}); ok {
-			subMap[s.sdParamName] = removeBytes(data[tok:p], s.sdValueEscapes, p)
+			subMap[s.sdParamName] = removeBytes(data[tok:p], s.sdValueEscapes, tok)
 		}
 
 		s.sdValueEscapes = nil

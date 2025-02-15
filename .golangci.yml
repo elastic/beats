@@ -30,6 +30,9 @@ issues:
     - text: "imported and not used"
       linters:
         - typecheck
+    - text: "previous case"
+      linters:
+        - typecheck
     # From mage we are printing to the console to ourselves
     - path: (.*magefile.go|.*dev-tools/mage/.*)
       linters: forbidigo
@@ -64,14 +67,19 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - gomodguard # check for blocked dependencies
-    - prealloc # Finds slice declarations that could potentially be pre-allocated
-    - depguard
+    - gomodguard # check for blocked dependencies in go.mod
+    - depguard # check for blocked dependencies in Go files
+    - gomoddirectives
 
 # all available settings of specific linters
 linters-settings:
   depguard:
     rules:
+      main:
+        list-mode: lax
+        deny:
+          - pkg: "math/rand$"
+            desc: "superseded by math/rand/v2"
       apache-licensed-code:
         list-mode: lax
         files:
@@ -81,7 +89,8 @@ linters-settings:
             desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (x-pack/).
   errcheck:
     # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
-    check-type-assertions: false
+    # default is false: such cases aren't reported by default.
+    check-type-assertions: true
     # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`.
     check-blank: false
     # List of functions to exclude from checking, where each entry is a single function to exclude.
@@ -121,10 +130,38 @@ linters-settings:
               - errors
               - fmt
             reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
+        - gotest.tools/v3:
+            recommendations:
+              - github.com/stretchr/testify
+            reason: "Use one assertion library consistently across the codebase"
+        - github.com/google/uuid:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - github.com/gofrs/uuid/v5
+            reason: "Use one uuid library consistently across the codebase"
+
+  gomoddirectives:
+    # Forbid local `replace` directives
+    replace-local: false
+
+    # Forbid any `replace` directives that are intended temporarily only during
+    # development. The modules listed below are intended to be replaced permanently.
+    replace-allow-list:
+      - github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
+      - github.com/Shopify/sarama
+      - github.com/apoydence/eachers
+      - github.com/dop251/goja
+      - github.com/dop251/goja_nodejs
+      - github.com/fsnotify/fsevents
+      - github.com/fsnotify/fsnotify
+      - github.com/google/gopacket
+      - github.com/insomniacslk/dhcp
+      - github.com/meraki/dashboard-api-go/v3
+      - github.com/snowflakedb/gosnowflake
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.10"
+    go: "1.22.12"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -142,19 +179,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.10"
+    go: "1.22.12"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.10"
+    go: "1.22.12"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.10"
+    go: "1.22.12"
 
   gosec:
     excludes:

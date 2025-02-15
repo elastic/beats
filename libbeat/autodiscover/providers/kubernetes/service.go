@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/utils"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -71,11 +71,17 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	var namespaceWatcher kubernetes.Watcher
 
 	metaConf := config.AddResourceMetadata
+	// We initialise the use_kubeadm variable based on modules KubeAdm base configuration
+	err = metaConf.Namespace.SetBool("use_kubeadm", -1, config.KubeAdm)
+	if err != nil {
+		logger.Errorf("couldn't set kubeadm variable for namespace due to error %+v", err)
+	}
 
 	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
 		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-			SyncTimeout: config.SyncPeriod,
-			Namespace:   config.Namespace,
+			SyncTimeout:  config.SyncPeriod,
+			Namespace:    config.Namespace,
+			HonorReSyncs: true,
 		}, nil)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)

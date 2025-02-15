@@ -65,6 +65,7 @@ type MetricSet struct {
 	*aws.MetricSet
 	logger             *logp.Logger
 	CostExplorerConfig CostExplorerConfig `config:"cost_explorer_config"`
+	PreviousEndTime    time.Time
 }
 
 // CostExplorerConfig holds a configuration specific for billing metricset.
@@ -194,7 +195,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	startDate, endDate := getStartDateEndDate(m.Period)
 
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency, m.PreviousEndTime)
+	m.PreviousEndTime = endTime
 
 	// get cost metrics from cost explorer
 	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
@@ -243,7 +245,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	endTime time.Time) []mb.Event {
 	var events []mb.Event
 	namespace := "AWS/Billing"
-	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.MonitoringAccountID, svcCloudwatch)
+	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
 	if err != nil {
 		m.Logger().Error(err.Error())
 		return nil

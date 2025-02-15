@@ -7,11 +7,15 @@ package httpjson
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -30,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -88,6 +93,60 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
+type redact struct {
+	value  mapstrM
+	fields []string
+}
+
+func (r redact) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	v, err := private.Redact(r.value, "", r.fields)
+	if err != nil {
+		return fmt.Errorf("could not redact value: %v", err)
+	}
+	return v.MarshalLogObject(enc)
+}
+
+// mapstrM is a non-mutating version of mapstr.M.
+// See https://github.com/elastic/elastic-agent-libs/issues/232.
+type mapstrM mapstr.M
+
+// MarshalLogObject implements the zapcore.ObjectMarshaler interface and allows
+// for more efficient marshaling of mapstrM in structured logging.
+func (m mapstrM) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	if len(m) == 0 {
+		return nil
+	}
+
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v := m[k]
+		if inner, ok := tryToMapStr(v); ok {
+			err := enc.AddObject(k, inner)
+			if err != nil {
+				return fmt.Errorf("failed to add object: %w", err)
+			}
+			continue
+		}
+		zap.Any(k, v).AddTo(enc)
+	}
+	return nil
+}
+
+func tryToMapStr(v interface{}) (mapstrM, bool) {
+	switch m := v.(type) {
+	case mapstrM:
+		return m, true
+	case map[string]interface{}:
+		return mapstrM(m), true
+	default:
+		return nil, false
+	}
+}
+
 func test(url *url.URL) error {
 	port := func() string {
 		if url.Port() != "" {
@@ -120,7 +179,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
 	if cfg.Request.Tracer != nil {
-		id := sanitizeFileName(ctx.ID)
+		id := sanitizeFileName(ctx.IDWithoutName)
 		cfg.Request.Tracer.Filename = strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
 
 		// Propagate tracer behaviour to all chain children.
@@ -156,7 +215,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 	pagination := newPagination(cfg, client, log)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
-	requester := newRequester(client, requestFactory, responseProcessor, log)
+	requester := newRequester(client, requestFactory, responseProcessor, metrics, log)
 
 	trCtx := emptyTransformContext()
 	trCtx.cursor = newCursor(cfg.Cursor, log)
@@ -239,13 +298,18 @@ func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *mo
 	return &httpClient{client: client, limiter: limiter}, nil
 }
 
+// lumberjackTimestamp is a glob expression matching the time format string used
+// by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
+// https://github.com/natefinch/lumberjack/blob/4cb27fcfbb0f35cb48c542c5ea80b7c1d18933d0/lumberjack.go#L39
+const lumberjackTimestamp = "[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]T[0-9][0-9]-[0-9][0-9]-[0-9][0-9].[0-9][0-9][0-9]"
+
 func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
 	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
 	}
 
-	if cfg.Tracer != nil {
+	if cfg.Tracer.enabled() {
 		w := zapcore.AddSync(cfg.Tracer)
 		go func() {
 			// Close the logger when we are done.
@@ -259,12 +323,27 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
-		maxSize := cfg.Tracer.MaxSize*1e6 - margin
-		if maxSize < 0 {
-			maxSize = 0
+		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, log)
+	} else if cfg.Tracer != nil {
+		// We have a trace log name, but we are not enabled,
+		// so remove all trace logs we own.
+		err = os.Remove(cfg.Tracer.Filename)
+		if err != nil && !errors.Is(err, fs.ErrNotExist) {
+			log.Errorw("failed to remove request trace log", "path", cfg.Tracer.Filename, "error", err)
 		}
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize, log)
+		ext := filepath.Ext(cfg.Tracer.Filename)
+		base := strings.TrimSuffix(cfg.Tracer.Filename, ext)
+		paths, err := filepath.Glob(base + "-" + lumberjackTimestamp + ext)
+		if err != nil {
+			log.Errorw("failed to collect request trace log path names", "error", err)
+		}
+		for _, p := range paths {
+			err = os.Remove(p)
+			if err != nil && !errors.Is(err, fs.ErrNotExist) {
+				log.Errorw("failed to remove request trace log", "path", p, "error", err)
+			}
+		}
 	}
 
 	if reg != nil {

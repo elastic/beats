@@ -102,7 +102,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	//
 	// See "Round outer limits" and "Round inner limits" tests in
 	// the metric_registry_test.go for more information.
-	//referenceTime := time.Now().UTC().Round(time.Second)
 	referenceTime := time.Now().UTC()
 
 	// Initialize cloud resources and monitor metrics

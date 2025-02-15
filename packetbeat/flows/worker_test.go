@@ -21,11 +21,10 @@ import (
 	"encoding/json"
 	"flag"
 	"os"
-	"reflect"
 	"testing"
 	"time"
 
-	"gotest.tools/assert"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -140,8 +139,8 @@ func TestCreateEvent(t *testing.T) {
 	expectbiFlow.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{0, 0}}
 
 	// Assert the biflow is not 0 before the test
-	assert.Assert(t, !reflect.DeepEqual(expectbiFlow.stats[0].uints, bif.stats[0].uints))
-	assert.Assert(t, !reflect.DeepEqual(expectbiFlow.stats[1].uints, bif.stats[1].uints))
+	assert.NotEqual(t, expectbiFlow.stats[0].uints, bif.stats[0].uints)
+	assert.NotEqual(t, expectbiFlow.stats[1].uints, bif.stats[1].uints)
 
 	event = createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, true)
 	result = validate(event.Fields)
@@ -153,8 +152,8 @@ func TestCreateEvent(t *testing.T) {
 	}
 
 	// Assert the biflow is 0 after the test
-	assert.DeepEqual(t, expectbiFlow.stats[0].uintFlags, bif.stats[0].uintFlags)
-	assert.DeepEqual(t, expectbiFlow.stats[0].uints, bif.stats[0].uints)
-	assert.DeepEqual(t, expectbiFlow.stats[1].uintFlags, bif.stats[1].uintFlags)
-	assert.DeepEqual(t, expectbiFlow.stats[1].uints, bif.stats[1].uints)
+	assert.Equal(t, expectbiFlow.stats[0].uintFlags, bif.stats[0].uintFlags)
+	assert.Equal(t, expectbiFlow.stats[0].uints, bif.stats[0].uints)
+	assert.Equal(t, expectbiFlow.stats[1].uintFlags, bif.stats[1].uintFlags)
+	assert.Equal(t, expectbiFlow.stats[1].uints, bif.stats[1].uints)
 }

@@ -18,7 +18,7 @@ import (
 	"time"
 
 	"github.com/google/gopacket"
-	"github.com/google/gopacket/pcap"
+	"github.com/google/gopacket/pcapgo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
@@ -67,11 +67,11 @@ type TestResult struct {
 	Flows []beat.Event `json:"events,omitempty"`
 }
 
-func newV2Context() (v2.Context, func()) {
+func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
 		Logger:      logp.NewLogger("netflow_test"),
-		ID:          "test_id",
+		ID:          id,
 		Cancelation: ctx,
 	}, cancel
 }
@@ -85,20 +85,30 @@ func TestNetFlow(t *testing.T) {
 	for _, file := range pcaps {
 		testName := strings.TrimSuffix(filepath.Base(file), ".pcap")
 
+		isReversed := strings.HasSuffix(file, ".reversed.pcap")
+
 		t.Run(testName, func(t *testing.T) {
 
 			pluginCfg, err := conf.NewConfigFrom(mapstr.M{})
 			require.NoError(t, err)
+			if isReversed {
+				// if pcap is reversed packet order we need to have multiple workers
+				// and thus enable the input packets lru
+				err = pluginCfg.SetInt("workers", -1, 2)
+				require.NoError(t, err)
+			}
 
 			netflowPlugin, err := Plugin(logp.NewLogger("netflow_test")).Manager.Create(pluginCfg)
 			require.NoError(t, err)
 
 			mockPipeline := &pipelinemock.MockPipelineConnector{}
 
-			ctx, cancelFn := newV2Context()
+			ctx, cancelFn := newV2Context(testName)
+			defer cancelFn()
 			errChan := make(chan error)
 			go func() {
 				defer close(errChan)
+				defer cancelFn()
 				errChan <- netflowPlugin.Run(ctx, mockPipeline)
 			}()
 
@@ -113,15 +123,18 @@ func TestNetFlow(t *testing.T) {
 			conn, err := net.DialUDP("udp", nil, udpAddr)
 			require.NoError(t, err)
 
-			f, err := pcap.OpenOffline(file)
+			f, err := os.Open(file)
 			require.NoError(t, err)
 			defer f.Close()
+
+			r, err := pcapgo.NewReader(f)
+			require.NoError(t, err)
 
 			goldenData := readGoldenFile(t, filepath.Join(goldenDir, testName+".pcap.golden.json"))
 
 			// Process packets in PCAP and get flow records.
 			var totalBytes, totalPackets int
-			packetSource := gopacket.NewPacketSource(f, f.LinkType())
+			packetSource := gopacket.NewPacketSource(r, r.LinkType())
 			for pkt := range packetSource.Packets() {
 				payloadData := pkt.TransportLayer().LayerPayload()
 
@@ -151,17 +164,27 @@ func TestNetFlow(t *testing.T) {
 				_ = event.Delete("observer.ip")
 			}
 
-			require.EqualValues(t, goldenData, normalize(t, TestResult{
-				Name:  goldenData.Name,
-				Error: "",
-				Flows: publishedEvents,
-			}))
+			if !isReversed {
+				require.EqualValues(t, goldenData, normalize(t, TestResult{
+					Name:  goldenData.Name,
+					Error: "",
+					Flows: publishedEvents,
+				}))
+			} else {
+				// flows order cannot be guaranteed for input that run with multiple workers
+				publishedTestResult := normalize(t, TestResult{
+					Name:  goldenData.Name,
+					Error: "",
+					Flows: publishedEvents,
+				})
+				require.ElementsMatch(t, goldenData.Flows, publishedTestResult.Flows)
+			}
 
 			cancelFn()
 			select {
 			case err := <-errChan:
 				require.NoError(t, err)
-			case <-time.After(5 * time.Second):
+			case <-time.After(10 * time.Second):
 				t.Fatal("netflow plugin did not stop")
 			}
 
@@ -321,16 +344,18 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 	t.Helper()
 
-	r, err := pcap.OpenOffline(pcapFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
+	f, err := os.Open(pcapFile)
+	require.NoError(t, err)
+	defer f.Close()
+
+	r, err := pcapgo.NewReader(f)
+	require.NoError(t, err)
 
 	config := decoder.NewConfig().
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
+		WithCache(strings.HasSuffix(pcapFile, ".reversed.pcap")).
 		WithLogOutput(test.TestLogWriter{TB: t})
 
 	decoder, err := decoder.NewDecoder(config)

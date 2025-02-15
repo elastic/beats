@@ -1,0 +1,7 @@
+- key: meraki
+  title: Cisco Meraki
+  release: beta
+  fields:
+   - name: meraki
+     type: group
+     fields:

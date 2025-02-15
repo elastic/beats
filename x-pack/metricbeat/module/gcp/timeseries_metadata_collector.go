@@ -27,16 +27,22 @@ func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zo
 
 // NewStackdriverMetadataServiceForTimeSeries apart from having a long name takes a time series object to return the
 // Stackdriver canonical Metadata extractor
-func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries) MetadataService {
+func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries, organizationID, organizationName string, projectName string) MetadataService {
 	return &StackdriverTimeSeriesMetadataCollector{
-		timeSeries: ts,
+		timeSeries:       ts,
+		organizationID:   organizationID,
+		organizationName: organizationName,
+		projectName:      projectName,
 	}
 }
 
 // StackdriverTimeSeriesMetadataCollector is the implementation of MetadataCollector to collect metrics from Stackdriver
 // common TimeSeries objects
 type StackdriverTimeSeriesMetadataCollector struct {
-	timeSeries *monitoringpb.TimeSeries
+	timeSeries       *monitoringpb.TimeSeries
+	organizationID   string
+	organizationName string
+	projectName      string
 }
 
 // Metadata parses a Timeseries object to return its metadata divided into "unknown" (first object) and ECS (second
@@ -53,14 +59,19 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 	ecs := mapstr.M{
 		ECSCloud: mapstr.M{
-			ECSCloudAccount: mapstr.M{
-				ECSCloudAccountID:   accountID,
-				ECSCloudAccountName: accountID,
+			ECSCloudProject: mapstr.M{
+				ECSCloudID:   accountID,
+				ECSCloudName: s.projectName,
 			},
 			ECSCloudProvider: "gcp",
 		},
 	}
-
+	if s.organizationID != "" {
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAccount+"."+ECSCloudID, s.organizationID)
+	}
+	if s.organizationName != "" {
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAccount+"."+ECSCloudName, s.organizationName)
+	}
 	if availabilityZone != "" {
 		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAvailabilityZone, availabilityZone)
 
@@ -100,7 +111,15 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
 		for k, v := range s.timeSeries.Resource.Labels {
-			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceID || k == TimeSeriesResponsePathForECSAccountID {
+
+			// We are omitting some labels here because they are added separately for services with additional metadata logic.
+			// However, we explicitly include the instance_id label to ensure it is not missed for services without additional metadata logic.
+			if k == TimeSeriesResponsePathForECSInstanceID {
+				_, _ = ecs.Put(ECSCloudInstanceIDKey, v)
+				continue
+			}
+
+			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSAccountID {
 				continue
 			}
 

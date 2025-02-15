@@ -21,6 +21,7 @@ package integration
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -32,15 +33,16 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"slices"
+	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type BeatProc struct {
@@ -50,6 +52,7 @@ type BeatProc struct {
 	RestartOnBeatOnExit bool
 	beatName            string
 	cmdMutex            sync.Mutex
+	waitingMutex        sync.Mutex
 	configFile          string
 	fullPath            string
 	logFileOffset       int64
@@ -185,7 +188,7 @@ func (b *BeatProc) Start(args ...string) {
 	b.fullPath = fullPath
 	b.Args = append(b.baseArgs, args...)
 
-	done := atomic.MakeBool(false)
+	var done atomic.Bool
 	wg := sync.WaitGroup{}
 	if b.RestartOnBeatOnExit {
 		wg.Add(1)
@@ -202,13 +205,8 @@ func (b *BeatProc) Start(args ...string) {
 
 	t.Cleanup(func() {
 		b.cmdMutex.Lock()
-		// 1. Kill the Beat
-		if err := b.Process.Signal(os.Interrupt); err != nil {
-			if !errors.Is(err, os.ErrProcessDone) {
-				t.Fatalf("could not stop process with PID: %d, err: %s",
-					b.Process.Pid, err)
-			}
-		}
+		// 1. Send an interrupt signal to the Beat
+		b.stopNonsynced()
 
 		// Make sure the goroutine restarting the Beat has exited
 		if b.RestartOnBeatOnExit {
@@ -220,7 +218,7 @@ func (b *BeatProc) Start(args ...string) {
 			// wg.Wait() or there is a possibility of
 			// deadlock.
 			b.cmdMutex.Unlock()
-			// 4. Wait for the goroutine to finish, this helps ensuring
+			// 4. Wait for the goroutine to finish, this helps to ensure
 			// no other Beat process was started
 			wg.Wait()
 		} else {
@@ -255,19 +253,35 @@ func (b *BeatProc) startBeat() {
 	require.NoError(b.t, err, "error starting beat process")
 
 	b.Process = cmd.Process
+
+	b.t.Cleanup(func() {
+		// If the test failed, print the whole cmd line to help debugging
+		if b.t.Failed() {
+			args := strings.Join(cmd.Args, " ")
+			b.t.Log("CMD line to execute Beat:", cmd.Path, args)
+		}
+	})
 }
 
-// waitBeatToExit blocks until the Beat exits, it returns
-// the process' exit code.
+// waitBeatToExit blocks until the Beat exits.
 // `startBeat` must be called before this method.
-func (b *BeatProc) waitBeatToExit() int {
+func (b *BeatProc) waitBeatToExit() {
+	if !b.waitingMutex.TryLock() {
+		// b.stopNonsynced must be waiting on the process already. Nothing to do.
+		return
+	}
+	defer b.waitingMutex.Unlock()
+
 	processState, err := b.Process.Wait()
 	if err != nil {
-		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %d",
-			b.beatName, err, processState.ExitCode())
-	}
+		exitCode := "unknown"
+		if processState != nil {
+			exitCode = strconv.Itoa(processState.ExitCode())
+		}
 
-	return processState.ExitCode()
+		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
+			b.beatName, err, exitCode)
+	}
 }
 
 // Stop stops the Beat process
@@ -275,11 +289,31 @@ func (b *BeatProc) waitBeatToExit() int {
 func (b *BeatProc) Stop() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
+	b.stopNonsynced()
+}
+
+// stopNonsynced is the actual stop code, but without locking so it can be reused
+// by methods that have already acquired the lock.
+func (b *BeatProc) stopNonsynced() {
 	if err := b.Process.Signal(os.Interrupt); err != nil {
 		if errors.Is(err, os.ErrProcessDone) {
 			return
 		}
-		b.t.Fatalf("could not stop process with PID: %d, err: %s", b.Process.Pid, err)
+		b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
+			b.Process.Pid, err)
+	}
+
+	if !b.waitingMutex.TryLock() {
+		// b.waitBeatToExit must be waiting on the process already. Nothing to do.
+		return
+	}
+	defer b.waitingMutex.Unlock()
+	ps, err := b.Process.Wait()
+	if err != nil {
+		b.t.Logf("[WARN] got an error waiting %s to top: %v", b.beatName, err)
+	}
+	if !ps.Success() {
+		b.t.Logf("[WARN] %s did not stopped successfully: %v", b.beatName, ps.String())
 	}
 }
 
@@ -292,7 +326,7 @@ func (b *BeatProc) LogMatch(match string) bool {
 	logFile := b.openLogFile()
 	defer logFile.Close()
 
-	found := false
+	var found bool
 	found, b.logFileOffset = b.logRegExpMatch(re, logFile, b.logFileOffset)
 	if found {
 		return found
@@ -355,8 +389,8 @@ func (b *BeatProc) LogContains(s string) bool {
 	logFile := b.openLogFile()
 	defer logFile.Close()
 
-	found := false
-	found, b.logFileOffset = b.searchStrInLogs(logFile, s, b.logFileOffset)
+	var found bool
+	found, b.logFileOffset, _ = b.searchStrInLogs(logFile, s, b.logFileOffset)
 	if found {
 		return found
 	}
@@ -366,16 +400,62 @@ func (b *BeatProc) LogContains(s string) bool {
 		return false
 	}
 	defer eventLogFile.Close()
-	found, b.eventLogFileOffset = b.searchStrInLogs(eventLogFile, s, b.eventLogFileOffset)
+	found, b.eventLogFileOffset, _ = b.searchStrInLogs(eventLogFile, s, b.eventLogFileOffset)
 
 	return found
+}
+
+// GetLogLine search for the string s starting at the beginning
+// of the logs, if it is found the whole log line is returned, otherwise
+// an empty string is returned. GetLogLine does not keep track of
+// any offset
+func (b *BeatProc) GetLogLine(s string) string {
+	logFile := b.openLogFile()
+	defer logFile.Close()
+
+	found, _, line := b.searchStrInLogs(logFile, s, 0)
+	if found {
+		return line
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return ""
+	}
+	defer eventLogFile.Close()
+	_, _, line = b.searchStrInLogs(eventLogFile, s, 0)
+
+	return line
+}
+
+// GetLastLogLine search for the string s starting at the end
+// of the logs, if it is found the whole log line is returned, otherwise
+// an empty string is returned. GetLastLogLine does not keep track of
+// any offset.
+func (b *BeatProc) GetLastLogLine(s string) string {
+	logFile := b.openLogFile()
+	defer logFile.Close()
+
+	found, line := b.searchStrInLogsReversed(logFile, s)
+	if found {
+		return line
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return ""
+	}
+	defer eventLogFile.Close()
+	_, line = b.searchStrInLogsReversed(eventLogFile, s)
+
+	return line
 }
 
 // searchStrInLogs search for s as a substring of any line in logFile starting
 // from offset.
 //
 // It will close logFile and return the current offset.
-func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bool, int64) {
+func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bool, int64, string) {
 	t := b.t
 
 	_, err := logFile.Seek(offset, io.SeekStart)
@@ -405,11 +485,49 @@ func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bo
 		}
 
 		if strings.Contains(line, s) {
-			return true, offset
+			return true, offset, line
 		}
 	}
 
-	return false, offset
+	return false, offset, ""
+}
+
+// searchStrInLogs search for s as a substring of any line in logFile starting
+// from offset.
+//
+// It will close logFile and return the current offset.
+func (b *BeatProc) searchStrInLogsReversed(logFile *os.File, s string) (bool, string) {
+	t := b.t
+
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			// That's not quite a test error, but it can impact
+			// next executions of LogContains, so treat it as an error
+			t.Errorf("could not close log file: %s", err)
+		}
+	}()
+
+	r := bufio.NewReader(logFile)
+	lines := []string{}
+	for {
+		line, err := r.ReadString('\n')
+		if err != nil {
+			if err != io.EOF {
+				t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
+			}
+			break
+		}
+		lines = append(lines, line)
+	}
+
+	slices.Reverse(lines)
+	for _, line := range lines {
+		if strings.Contains(line, s) {
+			return true, line
+		}
+	}
+
+	return false, ""
 }
 
 // WaitForLogs waits for the specified string s to be present in the logs within
@@ -625,6 +743,18 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	err = json.Unmarshal(metaBytes, &m)
 	require.NoError(b.t, err, "error unmarshalling meta data")
 	return m, nil
+}
+
+// RemoveAllCLIArgs removes all CLI arguments configured.
+// It will also remove all configuration for home path and
+// logs, therefore some methods, like the ones that read logs,
+// might fail if Filebeat is not configured the way this framework
+// expects.
+//
+// The only CLI argument kept is the `--systemTest` that is necessary
+// to make the System Test Binary run Filebeat
+func (b *BeatProc) RemoveAllCLIArgs() {
+	b.baseArgs = []string{b.beatName, "--systemTest"}
 }
 
 func (b *BeatProc) Stdin() io.WriteCloser {
@@ -851,4 +981,20 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
 		}
 	}
+}
+
+func (b *BeatProc) CountFileLines(glob string) int {
+	file := b.openGlobFile(glob, true)
+	defer file.Close()
+	data, err := io.ReadAll(file)
+	if err != nil {
+		b.t.Fatalf("could not read file '%s': %s", file.Name(), err)
+	}
+
+	return bytes.Count(data, []byte{'\n'})
+}
+
+// ConfigFilePath returns the config file path
+func (b *BeatProc) ConfigFilePath() string {
+	return b.configFile
 }

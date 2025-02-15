@@ -21,8 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lestrrat-go/jwx/v2/jwa"
-	"github.com/lestrrat-go/jwx/v2/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 )
@@ -180,20 +179,17 @@ func pemPKCS8PrivateKey(pemdata []byte) (any, error) {
 // signJWT creates a JWT token using required claims and sign it with the private key.
 func signJWT(cnf *oauth2.Config, key any) (string, error) {
 	now := time.Now()
-	tok, err := jwt.NewBuilder().Audience([]string{cnf.Endpoint.TokenURL}).
-		Issuer(cnf.ClientID).
-		Subject(cnf.ClientID).
-		IssuedAt(now).
-		Expiration(now.Add(time.Hour)).
-		Build()
-	if err != nil {
-		return "", fmt.Errorf("failed to create token: %w", err)
-	}
-	signedToken, err := jwt.Sign(tok, jwt.WithKey(jwa.RS256, key))
+	signed, err := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.RegisteredClaims{
+		Audience:  []string{cnf.Endpoint.TokenURL},
+		Issuer:    cnf.ClientID,
+		Subject:   cnf.ClientID,
+		IssuedAt:  jwt.NewNumericDate(now),
+		ExpiresAt: jwt.NewNumericDate(now.Add(time.Hour)),
+	}).SignedString(key)
 	if err != nil {
 		return "", fmt.Errorf("failed to sign token: %w", err)
 	}
-	return string(signedToken), nil
+	return signed, nil
 }
 
 // exchangeForBearerToken exchanges the Okta JWT for a bearer token.

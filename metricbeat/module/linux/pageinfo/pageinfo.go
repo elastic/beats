@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
@@ -43,6 +44,7 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	mod resolve.Resolver
+	log *logp.Logger
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -55,6 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		mod:           sys,
+		log:           logp.NewLogger("pageinfo"),
 	}, nil
 }
 
@@ -72,7 +75,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	reader := bufio.NewReader(fd)
 
-	zones, err := readPageFile(reader)
+	zones, err := readPageFile(m.log, reader)
 	if err != nil {
 		return fmt.Errorf("error reading pagetypeinfo: %w", err)
 	}

@@ -18,6 +18,7 @@
 package monitors
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -32,7 +33,9 @@ import (
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 
+	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 // TestMonitorBasic tests a basic config
@@ -103,10 +106,10 @@ func testMonitorConfig(t *testing.T, conf *conf.C, eventValidator validator.Vali
 		t.Fatalf("No publishes detected!")
 	}
 
-	assert.Equal(t, 1, built.Load())
+	assert.Equal(t, int64(1), built.Load())
 	mon.Stop()
 
-	assert.Equal(t, 1, closed.Load())
+	assert.Equal(t, int64(1), closed.Load())
 	assert.Equal(t, true, pcClient.closed)
 }
 
@@ -126,8 +129,65 @@ func TestCheckInvalidConfig(t *testing.T) {
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
 
 	// These counters are both zero since this fails at config parse time
-	require.Equal(t, 0, built.Load())
-	require.Equal(t, 0, closed.Load())
+	require.Equal(t, int64(0), built.Load())
+	require.Equal(t, int64(0), closed.Load())
 
 	require.Error(t, checkMonitorConfig(serverMonConf, reg))
+}
+
+type MockStatusReporter struct {
+	us func(status status.Status, msg string)
+}
+
+func (sr *MockStatusReporter) UpdateStatus(status status.Status, msg string) {
+	sr.us(status, msg)
+}
+
+func TestStatusReporter(t *testing.T) {
+	confMap := map[string]interface{}{
+		"type":     "fail",
+		"urls":     []string{"http://example.net"},
+		"schedule": "@every 1ms",
+		"name":     "myName",
+		"id":       "myId",
+	}
+	cfg, err := conf.NewConfigFrom(confMap)
+	require.NoError(t, err)
+
+	reg, _, _ := mockPluginsReg()
+	pipel := &MockPipeline{}
+	monReg := monitoring.NewRegistry()
+
+	mockDegradedPluginFactory := plugin.PluginFactory{
+		Name:    "fail",
+		Aliases: []string{"failAlias"},
+		Make: func(s string, cfg *conf.C) (plugin.Plugin, error) {
+			return plugin.Plugin{}, fmt.Errorf("error plugin")
+		},
+		Stats: plugin.NewPluginCountersRecorder("fail", monReg),
+	}
+	_ = reg.Add(mockDegradedPluginFactory)
+
+	sched := scheduler.Create(1, monitoring.NewRegistry(), time.Local, nil, true)
+	defer sched.Stop()
+
+	c, err := pipel.Connect()
+	require.NoError(t, err)
+	m, err := newMonitor(cfg, reg, c, sched.Add, nil, nil)
+	require.NoError(t, err)
+
+	// Track status marked as failed during run_once execution
+	failed := false
+	m.SetStatusReporter(&MockStatusReporter{
+		us: func(s status.Status, msg string) {
+			if s == status.Failed {
+				failed = true
+			}
+		},
+	})
+	m.Start()
+
+	sched.WaitForRunOnce()
+
+	require.True(t, failed)
 }

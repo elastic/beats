@@ -19,7 +19,7 @@ package stress
 
 import (
 	"context"
-	"math/rand"
+	"math/rand/v2"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -81,7 +81,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	min := int64(config.MinWait)
 	max := int64(config.MaxWait)
 	if max > 0 && min < max {
-		waitFor := rand.Int63n(max-min) + min
+		waitFor := rand.Int64N(max-min) + min
 
 		// TODO: make wait interruptable via `Close`
 		time.Sleep(time.Duration(waitFor))
@@ -93,7 +93,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 		if config.Fail.EveryBatch == t.batchCount {
 			t.batchCount = 0
-			t.observer.Failed(n)
+			t.observer.RetryableErrors(n)
 			batch.Retry()
 			return nil
 		}
@@ -104,7 +104,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 	// ack complete batch
 	batch.ACK()
-	t.observer.Acked(n)
+	t.observer.AckedEvents(n)
 
 	return nil
 }

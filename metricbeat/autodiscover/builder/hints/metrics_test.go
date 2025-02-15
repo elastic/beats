@@ -23,7 +23,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -35,6 +34,8 @@ import (
 
 func TestMain(m *testing.M) {
 	InitializeModule()
+
+	os.Exit(m.Run())
 }
 
 func TestGenerateHints(t *testing.T) {
@@ -769,7 +770,7 @@ func createAnExistingKeystore(t *testing.T, path string, secret string) keystore
 
 // create a temporary file on disk to save the keystore.
 func getTemporaryKeystoreFile() string {
-	path, err := ioutils.TempDir("", "testing")
+	path, err := os.MkdirTemp("", "testing")
 	if err != nil {
 		panic(err)
 	}

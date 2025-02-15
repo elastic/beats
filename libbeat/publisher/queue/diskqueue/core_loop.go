@@ -47,7 +47,7 @@ func (dq *diskQueue) run() {
 			// After receiving new ACKs, a segment might be ready to delete.
 			dq.maybeDeleteACKed()
 
-		case <-dq.done:
+		case <-dq.close:
 			dq.handleShutdown()
 			return
 
@@ -84,19 +84,8 @@ func (dq *diskQueue) run() {
 			// If there were blocked producers waiting for more queue space,
 			// we might be able to unblock them now.
 			dq.maybeUnblockProducers()
-
-		case metricsReq := <-dq.metricsRequestChan:
-			dq.handleMetricsRequest(metricsReq)
 		}
 	}
-}
-
-// handleMetricsRequest responds to an event on the metricsRequestChan chan
-func (dq *diskQueue) handleMetricsRequest(request metricsRequest) {
-	resp := metricsRequestResponse{
-		sizeOnDisk: dq.segments.sizeOnDisk(),
-	}
-	request.response <- resp
 }
 
 func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
@@ -122,6 +111,7 @@ func (dq *diskQueue) handleProducerWriteRequest(request producerWriteRequest) {
 		// pending list and report success, then dispatch it to the
 		// writer loop if no other requests are outstanding.
 		dq.enqueueWriteFrame(request.frame)
+		dq.observer.AddEvent(int(request.frame.sizeOnDisk()))
 		request.responseChan <- true
 	} else {
 		// The queue is too full. Either add the request to blockedProducers,
@@ -186,6 +176,8 @@ func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 	dq.deleting = false
 	newAckedSegments := []*queueSegment{}
 	errors := []error{}
+	removedEventCount := 0
+	removedByteCount := 0
 	for i, err := range response.results {
 		if err != nil {
 			// This segment had an error, so it stays in the acked list.
@@ -193,8 +185,15 @@ func (dq *diskQueue) handleDeleterLoopResponse(response deleterLoopResponse) {
 			errors = append(errors,
 				fmt.Errorf("couldn't delete segment %d: %w",
 					dq.segments.acked[i].id, err))
+		} else {
+			removedEventCount += int(dq.segments.acked[i].frameCount)
+			// For the metrics observer, we (can) only report the size of the raw
+			// events, not the segment header, so subtract that here so it doesn't
+			// look like we're deleting more than was added in the first place.
+			removedByteCount += int(dq.segments.acked[i].byteCount - dq.segments.acked[i].headerSize())
 		}
 	}
+	dq.observer.RemoveEvents(removedEventCount, removedByteCount)
 	if len(dq.segments.acked) > len(response.results) {
 		// Preserve any new acked segments that were added during the deletion
 		// request.
@@ -479,9 +478,13 @@ func (dq *diskQueue) canAcceptFrameOfSize(frameSize uint64) bool {
 		return true
 	}
 
-	// Compute the current queue size. We accept if there is enough capacity
-	// left in the queue after accounting for the existing segments and the
-	// pending writes that were already accepted.
+	// We accept if there is enough capacity left in the queue after accounting
+	// for the existing segments and the pending writes that were already
+	// accepted.
+	return dq.currentSize()+frameSize <= dq.settings.MaxBufferSize
+}
+
+func (dq *diskQueue) currentSize() uint64 {
 	pendingBytes := uint64(0)
 	for _, sf := range dq.pendingFrames {
 		pendingBytes += sf.frame.sizeOnDisk()
@@ -490,7 +493,5 @@ func (dq *diskQueue) canAcceptFrameOfSize(frameSize uint64) bool {
 	if dq.writing {
 		pendingBytes += dq.writeRequestSize
 	}
-	currentSize := pendingBytes + dq.segments.sizeOnDisk()
-
-	return currentSize+frameSize <= dq.settings.MaxBufferSize
+	return pendingBytes + dq.segments.sizeOnDisk()
 }

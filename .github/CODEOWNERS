@@ -12,19 +12,23 @@
 # https://github.community/t/codeowners-file-with-a-not-file-type-condition/1423/9
 CHANGELOG*
 
+# Top-level files ownership
+/catalog-info.yaml @elastic/ingest-eng-prod
 # The tech leads of the teams working in Beats share ownership of the Go module dependencies and related files.
-/.github/CODEOWNERS @elastic/beats-tech-leads
 /go.mod @elastic/beats-tech-leads
 /go.sum @elastic/beats-tech-leads
 /NOTICE.txt @elastic/beats-tech-leads
 
+# Sub-directories/files ownership. Remember that order matters; the last matching pattern takes the most precedence.
+/.buildkite @elastic/ingest-eng-prod
 /.ci/ @elastic/elastic-agent-data-plane @elastic/ingest-eng-prod
 /.github/ @elastic/ingest-eng-prod
+/.github/CODEOWNERS @elastic/beats-tech-leads
 /auditbeat/ @elastic/sec-linux-platform
 /deploy/ @elastic/elastic-agent-data-plane
-/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
+/deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /dev-tools/ @elastic/elastic-agent-data-plane
-/dev-tools/kubernetes @elastic/obs-ds-hosted-services
+/dev-tools/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /docs/ @elastic/elastic-agent-data-plane
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
@@ -53,8 +57,11 @@ CHANGELOG*
 /heartbeat/ @elastic/obs-ds-hosted-services
 /journalbeat @elastic/elastic-agent-data-plane
 /libbeat/ @elastic/elastic-agent-data-plane
+/libbeat/autodiscover/providers/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /libbeat/docs/processors-list.asciidoc @elastic/ingest-docs
 /libbeat/management @elastic/elastic-agent-control-plane
+/libbeat/processors/add_cloud_metadata @elastic/obs-ds-hosted-services
+/libbeat/processors/add_kubernetes_metadata @elastic/elastic-agent-data-plane
 /libbeat/processors/cache/ @elastic/security-service-integrations
 /libbeat/processors/community_id/ @elastic/sec-deployment-and-devices
 /libbeat/processors/decode_xml/ @elastic/security-service-integrations
@@ -62,10 +69,10 @@ CHANGELOG*
 /libbeat/processors/dns/ @elastic/sec-deployment-and-devices
 /libbeat/processors/registered_domain/ @elastic/sec-deployment-and-devices
 /libbeat/processors/syslog/ @elastic/sec-deployment-and-devices
+/libbeat/processors/translate_ldap_attribute/ @elastic/sec-windows-platform
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
-/libbeat/processors/add_cloud_metadata @elastic/obs-cloud-monitoring
-/libbeat/processors/add_kubernetes_metadata @elastic/obs-cloudnative-monitoring
 /libbeat/reader/syslog/ @elastic/sec-deployment-and-devices
+/libbeat/scripts @elastic/ingest-eng-prod
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
@@ -98,6 +105,7 @@ CHANGELOG*
 /metricbeat/module/redis @elastic/obs-infraobs-integrations
 /metricbeat/module/system/ @elastic/elastic-agent-data-plane
 /metricbeat/module/vsphere @elastic/obs-infraobs-integrations
+/metricbeat/module/windows/wmi @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
 /packetbeat/ @elastic/sec-linux-platform
 /script/ @elastic/elastic-agent-data-plane
@@ -109,10 +117,10 @@ CHANGELOG*
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/filebeat/docs/inputs/input-salesforce.asciidoc @elastic/obs-infraobs-integrations
-/x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
-/x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
+/x-pack/filebeat/input/awscloudwatch/ @elastic/obs-ds-hosted-services
+/x-pack/filebeat/input/awss3/ @elastic/obs-ds-hosted-services
 /x-pack/filebeat/input/azureblobstorage/ @elastic/security-service-integrations
-/x-pack/filebeat/input/azureeventhub/ @elastic/obs-cloud-monitoring
+/x-pack/filebeat/input/azureeventhub/ @elastic/obs-ds-hosted-services
 /x-pack/filebeat/input/cel/ @elastic/security-service-integrations
 /x-pack/filebeat/input/cometd/ @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/entityanalytics/ @elastic/security-service-integrations
@@ -123,15 +131,16 @@ CHANGELOG*
 /x-pack/filebeat/input/httpjson/ @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/httplog @elastic/security-service-integrations
 /x-pack/filebeat/input/internal/httpmon @elastic/security-service-integrations
+/x-pack/filebeat/input/internal/private @elastic/security-service-integrations
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
 /x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
 /x-pack/filebeat/input/salesforce @elastic/obs-infraobs-integrations
-/x-pack/filebeat/input/websocket/ @elastic/security-service-integrations
+/x-pack/filebeat/input/streaming/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
-/x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
-/x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
-/x-pack/filebeat/module/azure @elastic/obs-cloud-monitoring
+/x-pack/filebeat/module/aws @elastic/obs-ds-hosted-services
+/x-pack/filebeat/module/awsfargate @elastic/obs-ds-hosted-services
+/x-pack/filebeat/module/azure @elastic/obs-ds-hosted-services
 /x-pack/filebeat/module/barracuda @elastic/security-service-integrations
 /x-pack/filebeat/module/bluecoat @elastic/sec-deployment-and-devices
 /x-pack/filebeat/module/cef @elastic/sec-deployment-and-devices
@@ -194,8 +203,8 @@ CHANGELOG*
 /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/containerd/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/coredns @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application-backend
-/x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations @elastic/security-service-integrations
+/x-pack/metricbeat/module/enterprisesearch @elastic/app-search-team
+/x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/billing @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/cloudrun_metrics @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/cloudsql_mysql @elastic/obs-infraobs-integrations
@@ -204,21 +213,20 @@ CHANGELOG*
 /x-pack/metricbeat/module/gcp/carbon @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/gcp/compute @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/gcp/dataproc @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/gcp/dns @elastic/security-service-integrations
 /x-pack/metricbeat/module/gcp/firestore @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/gcp/firewall @elastic/security-service-integrations
 /x-pack/metricbeat/module/gcp/gke @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/gcp/loadbalancing_logs @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/loadbalancing_metrics @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/pubsub @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/gcp/redis @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/gcp/storage @elastic/obs-ds-hosted-services
-/x-pack/metricbeat/module/gcp/vpcflow @elastic/security-service-integrations
 /x-pack/metricbeat/module/ibmmq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/iis @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/istio/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/mssql @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/openai @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/oracle @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/panw @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/redisenterprise @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/sql @elastic/obs-infraobs-integrations
@@ -228,9 +236,3 @@ CHANGELOG*
 /x-pack/osquerybeat/ @elastic/sec-deployment-and-devices
 /x-pack/packetbeat/ @elastic/sec-linux-platform
 /x-pack/winlogbeat/ @elastic/sec-windows-platform
-
-# Ownership of CI or related files by the Ingest Eng Prod team
-/.buildkite @elastic/ingest-eng-prod
-/catalog-info.yaml @elastic/ingest-eng-prod
-/libbeat/scripts @elastic/ingest-eng-prod
-/metricbeat/tests @elastic/ingest-eng-prod

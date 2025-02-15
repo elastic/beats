@@ -4,9 +4,12 @@ name: "beats-libbeat"
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
@@ -16,10 +19,49 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
+  - group: "Check/Update"
+    key: "libbeat-check-update"
+
+    steps:
+      - label: "Libbeat: Run check/update"
+        command: |
+          set -eo pipefail
+          make -C libbeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "libbeat: check/update"
+
+      - label: "Libbeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          memory: "2Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "libbeat: pre-commit"
+
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "libbeat-check-update"
+
   - group: "Mandatory Tests"
     key: "mandatory-tests"
+
     steps:
-      - label: ":linux: Ubuntu Unit Tests"
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           set -euo pipefail
@@ -27,7 +69,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -35,11 +77,17 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*-unit.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Ununtu Unit Tests"
+              context: "libbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":go: Go Integration Tests"
+      - label: ":ubuntu: Libbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
@@ -47,7 +95,7 @@ steps:
           mage goIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -55,11 +103,17 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "libbeat: Go Integration Tests"
 
-      - label: ":python: Python Integration Tests"
+      - label: ":ubuntu: Libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
@@ -67,7 +121,7 @@ steps:
           mage pythonIntegTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -75,11 +129,17 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "libbeat: Python Integration Tests"
 
-      - label: ":negative_squared_cross_mark: Cross compile"
+      - label: ":ubuntu: Libbeat: Crosscompile"
         key: "mandatory-cross-compile"
         command: |
           set -euo pipefail
@@ -87,7 +147,7 @@ steps:
           make crosscompile
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -97,9 +157,9 @@ steps:
           - "libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "libbeat: Cross compile"
+              context: "libbeat: Crosscompile"
 
-      - label: ":testengine: Stress Tests"
+      - label: ":ubuntu: Libbeat: Stress Tests"
         key: "mandatory-stress-test"
         command: |
           set -euo pipefail
@@ -107,7 +167,7 @@ steps:
           make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS=' | go-junit-report > libbeat-stress-test.xml' stress-tests
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -120,8 +180,9 @@ steps:
   - group: "Extended Tests"
     key: "extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+
     steps:
-      - label: ":linux: Ubuntu ARM64 Unit Tests"
+      - label: ":ubuntu: Libbeat: Ubuntu arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: |
           set -euo pipefail
@@ -129,7 +190,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -137,6 +198,12 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Ubuntu ARM64 Unit Tests"
+              context: "libbeat: Ubuntu arm64 Unit Tests"

@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -44,6 +43,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/version"
 )
 
+const (
+	moduleNameField  = "_module_name"
+	filesetNameField = "_fileset_name"
+)
+
 // Fileset struct is the representation of a fileset.
 type Fileset struct {
 	name        string
@@ -58,6 +62,11 @@ type Fileset struct {
 type pipeline struct {
 	id       string
 	contents map[string]interface{}
+}
+
+// CheckIfModuleInput checks if the input configuration was created by a module
+func CheckIfModuleInput(cfg *conf.C) bool {
+	return cfg.HasField(moduleNameField)
 }
 
 // New allocates a new Fileset object with the given configuration.
@@ -143,11 +152,11 @@ type ProcessorRequirement struct {
 func (fs *Fileset) readManifest() (*manifest, error) {
 	cfg, err := common.LoadFile(filepath.Join(fs.modulePath, fs.name, "manifest.yml"))
 	if err != nil {
-		return nil, fmt.Errorf("Error reading manifest file: %v", err)
+		return nil, fmt.Errorf("Error reading manifest file: %w", err)
 	}
 	manifest, err := newManifest(cfg)
 	if err != nil {
-		return nil, fmt.Errorf("Error unpacking manifest: %v", err)
+		return nil, fmt.Errorf("Error unpacking manifest: %w", err)
 	}
 	return manifest, nil
 }
@@ -183,7 +192,7 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 
 		vars[name], err = resolveVariable(vars, value)
 		if err != nil {
-			return nil, fmt.Errorf("Error resolving variables on %s: %v", name, err)
+			return nil, fmt.Errorf("Error resolving variables on %s: %w", name, err)
 		}
 	}
 
@@ -246,7 +255,7 @@ func resolveVariable(vars map[string]interface{}, value interface{}) (interface{
 			if ok {
 				transf, err := ApplyTemplate(vars, s, false)
 				if err != nil {
-					return nil, fmt.Errorf("array: %v", err)
+					return nil, fmt.Errorf("array: %w", err)
 				}
 				transformed = append(transformed, transf)
 			} else {
@@ -322,25 +331,27 @@ func getTemplateFunctions(vars map[string]interface{}) (template.FuncMap, error)
 // getBuiltinVars computes the supported built in variables and groups them
 // in a dictionary
 func (fs *Fileset) getBuiltinVars(info beat.Info) (map[string]interface{}, error) {
-	host, err := os.Hostname()
-	if err != nil || len(host) == 0 {
+	osHost, err := os.Hostname()
+	if err != nil || len(osHost) == 0 {
 		return nil, fmt.Errorf("Error getting the hostname: %w", err)
 	}
-	split := strings.SplitN(host, ".", 2)
+	split := strings.SplitN(osHost, ".", 2)
 	hostname := split[0]
 	domain := ""
 	if len(split) > 1 {
 		domain = split[1]
 	}
 
-	return map[string]interface{}{
+	vars := map[string]interface{}{
 		"prefix":      info.IndexPrefix,
 		"hostname":    hostname,
 		"domain":      domain,
 		"module":      fs.mname,
 		"fileset":     fs.name,
 		"beatVersion": info.Version,
-	}, nil
+	}
+
+	return vars, nil
 }
 
 func (fs *Fileset) getInputConfig() (*conf.C, error) {
@@ -348,7 +359,7 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error expanding vars on the input path: %w", err)
 	}
-	contents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
+	contents, err := os.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 	if err != nil {
 		return nil, fmt.Errorf("Error reading input file %s: %w", path, err)
 	}
@@ -392,11 +403,11 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	}
 
 	// force our the module/fileset name
-	err = cfg.SetString("_module_name", -1, fs.mname)
+	err = cfg.SetString(moduleNameField, -1, fs.mname)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting the _module_name cfg in the input config: %w", err)
 	}
-	err = cfg.SetString("_fileset_name", -1, fs.name)
+	err = cfg.SetString(filesetNameField, -1, fs.name)
 	if err != nil {
 		return nil, fmt.Errorf("Error setting the _fileset_name cfg in the input config: %w", err)
 	}
@@ -434,7 +445,7 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %w", err)
 		}
 
-		strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
+		strContents, err := os.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 		if err != nil {
 			return nil, fmt.Errorf("Error reading pipeline file %s: %w", path, err)
 		}
@@ -458,7 +469,11 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 			if err != nil {
 				return nil, fmt.Errorf("Failed to sanitize the YAML pipeline file: %s: %w", path, err)
 			}
-			content = newContent.(map[string]interface{})
+			var ok bool
+			content, ok = newContent.(map[string]interface{})
+			if !ok {
+				return nil, errors.New("cannot convert newContent to map[string]interface{}")
+			}
 		default:
 			return nil, fmt.Errorf("Unsupported extension '%s' for pipeline file: %s", extension, path)
 		}

@@ -238,10 +238,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 			"testfield": "foo0",
 		},
 	}))
-	err = output.Publish(context.Background(), batch)
-	if err == nil {
-		t.Fatal("Expecting mapping conflict")
-	}
+	_ = output.Publish(context.Background(), batch)
 	_, _, err = client.conn.Refresh(deadletterIndex)
 	if err == nil {
 		t.Fatal("expecting index to not exist yet")
@@ -432,8 +429,12 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	}
 	client := randomClient(output).(clientWrap).Client().(*Client)
 
-	// Load version number
-	_ = client.Connect()
+	// Load version ctx
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to ES: %s", err)
+	}
 
 	return client, client
 }

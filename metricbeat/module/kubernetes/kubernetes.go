@@ -19,6 +19,8 @@ package kubernetes
 
 import (
 	"fmt"
+	httpnet "net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -123,7 +125,7 @@ func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFa
 	defer m.kubeStateMetricsCache.lock.Unlock()
 
 	now := time.Now()
-	// NOTE: These entries will be never removed, this can be a leak if
+	// NOTE: These entries will never be removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
 	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
 	familiesCache := m.kubeStateMetricsCache.getCacheMapEntry(m.cacheHash)
@@ -142,13 +144,32 @@ func (m *module) GetKubeletStats(http *helper.HTTP) ([]byte, error) {
 
 	now := time.Now()
 
-	// NOTE: These entries will be never removed, this can be a leak if
+	// NOTE: These entries will never be removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
 	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
 	statsCache := m.kubeletStatsCache.getCacheMapEntry(m.cacheHash)
 
+	// Check if the last time we tried to make a request to the Kubelet API ended in a 401 Unauthorized error.
+	// If this is the case, we should not keep making requests.
+	errorUnauthorisedMsg := fmt.Sprintf("HTTP error %d", httpnet.StatusUnauthorized)
+	if statsCache.lastFetchErr != nil && strings.Contains(statsCache.lastFetchErr.Error(), errorUnauthorisedMsg) {
+		return statsCache.sharedStats, statsCache.lastFetchErr
+	}
+
+	// If this is the first request, or it has passed more time than config.period, we should
+	// make a request to the Kubelet API again to get the last metrics' values.
 	if statsCache.lastFetchTimestamp.IsZero() || now.Sub(statsCache.lastFetchTimestamp) > m.Config().Period {
 		statsCache.sharedStats, statsCache.lastFetchErr = http.FetchContent()
+
+		// If we got an unauthorized error from our HTTP request, it is possible the token has expired.
+		// We should update the Authorization header in that case. We only try this for the first time
+		// we get HTTP 401 to avoid getting in a loop in case the cause of the error is something different.
+		if statsCache.lastFetchErr != nil && strings.Contains(statsCache.lastFetchErr.Error(), errorUnauthorisedMsg) {
+			if _, err := http.RefreshAuthorizationHeader(); err == nil {
+				statsCache.sharedStats, statsCache.lastFetchErr = http.FetchContent()
+			}
+		}
+
 		statsCache.lastFetchTimestamp = now
 	}
 

@@ -72,6 +72,7 @@ type mockedBackoff struct {
 
 	waits     []bool
 	waitIndex int
+	last      time.Time
 }
 
 var _ backoff.Backoff = new(mockedBackoff)
@@ -79,11 +80,16 @@ var _ backoff.Backoff = new(mockedBackoff)
 func (m *mockedBackoff) Wait() bool {
 	wait := m.waits[m.waitIndex]
 	m.waitIndex++
+	m.last = time.Now()
 	return wait
 }
 
 func (m *mockedBackoff) Reset() {
 	m.resetCount++
+}
+
+func (m *mockedBackoff) Last() time.Time {
+	return m.last
 }
 
 type mockedToken struct {

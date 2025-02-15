@@ -109,6 +109,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 	server, err := tcp.New(&s.config.Config, streaming.SplitHandlerFactory(
 		inputsource.FamilyTCP, log, tcp.MetadataCallback, func(data []byte, metadata inputsource.NetworkMetadata) {
+			log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)
 			evt := beat.Event{
 				Timestamp: time.Now(),
 				Fields: mapstr.M{

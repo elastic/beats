@@ -86,6 +86,8 @@ func newClientTestDriver(client outputs.NetworkClient) *testSyncDriver {
 	go func() {
 		defer driver.wg.Done()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		for {
 			cmd, ok := <-driver.ch
 			if !ok {
@@ -96,7 +98,7 @@ func newClientTestDriver(client outputs.NetworkClient) *testSyncDriver {
 			case driverCmdQuit:
 				return
 			case driverCmdConnect:
-				driver.client.Connect()
+				driver.client.Connect(ctx)
 			case driverCmdClose:
 				driver.client.Close()
 			case driverCmdPublish:

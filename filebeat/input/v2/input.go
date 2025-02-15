@@ -79,6 +79,10 @@ type Context struct {
 	// The input ID.
 	ID string
 
+	// The input ID without name. Some inputs append sourcename, we need the id to be untouched
+	// https://github.com/elastic/beats/blob/43d80af2aea60b0c45711475d114e118d90c4581/filebeat/input/v2/input-cursor/input.go#L118
+	IDWithoutName string
+
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
@@ -93,6 +97,7 @@ type Context struct {
 
 func (c Context) UpdateStatus(status status.Status, msg string) {
 	if c.StatusReporter != nil {
+		c.Logger.Debugf("updating status, status: '%s', message: '%s'", status.String(), msg)
 		c.StatusReporter.UpdateStatus(status, msg)
 	}
 }

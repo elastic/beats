@@ -18,9 +18,10 @@
 package elasticsearch
 
 import (
+	"context"
 	"errors"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 	"time"
 
@@ -125,13 +126,13 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		return nil, errors.New("empty hosts list")
 	}
 
-	var clients []outputs.NetworkClient
-	for _, host := range hosts {
-		client, err := makeClient(host, params, &config, beat.Beat)
+	clients := make([]outputs.NetworkClient, len(hosts))
+	for i, host := range hosts {
+		client, err := makeClient(host, params, &config, beat)
 		if err != nil {
 			return nil, err
 		}
-		clients = append(clients, client)
+		clients[i] = client
 	}
 
 	monitoring := monitoring.Default.GetRegistry("monitoring")
@@ -214,8 +215,10 @@ func (r *reporter) initLoop(c config) {
 
 	for {
 		// Select one configured endpoint by random and check if xpack is available
-		client := r.out[rand.Intn(len(r.out))]
-		err := client.Connect()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		client := r.out[rand.IntN(len(r.out))]
+		err := client.Connect(ctx)
 		if err == nil {
 			closing(log, client)
 			break
@@ -296,7 +299,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 	}
 }
 
-func makeClient(host string, params map[string]string, config *config, beatname string) (outputs.NetworkClient, error) {
+func makeClient(host string, params map[string]string, config *config, beat beat.Info) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)
 	if err != nil {
 		return nil, err
@@ -304,7 +307,7 @@ func makeClient(host string, params map[string]string, config *config, beatname 
 
 	esClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              url,
-		Beatname:         beatname,
+		Beatname:         beat.Beat,
 		Username:         config.Username,
 		Password:         config.Password,
 		APIKey:           config.APIKey,
@@ -312,6 +315,7 @@ func makeClient(host string, params map[string]string, config *config, beatname 
 		Headers:          config.Headers,
 		CompressionLevel: config.CompressionLevel,
 		Transport:        config.Transport,
+		UserAgent:        beat.UserAgent,
 	})
 	if err != nil {
 		return nil, err

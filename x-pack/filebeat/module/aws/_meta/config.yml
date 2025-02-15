@@ -14,7 +14,7 @@
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Process CloudTrail logs
@@ -63,9 +63,6 @@
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
 
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
-
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
 
@@ -87,7 +84,7 @@
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -123,9 +120,6 @@
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -148,7 +142,7 @@
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -184,9 +178,6 @@
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -209,7 +200,7 @@
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -245,9 +236,6 @@
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -270,7 +258,7 @@
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -306,9 +294,6 @@
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128
@@ -331,7 +316,7 @@
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
-    # Number of workers on S3 bucket
+    # Number of workers on S3 bucket or SQS queue
     #var.number_of_workers: 5
 
     # Filename of AWS credential file
@@ -367,9 +352,6 @@
 
     # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
     #var.fips_enabled: false
-
-    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
-    #var.max_number_of_messages: 5
 
     # URL to proxy AWS API calls
     #var.proxy_url: http://proxy:3128

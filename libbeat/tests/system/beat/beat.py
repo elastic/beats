@@ -269,10 +269,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if output is None:
             output = self.beat_name + "-" + self.today + ".ndjson"
 
-        args = [cmd, "-systemTest"]
+        args = [cmd, "--systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile",
+                "--test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
 
@@ -281,7 +281,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             path_home = home
 
         args += [
-            "-path.home", path_home,
+            "--path.home", path_home,
             "-c", os.path.join(self.working_dir, config),
         ]
 
@@ -851,7 +851,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 is_documented_aliases.append(key)
 
         if undocumented_keys:
-            raise Exception(f"Keys {undocumented_keys} not documented in event {str(evt)}")
+            raise Exception(f"Keys:\n\n{undocumented_keys}\n\nnot documented in event:\n\n{str(evt)}\n")
 
         if is_documented_aliases:
             raise Exception(f"Keys {is_documented_aliases} documented as aliases!")

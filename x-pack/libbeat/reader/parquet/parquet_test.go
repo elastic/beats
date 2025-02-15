@@ -14,11 +14,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/apache/arrow/go/v14/arrow"
-	"github.com/apache/arrow/go/v14/arrow/array"
-	"github.com/apache/arrow/go/v14/arrow/memory"
-	"github.com/apache/arrow/go/v14/parquet/pqarrow"
+	"github.com/apache/arrow/go/v17/arrow"
+	"github.com/apache/arrow/go/v17/arrow/array"
+	"github.com/apache/arrow/go/v17/arrow/memory"
+	"github.com/apache/arrow/go/v17/parquet/pqarrow"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // all test files are read from/stored within the "testdata" directory
@@ -55,6 +57,7 @@ func TestParquetWithRandomData(t *testing.T) {
 		},
 	}
 
+	logp.TestingSetup()
 	for i, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with rows=%d, and columns=%d", tc.rows, tc.columns)
 		t.Run(name, func(t *testing.T) {
@@ -189,6 +192,7 @@ func TestParquetWithFiles(t *testing.T) {
 		},
 	}
 
+	logp.TestingSetup()
 	for _, tc := range testCases {
 		name := fmt.Sprintf("Test parquet files with source file=%s, and target comparison file=%s", tc.parquetFile, tc.jsonFile)
 		t.Run(name, func(t *testing.T) {

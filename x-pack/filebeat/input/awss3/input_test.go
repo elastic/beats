@@ -88,8 +88,20 @@ func TestRegionSelection(t *testing.T) {
 			want:       "us-west-3",
 		},
 		{
-			name:     "abc.xyz_and_domain_with_blank_endpoint",
+			name:     "abc.xyz_and_domain_with_matching_endpoint_and_scheme",
 			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint: "https://abc.xyz",
+			want:     "us-east-1",
+		},
+		{
+			name:     "abc.xyz_and_domain_with_matching_url_endpoint",
+			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			endpoint: "https://s3.us-east-1.abc.xyz",
+			want:     "us-east-1",
+		},
+		{
+			name:     "abc.xyz_and_no_region_term",
+			queueURL: "https://sqs.abc.xyz/627959692251/test-s3-logs",
 			wantErr:  errBadQueueURL,
 		},
 		{
@@ -118,7 +130,7 @@ func TestRegionSelection(t *testing.T) {
 		{
 			name:     "non_aws_vpce_without_endpoint",
 			queueURL: "https://vpce-test.sqs.us-east-1.vpce.abc.xyz/12345678912/sqs-queue",
-			wantErr:  errBadQueueURL,
+			want:     "us-east-1",
 		},
 		{
 			name:       "non_aws_vpce_with_region_override",

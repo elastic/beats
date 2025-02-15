@@ -17,6 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	// Register the includes.
@@ -28,7 +29,7 @@ const Name = fbcmd.Name
 
 // Filebeat build the beat root command for executing filebeat and it's subcommands.
 func Filebeat() *cmd.BeatsRootCmd {
-	settings := fbcmd.FilebeatSettings()
+	settings := fbcmd.FilebeatSettings("")
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
@@ -40,6 +41,7 @@ func Filebeat() *cmd.BeatsRootCmd {
 	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(filebeatCfg)
 	}
+	command.AddCommand(otelbeat.OTelCmd(fbcmd.Name))
 	return command
 }
 

@@ -22,12 +22,10 @@ package pipeline
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -64,16 +62,9 @@ type Pipeline struct {
 
 	observer observer
 
-	// wait close support. If eventWaitGroup is non-nil, then publishing
-	// an event through this pipeline will increment it and acknowledging
-	// a published event will decrement it, so the pipeline can wait on
-	// the group on shutdown to allow pending events to be acknowledged.
+	// If waitCloseTimeout is positive, then the pipeline will wait up to the
+	// specified time when it is closed for pending events to be acknowledged.
 	waitCloseTimeout time.Duration
-	eventWaitGroup   *sync.WaitGroup
-
-	// closeRef signal propagation support
-	guardStartSigPropagation sync.Once
-	sigNewClient             chan *client
 
 	processors processing.Supporter
 }
@@ -136,9 +127,7 @@ func New(
 		processors:       settings.Processors,
 	}
 	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
-		// If wait-on-close is enabled, give the pipeline a WaitGroup for
-		// events that have been Published but not yet ACKed.
-		p.eventWaitGroup = &sync.WaitGroup{}
+		p.waitCloseTimeout = settings.WaitClose
 	}
 
 	if monitors.Metrics != nil {
@@ -157,7 +146,7 @@ func New(
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, p.eventWaitGroup, queueFactory, settings.InputQueueSize)
+	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -176,24 +165,8 @@ func (p *Pipeline) Close() error {
 
 	log.Debug("close pipeline")
 
-	if p.eventWaitGroup != nil {
-		ch := make(chan struct{})
-		go func() {
-			p.eventWaitGroup.Wait()
-			ch <- struct{}{}
-		}()
-
-		select {
-		case <-ch:
-			// all events have been ACKed
-
-		case <-time.After(p.waitCloseTimeout):
-			// timeout -> close pipeline with pending events
-		}
-	}
-
 	// Note: active clients are not closed / disconnected.
-	p.outputController.Close()
+	p.outputController.WaitClose(p.waitCloseTimeout)
 
 	p.observer.cleanup()
 	return nil
@@ -237,37 +210,19 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	client := &client{
 		logger:         p.monitors.Logger,
-		isOpen:         atomic.MakeBool(true),
 		clientListener: cfg.ClientListener,
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
-		eventWaitGroup: p.eventWaitGroup,
 		observer:       p.observer,
 	}
+	client.isOpen.Store(true)
 
 	ackHandler := cfg.EventListener
-
-	producerCfg := queue.ProducerConfig{}
-
-	if client.eventWaitGroup != nil || cfg.ClientListener != nil {
-		producerCfg.OnDrop = func(event queue.Entry) {
-			publisherEvent, _ := event.(publisher.Event)
-			if cfg.ClientListener != nil {
-				cfg.ClientListener.DroppedOnPublish(publisherEvent.Content)
-			}
-			if client.eventWaitGroup != nil {
-				client.eventWaitGroup.Add(-1)
-			}
-		}
-	}
 
 	var waiter *clientCloseWaiter
 	if waitClose > 0 {
 		waiter = newClientCloseWaiter(waitClose)
-	}
-
-	if waiter != nil {
 		if ackHandler == nil {
 			ackHandler = waiter
 		} else {
@@ -275,9 +230,16 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	if ackHandler != nil {
-		producerCfg.ACK = ackHandler.ACKEvents
-	} else {
+	producerCfg := queue.ProducerConfig{
+		ACK: func(count int) {
+			client.observer.eventsACKed(count)
+			if ackHandler != nil {
+				ackHandler.ACKEvents(count)
+			}
+		},
+	}
+
+	if ackHandler == nil {
 		ackHandler = acker.Nil()
 	}
 

@@ -38,15 +38,6 @@ type pushRequest struct {
 	resp       chan queue.EntryID
 }
 
-type producerCancelRequest struct {
-	producer *ackProducer
-	resp     chan producerCancelResponse
-}
-
-type producerCancelResponse struct {
-	removed int
-}
-
 // consumer -> broker API
 
 type getRequest struct {
@@ -55,19 +46,3 @@ type getRequest struct {
 }
 
 type batchDoneMsg struct{}
-
-// Metrics API
-
-type metricsRequest struct {
-	responseChan chan memQueueMetrics
-}
-
-// memQueueMetrics tracks metrics that are returned by the individual memory queue implementations
-type memQueueMetrics struct {
-	// the size of items in the queue
-	currentQueueSize int
-	// the number of items that have been read by a consumer but not yet ack'ed
-	occupiedRead int
-
-	oldestEntryID queue.EntryID
-}

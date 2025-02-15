@@ -23,6 +23,7 @@ type setConfig struct {
 	Value               *valueTpl `config:"value"`
 	Default             *valueTpl `config:"default"`
 	FailOnTemplateError bool      `config:"fail_on_template_error"`
+	DoNotLogFailure     bool      `config:"do_not_log_failure"`
 	ValueType           string    `config:"value_type"`
 }
 
@@ -31,6 +32,7 @@ type set struct {
 	value               *valueTpl
 	defaultValue        *valueTpl
 	failOnTemplateError bool
+	doNotLogFailure     bool
 	valueType           valueType
 
 	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
@@ -100,6 +102,7 @@ func newSet(cfg *conf.C, log *logp.Logger) (set, error) {
 		value:               c.Value,
 		defaultValue:        c.Default,
 		failOnTemplateError: c.FailOnTemplateError,
+		doNotLogFailure:     c.DoNotLogFailure,
 		valueType:           vt,
 	}, nil
 }
@@ -107,6 +110,9 @@ func newSet(cfg *conf.C, log *logp.Logger) (set, error) {
 func (set *set) run(ctx *transformContext, tr transformable) (transformable, error) {
 	value, err := set.value.Execute(ctx, tr, set.targetInfo.Name, set.defaultValue, set.log)
 	if err != nil && set.failOnTemplateError {
+		if set.doNotLogFailure {
+			err = notLogged{err}
+		}
 		return transformable{}, err
 	}
 	if value == "" {

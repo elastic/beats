@@ -27,21 +27,6 @@ retry() {
   return 0
 }
 
-define_arch() {
-  local platform_type="$(uname)"
-  local arch_type="$(uname -m)"
-  if [ "${arch_type}" == "x86_64" ]; then
-        export GOX_FLAGS="-arch amd64"
-        go_arch_type="amd64"
-  elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then
-    export GOX_FLAGS="-arch arm"
-    go_arch_type="arm64"
-  else
-    echo "+++ Unsupported OS archictecture; uname: $platform_type and uname -m: $arch_type"
-    exit 1
-  fi
-}
-
 create_workspace() {
   if [[ ! -d "${BIN}" ]]; then
     mkdir -p "${BIN}"
@@ -83,8 +68,7 @@ with_mage() {
 with_go() {
   echo "Setting up the Go environment..."
   create_workspace
-  define_arch
-  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${PLATFORM_TYPE_LOWERCASE}-${go_arch_type}"
+  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${PLATFORM_TYPE_LOWERCASE}-${GO_ARCH_TYPE}"
   chmod +x "${BIN}/gvm"
   eval "$(gvm $GO_VERSION)"
   go version

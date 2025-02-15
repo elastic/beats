@@ -10,7 +10,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -46,7 +45,9 @@ var inputTests = []struct {
 	want          []map[string]interface{}
 	wantCursor    []map[string]interface{}
 	wantErr       error
+	prepare       func() error
 	wantFile      string
+	wantNoFile    string
 }{
 	// Autonomous tests (no FS or net dependency).
 	{
@@ -54,6 +55,20 @@ var inputTests = []struct {
 		config: map[string]interface{}{
 			"interval": 1,
 			"program":  `{"events":[{"message":"Hello, World!"}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, World!"},
+		},
+	},
+	{
+		name: "hello_world_sprintf",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":sprintf("Hello, %s!", ["World"])}]}`,
 			"state":    nil,
 			"resource": map[string]interface{}{
 				"url": "",
@@ -362,6 +377,52 @@ var inputTests = []struct {
 		},
 		want: []map[string]interface{}{
 			{"message": "Hello, Void!"},
+		},
+	},
+	{
+		name: "env_var_static",
+		config: map[string]interface{}{
+			"interval": 1,
+			"allowed_environment": []string{
+				"CELTESTENVVAR",
+				"NONCELTESTENVVAR",
+			},
+			"program": `{"events":[
+				{"message":env.?CELTESTENVVAR.orValue("not present")},
+				{"message":env.?NONCELTESTENVVAR.orValue("not present")},
+				{"message":env.?DISALLOWEDCELTESTENVVAR.orValue("not present")},
+			]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "TESTVALUE"},
+			{"message": "not present"},
+			{"message": "not present"},
+		},
+	},
+	{
+		name: "env_var_dynamic",
+		config: map[string]interface{}{
+			"interval": 1,
+			"allowed_environment": []string{
+				"CELTESTENVVAR",
+				"NONCELTESTENVVAR",
+			},
+			"program": `{"events": ["CELTESTENVVAR","NONCELTESTENVVAR","DISALLOWEDCELTESTENVVAR"].map(k,
+				{"message":env[?k].orValue("not present")}
+			)}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "TESTVALUE"},
+			{"message": "not present"},
+			{"message": "not present"},
 		},
 	},
 
@@ -1142,6 +1203,102 @@ var inputTests = []struct {
 		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization.ndjson"),
 	},
 	{
+		name: "tracer_filename_sanitization_enabled",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.enabled":  true,
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
+		},
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+		wantFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_enabled.ndjson"),
+	},
+	{
+		name: "tracer_filename_sanitization_disabled",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			server := httptest.NewServer(h)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval":                 1,
+			"resource.tracer.enabled":  false,
+			"resource.tracer.filename": "logs/http-request-trace-*.ndjson",
+			"state": map[string]interface{}{
+				"fake_now": "2002-10-02T15:00:00Z",
+			},
+			"program": `
+	// Use terse non-standard check for presence of timestamp. The standard
+	// alternative is to use has(state.cursor) && has(state.cursor.timestamp).
+	(!is_error(state.cursor.timestamp) ?
+		state.cursor.timestamp
+	:
+		timestamp(state.fake_now)-duration('10m')
+	).as(time_cursor,
+	string(state.url).parse_url().with_replace({
+		"RawQuery": {"$filter": ["alertCreationTime ge "+string(time_cursor)]}.format_query()
+	}).format_url().as(url, bytes(get(url).Body)).decode_json().as(event, {
+		"events": [event],
+		// Get the timestamp from the event if it exists, otherwise advance a little to break a request loop.
+		// Due to the name of the @timestamp field, we can't use has(), so use is_error().
+		"cursor": [{"timestamp": !is_error(event["@timestamp"]) ? event["@timestamp"] : time_cursor+duration('1s')}],
+
+		// Just for testing, cycle this back into the next state.
+		"fake_now": state.fake_now
+	}))
+	`,
+		},
+		handler: dateCursorHandler(),
+		want: []map[string]interface{}{
+			{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
+			{"@timestamp": "2002-10-02T15:00:02Z", "foo": "bar"},
+		},
+		wantCursor: []map[string]interface{}{
+			{"timestamp": "2002-10-02T15:00:00Z"},
+			{"timestamp": "2002-10-02T15:00:01Z"},
+			{"timestamp": "2002-10-02T15:00:02Z"},
+		},
+		wantNoFile: filepath.Join("logs", "http-request-trace-test_id_tracer_filename_sanitization_disabled*"),
+	},
+	{
 		name:   "pagination_cursor_object",
 		server: newTestServer(httptest.NewServer),
 		config: map[string]interface{}{
@@ -1453,14 +1610,32 @@ var inputTests = []struct {
 
 	// Programmer error.
 	{
-		name:   "type_error_message",
+		name:   "type_error_message_compile_time",
 		server: newChainTestServer(httptest.NewServer),
 		config: map[string]interface{}{
 			"interval": 1,
 			"program": `
-	bytes(get(state.url).Body).decode_json().records.map(r,
-		bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
-	//                          ^~~~ r.id not converted to string: can't add integer to string.
+	get(state.url).Body.decode_json().records.map(r,
+		get(state.url+'/'+int(r.id)).Body.decode_json()).as(events, {
+	//                    ^~~~ r.id converted to incorrect type.
+			"events": events,
+	})
+	`,
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		wantErr: fmt.Errorf(`failed to check program: failed compilation: ERROR: <input>:3:20: found no matching overload for '_+_' applied to '(string, int)'
+ |   get(state.url+'/'+int(r.id)).Body.decode_json()).as(events, {
+ | ...................^ accessing config`),
+	},
+	{
+		name:   "type_error_message_run_time",
+		server: newChainTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	get(state.url).Body.decode_json().records.map(r,
+		get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+	//                    ^~~~ r.id not converted to string: can't add integer to string.
 			"events": events,
 	})
 	`,
@@ -1469,10 +1644,9 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
-					// This is the best we get for some errors from CEL.
-					"message": `failed eval: ERROR: <input>:3:56: no such overload
- |   bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
- | .......................................................^`,
+					"message": `failed eval: ERROR: <input>:3:26: no such overload
+ |   get(state.url+'/'+r.id).Body.decode_json()).as(events, {
+ | .........................^`,
 				},
 			},
 		},
@@ -1512,6 +1686,131 @@ var inputTests = []struct {
 			},
 		}},
 	},
+	{
+		name: "dump_no_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": try(debug("divide by zero", 0/0))}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  true,
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time:       func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-08T00-00-00.000.json"),
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"value": "division by zero",
+			},
+		}},
+	},
+	{
+		name: "dump_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  true,
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time:     func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		wantFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": `failed eval: ERROR: <input>:1:58: division by zero
+ | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
+ | .........................................................^`,
+				},
+			},
+		},
+	},
+	{
+		name: "dump_error_delete",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+			"failure_dump": map[string]interface{}{
+				"enabled":  false, // We have a name but are disabled, so delete.
+				"filename": "failure_dumps/dump.json",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		prepare: func() error {
+			// Make a file that the configuration should delete.
+			err := os.MkdirAll("failure_dumps", 0o700)
+			if err != nil {
+				return err
+			}
+			return os.WriteFile(filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), nil, 0o600)
+		},
+		wantNoFile: filepath.Join("failure_dumps", "dump-2010-02-09T00-00-00.000.json"), // One day after the no dump case.
+		want: []map[string]interface{}{
+			{
+				"error": map[string]interface{}{
+					"message": `failed eval: ERROR: <input>:1:58: division by zero
+ | {"events":[{"message":{"value": debug("divide by zero", 0/0)}}]}
+ | .........................................................^`,
+				},
+			},
+		},
+	},
+
+	// Coverage
+	{
+		name: "coverage",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `int(state.n).as(n, {
+							"events": [{"n": n+1}],
+							"n":          n+1,
+							"want_more":  n+1 < 5,
+							"probe":      n < 2 ?
+								"little"
+							:
+								"big",
+							"fail_probe": n < 0 ?
+								"negative"
+							:
+								"non-negative",
+						})`,
+			"record_coverage": true,
+			"state":           map[string]any{"n": 0},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		// The program will be evaluated five times in the first periodic
+		// run and then once for all subsequent runs. We depend here on
+		// the test construction that asks that we get at least as many
+		// results from the input as there are elements in the want slice
+		// and then stop.
+		want: []map[string]interface{}{
+			// First periodic run.
+			{"n": float64(1)},
+			{"n": float64(2)},
+			{"n": float64(3)},
+			{"n": float64(4)},
+			{"n": float64(5)},
+			// Second and subsequent periodic runs.
+			{"n": float64(6)},
+			{"n": float64(7)},
+		},
+	},
 
 	// not yet done from httpjson (some are redundant since they are compositional products).
 	//
@@ -1531,6 +1830,15 @@ func TestInput(t *testing.T) {
 		"ndjson_log_file_simple_file_scheme": "Path handling on Windows is incompatible with url.Parse/url.URL.String. See go.dev/issue/6027.",
 	}
 
+	// Set a var that is available to test env look-up.
+	os.Setenv("CELTESTENVVAR", "TESTVALUE")
+	os.Setenv("DISALLOWEDCELTESTENVVAR", "DISALLOWEDTESTVALUE")
+
+	err := os.RemoveAll("failure_dumps")
+	if err != nil {
+		t.Fatalf("failed to remove failure_dumps directory: %v", err)
+	}
+
 	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
@@ -1539,6 +1847,13 @@ func TestInput(t *testing.T) {
 			}
 			if test.remote && !*runRemote {
 				t.Skip("skipping remote endpoint test")
+			}
+
+			if test.prepare != nil {
+				err := test.prepare()
+				if err != nil {
+					t.Fatalf("unexpected from prepare(): %v", err)
+				}
 			}
 
 			if test.server != nil {
@@ -1551,7 +1866,10 @@ func TestInput(t *testing.T) {
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if err != nil {
-				t.Fatalf("unexpected error unpacking config: %v", err)
+				if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
+					t.Fatalf("unexpected error unpacking config: %v", err)
+				}
+				return
 			}
 
 			var tempDir string
@@ -1570,13 +1888,15 @@ func TestInput(t *testing.T) {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
+			id := "test_id:" + test.name
 			v2Ctx := v2.Context{
-				Logger:      logp.NewLogger("cel_test"),
-				ID:          "test_id:" + test.name,
-				Cancelation: ctx,
+				Logger:        logp.NewLogger("cel_test"),
+				ID:            id,
+				IDWithoutName: id,
+				Cancelation:   ctx,
 			}
 			var client publisher
 			client.done = func() {
@@ -1587,6 +1907,20 @@ func TestInput(t *testing.T) {
 			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
+			}
+			if test.wantFile != "" {
+				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
+					t.Errorf("expected log file not found: %v", err)
+				}
+			}
+			if test.wantNoFile != "" {
+				paths, err := filepath.Glob(filepath.Join(tempDir, test.wantNoFile))
+				if err != nil {
+					t.Fatalf("unexpected error calling filepath.Glob(%q): %v", test.wantNoFile, err)
+				}
+				if len(paths) != 0 {
+					t.Errorf("unexpected files found: %v", paths)
+				}
 			}
 			if test.wantErr != nil {
 				return
@@ -1618,11 +1952,6 @@ func TestInput(t *testing.T) {
 			for i, got := range client.cursors {
 				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
-				}
-			}
-			if test.wantFile != "" {
-				if _, err := os.Stat(filepath.Join(tempDir, test.wantFile)); err != nil {
-					t.Errorf("expected log file not found: %v", err)
 				}
 			}
 		})
@@ -1769,7 +2098,8 @@ func retryHandler() http.HandlerFunc {
 			w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		// Any 5xx except 501 will result in a retry.
+		w.WriteHeader(500)
 		count++
 	}
 }

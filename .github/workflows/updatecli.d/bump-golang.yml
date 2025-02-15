@@ -9,6 +9,7 @@ scms:
       owner: '{{ .scm.owner }}'
       repository: '{{ .scm.repository }}'
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: main
       commitusingapi: true
@@ -86,7 +87,7 @@ targets:
     scmid: githubConfig
     kind: file
     spec:
-      content: 'go {{ source "gomod" }}'
+      content: 'go {{ source "latestGoVersion" }}'
       file: go.mod
       matchpattern: 'go \d+.\d+.\d+'
   update-go-version:
@@ -165,16 +166,6 @@ targets:
         keyword: "FROM"
         matcher: "golang"
       file: ./packetbeat/Dockerfile
-  update-functionbeat-dockerfile:
-    name: "Update Functionbeat Dockerfile"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: dockerfile
-    spec:
-      instruction:
-        keyword: "FROM"
-        matcher: "golang"
-      file: ./x-pack/functionbeat/Dockerfile
   update-nats-module-dockerfile:
     name: "Update NATS module Dockerfile"
     sourceid: latestGoVersion

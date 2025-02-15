@@ -40,14 +40,16 @@ const NilHandle EvtHandle = 0
 // Event log error codes.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
 const (
-	ERROR_INVALID_HANDLE        syscall.Errno = 6
-	ERROR_INSUFFICIENT_BUFFER   syscall.Errno = 122
-	ERROR_NO_MORE_ITEMS         syscall.Errno = 259
-	RPC_S_SERVER_UNAVAILABLE    syscall.Errno = 1722
-	RPC_S_INVALID_BOUND         syscall.Errno = 1734
-	RPC_S_CALL_CANCELLED        syscall.Errno = 1818
-	ERROR_INVALID_OPERATION     syscall.Errno = 4317
-	ERROR_EVT_CHANNEL_NOT_FOUND syscall.Errno = 15007
+	ERROR_INVALID_HANDLE         syscall.Errno = 6
+	ERROR_INVALID_PARAMETER      syscall.Errno = 87
+	ERROR_INSUFFICIENT_BUFFER    syscall.Errno = 122
+	ERROR_NO_MORE_ITEMS          syscall.Errno = 259
+	RPC_S_SERVER_UNAVAILABLE     syscall.Errno = 1722
+	RPC_S_INVALID_BOUND          syscall.Errno = 1734
+	RPC_S_CALL_CANCELLED         syscall.Errno = 1818
+	ERROR_INVALID_OPERATION      syscall.Errno = 4317
+	ERROR_EVT_CHANNEL_NOT_FOUND  syscall.Errno = 15007
+	ERROR_EVT_PUBLISHER_DISABLED syscall.Errno = 15037
 )
 
 // EvtSubscribeFlag defines the possible values that specify when to start subscribing to events.
@@ -441,10 +443,15 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 	switch typ {
 	case EvtVarTypeNull:
 		return nil, nil
-	case EvtVarTypeString:
+	case EvtVarTypeString, EvtVarTypeEvtXml:
 		addr := unsafe.Pointer(&buf[0])
 		offset := v.ValueAsUintPtr() - uintptr(addr)
 		s, err := sys.UTF16BytesToString(buf[offset:])
+		return s, err
+	case EvtVarTypeAnsiString:
+		addr := unsafe.Pointer(&buf[0])
+		offset := v.ValueAsUintPtr() - uintptr(addr)
+		s, err := sys.ANSIBytesToString(buf[offset:])
 		return s, err
 	case EvtVarTypeSByte:
 		return int8(v.ValueAsUint8()), nil
@@ -475,14 +482,27 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 			return false, nil
 		}
 		return true, nil
+	case EvtVarTypeBinary:
+		addr := unsafe.Pointer(&buf[0])
+		offset := v.ValueAsUintPtr() - uintptr(addr)
+		return sys.BinaryToString(buf[offset:]), nil
 	case EvtVarTypeGuid:
 		addr := unsafe.Pointer(&buf[0])
 		offset := v.ValueAsUintPtr() - uintptr(addr)
 		guid := (*windows.GUID)(unsafe.Pointer(&buf[offset]))
 		copy := *guid
 		return copy, nil
+	case EvtVarTypeSizeT:
+		return v.ValueAsUintPtr(), nil
 	case EvtVarTypeFileTime:
 		ft := (*windows.Filetime)(unsafe.Pointer(&v.Value))
+		return time.Unix(0, ft.Nanoseconds()).UTC(), nil
+	case EvtVarTypeSysTime:
+		st := (*windows.Systemtime)(unsafe.Pointer(&v.Value))
+		var ft windows.Filetime
+		if err := sys.SystemTimeToFileTime(st, &ft); err != nil {
+			return nil, err
+		}
 		return time.Unix(0, ft.Nanoseconds()).UTC(), nil
 	case EvtVarTypeSid:
 		addr := unsafe.Pointer(&buf[0])

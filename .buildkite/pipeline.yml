@@ -111,11 +111,13 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - filebeat/
                 - x-pack/filebeat/
                 - x-pack/libbeat/
                 - .buildkite/x-pack/pipeline.xpack.filebeat.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
+                - .buildkite/deploy/docker/docker-compose.yml
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -214,11 +216,13 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - metricbeat/
                 - x-pack/metricbeat/
                 - x-pack/libbeat/common/aws
                 - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
+                - .buildkite/deploy/docker/docker-compose.yml
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -286,6 +290,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - winlogbeat/
                 - x-pack/winlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
                 - .buildkite/scripts
@@ -324,6 +329,7 @@ steps:
                 - .buildkite/hooks/
                 - .buildkite/scripts
                 - deploy/kubernetes/**
+                - metricbeat/module/kubernetes/**
                 - libbeat/docs/version.asciidoc
               config:
                 trigger: "deploy-k8s"
@@ -382,6 +388,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - libbeat/
                 - x-pack/libbeat/
                 - .buildkite/x-pack/pipeline.xpack.libbeat.yml
                 - .buildkite/scripts
@@ -416,6 +423,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - auditbeat/
                 - x-pack/auditbeat/
                 - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
                 - .buildkite/scripts/
@@ -451,6 +459,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - heartbeat/
                 - x-pack/heartbeat/
                 - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
                 - .buildkite/scripts/
@@ -486,6 +495,7 @@ steps:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
+                - packetbeat/
                 - x-pack/packetbeat/
                 - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
                 - .buildkite/scripts/
@@ -578,6 +588,54 @@ steps:
   - label: "Triggering Build for Packetbeat"
     if: build.pull_request.id == null
     trigger: "beats-packetbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - label: "Trigger Agentbeat"
+    if: build.pull_request.id != null
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - auditbeat/
+                - filebeat/
+                - heartbeat/
+                - metricbeat/
+                - osquerybeat/
+                - packetbeat/
+
+                - x-pack/agentbeat/
+                - x-pack/auditbeat/
+                - x-pack/filebeat/
+                - x-pack/heartbeat/
+                - x-pack/metricbeat/
+                - x-pack/osquerybeat/
+                - x-pack/packetbeat/
+
+                - .buildkite/x-pack/pipeline.xpack.agentbeat.yml
+                - .buildkite/scripts/
+                - .buildkite/hooks/
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - libbeat/
+                - testing/
+              config:
+                trigger: "beats-xpack-agentbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Triggering Build for Agentbeat"
+    if: build.pull_request.id == null
+    trigger: "beats-xpack-agentbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"

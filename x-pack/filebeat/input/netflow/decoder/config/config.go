@@ -24,6 +24,7 @@ type Config struct {
 	detectReset          bool
 	fields               fields.FieldDict
 	sharedTemplates      bool
+	withCache            bool
 	activeSessionsMetric ActiveSessionsMetric
 }
 
@@ -33,6 +34,7 @@ var defaultCfg = Config{
 	expiration:      time.Hour,
 	detectReset:     true,
 	sharedTemplates: false,
+	withCache:       false,
 }
 
 // Defaults returns a configuration object with defaults settings:
@@ -61,6 +63,17 @@ func (c *Config) WithLogOutput(output io.Writer) *Config {
 func (c *Config) WithExpiration(timeout time.Duration) *Config {
 	c.expiration = timeout
 	return c
+}
+
+// WithCache toggles the packet cache.
+func (c *Config) WithCache(enabled bool) *Config {
+	c.withCache = enabled
+	return c
+}
+
+// Cache returns if the packet cache is enabled.
+func (c *Config) Cache() bool {
+	return c.withCache
 }
 
 // WithSequenceResetEnabled allows to toggle the detection of reset sequences,
@@ -121,6 +134,11 @@ func (c *Config) ExpirationTimeout() time.Duration {
 // SequenceResetEnabled returns if sequence reset detection is enabled.
 func (c *Config) SequenceResetEnabled() bool {
 	return c.detectReset
+}
+
+// ShareTemplatesEnabled returns if template sharing is enabled.
+func (c *Config) ShareTemplatesEnabled() bool {
+	return c.sharedTemplates
 }
 
 // Fields returns the configured fields.

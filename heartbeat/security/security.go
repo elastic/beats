@@ -51,6 +51,9 @@ func InitializeModule() {
 
 	// Make heartbeat dumpable so elastic-agent can access process metrics.
 	_ = setDumpable()
+
+	// Customize the seccomp policy that will be loaded when the Heartbeat is initialized.
+	mustConfigureSeccompPolicy()
 }
 
 func setNodeProcAttr(localUserName string) error {

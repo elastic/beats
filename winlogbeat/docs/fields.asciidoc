@@ -15372,15 +15372,6 @@ Field aliases based on Winlogbeat 6.x that point to the fields for this version 
 
 
 
-*`type`*::
-+
---
-type: alias
-
-alias to: winlog.api
-
---
-
 *`activity_id`*::
 +
 --
@@ -16278,16 +16269,6 @@ The XML representation of the event is useful for troubleshooting purposes. The 
 All fields specific to the Windows Event Log are defined here.
 
 
-
-*`winlog.api`*::
-+
---
-The event log API type used to read the record. The possible values are "wineventlog" for the Windows Event Log API or "wineventlog-experimental" for its experimental implementation.
-
-
-required: True
-
---
 
 *`winlog.activity_id`*::
 +

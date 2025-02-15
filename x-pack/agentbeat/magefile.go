@@ -23,6 +23,7 @@ import (
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
+	xpacketbeat "github.com/elastic/beats/v7/x-pack/packetbeat/scripts/mage"
 
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
@@ -56,7 +57,7 @@ func init() {
 func Build() error {
 	args := devtools.DefaultBuildArgs()
 	if devtools.Platform.GOOS == "linux" {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,withjournald")
+		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	} else {
 		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	}
@@ -75,11 +76,8 @@ func BuildSystemTestBinary() error {
 func GolangCrossBuild() error {
 	// need packetbeat build arguments as it address the requirements for libpcap
 	args := packetbeat.GolangCrossBuildArgs()
-	if devtools.Platform.GOOS == "linux" {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat,withjournald")
-	} else {
-		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
-	}
+	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
+
 	return multierr.Combine(
 		devtools.GolangCrossBuild(args),
 		devtools.TestLinuxForCentosGLIBC(),
@@ -88,17 +86,9 @@ func GolangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
+	return devtools.CrossBuild(
+		devtools.ImageSelector(xpacketbeat.ImageSelector),
+	)
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -207,7 +197,7 @@ func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	args := devtools.DefaultGoTestIntegrationFromHostArgs()
 	args.Tags = append(args.Tags, "agentbeat")
-	args.Packages = append(args.Packages, "../auditbeat/...", "../filebeat/...", "../heartbeat/...", "../metricbeat/...", "../osquerybeat/...", "../packetbeat/...")
+	args.Packages = append(args.Packages, "../auditbeat/...", "../filebeat/...", "../heartbeat/...", "../osquerybeat/...", "../packetbeat/...")
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 

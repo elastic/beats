@@ -34,6 +34,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 
@@ -161,7 +162,7 @@ func (d *wrapperDriver) Close() error {
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
 	args := make([]string, 0, 4+len(d.Files)+len(arg)) // preallocate as much as possible
-	args = append(args, "--no-ansi", "--project-name", d.Name)
+	args = append(args, "--ansi", "never", "--project-name", d.Name)
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
 	}
@@ -347,7 +348,7 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 
 	var containers []types.Container
 	for _, f := range serviceFilters {
-		list, err := d.client.ContainerList(ctx, types.ContainerListOptions{
+		list, err := d.client.ContainerList(ctx, container.ListOptions{
 			All:     true,
 			Filters: f,
 		})
@@ -371,12 +372,12 @@ func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, fi
 // running containers.
 // It kills and removes all containers except the excluded services in 'except'.
 func (d *wrapperDriver) KillOld(ctx context.Context, except []string) error {
-	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	list, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return fmt.Errorf("listing containers to be killed: %w", err)
 	}
 
-	rmOpts := types.ContainerRemoveOptions{
+	rmOpts := container.RemoveOptions{
 		RemoveVolumes: true,
 		Force:         true,
 		RemoveLinks:   true,
@@ -413,7 +414,7 @@ func (d *wrapperDriver) serviceNames(ctx context.Context) ([]string, error) {
 
 // Inspect a container.
 func (d *wrapperDriver) Inspect(ctx context.Context, serviceName string) (string, error) {
-	list, err := d.client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	list, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return "", fmt.Errorf("listing containers to be inspected: %w", err)
 	}

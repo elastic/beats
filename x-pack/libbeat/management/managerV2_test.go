@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/joeshaw/multierror"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 func TestManagerV2(t *testing.T) {
@@ -36,6 +37,8 @@ func TestManagerV2(t *testing.T) {
 	r.MustRegisterOutput(output)
 	inputs := &reloadableList{}
 	r.MustRegisterInput(inputs)
+	apm := &reloadable{}
+	r.MustRegisterAPM(apm)
 
 	configsSet := atomic.Bool{}
 	configsCleared := atomic.Bool{}
@@ -46,22 +49,25 @@ func TestManagerV2(t *testing.T) {
 		if currentIdx == 1 {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
-			if oCfg != nil && len(iCfgs) == 3 {
+			apmCfg := apm.Config()
+			if oCfg != nil && len(iCfgs) == 3 && apmCfg != nil {
 				configsSet.Store(true)
-				t.Log("output and inputs configuration set")
+				t.Log("output, inputs, and APM configuration set")
 			}
 		} else if currentIdx == 2 {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
-			if oCfg == nil || len(iCfgs) != 3 {
+			apmCfg := apm.Config()
+			if oCfg == nil || len(iCfgs) != 3 || apmCfg == nil {
 				// should not happen (config no longer set)
 				configsSet.Store(false)
-				t.Log("output and inputs configuration cleared (should not happen)")
+				t.Log("output, inputs, and APM configuration cleared (should not happen)")
 			}
 		} else {
 			oCfg := output.Config()
 			iCfgs := inputs.Configs()
-			if oCfg == nil && len(iCfgs) == 0 {
+			apmCfg := apm.Config()
+			if oCfg == nil && len(iCfgs) == 0 && apmCfg == nil {
 				configsCleared.Store(true)
 			}
 			if len(observed.Units) == 0 {
@@ -78,125 +84,161 @@ func TestManagerV2(t *testing.T) {
 		t.Logf("FQDN feature flag set to %v", fqdnEnabled.Load())
 	}
 
-	srv := integration.NewMockServer([][]*proto.UnitExpected{
+	agentInfo := &proto.AgentInfo{
+		Id:       "elastic-agent-id",
+		Version:  version.GetDefaultVersion(),
+		Snapshot: true,
+	}
+	apmConfig := &proto.ElasticAPM{
+		Tls: &proto.ElasticAPMTLS{
+			ServerCa:   "serverca",
+			ServerCert: "servercert",
+			SkipVerify: true, // set to true as false is default when empty
+		},
+		Environment:  "unit-testing",
+		ApiKey:       "apikey123",
+		SecretToken:  "secrettoken123",
+		Hosts:        []string{"localhost:8200", "otherhost:8200"},
+		GlobalLabels: "label1,label2",
+	}
+	srv := integration.NewMockServer([]*proto.CheckinExpected{
 		{
-			{
-				Id:             "output-unit",
-				Type:           proto.UnitType_OUTPUT,
-				ConfigStateIdx: 1,
-				Config: &proto.UnitExpectedConfig{
-					Id:   "default",
-					Type: "elasticsearch",
-					Name: "elasticsearch",
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				{
+					Id:             "output-unit",
+					Type:           proto.UnitType_OUTPUT,
+					ConfigStateIdx: 1,
+					Config: &proto.UnitExpectedConfig{
+						Id:   "default",
+						Type: "elasticsearch",
+						Name: "elasticsearch",
+					},
+					State:    proto.State_HEALTHY,
+					LogLevel: proto.UnitLogLevel_INFO,
 				},
-				State:    proto.State_HEALTHY,
-				LogLevel: proto.UnitLogLevel_INFO,
-			},
-			{
-				Id:             "input-unit-1",
-				Type:           proto.UnitType_INPUT,
-				ConfigStateIdx: 1,
-				Config: &proto.UnitExpectedConfig{
-					Id:   "system/metrics-system-default-system-1",
-					Type: "system/metrics",
-					Name: "system-1",
-					Streams: []*proto.Stream{
-						{
-							Id: "system/metrics-system.filesystem-default-system-1",
-							Source: integration.RequireNewStruct(t, map[string]interface{}{
-								"metricsets": []interface{}{"filesystem"},
-								"period":     "1m",
-							}),
+				{
+					Id:             "input-unit-1",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 1,
+					Config: &proto.UnitExpectedConfig{
+						Id:   "system/metrics-system-default-system-1",
+						Type: "system/metrics",
+						Name: "system-1",
+						Streams: []*proto.Stream{
+							{
+								Id: "system/metrics-system.filesystem-default-system-1",
+								Source: integration.RequireNewStruct(t, map[string]interface{}{
+									"metricsets": []interface{}{"filesystem"},
+									"period":     "1m",
+								}),
+							},
 						},
 					},
+					State:    proto.State_HEALTHY,
+					LogLevel: proto.UnitLogLevel_INFO,
 				},
-				State:    proto.State_HEALTHY,
-				LogLevel: proto.UnitLogLevel_INFO,
-			},
-			{
-				Id:             "input-unit-2",
-				Type:           proto.UnitType_INPUT,
-				ConfigStateIdx: 1,
-				Config: &proto.UnitExpectedConfig{
-					Id:   "system/metrics-system-default-system-2",
-					Type: "system/metrics",
-					Name: "system-2",
-					Streams: []*proto.Stream{
-						{
-							Id: "system/metrics-system.filesystem-default-system-2",
-							Source: integration.RequireNewStruct(t, map[string]interface{}{
-								"metricsets": []interface{}{"filesystem"},
-								"period":     "1m",
-							}),
-						},
-						{
-							Id: "system/metrics-system.filesystem-default-system-3",
-							Source: integration.RequireNewStruct(t, map[string]interface{}{
-								"metricsets": []interface{}{"filesystem"},
-								"period":     "1m",
-							}),
+				{
+					Id:             "input-unit-2",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 1,
+					Config: &proto.UnitExpectedConfig{
+						Id:   "system/metrics-system-default-system-2",
+						Type: "system/metrics",
+						Name: "system-2",
+						Streams: []*proto.Stream{
+							{
+								Id: "system/metrics-system.filesystem-default-system-2",
+								Source: integration.RequireNewStruct(t, map[string]interface{}{
+									"metricsets": []interface{}{"filesystem"},
+									"period":     "1m",
+								}),
+							},
+							{
+								Id: "system/metrics-system.filesystem-default-system-3",
+								Source: integration.RequireNewStruct(t, map[string]interface{}{
+									"metricsets": []interface{}{"filesystem"},
+									"period":     "1m",
+								}),
+							},
 						},
 					},
+					State:    proto.State_HEALTHY,
+					LogLevel: proto.UnitLogLevel_INFO,
 				},
-				State:    proto.State_HEALTHY,
-				LogLevel: proto.UnitLogLevel_INFO,
+			},
+			Features:    nil,
+			FeaturesIdx: 1,
+		},
+		{
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				{
+					Id:             "output-unit",
+					Type:           proto.UnitType_OUTPUT,
+					ConfigStateIdx: 1,
+					State:          proto.State_HEALTHY,
+					LogLevel:       proto.UnitLogLevel_INFO,
+				},
+				{
+					Id:             "input-unit-1",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 1,
+					State:          proto.State_HEALTHY,
+					LogLevel:       proto.UnitLogLevel_DEBUG,
+				},
+				{
+					Id:             "input-unit-2",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 1,
+					State:          proto.State_HEALTHY,
+					LogLevel:       proto.UnitLogLevel_INFO,
+				},
+			},
+			Features:    &proto.Features{Fqdn: &proto.FQDNFeature{Enabled: true}},
+			FeaturesIdx: 2,
+			Component: &proto.Component{
+				ApmConfig: &proto.APMConfig{Elastic: apmConfig},
 			},
 		},
 		{
-			{
-				Id:             "output-unit",
-				Type:           proto.UnitType_OUTPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_HEALTHY,
-				LogLevel:       proto.UnitLogLevel_INFO,
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				{
+					Id:             "output-unit",
+					Type:           proto.UnitType_OUTPUT,
+					ConfigStateIdx: 1,
+					State:          proto.State_STOPPED,
+					LogLevel:       proto.UnitLogLevel_INFO,
+				},
+				{
+					Id:             "input-unit-1",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 1,
+					State:          proto.State_STOPPED,
+					LogLevel:       proto.UnitLogLevel_DEBUG,
+				},
+				{
+					Id:             "input-unit-2",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 1,
+					State:          proto.State_STOPPED,
+					LogLevel:       proto.UnitLogLevel_INFO,
+				},
 			},
-			{
-				Id:             "input-unit-1",
-				Type:           proto.UnitType_INPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_HEALTHY,
-				LogLevel:       proto.UnitLogLevel_DEBUG,
-			},
-			{
-				Id:             "input-unit-2",
-				Type:           proto.UnitType_INPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_HEALTHY,
-				LogLevel:       proto.UnitLogLevel_INFO,
+			Features:    nil,
+			FeaturesIdx: 2,
+			Component: &proto.Component{
+				ApmConfig: &proto.APMConfig{Elastic: apmConfig},
 			},
 		},
 		{
-			{
-				Id:             "output-unit",
-				Type:           proto.UnitType_OUTPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_STOPPED,
-				LogLevel:       proto.UnitLogLevel_INFO,
-			},
-			{
-				Id:             "input-unit-1",
-				Type:           proto.UnitType_INPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_STOPPED,
-				LogLevel:       proto.UnitLogLevel_DEBUG,
-			},
-			{
-				Id:             "input-unit-2",
-				Type:           proto.UnitType_INPUT,
-				ConfigStateIdx: 1,
-				State:          proto.State_STOPPED,
-				LogLevel:       proto.UnitLogLevel_INFO,
-			},
+			AgentInfo:   agentInfo,
+			Units:       []*proto.UnitExpected{},
+			Features:    nil,
+			FeaturesIdx: 2,
 		},
-		{},
 	},
-		[]uint64{1, 2, 2, 2},
-		[]*proto.Features{
-			nil,
-			{Fqdn: &proto.FQDNFeature{Enabled: true}},
-			nil,
-			nil,
-		},
 		onObserved,
 		500*time.Millisecond,
 	)
@@ -222,6 +264,141 @@ func TestManagerV2(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return configsSet.Load() && configsCleared.Load() && logLevelSet.Load() && fqdnEnabled.Load() && allStopped.Load()
 	}, 15*time.Second, 300*time.Millisecond)
+}
+
+func TestManagerV2_ReloadCount(t *testing.T) {
+	r := reload.NewRegistry()
+
+	output := &reloadable{}
+	r.MustRegisterOutput(output)
+	inputs := &reloadableList{}
+	r.MustRegisterInput(inputs)
+	apm := &reloadable{}
+	r.MustRegisterAPM(apm)
+
+	inputConfigUpdated := make(chan struct{})
+	onObserved := func(observed *proto.CheckinObserved, currentIdx int) {
+		if currentIdx == 1 {
+			period, err := inputs.Configs()[0].Config.String("period", -1)
+			require.NoError(t, err)
+			if period == "10m" {
+				select {
+				case <-inputConfigUpdated:
+				default:
+					close(inputConfigUpdated)
+				}
+			}
+		}
+	}
+
+	agentInfo := &proto.AgentInfo{
+		Id:       "elastic-agent-id",
+		Version:  version.GetDefaultVersion(),
+		Snapshot: true,
+	}
+	srv := integration.NewMockServer([]*proto.CheckinExpected{
+		{
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				{
+					Id:             "output-unit",
+					Type:           proto.UnitType_OUTPUT,
+					ConfigStateIdx: 1,
+					Config: &proto.UnitExpectedConfig{
+						Id:   "default",
+						Type: "elasticsearch",
+						Name: "elasticsearch",
+					},
+					State:    proto.State_HEALTHY,
+					LogLevel: proto.UnitLogLevel_INFO,
+				},
+				{
+					Id:             "input-unit-1",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 1,
+					Config: &proto.UnitExpectedConfig{
+						Id:   "system/metrics-system-default-system-1",
+						Type: "system/metrics",
+						Name: "system-1",
+						Streams: []*proto.Stream{
+							{
+								Id: "system/metrics-system.filesystem-default-system-1",
+								Source: integration.RequireNewStruct(t, map[string]interface{}{
+									"metricsets": []interface{}{"filesystem"},
+									"period":     "1m",
+								}),
+							},
+						},
+					},
+					State:    proto.State_HEALTHY,
+					LogLevel: proto.UnitLogLevel_INFO,
+				},
+			},
+			Features:    nil,
+			FeaturesIdx: 1,
+		},
+		{
+			AgentInfo: agentInfo,
+			Units: []*proto.UnitExpected{
+				{
+					Id:             "output-unit",
+					Type:           proto.UnitType_OUTPUT,
+					ConfigStateIdx: 1,
+					State:          proto.State_HEALTHY,
+					LogLevel:       proto.UnitLogLevel_INFO,
+				},
+				{
+					Id:             "input-unit-1",
+					Type:           proto.UnitType_INPUT,
+					ConfigStateIdx: 2,
+					Config: &proto.UnitExpectedConfig{
+						Id:   "system/metrics-system-default-system-1",
+						Type: "system/metrics",
+						Name: "system-1",
+						Streams: []*proto.Stream{
+							{
+								Id: "system/metrics-system.filesystem-default-system-1",
+								Source: integration.RequireNewStruct(t, map[string]interface{}{
+									"metricsets": []interface{}{"filesystem"},
+									"period":     "10m",
+								}),
+							},
+						},
+					},
+					State:    proto.State_HEALTHY,
+					LogLevel: proto.UnitLogLevel_INFO,
+				},
+			},
+			Features:    nil,
+			FeaturesIdx: 1,
+		},
+	},
+		onObserved,
+		500*time.Millisecond,
+	)
+	require.NoError(t, srv.Start())
+	defer srv.Stop()
+
+	client := client.NewV2(fmt.Sprintf(":%d", srv.Port), "", client.VersionInfo{
+		Name: "program",
+		Meta: map[string]string{
+			"key": "value",
+		},
+	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
+
+	m, err := NewV2AgentManagerWithClient(&Config{
+		Enabled: true,
+	}, r, client)
+	require.NoError(t, err)
+
+	err = m.Start()
+	require.NoError(t, err)
+	defer m.Stop()
+
+	<-inputConfigUpdated
+	assert.Equal(t, 1, output.reloadCount) // initial load
+	assert.Equal(t, 2, inputs.reloadCount) // initial load + config update
+	assert.Equal(t, 0, apm.reloadCount)    // no apm tracing config applied
 }
 
 func TestOutputError(t *testing.T) {
@@ -369,14 +546,14 @@ func TestErrorPerUnit(t *testing.T) {
 	r.MustRegisterOutput(output)
 	inputs := &mockReloadable{
 		ReloadFn: func(configs []*reload.ConfigWithMeta) error {
-			errs := multierror.Errors{}
+			errs := []error{}
 			for _, input := range configs {
 				errs = append(errs, cfgfile.UnitError{
 					UnitID: input.InputUnitID,
 					Err:    errors.New(errorMessages[input.InputUnitID]),
 				})
 			}
-			return errs.Err()
+			return errors.Join(errs...)
 		},
 	}
 	r.MustRegisterInput(inputs)
@@ -511,19 +688,22 @@ func TestErrorPerUnit(t *testing.T) {
 }
 
 type reloadable struct {
-	mx     sync.Mutex
-	config *reload.ConfigWithMeta
+	mx          sync.Mutex
+	config      *reload.ConfigWithMeta
+	reloadCount int
 }
 
 type reloadableList struct {
-	mx      sync.Mutex
-	configs []*reload.ConfigWithMeta
+	mx          sync.Mutex
+	configs     []*reload.ConfigWithMeta
+	reloadCount int
 }
 
 func (r *reloadable) Reload(config *reload.ConfigWithMeta) error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 	r.config = config
+	r.reloadCount++
 	return nil
 }
 
@@ -537,6 +717,7 @@ func (r *reloadableList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 	r.configs = configs
+	r.reloadCount++
 	return nil
 }
 

@@ -1,0 +1,16 @@
+FROM redis:latest
+
+# Copy the Redis configuration file
+COPY redis.conf /usr/local/etc/redis/redis.conf
+
+# Copy the certificates
+COPY certs /certs
+
+# Set the Redis password environment variable
+ENV REDIS_PASSWORD=password
+
+# Expose the Redis port
+EXPOSE 6379
+
+# Set the command to run Redis with the custom configuration
+CMD ["redis-server", "/usr/local/etc/redis/redis.conf"]

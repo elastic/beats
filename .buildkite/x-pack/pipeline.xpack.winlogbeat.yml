@@ -11,6 +11,8 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
 
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -19,20 +21,56 @@ env:
   TEST_COVERAGE: "true"
 
 steps:
-  - group: "x-pack/Winlogbeat Mandatory Tests"
-    key: "x-pack-winlogbeat-mandatory-tests"
+  - group: "Check/Update"
+    key: "x-pack-winlogbeat-check-update"
     steps:
-      - label: ":windows: x-pack/Winlogbeat Win-2019 Unit (MODULE) Tests"
-        key: "mandatory-win-2019-module-unit-tests"
+      - label: "x-pack/winlogbeat: Run check/update"
         command: |
-          Import-Module ./.buildkite/scripts/changesets.psm1
-          defineModuleFromTheChangeSet 'x-pack/winlogbeat'
-          Write-Output "~~~ Running tests"
+          set -eo pipefail
+          make -C x-pack/winlogbeat check update
+          make check-no-changes
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/winlogbeat: check/update"
+
+      - label: "x-pack/winlogbeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          memory: "2Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/winlogbeat: pre-commit"
+
+  - wait: ~
+    # with PRs, we want to run mandatory tests only if check/update step succeed
+    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in check/update step
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "x-pack-winlogbeat-check-update"
+
+  - group: "Mandatory Tests"
+    key: "x-pack-winlogbeat-mandatory-tests"
+
+    steps:
+      - label: ":windows: x-pack/winlogbeat Win 2019 Unit Tests"
+        key: "mandatory-win-2019-unit-tests"
+        command: |
+          .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -42,18 +80,25 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/winlogbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-2019 Unit (MODULE) Tests"
+              context: "x-pack/winlogbeat Win 2019 Unit Tests"
 
-      - label: ":windows: x-pack/Winlogbeat Win-2016 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 2016 Unit Tests"
         command: |
+          .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -63,18 +108,25 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/winlogbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-2016 Unit Tests"
+              context: "x-pack/winlogbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: x-pack/Winlogbeat Win-2022 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 2022 Unit Tests"
         command: |
+          .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -84,23 +136,30 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/winlogbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-2022 Unit Tests"
+              context: "x-pack/winlogbeat: Win 2022 Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: x-pack/Winlogbeat Win-10 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 10 Unit Tests"
         command: |
+          .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -110,18 +169,25 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/winlogbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-10 Unit Tests"
+              context: "x-pack/winlogbeat: Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/Winlogbeat Win-11 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 11 Unit Tests"
         command: |
+          .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -131,18 +197,25 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/winlogbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Win-11 Unit Tests"
+              context: "x-pack/winlogbeat: Win 11 Unit Tests"
 
-      - label: ":windows: x-pack/Winlogbeat Win-2019 Unit Tests"
+      - label: ":windows: x-pack/winlogbeat: Win 2019 Unit Tests"
         command: |
+          .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -152,9 +225,15 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/winlogbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/winlogbeat: Win-2019 Unit Tests"
+              context: "x-pack/winlogbeat: Win 2019 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -164,16 +243,20 @@ steps:
     depends_on:
       - "x-pack-winlogbeat-mandatory-tests"
 
-  - group: "x-pack/Winlogbeat Packaging"
+  - group: "Packaging"
     key: "x-pack-winlogbeat-packaging"
 
     steps:
-      - label: ":ubuntu: Packaging Linux"
+      - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux"
         key: "packaging-linux"
-        command: "cd x-pack/winlogbeat && mage package"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+        command: |
+          cd x-pack/winlogbeat
+          mage package
         retry:
           automatic:
-            - limit: 3
+            - limit: 1
         timeout_in_minutes: 20
         agents:
           provider: "gcp"
@@ -181,8 +264,6 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
-              context: "x-pack/Winlogbeat Packaging"
+              context: "x-pack/winlogbeat: Packaging Linux"

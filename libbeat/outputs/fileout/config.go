@@ -38,6 +38,7 @@ type fileOutConfig struct {
 
 func defaultConfig() fileOutConfig {
 	return fileOutConfig{
+		Path:            &PathFormatString{},
 		NumberOfFiles:   7,
 		RotateEveryKb:   10 * 1024,
 		Permissions:     0600,

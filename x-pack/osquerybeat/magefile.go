@@ -96,7 +96,7 @@ func Clean() error {
 
 func execCommand(ctx context.Context, name string, args ...string) error {
 	ps := strings.Join(append([]string{name}, args...), " ")
-	fmt.Println(ps)
+	fmt.Println("Executing command: ", ps)
 	output, err := command.Execute(ctx, name, args...)
 	if err != nil {
 		fmt.Println(ps, ", failed: ", err)
@@ -130,13 +130,13 @@ func stripLinuxOsqueryd() error {
 
 	osArchs := osquerybeat.OSArchs(devtools.Platforms)
 
-	strip := func(oquerydPath string) error {
+	strip := func(oquerydPath string, target distro.OSArch) error {
 		ok, err := fileutil.FileExists(oquerydPath)
 		if err != nil {
 			return err
 		}
 		if ok {
-			if err := execCommand(ctx, "strip", oquerydPath); err != nil {
+			if err := execCommand(ctx, stripCommand(target), oquerydPath); err != nil {
 				return err
 			}
 		}
@@ -160,13 +160,13 @@ func stripLinuxOsqueryd() error {
 		// Checking and stripping osqueryd binary and both paths osquerybeat/build and agentbeat/build
 		// because at the moment it's unclear if this step was initiated from osquerybeat or agentbeat build
 		osquerybeatPath := filepath.Clean(filepath.Join(cwd, "../..", querydRelativePath))
-		err = strip(osquerybeatPath)
+		err = strip(osquerybeatPath, osarch)
 		if err != nil {
 			return err
 		}
 
 		agentbeatPath := filepath.Clean(filepath.Join(cwd, "../../../agentbeat", querydRelativePath))
-		err = strip(agentbeatPath)
+		err = strip(agentbeatPath, osarch)
 		if err != nil {
 			return err
 		}
@@ -186,11 +186,6 @@ func GolangCrossBuild() error {
 	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	// Building osquerybeat
@@ -204,11 +199,6 @@ func CrossBuild() error {
 // CrossBuildExt cross-builds the osquery-extension.
 func CrossBuildExt() error {
 	return devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -232,7 +222,7 @@ func Package() {
 	osquerybeat.CustomizePackaging()
 
 	mg.Deps(Update, osquerybeat.FetchOsqueryDistros)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -260,3 +250,18 @@ func Fields() { mg.Deps(osquerybeat.Update.Fields) }
 // Config is an alias for update:config. This is a workaround for
 // https://github.com/magefile/mage/issues/217.
 func Config() { mg.Deps(osquerybeat.Update.Config) }
+
+func stripCommand(target distro.OSArch) string {
+	if target.OS != "linux" {
+		return "strip" // fallback
+	}
+
+	switch target.Arch {
+	case "arm64":
+		return "aarch64-linux-gnu-strip"
+	case "amd64":
+		return "x86_64-linux-gnu-strip"
+	}
+
+	return "strip"
+}

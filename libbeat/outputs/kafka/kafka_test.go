@@ -42,7 +42,7 @@ func TestBuildTopicSelector(t *testing.T) {
 		{
 			name:       "dynamic topic under agent",
 			topic:      "%{[foo]}",
-			expected:   "%{[foo]}",
+			expected:   "bar",
 			underAgent: true,
 		},
 		{

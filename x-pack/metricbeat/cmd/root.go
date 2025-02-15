@@ -33,9 +33,6 @@ const (
 	Name = "metricbeat"
 )
 
-// RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
-
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(mapstr.M{
 	"ecs": mapstr.M{
@@ -43,20 +40,21 @@ var withECSVersion = processing.WithFields(mapstr.M{
 	},
 })
 
-func init() {
+func Initialize() *cmd.BeatsRootCmd {
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
 	}
-	settings := mbcmd.MetricbeatSettings()
+	settings := mbcmd.MetricbeatSettings("")
 	settings.ElasticLicensed = true
 	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, withECSVersion, processing.WithHost, processing.WithAgentMeta())
-	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
-	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
-	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+	rootCmd := cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
+	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
+	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(metricbeatCfg)
 	}
+	return rootCmd
 }
 
 func defaultProcessors() []mapstr.M {

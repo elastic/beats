@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"time"
 
 	"golang.org/x/text/transform"
@@ -41,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const pluginName = "filestream"
@@ -61,6 +63,7 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	closerConfig    closerConfig
 	parsers         parser.Config
+	takeOver        bool
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -72,10 +75,11 @@ func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",
 		Manager: &loginp.InputManager{
-			Logger:     log,
-			StateStore: store,
-			Type:       pluginName,
-			Configure:  configure,
+			Logger:              log,
+			StateStore:          store,
+			Type:                pluginName,
+			Configure:           configure,
+			DefaultCleanTimeout: -1,
 		},
 	}
 }
@@ -101,6 +105,7 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		encodingFactory: encodingFactory,
 		closerConfig:    config.Close,
 		parsers:         config.Reader.Parsers,
+		takeOver:        config.TakeOver,
 	}
 
 	return prospector, filestream, nil
@@ -160,6 +165,8 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
+	// The caller of Run already reports the error and filters out errors that
+	// must not be reported, like 'context cancelled'.
 	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 }
 
@@ -369,7 +376,16 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
-		s.Offset += int64(message.Bytes)
+		s.Offset += int64(message.Bytes) + int64(message.Offset)
+
+		flags, err := message.Fields.GetValue("log.flags")
+		if err == nil {
+			if flags, ok := flags.([]string); ok {
+				if slices.Contains(flags, "truncated") { //nolint:typecheck,nolintlint // linter fails to infer generics
+					metrics.MessagesTruncated.Add(1)
+				}
+			}
+		}
 
 		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
@@ -377,6 +393,11 @@ func (inp *filestream) readFromSource(
 		}
 
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
+
+		// add "take_over" tag if `take_over` is set to true
+		if inp.takeOver {
+			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
+		}
 
 		if err := p.Publish(message.ToEvent(), s); err != nil {
 			metrics.ProcessingErrors.Inc()

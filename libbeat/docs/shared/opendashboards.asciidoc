@@ -13,7 +13,7 @@ include::{libbeat-dir}/tab-widgets/open-kibana-widget.asciidoc[]
 --
 
 . In the side navigation, click *Discover*. To see {beatname_uc} data, make
-sure the predefined +{beatname_lc}-*+ index pattern is selected.
+sure the predefined +{beatname_lc}-*+ data view is selected.
 +
 --
 TIP: If you don’t see data in {kib}, try changing the time filter to a larger

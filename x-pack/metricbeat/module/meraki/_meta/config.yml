@@ -1,0 +1,6 @@
+- module: meraki
+  metricsets: ["device_health"]
+  enabled: true
+  period: 300s
+  apiKey: "Meraki dashboard API key"
+  organizations: ["Meraki organization ID"]  

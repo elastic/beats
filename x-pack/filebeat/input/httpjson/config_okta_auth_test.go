@@ -7,7 +7,7 @@ package httpjson
 import (
 	"testing"
 
-	"github.com/lestrrat-go/jwx/v2/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/oauth2"
 )
 
@@ -22,16 +22,7 @@ func TestGenerateOktaJWT(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	tok, err := jwt.Parse([]byte(got), jwt.WithVerify(false))
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if tok.Issuer() != cnf.ClientID {
-		t.Errorf("unexpected issuer: got:%s want:%s", tok.Issuer(), cnf.ClientID)
-	}
-	if tok.Subject() != cnf.ClientID {
-		t.Errorf("unexpected subject: got:%s want:%s", tok.Subject(), cnf.ClientID)
-	}
+	checkToken(t, got, cnf)
 }
 
 func TestGenerateOktaJWTPEM(t *testing.T) {
@@ -75,14 +66,30 @@ LNV/bIgMHOMoxiGrwyjAhg==
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	tok, err := jwt.Parse([]byte(got), jwt.WithVerify(false))
+	checkToken(t, got, cnf)
+}
+
+func checkToken(t *testing.T, text string, cnf *oauth2.Config) {
+	t.Helper()
+
+	var p jwt.Parser
+	tok, _, err := p.ParseUnverified(text, jwt.MapClaims{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if tok.Issuer() != cnf.ClientID {
-		t.Errorf("unexpected issuer: got:%s want:%s", tok.Issuer(), cnf.ClientID)
+	gotIssuer, err := tok.Claims.GetIssuer()
+	if err != nil {
+		t.Fatalf("unexpected error calling GetIssuer(): %v", err)
 	}
-	if tok.Subject() != cnf.ClientID {
-		t.Errorf("unexpected subject: got:%s want:%s", tok.Subject(), cnf.ClientID)
+	if gotIssuer != cnf.ClientID {
+		t.Errorf("unexpected issuer: got:%s want:%s", gotIssuer, cnf.ClientID)
 	}
+	gotSubject, err := tok.Claims.GetSubject()
+	if err != nil {
+		t.Fatalf("unexpected error calling GetSubject(): %v", err)
+	}
+	if gotSubject != cnf.ClientID {
+		t.Errorf("unexpected issuer: got:%s want:%s", gotSubject, cnf.ClientID)
+	}
+
 }

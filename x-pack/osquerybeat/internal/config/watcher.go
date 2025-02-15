@@ -58,14 +58,14 @@ func (r *reloader) Reload(configs []*reload.ConfigWithMeta) error {
 	return nil
 }
 
-func WatchInputs(ctx context.Context, log *logp.Logger) <-chan []InputConfig {
+func WatchInputs(ctx context.Context, log *logp.Logger, registry *reload.Registry) <-chan []InputConfig {
 	ch := make(chan []InputConfig)
 	r := &reloader{
 		ctx: ctx,
 		log: log,
 		ch:  ch,
 	}
-	reload.RegisterV2.MustRegisterInput(r)
+	registry.MustRegisterInput(r)
 
 	return ch
 }

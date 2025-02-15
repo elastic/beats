@@ -1022,6 +1022,20 @@ func TestParseMetrics(t *testing.T) {
 				},
 			},
 		},
+		{ // Graphite 1.1.x Tags
+			input: "tags3;k1=v1;k2=v2:1|c",
+			expected: []statsdMetric{
+				{
+					name:       "tags3",
+					metricType: "c",
+					value:      "1",
+					tags: map[string]string{
+						"k1": "v1",
+						"k2": "v2",
+					},
+				},
+			},
+		},
 		/// errors
 		{
 			input:    "meter1-1.4|m",
@@ -1058,6 +1072,17 @@ func TestParseSingle(t *testing.T) {
 			err:   nil,
 			want: statsdMetric{
 				name:       "tags1",
+				metricType: "c",
+				sampleRate: "",
+				value:      "1",
+				tags:       map[string]string{"k1": "v1", "k2": "v2"},
+			},
+		},
+		"valid packet: counter with Graphite tags": {
+			input: "tags2;k1=v1;k2=v2:1|c",
+			err:   nil,
+			want: statsdMetric{
+				name:       "tags2",
 				metricType: "c",
 				sampleRate: "",
 				value:      "1",
@@ -1124,13 +1149,14 @@ func TestTagsGrouping(t *testing.T) {
 
 		"metric3:3|c|@0.1|#k1:v2,k2:v3",
 		"metric4:4|ms|#k1:v2,k2:v3",
+		"metric5;k1=v3;k2=v4:5|c",
 	}
 
 	err := process(testData, ms)
 	require.NoError(t, err)
 
 	events := ms.getEvents()
-	assert.Len(t, events, 4)
+	assert.Len(t, events, 5)
 
 	actualTags := []mapstr.M{}
 	for _, e := range events {
@@ -1162,6 +1188,12 @@ func TestTagsGrouping(t *testing.T) {
 				"k2": "v3",
 			},
 		},
+		{
+			"labels": mapstr.M{
+				"k1": "v3",
+				"k2": "v4",
+			},
+		},
 	}
 
 	assert.ElementsMatch(t, expectedTags, actualTags)
@@ -1173,6 +1205,7 @@ func TestTagsCleanup(t *testing.T) {
 		"metric1:1|g|#k1:v1,k2:v2",
 
 		"metric2:3|ms|#k1:v2,k2:v3",
+		"metric3;k1=v3;k2=v4:5|c",
 	}
 	err := process(testData, ms)
 	require.NoError(t, err)
@@ -1180,7 +1213,7 @@ func TestTagsCleanup(t *testing.T) {
 	time.Sleep(1000 * time.Millisecond)
 
 	// they will be reported at least once
-	assert.Len(t, ms.getEvents(), 2)
+	assert.Len(t, ms.getEvents(), 3)
 
 	testData = []string{
 		"metric1:+2|g|#k1:v1,k2:v2",
@@ -1229,12 +1262,13 @@ func TestData(t *testing.T) {
 		"metric08:seven|s|#k1:v1,k2:v2",
 		"metric09,k1=v1,k2=v2:8|h",
 		"metric10.with.dots,k1=v1,k2=v2:9|h",
+		"metric11;k1=v1;k2=v2:10|c",
 	}
 	err := process(testData, ms)
 	require.NoError(t, err)
 
 	events := ms.getEvents()
-	assert.Len(t, events, 10)
+	assert.Len(t, events, 11)
 
 	mbevent := mbtest.StandardizeEvent(ms, *events[0])
 	mbtest.WriteEventToDataJSON(t, mbevent, "")
@@ -1379,6 +1413,7 @@ func BenchmarkIngest(b *testing.B) {
 		"metric08:seven|s|#k1:v1,k2:v2",
 		"metric09,k1=v1,k2=v2:8|h",
 		"metric10.with.dots,k1=v1,k2=v2:9|h",
+		"metric11;k1=v1;k2=v2:10|c",
 	}
 
 	events := make([]*testUDPEvent, len(tests))
