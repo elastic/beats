@@ -377,10 +377,8 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 							}
 						}
 						continue
-					}
-
-					// index 1 is the key for the secondary group_by
-					if index == 1 {
+					} else if index == 1 {
+						// index 1 is the key for the secondary group_by
 						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
 							_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)
 
@@ -399,11 +397,9 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 							}
 						}
 						continue
-					}
-
-					// there should be no more than 2 keys per metric
-					// this is a safety mechanism to track issues
-					if index > 1 {
+					} else {
+						// there should be no more than 2 keys per metric
+						// this is a safety mechanism to track issues
 						m.Logger().Errorf("unexpected additional index %d, with key %s, while process metrics", index, key)
 						continue
 					}
