@@ -49,13 +49,17 @@ type Harvester struct {
 //	4) 1) "slowlog"
 //	   2) "get"
 //	   3) "100"
+//  5) "100.1.1.1:12345"
+//  6) "client-name"
 type log struct {
-	id        int64
-	timestamp int64
-	duration  int
-	cmd       string
-	key       string
-	args      []string
+	id         int64
+	timestamp  int64
+	duration   int
+	cmd        string
+	key        string
+	args       []string
+	clientAddr string
+	clientName string
 }
 
 // NewHarvester creates a new harvester with the given connection
@@ -128,7 +132,7 @@ func (h *Harvester) Run() error {
 
 		var log log
 		var args []string
-		_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args, &log.clientAddr, &log.clientName)
 		if err != nil {
 			logp.Err("Error scanning slowlog entry: %s", err)
 			continue
@@ -156,6 +160,8 @@ func (h *Harvester) Run() error {
 				"us": log.duration,
 			},
 			"role": role,
+			"clientAddr": log.clientAddr,
+			"clientName": log.clientName,
 		}
 
 		if log.args != nil {
