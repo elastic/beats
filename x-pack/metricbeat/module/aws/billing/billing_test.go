@@ -7,6 +7,9 @@
 package billing
 
 import (
+	"errors"
+	"fmt"
+	costexplorertypes "github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"testing"
 	"time"
 
@@ -17,6 +20,70 @@ func TestGetStartDateEndDate(t *testing.T) {
 	startDate, endDate := getStartDateEndDate(time.Duration(24) * time.Hour)
 	assert.NotEmpty(t, startDate)
 	assert.NotEmpty(t, endDate)
+}
+
+func TestValidateGroupByType(t *testing.T) {
+	cases := []struct {
+		groupByType     costexplorertypes.GroupDefinitionType
+		expectedSupport bool
+		expectedErr     error
+	}{
+		{
+			costexplorertypes.GroupDefinitionTypeDimension,
+			true,
+			nil,
+		},
+		{
+			costexplorertypes.GroupDefinitionTypeTag,
+			true,
+			nil,
+		},
+		{
+			costexplorertypes.GroupDefinitionTypeCostCategory,
+			false,
+			errors.New(fmt.Sprintf("costexplorer GetCostAndUsageRequest or metricbeat module does not support group_by type: %s", costexplorertypes.GroupDefinitionTypeCostCategory)),
+		},
+		{
+			"INVALID_TYPE",
+			false,
+			errors.New("costexplorer GetCostAndUsageRequest or metricbeat module does not support group_by type: INVALID_TYPE"),
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(string(c.groupByType), func(t *testing.T) {
+			supported, err := validateGroupByType(c.groupByType)
+			assert.Equal(t, c.expectedSupport, supported)
+			assert.Equal(t, c.expectedErr, err)
+		})
+	}
+}
+
+func TestValidateDimensionKey(t *testing.T) {
+	cases := []struct {
+		dimensionKey    string
+		expectedSupport bool
+		expectedErr     error
+	}{
+		{
+			"INSTANCE_TYPE",
+			true,
+			nil,
+		},
+		{
+			"INVALID_DIMENSION",
+			false,
+			errors.New("costexplorer GetCostAndUsageRequest does not support dimension key: INVALID_DIMENSION"),
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.dimensionKey, func(t *testing.T) {
+			supported, err := validateDimensionKey(c.dimensionKey)
+			assert.Equal(t, c.expectedSupport, supported)
+			assert.Equal(t, c.expectedErr, err)
+		})
+	}
 }
 
 func TestParseGroupKey(t *testing.T) {
@@ -63,10 +130,10 @@ func TestParseGroupKey(t *testing.T) {
 
 func TestGetGroupBys(t *testing.T) {
 	cases := []struct {
-		title            string
-		groupByTags      []string
-		groupByDimKeys   []string
-		expectedGroupBys []groupBy
+		title                string
+		groupBySecondaryKeys []string
+		groupByPrimaryKeys   []string
+		expectedGroupBys     []groupBy
 	}{
 		{
 			"test with both tags and dimKeys",
@@ -94,11 +161,19 @@ func TestGetGroupBys(t *testing.T) {
 				{"createdBy", ""},
 			},
 		},
+		{
+			"test with double dims",
+			[]string{"INSTANCE_TYPE"},
+			[]string{"AZ"},
+			[]groupBy{
+				{"INSTANCE_TYPE", "AZ"},
+			},
+		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			groupBys := getGroupBys(c.groupByTags, c.groupByDimKeys)
+			groupBys := getGroupBys(c.groupBySecondaryKeys, c.groupByPrimaryKeys)
 			assert.Equal(t, c.expectedGroupBys, groupBys)
 		})
 	}
