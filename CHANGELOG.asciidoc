@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 
 *Affecting all Beats*
 
-- Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
+- Set default Kafka version to 2.1.0 in Kafka output and Filebeat. {pull}41662[41662]
 - Replace default Ubuntu-based images with UBI-minimal-based ones. {pull}42150[42150]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 
@@ -20,8 +20,8 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 - Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
 - Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
 - Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
-- The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false`. {issue}40197[40197] {pull}41762[41762]
-- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be using while setting `allow_deprecated_use: true` in their configuration. {pull}42295[42295]
+- The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false`. {issue}40197[40197] {pull}41762[41762]
+- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be used when `allow_deprecated_use: true` is set in their configuration. {pull}42295[42295]
 
 *Osquerybeat*
 
@@ -33,7 +33,7 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 
 *Winlogbeat*
 
-- Default to use raw api and delete older xml implementation. {pull}42275[42275]
+- Default to use raw API and delete older XML implementation. {pull}42275[42275]
 
 ==== Bugfixes
 
@@ -52,8 +52,8 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 
 *Metricbeat*
 
-- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
-- Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
+- Fix bug where Metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
+- Remove `hostname` field from ZooKeeper's `mntr` data stream. {pull}41887[41887]
 
 *Packetbeat*
 
@@ -103,7 +103,7 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 - Include XML is respected for experimental API. {pull}41525[41525]
 - Forwarded events use renderedtext info for experimental API. {pull}41525[41525]
 - Language setting is respected for experimental API. {pull}41525[41525]
-- Language setting also added to decode xml wineventlog processor. {pull}41525[41525]
+- Language setting also added to decode XML wineventlog processor. {pull}41525[41525]
 - Format embedded messages in the experimental API. {pull}41525[41525]
 - Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
@@ -111,7 +111,7 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 
 *Functionbeat*
 
-- Removal of functionbeat binaries from CI pipelines. {issue}40745[40745] {pull}41506[41506]
+- Remove Functionbeat binaries from CI pipelines. {issue}40745[40745] {pull}41506[41506]
 
 
 [[release-notes-8.17.2]]
