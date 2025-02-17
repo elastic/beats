@@ -39,7 +39,7 @@ spec:
       name: beats
       description: "Beats Main pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/pipeline.yml"
       provider_settings:
         build_pull_request_forks: false
@@ -51,9 +51,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -89,7 +89,7 @@ spec:
       name: beats-metricbeat
       description: "Beats Metricbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/metricbeat/pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -102,9 +102,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -136,7 +136,7 @@ spec:
       name: filebeat
       description: "Filebeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -149,9 +149,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -196,9 +196,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -230,7 +230,7 @@ spec:
       name: heartbeat
       description: "Heartbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/heartbeat/heartbeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -243,9 +243,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -290,9 +290,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.* !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -324,7 +324,7 @@ spec:
       name: beats-libbeat
       description: "Beats libbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -337,9 +337,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -371,7 +371,7 @@ spec:
       name: beats-packetbeat
       description: "Beats packetbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/packetbeat/pipeline.packetbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -384,9 +384,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -430,9 +430,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -464,7 +464,7 @@ spec:
       name: beats-winlogbeat
       description: "Beats winlogbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/winlogbeat/pipeline.winlogbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -477,9 +477,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -511,7 +511,7 @@ spec:
       name: beats-xpack-winlogbeat
       description: "Beats x-pack winlogbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -524,9 +524,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -558,7 +558,7 @@ spec:
       name: beats-xpack-packetbeat
       description: "Beats x-pack packetbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.packetbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -571,9 +571,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -605,7 +605,7 @@ spec:
       name: beats-xpack-libbeat
       description: "Beats x-pack libbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.libbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -618,9 +618,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -652,7 +652,7 @@ spec:
       name: beats-xpack-metricbeat
       description: "Beats x-pack metricbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*"
+      branch_configuration: "main 7.17 8.* 9.*"
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.metricbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -665,9 +665,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -782,9 +782,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -829,9 +829,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -876,9 +876,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -923,9 +923,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -970,9 +970,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -1017,9 +1017,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !8.* !9.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !8.*"
+      skip_intermediate_builds_branch_filter: "!main !8.* !9.*"
       env:
         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
@@ -1053,7 +1053,7 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/packaging.pipeline.yml"
-      branch_configuration: "main 8.* 7.17"
+      branch_configuration: "main 8.* 7.17 9.*"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       maximum_timeout_in_minutes: 90
@@ -1102,7 +1102,7 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/ironbank-validation.yml"
-      branch_configuration: "main 8.* 7.17"
+      branch_configuration: "main 8.* 7.17 9.*"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       provider_settings:

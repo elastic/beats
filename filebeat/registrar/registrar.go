@@ -55,7 +55,7 @@ type successLogger interface {
 }
 
 type StateStore interface {
-	Access() (*statestore.Store, error)
+	Access(typ string) (*statestore.Store, error)
 }
 
 var (
@@ -72,7 +72,7 @@ const fileStatePrefix = "filebeat::logs::"
 // New creates a new Registrar instance, updating the registry file on
 // `file.State` updates. New fails if the file can not be opened or created.
 func New(stateStore StateStore, out successLogger, flushTimeout time.Duration) (*Registrar, error) {
-	store, err := stateStore.Access()
+	store, err := stateStore.Access("")
 	if err != nil {
 		return nil, err
 	}
