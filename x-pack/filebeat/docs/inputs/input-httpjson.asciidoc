@@ -1624,6 +1624,10 @@ observe the activity of the input.
 |=======
 | Metric                                     | Description
 | `events_published_total`                   | Total number of events published.
+| `events_pipeline_total`                    | Total number of events processed by the publishing pipeline.
+| `events_pipeline_failed_total`             | Total number of events failed at the publishing pipeline.
+| `events_pipeline_filtered_total`           | Total number of events filtered at the publishing pipeline.
+| `events_pipeline_published_total`          | Total number of events published at the publishing pipeline.
 | `pages_published_total`                    | Total number of pages of event published.
 | `http_request_total`                       | Total number of processed requests.
 | `http_request_errors_total`                | Total number of request errors.

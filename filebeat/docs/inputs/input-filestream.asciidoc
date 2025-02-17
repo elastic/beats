@@ -187,6 +187,10 @@ observe the activity of the input. Note that metrics from processors are not inc
 | `messages_truncated_total` | Total number of messages truncated.
 | `bytes_processed_total`    | Total number of bytes processed.
 | `events_processed_total`   | Total number of events processed.
+| `events_pipeline_total`   | Total number of events processed by the publishing pipeline.
+| `events_pipeline_failed_total`   | Total number of events failed at the publishing pipeline.
+| `events_pipeline_filtered_total`   | Total number of events filtered at the publishing pipeline.
+| `events_pipeline_published_total`   | Total number of events published at the publishing pipeline.
 | `processing_errors_total`  | Total number of processing errors.
 | `processing_time`          | Histogram of the elapsed time to process messages (expressed in nanoseconds).
 |=======
