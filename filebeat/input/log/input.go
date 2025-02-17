@@ -138,9 +138,6 @@ func NewInput(
 	//  The outlet generated here is the underlying outlet, only closed
 	//  once all workers have been shut down.
 	//  For state updates and events, separate sub-outlets will be used.
-	// TODO: there is neither ID in the context nor on inputConfig. It seems
-	// there is no ID at all. It's not publishing input metrics anyway. Where
-	// did that chart come from? https://github.com/elastic/beats/issues/42325#issuecomment-2648776284
 	out, err := outlet.Connect(cfg)
 	if err != nil {
 		return nil, err

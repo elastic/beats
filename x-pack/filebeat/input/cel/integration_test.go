@@ -7,9 +7,7 @@
 package cel_test
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -17,7 +15,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -34,12 +31,12 @@ import (
 // to report different states that are checked to match the expected states.
 func TestCheckinV2(t *testing.T) {
 	// make sure there is an ES instance running
-	// integration.EnsureESIsRunning(t)
-	// esConnectionDetails := integration.GetESURL(t, "http")
-	outputHosts := []interface{}{"http://127.0.0.1:40397"}
-	outputUsername := "user" // esConnectionDetails.User.Username()
-	outputPassword := "pass" // , _ := esConnectionDetails.User.Password()
-	outputProtocol := "http" // esConnectionDetails.Scheme
+	integration.EnsureESIsRunning(t)
+	esConnectionDetails := integration.GetESURL(t, "http")
+	outputHosts := []interface{}{fmt.Sprintf("%s://%s:%s", esConnectionDetails.Scheme, esConnectionDetails.Hostname(), esConnectionDetails.Port())}
+	outputUsername := esConnectionDetails.User.Username()
+	outputPassword, _ := esConnectionDetails.User.Password()
+	outputProtocol := esConnectionDetails.Scheme
 
 	invalidResponse := []byte("invalid json")
 	validResponse := []byte("{\"ip\":\"0.0.0.0\"}")
@@ -261,8 +258,6 @@ func TestCheckinV2(t *testing.T) {
 	initialOSArgs := os.Args
 	os.Args = []string{
 		"filebeat",
-		// TODO: enable http.metrics2
-		"-E", "http.enabled=true",
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 		"-E", "management.restart_on_output_change=true",
@@ -281,7 +276,6 @@ func TestCheckinV2(t *testing.T) {
 	// slice of funcs that check if the observed states match the expected ones.
 	// They return true if they match and false if they don't as well as a slice
 	// of units expected for the server to respond with.
-	// TODO: add a check to fetch the metrics
 	checks := []func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected){
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
 			// Wait for all healthy.
@@ -475,31 +469,6 @@ func TestCheckinV2(t *testing.T) {
 			return true, []*proto.UnitExpected{}
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
-			return len(observed.Units) == 0, []*proto.UnitExpected{}
-		},
-		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
-			// TODO: it works. perhaps make another test instead of hacking into
-			// this one
-			resp, err := http.Get("http://localhost:5066/inputs/")
-			require.NoError(t, err, "failed fetching input metrics")
-			defer resp.Body.Close()
-
-			var inputMetrics []struct {
-				EventsPipelineTotal          int    `json:"events_pipeline_total"`
-				EventsPipelineDroppedTotal   int    `json:"events_pipeline_dropped_total"`
-				EventsPipelineFilteredTotal  int    `json:"events_pipeline_filtered_total"`
-				EventsPipelinePublishedTotal int    `json:"events_pipeline_published_total"`
-				EventsProcessedTotal         int    `json:"events_processed_total"`
-				ID                           string `json:"id"`
-				Input                        string `json:"input"`
-			}
-			body, err := io.ReadAll(resp.Body)
-			require.NoError(t, err, "failed reading response body")
-			err = json.Unmarshal(body, &inputMetrics)
-			require.NoError(t, err, "failed unmarshalling response body")
-
-			t.Log(string(body))
-			t.Logf(observed.String())
 			return len(observed.Units) == 0, []*proto.UnitExpected{}
 		},
 	}
