@@ -114,7 +114,6 @@ func (pmw ParsedMaintWin) IsActive(tOrig time.Time) bool {
 		return false
 	}
 	tOrig = tOrig.UTC()
-	r := pmw.Rule
-	window := r.Before(tOrig, true)
-	return tOrig.Before(window.Add(pmw.Duration))
+	window := pmw.Rule.Before(tOrig, true)
+	return !window.IsZero() && tOrig.Before(window.Add(pmw.Duration))
 }
