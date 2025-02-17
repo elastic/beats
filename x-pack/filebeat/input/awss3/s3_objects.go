@@ -266,7 +266,12 @@ func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, e
 }
 
 func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
-	dec := json.NewDecoder(r)
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, r); err != nil {
+		// If an error occurs during the download, handle it here
+		return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
+	}
+	dec := json.NewDecoder(&buf)
 	dec.UseNumber()
 
 	for dec.More() && p.ctx.Err() == nil {
@@ -274,13 +279,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
-			if errors.Is(err, io.ErrUnexpectedEOF) {
-				// Wrap ErrUnexpectedEOF as an errS3DownloadFailed in the result so the caller knows it's not a
-				// permanent failure.
-				return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
-			} else {
-				return fmt.Errorf("failed to decode json: %w", err)
-			}
+			return fmt.Errorf("failed to decode json: %w", err)
 		}
 
 		if p.readerConfig.ExpandEventListFromField != "" {

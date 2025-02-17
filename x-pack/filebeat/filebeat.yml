@@ -14,22 +14,33 @@
 
 filebeat.inputs:
 
+- type: aws-s3
+  bucket_arn: arn:aws:s3:::gizas-5559-cloudflare-sdh/cloudflaretest/cloudflare-name-test-6/
+  number_of_workers: 5
+  bucket_list_interval: 10s
+  credential_profile_name: elastic-observability
+  expand_event_list_from_field: Records
+  region: eu-west-1
+  access_key_id: ${AWS_ACCESS_KEY_ID}
+  secret_access_key: ${AWS_SECRET_ACCESS_KEY}
+  session_token: ${AWS_SESSION_TOKEN}
+
 # Each - is an input. Most options can be set at the input level, so
 # you can use different inputs for various configurations.
 # Below are the input-specific configurations.
 
 # filestream is an input for collecting log messages from files.
-- type: filestream
+# - type: filestream
 
-  # Unique ID among all inputs, an ID is required.
-  id: my-filestream-id
+#   # Unique ID among all inputs, an ID is required.
+#   id: my-filestream-id
 
-  # Change to true to enable this input configuration.
-  enabled: false
+#   # Change to true to enable this input configuration.
+#   enabled: false
 
-  # Paths that should be crawled and fetched. Glob based paths.
-  paths:
-    - /var/log/*.log
+#   # Paths that should be crawled and fetched. Glob based paths.
+#   paths:
+#     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
