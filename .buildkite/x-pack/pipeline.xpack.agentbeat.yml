@@ -38,7 +38,7 @@ steps:
       - label: ":windows: x-pack/agentbeat: Win 2022 System Tests"
         key: "mandatory-win-2022-system-tests"
         command: |
-          .buildkite/scripts/gcp_auth.ps1
+          # .buildkite/scripts/gcp_auth.ps1
           Set-Location -Path x-pack/agentbeat
           mage systemTest
         retry:
