@@ -186,12 +186,14 @@ func TestPublish(t *testing.T) {
 		batch := outest.NewBatch(event3)
 		batch.Events()[0].Content.Timestamp = time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
 
-		var bodytimestamp string
+		var bodyTimestamp string
+		var recordTimestamp string
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
 			field, ok := record.Body().Map().Get("@timestamp")
+			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
 			assert.True(t, ok, "timestamp field not found")
-			bodytimestamp = field.AsString()
+			bodyTimestamp = field.AsString()
 			return nil
 		})
 
@@ -199,6 +201,7 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-		assert.Equal(t, "2025-01-29T09:02:39.000Z", bodytimestamp, "body timestamp is incorrect")
+		assert.Equal(t, "2025-01-29T09:02:39.000Z", bodyTimestamp, "body timestamp is incorrect")
+		assert.Equal(t, "2025-01-29T09:02:39.000Z", recordTimestamp, "record timestamp is incorrect")
 	})
 }
