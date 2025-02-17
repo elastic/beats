@@ -37,11 +37,7 @@ func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err err
 	if err != nil {
 		return "", "", err
 	}
-<<<<<<< HEAD
-	cmd := exec.CommandContext(ctx, agentbeatPath, append([]string{"-systemTest", "packetbeat", "-c", conf}, args...)...)
-=======
 	cmd := exec.CommandContext(ctx, agentbeatPath, append([]string{"--systemTest", "packetbeat", "--path.config", confDir}, args...)...)
->>>>>>> 67636970b (Fixing NPCAP install with agentbeat (#42626))
 	cmd.Dir = t.TempDir()
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd.Stdout = &stdoutBuf
