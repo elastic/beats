@@ -193,7 +193,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		var activeMainWin *maintwin.ParsedMaintWin
 		for _, pmw := range pmws {
 			if pmw.IsActive(now) {
-				pmwCopy := pmw 
+				pmwCopy := pmw
 				activeMainWin = &pmwCopy
 				break
 			}
