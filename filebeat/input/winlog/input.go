@@ -49,9 +49,7 @@ func (pub *publisher) Publish(records []eventlog.Record) error {
 	return nil
 }
 
-type winlogInput struct {
-	runner eventlog.Runner
-}
+type winlogInput struct{}
 
 // Plugin create a stateful input Plugin collecting logs from Windows Event Logs.
 func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
@@ -79,15 +77,18 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	}
 
 	sources := []cursor.Source{eventLog}
-	runner := eventlog.NewRunner()
-	return sources, winlogInput{runner: runner}, nil
+	return sources, winlogInput{}, nil
 }
 
 func (winlogInput) Name() string { return pluginName }
 
 func (in winlogInput) Test(source cursor.Source, ctx input.TestContext) error {
 	api := source.(eventlog.EventLog)
-	return in.runner.Test(api)
+	err := api.Open(checkpoint.EventLogState{})
+	if err != nil {
+		return fmt.Errorf("failed to open %q: %w", api.Channel(), err)
+	}
+	return api.Close()
 }
 
 func (in winlogInput) Run(
@@ -98,7 +99,7 @@ func (in winlogInput) Run(
 ) error {
 	api := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
-	return in.runner.Run(
+	return eventlog.Run(
 		ctxtool.FromCanceller(ctx.Cancelation),
 		api,
 		initCheckpoint(log, cursor),

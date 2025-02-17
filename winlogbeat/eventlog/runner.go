@@ -34,21 +34,7 @@ type Publisher interface {
 	Publish(records []Record) error
 }
 
-type Runner struct{}
-
-func NewRunner() Runner {
-	return Runner{}
-}
-
-func (Runner) Test(api EventLog) error {
-	err := api.Open(checkpoint.EventLogState{})
-	if err != nil {
-		return fmt.Errorf("failed to open %q: %w", api.Channel(), err)
-	}
-	return api.Close()
-}
-
-func (Runner) Run(
+func Run(
 	ctx context.Context,
 	api EventLog,
 	evtCheckpoint checkpoint.EventLogState,

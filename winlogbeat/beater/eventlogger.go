@@ -139,12 +139,11 @@ func (e *eventLogger) run(
 		cancelFn()
 	}()
 
-	runner := eventlog.NewRunner()
 	publisher := &publisher{
 		client:     client,
 		eventACKer: eventACKer,
 	}
-	if err := runner.Run(ctx, api, state, publisher, e.log); err != nil {
+	if err := eventlog.Run(ctx, api, state, publisher, e.log); err != nil {
 		e.log.Error(err)
 	}
 }
