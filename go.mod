@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.22.10
+go 1.22.12
 
 require (
 	cloud.google.com/go/bigquery v1.65.0
@@ -119,7 +119,6 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.9.0
-	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
 	github.com/vmware/govmomi v0.39.0
 	go.elastic.co/ecszap v1.0.2
