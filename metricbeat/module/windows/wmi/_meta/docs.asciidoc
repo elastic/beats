@@ -47,30 +47,32 @@ As of now, we only support and execute queries with `SELECT`, `FROM` and `WHERE`
       namespace: "root\\cimv2\\power" # Overwrites the module namespace in this query
 ----
 
+*`wmi.namespace`*::
+The default WMI namespace used for queries. This can be overridden per query.
+The default is `root\cimv2`.
 
-*`wmi.host`*:: The host for the remote WMI Connection. By default is localhost.
+*`wmi.host`*:: The host for the remote WMI Connection. The default is `localhost`.
 
-*`wmi.domain`*:: The domain for the remote WMI Connection. By default is the empty string.
+*`wmi.domain`*:: The domain for the remote WMI Connection. The default is the empty string (`""`).
 
-*`wmi.username`*:: The username for the remote WMI Connection. By default is empty string.
+*`wmi.username`*:: The username for the remote WMI Connection. The default is empty string (`""`).
 
-*`wmi.password`*:: The password for the remote WMI Connection. By default is empty string.
+*`wmi.password`*:: The password for the remote WMI Connection. The default is empty string (`""`).
 
 *`wmi.warning_threshold`*:: The time threshold after which Metricbeat will stop
 waiting for the query result and return control to the main flow of the program.
 A warning is logged indicating that the query execution has exceeded the threshold.
-By default is equal to the period.
+The default is equal to the period.
 
 *`wmi.queries`*:: The list of queries to execute. The list cannot be empty. See <<query-configuration, Query Configuration>> for the format of the queries.
 
-*`wmi.include_queries`*:: If set to true the metricset includes the query in the output document.
-query in the output document. False by default.
+*`wmi.include_queries`*:: If set to `true` the metricset includes the query in the output document. The default value is `false`.
 
-*`wmi.include_null`*:: If set to true the metricset includes the properties that have null value in the output document.
-properties that have a null value in the output document. False by default.
+*`wmi.include_null`*:: If set to `true` the metricset includes the properties that have null value in the output document.
+properties that have a `null` value in the output document. The default value is `false`.
 
 *`wmi.include_empty_string`*:: A boolean option that causes the metricset to include
-the properties that are empty string. False by default.
+the properties that are empty string. The default value is `false`.
 
 
 [float]
