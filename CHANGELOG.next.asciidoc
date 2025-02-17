@@ -230,6 +230,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. {issue}12658[12658] {pull}42737[42737]
 
 *Heartbeat*
 
