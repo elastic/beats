@@ -118,11 +118,19 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		pcommonEvent := otelmap.FromMapstr(beatEvent)
 		// if data_stream field is set on beats.Event. Add it to logrecord.Attributes to support dynamic indexing
 		if data, ok := pcommonEvent.Get("data_stream"); ok {
-			value := logRecord.Attributes().PutEmpty("data_stream")
-			data.CopyTo(value)
+			// If the below sub fields do not exist, it will return empty string.
+			var subFields = []string{"dataset", "namespace", "type"}
+
+			for _, subField := range subFields {
+				value, ok := data.Map().Get(subField)
+				if ok && value.Str() != "" {
+					// set log record attribute only if value is non empty
+					logRecord.Attributes().PutStr("data_stream."+subField, value.Str())
+				}
+			}
+
 		}
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
-
 	}
 
 	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
