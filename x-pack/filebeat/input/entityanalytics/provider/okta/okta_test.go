@@ -150,18 +150,14 @@ func TestOktaDoFetch(t *testing.T) {
 				id := fmt.Sprintf("%sid%d", prefix, n)
 
 				// Store expected states. The State values are all Discovered
-				// unless the user is deleted since they are all first appearance.
+				// since they are all first appearance. The status may differ.
 				states := []string{
 					"ACTIVE",
 					"RECOVERY",
 					"DEPROVISIONED",
 				}
 				status := states[n%len(states)]
-				state := Discovered
-				if status == "DEPROVISIONED" {
-					state = Deleted
-				}
-				wantStates[id] = state
+				wantStates[id] = Discovered
 
 				replacer := strings.NewReplacer(
 					strings.ToUpper(prefix+"id"), id,
