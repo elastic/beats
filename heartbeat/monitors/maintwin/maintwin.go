@@ -62,7 +62,7 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 	}
 
 	// validate DTSTART and make sure it's not older than 2 years
-	if dtstart.Before(time.Now().Add(-2*365*24*time.Hour)) && validateDtStart {
+	if dtstart.Before(time.Now().AddDate(-2, 0, 0)) && validateDtStart {
 		return nil, fmt.Errorf(
 			"invalid dtstart: %s is more than 2 years in the past. "+
 				"To prevent excessive iterations, please use a more recent date.",
