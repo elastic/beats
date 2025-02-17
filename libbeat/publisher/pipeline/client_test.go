@@ -476,7 +476,7 @@ func getMetrics(t *testing.T, beatInfo beat.Info, inputID string) (
 			"could not cast metric to *monitoring.Uint, got: %T",
 		filteredMetricName, filteredRaw)
 
-	droppedMetricName := inputID + "." + "events_pipeline_dropped_total"
+	droppedMetricName := inputID + "." + "events_pipeline_failed_total"
 	droppedRaw := reg.Get(droppedMetricName)
 	dropped, ok := droppedRaw.(*monitoring.Uint)
 	require.Truef(t, ok,

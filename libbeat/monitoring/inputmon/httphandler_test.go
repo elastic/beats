@@ -60,12 +60,6 @@ func TestHandler(t *testing.T) {
 	reg, _ := NewInputRegistry("foo", "123abc", parent)
 	monitoring.NewInt(reg, "gauge").Set(13344)
 
-	// TODO: add internal input specific metric to be merged with the other
-	//  input metrics
-	// internalReg:=namespace.GetRegistry().
-	// 	GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-	// monitoring.
-
 	// Register legacy metrics without id or input. This must be ignored.
 	{
 		legacy := parent.NewRegistry("f49c0680-fc5f-4b78-bd98-7b16628f9a77")

@@ -71,11 +71,8 @@ type metricsObserver struct {
 }
 
 type inputVars struct {
-	// there is no total events because when the observer is called for a new
-	// event the processors haven't run yet and therefore the inputID isn't
-	// available yet.
 	inputEventsTotal,
-	inputEventsDropped,
+	inputEventsFailed,
 	inputEventsFiltered,
 	inputEventsPublished *monitoring.Uint
 }
@@ -90,8 +87,7 @@ type metricsObserverVars struct {
 	eventsDropped, eventsRetry *monitoring.Uint // (retryer) drop/retry counters
 	activeEvents               *monitoring.Uint
 
-	// metrics per input. The input ID comes from the event's Meta['input_id']
-	inputs map[string]inputVars // TODO: do it need to be thread safe?
+	inputs map[string]inputVars
 }
 
 func newMetricsObserver(metrics, beatInternalInputRegistry *monitoring.Registry) *metricsObserver {
@@ -203,7 +199,7 @@ func (o *metricsObserver) failedPublishEvent(inputID string) {
 
 	input := o.inputMetrics(inputID)
 	if input != nil {
-		input.inputEventsDropped.Inc()
+		input.inputEventsFailed.Inc()
 	}
 }
 
@@ -222,7 +218,7 @@ func (o *metricsObserver) inputMetrics(inputID string) *inputVars {
 
 		input = inputVars{
 			inputEventsTotal:     monitoring.NewUint(reg, "events_pipeline_total"),
-			inputEventsDropped:   monitoring.NewUint(reg, "events_pipeline_dropped_total"),
+			inputEventsFailed:    monitoring.NewUint(reg, "events_pipeline_failed_total"),
 			inputEventsFiltered:  monitoring.NewUint(reg, "events_pipeline_filtered_total"),
 			inputEventsPublished: monitoring.NewUint(reg, "events_pipeline_published_total"),
 		}

@@ -43,7 +43,7 @@ http:
   enabled: true
 filebeat.inputs:
   - type: filestream
-    id: a-filestream-id
+    id: {{.filestream_id}}
     enabled: true
     paths:
       - {{.log_path}}
@@ -55,7 +55,7 @@ filebeat.inputs:
     close.reader.after_interval: 10m
 
   - type: cel
-    id: a-cel-input-id
+    id: {{.cel_id}}
     interval: 1s
     resource.url: {{.cel_resource_url}}
     program: bytes(get(state.url).Body).as(body,{"events":[body.decode_json()]})
@@ -67,7 +67,7 @@ filebeat.inputs:
               ip: "1.1.1.1"
 
   - type: httpjson
-    id: a-httpjson-input-id
+    id: {{.httpjson_id}}
     interval: 1s
     request.url: {{.httpjson_requestURL}}
     processors:
@@ -90,6 +90,7 @@ output.file:
 
 logging.level: debug
 `
+
 	celSrv := makeServer()
 	defer celSrv.Close()
 	httpjsonSrv := makeServer()
@@ -113,7 +114,14 @@ logging.level: debug
 	tmpl, err := template.New("filebeatConfig").Parse(tmplCfg)
 	require.NoErrorf(t, err, "Failed to parse config template")
 
+	filestreamInputID := "a-filestream-id"
+	celInputID := fmt.Sprintf("a-cel-input-id::%s", celSrv.URL)
+	httpsjonInputID := "a-httpjson-input-id"
+
 	require.NoError(t, tmpl.Execute(&cgfSB, map[string]string{
+		"filestream_id":       filestreamInputID,
+		"cel_id":              celInputID,
+		"httpjson_id":         httpsjonInputID,
 		"log_path":            logFilePath,
 		"cel_resource_url":    celSrv.URL,
 		"httpjson_requestURL": httpjsonSrv.URL,
@@ -134,23 +142,11 @@ logging.level: debug
 		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
-	// 5. Now that the reader has been closed, the file is ingested.
-	// TODO: fix that. how to know every input finished? or better to have a
-	//  test per input?
-	// filebeat.WaitForLogs(
-	// 	"Error while processing http request: failed to collect first response: failed to execute http GET:",
-	// 	30*time.Second, "")
-	// httpjson
-	// request finished: 1 events published
-
-	time.Sleep(5 * time.Second)
-	resp, err := http.Get("http://localhost:5066/inputs/")
-	require.NoError(t, err, "failed fetching input metrics")
-	defer resp.Body.Close()
+	// 5. Now that the reader has been closed, we can make the assertions.
 
 	type inputMetric struct {
 		EventsPipelineTotal          int `json:"events_pipeline_total"`
-		EventsPipelineDroppedTotal   int `json:"events_pipeline_dropped_total"`
+		EventsPipelineDroppedTotal   int `json:"events_pipeline_failed_total"`
 		EventsPipelineFilteredTotal  int `json:"events_pipeline_filtered_total"`
 		EventsPipelinePublishedTotal int `json:"events_pipeline_published_total"`
 
@@ -162,14 +158,89 @@ logging.level: debug
 		Input                string `json:"input"`
 	}
 
-	inputMetrics := []inputMetric{}
-	body, err := io.ReadAll(resp.Body)
-	require.NoError(t, err, "failed reading response body")
-	err = json.Unmarshal(body, &inputMetrics)
-	require.NoError(t, err, "failed unmarshalling response body")
+	totalEventsByInput := map[string]int{
+		filestreamInputID: 10,
+		celInputID:        2,
+		httpsjonInputID:   1,
+	}
+	var inputMetrics []inputMetric
+	var body []byte
+	errMsg := strings.Builder{}
+	defer func() {
+		if t.Failed() {
+			t.Errorf("test faild: input metrics response used for the assertions: %s", body)
+		}
+	}()
+	require.Eventuallyf(t, func() bool {
+		errMsg.Reset()
+		inputMetrics = []inputMetric{}
+
+		resp, err := http.Get("http://localhost:5066/inputs/")
+		if err != nil {
+			errMsg.WriteString(fmt.Sprintf("request to /inputs/ failed: %v", err))
+			return false
+		}
+		defer resp.Body.Close()
+
+		body, err = io.ReadAll(resp.Body)
+		if err != nil {
+			errMsg.WriteString(fmt.Sprintf("failed to read response body: %v", err))
+			return false
+		}
+		err = json.Unmarshal(body, &inputMetrics)
+		if err != nil {
+			errMsg.WriteString(fmt.Sprintf("failed unmarshalling response body: %v", err))
+			return false
+		}
+
+		if len(inputMetrics) != 3 {
+			errMsg.WriteString(
+				fmt.Sprintf("want %d inputs, got %d", 3, len(inputMetrics)))
+			return false
+		}
+
+		for _, metrics := range inputMetrics {
+			want, ok := totalEventsByInput[metrics.ID]
+			if !ok {
+				errMsg.WriteString(
+					fmt.Sprintf("input %q not found", metrics.ID))
+
+				return false
+			}
+
+			switch metrics.ID {
+			case filestreamInputID:
+				if want != metrics.EventsProcessedTotal {
+					errMsg.WriteString(
+						fmt.Sprintf("input %q wants %d events, got %d",
+							filestreamInputID, want, metrics.EventsProcessedTotal))
+
+					return false
+				}
+			case httpsjonInputID:
+				if want != metrics.EventsPipelineFilteredTotal {
+					errMsg.WriteString(
+						fmt.Sprintf("input %q wants %d events, got %d",
+							httpsjonInputID, want, metrics.EventsPipelineFilteredTotal))
+
+					return false
+				}
+			case celInputID:
+				if want != metrics.EventsPublishedTotal {
+					errMsg.WriteString(
+						fmt.Sprintf("input %q wants %d events, got %d",
+							celInputID, want, metrics.EventsPublishedTotal))
+
+					return false
+				}
+			}
+		}
+
+		return true
+	}, 30*time.Second, 1*time.Second, "did not get necessary input metrics: %s", &errMsg)
 
 	assertionsByInputID := map[string]func(t *testing.T, metrics inputMetric){
-		"a-filestream-id": func(t *testing.T, metrics inputMetric) {
+		filestreamInputID: func(t *testing.T, metrics inputMetric) {
 			assert.Equal(t, "filestream", metrics.Input)
 			assert.Equal(t,
 				metrics.EventsPipelineTotal,
@@ -181,7 +252,7 @@ logging.level: debug
 			assert.Equal(t, 9, metrics.EventsPipelinePublishedTotal)
 			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal)
 		},
-		fmt.Sprintf("a-cel-input-id::%s", celSrv.URL): func(t *testing.T, metrics inputMetric) {
+		celInputID: func(t *testing.T, metrics inputMetric) {
 			assert.Equal(t, "cel", metrics.Input)
 			assert.Equal(t,
 				metrics.EventsPipelineTotal,
@@ -193,7 +264,7 @@ logging.level: debug
 			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal)
 			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal)
 		},
-		"a-httpjson-input-id": func(t *testing.T, metrics inputMetric) {
+		httpsjonInputID: func(t *testing.T, metrics inputMetric) {
 			assert.Equal(t, "httpjson", metrics.Input)
 			assert.Equal(t,
 				metrics.EventsPipelineTotal,
@@ -217,8 +288,6 @@ logging.level: debug
 		}
 		assertions(t, inpMetric)
 	}
-
-	assert.Falsef(t, t.Failed(), "test faild: input metrics response used for the assertions: %s", body)
 }
 
 // makeServer returns a *httptest.Server to mock a server called by an input.
