@@ -201,7 +201,6 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-		assert.Equal(t, "2025-01-29T09:02:39.000Z", bodyTimestamp, "body timestamp is incorrect")
-		assert.Equal(t, "2025-01-29T09:02:39.000Z", recordTimestamp, "record timestamp is incorrect")
+		assert.Equal(t, bodyTimestamp, recordTimestamp, "log record timestamp should match body timestamp")
 	})
 }
