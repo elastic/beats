@@ -55,6 +55,7 @@ func Run(
 
 runLoop:
 	for {
+		//nolint:nilerr // only log error if we are not shutting down
 		if cancelCtx.Err() != nil {
 			return nil
 		}
@@ -106,6 +107,7 @@ runLoop:
 					return nil
 				}
 
+				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
 					return nil
 				}

@@ -83,7 +83,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 func (winlogInput) Name() string { return pluginName }
 
 func (in winlogInput) Test(source cursor.Source, ctx input.TestContext) error {
-	api := source.(eventlog.EventLog)
+	api, _ := source.(eventlog.EventLog)
 	err := api.Open(checkpoint.EventLogState{})
 	if err != nil {
 		return fmt.Errorf("failed to open %q: %w", api.Channel(), err)
@@ -97,7 +97,7 @@ func (in winlogInput) Run(
 	cursor cursor.Cursor,
 	pub cursor.Publisher,
 ) error {
-	api := source.(eventlog.EventLog)
+	api, _ := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 	return eventlog.Run(
 		ctxtool.FromCanceller(ctx.Cancelation),
