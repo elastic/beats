@@ -64,7 +64,6 @@ const (
 // should never treated as permanent, they are just an indication to apply a
 // retry backoff until the connection is healthy again.
 var errS3DownloadFailed = errors.New("S3 download failure")
-var errUnexpectedEOF = errors.New("unexpected EOF")
 
 func newS3ObjectProcessorFactory(metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
@@ -276,9 +275,9 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
 			if errors.Is(err, io.ErrUnexpectedEOF) {
-				// Wrap ErrUnexpectedEOF in the result so the caller knows it's not a
+				// Wrap ErrUnexpectedEOF as an errS3DownloadFailed in the result so the caller knows it's not a
 				// permanent failure.
-				return fmt.Errorf("%w: %w", errUnexpectedEOF, err)
+				return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
 			} else {
 				return fmt.Errorf("failed to decode json: %w", err)
 			}

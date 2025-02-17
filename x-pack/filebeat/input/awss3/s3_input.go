@@ -167,11 +167,6 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			// next iteration so we don't mark the object as permanently failed.
 			rateLimitWaiter.Wait()
 			continue
-		} else if errors.Is(err, errUnexpectedEOF) {
-			// UnexpectedEOF errors are ephemeral. Add a backoff delay, then skip to the
-			// next iteration so we don't mark the object as permanently failed.
-			rateLimitWaiter.Wait()
-			continue
 		}
 		// Reset the rate limit delay on results that aren't download errors.
 		rateLimitWaiter.Reset()
