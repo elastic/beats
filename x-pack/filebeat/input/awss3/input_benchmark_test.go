@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -355,7 +356,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					filterProvider:  newFilterProvider(&config),
 				}
 
-				s3Poller.run(ctx)
+				s3Poller.run(v2.Context{Cancelation: ctx})
 			}(i, wg)
 		}
 

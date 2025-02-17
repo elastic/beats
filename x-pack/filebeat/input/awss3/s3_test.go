@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 
@@ -150,7 +151,7 @@ func TestS3Poller(t *testing.T) {
 			metrics:         newInputMetrics("", nil, 0),
 			filterProvider:  newFilterProvider(&cfg),
 		}
-		poller.runPoll(ctx)
+		poller.runPoll(v2.Context{Cancelation: ctx})
 	})
 
 	t.Run("restart bucket scan after paging errors", func(t *testing.T) {
@@ -297,7 +298,7 @@ func TestS3Poller(t *testing.T) {
 			metrics:         newInputMetrics("", nil, 0),
 			filterProvider:  newFilterProvider(&cfg),
 		}
-		poller.run(ctx)
+		poller.run(v2.Context{Cancelation: ctx})
 	})
 }
 
@@ -530,7 +531,7 @@ func Test_S3StateHandling(t *testing.T) {
 
 			// when - run polling for desired time
 			for i := 0; i < test.runPollFor; i++ {
-				poller.runPoll(ctx)
+				poller.runPoll(v2.Context{Cancelation: ctx})
 				<-time.After(500 * time.Millisecond)
 			}
 

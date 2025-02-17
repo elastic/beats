@@ -33,8 +33,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
 )
 
 func TestInputMetricsFromPipeline_Filestream(t *testing.T) {
@@ -96,11 +94,7 @@ logging.level: debug
 	httpjsonSrv := makeServer()
 	defer httpjsonSrv.Close()
 
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
+	filebeat := NewFilebeat(t)
 	tempDir := filebeat.TempDir()
 
 	// 1. Generate the log file path
@@ -115,12 +109,13 @@ logging.level: debug
 	require.NoErrorf(t, err, "Failed to parse config template")
 
 	filestreamInputID := "a-filestream-id"
-	celInputID := fmt.Sprintf("a-cel-input-id::%s", celSrv.URL)
+	celBaseInputID := "a-cel-input-id"
+	celInputID := fmt.Sprintf("%s::%s", celBaseInputID, celSrv.URL)
 	httpsjonInputID := "a-httpjson-input-id"
 
 	require.NoError(t, tmpl.Execute(&cgfSB, map[string]string{
 		"filestream_id":       filestreamInputID,
-		"cel_id":              celInputID,
+		"cel_id":              celBaseInputID,
 		"httpjson_id":         httpsjonInputID,
 		"log_path":            logFilePath,
 		"cel_resource_url":    celSrv.URL,
