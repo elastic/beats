@@ -52,14 +52,14 @@ NOTE: While Metricbeat stops waiting for the result, the underlying WMI query ma
     include_empty_strings: false
     queries:
     - class: Win32_OperatingSystem
-      fields:
+      properties:
       - FreePhysicalMemory
       - FreeSpaceInPagingFiles
       - NumberOfUsers
       # Where Clasue
       where: ""
     - class: Win32_PowerPlan
-      fields: []
+      properties: []
       where: "IsActive = True"
       namespace: "root\\cimv2\\power" # Overwrites the module namespace in this query
 ----
@@ -101,7 +101,7 @@ Each item in the `queries` list specifies a wmi query to perform.
 
 *`class`*:: The wmi class. In the query it specifies the `FROM` clause. Required
 
-*`fields`*:: List of fields to return. In the query it specifies the `SELECT` clause. Set it to the empty list (default value) to retrieve all available properties.
+*`properties`*:: List of properties to return. In the query it specifies the `SELECT` clause. Set it to the empty list (default value) to retrieve all available properties.
 
 *`where`*:: The where clause. In the query it specifies the `WHERE` clause. Read more about the format link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/where-clause[in the Windows Documentation].
 
@@ -124,7 +124,7 @@ Equivalent YAML Configuration:
 [source,yaml]
 ----
 - class: Win32_Process
-  fields:
+  properties:
   - Name
   - ProcessId
   - WorkingSetSize

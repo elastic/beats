@@ -88,12 +88,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 }
 
 // This function handles the skip conditions
-func (m *MetricSet) shouldSkipNilOrEmptyValue(fieldValue interface{}) bool {
-	if fieldValue == nil {
+func (m *MetricSet) shouldSkipNilOrEmptyValue(propertyValue interface{}) bool {
+	if propertyValue == nil {
 		if !m.config.IncludeNull {
 			return true // Skip if it's nil and IncludeNull is false
 		}
-	} else if stringValue, ok := fieldValue.(string); ok {
+	} else if stringValue, ok := propertyValue.(string); ok {
 		if len(stringValue) == 0 && !m.config.IncludeEmptyString {
 			return true // Skip if it's an empty string and IncludeEmptyString is false
 		}
@@ -140,7 +140,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			if len(rows) == 0 {
-				m.Logger().Warnf("The query '%s' did not produce results. This can be expected, but it can also be the result of querying an invalid field. Make sure all required fields do exist or check the WMI-Activity Operational Log for more information.", query)
+				m.Logger().Warnf("The query '%s' did not produce results. This can be expected, but it can also be the result of querying an invalid property. Make sure all required properties do exist or check the WMI-Activity Operational Log for more information.", query)
 			}
 
 			defer wmi.CloseAllInstances(rows)
@@ -163,26 +163,26 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				}
 
 				// Get only the required properties
-				properties := queryConfig.Fields
+				properties := queryConfig.Properties
 
-				// If the Fields array is empty we retrieve all fields
-				if len(queryConfig.Fields) == 0 {
+				// If the Properties array is empty we retrieve all properties available in the class
+				if len(queryConfig.Properties) == 0 {
 					properties = instance.GetClass().GetPropertiesNames()
 				}
 
-				for _, fieldName := range properties {
-					fieldValue, err := instance.GetProperty(fieldName)
+				for _, propertyName := range properties {
+					propertyValue, err := instance.GetProperty(propertyName)
 					if err != nil {
 						m.Logger().Error("Unable to get propery by name: %v", err)
 						continue
 					}
 
-					if m.shouldSkipNilOrEmptyValue(fieldValue) {
+					if m.shouldSkipNilOrEmptyValue(propertyValue) {
 						continue
 					}
 
 					// The default case, we simply return what we got
-					finalValue := fieldValue
+					finalValue := propertyValue
 
 					// The script API of WMI returns strings for uint64, sint64, datetime
 					// Link: https://learn.microsoft.com/en-us/windows/win32/wmisdk/querying-wmi
@@ -190,31 +190,31 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					//
 					// Example: in the query: SELECT * FROM Win32_OperatingSystem
 					// FreePhysicalMemory is a string, but it should be an uint64
-					if RequiresExtraConversion(fieldValue) {
-						convertFun, ok := conversionTable[fieldName]
+					if RequiresExtraConversion(propertyValue) {
+						convertFun, ok := conversionTable[propertyName]
 						// If the function is not found let us fetch it and cache it
 						if !ok {
-							convertFun, err = GetConvertFunction(instance, fieldName, m.Logger())
+							convertFun, err = GetConvertFunction(instance, propertyName, m.Logger())
 							if err != nil {
-								m.Logger().Warn("Skipping addition of field %s: Unable to retrieve the conversion function: %v", fieldName, err)
+								m.Logger().Warn("Skipping addition of property %s: Unable to retrieve the conversion function: %v", propertyName, err)
 								continue
 							}
-							conversionTable[fieldName] = convertFun
+							conversionTable[propertyName] = convertFun
 						}
 						// Perform the conversion at this point it's safe to cast to string.
-						fieldValueString, ok := fieldValue.(string)
+						propertyValueString, ok := propertyValue.(string)
 						if !ok {
-							m.Logger().Warn("Skipping addition of field %s: expected a string found %v", fieldName, fieldValue)
+							m.Logger().Warn("Skipping addition of property %s: expected a string found %v", propertyName, propertyValue)
 							continue
 						}
-						convertedValue, err := convertFun(fieldValueString)
+						convertedValue, err := convertFun(propertyValueString)
 						if err != nil {
-							m.Logger().Warn("Skipping addition of field %s. Cannot convert: %v", fieldName, err)
+							m.Logger().Warn("Skipping addition of property %s. Cannot convert: %v", propertyName, err)
 							continue
 						}
 						finalValue = convertedValue
 					}
-					event.MetricSetFields.Put(fieldName, finalValue)
+					event.MetricSetFields.Put(propertyName, finalValue)
 				}
 				report.Event(event)
 			}

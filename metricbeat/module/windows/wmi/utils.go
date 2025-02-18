@@ -104,8 +104,8 @@ func ConvertString(v string) (interface{}, error) {
 
 // Function that determines if a given value requires additional conversion
 // This holds true for strings that encode uint64, sint64 and datetime format
-func RequiresExtraConversion(fieldValue interface{}) bool {
-	stringValue, isString := fieldValue.(string)
+func RequiresExtraConversion(propertyValue interface{}) bool {
+	stringValue, isString := propertyValue.(string)
 	if !isString {
 		return false
 	}
@@ -130,11 +130,11 @@ func getPropertyType(property *ole.IDispatch) (base.WmiType, error) {
 	return base.WmiType(value.(int32)), nil
 }
 
-// Returns the "raw" SWbemProperty containing type information for a given field.
+// Returns the "raw" SWbemProperty containing type information for a given property.
 //
 // The microsoft/wmi library does not have a function that given an instance and a property name
 // returns the wmi.wmiProperty object. This function mimics the behavior of the `GetSystemProperty`
-// method in the wmi.wmiInstance struct and applies it on the Properties_ field
+// method in the wmi.wmiInstance struct and applies it on the Properties_ property
 // https://github.com/microsoft/wmi/blob/v0.25.2/pkg/wmiinstance/WmiInstance.go#L87
 //
 // Note: We are not instantiating a wmi.wmiProperty because of this issue

@@ -28,51 +28,51 @@ import (
 func TestShouldSkipNilOrEmptyValue(t *testing.T) {
 	tests := []struct {
 		key                string
-		fieldValue         interface{}
+		propertyValue      interface{}
 		includeNull        bool
 		includeEmptyString bool
 		expectedShouldSkip bool
 	}{
-		// Test Case 1: fieldValue is nil, and IncludeNull is false
+		// Test Case 1: propertyValue is nil, and IncludeNull is false
 		{
 			key:                "Skip nil value with IncludeNull false",
-			fieldValue:         nil,
+			propertyValue:      nil,
 			includeNull:        false,
 			includeEmptyString: false,
 			expectedShouldSkip: true, // Should skip because IncludeNull is false
 		},
 
-		// Test Case 2: fieldValue is an empty string, and IncludeEmptyString is false
+		// Test Case 2: propertyValue is an empty string, and IncludeEmptyString is false
 		{
 			key:                "Skip Empty string with IncludeEmptyString false",
-			fieldValue:         "",
+			propertyValue:      "",
 			includeNull:        false,
 			includeEmptyString: false,
 			expectedShouldSkip: true, // Should skip because IncludeEmptyString is false
 		},
 
-		// Test Case 3: fieldValue is nil, and IncludeNull is true
+		// Test Case 3: propertyValue is nil, and IncludeNull is true
 		{
 			key:                "Don't skip Nil value with IncludeNull true",
-			fieldValue:         nil,
+			propertyValue:      nil,
 			includeNull:        true,
 			includeEmptyString: false,
 			expectedShouldSkip: false, // Should not skip because IncludeNull is true
 		},
 
-		// Test Case 4: fieldValue is a non-empty string, and IncludeEmptyString is false
+		// Test Case 4: propertyValue is a non-empty string, and IncludeEmptyString is false
 		{
 			key:                "Don't skip Non-empty string with IncludeEmptyString false",
-			fieldValue:         "non-empty",
+			propertyValue:      "non-empty",
 			includeNull:        false,
 			includeEmptyString: false,
 			expectedShouldSkip: false, // Should not skip because the string is non-empty
 		},
 
-		// Test Case 5: fieldValue is a non-empty string, and IncludeEmptyString is true
+		// Test Case 5: propertyValue is a non-empty string, and IncludeEmptyString is true
 		{
 			key:                "Non-empty string with IncludeEmptyString true",
-			fieldValue:         "non-empty",
+			propertyValue:      "non-empty",
 			includeNull:        true,
 			includeEmptyString: true,
 			expectedShouldSkip: false, // Should not skip because IncludeEmptyString is true
@@ -92,8 +92,8 @@ func TestShouldSkipNilOrEmptyValue(t *testing.T) {
 				config: config,
 			}
 
-			// Act: Call shouldSkipNilOrEmptyValue with the test case fieldValue
-			result := metricSet.shouldSkipNilOrEmptyValue(test.fieldValue)
+			// Act: Call shouldSkipNilOrEmptyValue with the test case propertyValue
+			result := metricSet.shouldSkipNilOrEmptyValue(test.propertyValue)
 
 			// Assert: Check if the result matches the expected result
 			assert.Equal(t, test.expectedShouldSkip, result)
