@@ -62,17 +62,15 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 	}
 
 	if v.hmacHeader != "" && v.hmacKey != "" && v.hmacType != "" {
-		// Read HMAC signature from HTTP header.
-		hmacHeaderValue := r.Header.Get(v.hmacHeader)
-		if v.hmacHeader == "" {
+		// Check whether the HMAC header exists at all.
+		if len(r.Header.Values(v.hmacHeader)) == 0 {
 			return http.StatusUnauthorized, errMissingHMACHeader
 		}
-		if v.hmacPrefix != "" {
-			hmacHeaderValue = strings.TrimPrefix(hmacHeaderValue, v.hmacPrefix)
-		}
-		signature, err := decodeHeaderValue(hmacHeaderValue)
+		// Read HMAC signature from HTTP header.
+		hmacHeaderValue := r.Header.Get(v.hmacHeader)
+		signature, err := decodeHeaderValue(strings.TrimPrefix(hmacHeaderValue, v.hmacPrefix))
 		if err != nil {
-			return http.StatusUnauthorized, fmt.Errorf("invalid HMAC signature hex: %w", err)
+			return http.StatusUnauthorized, fmt.Errorf("invalid HMAC signature encoding: %w", err)
 		}
 
 		// We need access to the request body to validate the signature, but we
@@ -113,7 +111,14 @@ var decoders = [...]func(string) ([]byte, error){
 	base64.StdEncoding.DecodeString,
 }
 
+// decodeHeaderValue attempts to decode s as hex, unpadded base64
+// ([base64.RawStdEncoding]), and padded base64 ([base64.StdEncoding]).
+// The first successful decoding result is returned. If all decodings fail, it
+// collects errors from each attempt and returns them as a single error.
 func decodeHeaderValue(s string) ([]byte, error) {
+	if s == "" {
+		return nil, errors.New("unexpected empty header value")
+	}
 	var errs []error
 	for _, d := range &decoders {
 		b, err := d(s)
