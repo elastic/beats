@@ -115,6 +115,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix autodiscovery memory leak related to metadata of start events {pull}41748[41748]
 - All standard queue metrics are now included in metrics monitoring, including: `added.{events, bytes}`, `consumed.{events, bytes}`, `removed.{events, bytes}`, and `filled.{events, bytes, pct}`. {pull}42439[42439]
 - The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
+- Restored event Meta fields in the Elasticsearch output's error logs. {pull}42559[42559]
 
 *Auditbeat*
 
@@ -187,6 +188,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size. {pull}42327[42327]
+- Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 
 *Heartbeat*
 
@@ -250,7 +252,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
-- Update to Go 1.22.10. {pull}42095[42095]
+- Update to Go 1.22.12. {pull}42681[42681]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 - Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
@@ -460,6 +462,12 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 ==== Known Issues
+
+
+
+
+
+
 
 
 

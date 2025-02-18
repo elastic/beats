@@ -60,7 +60,7 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	if err := xpacketbeat.CopyNPCAPInstaller(); err != nil {
+	if err := xpacketbeat.CopyNPCAPInstaller("./npcap/installer/"); err != nil {
 		return err
 	}
 
@@ -137,12 +137,7 @@ func TestPackages() error {
 }
 
 func SystemTest(ctx context.Context) error {
-	// Buildkite (CI) images have preinstalled npcap
-	if os.Getenv("CI") == "true" {
-		mg.SerialDeps(devtools.BuildSystemTestBinary)
-	} else {
-		mg.SerialDeps(xpacketbeat.GetNpcapInstaller, devtools.BuildSystemTestBinary)
-	}
+	mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("./"), devtools.BuildSystemTestBinary)
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"./tests/system/..."}
