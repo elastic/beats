@@ -135,15 +135,14 @@ Equivalent YAML Configuration:
 [float]
 === Best Practices
 
-- Test your queries in isolation with the command `metricbeat test modules`
+- Test your queries in isolation using the `Get-CimInstance` powerhsell cmdlet or the WMI Explorer.
 
 - Ensure that `wmi.warning_threshold` is **less than or equal to** the module's `period`.
-  This prevents starting multiple executions of the same query.
+  This prevents starting intentionally multiple executions of the same query.
 
-- Set up alerts in Metricbeat logs for timeouts and empty query results.
-  If a query frequently times out or returns no data, investigate the cause to avoid missing critical information.
+- Set up alerts in Metricbeat logs for timeouts and empty query results. If a query frequently times out or returns no data, investigate the cause to prevent missing critical information.
 
-- [Advanced] Collect WMI-Activity Operational Logs to correlate Metricbeat wmi warnings.
+- [Advanced] Collect WMI-Activity Operational Logs to correlate with Metricbeat WMI warnings.
 
 
 [float]
