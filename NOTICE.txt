@@ -10959,11 +10959,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/dgraph-io/badger/v4
-Version: v4.2.1-0.20240828131336-2725dc8ed5c2
+Version: v4.4.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/badger/v4@v4.2.1-0.20240828131336-2725dc8ed5c2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/badger/v4@v4.4.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -18468,11 +18468,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/flatbuffers
-Version: v23.5.26+incompatible
+Version: v24.3.25+incompatible
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v23.5.26+incompatible/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v24.3.25+incompatible/LICENSE:
 
 
                                  Apache License
@@ -37735,12 +37735,12 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/dgraph-io/ristretto
-Version: v0.1.2-0.20240116140435-c67e07994f91
+Dependency : github.com/dgraph-io/ristretto/v2
+Version: v2.0.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/ristretto@v0.1.2-0.20240116140435-c67e07994f91/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/ristretto/v2@v2.0.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -47767,11 +47767,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/klauspost/compress
-Version: v1.17.9
+Version: v1.17.11
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/klauspost/compress@v1.17.9/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/klauspost/compress@v1.17.11/LICENSE:
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2019 Klaus Post. All rights reserved.
@@ -54399,12 +54399,12 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/census-instrumentation/opencensus-go
+Dependency : go.opencensus.io
 Version: v0.24.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/census-instrumentation/opencensus-go@v0.24.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.opencensus.io@v0.24.0/LICENSE:
 
 
                                  Apache License

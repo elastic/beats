@@ -106,12 +106,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
-- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
-- Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
-- Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
-- Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
-- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218] 
-- In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
 
 *Heartbeat*
 
@@ -173,6 +168,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
+- Update to Go 1.22.12. {pull}42681[42681]
 
 *Auditbeat*
 
@@ -219,6 +215,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
+- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
 
 *Auditbeat*
 
@@ -294,6 +291,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
