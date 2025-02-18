@@ -121,6 +121,8 @@ func Test_RequiresExtraConversion(t *testing.T) {
 	}
 }
 
+const TEST_DATE_FORMAT string = "2006-01-02T15:04:05.999999-07:00"
+
 func Test_ConversionFunctions(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -170,8 +172,16 @@ func Test_ConversionFunctions(t *testing.T) {
 		{
 			name:        "ConvertDatetime - valid input",
 			conversion:  ConvertDatetime,
-			input:       "20231224093045.123456-000",
-			expected:    mustParseTime("20060102150405.999999-0700", "20231224093045.123456-0000"),
+			input:       "20231224093045.123456+000",
+			expected:    mustParseTime(TEST_DATE_FORMAT, "2023-12-24T09:30:45.123456+00:00"),
+			expectErr:   false,
+			description: "Should convert string to time.Time",
+		},
+		{
+			name:        "ConvertDatetime - valid input - timezone set",
+			conversion:  ConvertDatetime,
+			input:       "20231224093045.123456-690",
+			expected:    mustParseTime(TEST_DATE_FORMAT, "2023-12-24T09:30:45.123456-11:30"),
 			expectErr:   false,
 			description: "Should convert string to time.Time",
 		},
