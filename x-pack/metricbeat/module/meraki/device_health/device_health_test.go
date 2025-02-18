@@ -199,7 +199,7 @@ func (m *SuccessfulMockNetworkHealthService) GetNetworkNetworkHealthChannelUtili
 	wifi1utilizationTotal := 2.2
 
 	return &meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization{
-		{
+		meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilization{
 			Serial: "serial-1",
 			Wifi0: &[]meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{
 				{
@@ -216,7 +216,7 @@ func (m *SuccessfulMockNetworkHealthService) GetNetworkNetworkHealthChannelUtili
 				},
 			},
 		},
-		{
+		meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilization{
 			Serial: "serial-2",
 			Wifi0: &[]meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{
 				{
@@ -245,7 +245,7 @@ func (m *MultipleBucketsMockNetworkHealthService) GetNetworkNetworkHealthChannel
 	wifi0util_total := 3.2
 
 	return &meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization{
-		{
+		meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilization{
 			Serial: "serial-3",
 			Wifi0: &[]meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{
 				{ // First bucket will be used
