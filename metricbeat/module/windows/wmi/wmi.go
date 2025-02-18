@@ -140,7 +140,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			}
 
 			if len(rows) == 0 {
-				m.Logger().Warnf("The query '%s' did not produce results. This can be expected, but it can also be the result of querying an invalid property. Make sure all required properties do exist or check the WMI-Activity Operational Log for more information.", query)
+				m.Logger().Warnf("The query '%s' did not return any results. While this can be expected in case of a too strict WHERE clause, it may also indicate an invalid query. Ensure the query is correct or check the WMI-Activity Operational Log for further details.", query)
 			}
 
 			defer wmi.CloseAllInstances(rows)
