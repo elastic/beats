@@ -257,10 +257,9 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 			}
 		}
 		if len(users) != 0 {
-			var tracker *kvstore.TxTracker
 			start := time.Now()
+			tracker := kvstore.NewTxTracker(ctx)
 			p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-			tracker = kvstore.NewTxTracker(ctx)
 			for _, u := range users {
 				p.publishUser(u, state, inputCtx.ID, client, tracker)
 			}

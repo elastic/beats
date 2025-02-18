@@ -46,8 +46,8 @@ type Info struct {
 		DefaultUsername string                // The default username to be used to connect to Elasticsearch Monitoring
 		Namespace       *monitoring.Namespace // a monitor namespace that is unique per beat instance
 	}
-	LogConsumer consumer.Logs // otel log consumer
-
+	LogConsumer          consumer.Logs // otel log consumer
+	UseDefaultProcessors bool          // Whether to use the default processors
 }
 
 func (i Info) FQDNAwareHostname(useFQDN bool) string {
