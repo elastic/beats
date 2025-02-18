@@ -112,6 +112,14 @@ processors:
           type:
             - change
           action: registry-value-modified
+        "4662":
+          category:
+            - iam
+            - configuration
+          type:
+            - admin
+            - change
+          action: object-operation-performed
         "4670":
           category:
             - iam
@@ -750,6 +758,14 @@ processors:
           type:
             - end
           action: windows-firewall-driver-error
+        "5136":
+          category:
+            - iam
+            - configuration
+          type:
+            - admin
+            - change
+          action: directory-service-object-modified
         "5140":
           category:
             - network
@@ -795,11 +811,16 @@ processors:
             - info
           action: vault-credentials-were-read
       source: |-
-        if (ctx?.event?.code == null || params.get(ctx.event.code) == null) {
+        if (ctx.event?.code == null || params.get(ctx.event.code) == null) {
           return;
         }
-        def hm = new HashMap(params.get(ctx.event.code));
-        hm.forEach((k, v) -> ctx.event[k] = v);
+        params.get(ctx.event.code).forEach((k, v) -> {
+          if (v instanceof List) {
+            ctx.event[k] = new ArrayList(v);
+          } else {
+            ctx.event[k] = v;
+          }
+        });
   - script:
       lang: painless
       ignore_failure: false
@@ -818,14 +839,14 @@ processors:
         "10": RemoteInteractive
         "11": CachedInteractive
       source: |-
-        if (ctx?.winlog?.event_data?.LogonType == null) {
+        if (ctx.winlog?.event_data?.LogonType == null) {
           return;
         }
         def t = params.get(ctx.winlog.event_data.LogonType);
         if (t == null) {
           return;
         }
-        if (ctx?.winlog?.logon == null ) {
+        if (ctx.winlog?.logon == null ) {
           Map map = new HashMap();
           ctx.winlog.put("logon", map);
         }
@@ -861,27 +882,25 @@ processors:
         "0x00100000": USER_PARTIAL_SECRETS_ACCOUNT
         "0x00200000": USER_USE_AES_KEYS
       source: |-
-        if (ctx?.winlog?.event_data?.NewUacValue == null) {
+        if (ctx.winlog?.event_data == null) {
+          return;
+        }
+        if (ctx.winlog.event_data.NewUacValue == null || ctx.winlog.event_data.NewUacValue == "-") {
           return;
         }
         Long newUacValue = Long.decode(ctx.winlog.event_data.NewUacValue);
         ArrayList uacResult = new ArrayList();
-        def[] w = new def[] { null };
-        for (long b = 0; b < 32; b++) {
-          long flag = 1L << b;
-          if ((newUacValue.longValue() & flag) == flag) {
-            w[0] = flag;
-            def desc = params[String.format("0x%08X", w)];
-            if (desc != null) {
-              uacResult.add(desc);
-            }
+        for (entry in params.entrySet()) {
+          Long flag = Long.decode(entry.getKey());
+          if ((newUacValue.longValue() & flag.longValue()) == flag.longValue()) {
+            uacResult.add(entry.getValue());
           }
         }
         if (uacResult.length == 0) {
           return;
         }
         ctx.winlog.event_data.put("NewUACList", uacResult);
-        if (ctx?.winlog?.event_data?.UserAccountControl == null) {
+        if (ctx.winlog.event_data.UserAccountControl == null || ctx.winlog.event_data.UserAccountControl == "-") {
           return;
         }
         ArrayList uac_array = new ArrayList();
@@ -922,20 +941,15 @@ processors:
         "0x00000002": Renew
         "0x00000001": Validate
       source: |-
-        if (ctx?.winlog?.event_data?.TicketOptions == null) {
+        if (ctx.winlog?.event_data?.TicketOptions == null) {
           return;
         }
         Long tOpts = Long.decode(ctx.winlog.event_data.TicketOptions);
         ArrayList tDescs = new ArrayList();
-        def[] w = new def[] { null };
-        for (long b = 0; b < 32; b++) {
-          long flag = 1L << b;
-          if ((tOpts.longValue() & flag) == flag) {
-            w[0] = flag;
-            def desc = params[String.format("0x%08X", w)];
-            if (desc != null) {
-              tDescs.add(desc);
-            }
+        for (entry in params.entrySet()) {
+          Long flag = Long.decode(entry.getKey());
+          if ((tOpts.longValue() & flag.longValue()) == flag.longValue()) {
+            tDescs.add(entry.getValue());
           }
         }
         if (tDescs.length == 0) {
@@ -959,7 +973,7 @@ processors:
         "0x18": RC4-HMAC-EXP
         "0xffffffff": FAIL
       source: |-
-        if (ctx?.winlog?.event_data?.TicketEncryptionType == null) {
+        if (ctx.winlog?.event_data?.TicketEncryptionType == null) {
           return;
         }
         ctx.winlog.event_data.put("TicketEncryptionTypeDescription",
@@ -1032,8 +1046,8 @@ processors:
         "0x43": KRB_AP_ERR_NO_TGT
         "0x44": KDC_ERR_WRONG_REALM
       source: |-
-        if (ctx?.winlog?.event_data?.Status == null ||
-            ctx?.event?.code == null ||
+        if (ctx.winlog?.event_data?.Status == null ||
+            ctx.event?.code == null ||
             !["4768", "4769", "4770", "4771"].contains(ctx.event.code)) {
           return;
         }
@@ -1054,15 +1068,15 @@ processors:
         "0x110": Interactive Own Process
         "0x120": Interactive Share Process
       source: |-
-        if (ctx?.winlog?.event_data?.ServiceName != null) {
-          if (ctx?.service == null) {
+        if (ctx.winlog?.event_data?.ServiceName != null) {
+          if (ctx.service == null) {
             HashMap hm = new HashMap();
             ctx.put("service", hm);
           }
           ctx.service.put("name", ctx.winlog.event_data.ServiceName);
         }
-        if (ctx?.winlog.event_data?.ServiceType != null) {
-          if (ctx?.service == null) {
+        if (ctx.winlog.event_data?.ServiceType != null) {
+          if (ctx.service == null) {
             HashMap hm = new HashMap();
             ctx.put("service", hm);
           }
@@ -1073,8 +1087,6 @@ processors:
       ignore_failure: false
       tag: Set Audit Information
       description: Set Audit Information
-      # Audit Categories Description
-      # https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-gpac/77878370-0712-47cd-997d-b07053429f6d
       params:
         "0CCE9210-69AE-11D9-BED3-505054503030": ["Security State Change", "System"]
         "0CCE9211-69AE-11D9-BED3-505054503030": ["Security System Extension", "System"]
@@ -1082,59 +1094,59 @@ processors:
         "0CCE9213-69AE-11D9-BED3-505054503030": ["IPsec Driver", "System"]
         "0CCE9214-69AE-11D9-BED3-505054503030": ["Other System Events", "System"]
         "0CCE9215-69AE-11D9-BED3-505054503030": ["Logon", "Logon/Logoff"]
-        "0CCE9216-69AE-11D9-BED3-505054503030": ["Logoff", "Logon/Logoff"]
-        "0CCE9217-69AE-11D9-BED3-505054503030": ["Account Lockout", "Logon/Logoff"]
-        "0CCE9218-69AE-11D9-BED3-505054503030": ["IPsec Main Mode", "Logon/Logoff"]
-        "0CCE9219-69AE-11D9-BED3-505054503030": ["IPsec Quick Mode", "Logon/Logoff"]
-        "0CCE921A-69AE-11D9-BED3-505054503030": ["IPsec Extended Mode", "Logon/Logoff"]
-        "0CCE921B-69AE-11D9-BED3-505054503030": ["Special Logon", "Logon/Logoff"]
-        "0CCE921C-69AE-11D9-BED3-505054503030": ["Other Logon/Logoff Events", "Logon/Logoff"]
-        "0CCE9243-69AE-11D9-BED3-505054503030": ["Network Policy Server", "Logon/Logoff"]
-        "0CCE9247-69AE-11D9-BED3-505054503030": ["User / Device Claims", "Logon/Logoff"]
-        "0CCE921D-69AE-11D9-BED3-505054503030": ["File System", "Object Access"]
-        "0CCE921E-69AE-11D9-BED3-505054503030": ["Registry", "Object Access"]
-        "0CCE921F-69AE-11D9-BED3-505054503030": ["Kernel Object", "Object Access"]
-        "0CCE9220-69AE-11D9-BED3-505054503030": ["SAM", "Object Access"]
-        "0CCE9221-69AE-11D9-BED3-505054503030": ["Certification Services", "Object Access"]
-        "0CCE9222-69AE-11D9-BED3-505054503030": ["Application Generated", "Object Access"]
-        "0CCE9223-69AE-11D9-BED3-505054503030": ["Handle Manipulation", "Object Access"]
-        "0CCE9224-69AE-11D9-BED3-505054503030": ["File Share", "Object Access"]
-        "0CCE9225-69AE-11D9-BED3-505054503030": ["Filtering Platform Packet Drop", "Object Access"]
-        "0CCE9226-69AE-11D9-BED3-505054503030": ["Filtering Platform Connection ", "Object Access"]
-        "0CCE9227-69AE-11D9-BED3-505054503030": ["Other Object Access Events", "Object Access"]
-        "0CCE9244-69AE-11D9-BED3-505054503030": ["Detailed File Share", "Object Access"]
-        "0CCE9245-69AE-11D9-BED3-505054503030": ["Removable Storage", "Object Access"]
-        "0CCE9246-69AE-11D9-BED3-505054503030": ["Central Policy Staging", "Object Access"]
-        "0CCE9228-69AE-11D9-BED3-505054503030": ["Sensitive Privilege Use", "Privilege Use"]
-        "0CCE9229-69AE-11D9-BED3-505054503030": ["Non Sensitive Privilege Use", "Privilege Use"]
-        "0CCE922A-69AE-11D9-BED3-505054503030": ["Other Privilege Use Events", "Privilege Use"]
-        "0CCE922B-69AE-11D9-BED3-505054503030": ["Process Creation", "Detailed Tracking"]
-        "0CCE922C-69AE-11D9-BED3-505054503030": ["Process Termination", "Detailed Tracking"]
-        "0CCE922D-69AE-11D9-BED3-505054503030": ["DPAPI Activity", "Detailed Tracking"]
-        "0CCE922E-69AE-11D9-BED3-505054503030": ["RPC Events", "Detailed Tracking"]
-        "0CCE9248-69AE-11D9-BED3-505054503030": ["Plug and Play Events", "Detailed Tracking"]
-        "0CCE922F-69AE-11D9-BED3-505054503030": ["Audit Policy Change", "Policy Change"]
-        "0CCE9230-69AE-11D9-BED3-505054503030": ["Authentication Policy Change", "Policy Change"]
-        "0CCE9231-69AE-11D9-BED3-505054503030": ["Authorization Policy Change", "Policy Change"]
-        "0CCE9232-69AE-11D9-BED3-505054503030": ["MPSSVC Rule-Level Policy Change", "Policy Change"]
-        "0CCE9233-69AE-11D9-BED3-505054503030": ["Filtering Platform Policy Change", "Policy Change"]
-        "0CCE9234-69AE-11D9-BED3-505054503030": ["Other Policy Change Events", "Policy Change"]
-        "0CCE9235-69AE-11D9-BED3-505054503030": ["User Account Management", "Account Management"]
-        "0CCE9236-69AE-11D9-BED3-505054503030": ["Computer Account Management", "Account Management"]
-        "0CCE9237-69AE-11D9-BED3-505054503030": ["Security Group Management", "Account Management"]
-        "0CCE9238-69AE-11D9-BED3-505054503030": ["Distribution Group Management", "Account Management"]
-        "0CCE9239-69AE-11D9-BED3-505054503030": ["Application Group Management", "Account Management"]
-        "0CCE923A-69AE-11D9-BED3-505054503030": ["Other Account Management Events", "Account Management"]
-        "0CCE923B-69AE-11D9-BED3-505054503030": ["Directory Service Access", "Account Management"]
-        "0CCE923C-69AE-11D9-BED3-505054503030": ["Directory Service Changes", "Account Management"]
-        "0CCE923D-69AE-11D9-BED3-505054503030": ["Directory Service Replication", "Account Management"]
-        "0CCE923E-69AE-11D9-BED3-505054503030": ["Detailed Directory Service Replication", "Account Management"]
-        "0CCE923F-69AE-11D9-BED3-505054503030": ["Credential Validation", "Account Logon"]
-        "0CCE9240-69AE-11D9-BED3-505054503030": ["Kerberos Service Ticket Operations", "Account Logon"]
-        "0CCE9241-69AE-11D9-BED3-505054503030": ["Other Account Logon Events", "Account Logon"]
-        "0CCE9242-69AE-11D9-BED3-505054503030": ["Kerberos Authentication Service", "Account Logon"]
+        "0CCE9216-69AE-11D9-BED3-505054503030": ["Logoff","Logon/Logoff"]
+        "0CCE9217-69AE-11D9-BED3-505054503030": ["Account Lockout","Logon/Logoff"]
+        "0CCE9218-69AE-11D9-BED3-505054503030": ["IPsec Main Mode","Logon/Logoff"]
+        "0CCE9219-69AE-11D9-BED3-505054503030": ["IPsec Quick Mode","Logon/Logoff"]
+        "0CCE921A-69AE-11D9-BED3-505054503030": ["IPsec Extended Mode","Logon/Logoff"]
+        "0CCE921B-69AE-11D9-BED3-505054503030": ["Special Logon","Logon/Logoff"]
+        "0CCE921C-69AE-11D9-BED3-505054503030": ["Other Logon/Logoff Events","Logon/Logoff"]
+        "0CCE9243-69AE-11D9-BED3-505054503030": ["Network Policy Server","Logon/Logoff"]
+        "0CCE9247-69AE-11D9-BED3-505054503030": ["User / Device Claims","Logon/Logoff"]
+        "0CCE921D-69AE-11D9-BED3-505054503030": ["File System","Object Access"]
+        "0CCE921E-69AE-11D9-BED3-505054503030": ["Registry","Object Access"]
+        "0CCE921F-69AE-11D9-BED3-505054503030": ["Kernel Object","Object Access"]
+        "0CCE9220-69AE-11D9-BED3-505054503030": ["SAM","Object Access"]
+        "0CCE9221-69AE-11D9-BED3-505054503030": ["Certification Services","Object Access"]
+        "0CCE9222-69AE-11D9-BED3-505054503030": ["Application Generated","Object Access"]
+        "0CCE9223-69AE-11D9-BED3-505054503030": ["Handle Manipulation","Object Access"]
+        "0CCE9224-69AE-11D9-BED3-505054503030": ["File Share","Object Access"]
+        "0CCE9225-69AE-11D9-BED3-505054503030": ["Filtering Platform Packet Drop","Object Access"]
+        "0CCE9226-69AE-11D9-BED3-505054503030": ["Filtering Platform Connection ","Object Access"]
+        "0CCE9227-69AE-11D9-BED3-505054503030": ["Other Object Access Events","Object Access"]
+        "0CCE9244-69AE-11D9-BED3-505054503030": ["Detailed File Share","Object Access"]
+        "0CCE9245-69AE-11D9-BED3-505054503030": ["Removable Storage","Object Access"]
+        "0CCE9246-69AE-11D9-BED3-505054503030": ["Central Policy Staging","Object Access"]
+        "0CCE9228-69AE-11D9-BED3-505054503030": ["Sensitive Privilege Use","Privilege Use"]
+        "0CCE9229-69AE-11D9-BED3-505054503030": ["Non Sensitive Privilege Use","Privilege Use"]
+        "0CCE922A-69AE-11D9-BED3-505054503030": ["Other Privilege Use Events","Privilege Use"]
+        "0CCE922B-69AE-11D9-BED3-505054503030": ["Process Creation","Detailed Tracking"]
+        "0CCE922C-69AE-11D9-BED3-505054503030": ["Process Termination","Detailed Tracking"]
+        "0CCE922D-69AE-11D9-BED3-505054503030": ["DPAPI Activity","Detailed Tracking"]
+        "0CCE922E-69AE-11D9-BED3-505054503030": ["RPC Events","Detailed Tracking"]
+        "0CCE9248-69AE-11D9-BED3-505054503030": ["Plug and Play Events","Detailed Tracking"]
+        "0CCE922F-69AE-11D9-BED3-505054503030": ["Audit Policy Change","Policy Change"]
+        "0CCE9230-69AE-11D9-BED3-505054503030": ["Authentication Policy Change","Policy Change"]
+        "0CCE9231-69AE-11D9-BED3-505054503030": ["Authorization Policy Change","Policy Change"]
+        "0CCE9232-69AE-11D9-BED3-505054503030": ["MPSSVC Rule-Level Policy Change","Policy Change"]
+        "0CCE9233-69AE-11D9-BED3-505054503030": ["Filtering Platform Policy Change","Policy Change"]
+        "0CCE9234-69AE-11D9-BED3-505054503030": ["Other Policy Change Events","Policy Change"]
+        "0CCE9235-69AE-11D9-BED3-505054503030": ["User Account Management","Account Management"]
+        "0CCE9236-69AE-11D9-BED3-505054503030": ["Computer Account Management","Account Management"]
+        "0CCE9237-69AE-11D9-BED3-505054503030": ["Security Group Management","Account Management"]
+        "0CCE9238-69AE-11D9-BED3-505054503030": ["Distribution Group Management","Account Management"]
+        "0CCE9239-69AE-11D9-BED3-505054503030": ["Application Group Management","Account Management"]
+        "0CCE923A-69AE-11D9-BED3-505054503030": ["Other Account Management Events","Account Management"]
+        "0CCE923B-69AE-11D9-BED3-505054503030": ["Directory Service Access","Account Management"]
+        "0CCE923C-69AE-11D9-BED3-505054503030": ["Directory Service Changes","Account Management"]
+        "0CCE923D-69AE-11D9-BED3-505054503030": ["Directory Service Replication","Account Management"]
+        "0CCE923E-69AE-11D9-BED3-505054503030": ["Detailed Directory Service Replication","Account Management"]
+        "0CCE923F-69AE-11D9-BED3-505054503030": ["Credential Validation","Account Logon"]
+        "0CCE9240-69AE-11D9-BED3-505054503030": ["Kerberos Service Ticket Operations","Account Logon"]
+        "0CCE9241-69AE-11D9-BED3-505054503030": ["Other Account Logon Events","Account Logon"]
+        "0CCE9242-69AE-11D9-BED3-505054503030": ["Kerberos Authentication Service","Account Logon"]
       source: |-
-        if (ctx?.winlog?.event_data?.SubcategoryGuid == null) {
+        if (ctx.winlog?.event_data?.SubcategoryGuid == null) {
           return;
         }
         def subCatGuid = ctx.winlog.event_data.SubcategoryGuid.replace("{","").replace("}","").toUpperCase();
@@ -2885,7 +2897,7 @@ processors:
             ctx.winlog.event_data.put("LayerNameDescription", params.descriptions[code]);
           }
         }
-        if (ctx?.winlog?.event_data?.AccessMask != null) {
+        if (ctx.winlog?.event_data?.AccessMask != null) {
           ArrayList list = new ArrayList();
           long accessMask;
           for (elem in split(ctx.winlog.event_data.AccessMask)) {
@@ -2958,30 +2970,30 @@ processors:
         "0xc0000371": "The local account store does not contain secret material for the specified account"
         "0x0": "Status OK."
       source: |-
-        if (ctx?.winlog?.event_data?.Status == null ||
-            ctx?.event?.code == null ||
+        if (ctx.winlog?.event_data?.Status == null ||
+            ctx.event?.code == null ||
             !["4625", "4776"].contains(ctx.event.code)) {
           return;
         }
         if (params.containsKey(ctx.winlog.event_data.Status)) {
-          if (ctx?.winlog?.logon == null ) {
+          if (ctx.winlog?.logon == null ) {
               HashMap hm = new HashMap();
               ctx.winlog.put("logon", hm);
           }
-          if (ctx?.winlog?.logon?.failure == null) {
+          if (ctx.winlog?.logon?.failure == null) {
               HashMap hm = new HashMap();
               ctx.winlog.logon.put("failure", hm);
           }
           ctx.winlog.logon.failure.put("status", params[ctx.winlog.event_data.Status]);
         }
-        if (ctx?.winlog?.event_data?.SubStatus == null || !params.containsKey(ctx.winlog.event_data.SubStatus)) {
+        if (ctx.winlog?.event_data?.SubStatus == null || !params.containsKey(ctx.winlog.event_data.SubStatus)) {
           return;
         }
-        if (ctx?.winlog?.logon == null ) {
+        if (ctx.winlog?.logon == null ) {
           HashMap hm = new HashMap();
           ctx.winlog.put("logon", hm);
         }
-        if (ctx?.winlog?.logon?.failure == null) {
+        if (ctx.winlog?.logon?.failure == null) {
           HashMap hm = new HashMap();
           ctx.winlog.logon.put("failure", hm);
         }
@@ -2999,7 +3011,7 @@ processors:
         "3": "TRUST_TYPE_MIT"
         "4": "TRUST_TYPE_DCE"
       source: |-
-        if (ctx?.winlog?.event_data?.TdoType == null) {
+        if (ctx.winlog?.event_data?.TdoType == null) {
           return;
         }
         if (!params.containsKey(ctx.winlog.event_data.TdoType)) {
@@ -3019,7 +3031,7 @@ processors:
         "2": "TRUST_DIRECTION_OUTBOUND"
         "3": "TRUST_DIRECTION_BIDIRECTIONAL"
       source: |-
-        if (ctx?.winlog?.event_data?.TdoDirection == null) {
+        if (ctx.winlog?.event_data?.TdoDirection == null) {
           return;
         }
         if (!params.containsKey(ctx.winlog.event_data.TdoDirection)) {
@@ -3046,7 +3058,7 @@ processors:
         "512": "TRUST_ATTRIBUTE_CROSS_ORGANIZATION_NO_TGT_DELEGATION"
         "1024": "TRUST_ATTRIBUTE_PIM_TRUST"
       source: |-
-        if (ctx?.winlog?.event_data?.TdoAttributes == null) {
+        if (ctx.winlog?.event_data?.TdoAttributes == null) {
           return;
         }
         if (!params.containsKey(ctx.winlog.event_data.TdoAttributes)) {
@@ -3059,21 +3071,21 @@ processors:
       tag: Add Session Events
       description: Add Session Events
       source: |-
-        if (ctx?.event?.code == null ||
+        if (ctx.event?.code == null ||
             !["4778", "4779"].contains(ctx.event.code)) {
           return;
         }
         //AccountName to user.name and related.user
-        if (ctx?.winlog?.event_data?.AccountName != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.event_data?.AccountName != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
-          if (ctx?.related == null) {
+          if (ctx.related == null) {
             HashMap hm = new HashMap();
             ctx.put("related", hm);
           }
-          if (ctx?.related?.user == null) {
+          if (ctx.related?.user == null) {
             ArrayList al = new ArrayList();
             ctx.related.put("user", al);
           }
@@ -3084,8 +3096,8 @@ processors:
         }
 
         //AccountDomain to user.domain
-        if (ctx?.winlog?.event_data?.AccountDomain != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.event_data?.AccountDomain != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
@@ -3093,22 +3105,22 @@ processors:
         }
 
         //ClientAddress to source.ip and related.ip
-        if (ctx?.winlog?.event_data?.ClientAddress != null &&
+        if (ctx.winlog?.event_data?.ClientAddress != null &&
             ctx.winlog.event_data.ClientAddress != "-" &&
             ctx.winlog.event_data.ClientAddress != "Unknown") {
           // Correct invalid IP address "LOCAL"
           if (ctx?.winlog?.event_data?.ClientAddress == "LOCAL") {
             ctx.winlog.event_data.ClientAddress="127.0.0.1";
           }
-          if (ctx?.source == null) {
+          if (ctx.source == null) {
             HashMap hm = new HashMap();
             ctx.put("source", hm);
           }
-          if (ctx?.related == null) {
+          if (ctx.related == null) {
             HashMap hm = new HashMap();
             ctx.put("related", hm);
           }
-          if (ctx?.related?.ip == null) {
+          if (ctx.related?.ip == null) {
             ArrayList al = new ArrayList();
             ctx.related.put("ip", al);
           }
@@ -3119,8 +3131,8 @@ processors:
         }
 
         //ClientName to source.domain
-        if (ctx?.winlog?.event_data?.ClientName != null) {
-          if (ctx?.source == null) {
+        if (ctx.winlog?.event_data?.ClientName != null) {
+          if (ctx.source == null) {
             HashMap hm = new HashMap();
             ctx.put("source", hm);
           }
@@ -3128,8 +3140,8 @@ processors:
         }
 
         //LogonID to winlog.logon.id
-        if (ctx?.winlog?.event_data?.LogonID != null) {
-          if (ctx?.winlog?.logon == null) {
+        if (ctx.winlog?.event_data?.LogonID != null) {
+          if (ctx.winlog?.logon == null) {
             HashMap hm = new HashMap();
             ctx.winlog.put("logon", hm);
           }
@@ -3142,27 +3154,27 @@ processors:
       tag: Copy Target User
       description: Copy Target User
       source: |-
-        if (ctx?.event?.code == null ||
+        if (ctx.event?.code == null ||
             !["4624", "4625", "4634", "4647", "4648", "4768", "4769", "4770",
               "4771", "4776", "4964"].contains(ctx.event.code)) {
           return;
         }
 
-        def targetUserId = ctx?.winlog?.event_data?.TargetUserSid;
+        def targetUserId = ctx.winlog?.event_data?.TargetUserSid;
         if (targetUserId == null) {
-          targetUserId = ctx?.winlog?.event_data?.TargetSid;
+          targetUserId = ctx.winlog?.event_data?.TargetSid;
         }
 
         //TargetUserSid to user.id or user.target.id
         if (targetUserId != null) {
-          if (ctx?.user == null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
-          if (ctx?.user?.id == null) {
+          if (ctx.user?.id == null) {
             ctx.user.put("id", targetUserId);
           } else {
-            if (ctx?.user?.target == null) {
+            if (ctx.user?.target == null) {
               HashMap hm = new HashMap();
               ctx.user.put("target", hm);
             }
@@ -3171,26 +3183,26 @@ processors:
         }
 
         //TargetUserName to related.user and user.name or user.target.name
-        if (ctx?.winlog?.event_data?.TargetUserName != null) {
+        if (ctx.winlog?.event_data?.TargetUserName != null) {
           def tun = ctx.winlog.event_data.TargetUserName.splitOnToken("@");
-          if (ctx?.user == null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
-          if (ctx?.user?.name == null) {
+          if (ctx.user?.name == null) {
             ctx.user.put("name", tun[0]);
           } else {
-            if (ctx?.user?.target == null) {
+            if (ctx.user?.target == null) {
               HashMap hm = new HashMap();
               ctx.user.put("target", hm);
             }
             ctx.user.target.put("name", tun[0]);
           }
-          if (ctx?.related == null) {
+          if (ctx.related == null) {
             HashMap hm = new HashMap();
             ctx.put("related", hm);
           }
-          if (ctx?.related?.user == null) {
+          if (ctx.related?.user == null) {
             ArrayList al = new ArrayList();
             ctx.related.put("user", al);
           }
@@ -3199,50 +3211,58 @@ processors:
           }
         }
         //TargetUserDomain to user.domain or user.target.domain
-        if (ctx?.winlog?.event_data?.TargetDomainName != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.event_data?.TargetDomainName != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
-          if (ctx?.user?.domain == null) {
+          if (ctx.user?.domain == null) {
             ctx.user.put("domain", ctx.winlog.event_data.TargetDomainName);
           } else {
-            if (ctx?.user?.target == null){
+            if (ctx.user?.target == null){
               HashMap hm = new HashMap();
               ctx.user.put("target", hm);
             }
             ctx.user.target.put("domain", ctx.winlog.event_data.TargetDomainName);
           }
         }
+# split member name into parts based on comma ignoring escaped commas
+# https://learn.microsoft.com/en-us/previous-versions/windows/desktop/ldap/distinguished-names
+  - split:
+      if: ctx.winlog?.event_data?.MemberName != null
+      field: winlog.event_data.MemberName
+      target_field: _temp.MemberNameParts
+      separator: "(?<!\\\\),"
+      ignore_missing: true
   - script:
       lang: painless
       ignore_failure: false
       tag: Copy MemberName to User and User to Group
       description: Copy MemberName to User and User to Group
       source: |-
-        if (ctx?.event?.code == null ||
+        if (ctx.event?.code == null ||
             !["4727", "4728", "4729", "4730", "4731", "4732", "4733", "4734", "4735",
               "4737", "4744", "4745", "4746", "4747", "4748", "4749", "4750", "4751",
               "4752", "4753", "4754", "4755", "4756", "4757", "4758", "4759", "4760",
               "4761", "4762", "4763", "4764", "4799"].contains(ctx.event.code)) {
           return;
         }
-        if (ctx?.winlog?.event_data?.MemberName != null) {
-          def memberNameParts = ctx.winlog.event_data.MemberName.splitOnToken(",");
+        if (ctx.winlog?.event_data?.MemberName != null) {
+          def memberNameParts = ctx._temp.MemberNameParts;
           def memberName = memberNameParts[0].replace("CN=","").replace("cn=","");
-          if (ctx?.related == null) {
+          if (ctx.related == null) {
             HashMap hm = new HashMap();
             ctx.put("related", hm);
           }
-          if (ctx?.related?.user == null) {
+          if (ctx.related?.user == null) {
             ArrayList al = new ArrayList();
             ctx.related.put("user", al);
           }
-          if (ctx?.user == null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
-          if (ctx?.user?.target == null){
+          if (ctx.user?.target == null){
             HashMap hm = new HashMap();
             ctx.user.put("target", hm);
           }
@@ -3255,47 +3275,47 @@ processors:
             ctx.user.target.put("domain", domain);
           }
         }
-        if (ctx?.winlog?.event_data?.TargetUserSid != null) {
-          if (ctx?.group == null) {
+        if (ctx.winlog?.event_data?.TargetUserSid != null) {
+          if (ctx.group == null) {
             HashMap hm = new HashMap();
             ctx.put("group", hm);
           }
           ctx.group.put("id", ctx.winlog.event_data.TargetUserSid);
         }
-        if (ctx?.winlog?.event_data?.TargetSid != null) {
-          if (ctx?.group == null) {
+        if (ctx.winlog?.event_data?.TargetSid != null) {
+          if (ctx.group == null) {
             HashMap hm = new HashMap();
             ctx.put("group", hm);
           }
           ctx.group.put("id", ctx.winlog.event_data.TargetSid);
         }
-        if (ctx?.winlog?.event_data?.TargetUserName != null) {
-          if (ctx?.group == null) {
+        if (ctx.winlog?.event_data?.TargetUserName != null) {
+          if (ctx.group == null) {
             HashMap hm = new HashMap();
             ctx.put("group", hm);
           }
           ctx.group.put("name", ctx.winlog.event_data.TargetUserName);
         }
-        if (ctx?.winlog?.event_data?.TargetDomainName != null) {
-          if (ctx?.group == null) {
+        if (ctx.winlog?.event_data?.TargetDomainName != null) {
+          if (ctx.group == null) {
             HashMap hm = new HashMap();
             ctx.put("group", hm);
           }
           def domain = ctx.winlog.event_data.TargetDomainName.replace("DC=", "").replace("dc=", "");
           ctx.group.put("domain", domain);
         }
-        if (ctx?.user?.target != null) {
-          if (ctx?.user?.target?.group == null) {
+        if (ctx.user?.target != null) {
+          if (ctx.user?.target?.group == null) {
             HashMap hm = new HashMap();
             ctx.user.target.put("group", hm);
           }
-          if (ctx?.group?.id != null) {
+          if (ctx.group?.id != null) {
             ctx.user.target.group.put("id", ctx.group.id);
-          }
-          if (ctx?.group?.name != null) {
+          } 
+          if (ctx.group?.name != null) {
             ctx.user.target.group.put("name", ctx.group.name);
-          }
-          if (ctx?.group?.domain != null) {
+          } 
+          if (ctx.group?.domain != null) {
             ctx.user.target.group.put("domain", ctx.group.domain);
           }
         }
@@ -3306,26 +3326,26 @@ processors:
       tag: Copy Target User to Computer Object
       description: Copy Target User to Computer Object
       source: |-
-        if (ctx?.event?.code == null ||
+        if (ctx.event?.code == null ||
             !["4741", "4742", "4743"].contains(ctx.event.code)) {
           return;
         }
-        if (ctx?.winlog?.event_data?.TargetSid != null) {
-          if (ctx?.winlog?.computerObject == null) {
+        if (ctx.winlog?.event_data?.TargetSid != null) {
+          if (ctx.winlog?.computerObject == null) {
             HashMap hm = new HashMap();
             ctx.winlog.put("computerObject", hm);
           }
           ctx.winlog.computerObject.put("id", ctx.winlog.event_data.TargetSid);
         }
-        if (ctx?.winlog?.event_data?.TargetUserName != null) {
-          if (ctx?.winlog?.computerObject == null) {
+        if (ctx.winlog?.event_data?.TargetUserName != null) {
+          if (ctx.winlog?.computerObject == null) {
             HashMap hm = new HashMap();
             ctx.winlog.put("computerObject", hm);
           }
           ctx.winlog.computerObject.put("name", ctx.winlog.event_data.TargetUserName);
         }
-        if (ctx?.winlog?.event_data?.TargetDomainName != null) {
-          if (ctx?.winlog?.computerObject == null) {
+        if (ctx.winlog?.event_data?.TargetDomainName != null) {
+          if (ctx.winlog?.computerObject == null) {
             HashMap hm = new HashMap();
             ctx.winlog.put("computerObject", hm);
           }
@@ -3336,7 +3356,7 @@ processors:
       field: winlog.logon.id
       copy_from: winlog.event_data.TargetLogonId
       ignore_failure: false
-      if: ctx?.event?.code != null && ["4634", "4647", "4964"].contains(ctx.event.code)
+      if: ctx.event?.code != null && ["4634", "4647", "4964"].contains(ctx.event.code)
 
   - script:
       lang: painless
@@ -3344,36 +3364,35 @@ processors:
       tag: Copy Subject User from Event Data
       description: Copy Subject User from Event Data
       source: |-
-        if (ctx?.event?.code == null ||
-            !["4657", "4670", "4672", "4673", "4674", "4688", "4689", "4697",
-              "4698", "4699", "4700", "4701", "4702", "4706", "4707", "4713",
-              "4716", "4717", "4718", "4719", "4720", "4722", "4723", "4724",
-              "4725", "4726", "4727", "4728", "4729", "4730", "4731", "4732",
-              "4733", "4734", "4735", "4737", "4738", "4739", "4740", "4741",
-              "4742", "4743", "4744", "4745", "4746", "4747", "4748", "4749",
-              "4750", "4751", "4752", "4753", "4754", "4755", "4756", "4757",
-              "4758", "4759", "4760", "4761", "4762", "4763", "4764", "4767",
-              "4781", "4798", "4799", "4817", "4904", "4905", "4907", "4912",
-              "4648", "4797", "5140", "5145", "5379", "5380", "5381", "5382"].contains(ctx.event.code)) {
+        if (ctx.event?.code == null ||
+            !["4648", "4657", "4662", "4670", "4672", "4673", "4674", "4688", "4689", "4697",
+              "4698", "4699", "4700", "4701", "4702", "4706", "4707", "4713", "4716", "4717",
+              "4718", "4719", "4720", "4722", "4723", "4724", "4725", "4726", "4727", "4728",
+              "4729", "4730", "4731", "4732", "4733", "4734", "4735", "4737", "4738", "4739",
+              "4740", "4741", "4742", "4743", "4744", "4745", "4746", "4747", "4748", "4749",
+              "4750", "4751", "4752", "4753", "4754", "4755", "4756", "4757", "4758", "4759",
+              "4760", "4761", "4762", "4763", "4764", "4767", "4781", "4797", "4798", "4799",
+              "4817", "4904", "4905", "4907", "4912", "5136", "5140", "5145", "5379", "5380",
+              "5381", "5382"].contains(ctx.event.code)) {
           return;
         }
-        if (ctx?.winlog?.event_data?.SubjectUserSid != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.event_data?.SubjectUserSid != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
           ctx.user.put("id", ctx.winlog.event_data.SubjectUserSid);
         }
-        if (ctx?.winlog?.event_data?.SubjectUserName != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.event_data?.SubjectUserName != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
-          if (ctx?.related == null) {
+          if (ctx.related == null) {
             HashMap hm = new HashMap();
             ctx.put("related", hm);
           }
-          if (ctx?.related?.user == null) {
+          if (ctx.related?.user == null) {
             ArrayList al = new ArrayList();
             ctx.related.put("user", al);
           }
@@ -3382,8 +3401,8 @@ processors:
             ctx.related.user.add(ctx.winlog.event_data.SubjectUserName);
           }
         }
-        if (ctx?.winlog?.event_data?.SubjectDomainName != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.event_data?.SubjectDomainName != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
@@ -3476,27 +3495,27 @@ processors:
       tag: Copy Subject User from user_data
       description: Copy Subject User from user_data
       source: |-
-        if (ctx?.event?.code == null ||
+        if (ctx.event?.code == null ||
             !["1102"].contains(ctx.event.code)) {
           return;
         }
-        if (ctx?.winlog?.user_data?.SubjectUserSid != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.user_data?.SubjectUserSid != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
           ctx.user.put("id", ctx.winlog.user_data.SubjectUserSid);
         }
-        if (ctx?.winlog?.user_data?.SubjectUserName != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.user_data?.SubjectUserName != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
-          if (ctx?.related == null) {
+          if (ctx.related == null) {
             HashMap hm = new HashMap();
             ctx.put("related", hm);
           }
-          if (ctx?.related?.user == null) {
+          if (ctx.related?.user == null) {
             ArrayList al = new ArrayList();
             ctx.related.put("user", al);
           }
@@ -3505,8 +3524,8 @@ processors:
             ctx.related.user.add(ctx.winlog.user_data.SubjectUserName);
           }
         }
-        if (ctx?.winlog?.user_data?.SubjectDomainName != null) {
-          if (ctx?.user == null) {
+        if (ctx.winlog?.user_data?.SubjectDomainName != null) {
+          if (ctx.user == null) {
             HashMap hm = new HashMap();
             ctx.put("user", hm);
           }
@@ -3523,7 +3542,7 @@ processors:
       copy_from: winlog.user_data.SubjectLogonId
       ignore_failure: true
       if: |-
-        ctx?.event?.code != null &&
+        ctx.event?.code != null &&
         ["1102"].contains(ctx.event.code)
 
   - script:
@@ -3532,7 +3551,7 @@ processors:
       tag: Rename Common Auth Fields
       description: Rename Common Auth Fields
       source: |-
-        if (ctx?.event?.code == null ||
+        if (ctx.event?.code == null ||
             !["1100", "1102", "1104", "1105", "1108", "4624", "4648", "4625",
               "4670", "4673", "4674", "4689", "4697", "4719", "4720", "4722",
               "4723", "4724", "4725", "4726", "4727", "4728", "4729", "4730",
@@ -3544,8 +3563,8 @@ processors:
               "4904", "4905", "4907", "4912", "5140", "5145"].contains(ctx.event.code)) {
           return;
         }
-        if (ctx?.winlog?.event_data?.ProcessId != null) {
-          if (ctx?.process == null) {
+        if (ctx.winlog?.event_data?.ProcessId != null) {
+          if (ctx.process == null) {
             HashMap hm = new HashMap();
             ctx.put("process", hm);
           }
@@ -3557,49 +3576,49 @@ processors:
           }
           ctx.winlog.event_data.remove("ProcessId");
         }
-        if (ctx?.winlog?.event_data?.ProcessName != null) {
-          if (ctx?.process == null) {
+        if (ctx.winlog?.event_data?.ProcessName != null) {
+          if (ctx.process == null) {
             HashMap hm = new HashMap();
             ctx.put("process", hm);
           }
           ctx.process.put("executable", ctx.winlog.event_data.ProcessName);
           ctx.winlog.event_data.remove("ProcessName");
         }
-        if (ctx?.winlog?.event_data?.IpAddress != null &&
+        if (ctx.winlog?.event_data?.IpAddress != null &&
             ctx.winlog.event_data.IpAddress != "-") {
-          if (ctx?.source == null) {
+          if (ctx.source == null) {
             HashMap hm = new HashMap();
             ctx.put("source", hm);
           }
           ctx.source.put("ip", ctx.winlog.event_data.IpAddress);
           ctx.winlog.event_data.remove("IpAddress");
         }
-        if (ctx?.winlog?.event_data?.IpPort != null && ctx.winlog.event_data.IpPort != "-") {
-          if (ctx?.source == null) {
+        if (ctx.winlog?.event_data?.IpPort != null && ctx.winlog.event_data.IpPort != "-") {
+          if (ctx.source == null) {
             HashMap hm = new HashMap();
             ctx.put("source", hm);
           }
           ctx.source.put("port", Long.decode(ctx.winlog.event_data.IpPort));
           ctx.winlog.event_data.remove("IpPort");
         }
-        if (ctx?.winlog?.event_data?.WorkstationName != null) {
-          if (ctx?.source == null) {
+        if (ctx.winlog?.event_data?.WorkstationName != null) {
+          if (ctx.source == null) {
             HashMap hm = new HashMap();
             ctx.put("source", hm);
           }
           ctx.source.put("domain", ctx.winlog.event_data.WorkstationName);
           ctx.winlog.event_data.remove("WorkstationName");
         }
-        if (ctx?.winlog?.event_data?.ClientAddress != null &&
+        if (ctx.winlog?.event_data?.ClientAddress != null &&
             ctx.winlog.event_data.ClientAddress != "-") {
-          if (ctx?.related == null) {
+          if (ctx.related == null) {
             HashMap hm = new HashMap();
             ctx.put("related", hm);
           }
           ctx.related.put("ip", ctx.winlog.event_data.ClientAddress);
           ctx.winlog.event_data.remove("ClientAddress");
         }
-        if (ctx?.process?.name == null && ctx?.process?.executable != null) {
+        if (ctx.process?.name == null && ctx.process?.executable != null) {
           def parts = ctx.process.executable.splitOnToken("\\");
           ctx.process.put("name", parts[-1]);
         }
@@ -3610,12 +3629,12 @@ processors:
       tag: Process Event 4688
       description: Process Event 4688
       source: |-
-        if (ctx?.event?.code == null ||
+        if (ctx.event?.code == null ||
             !["4688"].contains(ctx.event.code)) {
           return;
         }
-        if (ctx?.winlog?.event_data?.NewProcessId != null) {
-          if (ctx?.process == null) {
+        if (ctx.winlog?.event_data?.NewProcessId != null) {
+          if (ctx.process == null) {
             HashMap hm = new HashMap();
             ctx.put("process", hm);
           }
@@ -3627,40 +3646,40 @@ processors:
           }
           ctx.winlog.event_data.remove("NewProcessId");
         }
-        if (ctx?.winlog?.event_data?.NewProcessName != null) {
-          if (ctx?.process == null) {
+        if (ctx.winlog?.event_data?.NewProcessName != null) {
+          if (ctx.process == null) {
             HashMap hm = new HashMap();
             ctx.put("process", hm);
           }
           ctx.process.put("executable", ctx.winlog.event_data.NewProcessName);
           ctx.winlog.event_data.remove("NewProcessName");
         }
-        if (ctx?.winlog?.event_data?.ParentProcessName != null) {
-          if (ctx?.process == null) {
+        if (ctx.winlog?.event_data?.ParentProcessName != null) {
+          if (ctx.process == null) {
             HashMap hm = new HashMap();
             ctx.put("process", hm);
           }
-          if (ctx?.process?.parent == null) {
+          if (ctx.process?.parent == null) {
             HashMap hm = new HashMap();
             ctx.process.put("parent", hm);
           }
           ctx.process.parent.put("executable", ctx.winlog.event_data.ParentProcessName);
           ctx.winlog.event_data.remove("ParentProcessName");
         }
-        if (ctx?.process?.name == null && ctx?.process?.executable != null) {
+        if (ctx.process?.name == null && ctx.process?.executable != null) {
           def parts = ctx.process.executable.splitOnToken("\\");
           ctx.process.put("name", parts[-1]);
         }
-        if (ctx?.process?.parent?.name == null && ctx?.process?.parent?.executable != null) {
+        if (ctx.process?.parent?.name == null && ctx.process?.parent?.executable != null) {
           def parts = ctx.process.parent.executable.splitOnToken("\\");
           ctx.process.parent.put("name", parts[-1]);
         }
-        if (ctx?.winlog?.event_data?.ProcessId != null) {
-          if (ctx?.process == null) {
+        if (ctx.winlog?.event_data?.ProcessId != null) {
+          if (ctx.process == null) {
             HashMap hm = new HashMap();
             ctx.put("process", hm);
           }
-          if (ctx?.process?.parent == null) {
+          if (ctx.process?.parent == null) {
             HashMap hm = new HashMap();
             ctx.process.put("parent", hm);
           }
@@ -3671,7 +3690,7 @@ processors:
             ctx.process.parent.put("pid", ctx.winlog.event_data.ProcessId);
           }
         }
-        if (ctx?.winlog?.event_data?.CommandLine != null) {
+        if (ctx.winlog?.event_data?.CommandLine != null) {
           int start = 0;
           int end = 0;
           boolean in_quote = false;
@@ -3693,20 +3712,20 @@ processors:
               al.add(ctx.winlog.event_data.CommandLine.substring(start, end + 1));
             }
           }
-          if (ctx?.process == null) {
+          if (ctx.process == null) {
             HashMap hm = new HashMap();
             ctx.put("process", hm);
           }
           ctx.process.put("args", al);
           ctx.process.put("command_line", ctx.winlog.event_data.CommandLine);
         }
-        if ((ctx?.winlog?.event_data?.TargetUserName != null) &&
+        if ((ctx.winlog?.event_data?.TargetUserName != null) &&
             (!ctx.winlog.event_data.TargetUserName.equals("-"))) {
-          if (ctx?.related == null) {
+          if (ctx.related == null) {
             HashMap hm = new HashMap();
             ctx.put("related", hm);
           }
-          if (ctx?.related?.user == null) {
+          if (ctx.related?.user == null) {
             ArrayList al = new ArrayList();
             ctx.related.put("user", al);
           }
@@ -3720,9 +3739,9 @@ processors:
       value: '{{winlog.event_data.SubjectUserName}}'
       allow_duplicates: false
       if: |-
-        ctx?.event?.code != null &&
+        ctx.event?.code != null &&
         ["4624", "4648", "4797", "5379", "5380", "5381", "5382"].contains(ctx.event.code) &&
-        ctx?.winlog?.event_data?.SubjectUserName != null &&
+        ctx.winlog?.event_data?.SubjectUserName != null &&
         ctx.winlog.event_data.SubjectUserName != "-"
 
   - append:
@@ -3730,19 +3749,19 @@ processors:
       value: '{{winlog.event_data.TargetUserName}}'
       allow_duplicates: false
       if: |-
-        ctx?.event?.code != null &&
+        ctx.event?.code != null &&
         ["4688", "4720", "4722", "4723", "4724", "4725", "4726", "4738",
          "4740", "4767", "4797", "4798"].contains(ctx.event.code) &&
-        ctx?.winlog?.event_data?.TargetUserName != null &&
+        ctx.winlog?.event_data?.TargetUserName != null &&
         ctx.winlog.event_data.TargetUserName != "-"
 
   - split:
       field: winlog.event_data.PrivilegeList
       separator: "\\s+"
       if: |-
-        ctx?.event?.code != null &&
+        ctx.event?.code != null &&
         ["4672", "4673", "4674", "4741", "4742", "4743"].contains(ctx.event.code) &&
-        ctx?.winlog?.event_data?.PrivilegeList != null
+        ctx.winlog?.event_data?.PrivilegeList != null
 
   - set:
       field: user.target.name
@@ -3759,7 +3778,7 @@ processors:
       value: '{{winlog.event_data.NewTargetUserName}}'
       allow_duplicates: false
       if: |-
-        ctx?.winlog?.event_data?.NewTargetUserName != null &&
+        ctx.winlog?.event_data?.NewTargetUserName != null &&
         ctx.winlog.event_data.NewTargetUserName != "-"
 
   - append:
@@ -3767,13 +3786,13 @@ processors:
       value: '{{winlog.event_data.OldTargetUserName}}'
       allow_duplicates: false
       if: |-
-        ctx?.winlog?.event_data?.OldTargetUserName != null &&
+        ctx.winlog?.event_data?.OldTargetUserName != null &&
         ctx.winlog.event_data.OldTargetUserName != "-"
 
   - gsub:
       field: source.ip
-      pattern: "::ffff:"
-      replacement: ""
+      pattern: '^\[?::ffff:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(?:\](?::[0-9]+)?)?$'
+      replacement: '$1'
       ignore_missing: true
 
   - append:
@@ -3781,7 +3800,7 @@ processors:
       value: '{{source.ip}}'
       allow_duplicates: false
       if: |-
-        ctx?.source?.ip != null &&
+        ctx.source?.ip != null &&
         ctx.source.ip != "-"
 
   - script:
@@ -3831,7 +3850,7 @@ processors:
           LS: Local service account
           SY: Local system
           NU: Network logon user
-          "NO": Network configuration operators
+          NO: Network configuration operators
           NS: Network service account
           PO: Printer operators
           PS: Personal self
@@ -4070,11 +4089,11 @@ processors:
               def newDacl = translateACL(dacListMatcher.group(0).replace("(","").replace(")",""), params);
               ctx.winlog.event_data.put(Sd + "Dacl" + i.toString(), newDacl['grantee'] + " :" + newDacl['type'] + " (" + newDacl['perms'] + ")");
               if (["Administrator", "Guest", "KRBTGT"].contains(newDacl['grantee'])) {
-                if (ctx?.related == null) {
+                if (ctx.related == null) {
                   HashMap hm = new HashMap();
                   ctx.put("related", hm);
                 }
-                if (ctx?.related?.user == null) {
+                if (ctx.related?.user == null) {
                   ArrayList al = new ArrayList();
                   ctx.related.put("user", al);
                 }
@@ -4094,11 +4113,11 @@ processors:
               def newSacl = translateACL(sacListMatcher.group(0).replace("(","").replace(")",""), params);
               ctx.winlog.event_data.put(Sd + "Sacl" + i.toString(), newSacl['grantee'] + " :" + newSacl['type'] + " (" + newSacl['perms'] + ")");
               if (["Administrator", "Guest", "KRBTGT"].contains(newSacl['grantee'])) {
-                if (ctx?.related == null) {
+                if (ctx.related == null) {
                   HashMap hm = new HashMap();
                   ctx.put("related", hm);
                 }
-                if (ctx?.related?.user == null) {
+                if (ctx.related?.user == null) {
                   ArrayList al = new ArrayList();
                   ctx.related.put("user", al);
                 }
@@ -4110,45 +4129,27 @@ processors:
           }
         }
 
-        def split(String s) {
-          def f = new ArrayList();
-          int last = 0;
-          for (; last < s.length() && Character.isWhitespace(s.charAt(last)); last++) {}
-          for (def i = last; i < s.length(); i++) {
-            if (!Character.isWhitespace(s.charAt(i))) {
-              continue;
-            }
-            f.add(s.substring(last, i));
-            for (; i < s.length() && Character.isWhitespace(s.charAt(i)); i++) {}
-            last = i;
-          }
-          f.add(s.substring(last));
-          return f;
-        }
-
         void splitSidList(def sids, def params, def ctx) {
-          ArrayList list = new ArrayList();
-          ArrayList desc = new ArrayList();
-          def sidList = split(sids);
-          for (def i = 0; i < sidList.length; i++) {
-            list.add(sidList[i]);
-            desc.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", ""), params));
+          ArrayList al = new ArrayList();
+          def sidList = sids.splitOnToken(" ");
+          ctx.winlog.event_data.put("SidList", sidList);
+          for (def i = 0; i < sidList.length; i++ ) {
+            al.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", "").replace(" ",""), params));
           }
-          ctx.winlog.event_data.put("SidList", list);
-          ctx.winlog.event_data.put("SidListDesc", desc);
+          ctx.winlog.event_data.put("SidListDesc", al);
         }
-
-        if (ctx?.event?.code == null ||
+        
+        if (ctx.event?.code == null ||
             !["4670", "4817", "4907", "4908"].contains(ctx.event.code)) {
           return;
         }
-        if (ctx?.winlog?.event_data?.OldSd != null) {
+        if (ctx.winlog?.event_data?.OldSd != null) {
           enrichSDDL(ctx.winlog.event_data.OldSd, "OldSd", params, ctx);
         }
-        if (ctx?.winlog?.event_data?.NewSd != null) {
+        if (ctx.winlog?.event_data?.NewSd != null) {
           enrichSDDL(ctx.winlog.event_data.NewSd, "NewSd", params, ctx);
         }
-        if (ctx?.winlog?.event_data?.SidList != null) {
+        if (ctx.winlog?.event_data?.SidList != null) {
           splitSidList(ctx.winlog.event_data.SidList, params, ctx);
         }
 
@@ -4210,30 +4211,41 @@ processors:
 
   - set:
       field: ecs.version
-      value: '1.12.0'
+      value: '8.0.0'
 
   - set:
       field: log.level
       copy_from: winlog.level
       ignore_empty_value: true
       ignore_failure: true
-      if: ctx?.winlog?.level != ""
+      if: ctx.winlog?.level != ""
 
   - date:
       field: winlog.time_created
+      tag: "time_created_date"
       formats:
         - ISO8601
-      ignore_failure: true
-      if: ctx?.winlog?.time_created != null
+      if: ctx.winlog?.time_created != null
+      on_failure:
+        - remove:
+            field: winlog.time_created
+            ignore_failure: true
+        - append:
+            field: error.message
+            value: "fail-{{{ _ingest.on_failure_processor_tag }}}"
+        - fail:
+            message: "Processor {{ _ingest.on_failure_processor_type }} with tag {{ _ingest.on_failure_processor_tag }} in pipeline {{ _ingest.on_failure_pipeline }} failed with message: {{ _ingest.on_failure_message }}"
 
+  #Cleanup _temp fields as it is not needed anymore
   - remove:
-      field: event.original
-      if: "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
-      ignore_failure: true
+      field: _temp
       ignore_missing: true
+      ignore_failure: true
 
 on_failure:
   - set:
+      field: event.kind
+      value: pipeline_error
+  - append:
       field: error.message
-      value: |-
-        Processor "{{ _ingest.on_failure_processor_type }}" with tag "{{ _ingest.on_failure_processor_tag }}" in pipeline "{{ _ingest.on_failure_pipeline }}" failed with message "{{ _ingest.on_failure_message }}"
+      value: "{{{ _ingest.on_failure_message }}}"
