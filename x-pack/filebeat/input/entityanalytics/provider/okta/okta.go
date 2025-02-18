@@ -315,32 +315,31 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	p.logger.Debugf("Starting fetch...")
-	_, err = p.doFetchUsers(ctx, state, true)
-	if err != nil {
-		return err
-	}
-	_, err = p.doFetchDevices(ctx, state, true)
-	if err != nil {
-		return err
-	}
-
 	wantUsers := p.cfg.wantUsers()
 	wantDevices := p.cfg.wantDevices()
-	if (len(state.users) != 0 && wantUsers) || (len(state.devices) != 0 && wantDevices) {
+	if wantUsers || wantDevices {
+		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+		p.logger.Debugf("Starting fetch...")
+
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
+
 		if wantUsers {
-			for _, u := range state.users {
+			err = p.doFetchUsers(ctx, state, true, func(u *User) {
 				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			})
+			if err != nil {
+				return err
 			}
 		}
 		if wantDevices {
-			for _, d := range state.devices {
+			err = p.doFetchDevices(ctx, state, true, func(d *Device) {
 				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			})
+			if err != nil {
+				return err
 			}
 		}
 
@@ -348,10 +347,10 @@ func (p *oktaInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, clien
 		p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
 
 		tracker.Wait()
-	}
 
-	if ctx.Err() != nil {
-		return ctx.Err()
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
 	}
 
 	state.lastSync = time.Now()
@@ -381,27 +380,28 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 	}()
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	updatedUsers, err := p.doFetchUsers(ctx, state, false)
-	if err != nil {
-		return err
-	}
-	updatedDevices, err := p.doFetchDevices(ctx, state, false)
-	if err != nil {
-		return err
-	}
+	tracker := kvstore.NewTxTracker(ctx)
 
-	var tracker *kvstore.TxTracker
-	if len(updatedUsers) != 0 || len(updatedDevices) != 0 {
-		tracker = kvstore.NewTxTracker(ctx)
-		for _, u := range updatedUsers {
+	if p.cfg.wantUsers() {
+		p.logger.Debugf("Fetching changed users...")
+		err = p.doFetchUsers(ctx, state, false, func(u *User) {
 			p.publishUser(u, state, inputCtx.ID, client, tracker)
+		})
+		if err != nil {
+			return err
 		}
-		for _, d := range updatedDevices {
+	}
+	if p.cfg.wantDevices() {
+		p.logger.Debugf("Fetching changed devices...")
+		err = p.doFetchDevices(ctx, state, false, func(d *Device) {
 			p.publishDevice(d, state, inputCtx.ID, client, tracker)
+		})
+		if err != nil {
+			return err
 		}
-		tracker.Wait()
 	}
 
+	tracker.Wait()
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -417,10 +417,10 @@ func (p *oktaInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Sto
 // doFetchUsers handles fetching user identities from Okta. If fullSync is true, then
 // any existing deltaLink will be ignored, forcing a full synchronization from Okta.
 // Returns a set of modified users by ID.
-func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool, publish func(u *User)) error {
 	if !p.cfg.wantUsers() {
 		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.cfg.Dataset)
-		return nil, nil
+		return nil
 	}
 
 	var (
@@ -446,29 +446,29 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 	const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
 	var (
-		users       []*User
+		n           int
 		lastUpdated time.Time
 	)
 	for {
 		batch, h, err := okta.GetUserDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", query, omit, p.lim, p.logger)
 		if err != nil {
-			p.logger.Debugf("received %d users from API", len(users))
-			return nil, err
+			p.logger.Debugf("received %d users from API", n)
+			return err
 		}
 		p.logger.Debugf("received batch of %d users from API", len(batch))
 
 		if fullSync {
 			for _, u := range batch {
-				p.addUserMetadata(ctx, u, state)
+				publish(p.addUserMetadata(ctx, u, state))
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
 			}
 		} else {
-			users = grow(users, len(batch))
 			for _, u := range batch {
 				su := p.addUserMetadata(ctx, u, state)
-				users = append(users, su)
+				publish(su)
+				n++
 				if u.LastUpdated.After(lastUpdated) {
 					lastUpdated = u.LastUpdated
 				}
@@ -480,8 +480,8 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 			if err == io.EOF {
 				break
 			}
-			p.logger.Debugf("received %d users from API", len(users))
-			return users, err
+			p.logger.Debugf("received %d users from API", n)
+			return err
 		}
 		query = next
 	}
@@ -495,8 +495,8 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 	query.Add("search", fmt.Sprintf(`lastUpdated ge "%s" and status pr`, lastUpdated.Format(okta.ISO8601)))
 	state.nextUsers = query.Encode()
 
-	p.logger.Debugf("received %d users from API", len(users))
-	return users, nil
+	p.logger.Debugf("received %d users from API", n)
+	return nil
 }
 
 func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *stateStore) *User {
@@ -541,10 +541,10 @@ func (p *oktaInput) addUserMetadata(ctx context.Context, u okta.User, state *sta
 // If fullSync is true, then any existing deltaLink will be ignored, forcing a full
 // synchronization from Okta.
 // Returns a set of modified devices by ID.
-func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool) ([]*Device, error) {
+func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool, publish func(d *Device)) error {
 	if !p.cfg.wantDevices() {
 		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.cfg.Dataset)
-		return nil, nil
+		return nil
 	}
 
 	var (
@@ -575,14 +575,14 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 	userQueryInit = cloneURLValues(deviceQuery)
 
 	var (
-		devices     []*Device
+		n           int
 		lastUpdated time.Time
 	)
 	for {
 		batch, h, err := okta.GetDeviceDetails(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, "", deviceQuery, p.lim, p.logger)
 		if err != nil {
-			p.logger.Debugf("received %d devices from API", len(devices))
-			return nil, err
+			p.logger.Debugf("received %d devices from API", n)
+			return err
 		}
 		p.logger.Debugf("received batch of %d devices from API", len(batch))
 
@@ -601,7 +601,7 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 				users, h, err := okta.GetDeviceUsers(ctx, p.client, p.cfg.OktaDomain, p.cfg.OktaToken, d.ID, userQuery, omit, p.lim, p.logger)
 				if err != nil {
 					p.logger.Debugf("received %d device users from API", len(users))
-					return nil, err
+					return err
 				}
 				p.logger.Debugf("received batch of %d device users from API", len(users))
 
@@ -617,8 +617,8 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 					if err == io.EOF {
 						break
 					}
-					p.logger.Debugf("received %d devices from API", len(devices))
-					return devices, err
+					p.logger.Debugf("received %d devices from API", n)
+					return err
 				}
 				userQuery = next
 			}
@@ -626,15 +626,16 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 
 		if fullSync {
 			for _, d := range batch {
-				state.storeDevice(d)
+				publish(state.storeDevice(d))
 				if d.LastUpdated.After(lastUpdated) {
 					lastUpdated = d.LastUpdated
 				}
 			}
 		} else {
-			devices = grow(devices, len(batch))
 			for _, d := range batch {
-				devices = append(devices, state.storeDevice(d))
+				sd := state.storeDevice(d)
+				publish(sd)
+				n++
 				if d.LastUpdated.After(lastUpdated) {
 					lastUpdated = d.LastUpdated
 				}
@@ -646,8 +647,8 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 			if err == io.EOF {
 				break
 			}
-			p.logger.Debugf("received %d devices from API", len(devices))
-			return devices, err
+			p.logger.Debugf("received %d devices from API", n)
+			return err
 		}
 		deviceQuery = next
 	}
@@ -661,8 +662,8 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 	deviceQuery.Add("search", fmt.Sprintf(`lastUpdated ge "%s" and status pr`, lastUpdated.Format(okta.ISO8601)))
 	state.nextDevices = deviceQuery.Encode()
 
-	p.logger.Debugf("received %d devices from API", len(devices))
-	return devices, nil
+	p.logger.Debugf("received %d devices from API", n)
+	return nil
 }
 
 func cloneURLValues(a url.Values) url.Values {
@@ -675,14 +676,6 @@ func cloneURLValues(a url.Values) url.Values {
 
 type entity interface {
 	*User | *Device | okta.User
-}
-
-func grow[T entity](e []T, n int) []T {
-	if len(e)+n <= cap(e) {
-		return e
-	}
-	new := append(e, make([]T, n)...)
-	return new[:len(e)]
 }
 
 // publishMarker will publish a write marker document using the given beat.Client.
