@@ -86,10 +86,10 @@ for more details.
 
 *`wmi.include_queries`*:: If set to `true` the metricset includes the query in the output document. The default value is `false`.
 
-*`wmi.include_null`*:: If set to `true` the metricset includes the properties that have null value in the output document.
+*`wmi.include_null_properties`*:: If set to `true` the metricset includes the properties that have null value in the output document.
 properties that have a `null` value in the output document. The default value is `false`.
 
-*`wmi.include_empty_string`*:: A boolean option that causes the metricset to include
+*`wmi.include_empty_string_properties`*:: A boolean option that causes the metricset to include
 the properties that are empty string. The default value is `false`.
 
 

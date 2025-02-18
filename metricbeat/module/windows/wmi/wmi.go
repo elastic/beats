@@ -90,12 +90,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // This function handles the skip conditions
 func (m *MetricSet) shouldSkipNilOrEmptyValue(propertyValue interface{}) bool {
 	if propertyValue == nil {
-		if !m.config.IncludeNull {
-			return true // Skip if it's nil and IncludeNull is false
+		if !m.config.IncludeNullProperties {
+			return true // Skip if it's nil and IncludeNullProperties is false
 		}
 	} else if stringValue, ok := propertyValue.(string); ok {
-		if len(stringValue) == 0 && !m.config.IncludeEmptyString {
-			return true // Skip if it's an empty string and IncludeEmptyString is false
+		if len(stringValue) == 0 && !m.config.IncludeEmptyStringProperties {
+			return true // Skip if it's an empty string and IncludeEmptyStringProperties is false
 		}
 	}
 	return false
