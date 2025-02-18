@@ -2090,7 +2090,7 @@ filebeat.modules:
     # Enable the CRC webhook validation
     #crc.enabled: false
 
-    # The secret token value provided by Zoom for CRC validation
+    # The secret token value provided by Zoom for CRC validation
     #crc.secret: ZOOMSECRETTOKEN
 
 
