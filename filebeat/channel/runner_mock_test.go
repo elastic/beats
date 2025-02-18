@@ -76,10 +76,10 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 					continue
 				}
 
-				require.NotSamef(t, c1.Processing, c2.Processing, "processing configuration cannot be re-used")
-				require.NotSamef(t, c1.Processing.Meta, c2.Processing.Meta, "`Processing.Meta` cannot be re-used")
-				require.NotSamef(t, c1.Processing.Fields, c2.Processing.Fields, "`Processing.Fields` cannot be re-used")
-				require.NotSamef(t, c1.Processing.Processor, c2.Processing.Processor, "`Processing.Processor` cannot be re-used")
+				require.NotEqualf(t, c1.Processing, c2.Processing, "processing configuration cannot be re-used")
+				require.NotEqualf(t, c1.Processing.Meta, c2.Processing.Meta, "`Processing.Meta` cannot be re-used")
+				require.NotEqualf(t, c1.Processing.Fields, c2.Processing.Fields, "`Processing.Fields` cannot be re-used")
+				require.NotEqualf(t, c1.Processing.Processor, c2.Processing.Processor, "`Processing.Processor` cannot be re-used")
 			}
 		}
 	})
@@ -98,7 +98,7 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 					continue
 				}
 
-				require.NotSamef(t, p1, p2, "processors must not be re-used")
+				require.NotEqualf(t, p1, p2, "processors must not be re-used")
 			}
 		}
 	})
