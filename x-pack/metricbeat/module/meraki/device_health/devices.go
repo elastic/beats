@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-resty/resty/v2"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -92,7 +94,19 @@ func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devi
 	}
 }
 
-func getDeviceChannelUtilization(client *meraki.Client, devices map[Serial]*Device, period time.Duration) error {
+type NetworkHealthService interface {
+	GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error)
+}
+
+type NetworkHealthServiceWrapper struct {
+	service *meraki.NetworksService
+}
+
+func (w *NetworkHealthServiceWrapper) GetNetworkNetworkHealthChannelUtilization(networkID string, getNetworkNetworkHealthChannelUtilizationQueryParams *meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams) (*meraki.ResponseNetworksGetNetworkNetworkHealthChannelUtilization, *resty.Response, error) {
+	return w.service.GetNetworkNetworkHealthChannelUtilization(networkID, getNetworkNetworkHealthChannelUtilizationQueryParams)
+}
+
+func getDeviceChannelUtilization(client NetworkHealthService, devices map[Serial]*Device, period time.Duration) error {
 	// There are two ways to get this information from the API.
 	// An alternative to this would be to use `/organizations/{organizationId}/wireless/devices/channelUtilization/byDevice`,
 	// avoids the need to extract the filtered network IDs below.
@@ -111,7 +125,7 @@ func getDeviceChannelUtilization(client *meraki.Client, devices map[Serial]*Devi
 	}
 
 	for networkID := range networkIDs {
-		val, res, err := client.Networks.GetNetworkNetworkHealthChannelUtilization(
+		val, res, err := client.GetNetworkNetworkHealthChannelUtilization(
 			networkID,
 			&meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams{
 				Timespan: period.Seconds(),
@@ -131,11 +145,17 @@ func getDeviceChannelUtilization(client *meraki.Client, devices map[Serial]*Devi
 			if device, ok := devices[Serial(utilization.Serial)]; ok {
 				if utilization.Wifi0 != nil && len(*utilization.Wifi0) != 0 {
 					// only take the first bucket - collection intervals which result in multiple buckets are not supported
+					if device.wifi0 == nil {
+						device.wifi0 = &meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{}
+					}
 					device.wifi0.Utilization80211 = (*utilization.Wifi0)[0].Utilization80211
 					device.wifi0.UtilizationNon80211 = (*utilization.Wifi0)[0].UtilizationNon80211
 					device.wifi0.UtilizationTotal = (*utilization.Wifi0)[0].UtilizationTotal
 				}
 				if utilization.Wifi1 != nil && len(*utilization.Wifi1) != 0 {
+					if device.wifi1 == nil {
+						device.wifi1 = &meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi1{}
+					}
 					device.wifi1.Utilization80211 = (*utilization.Wifi1)[0].Utilization80211
 					device.wifi1.UtilizationNon80211 = (*utilization.Wifi1)[0].UtilizationNon80211
 					device.wifi1.UtilizationTotal = (*utilization.Wifi1)[0].UtilizationTotal
@@ -150,10 +170,6 @@ func getDeviceChannelUtilization(client *meraki.Client, devices map[Serial]*Devi
 func getDeviceLicenses(client *meraki.Client, organizationID string, devices map[Serial]*Device) error {
 	val, res, err := client.Organizations.GetOrganizationLicenses(organizationID, &meraki.GetOrganizationLicensesQueryParams{})
 	if err != nil {
-		// Ignore 400 error for per-device licensing not supported
-		if res.StatusCode() == 400 && strings.Contains(string(res.Body()), "does not support per-device licensing") {
-			return nil
-		}
 		return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 	}
 
