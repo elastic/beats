@@ -480,7 +480,7 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	parser, err := textparse.New(b, contentType, false, labels.NewSymbolTable())
+	parser, err := textparse.New(b, contentType, "", false, false, labels.NewSymbolTable())
 	if err != nil {
 		return nil, err
 	}
