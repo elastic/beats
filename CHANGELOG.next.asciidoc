@@ -277,6 +277,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Winlogbeat*
 
 - Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
+- Sync missing changes in modules pipelines. {pull}42619[42619]
 
 
 *Elastic Logging Plugin*
