@@ -41,10 +41,6 @@ NOTE: While Metricbeat stops waiting for the result, the underlying WMI query ma
   metricsets: ["wmi"]
   period: 10m
   wmi:
-    # host: localhost
-    # domain: ""
-    # username: test
-    # password: foo
     namespace: "root\\cimv2" # Default Namespace
     warning_threshold: 10m
     include_queries: true
@@ -62,14 +58,6 @@ NOTE: While Metricbeat stops waiting for the result, the underlying WMI query ma
       where: "IsActive = True"
       namespace: "root\\cimv2\\power" # Overwrites the module namespace in this query
 ----
-
-*`wmi.host`*:: The host for the remote WMI Connection. The default is `localhost`.
-
-*`wmi.domain`*:: The domain for the remote WMI Connection. The default is an empty string (`""`).
-
-*`wmi.username`*:: The username for the remote WMI Connection. The default is an empty string (`""`).
-
-*`wmi.password`*:: The password for the remote WMI Connection. The default is an empty string (`""`).
 
 *`wmi.namespace`*::
 The default WMI namespace used for queries. This can be overridden per query.

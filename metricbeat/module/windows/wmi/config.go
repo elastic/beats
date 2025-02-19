@@ -34,14 +34,17 @@ type Config struct {
 	IncludeQueries               bool                     `config:"wmi.include_queries"`                 // Determines if the query string should be included in the output document
 	IncludeNullProperties        bool                     `config:"wmi.include_null_properties"`         // Specifies whether to include properties with nil values in the final document
 	IncludeEmptyStringProperties bool                     `config:"wmi.include_empty_string_properties"` // Specifies whether to include properties with empty string values in the final document
-	Host                         string                   `config:"wmi.host"`                            // Hostname of the remote WMI server
-	Domain                       string                   `config:"wmi.domain"`                          // Domain of the remote WMI Server
-	User                         string                   `config:"wmi.username"`                        // Username for authentication on the remote WMI server
-	Password                     string                   `config:"wmi.password"`                        // Password for authentication on the remote WMI server
 	Namespace                    string                   `config:"wmi.namespace"`                       // Default WMI namespace for executing queries, used if not overridden by individual query configurations
 	Queries                      []QueryConfig            `config:"wmi.queries"`                         // List of WMI query configurations
 	WarningThreshold             time.Duration            `config:"wmi.warning_threshold"`               // Maximum duration to wait for query results before logging a warning. The query will continue running in WMI but will no longer be awaited
 	NamespaceQueryIndex          map[string][]QueryConfig // Internal structure indexing queries by namespace to reduce the number of WMI connections required per execution
+	// Remote WMI Parameters
+	// These parameters are intentionally hidden to discourage their use.
+	// If you need access, please open a support ticket to request exposure.
+	Host     string // Hostname of the remote WMI server
+	Domain   string // Domain of the remote WMI Server
+	User     string // Username for authentication on the remote WMI server
+	Password string // Password for authentication on the remote WMI server
 }
 
 type QueryConfig struct {
