@@ -148,7 +148,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		// Batcher is experimental
 		"batcher": map[string]any{
 			"enabled":        true,
-			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
+			"min_size_items": escfg.BulkMaxSize, // bulk_max_size
 		},
 	}
 
