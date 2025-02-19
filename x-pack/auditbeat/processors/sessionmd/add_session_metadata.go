@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -23,6 +24,7 @@ import (
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -36,6 +38,9 @@ const (
 func InitializeModule() {
 	processors.RegisterPlugin(processorName, New)
 }
+
+// instanceID assigns a uniqueID to every instance of the metrics handler for the procfs DB
+var instanceID atomic.Uint32
 
 type addSessionMetadata struct {
 	ctx          context.Context
@@ -56,9 +61,17 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	logger := logp.NewLogger(logName)
 
+	id := int(instanceID.Add(1))
+	regName := "processor.add_session_metadata.processdb"
+	// if more than one instance of the DB is running, start to increment the metrics keys.
+	if id > 1 {
+		regName = fmt.Sprintf("%s.%d", regName, id)
+	}
+	metricsReg := monitoring.Default.NewRegistry(regName)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
-	db, err := processdb.NewDB(reader, *logger)
+	db, err := processdb.NewDB(ctx, metricsReg, reader, logger, c.DBReaperPeriod, c.ReapProcesses)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("failed to create DB: %w", err)
@@ -182,7 +195,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		fullProcess, err = p.db.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Debugw("PID not found in provider", "pid", pid, "error", err)
+			p.logger.Debugf("PID %d not found in provider: %s", pid, err)
 			return nil, e
 		}
 	}
