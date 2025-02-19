@@ -5,6 +5,7 @@
 package device_health
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -61,6 +62,10 @@ func getDeviceStatuses(client *meraki.Client, organizationID string, devices map
 		return fmt.Errorf("GetOrganizationDevicesStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 	}
 
+	if val == nil {
+		return errors.New("GetOrganizationDevicesStatuses returned nil response")
+	}
+
 	for i := range *val {
 		status := (*val)[i]
 		if device, ok := devices[Serial(status.Serial)]; ok {
@@ -73,6 +78,9 @@ func getDeviceStatuses(client *meraki.Client, organizationID string, devices map
 
 func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devices map[Serial]*Device) {
 	for _, device := range devices {
+		if device == nil || device.details == nil {
+			continue
+		}
 		// attempting to get a performance score for a non-MX device returns a 400
 		if strings.Index(device.details.Model, "MX") != 0 {
 			continue
@@ -115,6 +123,10 @@ func getDeviceChannelUtilization(client NetworkHealthService, devices map[Serial
 
 	networkIDs := make(map[string]bool)
 	for _, device := range devices {
+		if device == nil || device.details == nil {
+			continue
+		}
+
 		if device.details.ProductType != "wireless" {
 			continue
 		}
@@ -177,6 +189,10 @@ func getDeviceLicenses(client *meraki.Client, organizationID string, devices map
 		return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 	}
 
+	if val == nil {
+		return errors.New("GetOrganizationLicenses returned nil response")
+	}
+
 	for i := range *val {
 		license := (*val)[i]
 		if device, ok := devices[Serial(license.DeviceSerial)]; ok {
@@ -208,6 +224,9 @@ func deviceDetailsToMapstr(details *meraki.ResponseItemOrganizationsGetOrganizat
 func reportDeviceMetrics(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device) {
 	metrics := []mapstr.M{}
 	for _, device := range devices {
+		if device == nil || device.details == nil {
+			continue
+		}
 		metric := deviceDetailsToMapstr(device.details)
 
 		if device.haStatus != nil {
