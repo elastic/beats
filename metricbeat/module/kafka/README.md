@@ -20,10 +20,10 @@ To bring this container up simply run the tests for Kafka module:
 After the tests have been completed, the Kafka container should be still running. Verify with:
 
 ```console
-707b50334835    docker.elastic.co/integrations-ci/beats-kafka:2.2.2-2  "/run.sh"        2 minutes ago    Up 2 minutes (healthy)  2181/tcp, 0.0.0.0:32785->8774/tcp, 0.0.0.0:32784->8775/tcp, 0.0.0.0:32783->8779/tcp, 0.0.0.0:32782->9092/tcp  kafka_a035cf4c6889705a_kafka_1
+707b50334835    docker.elastic.co/integrations-ci/beats-kafka:3.6.0-2  "/run.sh"        2 minutes ago    Up 2 minutes (healthy)  2181/tcp, 0.0.0.0:32785->8774/tcp, 0.0.0.0:32784->8775/tcp, 0.0.0.0:32783->8779/tcp, 0.0.0.0:32782->9092/tcp  kafka_a035cf4c6889705a_kafka_1
 ```
 
-In order to identify to which port the Broker is listening on one should check in the logs of the container and find 
+In order to identify to which port the Broker is listening on one should check in the logs of the container and find
 the advertised address:
 
 ```console
@@ -39,7 +39,7 @@ listeners = INSIDE://localhost:9091,OUTSIDE://0.0.0.0:9092
 ```
 
 So here in this example the host we should in the module's config is `localhost:32778`.
-Note that this is different between MAC and Linux machines. The above is the case for the MAC machine, and here is how 
+Note that this is different between MAC and Linux machines. The above is the case for the MAC machine, and here is how
 the respective address for a LINUX machine should look like:
 
 ```console
@@ -60,7 +60,7 @@ This was needed before moving the metricbeat docker used in CI to host network, 
 
 #### Configuring Kafka module
 In order to configure the Module we will use the advertised addressed to connect to the broker and the credentials
-that are also used for the tests 
+that are also used for the tests
 (see [test config](https://github.com/elastic/beats/blob/6c279ebf2789655725889f37820c959a8f2ea969/metricbeat/module/kafka/consumergroup/consumergroup_integration_test.go#L39)).
 Here is how the config should look like (in a MAC):
 
