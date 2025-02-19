@@ -133,7 +133,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
 - Sync missing changes in modules pipelines. {pull}42619[42619]
 
 

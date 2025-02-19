@@ -2134,8 +2134,6 @@ processors:
           "16901": "Remote Access"
           "16902": "Subscribe"
           "16903": "Publish"
-<<<<<<< HEAD
-=======
         reversed_descriptions:
           "..." : ["1831"]
           "3DES" : ["8196","16399"]
@@ -2794,7 +2792,6 @@ processors:
           "vSwitch" : ["14604"]
           "vSwitch Egress" : ["14642"]
           "vSwitch Ingress" : ["14641"]
->>>>>>> 0708e19a2 ([x-pack/winlogbeat] Port pipeline changes from integrations (#42619))
         AccessMaskDescriptions:
           "0x00000001": Create Child
           "0x00000002": Delete Child
@@ -2836,17 +2833,12 @@ processors:
         }
         if (ctx.winlog?.event_data?.FailureReason != null) {
           def code = ctx.winlog.event_data.FailureReason.replace("%%","");
-<<<<<<< HEAD
-          if (params.descriptions.containsKey(code)) {
-            if (ctx?.winlog?.logon == null ) {
-=======
           def desc = params.descriptions[code];
           if (desc == null) {
             desc = code;
           }
           if (desc != null) {
             if (ctx.winlog?.logon == null ) {
->>>>>>> 0708e19a2 ([x-pack/winlogbeat] Port pipeline changes from integrations (#42619))
               HashMap hm = new HashMap();
               ctx.winlog.put("logon", hm);
             }
@@ -2909,9 +2901,6 @@ processors:
             }
             list.add(elem);
             def code = elem.replace("%%","").trim();
-<<<<<<< HEAD
-            accessMask |= Long.decode(code).longValue();
-=======
             if (params.descriptions.containsKey(code)) {
               list.add(params.descriptions[code]);
             } else {
@@ -2923,7 +2912,6 @@ processors:
               def longCode = Long.decode(code).longValue();
               accessMask |= longCode;
             } catch (Exception e) {}
->>>>>>> 0708e19a2 ([x-pack/winlogbeat] Port pipeline changes from integrations (#42619))
           }
           if (list.length > 0) {
             ctx.winlog.event_data.put("AccessMask", list);
