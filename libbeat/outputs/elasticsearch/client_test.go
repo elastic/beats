@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
+// go: build !integration
 
 package elasticsearch
 
@@ -88,9 +88,10 @@ func TestPublish(t *testing.T) {
 
 	makePublishTestClient := func(t *testing.T, url string) (*Client, *monitoring.Registry) {
 		reg := monitoring.NewRegistry()
+		internal := monitoring.NewRegistry()
 		client, err := NewClient(
 			clientSettings{
-				observer:      outputs.NewStats(reg),
+				observer:      outputs.NewStats(reg, internal),
 				connection:    eslegclient.ConnectionSettings{URL: url},
 				indexSelector: testIndexSelector{},
 			},
@@ -334,7 +335,11 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	event2 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}})
 	eventFail := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 3}}})
 	events := []publisher.Event{event1, eventFail, event2}
-
+	want := bulkResultStats{
+		acked:   []publisher.Event{event1, event2},
+		fails:   []publisher.Event{eventFail},
+		tooMany: []publisher.Event{eventFail},
+	}
 	res, stats := client.bulkCollectPublishFails(bulkResult{
 		events:   events,
 		status:   200,
@@ -344,7 +349,7 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
 	}
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, tooMany: 1}, stats)
+	assert.Equal(t, want, stats)
 }
 
 func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
@@ -365,6 +370,7 @@ func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
 	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}})
 	event1.EncodedEvent.(*encodedEvent).setDeadLetter(deadLetterIndex, 123, errorMessage)
 	events := []publisher.Event{event1}
+	want := bulkResultStats{deadLetter: []publisher.Event{event1}}
 
 	// The event should be successful after being set to dead letter, so it
 	// should be reported in the metrics as deadLetter
@@ -373,7 +379,7 @@ func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 0, deadLetter: 1}, stats)
+	assert.Equal(t, want, stats)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -397,6 +403,7 @@ func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
 	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}})
 	event1.EncodedEvent.(*encodedEvent).setDeadLetter(deadLetterIndex, 123, errorMessage)
 	events := []publisher.Event{event1}
+	want := bulkResultStats{nonIndexable: []publisher.Event{event1}}
 
 	// The event should fail permanently while being sent to the dead letter
 	// index, so it should be dropped instead of retrying.
@@ -405,7 +412,7 @@ func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 0, nonIndexable: 1}, stats)
+	assert.Equal(t, want, stats)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -421,6 +428,7 @@ func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
 
 	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}})
 	events := []publisher.Event{event1}
+	want := bulkResultStats{fails: []publisher.Event{event1}}
 
 	// The event should be successful after being set to dead letter, so it
 	// should be reported in the metrics as deadLetter
@@ -431,7 +439,7 @@ func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
 	})
 	// The event should be returned for retry, and should appear in aggregated
 	// stats as failed (retryable error)
-	assert.Equal(t, bulkResultStats{acked: 0, fails: 1}, stats)
+	assert.Equal(t, want, stats)
 	assert.Equal(t, 1, len(res))
 	if len(res) > 0 {
 		assert.Equal(t, event1, res[0])
@@ -468,13 +476,16 @@ func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
 	event2 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 2}}})
 	eventFail := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": "bar1"}}})
 	events := []publisher.Event{event1, eventFail, event2}
+	want := bulkResultStats{
+		acked: []publisher.Event{event1, event2},
+		fails: []publisher.Event{eventFail}}
 
 	res, stats := client.bulkCollectPublishFails(bulkResult{
 		events:   events,
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, nonIndexable: 0}, stats)
+	assert.Equal(t, want, stats)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equalf(t, eventFail, res[0], "bulkCollectPublishFails should return failed event")
@@ -525,13 +536,17 @@ func TestCollectPublishFailDrop(t *testing.T) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": "bar1"}}}
 	events := encodeEvents(client, []publisher.Event{event, eventFail, event})
 
+	want := bulkResultStats{
+		acked:        []publisher.Event{events[0], events[2]},
+		nonIndexable: []publisher.Event{events[1]}}
+
 	res, stats := client.bulkCollectPublishFails(bulkResult{
 		events:   events,
 		status:   200,
 		response: response,
 	})
 	assert.Equal(t, 0, len(res))
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 0, nonIndexable: 1}, stats)
+	assert.Equal(t, want, stats)
 }
 
 func TestCollectPublishFailAll(t *testing.T) {
@@ -553,7 +568,9 @@ func TestCollectPublishFailAll(t *testing.T) {
 
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
 	events := encodeEvents(client, []publisher.Event{event, event, event})
-
+	want := bulkResultStats{
+		fails:   events,
+		tooMany: events}
 	res, stats := client.bulkCollectPublishFails(bulkResult{
 		events:   events,
 		status:   200,
@@ -561,7 +578,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 	})
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
-	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
+	assert.Equal(t, want, stats)
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {

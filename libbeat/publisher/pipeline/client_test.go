@@ -307,8 +307,9 @@ func TestMonitoring(t *testing.T) {
 		pipeline, err := Load(
 			beatInfo,
 			Monitors{
-				Metrics:   metrics,
-				Telemetry: telemetry,
+				BeatRegistry: beatInfo.Monitoring.Namespace.GetRegistry(),
+				Metrics:      metrics,
+				Telemetry:    telemetry,
 			},
 			config,
 			processing.Supporter(nil),
@@ -360,8 +361,9 @@ func TestMonitoring(t *testing.T) {
 		pipeline, err := Load(
 			beatInfo,
 			Monitors{
-				Metrics:   metrics,
-				Telemetry: telemetry,
+				BeatRegistry: beatInfo.Monitoring.Namespace.GetRegistry(),
+				Metrics:      metrics,
+				Telemetry:    telemetry,
 			},
 			config,
 			testProcessorSupporter{
