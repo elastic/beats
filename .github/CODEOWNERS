@@ -224,6 +224,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/iis @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/istio/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/mssql @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/meraki @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/openai @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/oracle @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/panw @elastic/obs-infraobs-integrations
