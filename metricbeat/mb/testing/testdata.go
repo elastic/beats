@@ -20,9 +20,9 @@ package testing
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -131,7 +131,7 @@ func ReadDataConfig(t *testing.T, f string) DataConfig {
 	t.Helper()
 	config := defaultDataConfig()
 
-	configFile, err := ioutil.ReadFile(f)
+	configFile, err := os.ReadFile(f)
 	if err != nil {
 		t.Fatalf("failed to read '%s': %v", f, err)
 	}
@@ -294,13 +294,13 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err = ioutil.WriteFile(expectedFile, outputIndented, 0644); err != nil {
+		if err = os.WriteFile(expectedFile, outputIndented, 0644); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	// Read expected file
-	expected, err := ioutil.ReadFile(expectedFile)
+	expected, err := os.ReadFile(expectedFile)
 	if err != nil {
 		t.Fatalf("could not read file: %s", err)
 	}
@@ -361,8 +361,8 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 func writeDataJSON(t *testing.T, data mapstr.M, path string) {
 	// Add hardcoded timestamp
 	data.Put("@timestamp", "2019-03-01T08:05:34.853Z")
-	output, err := json.MarshalIndent(&data, "", "    ")
-	if err = ioutil.WriteFile(path, output, 0644); err != nil {
+	output, _ := json.MarshalIndent(&data, "", "    ")
+	if err := os.WriteFile(path, output, 0644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -494,7 +494,7 @@ func getConfig(module, metricSet, url string, config DataConfig) map[string]inte
 // server starts a server with a mock output
 func server(t *testing.T, path string, url string, contentType string) *httptest.Server {
 
-	body, err := ioutil.ReadFile(path)
+	body, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("could not read file: %s", err)
 	}
@@ -509,7 +509,7 @@ func server(t *testing.T, path string, url string, contentType string) *httptest
 		if r.URL.Path+query == url {
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(200)
-			w.Write(body)
+			_, _ = w.Write(body)
 		} else {
 			w.WriteHeader(404)
 		}
