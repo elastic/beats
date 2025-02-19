@@ -119,7 +119,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 	st := out.observer
 	events := batch.Events()
-	st.NewBatch(len(events))
+	st.NewBatch(events)
 
 	dropped := 0
 
@@ -136,6 +136,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 			out.log.Debug("Failed event logged to event log file")
 			out.log.Debugw(fmt.Sprintf("Failed event: %v", event), logp.TypeKey, logp.EventType)
 
+			st.PermanentError(events[i])
 			dropped++
 			continue
 		}
@@ -150,18 +151,15 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 				out.log.Warnf("Writing event to file failed with: %+v", err)
 			}
 
-			dropped++
+			st.PermanentError(events[i])
 			continue
 		}
 
 		st.WriteBytes(len(serializedEvent) + 1)
 		took := time.Since(begin)
 		st.ReportLatency(took)
+		st.AckedEvent(events[i])
 	}
-
-	st.PermanentErrors(dropped)
-
-	st.AckedEvents(len(events) - dropped)
 
 	return nil
 }
