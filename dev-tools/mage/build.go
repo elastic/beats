@@ -49,7 +49,7 @@ type BuildArgs struct {
 
 // buildTagRE is a regexp to match strings like "-tags=abcd"
 // but does not match "-tags= "
-var buildTagRE = regexp.MustCompile(`-tags=([\S]+)`)
+var buildTagRE = regexp.MustCompile(`-tags=([\S]+)?`)
 
 // ParseExtraFlags returns the ExtraFlags param where all flags that are go build tags are joined by a comma.
 //
@@ -65,7 +65,7 @@ func (b BuildArgs) ParseExtraFlags() []string {
 	for _, flag := range b.ExtraFlags {
 		if buildTagRE.MatchString(flag) {
 			arr := buildTagRE.FindStringSubmatch(flag)
-			if len(arr) != 2 {
+			if len(arr) != 2 || arr[1] == "" {
 				log.Printf("Parsing buildargs.ExtraFlags found strange flag %q ignoring value", flag)
 				continue
 			}
