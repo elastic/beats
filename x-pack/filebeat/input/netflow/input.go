@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/convert"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
@@ -59,7 +60,7 @@ func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 	customFields := make([]fields.FieldDict, len(inputCfg.CustomDefinitions))
 	for idx, yamlPath := range inputCfg.CustomDefinitions {
-		f, err := LoadFieldDefinitionsFromFile(yamlPath)
+		f, err := decoder.LoadFieldDefinitionsFromFile(yamlPath)
 		if err != nil {
 			return nil, fmt.Errorf("failed parsing custom field definitions from file '%s': %w", yamlPath, err)
 		}
@@ -192,7 +193,7 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 							flowsTotal.Add(uint64(fLen))
 						}
 						for flowIdx, flow := range flows {
-							evs[flowIdx] = toBeatEvent(flow, n.internalNetworks)
+							evs[flowIdx] = convert.RecordToBeatEvent(flow, n.internalNetworks)
 						}
 						client.PublishAll(evs)
 					}

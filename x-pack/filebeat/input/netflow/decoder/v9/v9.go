@@ -107,7 +107,7 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	session := p.Session.GetOrCreate(sessionKey)
 	remote := source.String()
 
-	p.logger.Debugf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)
+	p.logger.Debugf("Packet from:%s src:%#04x seq:%#04x", remote, header.SourceID, header.SequenceNo)
 	if p.detectReset {
 		if prev, reset := session.CheckReset(header.SequenceNo); reset {
 			p.logger.Debugf("Session %s reset (sequence=%d last=%d)", remote, header.SequenceNo, prev)

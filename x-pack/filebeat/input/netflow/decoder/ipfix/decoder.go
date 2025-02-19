@@ -21,12 +21,15 @@ import (
 const (
 	TemplateFlowSetID           = 2
 	TemplateOptionsSetID        = 3
+	TemplateFlowSetIDForFile    = 0
+	TemplateOptionsSetIDForFile = 1
 	EnterpriseBit        uint16 = 0x8000
 	SizeOfIPFIXHeader    uint16 = 16
 )
 
 type DecoderIPFIX struct {
 	v9.DecoderV9
+	FileBased      bool
 }
 
 var _ v9.Decoder = (*DecoderIPFIX)(nil)
@@ -57,6 +60,14 @@ func (DecoderIPFIX) ReadPacketHeader(buf *bytes.Buffer) (header v9.PacketHeader,
 }
 
 func (d DecoderIPFIX) ReadTemplateSet(setID uint16, buf *bytes.Buffer) ([]*template.Template, error) {
+	// ugly hack to make the file we were given work properly
+	// XXX Remove this! This is not valid.
+	if d.FileBased && setID == TemplateFlowSetIDForFile {
+		setID = TemplateFlowSetID
+	} else if d.FileBased && setID == TemplateOptionsSetIDForFile {
+		setID = TemplateOptionsSetID
+	}
+
 	switch setID {
 	case TemplateFlowSetID:
 		return v9.ReadTemplateFlowSet(d, buf)
