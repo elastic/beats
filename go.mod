@@ -120,8 +120,12 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
+<<<<<<< HEAD
 	github.com/stretchr/testify v1.9.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
+=======
+	github.com/stretchr/testify v1.10.0
+>>>>>>> 3ff193186 (Update testify and fix filebeat tests (#42747))
 	github.com/ugorji/go/codec v1.1.8
 	github.com/vmware/govmomi v0.39.0
 	go.elastic.co/ecszap v1.0.2
