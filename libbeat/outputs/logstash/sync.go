@@ -106,7 +106,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	events := batch.Events()
 	st := c.observer
 
-	st.NewBatch(len(events))
+	st.NewBatch(events)
 
 	if len(events) == 0 {
 		batch.ACK()
@@ -151,7 +151,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 			n, len(events), c.Host())
 
 		events = events[n:]
-		st.AckedEvents(n)
+		st.AckedEvents(events[:n])
 		deadlockListener.ack(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error

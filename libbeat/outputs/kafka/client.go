@@ -170,7 +170,7 @@ func (c *client) Close() error {
 
 func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 	events := batch.Events()
-	c.observer.NewBatch(len(events))
+	c.observer.NewBatch(events)
 
 	ref := &msgRef{
 		client: c,
@@ -181,13 +181,12 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	ch := c.producer.Input()
-	for i := range events {
-		d := &events[i]
-		msg, err := c.getEventMessage(d)
+	for _, d := range events {
+		msg, err := c.getEventMessage(&d)
 		if err != nil {
 			c.log.Errorf("Dropping event: %+v", err)
 			ref.done()
-			c.observer.PermanentErrors(1)
+			c.observer.PermanentError(d)
 			continue
 		}
 
@@ -384,17 +383,17 @@ func (r *msgRef) fail(msg *message, err error) {
 	switch {
 	case errors.Is(err, sarama.ErrInvalidMessage):
 		r.client.log.Errorf("Kafka (topic=%v): dropping invalid message", msg.topic)
-		r.client.observer.PermanentErrors(1)
+		r.client.observer.PermanentError(msg.data)
 
 	case errors.Is(err, sarama.ErrMessageSizeTooLarge) || errors.Is(err, sarama.ErrInvalidMessageSize):
 		r.client.log.Errorf("Kafka (topic=%v): dropping too large message of size %v.",
 			msg.topic,
 			len(msg.key)+len(msg.value))
-		r.client.observer.PermanentErrors(1)
+		r.client.observer.PermanentError(msg.data)
 
 	case isAuthError(err):
 		r.client.log.Errorf("Kafka (topic=%v): authorisation error: %s", msg.topic, err)
-		r.client.observer.PermanentErrors(1)
+		r.client.observer.PermanentError(msg.data)
 
 	case errors.Is(err, breaker.ErrBreakerOpen):
 		// Add this message to the failed list, but don't overwrite r.err since
@@ -429,13 +428,13 @@ func (r *msgRef) dec() {
 
 		stats.RetryableErrors(failed)
 		if success > 0 {
-			stats.AckedEvents(success)
+			stats.AckedEvent(success)
 		}
 
 		r.client.log.Debugf("Kafka publish failed with: %+v", err)
 	} else {
 		r.batch.ACK()
-		stats.AckedEvents(r.total)
+		stats.AckedEvent(r.total)
 	}
 }
 
