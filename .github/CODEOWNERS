@@ -76,7 +76,7 @@ CHANGELOG*
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
-/metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
+/metricbeat/helper/kubernetes @elastic/obs-ds-hosted-services
 /metricbeat/module/aerospike @elastic/obs-infraobs-integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/stack-monitoring
@@ -91,15 +91,15 @@ CHANGELOG*
 /metricbeat/module/jolokia @elastic/obs-infraobs-integrations
 /metricbeat/module/kafka @elastic/obs-infraobs-integrations
 /metricbeat/module/kibana/ @elastic/stack-monitoring
-/metricbeat/module/kubernetes/ @elastic/obs-cloudnative-monitoring
+/metricbeat/module/kubernetes/ @elastic/obs-ds-hosted-services
 /metricbeat/module/logstash/ @elastic/stack-monitoring
 /metricbeat/module/memcached @elastic/obs-infraobs-integrations
 /metricbeat/module/mongodb @elastic/obs-infraobs-integrations
 /metricbeat/module/mysql @elastic/obs-infraobs-integrations
-/metricbeat/module/nats/ @elastic/obs-cloudnative-monitoring
+/metricbeat/module/nats/ @elastic/obs-ds-hosted-services
 /metricbeat/module/nginx @elastic/obs-infraobs-integrations
 /metricbeat/module/php_fpm @elastic/obs-infraobs-integrations
-/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
+/metricbeat/module/prometheus/ @elastic/obs-ds-hosted-services
 /metricbeat/module/postgresql @elastic/obs-infraobs-integrations
 /metricbeat/module/rabbitmq @elastic/obs-infraobs-integrations
 /metricbeat/module/redis @elastic/obs-infraobs-integrations
@@ -200,7 +200,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/azure/billing @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cloudfoundry @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/containerd/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/containerd/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/coredns @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/enterprisesearch @elastic/app-search-team
 /x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations
@@ -221,16 +221,16 @@ CHANGELOG*
 /x-pack/metricbeat/module/gcp/storage @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/ibmmq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/iis @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/istio/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/istio/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/mssql @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/openai @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/oracle @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/panw @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/prometheus/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/redisenterprise @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/sql @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/stan/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/stan/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
 /x-pack/osquerybeat/ @elastic/sec-deployment-and-devices
 /x-pack/packetbeat/ @elastic/sec-linux-platform
