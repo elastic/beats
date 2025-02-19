@@ -150,6 +150,10 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 			"enabled":        true,
 			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
 		},
+
+		"mapping": map[string]any{
+			"mode": "bodymap",
+		},
 	}
 
 	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)    // headers
