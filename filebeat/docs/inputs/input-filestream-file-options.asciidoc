@@ -15,7 +15,7 @@ in the `paths` option. At the moment only simple file system scanning is
 supported.
 
 [float]
-[[filestream-input-id]]
+[id="{beatname_lc}-input-{type}-id"]
 ===== `id`
 
 A unique identifier for this filestream input. Each filestream input
@@ -117,6 +117,7 @@ NOTE: Patterns should start with `^` in case of absolute paths.
 
 See <<regexp-support>> for a list of supported regexp patterns.
 
+[id="{beatname_lc}-input-{type}-prospector-scanner-symlinks"]
 ===== `prospector.scanner.symlinks`
 
 The `symlinks` option allows {beatname_uc} to harvest symlinks in addition to

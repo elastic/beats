@@ -89,7 +89,7 @@ const globalInputID = ".global"
 
 // StateStore interface and configurations used to give the Manager access to the persistent store.
 type StateStore interface {
-	Access() (*statestore.Store, error)
+	Access(typ string) (*statestore.Store, error)
 	CleanupInterval() time.Duration
 }
 
