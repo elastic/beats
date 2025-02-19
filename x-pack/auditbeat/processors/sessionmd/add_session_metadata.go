@@ -56,20 +56,20 @@ type addSessionMetadata struct {
 	providerType string
 }
 
-func gen_registry(base string) *monitoring.Registry {
+func gen_registry(reg *monitoring.Registry, base string) *monitoring.Registry {
 	// if more than one instance of the DB is running, start to increment the metrics keys.
 	// This is kind of an edge case, but best to handle it so monitoring does not explode
 	id := 0
-	if monitoring.Default.GetRegistry(base) != nil {
+	if reg.GetRegistry(base) != nil {
 		id = int(instanceID.Add(1))
 	}
 
 	regName := base
-	if id > 1 {
+	if id > 0 {
 		regName = fmt.Sprintf("%s.%d", base, id)
 	}
 
-	metricsReg := monitoring.Default.NewRegistry(regName)
+	metricsReg := reg.NewRegistry(regName)
 	return metricsReg
 }
 
@@ -80,7 +80,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	}
 
 	logger := logp.NewLogger(logName)
-	procDBReg := gen_registry(regNameProcessDB)
+	procDBReg := gen_registry(monitoring.Default, regNameProcessDB)
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
 	db, err := processdb.NewDB(ctx, procDBReg, reader, logger, c.DBReaperPeriod, c.ReapProcesses)
@@ -94,7 +94,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	switch c.Backend {
 	case "auto":
-		procDBReg := gen_registry(regNameKernelTracing)
+		procDBReg := gen_registry(monitoring.Default, regNameKernelTracing)
 		p, err = kerneltracingprovider.NewProvider(ctx, logger, procDBReg)
 		if err != nil {
 			// Most likely cause of error is not supporting ebpf or kprobes on system, try procfs
@@ -121,7 +121,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		}
 		pType = procfsType
 	case "kernel_tracing":
-		procDBReg := gen_registry(regNameKernelTracing)
+		procDBReg := gen_registry(monitoring.Default, regNameKernelTracing)
 		p, err = kerneltracingprovider.NewProvider(ctx, logger, procDBReg)
 		if err != nil {
 			cancel()
