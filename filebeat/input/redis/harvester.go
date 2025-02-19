@@ -42,15 +42,15 @@ type Harvester struct {
 
 // log contains all data related to one slowlog entry
 //
-//		The data is in the following format:
-//		1) (integer) 13
-//		2) (integer) 1309448128
-//		3) (integer) 30
-//		4) 1) "slowlog"
-//		   2) "get"
-//		   3) "100"
-//		5) "100.1.1.1:12345"
-//		6) "client-name"
+//	The data is in the following format:
+//	1) (integer) 13
+//	2) (integer) 1309448128
+//	3) (integer) 30
+//	4) 1) "slowlog"
+//	   2) "get"
+//	   3) "100"
+//	5) "100.1.1.1:12345"
+//	6) "client-name"
 type log struct {
 	id         int64
 	timestamp  int64
