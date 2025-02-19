@@ -22,6 +22,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -118,6 +119,15 @@ func (s *Stats) NewBatch(n int) {
 	}
 }
 
+// NewBatchE updates active batch and event metrics.
+func (s *Stats) NewBatchE(evs []publisher.Event) {
+	if s != nil {
+		s.eventsBatches.Inc()
+		s.eventsTotal.Add(uint64(len(evs)))
+		s.eventsActive.Add(uint64(len(evs)))
+	}
+}
+
 func (s *Stats) ReportLatency(time time.Duration) {
 	s.sendLatencyMillis.Update(time.Milliseconds())
 }
@@ -130,10 +140,33 @@ func (s *Stats) AckedEvents(n int) {
 	}
 }
 
+// AckedEvents updates active and acked event metrics.
+func (s *Stats) AckedEvent(e publisher.Event) {
+	if s != nil {
+		s.eventsACKed.Add(uint64(1))
+		s.eventsActive.Sub(uint64(1))
+	}
+}
+
+// AckedEvents updates active and acked event metrics.
+func (s *Stats) AckedEventsE(evs []publisher.Event) {
+	if s != nil {
+		s.eventsACKed.Add(uint64(len(evs)))
+		s.eventsActive.Sub(uint64(len(evs)))
+	}
+}
+
 func (s *Stats) DeadLetterEvents(n int) {
 	if s != nil {
 		s.eventsDeadLetter.Add(uint64(n))
 		s.eventsActive.Sub(uint64(n))
+	}
+}
+
+func (s *Stats) DeadLetterEventsE(evs []publisher.Event) {
+	if s != nil {
+		s.eventsDeadLetter.Add(uint64(len(evs)))
+		s.eventsActive.Sub(uint64(len(evs)))
 	}
 }
 
@@ -153,6 +186,14 @@ func (s *Stats) DuplicateEvents(n int) {
 	}
 }
 
+// DuplicateEvents updates the active and duplicate event metrics.
+func (s *Stats) DuplicateEventsE(evs []publisher.Event) {
+	if s != nil {
+		s.eventsDuplicates.Add(uint64(len(evs)))
+		s.eventsActive.Sub(uint64(len(evs)))
+	}
+}
+
 // PermanentErrors updates total number of event drops as reported by the output.
 // Outputs will only report dropped events on fatal errors which lead to the
 // event not being publishable. For example encoding errors or total event size
@@ -162,6 +203,22 @@ func (s *Stats) PermanentErrors(n int) {
 	if s != nil {
 		s.eventsActive.Sub(uint64(n))
 		s.eventsDropped.Add(uint64(n))
+	}
+}
+
+func (s *Stats) PermanentError(e publisher.Event) {
+	// number of dropped events (e.g. encoding failures)
+	if s != nil {
+		s.eventsActive.Sub(1)
+		s.eventsDropped.Add(1)
+	}
+}
+
+func (s *Stats) PermanentErrorsE(evs []publisher.Event) {
+	// number of dropped events (e.g. encoding failures)
+	if s != nil {
+		s.eventsActive.Sub(uint64(len(evs)))
+		s.eventsDropped.Add(uint64(len(evs)))
 	}
 }
 

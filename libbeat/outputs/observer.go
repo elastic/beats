@@ -17,19 +17,30 @@
 
 package outputs
 
-import "time"
+import (
+	"time"
+
+	"github.com/elastic/beats/v7/libbeat/publisher"
+)
 
 // Observer provides an interface used by outputs to report common events on
 // documents/events being published and I/O workload.
 type Observer interface {
 	NewBatch(int) // report new batch being processed with number of events
+	NewBatchE([]publisher.Event)
 
-	RetryableErrors(int)  // report number of events with retryable errors
-	PermanentErrors(int)  // report number of events dropped due to permanent errors
-	DuplicateEvents(int)  // report number of events detected as duplicates (e.g. on resends)
+	RetryableErrors(int) // report number of events with retryable errors
+	PermanentErrors(int) // report number of events dropped due to permanent errors
+	PermanentError(e publisher.Event)
+	PermanentErrorsE([]publisher.Event)
+	DuplicateEvents(int) // report number of events detected as duplicates (e.g. on resends)
+	DuplicateEventsE([]publisher.Event)
 	DeadLetterEvents(int) // report number of failed events ingested to dead letter index
-	AckedEvents(int)      // report number of acked events
-	ErrTooMany(int)       // report too many requests response
+	DeadLetterEventsE([]publisher.Event)
+	AckedEvents(int) // report number of acked events
+	AckedEvent(e publisher.Event)
+	AckedEventsE([]publisher.Event)
+	ErrTooMany(int) // report too many requests response
 
 	BatchSplit() // report a batch was split for being too large to ingest
 
@@ -50,16 +61,23 @@ func NewNilObserver() Observer {
 	return nilObserver
 }
 
-func (*emptyObserver) NewBatch(int)                  {}
-func (*emptyObserver) ReportLatency(_ time.Duration) {}
-func (*emptyObserver) AckedEvents(int)               {}
-func (*emptyObserver) DeadLetterEvents(int)          {}
-func (*emptyObserver) DuplicateEvents(int)           {}
-func (*emptyObserver) RetryableErrors(int)           {}
-func (*emptyObserver) PermanentErrors(int)           {}
-func (*emptyObserver) BatchSplit()                   {}
-func (*emptyObserver) WriteError(error)              {}
-func (*emptyObserver) WriteBytes(int)                {}
-func (*emptyObserver) ReadError(error)               {}
-func (*emptyObserver) ReadBytes(int)                 {}
-func (*emptyObserver) ErrTooMany(int)                {}
+func (*emptyObserver) NewBatch(int)                        {}
+func (*emptyObserver) NewBatchE([]publisher.Event)         {}
+func (*emptyObserver) ReportLatency(_ time.Duration)       {}
+func (*emptyObserver) AckedEvents(int)                     {}
+func (*emptyObserver) AckedEvent(publisher.Event)          {}
+func (*emptyObserver) AckedEventsE([]publisher.Event)      {}
+func (*emptyObserver) DeadLetterEvents(int)                {}
+func (*emptyObserver) DeadLetterEventsE([]publisher.Event) {}
+func (*emptyObserver) DuplicateEvents(int)                 {}
+func (*emptyObserver) DuplicateEventsE([]publisher.Event)  {}
+func (*emptyObserver) RetryableErrors(int)                 {}
+func (*emptyObserver) PermanentErrors(int)                 {}
+func (*emptyObserver) PermanentError(publisher.Event)      {}
+func (*emptyObserver) PermanentErrorsE([]publisher.Event)  {}
+func (*emptyObserver) BatchSplit()                         {}
+func (*emptyObserver) WriteError(error)                    {}
+func (*emptyObserver) WriteBytes(int)                      {}
+func (*emptyObserver) ReadError(error)                     {}
+func (*emptyObserver) ReadBytes(int)                       {}
+func (*emptyObserver) ErrTooMany(int)                      {}
