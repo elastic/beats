@@ -131,6 +131,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 - [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
+- In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 
 *Heartbeat*
 

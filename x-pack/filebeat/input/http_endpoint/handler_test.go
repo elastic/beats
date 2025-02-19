@@ -360,6 +360,81 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
+			name: "hmac_header_not_present",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"missing HMAC header"}`,
+		},
+		{
+			name: "hmac_header_value_is_empty",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: unexpected empty header value"}`,
+		},
+		{
+			name: "hmac_header_value_only_contains_prefix",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "HMAC-SHA256 ")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: unexpected empty header value"}`,
+		},
+		{
+			name: "hmac_header_value_bad_encoding",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "HMAC-SHA256 not-hex-or-base64")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: encoding/hex: invalid byte: U+006E 'n'\nillegal base64 data at input byte 3\nillegal base64 data at input byte 3"}`,
+		},
+		{
 			name: "single_event_gzip",
 			conf: defaultConfig(),
 			request: func() *http.Request {
