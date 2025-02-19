@@ -80,7 +80,7 @@ func ConvertDatetime(v string) (interface{}, error) {
 	utcOffsetStr := v[22:]
 	utcOffset, err := strconv.ParseInt(utcOffsetStr, 10, 16)
 	if err != nil {
-		return nil, fmt.Errorf("datetime is invalid: error parsing UTC offset: %v", err)
+		return nil, fmt.Errorf("datetime is invalid: error parsing UTC offset: %w", err)
 	}
 	offsetHours := utcOffset / 60
 	offsetMinutes := utcOffset % 60
@@ -92,7 +92,7 @@ func ConvertDatetime(v string) (interface{}, error) {
 	// Parse the combined datetime string using the defined layout
 	date, err := time.Parse(WMI_DATETIME_LAYOUT+TIMEZONE_LAYOUT, dateString)
 	if err != nil {
-		return nil, fmt.Errorf("datetime is invalid: error parsing the final datetime: %v", err)
+		return nil, fmt.Errorf("datetime is invalid: error parsing the final datetime: %w", err)
 	}
 
 	return date, err
