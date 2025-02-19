@@ -52,6 +52,31 @@ type Observer interface {
 	ReportLatency(time.Duration) // report the duration a send to the output takes
 }
 
+// Observer provides an interface used by outputs to report common events on
+// documents/events being published and I/O workload.
+// TODO: fix docs
+type ObserverInputAware interface {
+	NewBatchE([]publisher.Event)
+
+	RetryableErrors(int) // report number of events with retryable errors
+	PermanentError(e publisher.Event)
+	PermanentErrorsE([]publisher.Event)
+	DuplicateEventsE([]publisher.Event)
+	DeadLetterEventsE([]publisher.Event)
+	AckedEvent(e publisher.Event)
+	AckedEventsE([]publisher.Event)
+	ErrTooMany(int) // report too many requests response
+
+	BatchSplit() // report a batch was split for being too large to ingest
+
+	WriteError(error) // report an I/O error on write
+	WriteBytes(int)   // report number of bytes being written
+	ReadError(error)  // report an I/O error on read
+	ReadBytes(int)    // report number of bytes being read
+
+	ReportLatency(time.Duration) // report the duration a send to the output takes
+}
+
 type emptyObserver struct{}
 
 var nilObserver = (*emptyObserver)(nil)

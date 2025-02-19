@@ -53,7 +53,7 @@ type Client struct {
 	indexSelector    outputs.IndexSelector
 	pipelineSelector *outil.Selector
 
-	observer outputs.Observer
+	observer outputs.ObserverInputAware
 
 	// If deadLetterIndex is set, events with bulk-ingest errors will be
 	// forwarded to this index. Otherwise, they will be dropped.
@@ -549,7 +549,7 @@ func (client *Client) Test(d testing.Driver) {
 	client.conn.Test(d)
 }
 
-func (stats bulkResultStats) reportToObserver(ob outputs.Observer) {
+func (stats bulkResultStats) reportToObserver(ob outputs.ObserverInputAware) {
 	ob.AckedEventsE(stats.acked)
 	ob.PermanentErrorsE(stats.nonIndexable)
 	ob.DuplicateEventsE(stats.duplicates)

@@ -85,10 +85,11 @@ func (bm *batchMock) RetryEvents(events []publisher.Event) {
 }
 
 func TestPublish(t *testing.T) {
-
+	// TODO: extend to include per inout metrics
+	// include always events with and without inputID
 	makePublishTestClient := func(t *testing.T, url string) (*Client, *monitoring.Registry) {
 		reg := monitoring.NewRegistry()
-		internal := monitoring.NewRegistry()
+		internal := monitoring.GetNamespace("TestPublish").GetRegistry()
 		client, err := NewClient(
 			clientSettings{
 				observer:      outputs.NewStats(reg, internal),
