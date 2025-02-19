@@ -48,8 +48,8 @@ NOTE: While Metricbeat stops waiting for the result, the underlying WMI query ma
     namespace: "root\\cimv2" # Default Namespace
     warning_threshold: 60s
     include_queries: true
-    include_null: false
-    include_empty_strings: false
+    include_null_properties: false
+    include_empty_strings_properties: false
     queries:
     - class: Win32_OperatingSystem
       properties:
@@ -64,10 +64,6 @@ NOTE: While Metricbeat stops waiting for the result, the underlying WMI query ma
       namespace: "root\\cimv2\\power" # Overwrites the module namespace in this query
 ----
 
-*`wmi.namespace`*::
-The default WMI namespace used for queries. This can be overridden per query.
-The default is `root\cimv2`.
-
 *`wmi.host`*:: The host for the remote WMI Connection. The default is `localhost`.
 
 *`wmi.domain`*:: The domain for the remote WMI Connection. The default is an empty string (`""`).
@@ -76,13 +72,15 @@ The default is `root\cimv2`.
 
 *`wmi.password`*:: The password for the remote WMI Connection. The default is an empty string (`""`).
 
+*`wmi.namespace`*::
+The default WMI namespace used for queries. This can be overridden per query.
+The default is `root\cimv2`.
+
 *`wmi.warning_threshold`*:: The time threshold after which Metricbeat will stop
 waiting for the query result and return control to the main flow of the program.
 A warning is logged indicating that the query execution has exceeded the threshold.
 The default is equal to the period. See <<wmi-arbitrator-and-query-execution, WMI Arbitrator and Query Execution>>
 for more details.
-
-*`wmi.queries`*:: The list of queries to execute. The list cannot be empty. See <<query-configuration, Query Configuration>> for the format of the queries.
 
 *`wmi.include_queries`*:: If set to `true` the metricset includes the query in the output document. The default value is `false`.
 
@@ -92,6 +90,7 @@ properties that have a `null` value in the output document. The default value is
 *`wmi.include_empty_string_properties`*:: A boolean option that causes the metricset to include
 the properties that are empty string. The default value is `false`.
 
+*`wmi.queries`*:: The list of queries to execute. The list cannot be empty. See <<query-configuration, Query Configuration>> for the format of the queries.
 
 [float]
 [[query-configuration]]
