@@ -146,7 +146,7 @@ func TestQueryCompile(t *testing.T) {
 			expectedPropertiesLength: 3,
 		},
 		{
-			name: "Query with wildcard (*) for properties",
+			name: "Query with  empty list for properties and Where",
 			queryConfig: QueryConfig{
 				Class:      "Win32_ComputerSystem",
 				Properties: []string{},
