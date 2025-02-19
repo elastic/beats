@@ -1735,7 +1735,7 @@ metricbeat.modules:
     # namespace: "root\\cimv2"
     queries:
     - class: Win32_OperatingSystem # FROM: Class to fetch
-      properties:                      # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
+      properties:                      # SELECT: Properties to retrieve for this WMI class. Omit the setting to fetch all properties
        - FreePhysicalMemory
        - FreeSpaceInPagingFiles
        - FreeVirtualMemory
