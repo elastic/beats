@@ -132,6 +132,7 @@ func TestClient(t *testing.T) {
 					continue
 				}
 				for i := 0; i < batch.Count(); i++ {
+					//nolint:errcheck // it always succeeds
 					e := batch.Entry(i).(publisher.Event)
 					received = append(received, e.Content)
 				}
