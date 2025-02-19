@@ -70,11 +70,41 @@ CHANGELOG*
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+<<<<<<< HEAD
 /metricbeat/module/ @elastic/integrations
 /metricbeat/module/beat/ @elastic/infra-monitoring-ui
 /metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui
 /metricbeat/module/kibana/ @elastic/infra-monitoring-ui
 /metricbeat/module/logstash/ @elastic/infra-monitoring-ui
+=======
+/metricbeat/helper/kubernetes @elastic/obs-ds-hosted-services
+/metricbeat/module/aerospike @elastic/obs-infraobs-integrations
+/metricbeat/module/apache @elastic/obs-infraobs-integrations
+/metricbeat/module/beat/ @elastic/stack-monitoring
+/metricbeat/module/ceph @elastic/obs-infraobs-integrations
+/metricbeat/module/couchbase @elastic/obs-infraobs-integrations
+/metricbeat/module/couchdb @elastic/obs-infraobs-integrations
+/metricbeat/module/elasticsearch/ @elastic/stack-monitoring
+/metricbeat/module/etcd @elastic/obs-infraobs-integrations
+/metricbeat/module/golang @elastic/obs-infraobs-integrations
+/metricbeat/module/haproxy @elastic/obs-infraobs-integrations
+/metricbeat/module/http @elastic/obs-infraobs-integrations
+/metricbeat/module/jolokia @elastic/obs-infraobs-integrations
+/metricbeat/module/kafka @elastic/obs-infraobs-integrations
+/metricbeat/module/kibana/ @elastic/stack-monitoring
+/metricbeat/module/kubernetes/ @elastic/obs-ds-hosted-services
+/metricbeat/module/logstash/ @elastic/stack-monitoring
+/metricbeat/module/memcached @elastic/obs-infraobs-integrations
+/metricbeat/module/mongodb @elastic/obs-infraobs-integrations
+/metricbeat/module/mysql @elastic/obs-infraobs-integrations
+/metricbeat/module/nats/ @elastic/obs-ds-hosted-services
+/metricbeat/module/nginx @elastic/obs-infraobs-integrations
+/metricbeat/module/php_fpm @elastic/obs-infraobs-integrations
+/metricbeat/module/prometheus/ @elastic/obs-ds-hosted-services
+/metricbeat/module/postgresql @elastic/obs-infraobs-integrations
+/metricbeat/module/rabbitmq @elastic/obs-infraobs-integrations
+/metricbeat/module/redis @elastic/obs-infraobs-integrations
+>>>>>>> 923b7e141 (updarte the ownership to comply with the current O11y org (#42764))
 /metricbeat/module/system/ @elastic/elastic-agent-data-plane
 /metricbeat/module/vsphere @elastic/obs-infraobs-integrations
 /metricbeat/module/zookeeper @elastic/obs-infraobs-integrations
@@ -157,6 +187,10 @@ CHANGELOG*
 /x-pack/metricbeat/module/azure/billing @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cloudfoundry @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations
+<<<<<<< HEAD
+=======
+/x-pack/metricbeat/module/containerd/ @elastic/obs-ds-hosted-services
+>>>>>>> 923b7e141 (updarte the ownership to comply with the current O11y org (#42764))
 /x-pack/metricbeat/module/coredns @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/enterprisesearch @elastic/app-search-team
 /x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations
@@ -168,14 +202,23 @@ CHANGELOG*
 /x-pack/metricbeat/module/gcp/storage @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/ibmmq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/iis @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/istio/ @elastic/obs-cloudnative-monitoring
+/x-pack/metricbeat/module/istio/ @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/mssql @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/oracle @elastic/obs-infraobs-integrations
+<<<<<<< HEAD
 /x-pack/metricbeat/module/prometheus/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/redisenterprise @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/sql @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/stan/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
+=======
+/x-pack/metricbeat/module/panw @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/prometheus/ @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/redisenterprise @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/sql @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/statsd @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/stan/ @elastic/obs-ds-hosted-services
+>>>>>>> 923b7e141 (updarte the ownership to comply with the current O11y org (#42764))
 /x-pack/metricbeat/module/tomcat @elastic/obs-infraobs-integrations
 /x-pack/osquerybeat/ @elastic/sec-deployment-and-devices
 /x-pack/packetbeat/ @elastic/sec-linux-platform
