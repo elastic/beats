@@ -225,7 +225,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
-- Add `use_kubeadm` config option in kubernetes module in order to toggle kubeadm-config api requests {pull}40086[40086]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
 
 *Metricbeat*
