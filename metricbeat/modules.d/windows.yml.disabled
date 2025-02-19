@@ -22,9 +22,9 @@
 #  - module: windows
 #   metricsets:
 #   - wmi
-#   period: 60s
+#   period: 10m
 #   wmi:
-#     warning_threshold: 30s
+#     warning_threshold: 10m
 #     # namespace: "root\\cimv2"
 #     queries:
 #     - class: Win32_OperatingSystem  # FROM: Class to fetch

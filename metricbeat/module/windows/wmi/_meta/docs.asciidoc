@@ -39,14 +39,14 @@ NOTE: While Metricbeat stops waiting for the result, the underlying WMI query ma
 ----
 - module: windows
   metricsets: ["wmi"]
-  period: 60s
+  period: 10m
   wmi:
     # host: localhost
     # domain: ""
     # username: test
     # password: foo
     namespace: "root\\cimv2" # Default Namespace
-    warning_threshold: 60s
+    warning_threshold: 10m
     include_queries: true
     include_null_properties: false
     include_empty_strings_properties: false
@@ -56,7 +56,6 @@ NOTE: While Metricbeat stops waiting for the result, the underlying WMI query ma
       - FreePhysicalMemory
       - FreeSpaceInPagingFiles
       - NumberOfUsers
-      # Where Clasue
       where: ""
     - class: Win32_PowerPlan
       properties: []
@@ -134,7 +133,7 @@ Equivalent YAML Configuration:
 [float]
 === Best Practices
 
-- Test your queries in isolation using the `Get-CimInstance` powerhsell cmdlet or the WMI Explorer.
+- Test your queries in isolation using the `Get-CimInstance` PowerShell cmdlet or the WMI Explorer.
 
 - Ensure that `wmi.warning_threshold` is **less than or equal to** the module's `period`.
   This prevents starting intentionally multiple executions of the same query.
@@ -150,7 +149,7 @@ Equivalent YAML Configuration:
 This module has been tested on the following platform:
 
 - Operating System: Microsoft Windows Server 2019 Datacenter
-- Architecture: x86
+- Architecture: x64
 
 Other Windows versions and architectures may also work but have not been explicitly tested.
 
