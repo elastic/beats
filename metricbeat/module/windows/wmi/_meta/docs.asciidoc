@@ -1,4 +1,4 @@
-The `wmi` metricset of the Windows module collect metrics via link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi[Windows Management Instrumentation (WMI)], a core management technology in the Windows Operating system.
+The `wmi` metricset of the Windows module collects metrics via link:https://learn.microsoft.com/en-us/windows/win32/wmisdk/about-wmi[Windows Management Instrumentation (WMI)], a core management technology in the Windows Operating system.
 
 By leveraging WMI Query Language (WQL), this metricset allows you to extract detailed
 system information and metrics to monitor the health and performance of Windows
