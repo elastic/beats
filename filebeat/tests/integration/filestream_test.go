@@ -556,8 +556,7 @@ func TestFilestreamCanMigrateID(t *testing.T) {
 	filebeat.Start()
 
 	// Wait for the file to be fully ingested
-	// eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
-	// filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
+	waitForEOF(t, filebeat, logFiles)
 	requirePublishedEvents(t, filebeat, 8, outputFile)
 	filebeat.Stop()
 
