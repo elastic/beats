@@ -111,6 +111,7 @@ func (c *client) publish(e beat.Event) {
 
 	e = *event
 	pubEvent := publisher.Event{
+		// ?
 		Content: e,
 		Flags:   c.eventFlags,
 	}

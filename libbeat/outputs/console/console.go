@@ -98,21 +98,21 @@ func (c *console) Close() error { return nil }
 func (c *console) Publish(_ context.Context, batch publisher.Batch) error {
 	st := c.observer
 	events := batch.Events()
-	st.NewBatch(len(events))
+	st.NewBatch(events)
 
 	dropped := 0
 	for i := range events {
 		ok := c.publishEvent(&events[i])
 		if !ok {
 			dropped++
+			st.PermanentError(events[i])
+			continue
 		}
+		st.AckedEvent(events[i])
 	}
 
 	c.writer.Flush()
 	batch.ACK()
-
-	st.PermanentErrors(dropped)
-	st.AckedEvents(len(events) - dropped)
 
 	return nil
 }

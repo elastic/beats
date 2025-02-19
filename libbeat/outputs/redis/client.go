@@ -146,7 +146,7 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	events := batch.Events()
-	c.observer.NewBatch(len(events))
+	c.observer.NewBatch(events)
 	rest, err := c.publish(c.key, events)
 	if rest != nil {
 		c.observer.RetryableErrors(len(rest))
@@ -229,8 +229,8 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		args := make([]interface{}, 1, len(data)+1)
 		args[0] = dest
 
-		okEvents, args := serializeEvents(c.log, args, 1, data, c.index, c.codec)
-		c.observer.PermanentErrors(len(data) - len(okEvents))
+		okEvents, args := c.serializeEvents(args, 1, data)
+		// c.observer.PermanentErrors(len(data) - len(okEvents))
 		if (len(args) - 1) == 0 {
 			return nil, nil
 		}
@@ -243,10 +243,11 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		if err != nil {
 			c.log.Errorf("Failed to %v to redis list with: %+v", command, err)
 			return okEvents, err
-
 		}
 
-		c.observer.AckedEvents(len(okEvents))
+		for _, e := range okEvents {
+			c.observer.AckedEvent(e)
+		}
 		return nil, nil
 	}
 }
@@ -255,19 +256,17 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 	return func(key outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
 		var okEvents []publisher.Event
 		serialized := make([]interface{}, 0, len(data))
-		okEvents, serialized = serializeEvents(c.log, serialized, 0, data, c.index, c.codec)
-		c.observer.PermanentErrors(len(data) - len(okEvents))
+		okEvents, serialized = c.serializeEvents(serialized, 0, data)
 		if len(serialized) == 0 {
 			return nil, nil
 		}
 
 		data = okEvents[:0]
-		dropped := 0
 		for i, serializedEvent := range serialized {
 			eventKey, err := key.Select(&okEvents[i].Content)
 			if err != nil {
 				c.log.Errorf("Failed to set redis key: %+v", err)
-				dropped++
+				c.observer.PermanentError(okEvents[i])
 				continue
 			}
 
@@ -277,7 +276,6 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 				return okEvents, err
 			}
 		}
-		c.observer.PermanentErrors(dropped)
 
 		if err := conn.Flush(); err != nil {
 			return data, err
@@ -301,29 +299,22 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 					break
 				}
 			}
+			c.observer.AckedEvent(data[i])
 		}
 
-		c.observer.AckedEvents(len(okEvents) - len(failed))
 		return failed, lastErr
 	}
 }
 
-func serializeEvents(
-	log *logp.Logger,
-	to []interface{},
-	i int,
-	data []publisher.Event,
-	index string,
-	codec codec.Codec,
-) ([]publisher.Event, []interface{}) {
+func (c *client) serializeEvents(to []interface{}, i int, data []publisher.Event) ([]publisher.Event, []interface{}) {
 
 	succeeded := data
 	for _, d := range data {
 		d := d
-		serializedEvent, err := codec.Encode(index, &d.Content)
+		serializedEvent, err := c.codec.Encode(c.index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
-			log.Errorw(fmt.Sprintf("Failed event: %v", d.Content), logp.TypeKey, logp.EventType)
+			c.log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
+			c.log.Errorw(fmt.Sprintf("Failed event: %v", d.Content), logp.TypeKey, logp.EventType)
 			goto failLoop
 		}
 
@@ -339,11 +330,12 @@ failLoop:
 	rest := data[i+1:]
 	for _, d := range rest {
 		d := d
-		serializedEvent, err := codec.Encode(index, &d.Content)
+		serializedEvent, err := c.codec.Encode(c.index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
-			log.Errorw(fmt.Sprintf("Failed event: %v", d.Content), logp.TypeKey, logp.EventType)
+			c.log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
+			c.log.Errorw(fmt.Sprintf("Failed event: %v", d.Content), logp.TypeKey, logp.EventType)
 			i++
+			c.observer.PermanentError(d)
 			continue
 		}
 

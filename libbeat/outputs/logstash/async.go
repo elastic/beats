@@ -139,7 +139,7 @@ func (c *asyncClient) Close() error {
 func (c *asyncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	st := c.observer
 	events := batch.Events()
-	st.NewBatch(len(events))
+	st.NewBatch(events)
 
 	if len(events) == 0 {
 		batch.ACK()
@@ -241,7 +241,7 @@ func (r *msgRef) customizedCallback() func(uint32, error) {
 }
 
 func (r *msgRef) callback(start time.Time, n uint32, err error) {
-	r.client.observer.AckedEvents(int(n))
+	r.client.observer.AckedEvents(make([]publisher.Event, n))
 	r.slice = r.slice[n:]
 	r.deadlockListener.ack(int(n))
 	if r.err == nil {
