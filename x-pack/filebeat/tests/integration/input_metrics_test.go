@@ -157,6 +157,7 @@ logging.level: debug
 		errMsg.Reset()
 		inputMetrics = []inputMetric{}
 
+		//nolint:noctx // on a test, it's ok
 		resp, err := http.Get("http://localhost:5066/inputs/")
 		if err != nil {
 			errMsg.WriteString(fmt.Sprintf("request to /inputs/ failed: %v", err))
