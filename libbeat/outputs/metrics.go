@@ -22,6 +22,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -110,98 +111,147 @@ func NewStats(reg *monitoring.Registry) *Stats {
 }
 
 // NewBatch updates active batch and event metrics.
-func (s *Stats) NewBatch(n int) {
-	if s != nil {
-		s.eventsBatches.Inc()
-		s.eventsTotal.Add(uint64(n))
-		s.eventsActive.Add(uint64(n))
+func (s *Stats) NewBatch(evs []publisher.Event) {
+	if s == nil {
+		return
 	}
+
+	s.eventsBatches.Inc()
+	s.eventsTotal.Add(uint64(len(evs)))
+	s.eventsActive.Add(uint64(len(evs)))
 }
 
 func (s *Stats) ReportLatency(time time.Duration) {
+	if s == nil {
+		return
+	}
+
 	s.sendLatencyMillis.Update(time.Milliseconds())
 }
 
-// AckedEvents updates active and acked event metrics.
-func (s *Stats) AckedEvents(n int) {
-	if s != nil {
-		s.eventsACKed.Add(uint64(n))
-		s.eventsActive.Sub(uint64(n))
+// AckedEvent updates active and acked event metrics.
+func (s *Stats) AckedEvent(e publisher.Event) {
+	if s == nil {
+		return
 	}
+
+	s.eventsACKed.Add(uint64(1))
+	s.eventsActive.Sub(uint64(1))
 }
 
-func (s *Stats) DeadLetterEvents(n int) {
-	if s != nil {
-		s.eventsDeadLetter.Add(uint64(n))
-		s.eventsActive.Sub(uint64(n))
+// AckedEvents updates active and acked event metrics.
+func (s *Stats) AckedEvents(evs []publisher.Event) {
+	if s == nil {
+		return
 	}
+
+	s.eventsACKed.Add(uint64(len(evs)))
+	s.eventsActive.Sub(uint64(len(evs)))
+}
+
+func (s *Stats) DeadLetterEvents(evs []publisher.Event) {
+	if s == nil {
+		return
+	}
+
+	n := uint64(len(evs))
+	s.eventsDeadLetter.Add(n)
+	s.eventsActive.Sub(n)
 }
 
 // RetryableErrors updates active and failed event metrics.
 func (s *Stats) RetryableErrors(n int) {
-	if s != nil {
-		s.eventsFailed.Add(uint64(n))
-		s.eventsActive.Sub(uint64(n))
+	if s == nil {
+		return
 	}
+
+	s.eventsFailed.Add(uint64(n))
+	s.eventsActive.Sub(uint64(n))
 }
 
 // DuplicateEvents updates the active and duplicate event metrics.
 func (s *Stats) DuplicateEvents(n int) {
-	if s != nil {
-		s.eventsDuplicates.Add(uint64(n))
-		s.eventsActive.Sub(uint64(n))
+	if s == nil {
+		return
 	}
+
+	s.eventsDuplicates.Add(uint64(n))
+	s.eventsActive.Sub(uint64(n))
 }
 
-// PermanentErrors updates total number of event drops as reported by the output.
+// PermanentError updates total number of event drops as reported by the output.
 // Outputs will only report dropped events on fatal errors which lead to the
 // event not being publishable. For example encoding errors or total event size
 // being bigger then maximum supported event size.
-func (s *Stats) PermanentErrors(n int) {
-	// number of dropped events (e.g. encoding failures)
-	if s != nil {
-		s.eventsActive.Sub(uint64(n))
-		s.eventsDropped.Add(uint64(n))
+func (s *Stats) PermanentError(e publisher.Event) {
+	if s == nil {
+		return
 	}
+
+	// number of dropped events (e.g. encoding failures)
+	s.eventsActive.Sub(uint64(1))
+	s.eventsDropped.Add(uint64(1))
+}
+
+func (s *Stats) PermanentErrors(evs []publisher.Event) {
+	if s == nil {
+		return
+	}
+
+	// number of dropped events (e.g. encoding failures)
+	s.eventsActive.Sub(uint64(len(evs)))
+	s.eventsDropped.Add(uint64(len(evs)))
 }
 
 func (s *Stats) BatchSplit() {
-	if s != nil {
-		s.batchesSplit.Inc()
+	if s == nil {
+		return
 	}
+
+	s.batchesSplit.Inc()
 }
 
 // ErrTooMany updates the number of Too Many Requests responses reported by the output.
 func (s *Stats) ErrTooMany(n int) {
-	if s != nil {
-		s.eventsTooMany.Add(uint64(n))
+	if s == nil {
+		return
 	}
+
+	s.eventsTooMany.Add(uint64(n))
 }
 
 // WriteError increases the write I/O error metrics.
-func (s *Stats) WriteError(err error) {
-	if s != nil {
-		s.writeErrors.Inc()
+func (s *Stats) WriteError(error) {
+	if s == nil {
+		return
 	}
+
+	s.writeErrors.Inc()
 }
 
 // WriteBytes updates the total number of bytes written/send by an output.
 func (s *Stats) WriteBytes(n int) {
-	if s != nil {
-		s.writeBytes.Add(uint64(n))
+	if s == nil {
+		return
 	}
+
+	s.writeBytes.Add(uint64(n))
 }
 
 // ReadError increases the read I/O error metrics.
-func (s *Stats) ReadError(err error) {
-	if s != nil {
-		s.readErrors.Inc()
+func (s *Stats) ReadError(error) {
+	if s == nil {
+		return
 	}
+
+	s.readErrors.Inc()
 }
 
 // ReadBytes updates the total number of bytes read/received by an output.
 func (s *Stats) ReadBytes(n int) {
-	if s != nil {
-		s.readBytes.Add(uint64(n))
+	if s == nil {
+		return
 	}
+
+	s.readBytes.Add(uint64(n))
 }

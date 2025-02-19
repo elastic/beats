@@ -76,7 +76,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	config := &t.config
 
 	n := len(batch.Events())
-	t.observer.NewBatch(n)
+	t.observer.NewBatch(batch.Events())
 
 	min := int64(config.MinWait)
 	max := int64(config.MaxWait)
@@ -104,7 +104,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 	// ack complete batch
 	batch.ACK()
-	t.observer.AckedEvents(n)
+	t.observer.AckedEvent(n)
 
 	return nil
 }

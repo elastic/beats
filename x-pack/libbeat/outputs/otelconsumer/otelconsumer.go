@@ -152,14 +152,14 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
 	if err != nil {
-		// Permanent errors shouldn't be retried. This tipically means
+		// Permanent errors shouldn't be retried. This typically means
 		// the data cannot be serialized by the exporter that is attached
 		// to the pipeline or when the destination refuses the data because
 		// it cannot decode it. Retrying in this case is useless.
 		//
 		// See https://github.com/open-telemetry/opentelemetry-collector/blob/1c47d89/receiver/doc.go#L23-L40
 		if consumererror.IsPermanent(err) {
-			st.PermanentErrors(len(events))
+			st.PermanentErrors(events)
 			batch.Drop()
 		} else {
 			st.RetryableErrors(len(events))
@@ -170,8 +170,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 	}
 
 	batch.ACK()
-	st.NewBatch(len(events))
-	st.AckedEvents(len(events))
+	st.NewBatch(events)
+	st.AckedEvents(events)
 	return nil
 }
 
