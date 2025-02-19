@@ -180,21 +180,15 @@ func TestNewLeaderElectionManager(t *testing.T) {
 	}
 
 	go func() {
-		// wait for first leader
+		defer close(finished)
 		newEventId := <-waitForNewLeader
 		expectedLoosingEventIds[newEventId] = true
-
-		// every time there is a new leader, we should check the event id emitted from the stopLeading
-	waitForRenewals:
 		for {
 			select {
 			case eventId := <-waitForNewLeader:
 				checkLoosingLeaders(eventId)
 			case <-endedRequests:
-				// once we receive something in this channel, we know the lease is no longer being modified,
-				// so we can finish this goroutine
-				finished <- 1
-				break waitForRenewals
+				return
 			}
 		}
 	}()
