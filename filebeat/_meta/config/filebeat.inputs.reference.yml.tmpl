@@ -810,10 +810,18 @@ filebeat.inputs:
     #- 2
 
   # You may wish to have separate inputs for each service. You can use
-  # include_matches.or to specify a list of filter expressions that are
-  # applied as a logical OR.
+  # include_matches.match to define a list of filters, each event needs
+  # to match all filters defined.
   #include_matches.match:
     #- _SYSTEMD_UNIT=foo.service
+
+  # To create a disjunction (logical OR) use the `+` character between
+  # the filters
+  #include_matches:
+    #match:
+      #- "systemd.transport=kernel"
+      #- "+"
+      #- "journald.process.name=systemd"
 
   # Uses the original hostname of the entry instead of the one
   # from the host running jounrald

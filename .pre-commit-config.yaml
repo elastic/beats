@@ -3,3 +3,5 @@ repos:
     rev: v4.4.0
     hooks:
     -   id: check-merge-conflict
+        args: ['--assume-in-merge']
+        exclude: (^NOTICE.txt$)

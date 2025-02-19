@@ -141,7 +141,7 @@ class Test(BaseTest):
 
         file.close()
 
-        filebeat = self.start_beat(extra_args=["-once"])
+        filebeat = self.start_beat(extra_args=["--once"])
 
         # Make sure all lines are read
         self.wait_until(
@@ -177,6 +177,7 @@ class Test(BaseTest):
 
         input_raw = """
 - type: log
+  allow_deprecated_use: true
   paths: []
 """
 
