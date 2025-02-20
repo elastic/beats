@@ -45,7 +45,6 @@ func init() {
 }
 
 func TestPipeline(t *testing.T) {
-	t.Skip()
 	genConfigs := collectConfigs(t, "configs/gen/*.yml")
 	pipelineConfigs := collectConfigs(t, "configs/pipeline/*.yml")
 	outConfigs := collectConfigs(t, "configs/out/*.yml")
