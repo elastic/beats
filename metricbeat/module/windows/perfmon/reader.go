@@ -100,6 +100,11 @@ func (re *Reader) Read() ([]mb.Event, error) {
 		//could be the case the specific services are started after and picked up by the next RefreshCounterPaths func
 		if err == pdh.PDH_NO_COUNTERS { //nolint:errorlint // Bad linter! This is always errno or nil.
 			re.log.Warnf("%s %v", collectFailedMsg, err)
+		} else if err == pdh.PDH_NO_DATA {
+			re.log.Warnf("%s %v", collectFailedMsg, err)
+
+			// without the return statement here it still fails when trying to get counter values
+			return nil, nil
 		} else {
 			return nil, fmt.Errorf("%v: %w", collectFailedMsg, err)
 		}
