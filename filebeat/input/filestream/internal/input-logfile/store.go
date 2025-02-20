@@ -283,6 +283,8 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 	s.updateIdentifiers(s.identifier.MatchesInput, getNewID)
 }
 
+// CopyStatesFromPreviousIDs copies an existing resource belonging to an input with a different ID
+// to a new ID (new resource ID and new input ID) and marks the previous one for removal.
 func (s *sourceStore) CopyStatesFromPreviousIDs(getNewID func(v Value) (string, interface{})) {
 	matchPreviousIdentifier := func(key string) bool {
 		for _, identifier := range s.previousIdentifiers {

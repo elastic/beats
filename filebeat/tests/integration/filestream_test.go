@@ -551,7 +551,7 @@ func TestFilestreamCanMigrateID(t *testing.T) {
 		"homePath": workDir,
 		"testdata": testDataPath,
 	}
-	cfgYAML := getMigrateIDConfig(t, vars)
+	cfgYAML := getMigrateIDConfig(t, vars, "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
@@ -563,7 +563,7 @@ func TestFilestreamCanMigrateID(t *testing.T) {
 	vars["previousID"] = oldID
 	vars["inputID"] = newID
 
-	cfgYAML = getMigrateIDConfig(t, vars)
+	cfgYAML = getMigrateIDConfig(t, vars, "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
 	removeOldLogFiles(t, workDir)
@@ -587,7 +587,79 @@ func TestFilestreamCanMigrateID(t *testing.T) {
 		testDataPath,
 		filepath.Join(testDataPath,
 			"update-filestream-id",
-			"expected-registry.json"),
+			"expected-registry-happy-paty.json"),
+		"Entries in the registry are different from the expectation",
+	)
+}
+
+func TestFilestreamIDMigrationDoesNotMigrateFileIdentity(t *testing.T) {
+	oldID := "first-id"
+	newID := "second-id"
+
+	testDataPath, err := filepath.Abs("./testdata")
+	if err != nil {
+		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+	}
+
+	// Get the absolute path for all files Filebeat will ingest
+	logFiles := []string{}
+	for _, f := range []string{"01.log", "02.log"} {
+		logFiles = append(logFiles, filepath.Join(testDataPath, "update-filestream-id", f))
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	outputFile := filepath.Join(workDir, "output-file*")
+
+	vars := map[string]string{
+		"inputID":     oldID,
+		"homePath":    workDir,
+		"testdata":    testDataPath,
+		"fileIentity": "fingerprint",
+	}
+	cfgYAML := getMigrateIDConfig(t, vars, "file-idenity-error.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	// Wait for the file to be fully ingested
+	waitForEOF(t, filebeat, logFiles)
+	requirePublishedEvents(t, filebeat, 4, outputFile)
+	filebeat.Stop()
+
+	vars["previousID"] = oldID
+	vars["inputID"] = newID
+	vars["fileIentity"] = "native"
+
+	cfgYAML = getMigrateIDConfig(t, vars, "file-idenity-error.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+
+	removeOldLogFiles(t, workDir)
+
+	// Start Filebeat again.
+	// This time the states must be migrated and no new data ingested
+	filebeat.Start()
+	// Make sure we've "read" the files to the end
+	waitForEOF(t, filebeat, logFiles)
+
+	// Ensure no new data has been published
+	requirePublishedEvents(t, filebeat, 8, outputFile) //this should already fail
+
+	// Wait for the registry clean up message
+	msg := fmt.Sprintf("Identifier from '%s' does not match, won't migrate state", logFiles[0])
+	filebeat.WaitForLogs(msg, 5*time.Second, "ID migration was not skipped because of different file identity")
+	filebeat.Stop()
+
+	assertRegistry(
+		t,
+		workDir,
+		testDataPath,
+		filepath.Join(testDataPath,
+			"update-filestream-id",
+			"expected-registry-do-no-migrate-identity.json"),
 		"Entries in the registry are different from the expectation",
 	)
 }
@@ -648,11 +720,11 @@ func createFileAndWaitIngestion(
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }
 
-func getMigrateIDConfig(t *testing.T, vars map[string]string) string {
+func getMigrateIDConfig(t *testing.T, vars map[string]string, tmplPath string) string {
 	t.Helper()
 	tmpl := template.Must(
 		template.ParseFiles(
-			filepath.Join("testdata", "update-filestream-id", "happy-path.yml")))
+			filepath.Join("testdata", "update-filestream-id", tmplPath)))
 
 	str := strings.Builder{}
 	if err := tmpl.Execute(&str, vars); err != nil {
@@ -714,6 +786,7 @@ func parseRegistry(entries []registryEntry) map[string]registryEntry {
 // assertRegistry reads Filebeat's registry from 'workDir' and compares
 // with the expected registry encoded as JSON in the file 'expectedRegistry'
 func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
+	t.Helper()
 	data, err := os.ReadFile(registry)
 	if err != nil {
 		t.Fatalf("canot read registry file '%q': %s", registry, err)
