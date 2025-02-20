@@ -75,7 +75,7 @@ headers:
   X-Bar-Header: bar    
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size_items: 0
   min_size_items: 1600
  `
 		input := newFromYamlString(t, beatCfg)
@@ -125,7 +125,7 @@ idle_conn_timeout: 3s
 num_workers: 1
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size_items: 0
   min_size_items: 1600
  `,
 			},
@@ -136,7 +136,7 @@ idle_conn_timeout: 15s
 num_workers: 4
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size_items: 0
   min_size_items: 1600
  `,
 			},
@@ -159,7 +159,7 @@ idle_conn_timeout: 1s
 num_workers: 1
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size_items: 0
   min_size_items: 1600
  `,
 			},
@@ -181,7 +181,7 @@ idle_conn_timeout: 3s
 num_workers: 0
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size_items: 0
   min_size_items: 1600
 
  `,

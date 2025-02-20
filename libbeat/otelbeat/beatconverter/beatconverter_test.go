@@ -47,7 +47,7 @@ exporters:
     batcher:
       enabled: true
       max_size_items: 1600
-      min_size_items: 1600
+      min_size_items: 0
 `
 
 func TestConverter(t *testing.T) {
@@ -188,7 +188,7 @@ exporters:
     batcher:
       enabled: true
       max_size_items: 1600
-      min_size_items: 1600
+      min_size_items: 0
 receivers:
   filebeatreceiver:
     filebeat:
