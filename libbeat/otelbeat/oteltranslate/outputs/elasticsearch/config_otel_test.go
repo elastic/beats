@@ -22,10 +22,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/confmap"
 	"gopkg.in/yaml.v2"
-	"gotest.tools/v3/assert"
 
 	"github.com/elastic/elastic-agent-libs/config"
 )
@@ -72,7 +72,7 @@ timeout: 1m30s
 user: elastic
 headers:
   X-Header-1: foo
-  X-Bar-Header: bar    
+  X-Bar-Header: bar
 batcher:
   enabled: true
   max_size_items: 1600
@@ -107,11 +107,11 @@ retry:
   enabled: true
   initial_interval: 1s
   max_interval: 1m0s
-  max_retries: 3  
-logs_index: some-index 
+  max_retries: 3
+logs_index: some-index
 password: changeme
-user: elastic  
-timeout: 1m30s 
+user: elastic
+timeout: 1m30s
 `
 
 		tests := []struct {
@@ -150,11 +150,11 @@ retry:
   enabled: true
   initial_interval: 5s
   max_interval: 5m0s
-  max_retries: 3  
-logs_index: some-index 
+  max_retries: 3
+logs_index: some-index
 password: changeme
-user: elastic  
-timeout: 1m30s 
+user: elastic
+timeout: 1m30s
 idle_conn_timeout: 1s
 num_workers: 1
 batcher:

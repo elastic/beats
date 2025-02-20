@@ -358,8 +358,38 @@
                       type: long
             - name: unset
               type: long
-        - name: sampling.transactions_dropped
-          type: long
+        - name: sampling
+          type: group
+          fields:
+            - name: tail
+              type: group
+              fields:
+                - name: dynamic_service_groups
+                  type: long
+                - name: events
+                  type: group
+                  fields:
+                    - name: dropped
+                      type: long
+                    - name: failed_writes
+                      type: long
+                    - name: head_unsampled
+                      type: long
+                    - name: processed
+                      type: long
+                    - name: sampled
+                      type: long
+                    - name: stored
+                      type: long
+                - name: storage
+                  type: group
+                  fields:
+                    - name: lsm_size
+                      type: long
+                    - name: value_log_size
+                      type: long
+            - name: transactions_dropped
+              type: long
         - name: server
           type: group
           fields:
@@ -561,10 +591,64 @@
           fields:
             - name: clients
               type: long
-            - name: queue.acked
-              type: long
-            - name: queue.max_events
-              type: long
+            - name: queue
+              type: group
+              fields:
+                - name: acked
+                  type: long
+                  metric_type: counter
+                  description: >
+                    Number of acknowledged events
+                - name: added.bytes
+                  type: long
+                  metric_type: counter
+                  description: >
+                    Number of bytes added to the queue
+                - name: added.events
+                  type: long
+                  metric_type: counter
+                  description: >
+                    Number of events added to the queue
+                - name: consumed.bytes
+                  type: long
+                  metric_type: counter
+                  description: >
+                    Number of bytes consumed from the queue
+                - name: consumed.events
+                  type: long
+                  metric_type: counter
+                  description: >
+                    Number of events consumed from the queue
+                - name: filled.bytes
+                  type: long
+                  metric_type: gauge
+                  description: >
+                    Number of bytes filled in the queue
+                - name: filled.events
+                  type: long
+                  metric_type: gauge
+                  description: >
+                    Number of events filled in the queue
+                - name: filled.pct
+                  type: float
+                  metric_type: gauge
+                  description: >
+                    Percentage of the queue filled
+                - name: max_events
+                  type: long
+                  metric_type: gauge
+                  description: >
+                    Maximum number of events allowed in the queue
+                - name: removed.bytes
+                  type: long
+                  metric_type: counter
+                  description: >
+                    Number of bytes removed from the queue
+                - name: removed.events
+                  type: long
+                  metric_type: counter
+                  description: >
+                    Number of events removed from the queue
             - name: events
               type: group
               fields:
@@ -665,6 +749,22 @@
                   type: long
                   description: >
                     Number of write errors
+                - name: latency
+                  type: group
+                  fields:
+                    - name: histogram
+                      type: group
+                      fields:
+                        - name: count
+                          type: long
+                        - name: max
+                          type: float
+                        - name: median
+                          type: long
+                        - name: p95
+                          type: float
+                        - name: p99
+                          type: float
     - name: output
       type: group
       fields:

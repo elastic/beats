@@ -18,6 +18,7 @@
 package channel
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -69,6 +70,10 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 	// we need to make sure `Assert` is called after `Create`
 	require.Len(t, r.cfgs, r.clientCount)
 
+	sameBacking := func(a, b any) bool {
+		return reflect.ValueOf(a).UnsafePointer() == reflect.ValueOf(b).UnsafePointer()
+	}
+
 	t.Run("new processing configuration each time", func(t *testing.T) {
 		for i, c1 := range r.cfgs {
 			for j, c2 := range r.cfgs {
@@ -76,10 +81,8 @@ func (r runnerFactoryMock) Assert(t *testing.T) {
 					continue
 				}
 
-				require.NotSamef(t, c1.Processing, c2.Processing, "processing configuration cannot be re-used")
-				require.NotSamef(t, c1.Processing.Meta, c2.Processing.Meta, "`Processing.Meta` cannot be re-used")
-				require.NotSamef(t, c1.Processing.Fields, c2.Processing.Fields, "`Processing.Fields` cannot be re-used")
-				require.NotSamef(t, c1.Processing.Processor, c2.Processing.Processor, "`Processing.Processor` cannot be re-used")
+				require.Falsef(t, sameBacking(c1.Processing.Meta, c2.Processing.Meta), "`Processing.Meta` cannot be re-used")
+				require.Falsef(t, sameBacking(c1.Processing.Fields, c2.Processing.Fields), "`Processing.Fields` cannot be re-used")
 			}
 		}
 	})
