@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_BuildArgs_ParseExtraFlags(t *testing.T) {
+func Test_BuildArgs_ParseBuildTags(t *testing.T) {
 	tests := []struct {
 		name   string
 		input  []string
@@ -65,7 +65,7 @@ func Test_BuildArgs_ParseExtraFlags(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			args := BuildArgs{ExtraFlags: tc.input}
-			flags := args.ParseExtraFlags()
+			flags := args.ParseBuildTags()
 			assert.EqualValues(t, tc.expect, flags)
 		})
 	}

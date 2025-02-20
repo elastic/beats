@@ -27,12 +27,15 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"debug/buildinfo"
+	"debug/elf"
 	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -45,6 +48,9 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const (
@@ -75,6 +81,7 @@ var (
 	monitorsd         = flag.Bool("monitors.d", false, "check monitors.d folder contents")
 	rootOwner         = flag.Bool("root-owner", false, "expect root to own package files")
 	rootUserContainer = flag.Bool("root-user-container", false, "expect root in container user")
+	fips              = flag.Bool("fips", false, "check agent binary for FIPS compliance")
 )
 
 func TestRPM(t *testing.T) {
@@ -96,7 +103,15 @@ func TestTar(t *testing.T) {
 	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
 	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
 	for _, tar := range tars {
-		checkTar(t, tar)
+		checkTar(t, tar, false)
+	}
+}
+
+func TestFIPSTar(t *testing.T) {
+	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
+	tars := getFiles(t, regexp.MustCompile(`-\w+-fips\.tar\.gz$`))
+	for _, tar := range tars {
+		checkTar(t, tar, *fips)
 	}
 }
 
@@ -159,7 +174,7 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkSystemdUnitPermissions(t, p)
 }
 
-func checkTar(t *testing.T, file string) {
+func checkTar(t *testing.T, file string, fipsCheck bool) {
 	p, err := readTar(file)
 	if err != nil {
 		t.Error(err)
@@ -174,6 +189,15 @@ func checkTar(t *testing.T, file string) {
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p, true)
 	checkLicensesPresent(t, "", p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			extractDir := t.TempDir()
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err)
+			containingDir := strings.TrimSuffix(path.Base(file), ".tar.gz")
+			checkFIPS(t, p.Name, filepath.Join(extractDir, containingDir))
+		})
+	}
 }
 
 func checkZip(t *testing.T, file string) {
@@ -771,6 +795,52 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 	}
 
 	return p, nil
+}
+
+func checkFIPS(t *testing.T, beatName, path string) {
+	t.Logf("Checking %s for FIPS compliance", beatName)
+	binaryPath := filepath.Join(path, beatName) // TODO eventually we'll need to support checking a .exe
+	require.FileExists(t, binaryPath, "Unable to find beat executable")
+
+	info, err := buildinfo.ReadFile(binaryPath)
+	require.NoError(t, err)
+
+	foundTags := false
+	foundExperiment := false
+	for _, setting := range info.Settings {
+		switch setting.Key {
+		case "-tags":
+			foundTags = true
+			require.Contains(t, setting.Value, "requirefips")
+			continue
+		case "GOEXPERIMENT":
+			foundExperiment = true
+			require.Contains(t, setting.Value, "systemcrypto")
+			continue
+		}
+	}
+
+	require.True(t, foundTags, "Did not find -tags within binary version information")
+	require.True(t, foundExperiment, "Did not find GOEXPERIMENT within binary version information")
+
+	// TODO only elf is supported at the moment, in the future we will need to use macho (darwin) and pe (windows)
+	f, err := elf.Open(binaryPath)
+	require.NoError(t, err, "unable to open ELF file")
+
+	symbols, err := f.Symbols()
+	if err != nil {
+		t.Logf("no symbols present in %q: %v", binaryPath, err)
+		return
+	}
+
+	hasOpenSSL := false
+	for _, symbol := range symbols {
+		if strings.Contains(symbol.Name, "OpenSSL_version") {
+			hasOpenSSL = true
+			break
+		}
+	}
+	require.True(t, hasOpenSSL, "unable to find OpenSSL_version symbol")
 }
 
 // inspector is a file contents inspector. It vets the contents of the file

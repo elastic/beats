@@ -51,11 +51,11 @@ type BuildArgs struct {
 // but does not match "-tags= "
 var buildTagRE = regexp.MustCompile(`-tags=([\S]+)?`)
 
-// ParseExtraFlags returns the ExtraFlags param where all flags that are go build tags are joined by a comma.
+// ParseBuildTags returns the ExtraFlags param where all flags that are go build tags are joined by a comma.
 //
 // For example if given -someflag=val1 -tags=buildtag1 -tags=buildtag2
 // It will return -someflag=val1 -tags=buildtag1,buildtag2
-func (b BuildArgs) ParseExtraFlags() []string {
+func (b BuildArgs) ParseBuildTags() []string {
 	flags := make([]string, 0)
 	if len(b.ExtraFlags) == 0 {
 		return flags
@@ -228,7 +228,7 @@ func Build(params BuildArgs) error {
 	if params.BuildMode != "" {
 		args = append(args, "-buildmode", params.BuildMode)
 	}
-	args = append(args, params.ParseExtraFlags()...)
+	args = append(args, params.ParseBuildTags()...)
 
 	// ldflags
 	ldflags := params.LDFlags
