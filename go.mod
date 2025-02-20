@@ -195,11 +195,7 @@ require (
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6
-<<<<<<< HEAD
-=======
-	github.com/go-ole/go-ole v1.2.6
 	github.com/go-resty/resty/v2 v2.13.1
->>>>>>> cd883f511 ([meraki] fix panic due to uninitialized device wifi structs (#42746))
 	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/cel-go v0.19.0
