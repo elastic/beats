@@ -32,8 +32,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -436,4 +438,67 @@ func takeAllLogsFromPath(t *testing.T, path string) []map[string]any {
 	}
 
 	return entries
+}
+
+func TestLoggerRotateSymlink(t *testing.T) {
+	dir := t.TempDir()
+
+	cfg := logp.DefaultConfig(logp.DefaultEnvironment)
+	cfg.Beat = "logger"
+	cfg.ToFiles = true
+	cfg.Files.Path = dir
+	cfg.Files.MaxBackups = 1
+	cfg.Files.RotateOnStartup = false
+
+	logname := cfg.Beat
+
+	privateFileContents := []byte("original contents")
+	privateFile := filepath.Join(dir, "private")
+	err := os.WriteFile(privateFile, privateFileContents, 0644)
+	require.NoError(t, err)
+
+	// Plant a symlink to the private file by guessing the log filename.
+	guessedFilename := filepath.Join(dir, fmt.Sprintf("%s-%s.ndjson", logname, time.Now().Format(file.DateFormat)))
+	err = os.Symlink(privateFile, guessedFilename)
+	require.NoError(t, err)
+
+	err = logp.Configure(cfg)
+	require.NoError(t, err)
+
+	logLine := "a info message"
+	logp.L().Info(logLine)
+
+	// The file rotation should have detected the destination is a symlink and rotated before writing.
+	rotatedFilename := filepath.Join(dir, fmt.Sprintf("%s-%s-1.ndjson", logname, time.Now().Format(file.DateFormat)))
+	assertDirContents(t, dir, filepath.Base(privateFile), filepath.Base(guessedFilename), filepath.Base(rotatedFilename))
+
+	got, err := os.ReadFile(privateFile)
+	require.NoError(t, err)
+	assert.Equal(t, privateFileContents, got, "The symlink target should not have been modified")
+
+	got, err = os.ReadFile(rotatedFilename)
+	require.NoError(t, err)
+	assert.Contains(t, string(got), logLine, "The rotated file should contain the log message")
+
+	assert.NoError(t, logp.L().Close())
+
+	// Error: TempDir RemoveAll cleanup: remove t.TempDir() The process cannot access the file because it is being used by another process.
+	require.NoError(t, os.RemoveAll(dir))
+}
+
+func assertDirContents(t *testing.T, dir string, files ...string) {
+	t.Helper()
+
+	f, err := os.Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	names, err := f.Readdirnames(-1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.ElementsMatch(t, files, names)
 }

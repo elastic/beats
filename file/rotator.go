@@ -20,6 +20,7 @@ package file
 import (
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -245,13 +246,27 @@ func (r *Rotator) openNew() error {
 		return fmt.Errorf("failed to make directories for new file: %w", err)
 	}
 
-	_, err = os.Stat(r.rot.ActiveFile())
+	stat, err := os.Lstat(r.rot.ActiveFile())
 	if err == nil {
+		isSymlink := stat.Mode()&fs.ModeSymlink != 0
+
 		// check if the file has to be rotated before writing to it
 		reason, t := r.isRotationTriggered(0)
 		if reason == rotateReasonNoRotate {
-			return r.appendToFile()
+			// To avoid symlink following attacks, if the active file is a symlink
+			// we need to rotate it to avoid writing to the symlink target, which
+			// could be a sensitive or protected file not owned by us.
+			if isSymlink {
+				if r.log != nil {
+					r.log.Debugw("Active file is a symlink, forcing rotation", "filename", r.rot.ActiveFile())
+				}
+				reason = rotateReasonInitializing
+				t = r.clock.Now()
+			} else {
+				return r.appendToFile()
+			}
 		}
+
 		if err = r.rot.Rotate(reason, t); err != nil {
 			return fmt.Errorf("failed to rotate backups: %w", err)
 		}
@@ -284,7 +299,7 @@ func (r *Rotator) openFile() error {
 		return fmt.Errorf("failed to make directories for new file: %w", err)
 	}
 
-	r.file, err = os.OpenFile(r.rot.ActiveFile(), os.O_CREATE|os.O_WRONLY|os.O_TRUNC, r.permissions)
+	r.file, err = os.OpenFile(r.rot.ActiveFile(), os.O_EXCL|os.O_CREATE|os.O_WRONLY|os.O_TRUNC, r.permissions)
 	if err != nil {
 		return fmt.Errorf("failed to open new file '%s': %w", r.rot.ActiveFile(), err)
 	}

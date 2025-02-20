@@ -255,6 +255,49 @@ func TestRotate(t *testing.T) {
 	AssertDirContents(t, dir, secondFile, thirdFile)
 }
 
+func TestRotateSymlink(t *testing.T) {
+	dir := t.TempDir()
+
+	logname := "beatname"
+	filename := filepath.Join(dir, logname)
+
+	c := &testClock{time.Date(2021, 11, 11, 0, 0, 0, 0, time.Local)}
+
+	privateFileContents := []byte("original contents")
+	privateFile := filepath.Join(dir, "private")
+	err := os.WriteFile(privateFile, privateFileContents, 0644)
+	require.NoError(t, err)
+
+	// Plant a symlink to the private file by guessing the log filename.
+	guessedFilename := filepath.Join(dir, fmt.Sprintf("%s-%s.ndjson", logname, c.Now().Format(file.DateFormat)))
+	err = os.Symlink(privateFile, guessedFilename)
+	require.NoError(t, err)
+
+	logger, buf := logp.NewInMemory("rotator", logp.ConsoleEncoderConfig())
+
+	r, err := file.NewFileRotator(filename,
+		file.MaxBackups(1),
+		file.WithClock(c),
+		file.RotateOnStartup(false),
+		file.WithLogger(logger),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+
+	WriteMsg(t, r)
+
+	// The file rotation should have detected the destination is a symlink and rotated before writing.
+	rotatedFilename := filepath.Join(dir, fmt.Sprintf("%s-%s-1.ndjson", logname, c.Now().Format(file.DateFormat)))
+	AssertDirContents(t, dir, filepath.Base(privateFile), filepath.Base(guessedFilename), filepath.Base(rotatedFilename))
+	require.Contains(t, buf.String(), "Active file is a symlink, forcing rotation")
+
+	got, err := os.ReadFile(privateFile)
+	require.NoError(t, err)
+	assert.Equal(t, privateFileContents, got, "The symlink target should not have been modified")
+}
+
 func TestRotateExtension(t *testing.T) {
 	dir := t.TempDir()
 
@@ -312,6 +355,7 @@ func AssertDirContents(t *testing.T, dir string, files ...string) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer f.Close()
 
 	names, err := f.Readdirnames(-1)
 	if err != nil {
