@@ -14,6 +14,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	meraki "github.com/meraki/dashboard-api-go/v3/sdk"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -101,14 +102,14 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 				},
 			},
 			validate: func(t *testing.T, devices map[Serial]*Device) {
-				require.NotNil(t, devices["serial-1"].wifi0)
-				require.Equal(t, 1.0, *devices["serial-1"].wifi0.Utilization80211)
-				require.Equal(t, 1.1, *devices["serial-1"].wifi0.UtilizationNon80211)
-				require.Equal(t, 1.2, *devices["serial-1"].wifi0.UtilizationTotal)
-				require.NotNil(t, devices["serial-2"].wifi1)
-				require.Equal(t, 2.0, *devices["serial-2"].wifi1.Utilization80211)
-				require.Equal(t, 2.1, *devices["serial-2"].wifi1.UtilizationNon80211)
-				require.Equal(t, 2.2, *devices["serial-2"].wifi1.UtilizationTotal)
+				assert.NotNil(t, devices["serial-1"].wifi0)
+				assert.Equal(t, 1.0, *devices["serial-1"].wifi0.Utilization80211)
+				assert.Equal(t, 1.1, *devices["serial-1"].wifi0.UtilizationNon80211)
+				assert.Equal(t, 1.2, *devices["serial-1"].wifi0.UtilizationTotal)
+				assert.NotNil(t, devices["serial-2"].wifi1)
+				assert.Equal(t, 2.0, *devices["serial-2"].wifi1.Utilization80211)
+				assert.Equal(t, 2.1, *devices["serial-2"].wifi1.UtilizationNon80211)
+				assert.Equal(t, 2.2, *devices["serial-2"].wifi1.UtilizationTotal)
 			},
 		},
 		{
@@ -123,11 +124,11 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 				},
 			},
 			validate: func(t *testing.T, devices map[Serial]*Device) {
-				require.NotNil(t, devices["serial-3"].wifi0)
-				require.Equal(t, 3.0, *devices["serial-3"].wifi0.Utilization80211)
-				require.Equal(t, 3.1, *devices["serial-3"].wifi0.UtilizationNon80211)
-				require.Equal(t, 3.2, *devices["serial-3"].wifi0.UtilizationTotal)
-				require.Nil(t, devices["serial-3"].wifi1)
+				assert.NotNil(t, devices["serial-3"].wifi0)
+				assert.Equal(t, 3.0, *devices["serial-3"].wifi0.Utilization80211)
+				assert.Equal(t, 3.1, *devices["serial-3"].wifi0.UtilizationNon80211)
+				assert.Equal(t, 3.2, *devices["serial-3"].wifi0.UtilizationTotal)
+				assert.Nil(t, devices["serial-3"].wifi1)
 			},
 		},
 		{
@@ -142,8 +143,8 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 				},
 			},
 			validate: func(t *testing.T, devices map[Serial]*Device) {
-				require.Nil(t, devices["serial-4"].wifi0)
-				require.Nil(t, devices["serial-4"].wifi1)
+				assert.Nil(t, devices["serial-4"].wifi0)
+				assert.Nil(t, devices["serial-4"].wifi1)
 			},
 		},
 		{
@@ -174,7 +175,7 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 
 			err := getDeviceChannelUtilization(tt.client, devicesCopy, time.Second)
 			if tt.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
 			require.NoError(t, err)

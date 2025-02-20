@@ -48,10 +48,8 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 
 	for _, device := range *applicanceUplinks {
 		deviceObj, ok := devices[Serial(device.Serial)]
-		if device.HighAvailability != nil {
-			if ok && deviceObj != nil {
-				devices[Serial(device.Serial)].haStatus = device.HighAvailability
-			}
+		if device.HighAvailability != nil && ok && deviceObj != nil {
+			devices[Serial(device.Serial)].haStatus = device.HighAvailability
 		}
 
 		if device.Uplinks != nil {
