@@ -20,7 +20,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
@@ -33,7 +32,6 @@ const (
 
 // SysinfoMetricSet collects data about the host.
 type SysInfoMetricSet struct {
-	system.SystemMetricSet
 	MetricSet
 	hasher    *hasher.FileHasher
 	cache     *cache.Cache
@@ -81,7 +79,7 @@ func (p Process) toMapStr() mapstr.M {
 }
 
 // NewFromSysInfo constructs a new MetricSet backed by go-sysinfo.
-func NewFromSysInfo(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
+func NewFromSysInfo(ms MetricSet) (mb.MetricSet, error) {
 	bucket, err := datastore.OpenBucket(bucketName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
@@ -117,12 +115,11 @@ func NewFromSysInfo(base mb.BaseMetricSet, ms MetricSet) (mb.MetricSet, error) {
 	}
 
 	sm := &SysInfoMetricSet{
-		SystemMetricSet: system.NewSystemMetricSet(base),
-		MetricSet:       ms,
-		cache:           cache.New(),
-		bucket:          bucket,
-		lastState:       lastState,
-		hasher:          hasher,
+		MetricSet: ms,
+		cache:     cache.New(),
+		bucket:    bucket,
+		lastState: lastState,
+		hasher:    hasher,
 	}
 
 	return sm, nil
@@ -351,27 +348,12 @@ func putIfNotEmpty(mapstr *mapstr.M, key string, value string) {
 }
 
 func processMessage(process *Process, action eventAction) string {
-	if process.Error != nil {
-		return fmt.Sprintf("ERROR for PID %d: %v", process.Info.PID, process.Error)
-	}
-
-	var actionString string
-	switch action {
-	case eventActionProcessStarted:
-		actionString = "STARTED"
-	case eventActionProcessStopped:
-		actionString = "STOPPED"
-	case eventActionExistingProcess:
-		actionString = "is RUNNING"
-	}
-
-	var userString string
+	var username string
 	if process.User != nil {
-		userString = fmt.Sprintf(" by user %v", process.User.Username)
+		username = process.User.Username
 	}
 
-	return fmt.Sprintf("Process %v (PID: %d)%v %v",
-		process.Info.Name, process.Info.PID, userString, actionString)
+	return makeMessage(process.Info.PID, action, process.Info.Name, username, process.Error)
 }
 
 func convertToCacheable(processes []*Process) []cache.Cacheable {
