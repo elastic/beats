@@ -149,7 +149,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		"batcher": map[string]any{
 			"enabled":        true,
 			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
-			"min_size_items": escfg.BulkMaxSize, // minimum batch size to trigger a flush
+			"min_size_items": 0,                 // 0 means immediately trigger a flush
 		},
 	}
 
