@@ -106,6 +106,9 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 	}
 
 	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr, stats *Stats) {
+
+		lastUpdate := time.Now()
+
 		defer qq.Close()
 		for ctx.Err() == nil {
 			p.qqMtx.Lock()
@@ -115,16 +118,18 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 				logger.Errorw("get events from quark, no more process enrichment from this processor will be done", "error", err)
 				break
 			}
+			if time.Since(lastUpdate) > time.Second*5 {
+				p.qqMtx.Lock()
+				metrics := qq.Stats()
+				p.qqMtx.Unlock()
 
-			p.qqMtx.Lock()
-			metrics := qq.Stats()
-			p.qqMtx.Unlock()
-
-			stats.Aggregations.Set(metrics.Aggregations)
-			stats.Insertions.Set(metrics.Insertions)
-			stats.Lost.Set(metrics.Lost)
-			stats.NonAggregations.Set(metrics.NonAggregations)
-			stats.Removals.Set(metrics.Removals)
+				stats.Aggregations.Set(metrics.Aggregations)
+				stats.Insertions.Set(metrics.Insertions)
+				stats.Lost.Set(metrics.Lost)
+				stats.NonAggregations.Set(metrics.NonAggregations)
+				stats.Removals.Set(metrics.Removals)
+				lastUpdate = time.Now()
+			}
 
 			if len(events) == 0 {
 				err = qq.Block()

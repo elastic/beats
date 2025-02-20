@@ -56,12 +56,20 @@ type addSessionMetadata struct {
 	providerType string
 }
 
-func gen_registry(reg *monitoring.Registry, base string) *monitoring.Registry {
+func genRegistry(reg *monitoring.Registry, base string) *monitoring.Registry {
 	// if more than one instance of the DB is running, start to increment the metrics keys.
-	// This is kind of an edge case, but best to handle it so monitoring does not explode
+	// This is kind of an edge case, but best to handle it so monitoring does not explode.
+	// This seems like awkward code, but NewRegistry() loves to panic, so we need to be careful.
 	id := 0
 	if reg.GetRegistry(base) != nil {
-		id = int(instanceID.Add(1))
+		current := int(instanceID.Load())
+		// because we call genRegistry() multiple times, make sure the registry doesn't exist before we iterate the counter
+		if current > 0 && reg.GetRegistry(fmt.Sprintf("%s.%d", base, current)) == nil {
+			id = current
+		} else {
+			id = int(instanceID.Add(1))
+		}
+
 	}
 
 	regName := base
@@ -80,7 +88,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	}
 
 	logger := logp.NewLogger(logName)
-	procDBReg := gen_registry(monitoring.Default, regNameProcessDB)
+	procDBReg := genRegistry(monitoring.Default, regNameProcessDB)
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
 	db, err := processdb.NewDB(ctx, procDBReg, reader, logger, c.DBReaperPeriod, c.ReapProcesses)
@@ -94,7 +102,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	switch c.Backend {
 	case "auto":
-		procDBReg := gen_registry(monitoring.Default, regNameKernelTracing)
+		procDBReg := genRegistry(monitoring.Default, regNameKernelTracing)
 		p, err = kerneltracingprovider.NewProvider(ctx, logger, procDBReg)
 		if err != nil {
 			// Most likely cause of error is not supporting ebpf or kprobes on system, try procfs
@@ -121,7 +129,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		}
 		pType = procfsType
 	case "kernel_tracing":
-		procDBReg := gen_registry(monitoring.Default, regNameKernelTracing)
+		procDBReg := genRegistry(monitoring.Default, regNameKernelTracing)
 		p, err = kerneltracingprovider.NewProvider(ctx, logger, procDBReg)
 		if err != nil {
 			cancel()

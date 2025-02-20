@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+// / Stats tracks the quark internal stats, which are integrated into the beats monitoring runtime
 type Stats struct {
 	Insertions      *monitoring.Uint
 	Removals        *monitoring.Uint
@@ -18,6 +19,7 @@ type Stats struct {
 	Lost            *monitoring.Uint
 }
 
+// / NewStats creates a new stats object
 func NewStats(reg *monitoring.Registry) *Stats {
 	return &Stats{
 		Insertions:      monitoring.NewUint(reg, "insertions"),

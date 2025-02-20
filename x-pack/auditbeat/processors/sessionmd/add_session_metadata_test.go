@@ -341,18 +341,24 @@ var (
 )
 
 func TestMetricsSetup(t *testing.T) {
+	// init a metrics registry multiple times with the same name, ensure we don't panic, and the names are correct
 	reg := monitoring.NewRegistry()
-	name := "test.metrics"
-	other := "other.metrics"
-	gen_registry(reg, name)
-	require.NotNil(t, reg.Get(name))
+	firstName := "test.metrics"
+	secondName := "other.stuff"
+	genRegistry(reg, firstName)
+	require.NotNil(t, reg.Get(firstName))
 
-	gen_registry(reg, name)
-	require.NotNil(t, reg.Get(fmt.Sprintf("%s.1", name)))
+	genRegistry(reg, firstName)
+	require.NotNil(t, reg.Get(fmt.Sprintf("%s.1", firstName)))
 
-	gen_registry(reg, other)
-	require.NotNil(t, reg.Get(other))
-	require.Nil(t, reg.Get(fmt.Sprintf("%s.1", other)))
+	genRegistry(reg, secondName)
+	require.NotNil(t, reg.Get(secondName))
+	require.Nil(t, reg.Get(fmt.Sprintf("%s.1", secondName)))
+
+	genRegistry(reg, secondName)
+	require.NotNil(t, reg.Get(secondName))
+	require.NotNil(t, reg.Get(fmt.Sprintf("%s.1", secondName)))
+	require.Nil(t, reg.Get(fmt.Sprintf("%s.2", secondName)))
 }
 
 func TestEnrich(t *testing.T) {
