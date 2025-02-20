@@ -124,16 +124,15 @@ setup.template.pattern: logs-filebeat-default
 		"@timestamp",
 		"agent.ephemeral_id",
 		"agent.id",
-		"log.file.indoe",
+		"log.file.inode",
 		"log.file.path",
-		"log.offset",
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
-
+	t.Helper()
 	logFile, err := os.Create(filename)
 	if err != nil {
 		t.Fatalf("could not create file '%s': %s", filename, err)
