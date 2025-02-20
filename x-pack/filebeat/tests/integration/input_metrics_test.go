@@ -22,11 +22,22 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestInputMetricsFromPipeline_Filestream(t *testing.T) {
+func TestInputMetricsFromPipeline(t *testing.T) {
 	var tmplCfg = `
 http:
   enabled: true
 filebeat.inputs:
+  - type: filestream
+    enabled: true
+    paths:
+      - {{.log_path_no_id}}
+    processors:
+      - drop_event:
+          when:
+            contains:
+              message: "PUT"
+    close.reader.after_interval: 10m
+
   - type: filestream
     id: {{.filestream_id}}
     enabled: true
@@ -90,6 +101,10 @@ logging.level: debug
 	logFilePath, err := filepath.Abs(relativePath)
 	require.NoError(t, err, "Failed to get absolute path for", relativePath)
 
+	relativePath = filepath.Join("testdata", "input_metrics-no-id.log")
+	logFileNoIDPath, err := filepath.Abs(relativePath)
+	require.NoError(t, err, "Failed to get absolute path for", relativePath)
+
 	// 2. Write configuration file and start Filebeat
 	cgfSB := strings.Builder{}
 	tmpl, err := template.New("filebeatConfig").Parse(tmplCfg)
@@ -105,13 +120,13 @@ logging.level: debug
 		"cel_id":              celBaseInputID,
 		"httpjson_id":         httpsjonInputID,
 		"log_path":            logFilePath,
+		"log_path_no_id":      logFileNoIDPath,
 		"cel_resource_url":    celSrv.URL,
 		"httpjson_requestURL": httpjsonSrv.URL,
 		"path_home":           tempDir,
 	}), "failed to execute config template")
 
 	filebeat.WriteConfigFile(cgfSB.String())
-	// filebeat.WriteConfigFile(tmplCfg)
 	filebeat.Start()
 
 	// 4. Wait for Filebeat to start scanning for files
