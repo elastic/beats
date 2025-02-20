@@ -285,6 +285,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added Cisco Meraki module {pull}40836[40836]
 - Added Palo Alto Networks module {pull}40686[40686]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
+- Log every 401 response from Kubernetes API Server {pull}42714[42714]
 
 *Metricbeat*
 
