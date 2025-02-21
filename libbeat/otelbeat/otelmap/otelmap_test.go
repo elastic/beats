@@ -32,7 +32,7 @@ func TestFromMapstrTime(t *testing.T) {
 		mapstr_val  string
 		pcommon_val string
 	}{
-		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: "2006-01-02T15:04:05.000Z"},
+		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: "2006-01-02T08:04:05.000Z"},
 		{mapstr_val: "1970-01-01T00:00:00+00:00", pcommon_val: "1970-01-01T00:00:00.000Z"},
 	}
 	for _, tc := range tests {
@@ -231,7 +231,7 @@ func TestFromMapstrSliceTime(t *testing.T) {
 		mapstr_val  string
 		pcommon_val string
 	}{
-		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: "2006-01-02T15:04:05.000Z"},
+		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: "2006-01-02T08:04:05.000Z"},
 		{mapstr_val: "1970-01-01T00:00:00+00:00", pcommon_val: "1970-01-01T00:00:00.000Z"},
 	}
 	var sliceTimes []time.Time

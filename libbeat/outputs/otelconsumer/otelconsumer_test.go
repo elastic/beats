@@ -20,6 +20,7 @@ package otelconsumer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -31,7 +32,6 @@ import (
 	"go.opentelemetry.io/collector/pdata/plog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -110,12 +110,14 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-		pcommonFields := otelmap.FromMapstr(event1.Fields)
-		want, ok := pcommonFields.Get("data_stream")
-		require.True(t, ok)
-		got, ok := attributes.Get("data_stream")
-		require.True(t, ok)
-		assert.EqualValues(t, want.AsRaw(), got.AsRaw())
+
+		var subFields = []string{"dataset", "namespace", "type"}
+		for _, subField := range subFields {
+			gotValue, ok := attributes.Get("data_stream." + subField)
+			require.True(t, ok, fmt.Sprintf("data_stream.%s not found on log record attribute", subField))
+			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
+		}
+
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
@@ -184,13 +186,14 @@ func TestPublish(t *testing.T) {
 		batch := outest.NewBatch(event3)
 		batch.Events()[0].Content.Timestamp = time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
 
-		var timestamp string
+		var bodyTimestamp string
+		var recordTimestamp string
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
 			field, ok := record.Body().Map().Get("@timestamp")
+			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
 			assert.True(t, ok, "timestamp field not found")
-			timestamp = field.AsString()
-
+			bodyTimestamp = field.AsString()
 			return nil
 		})
 
@@ -198,6 +201,6 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
-		assert.Equal(t, "2025-01-29T09:02:39.000Z", timestamp)
+		assert.Equal(t, bodyTimestamp, recordTimestamp, "log record timestamp should match body timestamp")
 	})
 }

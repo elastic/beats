@@ -224,9 +224,11 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size. {pull}42327[42327]
 - [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
+- In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 
 *Heartbeat*
 
+- Added maintenance windows support for Heartbeat. {pull}41508[41508]
 
 
 *Metricbeat*
@@ -263,6 +265,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
 - Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
+- Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 
 *Osquerybeat*
 
@@ -275,6 +278,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Winlogbeat*
 
 - Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
+- Sync missing changes in modules pipelines. {pull}42619[42619]
 
 
 *Elastic Logging Plugin*
@@ -477,6 +481,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
 - Add new metricset wmi for the windows module. {pull}42017[42017]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
+- Log every 401 response from Kubernetes API Server {pull}42714[42714]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]

@@ -161,12 +161,12 @@ func FromMapstr(m mapstr.M) pcommon.Map {
 				newMap.CopyTo(newVal.SetEmptyMap())
 			}
 		case time.Time:
-			out.PutStr(k, x.Format("2006-01-02T15:04:05.000Z"))
+			out.PutStr(k, x.UTC().Format("2006-01-02T15:04:05.000Z"))
 		case []time.Time:
 			dest := out.PutEmptySlice(k)
 			for _, i := range v.([]time.Time) {
 				newVal := dest.AppendEmpty()
-				newVal.SetStr(i.Format("2006-01-02T15:04:05.000Z"))
+				newVal.SetStr(i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
 		default:
 			out.PutStr(k, fmt.Sprintf("unknown type: %T", x))
