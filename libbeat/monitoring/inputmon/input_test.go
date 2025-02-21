@@ -88,10 +88,15 @@ func TestMetricSnapshotJSON(t *testing.T) {
 		require.NoError(t, globalRegistry().Clear())
 	})
 
+	bInfo := beat.Info{}
+	bInfo.Monitoring.Namespace = monitoring.GetNamespace("beat")
+
+	parentReg := bInfo.Monitoring.Namespace.GetRegistry()
 	inputID := "input-with-pipeline-metrics"
-	r1, cancel1 := NewInputRegistry("test", inputID, nil)
+	r1, cancel1 := NewInputRegistry("test", inputID, parentReg)
 	defer cancel1()
 	monitoring.NewInt(r1, "foo1_total").Set(100)
+	monitoring.NewInt(r1, "events_pipeline_total").Set(100)
 
 	r2, cancel2 := NewInputRegistry(
 		"test", "input-without-pipeline-metrics", nil)
@@ -107,25 +112,19 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	monitoring.NewString(r4, "id").Set("some-id")
 	monitoring.NewInt(r3, "foo3_total").Set(100)
 
-	bInfo := beat.Info{}
-	bInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMetricSnapshotJSON")
-	intInputReg := bInfo.Monitoring.Namespace.GetRegistry().
-		NewRegistry(inputID)
-	monitoring.NewInt(intInputReg, "events_pipeline_total").Set(100)
-
 	jsonBytes, err := MetricSnapshotJSON(bInfo)
 	require.NoError(t, err)
 
 	const expected = `[
   {
-    "events_pipeline_total": 100,
-    "foo1_total": 100,
-    "id": "input-with-pipeline-metrics",
+    "foo2_total": 100,
+    "id": "input-without-pipeline-metrics",
     "input": "test"
   },
   {
-    "foo2_total": 100,
-    "id": "input-without-pipeline-metrics",
+    "events_pipeline_total": 100,
+    "foo1_total": 100,
+    "id": "input-with-pipeline-metrics",
     "input": "test"
   }
 ]`

@@ -80,6 +80,17 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 func filteredSnapshot(dataset, beatRegistry *monitoring.Registry, requestedType string) []map[string]any {
 	metrics := monitoring.CollectStructSnapshot(dataset, monitoring.Full, false)
 
+	filtered := filterInputMetrics(metrics, requestedType)
+	if dataset != beatRegistry {
+		filtered = append(filtered, filterInputMetrics(
+			monitoring.CollectStructSnapshot(beatRegistry, monitoring.Full, false),
+			requestedType)...)
+	}
+
+	return filtered
+}
+
+func filterInputMetrics(metrics map[string]interface{}, requestedType string) []map[string]any {
 	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
@@ -98,29 +109,9 @@ func filteredSnapshot(dataset, beatRegistry *monitoring.Registry, requestedType 
 			continue
 		}
 
-		// merge metrics stored in the internal namespace if any is found
-		if dataset != beatRegistry {
-			mergeInternalMetrics(beatRegistry, id, m)
-		}
-
 		filtered = append(filtered, m)
 	}
 	return filtered
-}
-
-// mergeInternalMetrics looks for a registry identified by id in the internal
-// registry. If found, all the metrics are merged into m, if not, m is not
-// changed.
-func mergeInternalMetrics(internal *monitoring.Registry, id string, m map[string]any) {
-	reg := internal.GetRegistry(id)
-	if reg == nil {
-		return
-	}
-
-	intInput := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
-	for k, v := range intInput {
-		m[k] = v
-	}
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {
