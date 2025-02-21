@@ -191,7 +191,6 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 		}
 	}
 
-	// the metrics are created here, where is the pipeline cleint?
 	metrics := newInputMetrics(reg)
 
 	client, err := newHTTPClient(stdCtx, cfg, log, reg)

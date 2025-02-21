@@ -37,8 +37,8 @@ const (
 )
 
 type handler struct {
-	registryDataset        *monitoring.Registry
-	registryInternalInputs *monitoring.Registry
+	registryDataset *monitoring.Registry
+	registryBeat    *monitoring.Registry
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
@@ -47,12 +47,12 @@ func AttachHandler(beatInfo beat.Info, r *mux.Router) error {
 	return attachHandler(r, globalRegistry(), beatInfo.Monitoring.Namespace.GetRegistry())
 }
 
-func attachHandler(r *mux.Router, datasetReg, intInputsReg *monitoring.Registry) error {
+func attachHandler(r *mux.Router, datasetReg, beatReg *monitoring.Registry) error {
 	r = r.PathPrefix(route).Subrouter()
 
 	h := &handler{
-		registryDataset:        datasetReg,
-		registryInternalInputs: intInputsReg,
+		registryDataset: datasetReg,
+		registryBeat:    beatReg,
 	}
 	return r.StrictSlash(true).Handle("/", validationHandler(http.MethodGet, []string{"pretty", "type"}, h.allInputs)).GetError()
 }
@@ -71,7 +71,7 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 	}
 
 	filtered := filteredSnapshot(
-		h.registryDataset, h.registryInternalInputs, requestedType)
+		h.registryDataset, h.registryBeat, requestedType)
 
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)

@@ -137,7 +137,6 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
-	// metrics created here
 	metrics, reg := newInputMetrics(env)
 	defer metrics.Close()
 

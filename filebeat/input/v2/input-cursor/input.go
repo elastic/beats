@@ -110,8 +110,8 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	// a new context and therefore new metrics registry will be created for each
-	// worker, therefore the metrics won't be used, so cancel it.
+	// A new context and a new metrics registry will be created for each worker,
+	// therefore the metrics won't be used, so cancel it.
 	ctx.RegistryCancel()
 
 	var grp unison.MultiErrGroup
