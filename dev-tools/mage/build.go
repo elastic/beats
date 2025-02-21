@@ -73,6 +73,9 @@ func DefaultBuildArgs() BuildArgs {
 		args.LDFlags = append(args.LDFlags, "-s")
 		// Remove all file system paths from the compiled executable, to improve build reproducibility
 		args.ExtraFlags = append(args.ExtraFlags, "-trimpath")
+
+		// add pgodebug flags, find `hot-budget check allows inlining for call` in the output for pgo-based inlining information`
+		args.ExtraFlags = append(args.ExtraFlags, "-gcflags=all=-d=pgodebug=1")
 	}
 
 	return args
