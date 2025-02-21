@@ -47,6 +47,12 @@ exporters:
     batcher:
       enabled: true
       max_size_items: 1600
+<<<<<<< HEAD
+=======
+      min_size_items: 0
+    mapping:
+      mode: bodymap       
+>>>>>>> 2f3df1694 ([fbreceiver] - Fix batcher's configuration (#42797))
 `
 
 func TestConverter(t *testing.T) {
@@ -187,6 +193,12 @@ exporters:
     batcher:
       enabled: true
       max_size_items: 1600
+<<<<<<< HEAD
+=======
+      min_size_items: 0
+    mapping:
+      mode: bodymap       
+>>>>>>> 2f3df1694 ([fbreceiver] - Fix batcher's configuration (#42797))
 receivers:
   filebeatreceiver:
     filebeat:
