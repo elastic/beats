@@ -23,6 +23,19 @@ steps:
     artifact_paths:
       - "junit-*.xml"
 
+  - label: ":linux: Test Linux FIPS"
+    key: test-lin-fips
+    command:
+      - ".buildkite/scripts/test.sh"
+    env:
+      FIPS: "true"
+    agents:
+      image: golang:${GO_VERSION}
+      cpu: "8"
+      memory: "4G"
+    artifact_paths:
+      - "junit-*.xml"
+
   - label: ":windows: Test Windows"
     key: test-win
     command:
@@ -52,6 +65,8 @@ steps:
       provider: "gcp" #junit plugin requires docker
     depends_on:
       - step: "test-lin"
+        allow_failure: true
+      - step: "test-lin-fips"
         allow_failure: true
       - step: "test-win"
         allow_failure: true

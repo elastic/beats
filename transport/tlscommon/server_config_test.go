@@ -20,9 +20,10 @@ package tlscommon
 import (
 	"testing"
 
-	"github.com/elastic/go-ucfg"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
+
+	"github.com/elastic/go-ucfg"
 )
 
 // variables so we can use pointers in tests

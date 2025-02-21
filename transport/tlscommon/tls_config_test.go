@@ -26,9 +26,10 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/transport/tlscommontest"
 )
 
 func TestMakeVerifyServerConnection(t *testing.T) {

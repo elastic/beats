@@ -9,9 +9,14 @@ go version
 add_bin_path
 with_go_junit_report
 
+tags=integration
+if [[ "${FIPS:-false}" == "true" ]]; then
+    tags="${tags},requirefips"
+fi
+
 echo "--- Go Test"
 set +e
-go test -tags integration -race -v ./... > tests-report.txt
+go test -tags=${tags} -race -v ./... > tests-report.txt
 exit_code=$?
 set -e
 

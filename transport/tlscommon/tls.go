@@ -101,6 +101,7 @@ func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 		return nil, err
 	}
 
+	var errs error
 	for len(content) > 0 {
 		var block *pem.Block
 
@@ -117,13 +118,15 @@ func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 			block, err := decryptPKCS1Key(*block, pass)
 			if err != nil {
 				log.Errorf("Dropping encrypted pem block with private key, block type '%s': %s", block.Type, err)
+				errs = errors.Join(errs, err)
 				continue
 			}
 			blocks = append(blocks, &block)
 		case block.Type == "ENCRYPTED PRIVATE KEY":
 			block, err := decryptPKCS8Key(*block, pass)
 			if err != nil {
-				log.Errorf("Dropping encrypted pem block with private key, block type '%s', could not decypt as PKCS8: %s", block.Type, err)
+				log.Errorf("Dropping encrypted pem block with private key, block type '%s', could not decrypt as PKCS8: %s", block.Type, err)
+				errs = errors.Join(errs, err)
 				continue
 			}
 			blocks = append(blocks, &block)
@@ -133,7 +136,7 @@ func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 	}
 
 	if len(blocks) == 0 {
-		return nil, errors.New("no PEM blocks")
+		return nil, errors.Join(errors.New("no PEM blocks"), errs)
 	}
 
 	// re-encode available, decrypted blocks
