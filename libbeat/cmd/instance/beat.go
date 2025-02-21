@@ -1687,13 +1687,6 @@ func obfuscateConfigOpts() []ucfg.Option {
 	}
 }
 
-// LoadKeystore returns the appropriate keystore based on the configuration.
-func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
-	keystoreCfg, _ := cfg.Child("keystore", -1)
-	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
-	return keystore.Factory(keystoreCfg, defaultPathConfig, common.IsStrictPerms())
-}
-
 func InitKibanaConfig(beatConfig beatConfig) *config.C {
 	var esConfig *config.C
 	if isElasticsearchOutput(beatConfig.Output.Name()) {
