@@ -2,8 +2,10 @@
 
 set -ueo pipefail
 
+
 BEAT_DIR=${1:?-"Error: Beat directory must be specified."}
 
+#Use newer multiarch support for DRA packaging
 docker run --privileged --rm tonistiigi/binfmt:master --install all
 
 cd $BEAT_DIR
