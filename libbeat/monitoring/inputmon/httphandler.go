@@ -27,7 +27,6 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -45,14 +44,7 @@ type handler struct {
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
 // requests to /inputs.
 func AttachHandler(beatInfo beat.Info, r *mux.Router) error {
-	intInputsReg := beatInfo.Monitoring.Namespace.GetRegistry().
-		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-	if intInputsReg == nil {
-		intInputsReg = beatInfo.Monitoring.Namespace.GetRegistry().
-			NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-	}
-
-	return attachHandler(r, globalRegistry(), intInputsReg)
+	return attachHandler(r, globalRegistry(), beatInfo.Monitoring.Namespace.GetRegistry())
 }
 
 func attachHandler(r *mux.Router, datasetReg, intInputsReg *monitoring.Registry) error {
@@ -85,7 +77,7 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 	serveJSON(w, filtered, requestedPretty)
 }
 
-func filteredSnapshot(dataset, intInputs *monitoring.Registry, requestedType string) []map[string]any {
+func filteredSnapshot(dataset, beatRegistry *monitoring.Registry, requestedType string) []map[string]any {
 	metrics := monitoring.CollectStructSnapshot(dataset, monitoring.Full, false)
 
 	filtered := make([]map[string]any, 0, len(metrics))
@@ -107,7 +99,9 @@ func filteredSnapshot(dataset, intInputs *monitoring.Registry, requestedType str
 		}
 
 		// merge metrics stored in the internal namespace if any is found
-		mergeInternalMetrics(intInputs, id, m)
+		if dataset != beatRegistry {
+			mergeInternalMetrics(beatRegistry, id, m)
+		}
 
 		filtered = append(filtered, m)
 	}

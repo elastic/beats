@@ -24,6 +24,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -109,6 +110,10 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	// a new context and therefore new metrics registry will be created for each
+	// worker, therefore the metrics won't be used, so cancel it.
+	ctx.RegistryCancel()
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
@@ -119,6 +124,13 @@ func (inp *managedInput) Run(
 			inpCtx.IDWithoutName = ctx.ID
 			inpCtx.ID = ctx.ID + "::" + source.Name()
 			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
+
+			reg, regCancel := inputmon.NewInputRegistry(
+				inpCtx.Name,
+				inpCtx.ID,
+				inpCtx.Agent.Monitoring.Namespace.GetRegistry())
+			inpCtx.Registry = reg
+			inpCtx.RegistryCancel = regCancel
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
 				cancel()
@@ -147,7 +159,7 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		InputID:       ctx.ID,
+		InputRegistry: ctx.Registry,
 		EventListener: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {

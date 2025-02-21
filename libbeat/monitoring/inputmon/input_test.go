@@ -25,7 +25,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -111,7 +110,6 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	bInfo := beat.Info{}
 	bInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMetricSnapshotJSON")
 	intInputReg := bInfo.Monitoring.Namespace.GetRegistry().
-		NewRegistry(libbeatmonitoring.RegistryNameInternalInputs).
 		NewRegistry(inputID)
 	monitoring.NewInt(intInputReg, "events_pipeline_total").Set(100)
 

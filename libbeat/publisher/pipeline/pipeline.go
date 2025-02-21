@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
@@ -36,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -132,15 +132,8 @@ func New(
 	}
 
 	if monitors.Metrics != nil {
-		beatsIntReg := beat.Monitoring.Namespace.GetRegistry().
-			GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-		if beatsIntReg == nil {
-			beatsIntReg = beat.Monitoring.Namespace.GetRegistry().
-				NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-		}
-		p.observer = newMetricsObserver(
-			monitors.Metrics,
-			beatsIntReg)
+
+		p.observer = newMetricsObserver(monitors.Metrics)
 	}
 
 	// Convert the raw queue config to a parsed Settings object that will
@@ -218,13 +211,22 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client := &client{
-		inputID:        cfg.InputID,
 		logger:         p.monitors.Logger,
 		clientListener: cfg.ClientListener,
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
 		observer:       p.observer,
+	}
+
+	if cfg.InputRegistry != nil {
+		client.inputRegistry = cfg.InputRegistry
+		client.inputMetrics = inputMetrics{
+			inputEventsTotal:     monitoring.NewUint(cfg.InputRegistry, "events_pipeline_total"),
+			inputEventsFailed:    monitoring.NewUint(cfg.InputRegistry, "events_pipeline_failed_total"),
+			inputEventsFiltered:  monitoring.NewUint(cfg.InputRegistry, "events_pipeline_filtered_total"),
+			inputEventsPublished: monitoring.NewUint(cfg.InputRegistry, "events_pipeline_published_total"),
+		}
 	}
 	client.isOpen.Store(true)
 

@@ -147,7 +147,7 @@ logging.level: debug
 		EventsPipelineFilteredTotal  int `json:"events_pipeline_filtered_total"`
 		EventsPipelinePublishedTotal int `json:"events_pipeline_published_total"`
 
-		// EventsPublishedTotal is used by: filestream
+		// EventsProcessedTotal is used by: filestream
 		EventsProcessedTotal int `json:"events_processed_total"`
 		// EventsPublishedTotal is used by: cel
 		EventsPublishedTotal int    `json:"events_published_total"`

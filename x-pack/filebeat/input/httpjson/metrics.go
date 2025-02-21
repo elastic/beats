@@ -29,6 +29,7 @@ func newInputMetrics(reg *monitoring.Registry) *inputMetrics {
 	}
 
 	out := &inputMetrics{
+		// could add new metrics here
 		intervals:                 monitoring.NewUint(reg, "httpjson_interval_total"),
 		intervalErrs:              monitoring.NewUint(reg, "httpjson_interval_errors_total"),
 		eventsPublished:           monitoring.NewUint(reg, "events_published_total"),

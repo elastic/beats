@@ -29,7 +29,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -330,8 +329,6 @@ func TestMonitoring(t *testing.T) {
 		defer pipeline.Close()
 
 		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
-		metricsSnapshot := monitoring.CollectStructSnapshot(metrics, monitoring.Full, true)
-		_ = metricsSnapshot
 		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
 		assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
 		assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
@@ -348,14 +345,15 @@ func TestMonitoring(t *testing.T) {
 		}).Unpack(&config)
 		require.NoError(t, err, "failed creating config")
 
+		inputID := "a-input-id"
+		publishErrKey := "publish_err"
+		filterMeKey := "filter_me"
+
 		beatInfo := beat.Info{}
 		beatInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMonitoring.inputMetrics")
 		metrics := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry("metrics")
 		telemetry := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry("telemetry")
-
-		inputID := "a-input-id"
-		publishErrKey := "publish_err"
-		filterMeKey := "filter_me"
+		inputReg := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry(inputID)
 
 		pipeline, err := Load(
 			beatInfo,
@@ -375,7 +373,6 @@ func TestMonitoring(t *testing.T) {
 									in.Meta = mapstr.M{}
 								}
 								_, err = in.Meta.Put("input_id", inputID)
-								//
 								assert.NoError(t, err, "add meta processor failed")
 								return in, nil
 							},
@@ -406,7 +403,7 @@ func TestMonitoring(t *testing.T) {
 		)
 		require.NoError(t, err)
 
-		c, err := pipeline.ConnectWith(beat.ClientConfig{InputID: inputID})
+		c, err := pipeline.ConnectWith(beat.ClientConfig{InputRegistry: inputReg})
 		require.NoError(t, err, "pipeline.ConnectWith failed")
 
 		cc, ok := c.(*client)
@@ -458,8 +455,7 @@ func getMetrics(t *testing.T, beatInfo beat.Info, inputID string) (
 	*monitoring.Uint, *monitoring.Uint, *monitoring.Uint, *monitoring.Uint) {
 	t.Helper()
 
-	reg := beatInfo.Monitoring.Namespace.GetRegistry().
-		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	reg := beatInfo.Monitoring.Namespace.GetRegistry()
 
 	totalMetricName := inputID + "." + "events_pipeline_total"
 	totalRaw := reg.Get(totalMetricName)

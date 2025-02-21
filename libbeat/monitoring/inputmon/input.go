@@ -24,22 +24,25 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// NewInputRegistry returns a new monitoring.Registry for metrics related to
-// an input instance. The returned registry will be initialized with a static
-// string values for the input and id. When the input stops it should invoke
-// the returned cancel function to unregister the metrics. For testing purposes
-// an optional monitoring.Registry may be provided as an alternative to using
-// the global 'dataset' monitoring namespace. The inputType and id must be
-// non-empty for the metrics to be published to the global 'dataset' monitoring
-// namespace.
-func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
+// NewInputRegistry returns a new *monitoring.Registry for metrics related to
+// an input instance. The registry named ID.
+// The returned cancel function *must* be called when the input stops to
+// unregister the metrics and prevent resource leaks.
+//
+// If a parent registry is provided, it will be used instead of the default
+// 'dataset' monitoring namespace.
+//
+// If parent is nil, inputType and id must be non-empty otherwise the metrics
+// will not be published.
+//
+// This function will panic if a registry named id was already registered.
+func NewInputRegistry(inputType, id string, parent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Use the default registry unless one was provided (this would be for testing).
-	parentRegistry := optionalParent
+	parentRegistry := parent
 	if parentRegistry == nil {
 		parentRegistry = globalRegistry()
 	}
@@ -83,20 +86,13 @@ func globalRegistry() *monitoring.Registry {
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' and libbeatmonitoring.RegistryNameInternalInputs monitoring
-// namespace from the beatInfo instance. It returns a pretty formated JSON array
-// as a byte slice.
+// global 'dataset' and from the beat monitoring namespace from the beatInfo
+// instance. It returns a pretty formated JSON array as a byte slice.
 func MetricSnapshotJSON(beatInfo beat.Info) ([]byte, error) {
-	intReg := beatInfo.Monitoring.Namespace.GetRegistry().
-		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-	if intReg == nil {
-		intReg = beatInfo.Monitoring.Namespace.GetRegistry().
-			NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
-	}
 	return json.MarshalIndent(
 		filteredSnapshot(
 			globalRegistry(),
-			intReg,
+			beatInfo.Monitoring.Namespace.GetRegistry(),
 			""),
 		"",
 		"  ")

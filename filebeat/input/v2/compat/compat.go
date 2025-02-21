@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -133,11 +134,17 @@ func (r *runner) Start() {
 	go func() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
+
+		reg, cancel := inputmon.NewInputRegistry(
+			name, r.id, r.agent.Monitoring.Namespace.GetRegistry())
 		err := r.input.Run(
 			v2.Context{
 				ID:             r.id,
 				IDWithoutName:  r.id,
+				Name:           name,
 				Agent:          *r.agent,
+				Registry:       reg,
+				RegistryCancel: cancel,
 				Logger:         log,
 				Cancelation:    r.sig,
 				StatusReporter: r.statusReporter,

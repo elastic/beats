@@ -139,7 +139,7 @@ func (in *s3PollerInput) workerLoop(inputCtx v2.Context, workChan <-chan state) 
 	acks := newAWSACKHandler()
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := in.pipeline.ConnectWith(beat.ClientConfig{
-		InputID:       inputCtx.ID,
+		InputRegistry: inputCtx.Registry,
 		EventListener: acks.pipelineEventListener(),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization

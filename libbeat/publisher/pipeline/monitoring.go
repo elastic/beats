@@ -38,13 +38,13 @@ type pipelineObserver interface {
 
 type clientObserver interface {
 	// The client received a Publish call
-	newEvent(string)
+	newEvent(inputMetrics)
 	// An event was filtered by processors before being published
-	filteredEvent(string)
+	filteredEvent(inputMetrics)
 	// An event was published to the queue
-	publishedEvent(string)
+	publishedEvent(inputMetrics)
 	// An event was rejected by the queue
-	failedPublishEvent(string)
+	failedPublishEvent(inputMetrics)
 	eventsACKed(count int)
 }
 
@@ -70,7 +70,7 @@ type metricsObserver struct {
 	vars    metricsObserverVars
 }
 
-type inputVars struct {
+type inputMetrics struct {
 	inputEventsTotal,
 	inputEventsFailed,
 	inputEventsFiltered,
@@ -86,19 +86,16 @@ type metricsObserverVars struct {
 
 	eventsDropped, eventsRetry *monitoring.Uint // (retryer) drop/retry counters
 	activeEvents               *monitoring.Uint
-
-	inputs map[string]inputVars
 }
 
-func newMetricsObserver(metrics, beatInternalInputRegistry *monitoring.Registry) *metricsObserver {
+func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 	reg := metrics.GetRegistry("pipeline")
 	if reg == nil {
 		reg = metrics.NewRegistry("pipeline")
 	}
 
 	return &metricsObserver{
-		beatInternalInputRegistry: beatInternalInputRegistry,
-		metrics:                   metrics,
+		metrics: metrics,
 
 		vars: metricsObserverVars{
 			// (Gauge) clients measures the number of open pipeline clients.
@@ -129,8 +126,6 @@ func newMetricsObserver(metrics, beatInternalInputRegistry *monitoring.Registry)
 			// events.dropped counts events that were dropped because errors from
 			// the output workers exceeded the configured maximum retry count.
 			eventsDropped: monitoring.NewUint(reg, "events.dropped"),
-
-			inputs: map[string]inputVars{},
 		},
 	}
 }
@@ -156,35 +151,23 @@ func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 //
 
 // (client) client is trying to publish a new event
-func (o *metricsObserver) newEvent(inputID string) {
+func (o *metricsObserver) newEvent(inputMetrics inputMetrics) {
 	o.vars.eventsTotal.Inc()
 	o.vars.activeEvents.Inc()
-
-	input := o.inputMetrics(inputID)
-	if input != nil {
-		input.inputEventsTotal.Inc()
-	}
+	inputMetrics.inputEventsTotal.Inc()
 }
 
 // (client) event is filtered out (on purpose or failed)
-func (o *metricsObserver) filteredEvent(inputID string) {
+func (o *metricsObserver) filteredEvent(inputMetrics inputMetrics) {
 	o.vars.eventsFiltered.Inc()
 	o.vars.activeEvents.Dec()
-
-	input := o.inputMetrics(inputID)
-	if input != nil {
-		input.inputEventsFiltered.Inc()
-	}
+	inputMetrics.inputEventsFiltered.Inc()
 }
 
 // (client) managed to push an event into the publisher pipeline
-func (o *metricsObserver) publishedEvent(inputID string) {
+func (o *metricsObserver) publishedEvent(inputMetrics inputMetrics) {
 	o.vars.eventsPublished.Inc()
-
-	input := o.inputMetrics(inputID)
-	if input != nil {
-		input.inputEventsPublished.Inc()
-	}
+	inputMetrics.inputEventsPublished.Inc()
 }
 
 // (client) number of ACKed events from this client
@@ -193,39 +176,10 @@ func (o *metricsObserver) eventsACKed(n int) {
 }
 
 // (client) client closing down or DropIfFull is set
-func (o *metricsObserver) failedPublishEvent(inputID string) {
+func (o *metricsObserver) failedPublishEvent(inputMetrics inputMetrics) {
 	o.vars.eventsFailed.Inc()
 	o.vars.activeEvents.Dec()
-
-	input := o.inputMetrics(inputID)
-	if input != nil {
-		input.inputEventsFailed.Inc()
-	}
-}
-
-func (o *metricsObserver) inputMetrics(inputID string) *inputVars {
-	if inputID == "" {
-		// without an inputID it's not possible to aggregate metrics by input.
-		return nil
-	}
-
-	input, found := o.vars.inputs[inputID]
-	if !found {
-		reg := o.beatInternalInputRegistry.GetRegistry(inputID)
-		if reg == nil {
-			reg = o.beatInternalInputRegistry.NewRegistry(inputID)
-		}
-
-		input = inputVars{
-			inputEventsTotal:     monitoring.NewUint(reg, "events_pipeline_total"),
-			inputEventsFailed:    monitoring.NewUint(reg, "events_pipeline_failed_total"),
-			inputEventsFiltered:  monitoring.NewUint(reg, "events_pipeline_filtered_total"),
-			inputEventsPublished: monitoring.NewUint(reg, "events_pipeline_published_total"),
-		}
-		o.vars.inputs[inputID] = input
-	}
-
-	return &input
+	inputMetrics.inputEventsFailed.Inc()
 }
 
 //
@@ -246,13 +200,13 @@ type emptyObserver struct{}
 
 var nilObserver observer = (*emptyObserver)(nil)
 
-func (*emptyObserver) cleanup()                  {}
-func (*emptyObserver) clientConnected()          {}
-func (*emptyObserver) clientClosed()             {}
-func (*emptyObserver) newEvent(string)           {}
-func (*emptyObserver) filteredEvent(string)      {}
-func (*emptyObserver) publishedEvent(string)     {}
-func (*emptyObserver) failedPublishEvent(string) {}
-func (*emptyObserver) eventsACKed(n int)         {}
-func (*emptyObserver) eventsDropped(int)         {}
-func (*emptyObserver) eventsRetry(int)           {}
+func (*emptyObserver) cleanup()                        {}
+func (*emptyObserver) clientConnected()                {}
+func (*emptyObserver) clientClosed()                   {}
+func (*emptyObserver) newEvent(inputMetrics)           {}
+func (*emptyObserver) filteredEvent(inputMetrics)      {}
+func (*emptyObserver) publishedEvent(inputMetrics)     {}
+func (*emptyObserver) failedPublishEvent(inputMetrics) {}
+func (*emptyObserver) eventsACKed(n int)               {}
+func (*emptyObserver) eventsDropped(int)               {}
+func (*emptyObserver) eventsRetry(int)                 {}

@@ -20,7 +20,7 @@ package input_logfile
 import (
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -54,7 +54,7 @@ func (m *Metrics) Close() {
 	m.unregister()
 }
 
-func NewMetrics(id string) *Metrics {
+func NewMetrics(ctx v2.Context) *Metrics {
 	// The log input creates the `filebeat.harvester` registry as a package
 	// variable, so it should always exist before this function runs.
 	// However at least on testing scenarios this does not hold true, so
@@ -64,17 +64,16 @@ func NewMetrics(id string) *Metrics {
 		harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
 	}
 
-	reg, unreg := inputmon.NewInputRegistry("filestream", id, nil)
 	m := Metrics{
-		unregister:        unreg,
-		FilesOpened:       monitoring.NewUint(reg, "files_opened_total"),
-		FilesClosed:       monitoring.NewUint(reg, "files_closed_total"),
-		FilesActive:       monitoring.NewUint(reg, "files_active"),
-		MessagesRead:      monitoring.NewUint(reg, "messages_read_total"),
-		MessagesTruncated: monitoring.NewUint(reg, "messages_truncated_total"),
-		BytesProcessed:    monitoring.NewUint(reg, "bytes_processed_total"),
-		EventsProcessed:   monitoring.NewUint(reg, "events_processed_total"),
-		ProcessingErrors:  monitoring.NewUint(reg, "processing_errors_total"),
+		unregister:        ctx.RegistryCancel,
+		FilesOpened:       monitoring.NewUint(ctx.Registry, "files_opened_total"),
+		FilesClosed:       monitoring.NewUint(ctx.Registry, "files_closed_total"),
+		FilesActive:       monitoring.NewUint(ctx.Registry, "files_active"),
+		MessagesRead:      monitoring.NewUint(ctx.Registry, "messages_read_total"),
+		MessagesTruncated: monitoring.NewUint(ctx.Registry, "messages_truncated_total"),
+		BytesProcessed:    monitoring.NewUint(ctx.Registry, "bytes_processed_total"),
+		EventsProcessed:   monitoring.NewUint(ctx.Registry, "events_processed_total"),
+		ProcessingErrors:  monitoring.NewUint(ctx.Registry, "processing_errors_total"),
 		ProcessingTime:    metrics.NewUniformSample(1024),
 
 		HarvesterStarted:   monitoring.NewInt(harvesterMetrics, "started"),
@@ -82,7 +81,7 @@ func NewMetrics(id string) *Metrics {
 		HarvesterRunning:   monitoring.NewInt(harvesterMetrics, "running"),
 		HarvesterOpenFiles: monitoring.NewInt(harvesterMetrics, "open_files"),
 	}
-	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(ctx.Registry, "processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
 
 	return &m

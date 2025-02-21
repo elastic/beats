@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // client connects a beat with the processors and pipeline queue.
@@ -43,9 +44,11 @@ type client struct {
 	// Open state, signaling, and sync primitives for coordinating client Close.
 	isOpen atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
 
-	// inputID of the input this client belongs to. It's used to aggregate
-	// metrics by input.
-	inputID        string
+	// inputMetrics is the registry used to aggregate metrics by input.
+	inputRegistry *monitoring.Registry
+	// inputMetrics are the actual input metrics.
+	inputMetrics inputMetrics
+
 	observer       observer
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
@@ -175,22 +178,22 @@ func (c *client) onClosed() {
 }
 
 func (c *client) onNewEvent() {
-	c.observer.newEvent(c.inputID)
+	c.observer.newEvent(c.inputMetrics)
 }
 
 func (c *client) onPublished() {
-	c.observer.publishedEvent(c.inputID)
+	c.observer.publishedEvent(c.inputMetrics)
 	if c.clientListener != nil {
 		c.clientListener.Published()
 	}
 }
 
 func (c *client) onFilteredOut() {
-	c.observer.filteredEvent(c.inputID)
+	c.observer.filteredEvent(c.inputMetrics)
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
-	c.observer.failedPublishEvent(c.inputID)
+	c.observer.failedPublishEvent(c.inputMetrics)
 	if c.clientListener != nil {
 		c.clientListener.DroppedOnPublish(e)
 	}
