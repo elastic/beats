@@ -58,6 +58,7 @@ type s3DownloadedObject struct {
 const (
 	contentTypeJSON   = "application/json"
 	contentTypeNDJSON = "application/x-ndjson"
+	retry_attempts    = 3
 )
 
 // errS3DownloadFailed reports problems downloading an S3 object. Download errors
@@ -203,7 +204,7 @@ func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func
 		// Process object content stream.
 		switch {
 		case strings.HasPrefix(s3Obj.contentType, contentTypeJSON) || strings.HasPrefix(s3Obj.contentType, contentTypeNDJSON):
-			err = p.readJSON(reader)
+			err = p.readJSON(reader, log)
 		default:
 			err = p.readFile(reader)
 		}
@@ -265,36 +266,48 @@ func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, e
 	return gzip.NewReader(bufReader)
 }
 
-func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
-	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, r); err != nil {
-		// If an error occurs during the download, handle it here
-		return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
-	}
-	dec := json.NewDecoder(&buf)
-	dec.UseNumber()
+func (p *s3ObjectProcessor) readJSON(r io.Reader, log *logp.Logger) error {
+	attempt := 0
+	for attempt < retry_attempts {
+		dec := json.NewDecoder(r)
+		dec.UseNumber()
 
-	for dec.More() && p.ctx.Err() == nil {
-		offset := dec.InputOffset()
+		for dec.More() && p.ctx.Err() == nil {
+			offset := dec.InputOffset()
 
-		var item json.RawMessage
-		if err := dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode json: %w", err)
-		}
-
-		if p.readerConfig.ExpandEventListFromField != "" {
-			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
-				return err
+			var item json.RawMessage
+			if err := dec.Decode(&item); err != nil {
+				// If decoding fails, check if it's an io.ErrUnexpectedEOF
+				if errors.Is(err, io.ErrUnexpectedEOF) {
+					// Retry logic for io.ErrUnexpectedEOF
+					attempt++
+					if attempt >= retry_attempts {
+						return fmt.Errorf("download of file failed after %d attempts: %w", attempt, err)
+					}
+					// Log retry and attempt again
+					log.Debugf("Retrying due to unexpected EOF, attempt %d/%d", attempt, retry_attempts)
+					break // Break out of the inner loop to retry
+				}
+				// Return any other error immediately
+				return fmt.Errorf("failed to decode json: %w", err)
 			}
-			continue
+
+			if p.readerConfig.ExpandEventListFromField != "" {
+				if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
+					return err
+				}
+				continue
+			}
+
+			data, _ := item.MarshalJSON()
+			evt := p.createEvent(string(data), offset)
+			p.eventCallback(evt)
+
+			return nil
 		}
-
-		data, _ := item.MarshalJSON()
-		evt := p.createEvent(string(data), offset)
-		p.eventCallback(evt)
 	}
-
-	return nil
+	// If all attempts fail after retrying for io.ErrUnexpectedEOF
+	return fmt.Errorf("download of file failed after %d attempts", attempt)
 }
 
 // readJSONSlice uses a json.RawMessage to process JSON slice data as individual JSON objects.
