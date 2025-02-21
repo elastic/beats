@@ -58,7 +58,7 @@ type s3DownloadedObject struct {
 const (
 	contentTypeJSON   = "application/json"
 	contentTypeNDJSON = "application/x-ndjson"
-	retry_attempts    = 3
+	retry_attempts    = 3 // Used in readJson function to retry streaming of files
 )
 
 // errS3DownloadFailed reports problems downloading an S3 object. Download errors
