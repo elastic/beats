@@ -347,12 +347,8 @@ func TestMonitoring(t *testing.T) {
 	})
 
 	t.Run("nil input metrics", func(t *testing.T) {
-		inputID := "a-input-id-nil-metrics"
-
-		beatInfo := beat.Info{}
-
-		clientCfg := beat.ClientConfig{}
-		testInputMetrics(t, beatInfo, clientCfg, inputID)
+		testInputMetrics(
+			t, beat.Info{}, beat.ClientConfig{}, "a-input-id-nil-metrics")
 	})
 }
 

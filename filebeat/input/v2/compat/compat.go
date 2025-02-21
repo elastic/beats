@@ -135,6 +135,10 @@ func (r *runner) Start() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
 
+		// Ideally any input will use this registry for its metrics. By default,
+		// r.agent.Monitoring.Namespace is the same global 'dataset' namespace.
+		// Therefore, either can be used. When running as OTel receiver, it's
+		// different TODO: finish it!
 		reg, cancel := inputmon.NewInputRegistry(
 			name, r.id, r.agent.Monitoring.Namespace.GetRegistry())
 		err := r.input.Run(
