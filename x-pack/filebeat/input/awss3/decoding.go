@@ -42,6 +42,8 @@ func newDecoder(config decoderConfig, r io.Reader) (decoder, error) {
 		return newParquetDecoder(config, r)
 	case config.Codec.CSV != nil:
 		return newCSVDecoder(config, r)
+	case config.Codec.IPFIX != nil:
+		return newIpfixDecoder(config, r)
 	default:
 		return nil, fmt.Errorf("unsupported config value: %v", config)
 	}
