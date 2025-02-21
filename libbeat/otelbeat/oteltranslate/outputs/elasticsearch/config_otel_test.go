@@ -76,6 +76,12 @@ headers:
 batcher:
   enabled: true
   max_size_items: 1600
+<<<<<<< HEAD
+=======
+  min_size_items: 0
+mapping:
+  mode: bodymap  
+>>>>>>> 2f3df1694 ([fbreceiver] - Fix batcher's configuration (#42797))
  `
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
@@ -125,6 +131,7 @@ num_workers: 1
 batcher:
   enabled: true
   max_size_items: 1600
+  min_size_items: 0
  `,
 			},
 			{
@@ -135,6 +142,7 @@ num_workers: 4
 batcher:
   enabled: true
   max_size_items: 1600
+  min_size_items: 0
  `,
 			},
 			{
@@ -157,6 +165,12 @@ num_workers: 1
 batcher:
   enabled: true
   max_size_items: 1600
+<<<<<<< HEAD
+=======
+  min_size_items: 0
+mapping:
+  mode: bodymap    
+>>>>>>> 2f3df1694 ([fbreceiver] - Fix batcher's configuration (#42797))
  `,
 			},
 			{
@@ -167,6 +181,7 @@ num_workers: 1
 batcher:
   enabled: true
   max_size_items: 50
+  min_size_items: 0
  `,
 			},
 			{
@@ -177,6 +192,7 @@ num_workers: 0
 batcher:
   enabled: true
   max_size_items: 1600
+  min_size_items: 0
  `,
 			},
 		}
