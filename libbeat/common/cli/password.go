@@ -25,7 +25,7 @@ import (
 
 	"errors"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 type method func(m string) (string, error)
@@ -62,7 +62,7 @@ func ReadPassword(def string) (string, error) {
 
 func stdin(p string) (string, error) {
 	fmt.Print("Enter password: ")
-	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
 	if err != nil {
 		return "", fmt.Errorf("reading password input: %w", err)
 	}
