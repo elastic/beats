@@ -269,6 +269,7 @@ func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, e
 func (p *s3ObjectProcessor) readJSON(r io.Reader, log *logp.Logger) error {
 	attempt := 0
 	for attempt < retry_attempts {
+
 		dec := json.NewDecoder(r)
 		dec.UseNumber()
 
@@ -276,6 +277,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader, log *logp.Logger) error {
 			offset := dec.InputOffset()
 
 			var item json.RawMessage
+
 			if err := dec.Decode(&item); err != nil {
 				// If decoding fails, check if it's an io.ErrUnexpectedEOF
 				if errors.Is(err, io.ErrUnexpectedEOF) {
@@ -302,9 +304,8 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader, log *logp.Logger) error {
 			data, _ := item.MarshalJSON()
 			evt := p.createEvent(string(data), offset)
 			p.eventCallback(evt)
-
-			return nil
 		}
+		return nil
 	}
 	// If all attempts fail after retrying for io.ErrUnexpectedEOF
 	return fmt.Errorf("download of file failed after %d attempts", attempt)
