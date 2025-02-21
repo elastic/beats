@@ -8,9 +8,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
@@ -30,7 +31,7 @@ type NetflowV9Protocol struct {
 	ctx            context.Context
 	cancel         context.CancelFunc
 	decoder        Decoder
-	logger         *log.Logger
+	logger         *logp.Logger
 	Session        SessionMap
 	timeout        time.Duration
 	cache          *pendingTemplatesCache
@@ -39,15 +40,17 @@ type NetflowV9Protocol struct {
 }
 
 func init() {
-	_ = protocol.Registry.Register(ProtocolName, New)
+	if err := protocol.Registry.Register(ProtocolName, New); err != nil {
+		panic(err)
+	}
 }
 
 func New(config config.Config) protocol.Protocol {
-	logger := log.New(config.LogOutput(), LogPrefix, 0)
+	logger := config.LogOutput().Named(LogPrefix)
 	return NewProtocolWithDecoder(DecoderV9{Logger: logger, Fields: config.Fields()}, config, logger)
 }
 
-func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *log.Logger) *NetflowV9Protocol {
+func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *logp.Logger) *NetflowV9Protocol {
 	ctx, cancel := context.WithCancel(context.Background())
 	pd := &NetflowV9Protocol{
 		ctx:            ctx,
@@ -94,7 +97,7 @@ func (p *NetflowV9Protocol) Stop() error {
 func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows []record.Record, err error) {
 	header, payload, numFlowSets, err := p.decoder.ReadPacketHeader(buf)
 	if err != nil {
-		p.logger.Printf("Unable to read V9 header: %v", err)
+		p.logger.Debugf("Unable to read V9 header: %v", err)
 		return nil, fmt.Errorf("error reading header: %w", err)
 	}
 	buf = payload
@@ -104,10 +107,10 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 	session := p.Session.GetOrCreate(sessionKey)
 	remote := source.String()
 
-	p.logger.Printf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)
+	p.logger.Debugf("Packet from:%s src:%d seq:%d", remote, header.SourceID, header.SequenceNo)
 	if p.detectReset {
 		if prev, reset := session.CheckReset(header.SequenceNo); reset {
-			p.logger.Printf("Session %s reset (sequence=%d last=%d)", remote, header.SequenceNo, prev)
+			p.logger.Debugf("Session %s reset (sequence=%d last=%d)", remote, header.SequenceNo, prev)
 		}
 	}
 
@@ -117,15 +120,15 @@ func (p *NetflowV9Protocol) OnPacket(buf *bytes.Buffer, source net.Addr) (flows 
 			break
 		}
 		if buf.Len() < set.BodyLength() {
-			p.logger.Printf("FlowSet ID %+v overflows packet from %s", set, source)
+			p.logger.Debugf("FlowSet ID %+v overflows packet from %s", set, source)
 			break
 		}
 		body := bytes.NewBuffer(buf.Next(set.BodyLength()))
-		p.logger.Printf("FlowSet ID %d length %d", set.SetID, set.BodyLength())
+		p.logger.Debugf("FlowSet ID %d length %d", set.SetID, set.BodyLength())
 
 		f, err := p.parseSet(set.SetID, sessionKey, session, body)
 		if err != nil {
-			p.logger.Printf("Error parsing set %d: %v", set.SetID, err)
+			p.logger.Debugf("Error parsing set %d: %v", set.SetID, err)
 			return nil, fmt.Errorf("error parsing set: %w", err)
 		}
 		flows = append(flows, f...)
@@ -152,7 +155,7 @@ func (p *NetflowV9Protocol) parseSet(
 			if p.cache != nil {
 				p.cache.Add(key, buf)
 			} else {
-				p.logger.Printf("No template for ID %d", setID)
+				p.logger.Debugf("No template for ID %d", setID)
 			}
 			return nil, nil
 		}
