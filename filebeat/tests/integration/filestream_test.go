@@ -632,7 +632,7 @@ func TestFilestreamIDMigrationDoesNotMigrateFileIdentity(t *testing.T) {
 
 	vars["previousID"] = oldID
 	vars["inputID"] = newID
-	vars["fileIentity"] = "native"
+	vars["fileIentity"] = "path"
 
 	cfgYAML = getMigrateIDConfig(t, vars, "file-idenity-error.yml")
 	filebeat.WriteConfigFile(cfgYAML)

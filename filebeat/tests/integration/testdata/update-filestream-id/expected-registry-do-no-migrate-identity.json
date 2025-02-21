@@ -15,16 +15,16 @@
     "Op": "set",
     "Removed": false
   },
-  "filestream::second-id::native::12584438-65024": {
-    "Key": "filestream::second-id::native::12584438-65024",
+  "filestream::second-id::path::TESTDATA-PATH/update-filestream-id/01.log": {
+    "Key": "filestream::second-id::path::TESTDATA-PATH/update-filestream-id/01.log",
     "Offset": 309,
     "Filename": "TESTDATA-PATH/update-filestream-id/01.log",
     "TTL": -1,
     "Op": "set",
     "Removed": false
   },
-  "filestream::second-id::native::12590485-65024": {
-    "Key": "filestream::second-id::native::12590485-65024",
+  "filestream::second-id::path::TESTDATA-PATH/update-filestream-id/02.log": {
+    "Key": "filestream::second-id::path::TESTDATA-PATH/update-filestream-id/02.log",
     "Offset": 296,
     "Filename": "TESTDATA-PATH/update-filestream-id/02.log",
     "TTL": -1,
