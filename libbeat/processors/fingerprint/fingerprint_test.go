@@ -129,11 +129,11 @@ func TestHashMethods(t *testing.T) {
 		"xxhash": {"37bc50682fba6686"},
 	}
 
-	for method, test := range tests {
-		t.Run(method, func(t *testing.T) {
+	for _, method := range namedHashMethods {
+		t.Run(method.Name, func(t *testing.T) {
 			testConfig, err := config.NewConfigFrom(mapstr.M{
 				"fields": []string{"field1", "field2"},
-				"method": method,
+				"method": method.Name,
 			})
 			assert.NoError(t, err)
 
@@ -150,7 +150,7 @@ func TestHashMethods(t *testing.T) {
 
 			v, err := newEvent.GetValue("fingerprint")
 			assert.NoError(t, err)
-			assert.Equal(t, test.expected, v)
+			assert.Equal(t, tests[method.Name].expected, v)
 		})
 	}
 }
@@ -212,16 +212,16 @@ func TestEncoding(t *testing.T) {
 	tests := map[string]struct {
 		expectedFingerprint string
 	}{
-		"hex":    {"8934ca639027aab1ee9f3944d4d6bd1e"},
-		"base32": {"RE2MUY4QE6VLD3U7HFCNJVV5DY======"},
-		"base64": {"iTTKY5AnqrHunzlE1Na9Hg=="},
+		"hex":    {"49f15f7c03c606b4bdf43f60481842954ff7b45a020a22a1d0911d76f170c798"},
+		"base32": {"JHYV67ADYYDLJPPUH5QEQGCCSVH7PNC2AIFCFIOQSEOXN4LQY6MA===="},
+		"base64": {"SfFffAPGBrS99D9gSBhClU/3tFoCCiKh0JEddvFwx5g="},
 	}
 
 	for encoding, test := range tests {
 		t.Run(encoding, func(t *testing.T) {
 			testConfig, err := config.NewConfigFrom(mapstr.M{
 				"fields":   []string{"field2", "nested.field"},
-				"method":   "md5",
+				"method":   "sha256",
 				"encoding": encoding,
 			})
 			assert.NoError(t, err)
@@ -465,12 +465,12 @@ func TestProcessorStringer(t *testing.T) {
 	testConfig, err := config.NewConfigFrom(mapstr.M{
 		"fields":   []string{"field1"},
 		"encoding": "hex",
-		"method":   "md5",
+		"method":   "sha256",
 	})
 	require.NoError(t, err)
 	p, err := New(testConfig)
 	require.NoError(t, err)
-	require.Equal(t, `fingerprint={"Method":"md5","Encoding":"hex","Fields":["field1"],"TargetField":"fingerprint","IgnoreMissing":false}`, fmt.Sprint(p))
+	require.Equal(t, `fingerprint={"Method":"sha256","Encoding":"hex","Fields":["field1"],"TargetField":"fingerprint","IgnoreMissing":false}`, fmt.Sprint(p))
 }
 
 func BenchmarkHashMethods(b *testing.B) {
