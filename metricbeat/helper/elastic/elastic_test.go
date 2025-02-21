@@ -38,22 +38,22 @@ func TestMakeXPackMonitoringIndexName(t *testing.T) {
 		{
 			"Elasticsearch monitoring index",
 			Elasticsearch,
-			".monitoring-es-8-mb",
+			".monitoring-es-9-mb",
 		},
 		{
 			"Kibana monitoring index",
 			Kibana,
-			".monitoring-kibana-8-mb",
+			".monitoring-kibana-9-mb",
 		},
 		{
 			"Logstash monitoring index",
 			Logstash,
-			".monitoring-logstash-8-mb",
+			".monitoring-logstash-9-mb",
 		},
 		{
 			"Beats monitoring index",
 			Beats,
-			".monitoring-beats-8-mb",
+			".monitoring-beats-9-mb",
 		},
 	}
 
