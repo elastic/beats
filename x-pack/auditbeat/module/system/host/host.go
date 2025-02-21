@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -16,7 +17,6 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -117,7 +117,6 @@ func (host *Host) changeDetectionHash() uint64 {
 	return h.Sum64()
 }
 
-//nolint:errcheck // All checks are for mapstr.Put.
 func (host *Host) toMapStr() mapstr.M {
 	mapstr := mapstr.M{
 		// https://github.com/elastic/ecs#-host-fields
@@ -289,7 +288,6 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	var events []mb.Event
 
 	// Report ID changes as a separate, special event.
-	//nolint:errcheck // All checks are for mapstr.Put.
 	if ms.lastHost.Info.UniqueID != currentHost.Info.UniqueID {
 		/*
 		 Issue two events - one for the host with the old ID, one for the new
@@ -510,7 +508,7 @@ func getNetInfo() ([]net.IP, []net.HardwareAddr, error) {
 	}
 
 	// Keep track of all errors
-	var errs multierror.Errors
+	var errs []error
 
 	for _, i := range ifaces {
 		// Skip loopback interfaces
@@ -546,5 +544,5 @@ func getNetInfo() ([]net.IP, []net.HardwareAddr, error) {
 		}
 	}
 
-	return append(ipv4List, ipv6List...), hwList, errs.Err()
+	return append(ipv4List, ipv6List...), hwList, errors.Join(errs...)
 }
