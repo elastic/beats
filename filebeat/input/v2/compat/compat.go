@@ -135,6 +135,13 @@ func (r *runner) Start() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
 
+		// Ideally all inputs would use the registry from the beat.Info for its
+		// metrics. However, it isn't the case for most inputs. For compatibility
+		// beat.Info.Monitoring.Namespace is the global 'dataset' namespace for
+		// the standard beat. Only when running as OTel receiver it's different.
+		// The http monitoring will check both namespaces for input metrics.
+		// Therefore, using either namespace won't affect how the metrics are
+		// published.
 		reg, cancel := inputmon.NewInputRegistry(
 			name, r.id, r.agent.Monitoring.Namespace.GetRegistry())
 		err := r.input.Run(
