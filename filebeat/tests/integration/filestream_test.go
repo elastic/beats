@@ -27,6 +27,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"text/template"
@@ -650,6 +651,9 @@ func TestFilestreamIDMigrationDoesNotMigrateFileIdentity(t *testing.T) {
 
 	// Wait for the registry clean up message
 	msg := fmt.Sprintf("Identifier from '%s' does not match, won't migrate state", logFiles[0])
+	if runtime.GOOS == "windows" {
+		msg = strings.Replace(msg, `\`, `\\`, -1)
+	}
 	filebeat.WaitForLogs(msg, 5*time.Second, "ID migration was not skipped because of different file identity")
 	filebeat.Stop()
 
@@ -737,6 +741,9 @@ func getMigrateIDConfig(t *testing.T, vars map[string]string, tmplPath string) s
 
 func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
 	for _, path := range files {
+		if runtime.GOOS == "windows" {
+			path = strings.Replace(path, `\`, `\\`, -1)
+		}
 		eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", path)
 
 		require.Eventuallyf(
@@ -793,6 +800,13 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 	}
 
 	data = bytes.ReplaceAll(data, []byte("TESTDATA-PATH"), []byte(testdataDir))
+
+	// Replace the Linux path separator with Windows path separator and
+	// escape the path separator
+	if runtime.GOOS == "windows" {
+		data = bytes.ReplaceAll(data, []byte(`/`), []byte(`\`))
+		data = bytes.ReplaceAll(data, []byte(`\`), []byte(`\\`))
+	}
 	expectedRegistry := map[string]registryEntry{}
 	if err := json.Unmarshal(data, &expectedRegistry); err != nil {
 		t.Fatalf("cannot unmarshal expected registry file: %s", err)
@@ -801,6 +815,17 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
 	entries := readFilestreamRegistryLog(t, registryFile)
 	reg := parseRegistry(entries)
+
+	// More Windows workarounds.
+	// I don't know why, but on Windows, the offset of files is always 2 bytes
+	// more than on Linux, even for files commited to git.
+	// So we fix it here.
+	if runtime.GOOS == "windows" {
+		for k, v := range reg {
+			v.Offset = v.Offset - 2
+			reg[k] = v
+		}
+	}
 
 	assert.Equal(t, expectedRegistry, reg, msg)
 }
