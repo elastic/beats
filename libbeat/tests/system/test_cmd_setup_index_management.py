@@ -79,7 +79,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.enabled=false"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_not_loaded(self.data_stream+"ba")
+        self.idxmgmt.assert_index_template_not_loaded(self.data_stream + "ba")
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
