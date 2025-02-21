@@ -33,6 +33,10 @@ input:
         field: messages.enqueue.time.min
       - attr: ProducerCount
         field: producers.count
+    - mbean: 'org.apache.activemq:brokerName=*,destinationName=*,clientId=*,consumerId=*,endpoint=*,destinationType=Topic,type=Broker'
+      attributes:
+      - attr: PendingQueueSize
+        field: pending.queue.size
 processors:
   - script:
       lang: javascript
