@@ -210,6 +210,12 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
+	reg := cfg.InputRegistry
+	if reg == nil {
+		// No registry, then create a 'discard' registry.
+		reg = monitoring.NewRegistry()
+	}
+
 	client := &client{
 		logger:         p.monitors.Logger,
 		clientListener: cfg.ClientListener,
@@ -217,17 +223,16 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
 		observer:       p.observer,
+
+		inputRegistry: reg,
+		inputMetrics: inputMetrics{
+			inputEventsTotal:     monitoring.NewUint(reg, "events_pipeline_total"),
+			inputEventsFailed:    monitoring.NewUint(reg, "events_pipeline_failed_total"),
+			inputEventsFiltered:  monitoring.NewUint(reg, "events_pipeline_filtered_total"),
+			inputEventsPublished: monitoring.NewUint(reg, "events_pipeline_published_total"),
+		},
 	}
 
-	if cfg.InputRegistry != nil {
-		client.inputRegistry = cfg.InputRegistry
-		client.inputMetrics = inputMetrics{
-			inputEventsTotal:     monitoring.NewUint(cfg.InputRegistry, "events_pipeline_total"),
-			inputEventsFailed:    monitoring.NewUint(cfg.InputRegistry, "events_pipeline_failed_total"),
-			inputEventsFiltered:  monitoring.NewUint(cfg.InputRegistry, "events_pipeline_filtered_total"),
-			inputEventsPublished: monitoring.NewUint(cfg.InputRegistry, "events_pipeline_published_total"),
-		}
-	}
 	client.isOpen.Store(true)
 
 	ackHandler := cfg.EventListener

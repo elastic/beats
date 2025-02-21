@@ -302,7 +302,6 @@ func TestMonitoring(t *testing.T) {
 		telemetry := monitoring.NewRegistry()
 
 		beatInfo := beat.Info{}
-		beatInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMonitoring.outputMetrics")
 		pipeline, err := Load(
 			beatInfo,
 			Monitors{
@@ -335,106 +334,126 @@ func TestMonitoring(t *testing.T) {
 	})
 
 	t.Run("input metrics", func(t *testing.T) {
-		require.NoError(t, logp.TestingSetup(), "could not setup logger")
-
-		var config Config
-		err := conf.MustNewConfigFrom(map[string]interface{}{
-			"queue.mem.events":           32,
-			"queue.mem.flush.min_events": 1,
-			"queue.mem.flush.timeout":    time.Millisecond,
-		}).Unpack(&config)
-		require.NoError(t, err, "failed creating config")
-
 		inputID := "a-input-id"
-		publishErrKey := "publish_err"
-		filterMeKey := "filter_me"
 
 		beatInfo := beat.Info{}
-		beatInfo.Monitoring.Namespace = monitoring.GetNamespace("TestMonitoring.inputMetrics")
-		metrics := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry("metrics")
-		telemetry := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry("telemetry")
-		inputReg := beatInfo.Monitoring.Namespace.GetRegistry().NewRegistry(inputID)
+		beatInfo.Monitoring.Namespace =
+			monitoring.GetNamespace("TestMonitoring.inputMetrics")
 
-		pipeline, err := Load(
-			beatInfo,
-			Monitors{
-				Metrics:   metrics,
-				Telemetry: telemetry,
-			},
-			config,
-			testProcessorSupporter{
-				Processor: processorList{
-					processors: []beat.Processor{
-						&testProcessor{
-							name: "addMeta",
-							processorFn: func(in *beat.Event) (*beat.Event, error) {
-								var err error
-								if in.Meta == nil {
-									in.Meta = mapstr.M{}
-								}
-								_, err = in.Meta.Put("input_id", inputID)
-								assert.NoError(t, err, "add meta processor failed")
-								return in, nil
-							},
+		clientCfg := beat.ClientConfig{
+			InputRegistry: beatInfo.Monitoring.Namespace.
+				GetRegistry().NewRegistry(inputID)}
+		testInputMetrics(t, beatInfo, clientCfg, inputID)
+	})
+
+	t.Run("nil input metrics", func(t *testing.T) {
+		inputID := "a-input-id-nil-metrics"
+
+		beatInfo := beat.Info{}
+
+		clientCfg := beat.ClientConfig{}
+		testInputMetrics(t, beatInfo, clientCfg, inputID)
+	})
+}
+
+func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig, inputID string) {
+	require.NoError(t, logp.TestingSetup(), "could not setup logger")
+
+	var config Config
+	err := conf.MustNewConfigFrom(map[string]interface{}{
+		"queue.mem.events":           32,
+		"queue.mem.flush.min_events": 1,
+		"queue.mem.flush.timeout":    time.Millisecond,
+	}).Unpack(&config)
+	require.NoError(t, err, "failed creating config")
+
+	publishErrKey := "publish_err"
+	filterMeKey := "filter_me"
+
+	metrics := monitoring.NewRegistry()
+	telemetry := monitoring.NewRegistry()
+
+	pipeline, err := Load(
+		beatInfo,
+		Monitors{
+			Metrics:   metrics,
+			Telemetry: telemetry,
+		},
+		config,
+		testProcessorSupporter{
+			Processor: processorList{
+				processors: []beat.Processor{
+					&testProcessor{
+						name: "addMeta",
+						processorFn: func(in *beat.Event) (*beat.Event, error) {
+							var err error
+							if in.Meta == nil {
+								in.Meta = mapstr.M{}
+							}
+							_, err = in.Meta.Put("input_id", inputID)
+							assert.NoError(t, err, "add meta processor failed")
+							return in, nil
 						},
-						&testProcessor{
-							name: "filterProcessor",
-							processorFn: func(in *beat.Event) (*beat.Event, error) {
-								rawFilterMe, err := in.Fields.GetValue(filterMeKey)
-								if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
-									require.NoError(t, err, "could not get filter_me from Fields")
-								}
+					},
+					&testProcessor{
+						name: "filterProcessor",
+						processorFn: func(in *beat.Event) (*beat.Event, error) {
+							rawFilterMe, err := in.Fields.GetValue(filterMeKey)
+							if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+								require.NoError(t, err, "could not get filter_me from Fields")
+							}
 
-								filterMe, ok := rawFilterMe.(bool)
-								if filterMe && ok {
-									return nil, nil
-								}
-								return in, nil
-							},
+							filterMe, ok := rawFilterMe.(bool)
+							if filterMe && ok {
+								return nil, nil
+							}
+							return in, nil
 						},
 					},
 				},
 			},
-			func(outputs.Observer) (string, outputs.Group, error) {
-				return "output_name", outputs.Group{Clients: []outputs.Client{
-					newMockClient(func(publisher.Batch) error { return nil })},
-				}, nil
-			},
-		)
-		require.NoError(t, err)
+		},
+		func(outputs.Observer) (string, outputs.Group, error) {
+			return "output_name", outputs.Group{Clients: []outputs.Client{
+				newMockClient(func(publisher.Batch) error { return nil })},
+			}, nil
+		},
+	)
+	require.NoError(t, err)
 
-		c, err := pipeline.ConnectWith(beat.ClientConfig{InputRegistry: inputReg})
-		require.NoError(t, err, "pipeline.ConnectWith failed")
+	c, err := pipeline.ConnectWith(clientCfg)
+	require.NoError(t, err, "pipeline.ConnectWith failed")
 
-		cc, ok := c.(*client)
-		require.True(t, ok, "pipeline.ConnectWith return value cannot be cast to client")
-		cc.producer = &testProducer{publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
-			e, ok := event.(publisher.Event)
-			require.True(t, ok, "queue.Entry cannot be cast to publisher.Event")
+	cc, ok := c.(*client)
+	require.True(t, ok, "pipeline.ConnectWith return value cannot be cast to client")
+	cc.producer = &testProducer{publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+		e, ok := event.(publisher.Event)
+		require.True(t, ok, "queue.Entry cannot be cast to publisher.Event")
 
-			rawFail, err := e.Content.Fields.GetValue(publishErrKey)
-			if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
-				require.NoError(t, err, "failed getting 'publish_err' from event Meta")
-			}
-			fail, ok := rawFail.(bool)
-			if fail && ok {
-				return queue.EntryID(1), false
-			}
-			return queue.EntryID(1), true
-		}}
+		rawFail, err := e.Content.Fields.GetValue(publishErrKey)
+		if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+			require.NoError(t, err, "failed getting 'publish_err' from event Meta")
+		}
+		fail, ok := rawFail.(bool)
+		if fail && ok {
+			return queue.EntryID(1), false
+		}
+		return queue.EntryID(1), true
+	}}
 
-		c.PublishAll([]beat.Event{
-			{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
-			{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
-			{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
-		})
-		c.PublishAll([]beat.Event{
-			{Fields: mapstr.M{publishErrKey: true}, Meta: mapstr.M{}},
-			{Fields: mapstr.M{publishErrKey: true}, Meta: mapstr.M{}},
-		})
-		c.Publish(beat.Event{Meta: mapstr.M{}})
-		require.NoError(t, c.Close())
+	c.PublishAll([]beat.Event{
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+	})
+	c.PublishAll([]beat.Event{
+		{Fields: mapstr.M{publishErrKey: true}, Meta: mapstr.M{}},
+		{Fields: mapstr.M{publishErrKey: true}, Meta: mapstr.M{}},
+	})
+	c.Publish(beat.Event{Meta: mapstr.M{}})
+	require.NoError(t, c.Close())
 
+	if clientCfg.InputRegistry != nil {
 		total, filtered, dropped, published := getMetrics(t, beatInfo, inputID)
 
 		assert.Equal(t,
@@ -448,9 +467,8 @@ func TestMonitoring(t *testing.T) {
 			"should have 2 dropped events")
 		assert.Equal(t, 1, int(published.Get()),
 			"should have 1 published event")
-	})
+	}
 }
-
 func getMetrics(t *testing.T, beatInfo beat.Info, inputID string) (
 	*monitoring.Uint, *monitoring.Uint, *monitoring.Uint, *monitoring.Uint) {
 	t.Helper()
