@@ -18,12 +18,10 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
-	"syscall"
-
-	"errors"
 
 	"golang.org/x/term"
 )
@@ -64,7 +62,7 @@ func stdin(p string) (string, error) {
 	//nolint:forbidigo // ignore
 	fmt.Print("Enter password: ")
 	//nolint:unconvert // needed for cross-compilation
-	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+	bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
 		return "", fmt.Errorf("reading password input: %w", err)
 	}
