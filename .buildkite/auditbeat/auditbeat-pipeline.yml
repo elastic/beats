@@ -473,7 +473,7 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
-          cd.buildkite/scripts/packaging/packaging.sh auditbeat
+          .buildkite/scripts/packaging/packaging.sh auditbeat
         retry:
           automatic:
             - limit: 1

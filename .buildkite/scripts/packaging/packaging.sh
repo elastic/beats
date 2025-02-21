@@ -2,12 +2,7 @@
 
 set -ueo pipefail
 
-BEAT_DIR=${1:-""}
-
-if [ -z "$BEAT_DIR" ]; then
-    echo "Error: Beat directory must be specified."
-    exit 1
-fi
+BEAT_DIR=${1:?-"Error: Beat directory must be specified."}
 
 docker run --privileged --rm tonistiigi/binfmt:master --install all
 
