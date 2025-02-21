@@ -208,7 +208,7 @@ steps:
               context: "filebeat: Win 2022 Unit Tests"
 
       - label: ":windows: Filebeat: Win 2022 Integration Tests"
-        key: "windows-2022-unit-tests"
+        key: "windows-2022-integration-tests"
         command: |
           Set-Location -Path filebeat
           mage goIntegTest
