@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/go-concert/unison"
 )
@@ -78,6 +79,8 @@ type Context struct {
 
 	// The input ID.
 	ID string
+	// Name is the inout name
+	Name string
 
 	// The input ID without name. Some inputs append sourcename, we need the id to be untouched
 	// https://github.com/elastic/beats/blob/43d80af2aea60b0c45711475d114e118d90c4581/filebeat/input/v2/input-cursor/input.go#L118
@@ -86,9 +89,13 @@ type Context struct {
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
+	// Registry to collect metrics for this input.
+	Registry *monitoring.Registry
+	// RegistryCancel unregisters Registry and release the associated resources.
+	RegistryCancel func()
+
 	// Cancelation is used by Beats to signal the input to shutdown.
 	Cancelation Canceler
-
 	// StatusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.

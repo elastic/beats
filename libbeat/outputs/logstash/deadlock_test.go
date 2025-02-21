@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// flaky?
 func TestDeadlockListener(t *testing.T) {
 	const timeout = 5 * time.Millisecond
 	log := logp.NewLogger("test")
