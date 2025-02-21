@@ -386,7 +386,8 @@ func TestClientPublishTracer(t *testing.T) {
 
 func connectTestEsWithStats(t *testing.T, cfg interface{}, suffix string) (outputs.Client, *Client) {
 	m := monitoring.Default.NewRegistry("output-" + suffix)
-	s := outputs.NewStats(m)
+	internal := monitoring.Default.NewRegistry("internal.output-" + suffix)
+	s := outputs.NewStats(m, internal)
 	return connectTestEs(t, cfg, s)
 }
 

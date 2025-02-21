@@ -23,6 +23,8 @@ import (
 
 	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -81,7 +83,21 @@ func globalRegistry() *monitoring.Registry {
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' monitoring namespace encoded as a JSON array (pretty formatted).
-func MetricSnapshotJSON() ([]byte, error) {
-	return json.MarshalIndent(filteredSnapshot(globalRegistry(), ""), "", "  ")
+// global 'dataset' and libbeatmonitoring.RegistryNameInternalInputs monitoring
+// namespace from the beatInfo instance. It returns a pretty formated JSON array
+// as a byte slice.
+func MetricSnapshotJSON(beatInfo beat.Info) ([]byte, error) {
+	intReg := beatInfo.Monitoring.Namespace.GetRegistry().
+		GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	if intReg == nil {
+		intReg = beatInfo.Monitoring.Namespace.GetRegistry().
+			NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+	}
+	return json.MarshalIndent(
+		filteredSnapshot(
+			globalRegistry(),
+			intReg,
+			""),
+		"",
+		"  ")
 }

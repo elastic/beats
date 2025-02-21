@@ -147,6 +147,7 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		InputID:       ctx.ID,
 		EventListener: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {

@@ -22,9 +22,40 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
+
+// inputStats holds the metrics for a specific input
+type inputStats struct {
+	// Number of calls to the output's Publish function
+	eventsBatches *monitoring.Uint
+
+	// Number of events sent to the output's Publish function.
+	eventsTotal *monitoring.Uint
+
+	// Number of events accepted by the output's receiver.
+	eventsACKed *monitoring.Uint
+
+	// Number of failed events ingested to the dead letter index
+	eventsDeadLetter *monitoring.Uint
+
+	// Number of events that reported a retryable error from the output's
+	// receiver.
+	eventsFailed *monitoring.Uint
+
+	// Number of events that were dropped due to a non-retryable error.
+	eventsDropped *monitoring.Uint
+
+	// Number of events rejected by the output's receiver for being duplicates.
+	eventsDuplicates *monitoring.Uint
+
+	// (Gauge) Number of events that have been sent to the output's Publish
+	// call but have not yet been ACKed,
+	eventsActive *monitoring.Uint // (gauge) events sent and waiting for ACK/fail from output
+}
 
 // Stats implements the Observer interface, for collecting metrics on common
 // outputs events.
@@ -63,6 +94,12 @@ type Stats struct {
 	// These events are also included in eventsFailed.
 	eventsTooMany *monitoring.Uint
 
+	// Output event stats per input
+	inputs map[string]inputStats
+	// The input internal metrics registry where the per input metrics are
+	// stored.
+	inputsReg *monitoring.Registry
+
 	// Output batch stats
 
 	// Number of times a batch was split for being too large
@@ -83,8 +120,18 @@ type Stats struct {
 // NewStats creates a new Stats instance using a backing monitoring registry.
 // This function will create and register a number of metrics with the registry passed.
 // The registry must not be null.
-func NewStats(reg *monitoring.Registry) *Stats {
+func NewStats(reg *monitoring.Registry, internal *monitoring.Registry) *Stats {
+	inpInternalReg := internal.GetRegistry(
+		libbeatmonitoring.RegistryNameInternalInputs)
+	if inpInternalReg == nil {
+		inpInternalReg = internal.NewRegistry(
+			libbeatmonitoring.RegistryNameInternalInputs)
+	}
+
 	obj := &Stats{
+		inputsReg: inpInternalReg,
+		inputs:    map[string]inputStats{},
+
 		eventsBatches:    monitoring.NewUint(reg, "events.batches"),
 		eventsTotal:      monitoring.NewUint(reg, "events.total"),
 		eventsACKed:      monitoring.NewUint(reg, "events.acked"),
@@ -118,6 +165,27 @@ func (s *Stats) NewBatch(n int) {
 	}
 }
 
+// NewBatch updates active batch and event metrics.
+func (s *Stats) NewBatchE(evs []publisher.Event) {
+	if s == nil {
+		return
+	}
+
+	s.eventsBatches.Inc()
+	s.eventsTotal.Add(uint64(len(evs)))
+	s.eventsActive.Add(uint64(len(evs)))
+
+	for _, e := range evs {
+		inpM := s.inputMetrics(e)
+		if inpM == nil {
+			continue
+		}
+		inpM.eventsBatches.Inc()
+		inpM.eventsTotal.Add(1)
+		inpM.eventsActive.Add(1)
+	}
+}
+
 func (s *Stats) ReportLatency(time time.Duration) {
 	s.sendLatencyMillis.Update(time.Milliseconds())
 }
@@ -130,10 +198,51 @@ func (s *Stats) AckedEvents(n int) {
 	}
 }
 
+// AckedEvents updates active and acked event metrics.
+func (s *Stats) AckedEvent(e publisher.Event) {
+	if s == nil {
+		return
+	}
+	s.eventsACKed.Add(uint64(1))
+	s.eventsActive.Sub(uint64(1))
+
+	inpM := s.inputMetrics(e)
+	if inpM == nil {
+		return
+	}
+	inpM.eventsACKed.Add(1)
+	inpM.eventsActive.Sub(1)
+}
+
+// AckedEvents updates active and acked event metrics.
+func (s *Stats) AckedEventsE(evs []publisher.Event) {
+	if s == nil {
+		return
+	}
+	s.eventsACKed.Add(uint64(len(evs)))
+	s.eventsActive.Sub(uint64(len(evs)))
+
+	for _, e := range evs {
+		inpM := s.inputMetrics(e)
+		if inpM == nil {
+			continue
+		}
+		inpM.eventsACKed.Add(1)
+		inpM.eventsActive.Sub(1)
+	}
+}
+
 func (s *Stats) DeadLetterEvents(n int) {
 	if s != nil {
 		s.eventsDeadLetter.Add(uint64(n))
 		s.eventsActive.Sub(uint64(n))
+	}
+}
+
+func (s *Stats) DeadLetterEventsE(evs []publisher.Event) {
+	if s != nil {
+		s.eventsDeadLetter.Add(uint64(len(evs)))
+		s.eventsActive.Sub(uint64(len(evs)))
 	}
 }
 
@@ -153,6 +262,24 @@ func (s *Stats) DuplicateEvents(n int) {
 	}
 }
 
+// DuplicateEvents updates the active and duplicate event metrics.
+func (s *Stats) DuplicateEventsE(evs []publisher.Event) {
+	if s == nil {
+		return
+	}
+	s.eventsDuplicates.Add(uint64(len(evs)))
+	s.eventsActive.Sub(uint64(len(evs)))
+
+	for _, e := range evs {
+		inpM := s.inputMetrics(e)
+		if inpM == nil {
+			continue
+		}
+		inpM.eventsDuplicates.Add(1)
+		inpM.eventsActive.Sub(1)
+	}
+}
+
 // PermanentErrors updates total number of event drops as reported by the output.
 // Outputs will only report dropped events on fatal errors which lead to the
 // event not being publishable. For example encoding errors or total event size
@@ -162,6 +289,68 @@ func (s *Stats) PermanentErrors(n int) {
 	if s != nil {
 		s.eventsActive.Sub(uint64(n))
 		s.eventsDropped.Add(uint64(n))
+	}
+}
+
+func (s *Stats) PermanentError(e publisher.Event) {
+	if s == nil {
+		return
+	}
+
+	// total number of dropped events (e.g. encoding failures)
+	s.eventsActive.Sub(1)
+	s.eventsDropped.Add(1)
+
+	inpM := s.inputMetrics(e)
+	if inpM == nil {
+		return
+	}
+
+	inpM.eventsActive.Sub(1)
+	inpM.eventsDropped.Add(1)
+}
+
+func (s *Stats) inputMetrics(e publisher.Event) *inputStats {
+	// per input metric
+	if e.InputID == "" {
+		// no input information, nothing else to do
+		return nil
+	}
+	inpM, ok := s.inputs[e.InputID]
+	if !ok {
+		reg := s.inputsReg.GetRegistry(e.InputID)
+		if reg == nil {
+			reg = s.inputsReg.NewRegistry(e.InputID)
+		}
+
+		inpM = inputStats{
+			eventsBatches: monitoring.NewUint(reg,
+				"events_output_batches"),
+			eventsTotal: monitoring.NewUint(reg,
+				"events_output_total"),
+			eventsACKed: monitoring.NewUint(reg,
+				"events_output_acked"),
+			eventsDeadLetter: monitoring.NewUint(reg,
+				"events_output_dead_letter"),
+			eventsFailed: monitoring.NewUint(reg,
+				"events_output_failed"),
+			eventsDropped: monitoring.NewUint(reg,
+				"events_output_dropped"),
+			eventsDuplicates: monitoring.NewUint(reg,
+				"events_output_duplicates"),
+			eventsActive: monitoring.NewUint(reg,
+				"events_output_active"),
+		}
+		s.inputs[e.InputID] = inpM
+	}
+	return &inpM
+}
+
+func (s *Stats) PermanentErrorsE(evs []publisher.Event) {
+	// number of dropped events (e.g. encoding failures)
+	if s != nil {
+		s.eventsActive.Sub(uint64(len(evs)))
+		s.eventsDropped.Add(uint64(len(evs)))
 	}
 }
 

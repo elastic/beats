@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	libbeatmonitoring "github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
@@ -131,7 +132,15 @@ func New(
 	}
 
 	if monitors.Metrics != nil {
-		p.observer = newMetricsObserver(monitors.Metrics)
+		beatsIntReg := beat.Monitoring.Namespace.GetRegistry().
+			GetRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+		if beatsIntReg == nil {
+			beatsIntReg = beat.Monitoring.Namespace.GetRegistry().
+				NewRegistry(libbeatmonitoring.RegistryNameInternalInputs)
+		}
+		p.observer = newMetricsObserver(
+			monitors.Metrics,
+			beatsIntReg)
 	}
 
 	// Convert the raw queue config to a parsed Settings object that will
@@ -180,7 +189,7 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // ConnectWith create a new Client for publishing events to the pipeline.
 // The client behavior on close and ACK handling can be configured by setting
 // the appropriate fields in the passed ClientConfig.
-// If not set otherwise the defaut publish mode is OutputChooses.
+// If not set otherwise the default publish mode is OutputChooses.
 //
 // It is responsibility of the caller to close the client.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
@@ -209,6 +218,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client := &client{
+		inputID:        cfg.InputID,
 		logger:         p.monitors.Logger,
 		clientListener: cfg.ClientListener,
 		processors:     processors,
