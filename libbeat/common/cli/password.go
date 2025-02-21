@@ -61,7 +61,6 @@ func ReadPassword(def string) (string, error) {
 func stdin(p string) (string, error) {
 	//nolint:forbidigo // ignore
 	fmt.Print("Enter password: ")
-	//nolint:unconvert // needed for cross-compilation
 	bytePassword, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
 		return "", fmt.Errorf("reading password input: %w", err)
