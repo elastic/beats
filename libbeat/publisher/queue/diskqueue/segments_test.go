@@ -61,9 +61,6 @@ func TestSegmentsRoundTrip(t *testing.T) {
 		dst := make([]byte, len(tc.plaintext))
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
 		settings.UseCompression = tc.compress
 		qs := &queueSegment{
 			id: tc.id,
@@ -86,7 +83,7 @@ func TestSegmentsRoundTrip(t *testing.T) {
 
 		assert.Equal(t, len(dst), n, name)
 
-		//make sure we read back what we wrote
+		// make sure we read back what we wrote
 		assert.Equal(t, tc.plaintext, dst, name)
 
 		_, err = sr.Read(dst)
@@ -134,9 +131,6 @@ func TestSegmentReaderSeek(t *testing.T) {
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
 		settings.UseCompression = tc.compress
 
 		qs := &queueSegment{
@@ -154,7 +148,7 @@ func TestSegmentReaderSeek(t *testing.T) {
 		sw.Close()
 		sr, err := qs.getReader(settings)
 		assert.Nil(t, err, name)
-		//seek to second data piece
+		// seek to second data piece
 		n, err := sr.Seek(segmentHeaderSize+int64(len(tc.plaintexts[0])), io.SeekStart)
 		assert.Nil(t, err, name)
 		assert.Equal(t, segmentHeaderSize+int64(len(tc.plaintexts[0])), n, name)
@@ -209,9 +203,6 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 	for name, tc := range tests {
 		settings := DefaultSettings()
 		settings.Path = dir
-		if tc.encrypt {
-			settings.EncryptionKey = []byte("keykeykeykeykeyk")
-		}
 		settings.UseCompression = tc.compress
 		qs := &queueSegment{
 			id: tc.id,
@@ -226,7 +217,7 @@ func TestSegmentReaderSeekLocations(t *testing.T) {
 		sw.Close()
 		sr, err := qs.getReader(settings)
 		assert.Nil(t, err, name)
-		//seek to location
+		// seek to location
 		_, err = sr.Seek(tc.location, io.SeekStart)
 		assert.NotNil(t, err, name)
 	}
