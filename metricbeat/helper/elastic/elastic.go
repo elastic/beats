@@ -21,11 +21,12 @@ import (
 	"errors"
 	"fmt"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
