@@ -307,9 +307,15 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	if settings.DisableConfigResolver {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
-	} else {
+	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
 		config.OverwriteConfigOpts(configOpts(store))
+	} else {
+		config.OverwriteConfigOpts([]ucfg.Option{
+			ucfg.PathSep("."),
+			ucfg.ResolveEnv,
+			ucfg.VarExp,
+		})
 	}
 
 	b.Beat.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
@@ -1004,9 +1010,15 @@ func (b *Beat) configure(settings Settings) error {
 
 	if settings.DisableConfigResolver {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
-	} else {
+	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
 		config.OverwriteConfigOpts(configOpts(store))
+	} else {
+		config.OverwriteConfigOpts([]ucfg.Option{
+			ucfg.PathSep("."),
+			ucfg.ResolveEnv,
+			ucfg.VarExp,
+		})
 	}
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
