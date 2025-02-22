@@ -18,12 +18,14 @@
 package elastic
 
 import (
+	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -100,7 +102,7 @@ func ReportErrorForMissingField(field string, product Product, r mb.ReporterV2) 
 // MakeErrorForMissingField returns an error message for the given field being missing in an API
 // response received from a given product
 func MakeErrorForMissingField(field string, product Product) error {
-	return fmt.Errorf("Could not find field '%v' in %v API response", field, strings.Title(product.String()))
+	return fmt.Errorf("could not find field '%v' in %v API response", field, cases.Title(language.English).String(product.String()))
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version
@@ -120,7 +122,7 @@ func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
 // for it's date fields: https://github.com/elastic/elasticsearch/pull/36691
 func FixTimestampField(m mapstr.M, field string) error {
 	v, err := m.GetValue(field)
-	if err == mapstr.ErrKeyNotFound {
+	if errors.Is(err, mapstr.ErrKeyNotFound) {
 		return nil
 	}
 	if err != nil {
@@ -161,10 +163,19 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 	metricsets := xpackEnabledMetricsets
 	if err == nil && cfgdMetricsets != nil {
 		// Type cast the metricsets to a slice of strings
-		cfgdMetricsetsSlice := cfgdMetricsets.([]interface{})
-		cfgdMetricsetsStrings := make([]string, len(cfgdMetricsetsSlice))
+		cfgdMetricsetsSlice, ok := cfgdMetricsets.([]interface{})
+
+		if !ok {
+			return nil, fmt.Errorf("configured metricsets are not an array for module %v: %v", moduleName, cfgdMetricsets)
+		}
+
+		cfgdMetricsetsStrings := make([]string, 0, len(cfgdMetricsetsSlice))
 		for i := range cfgdMetricsetsSlice {
-			cfgdMetricsetsStrings[i] = cfgdMetricsetsSlice[i].(string)
+			asString, ok := cfgdMetricsetsSlice[i].(string)
+
+			if ok {
+				cfgdMetricsetsStrings[i] = asString
+			}
 		}
 
 		// Add any optional metricsets which are not already configured
