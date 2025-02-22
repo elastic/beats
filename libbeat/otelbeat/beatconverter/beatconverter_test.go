@@ -47,6 +47,7 @@ exporters:
     batcher:
       enabled: true
       max_size_items: 1600
+      min_size_items: 0
     mapping:
       mode: bodymap       
 `
@@ -189,6 +190,7 @@ exporters:
     batcher:
       enabled: true
       max_size_items: 1600
+      min_size_items: 0
     mapping:
       mode: bodymap       
 receivers:
