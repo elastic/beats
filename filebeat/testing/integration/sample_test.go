@@ -113,6 +113,8 @@ output.console:
 	})
 
 	t.Run("Filebeat crashes due to incorrect config", func(t *testing.T) {
+		t.Skip("Flaky test: https://github.com/elastic/beats/issues/42778")
+
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 

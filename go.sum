@@ -370,8 +370,8 @@ github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f h1:TsPpU5EAwlt
 github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f/go.mod h1:HHaWnZamYKWsR9/eZNHqRHob8iQDKnchHmmskT/SKko=
 github.com/elastic/go-perf v0.0.0-20241029065020-30bec95324b8 h1:FD01NjsTes0RxZVQ22ebNYJA4KDdInVnR9cn1hmaMwA=
 github.com/elastic/go-perf v0.0.0-20241029065020-30bec95324b8/go.mod h1:Nt+pnRYvf0POC+7pXsrv8ubsEOSsaipJP0zlz1Ms1RM=
-github.com/elastic/go-quark v0.2.0 h1:r2BL4NzvhESrrL/yA3AcHt8mwF7fvQDssBAUiOL1sdg=
-github.com/elastic/go-quark v0.2.0/go.mod h1:/ngqgumD/Z5vnFZ4XPN2kCbxnEfG5/Uc+bRvOBabVVA=
+github.com/elastic/go-quark v0.3.0 h1:d4vokx0psEJo+93fnhvWpTJMggPd9rfMJSleoLva4xA=
+github.com/elastic/go-quark v0.3.0/go.mod h1:bO/XIGZBUJGxyiJ9FTsSYn9YlfOTRJnmOP+iBE2FyjA=
 github.com/elastic/go-seccomp-bpf v1.5.0 h1:gJV+U1iP+YC70ySyGUUNk2YLJW5/IkEw4FZBJfW8ZZY=
 github.com/elastic/go-seccomp-bpf v1.5.0/go.mod h1:umdhQ/3aybliBF2jjiZwS492I/TOKz+ZRvsLT3hVe1o=
 github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727 h1:yuiN60oaQUz2PtNpNhDI2H6zrCdfiiptmNdwV5WUaKA=
@@ -901,8 +901,8 @@ github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/stretchr/testify v1.8.2/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
-github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
-github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
+github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
+github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 github.com/teambition/rrule-go v1.8.2 h1:lIjpjvWTj9fFUZCmuoVDrKVOtdiyzbzc93qTmRVe/J8=
 github.com/teambition/rrule-go v1.8.2/go.mod h1:Ieq5AbrKGciP1V//Wq8ktsTXwSwJHDD5mD/wLBGl3p4=
 github.com/tidwall/gjson v1.18.0 h1:FIDeeyB800efLX89e5a8Y0BNH+LOngJyGrIWxG2FKQY=

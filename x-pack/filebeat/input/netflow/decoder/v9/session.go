@@ -5,11 +5,12 @@
 package v9
 
 import (
-	"log"
 	"net"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
@@ -45,12 +46,12 @@ type SessionState struct {
 	mutex        sync.RWMutex
 	Templates    map[TemplateKey]*TemplateWrapper
 	lastSequence uint32
-	logger       *log.Logger
+	logger       *logp.Logger
 	Delete       atomic.Bool
 }
 
 // NewSession creates a new session.
-func NewSession(logger *log.Logger) *SessionState {
+func NewSession(logger *logp.Logger) *SessionState {
 	return &SessionState{
 		logger:    logger,
 		Templates: make(map[TemplateKey]*TemplateWrapper),
@@ -59,7 +60,7 @@ func NewSession(logger *log.Logger) *SessionState {
 
 // AddTemplate adds the passed template.
 func (s *SessionState) AddTemplate(t *template.Template) {
-	s.logger.Printf("state %p addTemplate %d %p", s, t.ID, t)
+	s.logger.Debugf("state %p addTemplate %d %p", s, t.ID, t)
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	s.Templates[TemplateKey(t.ID)] = &TemplateWrapper{Template: t}
@@ -94,7 +95,7 @@ func (s *SessionState) ExpireTemplates() (alive int, removed int) {
 		total = len(s.Templates)
 		for _, id := range toDelete {
 			if template, found := s.Templates[id]; found && template.Delete.Load() {
-				s.logger.Printf("expired template %v", id)
+				s.logger.Debugf("expired template %v", id)
 				delete(s.Templates, id)
 				removed++
 			}
@@ -125,12 +126,12 @@ func isValidSequence(current, next uint32) bool {
 type SessionMap struct {
 	mutex    sync.RWMutex
 	Sessions map[SessionKey]*SessionState
-	logger   *log.Logger
+	logger   *logp.Logger
 	metric   config.ActiveSessionsMetric
 }
 
 // NewSessionMap returns a new SessionMap.
-func NewSessionMap(logger *log.Logger, metric config.ActiveSessionsMetric) SessionMap {
+func NewSessionMap(logger *logp.Logger, metric config.ActiveSessionsMetric) SessionMap {
 	return SessionMap{
 		logger:   logger,
 		Sessions: make(map[SessionKey]*SessionState),
@@ -216,7 +217,7 @@ func (m *SessionMap) CleanupLoop(interval time.Duration, done <-chan struct{}) {
 		case <-t.C:
 			aliveS, removedS, aliveT, removedT := m.cleanup()
 			if removedS > 0 || removedT > 0 {
-				m.logger.Printf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
+				m.logger.Debugf("Expired %d sessions (%d remain) / %d templates (%d remain)", removedS, aliveS, removedT, aliveT)
 			}
 		}
 	}
