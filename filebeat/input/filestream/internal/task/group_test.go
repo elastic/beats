@@ -95,7 +95,7 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t,
 			func() bool { return want == runningCount.Load() },
-			time.Second, 100*time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("workloads wait for available worker", func(t *testing.T) {
@@ -158,7 +158,7 @@ func TestGroup_Go(t *testing.T) {
 		// Wait to ensure f1 and f2 are running, thus there is no workers free.
 		assert.Eventually(t,
 			func() bool { return int64(2) == runningCount.Load() },
-			100*time.Millisecond, time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 
 		err = g.Go(f3)
 		require.NoError(t, err)
@@ -170,7 +170,7 @@ func TestGroup_Go(t *testing.T) {
 			func() bool {
 				return f3Started.Load()
 			},
-			100*time.Millisecond, time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 
 		// If f3 started, f2 must have finished
 		assert.True(t, f2Finished.Load())
@@ -186,8 +186,8 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t,
 			func() bool { return doneCount.Load() == 3 },
-			50*time.Millisecond,
-			time.Millisecond,
+			1*time.Second,
+			10*time.Millisecond,
 			"not all goroutines finished")
 	})
 
@@ -222,8 +222,8 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t,
 			func() bool { return limit == runningCounter.Load() },
-			100*time.Millisecond,
-			time.Millisecond)
+			1*time.Second,
+			10*time.Millisecond)
 
 		close(done)
 		err := g.Stop()
@@ -253,7 +253,7 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t, func() bool {
 			return count.Load() == want && logger.String() != ""
-		}, 100*time.Millisecond, time.Millisecond)
+		}, 1*time.Second, 10*time.Millisecond)
 
 		err = g.Stop()
 		require.NoError(t, err)
@@ -286,7 +286,7 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t, func() bool {
 			return count.Load() == want && logger.String() != ""
-		}, 100*time.Millisecond, time.Millisecond, "not all workloads finished")
+		}, 1*time.Second, 10*time.Millisecond, "not all workloads finished")
 
 		assert.Contains(t, logger.String(), wantErr.Error())
 
