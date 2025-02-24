@@ -155,7 +155,7 @@ func TestIpfixWithRandomData(t *testing.T) {
 				CustomDefinitions: nil,
 			}
 			ioReader := bytes.NewReader(tc.data)
-			rows := readAndValidateIpfixFile(t, cfg, ioReader)
+			rows := readAndValidateIpfixData(t, cfg, ioReader)
 			// asserts of number of rows read is the same as the number of rows written
 			t.Logf("This file had [%v] rows", rows)
 			//assert.Equal(t, rows, tc.rows)
@@ -163,7 +163,7 @@ func TestIpfixWithRandomData(t *testing.T) {
 	}
 }
 
-func readAndValidateIpfixFile(t *testing.T, cfg *Config, reader io.Reader) int {
+func readAndValidateIpfixData(t *testing.T, cfg *Config, reader io.Reader) int {
 	sReader, err := NewBufferedReader(reader, cfg)
 	if err != nil {
 		t.Fatalf("failed to init stream reader: %v", err)

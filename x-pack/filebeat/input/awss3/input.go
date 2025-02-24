@@ -23,7 +23,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	ipfix_reader "github.com/elastic/beats/v7/x-pack/libbeat/reader/ipfix"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
@@ -60,7 +59,7 @@ type s3IpfixPollerInput struct {
 	config           s3IpfixPollerConfig
 	store            beater.StateStore
 	provider         string
-	metrics          *netflowMetrics
+	Metrics          *netflowMetrics
 	states           *states
 	filterProvider   *filterProvider
 	client           beat.Client
@@ -70,19 +69,28 @@ type s3IpfixPollerInput struct {
 	ctx              context.Context
 	cancelFunc       context.CancelFunc
 	w                chan bool
+
+	// Workers send on workRequestChan to indicate they're ready for the next
+	// message, and the reader loop replies on workResponseChan.
+	workRequestChan  chan struct{}
+	workResponseChan chan string
+
 }
 
 // XXX: this is a hack
 func newS3IpfixPollerInput(
 	config config,
 	store beater.StateStore,
-) (v2.Input, error) {
+) *s3IpfixPollerInput {
 	cfg := s3IpfixPollerConfig{ip: config, Paths: config.IpfixPaths}
 	return &s3IpfixPollerInput{
 		config:         cfg,
 		store:          store,
 		filterProvider: newFilterProvider(&config),
-	}, nil
+
+		workRequestChan: make(chan struct{}, 1),
+		workResponseChan: make(chan string),
+	}
 }
 
 // XXX: this is a hack
@@ -94,13 +102,6 @@ func (in *s3IpfixPollerInput) Test(ctx v2.TestContext) error {
 }
 
 // XXX: this is a hack
-func (n *s3IpfixPollerInput) stop(){
-	n.logger.Info("stopping")
-	<- n.ctx.Done()
-	n.w <- true
-}
-
-// XXX: this is a hack
 type FilePattern struct {
 	Patterns       []*regexp.Regexp
 	Dir            string
@@ -108,7 +109,33 @@ type FilePattern struct {
 }
 
 // XXX: this is a hack
-func newFilePattern(dir string, rexes []*regexp.Regexp) *FilePattern {
+func newFilePattern(logger *logp.Logger, paths []string) *FilePattern {
+	var rexes []*regexp.Regexp
+	var dir string
+	for _,path_ := range paths {
+		reg := filepath.Base(path_)
+		d := filepath.Dir(path_)
+		if d != "." {
+			if dir != "" && dir != d {
+				logger.Errorf("There can only be one dir we are watching! We have two: %q, %q", d, dir)
+				logger.Warnf("Ignoring %q", path_)
+				continue
+			}
+			dir = d
+		}
+		r,err := regexp.Compile(reg)
+		if err != nil {
+			logger.Warnf("Ignoring path [%s], due to [%v]", reg, err)
+		} else {
+			rexes = append(rexes, r)
+		}
+	}
+
+	// XXX: this is a hack
+	if dir == "" {
+		dir = "/var/run/srv/netflow"
+	}
+
 	processed := make(map[string]interface{})
 	result := FilePattern{
 		Dir: dir,
@@ -147,139 +174,132 @@ func (fp *FilePattern) getNextFile() (string, error) {
 	return "", nil
 }
 
+func (in *s3IpfixPollerInput) setup(
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+) error {
+
+	in.logger = inputContext.Logger.Named("s3-ipfix")
+	in.pipeline = pipeline
+
+	in.Metrics = newMetrics(inputContext.ID)
+
+	return nil
+}
+
+// XXX: this is a hack
+func (n *s3IpfixPollerInput) run(ctx context.Context) {
+	// start building the watcher
+
+	// start workers (only one)
+	n.wg.Add(1)
+	go func() {
+		defer n.wg.Done()
+		worker, err := n.newWorker(ctx)
+		if err != nil {
+			n.logger.Error(err)
+			return
+		}
+		go worker.run(ctx)
+	}()
+
+	// reader loop
+	fp := newFilePattern(n.logger, n.config.Paths)
+
+	// keep regular expressions
+	// read the channel
+	// track files we have looked at
+	stop := false
+	for {
+		if stop {
+			break
+		}
+
+		// wait on getting a new request
+		select {
+		case <-ctx.Done():
+			return
+		case <-n.workRequestChan:
+		}
+
+		// loop until we get another file
+		ticker := time.NewTicker(1 * time.Second)
+		innerStop := false
+		fpath := ""
+		for {
+			if innerStop {
+				break
+			}
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				tmp, _ := fp.getNextFile()
+				if tmp != "" {
+					fpath = tmp
+					innerStop = true
+				}
+			}
+		}
+
+		select {
+		case <-ctx.Done():
+			return
+		case n.workResponseChan<-fpath:
+		}
+	}
+
+	n.wg.Wait()
+}
+
 // XXX: this is a hack
 func (n *s3IpfixPollerInput) Run(
 	env v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	n.logger = env.Logger.Named("s3")
-	n.pipeline = pipeline
 
-	n.ctx = v2.GoContextFromCanceler(env.Cancelation)
+	n.setup(env, pipeline)
+	ctx := v2.GoContextFromCanceler(env.Cancelation)
 
-	n.metrics = newMetrics(env.ID)
+	n.run(ctx)
 
-	// start building the watcher
-
-	n.logger.Info("Starting netflow input")
-
-	n.logger.Info("Connecting to beat event publishing")
-
-	const pollInterval = time.Minute
-
-	n.metrics = newMetrics("nfipfix")
-	var err error
-
-	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		PublishMode: beat.DefaultGuarantees,
-		Processing: beat.ProcessingConfig{
-			EventNormalization: boolPtr(false),
-		},
-		EventListener: nil,
-	})
-	if err != nil {
-		env.UpdateStatus(status.Failed, fmt.Sprintf("Failed connecting to beat event publishing: %v", err))
-		n.logger.Errorw("Failed connecting to beat event publishing", "error", err)
-		n.stop()
-		return err
-	}
-
-	n.client = client
-	n.wg.Add(1)
-
-	var rexes []*regexp.Regexp
-	var dir string
-	for _,path_ := range n.config.Paths {
-		reg := filepath.Base(path_)
-		d := filepath.Dir(path_)
-		if d != "." {
-			if dir != "" && dir != d {
-				n.logger.Errorf("There can only be one dir we are watching! We have two: %q, %q", d, dir)
-				n.logger.Warnf("Ignoring %q", path_)
-				continue
-			}
-			dir = d
-		}
-		r,err := regexp.Compile(reg)
-		if err != nil {
-			n.logger.Warnf("Ignoring path [%s], due to [%v]", reg, err)
-		} else {
-			rexes = append(rexes, r)
-		}
-	}
-
-	// XXX: this is a hack
-	if dir == "" {
-		dir = "/var/run/srv/netflow"
-	}
-	fp := newFilePattern(dir, rexes)
-
-	// start a timer so we check the directory on a cadence
-	ticker := time.NewTicker(100 * time.Millisecond)
-	// start watching the directory
-
-	// keep regular expressions
-	// read the channel
-	// track files we have looked at
-	for {
-		select {
-		case <-n.ctx.Done():
-			break
-		case <-ticker.C:
-
-			fpath, err := fp.getNextFile()
-			if err != nil {
-				break
-			}
-			if fpath == "" {
-				continue
-			}
-
-			start := time.Now().In(time.UTC)
-			err = n.processFile(fpath)
-			n.metrics.ProcessingTime.Update(time.Since(start).Nanoseconds())
-			if err != nil {
-				break
-			}
-		case <- n.w:
-			break
-		}
-	}
-
-	env.UpdateStatus(status.Running, "continuing to monitor")
-	<-n.ctx.Done()
-	n.stop()
-
-	env.UpdateStatus(status.Running, "stopped monitoring")
 	return nil
 }
 
-func (n *s3IpfixPollerInput) processFile(fpath string) error {
+func (n *s3IpfixWorker) processFile(fpath string) {
+	if fpath == "" {
+		return
+	}
+	n.logger.Infof("processing file [%v] now", fpath)
+	start := time.Now().In(time.UTC)
+	n.input.Metrics.Log(fpath, 1)
+	defer n.input.Metrics.Log(fpath, 0)
+
 	// this will actually be the file to read, not the packet
 	fi, err := os.Stat(fpath)
 	if err != nil {
 		// log something
-		n.logger.Warnf("Error stat on file %s: %v", fpath, err)
-		return err
+		n.logger.Warnf("Error stat on file [%s]: %v", fpath, err)
+		return
 	}
 
 	// check for pipe?
 	if fi.Mode()&os.ModeNamedPipe != 0 {
 		n.logger.Warnf("Error on file %s: Named Pipes are not supported", fpath)
-		return fmt.Errorf("File is a named pipe: %s", fpath)
+		return
 	}
 	// check for regular file?
 
 	f, err := file.ReadOpen(fpath)
 	if err != nil {
 		n.logger.Warnf("Error ReadOpen on file %s: %v", fpath, err)
-		return err
+		return
 	}
 
 	defer f.Close()
+	defer os.Remove(fpath)
 
 	// log that we opened a file here
-	n.metrics.Log(fpath, 1)
 	ip := ipfix_reader.Config{}
 	decoder, err := ipfix_reader.NewBufferedReader(f, &ip)
 	for {
@@ -289,7 +309,7 @@ func (n *s3IpfixPollerInput) processFile(fpath string) error {
 		events, err := decoder.Record()
 		if err != nil {
 			n.logger.Warnf("Error parsing NetFlow Record")
-			if decodeErrors := n.metrics.DecodeErrors(); decodeErrors != nil {
+			if decodeErrors := n.input.Metrics.DecodeErrors(); decodeErrors != nil {
 				decodeErrors.Inc()
 			}
 			continue
@@ -297,11 +317,8 @@ func (n *s3IpfixPollerInput) processFile(fpath string) error {
 
 		n.client.PublishAll(events)
 	}
-	n.metrics.Log(fpath, 0)
 
-	os.Remove(fpath)
-
-	return nil
+	n.input.Metrics.ProcessingTime.Update(time.Since(start).Nanoseconds())
 }
 
 // XXX: this is a hack
@@ -385,6 +402,56 @@ func (n *netflowMetrics) ActiveSessions() *monitoring.Uint {
 	return n.activeSessions
 }
 
+type s3IpfixWorker struct {
+	logger *logp.Logger
+	input *s3IpfixPollerInput
+	client beat.Client
+}
+
+func (iw *s3IpfixWorker) run(ctx context.Context) {
+	defer iw.client.Close()
+
+	for ctx.Err() == nil {
+		// Send a work request
+		select {
+		case <-ctx.Done():
+			// Shutting down
+			return
+		case iw.input.workRequestChan <- struct{}{}:
+		}
+		// The request is sent, wait for a response
+		select {
+		case <-ctx.Done():
+			return
+		case msg := <-iw.input.workResponseChan:
+			iw.processFile(msg)
+		}
+	}
+}
+
+func (in *s3IpfixPollerInput) newWorker(ctx context.Context) (*s3IpfixWorker, error) {
+	// Create a pipeline client scoped to this worker.
+	client, err := in.pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: nil,
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("connecting to pipeline: %w", err)
+	}
+
+	worker:= s3IpfixWorker{
+		logger:     in.logger.Named("worker"),
+		input:      in,
+		client:     client,
+	}
+
+	go worker.run(ctx)
+	return &worker, nil
+}
 
 type s3InputManager struct {
 	store beater.StateStore
@@ -401,7 +468,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	if len(config.IpfixPaths) > 0 {
-		return newS3IpfixPollerInput(config, im.store)
+		return newS3IpfixPollerInput(config, im.store), nil
 	}
 
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
