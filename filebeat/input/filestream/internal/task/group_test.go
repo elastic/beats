@@ -21,7 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -202,14 +202,13 @@ func TestGroup_Go(t *testing.T) {
 
 	t.Run("without limit, all goroutines run", func(t *testing.T) {
 		// 100 <= limit <= 10000
-		limit := rand.Int63n(10000-100) + 100
+		limit := rand.IntN(10000-100) + 100
 		t.Logf("running %d goroutines", limit)
 		g := NewGroup(uint64(limit), time.Second, noopLogger{}, "")
 
 		done := make(chan struct{})
 		var runningCounter atomic.Int64
-		var i int64
-		for i = 0; i < limit; i++ {
+		for i := 0; i < limit; i++ {
 			err := g.Go(func(context.Context) error {
 				runningCounter.Add(1)
 				defer runningCounter.Add(-1)
@@ -221,7 +220,7 @@ func TestGroup_Go(t *testing.T) {
 		}
 
 		assert.Eventually(t,
-			func() bool { return limit == runningCounter.Load() },
+			func() bool { return int64(limit) == runningCounter.Load() },
 			1*time.Second,
 			10*time.Millisecond)
 
