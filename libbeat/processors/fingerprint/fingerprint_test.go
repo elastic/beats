@@ -129,7 +129,7 @@ func TestHashMethods(t *testing.T) {
 		"xxhash": {"37bc50682fba6686"},
 	}
 
-	for _, method := range namedHashMethods {
+	for _, method := range hashes {
 		t.Run(method.Name, func(t *testing.T) {
 			testConfig, err := config.NewConfigFrom(mapstr.M{
 				"fields": []string{"field1", "field2"},

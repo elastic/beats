@@ -15,18 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build requirefips
+//go:build !requirefips
 
 package fingerprint
 
 import (
-	"crypto/sha256"
-	"crypto/sha512"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-var namedHashMethods = []namedHashMethod{
-	{Name: "sha256", Hash: sha256.New},
-	{Name: "sha384", Hash: sha512.New384},
-	{Name: "sha512", Hash: sha512.New},
-	{Name: "xxhash", Hash: newXxHash},
+func TestHashMethod(t *testing.T) {
+	require.Len(t, hashes, 6)
+	require.Contains(t, hashes, "md5")
+	require.Contains(t, hashes, "sha1")
+	require.Contains(t, hashes, "sha256")
+	require.Contains(t, hashes, "sha384")
+	require.Contains(t, hashes, "sha512")
+	require.Contains(t, hashes, "xxhash")
 }
