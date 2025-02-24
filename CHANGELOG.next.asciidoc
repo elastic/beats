@@ -344,7 +344,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
 - The journald input is now generally available. {pull}42107[42107]
 - Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
-- Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 
 *Auditbeat*
