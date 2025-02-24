@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -19,12 +20,79 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
-	logger    = *logp.NewLogger("procfs_test")
+	logger    = logp.NewLogger("procfs_test")
 	timestamp = time.Now()
 )
+
+func constructEvt(tgid uint32, syscall string) *beat.Event {
+	evt := &beat.Event{Fields: mapstr.M{}}
+	evt.Fields.Put("process.pid", tgid)
+	evt.Fields.Put(syscallField, syscall)
+	return evt
+}
+
+func assertRegistryUint(t require.TestingT, reg *monitoring.Registry, key string, expected uint64, message string) {
+	entry := reg.Get(key)
+	assert.NotNil(t, entry)
+
+	value, ok := reg.Get(key).(*monitoring.Uint)
+	assert.True(t, ok)
+	assert.Equal(t, expected, value.Get(), message)
+}
+
+func loadDB(t *testing.T, count uint32, procHandler procfs.MockReader, prov prvdr) {
+	for i := uint32(1); i < count; i++ {
+		evt := constructEvt(i, "execve")
+		procHandler.AddEntry(i, procfs.ProcessInfo{PIDs: types.PIDInfo{Tgid: i, Ppid: 1234}})
+
+		err := prov.Sync(evt, i)
+		require.NoError(t, err)
+
+		// verify that we got the process
+		found, err := prov.db.GetProcess(i)
+		require.NoError(t, err)
+		require.NotNil(t, found)
+
+		// now insert the exit
+		exitEvt := constructEvt(i, "exit_group")
+		err = prov.Sync(exitEvt, i)
+		require.NoError(t, err)
+
+	}
+}
+
+func TestProviderLoadMetrics(t *testing.T) {
+	testReg := monitoring.NewRegistry()
+	testProc := procfs.NewMockReader()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
+
+	procDB, err := processdb.NewDB(ctx, testReg, testProc, logp.L(), time.Second*2, true)
+	require.NoError(t, err)
+
+	testProvider, err := NewProvider(ctx, logp.L(), procDB, testProc, "process.pid")
+	require.NoError(t, err)
+	rawPrvdr, _ := testProvider.(prvdr)
+
+	events := 100_000
+	loadDB(t, uint32(events), *testProc, rawPrvdr)
+
+	// wait for the maps to empty to the correct amount as the reaper runs
+	require.EventuallyWithT(t, func(collect *assert.CollectT) {
+		assertRegistryUint(collect, testReg, "processes_gauge", 0, "processes_gauge")
+		assertRegistryUint(collect, testReg, "exit_events_gauge", 0, "exit_events_gauge")
+	}, time.Minute*5, time.Second*10)
+
+	// ensure processes are getting resolved properly
+	assertRegistryUint(t, testReg, "resolved_orphan_exits", 0, "resolved_orphan_exits")
+	assertRegistryUint(t, testReg, "reaped_orphan_exits", 0, "reaped_orphan_exits")
+	assertRegistryUint(t, testReg, "failed_process_lookup_count", 0, "failed_process_lookup_count")
+	assertRegistryUint(t, testReg, "procfs_lookup_fail", 0, "procfs_lookup_fail")
+}
 
 func TestExecveEvent(t *testing.T) {
 	var pid uint32 = 100
@@ -109,8 +177,10 @@ func TestExecveEvent(t *testing.T) {
 		},
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(reader, logger)
+	db, err := processdb.NewDB(ctx, monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
@@ -121,7 +191,7 @@ func TestExecveEvent(t *testing.T) {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
 	}
 
-	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
+	provider, err := NewProvider(context.TODO(), logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
 	err = provider.Sync(&event, expected.PIDs.Tgid)
@@ -219,8 +289,10 @@ func TestExecveatEvent(t *testing.T) {
 		},
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(reader, logger)
+	db, err := processdb.NewDB(ctx, monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
@@ -231,7 +303,7 @@ func TestExecveatEvent(t *testing.T) {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
 	}
 
-	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
+	provider, err := NewProvider(context.TODO(), logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
 	err = provider.Sync(&event, expected.PIDs.Tgid)
@@ -306,15 +378,17 @@ func TestSetSidEvent(t *testing.T) {
 		},
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(reader, logger)
+	db, err := processdb.NewDB(ctx, monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
 	}
 	db.ScrapeProcfs()
 
-	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
+	provider, err := NewProvider(context.TODO(), logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
 	err = provider.Sync(&event, expected.PIDs.Tgid)
@@ -388,15 +462,17 @@ func TestSetSidEventFailed(t *testing.T) {
 		},
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(reader, logger)
+	db, err := processdb.NewDB(ctx, monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
 	}
 	db.ScrapeProcfs()
 
-	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
+	provider, err := NewProvider(context.TODO(), logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
 	err = provider.Sync(&event, expected.PIDs.Tgid)
@@ -459,15 +535,17 @@ func TestSetSidSessionLeaderNotScraped(t *testing.T) {
 		},
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
 	reader := procfs.NewMockReader()
-	db, err := processdb.NewDB(reader, logger)
+	db, err := processdb.NewDB(ctx, monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 	require.Nil(t, err)
 	for _, entry := range prereq {
 		reader.AddEntry(entry.PIDs.Tgid, entry)
 	}
 	db.ScrapeProcfs()
 
-	provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
+	provider, err := NewProvider(context.TODO(), logger, db, reader, "process.pid")
 	require.Nil(t, err, "error creating provider")
 
 	err = provider.Sync(&event, expected.PIDs.Tgid)
