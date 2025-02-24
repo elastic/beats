@@ -148,6 +148,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - hasher: Geneneral improvements and fixes. {pull}41863[41863]
 - hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
 - Split common tty definitions. {pull}42004[42004]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
 
 *Filebeat*
 
