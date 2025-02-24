@@ -265,6 +265,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
 - Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
+- Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 
 *Osquerybeat*
 
@@ -278,6 +279,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 - Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
 - Sync missing changes in modules pipelines. {pull}42619[42619]
+- Reset EventLog if error EOF is encountered. {pull}42826[42826]
+- Implement backoff on error retrial. {pull}42826[42826]
 
 
 *Elastic Logging Plugin*
@@ -420,6 +423,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
+- Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 
 *Auditbeat*
 
