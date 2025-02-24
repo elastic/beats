@@ -5,10 +5,10 @@
 package config
 
 import (
-	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type ActiveSessionsMetric interface {
@@ -19,7 +19,7 @@ type ActiveSessionsMetric interface {
 // Config stores the configuration used by the NetFlow Collector.
 type Config struct {
 	protocols            []string
-	logOutput            io.Writer
+	logOutput            *logp.Logger
 	expiration           time.Duration
 	detectReset          bool
 	fields               fields.FieldDict
@@ -28,33 +28,28 @@ type Config struct {
 	activeSessionsMetric ActiveSessionsMetric
 }
 
-var defaultCfg = Config{
-	protocols:       []string{},
-	logOutput:       io.Discard,
-	expiration:      time.Hour,
-	detectReset:     true,
-	sharedTemplates: false,
-	withCache:       false,
-}
-
 // Defaults returns a configuration object with defaults settings:
 // - no protocols are enabled.
-// - log output is discarded
+// - log output is set to the logger that is passed in.
 // - session expiration is checked once every hour.
-func Defaults() Config {
-	return defaultCfg
+// - resets are detected.
+// - templates are not shared.
+// - cache is disabled.
+func Defaults(logger *logp.Logger) Config {
+	return Config{
+		protocols:       []string{},
+		logOutput:       logger,
+		expiration:      time.Hour,
+		detectReset:     true,
+		sharedTemplates: false,
+		withCache:       false,
+	}
 }
 
 // WithProtocols modifies an existing configuration object to enable the
 // passed-in protocols.
 func (c *Config) WithProtocols(protos ...string) *Config {
 	c.protocols = protos
-	return c
-}
-
-// WithLogOutput sets the output io.Writer for logging.
-func (c *Config) WithLogOutput(output io.Writer) *Config {
-	c.logOutput = output
 	return c
 }
 
@@ -121,7 +116,7 @@ func (c *Config) Protocols() []string {
 }
 
 // LogOutput returns the io.Writer where logs are to be written.
-func (c *Config) LogOutput() io.Writer {
+func (c *Config) LogOutput() *logp.Logger {
 	return c.logOutput
 }
 

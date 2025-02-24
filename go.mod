@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.22.10
+go 1.22.12
 
 require (
 	cloud.google.com/go/bigquery v1.65.0
@@ -118,8 +118,7 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.9.0
-	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
+	github.com/stretchr/testify v1.10.0
 	github.com/ugorji/go/codec v1.1.8
 	github.com/vmware/govmomi v0.39.0
 	go.elastic.co/ecszap v1.0.2
@@ -180,7 +179,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.18.1
 	github.com/elastic/elastic-agent-system-metrics v0.11.7
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
-	github.com/elastic/go-quark v0.2.0
+	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.16.0
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
@@ -190,6 +189,7 @@ require (
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/go-ole/go-ole v1.2.6
+	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gofrs/uuid/v5 v5.2.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/cel-go v0.19.0
@@ -210,6 +210,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.54.1
 	github.com/shirou/gopsutil/v4 v4.24.10
+	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.12
 	github.com/xdg-go/scram v1.1.2
 	github.com/zyedidia/generic v1.2.1
@@ -311,7 +312,6 @@ require (
 	github.com/go-openapi/jsonpointer v0.20.2 // indirect
 	github.com/go-openapi/jsonreference v0.20.4 // indirect
 	github.com/go-openapi/swag v0.22.9 // indirect
-	github.com/go-resty/resty/v2 v2.13.1 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect

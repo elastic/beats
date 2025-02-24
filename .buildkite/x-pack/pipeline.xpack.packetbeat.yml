@@ -451,8 +451,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
-          cd x-pack/packetbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/packetbeat
         retry:
           automatic:
             - limit: 1
@@ -473,8 +472,7 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
-          cd x-pack/packetbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/packetbeat
         retry:
           automatic:
             - limit: 1
