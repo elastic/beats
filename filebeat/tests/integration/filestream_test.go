@@ -509,7 +509,7 @@ logging:
 	requireRegistryEntryRemoved(t, workDir, "native")
 }
 
-// TestFilestreamCanMigrateID ensures the Filestream input can migrate state
+// TestFilestreamIDMigration ensures the Filestream input can migrate state
 // when its ID is changed.
 // The way this test works is:
 //   - It uses a set of known files (testdata/migrate-id/) so the registry keys
@@ -524,7 +524,7 @@ logging:
 //   - 02.log: db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a
 //   - 01.txt: 9ef9433360a276b14e8eae3864594c0108042c0828d3504b34c082dfc1cd43da
 //   - 02.txt: 10c6577e45f2b06631e11285210d8bd967ebf9786cf81ccfc9fef64bc01725cd
-func TestFilestreamCanMigrateID(t *testing.T) {
+func TestFilestreamIDMigration(t *testing.T) {
 	oldID := "first-id"
 	newID := "second-id"
 

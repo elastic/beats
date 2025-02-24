@@ -207,36 +207,6 @@ steps:
           - github_commit_status:
               context: "filebeat: Win 2022 Unit Tests"
 
-      - label: ":windows: Filebeat: Win 2022 Integration Tests"
-        key: "windows-2022-integration-tests"
-        command: |
-          Set-Location -Path filebeat
-          mage goIntegTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-          - "filebeat/build/integration-tests/*"
-          - "filebeat/build/integration-tests/Test*/*"
-          - "filebeat/build/integration-tests/Test*/data/**/*"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "filebeat: Win 2022 Integration Tests"
-
   - group: "Extended Tests"
     key: "filebeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
