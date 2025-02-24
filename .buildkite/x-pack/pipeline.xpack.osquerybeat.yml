@@ -214,8 +214,7 @@ steps:
       - label: ":ubuntu: x-pack/osquerybeat: Packaging Linux"
         key: "packaging-linux"
         command: |
-          cd x-pack/osquerybeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/osquerybeat
         retry:
           automatic:
             - limit: 1

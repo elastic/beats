@@ -262,8 +262,12 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
         command: |
+<<<<<<< HEAD
           cd auditbeat
           mage package
+=======
+          .buildkite/scripts/packaging/packaging.sh auditbeat
+>>>>>>> 5409677da (Added binfmt to beats packaging step (#42825))
         retry:
           automatic:
             - limit: 1
@@ -282,8 +286,12 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
+<<<<<<< HEAD
           cd auditbeat
           mage package
+=======
+          .buildkite/scripts/packaging/packaging.sh auditbeat
+>>>>>>> 5409677da (Added binfmt to beats packaging step (#42825))
         retry:
           automatic:
             - limit: 1
