@@ -131,7 +131,7 @@ type segmentHeader struct {
 	// Only present in schema version >= 1.
 	frameCount uint32
 
-	// options holds flags to enable features, for example encryption.
+	// options holds flags to enable features, for example compression.
 	options uint32
 }
 
@@ -150,7 +150,7 @@ const currentSegmentVersion = 2
 const segmentHeaderSize = 12
 
 const (
-	ENABLE_ENCRYPTION  uint32 = 1 << iota // 0x1
+	_  uint32 = 1 << iota // 0x1
 	ENABLE_COMPRESSION                    // 0x2
 	ENABLE_PROTOBUF                       // 0x4
 )

@@ -27,33 +27,18 @@ import (
 func TestSegmentsRoundTrip(t *testing.T) {
 	tests := map[string]struct {
 		id        segmentID
-		encrypt   bool
 		compress  bool
 		plaintext []byte
 	}{
-		"No Encryption or Compression": {
+		"No Compression": {
 			id:        0,
-			encrypt:   false,
 			compress:  false,
 			plaintext: []byte("no encryption or compression"),
 		},
-		"Encryption Only": {
-			id:        1,
-			encrypt:   true,
-			compress:  false,
-			plaintext: []byte("encryption only"),
-		},
-		"Compression Only": {
+		"With Compression": {
 			id:        2,
-			encrypt:   false,
 			compress:  true,
 			plaintext: []byte("compression only"),
-		},
-		"Encryption and Compression": {
-			id:        3,
-			encrypt:   true,
-			compress:  true,
-			plaintext: []byte("encryption and compression"),
 		},
 	}
 	dir := t.TempDir()
@@ -98,31 +83,16 @@ func TestSegmentsRoundTrip(t *testing.T) {
 func TestSegmentReaderSeek(t *testing.T) {
 	tests := map[string]struct {
 		id         segmentID
-		encrypt    bool
 		compress   bool
 		plaintexts [][]byte
 	}{
-		"No Encryption or compression": {
+		"No Compression": {
 			id:         0,
-			encrypt:    false,
 			compress:   false,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 		},
-		"Encryption Only": {
-			id:         1,
-			encrypt:    true,
-			compress:   false,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-		},
-		"Compression Only": {
+		"With Compression": {
 			id:         2,
-			encrypt:    false,
-			compress:   true,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-		},
-		"Encryption and Compression": {
-			id:         3,
-			encrypt:    true,
 			compress:   true,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 		},
@@ -165,35 +135,18 @@ func TestSegmentReaderSeek(t *testing.T) {
 func TestSegmentReaderSeekLocations(t *testing.T) {
 	tests := map[string]struct {
 		id         segmentID
-		encrypt    bool
 		compress   bool
 		plaintexts [][]byte
 		location   int64
 	}{
-		"No Encryption or Compression": {
+		"No Compression": {
 			id:         0,
-			encrypt:    false,
 			compress:   false,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 			location:   -1,
 		},
-		"Encryption": {
-			id:         1,
-			encrypt:    true,
-			compress:   false,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-			location:   2,
-		},
 		"Compression": {
 			id:         1,
-			encrypt:    false,
-			compress:   true,
-			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
-			location:   2,
-		},
-		"Encryption and Compression": {
-			id:         1,
-			encrypt:    true,
 			compress:   true,
 			plaintexts: [][]byte{[]byte("abc"), []byte("defg")},
 			location:   2,
