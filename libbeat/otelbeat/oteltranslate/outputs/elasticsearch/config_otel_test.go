@@ -76,6 +76,9 @@ headers:
 batcher:
   enabled: true
   max_size_items: 1600
+  min_size_items: 0
+mapping:
+  mode: bodymap  
  `
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
@@ -111,6 +114,8 @@ logs_index: some-index
 password: changeme
 user: elastic
 timeout: 1m30s
+mapping:
+  mode: bodymap 
 `
 
 		tests := []struct {
@@ -125,6 +130,7 @@ num_workers: 1
 batcher:
   enabled: true
   max_size_items: 1600
+  min_size_items: 0
  `,
 			},
 			{
@@ -135,6 +141,7 @@ num_workers: 4
 batcher:
   enabled: true
   max_size_items: 1600
+  min_size_items: 0
  `,
 			},
 			{
@@ -157,6 +164,9 @@ num_workers: 1
 batcher:
   enabled: true
   max_size_items: 1600
+  min_size_items: 0
+mapping:
+  mode: bodymap    
  `,
 			},
 			{
@@ -167,6 +177,7 @@ num_workers: 1
 batcher:
   enabled: true
   max_size_items: 50
+  min_size_items: 0
  `,
 			},
 			{
@@ -177,6 +188,7 @@ num_workers: 0
 batcher:
   enabled: true
   max_size_items: 1600
+  min_size_items: 0
  `,
 			},
 		}

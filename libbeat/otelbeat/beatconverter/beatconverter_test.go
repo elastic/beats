@@ -47,6 +47,9 @@ exporters:
     batcher:
       enabled: true
       max_size_items: 1600
+      min_size_items: 0
+    mapping:
+      mode: bodymap       
 `
 
 func TestConverter(t *testing.T) {
@@ -187,6 +190,9 @@ exporters:
     batcher:
       enabled: true
       max_size_items: 1600
+      min_size_items: 0
+    mapping:
+      mode: bodymap       
 receivers:
   filebeatreceiver:
     filebeat:
