@@ -77,9 +77,9 @@ steps:
             - limit: 1
         timeout_in_minutes: 20
         agents:
-          provider: "gcp"
-          image: "family/platform-ingest-beats-ubuntu-2204-aarch64"
-          machineType: "t2a-standard-4"
+          provider: "aws"
+          imagePrefix: "platform-ingest-beats-ubuntu-2404-aarch64"
+          instanceType: "t4g.2xlarge"
         notify:
           - github_commit_status:
               context: "auditbeat: Packaging Linux arm64"
