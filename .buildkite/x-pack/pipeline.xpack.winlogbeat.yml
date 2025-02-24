@@ -182,14 +182,10 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/winlogbeat Packaging Linux"
         key: "packaging-linux"
-<<<<<<< HEAD
-        command: "cd x-pack/winlogbeat && mage package"
-=======
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/winlogbeat
->>>>>>> 5409677da (Added binfmt to beats packaging step (#42825))
         retry:
           automatic:
             - limit: 1
@@ -200,8 +196,6 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
         notify:
           - github_commit_status:
               context: "x-pack/winlogbeat Packaging Linux"
