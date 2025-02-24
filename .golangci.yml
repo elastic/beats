@@ -67,14 +67,19 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - gomodguard # check for blocked dependencies
-    - depguard
+    - gomodguard # check for blocked dependencies in go.mod
+    - depguard # check for blocked dependencies in Go files
     - gomoddirectives
 
 # all available settings of specific linters
 linters-settings:
   depguard:
     rules:
+      main:
+        list-mode: lax
+        deny:
+          - pkg: "math/rand$"
+            desc: "superseded by math/rand/v2"
       apache-licensed-code:
         list-mode: lax
         files:
@@ -156,7 +161,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.10"
+    go: "1.22.12"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -174,19 +179,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.10"
+    go: "1.22.12"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.10"
+    go: "1.22.12"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.10"
+    go: "1.22.12"
 
   gosec:
     excludes:
