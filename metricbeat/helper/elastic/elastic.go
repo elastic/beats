@@ -172,7 +172,6 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 		cfgdMetricsetsStrings := make([]string, 0, len(cfgdMetricsetsSlice))
 		for i := range cfgdMetricsetsSlice {
 			asString, ok := cfgdMetricsetsSlice[i].(string)
-
 			if ok {
 				cfgdMetricsetsStrings = append(cfgdMetricsetsStrings, asString)
 			}
