@@ -169,7 +169,7 @@ func cloneMap(dst, src M) {
 			dst[k] = d
 			cloneMap(d, v)
 		case map[string]interface{}:
-			d := make(map[string]interface{}, len(v))
+			d := make(M, len(v))
 			dst[k] = d
 			cloneMap(d, v)
 		case []M:
@@ -181,9 +181,9 @@ func cloneMap(dst, src M) {
 			}
 			dst[k] = a
 		case []map[string]interface{}:
-			a := make([]map[string]interface{}, 0, len(v))
+			a := make([]M, 0, len(v))
 			for _, m := range v {
-				d := make(map[string]interface{}, len(m))
+				d := make(M, len(m))
 				cloneMap(d, m)
 				a = append(a, d)
 			}
