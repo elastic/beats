@@ -30,7 +30,7 @@
 package diskqueue
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
@@ -63,7 +63,7 @@ func makePublisherEvent(r *rand.Rand) publisher.Event {
 		Content: beat.Event{
 			Timestamp: eventTime,
 			Fields: mapstr.M{
-				"message": msgs[r.Intn(len(msgs))],
+				"message": msgs[r.IntN(len(msgs))],
 			},
 		},
 	}
@@ -142,7 +142,7 @@ func benchmarkQueue(num_events int, batch_size int, compress bool, async bool, p
 
 	for n := 0; n < b.N; n++ {
 		b.StopTimer()
-		r := rand.New(rand.NewSource(1))
+		r := rand.New(rand.NewPCG(1, 2))
 		q, p := setup(b, compress, protobuf)
 		b.StartTimer()
 		if async {
