@@ -46,3 +46,6 @@
   - name: producers.count
     description: Number of producers attached to this destination.
     type: long
+  - name: pending.queue.size
+    description: Number of messages pending to be delivered
+    type: long

@@ -266,7 +266,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
 - Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
-- Fixed the missing support for `PendingQueueSize` in the ActiveMQ topic metricset. {pull}42821[42821]
 
 *Osquerybeat*
 
@@ -484,6 +483,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add new metricset wmi for the windows module. {pull}42017[42017]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
+- Added `pending.queue.size` in the ActiveMQ topic metricset. {pull}42821[42821]
+
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
