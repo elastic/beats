@@ -35,7 +35,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -192,12 +191,26 @@ func checkTar(t *testing.T, file string, fipsCheck bool) {
 	if fipsCheck {
 		t.Run(p.Name+"_fips_test", func(t *testing.T) {
 			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
 			err := mage.Extract(file, extractDir)
 			require.NoError(t, err)
-			containingDir := strings.TrimSuffix(path.Base(file), ".tar.gz")
-			checkFIPS(t, p.Name, filepath.Join(extractDir, containingDir))
+			containingDir := strings.TrimSuffix(filepath.Base(file), ".tar.gz")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			checkFIPS(t, beatName, filepath.Join(extractDir, containingDir))
 		})
 	}
+}
+
+func extractBeatNameFromTarName(t *testing.T, fileName string) string {
+	// TODO check if cutting at the first '-' is an acceptable shortcut
+	t.Logf("Extracting beat name from filename %s", fileName)
+	const sep = "-"
+	beatName, _, found := strings.Cut(fileName, sep)
+	if !found {
+		t.Logf("separator %s not found in filename %s: beatName may be incorrect", sep, fileName)
+	}
+
+	return beatName
 }
 
 func checkZip(t *testing.T, file string) {
@@ -800,7 +813,7 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 func checkFIPS(t *testing.T, beatName, path string) {
 	t.Logf("Checking %s for FIPS compliance", beatName)
 	binaryPath := filepath.Join(path, beatName) // TODO eventually we'll need to support checking a .exe
-	require.FileExists(t, binaryPath, "Unable to find beat executable")
+	require.FileExistsf(t, binaryPath, "Unable to find beat executable %s", binaryPath)
 
 	info, err := buildinfo.ReadFile(binaryPath)
 	require.NoError(t, err)
