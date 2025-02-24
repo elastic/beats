@@ -166,7 +166,7 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpa
 		// Type cast the metricsets to a slice of strings
 		cfgdMetricsetsSlice, ok := cfgdMetricsets.([]interface{})
 		if !ok {
-			return nil, fmt.Errorf("configured metricsets are not an array for module %v: %v", moduleName, cfgdMetricsets)
+			return nil, fmt.Errorf("configured metricsets are not an slice for module %s: %v", moduleName, cfgdMetricsets)
 		}
 
 		cfgdMetricsetsStrings := make([]string, 0, len(cfgdMetricsetsSlice))
