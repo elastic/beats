@@ -19,7 +19,7 @@ package fingerprint
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 	"testing"
 	"time"
@@ -497,7 +497,7 @@ func BenchmarkHashMethods(b *testing.B) {
 }
 
 func nRandomEvents(num int) []beat.Event {
-	prng := rand.New(rand.NewSource(12345))
+	prng := rand.New(rand.NewPCG(0, 12345))
 
 	const charset = "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -508,7 +508,7 @@ func nRandomEvents(num int) []beat.Event {
 	events := make([]beat.Event, 0, num)
 	for i := 0; i < num; i++ {
 		for j := range b {
-			b[j] = charset[prng.Intn(charsetLen)]
+			b[j] = charset[prng.IntN(charsetLen)]
 		}
 		events = append(events, beat.Event{
 			Fields: mapstr.M{
