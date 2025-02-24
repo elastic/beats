@@ -306,8 +306,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
-          cd packetbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh packetbeat
         retry:
           automatic:
             - limit: 1
@@ -328,8 +327,7 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
-          cd packetbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh packetbeat
         retry:
           automatic:
             - limit: 1
