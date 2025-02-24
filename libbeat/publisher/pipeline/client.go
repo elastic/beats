@@ -44,9 +44,10 @@ type client struct {
 	// Open state, signaling, and sync primitives for coordinating client Close.
 	isOpen atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
 
-	// inputMetrics is the registry used to aggregate metrics by input.
-	inputRegistry *monitoring.Registry
-	// inputMetrics are the actual input metrics.
+	// inputMetricsRegistry is the registry used for the per-input metrics.
+	inputMetricsRegistry *monitoring.Registry
+	// inputMetrics are the actual monitoring variables for the per-input
+	// metrics.
 	inputMetrics inputMetrics
 
 	observer       observer

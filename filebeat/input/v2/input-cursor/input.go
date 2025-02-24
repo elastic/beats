@@ -111,8 +111,8 @@ func (inp *managedInput) Run(
 	ctx.Cancelation = cancelCtx
 
 	// A new context and a new metrics registry will be created for each worker,
-	// therefore the metrics won't be used, so cancel it.
-	ctx.RegistryCancel()
+	// therefore this metrics won't be used, so cancel it.
+	ctx.MetricsRegistryCancel()
 
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
@@ -129,8 +129,8 @@ func (inp *managedInput) Run(
 				inpCtx.Name,
 				inpCtx.ID,
 				inpCtx.Agent.Monitoring.Namespace.GetRegistry())
-			inpCtx.Registry = reg
-			inpCtx.RegistryCancel = regCancel
+			inpCtx.MetricsRegistry = reg
+			inpCtx.MetricsRegistryCancel = regCancel
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
 				cancel()
@@ -159,8 +159,8 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		InputRegistry: ctx.Registry,
-		EventListener: newInputACKHandler(ctx.Logger),
+		InputMetricsRegistry: ctx.MetricsRegistry,
+		EventListener:        newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
 		return err

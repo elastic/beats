@@ -146,15 +146,15 @@ func (r *runner) Start() {
 			name, r.id, r.agent.Monitoring.Namespace.GetRegistry())
 		err := r.input.Run(
 			v2.Context{
-				ID:             r.id,
-				IDWithoutName:  r.id,
-				Name:           name,
-				Agent:          *r.agent,
-				Registry:       reg,
-				RegistryCancel: cancel,
-				Logger:         log,
-				Cancelation:    r.sig,
-				StatusReporter: r.statusReporter,
+				ID:                    r.id,
+				IDWithoutName:         r.id,
+				Name:                  name,
+				Agent:                 *r.agent,
+				MetricsRegistry:       reg,
+				MetricsRegistryCancel: cancel,
+				Logger:                log,
+				Cancelation:           r.sig,
+				StatusReporter:        r.statusReporter,
 			},
 			r.connector,
 		)

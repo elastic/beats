@@ -91,6 +91,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	bInfo := beat.Info{}
 	bInfo.Monitoring.Namespace = monitoring.GetNamespace("beat")
 
+	// Metrics from the beat.Info namespace
 	parentReg := bInfo.Monitoring.Namespace.GetRegistry()
 	inputID := "input-with-pipeline-metrics"
 	r1, cancel1 := NewInputRegistry("test", inputID, parentReg)
@@ -98,16 +99,18 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	monitoring.NewInt(r1, "foo1_total").Set(100)
 	monitoring.NewInt(r1, "events_pipeline_total").Set(100)
 
+	// an input registering metrics on the global namespace. This simulates an
+	// input without pipeline metrics reported for this input.
 	r2, cancel2 := NewInputRegistry(
 		"test", "input-without-pipeline-metrics", nil)
 	defer cancel2()
 	monitoring.NewInt(r2, "foo2_total").Set(100)
 
-	// this metric should not be reported
+	// unrelated registry in the global namespace, should be ignored.
 	r3 := globalRegistry().NewRegistry("another-registry")
 	monitoring.NewInt(r3, "foo3_total").Set(100)
 
-	// this metric should not be reported
+	// another input registry missing required information.
 	r4 := globalRegistry().NewRegistry("yet-another-registry")
 	monitoring.NewString(r4, "id").Set("some-id")
 	monitoring.NewInt(r3, "foo3_total").Set(100)

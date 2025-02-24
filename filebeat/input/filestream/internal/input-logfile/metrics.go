@@ -65,15 +65,15 @@ func NewMetrics(ctx v2.Context) *Metrics {
 	}
 
 	m := Metrics{
-		unregister:        ctx.RegistryCancel,
-		FilesOpened:       monitoring.NewUint(ctx.Registry, "files_opened_total"),
-		FilesClosed:       monitoring.NewUint(ctx.Registry, "files_closed_total"),
-		FilesActive:       monitoring.NewUint(ctx.Registry, "files_active"),
-		MessagesRead:      monitoring.NewUint(ctx.Registry, "messages_read_total"),
-		MessagesTruncated: monitoring.NewUint(ctx.Registry, "messages_truncated_total"),
-		BytesProcessed:    monitoring.NewUint(ctx.Registry, "bytes_processed_total"),
-		EventsProcessed:   monitoring.NewUint(ctx.Registry, "events_processed_total"),
-		ProcessingErrors:  monitoring.NewUint(ctx.Registry, "processing_errors_total"),
+		unregister:        ctx.MetricsRegistryCancel,
+		FilesOpened:       monitoring.NewUint(ctx.MetricsRegistry, "files_opened_total"),
+		FilesClosed:       monitoring.NewUint(ctx.MetricsRegistry, "files_closed_total"),
+		FilesActive:       monitoring.NewUint(ctx.MetricsRegistry, "files_active"),
+		MessagesRead:      monitoring.NewUint(ctx.MetricsRegistry, "messages_read_total"),
+		MessagesTruncated: monitoring.NewUint(ctx.MetricsRegistry, "messages_truncated_total"),
+		BytesProcessed:    monitoring.NewUint(ctx.MetricsRegistry, "bytes_processed_total"),
+		EventsProcessed:   monitoring.NewUint(ctx.MetricsRegistry, "events_processed_total"),
+		ProcessingErrors:  monitoring.NewUint(ctx.MetricsRegistry, "processing_errors_total"),
 		ProcessingTime:    metrics.NewUniformSample(1024),
 
 		HarvesterStarted:   monitoring.NewInt(harvesterMetrics, "started"),
@@ -81,7 +81,7 @@ func NewMetrics(ctx v2.Context) *Metrics {
 		HarvesterRunning:   monitoring.NewInt(harvesterMetrics, "running"),
 		HarvesterOpenFiles: monitoring.NewInt(harvesterMetrics, "open_files"),
 	}
-	_ = adapter.NewGoMetrics(ctx.Registry, "processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(ctx.MetricsRegistry, "processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(m.ProcessingTime))
 
 	return &m

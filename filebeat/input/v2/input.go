@@ -79,7 +79,7 @@ type Context struct {
 
 	// The input ID.
 	ID string
-	// Name is the inout name
+	// Name is the input name
 	Name string
 
 	// The input ID without name. Some inputs append sourcename, we need the id to be untouched
@@ -89,10 +89,10 @@ type Context struct {
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
-	// Registry to collect metrics for this input.
-	Registry *monitoring.Registry
-	// RegistryCancel unregisters Registry and release the associated resources.
-	RegistryCancel func()
+	// MetricsRegistry to collect metrics for this input.
+	MetricsRegistry *monitoring.Registry
+	// MetricsRegistryCancel unregisters Registry and release the associated resources.
+	MetricsRegistryCancel func()
 
 	// Cancelation is used by Beats to signal the input to shutdown.
 	Cancelation Canceler

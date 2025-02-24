@@ -1257,22 +1257,22 @@ type inputMetrics struct {
 
 func newInputMetrics(ctx v2.Context) (*inputMetrics, *monitoring.Registry) {
 	out := &inputMetrics{
-		unregister:          ctx.RegistryCancel,
-		resource:            monitoring.NewString(ctx.Registry, "resource"),
-		executions:          monitoring.NewUint(ctx.Registry, "cel_executions"),
-		batchesReceived:     monitoring.NewUint(ctx.Registry, "batches_received_total"),
-		eventsReceived:      monitoring.NewUint(ctx.Registry, "events_received_total"),
-		batchesPublished:    monitoring.NewUint(ctx.Registry, "batches_published_total"),
-		eventsPublished:     monitoring.NewUint(ctx.Registry, "events_published_total"),
+		unregister:          ctx.MetricsRegistryCancel,
+		resource:            monitoring.NewString(ctx.MetricsRegistry, "resource"),
+		executions:          monitoring.NewUint(ctx.MetricsRegistry, "cel_executions"),
+		batchesReceived:     monitoring.NewUint(ctx.MetricsRegistry, "batches_received_total"),
+		eventsReceived:      monitoring.NewUint(ctx.MetricsRegistry, "events_received_total"),
+		batchesPublished:    monitoring.NewUint(ctx.MetricsRegistry, "batches_published_total"),
+		eventsPublished:     monitoring.NewUint(ctx.MetricsRegistry, "events_published_total"),
 		celProcessingTime:   metrics.NewUniformSample(1024),
 		batchProcessingTime: metrics.NewUniformSample(1024),
 	}
-	_ = adapter.NewGoMetrics(ctx.Registry, "cel_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(ctx.MetricsRegistry, "cel_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.celProcessingTime))
-	_ = adapter.NewGoMetrics(ctx.Registry, "batch_processing_time", adapter.Accept).
+	_ = adapter.NewGoMetrics(ctx.MetricsRegistry, "batch_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 
-	return out, ctx.Registry
+	return out, ctx.MetricsRegistry
 }
 
 func (m *inputMetrics) Close() {

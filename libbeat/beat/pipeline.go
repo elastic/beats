@@ -46,9 +46,9 @@ type Client interface {
 // ClientConfig defines common configuration options one can pass to
 // Pipeline.ConnectWith to control the clients behavior and provide ACK support.
 type ClientConfig struct {
-	// InputMetrics is the metrics registry used to aggregate pipeline metrics
+	// InputMetricsRegistry is the metrics registry used to aggregate pipeline metrics
 	// per input.
-	InputRegistry *monitoring.Registry
+	InputMetricsRegistry *monitoring.Registry
 
 	PublishMode PublishMode
 

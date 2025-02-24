@@ -341,7 +341,7 @@ func TestMonitoring(t *testing.T) {
 			monitoring.GetNamespace("TestMonitoring.inputMetrics")
 
 		clientCfg := beat.ClientConfig{
-			InputRegistry: beatInfo.Monitoring.Namespace.
+			InputMetricsRegistry: beatInfo.Monitoring.Namespace.
 				GetRegistry().NewRegistry(inputID)}
 		testInputMetrics(t, beatInfo, clientCfg, inputID)
 	})
@@ -449,7 +449,7 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 	c.Publish(beat.Event{Meta: mapstr.M{}})
 	require.NoError(t, c.Close())
 
-	if clientCfg.InputRegistry != nil {
+	if clientCfg.InputMetricsRegistry != nil {
 		total, filtered, dropped, published := getMetrics(t, beatInfo, inputID)
 
 		assert.Equal(t,

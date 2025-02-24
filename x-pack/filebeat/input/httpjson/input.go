@@ -167,8 +167,8 @@ func test(url *url.URL) error {
 }
 
 func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
-	defer ctx.RegistryCancel()
-	return run(ctx, cfg, pub, crsr, ctx.Registry)
+	defer ctx.MetricsRegistryCancel()
+	return run(ctx, cfg, pub, crsr, ctx.MetricsRegistry)
 }
 
 func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry) error {
