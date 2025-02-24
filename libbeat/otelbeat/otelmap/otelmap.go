@@ -197,7 +197,7 @@ func convertValue(v []any, dest pcommon.Slice) {
 		case int32:
 			newValue.SetInt(int64(val))
 		case int64:
-			newValue.SetInt(int64(val))
+			newValue.SetInt(val)
 		case uint:
 			newValue.SetInt(int64(val))
 		case uint8:
@@ -211,7 +211,7 @@ func convertValue(v []any, dest pcommon.Slice) {
 		case float32:
 			newValue.SetDouble(float64(val))
 		case float64:
-			newValue.SetDouble(float64(val))
+			newValue.SetDouble(val)
 		case time.Time:
 			newValue.SetStr(val.UTC().Format("2006-01-02T15:04:05.000Z"))
 		default:
