@@ -216,7 +216,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/aws/s3_request @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/aws/sns @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/aws/sqs @elastic/obs-infraobs-integrations
-/x-pack/metricbeat/module/aws/transigateway @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/transitgateway @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/aws/usage @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/aws/vpn @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/aws/sqs @elastic/obs-infraobs-integrations
