@@ -28,7 +28,6 @@ import (
 	"strings"
 
 	"github.com/dustin/go-humanize"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
@@ -131,7 +130,7 @@ func (c *Config) Validate() error {
 	sort.Strings(c.Paths)
 	c.Paths = deduplicate(c.Paths)
 
-	var errs multierror.Errors
+	var errs []error
 	var err error
 
 nextHash:
@@ -187,7 +186,7 @@ nextHash:
 		errs = append(errs, errors.New("backend can only be specified on linux"))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // deduplicate deduplicates the given sorted string slice. The returned slice
