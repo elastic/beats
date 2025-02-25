@@ -122,8 +122,6 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
-          dig go.mongodb.org
-          service systemd-resolved status
           cd x-pack/metricbeat
           mage pythonIntegTest
         retry:
