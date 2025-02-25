@@ -69,24 +69,3 @@ func (t *AuthType) Unpack(value string) error {
 
 	return nil
 }
-
-func (c *Config) Validate() error {
-	switch c.AuthType {
-	case authPassword:
-		if c.Username == "" {
-			return fmt.Errorf("password authentication is selected for Kerberos, but username is not configured")
-		}
-		if c.Password == "" {
-			return fmt.Errorf("password authentication is selected for Kerberos, but password is not configured")
-		}
-
-	case authKeytab:
-		if c.KeyTabPath == "" {
-			return fmt.Errorf("keytab authentication is selected for Kerberos, but path to keytab is not configured")
-		}
-	default:
-		return InvalidAuthType
-	}
-
-	return nil
-}
