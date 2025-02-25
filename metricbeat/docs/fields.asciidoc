@@ -494,6 +494,15 @@ type: long
 
 --
 
+*`activemq.topic.pending.queue.size`*::
++
+--
+Number of messages pending to be delivered
+
+type: long
+
+--
+
 [[exported-fields-aerospike]]
 == Aerospike fields
 
