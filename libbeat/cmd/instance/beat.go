@@ -654,7 +654,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
-	b.registerMetrics()
+	b.RegisterMetrics()
 
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
@@ -765,7 +765,7 @@ func (b *Beat) reexec() error {
 // registerMetrics registers metrics with the internal monitoring API. This data
 // is then exposed through the HTTP monitoring endpoint (e.g. /info and /state)
 // and/or pushed to Elasticsearch through the x-pack monitoring feature.
-func (b *Beat) registerMetrics() {
+func (b *Beat) RegisterMetrics() {
 	// info
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
 	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
