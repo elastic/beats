@@ -43,6 +43,9 @@ type client struct {
 	// Open state, signaling, and sync primitives for coordinating client Close.
 	isOpen atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
 
+	// inputID of the input this client belongs to. It's used to aggregate
+	// metrics by input.
+	inputID        string
 	observer       observer
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
@@ -105,7 +108,7 @@ func (c *client) publish(e beat.Event) {
 
 	c.eventListener.AddEvent(e, publish)
 	if !publish {
-		c.onFilteredOut(e)
+		c.onFilteredOut()
 		return
 	}
 
@@ -113,6 +116,7 @@ func (c *client) publish(e beat.Event) {
 	pubEvent := publisher.Event{
 		Content: e,
 		Flags:   c.eventFlags,
+		InputID: c.inputID,
 	}
 
 	var published bool
@@ -172,22 +176,22 @@ func (c *client) onClosed() {
 }
 
 func (c *client) onNewEvent() {
-	c.observer.newEvent()
+	c.observer.newEvent(c.inputID)
 }
 
 func (c *client) onPublished() {
-	c.observer.publishedEvent()
+	c.observer.publishedEvent(c.inputID)
 	if c.clientListener != nil {
 		c.clientListener.Published()
 	}
 }
 
-func (c *client) onFilteredOut(e beat.Event) {
-	c.observer.filteredEvent()
+func (c *client) onFilteredOut() {
+	c.observer.filteredEvent(c.inputID)
 }
 
 func (c *client) onDroppedOnPublish(e beat.Event) {
-	c.observer.failedPublishEvent()
+	c.observer.failedPublishEvent(c.inputID)
 	if c.clientListener != nil {
 		c.clientListener.DroppedOnPublish(e)
 	}

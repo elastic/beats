@@ -39,10 +39,13 @@ const defaultQueueType = "mem"
 // Monitors configures visibility for observing state and progress of the
 // pipeline.
 type Monitors struct {
-	Metrics   *monitoring.Registry
-	Telemetry *monitoring.Registry
-	Logger    *logp.Logger
-	Tracer    *apm.Tracer
+	// BeatRegistry is the beat scoped registry. It should come from
+	// beat.Beat.Monitoring.Namespace.
+	BeatRegistry *monitoring.Registry
+	Metrics      *monitoring.Registry
+	Telemetry    *monitoring.Registry
+	Logger       *logp.Logger
+	Tracer       *apm.Tracer
 }
 
 // OutputFactory is used by the publisher pipeline to create an output instance.
@@ -133,7 +136,8 @@ func loadOutput(
 		} else {
 			metrics = monitors.Metrics.NewRegistry("output")
 		}
-		outStats = outputs.NewStats(metrics)
+		// here we need the other registry
+		outStats = outputs.NewStats(metrics, monitors.BeatRegistry)
 	}
 
 	outName, out, err := makeOutput(outStats)

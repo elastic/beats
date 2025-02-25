@@ -588,11 +588,13 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	var publisher *pipeline.Pipeline
 	monitors := pipeline.Monitors{
-		Metrics:   reg,
-		Telemetry: monitoring.GetNamespace("state").GetRegistry(),
-		Logger:    logp.L().Named("publisher"),
-		Tracer:    b.Instrumentation.Tracer(),
+		BeatRegistry: b.Info.Monitoring.Namespace.GetRegistry(),
+		Metrics:      reg,
+		Telemetry:    monitoring.GetNamespace("state").GetRegistry(),
+		Logger:       logp.L().Named("publisher"),
+		Tracer:       b.Instrumentation.Tracer(),
 	}
+	// here
 	outputFactory := b.makeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
 		// Since now publisher is closed on Stop, we want to give some

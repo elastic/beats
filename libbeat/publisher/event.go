@@ -60,6 +60,10 @@ type Event struct {
 	Flags   EventFlags
 	Cache   EventCache
 
+	// InputID is the inputID which generated this event. It's used to aggregate
+	// metrics per input.
+	InputID string
+
 	// If the output provides an early encoder for incoming events,
 	// it should store the encoded form in EncodedEvent and clear Content
 	// to free the unencoded data. The updated event will be provided to
