@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package flowhash
 
 import (
@@ -176,7 +178,7 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) []string {
 					}
 				}
 			}
-			flowID = CommunityID.Hash(flow)
+			flowID = Hash(flow)
 			flowStr = flowToString(flow)
 		}
 

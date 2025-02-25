@@ -15,24 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package flowhash_test
+//go:build !requirefips
 
-import (
-	"fmt"
-	"net"
+package flowhash
 
-	"github.com/elastic/beats/v7/libbeat/common/flowhash"
-)
+import "crypto"
 
-// ExampleCommunityIDHash shows example usage for flowhash.Hash()
-func ExampleCommunityIDHash() {
-	flow := flowhash.Flow{
-		SourceIP:        net.ParseIP("10.1.2.3"),
-		DestinationIP:   net.ParseIP("8.8.8.8"),
-		SourcePort:      63521,
-		DestinationPort: 53,
-		Protocol:        17,
-	}
-	fmt.Println(flowhash.Hash(flow))
-	// Output: 1:R7iR6vkxw+jaz3wjDfWMWooBdfc=
+var communityID = NewCommunityID(0, Base64Encoding, crypto.SHA1)
+
+func hashFlow(flow Flow) string {
+	return communityID.Hash(flow)
 }
