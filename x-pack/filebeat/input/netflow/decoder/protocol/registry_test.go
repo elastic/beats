@@ -11,9 +11,15 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 )
+
+func init() {
+	logp.TestingSetup()
+}
 
 type testProto int
 
@@ -61,7 +67,7 @@ func TestRegistry_Get(t *testing.T) {
 		assert.NoError(t, err)
 		gen, err := registry.Get("my_proto")
 		assert.NoError(t, err)
-		assert.Equal(t, testProto(0), gen(config.Defaults()))
+		assert.Equal(t, testProto(0), gen(config.Defaults(logp.L())))
 	})
 	t.Run("two protocols", func(t *testing.T) {
 		registry := ProtocolRegistry{}
@@ -71,10 +77,10 @@ func TestRegistry_Get(t *testing.T) {
 		assert.NoError(t, err)
 		gen, err := registry.Get("my_proto")
 		assert.NoError(t, err)
-		assert.Equal(t, testProto(1), gen(config.Defaults()))
+		assert.Equal(t, testProto(1), gen(config.Defaults(logp.L())))
 		gen, err = registry.Get("other_proto")
 		assert.NoError(t, err)
-		assert.Equal(t, testProto(2), gen(config.Defaults()))
+		assert.Equal(t, testProto(2), gen(config.Defaults(logp.L())))
 	})
 	t.Run("not registered", func(t *testing.T) {
 		registry := ProtocolRegistry{}
