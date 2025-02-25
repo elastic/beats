@@ -1007,13 +1007,8 @@ func (b *Beat) configure(settings Settings) error {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
 	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
+		// note that if the store is nil it should be excluded as an option
 		config.OverwriteConfigOpts(configOptsWithKeystore(store))
-	} else {
-		config.OverwriteConfigOpts([]ucfg.Option{
-			ucfg.PathSep("."),
-			ucfg.ResolveEnv,
-			ucfg.VarExp,
-		})
 	}
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
