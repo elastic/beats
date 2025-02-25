@@ -12,9 +12,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
@@ -56,6 +58,10 @@ func (fb *filebeatReceiver) startMonitoring() error {
 	if fb.httpConf.Enabled() {
 		var err error
 		fb.beat.RegisterMetrics()
+		err = metricreport.SetupMetrics(logp.NewLogger("metrics"), fb.beat.Info.Beat, version.GetDefaultVersion())
+		if err != nil {
+			return err
+		}
 		fb.beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), fb.httpConf, monitoring.GetNamespace)
 		if err != nil {
 			return err
