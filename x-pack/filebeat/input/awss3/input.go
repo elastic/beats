@@ -5,8 +5,11 @@
 package awss3
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"compress/gzip"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -266,6 +269,20 @@ func (n *s3IpfixPollerInput) Run(
 	return nil
 }
 
+func (p *s3IpfixWorker) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
+	bufReader := bufio.NewReader(body)
+
+	gzipped, err := isStreamGzipped(bufReader)
+	if err != nil {
+		return nil, err
+	}
+	if !gzipped {
+		return bufReader, nil
+	}
+
+	return gzip.NewReader(bufReader)
+}
+
 func (n *s3IpfixWorker) processFile(fpath string) {
 	if fpath == "" {
 		return
@@ -299,9 +316,13 @@ func (n *s3IpfixWorker) processFile(fpath string) {
 	defer f.Close()
 	defer os.Remove(fpath)
 
-	// log that we opened a file here
+	reader, err := n.addGzipDecoderIfNeeded(f)
+	if err != nil {
+		n.logger.Warnf("Failed to add gzip decoder: [%v]", err)
+	}
+
 	ip := ipfix_reader.Config{}
-	decoder, err := ipfix_reader.NewBufferedReader(f, &ip)
+	decoder, err := ipfix_reader.NewBufferedReader(reader, &ip)
 	for {
 		if !decoder.Next() {
 			break
