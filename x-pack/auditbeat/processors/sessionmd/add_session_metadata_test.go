@@ -8,6 +8,7 @@ package sessionmd
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -338,6 +339,27 @@ var (
 
 	logger = logp.NewLogger("add_session_metadata_test")
 )
+
+func TestMetricsSetup(t *testing.T) {
+	// init a metrics registry multiple times with the same name, ensure we don't panic, and the names are correct
+	reg := monitoring.NewRegistry()
+	firstName := "test.metrics"
+	secondName := "other.stuff"
+	genRegistry(reg, firstName)
+	require.NotNil(t, reg.Get(firstName))
+
+	genRegistry(reg, firstName)
+	require.NotNil(t, reg.Get(fmt.Sprintf("%s.1", firstName)))
+
+	genRegistry(reg, secondName)
+	require.NotNil(t, reg.Get(secondName))
+	require.Nil(t, reg.Get(fmt.Sprintf("%s.1", secondName)))
+
+	genRegistry(reg, secondName)
+	require.NotNil(t, reg.Get(secondName))
+	require.NotNil(t, reg.Get(fmt.Sprintf("%s.1", secondName)))
+	require.Nil(t, reg.Get(fmt.Sprintf("%s.2", secondName)))
+}
 
 func TestEnrich(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
