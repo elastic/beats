@@ -36,7 +36,7 @@ func (c *Config) Validate() error {
 			return fmt.Errorf("keytab authentication is selected for Kerberos, but path to keytab is not configured")
 		}
 	default:
-		return InvalidAuthType
+		return ErrInvalidAuthType
 	}
 
 	return nil
