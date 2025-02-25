@@ -5,6 +5,7 @@
 package azure
 
 import (
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/stretchr/testify/mock"
@@ -45,6 +46,24 @@ func (client *MockService) GetMetricNamespaces(resourceId string) (armmonitor.Me
 func (client *MockService) GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]armmonitor.Metric, string, error) {
 	args := client.Called(resourceId, namespace, timegrain, timespan, metricNames, aggregations, filter)
 	return args.Get(0).([]armmonitor.Metric), args.String(1), args.Error(2)
+}
+
+// QueryResources is a mock function for the azure service
+func (client *MockService) QueryResources(
+	resourceIDs []string,
+	subscriptionID string,
+	namespace string,
+	timegrain string,
+	startTime string,
+	endTime string,
+	metricNames []string,
+	aggregations string,
+	filter string,
+	location string) ([]azmetrics.MetricData, error) {
+
+	args := client.Called(resourceIDs, subscriptionID, namespace, timegrain, startTime, endTime, metricNames, aggregations, filter, location)
+
+	return args.Get(0).([]azmetrics.MetricData), args.Error(1)
 }
 
 // MockReporterV2 mock implementation for testing purposes
