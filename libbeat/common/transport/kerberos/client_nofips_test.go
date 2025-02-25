@@ -15,14 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package kerberos
 
 import (
 	"net/http"
+	"os"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+func TestNewClient(t *testing.T) {
+	cfg, err := os.CreateTemp(t.TempDir(), "config")
+	require.NoError(t, err)
+	c, err := NewClient(&Config{
+		AuthType:   authPassword,
+		ConfigPath: cfg.Name(),
+	}, http.DefaultClient, "")
+	require.Nil(t, err)
+	require.NotNil(t, c)
 }
