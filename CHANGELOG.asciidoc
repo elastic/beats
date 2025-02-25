@@ -3,157 +3,26 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-[[release-notes-7.17.27]]
-=== Beats version 7.17.27
-https://github.com/elastic/beats/compare/v7.17.26\...v7.17.27[View commits]
-
-==== Breaking changes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Agent*
-
-
-==== Bugfixes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Logging Plugin*
-
+[[release-notes-7.17.28]]
+=== Beats version 7.17.28
+https://github.com/elastic/beats/compare/v7.17.27\...v7.17.28[View commits]
 
 ==== Added
 
 *Affecting all Beats*
 
-- Update to Go 1.22.10. {pull}41946[41946]
-
-*Auditbeat*
+- Update Go version to 1.22.12. {pull}42681[42681]
 
 
-*Filebeat*
+[[release-notes-7.17.27]]
+=== Beats version 7.17.27
+https://github.com/elastic/beats/compare/v7.17.26\...v7.17.27[View commits]
 
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
+==== Added
 
 *Affecting all Beats*
 
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Update Go version to 1.22.10. {pull}41946[41946]
 
 
 [[release-notes-7.17.26]]
