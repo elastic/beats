@@ -26,6 +26,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -36,19 +37,24 @@ const (
 )
 
 type handler struct {
-	registry *monitoring.Registry
+	registryDataset *monitoring.Registry
+	registryBeat    *monitoring.Registry
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
 // requests to /inputs.
-func AttachHandler(r *mux.Router) error {
-	return attachHandler(r, globalRegistry())
+func AttachHandler(beatInfo beat.Info, r *mux.Router) error {
+	return attachHandler(r, globalRegistry(), beatInfo.Monitoring.Namespace.GetRegistry())
 }
 
-func attachHandler(r *mux.Router, registry *monitoring.Registry) error {
-	h := &handler{registry: registry}
+func attachHandler(r *mux.Router, datasetReg, beatReg *monitoring.Registry) error {
 	r = r.PathPrefix(route).Subrouter()
-	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
+
+	h := &handler{
+		registryDataset: datasetReg,
+		registryBeat:    beatReg,
+	}
+	return r.StrictSlash(true).Handle("/", validationHandler(http.MethodGet, []string{"pretty", "type"}, h.allInputs)).GetError()
 }
 
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
@@ -64,15 +70,27 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	filtered := filteredSnapshot(h.registry, requestedType)
+	filtered := filteredSnapshot(
+		h.registryDataset, h.registryBeat, requestedType)
 
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
 
-func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
-	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
+func filteredSnapshot(dataset, beatRegistry *monitoring.Registry, requestedType string) []map[string]any {
+	metrics := monitoring.CollectStructSnapshot(dataset, monitoring.Full, false)
 
+	filtered := filterInputMetrics(metrics, requestedType)
+	if dataset != beatRegistry {
+		filtered = append(filtered, filterInputMetrics(
+			monitoring.CollectStructSnapshot(beatRegistry, monitoring.Full, false),
+			requestedType)...)
+	}
+
+	return filtered
+}
+
+func filterInputMetrics(metrics map[string]interface{}, requestedType string) []map[string]any {
 	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
@@ -81,11 +99,13 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		if id, ok := m["id"].(string); !ok || id == "" {
+		id, ok := m["id"].(string)
+		if !ok || id == "" {
 			continue
 		}
 
-		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+		if inputType, ok := m["input"].(string); !ok || (requestedType != "" &&
+			!strings.EqualFold(inputType, requestedType)) {
 			continue
 		}
 

@@ -834,36 +834,40 @@ observe the activity of the input.
 
 [options="header"]
 |=======
-| Metric                           | Description
-| `resource`                       | URL or path of the input resource.
-| `cel_executions`                 | Number times the CEL program has been executed.
-| `batches_received_total`         | Number of event arrays received.
-| `events_received_total`          | Number of events received.
-| `batches_published_total`        | Number of event arrays published.
-| `events_published_total`         | Number of events published.
-| `cel_processing_time`            | Histogram of the elapsed successful CEL program processing times in nanoseconds.
-| `batch_processing_time`          | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
-| `http_request_total`             | Total number of processed requests.
-| `http_request_errors_total`      | Total number of request errors.
-| `http_request_delete_total`      | Total number of `DELETE` requests.
-| `http_request_get_total`         | Total number of `GET` requests.
-| `http_request_head_total`        | Total number of `HEAD` requests.
-| `http_request_options_total`     | Total number of `OPTIONS` requests.
-| `http_request_patch_total`       | Total number of `PATCH` requests.
-| `http_request_post_total`        | Total number of `POST` requests.
-| `http_request_put_total`         | Total number of `PUT` requests.
-| `http_request_body_bytes_total`  | Total of the requests body size.
-| `http_request_body_bytes`        | Histogram of the requests body size.
-| `http_response_total`            | Total number of responses received.
-| `http_response_errors_total`     | Total number of response errors.
-| `http_response_1xx_total`        | Total number of `1xx` responses.
-| `http_response_2xx_total`        | Total number of `2xx` responses.
-| `http_response_3xx_total`        | Total number of `3xx` responses.
-| `http_response_4xx_total`        | Total number of `4xx` responses.
-| `http_response_5xx_total`        | Total number of `5xx` responses.
-| `http_response_body_bytes_total` | Total of the responses body size.
-| `http_response_body_bytes`       | Histogram of the responses body size.
-| `http_round_trip_time`           | Histogram of the round trip time.
+| Metric                            | Description
+| `resource`                        | URL or path of the input resource.
+| `cel_executions`                  | Number times the CEL program has been executed.
+| `batches_received_total`          | Number of event arrays received.
+| `events_received_total`           | Number of events received.
+| `batches_published_total`         | Number of event arrays published.
+| `events_published_total`          | Number of events published.
+| `events_pipeline_total`           | Total number of events processed by the publishing pipeline.
+| `events_pipeline_failed_total`    | Total number of events failed at the publishing pipeline.
+| `events_pipeline_filtered_total`  | Total number of events filtered at the publishing pipeline.
+| `events_pipeline_published_total` | Total number of events published at the publishing pipeline.
+| `cel_processing_time`             | Histogram of the elapsed successful CEL program processing times in nanoseconds.
+| `batch_processing_time`           | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
+| `http_request_total`              | Total number of processed requests.
+| `http_request_errors_total`       | Total number of request errors.
+| `http_request_delete_total`       | Total number of `DELETE` requests.
+| `http_request_get_total`          | Total number of `GET` requests.
+| `http_request_head_total`         | Total number of `HEAD` requests.
+| `http_request_options_total`      | Total number of `OPTIONS` requests.
+| `http_request_patch_total`        | Total number of `PATCH` requests.
+| `http_request_post_total`         | Total number of `POST` requests.
+| `http_request_put_total`          | Total number of `PUT` requests.
+| `http_request_body_bytes_total`   | Total of the requests body size.
+| `http_request_body_bytes`         | Histogram of the requests body size.
+| `http_response_total`             | Total number of responses received.
+| `http_response_errors_total`      | Total number of response errors.
+| `http_response_1xx_total`         | Total number of `1xx` responses.
+| `http_response_2xx_total`         | Total number of `2xx` responses.
+| `http_response_3xx_total`         | Total number of `3xx` responses.
+| `http_response_4xx_total`         | Total number of `4xx` responses.
+| `http_response_5xx_total`         | Total number of `5xx` responses.
+| `http_response_body_bytes_total`  | Total of the responses body size.
+| `http_response_body_bytes`        | Histogram of the responses body size.
+| `http_round_trip_time`            | Histogram of the round trip time.
 |=======
 
 ==== Developer tools
