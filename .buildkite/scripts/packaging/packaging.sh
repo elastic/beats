@@ -12,8 +12,10 @@ set -ueo pipefail
 
 BEAT_DIR=${1:?-"Error: Beat directory must be specified."}
 
-#Use newer multiarch support for packaging
-docker run --privileged --rm tonistiigi/binfmt:master --install all
+BINFMT_IMAGE="tonistiigi/binfmt:qemu-v8.1.5"
+# Make sure to uninstall first to avoid conflicts
+docker run --privileged --rm "$BINFMT_IMAGE" --uninstall qemu-*
+docker run --privileged --rm "$BINFMT_IMAGE" --install all
 
 cd $BEAT_DIR
 mage package
