@@ -310,8 +310,7 @@ steps:
       - label: ":ubuntu: x-pack/filebeat: Packaging Linux"
         key: "packaging-linux"
         command: |
-          cd x-pack/filebeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/filebeat
         retry:
           automatic:
             - limit: 1
@@ -331,8 +330,7 @@ steps:
       - label: ":ubuntu: x-pack/filebeat: Packaging arm64"
         key: "packaging-arm"
         command: |
-          cd x-pack/filebeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/filebeat
         retry:
           automatic:
             - limit: 1
