@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package netflow
+package convert
 
 import (
 	"bytes"
@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func toBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
+func RecordToBeatEvent(flow record.Record, internalNetworks []string) (event beat.Event) {
 	var e beat.Event
 	switch flow.Type {
 	case record.Flow:

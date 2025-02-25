@@ -453,6 +453,7 @@ func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event
 			},
 		},
 	}
+
 	if offset >= 0 {
 		event.Fields.Put("log.offset", offset)
 		event.SetID(objectID(p.s3Obj.S3.Object.LastModified, p.s3ObjHash, offset))

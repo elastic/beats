@@ -26,6 +26,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/convert"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
@@ -299,7 +300,7 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 		WithExpiration(0)
 
 	for _, fieldFile := range testCase.Fields {
-		fields, err := LoadFieldDefinitionsFromFile(filepath.Join(fieldsDir, fieldFile))
+		fields, err := decoder.LoadFieldDefinitionsFromFile(filepath.Join(fieldsDir, fieldFile))
 		if err != nil {
 			t.Fatal(err, fieldFile)
 		}
@@ -332,7 +333,7 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 			}
 			ev := make([]beat.Event, len(flows))
 			for i := range flows {
-				flow := toBeatEvent(flows[i], []string{"private"})
+				flow := convert.RecordToBeatEvent(flows[i], []string{"private"})
 				flow.Fields.Delete("event.created")
 				ev[i] = flow
 			}
@@ -380,7 +381,7 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 		}
 		ev := make([]beat.Event, len(flows))
 		for i := range flows {
-			flow := toBeatEvent(flows[i], []string{"private"})
+			flow := convert.RecordToBeatEvent(flows[i], []string{"private"})
 			flow.Fields.Delete("event.created")
 			ev[i] = flow
 		}
@@ -481,7 +482,7 @@ func TestReverseFlows(t *testing.T) {
 
 	evs := make([]beat.Event, 0, len(flows))
 	for _, f := range flows {
-		evs = append(evs, toBeatEvent(f, []string{"private"}))
+		evs = append(evs, convert.RecordToBeatEvent(f, []string{"private"}))
 	}
 	if !assert.Len(t, evs, 2) {
 		t.Fatal()
