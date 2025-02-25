@@ -15,14 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kerberos
+//go:build !requirefips
+
+package fingerprint
 
 import (
-	"net/http"
+	"crypto/md5"
+	"crypto/sha1"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+func init() {
+	nonFipsApprovedHashes := []namedHashMethod{
+		{Name: "md5", Hash: md5.New},
+		{Name: "sha1", Hash: sha1.New},
+	}
+	for _, h := range nonFipsApprovedHashes {
+		hashes[h.Name] = h
+	}
 }
