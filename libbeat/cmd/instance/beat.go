@@ -307,9 +307,15 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	if settings.DisableConfigResolver {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
-	} else {
+	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
 		config.OverwriteConfigOpts(configOpts(store))
+	} else {
+		config.OverwriteConfigOpts([]ucfg.Option{
+			ucfg.PathSep("."),
+			ucfg.ResolveEnv,
+			ucfg.VarExp,
+		})
 	}
 
 	b.Beat.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
@@ -1004,9 +1010,15 @@ func (b *Beat) configure(settings Settings) error {
 
 	if settings.DisableConfigResolver {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
-	} else {
+	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
 		config.OverwriteConfigOpts(configOpts(store))
+	} else {
+		config.OverwriteConfigOpts([]ucfg.Option{
+			ucfg.PathSep("."),
+			ucfg.ResolveEnv,
+			ucfg.VarExp,
+		})
 	}
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
@@ -1685,13 +1697,6 @@ func obfuscateConfigOpts() []ucfg.Option {
 		ucfg.PathSep("."),
 		ucfg.ResolveNOOP,
 	}
-}
-
-// LoadKeystore returns the appropriate keystore based on the configuration.
-func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
-	keystoreCfg, _ := cfg.Child("keystore", -1)
-	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
-	return keystore.Factory(keystoreCfg, defaultPathConfig, common.IsStrictPerms())
 }
 
 func InitKibanaConfig(beatConfig beatConfig) *config.C {
