@@ -309,13 +309,8 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
 	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
-		config.OverwriteConfigOpts(configOpts(store))
-	} else {
-		config.OverwriteConfigOpts([]ucfg.Option{
-			ucfg.PathSep("."),
-			ucfg.ResolveEnv,
-			ucfg.VarExp,
-		})
+		// note that if the store is nil it should be excluded as an option
+		config.OverwriteConfigOpts(configOptsWithKeystore(store))
 	}
 
 	b.Beat.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
@@ -1012,7 +1007,7 @@ func (b *Beat) configure(settings Settings) error {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
 	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
-		config.OverwriteConfigOpts(configOpts(store))
+		config.OverwriteConfigOpts(configOptsWithKeystore(store))
 	} else {
 		config.OverwriteConfigOpts([]ucfg.Option{
 			ucfg.PathSep("."),
@@ -1679,9 +1674,9 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 	}
 }
 
-// configOpts returns ucfg config options with a resolver linked to the current keystore.
+// configOptsWithKeystore returns ucfg config options with a resolver linked to the current keystore.
 // Refactor to allow insert into the config option array without having to redefine everything
-func configOpts(store keystore.Keystore) []ucfg.Option {
+func configOptsWithKeystore(store keystore.Keystore) []ucfg.Option {
 	return []ucfg.Option{
 		ucfg.PathSep("."),
 		ucfg.Resolve(keystore.ResolverWrap(store)),
