@@ -270,8 +270,7 @@ steps:
       - label: ":ubuntu: x-pack/metricbeat: Packaging Linux"
         key: "packaging-linux"
         command: |
-          cd x-pack/metricbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
         retry:
           automatic:
             - limit: 1
@@ -291,8 +290,7 @@ steps:
       - label: ":ubuntu: x-pack/metricbeat: Packaging arm64"
         key: "packaging-arm"
         command: |
-          cd x-pack/metricbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
         retry:
           automatic:
             - limit: 1

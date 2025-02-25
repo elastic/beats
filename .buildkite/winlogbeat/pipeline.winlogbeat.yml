@@ -188,8 +188,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
         command: |
-          cd winlogbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh winlogbeat
         retry:
           automatic:
             - limit: 1

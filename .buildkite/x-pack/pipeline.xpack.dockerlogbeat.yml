@@ -118,8 +118,7 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
           SNAPSHOT: true
         command: |
-          cd x-pack/dockerlogbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/dockerlogbeat
         retry:
           automatic:
             - limit: 1
@@ -139,8 +138,7 @@ steps:
           PACKAGES: "docker"
           SNAPSHOT: true
         command: |
-          cd x-pack/dockerlogbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/dockerlogbeat
         retry:
           automatic:
             - limit: 1
