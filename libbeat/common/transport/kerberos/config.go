@@ -33,7 +33,7 @@ const (
 )
 
 var (
-	InvalidAuthType = errors.New("invalid authentication type")
+	ErrInvalidAuthType = errors.New("invalid authentication type")
 
 	authTypes = map[string]AuthType{
 		authPasswordStr: authPassword,
