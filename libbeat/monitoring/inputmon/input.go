@@ -80,13 +80,17 @@ func NewInputRegistry(inputType, id string, parent *monitoring.Registry) (reg *m
 	if reg == nil {
 		reg = parentRegistry.NewRegistry(key)
 	}
-	monitoring.NewString(reg, "input").Set(inputType)
+	SetInputType(reg, inputType)
 	monitoring.NewString(reg, "id").Set(id)
 
 	return reg, func() {
 		log.Infow("unregistering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
 		parentRegistry.Remove(key)
 	}
+}
+
+func SetInputType(r *monitoring.Registry, inputType string) {
+	monitoring.NewString(r, "input").Set(inputType)
 }
 
 func sanitizeID(id string) string {

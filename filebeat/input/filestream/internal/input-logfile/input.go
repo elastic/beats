@@ -65,7 +65,13 @@ func (inp *managedInput) Run(
 	ctx.Cancelation = cancelCtx
 
 	metrics := NewMetrics(ctx)
-	defer metrics.Close()
+	// disable metrics if needed. The metrics is still safe to be used, but it
+	// won't report metrics anymore.
+	if inp.metricsID == "" {
+		metrics.Close()
+	} else {
+		defer metrics.Close()
+	}
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,

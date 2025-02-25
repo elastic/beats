@@ -27,13 +27,6 @@ func TestInputMetricsFromPipeline(t *testing.T) {
 http:
   enabled: true
 filebeat.inputs:
-  # an input which will attempt to recreate the inout monitoring registry
-  - type: benchmark
-    enabled: true
-    id: input-benchmark-id
-    index: logs-generic-default
-    count: 2
-
   # an input without ID, therefore not metrics for it.
   - type: filestream
     enabled: true
@@ -46,10 +39,12 @@ filebeat.inputs:
               message: "PUT"
     close.reader.after_interval: 10m
 
-  # an inout which does not register input metrics
+  # an input which does not register input metrics
   - type: log
+    id: log-input-id
     paths:
       - {{.log_path_no_id}}
+    allow_deprecated_use: true
 
   - type: filestream
     id: {{.filestream_id}}

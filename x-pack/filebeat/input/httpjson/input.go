@@ -24,6 +24,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/mito/lib/xml"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -167,6 +168,7 @@ func test(url *url.URL) error {
 }
 
 func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
+	inputmon.SetInputType(ctx.MetricsRegistry, "httpjson")
 	defer ctx.MetricsRegistryCancel()
 	return run(ctx, cfg, pub, crsr, ctx.MetricsRegistry)
 }

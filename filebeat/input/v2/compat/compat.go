@@ -54,6 +54,7 @@ type factory struct {
 // has returned.
 type runner struct {
 	id             string
+	emptyInputID   bool
 	log            *logp.Logger
 	agent          *beat.Info
 	wg             sync.WaitGroup
@@ -105,18 +106,19 @@ func (f *factory) Create(
 		return nil, err
 	}
 
-	id, err := configID(config)
+	id, wasEmpty, err := configID(config)
 	if err != nil {
 		return nil, err
 	}
 
 	return &runner{
-		id:        id,
-		log:       f.log.Named(input.Name()).With("id", id),
-		agent:     &f.info,
-		sig:       ctxtool.WithCancelContext(context.Background()),
-		input:     input,
-		connector: p,
+		id:           id,
+		emptyInputID: wasEmpty,
+		log:          f.log.Named(input.Name()).With("id", id),
+		agent:        &f.info,
+		sig:          ctxtool.WithCancelContext(context.Background()),
+		input:        input,
+		connector:    p,
 	}, nil
 }
 
@@ -142,8 +144,14 @@ func (r *runner) Start() {
 		// The http monitoring will check both namespaces for input metrics.
 		// Therefore, using either namespace won't affect how the metrics are
 		// published.
+		// As the runner always have a non-empty ID, we need to check if the
+		// config had ot not an ID to pass the correct value to inputmon.NewInputRegistry
+		inputID := r.id
+		if r.emptyInputID {
+			inputID = ""
+		}
 		reg, cancel := inputmon.NewInputRegistry(
-			name, r.id, r.agent.Monitoring.Namespace.GetRegistry())
+			name, inputID, r.agent.Monitoring.Namespace.GetRegistry())
 		err := r.input.Run(
 			v2.Context{
 				ID:                    r.id,
@@ -173,30 +181,37 @@ func (r *runner) Stop() {
 	r.statusReporter = nil
 }
 
-func configID(config *conf.C) (string, error) {
+// configID extracts or generates an ID for a configuration.
+// If the "id" is present in config and is non-empty, it is returned.
+// If the "id" is absent or empty, the function calculates a hash of the
+// entire configuration and returns it as a hexadecimal string as the ID.
+// The function returns the ID, a boolean indicating whether the ID
+// was generated (true) or extracted from the config (false), and an error, if
+// any.
+func configID(config *conf.C) (string, bool, error) {
 	tmp := struct {
 		ID string `config:"id"`
 	}{}
 	if err := config.Unpack(&tmp); err != nil {
-		return "", fmt.Errorf("error extracting ID: %w", err)
+		return "", false, fmt.Errorf("error extracting ID: %w", err)
 	}
 	if tmp.ID != "" {
-		return tmp.ID, nil
+		return tmp.ID, false, nil
 	}
 
 	var h map[string]interface{}
 	err := config.Unpack(&h)
 	if err != nil {
-		return "", fmt.Errorf("could not unpack config into %T: unpack failed: %w",
+		return "", false, fmt.Errorf("could not unpack config into %T: unpack failed: %w",
 			h, err)
 	}
 
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
-		return "", fmt.Errorf("can not compute id from configuration: %w", err)
+		return "", false, fmt.Errorf("can not compute id from configuration: %w", err)
 	}
 
-	return fmt.Sprintf("%16X", id), nil
+	return fmt.Sprintf("%16X", id), true, nil
 }
 
 func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
