@@ -68,8 +68,6 @@ steps:
         command: |
           #!/usr/bin/env bash
           set -euo pipefail
-          # Use newer multiarch support for packaging
-          docker run --privileged --rm tonistiigi/binfmt:master --install all
           cd auditbeat
           mage package
         retry:
@@ -78,8 +76,8 @@ steps:
         timeout_in_minutes: 20
         agents:
           provider: "aws"
-          imagePrefix: "platform-ingest-beats-ubuntu-2404-aarch64"
-          instanceType: "t4g.2xlarge"
+          image: "test-platform-ingest-beats-ubuntu-2204-aarch64-1740494662"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:
               context: "auditbeat: Packaging Linux arm64"
