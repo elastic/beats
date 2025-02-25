@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type prvdr struct {
@@ -82,13 +83,15 @@ func readPIDNsInode() (uint64, error) {
 }
 
 // NewProvider returns a new instance of kerneltracingprovider
-func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, error) {
+func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Registry) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
 	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER | quark.QQ_NO_SNAPSHOT
 	qq, err := quark.OpenQueue(attr, 64)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %w", err)
 	}
+
+	procMetrics := NewStats(reg)
 
 	p := &prvdr{
 		ctx:            ctx,
@@ -102,7 +105,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 		backoffSkipped: 0,
 	}
 
-	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr) {
+	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr, stats *Stats) {
+
+		lastUpdate := time.Now()
+
 		defer qq.Close()
 		for ctx.Err() == nil {
 			p.qqMtx.Lock()
@@ -112,6 +118,19 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 				logger.Errorw("get events from quark, no more process enrichment from this processor will be done", "error", err)
 				break
 			}
+			if time.Since(lastUpdate) > time.Second*5 {
+				p.qqMtx.Lock()
+				metrics := qq.Stats()
+				p.qqMtx.Unlock()
+
+				stats.Aggregations.Set(metrics.Aggregations)
+				stats.Insertions.Set(metrics.Insertions)
+				stats.Lost.Set(metrics.Lost)
+				stats.NonAggregations.Set(metrics.NonAggregations)
+				stats.Removals.Set(metrics.Removals)
+				lastUpdate = time.Now()
+			}
+
 			if len(events) == 0 {
 				err = qq.Block()
 				if err != nil {
@@ -120,7 +139,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 				}
 			}
 		}
-	}(ctx, qq, logger, p)
+	}(ctx, qq, logger, p, procMetrics)
 
 	bootID, err = readBootID()
 	if err != nil {
@@ -150,11 +169,8 @@ const (
 // does not exceed a reasonable threshold that would delay all other events processed by auditbeat. When in the backoff state, enrichment
 // will proceed without waiting for the process data to exist in the cache, likely resulting in missing enrichment data.
 func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
-	p.qqMtx.Lock()
-	defer p.qqMtx.Unlock()
-
 	// If pid is already in qq, return immediately
-	if _, found := p.qq.Lookup(int(pid)); found {
+	if _, found := p.lookupLocked(pid); found {
 		return nil
 	}
 
@@ -169,7 +185,7 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 	nextWait := 5 * time.Millisecond
 	for {
 		waited := time.Since(start)
-		if _, found := p.qq.Lookup(int(pid)); found {
+		if _, found := p.lookupLocked(pid); found {
 			p.logger.Debugw("got process that was missing ", "waited", waited)
 			p.combinedWait = p.combinedWait + waited
 			return nil
