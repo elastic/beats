@@ -38,7 +38,7 @@ func init() {
 }
 
 const (
-	statsPath = "/_stats"
+	statsPath = "/_stats?level=cluster"
 
 	allowClosedIndices = "forbid_closed_indices=false"
 )
