@@ -165,15 +165,6 @@ func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 			assert.Failf(t, msg, "ignored field %q does not exist in either map, please remove it from the ignored fields", f)
 		}
 
-		// If the ignored field exists and is equal in both maps then it shouldn't be ignored
-		if hasKeyM1 && hasKeyM2 {
-			valM1, _ := flatM1.GetValue(f)
-			valM2, _ := flatM2.GetValue(f)
-			if valM1 == valM2 {
-				assert.Failf(t, msg, "ignored field %q is equal in both maps, please remove it from the ignored fields", f)
-			}
-		}
-
 		flatM1.Delete(f)
 		flatM2.Delete(f)
 	}

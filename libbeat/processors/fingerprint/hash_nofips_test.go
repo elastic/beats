@@ -15,14 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kerberos
+//go:build !requirefips
+
+package fingerprint
 
 import (
-	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+func TestHashMethod(t *testing.T) {
+	require.Len(t, hashes, 6)
+	require.Contains(t, hashes, "md5")
+	require.Contains(t, hashes, "sha1")
+	require.Contains(t, hashes, "sha256")
+	require.Contains(t, hashes, "sha384")
+	require.Contains(t, hashes, "sha512")
+	require.Contains(t, hashes, "xxhash")
 }
