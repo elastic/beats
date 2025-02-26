@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"time"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
@@ -45,65 +46,52 @@ func Run(
 	// to shut down or when returning after io.EOF
 	cancelCtx, cancelFn := ctxtool.WithFunc(ctx, func() {
 		if err := api.Close(); err != nil {
-			log.Errorw("Error while closing Windows Event Log access", "error", err)
+			log.Errorw("error while closing Windows Event Log access", "error", err)
 		}
 	})
 	defer cancelFn()
 
-	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
-	channelNotFoundErrDetected := false
+	openErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		if IsRecoverable(err, api.IsFile()) {
+			log.Errorw("encountered recoverable error when opening Windows Event Log", "error", err)
+			return true
+		}
+		return false
+	})
+
+	readErrHandler := newExponentialLimitedBackoff(log, 5*time.Second, time.Minute, func(err error) bool {
+		if IsRecoverable(err, api.IsFile()) {
+			log.Errorw("encountered recoverable error when reading from Windows Event Log", "error", err)
+			if resetErr := api.Reset(); resetErr != nil {
+				log.Errorw("error resetting Windows Event Log handle", "error", resetErr)
+			}
+			return true
+		}
+		return false
+	})
 
 runLoop:
-	for {
-		//nolint:nilerr // only log error if we are not shutting down
-		if cancelCtx.Err() != nil {
-			return nil
-		}
-
+	for cancelCtx.Err() == nil {
 		openErr := api.Open(evtCheckpoint)
-
-		switch {
-		case IsRecoverable(openErr):
-			log.Errorw("Encountered recoverable error when opening Windows Event Log", "error", openErr)
-			_ = timed.Wait(cancelCtx, 5*time.Second)
-			continue
-		case !api.IsFile() && IsChannelNotFound(openErr):
-			if !channelNotFoundErrDetected {
-				log.Errorw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
-			} else {
-				log.Debugw("Encountered channel not found error when opening Windows Event Log", "error", openErr)
+		if openErr != nil {
+			if openErrHandler.backoff(cancelCtx, openErr) {
+				continue
 			}
-			channelNotFoundErrDetected = true
-			_ = timed.Wait(cancelCtx, 5*time.Second)
-			continue
-		case openErr != nil:
 			return fmt.Errorf("failed to open Windows Event Log channel %q: %w", api.Channel(), openErr)
 		}
-		channelNotFoundErrDetected = false
 
-		log.Debug("Windows Event Log opened successfully")
+		log.Debug("windows event log opened successfully")
 
 		// read loop
 		for cancelCtx.Err() == nil {
-			records, err := api.Read()
-			if IsRecoverable(err) {
-				log.Errorw("Encountered recoverable error when reading from Windows Event Log", "error", err)
-				if resetErr := api.Reset(); resetErr != nil {
-					log.Errorw("Error resetting Windows Event Log handle", "error", resetErr)
+			records, readErr := api.Read()
+			if readErr != nil {
+				if readErrHandler.backoff(cancelCtx, readErr) {
+					continue runLoop
 				}
-				continue runLoop
-			}
-			if !api.IsFile() && IsChannelNotFound(err) {
-				log.Errorw("Encountered channel not found error when reading from Windows Event Log", "error", err)
-				if resetErr := api.Reset(); resetErr != nil {
-					log.Errorw("Error resetting Windows Event Log handle", "error", resetErr)
-				}
-				continue runLoop
-			}
 
-			if err != nil {
-				if errors.Is(err, io.EOF) {
-					log.Debugw("End of Winlog event stream reached", "error", err)
+				if errors.Is(readErr, io.EOF) {
+					log.Debugw("end of Winlog event stream reached", "error", readErr)
 					return nil
 				}
 
@@ -112,9 +100,11 @@ runLoop:
 					return nil
 				}
 
-				log.Errorw("Error occurred while reading from Windows Event Log", "error", err)
-				return err
+				log.Errorw("error occurred while reading from Windows Event Log", "error", readErr)
+
+				return readErr
 			}
+
 			if len(records) == 0 {
 				_ = timed.Wait(cancelCtx, time.Second)
 				continue
@@ -125,4 +115,44 @@ runLoop:
 			}
 		}
 	}
+	return nil
+}
+
+type exponentialLimitedBackoff struct {
+	log              *logp.Logger
+	initialDelay     time.Duration
+	maxDelay         time.Duration
+	currentDelay     time.Duration
+	backoffCondition func(error) bool
+}
+
+func newExponentialLimitedBackoff(log *logp.Logger, initialDelay, maxDelay time.Duration, errCondition func(error) bool) *exponentialLimitedBackoff {
+	b := &exponentialLimitedBackoff{
+		log:              log,
+		initialDelay:     initialDelay,
+		maxDelay:         maxDelay,
+		backoffCondition: errCondition,
+	}
+	b.reset()
+	return b
+}
+
+func (b *exponentialLimitedBackoff) backoff(ctx context.Context, err error) bool {
+	if !b.backoffCondition(err) {
+		b.reset()
+		return false
+	}
+	b.log.Debugf("backing off, waiting for %v", b.currentDelay)
+	select {
+	case <-ctx.Done():
+		return false
+	case <-time.After(b.currentDelay):
+		// Calculate the next delay, doubling it but not exceeding maxDelay
+		b.currentDelay = time.Duration(math.Min(float64(b.maxDelay), float64(b.currentDelay*2)))
+		return true
+	}
+}
+
+func (b *exponentialLimitedBackoff) reset() {
+	b.currentDelay = b.initialDelay
 }
