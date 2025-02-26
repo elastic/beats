@@ -41,7 +41,7 @@ const (
 	statsPath = "/_stats"
 
 	onlyClusterLevel   = "level=cluster"
-	allowClosedIndices = "forbid_closed_indices=false"
+	allowClosedIndices = "&forbid_closed_indices=false"
 )
 
 var (
