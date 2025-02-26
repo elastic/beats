@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/magefile/mage/sh"
@@ -33,17 +34,8 @@ import (
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
-// beats are the beats the agentbeat combines
-var beats = []string{
-	"auditbeat",
-	"filebeat",
-	"heartbeat",
-	"metricbeat",
-	"osquerybeat",
-	"packetbeat",
-}
-
 func init() {
+
 	common.RegisterCheckDeps(Update)
 
 	devtools.BeatDescription = "Combined beat ran only by the Elastic Agent"
@@ -74,8 +66,12 @@ func BuildSystemTestBinary() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	args := devtools.DefaultGolangCrossBuildArgs()
+	if slices.Contains(getIncludedBeats(), "packetbeat") {
+		args = packetbeat.GolangCrossBuildArgs()
+	}
 	// need packetbeat build arguments as it address the requirements for libpcap
-	args := packetbeat.GolangCrossBuildArgs()
+
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 
 	return multierr.Combine(
@@ -86,9 +82,12 @@ func GolangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild(
-		devtools.ImageSelector(xpacketbeat.ImageSelector),
-	)
+	if slices.Contains(getIncludedBeats(), "packetbeat") {
+		return devtools.CrossBuild(
+			devtools.ImageSelector(xpacketbeat.ImageSelector),
+		)
+	}
+	return devtools.CrossBuild()
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -164,7 +163,7 @@ func Update() {
 }
 
 func callForEachBeat(target string) error {
-	for _, beat := range beats {
+	for _, beat := range getIncludedBeats() {
 		err := callForBeat(target, beat)
 		if err != nil {
 			return fmt.Errorf("failed to perform mage %s for beat %s: %w", target, beat, err)
@@ -215,4 +214,26 @@ func GoIntegTest(ctx context.Context) error {
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+}
+
+func getIncludedBeats() []string {
+	if devtools.FIPSBuild {
+		// If a FIPS-compliant version of agentbeat is being built, restrict the list of beats to the fips-compliant ones
+		// FIPS-compliant beats the agentbeat combines
+		return []string{
+			"auditbeat",
+			"filebeat",
+			"metricbeat",
+		}
+	}
+
+	// beats are the beats the agentbeat combines
+	return []string{
+		"auditbeat",
+		"filebeat",
+		"heartbeat",
+		"metricbeat",
+		"osquerybeat",
+		"packetbeat",
+	}
 }
