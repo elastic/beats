@@ -98,9 +98,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	if err := re.query.CollectData(); err != nil {
 		// users can encounter the case no counters are found (services/processes stopped), this should not generate an event with the error message,
 		//could be the case the specific services are started after and picked up by the next RefreshCounterPaths func
-		if err == pdh.PDH_NO_COUNTERS { //nolint:errorlint // linter complains about comparing error using '==' operator but here error is always of type pdh.PdhErrno (or nil) so `errors.Is` is redundant here
-			re.log.Warnf("%s %v", collectFailedMsg, err)
-		} else if err == pdh.PDH_NO_DATA { //nolint:errorlint // the same thing as above ^
+		if err == pdh.PDH_NO_COUNTERS || err == pdh.PDH_NO_DATA { //nolint:errorlint // linter complains about comparing error using '==' operator but here error is always of type pdh.PdhErrno (or nil) so `errors.Is` is redundant here
 			re.log.Warnf("%s %v", collectFailedMsg, err)
 
 			// without the return statement here it still fails when trying to get counter values
