@@ -154,21 +154,25 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 	// Drain the netlink channel in parallel to Close() to prevent a deadlock.
 	// This goroutine will terminate once receive from netlink errors (EBADF,
 	// EBADFD, or any other error). This happens because the fd is closed.
-	go func() {
+	closeWaiter := &sync.WaitGroup{}
+	closeWaiter.Add(1)
+	go func(testClient *libaudit.AuditClient) {
 		for {
-			_, err := client.Netlink.Receive(true, discard)
+			_, err := testClient.Netlink.Receive(true, discard)
 			switch {
 			case err == nil, errors.Is(err, syscall.EINTR):
 			case errors.Is(err, syscall.EAGAIN):
 				time.Sleep(50 * time.Millisecond)
 			default:
+				closeWaiter.Done()
 				return
 			}
 		}
-	}()
+	}(client)
 	if err := client.Close(); err != nil {
 		log.Errorw("Error closing audit monitoring client", "error", err)
 	}
+	closeWaiter.Wait()
 }
 
 // Run initializes the audit client and receives audit messages from the
@@ -218,6 +222,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 			reporter.Error(err)
 			ms.log.Errorw("Failure creating audit monitoring client", "error", err)
 		}
+		ms.log.Infof("starting lost event monitor")
 		go func() {
 			defer func() { // Close the most recently allocated "client" instance.
 				if client != nil {
