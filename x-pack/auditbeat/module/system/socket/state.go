@@ -977,7 +977,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"complete": f.complete,
 		},
 	}
-	if communityid := flowhash.Hash(flowhash.Flow{
+	if communityid := flowhash.CommunityID.Hash(flowhash.Flow{
 		SourceIP:        localAddr.IP,
 		SourcePort:      uint16(localAddr.Port),
 		DestinationIP:   remoteAddr.IP,

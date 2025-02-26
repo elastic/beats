@@ -249,7 +249,7 @@ func (f *Fields) ComputeValues(localIPs []net.IP, internalNetworks []string) err
 	flow.ICMP.Type = f.ICMPType
 	flow.ICMP.Code = f.ICMPCode
 	if flow.Protocol > 0 && len(flow.SourceIP) > 0 && len(flow.DestinationIP) > 0 {
-		f.Network.CommunityID = flowhash.Hash(flow)
+		f.Network.CommunityID = flowhash.CommunityID.Hash(flow)
 	}
 
 	// network.type

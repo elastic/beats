@@ -327,7 +327,7 @@ func flowToBeatEvent(flow record.Record, internalNetworks []string) beat.Event {
 		ecsNetwork["name"] = ssid
 	}
 
-	if communityid := flowhash.Hash(flowhash.Flow{
+	if communityid := flowhash.CommunityID.Hash(flowhash.Flow{
 		SourceIP:        srcIP,
 		SourcePort:      srcPort,
 		DestinationIP:   dstIP,

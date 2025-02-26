@@ -21,8 +21,4 @@ package flowhash
 
 import "crypto"
 
-var communityID = NewCommunityID(0, Base64Encoding, crypto.SHA1)
-
-func hashFlow(flow Flow) string {
-	return communityID.Hash(flow)
-}
+var CommunityID = NewCommunityID(0, Base64Encoding, crypto.SHA1)

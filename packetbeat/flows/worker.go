@@ -472,7 +472,7 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 		}
 	}
 	if communityID.Protocol > 0 && len(communityID.SourceIP) > 0 && len(communityID.DestinationIP) > 0 {
-		if hash := flowhash.Hash(communityID); hash != "" {
+		if hash := flowhash.CommunityID.Hash(communityID); hash != "" {
 			network["community_id"] = hash
 		}
 	}

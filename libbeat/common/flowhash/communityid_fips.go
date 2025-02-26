@@ -19,6 +19,16 @@
 
 package flowhash
 
-func hashFlow(flow Flow) string {
+var CommunityID = NewCommunityID()
+
+type communityIDHasher struct{}
+
+// NewCommunityID allows to instantiate a flow hasher with custom settings.
+func NewCommunityID() Hasher {
+	return &communityIDHasher{}
+}
+
+// Hash returns the hash for the given flow.
+func (h *communityIDHasher) Hash(flow Flow) string {
 	return ""
 }

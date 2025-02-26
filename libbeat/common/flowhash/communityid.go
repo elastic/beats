@@ -29,13 +29,6 @@ type communityIDHasher struct {
 	hash    crypto.Hash
 }
 
-// Hash returns the hash of the given flow.
-// It uses an hasher with the default values in the community ID specification.
-// An empty string is returned if the hasher is not available.
-func Hash(flow Flow) string {
-	return hashFlow(flow)
-}
-
 // NewCommunityID allows to instantiate a flow hasher with custom settings.
 func NewCommunityID(seed uint16, encoder Encoding, hash crypto.Hash) Hasher {
 	h := &communityIDHasher{
