@@ -231,6 +231,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
 - Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 
 *Osquerybeat*
 
