@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"go.uber.org/zap"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -45,6 +46,8 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
+	// correct values are extracted from baseCfg
+	set.Logger = set.Logger.With(zap.String("component.id", "randomID"))
 	b, err := instance.NewBeatReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
