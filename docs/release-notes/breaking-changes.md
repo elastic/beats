@@ -1,5 +1,5 @@
 ---
-navigation_title: "Beats breaking changes"
+navigation_title: "Beats"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/breaking-changes.html
 ---

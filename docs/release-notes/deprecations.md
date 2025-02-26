@@ -1,5 +1,5 @@
 ---
-navigation_title: "Beats deprecations"
+navigation_title: "Beats"
 ---
 
 # Beats deprecations [beats-deprecations]

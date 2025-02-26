@@ -1,5 +1,5 @@
 ---
-navigation_title: "Beats known issues"
+navigation_title: "Beats"
 
 ---
 
