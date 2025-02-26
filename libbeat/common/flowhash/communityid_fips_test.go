@@ -28,6 +28,4 @@ import (
 func TestCommunityID(t *testing.T) {
 	s := CommunityID.Hash(Flow{SourcePort: 1})
 	require.Empty(t, s)
-
 }
-
