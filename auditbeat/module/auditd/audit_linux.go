@@ -172,6 +172,8 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 	if err := client.Close(); err != nil {
 		log.Errorw("Error closing audit monitoring client", "error", err)
 	}
+	// If we don't wait for the socket to drain, the calling function may tinker with
+	// the AuditClient pointer while the goroutine is trying to drain it
 	closeWaiter.Wait()
 }
 
@@ -222,7 +224,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 			reporter.Error(err)
 			ms.log.Errorw("Failure creating audit monitoring client", "error", err)
 		}
-		ms.log.Infof("starting lost event monitor")
+
 		go func() {
 			defer func() { // Close the most recently allocated "client" instance.
 				if client != nil {
