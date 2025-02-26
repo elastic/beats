@@ -269,11 +269,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, r); err != nil {
 		// If an error occurs during the download, handle it here
-		if errors.Is(err, io.ErrUnexpectedEOF) {
-			return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
-		} else {
-			return fmt.Errorf("failed to copy json: %w", err)
-		}
+		return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
 	}
 	dec := json.NewDecoder(&buf)
 	dec.UseNumber()
