@@ -15,14 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kerberos
+//go:build requirefips
+
+package instance
 
 import (
-	"net/http"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+// LoadKeystore returns nil in FIPS mode
+func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
+	return nil, nil
 }

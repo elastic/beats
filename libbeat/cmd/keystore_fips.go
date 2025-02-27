@@ -15,14 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kerberos
+//go:build requirefips
+
+package cmd
 
 import (
-	"net/http"
+	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+// genKeystoreCmd returns nil in fips mode as the keystore is disabled.
+func genKeystoreCmd(_ instance.Settings) *cobra.Command {
+	return nil
 }

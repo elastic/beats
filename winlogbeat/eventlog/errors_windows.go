@@ -19,6 +19,7 @@ package eventlog
 
 import (
 	"errors"
+	"io"
 
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
@@ -28,13 +29,13 @@ import (
 // reopening of the handle (Close, Open).
 //
 //nolint:errorlint // These are never wrapped.
-func IsRecoverable(err error) bool {
-	return err == win.ERROR_INVALID_HANDLE || err == win.RPC_S_SERVER_UNAVAILABLE ||
-		err == win.RPC_S_CALL_CANCELLED || err == win.ERROR_EVT_QUERY_RESULT_STALE ||
-		err == win.ERROR_INVALID_PARAMETER || err == win.ERROR_EVT_PUBLISHER_DISABLED
-}
-
-// IsChannelNotFound returns true if the error indicates the channel was not found.
-func IsChannelNotFound(err error) bool {
-	return errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND)
+func IsRecoverable(err error, isFile bool) bool {
+	return err == win.ERROR_INVALID_HANDLE ||
+		err == win.RPC_S_SERVER_UNAVAILABLE ||
+		err == win.RPC_S_CALL_CANCELLED ||
+		err == win.ERROR_EVT_QUERY_RESULT_STALE ||
+		err == win.ERROR_INVALID_PARAMETER ||
+		err == win.ERROR_EVT_PUBLISHER_DISABLED ||
+		(!isFile && errors.Is(err, io.EOF)) ||
+		(!isFile && errors.Is(err, win.ERROR_EVT_CHANNEL_NOT_FOUND))
 }

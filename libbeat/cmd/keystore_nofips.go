@@ -15,14 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kerberos
+//go:build !requirefips
+
+package cmd
 
 import (
-	"net/http"
+	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
+// genKeystoreCmd initialize the Keystore command to manage the Keystore
+// with the following subcommands:
+//   - create
+//   - add
+//   - remove
+//   - list
+func genKeystoreCmd(settings instance.Settings) *cobra.Command {
+	keystoreCmd := cobra.Command{
+		Use:   "keystore",
+		Short: "Manage secrets keystore",
+	}
 
-	CloseIdleConnections()
+	keystoreCmd.AddCommand(genCreateKeystoreCmd(settings))
+	keystoreCmd.AddCommand(genAddKeystoreCmd(settings))
+	keystoreCmd.AddCommand(genRemoveKeystoreCmd(settings))
+	keystoreCmd.AddCommand(genListKeystoreCmd(settings))
+
+	return &keystoreCmd
 }

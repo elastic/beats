@@ -15,14 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kerberos
+//go:build requirefips
+
+package instance
 
 import (
-	"net/http"
+	"testing"
+
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+func TestLoadKeystore(t *testing.T) {
+	ks, err := LoadKeystore(config.NewConfig(), "test")
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if ks != nil {
+		t.Error("keystore is not nil.")
+	}
 }

@@ -15,14 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kerberos
+//go:build !requirefips
+
+package instance
 
 import (
-	"net/http"
+	"fmt"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+// LoadKeystore returns the appropriate keystore based on the configuration.
+func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
+	keystoreCfg, _ := cfg.Child("keystore", -1)
+	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
+	return keystore.Factory(keystoreCfg, defaultPathConfig, common.IsStrictPerms())
 }
