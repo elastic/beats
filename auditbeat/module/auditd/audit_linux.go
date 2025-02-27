@@ -156,24 +156,26 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 	// EBADFD, or any other error). This happens because the fd is closed.
 	closeWaiter := &sync.WaitGroup{}
 	closeWaiter.Add(1)
-	go func(testClient *libaudit.AuditClient) {
+	go func() {
+		defer closeWaiter.Done()
 		for {
-			_, err := testClient.Netlink.Receive(true, discard)
+			_, err := client.Netlink.Receive(true, discard)
 			switch {
 			case err == nil, errors.Is(err, syscall.EINTR):
 			case errors.Is(err, syscall.EAGAIN):
 				time.Sleep(50 * time.Millisecond)
 			default:
-				closeWaiter.Done()
+
 				return
 			}
 		}
-	}(client)
+	}()
 	if err := client.Close(); err != nil {
 		log.Errorw("Error closing audit monitoring client", "error", err)
 	}
-	// If we don't wait for the socket to drain, the calling function may tinker with
-	// the AuditClient pointer while the goroutine is trying to drain it
+	// If we don't wait for the socket to drain, the calling function can
+	// assign a new client instance to the same pointer while our goroutine is using it.
+	// This guarentees that nothing is depending on the *client pointer by the time we return.
 	closeWaiter.Wait()
 }
 
