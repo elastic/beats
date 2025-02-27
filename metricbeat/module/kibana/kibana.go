@@ -43,7 +43,6 @@ const (
 	NodeRulesPath      = "api/monitoring_collection/node_rules"
 	ClusterActionsPath = "api/monitoring_collection/cluster_actions"
 	NodeActionsPath    = "api/monitoring_collection/node_actions"
-	SettingsPath       = "api/settings"
 )
 
 var (
@@ -56,9 +55,6 @@ var (
 
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
 	StatsAPIAvailableVersion = v6_4_0
-
-	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
-	SettingsAPIAvailableVersion = v6_5_0
 
 	// Version of Kibana since when the rules and task manager APIs are available
 	RulesAPIAvailableVersion   = v8_2_0
@@ -119,11 +115,6 @@ func GetVersion(http *helper.HTTP, currentPath string, apiKey string) (*version.
 // IsStatsAPIAvailable returns whether the stats API is available in the given version of Kibana
 func IsStatsAPIAvailable(currentKibanaVersion *version.V) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, StatsAPIAvailableVersion)
-}
-
-// IsSettingsAPIAvailable returns whether the settings API is available in the given version of Kibana
-func IsSettingsAPIAvailable(currentKibanaVersion *version.V) bool {
-	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
 }
 
 // IsRulesAPIAvailable returns whether the rules API is available in the given version of Kibana
