@@ -5,11 +5,12 @@
 package auth
 
 import (
+	"crypto"
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
 
-	"github.com/Azure/go-autorest/autorest/adal"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -23,26 +24,16 @@ func NewProviderFromCertificate(
 	if err != nil {
 		return nil, fmt.Errorf("failed loading certificates: %w", err)
 	}
-	oauth, err := adal.NewOAuthConfig(endpoint, tenantID)
-	if err != nil {
-		return nil, fmt.Errorf("error generating OAuthConfig: %w", err)
-	}
 
-	spt, err := adal.NewServicePrincipalTokenFromCertificate(
-		*oauth,
-		applicationID,
-		cert,
-		privKey,
-		resource,
-	)
+	cred, err := azidentity.NewClientCertificateCredential(tenantID, applicationID, []*x509.Certificate{cert}, privKey, nil)
 	if err != nil {
 		return nil, err
 	}
-	spt.SetAutoRefresh(true)
-	return (*servicePrincipalToken)(spt), nil
+
+	return (*credentialTokenProvider)(cred), nil
 }
 
-func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, key *rsa.PrivateKey, err error) {
+func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, key crypto.PrivateKey, err error) {
 	tlsCert, err := tlscommon.LoadCertificate(&cfg)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error loading X509 certificate from '%s': %w", cfg.Certificate, err)
@@ -61,5 +52,5 @@ func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, k
 	if !ok {
 		return nil, nil, fmt.Errorf("private key at '%s' is not an RSA private key", cfg.Key)
 	}
-	return cert, key, nil
+	return cert, tlsCert.PrivateKey, nil
 }

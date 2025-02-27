@@ -186,7 +186,6 @@ func (l listBlob) handleError(response *http.Response) (actions []poll.Action) {
 		// Authentication error. Renew oauth token and repeat this op.
 		l.delay = l.env.Config.PollInterval
 		return []poll.Action{
-			poll.RenewToken(),
 			poll.Fetch(l),
 		}
 	case 408, 503:
