@@ -142,6 +142,12 @@ CHANGELOG*
 /x-pack/filebeat/input/streaming/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/aws @elastic/obs-ds-hosted-services
+/x-pack/filebeat/module/aws/cloudtrail @elastic/obs-infraobs-integrations
+/x-pack/filebeat/module/aws/cloudwatch @elastic/obs-ds-hosted-services
+/x-pack/filebeat/module/aws/ec2 @elastic/obs-ds-hosted-services
+/x-pack/filebeat/module/aws/elb @elastic/obs-infraobs-integrations
+/x-pack/filebeat/module/aws/s3access @elastic/obs-ds-hosted-services @elastic/security-service-integrations
+/x-pack/filebeat/module/aws/vpcflow @elastic/security-service-integrations
 /x-pack/filebeat/module/awsfargate @elastic/obs-ds-hosted-services
 /x-pack/filebeat/module/azure @elastic/obs-ds-hosted-services
 /x-pack/filebeat/module/barracuda @elastic/security-service-integrations
@@ -199,6 +205,24 @@ CHANGELOG*
 /x-pack/metricbeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/airflow @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/aws @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/aws/billing @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/cloudwatch @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/aws/dynamodb @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/ebs @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/aws/ec2 @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/aws/elb @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/kinesis @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/lambda @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/natgateway @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/rds @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/s3_daily_storage @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/aws/s3_request @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/aws/sns @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/sqs @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/transitgateway @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/usage @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/vpn @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws/sqs @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/awsfargate @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/azure @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/azure/billing @elastic/obs-infraobs-integrations
