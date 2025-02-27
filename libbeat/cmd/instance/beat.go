@@ -103,6 +103,9 @@ type Beat struct {
 
 	// shouldReexec is a flag to indicate the Beat should restart
 	shouldReexec bool
+
+	stateRegistry *monitoring.Registry
+	infoRegistry  *monitoring.Registry
 }
 
 type beatConfig struct {
@@ -313,6 +316,8 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	}
 
 	b.Beat.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
+
+	b.SetupRegistry()
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
 	if err != nil {
@@ -571,7 +576,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	// Report central management state
-	mgmt := monitoring.GetNamespace("state").GetRegistry().NewRegistry("management")
+	mgmt := b.stateRegistry.NewRegistry("management")
 	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	debugf("Initializing output plugins")
@@ -589,7 +594,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	var publisher *pipeline.Pipeline
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
-		Telemetry: monitoring.GetNamespace("state").GetRegistry(),
+		Telemetry: b.stateRegistry,
 		Logger:    logp.L().Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
@@ -654,7 +659,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
-	b.registerMetrics()
+	b.RegisterMetrics()
 
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
@@ -762,46 +767,43 @@ func (b *Beat) reexec() error {
 	return b.doReexec()
 }
 
-// registerMetrics registers metrics with the internal monitoring API. This data
+// RegisterMetrics registers metrics with the internal monitoring API. This data
 // is then exposed through the HTTP monitoring endpoint (e.g. /info and /state)
 // and/or pushed to Elasticsearch through the x-pack monitoring feature.
-func (b *Beat) registerMetrics() {
+func (b *Beat) RegisterMetrics() {
 	// info
-	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
-	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
-	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
-	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
-	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
-	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
-	monitoring.NewString(infoRegistry, "binary_arch").Set(runtime.GOARCH)
-	monitoring.NewString(infoRegistry, "build_commit").Set(version.Commit())
-	monitoring.NewTimestamp(infoRegistry, "build_time").Set(version.BuildTime())
-	monitoring.NewBool(infoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+	monitoring.NewString(b.infoRegistry, "version").Set(b.Info.Version)
+	monitoring.NewString(b.infoRegistry, "beat").Set(b.Info.Beat)
+	monitoring.NewString(b.infoRegistry, "name").Set(b.Info.Name)
+	monitoring.NewString(b.infoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(b.infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
+	monitoring.NewString(b.infoRegistry, "binary_arch").Set(runtime.GOARCH)
+	monitoring.NewString(b.infoRegistry, "build_commit").Set(version.Commit())
+	monitoring.NewTimestamp(b.infoRegistry, "build_time").Set(version.BuildTime())
+	monitoring.NewBool(b.infoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
 
 	// Add user metadata data asynchronously (on Windows the lookup can take up to 60s).
 	go func() {
 		if u, err := user.Current(); err != nil {
 			// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
 			// if the user set securityContext.runAsUser to an arbitrary value.
-			monitoring.NewString(infoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
-			monitoring.NewString(infoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
+			monitoring.NewString(b.infoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
+			monitoring.NewString(b.infoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
 		} else {
-			monitoring.NewString(infoRegistry, "username").Set(u.Username)
-			monitoring.NewString(infoRegistry, "uid").Set(u.Uid)
-			monitoring.NewString(infoRegistry, "gid").Set(u.Gid)
+			monitoring.NewString(b.infoRegistry, "username").Set(u.Username)
+			monitoring.NewString(b.infoRegistry, "uid").Set(u.Uid)
+			monitoring.NewString(b.infoRegistry, "gid").Set(u.Gid)
 		}
 	}()
 
-	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-
 	// state.service
-	serviceRegistry := stateRegistry.NewRegistry("service")
+	serviceRegistry := b.stateRegistry.NewRegistry("service")
 	monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
 	monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
 	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
 
 	// state.beat
-	beatRegistry := stateRegistry.NewRegistry("beat")
+	beatRegistry := b.stateRegistry.NewRegistry("beat")
 	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 }
 
@@ -809,28 +811,10 @@ func (b *Beat) RegisterHostname(useFQDN bool) {
 	hostname := b.Info.FQDNAwareHostname(useFQDN)
 
 	// info.hostname
-	var infoRegistry *monitoring.Registry
-	if b.Info.Monitoring.Namespace != nil {
-		infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("info")
-		if infoRegistry == nil {
-			infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("info")
-		}
-	} else {
-		infoRegistry = monitoring.GetNamespace("info").GetRegistry()
-	}
-	monitoring.NewString(infoRegistry, "hostname").Set(hostname)
+	monitoring.NewString(b.infoRegistry, "hostname").Set(hostname)
 
 	// state.host
-	var stateRegistry *monitoring.Registry
-	if b.Info.Monitoring.Namespace != nil {
-		stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("state")
-		if stateRegistry == nil {
-			stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("state")
-		}
-	} else {
-		stateRegistry = monitoring.GetNamespace("state").GetRegistry()
-	}
-	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
+	monitoring.NewFunc(b.stateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -970,6 +954,30 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
+func (b *Beat) SetupRegistry() {
+	var infoRegistry *monitoring.Registry
+	if b.Info.Monitoring.Namespace != nil {
+		infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("info")
+		if infoRegistry == nil {
+			infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("info")
+		}
+	} else {
+		infoRegistry = monitoring.GetNamespace("info").GetRegistry()
+	}
+	b.infoRegistry = infoRegistry
+
+	var stateRegistry *monitoring.Registry
+	if b.Info.Monitoring.Namespace != nil {
+		stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("state")
+		if stateRegistry == nil {
+			stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("state")
+		}
+	} else {
+		stateRegistry = monitoring.GetNamespace("state").GetRegistry()
+	}
+	b.stateRegistry = stateRegistry
+}
+
 // handleFlags converts -flag to --flags, parses the command line
 // flags, and it invokes the HandleFlags callback if implemented by
 // the Beat.
@@ -990,6 +998,8 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
+
+	b.SetupRegistry()
 
 	if err := initPaths(cfg); err != nil {
 		return err
@@ -1513,8 +1523,7 @@ func (b *Beat) registerClusterUUIDFetching() {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
-	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
+	elasticsearchRegistry := b.stateRegistry.NewRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
 	callback := func(esClient *eslegclient.Connection) error {
@@ -1551,8 +1560,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
-		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-		monitoringRegistry := stateRegistry.NewRegistry("monitoring")
+		monitoringRegistry := b.stateRegistry.NewRegistry("monitoring")
 		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
 		clusterUUIDRegVar.Set(monitoringClusterUUID)
 	}
