@@ -153,3 +153,46 @@ func TestIsWildcard(t *testing.T) {
 	result = isWildcard(queries, instance)
 	assert.False(t, result)
 }
+
+func Test_handleCollectDataError(t *testing.T) {
+	tests := []struct {
+		name string
+
+		mockErr        error
+		expectedErrMsg string
+	}{
+		{
+			name: "no counters error",
+
+			mockErr:        pdh.PDH_NO_COUNTERS,
+			expectedErrMsg: "",
+		},
+		{
+			name: "no data error",
+
+			mockErr:        pdh.PDH_NO_DATA,
+			expectedErrMsg: "",
+		},
+		{
+			name: "unexpected error",
+
+			mockErr:        errors.New("test error"),
+			expectedErrMsg: "failed collecting counter values: test error",
+		},
+	}
+
+	reader := &Reader{
+		log: logp.NewLogger("perfmon"),
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := reader.handleCollectDataError(tt.mockErr)
+			if tt.expectedErrMsg == "" {
+				assert.NoError(t, err)
+			} else {
+				assert.EqualError(t, err, tt.expectedErrMsg)
+			}
+		})
+	}
+}
