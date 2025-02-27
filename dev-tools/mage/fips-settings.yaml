@@ -1,0 +1,7 @@
+# beats contains the list of beats that are FIPS-enabled
+beats:
+  - agentbeat
+  - auditbeat
+  - cloudbeat
+  - filebeat
+  - metricbeat

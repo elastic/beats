@@ -109,7 +109,11 @@ func AssembleDarwinUniversal() error {
 
 // CrossBuildDeps cross-builds the required dependencies.
 func CrossBuildDeps() error {
-	return callForBeat("crossBuildExt", "osquerybeat")
+	if slices.Contains(getIncludedBeats(), "osquerybeat") {
+		return callForBeat("crossBuildExt", "osquerybeat")
+	}
+
+	return nil
 }
 
 // PrepareLightModules prepares the module packaging.
@@ -131,15 +135,20 @@ func Package() error {
 	// specific packaging just for agentbeat
 	devtools.MustUsePackaging("agentbeat", "x-pack/agentbeat/dev-tools/packaging/packages.yml")
 
-	// Add osquery distro binaries, required for the osquerybeat subcommand.
-	osquerybeat.CustomizePackaging()
-
 	// Add metricbeat lightweight modules.
 	if err := metricbeat.CustomizeLightModulesPackaging(); err != nil {
 		return err
 	}
 
-	mg.SerialDeps(Update, PrepareLightModules, osquerybeat.FetchOsqueryDistros, CrossBuildDeps, CrossBuild, devtools.Package, TestPackages)
+	mg.SerialDeps(Update, PrepareLightModules)
+
+	if slices.Contains(getIncludedBeats(), "osquerybeat") {
+		// Add osquery distro binaries, required for the osquerybeat subcommand.
+		osquerybeat.CustomizePackaging()
+		mg.SerialDeps(osquerybeat.FetchOsqueryDistros)
+	}
+
+	mg.SerialDeps(CrossBuildDeps, CrossBuild, devtools.Package, TestPackages)
 
 	return nil
 }
@@ -206,7 +215,9 @@ func GoIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	args := devtools.DefaultGoTestIntegrationFromHostArgs()
 	args.Tags = append(args.Tags, "agentbeat")
-	args.Packages = append(args.Packages, "../auditbeat/...", "../filebeat/...", "../heartbeat/...", "../osquerybeat/...", "../packetbeat/...")
+	for _, beat := range getIncludedBeats() {
+		args.Packages = append(args.Packages, "../"+beat+"/...")
+	}
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
 
@@ -217,18 +228,8 @@ func PythonIntegTest(ctx context.Context) error {
 }
 
 func getIncludedBeats() []string {
-	if devtools.FIPSBuild {
-		// If a FIPS-compliant version of agentbeat is being built, restrict the list of beats to the fips-compliant ones
-		// FIPS-compliant beats the agentbeat combines
-		return []string{
-			"auditbeat",
-			"filebeat",
-			"metricbeat",
-		}
-	}
-
-	// beats are the beats the agentbeat combines
-	return []string{
+	// beats are all the beats the agentbeat can combine
+	includedBeats := []string{
 		"auditbeat",
 		"filebeat",
 		"heartbeat",
@@ -236,4 +237,17 @@ func getIncludedBeats() []string {
 		"osquerybeat",
 		"packetbeat",
 	}
+
+	if devtools.FIPSBuild {
+		// If a FIPS-compliant version of agentbeat is being built, restrict the list of beats to the fips-compliant ones
+		fipsCompliantBeats := make([]string, 0, len(includedBeats))
+		for _, beat := range includedBeats {
+			if slices.Contains(devtools.FIPSConfig.Beats, beat) {
+				fipsCompliantBeats = append(fipsCompliantBeats, beat)
+			}
+		}
+		return fipsCompliantBeats
+	}
+
+	return includedBeats
 }
