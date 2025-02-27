@@ -469,12 +469,17 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	uniq_reg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
 
+	reg := b.stateRegistry.GetRegistry("libbeat")
+	if reg == nil {
+		reg = b.stateRegistry.NewRegistry("libbeat")
+	}
+
 	tel := uniq_reg.GetRegistry("state")
 	if tel == nil {
 		tel = uniq_reg.NewRegistry("state")
 	}
 	monitors := pipeline.Monitors{
-		Metrics:   uniq_reg,
+		Metrics:   reg,
 		Telemetry: tel,
 		Logger:    logp.L().Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
