@@ -99,6 +99,7 @@ CHANGELOG*
 /metricbeat/module/nats/ @elastic/obs-ds-hosted-services
 /metricbeat/module/nginx @elastic/obs-infraobs-integrations
 /metricbeat/module/php_fpm @elastic/obs-infraobs-integrations
+/metricbeat/module/prometheus @elastic/obs-infraobs-integrations
 /metricbeat/module/prometheus/collector @elastic/obs-infraobs-integrations
 /metricbeat/module/prometheus/query @elastic/obs-infraobs-integrations
 /metricbeat/module/prometheus/remote_write @elastic/obs-ds-hosted-services
@@ -230,6 +231,7 @@ CHANGELOG*
 /x-pack/metricbeat/module/openai @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/oracle @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/panw @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/prometheus @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/prometheus/collector @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/prometheus/remote_write @elastic/obs-ds-hosted-services
 /x-pack/metricbeat/module/redisenterprise @elastic/obs-infraobs-integrations
