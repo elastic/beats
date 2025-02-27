@@ -130,6 +130,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - hasher: Geneneral improvements and fixes. {pull}41863[41863]
 - hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
 - Split common tty definitions. {pull}42004[42004]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
 
 *Auditbeat*
 
@@ -230,6 +231,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
 - Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
+- Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 
 *Osquerybeat*
 
@@ -242,6 +245,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Winlogbeat*
 
 - Sync missing changes in modules pipelines. {pull}42619[42619]
+- Reset EventLog if error EOF is encountered. {pull}42826[42826]
+- Implement backoff on error retrial. {pull}42826[42826]
 
 
 *Elastic Logging Plugin*
@@ -353,6 +358,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
 - Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
+- Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
+- Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 
 *Auditbeat*
 
