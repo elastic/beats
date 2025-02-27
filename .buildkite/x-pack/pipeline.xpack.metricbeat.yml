@@ -108,6 +108,7 @@ steps:
           TEST_TAGS: "oracle"
         command: |
           cd x-pack/metricbeat
+          rm -rf module/enterprisesearch
           mage goIntegTest
         retry:
           automatic:
