@@ -20,11 +20,13 @@
 package perfmon
 
 import (
+	"errrors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetCounter(t *testing.T) {
