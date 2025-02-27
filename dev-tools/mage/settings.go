@@ -34,7 +34,7 @@ import (
 	"github.com/magefile/mage/sh"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
