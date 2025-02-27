@@ -107,6 +107,7 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
+          git clean -fd
           cd x-pack/metricbeat
           mage goIntegTest
         retry:
