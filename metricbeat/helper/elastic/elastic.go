@@ -55,7 +55,6 @@ func (p Product) xPackMonitoringIndexString() string {
 		"kibana",
 		"logstash",
 		"beats",
-		"ent-search",
 	}
 
 	if int(p) < 0 || int(p) > len(indexProductNames) {
