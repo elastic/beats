@@ -20,7 +20,7 @@
 package perfmon
 
 import (
-	"errrors"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
