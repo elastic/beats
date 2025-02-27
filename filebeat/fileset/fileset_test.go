@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testcfg"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/version"
 )
@@ -41,17 +42,24 @@ func makeTestInfo(version string) beat.Info {
 	}
 }
 
-func getModuleForTesting(t *testing.T, module, fileset string) *Fileset {
+func getModuleForTesting(t *testing.T, module, fileset string, filesetCfg *FilesetConfig) *Fileset {
+	if filesetCfg == nil {
+		filesetCfg = &FilesetConfig{}
+	}
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
-	fs, err := New(modulesPath, fileset, module, &FilesetConfig{})
+
+	path := testcfg.CopyDirectoryWithOwnerWriteOnly(
+		t, filepath.Join(modulesPath, module), filepath.Join("module", module))
+
+	fs, err := New(filepath.Dir(path), fileset, module, filesetCfg)
 	require.NoError(t, err)
 
 	return fs
 }
 
 func TestLoadManifestNginx(t *testing.T) {
-	fs := getModuleForTesting(t, "nginx", "access")
+	fs := getModuleForTesting(t, "nginx", "access", nil)
 
 	manifest, err := fs.readManifest()
 	require.NoError(t, err)
@@ -66,7 +74,7 @@ func TestLoadManifestNginx(t *testing.T) {
 }
 
 func TestGetBuiltinVars(t *testing.T) {
-	fs := getModuleForTesting(t, "nginx", "access")
+	fs := getModuleForTesting(t, "nginx", "access", nil)
 
 	vars, err := fs.getBuiltinVars(makeTestInfo("6.6.0"))
 	require.NoError(t, err)
@@ -79,7 +87,7 @@ func TestGetBuiltinVars(t *testing.T) {
 }
 
 func TestEvaluateVarsNginx(t *testing.T) {
-	fs := getModuleForTesting(t, "nginx", "access")
+	fs := getModuleForTesting(t, "nginx", "access", nil)
 
 	var err error
 	fs.manifest, err = fs.readManifest()
@@ -96,15 +104,11 @@ func TestEvaluateVarsNginx(t *testing.T) {
 }
 
 func TestEvaluateVarsNginxOverride(t *testing.T) {
-	modulesPath, err := filepath.Abs("../module")
-	require.NoError(t, err)
-	fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
+	fs := getModuleForTesting(t, "nginx", "access", &FilesetConfig{
 		Var: map[string]interface{}{
 			"pipeline": "no_plugins",
-		},
-	})
-	require.NoError(t, err)
-
+		}})
+	var err error
 	fs.manifest, err = fs.readManifest()
 	require.NoError(t, err)
 
@@ -115,7 +119,7 @@ func TestEvaluateVarsNginxOverride(t *testing.T) {
 }
 
 func TestEvaluateVarsMySQL(t *testing.T) {
-	fs := getModuleForTesting(t, "mysql", "slowlog")
+	fs := getModuleForTesting(t, "mysql", "slowlog", nil)
 
 	var err error
 	fs.manifest, err = fs.readManifest()
@@ -178,7 +182,7 @@ func TestResolveVariable(t *testing.T) {
 }
 
 func TestGetInputConfigNginx(t *testing.T) {
-	fs := getModuleForTesting(t, "nginx", "access")
+	fs := getModuleForTesting(t, "nginx", "access", nil)
 	require.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
 	cfg, err := fs.getInputConfig()
@@ -193,9 +197,6 @@ func TestGetInputConfigNginx(t *testing.T) {
 }
 
 func TestGetInputConfigNginxOverrides(t *testing.T) {
-	modulesPath, err := filepath.Abs("../module")
-	require.NoError(t, err)
-
 	tests := map[string]struct {
 		input      map[string]interface{}
 		expectedFn require.ValueAssertionFunc
@@ -239,10 +240,8 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			fs, err := New(modulesPath, "access", "nginx", &FilesetConfig{
-				Input: test.input,
-			})
-			require.NoError(t, err)
+			fs := getModuleForTesting(t, "nginx", "access", &FilesetConfig{
+				Input: test.input})
 
 			require.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
@@ -267,7 +266,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 }
 
 func TestGetPipelineNginx(t *testing.T) {
-	fs := getModuleForTesting(t, "nginx", "access")
+	fs := getModuleForTesting(t, "nginx", "access", nil)
 	require.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
 	version := version.MustNew("5.2.0")

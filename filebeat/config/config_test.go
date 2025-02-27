@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/testing/testcfg"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -104,12 +105,16 @@ func TestMergeConfigFiles(t *testing.T) {
 	assert.NoError(t, err)
 
 	files, err := getConfigFiles(absPath)
-
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(files))
 
+	var fixedFiles []string
+	for _, f := range files {
+		fixedFiles = append(fixedFiles, testcfg.NewFileWith644Perm(t, f))
+	}
+
 	config := &Config{}
-	err = mergeConfigFiles(files, config)
+	err = mergeConfigFiles(fixedFiles, config)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(config.Inputs))
