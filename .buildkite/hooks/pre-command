@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# Revert after testing
 set -euo pipefail
 
 
