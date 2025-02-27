@@ -33896,12 +33896,49 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.indices.fielddata.evictions.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.indices.fielddata.memory.bytes`*::
 +
 --
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.flush.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.flush.total.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.get.time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.get.total.count`*::
++
+--
+type: long
 
 --
 
@@ -33928,12 +33965,42 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.indices.merges.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.merges.total.count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.indices.query_cache.memory.bytes`*::
 +
 --
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.refresh.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.refresh.total.count`*::
++
+--
+type: long
 
 --
 
@@ -33956,6 +34023,20 @@ type: long
 --
 
 *`elasticsearch.node.stats.indices.search.query_total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.search.fetch_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.search.fetch_total.count`*::
 +
 --
 type: long
@@ -34053,6 +34134,21 @@ format: bytes
 --
 
 
+*`elasticsearch.node.stats.indices.translog.size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.translog.operations.count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.jvm.mem.heap.max.bytes`*::
 +
 --
@@ -34078,6 +34174,13 @@ format: bytes
 type: double
 
 format: percent
+
+--
+
+*`elasticsearch.node.stats.jvm.threads.count`*::
++
+--
+type: long
 
 --
 
@@ -34411,7 +34514,59 @@ format: percent
 
 --
 
+*`elasticsearch.node.stats.process.mem.total_virtual.bytes`*::
++
+--
+type: long
 
+--
+
+*`elasticsearch.node.stats.process.open_file_descriptors`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.transport.rx.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.transport.rx.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.transport.tx.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.transport.tx.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.thread_pool.bulk.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.bulk.queue.count`*::
 +
@@ -34428,6 +34583,35 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.esql_worker.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.esql_worker.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.esql_worker.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.force_merge.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.force_merge.queue.count`*::
 +
 --
@@ -34442,6 +34626,35 @@ type: long
 
 --
 
+
+*`elasticsearch.node.stats.thread_pool.flush.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.flush.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.flush.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.get.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.get.queue.count`*::
 +
@@ -34458,6 +34671,13 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.index.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.index.queue.count`*::
 +
 --
@@ -34473,6 +34693,13 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.search.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.search.queue.count`*::
 +
 --
@@ -34487,6 +34714,101 @@ type: long
 
 --
 
+
+*`elasticsearch.node.stats.thread_pool.search_worker.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search_worker.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search_worker.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.snapshot.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.snapshot.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.snapshot.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.system_read.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_read.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_read.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.system_write.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_write.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_write.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.write.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.write.queue.count`*::
 +
