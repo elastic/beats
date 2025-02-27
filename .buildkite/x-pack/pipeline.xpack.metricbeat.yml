@@ -41,8 +41,6 @@ steps:
     steps:
       - label: "x-pack/metricbeat: Run check/update"
         command: |
-          rm -rf x-pack/metricbeat/module/elasticsearch
-          git clean -fd
           set -eo pipefail
           make -C x-pack/metricbeat check update
           make check-no-changes
@@ -109,8 +107,6 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
-          rm -rf x-pack/metricbeat/module/elasticsearch
-          git clean -fd
           cd x-pack/metricbeat
           mage goIntegTest
         retry:
