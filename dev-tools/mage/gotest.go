@@ -176,6 +176,11 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 	moduleArr := strings.Split(modules, ",")
 
 	for _, module := range moduleArr {
+		// explicitly skip Enterprise Search tests
+		if module == "enterprisesearch" {
+			continue
+		}
+
 		err := goTestIntegrationForSingleModule(ctx, module)
 		if err != nil {
 			return err

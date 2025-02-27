@@ -41,7 +41,6 @@ steps:
     steps:
       - label: "x-pack/metricbeat: Run check/update"
         command: |
-          rm -rf x-pack/metricbeat/module/enterprisesearch
           set -eo pipefail
           make -C x-pack/metricbeat check update
           make check-no-changes
@@ -108,7 +107,6 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
-          rm -rf x-pack/metricbeat/module/enterprisesearch
           cd x-pack/metricbeat
           mage goIntegTest
         retry:
