@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
@@ -35,7 +34,7 @@ func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) erro
 	go func() {
 		defer fb.wg.Done()
 		if err := fb.startMonitoring(); err != nil {
-			fb.logger.Error("could not start the HTTP server for the API", zap.Error(err))
+			fb.logger.Error("could not start the HTTP server for the monitoring API", zap.Error(err))
 		}
 		if err := fb.beater.Run(&fb.beat.Beat); err != nil {
 			fb.logger.Error("filebeat receiver run error", zap.Error(err))
@@ -62,7 +61,7 @@ func (fb *filebeatReceiver) startMonitoring() error {
 		if err != nil {
 			return err
 		}
-		fb.beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), fb.httpConf, monitoring.GetNamespace)
+		fb.beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), fb.httpConf, b.Info.Monitoring.Namespace)
 		if err != nil {
 			return err
 		}
