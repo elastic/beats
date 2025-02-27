@@ -81,6 +81,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 - Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+- Remove kibana.settings metricset since the API was removed in 8.0 {issue}30592[30592] {pull}42937[42937]
 
 *Osquerybeat*
 
