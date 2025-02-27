@@ -47,7 +47,6 @@ const (
 
 var (
 	v6_4_0 = version.MustNew("6.4.0")
-	v6_5_0 = version.MustNew("6.5.0")
 	v6_7_2 = version.MustNew("6.7.2")
 	v7_0_0 = version.MustNew("7.0.0")
 	v7_0_1 = version.MustNew("7.0.1")
