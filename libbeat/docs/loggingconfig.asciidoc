@@ -98,7 +98,7 @@ ifndef::serverless[]
 [float]
 ==== `logging.with_fields`
 
-A map of key-value pair included in beat process logs for additional context.
+A map of key-value pair appended to beat process logs for additional context.
 
 Usage:
 ```
