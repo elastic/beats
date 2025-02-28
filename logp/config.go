@@ -38,6 +38,8 @@ type Config struct {
 	Files   FileConfig    `config:"files"`
 	Metrics MetricsConfig `config:"metrics"`
 
+	WithFields map[string]any `config:"with_fields" yaml:"with_fields"`
+
 	environment Environment
 	addCaller   bool // Adds package and line number info to messages.
 	development bool // Controls how DPanic behaves.
