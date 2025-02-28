@@ -91,6 +91,12 @@ func shouldIgnore(file string) bool {
 			return true
 		}
 	}
+
+	// if the file has been removed, we should ignore it
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		return true
+	}
+
 	return false
 }
 
