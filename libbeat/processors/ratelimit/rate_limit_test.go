@@ -176,3 +176,16 @@ func TestRateLimit(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkRateLimit(b *testing.B) {
+	p, err := new(conf.MustNewConfigFrom(mapstr.M{
+		"limit": "100/s",
+	}))
+	require.NoError(b, err)
+	event := beat.Event{Fields: mapstr.M{"field": 1}}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		p.Run(&event)
+	}
+}
