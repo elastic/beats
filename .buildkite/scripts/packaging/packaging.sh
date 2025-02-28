@@ -9,7 +9,15 @@
 
 set -ueo pipefail
 
+
 BEAT_DIR=${1:?-"Error: Beat directory must be specified."}
+
+# NOTE: Pinned to QEMU v8.x since v9.x breaks compilation of amd64 binaries in arm64.
+# See: https://gitlab.com/qemu-project/qemu/-/issues/2560
+BINFMT_IMAGE="tonistiigi/binfmt:qemu-v8.1.5"
+# Make sure to uninstall first to avoid conflicts
+docker run --privileged --rm "$BINFMT_IMAGE" --uninstall qemu-*
+docker run --privileged --rm "$BINFMT_IMAGE" --install all
 
 cd $BEAT_DIR
 mage package
