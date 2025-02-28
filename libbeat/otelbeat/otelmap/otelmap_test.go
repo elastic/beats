@@ -125,7 +125,7 @@ func TestFromMapstrSliceInt(t *testing.T) {
 }
 
 func TestFromMapstrSliceAny(t *testing.T) {
-	inputSlice := []any{42, "fourty-three", true}
+	inputSlice := []any{42, "forty-three", true}
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
