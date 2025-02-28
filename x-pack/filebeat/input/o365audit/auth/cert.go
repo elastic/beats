@@ -48,7 +48,7 @@ func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, k
 	if tlsCert.PrivateKey == nil {
 		return nil, nil, fmt.Errorf("failed loading private key from '%s'", cfg.Key)
 	}
-	key, ok := tlsCert.PrivateKey.(*rsa.PrivateKey)
+	_, ok := tlsCert.PrivateKey.(*rsa.PrivateKey)
 	if !ok {
 		return nil, nil, fmt.Errorf("private key at '%s' is not an RSA private key", cfg.Key)
 	}
