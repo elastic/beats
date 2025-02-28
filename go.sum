@@ -370,8 +370,8 @@ github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f h1:TsPpU5EAwlt
 github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f/go.mod h1:HHaWnZamYKWsR9/eZNHqRHob8iQDKnchHmmskT/SKko=
 github.com/elastic/go-perf v0.0.0-20241029065020-30bec95324b8 h1:FD01NjsTes0RxZVQ22ebNYJA4KDdInVnR9cn1hmaMwA=
 github.com/elastic/go-perf v0.0.0-20241029065020-30bec95324b8/go.mod h1:Nt+pnRYvf0POC+7pXsrv8ubsEOSsaipJP0zlz1Ms1RM=
-github.com/elastic/go-quark v0.2.0 h1:r2BL4NzvhESrrL/yA3AcHt8mwF7fvQDssBAUiOL1sdg=
-github.com/elastic/go-quark v0.2.0/go.mod h1:/ngqgumD/Z5vnFZ4XPN2kCbxnEfG5/Uc+bRvOBabVVA=
+github.com/elastic/go-quark v0.3.0 h1:d4vokx0psEJo+93fnhvWpTJMggPd9rfMJSleoLva4xA=
+github.com/elastic/go-quark v0.3.0/go.mod h1:bO/XIGZBUJGxyiJ9FTsSYn9YlfOTRJnmOP+iBE2FyjA=
 github.com/elastic/go-seccomp-bpf v1.5.0 h1:gJV+U1iP+YC70ySyGUUNk2YLJW5/IkEw4FZBJfW8ZZY=
 github.com/elastic/go-seccomp-bpf v1.5.0/go.mod h1:umdhQ/3aybliBF2jjiZwS492I/TOKz+ZRvsLT3hVe1o=
 github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727 h1:yuiN60oaQUz2PtNpNhDI2H6zrCdfiiptmNdwV5WUaKA=
@@ -390,8 +390,8 @@ github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6 h1:VgOx6omXIMK
 github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/uo=
 github.com/elastic/gosigar v0.14.3/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
-github.com/elastic/mito v1.16.0 h1:7UYy1OpJ8rlr4nzy/HDYQHuHjUIDMCofk5ICalYC2LA=
-github.com/elastic/mito v1.16.0/go.mod h1:J+wCf4HccW2YoSFmZMGu+d06gN+WmnIlj5ehBqine74=
+github.com/elastic/mito v1.17.0 h1:UEEFfQy5WhS6vVvMPMwHvdn5rH24eBJMb2ZOlGBkI5s=
+github.com/elastic/mito v1.17.0/go.mod h1:nG5MoOsgJwVlglhlANiBFmHWqoIjrpbR5vy612wE8yE=
 github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015 h1:z8cC8GASpPo8yKlbnXI36HQ/BM9wYjhBPNbDjAWm0VU=
 github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015/go.mod h1:qH9DX/Dmflz6EAtaks/+2SsdQzecVAKE174Zl66hk7E=
 github.com/elastic/pkcs8 v1.0.0 h1:HhitlUKxhN288kcNcYkjW6/ouvuwJWd9ioxpjnD9jVA=

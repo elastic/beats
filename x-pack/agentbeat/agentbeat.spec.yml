@@ -355,11 +355,6 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
-  - name: enterprisesearch/metrics
-    description: "Enterprise search metrics"
-    platforms: *platforms
-    outputs: *outputs
-    command: *metricbeat_command
   - name: kibana/metrics
     description: "Kibana metrics"
     platforms: *platforms

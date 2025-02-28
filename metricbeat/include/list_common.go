@@ -93,7 +93,6 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/cluster_rules"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/node_actions"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/node_rules"
-	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/settings"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kvm"

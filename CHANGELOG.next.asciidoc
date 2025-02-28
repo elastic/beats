@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
+- Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
 
 *Auditbeat*
 
@@ -80,6 +81,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 - Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+- Remove kibana.settings metricset since the API was removed in 8.0 {issue}30592[30592] {pull}42937[42937]
+- Removed support for the Enterprise Search module {pull}42915[42915]
 
 *Osquerybeat*
 
@@ -148,6 +151,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - hasher: Geneneral improvements and fixes. {pull}41863[41863]
 - hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
 - Split common tty definitions. {pull}42004[42004]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
 
 *Filebeat*
 
@@ -265,6 +269,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
 - Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
+- Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
 
 *Osquerybeat*
 
@@ -278,6 +285,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 - Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
 - Sync missing changes in modules pipelines. {pull}42619[42619]
+- Reset EventLog if error EOF is encountered. {pull}42826[42826]
+- Implement backoff on error retrial. {pull}42826[42826]
 
 
 *Elastic Logging Plugin*
@@ -420,6 +429,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
+- Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
+- Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 
 *Auditbeat*
 
