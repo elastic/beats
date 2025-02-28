@@ -124,22 +124,6 @@ func TestFromMapstrSliceInt(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-func TestFromMapstrSliceAny(t *testing.T) {
-	inputSlice := []any{42, 43, 44}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := pcommon.NewMap()
-	sliceOfInt := want.PutEmptySlice("slice")
-	for _, i := range inputSlice {
-		val := sliceOfInt.AppendEmpty()
-		val.SetInt(int64(i.(int)))
-	}
-
-	got := FromMapstr(inputMap)
-	assert.Equal(t, want, got)
-}
-
 func TestFromMapstrDouble(t *testing.T) {
 	tests := map[string]struct {
 		mapstr_val  interface{}

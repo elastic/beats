@@ -94,6 +94,21 @@ ifndef::serverless[]
 When true, writes all logging output to standard error output. This is
 equivalent to using the `-e` command line option.
 
+ifndef::serverless[]
+[float]
+==== `logging.with_fields`
+
+A map of key-value pair added to beat process logs for additional context.
+
+Usage:
+```
+logging.with_fields:
+  id: 123
+  data_stream:
+    dataset: beat
+    namespace: default
+```
+
 [float]
 ==== `logging.to_syslog`
 
