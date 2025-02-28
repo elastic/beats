@@ -19,10 +19,9 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -49,12 +48,12 @@ type WinlogbeatConfig struct {
 // Validate validates the WinlogbeatConfig data and returns an error describing
 // all problems or nil if there are none.
 func (ebc WinlogbeatConfig) Validate() error {
-	var errs multierror.Errors
+	var errs []error
 
 	if len(ebc.EventLogs) == 0 {
 		errs = append(errs, fmt.Errorf("at least one event log must be "+
 			"configured as part of event_logs"))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
