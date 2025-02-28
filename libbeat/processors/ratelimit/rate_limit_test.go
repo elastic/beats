@@ -186,6 +186,6 @@ func BenchmarkRateLimit(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		p.Run(&event)
+		p.Run(&event) //nolint:errcheck // ignore
 	}
 }
