@@ -44,8 +44,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
 
-*Osquerybeat*
-
 
 *Packetbeat*
 
@@ -296,6 +294,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
 
