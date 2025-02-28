@@ -125,16 +125,19 @@ func TestFromMapstrSliceInt(t *testing.T) {
 }
 
 func TestFromMapstrSliceAny(t *testing.T) {
-	inputSlice := []any{42, 43, 44}
+	inputSlice := []any{42, "fourty-three", true}
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
 	want := pcommon.NewMap()
 	sliceOfInt := want.PutEmptySlice("slice")
-	for _, i := range inputSlice {
-		val := sliceOfInt.AppendEmpty()
-		val.SetInt(int64(i.(int)))
-	}
+
+	val := sliceOfInt.AppendEmpty()
+	val.SetInt(int64(inputSlice[0].(int)))
+	val = sliceOfInt.AppendEmpty()
+	val.SetStr(inputSlice[1].(string))
+	val = sliceOfInt.AppendEmpty()
+	val.SetBool(inputSlice[2].(bool))
 
 	got := FromMapstr(inputMap)
 	assert.Equal(t, want, got)
