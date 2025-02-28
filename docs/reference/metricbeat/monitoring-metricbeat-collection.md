@@ -111,7 +111,7 @@ To collect and ship monitoring data:
 
     If the Elastic {{security-features}} are enabled, you must also provide a user ID and password so that {{metricbeat}} can collect metrics successfully:
 
-    1. Create a user on the {{es}} cluster that has the `remote_monitoring_collector` [built-in role](elasticsearch://docs/reference/elasticsearch/roles.md). Alternatively, if it’s available in your environment, use the `remote_monitoring_user` [built-in user](docs-content://deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users.md).
+    1. Create a user on the {{es}} cluster that has the `remote_monitoring_collector` [built-in role](elasticsearch://reference/elasticsearch/roles.md). Alternatively, if it’s available in your environment, use the `remote_monitoring_user` [built-in user](docs-content://deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users.md).
     2. Add the `username` and `password` settings to the beat module configuration file.
 
 4. Optional: Disable the system module in the {{metricbeat}}.
@@ -156,7 +156,7 @@ To collect and ship monitoring data:
 
     If the {{es}} {{security-features}} are enabled on the monitoring cluster, you must provide a valid user ID and password so that {{metricbeat}} can send metrics successfully:
 
-    1. Create a user on the monitoring cluster that has the `remote_monitoring_agent` [built-in role](elasticsearch://docs/reference/elasticsearch/roles.md). Alternatively, if it’s available in your environment, use the `remote_monitoring_user` [built-in user](docs-content://deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users.md).
+    1. Create a user on the monitoring cluster that has the `remote_monitoring_agent` [built-in role](elasticsearch://reference/elasticsearch/roles.md). Alternatively, if it’s available in your environment, use the `remote_monitoring_user` [built-in user](docs-content://deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users.md).
 
         ::::{tip}
         If you’re using index lifecycle management, the remote monitoring user requires additional privileges to create and read indices. For more information, see [*Grant users access to secured resources*](/reference/metricbeat/feature-roles.md).

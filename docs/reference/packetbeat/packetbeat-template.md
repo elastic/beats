@@ -8,7 +8,7 @@ mapped_pages:
 {{es}} uses [index templates](docs-content://manage-data/data-store/templates.md) to define:
 
 * Settings that control the behavior of your data stream and backing indices. The settings include the lifecycle policy used to manage backing indices as they grow and age.
-* Mappings that determine how fields are analyzed. Each mapping sets the [{{es}} datatype](elasticsearch://docs/reference/elasticsearch/mapping-reference/field-data-types.md) to use for a specific data field.
+* Mappings that determine how fields are analyzed. Each mapping sets the [{{es}} datatype](elasticsearch://reference/elasticsearch/mapping-reference/field-data-types.md) to use for a specific data field.
 
 The recommended index template file for Packetbeat is installed by the Packetbeat packages. If you accept the default configuration in the `packetbeat.yml` config file, Packetbeat loads the template automatically after successfully connecting to {{es}}. If the template already exists, it’s not overwritten unless you configure Packetbeat to do so.
 

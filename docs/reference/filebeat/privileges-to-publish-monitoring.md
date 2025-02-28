@@ -17,7 +17,7 @@ Built-in users are not available when running our [hosted {{ess}}](https://www.e
 ::::
 
 
-* If you’re using [internal collection](/reference/filebeat/monitoring-internal-collection.md) to collect metrics about Filebeat, {{es-security-features}} provides the `beats_system` [built-in user](docs-content://deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users.md) and `beats_system` [built-in role](elasticsearch://docs/reference/elasticsearch/roles.md) to send monitoring information. You can use the built-in user, if it’s available in your environment, or create a user who has the privileges needed to send monitoring information.
+* If you’re using [internal collection](/reference/filebeat/monitoring-internal-collection.md) to collect metrics about Filebeat, {{es-security-features}} provides the `beats_system` [built-in user](docs-content://deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users.md) and `beats_system` [built-in role](elasticsearch://reference/elasticsearch/roles.md) to send monitoring information. You can use the built-in user, if it’s available in your environment, or create a user who has the privileges needed to send monitoring information.
 
     If you use the `beats_system` user, make sure you set the password.
 
@@ -38,7 +38,7 @@ Built-in users are not available when running our [hosted {{ess}}](https://www.e
         | `kibana_admin` | Use {{kib}} |
         | `monitoring_user` | Use **Stack Monitoring** in {{kib}} to monitor Filebeat |
 
-* If you’re [using {{metricbeat}}](/reference/filebeat/monitoring-metricbeat-collection.md) to collect metrics about Filebeat, {{es-security-features}} provides the `remote_monitoring_user` [built-in user](docs-content://deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users.md), and the `remote_monitoring_collector` and `remote_monitoring_agent` [built-in roles](elasticsearch://docs/reference/elasticsearch/roles.md) for collecting and sending monitoring information. You can use the built-in user, if it’s available in your environment, or create a user who has the privileges needed to collect and send monitoring information.
+* If you’re [using {{metricbeat}}](/reference/filebeat/monitoring-metricbeat-collection.md) to collect metrics about Filebeat, {{es-security-features}} provides the `remote_monitoring_user` [built-in user](docs-content://deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users.md), and the `remote_monitoring_collector` and `remote_monitoring_agent` [built-in roles](elasticsearch://reference/elasticsearch/roles.md) for collecting and sending monitoring information. You can use the built-in user, if it’s available in your environment, or create a user who has the privileges needed to collect and send monitoring information.
 
     If you use the `remote_monitoring_user` user, make sure you set the password.
 

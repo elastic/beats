@@ -9,5 +9,5 @@ Beats are lightweight data shippers that you install as agents on your servers t
 
 {{ls}} has a larger footprint, but provides a broad array of input, filter, and output plugins for collecting, enriching, and transforming data from a variety of sources.
 
-For more information, see the [{{ls}} Introduction](logstash://docs/reference/index.md) and the [Beats Overview](/reference/index.md).
+For more information, see the [{{ls}} Introduction](logstash://reference/index.md) and the [Beats Overview](/reference/index.md).
 

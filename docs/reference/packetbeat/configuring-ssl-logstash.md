@@ -12,7 +12,7 @@ To use SSL mutual authentication:
 1. Create a certificate authority (CA) and use it to sign the certificates that you plan to use for Packetbeat and Logstash. Creating a correct SSL/TLS infrastructure is outside the scope of this document. There are many online resources available that describe how to create certificates.
 
     ::::{tip}
-    If you are using {{security-features}}, you can use the [elasticsearch-certutil tool](elasticsearch://docs/reference/elasticsearch/command-line-tools/certutil.md) to generate certificates.
+    If you are using {{security-features}}, you can use the [elasticsearch-certutil tool](elasticsearch://reference/elasticsearch/command-line-tools/certutil.md) to generate certificates.
     ::::
 
 2. Configure Packetbeat to use SSL. In the `packetbeat.yml` config file, specify the following settings under `ssl`:
@@ -32,12 +32,12 @@ To use SSL mutual authentication:
 
         For more information about these configuration options, see [SSL](/reference/packetbeat/configuration-ssl.md).
 
-3. Configure Logstash to use SSL. In the Logstash config file, specify the following settings for the [Beats input plugin for Logstash](logstash://docs/reference/plugins-inputs-beats.md):
+3. Configure Logstash to use SSL. In the Logstash config file, specify the following settings for the [Beats input plugin for Logstash](logstash://reference/plugins-inputs-beats.md):
 
     * `ssl`: When set to true, enables Logstash to use SSL/TLS.
     * `ssl_certificate_authorities`: Configures Logstash to trust any certificates signed by the specified CA.
     * `ssl_certificate` and `ssl_key`: Specify the certificate and key that Logstash uses to authenticate with the client.
-    * `ssl_verify_mode`: Specifies whether the Logstash server verifies the client certificate against the CA. You need to specify either `peer` or `force_peer` to make the server ask for the certificate and validate it. If you specify `force_peer`, and Packetbeat doesn’t provide a certificate, the Logstash connection will be closed. If you choose not to use [certutil](elasticsearch://docs/reference/elasticsearch/command-line-tools/certutil.md), the certificates that you obtain must allow for both `clientAuth` and `serverAuth` if the extended key usage extension is present.
+    * `ssl_verify_mode`: Specifies whether the Logstash server verifies the client certificate against the CA. You need to specify either `peer` or `force_peer` to make the server ask for the certificate and validate it. If you specify `force_peer`, and Packetbeat doesn’t provide a certificate, the Logstash connection will be closed. If you choose not to use [certutil](elasticsearch://reference/elasticsearch/command-line-tools/certutil.md), the certificates that you obtain must allow for both `clientAuth` and `serverAuth` if the extended key usage extension is present.
 
         For example:
 
@@ -54,7 +54,7 @@ To use SSL mutual authentication:
         }
         ```
 
-        For more information about these options, see the [documentation for the Beats input plugin](logstash://docs/reference/plugins-inputs-beats.md).
+        For more information about these options, see the [documentation for the Beats input plugin](logstash://reference/plugins-inputs-beats.md).
 
 
 

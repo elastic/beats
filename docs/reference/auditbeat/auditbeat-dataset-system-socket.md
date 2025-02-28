@@ -14,7 +14,7 @@ This is the `socket` dataset of the system module. It allows to monitor network 
 
 * Supports TCP and UDP sockets over IPv4 and IPv6.
 * Outputs per-flow bytes and packets counters.
-* Enriches the flows with [process](ecs://docs/reference/ecs-process.md) and [user](ecs://docs/reference/ecs-user.md) information.
+* Enriches the flows with [process](ecs://reference/ecs-process.md) and [user](ecs://reference/ecs-user.md) information.
 * Provides information similar to Packetbeat’s flow monitoring with reduced CPU and memory usage.
 * Works on stock kernels without the need of custom modules, external libraries or development headers.
 * Correlates IP addresses with DNS requests.

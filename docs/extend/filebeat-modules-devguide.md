@@ -267,7 +267,7 @@ on_failure:
      value: "{{ _ingest.on_failure_message }}"
 ```
 
-From here, you would typically add processors to the `processors` array to do the actual parsing. For information about available ingest processors, see the [processor reference documentation](elasticsearch://docs/reference/ingestion-tools/enrich-processor/index.md). In particular, you will likely find the [grok processor](elasticsearch://docs/reference/ingestion-tools/enrich-processor/grok-processor.md) to be useful for parsing. Here is an example for parsing the Nginx access logs.
+From here, you would typically add processors to the `processors` array to do the actual parsing. For information about available ingest processors, see the [processor reference documentation](elasticsearch://reference/ingestion-tools/enrich-processor/index.md). In particular, you will likely find the [grok processor](elasticsearch://reference/ingestion-tools/enrich-processor/grok-processor.md) to be useful for parsing. Here is an example for parsing the Nginx access logs.
 
 ```json
 {

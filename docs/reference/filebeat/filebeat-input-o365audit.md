@@ -8,7 +8,7 @@ mapped_pages:
 
 [8.14.0]
 
-The o365audit input is deprecated. For collecting Microsoft Office 365 log data, please use the [Microsoft 365](integration-docs://docs/reference/o365.md) integration package. For more complex or user-specific use cases, similar functionality can be achieved using the [`CEL input`](/reference/filebeat/filebeat-input-cel.md) .
+The o365audit input is deprecated. For collecting Microsoft Office 365 log data, please use the [Microsoft 365](integration-docs://reference/o365.md) integration package. For more complex or user-specific use cases, similar functionality can be achieved using the [`CEL input`](/reference/filebeat/filebeat-input-cel.md) .
 
 
 ::::{warning}
@@ -20,7 +20,7 @@ Use the `o365audit` input to retrieve audit messages from Office 365 and Azure A
 
 A single input instance can be used to fetch events for multiple tenants as long as a single application is configured to access all tenants. Certificate-based authentication is recommended in this scenario.
 
-This input doesn’t perform any transformation on the incoming messages, notably no [Elastic Common Schema fields](ecs://docs/reference/index.md) are populated, and some data is encoded as arrays of objects, which are difficult to query in Elasticsearch. You probably want to use the [Office 365 module](/reference/filebeat/filebeat-module-o365.md) instead.
+This input doesn’t perform any transformation on the incoming messages, notably no [Elastic Common Schema fields](ecs://reference/index.md) are populated, and some data is encoded as arrays of objects, which are difficult to query in Elasticsearch. You probably want to use the [Office 365 module](/reference/filebeat/filebeat-module-o365.md) instead.
 
 Example configuration:
 

@@ -105,7 +105,7 @@ output {
 }
 ```
 
-1. Sets the `document_id` field in the [{{es}} output](logstash://docs/reference/plugins-outputs-elasticsearch.md) to the value stored in `@metadata._id`.
+1. Sets the `document_id` field in the [{{es}} output](logstash://reference/plugins-outputs-elasticsearch.md) to the value stored in `@metadata._id`.
 
 
 When {{es}} indexes the document, it sets the document ID to the specified value, preserving the ID passed from {{beats}}.

@@ -5,7 +5,7 @@ mapped_pages:
 
 # Kibana queries and filters [kibana-queries-filters]
 
-This topic provides a short introduction to some useful queries for searching Packetbeat data. For a full description of the query syntax, see [Searching Your Data](elasticsearch://docs/reference/query-languages/kql.md) in the *Kibana User Guide*.
+This topic provides a short introduction to some useful queries for searching Packetbeat data. For a full description of the query syntax, see [Searching Your Data](elasticsearch://reference/query-languages/kql.md) in the *Kibana User Guide*.
 
 In Kibana, you can filter transactions either by entering a search query or by clicking on elements within a visualization.
 
@@ -79,7 +79,7 @@ Kibana supports regular expression for filters and expressions. For example, to 
 http.response_headers.content_type: *json
 ```
 
-See [Elasticsearch regexp query](elasticsearch://docs/reference/query-languages/query-dsl-regexp-query.md) for more details about the syntax.
+See [Elasticsearch regexp query](elasticsearch://reference/query-languages/query-dsl-regexp-query.md) for more details about the syntax.
 
 
 ### Range queries [_range_queries]

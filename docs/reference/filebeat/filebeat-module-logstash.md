@@ -6,7 +6,7 @@ mapped_pages:
 # Logstash module [filebeat-module-logstash]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://docs/reference/logstash.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/logstash.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/ingestion-tools/fleet/index.md).
@@ -36,7 +36,7 @@ The `logstash` module has two filesets:
 * The `log` fileset collects and parses the logs that Logstash writes to disk.
 * The `slowlog` fileset parses the logstash slowlog.
 
-For the `slowlog` fileset, make sure to configure the [Logstash slowlog option](logstash://docs/reference/logging.md#_slowlog).
+For the `slowlog` fileset, make sure to configure the [Logstash slowlog option](logstash://reference/logging.md#_slowlog).
 
 
 ## Compatibility [_compatibility_21]

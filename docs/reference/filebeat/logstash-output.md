@@ -12,7 +12,7 @@ The {{ls}} output sends events directly to {{ls}} by using the lumberjack protoc
 ::::{admonition} Prerequisite
 :class: important
 
-To send events to {{ls}}, you also need to create a {{ls}} configuration pipeline that listens for incoming Beats connections and indexes the received events into {{es}}. For more information, see [Getting Started with {{ls}}](logstash://docs/reference/getting-started-with-logstash.md). Also see the documentation for the [{{beats}} input](logstash://docs/reference/plugins-inputs-beats.md) and [{{es}} output](logstash://docs/reference/plugins-outputs-elasticsearch.md) plugins.
+To send events to {{ls}}, you also need to create a {{ls}} configuration pipeline that listens for incoming Beats connections and indexes the received events into {{es}}. For more information, see [Getting Started with {{ls}}](logstash://reference/getting-started-with-logstash.md). Also see the documentation for the [{{beats}} input](logstash://reference/plugins-inputs-beats.md) and [{{es}} output](logstash://reference/plugins-outputs-elasticsearch.md) plugins.
 ::::
 
 
@@ -29,7 +29,7 @@ The `hosts` option specifies the {{ls}} server and the port (`5044`) where {{ls}
 
 For this configuration, you must [load the index template into {{es}} manually](/reference/filebeat/filebeat-template.md#load-template-manually) because the options for auto loading the template are only available for the {{es}} output.
 
-Want to use [Filebeat modules](/reference/filebeat/filebeat-modules.md) with {{ls}}? You need to do some extra setup. For more information, see [Working with Filebeat modules](logstash://docs/reference/working-with-filebeat-modules.md).
+Want to use [Filebeat modules](/reference/filebeat/filebeat-modules.md) with {{ls}}? You need to do some extra setup. For more information, see [Working with Filebeat modules](logstash://reference/working-with-filebeat-modules.md).
 
 ## Accessing metadata fields [_accessing_metadata_fields]
 
@@ -45,7 +45,7 @@ Every event sent to {{ls}} contains the following metadata fields that you can u
 }
 ```
 
-1. Filebeat uses the `@metadata` field to send metadata to {{ls}}. See the [{{ls}} documentation](logstash://docs/reference/event-dependent-configuration.md#metadata) for more about the `@metadata` field.
+1. Filebeat uses the `@metadata` field to send metadata to {{ls}}. See the [{{ls}} documentation](logstash://reference/event-dependent-configuration.md#metadata) for more about the `@metadata` field.
 2. The default is filebeat. To change this value, set the [`index`](#logstash-index) option in the Filebeat config file.
 3. The current version of Filebeat.
 
@@ -190,7 +190,7 @@ This parameter’s value will be assigned to the `metadata.beat` field. It can t
 
 ### `ssl` [_ssl_5]
 
-Configuration options for SSL parameters like the root CA for {{ls}} connections. See [SSL](/reference/filebeat/configuration-ssl.md) for more information. To use SSL, you must also configure the [Beats input plugin for Logstash](logstash://docs/reference/plugins-inputs-beats.md) to use SSL/TLS.
+Configuration options for SSL parameters like the root CA for {{ls}} connections. See [SSL](/reference/filebeat/configuration-ssl.md) for more information. To use SSL, you must also configure the [Beats input plugin for Logstash](logstash://reference/plugins-inputs-beats.md) to use SSL/TLS.
 
 
 ### `timeout` [_timeout_3]

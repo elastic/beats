@@ -197,7 +197,7 @@ PS > .\beatname.exe setup --dashboards
 
 All Elastic {{beats}} send events with ECS-compliant field names. If you have any custom {{kib}} dashboards or visualizations that use old fields, adjust them now to use ECS field names.
 
-To learn more about ECS, refer to the [ECS overview](ecs://docs/reference/index.md).
+To learn more about ECS, refer to the [ECS overview](ecs://reference/index.md).
 
 ::::{note}
 If you enabled the compatibility layer in 7.x (that is, if you set `migration.6_to_7.enabled: true`), make sure your custom dashboards no longer rely on the old aliases created by that setting. The old aliases are no longer supported. They may continue to work, but will be removed without notice in a future release.

@@ -11,7 +11,7 @@ This functionality is in beta and is subject to change. The design and code is l
 
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://docs/reference/o365.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/o365.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/ingestion-tools/fleet/index.md).
@@ -24,7 +24,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://docs/refere
 
 This is a module for Office 365 logs received via one of the Office 365 API endpoints. It currently supports user, admin, system, and policy actions and events from Office 365 and Azure AD activity logs exposed by the Office 365 Management Activity API.
 
-The [ingest-geoip](elasticsearch://docs/reference/ingestion-tools/enrich-processor/geoip-processor.md) and [ingest-user_agent](elasticsearch://docs/reference/ingestion-tools/enrich-processor/user-agent-processor.md) Elasticsearch plugins are required to run this module.
+The [ingest-geoip](elasticsearch://reference/ingestion-tools/enrich-processor/geoip-processor.md) and [ingest-user_agent](elasticsearch://reference/ingestion-tools/enrich-processor/user-agent-processor.md) Elasticsearch plugins are required to run this module.
 
 ::::{tip}
 Read the [quick start](/reference/filebeat/filebeat-installation-configuration.md) to learn how to configure and run modules.

@@ -14,7 +14,7 @@ Typically you need the create the following separate roles:
 * [writer role](/reference/winlogbeat/privileges-to-publish-events.md)  for publishing events collected by Winlogbeat
 * [reader role](/reference/winlogbeat/kibana-user-privileges.md) for {{kib}} users who need to view and create visualizations that access Winlogbeat data
 
-{{es-security-features}} provides [built-in roles](elasticsearch://docs/reference/elasticsearch/roles.md) that grant a subset of the privileges needed by Winlogbeat users. When possible, use the built-in roles to minimize the affect of future changes on your security strategy.
+{{es-security-features}} provides [built-in roles](elasticsearch://reference/elasticsearch/roles.md) that grant a subset of the privileges needed by Winlogbeat users. When possible, use the built-in roles to minimize the affect of future changes on your security strategy.
 
 Instead of using usernames and passwords, roles and privileges can be assigned to API keys to grant access to Elasticsearch resources. See [*Grant access using API keys*](/reference/winlogbeat/beats-api-keys.md) for more information.
 

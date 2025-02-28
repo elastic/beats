@@ -87,7 +87,7 @@ You can find up to 3 different types of files named `fields.yml` in the beats re
           fields:
     ```
 
-* `metricbeat/module/{{module}}/{metricset}/_meta/fields.yml`: Contains all fields definitions retrieved by the metricset. As field types, each field must have a core data type [supported by elasticsearch](elasticsearch://docs/reference/elasticsearch/mapping-reference/field-data-types.md#_core_datatypes). Here’s a very basic example that shows one group from the MySQL `status` metricset:
+* `metricbeat/module/{{module}}/{metricset}/_meta/fields.yml`: Contains all fields definitions retrieved by the metricset. As field types, each field must have a core data type [supported by elasticsearch](elasticsearch://reference/elasticsearch/mapping-reference/field-data-types.md#_core_datatypes). Here’s a very basic example that shows one group from the MySQL `status` metricset:
 
     ```yaml
     - name: status

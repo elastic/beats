@@ -87,7 +87,7 @@ The `run_from` option is used to label the geographic location where the monitor
 The `run_from` option takes two top-level fields:
 
 * `id`: A string used to uniquely identify the geographic location. It is indexed as the `observer.name` field.
-* `geo`: A map conforming to [ECS geo fields](ecs://docs/reference/ecs-geo.md). It is indexed under `observer.geo`.
+* `geo`: A map conforming to [ECS geo fields](ecs://reference/ecs-geo.md). It is indexed under `observer.geo`.
 
 Example:
 

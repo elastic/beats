@@ -73,7 +73,7 @@ Filebeat takes all the lines that do not start with `[` and combines them with t
     | `true` | `before` | Consecutive lines that don’t match the pattern are prepended to the next line that does match. | ![Lines a c b d e b become "acb" and "deb"](images/true-before-multi.png "") |
 
     ::::{note}
-    The `after` setting is equivalent to `previous` in [Logstash](logstash://docs/reference/plugins-codecs-multiline.md), and `before` is equivalent to `next`.
+    The `after` setting is equivalent to `previous` in [Logstash](logstash://reference/plugins-codecs-multiline.md), and `before` is equivalent to `next`.
     ::::
 
 

@@ -20,7 +20,7 @@ Winlogbeat’s default config file contains the option to send all events to the
 output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing
 ```
 
-The general goal of each module is to transform events by renaming fields to comply with the [Elastic Common Schema](ecs://docs/reference/index.md) (ECS). The modules may also apply additional categorization, tagging, and parsing as necessary.
+The general goal of each module is to transform events by renaming fields to comply with the [Elastic Common Schema](ecs://reference/index.md) (ECS). The modules may also apply additional categorization, tagging, and parsing as necessary.
 
 ::::{note}
 The provided modules only support events in English. For more information about how to configure the language in `winlogbeat`, refer to [Winlogbeat](/reference/winlogbeat/configuration-winlogbeat-options.md).

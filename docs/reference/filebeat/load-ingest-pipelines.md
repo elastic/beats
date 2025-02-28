@@ -86,7 +86,7 @@ PS > .\filebeat.exe setup --pipelines --enable-all-filesets
 ```
 
 ::::{tip}
-If you’re loading ingest pipelines manually because you want to send events to {{ls}}, also see [Working with Filebeat modules](logstash://docs/reference/working-with-filebeat-modules.md).
+If you’re loading ingest pipelines manually because you want to send events to {{ls}}, also see [Working with Filebeat modules](logstash://reference/working-with-filebeat-modules.md).
 ::::
 
 

@@ -87,7 +87,7 @@ The number of workers to read and decode concurrently netflow packets. Default i
 
 A list of paths to field definitions YAML files. These allow to update the NetFlow/IPFIX fields with vendor extensions and to override existing fields.
 
-The expected format is the same as used by Logstash’s NetFlow codec [ipfix_definitions](logstash://docs/reference/plugins-codecs-netflow.md#plugins-codecs-netflow-ipfix_definitions) and [netflow_definitions](logstash://docs/reference/plugins-codecs-netflow.md#plugins-codecs-netflow-netflow_definitions). Filebeat will detect which of the two formats is used.
+The expected format is the same as used by Logstash’s NetFlow codec [ipfix_definitions](logstash://reference/plugins-codecs-netflow.md#plugins-codecs-netflow-ipfix_definitions) and [netflow_definitions](logstash://reference/plugins-codecs-netflow.md#plugins-codecs-netflow-netflow_definitions). Filebeat will detect which of the two formats is used.
 
 NetFlow format example:
 

@@ -32,14 +32,14 @@ Define the field mappings in the `fields` array:
 ```
 
 1. `name`: The field name
-2. `type`: The field type. The value of `type` can be any datatype [available in {{es}}](elasticsearch://docs/reference/elasticsearch/mapping-reference/field-data-types.md). If no value is specified, the default type is `keyword`.
+2. `type`: The field type. The value of `type` can be any datatype [available in {{es}}](elasticsearch://reference/elasticsearch/mapping-reference/field-data-types.md). If no value is specified, the default type is `keyword`.
 3. `required`: Whether or not a field value is required
 4. `description`: Some information about the field contents
 
 
 ## Mapping parameters [_mapping_parameters]
 
-You can specify other mapping parameters for each field. See the [{{es}} Reference](elasticsearch://docs/reference/elasticsearch/mapping-reference/mapping-parameters.md) for more details about each parameter.
+You can specify other mapping parameters for each field. See the [{{es}} Reference](elasticsearch://reference/elasticsearch/mapping-reference/mapping-parameters.md) for more details about each parameter.
 
 `format`
 :   Specify a custom date format used by the field.
@@ -130,7 +130,7 @@ To keep the original keyword value when using `text` mappings, for instance to u
 3. `type`: Specify the `keyword` type to use the field in aggregations or to order documents.
 
 
-For more information, see the [{{es}} documentation about multi-fields](elasticsearch://docs/reference/elasticsearch/mapping-reference/multi-fields.md).
+For more information, see the [{{es}} documentation about multi-fields](elasticsearch://reference/elasticsearch/mapping-reference/multi-fields.md).
 
 
 ## Defining a text analyzer in-line [_defining_a_text_analyzer_in_line]

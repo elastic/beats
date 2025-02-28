@@ -121,7 +121,7 @@ cloud.auth: "heartbeat_setup:{pwd}" <1>
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
     2. The `username` and `password` settings for {{kib}} are optional. If you don’t specify credentials for {{kib}}, Heartbeat uses the `username` and `password` specified for the {{es}} output.
-    3. To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://docs/reference/elasticsearch/roles.md).
+    3. To use the pre-built {{kib}} dashboards, this user must be authorized to view dashboards or have the `kibana_admin` [built-in role](elasticsearch://reference/elasticsearch/roles.md).
 ::::::
 
 :::::::

@@ -55,7 +55,7 @@ You can adjust the following settings to load your own template or overwrite an 
 
 
 **`setup.template.settings._source`**
-:   A dictionary of settings for the `_source` field. For the available settings, please see the Elasticsearch [reference](elasticsearch://docs/reference/elasticsearch/mapping-reference/mapping-source-field.md).
+:   A dictionary of settings for the `_source` field. For the available settings, please see the Elasticsearch [reference](elasticsearch://reference/elasticsearch/mapping-reference/mapping-source-field.md).
 
     Example:
 
