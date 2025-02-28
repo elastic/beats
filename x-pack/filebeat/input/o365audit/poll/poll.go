@@ -86,7 +86,7 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 	// Delay before getting the token, so it doesn't become stale.
 	delay := max(item.Delay(), minDelay)
 	r.log.Debugf(" -- wait %s for %s", delay, item)
-	time.After(delay)
+	time.Sleep(delay)
 
 	// The order here is important. item's decorators must come first as those
 	// set the URL, which is required by other decorators (WithQueryParameters).
