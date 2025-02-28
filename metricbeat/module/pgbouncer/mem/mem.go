@@ -20,8 +20,6 @@ package mem
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/pgbouncer"
@@ -30,8 +28,6 @@ import (
 
 // init registers the MetricSet with the central registry.
 func init() {
-	log.SetOutput(os.Stderr)
-	log.SetFlags(0)
 	mb.Registry.MustAddMetricSet("pgbouncer", "mem", New,
 		mb.WithHostParser(pgbouncer.ParseURL),
 		mb.DefaultMetricSet(),
