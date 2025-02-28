@@ -15,14 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package kerberos
 
-import (
-	"net/http"
-)
+import "fmt"
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
+func (c *Config) Validate() error {
+	switch c.AuthType {
+	case authPassword:
+		if c.Username == "" {
+			return fmt.Errorf("password authentication is selected for Kerberos, but username is not configured")
+		}
+		if c.Password == "" {
+			return fmt.Errorf("password authentication is selected for Kerberos, but password is not configured")
+		}
 
-	CloseIdleConnections()
+	case authKeytab:
+		if c.KeyTabPath == "" {
+			return fmt.Errorf("keytab authentication is selected for Kerberos, but path to keytab is not configured")
+		}
+	default:
+		return ErrInvalidAuthType
+	}
+
+	return nil
 }

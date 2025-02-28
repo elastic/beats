@@ -15,14 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package kerberos
 
 import (
-	"net/http"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-type Client interface {
-	Do(req *http.Request) (*http.Response, error)
-
-	CloseIdleConnections()
+func TestConfigValidate(t *testing.T) {
+	cfg := &Config{
+		AuthType: authPassword,
+		Username: "username",
+		Password: "password",
+	}
+	err := cfg.Validate()
+	require.NoError(t, err)
 }
