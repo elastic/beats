@@ -66,7 +66,7 @@ func TestKafkaOutputCanConnectAndPublish(t *testing.T) {
 	// The mock broker must respond to a single metadata request.
 	metadataResponse := new(sarama.MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
-	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, nil, sarama.ErrNoError)
+	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, sarama.ErrNoError)
 	leader.Returns(metadataResponse)
 
 	// The mock broker must return a single produce response. If no produce request is received, the test will fail.
@@ -95,7 +95,7 @@ func TestAuthorisationErrors(t *testing.T) {
 	// The mock broker must respond to a single metadata request.
 	metadataResponse := new(sarama.MetadataResponse)
 	metadataResponse.AddBroker(leader.Addr(), leader.BrokerID())
-	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, nil, sarama.ErrNoError)
+	metadataResponse.AddTopicPartition(kafkaTopic, 0, leader.BrokerID(), nil, nil, sarama.ErrNoError)
 	leader.Returns(metadataResponse)
 
 	authErrors := []sarama.KError{
