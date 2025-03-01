@@ -46,7 +46,7 @@ const (
 	configurationRefreshIntervalSecs = 60
 
 	osqueryTimeout    = 1 * time.Minute
-	osqueryMaxTimeout = 15 * time.Minute
+	osqueryMaxTimeout = 24 * time.Hour
 )
 
 const (

@@ -44,8 +44,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
 
-*Osquerybeat*
-
 
 *Packetbeat*
 
@@ -157,6 +155,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
 
 *Osquerybeat*
 
@@ -288,12 +288,14 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added Palo Alto Networks module {pull}40686[40686]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
+- Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
 
 *Metricbeat*
 
 
 *Osquerybeat*
 
+- Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
 
