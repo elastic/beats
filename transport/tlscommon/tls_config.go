@@ -183,9 +183,16 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 		return fmt.Errorf("decode 'ca_trusted_fingerprint': %w", err)
 	}
 
+	foundCADigests := []string{}
+
 	for _, cert := range peerCerts {
+
 		// Compute digest for each certificate.
 		digest := sha256.Sum256(cert.Raw)
+
+		if cert.IsCA {
+			foundCADigests = append(foundCADigests, hex.EncodeToString(digest[:]))
+		}
 
 		if !bytes.Equal(digest[0:], fingerprint) {
 			continue
@@ -193,7 +200,7 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 
 		// Make sure the fingerprint matches a CA certificate
 		if !cert.IsCA {
-			logger.Info("Certificate matching 'ca_trusted_fingerprint' found, but is not a CA certificate")
+			logger.Warn("Certificate matching 'ca_trusted_fingerprint' found, but it is not a CA certificate. 'ca_trusted_fingerprint' can only be used to trust CA certificates.")
 			continue
 		}
 
@@ -206,7 +213,13 @@ func trustRootCA(cfg *TLSConfig, peerCerts []*x509.Certificate) error {
 		return nil
 	}
 
-	logger.Warn("no CA certificate matching the fingerprint")
+	// if we are here, we didn't find any CA certificate matching the fingerprint
+	if len(foundCADigests) == 0 {
+		logger.Warn("The remote server's certificate is presented without its certificate chain. Using 'ca_trusted_fingerprint' requires that the server presents a certificate chain that includes the certificate's issuing certificate authority.")
+	} else {
+		logger.Warnf("The provided 'ca_trusted_fingerprint': '%s' does not match the fingerprint of any Certificate Authority present in the server's certificate chain. Found the following CA fingerprints instead: %v", cfg.CATrustedFingerprint, foundCADigests)
+	}
+
 	return nil
 }
 

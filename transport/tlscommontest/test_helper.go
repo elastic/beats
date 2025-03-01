@@ -88,7 +88,7 @@ func GenTestCerts(t *testing.T) map[string]*x509.Certificate {
 		"unknown_authority": {
 			ca:       unknownCA,
 			keyUsage: x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-			isCA:     false,
+			isCA:     true,
 			dnsNames: []string{"localhost"},
 			// IPV4 and IPV6
 			ips: []net.IP{{127, 0, 0, 1}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
