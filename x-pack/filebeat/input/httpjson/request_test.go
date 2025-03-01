@@ -66,7 +66,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 	pagination := newPagination(config, client, log)
 	responseProcessor := newResponseProcessor(config, pagination, nil, nil, log)
 
-	requester := newRequester(client, requestFactory, responseProcessor, log)
+	requester := newRequester(client, requestFactory, responseProcessor, nil, log)
 
 	trCtx := emptyTransformContext()
 	trCtx.cursor = newCursor(config.Cursor, log)

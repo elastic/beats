@@ -21,7 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"time"
 
@@ -305,11 +305,14 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.Version = version
 
 	k.Producer.Partitioner = partitioner
+
 	k.MetricRegistry = adapter.GetGoMetrics(
 		monitoring.Default,
-		"libbeat.outputs.kafka",
-		adapter.Rename("incoming-byte-rate", "bytes_read"),
-		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		"libbeat.outputs",
+		adapter.Rename("incoming-byte-rate", "read.bytes"),
+		adapter.Rename("outgoing-byte-rate", "write.bytes"),
+		adapter.Rename("request-latency-in-ms", "write.latency"),
+		adapter.Rename("requests-in-flight", "kafka.requests-in-flight"),
 		adapter.GoMetricsNilify,
 	)
 
@@ -335,7 +338,7 @@ func makeBackoffFunc(cfg backoffConfig) func(retries, maxRetries int) time.Durat
 		// apply about equaly distributed jitter in second half of the interval, such that the wait
 		// time falls into the interval [dur/2, dur]
 		limit := int64(dur / 2)
-		jitter := rand.Int63n(limit + 1)
+		jitter := rand.Int64N(limit + 1)
 		return time.Duration(limit + jitter)
 	}
 }

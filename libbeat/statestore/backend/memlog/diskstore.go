@@ -201,7 +201,7 @@ func (s *diskstore) tryOpenLog() error {
 	ok = true
 	s.logNeedsTruncate = false
 	s.logFile = f
-	s.logBuf = bufio.NewWriterSize(&ensureWriter{s.logFile}, s.bufferSize)
+	s.logBuf = bufio.NewWriterSize(s.logFile, s.bufferSize)
 	return nil
 }
 
@@ -346,7 +346,7 @@ func (s *diskstore) checkpointTmpFile(tempfile string, states map[string]entry) 
 		f.Close()
 	})
 
-	writer := bufio.NewWriterSize(&ensureWriter{f}, s.bufferSize)
+	writer := bufio.NewWriterSize(f, s.bufferSize)
 	enc := newJSONEncoder(writer)
 	if _, err = writer.Write([]byte{'['}); err != nil {
 		return "", err
@@ -650,7 +650,7 @@ func writeMetaFile(home string, mode os.FileMode) error {
 		f.Close()
 	})
 
-	enc := newJSONEncoder(&ensureWriter{f})
+	enc := newJSONEncoder(f)
 	err = enc.Encode(storeMeta{
 		Version: storeVersion,
 	})
