@@ -18,12 +18,11 @@
 package licenser
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"math/rand"
 	"net/http"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -99,6 +98,7 @@ func (f *ElasticFetcher) parseJSON(b []byte) (License, error) {
 
 // esClientMux is taking care of round robin request over an array of elasticsearch client, note that
 // calling request is not threadsafe.
+// nolint: unused // it's used on Linux
 type esClientMux struct {
 	clients []eslegclient.Connection
 	idx     int
@@ -108,6 +108,7 @@ type esClientMux struct {
 // at the end of the function call, if an error occur we return the error and will pick up the next client on the
 // next call. Not that we just round robin between hosts, any backoff strategy should be handled by
 // the consumer of this type.
+// nolint: unused // it's used on Linux
 func (mux *esClientMux) Request(
 	method, path string,
 	pipeline string,
@@ -116,7 +117,9 @@ func (mux *esClientMux) Request(
 ) (int, []byte, error) {
 	c := mux.clients[mux.idx]
 
-	if err := c.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	if err := c.Connect(ctx); err != nil {
 		return 0, nil, err
 	}
 	defer c.Close()
@@ -127,20 +130,4 @@ func (mux *esClientMux) Request(
 		mux.idx = (mux.idx + 1) % len(mux.clients)
 	}
 	return status, response, err
-}
-
-// newESClientMux takes a list of clients and randomize where we start and the list of  host we are
-// querying.
-func newESClientMux(clients []eslegclient.Connection) *esClientMux {
-	// randomize where we start
-	idx := rand.Intn(len(clients))
-
-	// randomize the list of round robin hosts.
-	tmp := make([]eslegclient.Connection, len(clients))
-	copy(tmp, clients)
-	rand.Shuffle(len(tmp), func(i, j int) {
-		tmp[i], tmp[j] = tmp[j], tmp[i]
-	})
-
-	return &esClientMux{idx: idx, clients: tmp}
 }

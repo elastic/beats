@@ -18,9 +18,10 @@
 package elasticsearch
 
 import (
+	"context"
 	"errors"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 	"time"
 
@@ -31,8 +32,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -127,21 +126,13 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		return nil, errors.New("empty hosts list")
 	}
 
-	var clients []outputs.NetworkClient
-	for _, host := range hosts {
-		client, err := makeClient(host, params, &config, beat.Beat)
+	clients := make([]outputs.NetworkClient, len(hosts))
+	for i, host := range hosts {
+		client, err := makeClient(host, params, &config, beat)
 		if err != nil {
 			return nil, err
 		}
-		clients = append(clients, client)
-	}
-
-	queueFactory := func(ackListener queue.ACKListener) (queue.Queue, error) {
-		return memqueue.NewQueue(log,
-			memqueue.Settings{
-				ACKListener: ackListener,
-				Events:      20,
-			}), nil
+		clients[i] = client
 	}
 
 	monitoring := monitoring.Default.GetRegistry("monitoring")
@@ -149,7 +140,20 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
 
-	processing, err := processing.MakeDefaultSupport(true)(beat, log, conf.NewConfig())
+	processing, err := processing.MakeDefaultSupport(true, nil)(beat, log, conf.NewConfig())
+	if err != nil {
+		return nil, err
+	}
+
+	queueConfig := conf.Namespace{}
+	conf, err := conf.NewConfigFrom(map[string]interface{}{
+		"mem.events":           32,
+		"mem.flush.min_events": 1,
+	})
+	if err != nil {
+		return nil, err
+	}
+	err = queueConfig.Unpack(conf)
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +164,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 			Metrics: monitoring,
 			Logger:  log,
 		},
-		queueFactory,
+		queueConfig,
 		outputs.Group{
 			Clients:   []outputs.Client{outClient},
 			BatchSize: windowSize,
@@ -211,8 +215,10 @@ func (r *reporter) initLoop(c config) {
 
 	for {
 		// Select one configured endpoint by random and check if xpack is available
-		client := r.out[rand.Intn(len(r.out))]
-		err := client.Connect()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		client := r.out[rand.IntN(len(r.out))]
+		err := client.Connect(ctx)
 		if err == nil {
 			closing(log, client)
 			break
@@ -282,7 +288,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 			clusterUUID = getClusterUUID()
 		}
 		if clusterUUID != "" {
-			meta.Put("cluster_uuid", clusterUUID)
+			_, _ = meta.Put("cluster_uuid", clusterUUID)
 		}
 
 		r.client.Publish(beat.Event{
@@ -293,7 +299,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 	}
 }
 
-func makeClient(host string, params map[string]string, config *config, beatname string) (outputs.NetworkClient, error) {
+func makeClient(host string, params map[string]string, config *config, beat beat.Info) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)
 	if err != nil {
 		return nil, err
@@ -301,7 +307,7 @@ func makeClient(host string, params map[string]string, config *config, beatname 
 
 	esClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              url,
-		Beatname:         beatname,
+		Beatname:         beat.Beat,
 		Username:         config.Username,
 		Password:         config.Password,
 		APIKey:           config.APIKey,
@@ -309,6 +315,7 @@ func makeClient(host string, params map[string]string, config *config, beatname 
 		Headers:          config.Headers,
 		CompressionLevel: config.CompressionLevel,
 		Transport:        config.Transport,
+		UserAgent:        beat.UserAgent,
 	})
 	if err != nil {
 		return nil, err

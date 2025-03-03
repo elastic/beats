@@ -18,11 +18,17 @@ processors:
 - grok:
     field: message
     patterns:
+    - '(\[%{DATA:event.code}\])%{SPACE}(\[%{DATA:event.provider}\])%{SPACE}%{NOTSPACE}: Forcing close of thread %{INT}  user: ''%{USERNAME:user.name}'''
     - '(\[%{DATA:event.code}\])%{SPACE}(\[%{DATA:event.provider}\])%{SPACE}%{GREEDYMULTILINE}'
+    - "%{ACCESS:_tmp.auth_failed} for user '%{USERNAME:user.name}'(@'%{IP:source.ip}')?"
+    - '%{IP_RESOLVE_ERROR:_tmp.ip_resolve_error}'
+    - "Server socket created on IP: '%{IP:source.ip}'"
     - '%{GREEDYDATA}'
     ignore_missing: true
     ignore_failure: true
     pattern_definitions:
+      ACCESS: "Access denied" 
+      IP_RESOLVE_ERROR: "IP address '%{IP:source.ip}' could not be resolved: Name or service not known"
       GREEDYMULTILINE: |-
         (.|
         )+
@@ -51,9 +57,6 @@ processors:
     field: _tmp.timestamp
     formats:
     - ISO8601
-- remove:
-    field: _tmp
-    ignore_missing: true
 - set:
     field: event.kind
     value: event
@@ -67,6 +70,53 @@ processors:
     field: event.type
     value: error
     if: "ctx?.log?.level != null && ctx.log.level.toLowerCase() == 'error'"
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+- geoip:
+    database_file: GeoLite2-ASN.mmdb
+    field: source.ip
+    target_field: source.as
+    properties:
+      - asn
+      - organization_name
+    ignore_missing: true
+- rename:
+    field: source.as.asn
+    target_field: source.as.number
+    ignore_missing: true
+- rename:
+    field: source.as.organization_name
+    target_field: source.as.organization.name
+    ignore_missing: true
+- append:
+    field: related.ip
+    value: "{{source.ip}}"
+    if: ctx.source?.ip != null
+- append:
+    field: related.user
+    value: "{{user.name}}"
+    if: ctx.user?.name != null
+- append:
+    field: event.category
+    value: authentication
+    if: ctx._tmp?.auth_failed != null
+- append:
+    field: event.category
+    value: network
+    if: ctx?._tmp?.ip_resolve_error != null
+- append:
+    field: event.action
+    value: logon-failed
+    if: ctx._tmp?.auth_failed != null
+- set:
+    field: event.outcome
+    value: failure
+    if: ctx._tmp?.auth_failed != null
+- remove:
+    field: _tmp
+    ignore_missing: true
 on_failure:
 - set:
     field: error.message

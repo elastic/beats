@@ -1,0 +1,14 @@
+description: Journald Pipeline for system/auth Filebeat module
+processors:
+  - grok:
+      description: Grok specific auth messages.
+      tag: grok-specific-messages
+      field: _temp.message
+      ignore_missing: true
+      patterns:
+        - '^%{DATA:system.auth.ssh.event} %{DATA:system.auth.ssh.method} for (invalid user)?%{DATA:user.name} from %{IPORHOST:source.address} port %{NUMBER:source.port:long} ssh2(: %{GREEDYDATA:system.auth.ssh.signature})?'
+        - '^%{DATA:system.auth.ssh.event} user %{DATA:user.name} from %{IPORHOST:source.address}'
+        - '^Did not receive identification string from %{IPORHOST:system.auth.ssh.dropped_ip}'
+        - '^%{DATA:user.name} :( %{DATA:system.auth.sudo.error} ;)? TTY=%{DATA:system.auth.sudo.tty} ; PWD=%{DATA:system.auth.sudo.pwd} ; USER=%{DATA:system.auth.sudo.user} ; COMMAND=%{GREEDYDATA:system.auth.sudo.command}'
+        - '^new group: name=%{DATA:group.name}, GID=%{NUMBER:group.id}'
+        - '^new user: name=%{DATA:user.name}, UID=%{NUMBER:user.id}, GID=%{NUMBER:group.id}, home=%{DATA:system.auth.useradd.home}, shell=%{DATA:system.auth.useradd.shell}$'

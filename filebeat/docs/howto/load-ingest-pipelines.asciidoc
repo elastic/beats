@@ -5,7 +5,7 @@ The ingest pipelines used to parse log lines are set up automatically the first
 time you run {beatname_uc}, assuming the {es} output is enabled. If you're sending
 events to {ls} you need to load the ingest pipelines manually. To do this, run the
 `setup` command with the `--pipelines` option specified.  You also need to enable
-the modules and filesets, this can be accomplished one of two ways.
+the modules and filesets, this can be accomplished several ways.
 
 First you can use the `--modules` option to enable the module, and the
 `-M` option to enable the fileset.  For example, the following command
@@ -39,7 +39,40 @@ loads the access pipeline from the nginx module.
 PS > .{backslash}{beatname_lc}.exe setup --pipelines --modules nginx -M "nginx.access.enabled=true"
 ----
 
-The second option is to use the `--enable-all-filesets` option to
+The second option is to use the `--modules` option to enable the
+module, and the `--force-enable-module-filesets` option to enable all
+the filesets in the module.  For example, the following command loads
+the access pipeline from the nginx module.
+
+*deb and rpm:*
+
+["source","sh",subs="attributes"]
+----
+{beatname_lc} setup --pipelines --modules nginx --force-enable-module-filesets
+----
+
+*mac:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --pipelines --modules nginx --force-enable-module-filesets
+----
+
+*linux:*
+
+["source","sh",subs="attributes"]
+----
+./{beatname_lc} setup --pipelines --modules nginx --force-enable-module-filesets
+----
+
+*win:*
+
+["source","sh",subs="attributes"]
+----
+PS > .{backslash}{beatname_lc}.exe setup --pipelines --modules nginx --force-enable-module-filesets
+----
+
+The third option is to use the `--enable-all-filesets` option to
 enable all the modules and all the filesets so all of the ingest
 pipelines are loaded.  For example, the following command loads all
 the ingest pipelines.

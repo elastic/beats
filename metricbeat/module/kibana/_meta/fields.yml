@@ -45,6 +45,15 @@
         - name: process.event_loop_delay
           type: alias
           path: kibana.stats.process.event_loop_delay.ms
+        - name: process.event_loop_utilization.active
+          type: alias
+          path: kibana.stats.process.event_loop_utilization.active
+        - name: process.event_loop_utilization.idle
+          type: alias
+          path: kibana.stats.process.event_loop_utilization.idle
+        - name: process.event_loop_utilization.utilization
+          type: alias
+          path: kibana.stats.process.event_loop_utilization.utilization
         - name: requests.total
           type: alias
           path: kibana.stats.request.total

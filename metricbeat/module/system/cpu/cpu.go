@@ -16,13 +16,15 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows || aix
-// +build darwin freebsd linux openbsd windows aix
 
 package cpu
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
+	"runtime"
 
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -42,6 +44,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	opts metrics.MetricOpts
 	cpu  *metrics.Monitor
+	sys  resolve.Resolver
 }
 
 // New is a mb.MetricSetFactory that returns a cpu.MetricSet.
@@ -53,17 +56,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	opts, err := config.Validate()
 	if err != nil {
-		return nil, errors.Wrap(err, "error validating config")
+		return nil, fmt.Errorf("error validating config: %w", err)
 	}
 
 	if config.CPUTicks != nil && *config.CPUTicks {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type: %T", base.Module())
+	}
+
+	cpuOpts := make([]metrics.OptionFunc, 0)
+	if config.UserPerformanceCounters {
+		cpuOpts = append(cpuOpts, metrics.WithWindowsPerformanceCounter())
+	}
+	cpu, err := metrics.New(sys, cpuOpts...)
+
+	if err != nil {
+		return nil, fmt.Errorf("error initializing system.cpu metricset: %w", err)
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		opts:          opts,
-		cpu:           metrics.New(sys),
+		cpu:           cpu,
+		sys:           sys,
 	}, nil
 }
 
@@ -71,24 +88,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	sample, err := m.cpu.Fetch()
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch CPU times")
+		return fmt.Errorf("failed to fetch CPU times: %w", err)
 	}
 
 	event, err := sample.Format(m.opts)
 	if err != nil {
-		return errors.Wrap(err, "error formatting metrics")
+		return fmt.Errorf("error formatting metrics: %w", err)
 	}
 	event.Put("cores", sample.CPUCount())
 
 	//generate the host fields here, since we don't want users disabling it.
 	hostEvent, err := sample.Format(metrics.MetricOpts{NormalizedPercentages: true})
 	if err != nil {
-		return errors.Wrap(err, "error creating host fields")
+		return fmt.Errorf("error creating host fields: %w", err)
 	}
 	hostFields := mapstr.M{}
 	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.usage", 0)
 	if err != nil {
-		return errors.Wrap(err, "error fetching normalized CPU percent")
+		return fmt.Errorf("error fetching normalized CPU percent: %w", err)
 	}
 
 	r.Event(mb.Event{
@@ -97,6 +114,37 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	})
 
 	return nil
+}
+
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/cpu")
+	if runtime.GOOS == "linux" {
+		return []diagnostics.DiagnosticSetup{
+			{
+				Name:        "cpu-stat",
+				Description: "/proc/stat file",
+				Filename:    "stat",
+				Callback:    m.fetchRawCPU,
+			},
+			{
+				Name:        "cpu-cpuinfo",
+				Description: "/proc/cpuinfo file",
+				Filename:    "cpuinfo",
+				Callback:    m.fetchCPUInfo,
+			},
+		}
+	}
+	return nil
+
+}
+
+func (m *MetricSet) fetchRawCPU() []byte {
+	return diagnostics.GetRawFileOrErrorString(m.sys, "/proc/stat")
+}
+
+func (m *MetricSet) fetchCPUInfo() []byte {
+	return diagnostics.GetRawFileOrErrorString(m.sys, "/proc/cpuinfo")
 }
 
 // copyFieldsOrDefault copies the field specified by key to the given map. It will

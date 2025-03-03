@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !windows
-// +build !windows
 
 package pkg
 
@@ -14,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,8 +42,8 @@ func TestHomebrew(t *testing.T) {
 
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
-		f := mbtest.NewReportingMetricSetV2(t, getConfig())
-		defer f.(*MetricSet).bucket.DeleteBucket()
+		f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
+		defer deleteBucket(t, f)
 
 		events, errs := mbtest.ReportingFetchV2(f)
 		if len(errs) > 0 {
@@ -96,8 +96,8 @@ func TestHomebrewNotExist(t *testing.T) {
 
 	// Test whole dataset if on Darwin
 	if runtime.GOOS == "darwin" {
-		f := mbtest.NewReportingMetricSetV2(t, getConfig())
-		defer f.(*MetricSet).bucket.DeleteBucket()
+		f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
+		defer deleteBucket(t, f)
 
 		events, errs := mbtest.ReportingFetchV2(f)
 		if len(errs) > 0 {

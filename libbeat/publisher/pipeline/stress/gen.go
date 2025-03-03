@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"runtime/pprof"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -29,7 +30,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type generateConfig struct {
@@ -69,7 +69,7 @@ func generate(
 
 	logger := logp.NewLogger("publisher_pipeline_stress_generate")
 	if config.ACK {
-		settings.ACKHandler = acker.Counting(func(n int) {
+		settings.EventListener = acker.Counting(func(n int) {
 			logger.Infof("Pipeline client (%v) ACKS; %v", id, n)
 		})
 	}
@@ -97,7 +97,7 @@ func generate(
 	done := make(chan struct{})
 	defer close(done)
 
-	count := atomic.MakeUint64(0)
+	var count atomic.Uint64
 
 	var wg sync.WaitGroup
 	defer wg.Wait()
@@ -129,7 +129,7 @@ func generate(
 				if last == current {
 					// collect all active go-routines stack-traces:
 					var buf bytes.Buffer
-					pprof.Lookup("goroutine").WriteTo(&buf, 2)
+					_ = pprof.Lookup("goroutine").WriteTo(&buf, 2)
 
 					err := fmt.Errorf("no progress in generator %v (last=%v, current=%v):\n%s", id, last, current, buf.Bytes())
 					errors(err)
@@ -148,7 +148,7 @@ func generate(
 			Fields: mapstr.M{
 				"id":    id,
 				"hello": "world",
-				"count": count,
+				"count": count.Load(),
 
 				// TODO: more custom event generation?
 			},
@@ -156,7 +156,7 @@ func generate(
 
 		client.Publish(event)
 
-		total := count.Inc()
+		total := count.Add(1)
 		if config.MaxEvents > 0 && total == config.MaxEvents {
 			break
 		}

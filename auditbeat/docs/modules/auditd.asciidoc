@@ -154,8 +154,7 @@ stopped (e.g. stop `auditd`).
 `multicast` can be used in kernel versions 3.16 and newer. By using `multicast`
 {beatname_uc} will receive an audit event broadcast that is not exclusive to a
 a single process. This is ideal for situations where `auditd` is running and
-managing the rules. If `multicast` is specified, but the kernel version is less
-than 3.16 {beatname_uc} will automatically revert to `unicast`.
+managing the rules.
 +
 By default {beatname_uc} will use `multicast` if the kernel version is 3.16 or
 newer and no rules have been defined. Otherwise `unicast` will be used.
@@ -211,6 +210,9 @@ used by the Linux `auditctl` utility. {beatname_uc} supports adding file watches
 loaded after the rules declared in `audit_rules` are loaded. Wildcards are
 supported and will expand in lexicographical order. The format is the same as
 that of the `audit_rules` field.
+
+*`ignore_errors`*:: This setting allows errors during rule loading and parsing
+to be ignored, but logged as warnings.
 
 *`backpressure_strategy`*:: Specifies the strategy that {beatname_uc} uses to
 prevent backpressure from propagating to the kernel and impacting audited

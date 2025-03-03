@@ -20,19 +20,20 @@ package helper
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
+
+	"k8s.io/client-go/transport"
 
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
-	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 var userAgent = useragent.UserAgent("Metricbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
@@ -40,13 +41,14 @@ var userAgent = useragent.UserAgent("Metricbeat", version.GetDefaultVersion(), v
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.
 type HTTP struct {
-	hostData mb.HostData
-	client   *http.Client // HTTP client that is reused across requests.
-	headers  http.Header
-	name     string
-	uri      string
-	method   string
-	body     []byte
+	hostData   mb.HostData
+	bearerFile string
+	client     *http.Client // HTTP client that is reused across requests.
+	headers    http.Header
+	name       string
+	uri        string
+	method     string
+	body       []byte
 }
 
 // NewHTTP creates new http helper
@@ -59,7 +61,7 @@ func NewHTTP(base mb.BaseMetricSet) (*HTTP, error) {
 	return NewHTTPFromConfig(config, base.HostData())
 }
 
-// newHTTPWithConfig creates a new http helper from some configuration
+// NewHTTPFromConfig newHTTPWithConfig creates a new http helper from some configuration
 func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 	headers := http.Header{}
 	if config.Headers == nil {
@@ -67,14 +69,6 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 	}
 	for k, v := range config.Headers {
 		headers.Set(k, v)
-	}
-
-	if config.BearerTokenFile != "" {
-		header, err := getAuthHeaderFromToken(config.BearerTokenFile)
-		if err != nil {
-			return nil, err
-		}
-		headers.Set("Authorization", header)
 	}
 
 	// Ensure backward compatibility
@@ -97,13 +91,23 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		return nil, err
 	}
 
+	// Apply the token refreshing roundtripper. We can't do this in a transport option because we need to handle the
+	// error it can return at creation
+	if config.BearerTokenFile != "" {
+		client.Transport, err = transport.NewBearerAuthWithRefreshRoundTripper("", config.BearerTokenFile, client.Transport)
+	}
+	if err != nil {
+		return nil, err
+	}
+
 	return &HTTP{
-		hostData: hostData,
-		client:   client,
-		headers:  headers,
-		method:   "GET",
-		uri:      hostData.SanitizedURI,
-		body:     nil,
+		hostData:   hostData,
+		bearerFile: config.BearerTokenFile,
+		client:     client,
+		headers:    headers,
+		method:     "GET",
+		uri:        hostData.SanitizedURI,
+		body:       nil,
 	}, nil
 }
 
@@ -117,9 +121,9 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 		reader = bytes.NewReader(h.body)
 	}
 
-	req, err := http.NewRequest(h.method, h.uri, reader)
+	req, err := http.NewRequestWithContext(context.Background(), h.method, h.uri, reader) // TODO: get context from caller
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create HTTP request")
+		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
 	req.Header = h.headers
 	if h.hostData.User != "" || h.hostData.Password != "" {
@@ -128,7 +132,7 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 
 	resp, err := h.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("error making http request: %v", err)
+		return nil, fmt.Errorf("error making http request: %w", err)
 	}
 
 	return resp, nil
@@ -181,7 +185,7 @@ func (h *HTTP) FetchContent() ([]byte, error) {
 		return nil, fmt.Errorf("HTTP error %d in %s: %s", resp.StatusCode, h.name, resp.Status)
 	}
 
-	return ioutil.ReadAll(resp.Body)
+	return io.ReadAll(resp.Body)
 }
 
 // FetchScanner returns a Scanner for the content.
@@ -210,23 +214,4 @@ func (h *HTTP) FetchJSON() (map[string]interface{}, error) {
 	}
 
 	return data, nil
-}
-
-// getAuthHeaderFromToken reads a bearer authorizaiton token from the given file
-func getAuthHeaderFromToken(path string) (string, error) {
-	var token string
-
-	b, err := ioutil.ReadFile(path)
-	if err != nil {
-		return "", errors.Wrap(err, "reading bearer token file")
-	}
-
-	if len(b) != 0 {
-		if b[len(b)-1] == '\n' {
-			b = b[0 : len(b)-1]
-		}
-		token = fmt.Sprintf("Bearer %s", string(b))
-	}
-
-	return token, nil
 }

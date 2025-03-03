@@ -5,13 +5,13 @@
 package cmd
 
 import (
-	"flag"
+	"fmt"
 
-	"github.com/spf13/pflag"
+	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
@@ -33,9 +33,6 @@ const (
 	Name = "metricbeat"
 )
 
-// RootCmd to handle beats cli
-var RootCmd *cmd.BeatsRootCmd
-
 // withECSVersion is a modifier that adds ecs.version to events.
 var withECSVersion = processing.WithFields(mapstr.M{
 	"ecs": mapstr.M{
@@ -43,18 +40,33 @@ var withECSVersion = processing.WithFields(mapstr.M{
 	},
 })
 
-func init() {
-	management.ConfigTransform.SetTransform(metricbeatCfg)
-	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
-	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
-	settings := instance.Settings{
-		RunFlags:        runFlags,
-		Name:            Name,
-		HasDashboards:   true,
-		ElasticLicensed: true,
-		Processing:      processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+func Initialize() *cmd.BeatsRootCmd {
+	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
+	if err != nil { // these are hard-coded, shouldn't fail
+		panic(fmt.Errorf("error creating global processors: %w", err))
 	}
-	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
-	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
-	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	settings := mbcmd.MetricbeatSettings("")
+	settings.ElasticLicensed = true
+	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, withECSVersion, processing.WithHost, processing.WithAgentMeta())
+	rootCmd := cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
+	rootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
+	rootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		management.ConfigTransform.SetTransform(metricbeatCfg)
+	}
+	return rootCmd
+}
+
+func defaultProcessors() []mapstr.M {
+	// processors:
+	//   - add_host_metadata: ~
+	//   - add_cloud_metadata: ~
+	//   - add_docker_metadata: ~
+	//   - add_kubernetes_metadata: ~
+	return []mapstr.M{
+		{"add_host_metadata": nil},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{"add_kubernetes_metadata": nil},
+	}
 }

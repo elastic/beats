@@ -18,7 +18,7 @@
 package agent
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -74,12 +74,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return errors.Wrap(err, "error in http fetch")
+		return fmt.Errorf("error in http fetch: %w", err)
 	}
 
 	mappings, err := eventMapping(content)
 	if err != nil {
-		return errors.Wrap(err, "error in event mapping")
+		return fmt.Errorf("error in event mapping: %w", err)
 	}
 
 	for _, m := range mappings {

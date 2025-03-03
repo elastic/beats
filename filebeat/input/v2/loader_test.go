@@ -75,7 +75,7 @@ func TestLoader_New(t *testing.T) {
 }
 
 func TestLoader_Init(t *testing.T) {
-	pluginWithInit := func(name string, fn func(Mode) error) Plugin {
+	pluginWithInit := func(name string, fn func() error) Plugin {
 		return Plugin{
 			Name:      name,
 			Stability: feature.Stable,
@@ -85,7 +85,7 @@ func TestLoader_Init(t *testing.T) {
 
 	t.Run("calls all input managers", func(t *testing.T) {
 		count := 0
-		incCountOnInit := func(_ Mode) error { count++; return nil }
+		incCountOnInit := func() error { count++; return nil }
 
 		setup := loaderConfig{
 			Plugins: []Plugin{
@@ -94,7 +94,7 @@ func TestLoader_Init(t *testing.T) {
 			},
 		}
 		loader := setup.MustNewLoader()
-		err := loader.Init(nil, ModeRun)
+		err := loader.Init(nil)
 		expectNoError(t, err)
 		if count != 2 {
 			t.Errorf("expected init count 2, but got %v", count)
@@ -103,7 +103,7 @@ func TestLoader_Init(t *testing.T) {
 
 	t.Run("stop init on error", func(t *testing.T) {
 		count := 0
-		incCountOnInit := func(_ Mode) error { count++; return errors.New("oops") }
+		incCountOnInit := func() error { count++; return errors.New("oops") }
 		setup := loaderConfig{
 			Plugins: []Plugin{
 				pluginWithInit("a", incCountOnInit),
@@ -111,7 +111,7 @@ func TestLoader_Init(t *testing.T) {
 			},
 		}
 		loader := setup.MustNewLoader()
-		err := loader.Init(nil, ModeRun)
+		err := loader.Init(nil)
 		expectError(t, err)
 		if count != 1 {
 			t.Errorf("expected init count 1, but got %v", count)

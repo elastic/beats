@@ -8,8 +8,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -58,7 +56,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	db, err := mssql.NewConnection(base.HostData().URI)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create connection to db")
+		return nil, fmt.Errorf("could not create connection to db: %w", err)
 	}
 
 	return &MetricSet{
@@ -131,7 +129,7 @@ func (m *MetricSet) getLogSpaceUsageForDb(dbName string) (mapstr.M, error) {
 		&res.logSpaceInBytesSinceLastBackup); err != nil {
 		// Because this query only returns a single result an error in the first scan is
 		// probably a "data returned but not properly scanned"
-		err = errors.Wrap(err, "error scanning single result")
+		err = fmt.Errorf("error scanning single result: %w", err)
 		return nil, err
 	}
 
@@ -156,7 +154,7 @@ func (m *MetricSet) getLogStats(db dbInfo) (mapstr.M, error) {
 	if err := row.Scan(&res.databaseID, &res.sizeMB, &res.activeSizeMB, &res.backupTime, &res.sinceLastBackupMB, &res.sinceLastCheckpointMB, &res.recoverySizeMB); err != nil {
 		// Because this query only returns a single result an error in the first scan is
 		// probably a "data returned but not properly scanned"
-		err = errors.Wrap(err, "error scanning single result")
+		err = fmt.Errorf("error scanning single result: %w", err)
 		return nil, err
 	}
 
@@ -189,14 +187,14 @@ func (m *MetricSet) getDbsNames() ([]dbInfo, error) {
 	var rows *sql.Rows
 	rows, err := m.db.Query("SELECT name, database_id FROM sys.databases")
 	if err != nil {
-		return nil, errors.Wrap(err, "error doing query 'SELECT name, database_id FROM sys.databases'")
+		return nil, fmt.Errorf("error doing query 'SELECT name, database_id FROM sys.databases': %w", err)
 	}
 	defer closeRows(rows)
 
 	for rows.Next() {
 		var row dbInfo
 		if err = rows.Scan(&row.name, &row.id); err != nil {
-			return nil, errors.Wrap(err, "error scanning row results")
+			return nil, fmt.Errorf("error scanning row results: %w", err)
 		}
 
 		res = append(res, row)

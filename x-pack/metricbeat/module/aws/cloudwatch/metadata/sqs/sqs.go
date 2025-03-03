@@ -13,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metadataPrefix = "aws.sqs.queue"
@@ -30,8 +29,7 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 	// Get queueUrls for each region
 	queueURLs, err := getQueueUrls(svc)
 	if err != nil {
-		logp.Error(fmt.Errorf("getQueueUrls failed, skipping region %s: %w", regionName, err))
-		return events, nil
+		return events, fmt.Errorf("aws.sqs.queue fields are not available, skipping region %s: %w", regionName, err)
 	}
 
 	// collect monitoring state for each instance

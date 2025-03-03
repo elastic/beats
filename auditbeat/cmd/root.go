@@ -21,14 +21,20 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	// Register required includes
+	_ "github.com/elastic/beats/v7/auditbeat/include"
 )
 
 const (
@@ -53,19 +59,20 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 // AuditbeatSettings contains the default settings for auditbeat
-func AuditbeatSettings() instance.Settings {
+func AuditbeatSettings(globals processors.PluginConfig) instance.Settings {
 	runFlags := pflag.NewFlagSet(Name, pflag.ExitOnError)
 	return instance.Settings{
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, globals, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 	}
 }
 
 // Initialize initializes the entrypoint commands for auditbeat
 func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
-	create := beater.Creator(
+	create := beater.CreatorWithRegistry(
+		ab.Registry,
 		beater.WithModuleOptions(
 			module.WithEventModifier(core.AddDatasetToEvent),
 		),
@@ -76,5 +83,6 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 }
 
 func init() {
-	RootCmd = Initialize(AuditbeatSettings())
+	RootCmd = Initialize(AuditbeatSettings(nil))
+	initShowRules()
 }

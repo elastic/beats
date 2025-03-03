@@ -6,15 +6,15 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "default",
+        "namespace": "local-path-storage",
         "replicaset": {
-            "name": "jumpy-owl-redis-3481028193",
+            "name": "local-path-provisioner-7577fdbbfb",
             "replicas": {
                 "available": 1,
                 "desired": 1,
                 "labeled": 1,
                 "observed": 1,
-                "ready": 0
+                "ready": 1
             }
         }
     },

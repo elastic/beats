@@ -18,10 +18,10 @@
 package jmx
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -43,70 +43,73 @@ type Entry struct {
 // Map responseBody to mapstr.M
 //
 // A response has the following structure
-//  [
-//    {
-//        "request": {
-//            "mbean": "java.lang:type=Memory",
-//            "attribute": [
-//                "HeapMemoryUsage",
-//                "NonHeapMemoryUsage"
-//            ],
-//            "type": "read"
-//        },
-//        "value": {
-//            "HeapMemoryUsage": {
-//                "init": 1073741824,
-//                "committed": 1037959168,
-//                "max": 1037959168,
-//                "used": 227420472
-//            },
-//            "NonHeapMemoryUsage": {
-//                "init": 2555904,
-//                "committed": 53477376,
-//                "max": -1,
-//                "used": 50519768
-//            }
-//        },
-//        "timestamp": 1472298687,
-//        "status": 200
-//     }
-//  ]
+//
+//	[
+//	  {
+//	      "request": {
+//	          "mbean": "java.lang:type=Memory",
+//	          "attribute": [
+//	              "HeapMemoryUsage",
+//	              "NonHeapMemoryUsage"
+//	          ],
+//	          "type": "read"
+//	      },
+//	      "value": {
+//	          "HeapMemoryUsage": {
+//	              "init": 1073741824,
+//	              "committed": 1037959168,
+//	              "max": 1037959168,
+//	              "used": 227420472
+//	          },
+//	          "NonHeapMemoryUsage": {
+//	              "init": 2555904,
+//	              "committed": 53477376,
+//	              "max": -1,
+//	              "used": 50519768
+//	          }
+//	      },
+//	      "timestamp": 1472298687,
+//	      "status": 200
+//	   }
+//	]
 //
 // With wildcards there is an additional nesting level:
 //
-//  [
-//     {
-//        "request": {
-//           "type": "read",
-//           "attribute": "maxConnections",
-//           "mbean": "Catalina:name=*,type=ThreadPool"
-//        },
-//        "value": {
-//           "Catalina:name=\"http-bio-8080\",type=ThreadPool": {
-//              "maxConnections": 200
-//           },
-//           "Catalina:name=\"ajp-bio-8009\",type=ThreadPool": {
-//              "maxConnections": 200
-//           }
-//        },
-//        "timestamp": 1519409583
-//        "status": 200,
-//     }
-//  ]
+//	[
+//	   {
+//	      "request": {
+//	         "type": "read",
+//	         "attribute": "maxConnections",
+//	         "mbean": "Catalina:name=*,type=ThreadPool"
+//	      },
+//	      "value": {
+//	         "Catalina:name=\"http-bio-8080\",type=ThreadPool": {
+//	            "maxConnections": 200
+//	         },
+//	         "Catalina:name=\"ajp-bio-8009\",type=ThreadPool": {
+//	            "maxConnections": 200
+//	         }
+//	      },
+//	      "timestamp": 1519409583
+//	      "status": 200,
+//	   }
+//	]
 //
-// A response with single value
+// # A response with single value
 //
 // [
-//    {
-//       "request": {
-//          "mbean":"java.lang:type=Runtime",
-//          "attribute":"Uptime",
-//          "type":"read"
-//       },
-//       "value":88622,
-//       "timestamp":1551739190,
-//       "status":200
-//    }
+//
+//	{
+//	   "request": {
+//	      "mbean":"java.lang:type=Runtime",
+//	      "attribute":"Uptime",
+//	      "type":"read"
+//	   },
+//	   "value":88622,
+//	   "timestamp":1551739190,
+//	   "status":200
+//	}
+//
 // ]
 type eventKey struct {
 	mbean, event string
@@ -165,7 +168,7 @@ func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents ma
 		// to be actually the matching mbean name
 		values, ok := value.(map[string]interface{})
 		if !ok {
-			errs = append(errs, errors.Errorf("expected map of values for %s", v.Request.Mbean))
+			errs = append(errs, fmt.Errorf("expected map of values for %s", v.Request.Mbean))
 			continue
 		}
 
@@ -204,7 +207,7 @@ func parseResponseEntry(
 		// This shouldn't ever happen, if it does it is probably that some of our
 		// assumptions when building the request and the mapping is wrong.
 		logp.Debug("jolokia.jmx", "mapping: %+v", mapping)
-		return errors.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
+		return fmt.Errorf("metric key '%v' for mbean '%s' not found in mapping", attributeName, requestMbeanName)
 	}
 
 	var key eventKey

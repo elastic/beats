@@ -18,11 +18,10 @@
 package extract_array
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"sort"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -73,7 +72,7 @@ func (f *extractArrayProcessor) Unpack(from *conf.C) error {
 	tmp := defaultConfig
 	err := from.Unpack(&tmp)
 	if err != nil {
-		return fmt.Errorf("failed to unpack the extract_array configuration: %s", err)
+		return fmt.Errorf("failed to unpack the extract_array configuration: %w", err)
 	}
 	f.config = tmp
 	for field, column := range f.Mappings.Flatten() {
@@ -90,7 +89,7 @@ func (f *extractArrayProcessor) Unpack(from *conf.C) error {
 }
 
 // New builds a new extract_array processor.
-func New(c *conf.C) (processors.Processor, error) {
+func New(c *conf.C) (beat.Processor, error) {
 	p := &extractArrayProcessor{}
 	err := c.Unpack(p)
 	if err != nil {
@@ -120,7 +119,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "could not fetch value for field %s", f.config.Field)
+		return event, fmt.Errorf("could not fetch value for field %s: %w", f.config.Field, err)
 	}
 
 	array := reflect.ValueOf(iValue)
@@ -128,7 +127,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		if !f.config.FailOnError {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "unsupported type for field %s: got: %s needed: array", f.config.Field, t.String())
+		return event, fmt.Errorf("unsupported type for field %s: got: %s needed: array", f.config.Field, t.String())
 	}
 
 	saved := event
@@ -142,7 +141,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 			if !f.config.FailOnError {
 				continue
 			}
-			return saved, errors.Errorf("index %d exceeds length of %d when processing mapping for field %s", mapping.from, n, mapping.to)
+			return saved, fmt.Errorf("index %d exceeds length of %d when processing mapping for field %s", mapping.from, n, mapping.to)
 		}
 		cell := array.Index(mapping.from)
 		// checking for CanInterface() here is done to prevent .Interface() from
@@ -156,14 +155,14 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 				if !f.config.FailOnError {
 					continue
 				}
-				return saved, errors.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", mapping.to)
+				return saved, fmt.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", mapping.to)
 			}
 		}
 		if _, err = event.PutValue(mapping.to, clone(cell.Interface())); err != nil {
 			if !f.config.FailOnError {
 				continue
 			}
-			return saved, errors.Wrapf(err, "failed setting field %s", mapping.to)
+			return saved, fmt.Errorf("failed setting field %s: %w", mapping.to, err)
 		}
 	}
 	return event, nil

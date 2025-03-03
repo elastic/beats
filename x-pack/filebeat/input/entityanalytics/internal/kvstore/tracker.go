@@ -6,10 +6,10 @@ package kvstore
 
 import (
 	"context"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 // TxTracker implements a transaction tracker. Individual beat events which
@@ -17,20 +17,20 @@ import (
 // ACK-ed, the pending count is decremented (see NewTxACKHandler). Calling Wait
 // will block until all events are ACK-ed or the parent context is cancelled.
 type TxTracker struct {
-	pending atomic.Int
+	pending atomic.Int64
 	ctx     context.Context
 	cancel  context.CancelFunc
 }
 
 // Add increments the pending count.
 func (t *TxTracker) Add() {
-	t.pending.Inc()
+	t.pending.Add(1)
 }
 
 // Ack decrements the pending count. If pending goes to zero, then the
 // context on TxTracker is cancelled.
 func (t *TxTracker) Ack() {
-	if t.pending.Dec() == 0 {
+	if t.pending.Add(-1) == 0 {
 		t.cancel()
 	}
 }
@@ -55,9 +55,9 @@ func NewTxTracker(ctx context.Context) *TxTracker {
 	return &t
 }
 
-// NewTxACKHandler creates a new beat.ACKer. As events are ACK-ed and if the event
+// NewTxACKHandler creates a new beat.EventListener. As events are ACK-ed and if the event
 // contains a TxTracker, Ack will be called on the TxTracker.
-func NewTxACKHandler() beat.ACKer {
+func NewTxACKHandler() beat.EventListener {
 	return acker.ConnectionOnly(acker.EventPrivateReporter(func(acked int, privates []interface{}) {
 		for _, private := range privates {
 			if t, ok := private.(*TxTracker); ok {

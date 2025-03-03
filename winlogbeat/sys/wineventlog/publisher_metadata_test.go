@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
@@ -40,7 +39,7 @@ func TestPublisherMetadata(t *testing.T) {
 
 func testPublisherMetadata(t *testing.T, provider string) {
 	t.Run(provider, func(t *testing.T) {
-		md, err := NewPublisherMetadata(NilHandle, provider)
+		md, err := NewPublisherMetadata(NilHandle, provider, 0)
 		if err != nil {
 			t.Fatalf("%+v", err)
 		}
@@ -225,6 +224,6 @@ func testPublisherMetadata(t *testing.T, provider string) {
 }
 
 func TestNewPublisherMetadataUnknown(t *testing.T) {
-	_, err := NewPublisherMetadata(NilHandle, "Fake-Publisher")
+	_, err := NewPublisherMetadata(NilHandle, "Fake-Publisher", 0)
 	assert.ErrorIs(t, err, fs.ErrNotExist)
 }

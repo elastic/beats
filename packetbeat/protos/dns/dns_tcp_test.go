@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 // Unit tests and benchmarks for the dns package.
 //

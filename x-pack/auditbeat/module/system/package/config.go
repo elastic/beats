@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !windows
-// +build !windows
 
 package pkg
 
@@ -15,6 +14,9 @@ import (
 type config struct {
 	StatePeriod        time.Duration `config:"state.period"`
 	PackageStatePeriod time.Duration `config:"package.state.period"`
+	// PackageSuidDrop runs RPM queries with suid to drop out of root
+	// see the comment in package.go for more context
+	PackageSuidDrop *int64 `config:"package.rpm_drop_to_uid"`
 }
 
 func (c *config) effectiveStatePeriod() time.Duration {

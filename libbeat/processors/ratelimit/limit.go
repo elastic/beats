@@ -46,13 +46,13 @@ func (l *rate) Unpack(str string) error {
 	valueStr := strings.TrimSpace(parts[0])
 	unitStr := strings.TrimSpace(parts[1])
 
-	v, err := strconv.ParseFloat(valueStr, 8)
+	v, err := strconv.ParseFloat(valueStr, 64)
 	if err != nil {
 		return fmt.Errorf(`rate's value component is not numeric: %v`, valueStr)
 	}
 
 	if allowed := []unit{unitPerSecond, unitPerMinute, unitPerHour}; !contains(allowed, unitStr) {
-		allowedStrs := make([]string, len(allowed))
+		allowedStrs := make([]string, 0, len(allowed))
 		for _, a := range allowed {
 			allowedStrs = append(allowedStrs, "/"+string(a))
 		}

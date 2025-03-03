@@ -19,16 +19,14 @@ package actions
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -58,7 +56,7 @@ func init() {
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.
-func NewDecodeBase64Field(c *cfg.C) (processors.Processor, error) {
+func NewDecodeBase64Field(c *cfg.C) (beat.Processor, error) {
 	config := base64Config{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -66,7 +64,7 @@ func NewDecodeBase64Field(c *cfg.C) (processors.Processor, error) {
 
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the %s configuration: %s", processorName, err)
+		return nil, fmt.Errorf("fail to unpack the %s configuration: %w", processorName, err)
 	}
 
 	return &decodeBase64Field{
@@ -84,13 +82,12 @@ func (f *decodeBase64Field) Run(event *beat.Event) (*beat.Event, error) {
 
 	err := f.decodeField(event)
 	if err != nil {
-		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %v", err)
-		if publisher.LogWithTrace() {
-			f.log.Debug(errMsg.Error())
-		}
+		errMsg := fmt.Errorf("failed to decode base64 fields in processor: %w", err)
+		f.log.Debugw(errMsg.Error(), logp.TypeKey, logp.EventType)
+
 		if f.config.FailOnError {
 			event = backup
-			event.PutValue("error.message", errMsg.Error())
+			_, _ = event.PutValue("error.message", errMsg.Error())
 			return event, err
 		}
 	}
@@ -107,7 +104,7 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
-		return fmt.Errorf("could not fetch base64 value for key: %s, Error: %v", f.config.Field.From, err)
+		return fmt.Errorf("could not fetch base64 value for key: %s, Error: %w", f.config.Field.From, err)
 	}
 
 	base64String, ok := value.(string)
@@ -117,7 +114,7 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 
 	decodedData, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(base64String, "="))
 	if err != nil {
-		return fmt.Errorf("error trying to decode %s: %v", base64String, err)
+		return fmt.Errorf("error trying to decode %s: %w", base64String, err)
 	}
 
 	target := f.config.Field.To
@@ -127,7 +124,7 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 	}
 
 	if _, err = event.PutValue(target, string(decodedData)); err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %v", decodedData, target, err)
+		return fmt.Errorf("could not put value: %s: %v, %w", decodedData, target, err)
 	}
 
 	return nil

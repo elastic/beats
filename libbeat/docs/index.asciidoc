@@ -31,8 +31,8 @@ include::./config-file-format.asciidoc[]
 
 include::./upgrading.asciidoc[]
 
-include::./release-notes/breaking/breaking.asciidoc[]
-
 include::./release.asciidoc[]
+
+include::./release-notes/breaking/breaking.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]

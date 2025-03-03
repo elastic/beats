@@ -26,8 +26,6 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-
-	"github.com/pkg/errors"
 )
 
 // URLHostParserBuilder builds a tailored HostParser for used with host strings
@@ -55,7 +53,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			queryMap, ok := query.(map[string]interface{})
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'query' config for module %v is not a map", module.Name())
+				return mb.HostData{}, fmt.Errorf("'query' config for module %v is not a map", module.Name())
 			}
 
 			b.QueryParams = mb.QueryParams(queryMap).String()
@@ -66,7 +64,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			user, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'username' config for module %v is not a string", module.Name())
+				return mb.HostData{}, fmt.Errorf("'username' config for module %v is not a string", module.Name())
 			}
 		} else {
 			user = b.DefaultUsername
@@ -75,7 +73,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			pass, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'password' config for module %v is not a string", module.Name())
+				return mb.HostData{}, fmt.Errorf("'password' config for module %v is not a string", module.Name())
 			}
 		} else {
 			pass = b.DefaultPassword
@@ -84,7 +82,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			path, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'%v' config for module %v is not a string", b.PathConfigKey, module.Name())
+				return mb.HostData{}, fmt.Errorf("'%v' config for module %v is not a string", b.PathConfigKey, module.Name())
 			}
 		} else {
 			path = b.DefaultPath
@@ -96,7 +94,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		if ok {
 			basePath, ok = t.(string)
 			if !ok {
-				return mb.HostData{}, errors.Errorf("'basepath' config for module %v is not a string", module.Name())
+				return mb.HostData{}, fmt.Errorf("'basepath' config for module %v is not a string", module.Name())
 			}
 		}
 

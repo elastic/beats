@@ -5,12 +5,12 @@
 package v9
 
 import (
-	"io/ioutil"
-	"log"
 	"math"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
 
@@ -18,15 +18,18 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
-var logger = log.New(ioutil.Discard, "", 0)
+func init() {
+	logp.TestingSetup()
+}
 
 func makeSessionKey(t testing.TB, ipPortPair string, domain uint32) SessionKey {
-	return MakeSessionKey(test.MakeAddress(t, ipPortPair), domain)
+	return MakeSessionKey(test.MakeAddress(t, ipPortPair), domain, false)
 }
 
 func TestSessionMap_GetOrCreate(t *testing.T) {
+	var logger = logp.NewLogger("session_map")
 	t.Run("consistent behavior", func(t *testing.T) {
-		sm := NewSessionMap(logger)
+		sm := NewSessionMap(logger, nil)
 
 		// Session is created
 		s1 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1234", 42))
@@ -59,7 +62,7 @@ func TestSessionMap_GetOrCreate(t *testing.T) {
 	})
 	t.Run("parallel", func(t *testing.T) {
 		// Goroutines should observe the same session when created in parallel
-		sm := NewSessionMap(logger)
+		sm := NewSessionMap(logger, nil)
 		key := makeSessionKey(t, "127.0.0.1:9995", 42)
 		const N = 8
 		const Iters = 200
@@ -101,7 +104,7 @@ func testTemplate(id uint16) *template.Template {
 }
 
 func TestSessionState(t *testing.T) {
-	logger := log.New(ioutil.Discard, "", 0)
+	var logger = logp.NewLogger("session_state")
 	t.Run("create and get", func(t *testing.T) {
 		s := NewSession(logger)
 		t1 := testTemplate(1)
@@ -128,12 +131,12 @@ func TestSessionState(t *testing.T) {
 
 		t1c = s.GetTemplate(1)
 		assert.False(t, t1 == t1c)
-		assert.True(t, t1b == t1b)
+		assert.True(t, t1b == t1c)
 	})
 }
 
 func TestSessionMap_Cleanup(t *testing.T) {
-	sm := NewSessionMap(logger)
+	sm := NewSessionMap(logp.L(), nil)
 
 	// Session is created
 	k1 := makeSessionKey(t, "127.0.0.1:1234", 1)
@@ -180,7 +183,7 @@ func TestSessionMap_Cleanup(t *testing.T) {
 
 func TestSessionMap_CleanupLoop(t *testing.T) {
 	timeout := time.Millisecond * 100
-	sm := NewSessionMap(log.New(ioutil.Discard, "", 0))
+	sm := NewSessionMap(logp.NewLogger(""), nil)
 	key := makeSessionKey(t, "127.0.0.1:1", 42)
 	s := sm.GetOrCreate(key)
 
@@ -201,7 +204,7 @@ func TestSessionMap_CleanupLoop(t *testing.T) {
 }
 
 func TestTemplateExpiration(t *testing.T) {
-	s := NewSession(logger)
+	s := NewSession(logp.L())
 	assert.Nil(t, s.GetTemplate(256))
 	assert.Nil(t, s.GetTemplate(257))
 	s.AddTemplate(testTemplate(256))
@@ -263,7 +266,7 @@ func TestSessionCheckReset(t *testing.T) {
 		},
 	} {
 		t.Run(testCase.title, func(t *testing.T) {
-			s := NewSession(logger)
+			s := NewSession(logp.L())
 			s.lastSequence = testCase.current
 			prev, isReset := s.CheckReset(testCase.next)
 			assert.Equal(t, prev, testCase.current)

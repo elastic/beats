@@ -20,9 +20,8 @@ package streaming
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"net"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -76,7 +75,7 @@ func SplitHandlerFactory(family inputsource.Family, logger *logp.Logger, metadat
 					if IsMaxReadBufferErr(err) {
 						log.Errorw("split_client error", "error", err)
 					}
-					return errors.Wrap(err, string(family)+" split_client error")
+					return fmt.Errorf(string(family)+" split_client error: %w", err)
 				}
 				r.Reset()
 				callback(scanner.Bytes(), metadata)

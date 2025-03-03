@@ -97,11 +97,18 @@ defined `log` input, we need to add `take_over: true` to each new `filestream`. 
 that the new `filestream` inputs will continue ingesting files from the same offset where the `log`
 inputs stopped.
 
+NOTE: It's recommended to enable debug-level logs for Filebeat in order to follow the migration process.
+After the first run with `take_over: true` the setting can be removed.
+
+WARNING: The `take over` mode is in beta.
+
 IMPORTANT: If this parameter is not set, all the files will be re-ingested from the beginning
 and this will lead to data duplication. Please, double-check that this parameter is set.
 
 [source,yaml]
 ----
+logging:
+  level: debug
 filebeat.inputs:
 - type: filestream
   enabled: true
@@ -227,15 +234,28 @@ The example configuration shown earlier needs to be adjusted as well:
 |backoff.max
 |===
 
+=== Step 4
+
+The events produced by `filestream` input with `take_over: true` contain a `take_over` tag.
+You can filter on this tag in Kibana and see the events which came from a filestream in the "take_over" mode. 
+
+Once you start receiving events with this tag, you can remove `take_over: true` and restart the fileinput again.
+
 === If something went wrong
 
 If for whatever reason you'd like to revert the configuration after running the migrated configuration
 and return to old `log` inputs the files that were taken by `filestream` inputs, you need to do the following:
 
 1. Stop Filebeat as soon as possible
-2. Find your <<configuration-global-options,`registry.path/filebeat` directory>>
-3. Find the created backup files, they have the `<timestamp>.bak` suffix. If you have multiple backups for the same file, choose the one with the more recent timestamp.
-4. Replace the files with their backups, e.g. `log.json` should be replaced by `log.json-1674152412247684000.bak`
-5. Run Filebeat with the old configuration (no `filestream` inputs with `take_over: true`).
+2. Save its debug-level logs for further investigation
+3. Find your <<configuration-global-options,`registry.path/filebeat` directory>>
+4. Find the created backup files, they have the `<timestamp>.bak` suffix. If you have multiple backups for the same file, choose the one with the more recent timestamp.
+5. Replace the files with their backups, e.g. `log.json` should be replaced by `log.json-1674152412247684000.bak`
+6. Run Filebeat with the old configuration (no `filestream` inputs with `take_over: true`).
 
 NOTE: Reverting to backups might cause some events to repeat, depends on the amount of time the new configuration was running.
+
+=== Debugging on Kibana
+
+Events produced by `filestream` with `take_over: true` contains `take_over` tag.
+You can filter on this tag in Kibana and see the events which came from a filestream in the "take over" mode. 

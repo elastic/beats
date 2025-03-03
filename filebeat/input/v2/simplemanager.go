@@ -35,7 +35,7 @@ func ConfigureWith(fn func(*conf.C) (Input, error)) InputManager {
 
 // Init is required to fulfil the input.InputManager interface.
 // For the kafka input no special initialization is required.
-func (*simpleInputManager) Init(grp unison.Group, m Mode) error { return nil }
+func (*simpleInputManager) Init(grp unison.Group) error { return nil }
 
 // Create builds a new Input instance from the given configuration, or returns
 // an error if the configuration is invalid.

@@ -34,6 +34,7 @@
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  location_label: "resource.labels.zone"
   metrics:
     - aligner: ALIGN_NONE
       service: compute
@@ -60,3 +61,13 @@
   dataset_id: "dataset id"
   table_pattern: "table pattern"
   cost_type: "regular"
+
+- module: gcp
+  metricsets:
+    - carbon
+  period: 24h
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  endpoint: http://your-endpoint
+  dataset_id: "dataset id"
+  table_pattern: "table pattern"

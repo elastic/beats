@@ -20,21 +20,20 @@ package diskqueue
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
-	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/opt"
 )
+
+// The string used to specify this queue in beats configurations.
+const QueueType = "disk"
 
 // diskQueue is the internal type representing a disk-based implementation
 // of queue.Queue.
 type diskQueue struct {
 	logger   *logp.Logger
+	observer queue.Observer
 	settings Settings
 
 	// Metadata related to the segment files.
@@ -48,10 +47,6 @@ type diskQueue struct {
 	readerLoop  *readerLoop
 	writerLoop  *writerLoop
 	deleterLoop *deleterLoop
-
-	// Wait group for shutdown of the goroutines associated with this queue:
-	// reader loop, writer loop, deleter loop, and core loop (diskQueue.run()).
-	waitGroup sync.WaitGroup
 
 	// writing is true if the writer loop is processing a request, false
 	// otherwise.
@@ -73,9 +68,6 @@ type diskQueue struct {
 	// The API channel used by diskQueueProducer to write events.
 	producerWriteRequestChan chan producerWriteRequest
 
-	// API channel used by the public Metrics() API to request queue metrics
-	metricsRequestChan chan metricsRequest
-
 	// pendingFrames is a list of all incoming data frames that have been
 	// accepted by the queue and are waiting to be sent to the writer loop.
 	// Segment ids in this list always appear in sorted order, even between
@@ -87,49 +79,43 @@ type diskQueue struct {
 	// waiting for free space in the queue.
 	blockedProducers []producerWriteRequest
 
-	// The channel to signal our goroutines to shut down.
+	// The channel to signal our goroutines to shut down, used by
+	// (*diskQueue).Close.
+	close chan struct{}
+
+	// The channel to report that shutdown is finished, used by
+	// (*diskQueue).Done.
 	done chan struct{}
 }
 
-// channel request for metrics from an external client
-type metricsRequest struct {
-	response chan metricsRequestResponse
-}
-
-// metrics response from the disk queue
-type metricsRequestResponse struct {
-	sizeOnDisk uint64
-}
-
-func init() {
-	queue.RegisterQueueType(
-		"disk",
-		queueFactory,
-		feature.MakeDetails(
-			"Disk queue",
-			"Buffer events on disk before sending to the output.",
-			feature.Stable))
-}
-
-// queueFactory matches the queue.Factory interface, and is used to add the
-// disk queue to the registry.
-func queueFactory(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *config.C, _ int, // input queue size param is unused.
-) (queue.Queue, error) {
-	settings, err := SettingsForUserConfig(cfg)
-	if err != nil {
-		return nil, fmt.Errorf("disk queue couldn't load user config: %w", err)
+// FactoryForSettings is a simple wrapper around NewQueue so a concrete
+// Settings object can be wrapped in a queue-agnostic interface for
+// later use by the pipeline.
+func FactoryForSettings(settings Settings) queue.QueueFactory {
+	return func(
+		logger *logp.Logger,
+		observer queue.Observer,
+		inputQueueSize int,
+		encoderFactory queue.EncoderFactory,
+	) (queue.Queue, error) {
+		return NewQueue(logger, observer, settings, encoderFactory)
 	}
-	settings.WriteToDiskListener = ackListener
-	return NewQueue(logger, settings)
 }
 
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
-func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
+func NewQueue(
+	logger *logp.Logger,
+	observer queue.Observer,
+	settings Settings,
+	encoderFactory queue.EncoderFactory,
+) (*diskQueue, error) {
 	logger = logger.Named("diskqueue")
 	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
+	if observer == nil {
+		observer = queue.NewQueueObserver(nil)
+	}
 
 	if settings.MaxBufferSize > 0 &&
 		settings.MaxBufferSize < settings.MaxSegmentSize*2 {
@@ -138,6 +124,7 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 				"twice the segment size (%v)",
 			settings.MaxBufferSize, settings.MaxSegmentSize)
 	}
+	observer.MaxBytes(int(settings.MaxBufferSize))
 
 	// Create the given directory path if it doesn't exist.
 	err := os.MkdirAll(settings.directoryPath(), os.ModePerm)
@@ -185,6 +172,15 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		lastID := initialSegments[len(initialSegments)-1].id
 		nextSegmentID = lastID + 1
 	}
+	// Check the initial contents to report to the metrics observer.
+	initialEventCount := 0
+	initialByteCount := 0
+	for _, segment := range initialSegments {
+		initialEventCount += int(segment.frameCount)
+		// Event metrics for the queue observer don't include segment headser size
+		initialByteCount += int(segment.byteCount - segment.headerSize())
+	}
+	observer.Restore(initialEventCount, initialByteCount)
 
 	// If any of the initial segments are older than the current queue
 	// position, move them directly to the acked list where they can be
@@ -202,23 +198,22 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 		nextReadPosition = queuePosition{segmentID: initialSegments[0].id}
 	}
 
-	// We can compute the active frames right now but still need a way to report
-	// them to the global beat metrics. For now, just log the total.
-	// Note that for consistency with existing queue behavior, this excludes
-	// events that are still present on disk but were already sent and
-	// acknowledged on a previous run (we probably want to track these as well
-	// in the future.)
-	//nolint:godox // Ignore This
-	// TODO: pass in a context that queues can use to report these events.
+	// Count just the active events to report in the log
 	activeFrameCount := 0
 	for _, segment := range initialSegments {
 		activeFrameCount += int(segment.frameCount)
 	}
 	activeFrameCount -= int(nextReadPosition.frameIndex)
-	logger.Infof("Found %d existing events on queue start", activeFrameCount)
+	logger.Infof("Found %v queued events consuming %v bytes, %v events still pending", initialEventCount, initialByteCount, activeFrameCount)
+
+	var encoder queue.Encoder
+	if encoderFactory != nil {
+		encoder = encoderFactory()
+	}
 
 	queue := &diskQueue{
 		logger:   logger,
+		observer: observer,
 		settings: settings,
 
 		segments: diskQueueSegments{
@@ -230,37 +225,21 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
-		readerLoop:  newReaderLoop(settings),
+		readerLoop:  newReaderLoop(settings, encoder),
 		writerLoop:  newWriterLoop(logger, settings),
 		deleterLoop: newDeleterLoop(settings),
 
 		producerWriteRequestChan: make(chan producerWriteRequest),
-		metricsRequestChan:       make(chan metricsRequest),
 
-		done: make(chan struct{}),
+		close: make(chan struct{}),
+		done:  make(chan struct{}),
 	}
 
-	// We wait for four goroutines on shutdown: core loop, reader loop,
-	// writer loop, deleter loop.
-	queue.waitGroup.Add(4)
-
 	// Start the goroutines and return the queue!
-	go func() {
-		queue.readerLoop.run()
-		queue.waitGroup.Done()
-	}()
-	go func() {
-		queue.writerLoop.run()
-		queue.waitGroup.Done()
-	}()
-	go func() {
-		queue.deleterLoop.run()
-		queue.waitGroup.Done()
-	}()
-	go func() {
-		queue.run()
-		queue.waitGroup.Done()
-	}()
+	go queue.readerLoop.run()
+	go queue.writerLoop.run()
+	go queue.deleterLoop.run()
+	go queue.run()
 
 	return queue, nil
 }
@@ -272,10 +251,17 @@ func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 func (dq *diskQueue) Close() error {
 	// Closing the done channel signals to the core loop that it should
 	// shut down the other helper goroutines and wrap everything up.
-	close(dq.done)
-	dq.waitGroup.Wait()
+	close(dq.close)
 
 	return nil
+}
+
+func (dq *diskQueue) Done() <-chan struct{} {
+	return dq.done
+}
+
+func (dq *diskQueue) QueueType() string {
+	return QueueType
 }
 
 func (dq *diskQueue) BufferConfig() queue.BufferConfig {
@@ -283,42 +269,10 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
-	var serializationFormat SerializationFormat
-	if dq.settings.UseProtobuf {
-		serializationFormat = SerializationProtobuf
-	} else {
-		serializationFormat = SerializationCBOR
-	}
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newEventEncoder(serializationFormat),
+		encoder: newEventEncoder(SerializationCBOR),
 		done:    make(chan struct{}),
 	}
-}
-
-// Metrics returns current disk metrics
-func (dq *diskQueue) Metrics() (queue.Metrics, error) {
-	respChan := make(chan metricsRequestResponse, 1)
-	req := metricsRequest{response: respChan}
-
-	select {
-	case <-dq.done:
-		return queue.Metrics{}, io.EOF
-	case dq.metricsRequestChan <- req:
-
-	}
-
-	resp := metricsRequestResponse{}
-	select {
-	case <-dq.done:
-		return queue.Metrics{}, io.EOF
-	case resp = <-respChan:
-	}
-
-	maxSize := dq.settings.MaxBufferSize
-	return queue.Metrics{
-		ByteLimit: opt.UintWith(maxSize),
-		ByteCount: opt.UintWith(resp.sizeOnDisk),
-	}, nil
 }

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package container
 
@@ -31,7 +30,8 @@ import (
 
 func TestNewInputDone(t *testing.T) {
 	config := mapstr.M{
-		"paths": path.Join(os.TempDir(), "logs", "*.log"),
+		"allow_deprecated_use": true,
+		"paths":                path.Join(os.TempDir(), "logs", "*.log"),
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }

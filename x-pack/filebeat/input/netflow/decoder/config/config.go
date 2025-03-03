@@ -5,35 +5,45 @@
 package config
 
 import (
-	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+type ActiveSessionsMetric interface {
+	Inc()
+	Dec()
+}
 
 // Config stores the configuration used by the NetFlow Collector.
 type Config struct {
-	protocols   []string
-	logOutput   io.Writer
-	expiration  time.Duration
-	detectReset bool
-	fields      fields.FieldDict
-}
-
-var defaultCfg = Config{
-	protocols:   []string{},
-	logOutput:   ioutil.Discard,
-	expiration:  time.Hour,
-	detectReset: true,
+	protocols            []string
+	logOutput            *logp.Logger
+	expiration           time.Duration
+	detectReset          bool
+	fields               fields.FieldDict
+	sharedTemplates      bool
+	withCache            bool
+	activeSessionsMetric ActiveSessionsMetric
 }
 
 // Defaults returns a configuration object with defaults settings:
 // - no protocols are enabled.
-// - log output is discarded
+// - log output is set to the logger that is passed in.
 // - session expiration is checked once every hour.
-func Defaults() Config {
-	return defaultCfg
+// - resets are detected.
+// - templates are not shared.
+// - cache is disabled.
+func Defaults(logger *logp.Logger) Config {
+	return Config{
+		protocols:       []string{},
+		logOutput:       logger,
+		expiration:      time.Hour,
+		detectReset:     true,
+		sharedTemplates: false,
+		withCache:       false,
+	}
 }
 
 // WithProtocols modifies an existing configuration object to enable the
@@ -43,17 +53,22 @@ func (c *Config) WithProtocols(protos ...string) *Config {
 	return c
 }
 
-// WithLogOutput sets the output io.Writer for logging.
-func (c *Config) WithLogOutput(output io.Writer) *Config {
-	c.logOutput = output
-	return c
-}
-
 // WithExpiration configures the expiration timeout for sessions and templates.
 // A value of zero disables expiration.
 func (c *Config) WithExpiration(timeout time.Duration) *Config {
 	c.expiration = timeout
 	return c
+}
+
+// WithCache toggles the packet cache.
+func (c *Config) WithCache(enabled bool) *Config {
+	c.withCache = enabled
+	return c
+}
+
+// Cache returns if the packet cache is enabled.
+func (c *Config) Cache() bool {
+	return c.withCache
 }
 
 // WithSequenceResetEnabled allows to toggle the detection of reset sequences,
@@ -81,13 +96,27 @@ func (c *Config) WithCustomFields(dicts ...fields.FieldDict) *Config {
 	return c
 }
 
+// WithSharedTemplates allows to toggle the sharing of templates within
+// a v9 neflow or ipfix session. If it is not enabled, the source address
+// must match the address of the source of the template.
+func (c *Config) WithSharedTemplates(enabled bool) *Config {
+	c.sharedTemplates = enabled
+	return c
+}
+
+// WithActiveSessionsMetric configures the metric used to report active sessions.
+func (c *Config) WithActiveSessionsMetric(metric ActiveSessionsMetric) *Config {
+	c.activeSessionsMetric = metric
+	return c
+}
+
 // Protocols returns a list of the protocols enabled.
 func (c *Config) Protocols() []string {
 	return c.protocols
 }
 
 // LogOutput returns the io.Writer where logs are to be written.
-func (c *Config) LogOutput() io.Writer {
+func (c *Config) LogOutput() *logp.Logger {
 	return c.logOutput
 }
 
@@ -102,10 +131,24 @@ func (c *Config) SequenceResetEnabled() bool {
 	return c.detectReset
 }
 
+// ShareTemplatesEnabled returns if template sharing is enabled.
+func (c *Config) ShareTemplatesEnabled() bool {
+	return c.sharedTemplates
+}
+
 // Fields returns the configured fields.
 func (c *Config) Fields() fields.FieldDict {
 	if c.fields == nil {
 		return fields.GlobalFields
 	}
 	return c.fields
+}
+
+// ActiveSessionsMetric returns the configured metric to track active sessions.
+func (c *Config) ActiveSessionsMetric() ActiveSessionsMetric {
+	if c == nil {
+		return nil
+	}
+
+	return c.activeSessionsMetric
 }

@@ -31,6 +31,30 @@ storage_account_container: filebeat-platformlogs-{{ .eventhub }}
 resource_manager_endpoint: {{ .resource_manager_endpoint }}
 {{ end }}
 
+{{ if .migrate_checkpoint }}
+migrate_checkpoint: {{ .migrate_checkpoint }}
+{{ end }}
+
+{{ if .processor_version }}
+processor_version: {{ .processor_version }}
+{{ end }}
+
+{{ if .processor_update_interval }}
+processor_update_interval: {{ .processor_update_interval }}
+{{ end }}
+
+{{ if .processor_start_position }}
+processor_start_position: {{ .processor_start_position }}
+{{ end }}
+
+{{ if .partition_receive_timeout }}
+partition_receive_timeout: {{ .partition_receive_timeout }}
+{{ end }}
+
+{{ if .partition_receive_count }}
+partition_receive_count: {{ .partition_receive_count }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 

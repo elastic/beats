@@ -30,11 +30,18 @@ func device(goos string) string {
 	return "default_route"
 }
 
+// SelectLogic configures the types of project logic to use (OSS vs X-Pack).
+// It is set in the packetbeat and x-pack/packetbeat magefiles.
+var SelectLogic devtools.ProjectType
+
 // ConfigFileParams returns the default ConfigFileParams for generating
 // packetbeat*.yml files.
 func ConfigFileParams() devtools.ConfigFileParams {
 	p := devtools.DefaultConfigFileParams()
 	p.Templates = append(p.Templates, devtools.OSSBeatDir("_meta/config/*.tmpl"))
+	if SelectLogic == devtools.XPackProject {
+		p.Templates = append(p.Templates, devtools.XPackBeatDir("_meta/config/*.tmpl"))
+	}
 	p.ExtraVars = map[string]interface{}{
 		"device": device,
 	}

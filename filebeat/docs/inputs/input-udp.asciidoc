@@ -31,7 +31,7 @@ include::../inputs/input-common-udp-options.asciidoc[]
 === Metrics
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
-These metrics are exposed under the `/dataset` path. They can be used to
+These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.
 
 [options="header"]
@@ -41,8 +41,8 @@ observe the activity of the input.
 | `udp_read_buffer_length_gauge` | Size of the UDP socket buffer length in bytes (gauge).
 | `received_events_total`        | Total number of packets (events) that have been received.
 | `received_bytes_total`         | Total number of bytes received.
-| `receive_queue_length`         | Size of the system receive queue (linux only) (guage).
-| `system_packet_drops`          | Number of system packet drops (linux only) (guage).
+| `receive_queue_length`         | Aggregated size of the system receive queues (IPv4 and IPv6) (linux only) (gauge).
+| `system_packet_drops`          | Aggregated number of system packet drops (IPv4 and IPv6) (linux only) (gauge).
 | `arrival_period`               | Histogram of the time between successive packets in nanoseconds.
 | `processing_time`              | Histogram of the time taken to process packets in nanoseconds.
 |=======

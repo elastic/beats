@@ -42,6 +42,7 @@ type Module interface {
 	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, error)
 	GetKubeletStats(http *helper.HTTP) ([]byte, error)
 	GetMetricsRepo() *util.MetricsRepo
+	GetResourceWatchers() *util.Watchers
 }
 
 type familiesCache struct {
@@ -86,6 +87,7 @@ type module struct {
 	kubeStateMetricsCache *kubeStateMetricsCache
 	kubeletStatsCache     *kubeletStatsCache
 	metricsRepo           *util.MetricsRepo
+	resourceWatchers      *util.Watchers
 	cacheHash             uint64
 }
 
@@ -97,6 +99,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 		cacheMap: make(map[uint64]*statsCache),
 	}
 	metricsRepo := util.NewMetricsRepo()
+	resourceWatchers := util.NewWatchers()
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
@@ -108,6 +111,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 			kubeStateMetricsCache: kubeStateMetricsCache,
 			kubeletStatsCache:     kubeletStatsCache,
 			metricsRepo:           metricsRepo,
+			resourceWatchers:      resourceWatchers,
 			cacheHash:             hash,
 		}
 		return &m, nil
@@ -119,7 +123,7 @@ func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFa
 	defer m.kubeStateMetricsCache.lock.Unlock()
 
 	now := time.Now()
-	// NOTE: These entries will be never removed, this can be a leak if
+	// NOTE: These entries will never be removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
 	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
 	familiesCache := m.kubeStateMetricsCache.getCacheMapEntry(m.cacheHash)
@@ -138,13 +142,16 @@ func (m *module) GetKubeletStats(http *helper.HTTP) ([]byte, error) {
 
 	now := time.Now()
 
-	// NOTE: These entries will be never removed, this can be a leak if
+	// NOTE: These entries will never be removed, this can be a leak if
 	// metricbeat is used to monitor clusters dynamically created.
 	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
 	statsCache := m.kubeletStatsCache.getCacheMapEntry(m.cacheHash)
 
+	// If this is the first request, or it has passed more time than config.period, we should
+	// make a request to the Kubelet API again to get the last metrics' values.
 	if statsCache.lastFetchTimestamp.IsZero() || now.Sub(statsCache.lastFetchTimestamp) > m.Config().Period {
 		statsCache.sharedStats, statsCache.lastFetchErr = http.FetchContent()
+
 		statsCache.lastFetchTimestamp = now
 	}
 
@@ -161,4 +168,8 @@ func generateCacheHash(host []string) (uint64, error) {
 
 func (m *module) GetMetricsRepo() *util.MetricsRepo {
 	return m.metricsRepo
+}
+
+func (m *module) GetResourceWatchers() *util.Watchers {
+	return m.resourceWatchers
 }

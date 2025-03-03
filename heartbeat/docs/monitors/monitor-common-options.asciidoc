@@ -147,6 +147,66 @@ Example:
 ```
 
 [float]
+[[monitor-maintenance-windows]]
+=== `maintenance_windows`
+
+Use the `maintenance_windows` option to define recurring time periods when a heartbeat monitor should be paused. This feature is implemented via `rrule`, allowing flexible scheduling of maintenance windows.
+
+The `maintenance_windows` option supports the following top-level fields:
+
+* `freq`: Specifies the frequency of the maintenance window. Supported values are `daily`, `weekly`, `monthly`, and `yearly`.
+* `dtstart`: The start date and time for the first occurrence of the maintenance window in ISO 8601 format. This value cannot be older than two years to prevent excessive `rrule` iterations.
+* `interval`: The interval at which the rule repeats. For example, an interval of `1` with `freq: weekly` means the maintenance window occurs every week.
+* `byweekday`: (Optional) Specifies the days of the week when the maintenance window occurs. Accepts values like `MO`, `TU`, `WE`, `TH`, `FR`, `SA`, `SU`.
+* `byhour`: (Optional) Specifies the hour(s) of the day when the maintenance window should trigger.
+* `byminute`: (Optional) Specifies the minute(s) of the hour when the maintenance window should trigger.
+* `bysecond`: (Optional) Specifies the second(s) of the minute when the maintenance window should trigger.
+* `byeaster`: (Optional) Specifies the offset from Easter Sunday for the maintenance window.
+* `bysetpos`: (Optional) Specifies the nth occurrence in the set of recurrence values.
+* `bymonth`: (Optional) Specifies the month(s) when the maintenance window should trigger.
+* `byweekno`: (Optional) Specifies the week(s) of the year when the maintenance window should trigger.
+* `byyearday`: (Optional) Specifies the day(s) of the year when the maintenance window should trigger.
+* `bymonthday`: (Optional) Specifies the day(s) of the month when the maintenance window should trigger.
+* `wkst`: (Optional) Specifies the starting day of the week (e.g., `MO` for Monday).
+* `duration`: The duration of each maintenance window in milliseconds.
+* `count`: (Optional) The number of times the maintenance window should occur before stopping.
+
+Example:
+
+```yaml
+- type: http
+  # ID used to uniquely identify this monitor
+  id: my-monitor
+  # List of URLs to query
+  urls: ["http://localhost:9200"]
+  # Define maintenance windows
+  maintenance_windows:
+    - freq: daily
+      dtstart: "2024-11-04T01:00:00.000Z"
+      interval: 1
+      byweekday: [MO, TU, WE, TH, FR]
+      byhour: [1, 2]
+      byminute: [0, 30]
+      bysecond: [0]
+      bymonth: [1, 6, 12]
+      byweekno: [10, 20, 30]
+      byyearday: [100, 200, 300]
+      bymonthday: [1, 15, 31]
+      wkst: MO
+      duration: 3600000  # 1 hour in milliseconds
+      count: 10
+```
+
+This configuration pauses the monitor every weekday at 01:00 and 02:00 UTC for one hour, repeating for ten occurrences.
+
+**Limitations:**
+
+- Only `daily`, `weekly`, `monthly`, and `yearly` frequencies are supported.
+- `dtstart` must not be older than two years to limit the number of `rrule` iterations.
+
+
+
+[float]
 [[monitor-fields]]
 ==== `fields`
 
@@ -189,9 +249,7 @@ processors in your config.
 ==== `data_stream`
 
 Contains options pertaining to data stream naming, following the conventions followed by {fleet-guide}/data-streams.html[Fleet Data Streams]. By default Heartbeat will
-write to a datastream named `heartbeat-VERSION` except in the case of `browser` monitors, which will
-always follow the Fleet convention of `type-dataset-namespace`, where the type is always synthetics
-unless overriden.
+write to a datastream named `heartbeat-VERSION`.
 
 
 ```yaml

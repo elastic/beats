@@ -41,7 +41,7 @@ func MustNewTestLoader(t testing.TB, plugins []v2.Plugin, typeField, defaultType
 	return &Loader{t: t, Loader: l}
 }
 
-// MustConfigure confiures a new input. The test fails with t.Fatal if the
+// MustConfigure configures a new input. The test fails with t.Fatal if the
 // operation failed.
 func (l *Loader) MustConfigure(cfg *conf.C) v2.Input {
 	i, err := l.Configure(cfg)

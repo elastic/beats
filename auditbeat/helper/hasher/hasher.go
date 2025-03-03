@@ -26,7 +26,6 @@ import (
 	"fmt"
 	"hash"
 	"io"
-	"os"
 	"strings"
 	"time"
 
@@ -124,7 +123,7 @@ type FileTooLargeError struct {
 
 // Error returns the error message for FileTooLargeError.
 func (e FileTooLargeError) Error() string {
-	return fmt.Sprintf("hasher: file size %d exceeds max file size", e.fileSize)
+	return fmt.Sprintf("size %d exceeds max file size", e.fileSize)
 }
 
 // Config contains the configuration of a FileHasher.
@@ -174,11 +173,19 @@ type FileHasher struct {
 
 // NewFileHasher creates a new FileHasher.
 func NewFileHasher(c Config, done <-chan struct{}) (*FileHasher, error) {
+	var limit rate.Limit
+
+	if c.ScanRateBytesPerSec == 0 {
+		limit = rate.Inf
+	} else {
+		limit = rate.Limit(c.ScanRateBytesPerSec)
+	}
+
 	return &FileHasher{
 		config: c,
 		limiter: rate.NewLimiter(
-			rate.Limit(c.ScanRateBytesPerSec), // Rate
-			int(c.MaxFileSizeBytes),           // Burst
+			limit,                   // Rate
+			int(c.MaxFileSizeBytes), // Burst
 		),
 		done: done,
 	}, nil
@@ -186,20 +193,30 @@ func NewFileHasher(c Config, done <-chan struct{}) (*FileHasher, error) {
 
 // HashFile hashes the contents of a file.
 func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
-	info, err := os.Stat(path)
+	f, err := file.ReadOpen(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to stat file %v: %w", path, err)
+		return nil, fmt.Errorf("open: %w", err)
+	}
+	defer f.Close()
+
+	info, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("stat: %w", err)
+	}
+	if !info.Mode().IsRegular() {
+		return nil, fmt.Errorf("not a regular file")
+
 	}
 
 	// Throttle reading and hashing rate.
 	if len(hasher.config.HashTypes) > 0 {
 		err = hasher.throttle(info.Size())
 		if err != nil {
-			return nil, fmt.Errorf("failed to hash file %v: %w", path, err)
+			return nil, err
 		}
 	}
 
-	var hashes []hash.Hash
+	var hashes []hash.Hash //nolint:prealloc // Preallocating doesn't bring improvements.
 	for _, hashType := range hasher.config.HashTypes {
 		h, valid := validHashes[hashType]
 		if !valid {
@@ -210,15 +227,9 @@ func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 	}
 
 	if len(hashes) > 0 {
-		f, err := file.ReadOpen(path)
-		if err != nil {
-			return nil, fmt.Errorf("failed to open file for hashing: %w", err)
-		}
-		defer f.Close()
-
 		hashWriter := multiWriter(hashes)
 		if _, err := io.Copy(hashWriter, f); err != nil {
-			return nil, fmt.Errorf("failed to calculate file hashes: %w", err)
+			return nil, err
 		}
 
 		nameToHash := make(map[HashType]Digest, len(hashes))
@@ -233,6 +244,10 @@ func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 }
 
 func (hasher *FileHasher) throttle(fileSize int64) error {
+	// Burst is ignored if limit is infinite, so check it manually
+	if hasher.limiter.Limit() == rate.Inf && int(fileSize) > hasher.limiter.Burst() {
+		return FileTooLargeError{fileSize}
+	}
 	reservation := hasher.limiter.ReserveN(time.Now(), int(fileSize))
 	if !reservation.OK() {
 		// File is bigger than the max file size

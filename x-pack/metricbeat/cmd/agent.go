@@ -12,12 +12,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func metricbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
-	procs := defaultProcessors()
-	modules, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo, procs...)
+	modules, err := management.CreateInputsFromStreams(rawIn, "metrics", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
@@ -37,18 +35,4 @@ func metricbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo)
 	}
 
 	return configList, nil
-}
-
-func defaultProcessors() []mapstr.M {
-	// processors:
-	//   - add_host_metadata: ~
-	//   - add_cloud_metadata: ~
-	//   - add_docker_metadata: ~
-	//   - add_kubernetes_metadata: ~
-	return []mapstr.M{
-		{"add_host_metadata": nil},
-		{"add_cloud_metadata": nil},
-		{"add_docker_metadata": nil},
-		{"add_kubernetes_metadata": nil},
-	}
 }

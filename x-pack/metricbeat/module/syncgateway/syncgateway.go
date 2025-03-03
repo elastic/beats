@@ -6,10 +6,9 @@ package syncgateway
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -76,7 +75,7 @@ func (m *module) GetSyncgatewayResponse(http *helper.HTTP) (*SgResponse, error) 
 
 		input := SgResponse{}
 		if err = json.Unmarshal(byt, &input); err != nil {
-			return nil, errors.Wrap(err, "error unmarshalling JSON of SyncGateway expvar response")
+			return nil, fmt.Errorf("error unmarshalling JSON of SyncGateway expvar response: %w", err)
 		}
 
 		m.expvarCache.cachedData = input

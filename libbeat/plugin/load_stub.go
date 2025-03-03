@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build (linux && !go1.8) || (darwin && !go1.10) || (!linux && !darwin) || !cgo
-// +build linux,!go1.8 darwin,!go1.10 !linux,!darwin !cgo
 
 package plugin
 

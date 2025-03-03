@@ -1,6 +1,6 @@
 - key: gcp
   title: 'Google Cloud Platform'
-  release: beta
+  release: ga
   description: >
     GCP module
   fields:

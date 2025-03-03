@@ -21,10 +21,11 @@ import (
 	"fmt"
 	"regexp"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
@@ -42,8 +43,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -61,12 +60,8 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 		EphemeralID:     eid,
 		FirstStart:      time.Now(),
 		StartTime:       time.Now(),
-		Monitoring: struct {
-			DefaultUsername string
-		}{
-			DefaultUsername: "test",
-		},
 	}
+	info.Monitoring.DefaultUsername = "test"
 
 	sched = scheduler.Create(
 		1,
@@ -80,9 +75,8 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 			AddTask:     sched.Add,
 			StateLoader: monitorstate.NilStateLoader,
 			PluginsReg:  pluginsReg,
-			PipelineClientFactory: func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
-				c, _ := pipeline.Connect()
-				return SyncPipelineClientAdaptor{C: c}, nil
+			PipelineClientFactory: func(pipeline beat.Pipeline) (beat.Client, error) {
+				return pipeline.Connect()
 			},
 		}),
 		sched,
@@ -164,12 +158,6 @@ func (pc *MockPipeline) ConnectWith(cc beat.ClientConfig) (beat.Client, error) {
 	return c, nil
 }
 
-// Convenience function for tests
-func (pc *MockPipeline) ConnectSync() pipeline.ISyncClient {
-	c, _ := pc.Connect()
-	return SyncPipelineClientAdaptor{C: c}
-}
-
 func (pc *MockPipeline) PublishedEvents() []*beat.Event {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
@@ -203,9 +191,10 @@ func baseMockEventMonitorValidator(id string, name string, status string) valida
 
 func mockEventMonitorValidator(id string, name string) validator.Validator {
 	return lookslike.Strict(lookslike.Compose(
+		hbtestllext.MaybeHasEventType,
 		baseMockEventMonitorValidator(id, name, "up"),
 		hbtestllext.MonitorTimespanValidator,
-		hbtest.SummaryChecks(1, 0),
+		hbtest.SummaryStateChecks(1, 0),
 		lookslike.MustCompile(mockEventCustomFields()),
 	))
 }
@@ -223,17 +212,17 @@ func createMockJob() []jobs.Job {
 	return []jobs.Job{j}
 }
 
-func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
+func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int64, *atomic.Int64) {
 	reg := monitoring.NewRegistry()
 
-	built := atomic.NewInt(0)
-	closed := atomic.NewInt(0)
+	built := &atomic.Int64{}
+	closed := &atomic.Int64{}
 
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
 			Make: func(s string, config *config.C) (plugin.Plugin, error) {
-				built.Inc()
+				built.Add(1)
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
 					URLs []string `config:"urls" validate:"required"`
@@ -241,7 +230,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 
 				// track all closes, even on error
 				closer := func() error {
-					closed.Inc()
+					closed.Add(1)
 					return nil
 				}
 
@@ -253,12 +242,13 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 
 				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, nil
 			},
-			Stats: plugin.NewPluginCountersRecorder("test", reg)},
+			Stats: plugin.NewPluginCountersRecorder("test", reg),
+		},
 		built,
 		closed
 }
 
-func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int, closed *atomic.Int) {
+func mockPluginsReg() (p *plugin.PluginsReg, built *atomic.Int64, closed *atomic.Int64) {
 	reg := plugin.NewPluginsReg()
 	builder, built, closed := mockPluginBuilder()
 	_ = reg.Add(builder)

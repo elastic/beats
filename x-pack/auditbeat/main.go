@@ -6,15 +6,9 @@ package main
 
 import (
 	"os"
+	_ "time/tzdata" // for timezone handling
 
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cmd"
-
-	// Register modules.
-	_ "github.com/elastic/beats/v7/auditbeat/module/auditd"
-	_ "github.com/elastic/beats/v7/auditbeat/module/file_integrity"
-
-	// Register includes.
-	_ "github.com/elastic/beats/v7/auditbeat/include"
 )
 
 func main() {

@@ -52,7 +52,7 @@ func TestStore_OpenClose(t *testing.T) {
 	})
 
 	t.Run("fail if persistent store can not be accessed", func(t *testing.T) {
-		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test")
+		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test", "", true)
 		require.Error(t, err)
 	})
 
@@ -240,7 +240,7 @@ func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *sto
 		persistentStore = createSampleStore(t, nil)
 	}
 
-	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix)
+	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix, "", true)
 	if err != nil {
 		t.Fatalf("failed to open the store")
 	}
@@ -267,7 +267,7 @@ func createSampleStore(t *testing.T, data map[string]state) testStateStore {
 
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) Access() (*statestore.Store, error) {
+func (ts testStateStore) Access(_ string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}
@@ -296,7 +296,7 @@ func (ts testStateStore) snapshot() map[string]state {
 // persistent state.
 //
 // Note: The state returned by storeMemorySnapshot is always ahead of the state returned by storeInSyncSnapshot.
-//       All key value pairs are fully in-sync, if both snapshot functions return the same state.
+// All key value pairs are fully in-sync, if both snapshot functions return the same state.
 func storeMemorySnapshot(store *store) map[string]state {
 	store.ephemeralStore.mu.Lock()
 	defer store.ephemeralStore.mu.Unlock()
@@ -313,7 +313,7 @@ func storeMemorySnapshot(store *store) map[string]state {
 // written to the persistent store already.
 
 // Note: The state returned by storeMemorySnapshot is always ahead of the state returned by storeInSyncSnapshot.
-//       All key value pairs are fully in-sync, if both snapshot functions return the same state.
+// All key value pairs are fully in-sync, if both snapshot functions return the same state.
 func storeInSyncSnapshot(store *store) map[string]state {
 	store.ephemeralStore.mu.Lock()
 	defer store.ephemeralStore.mu.Unlock()

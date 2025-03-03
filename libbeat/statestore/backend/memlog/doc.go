@@ -66,11 +66,11 @@
 // the moment the only private field is `_key`, which is used to identify the
 // key-value pair.
 // NOTE: Creating a new file guarantees that Beats can progress when creating a
-//       new checkpoint file.  Some filesystems tend to block the
-//       delete/replace operation when the file is accessed by another process
-//       (e.g. common problem with AV Scanners on Windows). By creating a new
-//       file we circumvent this problem.  Failures in deleting old files is
-//       ok, and we will try to delete old data files again in the future.
+// new checkpoint file.  Some filesystems tend to block the
+// delete/replace operation when the file is accessed by another process
+// (e.g. common problem with AV Scanners on Windows). By creating a new
+// file we circumvent this problem.  Failures in deleting old files is
+// ok, and we will try to delete old data files again in the future.
 //
 // The active marker file is not really used by the store. It is written for
 // debugging purposes and contains the filepath of the last written data file
@@ -80,8 +80,8 @@
 // data file into the in-memory hashtable. Older data files are ignored. The
 // filename with the update sequence number is used to sort data files.
 // NOTE: the active marker file is not used, as the checkpoint operation is
-//       supposed to be an atomic operation that is finalized once the data
-//       file is moved to its correct location.
+// supposed to be an atomic operation that is finalized once the data
+// file is moved to its correct location.
 //
 // After loading the data file we loop over all operations in the log file.
 // Operations with a smaller sequence number are ignored when iterating the log

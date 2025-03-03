@@ -22,6 +22,10 @@ Users can either use `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and/or
 `AWS_SESSION_TOKEN`, or use shared AWS credentials file.
 Please see <<aws-credentials-config,AWS credentials options>> for more details.
 
+If you use AWS CloudWatch cross-account observability, credentials of the monitoring account
+should be used here and Metricbeat will collect all metrics from both the monitoring
+account and the linked source accounts.
+
 * *regions*
 
 This module also accepts optional configuration `regions` to specify which
@@ -39,7 +43,7 @@ latency amount.
 
 * *data_granularity*
 
-AWS CloudWatch allows to define the granularity of the returned datapoints, by setting "Period" while querying metrics.
+AWS CloudWatch allows to define the granularity of the returned data points, by setting "Period" while querying metrics.
 Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html[MetricDataQuery parameters] for more information.
 
 By default, metricbeat will query CloudWatch setting "Period" to Metricbeat collection period. If you wish to set a custom value for "Period", please specify a `data_granularity` parameter.
@@ -57,7 +61,35 @@ services do not include a region. In `aws` module, `endpoint` config is to set
 the `endpoint-code` part, such as `amazonaws.com`, `amazonaws.com.cn`, `c2s.ic.gov`,
 `sc2s.sgov.gov`.
 
-If endpoint is specified, `regions` config becomes required. For example:
+If endpoint is specified, `regions` config becomes required.
+
+* *include_linked_accounts*
+
+The `include_linked_accounts` parameter is used to enable the inclusion of metrics from different accounts linked to a
+main monitoring account. By setting this parameter to true, users can gather metrics from multiple AWS accounts that are
+linked through the https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html[CloudWatch cross-account observability].
+By default, the `include_linked_accounts` parameter is set to true, meaning that metrics from the main monitoring
+account and all linked accounts are all collected. When set to false, the parameter allows the CloudWatch service to
+only retrieve metrics from the monitoring account.
+
+If you need to collect metrics from a specific linked account, use `owning_account` configuration.
+
+*_Note_:* Users should ensure that the necessary IAM roles and policies are properly set up in order to link the monitoring
+account and source accounts together.
+Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account-Setup.html#CloudWatch-Unified-Cross-Account-Setup-permissions[Link monitoring accounts with source accounts] for more details.
+
+* *owning_account*
+
+This configuration works together with `include_linked_accounts` configuration and allows to collect metrics from a specific linked account.
+The configuration accepts a valid account ID and internally it maps to the `OwningAccount` parameter of https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html[ListMetrics API].
+
+Note that, `include_linked_accounts` should be enabled (which is the default value) to use this parameter.
+
+[source,yaml]
+----
+include_linked_accounts: true
+owning_account: 111111111111
+----
 
 * *tags_filter*
 
@@ -100,6 +132,25 @@ Enforces the use of FIPS service endpoints. See <<aws-credentials-config,AWS cre
     - us-west-2
   metricsets:
     - ec2
+----
+
+* *apigateway_max_results*
+
+This configuration works together with AWS/APIGateway namespace. It defines the maximum number of returned results per page. The default value is 25 and the maximum value is 500.
+See https://pkg.go.dev/github.com/aws/aws-sdk-go-v2/service/apigateway@v1.25.8#GetRestApisInput.Limit[GetRestApisInput.Limit]
+
+[source,yaml]
+----
+- module: aws
+      period: 10s
+      regions:
+        - us-east-1
+      metricsets:
+        - cloudwatch
+      metrics:
+        - namespace: "AWS/ApiGateway"
+          resource_type: "apigateway:restapis"
+          apigateway_max_results: 40
 ----
 
 The aws module comes with a predefined dashboard. For example:
@@ -285,7 +336,8 @@ GetMetricData max page size: 100, based on https://docs.aws.amazon.com/AmazonClo
 | IAM ListAccountAliases | 1 | Once on startup
 | STS GetCallerIdentity | 1 | Once on startup
 | EC2 DescribeRegions| 1 | Once on startup
-| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per collection period
+| CloudWatch ListMetrics without specifying namespace in configuration | Total number of results / ListMetrics max page size | Per region per collection period
+| CloudWatch ListMetrics with specific namespaces in configuration | Total number of results / ListMetrics max page size * number of unique namespaces | Per region per collection period
 | CloudWatch GetMetricData | Total number of results / GetMetricData max page size | Per region per namespace per collection period
 |===
 `billing`, `ebs`, `elb`, `sns`, `usage` and `lambda` are the same as `cloudwatch` metricset.

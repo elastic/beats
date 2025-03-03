@@ -30,11 +30,8 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	err := logp.DevelopmentSetup()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error creating logger: %s\n", err)
-		os.Exit(1)
-	}
+	logp.DevelopmentSetup()
+
 	tmp, err := os.MkdirTemp("", "pidfile_test")
 	defer os.RemoveAll(tmp)
 	if err != nil {

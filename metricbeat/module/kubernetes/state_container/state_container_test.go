@@ -16,29 +16,28 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package state_container
 
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-var files = []string{
-	"../_meta/test/ksm.v2.4.2",
-	"../_meta/test/ksm.v2.5.0",
-	"../_meta/test/ksm.v2.6.0",
-	"../_meta/test/ksm.v2.7.0",
-}
+var filesFolder = "../_meta/test/KSM"
+var expectedFolder = "./_meta/test"
 
 const name = "state_container"
 
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", name, k.GetTestCases(files))
+	testCases, err := k.GetTestCases(filesFolder, expectedFolder)
+	require.Equal(t, err, nil)
+	ptest.TestMetricSet(t, "kubernetes", name, testCases)
 }
 
 func TestData(t *testing.T) {
@@ -46,5 +45,5 @@ func TestData(t *testing.T) {
 }
 
 func TestMetricsFamily(t *testing.T) {
-	k.TestStateMetricsFamily(t, files, mapping)
+	k.TestMetricsFamilyFromFolder(t, filesFolder, mapping)
 }

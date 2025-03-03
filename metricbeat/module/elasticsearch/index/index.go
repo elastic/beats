@@ -18,10 +18,9 @@
 package index
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -42,8 +41,9 @@ const (
 	expandWildcards = "expand_wildcards=open"
 	statsPath       = "/_stats/" + statsMetrics + "?filter_path=indices&" + expandWildcards
 
-	bulkSuffix   = ",bulk"
-	hiddenSuffix = ",hidden"
+	bulkSuffix         = ",bulk"
+	hiddenSuffix       = ",hidden"
+	allowClosedIndices = "&forbid_closed_indices=false"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -73,7 +73,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	info, err := elasticsearch.GetInfo(m.HTTP, m.HostData().SanitizedURI)
 	if err != nil {
-		return errors.Wrap(err, "failed to get info from Elasticsearch")
+		return fmt.Errorf("failed to get info from Elasticsearch: %w", err)
 	}
 
 	if err := m.updateServicePath(*info.Version.Number); err != nil {
@@ -85,7 +85,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, m.HTTP, *info, content, m.XPackEnabled)
+	return eventsMapping(r, m.HTTP, info, content, m.XPackEnabled)
 }
 
 func (m *MetricSet) updateServicePath(esVersion version.V) error {
@@ -108,6 +108,7 @@ func getServicePath(esVersion version.V) (string, error) {
 
 	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
 		u.Path += bulkSuffix
+		u.RawQuery += allowClosedIndices
 	}
 
 	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {

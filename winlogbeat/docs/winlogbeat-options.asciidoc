@@ -98,7 +98,7 @@ winlogbeat.event_logs:
 ==== `event_logs.batch_read_size`
 
 The maximum number of event log records to read from the Windows API in a single
-batch. The default batch size is 100. Most Windows versions return an error if
+batch. The default batch size is 512. Most Windows versions return an error if
 the value is larger than 1024. *{vista_and_newer}*
 
 {beatname_uc} starts a goroutine (a lightweight thread) to read from each
@@ -112,29 +112,12 @@ reading additional event log records.
 ==== `event_logs.name`
 
 The name of the event log to monitor. Each dictionary under `event_logs` must
-have a `name` field, except for those which use a custom XML query. You can
-get a list of available event logs by running `Get-EventLog *` in PowerShell.
-Here is a sample of the output from the command:
-
-[source,sh]
---------------------------------------------------------------------------------
-PS C:\Users\vagrant> Get-EventLog *
-
-  Max(K) Retain OverflowAction        Entries Log
-  ------ ------ --------------        ------- ---
-  20,480      0 OverwriteAsNeeded          75 Application
-  20,480      0 OverwriteAsNeeded           0 HardwareEvents
-     512      7 OverwriteOlder              0 Internet Explorer
-  20,480      0 OverwriteAsNeeded           0 Key Management Service
-  20,480      0 OverwriteAsNeeded       1,609 Security
-  20,480      0 OverwriteAsNeeded       1,184 System
-  15,360      0 OverwriteAsNeeded         464 Windows PowerShell
---------------------------------------------------------------------------------
-
-Channel names can also be specified if running on Windows Vista or newer. A
-channel is a named stream of events that transports events from an event source
-to an event log. Most channels are tied to specific event publishers. Here is an
-example showing how to list all channels using PowerShell.
+have a `name` field, except for those which use a custom XML query.
+A channel is a named stream of events that transports events from an event
+source to an event log. Most channels are tied to specific event publishers.
+You can get a list of available event logs by using the PowerShell
+https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.diagnostics/get-winevent[`Get-WinEvent`] cmdlet
+on Windows Vista or newer. Here is a sample of the output from the command:
 
 [source,sh]
 --------------------------------------------------------------------------------
@@ -152,6 +135,24 @@ LogName : Microsoft-Rdms-UI/Admin
 LogName : Microsoft-Rdms-UI/Operational
 LogName : Microsoft-Windows-Windows Firewall With Advanced Security/Firewall
 ...
+--------------------------------------------------------------------------------
+
+If `Get-WinEvent` is not available, the https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog[`Get-EventLog`] cmdlet can be used in its
+place.
+
+[source,sh]
+--------------------------------------------------------------------------------
+PS C:\Users\vagrant> Get-EventLog *
+
+  Max(K) Retain OverflowAction        Entries Log
+  ------ ------ --------------        ------- ---
+  20,480      0 OverwriteAsNeeded          75 Application
+  20,480      0 OverwriteAsNeeded           0 HardwareEvents
+     512      7 OverwriteOlder              0 Internet Explorer
+  20,480      0 OverwriteAsNeeded           0 Key Management Service
+  20,480      0 OverwriteAsNeeded       1,609 Security
+  20,480      0 OverwriteAsNeeded       1,184 System
+  15,360      0 OverwriteAsNeeded         464 Windows PowerShell
 --------------------------------------------------------------------------------
 
 You must specify the full name of the channel in the configuration file.
@@ -229,46 +230,16 @@ and descriptions.
 
 A whitelist and blacklist of event IDs. The value is a comma-separated list. The
 accepted values are single event IDs to include (e.g. 4624), a range of event
-IDs to include (e.g. 4700-4800), and single event IDs to exclude (e.g. -4735).
+IDs to include (e.g. 4700-4800), single event IDs to exclude (e.g. -4735),
+and a range of event IDs to exclude (e.g. -4701-4710).
 *{vista_and_newer}*
 
 [source,yaml]
 --------------------------------------------------------------------------------
 winlogbeat.event_logs:
   - name: Security
-    event_id: 4624, 4625, 4700-4800, -4735
+    event_id: 4624, 4625, 4700-4800, -4735, -4701-4710
 --------------------------------------------------------------------------------
-
-[WARNING]
-=======================================
-If you specify more that 22 event IDs to include or 22 event IDs to exclude,
-Windows will prevent {beatname_uc} from reading the event log because it limits the
-number of conditions that can be used in an event log query. If this occurs a similar
-warning as shown below will be logged by {beatname_uc}, and it will continue
-processing data from other event logs. For more information, see
-https://support.microsoft.com/en-us/kb/970453.
-
-`WARN EventLog[Application] Open() error. No events will be read from this
-source. The specified query is invalid.`
-
-If you have more than 22 event IDs, you can workaround this Windows limitation
-by using a drop_event[drop-event] processor to do the filtering after
-{beatname_uc} has received the events from Windows. The filter shown below is
-equivalent to `event_id: 903, 1024, 4624` but can be expanded beyond 22
-event IDs.
-
-[source,yaml]
---------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: Security
-    processors:
-      - drop_event.when.not.or:
-        - equals.winlog.event_id: 903
-        - equals.winlog.event_id: 1024
-        - equals.winlog.event_id: 4624
---------------------------------------------------------------------------------
-
-=======================================
 
 [float]
 ==== `event_logs.language`
@@ -405,6 +376,9 @@ winlogbeat.event_logs:
     include_xml: true
 --------------------------------------------------------------------------------
 
+* This can have a significant impact on performance that can vary depending
+on your system specs.
+
 [float]
 ==== `event_logs.tags`
 
@@ -490,29 +464,6 @@ stopped. *{vista_and_newer}*
 Setting `no_more_events` to `stop` is useful when reading from archived event
 log files where you want to read the whole file then exit. There's a complete
 example of how to read from an `.evtx` file in the <<reading-from-evtx,FAQ>>.
-
-[float]
-==== `event_logs.api`
-
-This selects the event log reader implementation that is used to read events
-from the Windows APIs. You should only set this option when testing experimental
-features. When the value is set to `wineventlog-experimental` Winlogbeat will
-replace the default event log reader with the **experimental** implementation.
-We are evaluating this implementation to see if it can provide increased
-performance and reduce CPU usage. *{vista_and_newer}*
-
-[source,yaml]
---------------------------------------------------------------------------------
-winlogbeat.event_logs:
-  - name: ForwardedEvents
-    api: wineventlog-experimental
---------------------------------------------------------------------------------
-
-There are a few notable differences in the events:
-
-* Events that contained data under `winlog.user_data` will now have it under
-  `winlog.event_data`.
-* Setting `include_xml: true` has no effect.
 
 
 [float]

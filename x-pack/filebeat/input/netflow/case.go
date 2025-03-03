@@ -60,9 +60,8 @@ func CamelCaseToSnakeCase(in string) string {
 	}
 
 	out := make([]rune, 0, len(in)+4)
-	runes := []rune(in)
 	upperCount := 1
-	for _, r := range runes {
+	for _, r := range in {
 		lr := unicode.ToLower(r)
 		isUpper := lr != r
 		if isUpper {

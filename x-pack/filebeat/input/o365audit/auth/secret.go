@@ -5,8 +5,9 @@
 package auth
 
 import (
+	"fmt"
+
 	"github.com/Azure/go-autorest/autorest/adal"
-	"github.com/pkg/errors"
 )
 
 // NewProviderFromClientSecret returns a token provider that uses a secret
@@ -14,7 +15,7 @@ import (
 func NewProviderFromClientSecret(endpoint, resource, applicationID, tenantID, secret string) (p TokenProvider, err error) {
 	oauth, err := adal.NewOAuthConfig(endpoint, tenantID)
 	if err != nil {
-		return nil, errors.Wrap(err, "error generating OAuthConfig")
+		return nil, fmt.Errorf("error generating OAuthConfig: %w", err)
 	}
 	spt, err := adal.NewServicePrincipalToken(*oauth, applicationID, secret, resource)
 	if err != nil {

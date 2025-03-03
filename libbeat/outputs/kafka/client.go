@@ -26,8 +26,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/eapache/go-resiliency/breaker"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -70,6 +71,20 @@ type msgRef struct {
 
 var (
 	errNoTopicsSelected = errors.New("no topic could be selected")
+
+	// authErrors are authentication/authorisation errors that will cause
+	// the event to be dropped
+	authErrors = []error{
+		sarama.ErrTopicAuthorizationFailed,
+		sarama.ErrGroupAuthorizationFailed,
+		sarama.ErrClusterAuthorizationFailed,
+		// I believe those are handled before the connection is
+		// stabilised, however we also handle them here just in
+		// case
+		sarama.ErrUnsupportedSASLMechanism,
+		sarama.ErrIllegalSASLState,
+		sarama.ErrSASLAuthenticationFailed,
+	}
 )
 
 func newKafkaClient(
@@ -113,7 +128,7 @@ func newKafkaClient(
 	return c, nil
 }
 
-func (c *client) Connect() error {
+func (c *client) Connect(_ context.Context) error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
@@ -171,7 +186,7 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 		if err != nil {
 			c.log.Errorf("Dropping event: %+v", err)
 			ref.done()
-			c.observer.Dropped(1)
+			c.observer.PermanentErrors(1)
 			continue
 		}
 
@@ -214,21 +229,22 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 	if msg.topic == "" {
 		topic, err := c.topic.Select(event)
 		if err != nil {
-			return nil, fmt.Errorf("setting kafka topic failed with %v", err)
+			return nil, fmt.Errorf("setting kafka topic failed with %w", err)
 		}
 		if topic == "" {
 			return nil, errNoTopicsSelected
 		}
 		msg.topic = topic
 		if _, err := data.Cache.Put("topic", topic); err != nil {
-			return nil, fmt.Errorf("setting kafka topic in publisher event failed: %v", err)
+			return nil, fmt.Errorf("setting kafka topic in publisher event failed: %w", err)
 		}
 	}
 
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
 		if c.log.IsDebug() {
-			c.log.Debugf("failed event: %v", event)
+			c.log.Debug("failed event logged to event log file")
+			c.log.Debugw(fmt.Sprintf("failed event: %v", event), logp.TypeKey, logp.EventType)
 		}
 		return nil, err
 	}
@@ -256,7 +272,11 @@ func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 	defer c.log.Debug("Stop kafka ack worker")
 
 	for libMsg := range ch {
-		msg := libMsg.Metadata.(*message)
+		msg, ok := libMsg.Metadata.(*message)
+		if !ok {
+			c.log.Debug("Failed to assert libMsg.Metadata to *message")
+			return
+		}
 		msg.ref.done()
 	}
 }
@@ -267,10 +287,14 @@ func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	defer c.log.Debug("Stop kafka error handler")
 
 	for errMsg := range ch {
-		msg := errMsg.Msg.Metadata.(*message)
+		msg, ok := errMsg.Msg.Metadata.(*message)
+		if !ok {
+			c.log.Debug("Failed to assert libMsg.Metadata to *message")
+			return
+		}
 		msg.ref.fail(msg, errMsg.Err)
 
-		if errMsg.Err == breaker.ErrBreakerOpen {
+		if errors.Is(errMsg.Err, breaker.ErrBreakerOpen) {
 			// ErrBreakerOpen is a very special case in Sarama. It happens only when
 			// there have been repeated critical (broker / topic-level) errors, and it
 			// puts Sarama into a state where it immediately rejects all input
@@ -356,18 +380,22 @@ func (r *msgRef) done() {
 }
 
 func (r *msgRef) fail(msg *message, err error) {
-	switch err {
-	case sarama.ErrInvalidMessage:
+	switch {
+	case errors.Is(err, sarama.ErrInvalidMessage):
 		r.client.log.Errorf("Kafka (topic=%v): dropping invalid message", msg.topic)
-		r.client.observer.Dropped(1)
+		r.client.observer.PermanentErrors(1)
 
-	case sarama.ErrMessageSizeTooLarge, sarama.ErrInvalidMessageSize:
+	case errors.Is(err, sarama.ErrMessageSizeTooLarge) || errors.Is(err, sarama.ErrInvalidMessageSize):
 		r.client.log.Errorf("Kafka (topic=%v): dropping too large message of size %v.",
 			msg.topic,
 			len(msg.key)+len(msg.value))
-		r.client.observer.Dropped(1)
+		r.client.observer.PermanentErrors(1)
 
-	case breaker.ErrBreakerOpen:
+	case isAuthError(err):
+		r.client.log.Errorf("Kafka (topic=%v): authorisation error: %s", msg.topic, err)
+		r.client.observer.PermanentErrors(1)
+
+	case errors.Is(err, breaker.ErrBreakerOpen):
 		// Add this message to the failed list, but don't overwrite r.err since
 		// all the breaker error means is "there were a lot of other errors".
 		r.failed = append(r.failed, msg.data)
@@ -398,20 +426,20 @@ func (r *msgRef) dec() {
 		success := r.total - failed
 		r.batch.RetryEvents(r.failed)
 
-		stats.Failed(failed)
+		stats.RetryableErrors(failed)
 		if success > 0 {
-			stats.Acked(success)
+			stats.AckedEvents(success)
 		}
 
 		r.client.log.Debugf("Kafka publish failed with: %+v", err)
 	} else {
 		r.batch.ACK()
-		stats.Acked(r.total)
+		stats.AckedEvents(r.total)
 	}
 }
 
 func (c *client) Test(d testing.Driver) {
-	if c.config.Net.TLS.Enable == true {
+	if c.config.Net.TLS.Enable {
 		d.Warn("TLS", "Kafka output doesn't support TLS testing")
 	}
 
@@ -423,4 +451,14 @@ func (c *client) Test(d testing.Driver) {
 		})
 	}
 
+}
+
+func isAuthError(err error) bool {
+	for _, e := range authErrors {
+		if errors.Is(err, e) {
+			return true
+		}
+	}
+
+	return false
 }

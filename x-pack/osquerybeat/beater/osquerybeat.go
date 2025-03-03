@@ -11,16 +11,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gofrs/uuid"
-	lru "github.com/hashicorp/golang-lru"
+	"github.com/gofrs/uuid/v5"
+	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/osquery/osquery-go"
 	kconfig "github.com/osquery/osquery-go/plugin/config"
 	klogger "github.com/osquery/osquery-go/plugin/logger"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -44,7 +45,8 @@ const (
 	// osqueryd child process requests configuration from the configuration plugin implemented in osquerybeat
 	configurationRefreshIntervalSecs = 60
 
-	osqueryTimeout = 60 * time.Second
+	osqueryTimeout    = 1 * time.Minute
+	osqueryMaxTimeout = 24 * time.Hour
 )
 
 const (
@@ -127,6 +129,12 @@ func (bt *osquerybeat) close() {
 
 // Run starts osquerybeat.
 func (bt *osquerybeat) Run(b *beat.Beat) error {
+	pj, err := proc.CreateJobObject()
+	if err != nil {
+		return fmt.Errorf("failed to create process JobObject: %w", err)
+	}
+	defer pj.Close()
+
 	ctx, err := bt.init()
 	if err != nil {
 		return err
@@ -134,7 +142,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx, bt.log)
+	inputConfigCh := config.WatchInputs(ctx, bt.log, b.Registry)
 
 	// Install osqueryd if needed
 	err = installOsquery(ctx)
@@ -150,13 +158,17 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer cleanupFn()
 
 	// Create osqueryd runner
-	osq := osqd.New(
+	osq, err := osqd.New(
 		socketPath,
 		osqd.WithLogger(bt.log),
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
 	)
+
+	if err != nil {
+		return err
+	}
 
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
@@ -165,7 +177,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 
 	// Set reseable action handler
-	rah := newResetableActionHandler(bt.log)
+	rah := newResetableActionHandler(bt.pub, bt.log)
 	defer rah.Clear()
 
 	g, ctx := errgroup.WithContext(ctx)
@@ -242,7 +254,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	socketPath := osq.SocketPath()
 
 	// Create a cache for queries types resolution
-	cache, err := lru.New(adhocOsqueriesTypesCacheSize)
+	cache, err := lru.New[string, map[string]string](adhocOsqueriesTypesCacheSize)
 	if err != nil {
 		bt.log.Errorf("Failed to create osquery query results types cache: %v", err)
 		return err
@@ -271,6 +283,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	cli := osqdcli.New(socketPath,
 		osqdcli.WithLogger(bt.log),
 		osqdcli.WithTimeout(osqueryTimeout),
+		osqdcli.WithMaxTimeout(osqueryMaxTimeout),
 		osqdcli.WithCache(cache, adhocOsqueriesTypesCacheSize),
 	)
 
@@ -337,7 +350,7 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	// Register config and logger extensions
 	extserver, err := osquery.NewExtensionManagerServer(extManagerServerName, socketPath, osquery.ServerTimeout(timeout))
 	if err != nil {
-		return
+		return err
 	}
 
 	// Register osquery configuration plugin

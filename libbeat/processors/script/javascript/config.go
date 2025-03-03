@@ -18,21 +18,21 @@
 package javascript
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 // Config defines the Javascript source files to use for the processor.
 type Config struct {
-	Tag               string                 `config:"tag"`                                  // Processor ID for debug and metrics.
-	Source            string                 `config:"source"`                               // Inline script to execute.
-	File              string                 `config:"file"`                                 // Source file.
-	Files             []string               `config:"files"`                                // Multiple source files.
-	Params            map[string]interface{} `config:"params"`                               // Parameters to pass to script.
-	Timeout           time.Duration          `config:"timeout" validate:"min=0"`             // Execution timeout.
-	TagOnException    string                 `config:"tag_on_exception"`                     // Tag to add to events when an exception happens.
-	MaxCachedSessions int                    `config:"max_cached_sessions" validate:"min=0"` // Max. number of cached VM sessions.
+	Tag                string                 `config:"tag"`                                  // Processor ID for debug and metrics.
+	Source             string                 `config:"source"`                               // Inline script to execute.
+	File               string                 `config:"file"`                                 // Source file.
+	Files              []string               `config:"files"`                                // Multiple source files.
+	Params             map[string]interface{} `config:"params"`                               // Parameters to pass to script.
+	Timeout            time.Duration          `config:"timeout" validate:"min=0"`             // Execution timeout.
+	TagOnException     string                 `config:"tag_on_exception"`                     // Tag to add to events when an exception happens.
+	MaxCachedSessions  int                    `config:"max_cached_sessions" validate:"min=0"` // Max. number of cached VM sessions.
+	OnlyCachedSessions bool                   `config:"only_cached_sessions"`                 // Only use cached VM sessions.
 }
 
 // Validate returns an error if one (and only one) option is not set.
@@ -46,10 +46,10 @@ func (c Config) Validate() error {
 
 	switch {
 	case numConfigured == 0:
-		return errors.Errorf("javascript must be defined via 'file', " +
+		return fmt.Errorf("javascript must be defined via 'file', " +
 			"'files', or inline as 'source'")
 	case numConfigured > 1:
-		return errors.Errorf("javascript can be defined in only one of " +
+		return fmt.Errorf("javascript can be defined in only one of " +
 			"'file', 'files', or inline as 'source'")
 	}
 
@@ -58,7 +58,8 @@ func (c Config) Validate() error {
 
 func defaultConfig() Config {
 	return Config{
-		TagOnException:    "_js_exception",
-		MaxCachedSessions: 4,
+		TagOnException:     "_js_exception",
+		MaxCachedSessions:  4,
+		OnlyCachedSessions: false,
 	}
 }

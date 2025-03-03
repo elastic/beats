@@ -16,7 +16,7 @@
                                     "dataType": "number",
                                     "isBucketed": false,
                                     "label": "Total Billing Cost",
-                                    "operationType": "max",
+                                    "operationType": "sum",
                                     "scale": "ratio",
                                     "sourceField": "gcp.billing.total"
                                 },

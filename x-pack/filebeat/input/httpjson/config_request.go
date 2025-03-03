@@ -136,7 +136,16 @@ type requestConfig struct {
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 
-	Tracer *lumberjack.Logger `config:"tracer"`
+	Tracer *tracerConfig `config:"tracer"`
+}
+
+type tracerConfig struct {
+	Enabled           *bool `config:"enabled"`
+	lumberjack.Logger `config:",inline"`
+}
+
+func (t *tracerConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
 }
 
 func (c *requestConfig) Validate() error {
@@ -151,7 +160,7 @@ func (c *requestConfig) Validate() error {
 		return fmt.Errorf("unsupported method %q", c.Method)
 	}
 
-	if _, err := newBasicTransformsFromConfig(c.Transforms, requestNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, requestNamespace, nil); err != nil {
 		return err
 	}
 

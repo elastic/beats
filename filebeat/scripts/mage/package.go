@@ -18,8 +18,9 @@
 package mage
 
 import (
+	"fmt"
+
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -59,7 +60,7 @@ func CustomizePackaging() {
 				args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
 				args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 			break
 		}

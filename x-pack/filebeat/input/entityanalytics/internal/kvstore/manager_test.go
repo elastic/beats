@@ -10,7 +10,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -77,7 +76,7 @@ func TestManager_Init(t *testing.T) {
 	var grp unison.TaskGroup
 
 	m := Manager{}
-	gotErr := m.Init(&grp, v2.ModeRun)
+	gotErr := m.Init(&grp)
 
 	require.NoError(t, gotErr)
 }

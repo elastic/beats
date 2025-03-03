@@ -49,7 +49,7 @@
 // tag::docker[]
 ["source","sh",subs="attributes"]
 ----
-docker run --net="host" {dockerimage} setup -e \
+docker run --rm --net="host" {dockerimage} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username={beat_default_index_prefix}_internal \

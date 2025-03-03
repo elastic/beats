@@ -42,7 +42,7 @@ func validateClientConfig(c *beat.ClientConfig) error {
 	withDrop := false
 
 	switch m := c.PublishMode; m {
-	case beat.DefaultGuarantees, beat.GuaranteedSend, beat.OutputChooses:
+	case beat.DefaultGuarantees, beat.GuaranteedSend:
 	case beat.DropIfFull:
 		withDrop = true
 	default:
@@ -51,7 +51,7 @@ func validateClientConfig(c *beat.ClientConfig) error {
 
 	// ACK handlers can not be registered DropIfFull is set, as dropping events
 	// due to full broker can not be accounted for in the clients acker.
-	if c.ACKHandler != nil && withDrop {
+	if c.EventListener != nil && withDrop {
 		return errors.New("ACK handlers with DropIfFull mode not supported")
 	}
 

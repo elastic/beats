@@ -54,6 +54,13 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 }
 
 func TestReceiveEventsAndMetadata(t *testing.T) {
+	// Excluding tcp6 for now, since it fails in our CI
+	for _, network := range []string{networkTCP, networkTCP4} {
+		testReceiveEventsAndMetadata(t, network)
+	}
+}
+
+func testReceiveEventsAndMetadata(t *testing.T, network string) {
 	expectedMessages := generateMessages(5, 100)
 	largeMessages := generateMessages(10, 4096)
 	extraLargeMessages := generateMessages(2, 65*1024)
@@ -220,6 +227,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			if !assert.NoError(t, err) {
 				return
 			}
+			config.Network = network
 
 			splitFunc, err := streaming.SplitFunc(test.framing, test.delimiter)
 			if !assert.NoError(t, err) {
@@ -237,7 +245,8 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 			}
 			defer server.Stop()
 
-			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
+			addr := server.Listener.Listener.Addr().String()
+			conn, err := net.Dial(network, addr)
 			require.NoError(t, err)
 			fmt.Fprint(conn, test.messageSent)
 			conn.Close()
@@ -294,8 +303,8 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 	for w := 0; w < workers; w++ {
 		go func() {
 			conn, err := net.Dial("tcp", server.Listener.Listener.Addr().String())
-			defer conn.Close()
 			assert.NoError(t, err)
+			defer conn.Close()
 			for _, sample := range samples {
 				fmt.Fprintln(conn, sample)
 			}

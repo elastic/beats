@@ -19,8 +19,7 @@ package exchange
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -59,7 +58,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var exchanges []map[string]interface{}
 	err := json.Unmarshal(content, &exchanges)
 	if err != nil {
-		return errors.Wrap(err, "error in unmarshal")
+		return fmt.Errorf("error in unmarshal: %w", err)
 	}
 
 	for _, exchange := range exchanges {

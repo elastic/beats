@@ -16,14 +16,13 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package agent
 
 import (
 	"testing"
 
-	_ "github.com/denisenkom/go-mssqldb"
+	_ "github.com/microsoft/go-mssqldb"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"

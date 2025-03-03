@@ -17,6 +17,8 @@
 
 package backoff
 
+import "time"
+
 // Backoff defines the interface for backoff strategies.
 type Backoff interface {
 	// Wait blocks for a duration of time governed by the backoff strategy.
@@ -24,6 +26,9 @@ type Backoff interface {
 
 	// Reset resets the backoff duration to an initial value governed by the backoff strategy.
 	Reset()
+
+	Last() time.Time
+	// Last returns the time when the last call to Wait returned
 }
 
 // WaitOnError is a convenience method, if an error is received it will block, if not errors is

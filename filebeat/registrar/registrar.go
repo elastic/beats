@@ -23,8 +23,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
@@ -57,7 +55,7 @@ type successLogger interface {
 }
 
 type StateStore interface {
-	Access() (*statestore.Store, error)
+	Access(typ string) (*statestore.Store, error)
 }
 
 var (
@@ -74,7 +72,7 @@ const fileStatePrefix = "filebeat::logs::"
 // New creates a new Registrar instance, updating the registry file on
 // `file.State` updates. New fails if the file can not be opened or created.
 func New(stateStore StateStore, out successLogger, flushTimeout time.Duration) (*Registrar, error) {
-	store, err := stateStore.Access()
+	store, err := stateStore.Access("")
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +100,7 @@ func (r *Registrar) GetStates() []file.State {
 func (r *Registrar) loadStates() error {
 	states, err := readStatesFrom(r.store)
 	if err != nil {
-		return errors.Wrap(err, "can not load filebeat registry state")
+		return fmt.Errorf("can not load filebeat registry state: %w", err)
 	}
 
 	r.states.SetStates(states)
@@ -115,7 +113,7 @@ func (r *Registrar) Start() error {
 	// Load the previous log file locations now, for use in input
 	err := r.loadStates()
 	if err != nil {
-		return fmt.Errorf("error loading state: %v", err)
+		return fmt.Errorf("error loading state: %w", err)
 	}
 
 	r.wg.Add(1)
@@ -143,7 +141,9 @@ func (r *Registrar) Run() {
 	defer r.store.Close()
 
 	defer func() {
-		writeStates(r.store, r.states.GetStates())
+		if err := writeStates(r.store, r.states.GetStates()); err != nil {
+			r.log.Errorf("Error writing stopping registrar state to statestore: %v", err)
+		}
 	}()
 
 	var (
@@ -244,8 +244,7 @@ func (r *Registrar) gcStates() {
 
 	beforeCount := r.states.Count()
 	cleanedStates, pendingClean := r.states.CleanupWith(func(id string) {
-		// TODO: report error
-		r.store.Remove(fileStatePrefix + id)
+		r.store.Remove(fileStatePrefix + id) //nolint:errcheck // TODO: report error
 	})
 	statesCleanup.Add(int64(cleanedStates))
 
@@ -276,13 +275,13 @@ func readStatesFrom(store *statestore.Store) ([]file.State, error) {
 			return true, nil
 		}
 
-		// try to decode. Ingore faulty/incompatible values.
+		// try to decode. Ignore faulty/incompatible values.
 		var st file.State
 		if err := dec.Decode(&st); err != nil {
 			// XXX: Do we want to log here? In case we start to store other
 			// state types in the registry, then this operation will likely fail
 			// quite often, producing some false-positives in the logs...
-			return true, nil
+			return true, nil //nolint:nilerr // Ignore per comment above
 		}
 
 		st.Id = key[len(fileStatePrefix):]

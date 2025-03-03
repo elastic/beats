@@ -19,6 +19,7 @@ package module
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -26,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -34,11 +36,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/testing"
 )
 
-// Expvar metric names.
 const (
-	successesKey = "success"
-	failuresKey  = "failures"
-	eventsKey    = "events"
+	// Expvar metric names.
+	successesKey           = "success"
+	failuresKey            = "failures"
+	eventsKey              = "events"
+	consecutiveFailuresKey = "consecutive_failures"
+
+	// Failure threshold config key
+	failureThresholdKey = "failure_threshold"
 )
 
 var (
@@ -68,16 +74,18 @@ type metricSetWrapper struct {
 	module *Wrapper // Parent Module.
 	stats  *stats   // stats for this MetricSet.
 
-	periodic bool // Set to true if this metricset is a periodic fetcher
+	periodic         bool // Set to true if this metricset is a periodic fetcher
+	failureThreshold uint // threshold of consecutive errors needed to set the stream as degraded
 }
 
 // stats bundles common metricset stats.
 type stats struct {
-	key      string          // full stats key
-	ref      uint32          // number of modules/metricsets reusing stats instance
-	success  *monitoring.Int // Total success events.
-	failures *monitoring.Int // Total error events.
-	events   *monitoring.Int // Total events published.
+	key                 string           // full stats key
+	ref                 uint32           // number of modules/metricsets reusing stats instance
+	success             *monitoring.Int  // Total success events.
+	failures            *monitoring.Int  // Total error events.
+	events              *monitoring.Int  // Total events published.
+	consecutiveFailures *monitoring.Uint // Consecutive failures fetching this metricset
 }
 
 // NewWrapper creates a new module and its associated metricsets based on the given configuration.
@@ -104,11 +112,28 @@ func createWrapper(module mb.Module, metricSets []mb.MetricSet, options ...Optio
 		applyOption(wrapper)
 	}
 
+	failureThreshold := uint(1)
+
+	var streamHealthSettings struct {
+		FailureThreshold *uint `config:"failure_threshold"`
+	}
+
+	err := module.UnpackConfig(&streamHealthSettings)
+
+	if err != nil {
+		return nil, fmt.Errorf("unpacking raw config: %w", err)
+	}
+
+	if streamHealthSettings.FailureThreshold != nil {
+		failureThreshold = *streamHealthSettings.FailureThreshold
+	}
+
 	for i, metricSet := range metricSets {
 		wrapper.metricSets[i] = &metricSetWrapper{
-			MetricSet: metricSet,
-			module:    wrapper,
-			stats:     getMetricSetStats(wrapper.Name(), metricSet.Name()),
+			MetricSet:        metricSet,
+			module:           wrapper,
+			stats:            getMetricSetStats(wrapper.Name(), metricSet.Name()),
+			failureThreshold: failureThreshold,
 		}
 	}
 	return wrapper, nil
@@ -146,6 +171,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
 			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())
 
+			msw.module.UpdateStatus(status.Starting, fmt.Sprintf("%s/%s is starting", msw.module.Name(), msw.Name()))
 			msw.run(done, out)
 		}(msw)
 	}
@@ -199,13 +225,13 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 	}
 
 	switch ms := msw.MetricSet.(type) {
-	case mb.PushMetricSet:
+	case mb.PushMetricSet: //nolint:staticcheck // PushMetricSet is deprecated but not removed
 		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(&channelContext{done}, reporter.V2())
-	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
+	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
@@ -242,7 +268,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
-	case mb.ReportingMetricSet:
+	case mb.ReportingMetricSet: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V1())
 	case mb.ReportingMetricSetV2:
@@ -251,17 +277,11 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	case mb.ReportingMetricSetV2Error:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(reporter.V2())
-		if err != nil {
-			reporter.V2().Error(err)
-			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
-		}
+		msw.handleFetchError(err, reporter.V2())
 	case mb.ReportingMetricSetV2WithContext:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(ctx, reporter.V2())
-		if err != nil {
-			reporter.V2().Error(err)
-			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
-		}
+		msw.handleFetchError(err, reporter.V2())
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))
 	}
@@ -290,9 +310,34 @@ func (msw *metricSetWrapper) Test(d testing.Driver) {
 	})
 }
 
+func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporterV2) {
+	switch {
+	case err == nil:
+		msw.stats.consecutiveFailures.Set(0)
+		msw.module.UpdateStatus(status.Running, "")
+
+	case errors.As(err, &mb.PartialMetricsError{}):
+		reporter.Error(err)
+		msw.stats.consecutiveFailures.Set(0)
+		// mark module as running if metrics are partially available and display the error message
+		msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+
+	default:
+		reporter.Error(err)
+		msw.stats.consecutiveFailures.Inc()
+		if msw.failureThreshold > 0 && msw.stats.consecutiveFailures != nil && uint(msw.stats.consecutiveFailures.Get()) >= msw.failureThreshold {
+			// mark it as degraded for any other issue encountered
+			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+		}
+		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+
+	}
+}
+
 type reporter interface {
 	StartFetchTimer()
-	V1() mb.PushReporter
+	V1() mb.PushReporter //nolint:staticcheck // PushReporter is deprecated but not removed
 	V2() mb.PushReporterV2
 }
 
@@ -309,7 +354,7 @@ type eventReporter struct {
 // startFetchTimer demarcates the start of a new fetch. The elapsed time of a
 // fetch is computed based on the time of this call.
 func (r *eventReporter) StartFetchTimer() { r.start = time.Now() }
-func (r *eventReporter) V1() mb.PushReporter {
+func (r *eventReporter) V1() mb.PushReporter { //nolint:staticcheck // PushReporter is deprecated but not removed
 	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
 }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }
@@ -416,11 +461,12 @@ func getMetricSetStats(module, name string) *stats {
 
 	reg := monitoring.Default.NewRegistry(key)
 	s := &stats{
-		key:      key,
-		ref:      1,
-		success:  monitoring.NewInt(reg, successesKey),
-		failures: monitoring.NewInt(reg, failuresKey),
-		events:   monitoring.NewInt(reg, eventsKey),
+		key:                 key,
+		ref:                 1,
+		success:             monitoring.NewInt(reg, successesKey),
+		failures:            monitoring.NewInt(reg, failuresKey),
+		events:              monitoring.NewInt(reg, eventsKey),
+		consecutiveFailures: monitoring.NewUint(reg, consecutiveFailuresKey),
 	}
 
 	fetches[key] = s

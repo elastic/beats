@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-// +build windows
 
 // Package npcap provides an embedded Npcap OEM installer. The embedded installer
 // must be placed in the installer directory and have a name that matches the pattern

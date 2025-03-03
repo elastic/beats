@@ -6,12 +6,12 @@ package poll
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/auth"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -90,14 +90,14 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 	if r.tp != nil {
 		token, err := r.tp.Token()
 		if err != nil {
-			return errors.Wrap(err, "failed getting a token")
+			return fmt.Errorf("failed getting a token: %w", err)
 		}
 		decorators = append(decorators, autorest.WithBearerAuthorization(token))
 	}
 
 	request, err := autorest.Prepare(&http.Request{}, decorators...)
 	if err != nil {
-		return errors.Wrap(err, "failed preparing request")
+		return fmt.Errorf("failed preparing request: %w", err)
 	}
 	delay := max(item.Delay(), minDelay)
 	r.log.Debugf(" -- wait %s for %s", delay, request.URL.String())
@@ -115,7 +115,7 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 
 	for _, act := range acts {
 		if err = act(r); err != nil {
-			return errors.Wrapf(err, "error acting on %+v", act)
+			return fmt.Errorf("error acting on %+v: %w", act, err)
 		}
 	}
 
@@ -242,7 +242,7 @@ func Terminate(err error) Action {
 		if err == nil {
 			return errors.New("polling terminated without a specific error")
 		}
-		return errors.Wrap(err, "polling terminated due to error")
+		return fmt.Errorf("polling terminated due to error: %w", err)
 	}
 }
 

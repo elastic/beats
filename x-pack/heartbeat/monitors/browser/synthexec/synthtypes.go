@@ -1,8 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
-// +build linux darwin
+//go:build linux || darwin || synthetics
 
 package synthexec
 
@@ -16,7 +15,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/ecserr"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 )
 
 // These constants define all known synthetics event types
@@ -96,9 +95,10 @@ func (se SynthEvent) ToMap() (m mapstr.M) {
 	if se.URL != "" {
 		u, e := url.Parse(se.URL)
 		if e != nil {
-			logp.L().Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
+			_, _ = m.Put("url", mapstr.M{"full": se.URL})
+			logp.L().Warnf("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
-			_, _ = m.Put("url", wrappers.URLFields(u))
+			_, _ = m.Put("url", wraputil.URLFields(u))
 		}
 	}
 

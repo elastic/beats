@@ -50,7 +50,8 @@
             "query_time_in_millis": 2456214
           },
           "store": {
-            "size_in_bytes": 17759832
+            "size_in_bytes": 17759832,
+            "total_data_set_size_in_bytes": 17759832
           },
           "query_cache": {
             "memory_size_in_bytes": 21120,
@@ -89,7 +90,8 @@
             "total_size_in_bytes": 2199683211
           },
           "store": {
-            "size_in_bytes": 17759832
+            "size_in_bytes": 17759832,
+            "total_data_set_size_in_bytes": 17759832
           },
           "indexing": {
             "index_time_in_millis": 117187,
@@ -142,6 +144,9 @@
           }
         },
         "status": "green",
+        "tier_preference": "data_content",
+        "creation_date": 1731657995821,
+        "version": "8505000",
         "hidden": true,
         "shards": {
           "total": 1,

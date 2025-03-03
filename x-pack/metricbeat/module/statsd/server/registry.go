@@ -17,11 +17,10 @@ import (
 var logger = logp.NewLogger("statd")
 
 type metric struct {
-	name       string
-	tags       map[string]string
-	lastSeen   time.Time
-	sampleRate float32
-	metric     interface{}
+	name     string
+	tags     map[string]string
+	lastSeen time.Time
+	metric   interface{}
 }
 
 type registry struct {
@@ -287,7 +286,7 @@ func (r *registry) getOrNew(name string, tags map[string]string, new func() inte
 	tc, ok := r.metrics[tagsKey]
 	if !ok {
 		counter := new()
-		r.metrics[tagsKey] = map[string]*metric{name: &metric{
+		r.metrics[tagsKey] = map[string]*metric{name: {
 			metric:   counter,
 			name:     name,
 			tags:     tags,
@@ -330,7 +329,6 @@ func (r *registry) GetOrNewCounter(name string, tags map[string]string) metrics.
 
 	r.clearTypeChanged(name, tags)
 	return r.GetOrNewCounter(name, tags)
-
 }
 
 func (r *registry) GetOrNewTimer(name string, tags map[string]string) *samplingTimer {

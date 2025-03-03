@@ -3,27 +3,21 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io/fs"
 	"os"
-	"path/filepath"
-	"runtime"
-	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
+	xpacketbeat "github.com/elastic/beats/v7/x-pack/packetbeat/scripts/mage"
 
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
@@ -33,14 +27,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
-// NpcapVersion specifies the version of the OEM Npcap installer to bundle with
-// the packetbeat executable. It is used to specify which npcap builder crossbuild
-// image to use and the installer to obtain from the cloud store for testing.
-const (
-	NpcapVersion = "1.71"
-	installer    = "npcap-" + NpcapVersion + "-oem.exe"
-)
-
 func init() {
 	common.RegisterCheckDeps(Update)
 
@@ -48,6 +34,7 @@ func init() {
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
+	packetbeat.SelectLogic = devtools.XPackProject
 }
 
 // Update updates the generated files.
@@ -73,12 +60,10 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	if devtools.Platform.GOOS == "windows" && (devtools.Platform.GOARCH == "amd64" || devtools.Platform.GOARCH == "386") {
-		err := sh.Copy("./npcap/installer/"+installer, "/installer/"+installer)
-		if err != nil {
-			return fmt.Errorf("failed to copy Npcap installer into source tree: %w", err)
-		}
+	if err := xpacketbeat.CopyNPCAPInstaller("./npcap/installer/"); err != nil {
+		return err
 	}
+
 	return packetbeat.GolangCrossBuild()
 }
 
@@ -94,31 +79,8 @@ func CrossBuild() error {
 		// by concurrent builds. See https://github.com/elastic/beats/issues/24304.
 		devtools.Serially(),
 
-		devtools.ImageSelector(func(platform string) (string, error) {
-			image, err := devtools.CrossBuildImage(platform)
-			if err != nil {
-				return "", err
-			}
-			if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
-				return image, nil
-			}
-			if platform == "windows/amd64" || platform == "windows/386" {
-				image = strings.ReplaceAll(image, "beats-dev", "observability-ci") // Temporarily work around naming of npcap image.
-				image = strings.ReplaceAll(image, "main", "npcap-"+NpcapVersion+"-debian9")
-			}
-			return image, nil
-		}),
+		devtools.ImageSelector(xpacketbeat.ImageSelector),
 	)
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -146,7 +108,7 @@ func Package() {
 	packetbeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -165,40 +127,9 @@ func TestPackages() error {
 }
 
 func SystemTest(ctx context.Context) error {
-	mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
+	mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("./"), devtools.BuildSystemTestBinary)
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"./tests/system/..."}
 	return devtools.GoTest(ctx, args)
-}
-
-// getNpcapInstaller gets the installer from the Google Cloud Storage service.
-//
-// On Windows platforms, if getNpcapInstaller is invoked with the environment variables
-// CI or NPCAP_LOCAL set to "true" and the OEM Npcap installer is not available it is
-// obtained from the cloud storage. This behaviour requires access to the private store.
-// If NPCAP_LOCAL is set to "true" and the file is in the npcap/installer directory, no
-// fetch will be made.
-func getNpcapInstaller() error {
-	// TODO: Consider whether to expose this as a target.
-	if runtime.GOOS != "windows" {
-		return nil
-	}
-	if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
-		return errors.New("only available if running in the CI or with NPCAP_LOCAL=true")
-	}
-	dstPath := filepath.Join("./npcap/installer", installer)
-	if os.Getenv("NPCAP_LOCAL") == "true" {
-		fi, err := os.Stat(dstPath)
-		if err == nil && !fi.IsDir() {
-			fmt.Println("using local Npcap installer with NPCAP_LOCAL=true")
-			return nil
-		}
-		if !errors.Is(err, fs.ErrNotExist) {
-			return err
-		}
-	}
-
-	fmt.Printf("getting %s from private cache\n", installer)
-	return sh.RunV("gsutil", "cp", "gs://obs-ci-cache/private/"+installer, dstPath)
 }

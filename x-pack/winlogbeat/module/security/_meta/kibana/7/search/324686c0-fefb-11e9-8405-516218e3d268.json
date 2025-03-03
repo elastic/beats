@@ -122,11 +122,10 @@
         "title": "User management Details - Search [Winlogbeat Security]",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:05.336Z",
     "id": "324686c0-fefb-11e9-8405-516218e3d268",
-    "migrationVersion": {
-        "search": "7.9.3"
-    },
+    "managed": false,
     "references": [
         {
             "id": "winlogbeat-*",
@@ -140,6 +139,7 @@
         }
     ],
     "type": "search",
-    "updated_at": "2021-08-11T13:19:00.386Z",
-    "version": "WzIzMTgsMl0="
+    "typeMigrationVersion": "7.9.3",
+    "updated_at": "2023-11-10T17:08:05.336Z",
+    "version": "WzI0OCwxXQ=="
 }

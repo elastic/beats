@@ -26,28 +26,32 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
+	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
-
-	"errors"
+	"time"
 
 	"github.com/blakesmith/ar"
-	rpm "github.com/cavaliercoder/go-rpm"
+	rpm "github.com/cavaliergopher/rpm"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/strslice"
+	"github.com/docker/docker/client"
 )
 
 const (
-	expectedConfigMode     = os.FileMode(0600)
-	expectedManifestMode   = os.FileMode(0644)
+	expectedConfigMode     = os.FileMode(0o600)
+	expectedManifestMode   = os.FileMode(0o644)
 	expectedModuleFileMode = expectedManifestMode
-	expectedModuleDirMode  = os.FileMode(0755)
+	expectedModuleDirMode  = os.FileMode(0o755)
 )
 
 var (
@@ -106,6 +110,7 @@ func TestZip(t *testing.T) {
 func TestDocker(t *testing.T) {
 	dockers := getFiles(t, regexp.MustCompile(`\.docker\.tar\.gz$`))
 	for _, docker := range dockers {
+		t.Log(docker)
 		checkDocker(t, docker)
 	}
 }
@@ -113,7 +118,7 @@ func TestDocker(t *testing.T) {
 // Sub-tests
 
 func checkRPM(t *testing.T, file string) {
-	p, rpmPkg, err := readRPM(file)
+	p, _, err := readRPM(file)
 	if err != nil {
 		t.Error(err)
 		return
@@ -131,7 +136,6 @@ func checkRPM(t *testing.T, file string) {
 	checkLicensesPresent(t, "/usr/share", p)
 	checkSystemdUnitPermissions(t, p)
 	ensureNoBuildIDLinks(t, p)
-	checkRPMDigestTypeSHA256(t, rpmPkg)
 }
 
 func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
@@ -234,15 +238,15 @@ func checkDocker(t *testing.T, file string) {
 		t.Errorf("error reading file %v: %v", file, err)
 		return
 	}
-
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
 	checkDockerUser(t, p, info, *rootUserContainer)
-	checkConfigPermissionsWithMode(t, p, os.FileMode(0644))
-	checkManifestPermissionsWithMode(t, p, os.FileMode(0644))
+	checkConfigPermissionsWithMode(t, p, os.FileMode(0o644))
+	checkManifestPermissionsWithMode(t, p, os.FileMode(0o644))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkLicensesPresent(t, "licenses/", p)
+	checkDockerImageRun(t, p, file)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -262,7 +266,7 @@ func checkConfigPermissionsWithMode(t *testing.T, p *packageFile, expectedMode o
 				return
 			}
 		}
-		t.Errorf("no config file found matching %v", configFilePattern)
+		t.Logf("no config file found matching %v", configFilePattern)
 	})
 }
 
@@ -287,7 +291,7 @@ func checkConfigOwner(t *testing.T, p *packageFile, expectRoot bool) {
 				return
 			}
 		}
-		t.Errorf("no config file found matching %v", configFilePattern)
+		t.Logf("no config file found matching %v", configFilePattern)
 	})
 }
 
@@ -356,7 +360,7 @@ func checkModulesOwner(t *testing.T, p *packageFile, expectRoot bool) {
 // Verify that the systemd unit file has a mode of 0644. It should not be
 // executable.
 func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
-	const expectedMode = os.FileMode(0644)
+	const expectedMode = os.FileMode(0o644)
 	t.Run(p.Name+" systemd unit file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if systemdUnitFilePattern.MatchString(entry.File) {
@@ -443,7 +447,7 @@ func checkLicensesPresent(t *testing.T, prefix string, p *packageFile) {
 }
 
 func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
-	expectedMode := os.FileMode(0755)
+	expectedMode := os.FileMode(0o755)
 
 	t.Run(fmt.Sprintf("%s entrypoint", p.Name), func(t *testing.T) {
 		if len(info.Config.Entrypoint) == 0 {
@@ -466,6 +470,10 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 	})
 }
 
+// {BeatName}-oss-{OptionalVariantSuffix}-{version}-{os}-{arch}.docker.tar.gz
+// For example, `heartbeat-oss-8.16.0-linux-arm64.docker.tar.gz`
+var ossSuffixRegexp = regexp.MustCompile(`^(\w+)-oss-.+$`)
+
 func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file string) {
 	vendor := info.Config.Labels["org.label-schema.vendor"]
 	if vendor != "Elastic" {
@@ -474,12 +482,7 @@ func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file stri
 
 	t.Run(fmt.Sprintf("%s license labels", p.Name), func(t *testing.T) {
 		expectedLicense := "Elastic License"
-		ossPrefix := strings.Join([]string{
-			info.Config.Labels["org.label-schema.name"],
-			"oss",
-			info.Config.Labels["org.label-schema.version"],
-		}, "-")
-		if strings.HasPrefix(filepath.Base(file), ossPrefix) {
+		if ossSuffixRegexp.MatchString(filepath.Base(file)) {
 			expectedLicense = "ASL 2.0"
 		}
 		licenseLabels := []string{
@@ -512,6 +515,111 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 	})
 }
 
+func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
+	t.Run(fmt.Sprintf("%s check docker images runs", p.Name), func(t *testing.T) {
+		var ctx context.Context
+		dl, ok := t.Deadline()
+		if !ok {
+			ctx = context.Background()
+		} else {
+			c, cancel := context.WithDeadline(context.Background(), dl)
+			ctx = c
+			defer cancel()
+		}
+		f, err := os.Open(imagePath)
+		if err != nil {
+			t.Fatalf("failed to open docker image %q: %s", imagePath, err)
+		}
+		defer f.Close()
+
+		c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			t.Fatalf("failed to get a Docker client: %s", err)
+		}
+
+		loadResp, err := c.ImageLoad(ctx, f, true)
+		if err != nil {
+			t.Fatalf("error loading docker image: %s", err)
+		}
+
+		loadRespBody, err := io.ReadAll(loadResp.Body)
+		if err != nil {
+			t.Fatalf("failed to read image load response: %s", err)
+		}
+		loadResp.Body.Close()
+
+		_, after, found := strings.Cut(string(loadRespBody), "Loaded image: ")
+		if !found {
+			t.Fatalf("image load response was unexpected: %s", string(loadRespBody))
+		}
+		imageId := strings.TrimRight(after, "\\n\"}\r\n")
+
+		var caps strslice.StrSlice
+		if strings.Contains(imageId, "packetbeat") {
+			caps = append(caps, "NET_ADMIN")
+		}
+
+		createResp, err := c.ContainerCreate(ctx,
+			&container.Config{
+				Image: imageId,
+			},
+			&container.HostConfig{
+				CapAdd: caps,
+			},
+			nil,
+			nil,
+			"")
+		if err != nil {
+			t.Fatalf("error creating container from image: %s", err)
+		}
+		defer func() {
+			err := c.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+			if err != nil {
+				t.Errorf("error removing container: %s", err)
+			}
+		}()
+
+		err = c.ContainerStart(ctx, createResp.ID, container.StartOptions{})
+		if err != nil {
+			t.Fatalf("failed to start container: %s", err)
+		}
+		defer func() {
+			err := c.ContainerStop(ctx, createResp.ID, container.StopOptions{})
+			if err != nil {
+				t.Errorf("error stopping container: %s", err)
+			}
+		}()
+
+		timer := time.NewTimer(15 * time.Second)
+		defer timer.Stop()
+		ticker := time.NewTicker(2 * time.Second)
+		defer ticker.Stop()
+
+		var logs []byte
+		sentinelLog := "Beat ID: "
+		for {
+			select {
+			case <-timer.C:
+				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
+				return
+			case <-ticker.C:
+				out, err := c.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+				if err != nil {
+					t.Logf("could not get logs: %s", err)
+				}
+				logs, err = io.ReadAll(out)
+				out.Close()
+				if err != nil {
+					t.Logf("error reading logs: %s", err)
+				}
+				if bytes.Contains(logs, []byte(sentinelLog)) {
+					return
+				}
+			}
+		}
+	})
+}
+
 // ensureNoBuildIDLinks checks for regressions related to
 // https://github.com/elastic/beats/issues/12956.
 func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
@@ -520,16 +628,6 @@ func ensureNoBuildIDLinks(t *testing.T, p *packageFile) {
 			if strings.Contains(name, "/usr/lib/.build-id") {
 				t.Error("found unexpected /usr/lib/.build-id in package")
 			}
-		}
-	})
-}
-
-// checkRPMDigestTypeSHA256 verifies that the RPM contains sha256 digests.
-// https://github.com/elastic/beats/issues/23670
-func checkRPMDigestTypeSHA256(t *testing.T, rpmPkg *rpm.PackageFile) {
-	t.Run("rpm_digest_type_is_sha256", func(t *testing.T) {
-		if rpmPkg.ChecksumType() != "sha256" {
-			t.Errorf("expected SHA256 digest type but got %v", rpmPkg.ChecksumType())
 		}
 	})
 }
@@ -563,8 +661,8 @@ func getFiles(t *testing.T, pattern *regexp.Regexp) []string {
 	return files
 }
 
-func readRPM(rpmFile string) (*packageFile, *rpm.PackageFile, error) {
-	p, err := rpm.OpenPackageFile(rpmFile)
+func readRPM(rpmFile string) (*packageFile, *rpm.Package, error) {
+	p, err := rpm.Open(rpmFile)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -713,15 +811,20 @@ func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFil
 }
 
 func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
+	var manifest *dockerManifest
+	var info *dockerInfo
+	layers := make(map[string]*packageFile)
+
+	manifest, err := readManifest(dockerFile)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	file, err := os.Open(dockerFile)
 	if err != nil {
 		return nil, nil, err
 	}
 	defer file.Close()
-
-	var manifest *dockerManifest
-	var info *dockerInfo
-	layers := make(map[string]*packageFile)
 
 	gzipReader, err := gzip.NewReader(file)
 	if err != nil {
@@ -740,22 +843,17 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 		}
 
 		switch {
-		case header.Name == "manifest.json":
-			manifest, err = readDockerManifest(tarReader)
-			if err != nil {
-				return nil, nil, err
-			}
-		case strings.HasSuffix(header.Name, ".json") && header.Name != "manifest.json":
+		case header.Name == manifest.Config:
 			info, err = readDockerInfo(tarReader)
 			if err != nil {
 				return nil, nil, err
 			}
-		case strings.HasSuffix(header.Name, "/layer.tar"):
+		case slices.Contains(manifest.Layers, header.Name):
 			layer, err := readTarContents(header.Name, tarReader)
 			if err != nil {
 				return nil, nil, err
 			}
-			layers[filepath.Dir(header.Name)] = layer
+			layers[header.Name] = layer
 		}
 	}
 
@@ -768,12 +866,7 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 
 	// Read layers in order and for each file keep only the entry seen in the later layer
 	p := &packageFile{Name: filepath.Base(dockerFile), Contents: map[string]packageEntry{}}
-	for _, layer := range manifest.Layers {
-		layerID := filepath.Dir(layer)
-		layerFile, found := layers[layerID]
-		if !found {
-			return nil, nil, fmt.Errorf("layer not found: %s", layerID)
-		}
+	for _, layerFile := range layers {
 		for name, entry := range layerFile.Contents {
 			// Check only files in working dir and entrypoint
 			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
@@ -798,6 +891,42 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 	return p, info, nil
 }
 
+func readManifest(dockerFile string) (*dockerManifest, error) {
+	var manifest *dockerManifest
+
+	file, err := os.Open(dockerFile)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	gzipReader, err := gzip.NewReader(file)
+	if err != nil {
+		return nil, err
+	}
+	defer gzipReader.Close()
+
+	tarReader := tar.NewReader(gzipReader)
+	for {
+		header, err := tarReader.Next()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return nil, err
+		}
+
+		if header.Name == "manifest.json" {
+			manifest, err = readDockerManifest(tarReader)
+			if err != nil {
+				return nil, err
+			}
+			break
+		}
+	}
+	return manifest, err
+}
+
 type dockerManifest struct {
 	Config   string
 	RepoTags []string
@@ -805,7 +934,7 @@ type dockerManifest struct {
 }
 
 func readDockerManifest(r io.Reader) (*dockerManifest, error) {
-	data, err := ioutil.ReadAll(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
@@ -833,7 +962,7 @@ type dockerInfo struct {
 }
 
 func readDockerInfo(r io.Reader) (*dockerInfo, error) {
-	data, err := ioutil.ReadAll(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}

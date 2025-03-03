@@ -18,15 +18,17 @@
 package cfgfile
 
 import (
+	"errors"
+	"fmt"
 	"sync"
 
-	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -51,12 +53,37 @@ func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineCon
 	}
 }
 
+// Runners returns a slice containing all
+// currently running runners
+func (r *RunnerList) Runners() []Runner {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
+	runners := make([]Runner, 0, len(r.runners))
+	for _, r := range r.runners {
+		runners = append(runners, r)
+	}
+	return runners
+}
+
 // Reload the list of runners to match the given state
+//
+// Runners might fail to start, it's the callers responsibility to
+// handle any error. During execution, any encountered errors are
+// accumulated in a []errors and returned as errors.Join(errs) upon completion.
+//
+// While the stopping of runners occurs on separate goroutines,
+// Reload will wait for all runners to finish before starting any new runners.
+//
+// The starting of runners occurs synchronously, one after the other.
+//
+// It is recommended not to call this method more than once per second to avoid
+// unnecessary starting and stopping of runners.
 func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 
-	var errs multierror.Errors
+	var errs []error
 
 	startList := map[uint64]*reload.ConfigWithMeta{}
 	stopList := r.copyRunnerList()
@@ -68,7 +95,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)
-			errs = append(errs, errors.Wrap(err, "Unable to hash given config"))
+			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err))
 			continue
 		}
 
@@ -102,20 +129,46 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for hash, config := range startList {
 		runner, err := createRunner(r.factory, r.pipeline, config)
 		if err != nil {
-			if _, ok := err.(*common.ErrInputNotFinished); ok {
+			if errors.As(err, new(*common.ErrInputNotFinished)) {
 				// error is related to state, we should not log at error level
 				r.logger.Debugf("Error creating runner from config: %s", err)
 			} else {
 				r.logger.Errorf("Error creating runner from config: %s", err)
 			}
-			errs = append(errs, errors.Wrap(err, "Error creating runner from config"))
+
+			// If InputUnitID is not empty, then we're running under Elastic-Agent
+			// and we need to report the errors per unit.
+			if config.InputUnitID != "" {
+				err = UnitError{
+					Err:    err,
+					UnitID: config.InputUnitID,
+				}
+			}
+
+			errs = append(errs, fmt.Errorf("Error creating runner from config: %w", err))
 			continue
 		}
 
 		r.logger.Debugf("Starting runner: %s", runner)
 		r.runners[hash] = runner
+		if config.StatusReporter != nil {
+			if runnerWithStatus, ok := runner.(status.WithStatusReporter); ok {
+				runnerWithStatus.SetStatusReporter(config.StatusReporter)
+			}
+		}
+
 		runner.Start()
 		moduleStarts.Add(1)
+		if config.DiagCallback != nil {
+			if diag, ok := runner.(diagnostics.DiagnosticReporter); ok {
+				r.logger.Debugf("Runner '%s' has diagnostics, attempting to register", runner)
+				for _, dc := range diag.Diagnostics() {
+					config.DiagCallback.Register(dc.Name, dc.Description, dc.Filename, dc.ContentType, dc.Callback)
+				}
+			} else {
+				r.logger.Debugf("Runner %s does not implement DiagnosticRunner, skipping", runner)
+			}
+		}
 	}
 
 	// NOTE: This metric tracks the number of modules in the list. The true
@@ -124,7 +177,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	// above it is done asynchronously.
 	moduleRunning.Set(int64(len(r.runners)))
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Stop all runners
@@ -186,4 +239,17 @@ func createRunner(factory RunnerFactory, pipeline beat.PipelineConnector, cfg *r
 	// that doesn't affect the hash of the original one.
 	c, _ := config.NewConfigFrom(cfg.Config)
 	return factory.Create(pipetool.WithDynamicFields(pipeline, cfg.Meta), c)
+}
+
+type UnitError struct {
+	UnitID string
+	Err    error
+}
+
+func (u UnitError) Error() string {
+	return u.Err.Error()
+}
+
+func (u UnitError) Unwrap() error {
+	return u.Err
 }

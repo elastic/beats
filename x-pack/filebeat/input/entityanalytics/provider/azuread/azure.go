@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,12 +42,15 @@ var _ provider.Provider = &azure{}
 type azure struct {
 	*kvstore.Manager
 
+	cfg  *config.C
 	conf conf
 
 	metrics *inputMetrics
 	logger  *logp.Logger
 	auth    authenticator.Authenticator
 	fetcher fetcher.Fetcher
+
+	ctx v2.Context
 }
 
 // Name returns the name of this provider.
@@ -71,8 +74,21 @@ func (p *azure) Test(testCtx v2.TestContext) error {
 // Run will start data collection on this provider.
 func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("tenant_id", p.conf.TenantID, "provider", Name)
+	p.ctx = inputCtx
+
+	var err error
+	p.auth, err = oauth2.New(p.cfg, p.Manager.Logger)
+	if err != nil {
+		return fmt.Errorf("unable to create authenticator: %w", err)
+	}
 	p.auth.SetLogger(p.logger)
+
+	p.fetcher, err = graph.New(ctxtool.FromCanceller(p.ctx.Cancelation), p.ctx.ID, p.cfg, p.Manager.Logger, p.auth)
+	if err != nil {
+		return fmt.Errorf("unable to create fetcher: %w", err)
+	}
 	p.fetcher.SetLogger(p.logger)
+
 	p.metrics = newMetrics(inputCtx.ID, nil)
 	defer p.metrics.Close()
 
@@ -94,7 +110,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 		case <-syncTimer.C:
 			start := time.Now()
 			if err := p.runFullSync(inputCtx, store, client); err != nil {
-				p.logger.Errorf("Error running full sync: %v", err)
+				p.logger.Errorw("Error running full sync", "error", err)
 				p.metrics.syncError.Inc()
 			}
 			p.metrics.syncTotal.Inc()
@@ -114,7 +130,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 		case <-updateTimer.C:
 			start := time.Now()
 			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
-				p.logger.Errorf("Error running incremental update: %v", err)
+				p.logger.Errorw("Error running incremental update", "error", err)
 				p.metrics.updateError.Inc()
 			}
 			p.metrics.updateTotal.Inc()
@@ -129,7 +145,7 @@ func (p *azure) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Clien
 // identities from Azure Active Directory, enrich users with group memberships,
 // and publishes all known users (regardless if they have been modified) to the
 // given beat.Client.
-func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client beat.Client) (err error) {
+func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger.Debugf("Running full sync...")
 
 	p.logger.Debugf("Opening new transaction...")
@@ -139,24 +155,37 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 	}
 	p.logger.Debugf("Transaction opened")
 	defer func() { // If commit is successful, call to this close will be no-op.
-		if err = state.close(false); err != nil {
-			p.logger.Errorf("Error rolling back transaction: %v", err)
+		if closeErr := state.close(false); closeErr != nil {
+			p.logger.Errorw("Error rolling back full sync transaction", "error", closeErr)
 		}
 	}()
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	p.logger.Debugf("Starting fetch...")
-	if _, err := p.doFetch(ctx, state, true); err != nil {
+	if _, _, err = p.doFetch(ctx, state, true); err != nil {
 		return err
 	}
 
-	if len(state.users) != 0 {
+	wantUsers := p.conf.wantUsers()
+	wantDevices := p.conf.wantDevices()
+	if (len(state.users) != 0 && wantUsers) || (len(state.devices) != 0 && wantDevices) {
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-		for _, u := range state.users {
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
+
+		if len(state.users) != 0 && wantUsers {
+			p.logger.Debugw("publishing users", "count", len(state.devices))
+			for _, u := range state.users {
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			}
+		}
+
+		if len(state.devices) != 0 && wantDevices {
+			p.logger.Debugw("publishing devices", "count", len(state.devices))
+			for _, d := range state.devices {
+				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			}
 		}
 
 		end := time.Now()
@@ -180,7 +209,7 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 // runIncrementalUpdate will run an incremental update. The process is similar
 // to full synchronization, except only users which have changed (newly
 // discovered, modified, or deleted) will be published.
-func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) (err error) {
+func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger.Debugf("Running incremental update...")
 
 	state, err := newStateStore(store)
@@ -188,27 +217,41 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 		return fmt.Errorf("unable to begin transaction: %w", err)
 	}
 	defer func() { // If commit is successful, call to this close will be no-op.
-		if err = state.close(false); err != nil {
-			p.logger.Errorf("Error rolling back transaction: %v", err)
+		if closeErr := state.close(false); closeErr != nil {
+			p.logger.Errorw("Error rolling back incremental update transaction", "error", closeErr)
 		}
 	}()
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	updatedUsers, err := p.doFetch(ctx, state, false)
+	updatedUsers, updatedDevices, err := p.doFetch(ctx, state, false)
 	if err != nil {
 		return err
 	}
 
-	if updatedUsers.Len() != 0 {
+	if updatedUsers.Len() != 0 || updatedDevices.Len() != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
-		updatedUsers.ForEach(func(id uuid.UUID) {
-			u, ok := state.users[id]
-			if !ok {
-				p.logger.Warnf("Unable to lookup user %q", id, u.ID)
-				return
-			}
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
-		})
+
+		if updatedUsers.Len() != 0 {
+			updatedUsers.ForEach(func(id uuid.UUID) {
+				u, ok := state.users[id]
+				if !ok {
+					p.logger.Warnf("Unable to lookup user %q", id)
+					return
+				}
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			})
+		}
+
+		if updatedDevices.Len() != 0 {
+			updatedDevices.ForEach(func(id uuid.UUID) {
+				d, ok := state.devices[id]
+				if !ok {
+					p.logger.Warnf("Unable to lookup device %q", id)
+					return
+				}
+				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			})
+		}
 
 		tracker.Wait()
 	}
@@ -229,36 +272,65 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 // and enriching users with group memberships. If fullSync is true, then any
 // existing deltaLink will be ignored, forcing a full synchronization from
 // Azure Active Directory. Returns a set of modified users by ID.
-func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (collections.UUIDSet, error) {
-	var updatedUsers collections.UUIDSet
-	var usersDeltaLink string
-	var groupsDeltaLink string
+func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (updatedUsers, updatedDevices collections.UUIDSet, err error) {
+	var usersDeltaLink, devicesDeltaLink, groupsDeltaLink string
 
 	// Get user changes.
 	if !fullSync {
 		usersDeltaLink = state.usersLink
+		devicesDeltaLink = state.devicesLink
 		groupsDeltaLink = state.groupsLink
 	}
 
-	changedUsers, userLink, err := p.fetcher.Users(ctx, usersDeltaLink)
-	if err != nil {
-		return updatedUsers, err
+	var (
+		wantUsers    = p.conf.wantUsers()
+		changedUsers []*fetcher.User
+		userLink     string
+	)
+	if wantUsers {
+		changedUsers, userLink, err = p.fetcher.Users(ctx, usersDeltaLink)
+		if err != nil {
+			return updatedUsers, updatedDevices, err
+		}
+		p.logger.Debugf("Received %d users from API", len(changedUsers))
+	} else {
+		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.conf.Dataset)
 	}
-	p.logger.Debugf("Received %d users from API", len(changedUsers))
 
-	// Get group changes.
+	var (
+		wantDevices    = p.conf.wantDevices()
+		changedDevices []*fetcher.Device
+		deviceLink     string
+	)
+	if wantDevices {
+		changedDevices, deviceLink, err = p.fetcher.Devices(ctx, devicesDeltaLink)
+		if err != nil {
+			return updatedUsers, updatedDevices, err
+		}
+		p.logger.Debugf("Received %d devices from API", len(changedDevices))
+	} else {
+		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.conf.Dataset)
+	}
+
+	// Get group changes. Groups are required for both users and devices.
+	// So always collect these.
 	changedGroups, groupLink, err := p.fetcher.Groups(ctx, groupsDeltaLink)
 	if err != nil {
-		return updatedUsers, err
+		return updatedUsers, updatedDevices, err
 	}
 	p.logger.Debugf("Received %d groups from API", len(changedGroups))
 
 	state.usersLink = userLink
+	state.devicesLink = deviceLink
 	state.groupsLink = groupLink
 
 	for _, v := range changedUsers {
 		updatedUsers.Add(v.ID)
 		state.storeUser(v)
+	}
+	for _, v := range changedDevices {
+		updatedDevices.Add(v.ID)
+		state.storeDevice(v)
 	}
 	for _, v := range changedGroups {
 		state.storeGroup(v)
@@ -279,6 +351,9 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		for _, member := range g.Members {
 			switch member.Type {
 			case fetcher.MemberGroup:
+				if !wantUsers {
+					break
+				}
 				for _, u := range state.users {
 					if u.TransitiveMemberOf.Contains(member.ID) {
 						updatedUsers.Add(u.ID)
@@ -291,6 +366,9 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 				}
 
 			case fetcher.MemberUser:
+				if !wantUsers {
+					break
+				}
 				if u, ok := state.users[member.ID]; ok {
 					updatedUsers.Add(u.ID)
 					if member.Deleted {
@@ -299,29 +377,66 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 						u.MemberOf.Add(g.ID)
 					}
 				}
+
+			case fetcher.MemberDevice:
+				if !wantDevices {
+					break
+				}
+				if d, ok := state.devices[member.ID]; ok {
+					updatedDevices.Add(d.ID)
+					if member.Deleted {
+						d.MemberOf.Remove(g.ID)
+					} else {
+						d.MemberOf.Add(g.ID)
+					}
+				}
 			}
 		}
 	}
 
 	// Expand user group memberships.
-	updatedUsers.ForEach(func(userID uuid.UUID) {
-		u, ok := state.users[userID]
-		if !ok {
-			p.logger.Errorf("Unable to find user %q in state", userID)
-			return
-		}
-		u.Modified = true
-		if u.Deleted {
-			return
-		}
+	if wantUsers {
+		updatedUsers.ForEach(func(userID uuid.UUID) {
+			u, ok := state.users[userID]
+			if !ok {
+				p.logger.Errorf("Unable to find user %q in state", userID)
+				return
+			}
+			u.Modified = true
+			if u.Deleted {
+				p.logger.Debugw("not expanding membership for deleted user", "user", userID)
+				return
+			}
 
-		u.TransitiveMemberOf = u.MemberOf
-		state.relationships.ExpandFromSet(u.MemberOf).ForEach(func(elem uuid.UUID) {
-			u.TransitiveMemberOf.Add(elem)
+			u.TransitiveMemberOf = u.MemberOf
+			state.relationships.ExpandFromSet(u.MemberOf).ForEach(func(elem uuid.UUID) {
+				u.TransitiveMemberOf.Add(elem)
+			})
 		})
-	})
+	}
 
-	return updatedUsers, nil
+	// Expand device group memberships.
+	if wantDevices {
+		updatedDevices.ForEach(func(devID uuid.UUID) {
+			d, ok := state.devices[devID]
+			if !ok {
+				p.logger.Errorf("Unable to find device %q in state", devID)
+				return
+			}
+			d.Modified = true
+			if d.Deleted {
+				p.logger.Debugw("not expanding membership for deleted device", "device", devID)
+				return
+			}
+
+			d.TransitiveMemberOf = d.MemberOf
+			state.relationships.ExpandFromSet(d.MemberOf).ForEach(func(elem uuid.UUID) {
+				d.TransitiveMemberOf.Add(elem)
+			})
+		})
+	}
+
+	return updatedUsers, updatedDevices, nil
 }
 
 // publishMarker will publish a write marker document using the given beat.Client.
@@ -394,21 +509,83 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 	client.Publish(event)
 }
 
+// publishDevice will publish a device document using the given beat.Client.
+func (p *azure) publishDevice(d *fetcher.Device, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
+	deviceDoc := mapstr.M{}
+
+	_, _ = deviceDoc.Put("azure_ad", d.Fields)
+	_, _ = deviceDoc.Put("labels.identity_source", inputID)
+	_, _ = deviceDoc.Put("device.id", d.ID.String())
+
+	if d.Deleted {
+		_, _ = deviceDoc.Put("event.action", "device-deleted")
+	} else if d.Discovered {
+		_, _ = deviceDoc.Put("event.action", "device-discovered")
+	} else if d.Modified {
+		_, _ = deviceDoc.Put("event.action", "device-modified")
+	}
+
+	var groups []fetcher.GroupECS
+	d.TransitiveMemberOf.ForEach(func(groupID uuid.UUID) {
+		g, ok := state.groups[groupID]
+		if !ok {
+			p.logger.Warnf("Unable to lookup group %q for device %q", groupID, d.ID)
+			return
+		}
+		groups = append(groups, g.ToECS())
+	})
+	if len(groups) != 0 {
+		_, _ = deviceDoc.Put("device.group", groups)
+	}
+
+	owners := make([]mapstr.M, 0, d.RegisteredOwners.Len())
+	d.RegisteredOwners.ForEach(func(userID uuid.UUID) {
+		u, ok := state.users[userID]
+		if !ok {
+			p.logger.Warnf("Unable to lookup registered owner %q for device %q", userID, d.ID)
+			return
+		}
+		m := u.Fields.Clone()
+		_, _ = m.Put("user.id", u.ID.String())
+		owners = append(owners, m)
+	})
+	if len(owners) != 0 {
+		_, _ = deviceDoc.Put("device.registered_owners", owners)
+	}
+
+	users := make([]mapstr.M, 0, d.RegisteredUsers.Len())
+	d.RegisteredUsers.ForEach(func(userID uuid.UUID) {
+		u, ok := state.users[userID]
+		if !ok {
+			p.logger.Warnf("Unable to lookup registered user %q for device %q", userID, d.ID)
+			return
+		}
+		m := u.Fields.Clone()
+		_, _ = m.Put("user.id", u.ID.String())
+		users = append(users, m)
+	})
+	if len(users) != 0 {
+		_, _ = deviceDoc.Put("device.registered_users", users)
+	}
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    deviceDoc,
+		Private:   tracker,
+	}
+	tracker.Add()
+
+	p.logger.Debugf("Publishing device %q", d.ID)
+
+	client.Publish(event)
+}
+
 // configure configures this provider using the given configuration.
 func (p *azure) configure(cfg *config.C) (kvstore.Input, error) {
-	var err error
-
-	if err = cfg.Unpack(&p.conf); err != nil {
+	if err := cfg.Unpack(&p.conf); err != nil {
 		return nil, fmt.Errorf("unable to unpack %s input config: %w", Name, err)
 	}
-
-	if p.auth, err = oauth2.New(cfg, p.Manager.Logger); err != nil {
-		return nil, fmt.Errorf("unable to create authenticator: %w", err)
-	}
-	if p.fetcher, err = graph.New(cfg, p.Manager.Logger, p.auth); err != nil {
-		return nil, fmt.Errorf("unable to create fetcher: %w", err)
-	}
-
+	p.cfg = cfg
 	return p, nil
 }
 

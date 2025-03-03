@@ -35,8 +35,9 @@ import (
 // netSOCKS5Proxy starts a new SOCKS5 proxy server that listens on localhost.
 //
 // Usage:
-//  l, teardown := newSOCKS5Proxy(t)
-//  defer teardown()
+//
+//	l, teardown := newSOCKS5Proxy(t)
+//	defer teardown()
 func newSOCKS5Proxy(t *testing.T) (net.Listener, func()) {
 	// Create a SOCKS5 server
 	conf := &socks5.Config{}

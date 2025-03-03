@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin || linux || openbsd || windows || (freebsd && cgo)
-// +build darwin linux openbsd windows freebsd,cgo
 
 package uptime
 

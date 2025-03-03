@@ -25,6 +25,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
@@ -55,6 +56,13 @@ func TestHandler(t *testing.T) {
 	parent := monitoring.NewRegistry()
 	reg, _ := NewInputRegistry("foo", "123abc", parent)
 	monitoring.NewInt(reg, "gauge").Set(13344)
+
+	// Register legacy metrics without id or input. This must be ignored.
+	{
+		legacy := parent.NewRegistry("f49c0680-fc5f-4b78-bd98-7b16628f9a77")
+		monitoring.NewString(legacy, "name").Set("/var/log/wifi.log")
+		monitoring.NewTimestamp(legacy, "last_event_published_time").Set(time.Now())
+	}
 
 	r := mux.NewRouter()
 	s := httptest.NewServer(r)

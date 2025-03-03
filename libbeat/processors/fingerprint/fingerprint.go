@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -38,7 +37,7 @@ const (
 
 func init() {
 	processors.RegisterPlugin(procName, New)
-	jsprocessor.RegisterPlugin(strings.Title(procName), New)
+	jsprocessor.RegisterPlugin("Fingerprint", New)
 }
 
 type fingerprint struct {
@@ -48,7 +47,7 @@ type fingerprint struct {
 }
 
 // New constructs a new fingerprint processor.
-func New(cfg *config.C) (processors.Processor, error) {
+func New(cfg *config.C) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)
@@ -61,7 +60,7 @@ func New(cfg *config.C) (processors.Processor, error) {
 
 	p := &fingerprint{
 		config: config,
-		hash:   config.Method,
+		hash:   config.Method.Hash,
 		fields: fields,
 	}
 
@@ -76,7 +75,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 		return nil, makeErrComputeFingerprint(err)
 	}
 
-	encodedHash := p.config.Encoding(hashFn.Sum(nil))
+	encodedHash := p.config.Encoding.Encode(hashFn.Sum(nil))
 
 	if _, err := event.PutValue(p.config.TargetField, encodedHash); err != nil {
 		return nil, makeErrComputeFingerprint(err)
@@ -86,7 +85,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *fingerprint) String() string {
-	json, _ := json.Marshal(p.config)
+	json, _ := json.Marshal(&p.config)
 	return procName + "=" + string(json)
 }
 
@@ -111,6 +110,6 @@ func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 		fmt.Fprintf(to, "|%v|%v", k, v)
 	}
 
-	io.WriteString(to, "|")
+	_, _ = io.WriteString(to, "|")
 	return nil
 }

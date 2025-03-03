@@ -51,16 +51,21 @@ func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
 				"count": memoryData.Failcnt,
 			},
 			"limit": memoryData.Limit,
-			"rss": mapstr.M{
-				"total": memoryData.TotalRss,
-				"pct":   memoryData.TotalRssP,
-			},
 			"usage": mapstr.M{
 				"total": memoryData.Usage,
 				"pct":   memoryData.UsageP,
 				"max":   memoryData.MaxUsage,
 			},
 		}
+		if memoryData.TotalRss.Exists() {
+			fields["rss"] = mapstr.M{
+				"total": memoryData.TotalRss.ValueOr(0),
+			}
+			if memoryData.TotalRssP.Exists() {
+				fields.Put("rss.pct", memoryData.TotalRssP.ValueOr(0))
+			}
+		}
+
 		// Add container ECS fields
 		_, _ = rootFields.Put("container.memory.usage", memoryData.UsageP)
 	}

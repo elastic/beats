@@ -42,6 +42,9 @@ var (
 
 // GetOSState returns the platform specific StateOS
 func GetOSState(info os.FileInfo) StateOS {
+	if info == nil {
+		return StateOS{}
+	}
 	// os.SameFile must be called to populate the id fields. Otherwise in case for example
 	// os.Stat(file) is used to get the fileInfo, the ids are empty.
 	// https://github.com/elastic/beats/filebeat/pull/53
@@ -56,12 +59,20 @@ func GetOSState(info os.FileInfo) StateOS {
 	// Uint should already return uint64, but making sure this is the case
 	// The required fields can be found here: https://github.com/golang/go/blob/master/src/os/types_windows.go#L78
 	fileState := StateOS{
-		IdxHi: uint64(fileStat.FieldByName("idxhi").Uint()),
-		IdxLo: uint64(fileStat.FieldByName("idxlo").Uint()),
-		Vol:   uint64(fileStat.FieldByName("vol").Uint()),
+		IdxHi: getFieldValue(fileStat, "idxhi"),
+		IdxLo: getFieldValue(fileStat, "idxlo"),
+		Vol:   getFieldValue(fileStat, "vol"),
 	}
 
 	return fileState
+}
+
+func getFieldValue(val reflect.Value, name string) uint64 {
+	fieldValue := val.FieldByName(name)
+	if !fieldValue.IsValid() {
+		return 0
+	}
+	return uint64(fieldValue.Uint())
 }
 
 // IsSame file checks if the files are identical

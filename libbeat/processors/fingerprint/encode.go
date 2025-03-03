@@ -24,16 +24,26 @@ import (
 	"strings"
 )
 
+type namedEncodingMethod struct {
+	Name   string
+	Encode encodingMethod
+}
 type encodingMethod func([]byte) string
 
-var encodings = map[string]encodingMethod{
-	"hex":    hex.EncodeToString,
-	"base32": base32.StdEncoding.EncodeToString,
-	"base64": base64.StdEncoding.EncodeToString,
+var encodings = map[string]namedEncodingMethod{}
+
+func init() {
+	for _, e := range []namedEncodingMethod{
+		{Name: "hex", Encode: hex.EncodeToString},
+		{Name: "base32", Encode: base32.StdEncoding.EncodeToString},
+		{Name: "base64", Encode: base64.StdEncoding.EncodeToString},
+	} {
+		encodings[e.Name] = e
+	}
 }
 
 // Unpack creates the encodingMethod from the given string
-func (e *encodingMethod) Unpack(str string) error {
+func (e *namedEncodingMethod) Unpack(str string) error {
 	str = strings.ToLower(str)
 
 	m, found := encodings[str]

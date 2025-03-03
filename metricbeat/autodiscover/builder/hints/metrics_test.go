@@ -23,7 +23,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -32,6 +31,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestMain(m *testing.M) {
+	InitializeModule()
+
+	os.Exit(m.Run())
+}
 
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
@@ -765,7 +770,7 @@ func createAnExistingKeystore(t *testing.T, path string, secret string) keystore
 
 // create a temporary file on disk to save the keystore.
 func getTemporaryKeystoreFile() string {
-	path, err := ioutils.TempDir("", "testing")
+	path, err := os.MkdirTemp("", "testing")
 	if err != nil {
 		panic(err)
 	}

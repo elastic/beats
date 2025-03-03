@@ -2,7 +2,7 @@
 hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.logs`. As soon as
 the container starts, {beatname_uc} will check if it contains any hints and launch the proper config for
 it. Hints tell {beatname_uc} how to get logs for the given container. By default logs will be retrieved
-from the container using the `container` input. You can use hints to modify this behavior. This is the full
+from the container using the `filestream` input. You can use hints to modify this behavior. This is the full
 list of supported hints:
 
 [float]
@@ -23,7 +23,24 @@ Multiline settings. See <<multiline-examples>> for a full list of all supported 
 [float]
 ===== `co.elastic.logs/json.*`
 
-JSON settings. See <<filebeat-input-log-config-json>> for a full list of all supported options.
+JSON settings. See <<filebeat-input-filestream-ndjson>> for a full list of all supported options.
+
+For example, the following hints with json options:
+[source,yaml]
+-----
+co.elastic.logs/json.message_key: "log"
+co.elastic.logs/json.add_error_key: "true"
+-----
+will lead to the following input configuration:
+
+`filestream`
+[source,yaml]
+-----
+parsers:
+  - ndjson:
+      message_key: "log"
+      add_error_key: "true"
+-----
 
 [float]
 ===== `co.elastic.logs/include_lines`
@@ -353,7 +370,8 @@ filebeat.autodiscover:
     - type: nomad
       hints.enabled: true
       hints.default_config:
-        type: log
+        type: filestream
+        id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -----
@@ -369,7 +387,8 @@ filebeat.autodiscover:
       hints.enabled: true
       hints.default_config:
         enabled: false
-        type: log
+        type: filestream
+        id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
 -----
@@ -403,7 +422,8 @@ filebeat.autodiscover:
       hints.enabled: true
       hints.default_config:
         enabled: false <1>
-        type: log
+        type: filestream
+        id: ${data.nomad.task.name}-${data.nomad.allocation.id} # unique ID required
         paths:
           - /opt/nomad/alloc/${data.nomad.allocation.id}/alloc/logs/${data.nomad.task.name}.*
         processors:

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !windows
-// +build !windows
 
 package proc
 
@@ -20,7 +19,7 @@ var (
 )
 
 func CreateJobObject() (pj Job, err error) {
-	return
+	return 0, nil
 }
 
 // NewJob is noop on unix

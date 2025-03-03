@@ -18,7 +18,7 @@
 package memory
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -61,7 +61,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	rootEvent := mapstr.M{}
 	err := FetchLinuxMemStats(rootEvent, m.mod)
 	if err != nil {
-		return errors.Wrap(err, "error fetching memory stats")
+		return fmt.Errorf("error fetching memory stats: %w", err)
 	}
 	report.Event(mb.Event{
 		MetricSetFields: rootEvent,

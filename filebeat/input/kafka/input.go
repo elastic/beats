@@ -20,17 +20,15 @@ package kafka
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/Shopify/sarama"
-	"github.com/pkg/errors"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -42,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/sarama"
 )
 
 const pluginName = "kafka"
@@ -66,7 +65,7 @@ func configure(cfg *conf.C) (input.Input, error) {
 
 	saramaConfig, err := newSaramaConfig(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "initializing Sarama config")
+		return nil, fmt.Errorf("initializing Sarama config: %w", err)
 	}
 	return NewInput(config, saramaConfig)
 }
@@ -111,7 +110,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 	log := ctx.Logger.Named("kafka input").With("hosts", input.config.Hosts)
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		ACKHandler: acker.ConnectionOnly(
+		EventListener: acker.ConnectionOnly(
 			acker.EventPrivateReporter(func(_ int, events []interface{}) {
 				for _, event := range events {
 					if meta, ok := event.(eventMeta); ok {
@@ -120,12 +119,12 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 				}
 			}),
 		),
-		CloseRef:  ctx.Cancelation,
 		WaitClose: input.config.WaitClose,
 	})
 	if err != nil {
 		return err
 	}
+	defer client.Close()
 
 	log.Info("Starting Kafka input")
 	defer log.Info("Kafka input stopped")
@@ -165,7 +164,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 		input.runConsumerGroup(log, client, goContext, consumerGroup)
 	}
 
-	if ctx.Cancelation.Err() == context.Canceled {
+	if errors.Is(ctx.Cancelation.Err(), context.Canceled) {
 		return nil
 	} else {
 		return ctx.Cancelation.Err()
@@ -254,6 +253,7 @@ func doneChannelContext(ctx input.Context) context.Context {
 }
 
 func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
+	//nolint:nakedret // omitting the return gives a build error
 	return
 }
 
@@ -311,7 +311,7 @@ func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 	parser := h.parsers.Create(reader)
 	for h.session.Context().Err() == nil {
 		message, err := parser.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			return nil
 		}
 		if err != nil {
@@ -391,9 +391,10 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 	timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
 	messages := l.parseMultipleMessages(msg.Value)
 
-	neededAcks := atomic.MakeInt(len(messages))
+	neededAcks := atomic.Int64{}
+	neededAcks.Add(int64(len(messages)))
 	ackHandler := func() {
-		if neededAcks.Dec() == 0 {
+		if neededAcks.Add(-1) == 0 {
 			l.groupHandler.ack(msg)
 		}
 	}

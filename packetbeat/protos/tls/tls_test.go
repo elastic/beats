@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package tls
 
@@ -27,8 +26,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -71,7 +70,7 @@ func testInit() (*eventStore, *tlsPlugin) {
 	logp.TestingSetup(logp.WithSelectors("tls", "tlsdetailed"))
 
 	results := &eventStore{}
-	tls, err := New(true, results.publish, procs.ProcessesWatcher{}, nil)
+	tls, err := New(true, results.publish, &procs.ProcessesWatcher{}, nil)
 	if err != nil {
 		return nil, nil
 	}
@@ -313,7 +312,7 @@ func TestOCSPStatus(t *testing.T) {
 						"not_after":            time.Date(2035, 3, 4, 9, 0, 0, 0, time.UTC),
 						"public_key_algorithm": "RSA",
 						"public_key_size":      4096,
-						"serial_number":        "1492448539999078269498416841973088004758827",
+						"serial_number":        "1121E97D5D37348C572C555A3A59B7B65D2B",
 						"signature_algorithm":  "SHA256-RSA",
 						"subject": mapstr.M{
 							"common_name":         "Orange Devices PKI TV LAB CA",
@@ -336,7 +335,7 @@ func TestOCSPStatus(t *testing.T) {
 						"not_before":           time.Date(2020, 3, 2, 17, 0, 0, 0, time.UTC),
 						"public_key_algorithm": "RSA",
 						"public_key_size":      4096,
-						"serial_number":        "1492246295378596931754418352553114016724120",
+						"serial_number":        "112151567790FB40C755010CA9169CF4B498",
 						"signature_algorithm":  "SHA256-RSA",
 						"subject": mapstr.M{
 							"common_name":         "Orange Devices Root LAB CA",
@@ -403,7 +402,7 @@ func TestOCSPStatus(t *testing.T) {
 					"not_before":           time.Date(2021, 6, 3, 13, 38, 16, 0, time.UTC),
 					"public_key_algorithm": "ECDSA",
 					"public_key_size":      256,
-					"serial_number":        "189790697042017246339292011338547986350262673379",
+					"serial_number":        "213E825A875EB349390D11117C6C14F894135FE3",
 					"signature_algorithm":  "SHA256-RSA",
 					"subject": mapstr.M{
 						"common_name":         "server2 test PKI TV LAB",
@@ -422,9 +421,7 @@ func TestOCSPStatus(t *testing.T) {
 	}
 
 	got := results.events[0].Fields
-	if !cmp.Equal(got, want) {
-		t.Errorf("unexpected result: %s", cmp.Diff(got, want))
-	}
+	require.Equal(t, want, got)
 }
 
 func TestFragmentedHandshake(t *testing.T) {

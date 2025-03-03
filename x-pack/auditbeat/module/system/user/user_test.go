@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux && cgo
-// +build linux,cgo
 
 package user
 
@@ -14,15 +13,17 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 )
 
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 
 	// Set lastState and add test process to cache so it will be reported as stopped.
 	f.(*MetricSet).lastState = time.Now()
@@ -79,7 +80,7 @@ func testUser() *User {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
+		"module":     system.ModuleName,
 		"metricsets": []string{"user"},
 
 		// Would require root access to /etc/shadow

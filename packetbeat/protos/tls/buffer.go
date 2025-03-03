@@ -101,18 +101,24 @@ func (r bufferView) readBytes(pos int, length int) []byte {
 }
 
 func (r bufferView) subview(start, length int) bufferView {
-	if 0 <= start && 0 <= length && start+length <= r.limit {
-		return bufferView{
-			base:  r.base + start,
-			limit: r.base + start + length,
-			buf:   r.buf,
-		}
+	if start < 0 || length < 0 || start+length > r.limit {
+		panic(bufferViewError{start: start, length: length, limit: r.limit})
 	}
-
-	panic(fmt.Sprintf("invalid buffer view requested start:%d len:%d limit:%d",
-		start, length, r.limit))
+	return bufferView{
+		base:  r.base + start,
+		limit: r.base + start + length,
+		buf:   r.buf,
+	}
 }
 
 func (r bufferView) length() int {
 	return r.limit - r.base
+}
+
+type bufferViewError struct {
+	start, length, limit int
+}
+
+func (e bufferViewError) Error() string {
+	return fmt.Sprintf("invalid buffer view requested start:%d len:%d limit:%d", e.start, e.length, e.limit)
 }

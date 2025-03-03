@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"sort"
@@ -34,7 +33,6 @@ import (
 
 // diskQueueSegments encapsulates segment-related queue metadata.
 type diskQueueSegments struct {
-
 	// A list of the segments that have not yet been completely written, sorted
 	// by increasing segment ID. When the first entry has been completely
 	// written, it is removed from this list and appended to reading.
@@ -95,10 +93,7 @@ type queueSegment struct {
 	// If this segment was loaded from a previous session, schemaVersion
 	// points to the file schema version that was read from its header.
 	// This is only used by queueSegment.headerSize(), which is used in
-	// maybeReadPending to calculate the position of the first data frame,
-	// and by queueSegment.shouldUseJSON(), which is used in the reader
-	// loop to detect old segments that used JSON encoding instead of
-	// the current CBOR.
+	// maybeReadPending to calculate the position of the first data frame.
 	schemaVersion *uint32
 
 	// The number of bytes occupied by this segment on-disk, as of the most
@@ -136,7 +131,7 @@ type segmentHeader struct {
 	// Only present in schema version >= 1.
 	frameCount uint32
 
-	// options holds flags to enable features, for example encryption.
+	// options holds flags to enable features, for example compression.
 	options uint32
 }
 
@@ -155,7 +150,7 @@ const currentSegmentVersion = 2
 const segmentHeaderSize = 12
 
 const (
-	ENABLE_ENCRYPTION  uint32 = 1 << iota // 0x1
+	_                  uint32 = 1 << iota // 0x1
 	ENABLE_COMPRESSION                    // 0x2
 	ENABLE_PROTOBUF                       // 0x4
 )
@@ -170,13 +165,19 @@ func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
 func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment, error) {
-	files, err := ioutil.ReadDir(pathStr)
+	dirEntries, err := os.ReadDir(pathStr)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't read queue directory '%s': %w", pathStr, err)
+		return nil, fmt.Errorf("could not read queue directory '%s': %w", pathStr, err)
 	}
 
 	segments := []*queueSegment{}
-	for _, file := range files {
+	for _, dirEntry := range dirEntries {
+		file, err := dirEntry.Info()
+		if err != nil {
+			logger.Errorf("could not get info for file '%s', skipping. Error: %w", dirEntry.Name(), err)
+			continue
+		}
+
 		components := strings.Split(file.Name(), ".")
 		if len(components) == 2 && strings.ToLower(components[1]) == "seg" {
 			// Parse the id as base-10 64-bit unsigned int. We ignore file names that
@@ -251,35 +252,17 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 	// Version 1 is CBOR, Version 2 could be CBOR or ProtoBuf, the
 	// options control which
 	if header.version > 0 {
-		if (header.options & ENABLE_PROTOBUF) == ENABLE_PROTOBUF {
-			sr.serializationFormat = SerializationProtobuf
-		} else {
-			sr.serializationFormat = SerializationCBOR
-		}
+		sr.serializationFormat = SerializationCBOR
 	}
 
-	if (header.options & ENABLE_ENCRYPTION) == ENABLE_ENCRYPTION {
-		sr.er, err = NewEncryptionReader(sr.src, queueSettings.EncryptionKey)
-		if err != nil {
-			sr.src.Close()
-			return nil, fmt.Errorf("couldn't create encryption reader: %w", err)
-		}
-	}
 	if (header.options & ENABLE_COMPRESSION) == ENABLE_COMPRESSION {
-		if sr.er != nil {
-			sr.cr = NewCompressionReader(sr.er)
-		} else {
-			sr.cr = NewCompressionReader(sr.src)
-		}
+		sr.cr = NewCompressionReader(sr.src)
 	}
 	return sr, nil
 }
 
-// getWriter sets up the segmentWriter.  The order of encryption and
-// compression is important.  If both options are enabled we want
-// encrypted compressed data not compressed encrypted data.  This is
-// because encryption will mask the repetions in the data making
-// compression much less effective.  getWriter should only be called
+// getWriter sets up the segmentWriter.
+// getWriter should only be called.
 // from the writer loop.
 func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, error) {
 	var options uint32
@@ -289,16 +272,8 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 		return nil, err
 	}
 
-	if len(queueSettings.EncryptionKey) > 0 {
-		options = options | ENABLE_ENCRYPTION
-	}
-
 	if queueSettings.UseCompression {
 		options = options | ENABLE_COMPRESSION
-	}
-
-	if queueSettings.UseProtobuf {
-		options = options | ENABLE_PROTOBUF
 	}
 
 	sw := &segmentWriter{}
@@ -308,20 +283,8 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 		return nil, err
 	}
 
-	if (options & ENABLE_ENCRYPTION) == ENABLE_ENCRYPTION {
-		sw.ew, err = NewEncryptionWriter(sw.dst, queueSettings.EncryptionKey)
-		if err != nil {
-			sw.dst.Close()
-			return nil, fmt.Errorf("couldn't create encryption writer: %w", err)
-		}
-	}
-
 	if (options & ENABLE_COMPRESSION) == ENABLE_COMPRESSION {
-		if sw.ew != nil {
-			sw.cw = NewCompressionWriter(sw.ew)
-		} else {
-			sw.cw = NewCompressionWriter(sw.dst)
-		}
+		sw.cw = NewCompressionWriter(sw.dst)
 	}
 
 	return sw, nil
@@ -480,7 +443,6 @@ func (segments *diskQueueSegments) sizeOnDisk() uint64 {
 // less compressable.
 type segmentReader struct {
 	src                 io.ReadSeekCloser
-	er                  *EncryptionReader
 	cr                  *CompressionReader
 	serializationFormat SerializationFormat
 }
@@ -489,18 +451,12 @@ func (r *segmentReader) Read(p []byte) (int, error) {
 	if r.cr != nil {
 		return r.cr.Read(p)
 	}
-	if r.er != nil {
-		return r.er.Read(p)
-	}
 	return r.src.Read(p)
 }
 
 func (r *segmentReader) Close() error {
 	if r.cr != nil {
 		return r.cr.Close()
-	}
-	if r.er != nil {
-		return r.er.Close()
 	}
 	return r.src.Close()
 }
@@ -514,35 +470,16 @@ func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
 		if _, err := r.src.Seek(segmentHeaderSize, io.SeekStart); err != nil {
 			return 0, fmt.Errorf("could not seek past segment header: %w", err)
 		}
-		if r.er != nil {
-			if err := r.er.Reset(); err != nil {
-				return 0, fmt.Errorf("could not reset encryption: %w", err)
-			}
-		}
 		if err := r.cr.Reset(); err != nil {
 			return 0, fmt.Errorf("could not reset compression: %w", err)
 		}
 		written, err := io.CopyN(io.Discard, r.cr, (offset+int64(whence))-segmentHeaderSize)
 		return written + segmentHeaderSize, err
 	}
-	if r.er != nil {
-		//can't seek before segment header
-		if (offset + int64(whence)) < segmentHeaderSize {
-			return 0, fmt.Errorf("illegal seek offset %d, whence %d", offset, whence)
-		}
-		if _, err := r.src.Seek(segmentHeaderSize, io.SeekStart); err != nil {
-			return 0, fmt.Errorf("could not seek past segment header: %w", err)
-		}
-		if err := r.er.Reset(); err != nil {
-			return 0, fmt.Errorf("could not reset encryption: %w", err)
-		}
-		written, err := io.CopyN(io.Discard, r.er, (offset+int64(whence))-segmentHeaderSize)
-		return written + segmentHeaderSize, err
-	}
 	return r.src.Seek(offset, whence)
 }
 
-//segmentWriter handles writing of segments.  With Schema version 2
+// segmentWriter handles writing of segments.  With Schema version 2
 // there is the option for plain data, encrypted data, compressed data
 // and encrypted compressed data.  getWriter sets up the segmentWriter
 // to handle these options.  If compression is enabled operations go
@@ -551,16 +488,12 @@ func (r *segmentReader) Seek(offset int64, whence int) (int64, error) {
 // data less compressable.
 type segmentWriter struct {
 	dst *os.File
-	ew  *EncryptionWriter
 	cw  *CompressionWriter
 }
 
 func (w *segmentWriter) Write(p []byte) (int, error) {
 	if w.cw != nil {
 		return w.cw.Write(p)
-	}
-	if w.ew != nil {
-		return w.ew.Write(p)
 	}
 	return w.dst.Write(p)
 }
@@ -569,18 +502,12 @@ func (w *segmentWriter) Close() error {
 	if w.cw != nil {
 		return w.cw.Close()
 	}
-	if w.ew != nil {
-		return w.ew.Close()
-	}
 	return w.dst.Close()
 }
 
 func (w *segmentWriter) Sync() error {
 	if w.cw != nil {
 		return w.cw.Sync()
-	}
-	if w.ew != nil {
-		return w.ew.Sync()
 	}
 	return w.dst.Sync()
 }

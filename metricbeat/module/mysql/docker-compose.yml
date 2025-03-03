@@ -2,10 +2,10 @@ version: '2.3'
 
 services:
   mysql:
-    image: docker.elastic.co/integrations-ci/beats-mysql:${MYSQL_VARIANT:-mysql}-${MYSQL_VERSION:-5.7.12}-1
+    image: docker.elastic.co/integrations-ci/beats-mysql:${MYSQL_VARIANT:-mysql}-${MYSQL_VERSION:-8.0}-1
     build:
       context: ./_meta
       args:
-        MYSQL_IMAGE: ${MYSQL_VARIANT:-mysql}:${MYSQL_VERSION:-5.7.12}
+        MYSQL_IMAGE: ${MYSQL_VARIANT:-mysql}:${MYSQL_VERSION:-8.0}
     ports:
       - 3306

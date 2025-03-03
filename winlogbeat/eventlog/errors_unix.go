@@ -16,13 +16,12 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package eventlog
 
 // IsRecoverable returns a boolean indicating whether the error represents
 // a condition where the Windows Event Log session can be recovered through a
 // reopening of the handle (Close, Open).
-func IsRecoverable(err error) bool {
+func IsRecoverable(error, bool) bool {
 	return false
 }

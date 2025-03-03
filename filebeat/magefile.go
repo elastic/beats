@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -66,19 +65,9 @@ func GolangCrossBuild() error {
 	return filebeat.GolangCrossBuild()
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return filebeat.CrossBuild()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -101,7 +90,7 @@ func Package() {
 	filebeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -120,7 +109,7 @@ func TestPackages() error {
 
 // Update is an alias for executing fields, dashboards, config, includes.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, includeList, fieldDocs,
+	mg.SerialDeps(Fields, Dashboards, Config, GenerateModuleIncludeListGo, fieldDocs,
 		filebeat.CollectDocs,
 		filebeat.PrepareModulePackagingOSS)
 }
@@ -136,10 +125,10 @@ func configYML() error {
 	return devtools.Config(devtools.AllConfigTypes, filebeat.OSSConfigFileParams(), ".")
 }
 
-// includeList generates include/list.go with imports for inputs.
-func includeList() error {
+// GenerateModuleIncludeListGo generates include/list.go with imports for inputs.
+func GenerateModuleIncludeListGo() error {
 	options := devtools.DefaultIncludeListOptions()
-	options.ImportDirs = []string{"input/*"}
+	options.ImportDirs = []string{"autodiscover", "autodiscover/**/*", "input", "input/*", "processor/*"}
 	return devtools.GenerateIncludeListGo(options)
 }
 
@@ -206,6 +195,7 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
+	mg.Deps(BuildSystemTestBinary)
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 

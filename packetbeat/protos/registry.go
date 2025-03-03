@@ -30,7 +30,7 @@ import (
 type ProtocolPlugin func(
 	testMode bool,
 	results Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (Plugin, error)
 

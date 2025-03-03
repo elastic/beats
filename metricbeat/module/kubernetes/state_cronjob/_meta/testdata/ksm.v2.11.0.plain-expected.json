@@ -1,0 +1,36 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.cronjob",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "cronjob": {
+                "active": {
+                    "count": 0
+                },
+                "created": {
+                    "sec": 1713862291
+                },
+                "is_suspended": false,
+                "last_schedule": {
+                    "sec": 1713881940
+                },
+                "name": "hello",
+                "next_schedule": {
+                    "sec": 1713882000
+                }
+            },
+            "namespace": "default"
+        },
+        "metricset": {
+            "name": "state_cronjob",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

@@ -19,16 +19,16 @@
 //
 // Use the helpers with `defer`. For example use IfNot with `defer`, such that
 // cleanup functions will be executed if `check` is false, no matter if an
-// error has been returned or an panic has occured.
+// error has been returned or an panic has occurred.
 //
-//     initOK := false
-//     defer cleanup.IfNot(&initOK, func() {
-//       cleanup
-//     })
+//	initOK := false
+//	defer cleanup.IfNot(&initOK, func() {
+//	  cleanup
+//	})
 //
-//     ... // init structures...
+//	... // init structures...
 //
-//     initOK = true // notify handler cleanup code must not be executed
+//	initOK = true // notify handler cleanup code must not be executed
 package cleanup
 
 // If will run the cleanup function if the bool value is true.
@@ -59,7 +59,7 @@ func IfNotPred(pred func() bool, cleanup func()) {
 	}
 }
 
-// WithError returns a cleanup function calling a custom handler if an error occured.
+// WithError returns a cleanup function calling a custom handler if an error occurred.
 func WithError(fn func(error), cleanup func() error) func() {
 	return func() {
 		if err := cleanup(); err != nil {

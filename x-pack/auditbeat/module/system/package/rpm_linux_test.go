@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux && cgo
-// +build linux,cgo
 
 package pkg
 
@@ -28,7 +27,7 @@ func TestRPMPackages(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	packages, err := listRPMPackages()
+	packages, err := listRPMPackages(false)
 	if err != nil {
 		t.Fatal(err)
 	}

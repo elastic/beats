@@ -20,13 +20,12 @@ package elasticsearch
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"go.elastic.co/apm/v2"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -60,12 +59,12 @@ func newPublishClient(
 	return p, nil
 }
 
-func (c *publishClient) Connect() error {
+func (c *publishClient) Connect(ctx context.Context) error {
 	c.log.Debug("Monitoring client: connect.")
 
-	err := c.es.Connect()
+	err := c.es.Connect(ctx)
 	if err != nil {
-		return errors.Wrap(err, "cannot connect underlying Elasticsearch client")
+		return fmt.Errorf("cannot connect underlying Elasticsearch client: %w", err)
 	}
 
 	params := map[string]string{
@@ -73,7 +72,7 @@ func (c *publishClient) Connect() error {
 	}
 	status, body, err := c.es.Request("GET", "/_xpack", "", params, nil)
 	if err != nil {
-		return fmt.Errorf("X-Pack capabilities query failed with: %v", err)
+		return fmt.Errorf("X-Pack capabilities query failed with: %w", err)
 	}
 
 	if status != 200 {
@@ -172,6 +171,7 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 		meta["_type"] = "doc"
 	}
 
+	//nolint:typecheck // typecheck linter is buggy and thinks opType is unused.
 	opType := events.OpTypeCreate
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
 		opType = events.OpTypeIndex
@@ -181,7 +181,7 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 		opType.String(): meta,
 	}
 
-	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
+	_, _ = event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 
 	fields := mapstr.M{
 		"type": typ,
@@ -190,15 +190,15 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 
 	interval, err := event.Content.Meta.GetValue("interval_ms")
 	if err != nil {
-		return errors.Wrap(err, "could not determine interval_ms field")
+		return fmt.Errorf("could not determine interval_ms field: %w", err)
 	}
-	fields.Put("interval_ms", interval)
+	_, _ = fields.Put("interval_ms", interval)
 
 	clusterUUID, err := event.Content.Meta.GetValue("cluster_uuid")
-	if err != nil && err != mapstr.ErrKeyNotFound {
-		return errors.Wrap(err, "could not determine cluster_uuid field")
+	if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+		return fmt.Errorf("could not determine cluster_uuid field: %w", err)
 	}
-	fields.Put("cluster_uuid", clusterUUID)
+	_, _ = fields.Put("cluster_uuid", clusterUUID)
 
 	document := report.Event{
 		Timestamp: event.Content.Timestamp,
@@ -224,7 +224,7 @@ func getMonitoringIndexName() string {
 	return fmt.Sprintf(".monitoring-beats-%v-%s", version, date)
 }
 
-func logBulkFailures(log *logp.Logger, result eslegclient.BulkResult, events []report.Event) {
+func logBulkFailures(log *logp.Logger, result eslegclient.BulkResponse, events []report.Event) {
 	var response struct {
 		Items []map[string]map[string]interface{} `json:"items"`
 	}
