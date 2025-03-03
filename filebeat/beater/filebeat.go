@@ -334,6 +334,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			// See https://github.com/elastic/beats/issues/42815
 			configCopy, err := conf.NewConfigFrom(outCfg.Config())
 			if err != nil {
+				logp.Err("Failed to create a new config from the output config: %v", err)
 				return nil
 			}
 			stateStore.notifier.Notify(configCopy)
