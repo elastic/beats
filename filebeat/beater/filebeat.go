@@ -329,7 +329,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 				return nil
 			}
 
-			stateStore.notifier.Notify(outCfg.Config())
+			c, err := conf.NewConfigFrom(outCfg.Config())
+			if err != nil {
+				return nil
+			}
+			stateStore.notifier.Notify(c)
 			return nil
 		})
 	}
