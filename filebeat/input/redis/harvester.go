@@ -72,6 +72,33 @@ func NewHarvester(conn rd.Conn) (*Harvester, error) {
 	}, nil
 }
 
+// Expected response
+//
+// 1) "master"
+// 2) (integer) 100
+// 3) 1) 1) "10.0.0.2"
+//       2) "6379"
+//       3) "100"
+//    2) 1) "10.0.0.3"
+//       2) "6379"
+//       3) "100"
+//
+// OR
+//
+// 1) "slave"
+// 2) "10.0.0.1"
+// 3) (integer) 6379
+// 4) "connected"
+// 5) (integer) 100
+
+func (h *Harvester) parseReplicationRole(reply []interface{}) (string, error) {
+	role, ok := reply[0].([]byte)
+	if !ok {
+		return "", fmt.Errorf("unexpected type for role response: %T", reply[0])
+	}
+	return string(role), nil
+}
+
 // Run starts a new redis harvester
 func (h *Harvester) Run() error {
 	defer h.conn.Close()
@@ -108,9 +135,13 @@ func (h *Harvester) Run() error {
 	}
 
 	// Read reply from ROLE
-	role, err := h.conn.Receive()
+	roleReply, err := rd.Values(h.conn.Receive())
 	if err != nil {
 		return fmt.Errorf("error receiving replication role: %w", err)
+	}
+	role, err := h.parseReplicationRole(roleReply)
+	if err != nil {
+		return fmt.Errorf("error parsing replication role: %w", err)
 	}
 
 	for _, item := range logs {
