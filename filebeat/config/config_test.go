@@ -108,13 +108,17 @@ func TestMergeConfigFiles(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(files))
 
-	var fixedFiles []string
+	// The beats won't accept config files that can be written by the user's
+	// group or others and as git won't save the full permission to a files,
+	// we need to ensure the config files have the right permissions.
+	var filesWithCorrectPermission []string
 	for _, f := range files {
-		fixedFiles = append(fixedFiles, testcfg.NewFileWith644Perm(t, f))
+		filesWithCorrectPermission = append(
+			filesWithCorrectPermission, testcfg.NewFileWith644Perm(t, f))
 	}
 
 	config := &Config{}
-	err = mergeConfigFiles(fixedFiles, config)
+	err = mergeConfigFiles(filesWithCorrectPermission, config)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(config.Inputs))
