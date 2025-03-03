@@ -174,8 +174,8 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 		log.Errorw("Error closing audit monitoring client", "error", err)
 	}
 	// If we don't wait for the socket to drain, the calling function can
-	// assign a new client instance to the same pointer while our goroutine is using it.
-	// This guarantees that nothing is depending on the *client pointer by the time we return.
+	// assign a new client instance to the same FD while our goroutine is using it.
+	// This guarantees that we're not trying to read from the file descriptor by the time we return.
 	closeWaiter.Wait()
 }
 
