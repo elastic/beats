@@ -55,6 +55,16 @@ shared:
       <<: *binary_files
       <<: *windows_osquery_files
 
+  - &fips_binary_spec
+    <<: *common
+    name: '{{.BeatName}}-fips'
+    fips: true
+    files:
+      <<: *binary_files
+      '{{.BeatName}}{{.BinaryExt}}':
+        source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        mode: 0755
+
   # License modifiers for the Elastic License
   - &elastic_license_for_binaries
     license: "Elastic License"
@@ -101,4 +111,15 @@ specs:
       types: [tgz]
       spec:
         <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries
+
+  # Elastic Beat with Elastic License and binary taken the current directory.
+  agentbeat_fips:
+    ###
+    # Elastic Licensed Packages
+    ###
+    - os: linux
+      types: [tgz]
+      spec:
+        <<: *fips_binary_spec
         <<: *elastic_license_for_binaries

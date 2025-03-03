@@ -89,7 +89,12 @@ var (
 	fipsConfigRaw []byte
 
 	FIPSConfig struct {
-		Beats []string
+		Beats   []string `yaml:"beats"`
+		Compile struct {
+			CGO  bool              `yaml:"cgo"`
+			Env  map[string]string `yaml:"env"`
+			Tags []string          `yaml:"tags"`
+		} `yaml:"compile"`
 	}
 
 	versionQualified bool
@@ -143,11 +148,9 @@ func init() {
 		panic(fmt.Errorf("failed to parse FIPS env value: %w", err))
 	}
 
-	if FIPSBuild {
-		err := yaml.Unmarshal(fipsConfigRaw, &FIPSConfig)
-		if err != nil {
-			panic(fmt.Errorf("failed to parse FIPS config: %w", err))
-		}
+	err = yaml.Unmarshal(fipsConfigRaw, &FIPSConfig)
+	if err != nil {
+		panic(fmt.Errorf("failed to parse FIPS config: %w", err))
 	}
 
 	versionQualifier, versionQualified = os.LookupEnv("VERSION_QUALIFIER")
