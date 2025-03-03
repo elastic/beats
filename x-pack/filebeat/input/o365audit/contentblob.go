@@ -107,7 +107,7 @@ func (c contentBlob) handleError(response *http.Response) (actions []poll.Action
 	}
 
 	switch response.StatusCode {
-	case 401: // Authentication error. Renew oauth token and repeat this op.
+	case 401: // Authentication error. Repeat this op.
 		return []poll.Action{
 			poll.Fetch(withDelay{contentBlob: c, delay: c.env.Config.PollInterval}),
 		}

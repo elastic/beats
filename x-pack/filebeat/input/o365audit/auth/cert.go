@@ -5,7 +5,6 @@
 package auth
 
 import (
-	"crypto"
 	"crypto/rsa"
 	"crypto/x509"
 	"fmt"
@@ -17,9 +16,7 @@ import (
 
 // NewProviderFromCertificate returns a TokenProvider that uses certificate-based
 // authentication.
-func NewProviderFromCertificate(
-	endpoint, resource, applicationID, tenantID string,
-	conf tlscommon.CertificateConfig) (sptp TokenProvider, err error) {
+func NewProviderFromCertificate(resource, applicationID, tenantID string, conf tlscommon.CertificateConfig) (sptp TokenProvider, err error) {
 	cert, privKey, err := loadConfigCerts(conf)
 	if err != nil {
 		return nil, fmt.Errorf("failed loading certificates: %w", err)
@@ -33,7 +30,7 @@ func NewProviderFromCertificate(
 	return (*credentialTokenProvider)(cred), nil
 }
 
-func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, key crypto.PrivateKey, err error) {
+func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, key *rsa.PrivateKey, err error) {
 	tlsCert, err := tlscommon.LoadCertificate(&cfg)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error loading X509 certificate from '%s': %w", cfg.Certificate, err)
@@ -48,9 +45,9 @@ func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, k
 	if tlsCert.PrivateKey == nil {
 		return nil, nil, fmt.Errorf("failed loading private key from '%s'", cfg.Key)
 	}
-	_, ok := tlsCert.PrivateKey.(*rsa.PrivateKey)
+	key, ok := tlsCert.PrivateKey.(*rsa.PrivateKey)
 	if !ok {
 		return nil, nil, fmt.Errorf("private key at '%s' is not an RSA private key", cfg.Key)
 	}
-	return cert, tlsCert.PrivateKey, nil
+	return cert, key, nil
 }
