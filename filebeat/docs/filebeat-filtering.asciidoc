@@ -71,10 +71,12 @@ The following configuration decodes the inner JSON object:
 ["source","yaml",subs="attributes"]
 -----------------------------------------------------
 {beatname_lc}.inputs:
-- type: log
+- type: filestream
   paths:
     - input.json
-  json.keys_under_root: true
+  parsers:
+    - ndjson:
+        target: ""
 
 processors:
   - decode_json_fields:

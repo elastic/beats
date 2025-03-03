@@ -168,7 +168,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		}
 	}
 	wantDump := cfg.FailureDump.enabled() && cfg.FailureDump.Filename != ""
-	prg, ast, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace, wantDump)
+	doCov := cfg.RecordCoverage && log.IsDebug()
+	prg, ast, cov, err := newProgram(ctx, cfg.Program, root, getEnv(cfg.AllowedEnvironment), client, limiter, auth, patterns, cfg.XSDs, log, trace, wantDump, doCov)
 	if err != nil {
 		return err
 	}
@@ -228,6 +229,14 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		)
 		// Keep track of whether CEL is degraded for this periodic run.
 		var isDegraded bool
+		if doCov {
+			defer func() {
+				// If doCov is true, log the updated coverage details.
+				// Updates are a running aggregate for each call to run
+				// as cov is shared via the program compilation.
+				log.Debugw("coverage", "details", cov.Details())
+			}()
+		}
 		for {
 			if wait := time.Until(waitUntil); wait > 0 {
 				// We have a special-case wait for when we have a zero limit.
@@ -776,9 +785,8 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
-		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
-		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
+		maxBodyLen := cfg.Resource.Tracer.MaxSize * 1e6 / 10 // 10% of file max
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, maxBodyLen, log)
 		c.Transport = trace
 	} else if cfg.Resource.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
@@ -1039,10 +1047,10 @@ func getEnv(allowed []string) map[string]string {
 	return env
 }
 
-func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details bool) (cel.Program, *cel.Ast, error) {
+func newProgram(ctx context.Context, src, root string, vars map[string]string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper, details, coverage bool) (cel.Program, *cel.Ast, *lib.Coverage, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
+		return nil, nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
 	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
@@ -1070,23 +1078,30 @@ func newProgram(ctx context.Context, src, root string, vars map[string]string, c
 	}
 	env, err := cel.NewEnv(opts...)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create env: %w", err)
+		return nil, nil, nil, fmt.Errorf("failed to create env: %w", err)
 	}
 
 	ast, iss := env.Compile(src)
 	if iss.Err() != nil {
-		return nil, nil, fmt.Errorf("failed compilation: %w", iss.Err())
+		return nil, nil, nil, fmt.Errorf("failed compilation: %w", iss.Err())
 	}
 
-	var progOpts []cel.ProgramOption
+	var (
+		progOpts []cel.ProgramOption
+		cov      *lib.Coverage
+	)
+	if coverage {
+		cov = lib.NewCoverage(ast)
+		progOpts = []cel.ProgramOption{cov.ProgramOption()}
+	}
 	if details {
 		progOpts = []cel.ProgramOption{cel.EvalOptions(cel.OptTrackState)}
 	}
 	prg, err := env.Program(ast, progOpts...)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed program instantiation: %w", err)
+		return nil, nil, nil, fmt.Errorf("failed program instantiation: %w", err)
 	}
-	return prg, ast, nil
+	return prg, ast, cov, nil
 }
 
 func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, any) {

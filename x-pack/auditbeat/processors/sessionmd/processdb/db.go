@@ -7,7 +7,7 @@
 package processdb
 
 import (
-	"container/heap"
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -20,20 +20,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-type TTYType int
-
-const (
-	TTYUnknown TTYType = iota
-	Pts
-	TTY
-	TTYConsole
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type EntryType string
@@ -67,23 +60,21 @@ var filteredExecutables = [...]string{
 }
 
 const (
-	ptsMinMajor     = 136
-	ptsMaxMajor     = 143
-	ttyMajor        = 4
-	consoleMaxMinor = 63
-	ttyMaxMinor     = 255
-	retryCount      = 2
+	retryCount = 2
 )
 
 type Process struct {
 	PIDs     types.PIDInfo
 	Creds    types.CredInfo
-	CTTY     types.TTYDev
+	CTTY     tty.TTYDev
 	Argv     []string
 	Cwd      string
-	Env      map[string]string
 	Filename string
 	ExitCode int32
+
+	// procfsLookupFail is true if procfs couldn't find a matching PID in /proc.
+	procfsLookupFail bool
+	insertTime       time.Time
 }
 
 var (
@@ -142,8 +133,8 @@ func credInfoFromProto(p types.CredInfo) types.CredInfo {
 	}
 }
 
-func ttyTermiosFromProto(p types.TTYTermios) types.TTYTermios {
-	return types.TTYTermios{
+func ttyTermiosFromProto(p tty.TTYTermios) tty.TTYTermios {
+	return tty.TTYTermios{
 		CIflag: p.CIflag,
 		COflag: p.COflag,
 		CLflag: p.CLflag,
@@ -151,15 +142,15 @@ func ttyTermiosFromProto(p types.TTYTermios) types.TTYTermios {
 	}
 }
 
-func ttyWinsizeFromProto(p types.TTYWinsize) types.TTYWinsize {
-	return types.TTYWinsize{
+func ttyWinsizeFromProto(p tty.TTYWinsize) tty.TTYWinsize {
+	return tty.TTYWinsize{
 		Rows: p.Rows,
 		Cols: p.Cols,
 	}
 }
 
-func ttyDevFromProto(p types.TTYDev) types.TTYDev {
-	return types.TTYDev{
+func ttyDevFromProto(p tty.TTYDev) tty.TTYDev {
+	return tty.TTYDev{
 		Major:   p.Major,
 		Minor:   p.Minor,
 		Winsize: ttyWinsizeFromProto(p.Winsize),
@@ -188,22 +179,59 @@ type DB struct {
 	entryLeaderRelationships map[uint32]uint32
 	procfs                   procfs.Reader
 	stopChan                 chan struct{}
-	removalCandidates        rcHeap
+	// map of processes that we can remove during the next reaper run, if the exit event is older than `removalCandidateTimeout`
+	removalMap map[uint32]removalCandidate
+	ctx        context.Context
+
+	// used for metrics reporting
+	stats *Stats
+
+	// knobs for the reaper thread follows
+
+	// how often the reaper checks for expired or orphaned events.
+	// A negative value disables the reaper.
+	reaperPeriod time.Duration
+	// Tells the reaper to remove orphaned process exec events.
+	// If true, exec events for which no /proc entry can be found will be removed after their insertion time has passed `orphanTimeout`.
+	// If disabled, the reaper will only remove exec events if they are matched with a exit event.
+	reapProcesses bool
+	// The duration after which we'll reap an orphaned process exec event for which no /proc data exists. Measured from the time the event is inserted.
+	processReapAfter time.Duration
 }
 
-func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
+// NewDB creates a new DB for tracking processes.
+//
+//   - metrics: monitoring registry for exporting DB metrics
+//   - reader: handler for /proc data and events.
+//   - reaperPeriod: tells the reaper to update its tracking of deat and orphaned processes every at every `n` period.
+//   - reapProcesses: optionally tell the reaper to also reap orphan processes from the DB, if no matching exit event can be found.
+//     May result in data loss if the DB in under load and events do not arrive in a timely fashion.
+func NewDB(ctx context.Context, metrics *monitoring.Registry, reader procfs.Reader, logger *logp.Logger, reaperPeriod time.Duration, reapProcesses bool) (*DB, error) {
 	once.Do(initialize)
 	if initError != nil {
 		return &DB{}, initError
 	}
 	db := DB{
-		logger:                   logp.NewLogger("processdb"),
+		logger:                   logger.Named("processdb"),
 		processes:                make(map[uint32]Process),
 		entryLeaders:             make(map[uint32]EntryType),
 		entryLeaderRelationships: make(map[uint32]uint32),
 		procfs:                   reader,
 		stopChan:                 make(chan struct{}),
-		removalCandidates:        make(rcHeap, 0),
+		removalMap:               make(map[uint32]removalCandidate),
+		reaperPeriod:             reaperPeriod,
+		stats:                    NewStats(metrics),
+		reapProcesses:            reapProcesses,
+		processReapAfter:         time.Minute * 10,
+		ctx:                      ctx,
+	}
+
+	if db.reaperPeriod > 0 {
+		logger.Infof("starting processDB reaper with interval %s", db.reaperPeriod)
+	}
+
+	if db.reapProcesses {
+		logger.Info("WARNING: reaping orphaned processes. May result in data loss.")
 	}
 	db.startReaper()
 	return &db, nil
@@ -273,18 +301,34 @@ func (db *DB) insertProcess(process Process) {
 	}
 }
 
+// InsertExec adds an exec event
 func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
 	proc := Process{
-		PIDs:     pidInfoFromProto(exec.PIDs),
-		Creds:    credInfoFromProto(exec.Creds),
-		CTTY:     ttyDevFromProto(exec.CTTY),
-		Argv:     exec.Argv,
-		Cwd:      exec.CWD,
-		Env:      exec.Env,
-		Filename: exec.Filename,
+		PIDs:             pidInfoFromProto(exec.PIDs),
+		Creds:            credInfoFromProto(exec.Creds),
+		CTTY:             ttyDevFromProto(exec.CTTY),
+		Argv:             exec.Argv,
+		Cwd:              exec.CWD,
+		Filename:         exec.Filename,
+		procfsLookupFail: exec.ProcfsLookupFail,
+		insertTime:       time.Now(),
+	}
+	if proc.procfsLookupFail {
+		db.stats.procfsLookupFail.Add(1)
+	}
+
+	// check to see if an orphaned exit event maps to this exec event.
+	// the out-of-order problem where we get the exit before the exec usually happens under load.
+	// if we don't track orphaned processes like this, we'll never scrub them from the DB.
+	if evt, ok := db.removalMap[proc.PIDs.Tgid]; ok {
+		proc.ExitCode = evt.exitCode
+		db.stats.resolvedOrphanExits.Add(1)
+		db.logger.Debugf("resolved orphan exit for pid %d", proc.PIDs.Tgid)
+		evt.startTime = proc.PIDs.StartTimeNS
+		db.removalMap[proc.PIDs.Tgid] = evt
 	}
 
 	db.processes[exec.PIDs.Tgid] = proc
@@ -299,7 +343,7 @@ func (db *DB) createEntryLeader(pid uint32, entryType EntryType) {
 	db.logger.Debugf("created entry leader %d: %s, name: %s", pid, string(entryType), db.processes[pid].Filename)
 }
 
-// pid returned is a pointer type because its possible for no
+// pid returned is a pointer type because it is possible no matching PID is found.
 func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 	pid := p.PIDs.Tgid
 
@@ -319,15 +363,15 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 
 	// could be an entry leader
 	if p.PIDs.Tgid == p.PIDs.Sid {
-		ttyType := getTTYType(p.CTTY.Major, p.CTTY.Minor)
+		ttyType := tty.GetTTYType(p.CTTY.Major, p.CTTY.Minor)
 
 		procBasename := basename(p.Filename)
 		switch {
-		case ttyType == TTY:
+		case ttyType == tty.TTY:
 			db.createEntryLeader(pid, Terminal)
 			db.logger.Debugf("entry_eval %d: entry type is terminal", p.PIDs.Tgid)
 			return &pid
-		case ttyType == TTYConsole && procBasename == "login":
+		case ttyType == tty.TTYConsole && procBasename == "login":
 			db.createEntryLeader(pid, EntryConsole)
 			db.logger.Debugf("entry_eval %d: entry type is console", p.PIDs.Tgid)
 			return &pid
@@ -338,7 +382,7 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 		case !isFilteredExecutable(procBasename):
 			if parent, ok := db.processes[p.PIDs.Ppid]; ok {
 				parentBasename := basename(parent.Filename)
-				if ttyType == Pts && parentBasename == "ssm-session-worker" {
+				if ttyType == tty.Pts && parentBasename == "ssm-session-worker" {
 					db.createEntryLeader(pid, Ssm)
 					db.logger.Debugf("entry_eval %d: entry type is ssm", p.PIDs.Tgid)
 					return &pid
@@ -400,6 +444,7 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 	return nil
 }
 
+// InsertSetsid adds a set SID event
 func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
@@ -414,32 +459,33 @@ func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) {
 	}
 }
 
+// InsertExit adds a process exit event
 func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
-
 	pid := exit.PIDs.Tgid
+	newRemoval := removalCandidate{
+		pid:      pid,
+		exitTime: time.Now(),
+		exitCode: exit.ExitCode,
+	}
+
 	process, ok := db.processes[pid]
 	if !ok {
-		db.logger.Debugf("could not insert exit, pid %v not found in db", pid)
-		return
+		newRemoval.orphanTime = time.Now()
+		db.logger.Debugf("pid %v for exit event not found in db, adding as orphan", pid)
+	} else {
+		// If we already have the process, add our exit info
+		process.ExitCode = exit.ExitCode
+		db.processes[pid] = process
+		newRemoval.startTime = process.PIDs.StartTimeNS
 	}
-	process.ExitCode = exit.ExitCode
-	db.processes[pid] = process
-	heap.Push(&db.removalCandidates, removalCandidate{
-		pid:       pid,
-		startTime: process.PIDs.StartTimeNS,
-		exitTime:  time.Now(),
-	})
-}
-
-func interactiveFromTTY(tty types.TTYDev) bool {
-	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
+	db.removalMap[pid] = newRemoval
 }
 
 func fullProcessFromDBProcess(p Process) types.Process {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(p.PIDs.StartTimeNS)
-	interactive := interactiveFromTTY(p.CTTY)
+	interactive := tty.InteractiveFromTTY(p.CTTY)
 
 	ret := types.Process{
 		PID:              p.PIDs.Tgid,
@@ -475,7 +521,7 @@ func fullProcessFromDBProcess(p Process) types.Process {
 func fillParent(process *types.Process, parent Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(parent.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTTY(parent.CTTY)
+	interactive := tty.InteractiveFromTTY(parent.CTTY)
 	euid := parent.Creds.Euid
 	egid := parent.Creds.Egid
 	process.Parent.PID = parent.PIDs.Tgid
@@ -500,7 +546,7 @@ func fillParent(process *types.Process, parent Process) {
 func fillGroupLeader(process *types.Process, groupLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(groupLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTTY(groupLeader.CTTY)
+	interactive := tty.InteractiveFromTTY(groupLeader.CTTY)
 	euid := groupLeader.Creds.Euid
 	egid := groupLeader.Creds.Egid
 	process.GroupLeader.PID = groupLeader.PIDs.Tgid
@@ -525,7 +571,7 @@ func fillGroupLeader(process *types.Process, groupLeader Process) {
 func fillSessionLeader(process *types.Process, sessionLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(sessionLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTTY(sessionLeader.CTTY)
+	interactive := tty.InteractiveFromTTY(sessionLeader.CTTY)
 	euid := sessionLeader.Creds.Euid
 	egid := sessionLeader.Creds.Egid
 	process.SessionLeader.PID = sessionLeader.PIDs.Tgid
@@ -550,7 +596,7 @@ func fillSessionLeader(process *types.Process, sessionLeader Process) {
 func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTTY(entryLeader.CTTY)
+	interactive := tty.InteractiveFromTTY(entryLeader.CTTY)
 	euid := entryLeader.Creds.Euid
 	egid := entryLeader.Creds.Egid
 	process.EntryLeader.PID = entryLeader.PIDs.Tgid
@@ -627,8 +673,10 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 
 	process, ok := db.processes[pid]
 	if !ok {
+		db.stats.failedToFindProcessCount.Add(1)
 		return types.Process{}, errors.New("process not found")
 	}
+	db.stats.servedProcessCount.Add(1)
 
 	ret := fullProcessFromDBProcess(process)
 
@@ -668,6 +716,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 		}
 	} else {
 		db.logger.Debugf("failed to find entry leader for %d (%s)", pid, db.processes[pid].Filename)
+		db.stats.entryLeaderLookupFail.Add(1)
 	}
 
 	db.setEntityID(&ret)
@@ -712,7 +761,6 @@ func (db *DB) ScrapeProcfs() []uint32 {
 			CTTY:     ttyDevFromProto(procInfo.CTTY),
 			Argv:     procInfo.Argv,
 			Cwd:      procInfo.Cwd,
-			Env:      procInfo.Env,
 			Filename: procInfo.Filename,
 		}
 
@@ -741,22 +789,6 @@ func isContainerRuntime(executable string) bool {
 
 func isFilteredExecutable(executable string) bool {
 	return stringStartsWithEntryInList(executable, filteredExecutables[:])
-}
-
-func getTTYType(major uint32, minor uint32) TTYType {
-	if major >= ptsMinMajor && major <= ptsMaxMajor {
-		return Pts
-	}
-
-	if ttyMajor == major {
-		if minor <= consoleMaxMinor {
-			return TTYConsole
-		} else if minor > consoleMaxMinor && minor <= ttyMaxMinor {
-			return TTY
-		}
-	}
-
-	return TTYUnknown
 }
 
 func (db *DB) Close() {

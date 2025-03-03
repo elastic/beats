@@ -6,6 +6,8 @@ package types
 
 //go:generate stringer -linecomment=true -type=Type,HookPoint,Field -output=gen_types_string.go
 
+import "github.com/elastic/beats/v7/auditbeat/helper/tty"
+
 type Type uint64
 
 const (
@@ -47,25 +49,6 @@ type CredInfo struct {
 	CapEffective uint64
 }
 
-type TTYWinsize struct {
-	Rows uint16
-	Cols uint16
-}
-
-type TTYTermios struct {
-	CIflag uint32
-	COflag uint32
-	CLflag uint32
-	CCflag uint32
-}
-
-type TTYDev struct {
-	Minor   uint32
-	Major   uint32
-	Winsize TTYWinsize
-	Termios TTYTermios
-}
-
 type ProcessForkEvent struct {
 	ParentPIDs PIDInfo
 	ChildPIDs  PIDInfo
@@ -73,9 +56,10 @@ type ProcessForkEvent struct {
 }
 
 type ProcessExecEvent struct {
-	PIDs  PIDInfo
-	Creds CredInfo
-	CTTY  TTYDev
+	PIDs             PIDInfo
+	Creds            CredInfo
+	CTTY             tty.TTYDev
+	ProcfsLookupFail bool
 
 	// varlen fields
 	CWD      string

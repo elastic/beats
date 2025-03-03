@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/procfs"
 	"golang.org/x/sys/unix"
 
+	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -30,6 +31,7 @@ func MinorTTY(ttyNr uint32) uint32 {
 type Reader interface {
 	GetProcess(pid uint32) (ProcessInfo, error)
 	GetAllProcesses() ([]ProcessInfo, error)
+	ProcessExists(pid uint32) bool
 }
 
 type ProcfsReader struct {
@@ -47,7 +49,7 @@ type Stat procfs.ProcStat
 type ProcessInfo struct {
 	PIDs       types.PIDInfo
 	Creds      types.CredInfo
-	CTTY       types.TTYDev
+	CTTY       tty.TTYDev
 	Argv       []string
 	Cwd        string
 	Env        map[string]string
@@ -165,7 +167,7 @@ func (r ProcfsReader) getProcessInfo(proc procfs.Proc) (ProcessInfo, error) {
 			Sid:         uint32(stat.Session),
 		},
 		Creds: creds,
-		CTTY: types.TTYDev{
+		CTTY: tty.TTYDev{
 			Major: MajorTTY(uint32(stat.TTY)),
 			Minor: MinorTTY(uint32(stat.TTY)),
 		},
@@ -183,6 +185,11 @@ func (r ProcfsReader) GetProcess(pid uint32) (ProcessInfo, error) {
 		return ProcessInfo{}, err
 	}
 	return r.getProcessInfo(proc)
+}
+
+func (ProcfsReader) ProcessExists(pid uint32) bool {
+	_, err := procfs.NewProc(int(pid))
+	return err == nil
 }
 
 // returns empty slice on error

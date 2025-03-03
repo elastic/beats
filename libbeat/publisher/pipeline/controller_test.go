@@ -20,12 +20,12 @@ package pipeline
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"testing/quick"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -64,9 +64,9 @@ func TestOutputReload(t *testing.T) {
 					fmt.Sprintf("mem.events: %v", numEventsToPublish))
 				_ = queueConfig.Unpack(conf)
 
-				var publishedCount atomic.Uint
+				var publishedCount atomic.Uint64
 				countingPublishFn := func(batch publisher.Batch) error {
-					publishedCount.Add(uint(len(batch.Events())))
+					publishedCount.Add(uint64(len(batch.Events())))
 					return nil
 				}
 
@@ -108,7 +108,7 @@ func TestOutputReload(t *testing.T) {
 
 				timeout := 20 * time.Second
 				return waitUntilTrue(timeout, func() bool {
-					return numEventsToPublish == publishedCount.Load()
+					return uint64(numEventsToPublish) == publishedCount.Load()
 				})
 			}, &quick.Config{MaxCount: 25})
 
@@ -222,18 +222,21 @@ func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
 	// block, because there is no queue, but they should become unblocked
 	// once we set a nonempty output.
 	const producerCount = 10
-	remaining := atomic.MakeInt(producerCount)
+	var remaining atomic.Int64
+	remaining.Store(producerCount)
 	for i := 0; i < producerCount; i++ {
 		go func() {
 			controller.queueProducer(queue.ProducerConfig{})
-			remaining.Dec()
+			remaining.Add(-1)
 		}()
 	}
 	allStarted := waitUntilTrue(time.Second, func() bool {
+		controller.queueLock.Lock()
+		defer controller.queueLock.Unlock()
 		return len(controller.pendingRequests) == producerCount
 	})
 	assert.True(t, allStarted, "All queueProducer requests should be saved as pending requests by outputController")
-	assert.Equal(t, producerCount, remaining.Load(), "No queueProducer request should return before an output is set")
+	assert.Equal(t, int64(producerCount), remaining.Load(), "No queueProducer request should return before an output is set")
 
 	// Set the output, then ensure that it unblocks all the waiting goroutines.
 	controller.Set(outputs.Group{

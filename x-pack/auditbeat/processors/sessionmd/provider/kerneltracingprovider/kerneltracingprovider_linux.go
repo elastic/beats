@@ -20,10 +20,12 @@ import (
 
 	quark "github.com/elastic/go-quark"
 
+	"github.com/elastic/beats/v7/auditbeat/helper/tty"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type prvdr struct {
@@ -38,15 +40,6 @@ type prvdr struct {
 	backoffSkipped int
 }
 
-type TTYType int
-
-const (
-	TTYUnknown TTYType = iota
-	Pts
-	TTY
-	TTYConsole
-)
-
 const (
 	Init         = "init"
 	Sshd         = "sshd"
@@ -56,14 +49,6 @@ const (
 	Kthread      = "kthread"
 	EntryConsole = "console"
 	EntryUnknown = "unknown"
-)
-
-const (
-	ptsMinMajor     = 136
-	ptsMaxMajor     = 143
-	ttyMajor        = 4
-	consoleMaxMinor = 63
-	ttyMaxMinor     = 255
 )
 
 var (
@@ -98,13 +83,15 @@ func readPIDNsInode() (uint64, error) {
 }
 
 // NewProvider returns a new instance of kerneltracingprovider
-func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, error) {
+func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Registry) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
 	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER | quark.QQ_NO_SNAPSHOT
 	qq, err := quark.OpenQueue(attr, 64)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %w", err)
 	}
+
+	procMetrics := NewStats(reg)
 
 	p := &prvdr{
 		ctx:            ctx,
@@ -118,7 +105,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 		backoffSkipped: 0,
 	}
 
-	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr) {
+	go func(ctx context.Context, qq *quark.Queue, logger *logp.Logger, p *prvdr, stats *Stats) {
+
+		lastUpdate := time.Now()
+
 		defer qq.Close()
 		for ctx.Err() == nil {
 			p.qqMtx.Lock()
@@ -128,6 +118,19 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 				logger.Errorw("get events from quark, no more process enrichment from this processor will be done", "error", err)
 				break
 			}
+			if time.Since(lastUpdate) > time.Second*5 {
+				p.qqMtx.Lock()
+				metrics := qq.Stats()
+				p.qqMtx.Unlock()
+
+				stats.Aggregations.Set(metrics.Aggregations)
+				stats.Insertions.Set(metrics.Insertions)
+				stats.Lost.Set(metrics.Lost)
+				stats.NonAggregations.Set(metrics.NonAggregations)
+				stats.Removals.Set(metrics.Removals)
+				lastUpdate = time.Now()
+			}
+
 			if len(events) == 0 {
 				err = qq.Block()
 				if err != nil {
@@ -136,7 +139,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger) (provider.Provider, e
 				}
 			}
 		}
-	}(ctx, qq, logger, p)
+	}(ctx, qq, logger, p, procMetrics)
 
 	bootID, err = readBootID()
 	if err != nil {
@@ -166,11 +169,8 @@ const (
 // does not exceed a reasonable threshold that would delay all other events processed by auditbeat. When in the backoff state, enrichment
 // will proceed without waiting for the process data to exist in the cache, likely resulting in missing enrichment data.
 func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
-	p.qqMtx.Lock()
-	defer p.qqMtx.Unlock()
-
 	// If pid is already in qq, return immediately
-	if _, found := p.qq.Lookup(int(pid)); found {
+	if _, found := p.lookupLocked(pid); found {
 		return nil
 	}
 
@@ -185,7 +185,7 @@ func (p *prvdr) Sync(_ *beat.Event, pid uint32) error {
 	nextWait := 5 * time.Millisecond
 	for {
 		waited := time.Since(start)
-		if _, found := p.qq.Lookup(int(pid)); found {
+		if _, found := p.lookupLocked(pid); found {
 			p.logger.Debugw("got process that was missing ", "waited", waited)
 			p.combinedWait = p.combinedWait + waited
 			return nil
@@ -241,7 +241,7 @@ func (p *prvdr) GetProcess(pid uint32) (*types.Process, error) {
 		return nil, fmt.Errorf("PID %d not found in cache", pid)
 	}
 
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -303,7 +303,7 @@ func (p prvdr) fillParent(process *types.Process, ppid uint32) {
 	}
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -338,7 +338,7 @@ func (p prvdr) fillGroupLeader(process *types.Process, pgid uint32) {
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -373,7 +373,7 @@ func (p prvdr) fillSessionLeader(process *types.Process, sid uint32) {
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -408,7 +408,7 @@ func (p prvdr) fillEntryLeader(process *types.Process, elid uint32) {
 
 	start := time.Unix(0, int64(proc.Proc.TimeBoot))
 
-	interactive := interactiveFromTTY(types.TTYDev{
+	interactive := tty.InteractiveFromTTY(tty.TTYDev{
 		Major: proc.Proc.TtyMajor,
 		Minor: proc.Proc.TtyMinor,
 	})
@@ -473,28 +473,6 @@ func setSameAsProcess(process *types.Process) {
 		sameAsProcess := process.PID == process.EntryLeader.PID
 		process.EntryLeader.SameAsProcess = &sameAsProcess
 	}
-}
-
-// interactiveFromTTY returns if this is an interactive tty device.
-func interactiveFromTTY(tty types.TTYDev) bool {
-	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
-}
-
-// getTTYType returns the type of a TTY device based on its major and minor numbers.
-func getTTYType(major uint32, minor uint32) TTYType {
-	if major >= ptsMinMajor && major <= ptsMaxMajor {
-		return Pts
-	}
-
-	if ttyMajor == major {
-		if minor <= consoleMaxMinor {
-			return TTYConsole
-		} else if minor > consoleMaxMinor && minor <= ttyMaxMinor {
-			return TTY
-		}
-	}
-
-	return TTYUnknown
 }
 
 // calculateEntityIDv1 calculates the entity ID for a process.

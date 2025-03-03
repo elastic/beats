@@ -704,7 +704,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(
-            lambda: self.output_has_message("entry2", output_file="output/filebeat-"+self.today+"-1.ndjson"),
+            lambda: self.output_has_message("entry2", output_file="output/filebeat-" + self.today + "-1.ndjson"),
             max_timeout=10,
             name="output contains 'entry2'")
 

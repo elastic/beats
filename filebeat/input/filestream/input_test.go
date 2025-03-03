@@ -50,6 +50,7 @@ func BenchmarkFilestream(b *testing.B) {
 			cfg := `
 type: filestream
 prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
 paths:
     - ` + filename + `
 `
@@ -91,6 +92,7 @@ paths:
 			cfg := `
 type: filestream
 prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
 paths:
     - ` + ingestPath + `
 `
@@ -146,6 +148,7 @@ func TestTakeOverTags(t *testing.T) {
 			cfg := fmt.Sprintf(`
 type: filestream
 prospector.scanner.check_interval: 1s
+prospector.scanner.fingerprint.enabled: false
 take_over: %t
 paths:
     - %s`, testCase.takeOver, filename)
@@ -244,7 +247,7 @@ func (s *testStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testStore) Access() (*statestore.Store, error) {
+func (s *testStore) Access(_ string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
 }
 

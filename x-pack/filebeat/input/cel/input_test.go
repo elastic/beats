@@ -96,6 +96,35 @@ var inputTests = []struct {
 		}},
 	},
 	{
+		name: "hello_world_sum",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":string(sum([1,2,3,4]))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "10",
+		}},
+	},
+	{
+		name: "hello_world_front_and_tail_2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":front([1,2,3,4,5],2)}, {"message":tail([1,2,3,4,5],2)}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": []any{1.0, 2.0}},
+			{"message": []any{3.0, 4.0, 5.0}},
+		},
+	},
+	{
 		name: "bad_events_type",
 		config: map[string]interface{}{
 			"interval": 1,
@@ -1766,6 +1795,49 @@ var inputTests = []struct {
  | .........................................................^`,
 				},
 			},
+		},
+	},
+
+	// Coverage
+	{
+		name: "coverage",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `int(state.n).as(n, {
+							"events": [{"n": n+1}],
+							"n":          n+1,
+							"want_more":  n+1 < 5,
+							"probe":      n < 2 ?
+								"little"
+							:
+								"big",
+							"fail_probe": n < 0 ?
+								"negative"
+							:
+								"non-negative",
+						})`,
+			"record_coverage": true,
+			"state":           map[string]any{"n": 0},
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 9, 0, 0, 0, 0, time.UTC) },
+		// The program will be evaluated five times in the first periodic
+		// run and then once for all subsequent runs. We depend here on
+		// the test construction that asks that we get at least as many
+		// results from the input as there are elements in the want slice
+		// and then stop.
+		want: []map[string]interface{}{
+			// First periodic run.
+			{"n": float64(1)},
+			{"n": float64(2)},
+			{"n": float64(3)},
+			{"n": float64(4)},
+			{"n": float64(5)},
+			// Second and subsequent periodic runs.
+			{"n": float64(6)},
+			{"n": float64(7)},
 		},
 	},
 

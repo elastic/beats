@@ -26,13 +26,13 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"text/template"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -40,8 +40,8 @@ import (
 func TestRenderer(t *testing.T) {
 	logp.TestingSetup()
 
-	t.Run(filepath.Base(sysmon9File), func(t *testing.T) {
-		log := openLog(t, sysmon9File)
+	t.Run(filepath.Base(security4738File), func(t *testing.T) {
+		log := openLog(t, security4738File)
 		defer log.Close()
 
 		r, err := NewRenderer(RenderConfig{}, NilHandle, logp.L())
@@ -297,7 +297,7 @@ func BenchmarkRenderer(b *testing.B) {
 		defer itr.Close()
 		defer r.Close()
 
-		count := atomic.NewUint64(0)
+		count := atomic.Uint64{}
 		start := time.Now()
 		b.ResetTimer()
 
@@ -314,7 +314,7 @@ func BenchmarkRenderer(b *testing.B) {
 				b.Fatal(err)
 			}
 
-			count.Inc()
+			count.Add(1)
 		}
 
 		elapsed := time.Since(start)
@@ -326,7 +326,7 @@ func BenchmarkRenderer(b *testing.B) {
 		defer itr.Close()
 		defer r.Close()
 
-		count := atomic.NewUint64(0)
+		var count atomic.Uint64
 		start := time.Now()
 		b.ResetTimer()
 
@@ -343,7 +343,7 @@ func BenchmarkRenderer(b *testing.B) {
 				if err != nil {
 					b.Fatal(err)
 				}
-				count.Inc()
+				count.Add(1)
 			}
 		})
 

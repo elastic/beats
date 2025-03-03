@@ -20,20 +20,20 @@ package beater
 import (
 	"context"
 	"sync"
+	"sync/atomic"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 )
 
 type eventACKer struct {
-	active     *atomic.Int
+	active     *atomic.Int64
 	wg         *sync.WaitGroup
 	checkpoint *checkpoint.Checkpoint
 }
 
 func newEventACKer(checkpoint *checkpoint.Checkpoint) *eventACKer {
 	return &eventACKer{
-		active:     atomic.NewInt(0),
+		active:     &atomic.Int64{},
 		wg:         &sync.WaitGroup{},
 		checkpoint: checkpoint,
 	}
@@ -55,7 +55,7 @@ func (a *eventACKer) ACKEvents(data []interface{}) {
 	}
 
 	// Mark events as done (subtract).
-	a.active.Add(-1 * len(data))
+	a.active.Add(-1 * int64(len(data)))
 	a.wg.Add(-1 * len(data))
 }
 
@@ -71,11 +71,11 @@ func (a *eventACKer) Wait(ctx context.Context) {
 
 // Add adds to the number of active events.
 func (a *eventACKer) Add(delta int) {
-	a.active.Add(delta)
+	a.active.Add(int64(delta))
 	a.wg.Add(delta)
 }
 
 // Active returns the number of active events (published but not yet ACKed).
 func (a *eventACKer) Active() int {
-	return a.active.Load()
+	return int(a.active.Load())
 }

@@ -18,6 +18,7 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -30,4 +31,52 @@ type ErrInputNotFinished struct {
 // Error method of ErrInputNotFinished
 func (e *ErrInputNotFinished) Error() string {
 	return fmt.Sprintf("Can only start an input when all related states are finished: %+v", e.State)
+}
+
+type ErrNonReloadable struct {
+	Err error
+}
+
+func (e ErrNonReloadable) Error() string {
+	return fmt.Sprintf("ErrNonReloadable: %v", e.Err)
+}
+
+func (e ErrNonReloadable) Unwrap() error { return e.Err }
+
+func (e ErrNonReloadable) Is(err error) bool {
+	switch err.(type) {
+	case ErrNonReloadable:
+		return true
+	default:
+		return errors.Is(e.Err, err)
+	}
+}
+
+// IsInputReloadable returns true if err, or any error wrapped
+// by err can be retried.
+//
+// Effectively, it will only return false if ALL
+// errors are ErrNonReloadable.
+func IsInputReloadable(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	type unwrapList interface {
+		Unwrap() []error
+	}
+
+	//nolint:errorlint // we only want to check that specific error, not all errors in the chain
+	errList, isErrList := err.(unwrapList)
+	if !isErrList {
+		return !errors.Is(err, ErrNonReloadable{})
+	}
+
+	for _, e := range errList.Unwrap() {
+		if !errors.Is(e, ErrNonReloadable{}) {
+			return true
+		}
+	}
+
+	return false
 }
