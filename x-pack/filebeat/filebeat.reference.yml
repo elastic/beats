@@ -4608,9 +4608,6 @@ setup.kibana:
 # Beats and contains module or input metrics.
 #logging.metrics.namespaces: [stats]
 
-# A map of key-value pair appended to beat process logs for additional context.
-#logging.with_fields: 
-
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
 logging.to_files: true
@@ -4692,6 +4689,8 @@ logging.files:
   # file. Defaults to false.
   # rotateonstartup: false
 
+# A map of key-value pair appended to beat process logs for additional context.
+#logging.with_fields: 
 # ============================= X-Pack Monitoring ==============================
 # Filebeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The
