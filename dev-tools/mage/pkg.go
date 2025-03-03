@@ -50,6 +50,11 @@ func Package() error {
 	var tasks []interface{}
 	for _, target := range platforms {
 		for _, pkg := range Packages {
+
+			if mg.Verbose() {
+				log.Printf("Evaluating package %v for target %s", pkg.Spec, target)
+			}
+
 			if pkg.OS != target.GOOS() || pkg.Arch != "" && pkg.Arch != target.Arch() {
 				continue
 			}
@@ -82,13 +87,19 @@ func Package() error {
 					continue
 				}
 
+				// TODO add filters on fips-enabled beats
+				if pkg.Spec.FIPS && !FIPSBuild {
+					log.Printf("Skipping creation for package type %v because spec.Fips=%b and fips=%b: %v", pkgType, pkg.Spec.FIPS, FIPSBuild)
+					continue
+				}
+
 				agentPackageDrop, _ := os.LookupEnv("AGENT_DROP_PATH")
 
 				spec := pkg.Spec.Clone()
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
 				spec.Snapshot = Snapshot
-				spec.FIPS = FIPSBuild
+				//spec.FIPS = FIPSBuild
 				spec.evalContext = map[string]interface{}{
 					"GOOS":          target.GOOS(),
 					"GOARCH":        target.GOARCH(),
