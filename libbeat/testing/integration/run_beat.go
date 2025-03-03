@@ -126,7 +126,7 @@ type RunBeatOptions struct {
 	KeepRunning bool
 }
 
-// RunBeat a Beat binary with the given config and args.
+// RunBeat runs a Beat binary with the given config and args.
 // Returns a `RunningBeat` that allow to collect the output and wait until the exit.
 func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher OutputWatcher) *RunningBeat {
 	t.Logf("preparing to run %s...", opts.Beatname)
