@@ -18,9 +18,9 @@
 package validate
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -49,11 +49,11 @@ func NewMapping(fieldsYAML []byte) (Mapping, error) {
 
 	var fields interface{}
 	if err := yaml.Unmarshal(fieldsYAML, &fields); err != nil {
-		return result, errors.Wrap(err, "decoding fields YAML")
+		return result, fmt.Errorf("decoding fields YAML: %w", err)
 	}
 	subFields, ok := fields.([]interface{})
 	if !ok {
-		return result, errors.Errorf("top-level fields is not an array, but %T", fields)
+		return result, fmt.Errorf("top-level fields is not an array, but %T", fields)
 	}
 	for _, subField := range subFields {
 		if err := recursiveFattenFields(subField, "", &result, ""); err != nil {
@@ -75,7 +75,7 @@ func (m *Mapping) Validate(dict map[string]interface{}) error {
 	}
 	for _, required := range m.Required {
 		if _, found := docFields[required]; !found {
-			return errors.Errorf("required field '%s' not found", required)
+			return fmt.Errorf("required field '%s' not found", required)
 		}
 	}
 	return nil
@@ -86,11 +86,11 @@ func (m *Mapping) validateFields(dict map[string]interface{}, prefix Prefix) (se
 		name := prefix.Append(key)
 		field, found := m.Fields[name.String()]
 		if !found {
-			return nil, errors.Errorf("field %s not found in mapping", name.String())
+			return nil, fmt.Errorf("field %s not found in mapping", name.String())
 		}
 		dicts, err := typeCheck(value, field.Type)
 		if err != nil {
-			return nil, errors.Wrapf(err, "field %s does not match expected type %s", name.String(), field.Type)
+			return nil, fmt.Errorf("field %s does not match expected type %s: %w", name.String(), field.Type, err)
 		}
 		for _, dict := range dicts {
 			s, err := m.validateFields(dict, name)
@@ -134,7 +134,7 @@ func (m *Mapping) storeField(path string, field Field) error {
 	} else {
 		// Allow groups to be specified more than once
 		if prev.Type != "group" || field.Type != "group" {
-			return errors.Errorf("duplicate field %s (types %s and %s)", path, prev.Type, field.Type)
+			return fmt.Errorf("duplicate field %s (types %s and %s)", path, prev.Type, field.Type)
 		}
 	}
 	return nil
@@ -143,7 +143,7 @@ func (m *Mapping) storeField(path string, field Field) error {
 func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, key string) error {
 	dict, ok := fields.(map[interface{}]interface{})
 	if !ok {
-		return errors.Errorf("fields entry [%s](%s) is not a dictionary", key, prefix)
+		return fmt.Errorf("fields entry [%s](%s) is not a dictionary", key, prefix)
 	}
 	keyIf, hasKey := dict["key"]
 	nameIf, hasName := dict["name"]
@@ -157,22 +157,22 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 	if hasKey {
 		newKey, ok := keyIf.(string)
 		if !ok {
-			return errors.Errorf("a 'key' field is not of type string, but %T (value=%v)", keyIf, keyIf)
+			return fmt.Errorf("a 'key' field is not of type string, but %T (value=%v)", keyIf, keyIf)
 		}
 		if len(key) > 0 {
-			return errors.Errorf("unexpected 'key' field in [%s](%s). Keys can only be defined at top level", key, prefix)
+			return fmt.Errorf("unexpected 'key' field in [%s](%s). Keys can only be defined at top level", key, prefix)
 		}
 		key = newKey
 	} else {
 		if len(key) == 0 {
-			return errors.Errorf("found top-level fields entry without a 'key' field")
+			return fmt.Errorf("found top-level fields entry without a 'key' field")
 		}
 	}
 
 	if hasName {
 		name, ok = nameIf.(string)
 		if !ok {
-			return errors.Errorf("a field in [%s](%s) has a 'name' entry of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
+			return fmt.Errorf("a field in [%s](%s) has a 'name' entry of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
 		}
 		prefix = prefix.Append(name)
 	} else {
@@ -181,14 +181,14 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 				// Ignore fields that have no name or key, but a release. Used in metricbeat to document some modules.
 				return nil
 			}
-			return errors.Errorf("field [%s](%s) has a sub-field without 'name' nor 'key'", key, prefix)
+			return fmt.Errorf("field [%s](%s) has a sub-field without 'name' nor 'key'", key, prefix)
 		}
 	}
 
 	if hasType {
 		typ, ok = typIf.(string)
 		if !ok {
-			return errors.Errorf("field [%s](%s) has a 'type' entry of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
+			return fmt.Errorf("field [%s](%s) has a 'type' entry of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
 		}
 		if typ == "object" {
 			typ = "group"
@@ -198,7 +198,7 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 	if hasRequired {
 		required, ok = requiredIf.(bool)
 		if !ok {
-			return errors.Errorf("field [%s](%s) has 'required' property but is not a boolean, but %T (value=%v)", key, prefix, requiredIf, requiredIf)
+			return fmt.Errorf("field [%s](%s) has 'required' property but is not a boolean, but %T (value=%v)", key, prefix, requiredIf, requiredIf)
 		}
 	}
 
@@ -211,7 +211,7 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 
 		path := prefix.String()
 		if err := mapping.addField(path, Field{Type: typ}, required); err != nil {
-			return errors.Wrapf(err, "adding field [%s](%s)", key, path)
+			return fmt.Errorf("adding field [%s](%s): %w", key, path, err)
 		}
 		return nil
 	}
@@ -219,7 +219,7 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 	// Parse a group
 
 	if hasType && typ != "group" {
-		return errors.Errorf("field [%s](%s) has a 'fields' tag but type is not group (type=%s)", key, prefix, typ)
+		return fmt.Errorf("field [%s](%s) has a 'fields' tag but type is not group (type=%s)", key, prefix, typ)
 	}
 	if !hasType {
 		typ = "group"
@@ -228,14 +228,14 @@ func recursiveFattenFields(fields interface{}, prefix Prefix, mapping *Mapping, 
 	if hasName {
 		path := prefix.String()
 		if err := mapping.addField(path, Field{Type: typ}, required); err != nil {
-			return errors.Wrapf(err, "adding field [%s](%s)", key, path)
+			return fmt.Errorf("adding field [%s](%s): %w", key, path, err)
 		}
 	}
 
 	if fieldsIf != nil {
 		innerFields, ok := fieldsIf.([]interface{})
 		if !ok {
-			return errors.Errorf("field [%s](%s) has a 'fields' tag of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
+			return fmt.Errorf("field [%s](%s) has a 'fields' tag of unexpected type (type=%T value=%v)", key, prefix, nameIf, nameIf)
 		}
 		for _, field := range innerFields {
 			if err := recursiveFattenFields(field, prefix, mapping, key); err != nil {

@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -26,7 +27,6 @@ var (
 // by applying elements of the chain's linked list to an input until completed
 // or an error state is encountered.
 type split struct {
-	log              *logp.Logger
 	targetInfo       targetInfo
 	kind             string
 	transforms       []basicTransform
@@ -36,6 +36,7 @@ type split struct {
 	keyField         string
 	isRoot           bool
 	delimiter        string
+	log              *logp.Logger
 }
 
 // newSplitResponse returns a new split based on the provided config and
@@ -66,7 +67,7 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		return nil, fmt.Errorf("invalid target type: %s", ti.Type)
 	}
 
-	ts, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, log)
+	ts, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, log)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +81,6 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 	}
 
 	return &split{
-		log:              log,
 		targetInfo:       ti,
 		kind:             c.Type,
 		keepParent:       c.KeepParent,
@@ -89,19 +89,21 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 		delimiter:        c.DelimiterString,
 		transforms:       ts,
 		child:            s,
+		log:              log,
 	}, nil
 }
 
-// run runs the split operation on the contents of resp, sending successive
-// split results on ch. ctx is passed to transforms that are called during
+// run runs the split operation on the contents of resp, processing successive
+// split results on via h. ctx is passed to transforms that are called during
 // the split.
-func (s *split) run(ctx *transformContext, resp transformable, ch chan<- maybeMsg) error {
+func (s *split) run(ctx context.Context, trCtx *transformContext, resp transformable, h handler) error {
 	root := resp.body()
-	return s.split(ctx, root, ch)
+	return s.split(ctx, trCtx, root, h)
 }
 
 // split recursively executes the split processor chain.
-func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) error {
+func (s *split) split(ctx context.Context, trCtx *transformContext, root mapstr.M, h handler) error {
+
 	v, err := root.GetValue(s.targetInfo.Name)
 	if err != nil && err != mapstr.ErrKeyNotFound { //nolint:errorlint // mapstr.ErrKeyNotFound is never wrapped by GetValue.
 		return err
@@ -110,21 +112,21 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 	if v == nil {
 		if s.ignoreEmptyValue {
 			if s.child != nil {
-				return s.child.split(ctx, root, ch)
+				return s.child.split(ctx, trCtx, root, h)
 			}
 			if s.keepParent {
-				ch <- maybeMsg{msg: root}
+				h.handleEvent(ctx, root)
 			}
 			return nil
 		}
 		if s.isRoot {
 			if s.keepParent {
-				ch <- maybeMsg{msg: root}
+				h.handleEvent(ctx, root)
 				return errEmptyField
 			}
 			return errEmptyRootField
 		}
-		ch <- maybeMsg{msg: root}
+		h.handleEvent(ctx, root)
 		return errEmptyField
 	}
 
@@ -138,23 +140,23 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 		if len(varr) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, ch)
+					return s.child.split(ctx, trCtx, root, h)
 				}
 				if s.keepParent {
-					ch <- maybeMsg{msg: root}
+					h.handleEvent(ctx, root)
 				}
 				return nil
 			}
 			if s.isRoot {
-				ch <- maybeMsg{msg: root}
+				h.handleEvent(ctx, root)
 				return errEmptyRootField
 			}
-			ch <- maybeMsg{msg: root}
+			h.handleEvent(ctx, root)
 			return errEmptyField
 		}
 
 		for _, e := range varr {
-			err := s.sendMessage(ctx, root, s.targetInfo.Name, e, ch)
+			err := s.processMessage(ctx, trCtx, root, s.targetInfo.Name, e, h)
 			if err != nil {
 				s.log.Debug(err)
 			}
@@ -170,22 +172,22 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 		if len(vmap) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, ch)
+					return s.child.split(ctx, trCtx, root, h)
 				}
 				if s.keepParent {
-					ch <- maybeMsg{msg: root}
+					h.handleEvent(ctx, root)
 				}
 				return nil
 			}
 			if s.isRoot {
 				return errEmptyRootField
 			}
-			ch <- maybeMsg{msg: root}
+			h.handleEvent(ctx, root)
 			return errEmptyField
 		}
 
 		for k, e := range vmap {
-			if err := s.sendMessage(ctx, root, k, e, ch); err != nil {
+			if err := s.processMessage(ctx, trCtx, root, k, e, h); err != nil {
 				s.log.Debug(err)
 			}
 		}
@@ -200,18 +202,18 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 		if len(vstr) == 0 {
 			if s.ignoreEmptyValue {
 				if s.child != nil {
-					return s.child.split(ctx, root, ch)
+					return s.child.split(ctx, trCtx, root, h)
 				}
 				return nil
 			}
 			if s.isRoot {
 				return errEmptyRootField
 			}
-			ch <- maybeMsg{msg: root}
+			h.handleEvent(ctx, root)
 			return errEmptyField
 		}
 		for _, substr := range strings.Split(vstr, s.delimiter) {
-			if err := s.sendMessageSplitString(ctx, root, substr, ch); err != nil {
+			if err := s.processMessageSplitString(ctx, trCtx, root, substr, h); err != nil {
 				s.log.Debug(err)
 			}
 		}
@@ -222,9 +224,9 @@ func (s *split) split(ctx *transformContext, root mapstr.M, ch chan<- maybeMsg) 
 	return errUnknownSplitType
 }
 
-// sendMessage sends an array or map split result value, v, on ch after performing
+// processMessage processes an array or map split result value, v, via h after performing
 // any necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v interface{}, ch chan<- maybeMsg) error {
+func (s *split) processMessage(ctx context.Context, trCtx *transformContext, root mapstr.M, key string, v interface{}, h handler) error {
 	obj, ok := toMapStr(v, s.targetInfo.Name)
 	if !ok {
 		return errExpectedSplitObj
@@ -245,17 +247,17 @@ func (s *split) sendMessage(ctx *transformContext, root mapstr.M, key string, v 
 
 	var err error
 	for _, t := range s.transforms {
-		tr, err = t.run(ctx, tr)
+		tr, err = t.run(trCtx, tr)
 		if err != nil {
 			return err
 		}
 	}
 
 	if s.child != nil {
-		return s.child.split(ctx, clone, ch)
+		return s.child.split(ctx, trCtx, clone, h)
 	}
 
-	ch <- maybeMsg{msg: clone}
+	h.handleEvent(ctx, clone)
 
 	return nil
 }
@@ -275,9 +277,9 @@ func toMapStr(v interface{}, key string) (mapstr.M, bool) {
 	return mapstr.M{}, false
 }
 
-// sendMessage sends a string split result value, v, on ch after performing any
+// sendMessage processes a string split result value, v, via h after performing any
 // necessary transformations. If key is "", the value is an element of an array.
-func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v string, ch chan<- maybeMsg) error {
+func (s *split) processMessageSplitString(ctx context.Context, trCtx *transformContext, root mapstr.M, v string, h handler) error {
 	clone := root.Clone()
 	_, _ = clone.Put(s.targetInfo.Name, v)
 
@@ -286,17 +288,17 @@ func (s *split) sendMessageSplitString(ctx *transformContext, root mapstr.M, v s
 
 	var err error
 	for _, t := range s.transforms {
-		tr, err = t.run(ctx, tr)
+		tr, err = t.run(trCtx, tr)
 		if err != nil {
 			return err
 		}
 	}
 
 	if s.child != nil {
-		return s.child.split(ctx, clone, ch)
+		return s.child.split(ctx, trCtx, clone, h)
 	}
 
-	ch <- maybeMsg{msg: clone}
+	h.handleEvent(ctx, clone)
 
 	return nil
 }

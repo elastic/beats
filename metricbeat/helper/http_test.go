@@ -19,11 +19,12 @@ package helper
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 	"time"
@@ -31,55 +32,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
-
-func TestGetAuthHeaderFromToken(t *testing.T) {
-	tests := []struct {
-		Name, Content, Expected string
-	}{
-		{
-			"Test a token is read",
-			"testtoken",
-			"Bearer testtoken",
-		},
-		{
-			"Test a token is trimmed",
-			"testtoken\n",
-			"Bearer testtoken",
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
-			content := []byte(test.Content)
-			tmpfile, err := ioutil.TempFile("", "token")
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer os.Remove(tmpfile.Name())
-
-			if _, err := tmpfile.Write(content); err != nil {
-				t.Fatal(err)
-			}
-			if err := tmpfile.Close(); err != nil {
-				t.Fatal(err)
-			}
-
-			header, err := getAuthHeaderFromToken(tmpfile.Name())
-			assert.NoError(t, err)
-			assert.Equal(t, test.Expected, header)
-		})
-	}
-}
-
-func TestGetAuthHeaderFromTokenNoFile(t *testing.T) {
-	header, err := getAuthHeaderFromToken("nonexistingfile")
-	assert.Equal(t, "", header)
-	assert.Error(t, err)
-}
 
 func TestTimeout(t *testing.T) {
 	c := make(chan struct{})
@@ -236,14 +193,14 @@ func TestOverUnixSocket(t *testing.T) {
 			fmt.Fprintf(w, "ehlo!")
 		})
 
-		go http.Serve(l, mux)
+		go http.Serve(l, mux) //nolint:errcheck,gosec // Ignore the error, it's a test file
 
 		return l
 	}
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			tmpDir, err := ioutil.TempDir("", "testsocket")
+			tmpDir, err := os.MkdirTemp("", "testsocket")
 			require.NoError(t, err)
 			defer os.RemoveAll(tmpDir)
 
@@ -262,7 +219,7 @@ func TestOverUnixSocket(t *testing.T) {
 			r, err := h.FetchResponse()
 			require.NoError(t, err)
 			defer r.Body.Close()
-			content, err := ioutil.ReadAll(r.Body)
+			content, err := io.ReadAll(r.Body)
 			require.NoError(t, err)
 			assert.Equal(t, []byte("ehlo!"), content)
 		})
@@ -292,6 +249,41 @@ func TestUserAgentCheck(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 	assert.Contains(t, ua, "Metricbeat")
+}
+
+func TestRefreshAuthorizationHeader(t *testing.T) {
+	path := t.TempDir()
+	bearerFileName := "token"
+	bearerFilePath := filepath.Join(path, bearerFileName)
+
+	var authToken string
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authToken = r.Header.Get("Authorization")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	firstToken := "token-1"
+	err := os.WriteFile(bearerFilePath, []byte(firstToken), 0644)
+	assert.NoError(t, err)
+
+	cfg := defaultConfig()
+	cfg.BearerTokenFile = bearerFilePath
+	hostData := mb.HostData{
+		URI:          ts.URL,
+		SanitizedURI: ts.URL,
+	}
+
+	h, err := NewHTTPFromConfig(cfg, hostData)
+	require.NoError(t, err)
+
+	res, err := h.FetchResponse()
+	require.NoError(t, err)
+	res.Body.Close()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Contains(t, authToken, firstToken)
 }
 
 func checkTimeout(t *testing.T, h *HTTP) {
@@ -327,3 +319,5 @@ func (*dummyModule) Config() mb.ModuleConfig {
 func (*dummyModule) UnpackConfig(interface{}) error {
 	return nil
 }
+func (dummyModule) UpdateStatus(_ status.Status, _ string)    {}
+func (dummyModule) SetStatusReporter(_ status.StatusReporter) {}

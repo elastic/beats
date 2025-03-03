@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build ignore
-// +build ignore
 
 package service
 
@@ -103,7 +102,7 @@ const (
 
 type ServiceEnumState uint32
 
-//Service Enum States
+// Service Enum States
 const (
 	// Enumerates services that are in the following states: SERVICE_START_PENDING, SERVICE_STOP_PENDING, SERVICE_RUNNING, SERVICE_CONTINUE_PENDING, SERVICE_PAUSE_PENDING, and SERVICE_PAUSED.
 	ServiceActive ServiceEnumState = C.SERVICE_ACTIVE
@@ -201,5 +200,5 @@ type ServiceStatusProcess C.SERVICE_STATUS_PROCESS
 // Contains the name of a service in a service control manager database and information about the service.
 type EnumServiceStatusProcess C.ENUM_SERVICE_STATUS_PROCESS
 
-//Contains configuration information for an installed service.
+// Contains configuration information for an installed service.
 type QueryServiceConfig C.QUERY_SERVICE_CONFIG

@@ -34,7 +34,7 @@ type cleaner struct {
 // run starts a loop that tries to clean entries from the registry.
 // The cleaner locks the store, such that no new states can be created
 // during the cleanup phase. Only resources that are finished and whos TTL
-// (clean_timeout setting) has expired will be removed.
+// (clean_inactive setting) has expired will be removed.
 //
 // Resources are considered "Finished" if they do not have a current owner (active input), and
 // if they have no pending updates that still need to be written to the registry file after associated
@@ -44,6 +44,7 @@ type cleaner struct {
 // once the last event has been ACKed.
 func (c *cleaner) run(canceler unison.Canceler, store *store, interval time.Duration) {
 	started := time.Now()
+	//nolint: errcheck // gcStore does not return an error
 	timed.Periodic(canceler, interval, func() error {
 		gcStore(c.log, started, store)
 		return nil

@@ -9,16 +9,14 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"hash"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -41,7 +39,7 @@ type apiValidator struct {
 	hmacPrefix         string
 }
 
-func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
+func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) {
 	if v.basicAuth {
 		username, password, _ := r.BasicAuth()
 		if v.username != username || v.password != password {
@@ -64,27 +62,25 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 	}
 
 	if v.hmacHeader != "" && v.hmacKey != "" && v.hmacType != "" {
-		// Read HMAC signature from HTTP header.
-		hmacHeaderValue := r.Header.Get(v.hmacHeader)
-		if v.hmacHeader == "" {
+		// Check whether the HMAC header exists at all.
+		if len(r.Header.Values(v.hmacHeader)) == 0 {
 			return http.StatusUnauthorized, errMissingHMACHeader
 		}
-		if v.hmacPrefix != "" {
-			hmacHeaderValue = strings.TrimPrefix(hmacHeaderValue, v.hmacPrefix)
-		}
-		signature, err := hex.DecodeString(hmacHeaderValue)
+		// Read HMAC signature from HTTP header.
+		hmacHeaderValue := r.Header.Get(v.hmacHeader)
+		signature, err := decodeHeaderValue(strings.TrimPrefix(hmacHeaderValue, v.hmacPrefix))
 		if err != nil {
-			return http.StatusUnauthorized, fmt.Errorf("invalid HMAC signature hex: %w", err)
+			return http.StatusUnauthorized, fmt.Errorf("invalid HMAC signature encoding: %w", err)
 		}
 
 		// We need access to the request body to validate the signature, but we
 		// must leave the body intact for future processing.
-		buf, err := ioutil.ReadAll(r.Body)
+		buf, err := io.ReadAll(r.Body)
 		if err != nil {
 			return http.StatusInternalServerError, fmt.Errorf("failed to read request body: %w", err)
 		}
 		// Set r.Body back to untouched original value.
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		// Compute HMAC of raw body.
 		var mac hash.Hash
@@ -105,39 +101,31 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 		}
 	}
 
-	return 0, nil
+	return http.StatusAccepted, nil
 }
 
-type apiValidationHandler struct {
-	next      http.Handler
-	validator *apiValidator
-	log       *logp.Logger
+// decoders is the priority-ordered set of decoders to use for HMAC header values.
+var decoders = [...]func(string) ([]byte, error){
+	hex.DecodeString,
+	base64.RawStdEncoding.DecodeString,
+	base64.StdEncoding.DecodeString,
 }
 
-func newAPIValidationHandler(next http.Handler, v *apiValidator, log *logp.Logger) http.Handler {
-	return &apiValidationHandler{
-		next:      next,
-		validator: v,
-		log:       log,
+// decodeHeaderValue attempts to decode s as hex, unpadded base64
+// ([base64.RawStdEncoding]), and padded base64 ([base64.StdEncoding]).
+// The first successful decoding result is returned. If all decodings fail, it
+// collects errors from each attempt and returns them as a single error.
+func decodeHeaderValue(s string) ([]byte, error) {
+	if s == "" {
+		return nil, errors.New("unexpected empty header value")
 	}
-}
-
-func (v *apiValidationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if status, err := v.validator.ValidateHeader(r); status != 0 && err != nil {
-		sendAPIErrorResponse(w, r, v.log, status, err)
-		return
+	var errs []error
+	for _, d := range &decoders {
+		b, err := d(s)
+		if err == nil {
+			return b, nil
+		}
+		errs = append(errs, err)
 	}
-
-	v.next.ServeHTTP(w, r)
-}
-
-func sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(status)
-
-	enc := json.NewEncoder(w)
-	enc.SetEscapeHTML(false)
-	if err := enc.Encode(map[string]interface{}{"message": apiError.Error()}); err != nil {
-		log.Debugw("Failed to write HTTP response.", "error", err, "client.address", r.RemoteAddr)
-	}
+	return nil, errors.Join(errs...)
 }

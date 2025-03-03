@@ -145,8 +145,8 @@ func (c *counterReg) newFloat(name string) (*Float, error) {
 }
 
 // XXX:
-//  - error on index > int max
-//  - error if already in use
+//   - error on index > int max
+//   - error if already in use
 func (reg *counterTypeReg) reg(name string) (int, error) {
 	debugf("register flow counter: %v", name)
 

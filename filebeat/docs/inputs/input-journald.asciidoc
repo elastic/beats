@@ -7,11 +7,15 @@
 <titleabbrev>journald</titleabbrev>
 ++++
 
-experimental[]
-
 https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html[`journald`]
 is a system service that collects and stores logging data. The `journald` input
-reads this log data and the metadata associated with it.
+reads this log data and the metadata associated with it. To read this
+log data {beatname_uc} calls `journalctl` to read from the journal, therefore
+{beatname_uc} needs permission to execute `journalctl`.
+
+If the `journalctl` process exits unexpectedly the {type} input will
+terminate with an error and {beatname_uc} will need to be
+restarted to start reading from the jouranl again.
 
 The simplest configuration example is one that reads all logs from the default
 journal.
@@ -71,21 +75,22 @@ The `journald` input supports the following configuration options plus the
 [id="{beatname_lc}-input-{type}-id"]
 ==== `id`
 
-An optional unique identifier for the input. By providing a unique `id` you can
+An unique identifier for the input. By providing a unique `id` you can
 operate multiple inputs on the same journal. This allows each input's cursor to
-be persisted independently in the registry file.
+be persisted independently in the registry file. Each {type} input must have
+an unique ID.
 
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: journald
   id: consul.service
-  include_matches:
+  include_matches.match:
     - _SYSTEMD_UNIT=consul.service
 
 - type: journald
   id: vault.service
-  include_matches:
+  include_matches.match:
     - _SYSTEMD_UNIT=vault.service
 ----
 
@@ -101,20 +106,6 @@ into a single journal and reads them.
 If no paths are specified, {beatname_uc} reads from the default journal.
 
 [float]
-[id="{beatname_lc}-input-{type}-backoff"]
-==== `backoff`
-
-The number of seconds to wait before trying to read again from journals. The
-default is 1s.
-
-[float]
-[id="{beatname_lc}-input-{type}-max-backoff"]
-==== `max_backoff`
-
-The maximum number of seconds to wait before attempting to read again from
-journals. The default is 60s.
-
-[float]
 [id="{beatname_lc}-input-{type}-seek"]
 ==== `seek`
 
@@ -122,16 +113,30 @@ The position to start reading the journal from. Valid settings are:
 
 * `head`: Starts reading at the beginning of the journal. After a restart,
 {beatname_uc} resends all log messages in the journal.
-* `tail`: Starts reading at the end of the journal. After a restart,
-{beatname_uc} resends the last message, which might result in duplicates. If
-multiple log messages are written to a journal while {beatname_uc} is down,
-only the last log message is sent on restart.
-* `cursor`: On first read, starts reading at the beginning of the journal. After
-a reload or restart, continues reading at the last known position.
+* `tail`: Starts reading at the end of the journal. This means that no events
+will be sent until a new message is written.
+* `since`: Use the `since` option to determine where to start reading from.
 
-If you have old log files and want to skip lines, start {beatname_uc} with
-`seek: tail` specified. Then stop {beatname_uc}, set `seek: cursor`, and restart
-{beatname_uc}.
+Regardless of the value of `seek` if {beatname_uc} has a state (cursor) for this
+input, the `seek` value is ignored and the current cursor is used. To reset
+the cursor, just change the `id` of the input, this will start from a fresh state.
+
+
+[float]
+[id="{beatname_lc}-input-{type}-since"]
+==== `since`
+
+A time offset from the current time to start reading from. To use
+`since`, `seek` option must be set to `since`.
+
+This example demonstrates how to resume from the persisted cursor when
+it exists, or otherwise begin reading logs from the last 24 hours.
+
+["source","yaml",subs="attributes"]
+----
+seek: since
+since: -24h
+----
 
 [float]
 [id="{beatname_lc}-input-{type}-units"]
@@ -163,33 +168,79 @@ Valid transports:
 * kernel: messages from the kernel
 
 [float]
+[id="{beatname_lc}-input-{type}-facilities"]
+==== `facilities`
+
+Filter entries by facilities, facilities must be specified using their
+numeric code.
+
+[float]
 [id="{beatname_lc}-input-{type}-include-matches"]
 ==== `include_matches`
 
 A collection of filter expressions used to match fields. The format of the expression
-is `field=value`. {beatname_uc} fetches all events that exactly match the
+is `field=value` or `+` representing disjunction (i.e. logical
+OR). {beatname_uc} fetches all events that exactly match the
 expressions. Pattern matching is not supported.
+
+When `+` is used, it will cause all matches before and after to be
+combined in a disjunction (i.e. logical OR).
 
 If you configured a filter expression, only entries with this field set will be iterated by the journald reader of Filebeat.
 If the filter expressions apply to different fields, only entries with all fields set will be iterated.
 If they apply to the same fields, only entries where the field takes one of the specified values will be iterated.
 
 `match`: List of filter expressions to match fields.
-`or`: The filter expressions listed under `or` are connected with a disjunction (or).
-`and`: The filter expressions listed under `and` are connected with a conjunction (and).
 
 Please note that these expressions are limited. You can build complex filtering, but full logical
 expressions are not supported.
 
-The following include matches configuration reads all `systemd` syslog entries:
+The following include matches configuration will ingest entries that
+contain `journald.process.name: systemd` and `systemd.transport: syslog`.
 
 ["source","yaml",subs="attributes"]
 ----
-include_matches.and:
-- match:
-  - "journald.process.name=systemd"
-  - "systemd.transport=syslog"
+include_matches:
+  match:
+    - "journald.process.name=systemd"
+    - "systemd.transport=syslog"
 ----
+
+The following include matches configuration will ingest entries that
+contain `systemd.transport: systemd` or `systemd.transport: kernel`.
+
+["source","yaml",subs="attributes"]
+----
+include_matches:
+  match:
+    - "systemd.transport=kernel"
+    - "systemd.transport=syslog"
+----
+
+
+The following include matches configuration is the equivalent of the
+following logical expression:
+
+```
+A=a OR (B=b AND C=c) OR (D=d AND B=1)
+```
+
+["source","yaml",subs="attributes"]
+----
+include_matches:
+  match:
+    - A=a
+    - +
+    - B=b
+    - C=c
+    - +
+    - B=1
+----
+
+`include_matches` translates to `journalctl` `MATCHES`, its
+[documentation](https://www.man7.org/linux/man-pages/man1/journalctl.1.html)
+is not clear about how multiple disjunctions are handled. The previous
+example was tested with journalctl version 257.
 
 To reference fields, use one of the following:
 
@@ -199,6 +250,203 @@ To reference fields, use one of the following:
 used by {beatname_uc}. For example, `container.image.tag=redis`. {beatname_uc}
 does not translate all fields from the journal. For custom fields, use the name
 specified in the systemd journal.
+
+[float]
+===== `parsers`
+
+This option expects a list of parsers that the entry has to go through.
+
+Available parsers:
+
+* `multiline`
+* `ndjson`
+* `container`
+* `syslog`
+* `include_message`
+
+In this example, {beatname_uc} is reading multiline messages that consist of 3 lines
+and are encapsulated in single-line JSON objects.
+The multiline message is stored under the key `msg`.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  parsers:
+    - ndjson:
+        target: ""
+        message_key: msg
+    - multiline:
+        type: count
+        count_lines: 3
+----
+
+See the available parser settings in detail below.
+
+[float]
+===== `multiline`
+
+Options that control how {beatname_uc} deals with log messages that span
+multiple lines. See <<multiline-examples>> for more information about
+configuring multiline options.
+
+[float]
+[id="{beatname_lc}-input-{type}-ndjson"]
+===== `ndjson`
+
+These options make it possible for {beatname_uc} to decode logs structured as
+JSON messages. {beatname_uc} processes the entry by line, so the JSON
+decoding only works if there is one JSON object per message.
+
+The decoding happens before line filtering. You can combine JSON
+decoding with filtering if you set the `message_key` option. This
+can be helpful in situations where the application logs are wrapped in JSON
+objects, like when using Docker.
+
+Example configuration:
+
+[source,yaml]
+----
+- ndjson:
+    target: ""
+    add_error_key: true
+    message_key: log
+----
+
+*`target`*:: The name of the new JSON object that should contain the parsed key value pairs. If you
+leave it empty, the new keys will go under root.
+
+*`overwrite_keys`*:: Values from the decoded JSON object overwrite the fields that {beatname_uc}
+normally adds (type, source, offset, etc.) in case of conflicts. Disable it if you want
+to keep previously added values.
+
+*`expand_keys`*:: If this setting is enabled, {beatname_uc} will recursively
+de-dot keys in the decoded JSON, and expand them into a hierarchical object
+structure. For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+This setting should be enabled when the input is produced by an
+https://github.com/elastic/ecs-logging[ECS logger].
+
+*`add_error_key`*:: If this setting is enabled, {beatname_uc} adds an
+"error.message" and "error.type: json" key in case of JSON unmarshalling errors
+or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the key
+must be at the top level in the JSON object and the value associated with the
+key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
+*`document_id`*:: Option configuration setting that specifies the JSON key to
+set the document id. If configured, the field will be removed from the original
+JSON document and stored in `@metadata._id`
+
+*`ignore_decoding_error`*:: An optional configuration setting that specifies if
+JSON decoding errors should be logged or not. If set to true, errors will not
+be logged. The default is false.
+
+[float]
+===== `container`
+
+Use the `container` parser to extract information from  containers log files.
+It parses lines into common message lines, extracting timestamps too.
+
+*`stream`*:: Reads from the specified streams only: `all`, `stdout` or `stderr`. The default
+is `all`.
+
+*`format`*:: Use the given format when parsing logs: `auto`, `docker` or `cri`. The
+default is `auto`, it will automatically detect the format. To disable
+autodetection set any of the other options.
+
+The following snippet configures {beatname_uc} to read the `stdout` stream from
+all containers under the default Kubernetes logs path:
+
+[source,yaml]
+----
+  parsers:
+    - container:
+        stream: stdout
+----
+
+[float]
+===== `syslog`
+
+The `syslog` parser parses RFC 3146 and/or RFC 5424 formatted syslog messages.
+
+The supported configuration options are:
+
+*`format`*:: (Optional) The syslog format to use, `rfc3164`, or `rfc5424`. To automatically
+detect the format from the log entries, set this option to `auto`. The default is `auto`.
+
+*`timezone`*:: (Optional) IANA time zone name(e.g. `America/New York`) or a
+fixed time offset (e.g. +0200) to use when parsing syslog timestamps that do not contain
+a time zone. `Local` may be specified to use the machine's local time zone. Defaults to `Local`.
+
+*`log_errors`*:: (Optional) If `true` the parser will log syslog parsing errors. Defaults to `false`.
+
+*`add_error_key`*:: (Optional) If this setting is enabled, the parser adds or appends to an
+`error.message` key with the parsing error that was encountered. Defaults to `true`.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- syslog:
+    format: rfc3164
+    timezone: America/Chicago
+    log_errors: true
+    add_error_key: true
+-------------------------------------------------------------------------------
+
+*Timestamps*
+
+The RFC 3164 format accepts the following forms of timestamps:
+
+* Local timestamp (`Mmm dd hh:mm:ss`):
+** `Jan 23 14:09:01`
+* RFC-3339*:
+** `2003-10-11T22:14:15Z`
+** `2003-10-11T22:14:15.123456Z`
+** `2003-10-11T22:14:15-06:00`
+** `2003-10-11T22:14:15.123456-06:00`
+
+*Note*: The local timestamp (for example, `Jan 23 14:09:01`) that accompanies an
+RFC 3164 message lacks year and time zone information. The time zone will be enriched
+using the `timezone` configuration option, and the year will be enriched using the
+{beatname_uc} system's local time (accounting for time zones). Because of this, it is possible
+for messages to appear in the future. An example of when this might happen is logs
+generated on December 31 2021 are ingested on January 1 2022. The logs would be enriched
+with the year 2022 instead of 2021.
+
+The RFC 5424 format accepts the following forms of timestamps:
+
+* RFC-3339:
+** `2003-10-11T22:14:15Z`
+** `2003-10-11T22:14:15.123456Z`
+** `2003-10-11T22:14:15-06:00`
+** `2003-10-11T22:14:15.123456-06:00`
+
+Formats with an asterisk (*) are a non-standard allowance.
+
+[float]
+===== `include_message`
+
+Use the `include_message` parser to filter messages in the parsers pipeline. Messages that
+match the provided pattern are passed to the next parser, the others are dropped.
+
+You should use `include_message` instead of `include_lines` if you would like to
+control when the filtering happens. `include_lines` runs after the parsers, `include_message`
+runs in the parsers pipeline.
+
+*`patterns`*:: List of regexp patterns to match.
+
+This example shows you how to include messages that start with the string ERR or WARN:
+
+[source,yaml]
+----
+  parsers:
+    - include_message.patterns: ["^ERR", "^WARN"]
+----
 
 [float]
 [id="{beatname_lc}-input-{type}-translated-fields"]
@@ -240,10 +488,10 @@ journald fields:
 `_MACHINE_ID`::               `host.id`
 `_MESSAGE`::                  `message`
 `_PID`::                      `process.pid`
-`_PRIORITY`::                 `syslog.priority`
-`_SYSLOG_FACILITY`::          `syslog.facility`
-`_SYSLOG_IDENTIFIER`::        `syslog.identifier`
-`_SYSLOG_PID`::               `syslog.pid`
+`_PRIORITY`::                 `log.syslog.priority`
+`_SYSLOG_FACILITY`::          `log.syslog.facility.code`
+`_SYSLOG_IDENTIFIER`::        `log.syslog.appname`
+`_SYSLOG_PID`::               `log.syslog.procid`
 `_SYSTEMD_CGROUP`::           `systemd.cgroup`
 `_SYSTEMD_INVOCATION_ID`::    `systemd.invocation_id`
 `_SYSTEMD_OWNER_UID`::        `systemd.owner_uid`
@@ -263,11 +511,12 @@ https://docs.docker.com/config/containers/logging/journald/[Docker] are also
 available:
 
 [horizontal]
-`CONTAINER_ID`::              `container.id_truncated`
 `CONTAINER_ID_FULL`::         `container.id`
 `CONTAINER_NAME`::            `container.name`
-`CONTAINER_PARTIAL_MESSAGE`:: `container.partial`
-`CONTAINER_TAG`::             `container.image.tag`
+`IMAGE_NAME`::		      `container.image.name`
+
+If `CONTAINER_PARTIAL_MESSAGE` is present and it is true, then the tag
+`partial_message` is added to the final event.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]

@@ -27,4 +27,5 @@ Version: '10.4.8-MariaDB-log'  socket: '/data/mysqldata/mysql.sock'  port: 3306 
 2019-10-16 17:25:43 12 [Note] Event Scheduler: Dropping test.test_error_log
 2019-10-16 17:25:43 12 [ERROR] Event Scheduler: [root@localhost][test.test_error_log] hi from the error log
 2019-10-16 17:25:43 12 [Note] Event Scheduler: [root@localhost][test.test_error_log] At line 1 in test.test_error_log
-
+2023-03-02 17:00:06 200 [Warning] Access denied for user 'sherlock'@'localhost' (using password: NO)
+2023-03-02 17:00:06 200 [Warning] Access denied for user 'sherlock'@'10.10.10.10' (using password: NO)

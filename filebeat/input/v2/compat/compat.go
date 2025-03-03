@@ -22,14 +22,17 @@ package compat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/mitchellh/hashstructure"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -49,13 +52,14 @@ type factory struct {
 // On stop the runner triggers the shutdown signal and waits until the input
 // has returned.
 type runner struct {
-	id        string
-	log       *logp.Logger
-	agent     *beat.Info
-	wg        sync.WaitGroup
-	sig       ctxtool.CancelContext
-	input     v2.Input
-	connector beat.PipelineConnector
+	id             string
+	log            *logp.Logger
+	agent          *beat.Info
+	wg             sync.WaitGroup
+	sig            ctxtool.CancelContext
+	input          v2.Input
+	connector      beat.PipelineConnector
+	statusReporter status.StatusReporter
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
@@ -70,10 +74,24 @@ func RunnerFactory(
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {
-	_, err := f.loader.Configure(cfg)
+	// just check the config, therefore to avoid potential side effects (ID duplication)
+	// change the ID.
+	checkCfg, err := f.generateCheckConfig(cfg)
 	if err != nil {
-		return err
+		f.log.Warnw(fmt.Sprintf("input V2 factory.CheckConfig failed to clone config before checking it. Original config will be checked, it might trigger an input duplication warning: %v", err), "original_config", conf.DebugString(cfg, true))
+		checkCfg = cfg
 	}
+	_, err = f.loader.Configure(checkCfg)
+	if err != nil {
+		return fmt.Errorf("runner factory could not check config: %w", err)
+	}
+
+	if err = f.loader.Delete(checkCfg); err != nil {
+		return fmt.Errorf(
+			"runner factory failed to delete an input after config check: %w",
+			err)
+	}
+
 	return nil
 }
 
@@ -101,6 +119,10 @@ func (f *factory) Create(
 	}, nil
 }
 
+func (r *runner) SetStatusReporter(reported status.StatusReporter) {
+	r.statusReporter = reported
+}
+
 func (r *runner) String() string { return r.input.Name() }
 
 func (r *runner) Start() {
@@ -113,14 +135,16 @@ func (r *runner) Start() {
 		log.Infof("Input '%s' starting", name)
 		err := r.input.Run(
 			v2.Context{
-				ID:          r.id,
-				Agent:       *r.agent,
-				Logger:      log,
-				Cancelation: r.sig,
+				ID:             r.id,
+				IDWithoutName:  r.id,
+				Agent:          *r.agent,
+				Logger:         log,
+				Cancelation:    r.sig,
+				StatusReporter: r.statusReporter,
 			},
 			r.connector,
 		)
-		if err != nil {
+		if err != nil && !errors.Is(err, context.Canceled) {
 			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
@@ -132,6 +156,7 @@ func (r *runner) Stop() {
 	r.sig.Cancel()
 	r.wg.Wait()
 	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
+	r.statusReporter = nil
 }
 
 func configID(config *conf.C) (string, error) {
@@ -146,11 +171,41 @@ func configID(config *conf.C) (string, error) {
 	}
 
 	var h map[string]interface{}
-	config.Unpack(&h)
+	err := config.Unpack(&h)
+	if err != nil {
+		return "", fmt.Errorf("could not unpack config into %T: unpack failed: %w",
+			h, err)
+	}
+
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
 		return "", fmt.Errorf("can not compute id from configuration: %w", err)
 	}
 
 	return fmt.Sprintf("%16X", id), nil
+}
+
+func (f *factory) generateCheckConfig(config *conf.C) (*conf.C, error) {
+	// copy the config so it's safe to change it
+	testCfg, err := conf.NewConfigFrom(config)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new config: %w", err)
+	}
+
+	// let's try to override the `id` field, if it fails, give up
+	inputID, err := testCfg.String("id", -1)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get 'id': %w", err)
+	}
+
+	id, err := uuid.NewV4()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate check congig id: %w", err)
+	}
+	err = testCfg.SetString("id", -1, inputID+"-"+id.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to set 'id': %w", err)
+	}
+
+	return testCfg, nil
 }

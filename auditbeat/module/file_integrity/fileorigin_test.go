@@ -16,18 +16,17 @@
 // under the License.
 
 //go:build darwin
-// +build darwin
 
 package file_integrity
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -50,49 +49,57 @@ func TestDarwinWhereFroms(t *testing.T) {
 	if runtime.GOOS != "darwin" {
 		t.Skip("Unsupported platform")
 	}
-	f, err := ioutil.TempFile("", "wherefrom")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.Remove(f.Name())
 
 	t.Run("no origin", func(t *testing.T) {
+		f, err := os.CreateTemp(t.TempDir(), "no_origin")
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
+
 		origin, err := GetFileOrigin(f.Name())
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+
 		assert.Len(t, origin, 0)
 	})
 	t.Run("valid origin", func(t *testing.T) {
+		f, err := os.CreateTemp(t.TempDir(), "valid_origin")
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
+
+		//nolint:gosec // Using file.Name() as an argument is safe.
 		err = exec.Command("xattr", "-w", "-x", key, value, f.Name()).Run()
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+
 		origin, err := GetFileOrigin(f.Name())
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+
 		assert.Len(t, origin, 2)
 		assert.Equal(t, "https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-6.1.1-darwin-x86_64.tar.gz", origin[0])
 		assert.Equal(t, "https://www.elastic.co/downloads/beats/auditbeat", origin[1])
 	})
 	t.Run("empty origin", func(t *testing.T) {
+		f, err := os.CreateTemp(t.TempDir(), "empty_origin")
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
+
+		//nolint:gosec // Using file.Name() as an argument is safe.
 		err = exec.Command("xattr", "-w", "-x", key, "", f.Name()).Run()
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+
 		origin, err := GetFileOrigin(f.Name())
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
+
 		assert.Len(t, origin, 0)
 	})
 	t.Run("bad origin", func(t *testing.T) {
+		f, err := os.CreateTemp(t.TempDir(), "bad_origin")
+		require.NoError(t, err)
+		require.NoError(t, f.Close())
+
+		//nolint:gosec // Using file.Name() as an argument is safe.
 		err = exec.Command("xattr", "-w", "-x", key, "01 23 45 67", f.Name()).Run()
-		if err != nil {
-			t.Fatal(err)
-		}
-		_, err := GetFileOrigin(f.Name())
+		require.NoError(t, err)
+
+		_, err = GetFileOrigin(f.Name())
 		assert.Error(t, err)
 	})
 }

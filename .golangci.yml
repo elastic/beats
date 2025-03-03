@@ -2,6 +2,9 @@
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 15m
+  build-tags:
+    - synthetics
+    - integration
 
 issues:
   # Maximum count of issues with the same text.
@@ -24,10 +27,13 @@ issues:
     - text: "undeclared name:"
       linters:
         - typecheck
-    - text: "imported but not used"
+    - text: "imported and not used"
       linters:
         - typecheck
-    # From mage we are priting to the console to ourselves
+    - text: "previous case"
+      linters:
+        - typecheck
+    # From mage we are printing to the console to ourselves
     - path: (.*magefile.go|.*dev-tools/mage/.*)
       linters: forbidigo
 
@@ -40,7 +46,7 @@ linters:
   enable:
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
-    - forbidigo # forbids identifiers	matched by reg exps
+    - forbidigo # forbids identifiers matched by reg exps
     - gosimple # linter for Go source code that specializes in simplifying a code
     - misspell # finds commonly misspelled English words in comments
     - nakedret # finds naked returns in functions greater than a specified function length
@@ -50,8 +56,6 @@ linters:
     - unused # checks Go code for unused constants, variables, functions and types
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
-    - structcheck # finds unused struct fields
-    - varcheck # Finds unused global variables and constants
     - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
     - bodyclose # checks whether HTTP response body is closed successfully
     - durationcheck # check for two durations multiplied together
@@ -63,20 +67,39 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - gomodguard # check for blocked dependencies
+    - gomodguard # check for blocked dependencies in go.mod
+    - depguard # check for blocked dependencies in Go files
+    - gomoddirectives
 
 # all available settings of specific linters
 linters-settings:
+  depguard:
+    rules:
+      main:
+        list-mode: lax
+        deny:
+          - pkg: "math/rand$"
+            desc: "superseded by math/rand/v2"
+      apache-licensed-code:
+        list-mode: lax
+        files:
+          - '!**/x-pack/**/*.go'
+        deny:
+          - pkg: github.com/elastic/beats/v7/x-pack
+            desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (x-pack/).
   errcheck:
     # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
-    check-type-assertions: false
+    # default is false: such cases aren't reported by default.
+    check-type-assertions: true
     # report about assignment of errors to blank identifier: `num, _ := strconv.Atoi(numStr)`.
     check-blank: false
     # List of functions to exclude from checking, where each entry is a single function to exclude.
     # See https://github.com/kisielk/errcheck#excluding-functions for details.
     exclude-functions:
-      - (mapstr.M).Delete # Only returns ErrKeyNotFound, can safely be ignored.
-      - (mapstr.M).Put # Can only fail on type conversions, usually safe to ignore.
+      - (github.com/elastic/elastic-agent-libs/mapstr.M).Delete # Only returns ErrKeyNotFound, can safely be ignored.
+      - (github.com/elastic/elastic-agent-libs/mapstr.M).Put # Can only fail on type conversions, usually safe to ignore.
+      - github.com/elastic/elastic-agent-libs/logp.TestingSetup # Cannot return a non-nil error using the provided API.
+      - github.com/elastic/elastic-agent-libs/logp.DevelopmentSetup # Cannot return a non-nil error using the provided API.
 
   errorlint:
     # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
@@ -107,10 +130,38 @@ linters-settings:
               - errors
               - fmt
             reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
+        - gotest.tools/v3:
+            recommendations:
+              - github.com/stretchr/testify
+            reason: "Use one assertion library consistently across the codebase"
+        - github.com/google/uuid:
+            # Recommended modules that should be used instead. (Optional)
+            recommendations:
+              - github.com/gofrs/uuid/v5
+            reason: "Use one uuid library consistently across the codebase"
+
+  gomoddirectives:
+    # Forbid local `replace` directives
+    replace-local: false
+
+    # Forbid any `replace` directives that are intended temporarily only during
+    # development. The modules listed below are intended to be replaced permanently.
+    replace-allow-list:
+      - github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
+      - github.com/Shopify/sarama
+      - github.com/apoydence/eachers
+      - github.com/dop251/goja
+      - github.com/dop251/goja_nodejs
+      - github.com/fsnotify/fsevents
+      - github.com/fsnotify/fsnotify
+      - github.com/google/gopacket
+      - github.com/insomniacslk/dhcp
+      - github.com/meraki/dashboard-api-go/v3
+      - github.com/snowflakedb/gosnowflake
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.18.10"
+    go: "1.22.12"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -119,8 +170,6 @@ linters-settings:
   nolintlint:
     # Enable to ensure that nolint directives are all used. Default is true.
     allow-unused: false
-    # Disable to ensure that nolint directives don't have a leading space. Default is true.
-    allow-leading-space: false
     # Exclude following linters from requiring an explanation.  Default is [].
     allow-no-explanation: []
     # Enable to require an explanation of nonzero length after each nolint directive. Default is false.
@@ -130,19 +179,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.18.10"
+    go: "1.22.12"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.18.10"
+    go: "1.22.12"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.18.10"
+    go: "1.22.12"
 
   gosec:
     excludes:
@@ -151,3 +200,17 @@ linters-settings:
     - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
     - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
     - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
+
+  prealloc:
+    # IMPORTANT: we don't recommend using this linter before doing performance profiling.
+    # For most programs usage of prealloc will be a premature optimization.
+
+    # Report pre-allocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
+    # Default: true
+    simple: false
+    # Report pre-allocation suggestions on range loops.
+    # Default: true
+    range-loops: true
+    # Report pre-allocation suggestions on for loops.
+    # Default: false
+    for-loops: true

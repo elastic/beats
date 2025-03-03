@@ -25,14 +25,17 @@ package query
 
 import (
 	"context"
+	"crypto/tls"
+	"fmt"
 
-	"github.com/pkg/errors"
+	mysqlDriver "github.com/go-sql-driver/mysql"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mysql"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func init() {
@@ -58,8 +61,10 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	db     *sql.DbClient
 	Config struct {
-		Queries   []query `config:"queries" validate:"nonzero,required"`
-		Namespace string  `config:"namespace" validate:"nonzero,required"`
+		Queries   []query           `config:"queries" validate:"nonzero,required"`
+		Namespace string            `config:"namespace" validate:"nonzero,required"`
+		TLS       *tlscommon.Config `config:"ssl"`
+		TLSConfig *tls.Config
 	}
 }
 
@@ -73,16 +78,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	if b.Config.TLS.IsEnabled() {
+		tlsConfig, err := tlscommon.LoadTLSConfig(b.Config.TLS)
+		if err != nil {
+			return nil, fmt.Errorf("could not load provided TLS configuration: %w", err)
+		}
+
+		b.Config.TLSConfig = tlsConfig.ToConfig()
+	}
+
 	return b, nil
 }
 
 // Fetch fetches status messages from a mysql host.
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	if m.db == nil {
+		if m.Config.TLSConfig != nil {
+			err := mysqlDriver.RegisterTLSConfig(mysql.TLSConfigKey, m.Config.TLSConfig)
+			if err != nil {
+				return fmt.Errorf("registering custom tls config failed: %w", err)
+			}
+		}
 		var err error
 		m.db, err = sql.NewDBClient("mysql", m.HostData().URI, m.Logger())
 		if err != nil {
-			return errors.Wrap(err, "mysql-status fetch failed")
+			return fmt.Errorf("mysql-query fetch failed: %w", err)
 		}
 	}
 
@@ -142,5 +162,5 @@ func (m *MetricSet) Close() error {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
+	return fmt.Errorf("failed to close mysql database client: %w", m.db.Close())
 }

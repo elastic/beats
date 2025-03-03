@@ -161,6 +161,7 @@ data:
                   period: 10s
                   add_metadata: true
                   metricsets:
+                    - state_namespace
                     - state_node
                     - state_deployment
                     - state_daemonset
@@ -290,11 +291,11 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:8.6.0
+        image: docker.elastic.co/beats/metricbeat-wolfi:9.1.0
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
-          "-system.hostfs=/hostfs",
+          "--system.hostfs=/hostfs",
         ]
         env:
         - name: ELASTICSEARCH_HOST

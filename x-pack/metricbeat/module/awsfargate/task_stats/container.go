@@ -15,6 +15,7 @@ type container struct {
 	Name     string
 	Image    string
 	Labels   map[string]string
+	Limits   Limits
 }
 
 func getContainerMetadata(c *container) *container {
@@ -23,6 +24,7 @@ func getContainerMetadata(c *container) *container {
 		Image:    c.Image,
 		Name:     helpers.ExtractContainerName([]string{c.Name}),
 		Labels:   deDotLabels(c.Labels),
+		Limits:   c.Limits,
 	}
 }
 

@@ -19,8 +19,11 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -40,10 +43,20 @@ func TestExeObjParser(t *testing.T) {
 
 			key := fmt.Sprintf("%s_%s", builder, format)
 			t.Run(fmt.Sprintf("executableObject_%s_%s", format, builder), func(t *testing.T) {
+				if builder == "garble" && format == "pe" {
+					t.Skip("skipping test on garbled PE file: see https://github.com/elastic/beats/issues/35705")
+				}
+
+				if _, ci := os.LookupEnv("CI"); ci {
+					if _, err := os.Stat(target); err != nil && errors.Is(err, fs.ErrNotExist) {
+						t.Skip("skipping test because target binary was not found: see https://github.com/elastic/beats/issues/38211")
+					}
+				}
+
 				got := make(mapstr.M)
 				err := exeObjParser(nil).Parse(got, target)
 				if err != nil {
-					t.Errorf("unexpected error calling exeObjParser.Parse: %v", err)
+					t.Fatalf("unexpected error calling exeObjParser.Parse: %v", err)
 				}
 
 				fields := []struct {
@@ -262,95 +275,35 @@ var want = map[string]mapstr.M{
 			},
 		},
 	},
-	"garble_pe": {
-		"pe": mapstr.M{
-			"import_hash": "c7269d59926fa4252270f407e4dab043",
-			"imphash":     "c7269d59926fa4252270f407e4dab043",
-			"imports": []string{
-				"kernel32.writefile",
-				"kernel32.writeconsolew",
-				"kernel32.waitformultipleobjects",
-				"kernel32.waitforsingleobject",
-				"kernel32.virtualquery",
-				"kernel32.virtualfree",
-				"kernel32.virtualalloc",
-				"kernel32.switchtothread",
-				"kernel32.suspendthread",
-				"kernel32.sleep",
-				"kernel32.setwaitabletimer",
-				"kernel32.setunhandledexceptionfilter",
-				"kernel32.setprocesspriorityboost",
-				"kernel32.setevent",
-				"kernel32.seterrormode",
-				"kernel32.setconsolectrlhandler",
-				"kernel32.resumethread",
-				"kernel32.postqueuedcompletionstatus",
-				"kernel32.loadlibrarya",
-				"kernel32.loadlibraryw",
-				"kernel32.setthreadcontext",
-				"kernel32.getthreadcontext",
-				"kernel32.getsysteminfo",
-				"kernel32.getsystemdirectorya",
-				"kernel32.getstdhandle",
-				"kernel32.getqueuedcompletionstatusex",
-				"kernel32.getprocessaffinitymask",
-				"kernel32.getprocaddress",
-				"kernel32.getenvironmentstringsw",
-				"kernel32.getconsolemode",
-				"kernel32.freeenvironmentstringsw",
-				"kernel32.exitprocess",
-				"kernel32.duplicatehandle",
-				"kernel32.createwaitabletimerexw",
-				"kernel32.createthread",
-				"kernel32.createiocompletionport",
-				"kernel32.createfilea",
-				"kernel32.createeventa",
-				"kernel32.closehandle",
-				"kernel32.addvectoredexceptionhandler",
-			},
-			"imports_names_entropy":     4.2079021689106195,
-			"imports_names_var_entropy": 0.0014785066641319837,
-			"go_import_hash":            "d41d8cd98f00b204e9800998ecf8427e",
-			"go_stripped":               true,
-			"sections": []objSection{
-				{Name: strPtr(".text"), Size: uint64Ptr(0x83000), Entropy: float64Ptr(6.18), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".rdata"), Size: uint64Ptr(0x97a00), Entropy: float64Ptr(5.10), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".data"), Size: uint64Ptr(0x17800), Entropy: float64Ptr(4.60), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".idata"), Size: uint64Ptr(0x600), Entropy: float64Ptr(3.60), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".reloc"), Size: uint64Ptr(0x6800), Entropy: float64Ptr(5.42), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".symtab"), Size: uint64Ptr(0x200), Entropy: float64Ptr(0.02), VarEntropy: float64Ptr(0.0001)},
-			},
-		},
-	},
 	"go_elf": {
 		"elf": mapstr.M{
 			"go_imports_names_entropy":     4.156563879566413,
 			"go_imports_names_var_entropy": 0.0073028693197579415,
 			"go_stripped":                  false,
 			"sections": []objSection{
-				{Name: strPtr(""), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
+				{Name: strPtr(""), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0)},
 				{Name: strPtr(".text"), Size: uint64Ptr(0x7ffd6), Entropy: float64Ptr(6.17), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".rodata"), Size: uint64Ptr(0x35940), Entropy: float64Ptr(4.35), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".shstrtab"), Size: uint64Ptr(0x17a), Entropy: float64Ptr(4.33), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".typelink"), Size: uint64Ptr(0x4f0), Entropy: float64Ptr(3.77), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".itablink"), Size: uint64Ptr(0x60), Entropy: float64Ptr(2.14), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".gosymtab"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".gopclntab"), Size: uint64Ptr(0x5a5c8), Entropy: float64Ptr(5.48), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".go.buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.56), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".noptrdata"), Size: uint64Ptr(0x10720), Entropy: float64Ptr(5.60), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".data"), Size: uint64Ptr(0x7810), Entropy: float64Ptr(1.60), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".bss"), Size: uint64Ptr(0x2ef48), Entropy: float64Ptr(0), VarEntropy: float64Ptr(0)},
-				{Name: strPtr(".noptrbss"), Size: uint64Ptr(0x5360), Entropy: float64Ptr(0), VarEntropy: float64Ptr(0)},
-				{Name: strPtr(".zdebug_abbrev"), Size: uint64Ptr(0x119), Entropy: float64Ptr(7.18), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".zdebug_line"), Size: uint64Ptr(0x1b90f), Entropy: float64Ptr(7.99), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".zdebug_frame"), Size: uint64Ptr(0x551b), Entropy: float64Ptr(7.92), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".debug_gdb_scripts"), Size: uint64Ptr(0x31), Entropy: float64Ptr(4.24), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".zdebug_info"), Size: uint64Ptr(0x31a2a), Entropy: float64Ptr(7.99), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".zdebug_loc"), Size: uint64Ptr(0x198d9), Entropy: float64Ptr(7.98), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".zdebug_ranges"), Size: uint64Ptr(0x8fbc), Entropy: float64Ptr(7.78), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".note.go.buildid"), Size: uint64Ptr(0x64), Entropy: float64Ptr(5.38), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".symtab"), Size: uint64Ptr(0xc5e8), Entropy: float64Ptr(3.21), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".strtab"), Size: uint64Ptr(0xb2d6), Entropy: float64Ptr(4.81), VarEntropy: float64Ptr(0.0001)},
+				{Name: strPtr(".rodata"), Size: uint64Ptr(0x35940), Entropy: float64Ptr(4.36), VarEntropy: float64Ptr(0.0005)},
+				{Name: strPtr(".shstrtab"), Size: uint64Ptr(0x17a), Entropy: float64Ptr(4.33), VarEntropy: float64Ptr(0.0019)},
+				{Name: strPtr(".typelink"), Size: uint64Ptr(0x4f0), Entropy: float64Ptr(3.77), VarEntropy: float64Ptr(0.0083)},
+				{Name: strPtr(".itablink"), Size: uint64Ptr(0x60), Entropy: float64Ptr(2.15), VarEntropy: float64Ptr(0.046)},
+				{Name: strPtr(".gosymtab"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0)},
+				{Name: strPtr(".gopclntab"), Size: uint64Ptr(0x5a5c8), Entropy: float64Ptr(5.49), VarEntropy: float64Ptr(0.0001)},
+				{Name: strPtr(".go.buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.56), VarEntropy: float64Ptr(0.07)},
+				{Name: strPtr(".noptrdata"), Size: uint64Ptr(0x10720), Entropy: float64Ptr(5.61), VarEntropy: float64Ptr(0.0001)},
+				{Name: strPtr(".data"), Size: uint64Ptr(0x7810), Entropy: float64Ptr(1.60), VarEntropy: float64Ptr(0.0004)},
+				{Name: strPtr(".bss"), Size: uint64Ptr(0x2ef48), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0)},
+				{Name: strPtr(".noptrbss"), Size: uint64Ptr(0x5360), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0)},
+				{Name: strPtr(".zdebug_abbrev"), Size: uint64Ptr(0x1e6), Entropy: float64Ptr(4.71), VarEntropy: float64Ptr(0.007)},
+				{Name: strPtr(".zdebug_line"), Size: uint64Ptr(0x30b61), Entropy: float64Ptr(5.93), VarEntropy: float64Ptr(0.0003)},
+				{Name: strPtr(".zdebug_frame"), Size: uint64Ptr(0xee0c), Entropy: float64Ptr(3.59), VarEntropy: float64Ptr(0.0002)},
+				{Name: strPtr(".debug_gdb_scripts"), Size: uint64Ptr(0x31), Entropy: float64Ptr(4.25), VarEntropy: float64Ptr(0.016)},
+				{Name: strPtr(".zdebug_info"), Size: uint64Ptr(0x79ef9), Entropy: float64Ptr(5.80), VarEntropy: float64Ptr(0.0002)},
+				{Name: strPtr(".zdebug_loc"), Size: uint64Ptr(0x919d5), Entropy: float64Ptr(2.62), VarEntropy: float64Ptr(0.0002)},
+				{Name: strPtr(".zdebug_ranges"), Size: uint64Ptr(0x313b0), Entropy: float64Ptr(2.20), VarEntropy: float64Ptr(0.0006)},
+				{Name: strPtr(".note.go.buildid"), Size: uint64Ptr(0x64), Entropy: float64Ptr(5.29), VarEntropy: float64Ptr(0.012)},
+				{Name: strPtr(".symtab"), Size: uint64Ptr(0xc5e8), Entropy: float64Ptr(3.21), VarEntropy: float64Ptr(0.0003)},
+				{Name: strPtr(".strtab"), Size: uint64Ptr(0xb2d6), Entropy: float64Ptr(4.81), VarEntropy: float64Ptr(0.0004)},
 			},
 			"import_hash":    "d41d8cd98f00b204e9800998ecf8427e",
 			"go_import_hash": "10bddcb4cee42080f76c88d9ff964491",

@@ -18,6 +18,7 @@
 package hints
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -59,7 +60,7 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"hints": mapstr.M{
 					"monitor": mapstr.M{
-						"type": "icmp",
+						"type": "http",
 					},
 				},
 			},
@@ -67,60 +68,36 @@ func TestGenerateHints(t *testing.T) {
 			result: mapstr.M{},
 		},
 		{
-			message: "Hints without matching port should return nothing in the hosts section",
+			message: "Hints without port should return nothing if ${data.port} is used",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"port": 9090,
 				"hints": mapstr.M{
 					"monitor": mapstr.M{
-						"type":  "icmp",
-						"hosts": "${data.host}:8888",
+						"type":  "http",
+						"hosts": "${data.host}:${data.port},test:${data.port}",
 					},
 				},
 			},
-			len: 1,
-			result: mapstr.M{
-				"schedule": "@every 5s",
-				"type":     "icmp",
-				"hosts":    []interface{}{},
-			},
+			len:    0,
+			result: mapstr.M{},
 		},
 		{
-			message: "Hints with multiple hosts return only the matching one",
+			message: "Hints with multiple hosts returns all with the template",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
 				"hints": mapstr.M{
 					"monitor": mapstr.M{
-						"type":  "icmp",
-						"hosts": "${data.host}:8888,${data.host}:9090",
-					},
-				},
-			},
-			len: 1,
-			result: mapstr.M{
-				"type":     "icmp",
-				"schedule": "@every 5s",
-				"hosts":    []interface{}{"1.2.3.4:9090"},
-			},
-		},
-		{
-			message: "Hints with multiple hosts return only the one with the template",
-			event: bus.Event{
-				"host": "1.2.3.4",
-				"port": 9090,
-				"hints": mapstr.M{
-					"monitor": mapstr.M{
-						"type":  "icmp",
+						"type":  "http",
 						"hosts": "${data.host}:8888,${data.host}:${data.port}",
 					},
 				},
 			},
 			len: 1,
 			result: mapstr.M{
-				"type":     "icmp",
+				"type":     "http",
 				"schedule": "@every 5s",
-				"hosts":    []interface{}{"1.2.3.4:9090"},
+				"hosts":    []string{"1.2.3.4:8888", "1.2.3.4:9090"},
 			},
 		},
 		{
@@ -129,13 +106,13 @@ func TestGenerateHints(t *testing.T) {
 				"host": "1.2.3.4",
 				"hints": mapstr.M{
 					"monitor": mapstr.M{
-						"raw": "{\"enabled\":true,\"type\":\"icmp\",\"schedule\":\"@every 20s\",\"timeout\":\"3s\"}",
+						"raw": "{\"enabled\":true,\"type\":\"http\",\"schedule\":\"@every 20s\",\"timeout\":\"3s\"}",
 					},
 				},
 			},
 			len: 1,
 			result: mapstr.M{
-				"type":     "icmp",
+				"type":     "http",
 				"timeout":  "3s",
 				"schedule": "@every 20s",
 				"enabled":  true,
@@ -148,7 +125,7 @@ func TestGenerateHints(t *testing.T) {
 				"port": 9090,
 				"hints": mapstr.M{
 					"monitor": mapstr.M{
-						"type":  "icmp",
+						"type":  "http",
 						"hosts": "${data.host}:9090",
 						"processors": mapstr.M{
 							"add_locale": mapstr.M{
@@ -160,8 +137,8 @@ func TestGenerateHints(t *testing.T) {
 			},
 			len: 1,
 			result: mapstr.M{
-				"type":     "icmp",
-				"hosts":    []interface{}{"1.2.3.4:9090"},
+				"type":     "http",
+				"hosts":    []string{"1.2.3.4:9090"},
 				"schedule": "@every 5s",
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -180,11 +157,11 @@ func TestGenerateHints(t *testing.T) {
 				"hints": mapstr.M{
 					"monitor": mapstr.M{
 						"1": mapstr.M{
-							"type":  "icmp",
+							"type":  "http",
 							"hosts": "${data.host}:8888,${data.host}:9090",
 						},
 						"2": mapstr.M{
-							"type":  "icmp",
+							"type":  "http",
 							"hosts": "${data.host}:8888,${data.host}:9090",
 						},
 					},
@@ -192,10 +169,31 @@ func TestGenerateHints(t *testing.T) {
 			},
 			len: 2,
 			result: mapstr.M{
-				"type":     "icmp",
+				"type":     "http",
 				"schedule": "@every 5s",
-				"hosts":    []interface{}{"1.2.3.4:9090"},
+				"hosts":    []string{"1.2.3.4:8888", "1.2.3.4:9090"},
 			},
+		},
+		{
+			message: "Hints for ICMP with port should return nothing",
+			event: bus.Event{
+				"host": "1.2.3.4",
+				"port": 9090,
+				"hints": mapstr.M{
+					"monitor": mapstr.M{
+						"1": mapstr.M{
+							"type":  "icmp",
+							"hosts": "${data.host}:9090",
+						},
+						"2": mapstr.M{
+							"type":  "icmp",
+							"hosts": "${data.host}:${data.port}",
+						},
+					},
+				},
+			},
+			len:    0,
+			result: mapstr.M{},
 		},
 	}
 	for _, test := range tests {
@@ -205,12 +203,23 @@ func TestGenerateHints(t *testing.T) {
 			logger: logp.L(),
 		}
 		cfgs := m.CreateConfig(test.event)
-		assert.Equal(t, len(cfgs), test.len, test.message)
+		assert.Equal(t, test.len, len(cfgs), test.message)
 
 		if len(cfgs) != 0 {
 			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.message)
+
+			// Autodiscover can return configs with different sort orders here, which is irrelevant
+			// To make tests pass consistently we sort the host list
+			hostStrs := []string{}
+			if hostsSlice, ok := config["hosts"].([]interface{}); ok && len(hostsSlice) > 0 {
+				for _, hi := range hostsSlice {
+					hostStrs = append(hostStrs, hi.(string))
+				}
+				sort.Strings(hostStrs)
+				config["hosts"] = hostStrs
+			}
 
 			assert.Equal(t, test.result, config, test.message)
 		}

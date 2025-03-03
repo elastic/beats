@@ -19,8 +19,7 @@ package cluster_disk
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -44,7 +43,7 @@ func eventMapping(content []byte) (mapstr.M, error) {
 	var d DfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not get DFRequest data")
+		return nil, fmt.Errorf("could not get DFRequest data: %w", err)
 	}
 
 	return mapstr.M{

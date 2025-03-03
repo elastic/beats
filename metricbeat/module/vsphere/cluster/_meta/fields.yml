@@ -1,0 +1,63 @@
+- name: cluster
+  type: group
+  release: beta
+  description: >
+    Cluster information.
+  fields:
+    - name: datastore
+      type: group
+      fields:
+        - name: names
+          type: keyword
+          description: >
+            List of all the datastore names associated with the cluster.
+        - name: count
+          type: long
+          description: >
+            Number of datastores associated with the cluster.
+    - name: das_config
+      type: group
+      fields:
+        - name: admission.control.enabled
+          type: boolean
+          description: >
+            Indicates whether strict admission control is enabled.
+        - name: enabled
+          type: boolean
+          description: >
+            Indicates whether vSphere HA feature is enabled.
+    - name: host
+      type: group
+      fields:
+        - name: count
+          type: long
+          description: >
+            Number of hosts associated with the cluster.
+        - name: names
+          type: keyword
+          description: >
+            List of all the host names associated with the cluster.
+    - name: id
+      type: keyword
+      description: >
+        Unique cluster ID.
+    - name: name
+      type: keyword
+      description: >
+        Cluster name.
+    - name: network
+      type: group
+      fields:
+        - name: count
+          type: long
+          description: >
+            Number of networks associated with the cluster.
+        - name: names
+          type: keyword
+          description: >
+            List of all the network names associated with the cluster.
+    - name: triggered_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggered alarms.

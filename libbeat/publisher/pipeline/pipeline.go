@@ -21,19 +21,19 @@
 package pipeline
 
 import (
-	"reflect"
-	"sync"
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -58,19 +58,13 @@ type Pipeline struct {
 
 	monitors Monitors
 
-	queue  queue.Queue
-	output *outputController
+	outputController *outputController
 
 	observer observer
 
-	// wait close support
-	waitOnClose      bool
+	// If waitCloseTimeout is positive, then the pipeline will wait up to the
+	// specified time when it is closed for pending events to be acknowledged.
 	waitCloseTimeout time.Duration
-	waitCloseGroup   sync.WaitGroup
-
-	// closeRef signal propagation support
-	guardStartSigPropagation sync.Once
-	sigNewClient             chan *client
 
 	processors processing.Supporter
 }
@@ -107,11 +101,9 @@ const (
 type OutputReloader interface {
 	Reload(
 		cfg *reload.ConfigWithMeta,
-		factory func(outputs.Observer, config.Namespace) (outputs.Group, error),
+		factory func(outputs.Observer, conf.Namespace) (outputs.Group, error),
 	) error
 }
-
-type queueFactory func(queue.ACKListener) (queue.Queue, error)
 
 // New create a new Pipeline instance from a queue instance and a set of outputs.
 // The new pipeline will take ownership of queue and outputs. On Close, the
@@ -119,12 +111,10 @@ type queueFactory func(queue.ACKListener) (queue.Queue, error)
 func New(
 	beat beat.Info,
 	monitors Monitors,
-	queueFactory queueFactory,
+	userQueueConfig conf.Namespace,
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
-	var err error
-
 	if monitors.Logger == nil {
 		monitors.Logger = logp.NewLogger("publish")
 	}
@@ -133,42 +123,37 @@ func New(
 		beatInfo:         beat,
 		monitors:         monitors,
 		observer:         nilObserver,
-		waitOnClose:      settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0,
 		waitCloseTimeout: settings.WaitClose,
 		processors:       settings.Processors,
+	}
+	if settings.WaitCloseMode == WaitOnPipelineClose && settings.WaitClose > 0 {
+		p.waitCloseTimeout = settings.WaitClose
 	}
 
 	if monitors.Metrics != nil {
 		p.observer = newMetricsObserver(monitors.Metrics)
 	}
 
-	p.queue, err = queueFactory(p)
+	// Convert the raw queue config to a parsed Settings object that will
+	// be used during queue creation. This lets us fail immediately on startup
+	// if there's a configuration problem.
+	queueType := defaultQueueType
+	if b := userQueueConfig.Name(); b != "" {
+		queueType = b
+	}
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config())
 	if err != nil {
 		return nil, err
 	}
 
-	maxEvents := p.queue.BufferConfig().MaxEvents
-	if maxEvents <= 0 {
-		// Maximum number of events until acker starts blocking.
-		// Only active if pipeline can drop events.
-		maxEvents = 64000
+	output, err := newOutputController(beat, monitors, p.observer, queueFactory, settings.InputQueueSize)
+	if err != nil {
+		return nil, err
 	}
-	p.observer.queueMaxEvents(maxEvents)
-
-	p.output = newOutputController(beat, monitors, p.observer, p.queue)
-	p.output.Set(out)
+	p.outputController = output
+	p.outputController.Set(out)
 
 	return p, nil
-}
-
-// OnACK implements the queue.ACKListener interface, so the queue can notify the
-// Pipeline when events are acknowledged.
-func (p *Pipeline) OnACK(n int) {
-	p.observer.queueACKed(n)
-
-	if p.waitOnClose {
-		p.waitCloseGroup.Add(-n)
-	}
 }
 
 // Close stops the pipeline, outputs and queue.
@@ -180,37 +165,10 @@ func (p *Pipeline) Close() error {
 
 	log.Debug("close pipeline")
 
-	if p.waitOnClose {
-		ch := make(chan struct{})
-		go func() {
-			p.waitCloseGroup.Wait()
-			ch <- struct{}{}
-		}()
-
-		select {
-		case <-ch:
-			// all events have been ACKed
-
-		case <-time.After(p.waitCloseTimeout):
-			// timeout -> close pipeline with pending events
-		}
-	}
-
 	// Note: active clients are not closed / disconnected.
-
-	// Closing the queue stops ACKs from propagating, so we close the output first
-	// to give it a chance to wait for any outstanding events to be acknowledged.
-	p.output.Close()
-	// shutdown queue
-	err := p.queue.Close()
-	if err != nil {
-		log.Error("pipeline queue shutdown error: ", err)
-	}
+	p.outputController.WaitClose(p.waitCloseTimeout)
 
 	p.observer.cleanup()
-	if p.sigNewClient != nil {
-		close(p.sigNewClient)
-	}
 	return nil
 }
 
@@ -223,6 +181,8 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // The client behavior on close and ACK handling can be configured by setting
 // the appropriate fields in the passed ClientConfig.
 // If not set otherwise the defaut publish mode is OutputChooses.
+//
+// It is responsibility of the caller to close the client.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	var (
 		canDrop    bool
@@ -242,7 +202,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	waitClose := cfg.WaitClose
-	reportEvents := p.waitOnClose
 
 	processors, err := p.createEventProcessing(cfg.Processing, publishDisabled)
 	if err != nil {
@@ -250,39 +209,20 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	client := &client{
-		pipeline:     p,
-		closeRef:     cfg.CloseRef,
-		done:         make(chan struct{}),
-		isOpen:       atomic.MakeBool(true),
-		eventer:      cfg.Events,
-		processors:   processors,
-		eventFlags:   eventFlags,
-		canDrop:      canDrop,
-		reportEvents: reportEvents,
+		logger:         p.monitors.Logger,
+		clientListener: cfg.ClientListener,
+		processors:     processors,
+		eventFlags:     eventFlags,
+		canDrop:        canDrop,
+		observer:       p.observer,
 	}
+	client.isOpen.Store(true)
 
-	ackHandler := cfg.ACKHandler
-
-	producerCfg := queue.ProducerConfig{}
-
-	if reportEvents || cfg.Events != nil {
-		producerCfg.OnDrop = func(event interface{}) {
-			publisherEvent, _ := event.(publisher.Event)
-			if cfg.Events != nil {
-				cfg.Events.DroppedOnPublish(publisherEvent.Content)
-			}
-			if reportEvents {
-				p.waitCloseGroup.Add(-1)
-			}
-		}
-	}
+	ackHandler := cfg.EventListener
 
 	var waiter *clientCloseWaiter
 	if waitClose > 0 {
 		waiter = newClientCloseWaiter(waitClose)
-	}
-
-	if waiter != nil {
 		if ackHandler == nil {
 			ackHandler = waiter
 		} else {
@@ -290,102 +230,30 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		}
 	}
 
-	if ackHandler != nil {
-		producerCfg.ACK = ackHandler.ACKEvents
-	} else {
+	producerCfg := queue.ProducerConfig{
+		ACK: func(count int) {
+			client.observer.eventsACKed(count)
+			if ackHandler != nil {
+				ackHandler.ACKEvents(count)
+			}
+		},
+	}
+
+	if ackHandler == nil {
 		ackHandler = acker.Nil()
 	}
 
-	client.acker = ackHandler
+	client.eventListener = ackHandler
 	client.waiter = waiter
-	client.producer = p.queue.Producer(producerCfg)
+	client.producer = p.outputController.queueProducer(producerCfg)
+	if client.producer == nil {
+		// This can only happen if the pipeline was shut down while clients
+		// were still waiting to connect.
+		return nil, fmt.Errorf("client failed to connect because the pipeline is shutting down")
+	}
 
 	p.observer.clientConnected()
-
-	if client.closeRef != nil {
-		p.registerSignalPropagation(client)
-	}
-
 	return client, nil
-}
-
-func (p *Pipeline) registerSignalPropagation(c *client) {
-	p.guardStartSigPropagation.Do(func() {
-		p.sigNewClient = make(chan *client, 1)
-		go p.runSignalPropagation()
-	})
-	p.sigNewClient <- c
-}
-
-func (p *Pipeline) runSignalPropagation() {
-	var channels []reflect.SelectCase
-	var clients []*client
-
-	channels = append(channels, reflect.SelectCase{
-		Dir:  reflect.SelectRecv,
-		Chan: reflect.ValueOf(p.sigNewClient),
-	})
-
-	for {
-		chosen, recv, recvOK := reflect.Select(channels)
-		if chosen == 0 {
-			if !recvOK {
-				// sigNewClient was closed
-				return
-			}
-
-			// new client -> register client for signal propagation.
-			if client := recv.Interface().(*client); client != nil {
-				channels = append(channels,
-					reflect.SelectCase{
-						Dir:  reflect.SelectRecv,
-						Chan: reflect.ValueOf(client.closeRef.Done()),
-					},
-					reflect.SelectCase{
-						Dir:  reflect.SelectRecv,
-						Chan: reflect.ValueOf(client.done),
-					},
-				)
-				clients = append(clients, client)
-			}
-			continue
-		}
-
-		// find client we received a signal for. If client.done was closed, then
-		// we have to remove the client only. But if closeRef did trigger the signal, then
-		// we have to propagate the async close to the client.
-		// In either case, the client will be removed
-
-		i := (chosen - 1) / 2
-		isSig := (chosen & 1) == 1
-		if isSig {
-			client := clients[i]
-			client.Close()
-		}
-
-		// remove:
-		last := len(clients) - 1
-		ch1 := i*2 + 1
-		ch2 := ch1 + 1
-		lastCh1 := last*2 + 1
-		lastCh2 := lastCh1 + 1
-
-		clients[i], clients[last] = clients[last], nil
-		channels[ch1], channels[lastCh1] = channels[lastCh1], reflect.SelectCase{}
-		channels[ch2], channels[lastCh2] = channels[lastCh2], reflect.SelectCase{}
-
-		clients = clients[:last]
-		channels = channels[:lastCh1]
-		if cap(clients) > 10 && len(clients) <= cap(clients)/2 {
-			clientsTmp := make([]*client, len(clients))
-			copy(clientsTmp, clients)
-			clients = clientsTmp
-
-			channelsTmp := make([]reflect.SelectCase, len(channels))
-			copy(channelsTmp, channels)
-			channels = channelsTmp
-		}
-	}
 }
 
 func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bool) (beat.Processor, error) {
@@ -397,5 +265,28 @@ func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bo
 
 // OutputReloader returns a reloadable object for the output section of this pipeline
 func (p *Pipeline) OutputReloader() OutputReloader {
-	return p.output
+	return p.outputController
+}
+
+// Parses the given config and returns a QueueFactory based on it.
+// This helper exists to frontload config parsing errors: if there is an
+// error in the queue config, we want it to show up as fatal during
+// initialization, even if the queue itself isn't created until later.
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.QueueFactory, error) {
+	switch queueType {
+	case memqueue.QueueType:
+		settings, err := memqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, err
+		}
+		return memqueue.FactoryForSettings(settings), nil
+	case diskqueue.QueueType:
+		settings, err := diskqueue.SettingsForUserConfig(userConfig)
+		if err != nil {
+			return nil, err
+		}
+		return diskqueue.FactoryForSettings(settings), nil
+	default:
+		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
+	}
 }

@@ -24,6 +24,9 @@ endif::[]
 ifndef::no_console_output[]
 * <<console-output>>
 endif::[]
+ifndef::no_discard_output[]
+* <<discard-output>>
+endif::[]
 
 //# end::outputs-list[]
 
@@ -75,6 +78,13 @@ ifdef::requires_xpack[]
 [role="xpack"]
 endif::[]
 include::{libbeat-outputs-dir}/console/docs/console.asciidoc[]
+endif::[]
+
+ifndef::no_discard_output[]
+ifdef::requires_xpack[]
+[role="xpack"]
+endif::[]
+include::{libbeat-outputs-dir}/discard/docs/discard.asciidoc[]
 endif::[]
 
 ifndef::no_codec[]

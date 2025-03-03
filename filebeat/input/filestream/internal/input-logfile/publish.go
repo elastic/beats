@@ -132,7 +132,10 @@ func (op *updateOp) Execute(store *store, n uint) {
 		resource.cursor = resource.pendingCursor()
 		resource.pendingCursorValue = nil
 	} else {
-		typeconv.Convert(&resource.cursor, op.delta)
+		err := typeconv.Convert(&resource.cursor, op.delta)
+		if err != nil {
+			store.log.Errorf("failed to perform type conversion: %w", err)
+		}
 	}
 
 	if resource.internalState.Updated.Before(op.timestamp) {
@@ -142,7 +145,7 @@ func (op *updateOp) Execute(store *store, n uint) {
 	err := store.persistentStore.Set(resource.key, resource.inSyncStateSnapshot())
 	if err != nil {
 		if !statestore.IsClosed(err) {
-			store.log.Errorf("Failed to update state in the registry for '%v'", resource.key)
+			store.log.Errorf("Failed to update state in the registry for '%v': %s", resource.key, err)
 		}
 	} else {
 		resource.stored = true

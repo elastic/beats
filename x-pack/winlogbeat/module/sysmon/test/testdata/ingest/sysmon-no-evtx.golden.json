@@ -1,0 +1,104 @@
+[
+  {
+    "dns": {
+      "answers": [
+        {
+          "type": "SRV"
+        },
+        {
+          "type": "SRV"
+        },
+        {
+          "data": "1:2:3::3",
+          "type": "AAAA"
+        },
+        {
+          "data": "1.2.3.3",
+          "type": "A"
+        }
+      ],
+      "question": {
+        "name": "some.other.domain.com",
+        "registered_domain": "domain.com",
+        "subdomain": "some.other",
+        "top_level_domain": "com"
+      },
+      "resolved_ip": [
+        "1:2:3::3",
+        "1.2.3.3"
+      ]
+    },
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "category": [
+        "network"
+      ],
+      "code": "22",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "connection",
+        "protocol",
+        "info"
+      ]
+    },
+    "host": {
+      "name": "internal.network.org"
+    },
+    "log": {
+      "level": "information"
+    },
+    "network": {
+      "protocol": "dns"
+    },
+    "process": {
+      "executable": "C:\\Windows\\System32\\lsass.exe",
+      "name": "lsass.exe",
+      "pid": 500
+    },
+    "related": {
+      "hosts": [
+        "some.other.domain.com"
+      ],
+      "ip": [
+        "1:2:3::3",
+        "1.2.3.3"
+      ],
+      "user": [
+        "SYSTEM"
+      ]
+    },
+    "sysmon": {
+      "dns": {
+        "status": "SUCCESS"
+      }
+    },
+    "user": {
+      "domain": "NT AUTHORITY",
+      "id": "A-0-0-00",
+      "name": "SYSTEM"
+    },
+    "winlog": {
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "internal.network.org",
+      "event_id": "22",
+      "opcode": "Info",
+      "process": {
+        "pid": 1000,
+        "thread": {
+          "id": 2000
+        }
+      },
+      "provider_guid": "{00000000-0000-0000-0000-000000000000}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "1111",
+      "user": {
+        "identifier": "A-0-0-00"
+      },
+      "version": 5
+    }
+  }
+]

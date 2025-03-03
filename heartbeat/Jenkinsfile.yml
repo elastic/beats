@@ -64,6 +64,11 @@ stages:
                 - "macosM1Test"
             tags: false         ## for all the tags
         stage: extended
+    rhel-9:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "rhel-9"
+        stage: mandatory
     windows-2022:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

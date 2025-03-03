@@ -157,7 +157,7 @@ roleRef:
 === Compatibility
 
 The Kubernetes module is tested with the following versions of Kubernetes:
-1.23.x, 1.24.x, 1.25.x, 1.26.x
+1.28.x, 1.29.x, 1.30.x and 1.31.x
 
 [float]
 === Dashboard
@@ -232,11 +232,20 @@ metricbeat.modules:
 
   # Enriching parameters:
   add_metadata: true
-  # When used outside the cluster:
-  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
+  #include_labels: []
+  #exclude_labels: []
+  #include_annotations: []
+  #labels.dedot: true
+  #annotations.dedot: true
+
+  # When used outside the cluster:
+  #node: node_name
+
   # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
@@ -276,13 +285,23 @@ metricbeat.modules:
 
   # Enriching parameters:
   add_metadata: true
-  # When used outside the cluster:
-  #node: node_name
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
+  #include_labels: []
+  #exclude_labels: []
+  #include_annotations: []
+  #labels.dedot: true
+  #annotations.dedot: true
+
+  # When used outside the cluster:
+  #node: node_name
+
   # Set the namespace to watch for resources
   #namespace: staging
+
   # To configure additionally node and namespace metadata `add_resource_metadata` can be defined.
   # By default all labels will be included while annotations are not added by default.
   # add_resource_metadata:
@@ -311,6 +330,8 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
   # Set the namespace to watch for events
   #namespace: staging
   # Set the sync period of the watchers
@@ -331,6 +352,8 @@ metricbeat.modules:
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
@@ -340,6 +363,8 @@ metricbeat.modules:
     - proxy
   hosts: ["localhost:10249"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes controller manager
 # (URL and deployment method should be adapted to match the controller manager deployment / service / endpoint)
@@ -349,6 +374,8 @@ metricbeat.modules:
     - controllermanager
   hosts: ["http://localhost:10252"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes scheduler
 # (URL and deployment method should be adapted to match scheduler deployment / service / endpoint)
@@ -358,6 +385,8 @@ metricbeat.modules:
     - scheduler
   hosts: ["localhost:10251"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 ----
 
 This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.

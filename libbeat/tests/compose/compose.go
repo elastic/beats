@@ -42,7 +42,7 @@ type HostInfo interface {
 }
 
 // EnsureUp starts all the requested services (must be defined in docker-compose.yml)
-// with a default timeout of 300 seconds
+// with a default timeout of 60 seconds.
 func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 	t.Helper()
 
@@ -76,7 +76,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		// Start container
 		err := compose.Start(service, upOptions)
 		if err != nil {
-			return fmt.Errorf("failed to start service '%s: %v", service, err)
+			return fmt.Errorf("failed to start service '%s': %w", service, err)
 		}
 
 		// Wait for health
@@ -86,7 +86,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 			if inspectErr != nil {
 				t.Logf("inspection error: %v", err)
 			} else {
-				t.Logf("Container state (service: '%s'): %s", service, inspected)
+				t.Logf("container state (service: '%s'): %s", service, inspected)
 			}
 
 			return err
@@ -102,8 +102,16 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 			break
 		}
 		t.Log(err)
+
 		// Ignore errors here
-		compose.Kill(service)
+		err = compose.Kill(service)
+		if err != nil {
+			t.Logf("kill container error: %v", err)
+		}
+		err = compose.Remove(service, true)
+		if err != nil {
+			t.Logf("remove container error: %v", err)
+		}
 	}
 	if err != nil {
 		t.FailNow()

@@ -1,0 +1,65 @@
+[
+    {
+        "event.dataset": "system.syslog",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "systemd",
+        "log.syslog.facility.code": 3,
+        "log.syslog.priority": 6,
+        "message": "Stopped target getty.target - Login Prompts.",
+        "process.args": [
+            "/sbin/init"
+        ],
+        "process.args_count": 1,
+        "process.command_line": "/sbin/init",
+        "process.name": "systemd",
+        "process.pid": 1,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "service.type": "system",
+        "user.group.id": "0",
+        "user.id": "0"
+    },
+    {
+        "event.dataset": "system.syslog",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "kernel",
+        "log.syslog.facility.code": 0,
+        "log.syslog.priority": 6,
+        "message": "Console: switching to colour frame buffer device 160x50",
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "service.type": "system"
+    },
+    {
+        "event.dataset": "system.syslog",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "host.hostname": "bookworm",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "kernel",
+        "log.syslog.facility.code": 0,
+        "log.syslog.priority": 6,
+        "message": "thermal_sys: Registered thermal governor 'power_allocator'",
+        "related.hosts": [
+            "bookworm"
+        ],
+        "service.type": "system"
+    }
+]

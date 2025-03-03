@@ -16,17 +16,15 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package perfmon
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -51,7 +49,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 				// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
 				// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
 				// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
-				if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+				if errors.Is(val.Err.Error, pdh.PDH_CALC_NEGATIVE_VALUE) || errors.Is(val.Err.Error, pdh.PDH_INVALID_DATA) {
 					re.log.Debugw("Counter value retrieval returned",
 						"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("perfmon"), "query", counterPath)
 					continue
@@ -72,7 +70,9 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			if _, ok := eventMap[eventKey]; !ok {
 				eventMap[eventKey] = &mb.Event{
 					MetricSetFields: mapstr.M{},
-					Error:           errors.Wrapf(val.Err.Error, "failed on query=%v", counterPath),
+				}
+				if val.Err.Error != nil {
+					eventMap[eventKey].Error = fmt.Errorf("failed on query=%v: %w", counterPath, val.Err.Error)
 				}
 				if val.Instance != "" {
 					// will ignore instance index
@@ -96,9 +96,11 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 		}
 	}
 	// Write the values into the map.
-	var events []mb.Event
+	events := make([]mb.Event, len(eventMap))
+	iter := 0
 	for _, val := range eventMap {
-		events = append(events, *val)
+		events[iter] = *val
+		iter++
 	}
 	return events
 }
@@ -114,7 +116,7 @@ func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.
 				// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 				// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 				if val.Err.Error != nil {
-					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+					if errors.Is(val.Err.Error, pdh.PDH_CALC_NEGATIVE_VALUE) || errors.Is(val.Err.Error, pdh.PDH_INVALID_DATA) {
 						re.log.Debugw("Counter value retrieval returned",
 							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("perfmon"), "query", counterPath)
 						continue

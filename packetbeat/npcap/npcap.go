@@ -56,7 +56,9 @@ func Install(ctx context.Context, log *logp.Logger, path, dst string, compat boo
 }
 
 func install(ctx context.Context, log *logp.Logger, path, dst string, compat bool) error {
-	if Version() != "" {
+	log.Info("installing Npcap DLL")
+	if version := Version(); version != "" {
+		log.Infof("replace existing version: %s", version)
 		// If we are here there is a runtime Npcap DLL loaded. We need to
 		// unload this to prevent the application being killed during the
 		// install.

@@ -10,6 +10,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -24,18 +25,20 @@ import (
 )
 
 var serverPoolTests = []struct {
-	name    string
-	cfgs    []*httpEndpoint
-	events  []target
-	want    []mapstr.M
-	wantErr error
+	name       string
+	method     string
+	cfgs       []*httpEndpoint
+	events     []target
+	want       []mapstr.M
+	wantStatus int
+	wantErr    error
 }{
 	{
 		name: "single",
 		cfgs: []*httpEndpoint{{
 			addr: "127.0.0.1:9001",
 			config: config{
-				ResponseCode:  200,
+				ResponseCode:  http.StatusOK,
 				ResponseBody:  `{"message": "success"}`,
 				ListenAddress: "127.0.0.1",
 				ListenPort:    "9001",
@@ -49,6 +52,63 @@ var serverPoolTests = []struct {
 			{url: "http://127.0.0.1:9001/", event: `{"b":2}`},
 			{url: "http://127.0.0.1:9001/", event: `{"c":3}`},
 		},
+		wantStatus: http.StatusOK,
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+			{"json": mapstr.M{"b": int64(2)}},
+			{"json": mapstr.M{"c": int64(3)}},
+		},
+	},
+	{
+		name:   "put",
+		method: http.MethodPut,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPut,
+				ResponseCode:  http.StatusOK,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", event: `{"a":1}`},
+			{url: "http://127.0.0.1:9001/", event: `{"b":2}`},
+			{url: "http://127.0.0.1:9001/", event: `{"c":3}`},
+		},
+		wantStatus: http.StatusOK,
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+			{"json": mapstr.M{"b": int64(2)}},
+			{"json": mapstr.M{"c": int64(3)}},
+		},
+	},
+	{
+		name:   "patch",
+		method: http.MethodPatch,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPatch,
+				ResponseCode:  http.StatusOK,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", event: `{"a":1}`},
+			{url: "http://127.0.0.1:9001/", event: `{"b":2}`},
+			{url: "http://127.0.0.1:9001/", event: `{"c":3}`},
+		},
+		wantStatus: http.StatusOK,
 		want: []mapstr.M{
 			{"json": mapstr.M{"a": int64(1)}},
 			{"json": mapstr.M{"b": int64(2)}},
@@ -61,7 +121,7 @@ var serverPoolTests = []struct {
 			{
 				addr: "127.0.0.1:9001",
 				config: config{
-					ResponseCode:  200,
+					ResponseCode:  http.StatusOK,
 					ResponseBody:  `{"message": "success"}`,
 					ListenAddress: "127.0.0.1",
 					ListenPort:    "9001",
@@ -73,7 +133,7 @@ var serverPoolTests = []struct {
 			{
 				addr: "127.0.0.1:9002",
 				config: config{
-					ResponseCode:  200,
+					ResponseCode:  http.StatusOK,
 					ResponseBody:  `{"message": "success"}`,
 					ListenAddress: "127.0.0.1",
 					ListenPort:    "9002",
@@ -88,6 +148,7 @@ var serverPoolTests = []struct {
 			{url: "http://127.0.0.1:9002/b/", event: `{"b":2}`},
 			{url: "http://127.0.0.1:9001/a/", event: `{"c":3}`},
 		},
+		wantStatus: http.StatusOK,
 		want: []mapstr.M{
 			{"json": mapstr.M{"a": int64(1)}},
 			{"json": mapstr.M{"b": int64(2)}},
@@ -100,7 +161,7 @@ var serverPoolTests = []struct {
 			{
 				addr: "127.0.0.1:9001",
 				config: config{
-					ResponseCode:  200,
+					ResponseCode:  http.StatusOK,
 					ResponseBody:  `{"message": "success"}`,
 					ListenAddress: "127.0.0.1",
 					ListenPort:    "9001",
@@ -112,7 +173,7 @@ var serverPoolTests = []struct {
 			{
 				addr: "127.0.0.1:9001",
 				config: config{
-					ResponseCode:  200,
+					ResponseCode:  http.StatusOK,
 					ResponseBody:  `{"message": "success"}`,
 					ListenAddress: "127.0.0.1",
 					ListenPort:    "9001",
@@ -127,6 +188,7 @@ var serverPoolTests = []struct {
 			{url: "http://127.0.0.1:9001/b/", event: `{"b":2}`},
 			{url: "http://127.0.0.1:9001/a/", event: `{"c":3}`},
 		},
+		wantStatus: http.StatusOK,
 		want: []mapstr.M{
 			{"json": mapstr.M{"a": int64(1)}},
 			{"json": mapstr.M{"b": int64(2)}},
@@ -139,7 +201,7 @@ var serverPoolTests = []struct {
 			{
 				addr: "127.0.0.1:9001",
 				config: config{
-					ResponseCode:  200,
+					ResponseCode:  http.StatusOK,
 					ResponseBody:  `{"message": "success"}`,
 					ListenAddress: "127.0.0.1",
 					ListenPort:    "9001",
@@ -152,7 +214,7 @@ var serverPoolTests = []struct {
 				addr: "127.0.0.1:9001",
 				config: config{
 					TLS:           &tlscommon.ServerConfig{},
-					ResponseCode:  200,
+					ResponseCode:  http.StatusOK,
 					ResponseBody:  `{"message": "success"}`,
 					ListenAddress: "127.0.0.1",
 					ListenPort:    "9001",
@@ -173,7 +235,7 @@ var serverPoolTests = []struct {
 					TLS: &tlscommon.ServerConfig{
 						VerificationMode: tlscommon.VerifyStrict,
 					},
-					ResponseCode:  200,
+					ResponseCode:  http.StatusOK,
 					ResponseBody:  `{"message": "success"}`,
 					ListenAddress: "127.0.0.1",
 					ListenPort:    "9001",
@@ -188,7 +250,7 @@ var serverPoolTests = []struct {
 					TLS: &tlscommon.ServerConfig{
 						VerificationMode: tlscommon.VerifyNone,
 					},
-					ResponseCode:  200,
+					ResponseCode:  http.StatusOK,
 					ResponseBody:  `{"message": "success"}`,
 					ListenAddress: "127.0.0.1",
 					ListenPort:    "9001",
@@ -200,11 +262,87 @@ var serverPoolTests = []struct {
 		},
 		wantErr: invalidTLSStateErr{addr: "127.0.0.1:9001", reason: "configuration options do not agree"},
 	},
+	{
+		name:   "exceed_max_in_flight",
+		method: http.MethodPost,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPost,
+				ResponseCode:  http.StatusOK,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				MaxInFlight:   2,
+				RetryAfter:    10,
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"a":1}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"b":2}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"c":3}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
+		},
+		wantStatus: http.StatusServiceUnavailable,
+		want:       nil,
+	},
+	{
+		name:   "not_exceed_max_in_flight",
+		method: http.MethodPost,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPost,
+				ResponseCode:  http.StatusOK,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				MaxInFlight:   20,
+				RetryAfter:    10,
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"a":1}`, wantBody: `{"message": "success"}`, wantHeader: http.Header{"Retry-After": nil}},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"b":2}`, wantBody: `{"message": "success"}`, wantHeader: http.Header{"Retry-After": nil}},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"c":3}`, wantBody: `{"message": "success"}`, wantHeader: http.Header{"Retry-After": nil}},
+		},
+		wantStatus: http.StatusOK,
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+			{"json": mapstr.M{"b": int64(2)}},
+			{"json": mapstr.M{"c": int64(3)}},
+		},
+	},
 }
 
 type target struct {
-	url   string
-	event string
+	url        string
+	event      string
+	wantBody   string
+	wantHeader http.Header
+}
+
+// isWantedHeader returns whether got includes the wanted header and that
+// the values match. A nil value for a header in the receiver matches absence
+// of that header in the got parameter.
+func (t target) isWantedHeader(got http.Header) bool {
+	for h, v := range t.wantHeader {
+		if v == nil {
+			if _, ok := got[h]; ok {
+				return false
+			}
+			continue
+		}
+		if !slices.Equal(got[h], v) {
+			return false
+		}
+	}
+	return true
 }
 
 func TestServerPool(t *testing.T) {
@@ -217,13 +355,15 @@ func TestServerPool(t *testing.T) {
 				fails = make(chan error, 1)
 			)
 			ctx, cancel := newCtx("server_pool_test", test.name)
+			metrics := newInputMetrics("")
+			defer metrics.Close()
 			var wg sync.WaitGroup
 			for _, cfg := range test.cfgs {
 				cfg := cfg
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					err := servers.serve(ctx, cfg, &pub)
+					err := servers.serve(ctx, cfg, pub.Publish, metrics)
 					if err != http.ErrServerClosed {
 						select {
 						case fails <- err:
@@ -247,13 +387,20 @@ func TestServerPool(t *testing.T) {
 				}
 			}
 			for i, e := range test.events {
-				resp, err := http.Post(e.url, "application/json", strings.NewReader(e.event))
+				resp, err := doRequest(test.method, e.url, "application/json", strings.NewReader(e.event))
 				if err != nil {
 					t.Fatalf("failed to post event #%d: %v", i, err)
 				}
-				if resp.StatusCode != http.StatusOK {
-					t.Errorf("unexpected response status code: %s (%d)\nresp: %s",
-						resp.Status, resp.StatusCode, dump(resp.Body))
+				body := dump(resp.Body)
+				if resp.StatusCode != test.wantStatus {
+					t.Errorf("unexpected response status code: %s (%d), want: %d\nresp: %s",
+						resp.Status, resp.StatusCode, test.wantStatus, body)
+				}
+				if len(e.wantBody) != 0 && string(body) != e.wantBody {
+					t.Errorf("unexpected response body:\ngot: %s\nwant:%s", body, e.wantBody)
+				}
+				if !e.isWantedHeader(resp.Header) {
+					t.Errorf("unexpected header:\n--- want\n+++ got\n%s", cmp.Diff(e.wantHeader, resp.Header))
 				}
 			}
 			cancel()
@@ -262,11 +409,39 @@ func TestServerPool(t *testing.T) {
 			for _, e := range pub.events {
 				got = append(got, e.Fields)
 			}
-			if !cmp.Equal(got, test.want) {
-				t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(got, test.want))
+			if !cmp.Equal(test.want, got) {
+				t.Errorf("unexpected result:\n--- want\n+++ got\n%s", cmp.Diff(test.want, got))
 			}
+
+			// Try to re-register the same addresses.
+			ctx, cancel = newCtx("server_pool_test", test.name)
+			for _, cfg := range test.cfgs {
+				cfg := cfg
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					err := servers.serve(ctx, cfg, pub.Publish, metrics)
+					if err != nil && err != http.ErrServerClosed && test.wantErr == nil {
+						t.Errorf("failed to re-register %v: %v", cfg.addr, err)
+					}
+				}()
+			}
+			cancel()
+			wg.Wait()
 		})
 	}
+}
+
+func doRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {
+	if method == "" {
+		method = http.MethodPost
+	}
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", contentType)
+	return http.DefaultClient.Do(req)
 }
 
 // Is is included to simplify testing, but is not exposed to avoid unwanted error
@@ -290,9 +465,9 @@ func newCtx(log, id string) (_ v2.Context, cancel func()) {
 	}, cancel
 }
 
-func dump(r io.ReadCloser) string {
+func dump(r io.ReadCloser) []byte {
 	defer r.Close()
 	var buf bytes.Buffer
 	io.Copy(&buf, r)
-	return buf.String()
+	return buf.Bytes()
 }

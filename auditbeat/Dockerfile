@@ -1,4 +1,4 @@
-FROM golang:1.18.10
+FROM golang:1.22.12
 
 RUN \
     apt-get update \
@@ -10,6 +10,10 @@ RUN \
          iproute2 \
       && rm -rf /var/lib/apt/lists/*
 
+# Use a virtualenv to avoid the PEP668 "externally managed environment" error caused by conflicts
+# with the system Python installation. golang:1.20.6 uses Debian 12 which now enforces PEP668.
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
 RUN pip3 install --upgrade pip==20.1.1
-RUN pip3 install --upgrade setuptools==47.3.2
-RUN pip3 install --upgrade docker-compose==1.23.2

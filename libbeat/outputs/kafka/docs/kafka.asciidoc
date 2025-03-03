@@ -33,11 +33,18 @@ output.kafka:
 
 NOTE: Events bigger than <<kafka-max_message_bytes,`max_message_bytes`>> will be dropped. To avoid this problem, make sure {beatname_uc} does not generate events bigger than <<kafka-max_message_bytes,`max_message_bytes`>>.
 
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
+
 [[kafka-compatibility]]
 ==== Compatibility
 
 This output can connect to Kafka version 0.8.2.0 and later. Older versions
-might work as well, but are not supported.
+might work as well, but are not supported. When using Kafka 4.0 and newer, the version must be set to at least `"2.1.0"`
 
 ==== Configuration options
 
@@ -62,7 +69,7 @@ The cluster metadata contain the actual Kafka brokers events are published to.
 
 ===== `version`
 
-Kafka protocol version that {beatname_uc} will request when connecting. Defaults to 1.0.0.
+Kafka protocol version that {beatname_uc} will request when connecting. Defaults to 2.1.0. When using Kafka 4.0 and newer, the version must be set to at least `"2.1.0"`
 
 Valid values are all kafka releases in between `0.8.2.0` and `2.6.0`.
 
@@ -293,7 +300,7 @@ The keep-alive period for an active network connection. If 0s, keep-alives are d
 
 ===== `compression`
 
-Sets the output compression codec. Must be one of `none`, `snappy`, `lz4` and `gzip`. The default is `gzip`.
+Sets the output compression codec. Must be one of `none`, `snappy`, `lz4`, `gzip` and `zstd`. The default is `gzip`.
 
 [IMPORTANT]
 .Known issue with Azure Event Hub for Kafka
@@ -337,3 +344,11 @@ beta[]
 Configuration options for Kerberos authentication.
 
 See <<configuration-kerberos>> for more information.
+
+===== `queue`
+
+Configuration options for internal queue.
+
+See <<configuring-internal-queue>> for more information.
+
+Note:`queue` options can be set under +{beatname_lc}.yml+ or the `output` section but not both.

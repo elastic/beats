@@ -47,7 +47,7 @@ func New(formatString *fmtstr.TimestampFormatString) *AddFormattedIndex {
 }
 
 // NewC constructs a new AddFormattedIndex processor from configuration
-func NewC(cfg *conf.C) (processors.Processor, error) {
+func NewC(cfg *conf.C) (beat.Processor, error) {
 	var c config
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err

@@ -43,12 +43,13 @@ type osqLogSeverity int
 
 // The severity levels are taken from osquery source
 // https://github.com/osquery/osquery/blob/master/osquery/core/plugins/logger.h#L39
-//  enum StatusLogSeverity {
-// 	  O_INFO = 0,
-// 	  O_WARNING = 1,
-// 	  O_ERROR = 2,
-// 	  O_FATAL = 3,
-//  };
+//
+//	 enum StatusLogSeverity {
+//		  O_INFO = 0,
+//		  O_WARNING = 1,
+//		  O_ERROR = 2,
+//		  O_FATAL = 3,
+//	 };
 const (
 	severityInfo osqLogSeverity = iota
 	severityWarning
@@ -80,7 +81,7 @@ func (m *osqueryLogMessage) Log(typ logger.LogType, log *logp.Logger) {
 	case severityWarning:
 		log.Warnw(m.Message, args...)
 	case severityInfo:
-		log.Infow(m.Message, args...)
+		log.Debugw(m.Message, args...)
 	default:
 		log.Debugw(m.Message, args...)
 	}

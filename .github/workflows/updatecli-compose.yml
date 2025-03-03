@@ -1,0 +1,62 @@
+---
+name: updatecli-compose
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: --experimental compose diff
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: elastic/oblt-actions/updatecli/run@v1
+        with:
+          command: --experimental compose apply
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: ${{ failure()  }}
+        name: Report obsoleted branches (slack)
+        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
+        with:
+          method: chat.postMessage
+          token: ${{ secrets.SLACK_BOT_TOKEN }}
+          payload: |
+            {
+              "channel": "#ingest-notifications",
+              "text": "${{ env.SLACK_MESSAGE }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ env.SLACK_MESSAGE }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_MESSAGE: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+  

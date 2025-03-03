@@ -73,7 +73,10 @@ set `subscription.max_outstanding_messages`. Default is 1.
 
 The maximum number of unprocessed messages (unacknowledged but not yet expired).
 If the value is negative, then there will be no limit on the number of
-unprocessed messages. Default is 1000.
+unprocessed messages. Due to the presence of internal queue, the input gets 
+blocked until `queue.mem.flush.min_events` or `queue.mem.flush.timeout` 
+is reached. To prevent this blockage, this option must be at least 
+`queue.mem.flush.min_events`. Default is 1600.
 
 [float]
 ==== `credentials_file`
@@ -96,3 +99,20 @@ Default Credentials] (ADC).
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 :type!:
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                                    | Description
+| `acked_message_total`                     | Number of successfully ACKed messages.
+| `failed_acked_message_total`              | Number of failed ACKed messages.
+| `nacked_message_total`                    | Number of NACKed messages.
+| `bytes_processed_total`                   | Number of bytes processed.
+| `processing_time`                         | Histogram of the elapsed time for processing an event in nanoseconds.
+|=======

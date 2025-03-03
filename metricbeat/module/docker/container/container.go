@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package container
 
@@ -24,7 +23,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -68,7 +67,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // This is based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/list-containers.
 func (m *MetricSet) Fetch(ctx context.Context, r mb.ReporterV2) error {
 	// Fetch a list of all containers.
-	containers, err := m.dockerClient.ContainerList(ctx, types.ContainerListOptions{})
+	containers, err := m.dockerClient.ContainerList(ctx, container.ListOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to get docker containers list: %w", err)
 	}
@@ -77,7 +76,7 @@ func (m *MetricSet) Fetch(ctx context.Context, r mb.ReporterV2) error {
 	return nil
 }
 
-//Close stops the metricset
+// Close stops the metricset
 func (m *MetricSet) Close() error {
 
 	return m.dockerClient.Close()

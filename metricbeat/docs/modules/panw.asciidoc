@@ -1,0 +1,143 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: panw
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/panw/_meta/docs.asciidoc
+
+
+[[metricbeat-module-panw]]
+[role="xpack"]
+== Panw module
+
+beta[]
+
+:modulename: panw
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+The panw Metricbeat module uses the Palo Alto [pango](https://pkg.go.dev/github.com/PaloAltoNetworks/pango#section-documentation) package to extract metrics
+information from a firewall device via the XML API.
+
+[float]
+=== Dashboards
+
+
+[float]
+=== Module-specific configuration notes
+
+The panw module configuration requires the ip address of the target firewall device and an API Key generated from that firewall. It is assumed
+that network access to the firewall is available. All access by the panw module is read-only.
+
+***Limitations***
+The current version of the module is configured to run against **exactly 1** firewall. Multiple firewalls will require multiple agent configurations. 
+The module has also not been tested with Panorama, though it should work since it only relies on lower level Client.Op calls to send XML API commands 
+to the server.
+
+Required credentials for the `panw` module:
+
+`host_ip` :: IP address of the firewall - must be network accessible.
+
+`apiKey`:: An API Key generated via an XML API call to the firewall or via the management dashboard. This
+
+
+[float]
+== Metricsets
+
+[float]
+=== `bgp_peers`
+This metricset reports information on BGP Peers defined in the firewall.
+
+[float]
+=== `certificates`
+This metricset will capture certificates defined on the firewall including expiration dates.
+
+[float]
+=== `fans`
+This metricset will collect information from hardware fans (RPMS) and will report if an alarm is active for a given fan.
+
+[float]
+=== `filesystem`
+This metricset reports disk usage for filesystems defined on the device, based on df output.
+
+[float]
+=== `globalprotect_sessions`
+This metricset will collect metrics on current user sessions established on Global Protect gateways.
+
+[float]
+=== `globalprotect_stats`
+This metricset reports the number of user per GlobalProtect gateway and totals across all gateways.
+
+[float]
+=== `ha_interfaces`
+This metricset will collect metrics from the device on High Availabilty configuration for interfaces.
+
+[float]
+=== `licenses`
+This metricset reports on licenses for sofware features with expiration dates.
+
+[float]
+=== `logical`
+This metricset will collect metrics on logical interfaces in the device's network.
+
+[float]
+=== `power`
+This metricset reports power usage and alarms.
+
+[float]
+=== `system`
+This metricset captures system informate such as uptime, user count, CPU, memory and swap: essentiallyl the first 5 lines of 'top' output. 
+
+[float]
+=== `temperature`
+This metricset reports temperature for various slots on the device and reports on alarm status. 
+
+[float]
+=== `tunnels`
+This metricset enumerates ipsec tunnels and their status.
+
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Panw module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: panw
+  metricsets: ["licenses"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-panw-interfaces,interfaces>>
+
+* <<metricbeat-metricset-panw-routing,routing>>
+
+* <<metricbeat-metricset-panw-system,system>>
+
+* <<metricbeat-metricset-panw-vpn,vpn>>
+
+include::panw/interfaces.asciidoc[]
+
+include::panw/routing.asciidoc[]
+
+include::panw/system.asciidoc[]
+
+include::panw/vpn.asciidoc[]
+
+:edit_url!:

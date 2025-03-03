@@ -1,0 +1,47 @@
+[
+  {
+    "event": {
+      "code": "22",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "internal.network.org"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "internal.network.org",
+      "event_data": {
+        "Image": "C:\\Windows\\System32\\lsass.exe",
+        "ProcessGuid": "{00000000-0000-0000-0000-000000000000}",
+        "ProcessId": "500",
+        "QueryName": "some.other.domain.com",
+        "QueryResults": "type:  33 ;type:  33 ;1:2:3::3;1.2.3.3;",
+        "QueryStatus": "0",
+        "RuleName": "-",
+        "User": "NT AUTHORITY\\SYSTEM",
+        "UtcTime": "2000-01-01T00:00:00.000"
+      },
+      "event_id": "22",
+      "level": "information",
+      "opcode": "Info",
+      "process": {
+        "pid": 1000,
+        "thread": {
+          "id": 2000
+        }
+      },
+      "provider_guid": "{00000000-0000-0000-0000-000000000000}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 1111,
+      "time_created": "2000-01-01T00:00:00Z",
+      "user": {
+        "identifier": "A-0-0-00"
+      },
+      "version": 5
+    }
+  }
+]

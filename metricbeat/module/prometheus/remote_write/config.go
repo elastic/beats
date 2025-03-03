@@ -20,9 +20,10 @@ package remote_write
 import "github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 type Config struct {
-	Host string                  `config:"host"`
-	Port int                     `config:"port"`
-	TLS  *tlscommon.ServerConfig `config:"ssl"`
+	MetricsCount bool                    `config:"metrics_count"`
+	Host         string                  `config:"host"`
+	Port         int                     `config:"port"`
+	TLS          *tlscommon.ServerConfig `config:"ssl"`
 }
 
 func defaultConfig() Config {

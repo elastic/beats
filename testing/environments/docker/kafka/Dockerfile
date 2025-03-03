@@ -1,21 +1,21 @@
 FROM debian:buster
 
-ENV KAFKA_HOME /kafka
+ENV KAFKA_HOME=/kafka
 # Controls the hostname advertised within the Docker network, should generally match the container
 # name in a docker-compose file.
-ENV KAFKA_ADVERTISED_HOST kafka
+ENV KAFKA_ADVERTISED_HOST=kafka
 
 ENV KAFKA_LOGS_DIR="/kafka-logs"
-ENV KAFKA_VERSION 2.2.2
-ENV _JAVA_OPTIONS "-Djava.net.preferIPv4Stack=true"
+ENV KAFKA_VERSION=3.6.0
+ENV _JAVA_OPTIONS="-Djava.net.preferIPv4Stack=true"
 ENV TERM=linux
 
-RUN apt-get update && apt-get install -y curl openjdk-11-jre-headless netcat
+RUN apt-get update && apt-get install -y curl openjdk-11-jre-headless netcat-openbsd
 
 RUN mkdir -p ${KAFKA_LOGS_DIR} && mkdir -p ${KAFKA_HOME} && \
     curl -J -L -s -f -o - https://github.com/kadwanev/retry/releases/download/1.0.1/retry-1.0.1.tar.gz | tar xfz - -C /usr/local/bin && \
     retry --min 1 --max 180 -- curl -J -L -s -f --show-error -o $INSTALL_DIR/kafka.tgz \
-        "https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.11-${KAFKA_VERSION}.tgz" && \
+        "https://archive.apache.org/dist/kafka/${KAFKA_VERSION}/kafka_2.13-${KAFKA_VERSION}.tgz" && \
     tar xzf ${INSTALL_DIR}/kafka.tgz -C ${KAFKA_HOME} --strip-components 1
 
 ADD run.sh /run.sh

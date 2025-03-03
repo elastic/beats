@@ -22,7 +22,7 @@
 
   # Array of hosts to connect to.
   # Scheme and port can be left out and will be set to the default (http and 9200)
-  # In case you specify and additional path, the scheme is required: http://localhost:9200/path
+  # In case you specify an additional path, the scheme is required: http://localhost:9200/path
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   #hosts: ["localhost:9200"]
 
@@ -69,7 +69,7 @@
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
-  # Configure HTTP request timeout before failing an request to Elasticsearch.
+  # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}

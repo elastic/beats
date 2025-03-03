@@ -64,7 +64,14 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	metrics := monitoring.CollectStructSnapshot(h.registry, monitoring.Full, false)
+	filtered := filteredSnapshot(h.registry, requestedType)
+
+	w.Header().Set(contentType, applicationJSON)
+	serveJSON(w, filtered, requestedPretty)
+}
+
+func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
+	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
 
 	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
@@ -73,17 +80,18 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		if requestedType != "" {
-			if typ, ok := m["input"].(string); ok && !strings.EqualFold(typ, requestedType) {
-				continue
-			}
+		// Require all entries to have an 'input' and 'id' to be accessed through this API.
+		if id, ok := m["id"].(string); !ok || id == "" {
+			continue
+		}
+
+		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+			continue
 		}
 
 		filtered = append(filtered, m)
 	}
-
-	w.Header().Set(contentType, applicationJSON)
-	serveJSON(w, filtered, requestedPretty)
+	return filtered
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {

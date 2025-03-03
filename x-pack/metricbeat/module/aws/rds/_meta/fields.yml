@@ -13,7 +13,7 @@
       type: scaled_float
       format: percent
       description: >
-        The percentage of CPU utilization.
+        CPU utilization with value range from 0 to 1.
     - name: cpu.credit_usage
       type: long
       description: >

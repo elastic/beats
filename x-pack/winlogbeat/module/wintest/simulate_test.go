@@ -7,11 +7,11 @@
 // to the VM inception problem.
 //
 //go:build !windows
-// +build !windows
 
 package wintest_test
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -73,7 +73,9 @@ func TestSimulate(t *testing.T) {
 	}
 	defer conn.Close()
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatalf("unexpected error making connection: %v", err)
 	}

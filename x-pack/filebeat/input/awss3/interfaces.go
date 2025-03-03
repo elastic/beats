@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"sync"
 	"time"
 
 	smithyhttp "github.com/aws/smithy-go/transport/http"
@@ -16,7 +17,6 @@ import (
 	"github.com/aws/smithy-go/middleware"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -27,9 +27,10 @@ import (
 )
 
 // Run 'go generate' to create mocks that are used in tests.
-//go:generate go install github.com/golang/mock/mockgen@v1.6.0
-//go:generate mockgen -source=interfaces.go -destination=mock_interfaces_test.go -package awss3 -mock_names=sqsAPI=MockSQSAPI,sqsProcessor=MockSQSProcessor,s3API=MockS3API,s3Pager=MockS3Pager,s3ObjectHandlerFactory=MockS3ObjectHandlerFactory,s3ObjectHandler=MockS3ObjectHandler
-//go:generate mockgen -destination=mock_publisher_test.go -package=awss3 -mock_names=Client=MockBeatClient,Pipeline=MockBeatPipeline github.com/elastic/beats/v7/libbeat/beat Client,Pipeline
+//go:generate go run go.uber.org/mock/mockgen -source=interfaces.go -destination=mock_interfaces_test.go -package awss3 -mock_names=sqsAPI=MockSQSAPI,sqsProcessor=MockSQSProcessor,s3API=MockS3API,s3Pager=MockS3Pager,s3ObjectHandlerFactory=MockS3ObjectHandlerFactory,s3ObjectHandler=MockS3ObjectHandler
+//go:generate go run go.uber.org/mock/mockgen -destination=mock_publisher_test.go -package=awss3 -mock_names=Client=MockBeatClient,Pipeline=MockBeatPipeline github.com/elastic/beats/v7/libbeat/beat Client,Pipeline
+//go:generate go run github.com/elastic/go-licenser -license Elastic .
+//go:generate go run golang.org/x/tools/cmd/goimports -w -local github.com/elastic .
 
 // ------
 // SQS interfaces
@@ -38,21 +39,10 @@ import (
 const s3RequestURLMetadataKey = `x-beat-s3-request-url`
 
 type sqsAPI interface {
-	sqsReceiver
-	sqsDeleter
-	sqsVisibilityChanger
-}
-
-type sqsReceiver interface {
 	ReceiveMessage(ctx context.Context, maxMessages int) ([]types.Message, error)
-}
-
-type sqsDeleter interface {
 	DeleteMessage(ctx context.Context, msg *types.Message) error
-}
-
-type sqsVisibilityChanger interface {
 	ChangeMessageVisibility(ctx context.Context, msg *types.Message, timeout time.Duration) error
+	GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error)
 }
 
 type sqsProcessor interface {
@@ -60,7 +50,7 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *types.Message) error
+	ProcessSQS(ctx context.Context, msg *types.Message, eventCallback func(e beat.Event)) sqsProcessingResult
 }
 
 // ------
@@ -74,12 +64,12 @@ type s3API interface {
 }
 
 type s3Getter interface {
-	GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error)
+	GetObject(ctx context.Context, region, bucket, key string) (*s3.GetObjectOutput, error)
 }
 
 type s3Mover interface {
-	CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error)
-	DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error)
+	CopyObject(ctx context.Context, region, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error)
+	DeleteObject(ctx context.Context, region, bucket, key string) (*s3.DeleteObjectOutput, error)
 }
 
 type s3Lister interface {
@@ -95,25 +85,18 @@ type s3ObjectHandlerFactory interface {
 	// Create returns a new s3ObjectHandler that can be used to process the
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
-	Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
+	Create(ctx context.Context, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {
 	// ProcessS3Object downloads the S3 object, parses it, creates events, and
-	// publishes them. It returns when processing finishes or when it encounters
-	// an unrecoverable error. It does not wait for the events to be ACKed by
-	// the publisher before returning (use eventACKTracker's Wait() method to
-	// determine this).
-	ProcessS3Object() error
+	// passes to the given callback. It returns when processing finishes or
+	// when it encounters an unrecoverable error.
+	ProcessS3Object(log *logp.Logger, eventCallback func(e beat.Event)) error
 
 	// FinalizeS3Object finalizes processing of an S3 object after the current
 	// batch is finished.
 	FinalizeS3Object() error
-
-	// Wait waits for every event published by ProcessS3Object() to be ACKed
-	// by the publisher before returning. Internally it uses the
-	// s3ObjectHandler eventACKTracker's Wait() method
-	Wait()
 }
 
 // ------
@@ -138,7 +121,7 @@ func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]type
 		MaxNumberOfMessages: int32(min(maxMessages, sqsMaxNumberOfMessagesLimit)),
 		VisibilityTimeout:   int32(a.visibilityTimeout.Seconds()),
 		WaitTimeSeconds:     int32(a.longPollWaitTime.Seconds()),
-		AttributeNames:      []types.QueueAttributeName{sqsApproximateReceiveCountAttribute},
+		AttributeNames:      []types.QueueAttributeName{sqsApproximateReceiveCountAttribute, sqsSentTimestampAttribute},
 	})
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
@@ -197,16 +180,48 @@ func (a *awsSQSAPI) ChangeMessageVisibility(ctx context.Context, msg *types.Mess
 	return nil
 }
 
+func (a *awsSQSAPI) GetQueueAttributes(ctx context.Context, attr []types.QueueAttributeName) (map[string]string, error) {
+	ctx, cancel := context.WithTimeout(ctx, a.apiTimeout)
+	defer cancel()
+
+	attributeOutput, err := a.client.GetQueueAttributes(ctx, &sqs.GetQueueAttributesInput{
+		AttributeNames: attr,
+		QueueUrl:       awssdk.String(a.queueURL),
+	})
+
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			err = fmt.Errorf("api_timeout exceeded: %w", err)
+		}
+		return nil, fmt.Errorf("sqs GetQueueAttributes failed: %w", err)
+	}
+
+	return attributeOutput.Attributes, nil
+}
+
 // ------
 // AWS S3 implementation
 // ------
 
 type awsS3API struct {
 	client *s3.Client
+
+	// others is the set of other clients referred
+	// to by notifications seen by the API connection.
+	// The number of cached elements is limited to
+	// awsS3APIcacheMax.
+	mu     sync.RWMutex
+	others map[string]*s3.Client
 }
 
-func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectOutput, error) {
-	getObjectOutput, err := a.client.GetObject(ctx, &s3.GetObjectInput{
+const awsS3APIcacheMax = 100
+
+func newAWSs3API(cli *s3.Client) *awsS3API {
+	return &awsS3API{client: cli, others: make(map[string]*s3.Client)}
+}
+
+func (a *awsS3API) GetObject(ctx context.Context, region, bucket, key string) (*s3.GetObjectOutput, error) {
+	getObjectOutput, err := a.clientFor(region).GetObject(ctx, &s3.GetObjectInput{
 		Bucket: awssdk.String(bucket),
 		Key:    awssdk.String(key),
 	}, s3.WithAPIOptions(
@@ -238,8 +253,8 @@ func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetOb
 	return getObjectOutput, nil
 }
 
-func (a *awsS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
-	copyObjectOutput, err := a.client.CopyObject(ctx, &s3.CopyObjectInput{
+func (a *awsS3API) CopyObject(ctx context.Context, region, from_bucket, to_bucket, from_key, to_key string) (*s3.CopyObjectOutput, error) {
+	copyObjectOutput, err := a.clientFor(region).CopyObject(ctx, &s3.CopyObjectInput{
 		Bucket:     awssdk.String(to_bucket),
 		CopySource: awssdk.String(fmt.Sprintf("%s/%s", from_bucket, from_key)),
 		Key:        awssdk.String(to_key),
@@ -250,8 +265,8 @@ func (a *awsS3API) CopyObject(ctx context.Context, from_bucket, to_bucket, from_
 	return copyObjectOutput, nil
 }
 
-func (a *awsS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.DeleteObjectOutput, error) {
-	deleteObjectOutput, err := a.client.DeleteObject(ctx, &s3.DeleteObjectInput{
+func (a *awsS3API) DeleteObject(ctx context.Context, region, bucket, key string) (*s3.DeleteObjectOutput, error) {
+	deleteObjectOutput, err := a.clientFor(region).DeleteObject(ctx, &s3.DeleteObjectInput{
 		Bucket: awssdk.String(bucket),
 		Key:    awssdk.String(key),
 	})
@@ -259,6 +274,49 @@ func (a *awsS3API) DeleteObject(ctx context.Context, bucket, key string) (*s3.De
 		return nil, fmt.Errorf("s3 DeleteObject failed: %w", err)
 	}
 	return deleteObjectOutput, nil
+}
+
+func (a *awsS3API) clientFor(region string) *s3.Client {
+	// Conditionally replace the client if the region of
+	// the request does not match the pre-prepared client.
+	opts := a.client.Options()
+	if region == "" || opts.Region == region {
+		return a.client
+	}
+	// Use a cached client if we have already seen this region.
+	a.mu.RLock()
+	cli, ok := a.others[region]
+	a.mu.RUnlock()
+	if ok {
+		return cli
+	}
+
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// Check that another writer did not beat us here.
+	cli, ok = a.others[region]
+	if ok {
+		// ... they did.
+		return cli
+	}
+
+	// Otherwise create a new client and cache it.
+	opts.Region = region
+	cli = s3.New(opts)
+	// We should never be in the situation that the cache
+	// grows unbounded, but ensure this is the case.
+	if len(a.others) >= awsS3APIcacheMax {
+		// Do a single iteration delete to perform a
+		// random cache eviction.
+		for r := range a.others {
+			delete(a.others, r)
+			break
+		}
+	}
+	a.others[region] = cli
+
+	return cli
 }
 
 func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {

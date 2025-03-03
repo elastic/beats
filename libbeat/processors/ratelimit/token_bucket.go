@@ -18,15 +18,15 @@
 package ratelimit
 
 import (
+	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/go-concert/unison"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -50,7 +50,7 @@ type tokenBucket struct {
 	gc struct {
 		thresholds tokenBucketGCConfig
 		metrics    struct {
-			numCalls atomic.Uint
+			numCalls atomic.Uint64
 		}
 	}
 
@@ -83,7 +83,7 @@ func newTokenBucket(config algoConfig) (algorithm, error) {
 	}
 
 	if err := config.config.Unpack(&cfg); err != nil {
-		return nil, errors.Wrap(err, "could not unpack token_bucket algorithm configuration")
+		return nil, fmt.Errorf("could not unpack token_bucket algorithm configuration: %w", err)
 	}
 
 	return &tokenBucket{
@@ -93,7 +93,7 @@ func newTokenBucket(config algoConfig) (algorithm, error) {
 		gc: struct {
 			thresholds tokenBucketGCConfig
 			metrics    struct {
-				numCalls atomic.Uint
+				numCalls atomic.Uint64
 			}
 		}{
 			thresholds: tokenBucketGCConfig{
@@ -112,7 +112,7 @@ func (t *tokenBucket) IsAllowed(key uint64) bool {
 	b := t.getBucket(key)
 	allowed := b.withdraw()
 
-	t.gc.metrics.numCalls.Inc()
+	t.gc.metrics.numCalls.Add(1)
 	return allowed
 }
 
@@ -126,6 +126,7 @@ func (t *tokenBucket) getBucket(key uint64) *bucket {
 		tokens:        t.depth,
 		lastReplenish: t.clock.Now(),
 	})
+	//nolint:errcheck // ignore
 	b := v.(*bucket)
 
 	if exists {
@@ -154,7 +155,7 @@ func (b *bucket) replenish(rate rate, clock clockwork.Clock) {
 
 func (t *tokenBucket) runGC() {
 	// Don't run GC if thresholds haven't been crossed.
-	if t.gc.metrics.numCalls.Load() < t.gc.thresholds.NumCalls {
+	if t.gc.metrics.numCalls.Load() < uint64(t.gc.thresholds.NumCalls) {
 		return
 	}
 
@@ -171,7 +172,9 @@ func (t *tokenBucket) runGC() {
 		toDelete := make([]uint64, 0)
 		numBucketsBefore := 0
 		t.buckets.Range(func(k, v interface{}) bool {
+			//nolint:errcheck // ignore
 			key := k.(uint64)
+			//nolint:errcheck // ignore
 			b := v.(*bucket)
 
 			b.replenish(t.limit, t.clock)
@@ -190,9 +193,9 @@ func (t *tokenBucket) runGC() {
 		}
 
 		// Reset GC metrics
-		t.gc.metrics.numCalls = atomic.MakeUint(0)
+		t.gc.metrics.numCalls = atomic.Uint64{}
 
-		gcDuration := time.Now().Sub(gcStartTime)
+		gcDuration := time.Since(gcStartTime)
 		numBucketsDeleted := len(toDelete)
 		numBucketsAfter := numBucketsBefore - numBucketsDeleted
 		t.logger.Debugf("gc duration: %v, buckets: (before: %v, deleted: %v, after: %v)",

@@ -12,13 +12,14 @@ import (
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
-	"github.com/golang/protobuf/ptypes/duration"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	cloudresourcemanager "google.golang.org/api/cloudresourcemanager/v1"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -50,7 +51,7 @@ type MetricSet struct {
 	MetricsConfig []metricsConfig `config:"metrics" validate:"nonzero,required"`
 }
 
-//metricsConfig holds a configuration specific for metrics metricset.
+// metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
 	ServiceName string `config:"service"  validate:"required"`
 	// ServiceMetricPrefix allows to specify the prefix string for MetricTypes
@@ -102,20 +103,23 @@ type config struct {
 	Zone                string   `config:"zone"`
 	Region              string   `config:"region"`
 	Regions             []string `config:"regions"`
+	LocationLabel       string   `config:"location_label"`
 	ProjectID           string   `config:"project_id" validate:"required"`
 	ExcludeLabels       bool     `config:"exclude_labels"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
 	CredentialsJSON     string   `config:"credentials_json"`
+	Endpoint            string   `config:"endpoint"`
 
-	opt    []option.ClientOption
-	period *duration.Duration
+	opt              []option.ClientOption
+	period           *durationpb.Duration
+	organizationID   string
+	organizationName string
+	projectName      string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The gcp '%s' metricset is beta.", MetricsetName)
-
 	m := &MetricSet{BaseMetricSet: base}
 
 	if err := base.Module().UnpackConfig(&m.config); err != nil {
@@ -142,16 +146,28 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return m, fmt.Errorf("no credentials_file_path or credentials_json specified")
 	}
 
-	m.config.period = &duration.Duration{
+	if m.config.Endpoint != "" {
+		m.Logger().Warnf("You are using a custom endpoint '%s' for the GCP API calls.", m.config.Endpoint)
+		m.config.opt = append(m.config.opt, option.WithEndpoint(m.config.Endpoint))
+	}
+
+	m.config.period = &durationpb.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
 
 	if err := validatePeriodForGCP(m.Module().Config().Period); err != nil {
-		return nil, err
+		m.Logger().Warnf("Period has been set to default value of 60s: %s", err)
+		m.config.period = &durationpb.Duration{
+			Seconds: int64(gcp.MonitoringMetricsSamplingRate),
+		}
 	}
 
 	// Get ingest delay and sample period for each metric type
 	ctx := context.Background()
+	// set organization id
+	if errs := m.setOrgAndProjectDetails(ctx); errs != nil {
+		m.Logger().Warnf("error occurred while fetching organization and project details: %s", errs)
+	}
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Stackdriver client: %w", err)
@@ -185,65 +201,50 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		for _, v := range sdc.MetricTypes {
 			metricsToCollect[sdc.AddPrefixTo(v)] = m.metricsMeta[sdc.AddPrefixTo(v)]
 		}
-		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
+
+		// Collect time series values from Google Cloud Monitoring API
+		timeSeries, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
 			err = fmt.Errorf("error trying to get metrics for project '%s' and zone '%s' or region '%s': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
 			m.Logger().Error(err)
 			return err
 		}
 
-		events, err := m.eventMapping(ctx, responses, sdc)
+		events, err := m.mapToEvents(ctx, timeSeries, sdc)
 		if err != nil {
-			err = fmt.Errorf("eventMapping failed: %w", err)
+			err = fmt.Errorf("mapToEvents failed: %w", err)
 			m.Logger().Error(err)
 			return err
 		}
 
+		// Publish events to Elasticsearch
 		m.Logger().Debugf("Total %d of events are created for service name = %s and metric type = %s.", len(events), sdc.ServiceName, sdc.MetricTypes)
 		for _, event := range events {
 			reporter.Event(event)
 		}
 	}
+
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
-	e := newIncomingFieldExtractor(m.Logger(), sdc)
+// mapToEvents maps time series data from GCP into events for Elasticsearch.
+func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
+	mapper := newIncomingFieldMapper(m.Logger(), sdc)
 
-	var gcpService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
+	var metadataService gcp.MetadataService
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
+		if metadataService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
 			return nil, fmt.Errorf("error trying to create metadata service: %w", err)
 		}
 	}
 
-	tsGrouped := m.timeSeriesGrouped(ctx, gcpService, tss, e)
+	// Group the time series values by common traits.
+	timeSeriesGroups := m.groupTimeSeries(ctx, timeSeries, metadataService, mapper)
 
-	//Create single events for each group of data that matches some common patterns like labels and timestamp
-	events := make([]mb.Event, 0)
-	for _, groupedEvents := range tsGrouped {
-		event := mb.Event{
-			Timestamp: groupedEvents[0].Timestamp,
-			ModuleFields: mapstr.M{
-				"labels": groupedEvents[0].Labels,
-			},
-			MetricSetFields: mapstr.M{},
-		}
-
-		for _, singleEvent := range groupedEvents {
-			_, _ = event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
-		}
-
-		if sdc.ServiceName == "compute" {
-			event.RootFields = addHostFields(groupedEvents)
-		} else {
-			event.RootFields = groupedEvents[0].ECS
-		}
-
-		events = append(events, event)
-	}
+	// Create single events for each time series group.
+	events := createEventsFromGroups(sdc.ServiceName, timeSeriesGroups)
 
 	return events, nil
 }
@@ -366,4 +367,62 @@ func addHostFields(groupedEvents []KeyValuePoint) mapstr.M {
 		}
 	}
 	return hostRootFields
+}
+
+func (m *MetricSet) setOrgAndProjectDetails(ctx context.Context) []error {
+	var errs []error
+
+	// Initialize the Cloud Resource Manager service
+	srv, err := cloudresourcemanager.NewService(ctx, m.config.opt...)
+	if err != nil {
+		errs = append(errs, fmt.Errorf("failed to create cloudresourcemanager service: %w", err))
+		return errs
+	}
+	// Set Project name
+	err = m.setProjectDetails(ctx, srv)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	//Set Organization Details
+	err = m.setOrganizationDetails(ctx, srv)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	return errs
+}
+
+func (m *MetricSet) setProjectDetails(ctx context.Context, service *cloudresourcemanager.Service) error {
+	project, err := service.Projects.Get(m.config.ProjectID).Context(ctx).Do()
+	if err != nil {
+		return fmt.Errorf("failed to get project name: %w", err)
+	}
+	if project != nil {
+		m.config.projectName = project.Name
+	}
+	return nil
+}
+
+func (m *MetricSet) setOrganizationDetails(ctx context.Context, service *cloudresourcemanager.Service) error {
+	// Get the project ancestor details
+	ancestryResponse, err := service.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Context(ctx).Do()
+	if err != nil {
+		return fmt.Errorf("failed to get project ancestors: %w", err)
+	}
+	if len(ancestryResponse.Ancestor) == 0 {
+		return fmt.Errorf("no ancestors found for project '%s'", m.config.ProjectID)
+	}
+	ancestor := ancestryResponse.Ancestor[len(ancestryResponse.Ancestor)-1]
+
+	if ancestor.ResourceId.Type == "organization" {
+		m.config.organizationID = ancestor.ResourceId.Id
+		orgReq := service.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.organizationID))
+
+		orgDetails, err := orgReq.Context(ctx).Do()
+		if err != nil {
+			return fmt.Errorf("failed to get organization details: %w", err)
+		}
+
+		m.config.organizationName = orgDetails.DisplayName
+	}
+	return nil
 }

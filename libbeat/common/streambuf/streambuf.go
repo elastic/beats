@@ -155,7 +155,9 @@ func (b *Buffer) doAppend(data []byte, retainable bool, newCap int) error {
 				b.data = tmp
 			}
 		}
-		b.data = append(b.data, data...)
+		tBuf := bytes.NewBuffer(b.data)
+		tBuf.Write(data)
+		b.data = tBuf.Bytes()
 	}
 	b.available += len(data)
 

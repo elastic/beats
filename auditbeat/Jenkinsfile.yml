@@ -30,6 +30,24 @@ stages:
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
+    integTest:
+        mage: "mage build integTest"
+        when:
+            comments:
+                - "/test auditbeat integTest"
+            branches: false
+            tags: false
+        stage: extended
+    integTest-arm:
+        mage: "mage build integTest"
+        platforms:
+          - "ubuntu-2204-aarch64"
+        when:
+            comments:
+                - "/test auditbeat integTest arm"
+            branches: false
+            tags: false
+        stage: extended
     crosscompile:
         make: "make -C auditbeat crosscompile"
         stage: mandatory
@@ -60,6 +78,11 @@ stages:
 #                 - "macosM1Test"
 #             tags: false         ## for all the tags
 #         stage: extended
+    rhel-9:
+        mage: "mage build unitTest"
+        platforms:             ## override default labels in this specific stage.
+            - "rhel-9"
+        stage: mandatory
     windows-2022:
         mage: "mage build unitTest"
         platforms:             ## override default labels in this specific stage.

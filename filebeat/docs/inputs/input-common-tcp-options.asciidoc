@@ -17,6 +17,12 @@ The maximum size of the message received over TCP. The default is `20MiB`.
 The host and TCP port to listen on for event streams.
 
 [float]
+[id="{beatname_lc}-input-{type}-tcp-network"]
+==== `network`
+
+The network type. Acceptable values are: "tcp" (default), "tcp4", "tcp6"
+
+[float]
 [id="{beatname_lc}-input-{type}-tcp-framing"]
 ==== `framing`
 

@@ -23,6 +23,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -56,6 +59,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -89,6 +95,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -122,6 +131,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -155,6 +167,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -188,6 +203,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -221,6 +239,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -254,6 +275,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -287,6 +311,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -320,6 +347,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -353,6 +383,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -386,6 +419,9 @@
         "oracle.database_audit.session_id": "0",
         "oracle.database_audit.status": "0",
         "process.pid": "24705",
+        "related.hosts": [
+            "testlab.local"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",

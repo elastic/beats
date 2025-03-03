@@ -7,8 +7,11 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	packetbeatCmd "github.com/elastic/beats/v7/packetbeat/cmd"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
@@ -20,6 +23,9 @@ import (
 
 	// This registers the Npcap installer on Windows.
 	_ "github.com/elastic/beats/v7/x-pack/packetbeat/npcap"
+
+	// Enable pipelines.
+	_ "github.com/elastic/beats/v7/x-pack/packetbeat/module"
 )
 
 // Name of this beat.
@@ -32,8 +38,7 @@ var RootCmd *cmd.BeatsRootCmd
 // configuration generated from a raw Elastic Agent config
 func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) ([]*reload.ConfigWithMeta, error) {
 	//grab and properly format the input streams
-	procs := defaultProcessors()
-	inputStreams, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo, procs...)
+	inputStreams, err := management.CreateInputsFromStreams(rawIn, "logs", agentInfo)
 	if err != nil {
 		return nil, fmt.Errorf("error generating new stream config: %w", err)
 	}
@@ -52,12 +57,18 @@ func packetbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo)
 }
 
 func init() {
-	// Register packetbeat with central management to perform any needed config
-	// transformations before agent configs are sent to the beat during reload.
-	management.ConfigTransform.SetTransform(packetbeatCfg)
-	settings := packetbeatCmd.PacketbeatSettings()
+	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
+	if err != nil { // these are hard-coded, shouldn't fail
+		panic(fmt.Errorf("error creating global processors: %w", err))
+	}
+	settings := packetbeatCmd.PacketbeatSettings(globalProcs)
 	settings.ElasticLicensed = true
 	RootCmd = packetbeatCmd.Initialize(settings)
+	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		// Register packetbeat with central management to perform any needed config
+		// transformations before agent configs are sent to the beat during reload.
+		management.ConfigTransform.SetTransform(packetbeatCfg)
+	}
 }
 
 func defaultProcessors() []mapstr.M {

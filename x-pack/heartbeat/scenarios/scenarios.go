@@ -5,54 +5,20 @@
 package scenarios
 
 import (
-	"context"
 	"fmt"
-	"net/http"
 	"net/http/httptest"
 	"net/url"
-	"sync"
 	"testing"
-	"time"
-
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/hbtest"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/scenarios/framework"
 )
 
 var scenarioDB = framework.NewScenarioDB()
 var testWs *httptest.Server
-
-var testWsOnce = &sync.Once{}
-
-// Starting this thing up is expensive, let's just do it once
-func startTestWebserver(t *testing.T) *httptest.Server {
-	testWsOnce.Do(func() {
-		testWs = httptest.NewServer(hbtest.HelloWorldHandler(200))
-		var err error
-		for i := 0; i < 20; i++ {
-			var resp *http.Response
-			req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, testWs.URL, nil)
-			resp, err = http.DefaultClient.Do(req)
-			if err == nil {
-				resp.Body.Close()
-				if resp.StatusCode == 200 {
-					break
-				}
-			}
-
-			time.Sleep(time.Millisecond * 250)
-		}
-
-		if err != nil {
-			require.NoError(t, err, "could not retrieve successful response from test webserver")
-		}
-	})
-
-	return testWs
-}
+var failingTestWs *httptest.Server
 
 // Note, no browser scenarios here, those all go in browserscenarios.go
 // since they have different build tags
@@ -61,9 +27,11 @@ func init() {
 		framework.Scenario{
 			Name: "http-simple",
 			Type: "http",
-			Tags: []string{"lightweight", "http"},
-			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+			Tags: []string{"lightweight", "http", "up"},
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
 				server := startTestWebserver(t)
+				meta.URL, _ = url.Parse(server.URL)
+				meta.Status = monitorstate.StatusUp
 				config = mapstr.M{
 					"id":       "http-test-id",
 					"name":     "http-test-name",
@@ -71,19 +39,41 @@ func init() {
 					"schedule": "@every 1m",
 					"urls":     []string{server.URL},
 				}
-				return config, nil, nil
+				return config, meta, nil, nil
+			},
+		},
+		framework.Scenario{
+			Name: "http-down",
+			Type: "http",
+			Tags: []string{"lightweight", "http", "down"},
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
+				server := startFailingTestWebserver(t)
+				u := server.URL
+				meta.URL, _ = url.Parse(u)
+				meta.Status = monitorstate.StatusDown
+				config = mapstr.M{
+					"id":       "http-test-id",
+					"name":     "http-test-name",
+					"type":     "http",
+					"schedule": "@every 1m",
+					"urls":     []string{u},
+				}
+				return config, meta, nil, nil
 			},
 		},
 		framework.Scenario{
 			Name: "tcp-simple",
 			Type: "tcp",
-			Tags: []string{"lightweight", "tcp"},
-			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+			Tags: []string{"lightweight", "tcp", "up"},
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
 				server := startTestWebserver(t)
 				parsedUrl, err := url.Parse(server.URL)
 				if err != nil {
 					panic(fmt.Sprintf("URL %s should always be parsable: %s", server.URL, err))
 				}
+				parsedUrl.Scheme = "tcp"
+				meta.URL = parsedUrl
+				meta.Status = monitorstate.StatusUp
 				config = mapstr.M{
 					"id":       "tcp-test-id",
 					"name":     "tcp-test-name",
@@ -91,21 +81,44 @@ func init() {
 					"schedule": "@every 1m",
 					"hosts":    []string{parsedUrl.Host}, // Host includes host:port
 				}
-				return config, nil, nil
+				return config, meta, nil, nil
+			},
+		},
+		framework.Scenario{
+			Name: "tcp-down",
+			Type: "tcp",
+			Tags: []string{"lightweight", "tcp", "down"},
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
+				// This ip should never route anywhere
+				// see https://stackoverflow.com/questions/528538/non-routable-ip-address
+				parsedUrl, _ := url.Parse("tcp://192.0.2.0:8282")
+				parsedUrl.Scheme = "tcp"
+				meta.URL = parsedUrl
+				meta.Status = monitorstate.StatusDown
+				config = mapstr.M{
+					"id":       "tcp-test-id",
+					"name":     "tcp-test-name",
+					"type":     "tcp",
+					"schedule": "@every 1m",
+					"hosts":    []string{parsedUrl.Host}, // Host includes host:port
+				}
+				return config, meta, nil, nil
 			},
 		},
 		framework.Scenario{
 			Name: "simple-icmp",
 			Type: "icmp",
-			Tags: []string{"icmp"},
-			Runner: func(t *testing.T) (config mapstr.M, close func(), err error) {
+			Tags: []string{"icmp", "up"},
+			Runner: func(t *testing.T) (config mapstr.M, meta framework.ScenarioRunMeta, close func(), err error) {
+				meta.URL, _ = url.Parse("icp://127.0.0.1")
+				meta.Status = monitorstate.StatusUp
 				return mapstr.M{
 					"id":       "icmp-test-id",
 					"name":     "icmp-test-name",
 					"type":     "icmp",
 					"schedule": "@every 1m",
 					"hosts":    []string{"127.0.0.1"},
-				}, func() {}, nil
+				}, meta, nil, nil
 			},
 		},
 	)

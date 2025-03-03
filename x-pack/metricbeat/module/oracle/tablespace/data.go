@@ -6,55 +6,55 @@ package tablespace
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 // extract is the E of a ETL processing. Gets the data files, used/free space and temp free space data that is fetch
 // by doing queries to Oracle
-func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (out *extractedData, err error) {
-	out = &extractedData{}
+func (m *MetricSet) extract(ctx context.Context, extractor tablespaceExtractMethods) (*extractedData, error) {
+	out := &extractedData{}
+	var err error
 
 	if out.dataFiles, err = extractor.dataFilesData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting data_files")
+		return nil, fmt.Errorf("error getting data_files: %w", err)
 	}
 
 	if out.tempFreeSpace, err = extractor.tempFreeSpaceData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting temp_free_space")
+		return nil, fmt.Errorf("error getting temp_free_space: %w", err)
 	}
 
 	if out.freeSpace, err = extractor.usedAndFreeSpaceData(ctx); err != nil {
-		return nil, errors.Wrap(err, "error getting free space data")
+		return nil, fmt.Errorf("error getting free space data: %w", err)
 	}
 
-	return
+	return out, nil
 }
 
 // transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
 // to create a Kibana/Elasticsearch friendly JSON. Data from Oracle is pretty fragmented by design so a lot of data
 // was necessary. Data is organized by Tablespace entity (Tablespaces might contain one or more data files)
-func (m *MetricSet) transform(in *extractedData) (out map[string]mapstr.M) {
-	out = make(map[string]mapstr.M, 0)
+func (m *MetricSet) transform(in *extractedData) map[string]mapstr.M {
+	out := make(map[string]mapstr.M, 0)
 
-	for _, dataFile := range in.dataFiles {
-		m.addDataFileData(&dataFile, out)
+	for i := range in.dataFiles {
+		m.addDataFileData(&in.dataFiles[i], out)
 	}
 
 	m.addUsedAndFreeSpaceData(in.freeSpace, out)
 	m.addTempFreeSpaceData(in.tempFreeSpace, out)
 
-	return
+	return out
 }
 
 func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error) {
 	extractedMetricsData, err := m.extract(ctx, m.extractor)
 	if err != nil {
-		return nil, errors.Wrap(err, "error extracting data")
+		return nil, fmt.Errorf("error extracting data: %w", err)
 	}
 
 	out := m.transform(extractedMetricsData)
@@ -79,7 +79,7 @@ func (m *MetricSet) addTempFreeSpaceData(tempFreeSpaces []tempFreeSpace, out map
 		name := val.(string)
 		if name == "TEMP" {
 			for _, tempFreeSpaceTable := range tempFreeSpaces {
-				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.TablespaceSize})
+				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.TotalSpaceBytes})
 				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.UsedSpaceBytes})
 				oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{NullInt64: tempFreeSpaceTable.FreeSpace})
 			}
@@ -102,6 +102,7 @@ func (m *MetricSet) addUsedAndFreeSpaceData(freeSpaces []usedAndFreeSpace, out m
 				if name == freeSpaceTable.TablespaceName {
 					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.free.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalFreeBytes})
 					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.used.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalUsedBytes})
+					oracle.SetSqlValueWithParentKey(m.Logger(), out, key, "space.total.bytes", &oracle.Int64Value{NullInt64: freeSpaceTable.TotalSpaceBytes})
 				}
 			}
 		}

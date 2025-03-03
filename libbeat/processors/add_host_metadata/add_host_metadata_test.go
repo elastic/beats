@@ -19,7 +19,10 @@ package add_host_metadata
 
 import (
 	"fmt"
+	"net"
+	"os"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
 
@@ -27,9 +30,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/features"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
+
+	"github.com/foxcpp/go-mockdns"
 )
 
 var (
@@ -466,4 +472,140 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 			assert.Equal(t, c.expectedSkip, skip)
 		})
 	}
+}
+
+func TestFQDNEventSync(t *testing.T) {
+	hostname, err := os.Hostname()
+	require.NoError(t, err)
+	srv, _ := mockdns.NewServer(map[string]mockdns.Zone{
+		hostname + ".": {
+			CNAME: "foo.bar.baz.",
+		},
+		"foo.bar.baz.": {
+			A: []string{"1.1.1.1"},
+		},
+	}, false)
+	defer srv.Close()
+
+	srv.PatchNet(net.DefaultResolver)
+	defer mockdns.UnpatchNet(net.DefaultResolver)
+
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+		"cache.ttl": "5m",
+	})
+
+	// Start with FQDN off
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": false,
+	}))
+	require.NoError(t, err)
+
+	p, err := New(testConfig)
+	require.NoError(t, err)
+
+	// update
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": true,
+	}))
+	require.NoError(t, err)
+
+	t.Logf("updated FQDN")
+
+	// run a number of events, make sure none have wrong hostname.
+	checkWait := sync.WaitGroup{}
+	for i := 0; i < 10; i++ {
+		checkWait.Add(1)
+		go func() {
+			resp, err := p.Run(&beat.Event{
+				Fields: mapstr.M{},
+			})
+			require.NoError(t, err)
+			name, err := resp.Fields.GetValue("host.name")
+			require.NoError(t, err)
+			require.Equal(t, "foo.bar.baz", name)
+			checkWait.Done()
+		}()
+	}
+	t.Logf("Waiting for runners to return...")
+	checkWait.Wait()
+}
+
+func TestFQDNLookup(t *testing.T) {
+	hostname, err := os.Hostname()
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		cnameLookupResult             string
+		expectedHostName              string
+		expectedFQDNLookupFailedCount int64
+	}{
+		"lookup_succeeds": {
+			cnameLookupResult:             "example.com.",
+			expectedHostName:              "example.com",
+			expectedFQDNLookupFailedCount: 0,
+		},
+		"lookup_fails": {
+			cnameLookupResult:             "",
+			expectedHostName:              hostname,
+			expectedFQDNLookupFailedCount: 1,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			// Mock CNAME resolution
+			srv, _ := mockdns.NewServer(map[string]mockdns.Zone{
+				hostname + ".": {
+					CNAME: test.cnameLookupResult,
+				},
+				test.cnameLookupResult: {
+					A: []string{"1.1.1.1"},
+				},
+			}, false)
+			defer srv.Close()
+
+			srv.PatchNet(net.DefaultResolver)
+			defer mockdns.UnpatchNet(net.DefaultResolver)
+
+			// Enable FQDN feature flag
+			err = features.UpdateFromConfig(fqdnFeatureFlagConfig(true))
+			require.NoError(t, err)
+			defer func() {
+				err = features.UpdateFromConfig(fqdnFeatureFlagConfig(true))
+				require.NoError(t, err)
+			}()
+
+			// Create processor and check that FQDN lookup failed
+			testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
+			require.NoError(t, err)
+
+			p, err := New(testConfig)
+			require.NoError(t, err)
+
+			addHostMetadataP, ok := p.(*addHostMetadata)
+			require.True(t, ok)
+			require.Equal(t, test.expectedFQDNLookupFailedCount, addHostMetadataP.metrics.FQDNLookupFailed.Get())
+			// reset so next run is correct, registry is global
+			addHostMetadataP.metrics.FQDNLookupFailed.Set(0)
+
+			// Run event through processor and check that hostname reported
+			// by processor is same as OS-reported hostname
+			event := &beat.Event{
+				Fields:    mapstr.M{},
+				Timestamp: time.Now(),
+			}
+			newEvent, err := p.Run(event)
+			require.NoError(t, err)
+
+			v, err := newEvent.GetValue("host.name")
+			require.NoError(t, err)
+			require.Equal(t, test.expectedHostName, v)
+		})
+	}
+}
+
+func fqdnFeatureFlagConfig(fqdnEnabled bool) *conf.C {
+	return conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": fqdnEnabled,
+	})
 }

@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/go-autorest/autorest/date"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,8 +22,8 @@ func TestMetricExists(t *testing.T) {
 		Time: date1,
 	}
 	var name = "Requests"
-	insightValue := insights.MetricValue{
-		TimeStamp: &stamp,
+	insightValue := armmonitor.MetricValue{
+		TimeStamp: &stamp.Time,
 		Average:   &fl,
 		Minimum:   &fl1,
 		Maximum:   nil,
@@ -77,9 +77,15 @@ func TestMatchMetrics(t *testing.T) {
 		Values:       []MetricValue{},
 		TimeGrain:    "1PM",
 	}
+	// match
 	result := matchMetrics(prev, current)
 	assert.True(t, result)
+	// different resourceId, not match
 	current.ResourceId = "id1"
+	result = matchMetrics(prev, current)
+	assert.False(t, result)
+	// different dimension, not match
+	current.Dimensions = []Dimension{{Name: "location", Value: "East Europe"}}
 	result = matchMetrics(prev, current)
 	assert.False(t, result)
 }
@@ -90,8 +96,8 @@ func TestMetricIsEmpty(t *testing.T) {
 	stamp := date.Time{
 		Time: time.Date(2019, 12, 12, 12, 12, 12, 12, &location),
 	}
-	insightValue := insights.MetricValue{
-		TimeStamp: &stamp,
+	insightValue := armmonitor.MetricValue{
+		TimeStamp: &stamp.Time,
 		Average:   &fl,
 		Minimum:   nil,
 		Maximum:   nil,
@@ -129,36 +135,6 @@ func TestCompareMetricValues(t *testing.T) {
 	val2 = &float1
 	result = compareMetricValues(val1, val2)
 	assert.True(t, result)
-}
-
-func TestGetDimension(t *testing.T) {
-	dimension := "VMName"
-	dim1 := "SlotID"
-	dim2 := "VNU"
-	dim3 := "VMName"
-	dimensionList := []Dimension{
-		{
-			Name:  dim1,
-			Value: dim1,
-		},
-		{
-			Name:  dim2,
-			Value: dim2,
-		},
-		{
-			Name:  dim3,
-			Value: dim3,
-		},
-	}
-	result, ok := getDimension(dimension, dimensionList)
-	assert.True(t, ok)
-	assert.Equal(t, result.Name, dim3)
-	assert.Equal(t, result.Value, dim3)
-	dimension = "VirtualMachine"
-	result, ok = getDimension(dimension, dimensionList)
-	assert.False(t, ok)
-	assert.Equal(t, result.Name, "")
-	assert.Equal(t, result.Value, "")
 }
 
 func TestContainsResource(t *testing.T) {

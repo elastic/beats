@@ -16,17 +16,17 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package template
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -39,14 +39,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-}
 
 type testTemplate struct {
 	t      *testing.T
@@ -66,13 +63,19 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
 	client := getTestingElasticsearch(t)
-	if err := client.Connect(); err != nil {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
 		t.Fatal(err)
 	}
-	s := testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
-	client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
+	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
+	loader, err := NewESLoader(client, handler)
+	require.NoError(t, err)
+	s := testSetup{t: t, client: client, loader: loader, config: cfg}
+	// don't care if the cleanup fails, since they might just return a 404
+	_, _, _ = client.Request("DELETE", "/_data_stream/"+cfg.Name, "", nil, nil)
 	s.requireDataStreamDoesNotExist("")
-	client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_index_template/"+cfg.Name, "", nil, nil)
 	s.requireTemplateDoesNotExist("")
 	return &s
 }
@@ -82,14 +85,10 @@ func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig)
 	if cfg.Name == "" {
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
-	return &testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
-}
-
-func (ts *testSetup) mustLoadTemplate(body map[string]interface{}) {
-	ts.t.Helper()
-	err := ts.loader.loadTemplate(ts.config.Name, body)
-	require.NoError(ts.t, err)
-	ts.requireTemplateExists("")
+	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
+	loader, err := NewESLoader(client, handler)
+	require.NoError(t, err)
+	return &testSetup{t: t, client: client, loader: loader, config: cfg}
 }
 
 func (ts *testSetup) loadFromFile(fileElems []string) error {
@@ -123,12 +122,14 @@ func (ts *testSetup) requireTemplateExists(name string) {
 }
 
 func (ts *testSetup) cleanupDataStream(name string) {
-	ts.client.Request("DELETE", "/_data_stream/"+name, "", nil, nil)
+	_, _, err := ts.client.Request("DELETE", "/_data_stream/"+name, "", nil, nil)
+	require.NoError(ts.t, err)
 	ts.requireDataStreamDoesNotExist(name)
 }
 
 func (ts *testSetup) cleanupTemplate(name string) {
-	ts.client.Request("DELETE", "/_index_template/"+name, "", nil, nil)
+	_, _, err := ts.client.Request("DELETE", "/_index_template/"+name, "", nil, nil)
+	require.NoError(ts.t, err)
 	ts.requireTemplateDoesNotExist(name)
 }
 
@@ -173,6 +174,7 @@ func (ts *testSetup) requireTestEventPresent() string {
 
 	var resp eslegclient.SearchResults
 	err = json.Unmarshal(b, &resp)
+	require.NoError(ts.t, err)
 	require.Equal(ts.t, 1, resp.Hits.Total.Value, "the test event must be returned")
 
 	idx := struct {
@@ -188,7 +190,8 @@ func TestESLoader_Load(t *testing.T) {
 		t.Run("loading disabled", func(t *testing.T) {
 			setup := newTestSetup(t, TemplateConfig{Enabled: false})
 
-			setup.load(nil)
+			err := setup.load(nil)
+			require.NoError(t, err)
 			setup.requireTemplateDoesNotExist("")
 		})
 
@@ -199,15 +202,6 @@ func TestESLoader_Load(t *testing.T) {
 			err := setup.loader.Load(setup.config, beatInfo, nil, false)
 			require.Error(t, err)
 			require.Contains(t, err.Error(), "version is not semver")
-		})
-
-		t.Run("no Elasticsearch client", func(t *testing.T) {
-			setup := newTestSetupWithESClient(t, nil, TemplateConfig{Enabled: true})
-
-			beatInfo := beat.Info{Version: "9.9.9"}
-			err := setup.loader.Load(setup.config, beatInfo, nil, false)
-			require.Error(t, err)
-			require.Contains(t, err.Error(), "can not load template without active Elasticsearch client")
 		})
 
 		t.Run("cannot check template", func(t *testing.T) {
@@ -260,25 +254,28 @@ func TestESLoader_Load(t *testing.T) {
 		setup.config.Settings = TemplateSettings{Source: map[string]interface{}{"enabled": false}}
 
 		t.Run("disabled", func(t *testing.T) {
-			setup.load(nil)
+			err := setup.load(nil)
+			require.NoError(t, err)
 			tmpl := getTemplate(t, setup.client, setup.config.Name)
 			assert.Equal(t, true, tmpl.SourceEnabled())
 		})
 
 		t.Run("enabled", func(t *testing.T) {
 			setup.config.Overwrite = true
-			setup.load(nil)
+			err := setup.load(nil)
+			require.NoError(t, err)
 			tmpl := getTemplate(t, setup.client, setup.config.Name)
 			assert.Equal(t, false, tmpl.SourceEnabled())
 		})
 
 		t.Run("preserve existing data stream even if overwriting templates is allowed", func(t *testing.T) {
-			fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+			fields, err := os.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
 			require.NoError(t, err)
 			setup := newTestSetup(t, TemplateConfig{Enabled: true, Overwrite: true})
 			setup.mustLoad(fields)
 
 			exists, err := setup.loader.checkExistsDatastream(setup.config.Name)
+			require.NoError(t, err)
 			require.True(t, exists, "data stream must exits")
 
 			// send test event before reloading the template
@@ -305,13 +302,14 @@ func TestESLoader_Load(t *testing.T) {
 			Name         string `config:"name"`
 			IsDataStream bool   `config:"data_stream"`
 		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON, IsDataStream: false}
-		setup.load(nil)
+		err := setup.load(nil)
+		require.NoError(t, err)
 		setup.requireTemplateExists(nameJSON)
 		setup.cleanupTemplate(nameJSON)
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
-		fields, err := ioutil.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
+		fields, err := os.ReadFile(path(t, []string{"testdata", "default_fields.yml"}))
 		require.NoError(t, err)
 		for run, data := range map[string]struct {
 			cfg        TemplateConfig
@@ -475,7 +473,8 @@ func TestTemplateWithData(t *testing.T) {
 	setup := newTestSetup(t, TemplateConfig{Enabled: true})
 	setup.mustLoadFromFile([]string{"testdata", "fields.yml"})
 
-	esClient := setup.client.(*eslegclient.Connection)
+	esClient, ok := setup.client.(*eslegclient.Connection)
+	assert.True(t, ok)
 	for _, test := range dataTests {
 		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
 		if test.error {
@@ -499,7 +498,8 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 
 	templates, _ := response.GetValue("index_templates")
 	templatesList, _ := templates.([]interface{})
-	templateElem := templatesList[0].(map[string]interface{})
+	templateElem, ok := templatesList[0].(map[string]interface{})
+	require.True(t, ok)
 
 	return testTemplate{
 		t:      t,
@@ -509,7 +509,7 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 }
 
 func (tt *testTemplate) SourceEnabled() bool {
-	key := fmt.Sprintf("template.mappings._source.enabled")
+	key := "template.mappings._source.enabled"
 
 	// _source.enabled is true if it's missing (default)
 	b, _ := tt.HasKey(key)
@@ -520,7 +520,7 @@ func (tt *testTemplate) SourceEnabled() bool {
 	val, err := tt.GetValue(key)
 	if !assert.NoError(tt.t, err) {
 		doc, _ := json.MarshalIndent(tt.M, "", "    ")
-		tt.t.Fatal(fmt.Sprintf("failed to read '%v' in %s", key, doc))
+		tt.t.Fatalf("failed to read '%v' in %s", key, doc)
 	}
 
 	return val.(bool)
@@ -555,7 +555,9 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 
 	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test
@@ -564,6 +566,22 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	return conn
 }
 
+type mockClientHandler struct {
+	serverless bool
+	mode       lifecycle.Mode
+}
+
+func (cli *mockClientHandler) IsServerless() bool            { return cli.serverless }
+func (cli *mockClientHandler) CheckEnabled() (bool, error)   { return true, nil }
+func (cli *mockClientHandler) Mode() lifecycle.Mode          { return cli.mode }
+func (cli *mockClientHandler) IsElasticsearch() bool         { return true }
+func (cli *mockClientHandler) CheckExists() bool             { return true }
+func (cli *mockClientHandler) PolicyName() string            { return "test" }
+func (cli *mockClientHandler) HasPolicy() (bool, error)      { return false, nil }
+func (cli *mockClientHandler) CreatePolicyFromConfig() error { return nil }
+func (cli *mockClientHandler) Policy() lifecycle.Policy      { return lifecycle.Policy{Name: "test"} }
+func (cli *mockClientHandler) Overwrite() bool               { return true }
+
 func getMockElasticsearchClient(t *testing.T, method, endpoint string, code int, body []byte) *eslegclient.Connection {
 	server := esMock(t, method, endpoint, code, body)
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
@@ -571,7 +589,9 @@ func getMockElasticsearchClient(t *testing.T, method, endpoint string, code int,
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	})
 	require.NoError(t, err)
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	require.NoError(t, err)
 	return conn
 }
@@ -581,14 +601,16 @@ func esMock(t *testing.T, method, endpoint string, code int, body []byte) *httpt
 		if r.URL.Path == "/" {
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(`{"version":{"number":"5.0.0"}}`))
+			_, err := w.Write([]byte(`{"version":{"number":"5.0.0"}}`))
+			require.NoError(t, err)
 			return
 		}
 
 		if r.Method == method && strings.HasPrefix(r.URL.Path, endpoint) {
 			w.WriteHeader(code)
 			w.Header().Set("Content-Type", "application/json")
-			w.Write(body)
+			_, err := w.Write(body)
+			require.NoError(t, err)
 			return
 		}
 
@@ -601,7 +623,8 @@ func esMock(t *testing.T, method, endpoint string, code int, body []byte) *httpt
 		w.WriteHeader(c)
 		if body != nil {
 			w.Header().Set("Content-Type", "application/json")
-			w.Write(body)
+			_, err := w.Write(body)
+			require.NoError(t, err)
 		}
 	}))
 }

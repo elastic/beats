@@ -79,7 +79,13 @@ type TaskMetadata struct {
 	Revision      string       `json:"Revision"`
 	DesiredStatus string       `json:"DesiredStatus"`
 	KnownStatus   string       `json:"KnownStatus"`
+	Limit         Limits       `json:"Limits"`
 	Containers    []*container `json:"Containers"`
+}
+
+// Limits is a struct that represents the memory limit from ${ECS_CONTAINER_METADATA_URI_V4}/task, which is the Hard Memory Limit set in AWS ECS
+type Limits struct {
+	Memory uint64 `json:"Memory"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -131,6 +137,8 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
+	defer taskStatsResp.Body.Close()
+
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	if err != nil {
 		return nil, fmt.Errorf("getTaskStats failed: %w", err)
@@ -145,6 +153,8 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
+	defer taskResp.Body.Close()
+
 	taskOutput, err := getTask(taskResp)
 	if err != nil {
 		return nil, fmt.Errorf("getTask failed: %w", err)

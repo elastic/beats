@@ -15,7 +15,83 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
-// +build !integration
-
 package config
+
+import (
+	"os"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestDefaults(t *testing.T) {
+	cases := []struct {
+		Name      string
+		EnvKey    string
+		EnvVal    string
+		LimitType string
+		LimitVal  int64
+	}{
+		{
+			"Browser monitor override",
+			"SYNTHETICS_LIMIT_BROWSER",
+			"123",
+			"browser",
+			123,
+		},
+		{
+			"Browser default is 2 when other monitor is overridden",
+			"SYNTHETICS_LIMIT_HTTP",
+			"123",
+			"browser",
+			2,
+		},
+		{
+			"Browser default is 2 when nothing is overridden",
+			"FOO",
+			"bar",
+			"browser",
+			2,
+		},
+		{
+			"Browser default is 2 when bad value passed",
+			"SYNTHETICS_LIMIT_BROWSER",
+			"bar",
+			"browser",
+			2,
+		},
+		{
+			"HTTP monitor override",
+			"SYNTHETICS_LIMIT_HTTP",
+			"456",
+			"http",
+			456,
+		},
+		{
+			"TCP monitor override",
+			"SYNTHETICS_LIMIT_TCP",
+			"789",
+			"tcp",
+			789,
+		},
+		{
+			"ICMP monitor override",
+			"SYNTHETICS_LIMIT_ICMP",
+			"911",
+			"icmp",
+			911,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			os.Setenv(c.EnvKey, c.EnvVal)
+			defer os.Unsetenv(c.EnvKey)
+
+			dc := DefaultConfig()
+			require.NotNil(t, dc.Jobs[c.LimitType])
+			assert.Equal(t, dc.Jobs[c.LimitType].Limit, c.LimitVal)
+		})
+	}
+}

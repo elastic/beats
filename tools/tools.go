@@ -26,13 +26,11 @@ import (
 	_ "github.com/magefile/mage"
 	_ "github.com/pierrre/gotestcover"
 	_ "github.com/stretchr/testify/assert"
-	_ "github.com/tsg/go-daemon"
 	_ "golang.org/x/tools/cmd/goimports"
 	_ "golang.org/x/tools/cmd/stringer"
 	_ "gotest.tools/gotestsum/cmd"
 
 	_ "github.com/mitchellh/gox"
-	_ "golang.org/x/lint/golint"
 
 	_ "go.elastic.co/go-licence-detector"
 

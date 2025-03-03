@@ -6,13 +6,12 @@ package cloudsql
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/option"
 	sqladmin "google.golang.org/api/sqladmin/v1"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -20,15 +19,18 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP CloudSQL resource.
-func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
-		projectID: projectID,
-		zone:      zone,
-		region:    region,
-		regions:   regions,
-		opt:       opt,
-		instances: make(map[string]*sqladmin.DatabaseInstance),
-		logger:    logp.NewLogger("metrics-cloudsql"),
+		projectID:        projectID,
+		projectName:      projectName,
+		organizationID:   organizationID,
+		organizationName: organizationName,
+		zone:             zone,
+		region:           region,
+		regions:          regions,
+		opt:              opt,
+		instances:        make(map[string]*sqladmin.DatabaseInstance),
+		logger:           logp.NewLogger("metrics-cloudsql"),
 	}, nil
 }
 
@@ -47,11 +49,14 @@ type cloudsqlMetadata struct {
 }
 
 type metadataCollector struct {
-	projectID string
-	zone      string
-	region    string
-	regions   []string
-	opt       []option.ClientOption
+	projectID        string
+	projectName      string
+	organizationID   string
+	organizationName string
+	zone             string
+	region           string
+	regions          []string
+	opt              []option.ClientOption
 	// NOTE: instances holds data used for all metrics collected in a given period
 	// this avoids calling the remote endpoint for each metric, which would take a long time overall
 	instances map[string]*sqladmin.DatabaseInstance
@@ -92,7 +97,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 		return gcp.MetadataCollectorData{}, err
 	}
 
-	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp)
+	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName, s.projectName)
 
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
@@ -156,24 +161,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 	}
 
 	return cloudsqlMetadata, nil
-}
-
-func (s *metadataCollector) ID(ctx context.Context, in *gcp.MetadataCollectorInputData) (string, error) {
-	metadata, err := s.Metadata(ctx, in.TimeSeries)
-	if err != nil {
-		return "", err
-	}
-
-	metadata.ECS.Update(metadata.Labels)
-	if in.Timestamp != nil {
-		_, _ = metadata.ECS.Put("timestamp", in.Timestamp)
-	} else if in.Point != nil {
-		_, _ = metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
-	} else {
-		return "", errors.New("no timestamp information found")
-	}
-
-	return metadata.ECS.String(), nil
 }
 
 func (s *metadataCollector) instance(ctx context.Context, instanceName string) (*sqladmin.DatabaseInstance, error) {

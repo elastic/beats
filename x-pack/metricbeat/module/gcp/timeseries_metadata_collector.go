@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -27,16 +27,22 @@ func NewStackdriverCollectorInputData(ts *monitoringpb.TimeSeries, projectID, zo
 
 // NewStackdriverMetadataServiceForTimeSeries apart from having a long name takes a time series object to return the
 // Stackdriver canonical Metadata extractor
-func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries) MetadataService {
+func NewStackdriverMetadataServiceForTimeSeries(ts *monitoringpb.TimeSeries, organizationID, organizationName string, projectName string) MetadataService {
 	return &StackdriverTimeSeriesMetadataCollector{
-		timeSeries: ts,
+		timeSeries:       ts,
+		organizationID:   organizationID,
+		organizationName: organizationName,
+		projectName:      projectName,
 	}
 }
 
 // StackdriverTimeSeriesMetadataCollector is the implementation of MetadataCollector to collect metrics from Stackdriver
 // common TimeSeries objects
 type StackdriverTimeSeriesMetadataCollector struct {
-	timeSeries *monitoringpb.TimeSeries
+	timeSeries       *monitoringpb.TimeSeries
+	organizationID   string
+	organizationName string
+	projectName      string
 }
 
 // Metadata parses a Timeseries object to return its metadata divided into "unknown" (first object) and ECS (second
@@ -53,21 +59,26 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 
 	ecs := mapstr.M{
 		ECSCloud: mapstr.M{
-			ECSCloudAccount: mapstr.M{
-				ECSCloudAccountID:   accountID,
-				ECSCloudAccountName: accountID,
+			ECSCloudProject: mapstr.M{
+				ECSCloudID:   accountID,
+				ECSCloudName: s.projectName,
 			},
 			ECSCloudProvider: "gcp",
 		},
 	}
-
+	if s.organizationID != "" {
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAccount+"."+ECSCloudID, s.organizationID)
+	}
+	if s.organizationName != "" {
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAccount+"."+ECSCloudName, s.organizationName)
+	}
 	if availabilityZone != "" {
-		ecs[ECSCloud+"."+ECSCloudAvailabilityZone] = availabilityZone
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAvailabilityZone, availabilityZone)
 
 		// Get region name from availability zone name
 		region := getRegionName(availabilityZone)
 		if region != "" {
-			ecs[ECSCloud+"."+ECSCloudRegion] = region
+			_, _ = ecs.Put(ECSCloud+"."+ECSCloudRegion, region)
 		}
 	}
 
@@ -100,7 +111,15 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		// common.Mapstr seems to not work as expected when deleting keys so I have to iterate over all results to add
 		// the ones I want
 		for k, v := range s.timeSeries.Resource.Labels {
-			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSInstanceID || k == TimeSeriesResponsePathForECSAccountID {
+
+			// We are omitting some labels here because they are added separately for services with additional metadata logic.
+			// However, we explicitly include the instance_id label to ensure it is not missed for services without additional metadata logic.
+			if k == TimeSeriesResponsePathForECSInstanceID {
+				_, _ = ecs.Put(ECSCloudInstanceIDKey, v)
+				continue
+			}
+
+			if k == TimeSeriesResponsePathForECSAvailabilityZone || k == TimeSeriesResponsePathForECSAccountID {
 				continue
 			}
 
@@ -123,59 +142,6 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		ECS:    ecs,
 	}, nil
 }
-
-// ID returns a unique generated ID for an event when no service is implemented to get a "better" ID.`El trickerionEl trickerion
-func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *MetadataCollectorInputData) (string, error) {
-	m := mapstr.M{
-		KeyTimestamp: in.Timestamp.UnixNano(),
-	}
-
-	if s.timeSeries == nil {
-		return "", fmt.Errorf("no data found on the time series")
-	}
-
-	if s.timeSeries.Metric != nil {
-		if s.timeSeries.Metric.Type != "" {
-			_, _ = m.Put("metric.type", s.timeSeries.Metric.Type)
-		}
-
-		if s.timeSeries.Metric.Labels != nil {
-			_, _ = m.Put("metric.labels", s.timeSeries.Metric.Labels)
-		}
-	}
-
-	if s.timeSeries.Resource != nil {
-		if s.timeSeries.Resource.Type != "" {
-			_, _ = m.Put("resource.type", s.timeSeries.Resource.Type)
-		}
-
-		if s.timeSeries.Resource.Labels != nil {
-			_, _ = m.Put("resource.labels", s.timeSeries.Resource.Labels)
-		}
-	}
-
-	if s.timeSeries.Metadata != nil {
-		if s.timeSeries.Metadata.SystemLabels != nil {
-			_, _ = m.Put("metadata.system.labels", s.timeSeries.Metadata.SystemLabels)
-		}
-		if s.timeSeries.Metadata.UserLabels != nil {
-			_, _ = m.Put("metadata.user.labels", s.timeSeries.Metadata.UserLabels)
-		}
-	}
-
-	return m.String(), nil
-}
-
-/*
-func (s *StackdriverTimeSeriesMetadataCollector) getTimestamp(p *monitoringpb.Point) (t time.Time, err error) {
-	// Don't add point intervals that can't be "stated" at some timestamp.
-	if p != nil && p.Interval != nil {
-		return p.Interval.StartTime.AsTime(), nil
-	}
-
-	return time.Time{}, fmt.Errorf("error trying to extract the timestamp from the point data")
-}
-*/
 
 func getRegionName(availabilityZone string) string {
 	azSplit := strings.Split(availabilityZone, "-")

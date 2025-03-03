@@ -26,7 +26,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -150,13 +149,13 @@ type mockProcessor struct {
 	fields mapstr.M
 }
 
-func newMock(c *config.C) (processors.Processor, error) {
+func newMock(c *config.C) (beat.Processor, error) {
 	config := struct {
 		Fields mapstr.M `config:"fields" validate:"required"`
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the mock processor configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the mock processor configuration: %w", err)
 	}
 
 	return &mockProcessor{
@@ -176,7 +175,7 @@ func (m *mockProcessor) String() string {
 
 type mockProcessorWithCloser struct{}
 
-func newMockWithCloser(c *config.C) (processors.Processor, error) {
+func newMockWithCloser(c *config.C) (beat.Processor, error) {
 	return &mockProcessorWithCloser{}, nil
 }
 

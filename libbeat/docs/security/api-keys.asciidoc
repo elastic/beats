@@ -33,7 +33,7 @@ POST /_security/api_key
       "index": [
         {
           "names": ["{beat_default_index_prefix}-*"],
-          "privileges": ["view_index_metadata", "create_doc"]
+          "privileges": ["view_index_metadata", "create_doc", "auto_configure"]
         }
       ]
     }

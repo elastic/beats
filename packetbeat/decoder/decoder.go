@@ -160,8 +160,6 @@ func (d *Decoder) AddLayers(layers []gopacket.DecodingLayer) {
 }
 
 func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
-	defer d.logger.Recover("packet decoding failed")
-
 	d.truncated = false
 
 	current := d.linkLayerDecoder

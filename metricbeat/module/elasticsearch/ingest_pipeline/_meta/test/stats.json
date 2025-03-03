@@ -1,0 +1,94 @@
+{
+  "_nodes": {
+    "total": 10,
+    "successful": 10,
+    "failed": 0
+  },
+  "cluster_name": "helloworld",
+  "nodes": {
+    "dYf4_OtUSG6-A06WCui3Ug": {
+      "timestamp": 1673866037740,
+      "name": "instance-0000000022",
+      "transport_address": "10.43.0.27:19883",
+      "host": "10.43.0.27",
+      "ip": "10.43.0.27:19883",
+      "roles": [
+        "ingest",
+        "remote_cluster_client"
+      ],
+      "ingest": {
+        "total": {
+          "count": 288234496,
+          "time_in_millis": 15451943,
+          "current": 0,
+          "failed": 100
+        },
+        "pipelines": {
+          "pipeline1": {
+            "count": 19271022,
+            "time_in_millis": 823888,
+            "current": 0,
+            "failed": 100,
+            "processors": [
+              {
+                "set:tag1": {
+                  "type": "set",
+                  "stats": {
+                    "count": 19271022,
+                    "time_in_millis": 256275,
+                    "current": 0,
+                    "failed": 100
+                  }
+                }
+              },
+              {
+                "geoip:tag2": {
+                  "type": "geoip",
+                  "stats": {
+                    "count": 19271022,
+                    "time_in_millis": 189232,
+                    "current": 0,
+                    "failed": 0
+                  }
+                }
+              },
+              {
+                "rename:tag3": {
+                  "type": "rename",
+                  "stats": {
+                    "count": 19271022,
+                    "time_in_millis": 12492,
+                    "current": 0,
+                    "failed": 0
+                  }
+                }
+              },
+              {
+                "compound:CompoundProcessor-remove": {
+                  "type": "conditional",
+                  "stats": {
+                    "count": 0,
+                    "time_in_millis": 0,
+                    "current": 0,
+                    "failed": 0
+                  }
+                }
+              },
+              {
+                "pipeline:pipeline2": {
+                  "type": "pipeline",
+                  "stats": {
+                    "count": 19271022,
+                    "time_in_millis": 4607,
+                    "current": 0,
+                    "failed": 0
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

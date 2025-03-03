@@ -11,6 +11,8 @@
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
+If you are starting development of a new custom HTTP API input, we recommend that you use the <<filebeat-input-cel,Common Expression Language input>> which provides greater flexibility and an improved developer experience.
+
 This input supports:
 
 * Auth
@@ -117,7 +119,7 @@ The state has the following elements:
 - `body`: A map containing the body. References the next request body when used in <<request-transforms-headers>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
 - `cursor`: A map containing any data the user configured to be stored between restarts (See <<cursor>>).
 
-All of the mentioned objects are only stored at runtime, except `cursor`, which has values that are persisted between restarts.
+All of the mentioned objects are only stored at runtime during the execution of the periodic request, except `cursor`, which has values that are persisted between periodic request and restarts.
 
 [[transforms]]
 ==== Transforms
@@ -144,6 +146,7 @@ Appends a value to an array. If the field does not exist, the first entry will c
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 - `value_type` defines the type of the resulting value. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
+- `do_not_log_failure` if set to true a `fail_on_template_error` will not be logged except at DEBUG level. This should be used when template failure is expected in normal operation as control flow.
 
 [float]
 ==== `delete`
@@ -176,6 +179,7 @@ Sets a value.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
 - `value_type` defines how the resulting value will be treated. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
+- `do_not_log_failure` if set to true a `fail_on_template_error` will not be logged except at DEBUG level. This should be used when template failure is expected in normal operation as control flow.
 
 [[value-templates]]
 ==== Value templates
@@ -214,9 +218,12 @@ Some built-in helper functions are provided to work with the input state inside 
 - `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
+- `max`: returns the maximum of two values.
+- `min`: returns the minimum of two values.
 - `mul`: multiplies two integers.
 - `now`: returns the current `time.Time` object in UTC. Optionally, it can receive a `time.Duration` as a parameter. Example: `[[now (parseDuration "-1h")]]` returns the time at 1 hour before now.
-- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.
+- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Note: Parsing timezone abbreviations may cause ambiguities. Prefer `parseDateInTZ` for explicit timezone handling. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.
+- `parseDateInTZ`: parses a date string within a specified timezone (TZ), returning a `time.Time` in UTC. Specified timezone overwrites implicit timezone from the input date. Accepts timezone offsets ("-07:00", "-0700", "-07") or IANA Time Zone names ("America/New_York"). If TZ is invalid, defaults to UTC. Optional layout argument as in parseDate. Example: `[[ parseDateInTZ "2020-11-05T12:25:32" "America/New_York" ]]`, `[[ parseDateInTZ "2020-11-05T12:25:32" "-07:00" "RFC3339" ]]`.
 - `parseDuration`: parses duration strings and returns `time.Duration`. Example: `[[parseDuration "1h"]]`.
 - `parseTimestampMilli`: parses a timestamp in milliseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 - `parseTimestampNano`: parses a timestamp in nanoseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000000000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
@@ -272,19 +279,19 @@ the `auth.oauth2` section is missing.
 
 Used to configure supported oauth2 providers.
 Each supported provider will require specific settings. It is not set by default.
-Supported providers are: `azure`, `google`.
+Supported providers are: `azure`, `google`, `okta`.
 
 [float]
 ==== `auth.oauth2.client.id`
 
 The client ID used as part of the authentication flow. It is always required
-except if using `google` as provider. Required for providers: `default`, `azure`.
+except if using `google` as provider. Required for providers: `default`, `azure`, `okta`.
 
 [float]
 ==== `auth.oauth2.client.secret`
 
 The client secret used as part of the authentication flow. It is always required
-except if using `google` as provider. Required for providers: `default`, `azure`.
+except if using `google` or `okta` as provider. Required for providers: `default`, `azure`.
 
 [float]
 ==== `auth.oauth2.user`
@@ -386,10 +393,29 @@ default credentials from the environment will be attempted via ADC. For more inf
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
 
 [float]
+==== `auth.oauth2.okta.jwk_file`
+
+The RSA JWK Private Key file for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+
+[float]
+==== `auth.oauth2.okta.jwk_json`
+
+The RSA JWK Private Key JSON for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+[float]
+==== `auth.oauth2.okta.jwk_pem`
+
+The RSA JWK private key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+
+[float]
 ==== `auth.oauth2.google.delegated_account`
 
 Email of the delegated account used to create the credentials (usually an admin). Used in combination
-with `auth.oauth2.google.jwt_file` or `auth.oauth2.google.jwt_json`.
+with `auth.oauth2.google.jwt_file`, `auth.oauth2.google.jwt_json`, and when defaulting to use ADC.
 
 [[request-parameters]]
 [float]
@@ -570,8 +596,8 @@ filebeat.inputs:
         value: '[[now (parseDuration "-1h")]]'
 ----
 
-NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination 
-does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains. You can look at this 
+NOTE: The clause `.parent_last_response.` should only be used from within chain steps and when pagination exists at the root request level. If pagination
+does not exist at the root level, please use the clause `.first_response.` to access parent response object from within chains. You can look at this
 **example** below for a better idea.
 
 **Example Config:**
@@ -594,8 +620,9 @@ does not exist at the root level, please use the clause `.first_response.` to ac
       - set:
           target: body.page
           value: '[[ .last_response.body.page ]]'
-          fail_on_template_error: true 
-    chain: 
+          fail_on_template_error: true
+          do_not_log_failure: true
+    chain:
     - step:
           request.url: http://xyz.com/services/data/v1.0/$.exportId/export_ids/$.files[:].id/info
           request.method: POST
@@ -607,24 +634,32 @@ does not exist at the root level, please use the clause `.first_response.` to ac
           replace_with: '$.exportId,.parent_last_response.body.exportId'
 
 Here we can see that the chain step uses `.parent_last_response.body.exportId` only because `response.pagination` is present for the parent (root) request.
-However if `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is 
-because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the
-`first_response` object always stores the very first response in the process chain.
+However if `response.pagination` was not present in the parent (root) request, `replace_with` clause should have used `.first_response.body.exportId`. This is
+because when pagination does not exist at the parent level `parent_last_response` object is not populated with required values for performance reasons, but the `first_response` object always stores the very first response in the process chain.
+
+NOTE: The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 
 [float]
-==== `request.tracer.filename`
+==== `request.tracer.enable`
 
-It is possible to log httpjson requests and responses to a local file-system for debugging configurations.
-This option is enabled by setting the `request.tracer.filename` value. Additional options are available to
-tune log rotation behavior.
+It is possible to log HTTP requests and responses to a local file-system for debugging configurations.
+This option is enabled by setting `request.tracer.enabled` to true and setting the `request.tracer.filename` value.
+Additional options are available to tune log rotation behavior. To delete existing logs, set `request.tracer.enabled`
+to false without unsetting the filename option.
 
 Enabling this option compromises security and should only be used for debugging.
+
+==== `request.tracer.filename`
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the
+filename and will be replaced with the input instance id. For Example, `http-request-trace-*.ndjson`.
 
 [float]
 ==== `request.tracer.maxsize`
 
 This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
 logs are allowed to reach 1MB before rotation.
+Individual request/response bodies will be truncated to 10% of this size.
 
 [float]
 ==== `request.tracer.maxage`
@@ -651,11 +686,18 @@ This determines whether rotated logs should be gzip compressed.
 [float]
 ==== `response.decode_as`
 
-ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`, `application/zip`. It is not set by default.
+ContentType used for decoding the response body. If set it will force the decoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. Supported values: `application/json, application/x-ndjson`, `text/csv`, `application/zip`, `application/xml` and `text/xml`. It is not set by default.
 
 NOTE: For `text/csv`, one event for each line will be created, using the header values as the object keys. For this reason is always assumed that a header exists.
 
 NOTE: For `application/zip`, the `zip` file is expected to contain one or more `.json` or `.ndjson` files. The contents of all of them will be merged into a single list of `JSON` objects.
+
+NOTE: For `application/xml` and `text/xml` type information for decoding the XML document can be provided via the `response.xsd` option.
+
+[float]
+==== `response.xsd`
+
+XML documents may require additional type information to enable correct parsing and ingestion. This information can be provided as an XML Schema Definition (XSD) for the document using the `response.xsd` option.
 
 [[response-transforms]]
 [float]
@@ -741,6 +783,8 @@ Valid when used with `type: map`. When not empty, defines a new field where the 
 ==== `response.split[].ignore_empty_value`
 
 If set to true, empty or missing value will be ignored and processing will pass on to the next nested split operation instead of failing with an error. Default: `false`.
+
+Note that if `ignore_empty_value` is `true` and the final result is empty, no event will be published, and no cursor update will be made. If a cursor update must be made for all responses, this should be set to `false` and the ingest pipeline must be configured to tolerate empty event sets.
 
 [float]
 ==== `response.split[].split`
@@ -1117,14 +1161,14 @@ filebeat.inputs:
   chain:
     # second call
     - step:
-      request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
-      request.method: GET
-      replace: $.records[:].id
+        request.url: https://example.com/services/data/v1.0/$.records[:].id/export_ids
+        request.method: GET
+        replace: $.records[:].id
     # third call
     - step:
-      request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
-      request.method: GET
-      replace: $.file_name
+        request.url: https://example.com/services/data/v1.0/export_ids/$.file_name/info
+        request.method: GET
+        replace: $.file_name
 ----
 
 Example:
@@ -1199,13 +1243,37 @@ request_url using file_name as 'file_2': \https://example.com/services/data/v1.0
 Collect and make events from response in any format supported by httpjson for all calls.
 
 +
+Note that since `request.url` must be a valid URL, if an API returns complete URLs in place of an identifier as in the example above, it would not be possible to use the JSON Path syntax. To achieve the desired result in this case an opaque URI syntax can be used. An opaque URI has an arbitrary scheme and opaque text separated by a colon. When the replacement is done, the scheme and colon are stripped from the URI prior to the replacement and the remaining opaque text is used as the replacement target. In the following example, the scheme is "placeholder".
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/records
+  interval: 1h
+  chain:
+    # second call
+    - step:
+        request.url: placeholder:$.records[:]
+        request.method: GET
+        replace: $.records[:]
+    # third call
+    - step:
+        request.url: placeholder:$.file_name
+        request.method: GET
+        replace: $.file_name
+----
+
++
 [[chain-step-replace_with]]
 [float]
 ==== `chain[].step.replace_with`
 
-The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value. 
-The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables 
-like [`.last_response.*`, `.first_response.*`, `.parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause 
+The `replace_with: "pattern,value"` clause is used to replace a fixed pattern string defined in `request.url` with the given value.
+The fixed pattern must have a `$.` prefix, for example: `$.xyz`. The `value` may be hard coded or extracted from context variables
+like [`.last_response.*`, `.first_response.*`, `.parent_last_response.*`] etc. The `replace_with` clause can be used in combination with the `replace` clause
 thus providing a lot of flexibility in the logic of chain requests.
 
 Example:
@@ -1229,9 +1297,9 @@ filebeat.inputs:
   chain:
     # second call
     - step:
-      request.url: https://example.com/services/data/v1.0/$.exportId/files
-      request.method: GET
-      replace_with: '$.exportId,.first_response.body.exportId'
+        request.url: https://example.com/services/data/v1.0/$.exportId/files
+        request.method: GET
+        replace_with: '$.exportId,.first_response.body.exportId'
 ----
 
 Example:
@@ -1282,18 +1350,18 @@ response_json using exportId as '2212':
 This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
 
 **Some useful points to remember:- **
-  
-    1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a 
-    **single '.' (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal 
-    processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one '.' (dot) as prefix) or  
+
+    1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a
+    **single '.' (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal
+    processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one '.' (dot) as prefix) or
     `replace_with:'$.exportId,first_response.body.exportId'` (no '.' dot as prefix)
-   
-   2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with: 
+
+   2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with:
     '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from
-    the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be 
+    the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be
     extrated becomes `"" (an empty string)`, which has no definition within any context variable.
 
-NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching.
+NOTE: Fixed patterns must not contain commas in their definition. String replacement patterns are matched by the `replace_with` processor with exact string matching. The `first_response` object at the moment can only store flat JSON structures (i.e. no support for JSONS having array at root level, NDJSON or Gzipped JSON), hence it should only be used in scenarios where the this is the case. Splits cannot be performed on `first_response`. It needs to be explicitly enabled by setting the flag `response.save_first_response` to `true` in the httpjson config.
 
 [float]
 ==== `chain[].while`
@@ -1450,6 +1518,34 @@ response_json using id as '2':
 +
 Collect and make events from response in any format supported by httpjson for all calls.
 
++
+Note that since `request.url` must be a valid URL, if an API returns complete URLs in place of an identifier as in the example above, it would not be possible to use the JSON Path syntax. To achieve the desired result in this case an opaque URI syntax can be used. An opaque URI has an arbitrary scheme and opaque text separated by a colon. When the replacement is done, the scheme and colon are stripped from the URI prior to the replacement and the remaining opaque text is used as the replacement target. In the following example, the scheme is "placeholder".
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  id: my-httpjson-id
+  request.url: http://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - while:
+        request.url: placeholder:$.exportId
+        request.method: GET
+        replace: $.exportId
+        until: '[[ eq .last_response.body.status "completed" ]]'
+        request.retry.max_attempts: 5
+        request.retry.wait_min: 5s
+    # third call
+    - step:
+        request.url: placeholder:$.files[:]
+        request.method: GET
+        replace: $.files[:]
+----
+
 NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
 
 [float]
@@ -1462,6 +1558,8 @@ See  <<chain-step-replace_with, chain[].step.replace_with>> .
 ==== `cursor`
 
 Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
+
+If no event is published, no cursor update is made. This can have implications on how cursor updates should be performed when the target API returns empty response sets.
 
 Each cursor entry is formed by:
 
@@ -1513,6 +1611,47 @@ image:images/input-httpjson-chain-lifecycle.png[Chain Request lifecycle]
 . Process generated requests and collect responses from server.
 . Go back to step-2 for the next step.
 . Publish collected responses from the last chain step.
+
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                                     | Description
+| `events_published_total`                   | Total number of events published.
+| `pages_published_total`                    | Total number of pages of event published.
+| `http_request_total`                       | Total number of processed requests.
+| `http_request_errors_total`                | Total number of request errors.
+| `http_request_delete_total`                | Total number of `DELETE` requests.
+| `http_request_get_total`                   | Total number of `GET` requests.
+| `http_request_head_total`                  | Total number of `HEAD` requests.
+| `http_request_options_total`               | Total number of `OPTIONS` requests.
+| `http_request_patch_total`                 | Total number of `PATCH` requests.
+| `http_request_post_total`                  | Total number of `POST` requests.
+| `http_request_put_total`                   | Total number of `PUT` requests.
+| `http_request_body_bytes_total`            | Total of the requests body size.
+| `http_request_body_bytes`                  | Histogram of the requests body size.
+| `http_response_total`                      | Total number of responses received.
+| `http_response_errors_total`               | Total number of response errors.
+| `http_response_1xx_total`                  | Total number of `1xx` responses.
+| `http_response_2xx_total`                  | Total number of `2xx` responses.
+| `http_response_3xx_total`                  | Total number of `3xx` responses.
+| `http_response_4xx_total`                  | Total number of `4xx` responses.
+| `http_response_5xx_total`                  | Total number of `5xx` responses.
+| `http_response_body_bytes_total`           | Total of the responses body size.
+| `http_response_body_bytes`                 | Histogram of the responses body size.
+| `http_round_trip_time`                     | Histogram of the round trip time.
+| `httpjson_interval_total`                  | Total number of intervals executed.
+| `httpjson_interval_errors_total`           | Total number of interval errors.
+| `httpjson_interval_execution_time`         | Histogram of the interval execution time.
+| `httpjson_interval_pages`                  | Histogram of the total number of pages per interval.
+| `httpjson_interval_pages_execution_time`   | Histogram of the interval pages execution time.
+|=======
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

@@ -39,7 +39,7 @@ func init() {
 	}
 }
 
-//NewModule returns a new instance of the module
+// NewModule returns a new instance of the module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	// Validate that at least one host has been specified.
 	config := struct {
@@ -52,7 +52,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	return &base, nil
 }
 
-//ParseURL is the postgres host parser
+// ParseURL is the postgres host parser
 func ParseURL(mod mb.Module, rawURL string) (mb.HostData, error) {
 	c := struct {
 		Username string `config:"username"`

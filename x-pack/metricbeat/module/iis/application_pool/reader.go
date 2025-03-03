@@ -3,18 +3,18 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-// +build windows
 
 package application_pool
 
 import (
+	"errors"
+	"fmt"
 	"strings"
+	"syscall"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -36,7 +36,6 @@ type Reader struct {
 type ApplicationPool struct {
 	name             string
 	workerProcessIds []int
-	counters         map[string]string
 }
 
 // WorkerProcess struct contains the worker process details
@@ -46,21 +45,40 @@ type WorkerProcess struct {
 }
 
 var appPoolCounters = map[string]string{
-	"process.pid":                          "\\Process(w3wp*)\\ID Process",
-	"process.cpu_usage_perc":               "\\Process(w3wp*)\\% Processor Time",
-	"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
-	"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
-	"process.working_set":                  "\\Process(w3wp*)\\Working Set",
-	"process.private_bytes":                "\\Process(w3wp*)\\Private Bytes",
-	"process.virtual_bytes":                "\\Process(w3wp*)\\Virtual Bytes",
-	"process.page_faults_per_sec":          "\\Process(w3wp*)\\Page Faults/sec",
-	"process.io_read_operations_per_sec":   "\\Process(w3wp*)\\IO Read Operations/sec",
-	"process.io_write_operations_per_sec":  "\\Process(w3wp*)\\IO Write Operations/sec",
+	"process.pid":                         "\\Process(w3wp*)\\ID Process",
+	"process.cpu_usage_perc":              "\\Process(w3wp*)\\% Processor Time",
+	"process.handle_count":                "\\Process(w3wp*)\\Handle Count",
+	"process.thread_count":                "\\Process(w3wp*)\\Thread Count",
+	"process.working_set":                 "\\Process(w3wp*)\\Working Set",
+	"process.private_bytes":               "\\Process(w3wp*)\\Private Bytes",
+	"process.virtual_bytes":               "\\Process(w3wp*)\\Virtual Bytes",
+	"process.page_faults_per_sec":         "\\Process(w3wp*)\\Page Faults/sec",
+	"process.io_read_operations_per_sec":  "\\Process(w3wp*)\\IO Read Operations/sec",
+	"process.io_write_operations_per_sec": "\\Process(w3wp*)\\IO Write Operations/sec",
+
+	// .NET CLR Memory
+	"net_clr.memory.bytes_in_all_heaps":      "\\.NET CLR Memory(w3wp*)\\# Bytes in all Heaps",
+	"net_clr.memory.gen_0_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 0 Collections",
+	"net_clr.memory.gen_1_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 1 Collections",
+	"net_clr.memory.gen_2_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 2 Collections",
+	"net_clr.memory.total_committed_bytes":   "\\.NET CLR Memory(w3wp*)\\# Total committed Bytes",
+	"net_clr.memory.allocated_bytes_per_sec": "\\.NET CLR Memory(w3wp*)\\Allocated Bytes/sec",
+	"net_clr.memory.gen_0_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 0 heap size",
+	"net_clr.memory.gen_1_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 1 heap size",
+	"net_clr.memory.gen_2_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 2 heap size",
+	"net_clr.memory.large_object_heap_size":  "\\.NET CLR Memory(w3wp*)\\Large Object Heap size",
+	"net_clr.memory.time_in_gc_perc":         "\\.NET CLR Memory(w3wp*)\\% Time in GC",
+
+	// .NET CLR Exceptions
 	"net_clr.total_exceptions_thrown":      "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
 	"net_clr.exceptions_thrown_per_sec":    "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
 	"net_clr.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
 	"net_clr.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
 	"net_clr.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
+
+	// .NET CLR LocksAndThreads
+	"net_clr.locks_and_threads.contention_rate_per_sec": "\\.NET CLR LocksAndThreads(w3wp*)\\Contention Rate / sec",
+	"net_clr.locks_and_threads.current_queue_length":    "\\.NET CLR LocksAndThreads(w3wp*)\\Current Queue Length",
 }
 
 // newReader creates a new instance of Reader.
@@ -78,7 +96,7 @@ func newReader(config Config) (*Reader, error) {
 
 	err := r.initAppPools()
 	if err != nil {
-		return nil, errors.Wrap(err, "error loading counters for existing app pools")
+		return nil, fmt.Errorf("error loading counters for existing app pools: %w", err)
 	}
 	return r, nil
 }
@@ -87,23 +105,34 @@ func newReader(config Config) (*Reader, error) {
 func (r *Reader) initAppPools() error {
 	apps, err := getApplicationPools(r.config.Names)
 	if err != nil {
-		return errors.Wrap(err, "failed retrieving running worker processes")
+		return fmt.Errorf("failed retrieving running worker processes: %w", err)
 	}
 	r.applicationPools = apps
 	if len(apps) == 0 {
 		r.log.Info("no running application pools found")
 		return nil
 	}
+	// Helper function to identify known PDH errors, such as missing counters or instances.
+	// These errors are expected in certain cases (e.g. "No Managed Code" environments).
+	isPDHError := func(err error) bool {
+		return errors.Is(err, pdh.PdhErrno(syscall.ERROR_NOT_FOUND)) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTER) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTERNAME) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_INSTANCE) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_OBJECT)
+	}
 	var newQueries []string
 	r.workerProcesses = make(map[string]string)
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
-			if err == pdh.PDH_CSTATUS_NO_COUNTER || err == pdh.PDH_CSTATUS_NO_COUNTERNAME || err == pdh.PDH_CSTATUS_NO_INSTANCE || err == pdh.PDH_CSTATUS_NO_OBJECT {
+			// Handle known PDH errors as informational (e.g. missing counters).
+			if isPDHError(err) {
 				r.log.Infow("Ignoring non existent counter", "error", err,
-					logp.Namespace("application pool"), "query", value)
+					logp.Namespace("application pool"), "query", value,
+				)
 			} else {
-				r.log.Error(err, `failed to expand counter path (query= "%v")`, value)
+				r.log.Errorf(`failed to expand counter path (query= "%v"): %w`, value, err)
 			}
 			continue
 		}
@@ -117,14 +146,14 @@ func (r *Reader) initAppPools() error {
 		}
 		for _, v := range childQueries {
 			if err := r.query.AddCounter(v, "", "float", len(childQueries) > 1); err != nil {
-				return errors.Wrapf(err, `failed to add counter (query="%v")`, v)
+				return fmt.Errorf(`failed to add counter (query="%v"): %w`, v, err)
 			}
 			r.workerProcesses[v] = key
 		}
 	}
 	err = r.query.RemoveUnusedCounters(newQueries)
 	if err != nil {
-		return errors.Wrap(err, "failed removing unused counter values")
+		return fmt.Errorf("failed removing unused counter values: %w", err)
 	}
 	return nil
 }
@@ -139,14 +168,14 @@ func (r *Reader) read() ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := r.query.CollectData(); err != nil {
-		return nil, errors.Wrap(err, "failed querying counter values")
+		return nil, fmt.Errorf("failed querying counter values: %w", err)
 	}
 
 	// Get the values.
 	values, err := r.query.GetFormattedCounterValues()
 	if err != nil {
 		r.close()
-		return nil, errors.Wrap(err, "failed formatting counter values")
+		return nil, fmt.Errorf("failed formatting counter values: %w", err)
 	}
 	var events []mb.Event
 	eventGroup := r.mapEvents(values)
@@ -179,7 +208,7 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 					// The counter has a negative value or the counter was successfully found, but the data returned is not valid.
 					// This error can occur if the counter value is less than the previous value. (Because counter values always increment, the counter value rolls over to zero when it reaches its maximum value.)
 					// This is not an error that stops the application from running successfully and a positive counter value should be retrieved in the later calls.
-					if val.Err.Error == pdh.PDH_CALC_NEGATIVE_VALUE || val.Err.Error == pdh.PDH_INVALID_DATA {
+					if errors.Is(val.Err.Error, pdh.PDH_CALC_NEGATIVE_VALUE) || errors.Is(val.Err.Error, pdh.PDH_INVALID_DATA) {
 						r.log.Debugw("Counter value retrieval returned",
 							"error", val.Err.Error, "cstatus", pdh.PdhErrno(val.Err.CStatus), logp.Namespace("application_pool"), "query", counterPath)
 						continue
@@ -193,7 +222,6 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 					}
 				}
 			}
-
 		}
 	}
 	return events
@@ -210,7 +238,7 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	if err != nil {
 		return nil, err
 	}
-	var appPools = make(map[string][]int)
+	appPools := make(map[string][]int)
 	for key, value := range processes {
 		appPools[value] = append(appPools[value], key)
 	}

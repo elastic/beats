@@ -18,6 +18,7 @@
 package beater
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sync"
@@ -35,13 +36,14 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	_ "github.com/elastic/beats/v7/heartbeat/security"
+	"github.com/elastic/beats/v7/heartbeat/tracer"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
 // Heartbeat represents the root datastructure of this beat.
@@ -49,26 +51,53 @@ type Heartbeat struct {
 	done     chan struct{}
 	stopOnce sync.Once
 	// config is used for iterating over elements of the config.
-	config             config.Config
+	config             *config.Config
 	scheduler          *scheduler.Scheduler
 	monitorReloader    *cfgfile.Reloader
 	monitorFactory     *monitors.RunnerFactory
 	autodiscover       *autodiscover.Autodiscover
 	replaceStateLoader func(sl monitorstate.StateLoader)
+	trace              tracer.Tracer
 }
 
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
-	parsedConfig := config.DefaultConfig
+	parsedConfig := config.DefaultConfig()
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
+	// The sock tracer should be setup before any other code to ensure its reliability
+	// The ES Loader, for instance, can exit early
+	var trace tracer.Tracer = tracer.NewNoopTracer()
+	stConfig := parsedConfig.SocketTrace
+	if stConfig != nil {
+		// Note this, intentionally, blocks until connected to the trace endpoint
+		var err error
+		logp.L().Infof("Setting up sock tracer at %s (wait: %s)", stConfig.Path, stConfig.Wait)
+		sockTrace, err := tracer.NewSockTracer(stConfig.Path, stConfig.Wait)
+		if err == nil {
+			trace = sockTrace
+		} else {
+			logp.L().Warnf("could not connect to socket trace at path %s after %s timeout: %w", stConfig.Path, stConfig.Wait, err)
+		}
+	}
+
+	// Check if any of these can prevent using states client
 	stateLoader, replaceStateLoader := monitorstate.AtomicStateLoader(monitorstate.NilStateLoader)
 	if b.Config.Output.Name() == "elasticsearch" && !b.Manager.Enabled() {
 		// Connect to ES and setup the State loader if the output is not managed by agent
-		if err := makeStatesClient(b.Config.Output.Config(), replaceStateLoader, parsedConfig.RunFrom); err != nil {
-			logp.L().Warnf("could not connect to ES for state management during initial load: %s", err)
+		// Note this, intentionally, blocks until connected or max attempts reached
+		esClient, err := makeESClient(context.TODO(), b.Config.Output.Config(), 3, 2*time.Second)
+		if err != nil {
+			if parsedConfig.RunOnce {
+				trace.Abort()
+				return nil, fmt.Errorf("run_once mode fatal error: %w", err)
+			} else {
+				logp.L().Warnf("skipping monitor state management: %w", err)
+			}
+		} else {
+			replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, parsedConfig.RunFrom))
 		}
 	} else if b.Manager.Enabled() {
 		stateLoader, replaceStateLoader = monitorstate.DeferredStateLoader(monitorstate.NilStateLoader, 15*time.Second)
@@ -87,17 +116,8 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 
 	sched := scheduler.Create(limit, hbregistry.SchedulerRegistry, location, jobConfig, parsedConfig.RunOnce)
 
-	pipelineClientFactory := func(p beat.Pipeline) (pipeline.ISyncClient, error) {
-		if parsedConfig.RunOnce {
-			client, err := pipeline.NewSyncClient(logp.L(), p, beat.ClientConfig{})
-			if err != nil {
-				return nil, fmt.Errorf("could not create pipeline sync client for run_once: %w", err)
-			}
-			return client, nil
-		} else {
-			client, err := p.Connect()
-			return monitors.SyncPipelineClientAdaptor{C: client}, err
-		}
+	pipelineClientFactory := func(p beat.Pipeline) (beat.Client, error) {
+		return p.Connect()
 	}
 
 	bt := &Heartbeat{
@@ -115,29 +135,48 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 			PipelineClientFactory: pipelineClientFactory,
 			BeatRunFrom:           parsedConfig.RunFrom,
 		}),
+		trace: trace,
 	}
+	runFromID := "<unknown location>"
+	if parsedConfig.RunFrom != nil {
+		runFromID = parsedConfig.RunFrom.ID
+	}
+	logp.L().Infof("heartbeat starting, running from: %v", runFromID)
 	return bt, nil
 }
 
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
+	bt.trace.Start()
+	defer bt.trace.Close()
+
+	// Adapt local pipeline to synchronized mode if run_once is enabled
+	pipeline := b.Publisher
+	var pipelineWrapper monitors.PipelineWrapper = &monitors.NoopPipelineWrapper{}
+	if bt.config.RunOnce {
+		sync := &monitors.SyncPipelineWrapper{}
+
+		pipeline = monitors.WithSyncPipelineWrapper(pipeline, sync)
+		pipelineWrapper = sync
+	}
+
 	logp.L().Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
-	logp.L().Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+	logp.L().Infof("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
+
+	waitMonitors := monitors.NewSignalWait()
 
 	// It is important this appear before we check for run once mode
 	// In run once mode we depend on these monitors being loaded, but not other more
 	// dynamic types.
-	stopStaticMonitors, err := bt.RunStaticMonitors(b)
+	stopStaticMonitors, err := bt.RunStaticMonitors(b, pipeline)
 	if err != nil {
 		return err
 	}
 	defer stopStaticMonitors()
 
 	if bt.config.RunOnce {
-		bt.scheduler.WaitForRunOnce()
-		logp.L().Info("Ending run_once run")
-		return nil
+		waitMonitors.Add(monitors.WithLog(bt.scheduler.WaitForRunOnce, "Ending run_once run."))
 	}
 
 	if b.Manager.Enabled() {
@@ -145,7 +184,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
-		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
+		bt.monitorReloader = cfgfile.NewReloader(logp.L().Named("module.reload"), b.Publisher, bt.config.ConfigMonitors)
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors()
@@ -172,20 +211,37 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 	defer bt.scheduler.Stop()
 
-	<-bt.done
+	// Wait until run_once ends or bt is being shut down
+	waitMonitors.AddChan(bt.done)
+	waitMonitors.Wait()
 
-	logp.L().Info("Shutting down.")
+	logp.L().Info("Shutting down, waiting for output to complete")
+
+	// Due to defer's LIFO execution order, waitPublished.Wait() has to be
+	// located _after_ b.Manager.Stop() or else it will exit early
+	waitPublished := monitors.NewSignalWait()
+	defer waitPublished.Wait()
+
+	// Three possible events: global beat, run_once pipeline done and publish timeout
+	waitPublished.AddChan(bt.done)
+	waitPublished.Add(monitors.WithLog(pipelineWrapper.Wait, "shutdown: finished publishing events."))
+	if bt.config.PublishTimeout > 0 {
+		logp.L().Infof("shutdown: output timer started. Waiting for max %v.", bt.config.PublishTimeout)
+		waitPublished.Add(monitors.WithLog(monitors.WaitDuration(bt.config.PublishTimeout),
+			"shutdown: timed out waiting for pipeline to publish events."))
+	}
+
 	return nil
 }
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
-func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
+func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat, pipeline beat.Pipeline) (stop func(), err error) {
 	runners := make([]cfgfile.Runner, 0, len(bt.config.Monitors))
 	for _, cfg := range bt.config.Monitors {
-		created, err := bt.monitorFactory.Create(b.Publisher, cfg)
+		created, err := bt.monitorFactory.Create(pipeline, cfg)
 		if err != nil {
 			if errors.Is(err, monitors.ErrMonitorDisabled) {
-				logp.L().Info("skipping disabled monitor: %s", err)
+				logp.L().Infof("skipping disabled monitor: %s", err)
 				continue // don't stop loading monitors just because they're disabled
 			}
 
@@ -213,26 +269,31 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 			return nil
 		}
 		outCfg := conf.Namespace{}
+		//nolint:nilerr // we are intentionally ignoring specific errors here
 		if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
 			return nil
 		}
 
-		if err := makeStatesClient(outCfg.Config(), bt.replaceStateLoader, bt.config.RunFrom); err != nil {
-			logp.L().Warnf("could not connect to ES for state management during managed reload: %s", err)
+		// Backoff panics with 0 duration, set to smallest unit
+		esClient, err := makeESClient(context.TODO(), outCfg.Config(), 1, 1*time.Nanosecond)
+		if err != nil {
+			logp.L().Warnf("skipping monitor state management during managed reload: %w", err)
+		} else {
+			bt.replaceStateLoader(monitorstate.MakeESLoader(esClient, monitorstate.DefaultDataStreams, bt.config.RunFrom))
 		}
 
 		return nil
 	})
 
 	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
-	reload.RegisterV2.MustRegisterInput(inputs)
+	b.Registry.MustRegisterInput(inputs)
 }
 
 // RunReloadableMonitors runs the `heartbeat.config.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunReloadableMonitors() (err error) {
 	// Check monitor configs
 	if err := bt.monitorReloader.Check(bt.monitorFactory); err != nil {
-		logp.Error(fmt.Errorf("error loading reloadable monitors: %w", err))
+		logp.L().Error(fmt.Errorf("error loading reloadable monitors: %w", err))
 	}
 
 	// Execute the monitor
@@ -262,16 +323,44 @@ func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
 }
 
-func makeStatesClient(cfg *conf.C, replace func(monitorstate.StateLoader), runFrom *config.LocationWithID) error {
-	esClient, err := eslegclient.NewConnectedClient(cfg, "Heartbeat")
+// makeESClient establishes an ES connection meant to load monitors' state
+func makeESClient(ctx context.Context, cfg *conf.C, attempts int, wait time.Duration) (*eslegclient.Connection, error) {
+	var (
+		esClient *eslegclient.Connection
+		err      error
+	)
+
+	// ES client backoff
+	connectDelay := backoff.NewEqualJitterBackoff(
+		context.Background().Done(),
+		wait,
+		wait,
+	)
+
+	// Overriding the default ES request timeout:
+	// Higher values of timeouts cannot be applied on the SAAS Service
+	// where we are running in tight loops and want the next successive check to be run for a given monitor
+	// within the next scheduled interval which could be 1m or 3m
+
+	// Clone original config since we don't want this change to be global
+	newCfg, err := conf.NewConfigFrom(cfg)
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("error cloning config: %w", err)
+	}
+	timeout := int64((10 * time.Second).Seconds())
+	if err := newCfg.SetInt("timeout", -1, timeout); err != nil {
+		return nil, fmt.Errorf("error setting the ES timeout in config: %w", err)
 	}
 
-	if esClient != nil {
-		logp.L().Info("replacing states loader")
-		replace(monitorstate.MakeESLoader(esClient, "synthetics-*,heartbeat-*", runFrom))
+	for i := 0; i < attempts; i++ {
+		esClient, err = eslegclient.NewConnectedClient(ctx, newCfg, "Heartbeat")
+		if err == nil {
+			connectDelay.Reset()
+			return esClient, nil
+		} else {
+			connectDelay.Wait()
+		}
 	}
 
-	return nil
+	return nil, fmt.Errorf("could not establish states loader connection after %d attempts, with %s delay", attempts, wait)
 }

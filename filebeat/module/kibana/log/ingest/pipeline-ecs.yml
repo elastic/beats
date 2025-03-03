@@ -6,31 +6,18 @@ processors:
 - set:
     copy_from: '@timestamp'
     field: event.created
-- rename:
-    field: message
-    target_field: _ecs_json_message
-    if: |-
-      def message = ctx.message;
-      return message != null
-          && message.startsWith('{')
-          && message.endsWith('}')
-          && message.contains('"@timestamp"')
-    ignore_missing: true
-- json:
-    field: _ecs_json_message
-    add_to_root: true
-    add_to_root_conflict_strategy: merge
-    allow_duplicate_keys: true
-    if: ctx.containsKey('_ecs_json_message')
-    on_failure:
-    - rename:
-        field: _ecs_json_message
-        target_field: message
-        ignore_missing: true
-    - set:
-        field: error.message
-        value: Error while parsing JSON
-        override: false
+- script:
+    lang: painless
+    if: 'ctx.json != null'
+    description: Merges filebeat generated fields with ECS log content
+    source: |-
+      ctx.json.keySet().each(key -> ctx.merge(key, ctx.json.get(key), (oldValue, newValue) -> {
+        if (newValue instanceof Map) {
+          newValue.putAll(oldValue);
+        }
+
+        return newValue;
+      }))
 - rename:
     field: http.request.headers
     target_field: kibana.log.meta.req.headers
@@ -47,6 +34,21 @@ processors:
     field: event.outcome
     value: failure
     if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
+- script:
+    lang: painless
+    description: Overrides log entry with custom field values. Applicable when fields_under_root is true
+    if: "ctx.fields != null"
+    source: |-
+      ctx.fields.keySet().each(key -> ctx.merge(key, ctx.fields.get(key), (oldValue, newValue) -> {
+        if (oldValue instanceof Map) {
+          oldValue.putAll(newValue);
+        }
+
+        return oldValue;
+      }));
+- remove:
+    field: fields
+    ignore_missing: true
 - remove:
     field: json
     ignore_missing: true

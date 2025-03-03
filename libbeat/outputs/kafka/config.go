@@ -21,22 +21,22 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"time"
-
-	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/sarama"
 )
 
 type backoffConfig struct {
@@ -76,6 +76,12 @@ type kafkaConfig struct {
 	Codec              codec.Config              `config:"codec"`
 	Sasl               kafka.SaslConfig          `config:"sasl"`
 	EnableFAST         bool                      `config:"enable_krb5_fast"`
+	Queue              config.Namespace          `config:"queue"`
+
+	// Currently only used for validation. Those values are later
+	// unpacked into temporary structs whenever they're necessary.
+	Topic  string `config:"topic"`
+	Topics []any  `config:"topics"`
 }
 
 type metaConfig struct {
@@ -93,19 +99,19 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	// As of sarama 1.24.1, zstd support is broken
 	// (https://github.com/Shopify/sarama/issues/1252), which needs to be
 	// addressed before we add support here.
+
+	// (https://github.com/IBM/sarama/pull/1574) sarama version 1.26.0 has
+	// fixed this issue and elastic version of sarama has merged this commit.
+	// (https://github.com/elastic/sarama/commit/37faed7ffc7d59e681d99cfebd1f3d453d6d607c)
+
 	"none":   sarama.CompressionNone,
 	"no":     sarama.CompressionNone,
 	"off":    sarama.CompressionNone,
 	"gzip":   sarama.CompressionGZIP,
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
+	"zstd":   sarama.CompressionZSTD,
 }
-
-const (
-	saslTypePlaintext   = sarama.SASLTypePlaintext
-	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
-	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
-)
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
@@ -129,7 +135,7 @@ func defaultConfig() kafkaConfig {
 		BrokerTimeout:    10 * time.Second,
 		Compression:      "gzip",
 		CompressionLevel: 4,
-		Version:          kafka.Version("1.0.0"),
+		Version:          kafka.Version("2.1.0"),
 		MaxRetries:       3,
 		Headers:          nil,
 		Backoff: backoffConfig{
@@ -174,6 +180,20 @@ func (c *kafkaConfig) Validate() error {
 			return fmt.Errorf("compression_level must be between 0 and 9")
 		}
 	}
+
+	if c.Topic == "" && len(c.Topics) == 0 {
+		return errors.New("either 'topic' or 'topics' must be defined")
+	}
+
+	// When running under Elastic-Agent we do not support dynamic topic
+	// selection, so `topics` is not supported and `topic` is treated as an
+	// plain string
+	if management.UnderAgent() {
+		if len(c.Topics) != 0 {
+			return errors.New("'topics' is not supported when running under Elastic-Agent")
+		}
+	}
+
 	return nil
 }
 
@@ -285,11 +305,14 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.Version = version
 
 	k.Producer.Partitioner = partitioner
+
 	k.MetricRegistry = adapter.GetGoMetrics(
 		monitoring.Default,
-		"libbeat.outputs.kafka",
-		adapter.Rename("incoming-byte-rate", "bytes_read"),
-		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		"libbeat.outputs",
+		adapter.Rename("incoming-byte-rate", "read.bytes"),
+		adapter.Rename("outgoing-byte-rate", "write.bytes"),
+		adapter.Rename("request-latency-in-ms", "write.latency"),
+		adapter.Rename("requests-in-flight", "kafka.requests-in-flight"),
 		adapter.GoMetricsNilify,
 	)
 
@@ -315,7 +338,7 @@ func makeBackoffFunc(cfg backoffConfig) func(retries, maxRetries int) time.Durat
 		// apply about equaly distributed jitter in second half of the interval, such that the wait
 		// time falls into the interval [dur/2, dur]
 		limit := int64(dur / 2)
-		jitter := rand.Int63n(limit + 1)
+		jitter := rand.Int64N(limit + 1)
 		return time.Duration(limit + jitter)
 	}
 }

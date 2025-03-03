@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package kafka
 
@@ -26,8 +25,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"

@@ -282,6 +282,7 @@ class Test(BaseTest):
 
         filebeat.check_wait(exit_code=1)
 
+    @unittest.skip("Skipped as flaky: https://github.com/elastic/beats/issues/34982")
     def test_no_paths_defined(self):
         """
         In case a input is defined but doesn't contain any paths, input must return error which
@@ -703,7 +704,7 @@ class Test(BaseTest):
         filebeat = self.start_beat()
 
         self.wait_until(
-            lambda: self.output_has_message("entry2", output_file="output/filebeat-"+self.today+"-1.ndjson"),
+            lambda: self.output_has_message("entry2", output_file="output/filebeat-" + self.today + "-1.ndjson"),
             max_timeout=10,
             name="output contains 'entry2'")
 

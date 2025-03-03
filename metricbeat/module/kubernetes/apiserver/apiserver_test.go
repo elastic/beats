@@ -17,7 +17,6 @@
 
 // skipping tests on windows 32 bit versions, not supported
 //go:build !integration && !windows && !386
-// +build !integration,!windows,!386
 
 package apiserver
 
@@ -32,7 +31,7 @@ import (
 func TestEventMappingV2_0(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "apiserver",
 		ptest.TestCases{
-			{
+			ptest.TestCase{
 				MetricsFile:  "./_meta/test/metrics.2.0",
 				ExpectedFile: "./_meta/test/metrics.2.0.expected",
 			},

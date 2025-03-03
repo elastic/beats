@@ -19,14 +19,12 @@ package elasticsearch
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -56,7 +54,8 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		"node_stats",
 		"shard",
 	}
-	return elastic.NewModule(&base, xpackEnabledMetricSets, []string{}, logp.NewLogger(ModuleName))
+	optionalXpackMetricsets := []string{"ingest_pipeline"}
+	return elastic.NewModule(&base, xpackEnabledMetricSets, optionalXpackMetricsets, logp.NewLogger(ModuleName))
 }
 
 var (
@@ -170,18 +169,20 @@ func getNodeName(http *helper.HTTP, uri string) (string, error) {
 		Nodes map[string]interface{} `json:"nodes"`
 	}{}
 
-	json.Unmarshal(content, &nodesStruct)
+	err = json.Unmarshal(content, &nodesStruct)
+	if err != nil {
+		return "", err
+	}
 
 	// _local will only fetch one node info. First entry is node name
 	for k := range nodesStruct.Nodes {
 		return k, nil
 	}
-	return "", fmt.Errorf("No local node found")
+	return "", fmt.Errorf("no local node found")
 }
 
 func getMasterName(http *helper.HTTP, uri string) (string, error) {
-	// TODO: evaluate on why when run with ?local=true request does not contain master_node field
-	content, err := fetchPath(http, uri, "_cluster/state/master_node", "")
+	content, err := fetchPath(http, uri, "_cluster/state/master_node", "local=true")
 	if err != nil {
 		return "", err
 	}
@@ -190,23 +191,25 @@ func getMasterName(http *helper.HTTP, uri string) (string, error) {
 		MasterNode string `json:"master_node"`
 	}{}
 
-	json.Unmarshal(content, &clusterStruct)
+	err = json.Unmarshal(content, &clusterStruct)
+	if err != nil {
+		return "", err
+	}
 
 	return clusterStruct.MasterNode, nil
 }
 
 // GetInfo returns the data for the Elasticsearch / endpoint.
-func GetInfo(http *helper.HTTP, uri string) (*Info, error) {
-
+func GetInfo(http *helper.HTTP, uri string) (Info, error) {
 	content, err := fetchPath(http, uri, "/", "")
 	if err != nil {
-		return nil, err
+		return Info{}, err
 	}
 
-	info := &Info{}
+	info := Info{}
 	err = json.Unmarshal(content, &info)
 	if err != nil {
-		return nil, err
+		return Info{}, err
 	}
 
 	return info, nil
@@ -237,7 +240,10 @@ func GetNodeInfo(http *helper.HTTP, uri string, nodeID string) (*NodeInfo, error
 		Nodes map[string]*NodeInfo `json:"nodes"`
 	}{}
 
-	json.Unmarshal(content, &nodesStruct)
+	err = json.Unmarshal(content, &nodesStruct)
+	if err != nil {
+		return nil, err
+	}
 
 	// _local will only fetch one node info. First entry is node name
 	for k, v := range nodesStruct.Nodes {
@@ -282,13 +288,21 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 }
 
 // GetClusterState returns cluster state information.
-func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (mapstr.M, error) {
+func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filterPaths []string) (mapstr.M, error) {
+	queryParams := []string{"local=true"}
 	clusterStateURI := "_cluster/state"
-	if metrics != nil && len(metrics) > 0 {
+	if len(metrics) > 0 {
 		clusterStateURI += "/" + strings.Join(metrics, ",")
 	}
 
-	content, err := fetchPath(http, resetURI, clusterStateURI, "")
+	if len(filterPaths) > 0 {
+		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
+		queryParams = append(queryParams, filterPathQueryParam)
+	}
+
+	queryString := strings.Join(queryParams, "&")
+
+	content, err := fetchPath(http, resetURI, clusterStateURI, queryString)
 	if err != nil {
 		return nil, err
 	}
@@ -296,6 +310,28 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (maps
 	var clusterState map[string]interface{}
 	err = json.Unmarshal(content, &clusterState)
 	return clusterState, err
+}
+
+func GetIndexSettings(http *helper.HTTP, resetURI string, indexPattern string, filterPaths []string) (mapstr.M, error) {
+
+	queryParams := []string{"local=true", "expand_wildcards=hidden,all"}
+	indicesSettingsURI := indexPattern + "/_settings"
+
+	if len(filterPaths) > 0 {
+		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
+		queryParams = append(queryParams, filterPathQueryParam)
+	}
+
+	queryString := strings.Join(queryParams, "&")
+
+	content, err := fetchPath(http, resetURI, indicesSettingsURI, queryString)
+	if err != nil {
+		return nil, err
+	}
+
+	var indicesSettings map[string]interface{}
+	err = json.Unmarshal(content, &indicesSettings)
+	return indicesSettings, err
 }
 
 // GetClusterSettingsWithDefaults returns cluster settings.
@@ -311,7 +347,7 @@ func GetClusterSettings(http *helper.HTTP, resetURI string, includeDefaults bool
 		queryParams = append(queryParams, "include_defaults=true")
 	}
 
-	if filterPaths != nil && len(filterPaths) > 0 {
+	if len(filterPaths) > 0 {
 		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
 		queryParams = append(queryParams, filterPathQueryParam)
 	}
@@ -345,6 +381,9 @@ type XPack struct {
 		CCR struct {
 			Enabled bool `json:"enabled"`
 		} `json:"CCR"`
+		ML struct {
+			Enabled bool `json:"enabled"`
+		} `json:"ml"`
 	} `json:"features"`
 }
 
@@ -359,61 +398,6 @@ func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
 	var xpack XPack
 	err = json.Unmarshal(content, &xpack)
 	return xpack, err
-}
-
-type boolStr bool
-
-func (b *boolStr) UnmarshalJSON(raw []byte) error {
-	var bs string
-	err := json.Unmarshal(raw, &bs)
-	if err != nil {
-		return err
-	}
-
-	bv, err := strconv.ParseBool(bs)
-	if err != nil {
-		return err
-	}
-
-	*b = boolStr(bv)
-	return nil
-}
-
-type IndexSettings struct {
-	Hidden bool
-}
-
-// GetIndicesSettings returns a map of index names to their settings.
-// Note that as of now it is optimized to fetch only the "hidden" index setting to keep the memory
-// footprint of this function call as low as possible.
-func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSettings, error) {
-	content, err := fetchPath(http, resetURI, "*/_settings", "filter_path=*.settings.index.hidden&expand_wildcards=all")
-
-	if err != nil {
-		return nil, errors.Wrap(err, "could not fetch indices settings")
-	}
-
-	var resp map[string]struct {
-		Settings struct {
-			Index struct {
-				Hidden boolStr `json:"hidden"`
-			} `json:"index"`
-		} `json:"settings"`
-	}
-
-	err = json.Unmarshal(content, &resp)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not parse indices settings response")
-	}
-
-	ret := make(map[string]IndexSettings, len(resp))
-	for index, settings := range resp {
-		ret[index] = IndexSettings{
-			Hidden: bool(settings.Settings.Index.Hidden),
-		}
-	}
-
-	return ret, nil
 }
 
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
@@ -452,7 +436,7 @@ func GetMasterNodeID(http *helper.HTTP, resetURI string) (string, error) {
 		return "", err
 	}
 
-	for nodeID, _ := range response.Nodes {
+	for nodeID := range response.Nodes {
 		return nodeID, nil
 	}
 
@@ -604,7 +588,7 @@ func (l *License) ToMapStr() mapstr.M {
 func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 	hasSettingGroup, err := allSettings.HasKey(groupKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "failure to determine if "+groupKey+" settings exist")
+		return nil, fmt.Errorf("failure to determine if %s settings exist: %w", groupKey, err)
 	}
 
 	if !hasSettingGroup {
@@ -613,12 +597,12 @@ func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 
 	settings, err := allSettings.GetValue(groupKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "failure to extract "+groupKey+" settings")
+		return nil, fmt.Errorf("failure to extract %s settings: %w", groupKey, err)
 	}
 
 	v, ok := settings.(map[string]interface{})
 	if !ok {
-		return nil, errors.Wrap(err, groupKey+" settings are not a map")
+		return nil, fmt.Errorf("%s settings are not a map", groupKey)
 	}
 
 	return mapstr.M(v), nil

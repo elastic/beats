@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package http
 
@@ -88,7 +87,7 @@ func httpModForTests(store *eventStore) *httpPlugin {
 		callback = store.publish
 	}
 
-	http, err := New(false, callback, procs.ProcessesWatcher{}, conf.NewConfig())
+	http, err := New(false, callback, &procs.ProcessesWatcher{}, conf.NewConfig())
 	if err != nil {
 		panic(err)
 	}
@@ -987,7 +986,7 @@ func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
 
 	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
 	if rawMessageObscured < 0 {
-		t.Errorf("Obscured authorization string not found: " + string(msg[:]))
+		t.Error("Obscured authorization string not found: " + string(msg[:]))
 	}
 }
 
@@ -1022,7 +1021,7 @@ func TestHttpParser_RedactAuthorization_Proxy_raw(t *testing.T) {
 
 	rawMessageObscured := bytes.Index(msg, []byte("uthorization:*"))
 	if rawMessageObscured < 0 {
-		t.Errorf("Failed to redact proxy-authorization header: " + string(msg[:]))
+		t.Error("Failed to redact proxy-authorization header: " + string(msg[:]))
 	}
 }
 
@@ -1899,6 +1898,36 @@ func TestHttpParser_Extension(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestExtractHostHeader(t *testing.T) {
+	tests := []struct {
+		header   string
+		wantHost string
+		wantPort int
+	}{
+		{header: "", wantHost: "", wantPort: 0},
+		{header: "localhost:0", wantHost: "localhost:0", wantPort: 0},
+		{header: "127.0.0.1:0", wantHost: "127.0.0.1:0", wantPort: 0},
+		{header: "[::]:0", wantHost: "[::]:0", wantPort: 0},
+		{header: "localhost", wantHost: "localhost", wantPort: 0},
+		{header: "localhost:9001", wantHost: "localhost", wantPort: 9001},
+		{header: "localhost:9000000", wantHost: "localhost:9000000", wantPort: 0},
+		{header: "127.0.0.1:9001", wantHost: "127.0.0.1", wantPort: 9001},
+		{header: "127.0.0.1", wantHost: "127.0.0.1", wantPort: 0},
+		{header: "[::]", wantHost: "::", wantPort: 0},
+		{header: ":0", wantHost: ":0", wantPort: 0},
+		{header: ":9001", wantHost: "", wantPort: 9001},
+	}
+	for _, test := range tests {
+		host, port := extractHostHeader(test.header)
+		if host != test.wantHost {
+			t.Errorf("unexpected host for %q: got:%q want:%q", test.header, host, test.wantHost)
+		}
+		if port != test.wantPort {
+			t.Errorf("unexpected port for %q: got:%d want:%d", test.header, port, test.wantPort)
+		}
 	}
 }
 

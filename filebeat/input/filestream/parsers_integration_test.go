@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package filestream
 
@@ -30,9 +29,11 @@ func TestParsersAgentLogs(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"ndjson": map[string]interface{}{
@@ -44,7 +45,7 @@ func TestParsersAgentLogs(t *testing.T) {
 	})
 
 	testline := []byte("{\"log.level\":\"info\",\"@timestamp\":\"2021-05-12T16:15:09.411+0000\",\"log.origin\":{\"file.name\":\"log/harvester.go\",\"file.line\":302},\"message\":\"Harvester started for file: /var/log/auth.log\",\"ecs.version\":\"1.6.0\"}\n")
-	env.mustWriteLinesToFile(testlogName, testline)
+	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -60,15 +61,52 @@ func TestParsersAgentLogs(t *testing.T) {
 	env.waitUntilInputStops()
 }
 
+func TestParsersIncludeMessage(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	readLine := "include this"
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "100ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
+		"parsers": []map[string]interface{}{
+			{
+				"include_message": map[string]interface{}{
+					"patterns": "^" + readLine + "$",
+				},
+			},
+		},
+	})
+
+	logs := []byte("do no include this line\r\n" + readLine + "\r\n")
+	env.mustWriteToFile(testlogName, logs)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, inp)
+
+	env.waitUntilEventCount(1)
+	env.requireOffsetInRegistry(testlogName, "fake-ID", len(logs))
+
+	env.requireEventContents(0, "message", readLine)
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
 // test_docker_logs_filtering from test_json.py
 func TestParsersDockerLogsFiltering(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"ndjson": map[string]interface{}{
@@ -84,7 +122,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 {"log":"Fetching dependencies...\n","stream":"stdout","time":"2016-03-02T22:59:04.609292428Z"}
 {"log":"Execute /scripts/packetbeat_before_build.sh\n","stream":"stdout","time":"2016-03-02T22:59:04.617434682Z"}
 `)
-	env.mustWriteLinesToFile(testlogName, testline)
+	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -105,9 +143,11 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"ndjson": map[string]interface{}{
@@ -120,7 +160,7 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 	})
 
 	testline := []byte("{\"source\": \"hello\", \"message\": \"test source\"}\n")
-	env.mustWriteLinesToFile(testlogName, testline)
+	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -141,9 +181,11 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"ndjson": map[string]interface{}{
@@ -160,7 +202,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 {"@timestamp":{"hello": "test"}}
 `)
 
-	env.mustWriteLinesToFile(testlogName, testline)
+	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -182,9 +224,11 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -199,7 +243,7 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 	})
 
 	testlines := []byte(elasticsearchMultilineLogs)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -217,9 +261,11 @@ func TestParsersCStyleLog(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -240,7 +286,7 @@ lines
 In addition it has normal lines
 The total should be 4 lines covered
 `)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -258,9 +304,11 @@ func TestParsersRabbitMQMultilineLog(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -285,7 +333,7 @@ connection <0.23893.109>, channel 3 - soft error:
             "no queue 'bucket-1' in vhost '/'",
             'queue.declare'}
 `)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -303,9 +351,11 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -321,7 +371,7 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 	})
 
 	testlines := []byte(elasticsearchMultilineLongLogs)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -347,9 +397,11 @@ func TestParsersMultilineTimeout(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -368,7 +420,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
   First Line
   Second Line
 `)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -382,7 +434,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
   First line again
 `)
 
-	env.mustAppendLinesToFile(testlogName, moreLines)
+	env.mustAppendToFile(testlogName, moreLines)
 
 	env.requireEventsReceived([]string{
 		`[2015] hello world
@@ -412,10 +464,12 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
-		"message_max_bytes":                 50,
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"message_max_bytes":                      50,
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -430,7 +484,7 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 	})
 
 	testlines := []byte(elasticsearchMultilineLongLogs)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -454,10 +508,12 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
-		"close.reader.after_interval":       "1s",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"close.reader.after_interval":            "1s",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -474,7 +530,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
   First Line
   Second Line
 `)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)
@@ -489,7 +545,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
   First line again
 `)
 
-	env.mustAppendLinesToFile(testlogName, moreLines)
+	env.mustAppendToFile(testlogName, moreLines)
 
 	env.requireEventsReceived([]string{
 		`[2015] hello world
@@ -519,10 +575,12 @@ func TestParsersConsecutiveNewline(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
-		"close.reader.after_interval":       "1s",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"close.reader.after_interval":            "1s",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -550,7 +608,7 @@ SetAdCodeMiddleware.default_ad_code path /health_check
 SetAdCodeMiddleware.default_ad_code route
 `
 	testlines := append([]byte(line1), []byte(line2)...)
-	env.mustWriteLinesToFile(testlogName, testlines)
+	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
 	env.startInput(ctx, inp)

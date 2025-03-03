@@ -6,26 +6,33 @@ package netflow
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/google/gopacket"
-	"github.com/google/gopacket/pcap"
+	"github.com/google/gopacket/pcapgo"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -41,6 +48,10 @@ const (
 	fieldsDir   = "testdata/fields"
 	datSourceIP = "192.0.2.1"
 )
+
+func init() {
+	logp.TestingSetup()
+}
 
 // DatTests specifies the .dat files associated with test cases.
 type DatTests struct {
@@ -58,6 +69,131 @@ type TestResult struct {
 	Name  string       `json:"test_name"`
 	Error string       `json:"error,omitempty"`
 	Flows []beat.Event `json:"events,omitempty"`
+}
+
+func newV2Context(id string) (v2.Context, func()) {
+	ctx, cancel := context.WithCancel(context.Background())
+	return v2.Context{
+		Logger:      logp.NewLogger("netflow_test"),
+		ID:          id,
+		Cancelation: ctx,
+	}, cancel
+}
+
+func TestNetFlow(t *testing.T) {
+	pcaps, err := filepath.Glob(filepath.Join(pcapDir, "*.pcap"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, file := range pcaps {
+		testName := strings.TrimSuffix(filepath.Base(file), ".pcap")
+
+		isReversed := strings.HasSuffix(file, ".reversed.pcap")
+
+		t.Run(testName, func(t *testing.T) {
+
+			pluginCfg, err := conf.NewConfigFrom(mapstr.M{})
+			require.NoError(t, err)
+			if isReversed {
+				// if pcap is reversed packet order we need to have multiple workers
+				// and thus enable the input packets lru
+				err = pluginCfg.SetInt("workers", -1, 2)
+				require.NoError(t, err)
+			}
+
+			netflowPlugin, err := Plugin(logp.NewLogger("netflow_test")).Manager.Create(pluginCfg)
+			require.NoError(t, err)
+
+			mockPipeline := &pipelinemock.MockPipelineConnector{}
+
+			ctx, cancelFn := newV2Context(testName)
+			defer cancelFn()
+			errChan := make(chan error)
+			go func() {
+				defer close(errChan)
+				defer cancelFn()
+				errChan <- netflowPlugin.Run(ctx, mockPipeline)
+			}()
+
+			defer cancelFn()
+
+			require.Eventually(t, mockPipeline.HasConnectedClients, 5*time.Second, 100*time.Millisecond,
+				"no client has connected to the pipeline")
+
+			udpAddr, err := net.ResolveUDPAddr("udp", defaultConfig.Config.Host)
+			require.NoError(t, err)
+
+			conn, err := net.DialUDP("udp", nil, udpAddr)
+			require.NoError(t, err)
+
+			f, err := os.Open(file)
+			require.NoError(t, err)
+			defer f.Close()
+
+			r, err := pcapgo.NewReader(f)
+			require.NoError(t, err)
+
+			goldenData := readGoldenFile(t, filepath.Join(goldenDir, testName+".pcap.golden.json"))
+
+			// Process packets in PCAP and get flow records.
+			var totalBytes, totalPackets int
+			packetSource := gopacket.NewPacketSource(r, r.LinkType())
+			for pkt := range packetSource.Packets() {
+				payloadData := pkt.TransportLayer().LayerPayload()
+
+				n, err := conn.Write(payloadData)
+				require.NoError(t, err)
+				totalBytes += n
+				totalPackets++
+			}
+
+			require.Eventually(t, func() bool {
+				return len(mockPipeline.GetAllEvents()) == len(goldenData.Flows)
+			}, 5*time.Second, 100*time.Millisecond,
+				"got a different number of events than expected")
+
+			for _, event := range goldenData.Flows {
+				// fields that cannot be matched at runtime
+				_ = event.Delete("netflow.exporter.address")
+				_ = event.Delete("event.created")
+				_ = event.Delete("observer.ip")
+			}
+
+			publishedEvents := mockPipeline.GetAllEvents()
+			for _, event := range publishedEvents {
+				// fields that cannot be matched at runtime
+				_ = event.Delete("netflow.exporter.address")
+				_ = event.Delete("event.created")
+				_ = event.Delete("observer.ip")
+			}
+
+			if !isReversed {
+				require.EqualValues(t, goldenData, normalize(t, TestResult{
+					Name:  goldenData.Name,
+					Error: "",
+					Flows: publishedEvents,
+				}))
+			} else {
+				// flows order cannot be guaranteed for input that run with multiple workers
+				publishedTestResult := normalize(t, TestResult{
+					Name:  goldenData.Name,
+					Error: "",
+					Flows: publishedEvents,
+				})
+				require.ElementsMatch(t, goldenData.Flows, publishedTestResult.Flows)
+			}
+
+			cancelFn()
+			select {
+			case err := <-errChan:
+				require.NoError(t, err)
+			case <-time.After(10 * time.Second):
+				t.Fatal("netflow plugin did not stop")
+			}
+
+		})
+	}
 }
 
 func TestPCAPFiles(t *testing.T) {
@@ -83,7 +219,7 @@ func TestPCAPFiles(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				err = ioutil.WriteFile(goldenName, data, 0o644)
+				err = os.WriteFile(goldenName, data, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -115,7 +251,7 @@ func TestDatFiles(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				err = ioutil.WriteFile(goldenName, data, 0o644)
+				err = os.WriteFile(goldenName, data, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -141,7 +277,7 @@ func TestDatFiles(t *testing.T) {
 }
 
 func readDatTests(t testing.TB) *DatTests {
-	data, err := ioutil.ReadFile("testdata/dat_tests.yaml")
+	data, err := os.ReadFile("testdata/dat_tests.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,11 +293,10 @@ func readDatTests(t testing.TB) *DatTests {
 func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 	t.Helper()
 
-	config := decoder.NewConfig().
+	config := decoder.NewConfig(logp.NewLogger("netflow_test")).
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
-		WithExpiration(0).
-		WithLogOutput(test.TestLogWriter{TB: t})
+		WithExpiration(0)
 
 	for _, fieldFile := range testCase.Fields {
 		fields, err := LoadFieldDefinitionsFromFile(filepath.Join(fieldsDir, fieldFile))
@@ -179,7 +314,7 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 	source := test.MakeAddress(t, datSourceIP+":4444")
 	var events []beat.Event
 	for _, f := range testCase.Files {
-		dat, err := ioutil.ReadFile(filepath.Join(datDir, f))
+		dat, err := os.ReadFile(filepath.Join(datDir, f))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -212,17 +347,18 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 	t.Helper()
 
-	r, err := pcap.OpenOffline(pcapFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer r.Close()
+	f, err := os.Open(pcapFile)
+	require.NoError(t, err)
+	defer f.Close()
 
-	config := decoder.NewConfig().
+	r, err := pcapgo.NewReader(f)
+	require.NoError(t, err)
+
+	config := decoder.NewConfig(logp.NewLogger("netflow_test")).
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
-		WithLogOutput(test.TestLogWriter{TB: t})
+		WithCache(strings.HasSuffix(pcapFile, ".reversed.pcap"))
 
 	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {
@@ -268,7 +404,7 @@ func normalize(t testing.TB, result TestResult) TestResult {
 }
 
 func readGoldenFile(t testing.TB, file string) TestResult {
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -343,7 +479,7 @@ func TestReverseFlows(t *testing.T) {
 		},
 	}
 
-	var evs []beat.Event
+	evs := make([]beat.Event, 0, len(flows))
 	for _, f := range flows {
 		evs = append(evs, toBeatEvent(f, []string{"private"}))
 	}

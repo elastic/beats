@@ -31,13 +31,19 @@
         "mysql.slowlog.rows_affected": 0,
         "mysql.slowlog.rows_examined": 3145718,
         "mysql.slowlog.rows_sent": 10,
-        "mysql.slowlog.schema": "employees",
+        "mysql.slowlog.schema": [
+            "employees-test",
+            "employees-test"
+        ],
         "mysql.slowlog.tmp_disk_tables": "0",
         "mysql.slowlog.tmp_table": true,
         "mysql.slowlog.tmp_table_on_disk": false,
         "mysql.slowlog.tmp_table_sizes": 4026528,
         "mysql.slowlog.tmp_tables": 1,
         "mysql.thread_id": "37",
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"

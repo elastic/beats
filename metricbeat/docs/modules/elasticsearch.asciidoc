@@ -28,6 +28,20 @@ UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `met
 from the module's configuration. Alternatively, run `metricbeat modules disable elasticsearch` and
 `metricbeat modules enable elasticsearch-xpack`.
 
+When xpack mode is enabled, all the legacy metricsets are automatically enabled by default.
+This means that you do not need to manually enable them, and there will be no conflicts or issues because Metricbeat merges the user-defined metricsets with the ones that xpack mode forces to enable.
+As a result, you can seamlessly collect comprehensive metrics without worrying about dataset overlap or duplication.
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: elasticsearch
+  xpack.enabled: true
+  metricsets:
+    - ingest_pipeline
+  period: 10s
+----
+
 NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
 monitoring index instead of the default index typically used by {metricbeat}.
 For more details about the monitoring index, see
@@ -64,15 +78,18 @@ metricbeat.modules:
     #- index
     #- index_recovery
     #- index_summary
+    #- ingest_pipeline
     #- shard
     #- ml_job
   period: 10s
   hosts: ["http://localhost:9200"]
   #username: "elastic"
   #password: "changeme"
+  #api_key: "foo:bar"
   #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
 
   #index_recovery.active_only: true
+  #ingest_pipeline.processor_sample_rate: 0.25
   #xpack.enabled: false
   #scope: node
 ----
@@ -97,6 +114,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-elasticsearch-index_summary,index_summary>>
 
+* <<metricbeat-metricset-elasticsearch-ingest_pipeline,ingest_pipeline>>
+
 * <<metricbeat-metricset-elasticsearch-ml_job,ml_job>>
 
 * <<metricbeat-metricset-elasticsearch-node,node>>
@@ -118,6 +137,8 @@ include::elasticsearch/index.asciidoc[]
 include::elasticsearch/index_recovery.asciidoc[]
 
 include::elasticsearch/index_summary.asciidoc[]
+
+include::elasticsearch/ingest_pipeline.asciidoc[]
 
 include::elasticsearch/ml_job.asciidoc[]
 

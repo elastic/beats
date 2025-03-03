@@ -1,4 +1,4 @@
-BEAT_VERSION ?= 8.5.0
+BEAT_VERSION ?= 8.9.0
 LOCATION := ../build/heartbeat-ironbank-$(BEAT_VERSION)-docker-build-context
 
 YQ_VERSION ?= v4.13.2
@@ -48,6 +48,6 @@ package: ## Package heartbeat for the artifacts consumed by the ironbank docker 
 validate-ironbank: prepare
 	docker build \
 		--build-arg BASE_REGISTRY=docker.elastic.co \
-		--build-arg BASE_IMAGE=ubi8/ubi \
+		--build-arg BASE_IMAGE=ubi9/ubi \
 		--build-arg BASE_TAG=latest \
 		$(LOCATION)

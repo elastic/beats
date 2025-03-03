@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/prometheus/prometheus/pkg/labels"
-	"github.com/prometheus/prometheus/pkg/textparse"
+	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
@@ -45,7 +45,7 @@ var (
 	}.Build()
 
 	upMetricName          = "up"
-	upMetricType          = textparse.MetricTypeGauge
+	upMetricType          = model.MetricTypeGauge
 	upMetricInstanceLabel = "instance"
 	upMetricJobLabel      = "job"
 )
@@ -137,7 +137,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	families, err := m.openmetrics.GetFamilies()
-	eventList := map[textparse.MetricType]map[string]mapstr.M{}
+	eventList := map[model.MetricType]map[string]mapstr.M{}
 	if err != nil {
 		// send up event only
 		families = append(families, m.upMetricFamily(0.0))

@@ -20,7 +20,7 @@
 package include
 
 import (
-	// Import packages that need to register themselves.
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/metricbeat/module/aerospike"
 	_ "github.com/elastic/beats/v7/metricbeat/module/aerospike/namespace"
 	_ "github.com/elastic/beats/v7/metricbeat/module/apache"
@@ -59,6 +59,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_recovery"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/index_summary"
+	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ingest_pipeline"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/ml_job"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
@@ -92,7 +93,6 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/cluster_rules"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/node_actions"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/node_rules"
-	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/settings"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kibana/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/kvm"
@@ -180,12 +180,17 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/uwsgi"
 	_ "github.com/elastic/beats/v7/metricbeat/module/uwsgi/status"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/cluster"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastore"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/datastorecluster"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/host"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/network"
+	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/resourcepool"
 	_ "github.com/elastic/beats/v7/metricbeat/module/vsphere/virtualmachine"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/perfmon"
 	_ "github.com/elastic/beats/v7/metricbeat/module/windows/service"
+	_ "github.com/elastic/beats/v7/metricbeat/module/windows/wmi"
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper"
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper/connection"
 	_ "github.com/elastic/beats/v7/metricbeat/module/zookeeper/mntr"

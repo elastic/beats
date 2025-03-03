@@ -18,6 +18,21 @@ https://gitlab.com/apparmor/apparmor/wikis/TechnicalDoc_Proc_and_ptrace[AppArmor
 and other LSM software], even though the System module doesn't use `ptrace`
 directly.
 
+[TIP] 
+.How and when metrics are collected
+==== 
+Certain metrics monitored by the System module require multiple values to be 
+collected.
+For example, the `system.process.cpu.total.norm.pct` field reports the percentage
+of CPU time spent by the process since the last event. For this percentage to be
+determined, the process needs to appear at least twice so that a performance delta
+can be calculated. 
+
+Note that in some cases a field like this may be missing from the System module
+metricset if the process has not been available long enough to be included in 
+two periods of metric collection.
+====
+
 [float]
 === Dashboard
 

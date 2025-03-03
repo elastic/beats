@@ -17,10 +17,12 @@ const (
 
 type responseConfig struct {
 	DecodeAs                string           `config:"decode_as"`
+	XSD                     string           `config:"xsd"`
 	RequestBodyOnPagination bool             `config:"request_body_on_pagination"`
 	Transforms              transformsConfig `config:"transforms"`
 	Pagination              transformsConfig `config:"pagination"`
 	Split                   *splitConfig     `config:"split"`
+	SaveFirstResponse       bool             `config:"save_first_response"`
 }
 
 type splitConfig struct {
@@ -35,10 +37,10 @@ type splitConfig struct {
 }
 
 func (c *responseConfig) Validate() error {
-	if _, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, nil); err != nil {
 		return err
 	}
-	if _, err := newBasicTransformsFromConfig(c.Pagination, paginationNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Pagination, paginationNamespace, nil); err != nil {
 		return err
 	}
 	if c.DecodeAs != "" {
@@ -50,7 +52,7 @@ func (c *responseConfig) Validate() error {
 }
 
 func (c *splitConfig) Validate() error {
-	if _, err := newBasicTransformsFromConfig(c.Transforms, responseNamespace, nil); err != nil {
+	if _, err := newBasicTransformsFromConfig(registeredTransforms, c.Transforms, responseNamespace, nil); err != nil {
 		return err
 	}
 

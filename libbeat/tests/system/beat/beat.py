@@ -269,10 +269,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if output is None:
             output = self.beat_name + "-" + self.today + ".ndjson"
 
-        args = [cmd, "-systemTest"]
+        args = [cmd, "--systemTest"]
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile",
+                "--test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
 
@@ -281,7 +281,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             path_home = home
 
         args += [
-            "-path.home", path_home,
+            "--path.home", path_home,
             "-c", os.path.join(self.working_dir, config),
         ]
 
@@ -443,6 +443,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
+                print("Test has failed, here are the Beat logs")
+                for l in self.get_log_lines():
+                    print(l)
                 raise WaitTimeoutError(
                     f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
             time.sleep(poll_interval)
@@ -514,9 +517,10 @@ class TestCase(unittest.TestCase, ComposeMixin):
         if logfile is None:
             logfile = self.beat_name + "-" + self.today + ".ndjson"
 
-        print("logfile", logfile, self.working_dir)
+        logfile_path = os.path.join(self.working_dir, logfile)
+        print("logfile      ", logfile_path)
         try:
-            with open(os.path.join(self.working_dir, logfile), "r", encoding="utf_8") as f:
+            with open(logfile_path, "r", encoding="utf_8") as f:
                 for line in f:
                     if is_regexp:
                         if msg.search(line) is not None:
@@ -526,6 +530,27 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         line = line.lower()
                     if line.find(msg) >= 0:
                         counter = counter + 1
+
+            # Event log file:
+            logfile = self.beat_name + "-events-data-" + self.today + ".ndjson"
+            logfile_path = os.path.join(self.working_dir, "logs", logfile)
+            print("event logfile", logfile_path)
+            try:
+                with open(logfile_path, "r", encoding="utf_8") as f:
+                    for line in f:
+                        if is_regexp:
+                            if msg.search(line) is not None:
+                                counter = counter + 1
+                            continue
+                        if ignore_case:
+                            line = line.lower()
+                        if line.find(msg) >= 0:
+                            counter = counter + 1
+            except FileNotFoundError as e:
+                # The events log file is not always present, so we ignore
+                # if it does not exit
+                pass
+
         except IOError as ioe:
             print(ioe)
             counter = -1
@@ -714,6 +739,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             if not os.path.isfile(path):
                 path = os.path.abspath(os.path.dirname(
                     __file__) + "../../../../_meta/fields.common.yml")
+
             with open(path, encoding="utf-8") as f2:
                 content = f2.read()
 
@@ -785,7 +811,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
     def assert_fields_are_documented(self, evt):
         """
         Assert that all keys present in evt are documented in fields.yml.
-        This reads from the global fields.yml, means `make collect` has to be run before the check.
+        This reads from the global fields.yml, means `mage fields` has to be run before the check.
         """
         expected_fields, dict_fields, aliases = self.load_fields()
         flat = self.flatten_object(evt, dict_fields)
@@ -810,16 +836,25 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     return True
             return False
 
+        undocumented_keys = []
+        is_documented_aliases = []
+
         for key in flat.keys():
             meta_key = key.startswith('@metadata.')
             # Range keys as used in 'date_range' etc will not have docs of course
             is_range_key = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
+
             if not(is_documented(key, expected_fields) or meta_key or is_range_key):
-                raise Exception(
-                    f"Key '{key}' found in event ({str(evt)}) is not documented!")
+                undocumented_keys.append(key)
+
             if is_documented(key, aliases):
-                raise Exception(
-                    "Key '{key}' found in event is documented as an alias!")
+                is_documented_aliases.append(key)
+
+        if undocumented_keys:
+            raise Exception(f"Keys:\n\n{undocumented_keys}\n\nnot documented in event:\n\n{str(evt)}\n")
+
+        if is_documented_aliases:
+            raise Exception(f"Keys {is_documented_aliases} documented as aliases!")
 
     def get_beat_version(self):
         """

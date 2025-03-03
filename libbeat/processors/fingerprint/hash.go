@@ -18,8 +18,6 @@
 package fingerprint
 
 import (
-	"crypto/md5"
-	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
 	"hash"
@@ -28,19 +26,28 @@ import (
 	"github.com/cespare/xxhash/v2"
 )
 
+type namedHashMethod struct {
+	Name string
+	Hash hashMethod
+}
 type hashMethod func() hash.Hash
 
-var hashes = map[string]hashMethod{
-	"md5":    md5.New,
-	"sha1":   sha1.New,
-	"sha256": sha256.New,
-	"sha384": sha512.New384,
-	"sha512": sha512.New,
-	"xxhash": newXxHash,
+var hashes = map[string]namedHashMethod{}
+
+func init() {
+	fipsApprovedHashes := []namedHashMethod{
+		{Name: "sha256", Hash: sha256.New},
+		{Name: "sha384", Hash: sha512.New384},
+		{Name: "sha512", Hash: sha512.New},
+		{Name: "xxhash", Hash: newXxHash},
+	}
+	for _, h := range fipsApprovedHashes {
+		hashes[h.Name] = h
+	}
 }
 
 // Unpack creates the hashMethod from the given string
-func (f *hashMethod) Unpack(str string) error {
+func (f *namedHashMethod) Unpack(str string) error {
 	str = strings.ToLower(str)
 
 	m, found := hashes[str]

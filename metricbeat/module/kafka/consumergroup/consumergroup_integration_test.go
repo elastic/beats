@@ -16,17 +16,16 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package consumergroup
 
 import (
+	"fmt"
 	"io"
 	"testing"
 	"time"
 
-	saramacluster "github.com/bsm/sarama-cluster"
-	"github.com/pkg/errors"
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -46,9 +45,9 @@ func TestData(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
+	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
 	if err != nil {
-		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
+		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
 	defer c.Close()
 
@@ -69,9 +68,9 @@ func TestFetch(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
+	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
 	if err != nil {
-		t.Fatal(errors.Wrap(err, "starting kafka consumer"))
+		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
 	defer c.Close()
 
@@ -94,19 +93,25 @@ func TestFetch(t *testing.T) {
 	}
 }
 
-func startConsumer(t *testing.T, host string, topic string) (io.Closer, error) {
+func startConsumer(t *testing.T, host string, groupID string) (io.Closer, error) {
 	brokers := []string{host}
-	topics := []string{topic}
-	config := saramacluster.NewConfig()
+
+	config := sarama.NewConfig()
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = kafkaSASLConsumerUsername
 	config.Net.SASL.Password = kafkaSASLConsumerPassword
-	// The test panics unless CommitInterval is set due to the following bug in sarama:
-	// https://github.com/Shopify/sarama/issues/1638
-	// To work around the issue we need to set CommitInterval, but now sarama emits
-	// a deprecation warning.
-	config.Consumer.Offsets.CommitInterval = 1 * time.Second
-	return saramacluster.NewConsumer(brokers, "test-group", topics, config)
+
+	config.Consumer.Offsets.AutoCommit.Enable = true
+	config.Consumer.Offsets.AutoCommit.Interval = 1 * time.Second
+
+	// Create a new consumer group
+	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, config)
+	if err != nil {
+		t.Fatalf("Error creating consumer group: %v, brokers: %s", err, brokers)
+		return nil, err
+	}
+
+	return consumerGroup, nil
 }
 
 func getConfig(host string) map[string]interface{} {

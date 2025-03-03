@@ -50,13 +50,13 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	return newPlugin(testMode, results, watcher, cfg)
 }
 
-func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *conf.C) (*dhcpv4Plugin, error) {
+func newPlugin(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (*dhcpv4Plugin, error) {
 	config := defaultConfig
 
 	if !testMode {
@@ -76,7 +76,7 @@ func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWa
 type dhcpv4Plugin struct {
 	dhcpv4Config
 	report  protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 	log     *logp.Logger
 }
 

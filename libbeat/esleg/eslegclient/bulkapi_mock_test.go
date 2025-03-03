@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package eslegclient
 
@@ -38,7 +37,6 @@ import (
 
 func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	expectedResp := []byte(`{"took":7,"errors":false,"items":[]}`)
 
@@ -62,7 +60,7 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(200, expectedResp)
 
-	client := newTestConnection(server.URL)
+	client := newTestConnection(t, server.URL)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -75,7 +73,6 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 
 func TestOneHost500Resp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{
@@ -98,7 +95,7 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(http.StatusInternalServerError, []byte("Something wrong happened"))
 
-	client := newTestConnection(server.URL)
+	client := newTestConnection(t, server.URL)
 
 	params := map[string]string{
 		"refresh": "true",
@@ -115,7 +112,6 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 
 func TestOneHost503Resp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{
@@ -138,7 +134,7 @@ func TestOneHost503Resp_Bulk(t *testing.T) {
 
 	server := ElasticsearchMock(503, []byte("Something wrong happened"))
 
-	client := newTestConnection(server.URL)
+	client := newTestConnection(t, server.URL)
 
 	params := map[string]string{
 		"refresh": "true",

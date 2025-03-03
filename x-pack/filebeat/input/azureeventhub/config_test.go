@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -37,13 +36,12 @@ func TestStorageContainerValidate(t *testing.T) {
 
 func TestValidate(t *testing.T) {
 	t.Run("Sanitize storage account containers with underscores", func(t *testing.T) {
-		config := azureInputConfig{
-			ConnectionString: "sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET",
-			EventHubName:     "event_hub_00",
-			SAName:           "teststorageaccount",
-			SAKey:            "secret",
-			SAContainer:      "filebeat-activitylogs-event_hub_00",
-		}
+		config := defaultConfig()
+		config.ConnectionString = "sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
+		config.EventHubName = "event_hub_00"
+		config.SAName = "teststorageaccount"
+		config.SAKey = "secret"
+		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
 		if err := config.Validate(); err != nil {
 			t.Fatalf("unexpected validation error: %v", err)

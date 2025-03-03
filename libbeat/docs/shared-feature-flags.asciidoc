@@ -1,0 +1,61 @@
+[[configuration-feature-flags]]
+== Configure feature flags
+
+++++
+<titleabbrev>Feature flags</titleabbrev>
+++++
+
+The Feature Flags section of the +{beatname_lc}.yml+ config file contains
+settings in {beatname_uc} that are disabled by default. These may include 
+experimental features, changes to behaviors within {beatname_uc}, or 
+settings that could cause a breaking change. For example a
+setting that changes information included in events might be inconsistent with
+the naming pattern expected in your configured {beatname_uc} output.
+
+To enable any of the settings listed on this page, change the associated `enabled`
+flag from `false` to `true`.
+
+[source,yaml]
+----
+features:
+  mysetting:
+    enabled: true
+----
+
+[float]
+=== Configuration options
+
+You can specify the following options in the `features` section of the +{beatname_lc}.yml+ config file:
+
+[float]
+==== `fqdn`
+
+Contains configuration for the FQDN reporting feature. When this feature is
+enabled, the fully-qualified domain name for the host is reported in the
+`host.name` field in events produced by {beatname_uc}.
+
+preview::[]
+
+For FQDN reporting to work as expected, the hostname of the current host must either:
+
+* Have a CNAME entry defined in DNS.
+* Have one of its corresponding IP addresses respond successfully to a reverse
+DNS lookup.
+
+If neither pre-requisite is satisfied, `host.name` continues to report the
+hostname of the current host as if the FQDN feature flag were not enabled.
+
+Example configuration:
+
+[source,yaml]
+----
+features:
+  fqdn:
+    enabled: true
+----
+
+[float]
+===== `enabled`
+Set to `true` to enable the FQDN reporting feature of {beatname_uc}.
+Defaults to `false`.
+

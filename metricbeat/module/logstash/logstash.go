@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -109,7 +107,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 func GetPipelines(m *MetricSet) ([]PipelineState, string, error) {
 	content, err := fetchPath(m.HTTP, "_node/pipelines", "graph=true")
 	if err != nil {
-		return nil, "", errors.Wrap(err, "could not fetch node pipelines")
+		return nil, "", fmt.Errorf("could not fetch node pipelines: %w", err)
 	}
 
 	pipelinesResponse := struct {
@@ -121,7 +119,7 @@ func GetPipelines(m *MetricSet) ([]PipelineState, string, error) {
 
 	err = json.Unmarshal(content, &pipelinesResponse)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "could not parse node pipelines response")
+		return nil, "", fmt.Errorf("could not parse node pipelines response: %w", err)
 	}
 
 	var pipelines []PipelineState

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package socket
 
@@ -15,8 +14,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 

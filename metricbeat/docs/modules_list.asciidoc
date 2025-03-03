@@ -16,7 +16,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-aws,AWS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.17+| .17+|  |<<metricbeat-metricset-aws-billing,billing>> beta[]  
+.18+| .18+|  |<<metricbeat-metricset-aws-awshealth,awshealth>> beta[]  
+|<<metricbeat-metricset-aws-billing,billing>> beta[]  
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
 |<<metricbeat-metricset-aws-dynamodb,dynamodb>> beta[]  
 |<<metricbeat-metricset-aws-ebs,ebs>>   
@@ -50,6 +51,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   
+|<<metricbeat-module-benchmark,Benchmark>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-benchmark-info,info>> beta[]  
 |<<metricbeat-module-ceph,Ceph>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .13+| .13+|  |<<metricbeat-metricset-ceph-cluster_disk,cluster_disk>>   
 |<<metricbeat-metricset-ceph-cluster_health,cluster_health>>   
@@ -98,20 +101,18 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-dropwizard,Dropwizard>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-dropwizard-collector,collector>>   
 |<<metricbeat-module-elasticsearch,Elasticsearch>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.11+| .11+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
+.12+| .12+|  |<<metricbeat-metricset-elasticsearch-ccr,ccr>>   
 |<<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>   
 |<<metricbeat-metricset-elasticsearch-enrich,enrich>>   
 |<<metricbeat-metricset-elasticsearch-index,index>>   
 |<<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>   
 |<<metricbeat-metricset-elasticsearch-index_summary,index_summary>>   
+|<<metricbeat-metricset-elasticsearch-ingest_pipeline,ingest_pipeline>> beta[]  
 |<<metricbeat-metricset-elasticsearch-ml_job,ml_job>>   
 |<<metricbeat-metricset-elasticsearch-node,node>>   
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>>   
 |<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>   
 |<<metricbeat-metricset-elasticsearch-shard,shard>>   
-|<<metricbeat-module-enterprisesearch,Enterprise Search>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-enterprisesearch-health,health>> beta[]  
-|<<metricbeat-metricset-enterprisesearch-stats,stats>> beta[]  
 |<<metricbeat-module-envoyproxy,Envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>>   
 |<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -119,16 +120,17 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-etcd-metrics,metrics>> beta[]  
 |<<metricbeat-metricset-etcd-self,self>>   
 |<<metricbeat-metricset-etcd-store,store>>   
-|<<metricbeat-module-gcp,Google Cloud Platform>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.9+| .9+|  |<<metricbeat-metricset-gcp-billing,billing>> beta[]  
-|<<metricbeat-metricset-gcp-compute,compute>> beta[]  
-|<<metricbeat-metricset-gcp-dataproc,dataproc>> beta[]  
-|<<metricbeat-metricset-gcp-firestore,firestore>> beta[]  
-|<<metricbeat-metricset-gcp-gke,gke>> beta[]  
-|<<metricbeat-metricset-gcp-loadbalancing,loadbalancing>> beta[]  
-|<<metricbeat-metricset-gcp-metrics,metrics>> beta[]  
-|<<metricbeat-metricset-gcp-pubsub,pubsub>> beta[]  
-|<<metricbeat-metricset-gcp-storage,storage>> beta[]  
+|<<metricbeat-module-gcp,Google Cloud Platform>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.10+| .10+|  |<<metricbeat-metricset-gcp-billing,billing>>   
+|<<metricbeat-metricset-gcp-carbon,carbon>> beta[]  
+|<<metricbeat-metricset-gcp-compute,compute>>   
+|<<metricbeat-metricset-gcp-dataproc,dataproc>>   
+|<<metricbeat-metricset-gcp-firestore,firestore>>   
+|<<metricbeat-metricset-gcp-gke,gke>>   
+|<<metricbeat-metricset-gcp-loadbalancing,loadbalancing>>   
+|<<metricbeat-metricset-gcp-metrics,metrics>>   
+|<<metricbeat-metricset-gcp-pubsub,pubsub>>   
+|<<metricbeat-metricset-gcp-storage,storage>>   
 |<<metricbeat-module-golang,Golang>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-golang-expvar,expvar>>   
 |<<metricbeat-metricset-golang-heap,heap>>   
@@ -163,11 +165,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kafka-partition,partition>>   
 |<<metricbeat-metricset-kafka-producer,producer>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.7+| .7+|  |<<metricbeat-metricset-kibana-cluster_actions,cluster_actions>> beta[]  
+.6+| .6+|  |<<metricbeat-metricset-kibana-cluster_actions,cluster_actions>> beta[]  
 |<<metricbeat-metricset-kibana-cluster_rules,cluster_rules>> beta[]  
 |<<metricbeat-metricset-kibana-node_actions,node_actions>> beta[]  
 |<<metricbeat-metricset-kibana-node_rules,node_rules>> beta[]  
-|<<metricbeat-metricset-kibana-settings,settings>>   
 |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -210,6 +211,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-logstash-node_stats,node_stats>>   
 |<<metricbeat-module-memcached,Memcached>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-memcached-stats,stats>>   
+|<<metricbeat-module-meraki,Cisco Meraki>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-meraki-device_health,device_health>> beta[]  
 |<<metricbeat-module-mongodb,MongoDB>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-mongodb-collstats,collstats>>   
 |<<metricbeat-metricset-mongodb-dbstats,dbstats>>   
@@ -235,12 +238,19 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-nats-subscriptions,subscriptions>>   
 |<<metricbeat-module-nginx,Nginx>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-nginx-stubstatus,stubstatus>>   
+|<<metricbeat-module-openai,openai>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-openai-usage,usage>> beta[]  
 |<<metricbeat-module-openmetrics,Openmetrics>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-openmetrics-collector,collector>> beta[]  
 |<<metricbeat-module-oracle,Oracle>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-oracle-performance,performance>>   
 |<<metricbeat-metricset-oracle-sysmetric,sysmetric>> beta[]  
 |<<metricbeat-metricset-oracle-tablespace,tablespace>>   
+|<<metricbeat-module-panw,Panw>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.4+| .4+|  |<<metricbeat-metricset-panw-interfaces,interfaces>> beta[]  
+|<<metricbeat-metricset-panw-routing,routing>> beta[]  
+|<<metricbeat-metricset-panw-system,system>> beta[]  
+|<<metricbeat-metricset-panw-vpn,vpn>> beta[]  
 |<<metricbeat-module-php_fpm,PHP_FPM>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>>   
 |<<metricbeat-metricset-php_fpm-process,process>>   
@@ -266,8 +276,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-redisenterprise,Redis Enterprise>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .2+| .2+|  |<<metricbeat-metricset-redisenterprise-node,node>> beta[]  
 |<<metricbeat-metricset-redisenterprise-proxy,proxy>> beta[]  
-|<<metricbeat-module-sql,SQL>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.1+| .1+|  |<<metricbeat-metricset-sql-query,query>> beta[]  
+|<<metricbeat-module-sql,SQL>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-sql-query,query>>   
 |<<metricbeat-module-stan,Stan>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-stan-channels,channels>>   
 |<<metricbeat-metricset-stan-stats,stats>>   
@@ -308,12 +318,17 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-uwsgi,uWSGI>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-uwsgi-status,status>>   
 |<<metricbeat-module-vsphere,vSphere>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.3+| .3+|  |<<metricbeat-metricset-vsphere-datastore,datastore>>   
+.7+| .7+|  |<<metricbeat-metricset-vsphere-cluster,cluster>> beta[]  
+|<<metricbeat-metricset-vsphere-datastore,datastore>>   
+|<<metricbeat-metricset-vsphere-datastorecluster,datastorecluster>> beta[]  
 |<<metricbeat-metricset-vsphere-host,host>>   
+|<<metricbeat-metricset-vsphere-network,network>> beta[]  
+|<<metricbeat-metricset-vsphere-resourcepool,resourcepool>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>   
 |<<metricbeat-module-windows,Windows>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
+.3+| .3+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
 |<<metricbeat-metricset-windows-service,service>>   
+|<<metricbeat-metricset-windows-wmi,wmi>> beta[]  
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>>   
 |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
@@ -330,6 +345,7 @@ include::modules/aws.asciidoc[]
 include::modules/awsfargate.asciidoc[]
 include::modules/azure.asciidoc[]
 include::modules/beat.asciidoc[]
+include::modules/benchmark.asciidoc[]
 include::modules/ceph.asciidoc[]
 include::modules/cloudfoundry.asciidoc[]
 include::modules/cockroachdb.asciidoc[]
@@ -341,7 +357,6 @@ include::modules/couchdb.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
-include::modules/enterprisesearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/etcd.asciidoc[]
 include::modules/gcp.asciidoc[]
@@ -360,14 +375,17 @@ include::modules/kvm.asciidoc[]
 include::modules/linux.asciidoc[]
 include::modules/logstash.asciidoc[]
 include::modules/memcached.asciidoc[]
+include::modules/meraki.asciidoc[]
 include::modules/mongodb.asciidoc[]
 include::modules/mssql.asciidoc[]
 include::modules/munin.asciidoc[]
 include::modules/mysql.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/nginx.asciidoc[]
+include::modules/openai.asciidoc[]
 include::modules/openmetrics.asciidoc[]
 include::modules/oracle.asciidoc[]
+include::modules/panw.asciidoc[]
 include::modules/php_fpm.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]

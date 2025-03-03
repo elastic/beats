@@ -1,14 +1,12 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux
-// +build linux
+//go:build linux || synthetics
 
 package synthexec
 
 import (
 	"os"
-	"os/exec"
 
 	"golang.org/x/sys/unix"
 
@@ -17,7 +15,7 @@ import (
 )
 
 func init() {
-	platformCmdMutate = func(cmd *exec.Cmd) {
+	platformCmdMutate = func(cmd *SynthCmd) {
 		logp.L().Warn("invoking node as:", security.NodeChildProcCred, " from: ", os.Getenv("HOME"))
 		// Note that while cmd.SysProcAtr takes a syscall.SysProcAttr object
 		// we are passing in a unix.SysProcAttr object

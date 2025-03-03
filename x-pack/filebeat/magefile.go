@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -60,16 +59,6 @@ func CrossBuild() error {
 	return filebeat.CrossBuild()
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
-}
-
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
 // universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
 // were built and only performs the merge.
@@ -95,7 +84,7 @@ func Package() {
 	filebeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -179,6 +168,7 @@ func IntegTest() {
 
 // GoIntegTest starts the docker containers and executes the Go integration tests.
 func GoIntegTest(ctx context.Context) error {
+	mg.Deps(BuildSystemTestBinary)
 	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 

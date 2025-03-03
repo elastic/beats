@@ -18,11 +18,10 @@
 package linux
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // ReadIntFromFile reads a single int value from a path and returns an int64.
@@ -31,14 +30,14 @@ func ReadIntFromFile(path string, base int) (int64, error) {
 
 	raw, err := ioutil.ReadFile(path)
 	if err != nil {
-		return 0, errors.Wrapf(err, "error reading file %s", path)
+		return 0, fmt.Errorf("error reading file %s: %w", path, err)
 	}
 
 	clean := strings.TrimSpace(string(raw))
 
 	intval, err := strconv.ParseInt(clean, 10, 64)
 	if err != nil {
-		return 0, errors.Wrapf(err, "error converting string: %s", clean)
+		return 0, fmt.Errorf("error converting string: %s: %w", clean, err)
 	}
 
 	return intval, nil

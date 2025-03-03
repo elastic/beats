@@ -51,6 +51,9 @@ metricbeat.modules:
   hosts: ["localhost:5601"]
   basepath: ""
   enabled: true
+  #username: "user"
+  #password: "secret"
+  #api_key: "foo:bar"
 
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.
@@ -73,8 +76,6 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kibana-node_rules,node_rules>>
 
-* <<metricbeat-metricset-kibana-settings,settings>>
-
 * <<metricbeat-metricset-kibana-stats,stats>>
 
 * <<metricbeat-metricset-kibana-status,status>>
@@ -86,8 +87,6 @@ include::kibana/cluster_rules.asciidoc[]
 include::kibana/node_actions.asciidoc[]
 
 include::kibana/node_rules.asciidoc[]
-
-include::kibana/settings.asciidoc[]
 
 include::kibana/stats.asciidoc[]
 

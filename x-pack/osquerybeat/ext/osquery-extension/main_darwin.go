@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build darwin
-// +build darwin
 
 package main
 
@@ -17,4 +16,5 @@ import (
 func RegisterTables(server *osquery.ExtensionManagerServer) {
 	server.RegisterPlugin(table.NewPlugin("host_users", tables.HostUsersColumns(), tables.GetHostUsersGenerateFunc()))
 	server.RegisterPlugin(table.NewPlugin("host_groups", tables.HostGroupsColumns(), tables.GetHostGroupsGenerateFunc()))
+	server.RegisterPlugin(table.NewPlugin("elastic_file_analysis", tables.FileAnalysisColumns(), tables.GetFileAnalysisGenerateFunc()))
 }

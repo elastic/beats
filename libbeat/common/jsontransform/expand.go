@@ -34,7 +34,7 @@ import (
 func ExpandFields(logger *logp.Logger, event *beat.Event, m mapstr.M, addErrorKey bool) {
 	if err := expandFields(m); err != nil {
 		logger.Errorf("JSON: failed to expand fields: %s", err)
-		event.SetErrorWithOption(createJSONError(err.Error()), addErrorKey)
+		event.SetErrorWithOption(err.Error(), addErrorKey, "", "")
 	}
 }
 

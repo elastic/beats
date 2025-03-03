@@ -25,7 +25,6 @@
 //     to OS specific temporary directory)
 //   - `-keep`: The test directories will not be deleted after a test has
 //     finished. The test directory is added to the test logs.
-//
 package storecompliance
 
 import (

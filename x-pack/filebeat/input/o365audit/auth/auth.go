@@ -5,8 +5,9 @@
 package auth
 
 import (
+	"fmt"
+
 	"github.com/Azure/go-autorest/autorest/adal"
-	"github.com/pkg/errors"
 )
 
 // TokenProvider is the interface that wraps an authentication mechanism and
@@ -28,7 +29,7 @@ type servicePrincipalToken adal.ServicePrincipalToken
 func (provider *servicePrincipalToken) Token() (string, error) {
 	inner := (*adal.ServicePrincipalToken)(provider)
 	if err := inner.EnsureFresh(); err != nil {
-		return "", errors.Wrap(err, "refreshing spt token")
+		return "", fmt.Errorf("refreshing spt token: %w", err)
 	}
 	token := inner.Token()
 	return token.OAuthToken(), nil

@@ -80,7 +80,7 @@ func newGroup(title string, log *logp.Logger) *group {
 	}
 }
 
-func (p *group) add(processor processors.Processor) {
+func (p *group) add(processor beat.Processor) {
 	if processor != nil {
 		p.list = append(p.list, processor)
 	}
@@ -101,7 +101,7 @@ func (p *group) Close() error {
 }
 
 func (p *group) String() string {
-	var s []string
+	s := make([]string, 0, len(p.list))
 	for _, p := range p.list {
 		s = append(s, p.String())
 	}
@@ -199,15 +199,20 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		EscapeHTML: false,
 	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
+		if !log.IsDebug() {
+			return event, nil
+		}
+
 		mux.Lock()
 		defer mux.Unlock()
 
 		b, err := encoder.Encode(info.Beat, event)
 		if err != nil {
+			//nolint:nilerr // encoder failure is not considered an error by this processor [why not?]
 			return event, nil
 		}
 
-		log.Debugf("Publish event: %s", b)
+		log.Debugw(fmt.Sprintf("Publish event: %s", b), logp.TypeKey, logp.EventType)
 		return event, nil
 	})
 }

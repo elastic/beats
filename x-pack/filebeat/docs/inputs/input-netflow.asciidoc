@@ -55,12 +55,32 @@ The time before an idle session or unused template is expired.
 Only applicable to v9 and IPFIX protocols. A value of zero disables expiration.
 
 [float]
+[[share_templates]]
+==== `share_templates`
+
+This option allows v9 and ipfix templates to be shared within a session without
+reference to the origin of the template.
+
+Note that setting this to true is not recommended as it can result in the wrong
+template being applied under certain conditions, but it may be required for some
+systems.
+
+[float]
 [[queue_size]]
 ==== `queue_size`
 
 The maximum number of packets that can be queued for processing.
 Use this setting to avoid packet-loss when dealing with occasional bursts
 of traffic.
+
+
+[float]
+[[workers]]
+==== `workers`
+
+The number of workers to read and decode concurrently netflow packets.
+Default is `1`. Note that in order to maximize the performance gains of multiple
+workers it is advised to switch the output to `throughput` preset (https://www.elastic.co/guide/en/beats/filebeat/current/elasticsearch-output.html#_preset[link]).
 
 [float]
 [[custom_definitions]]
@@ -133,5 +153,33 @@ which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs/` path. They can be used to
+observe the activity of the input.
+
+You must assign a unique `id` to the input to expose metrics.
+
+[options="header"]
+|=======
+| Metric                         | Description
+| `device`                       | Host/port of the UDP stream.
+| `udp_read_buffer_length_gauge` | Size of the UDP socket buffer length in bytes (gauge).
+| `received_events_total`        | Total number of packets (events) that have been received.
+| `received_bytes_total`         | Total number of bytes received.
+| `receive_queue_length`         | Aggregated size of the system receive queues (IPv4 and IPv6) (linux only) (gauge).
+| `system_packet_drops`          | Aggregated number of system packet drops (IPv4 and IPv6) (linux only) (gauge).
+| `arrival_period`               | Histogram of the time between successive packets in nanoseconds.
+| `processing_time`              | Histogram of the time taken to process packets in nanoseconds.
+| `discarded_events_total`       | Total number of discarded events.
+| `decode_errors_total`          | Total number of errors at decoding a packet.
+| `flows_total`                  | Total number of received flows.
+| `open_connections`             | Number of current active netflow sessions.
+|=======
+
+Histogram metrics are aggregated over the previous 1024 events.
 
 :type!:

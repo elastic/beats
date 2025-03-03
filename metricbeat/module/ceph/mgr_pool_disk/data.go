@@ -18,7 +18,7 @@
 package mgr_pool_disk
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -41,7 +41,7 @@ func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var response DfResponse
 	err := mgr.UnmarshalResponse(content, &response)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not get response data")
+		return nil, fmt.Errorf("could not get response data: %w", err)
 	}
 
 	var events []mapstr.M

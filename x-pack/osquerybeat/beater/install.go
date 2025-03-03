@@ -12,7 +12,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -33,10 +32,6 @@ func installOsqueryWithDir(ctx context.Context, dir string) error {
 
 	fp := filepath.Join(dir, distro.OsquerydDistroFilename())
 	var installFunc func(context.Context, string, string, bool) error
-
-	if runtime.GOOS == "darwin" {
-		installFunc = install.InstallFromPkg
-	}
 
 	installing := false
 	ilog := log.With("file", fp)

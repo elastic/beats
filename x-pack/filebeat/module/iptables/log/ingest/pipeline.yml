@@ -54,6 +54,7 @@ processors:
 - rename:
     field: message
     target_field: event.original
+    if: ctx.event?.original == null
 - grok:
     field: iptables.ubiquiti.rule_set
     ignore_missing: true

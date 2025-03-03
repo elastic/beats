@@ -4,6 +4,8 @@
   description: >
     kibana Module
   fields:
+    - name: service.node.roles
+      type: keyword
     - name: kibana
       type: group
       description: >
@@ -24,6 +26,10 @@
         - name: saved_object.id
           description: "The id of the saved object associated with this event."
           example: "6295bdd0-0a0e-11e7-825f-6748cda7d858"
+          type: keyword
+        - name: saved_object.name
+          description: "The name of the saved object associated with this event."
+          example: "my-saved-object"
           type: keyword
         - name: add_to_spaces
           description: "The set of space ids that a saved object was shared to."

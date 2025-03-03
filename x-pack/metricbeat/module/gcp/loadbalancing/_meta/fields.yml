@@ -1,6 +1,6 @@
 - name: loadbalancing
   description: Google Cloud Load Balancing metrics
-  release: beta
+  release: ga
   type: group
   fields:
   - name: https.backend_request.bytes

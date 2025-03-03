@@ -8,6 +8,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/cloudsql"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/compute"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics/redis"
 )
 
 // NewMetadataServiceForConfig returns a service to fetch metadata from a config struct. It must return the Compute
@@ -15,9 +16,11 @@ import (
 func NewMetadataServiceForConfig(c config, serviceName string) (gcp.MetadataService, error) {
 	switch serviceName {
 	case gcp.ServiceCompute:
-		return compute.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.opt...)
+		return compute.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
 	case gcp.ServiceCloudSQL:
-		return cloudsql.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.opt...)
+		return cloudsql.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
+	case gcp.ServiceRedis:
+		return redis.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
 	default:
 		return nil, nil
 	}

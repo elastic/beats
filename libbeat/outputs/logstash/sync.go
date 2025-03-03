@@ -74,9 +74,9 @@ func newSyncClient(
 	return c, nil
 }
 
-func (c *syncClient) Connect() error {
+func (c *syncClient) Connect(ctx context.Context) error {
 	c.log.Debug("connect")
-	err := c.Client.Connect()
+	err := c.Client.ConnectContext(ctx)
 	if err != nil {
 		return err
 	}
@@ -113,7 +113,10 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		return nil
 	}
 
+	deadlockListener := newDeadlockListener(c.log, logstashDeadlockTimeout)
+	defer deadlockListener.close()
 	for len(events) > 0 {
+
 		// check if we need to reconnect
 		if c.ticker != nil {
 			select {
@@ -136,33 +139,34 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 			err error
 		)
 
+		begin := time.Now()
 		if c.win == nil {
 			n, err = c.sendEvents(events)
 		} else {
 			n, err = c.publishWindowed(events)
 		}
-
+		took := time.Since(begin)
+		st.ReportLatency(took)
 		c.log.Debugf("%v events out of %v events sent to logstash host %s. Continue sending",
 			n, len(events), c.Host())
 
 		events = events[n:]
-		st.Acked(n)
+		st.AckedEvents(n)
+		deadlockListener.ack(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
 			batch.RetryEvents(events)
 
-			if c.win != nil {
-				c.win.shrinkWindow()
-			}
 			_ = c.Close()
 
 			c.log.Errorf("Failed to publish events caused by: %+v", err)
 
 			rest := len(events)
-			st.Failed(rest)
+			st.RetryableErrors(rest)
 
 			return err
 		}
+
 	}
 
 	batch.ACK()
@@ -182,6 +186,7 @@ func (c *syncClient) publishWindowed(events []publisher.Event) (int, error) {
 
 	n, err := c.sendEvents(events)
 	if err != nil {
+		c.win.shrinkWindow()
 		return n, err
 	}
 

@@ -102,7 +102,7 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T11:34:34.000-02:00",
+        "@timestamp": "2014-04-15T13:34:34.000Z",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
@@ -122,7 +122,6 @@
         "event.original": "%ASA-session-5-106100: access-list acl_in permitted tcp inside/10.1.2.16(2241) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "success",
         "event.severity": 5,
-        "event.timezone": "-02:00",
         "event.type": [
             "allowed",
             "connection"
@@ -1964,7 +1963,7 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T11:34:34.000-02:00",
+        "@timestamp": "2018-04-15T13:34:34.000Z",
         "cisco.asa.destination_interface": "outside",
         "cisco.asa.message_id": "106100",
         "cisco.asa.rule_name": "acl_in",
@@ -1984,7 +1983,6 @@
         "event.original": "%ASA-session-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2241) -> outside/192.0.0.99(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "success",
         "event.severity": 5,
-        "event.timezone": "-02:00",
         "event.type": [
             "allowed",
             "connection"

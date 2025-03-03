@@ -58,6 +58,9 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 		podId := util.NewPodId(pod.PodRef.Namespace, pod.PodRef.Name)
 		podStore := nodeStore.GetPodStore(podId)
 
+		allContainersCPULimitsDefined := true
+		allContainersMemoryLimitsDefined := true
+
 		for _, container := range pod.Containers {
 			usageNanoCores += container.CPU.UsageNanoCores
 			usageMem += container.Memory.UsageBytes
@@ -70,17 +73,22 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			containerStore := podStore.GetContainerStore(container.Name)
 			containerMetrics := containerStore.GetContainerMetrics()
 
-			containerCoresLimit := nodeCores
-			if containerMetrics.CoresLimit != nil {
-				containerCoresLimit = containerMetrics.CoresLimit.Value
+			// podCoreLimit and podMemLimit are defined only if all of Pod containers have a limit defined, otherwise the limit will be set to 0
+			if allContainersCPULimitsDefined && containerMetrics.CoresLimit == nil {
+				allContainersCPULimitsDefined = false
+				podCoreLimit = 0.0
+			}
+			if allContainersCPULimitsDefined {
+				podCoreLimit += containerMetrics.CoresLimit.Value
 			}
 
-			containerMemLimit := nodeMem
-			if containerMetrics.MemoryLimit != nil {
-				containerMemLimit = containerMetrics.MemoryLimit.Value
+			if allContainersMemoryLimitsDefined && containerMetrics.MemoryLimit == nil {
+				allContainersMemoryLimitsDefined = false
+				podMemLimit = 0.0
 			}
-			podCoreLimit += containerCoresLimit
-			podMemLimit += containerMemLimit
+			if allContainersMemoryLimitsDefined {
+				podMemLimit += containerMetrics.MemoryLimit.Value
+			}
 		}
 
 		podEvent := mapstr.M{
@@ -132,32 +140,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 			kubernetes2.ShouldPut(podEvent, "start_time", pod.StartTime, logger)
 		}
 
-		// NOTE:
-		// - `podCoreLimit > `nodeCores` is possible if a pod has more than one container
-		// and at least one of them doesn't have a limit set. The container without limits
-		// inherit a limit = `nodeCores` and the sum of all limits for all the
-		// containers will be > `nodeCores`. In this case we want to cap the
-		// value of `podCoreLimit` to `nodeCores`.
-		// - `nodeCores` can be 0 if `state_node` and/or `node` metricsets are disabled.
-		// - if `nodeCores` == 0 and podCoreLimit > 0` we need to avoid that `podCoreLimit` is
-		// incorrectly overridden to 0. That's why we check for `nodeCores > 0`.
-		if nodeCores > 0 && podCoreLimit > nodeCores {
-			podCoreLimit = nodeCores
-		}
-
-		// NOTE:
-		// - `podMemLimit > `nodeMem` is possible if a pod has more than one container
-		// and at least one of them doesn't have a limit set. The container without limits
-		// inherit a limit = `nodeMem` and the sum of all limits for all the
-		// containers will be > `nodeMem`. In this case we want to cap the
-		// value of `podMemLimit` to `nodeMem`.
-		// - `nodeMem` can be 0 if `state_node` and/or `node` metricsets are disabled.
-		// - if `nodeMem` == 0 and podMemLimit > 0` we need to avoid that `podMemLimit` is
-		// incorrectly overridden to 0. That's why we check for `nodeMem > 0`.
-		if nodeMem > 0 && podMemLimit > nodeMem {
-			podMemLimit = nodeMem
-		}
-
+		// `nodeCores` can be 0 if `state_node` and/or `node` metricsets are disabled
 		if nodeCores > 0 {
 			kubernetes2.ShouldPut(podEvent, "cpu.usage.node.pct", float64(usageNanoCores)/1e9/nodeCores, logger)
 		}
@@ -167,6 +150,7 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 		}
 
 		if usageMem > 0 {
+			// `nodeMem` can be 0 if `state_node` and/or `node` metricsets are disabled
 			if nodeMem > 0 {
 				kubernetes2.ShouldPut(podEvent, "memory.usage.node.pct", float64(usageMem)/nodeMem, logger)
 			}

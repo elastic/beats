@@ -27,6 +27,7 @@ var:
     default: ASA
   - name: external_zones
   - name: internal_zones
+  - name: timezone_offset
 
 ingest_pipeline: ../shared/ingest/asa-ftd-pipeline.yml
 input: config/input.yml

@@ -34,7 +34,7 @@ type transactions struct {
 
 	onTransaction transactionHandler
 
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 type transactionConfig struct {
@@ -48,7 +48,7 @@ type messageList struct {
 	head, tail *message
 }
 
-func (trans *transactions) init(c *transactionConfig, watcher procs.ProcessesWatcher, cb transactionHandler) {
+func (trans *transactions) init(c *transactionConfig, watcher *procs.ProcessesWatcher, cb transactionHandler) {
 	trans.config = c
 	trans.watcher = watcher
 	trans.onTransaction = cb

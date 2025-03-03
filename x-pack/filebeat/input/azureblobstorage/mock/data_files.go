@@ -9,6 +9,7 @@ const (
 	beatsJSONContainer          = "beatsjsoncontainer"
 	beatsNdJSONContainer        = "beatsndjsoncontainer"
 	beatsGzJSONContainer        = "beatsgzjsoncontainer"
+	beatsJSONWithArrayContainer = "beatsjsonwitharraycontainer"
 )
 
 var fileContainers = map[string]bool{
@@ -16,6 +17,7 @@ var fileContainers = map[string]bool{
 	beatsJSONContainer:          true,
 	beatsNdJSONContainer:        true,
 	beatsGzJSONContainer:        true,
+	beatsJSONWithArrayContainer: true,
 }
 
 var availableFileBlobs = map[string]map[string]bool{
@@ -31,6 +33,10 @@ var availableFileBlobs = map[string]map[string]bool{
 	},
 	beatsGzJSONContainer: {
 		"multiline.json.gz": true,
+	},
+	beatsJSONWithArrayContainer: {
+		"array-at-root.json": true,
+		"nested-arrays.json": true,
 	},
 }
 
@@ -125,6 +131,48 @@ var fetchFilesContainer = map[string]string{
 					</Blobs>
 					<NextMarker />
 				</EnumerationResults>`,
+	beatsJSONWithArrayContainer: `<?xml version="1.0" encoding="utf-8"?>
+	<EnumerationResults ServiceEndpoint="https://127.0.0.1/" ContainerName="beatsjsonwitharraycontainer">
+		<Blobs>
+			<Blob>
+				<Name>array-at-root.json</Name>
+				<Properties>
+					<Last-Modified>Wed, 14 Sep 2022 12:12:28 GMT</Last-Modified>
+					<Etag>0x8DA964A64516C82</Etag>
+					<Content-Length>643</Content-Length>
+					<Content-Type>application/json</Content-Type>
+					<Content-Encoding />
+					<Content-Language />
+					<Content-MD5>UjQX73kQRTHx+UyXZDvVkg==</Content-MD5>
+					<Cache-Control />
+					<Content-Disposition />
+					<BlobType>BlockBlob</BlobType>
+					<LeaseStatus>unlocked</LeaseStatus>
+					<LeaseState>available</LeaseState>
+				</Properties>
+				<Metadata />
+			</Blob>
+			<Blob>
+				<Name>nested-arrays.json</Name>
+				<Properties>
+					<Last-Modified>Wed, 14 Sep 2022 12:12:28 GMT</Last-Modified>
+					<Etag>0x8DA964A64516C83</Etag>
+					<Content-Length>643</Content-Length>
+					<Content-Type>application/json</Content-Type>
+					<Content-Encoding />
+					<Content-Language />
+					<Content-MD5>UjQX73kQRTHx+UyXZDvVkg==</Content-MD5>
+					<Cache-Control />
+					<Content-Disposition />
+					<BlobType>BlockBlob</BlobType>
+					<LeaseStatus>unlocked</LeaseStatus>
+					<LeaseState>available</LeaseState>
+				</Properties>
+				<Metadata />
+			</Blob>
+			</Blobs>
+			<NextMarker />
+		</EnumerationResults>`,
 	beatsGzJSONContainer: `<?xml version="1.0" encoding="utf-8"?>
 				<EnumerationResults ServiceEndpoint="https://127.0.0.1/" ContainerName="beatsgzjsoncontainer">
 					<Blobs>
@@ -165,6 +213,18 @@ var BeatsFilesContainer_log_json = []string{
 var BeatsFilesContainer_log_ndjson = []string{
 	`{"@timestamp":"2021-05-25T17:25:42.806Z","log.level":"error","message":"error in http request"}`,
 	`{"@timestamp":"2021-05-25T17:25:51.391Z","log.level":"info","message":"available space is 44.3gb"}`,
+}
+
+var BeatsFilesContainer_events_array_json = []string{
+	"{\n            \"time\": \"2021-05-25 18:20:58 UTC\",\n            \"msg\": \"hello\"\n        }",
+	"{\n            \"time\": \"2021-05-26 22:21:40 UTC\",\n            \"msg\": \"world\"\n        }",
+}
+
+var BeatsFilesContainer_json_array = []string{
+	"{\n        \"time\": \"2021-05-25 18:20:58 UTC\",\n        \"msg\": \"hello\"\n    }",
+	"{\n        \"time\": \"2021-05-26 22:21:40 UTC\",\n        \"msg\": \"world\"\n    }",
+	"[\n       {\n           \"time\": \"2021-05-25 18:20:58 UTC\",\n           \"msg\": \"hello\"\n       },\n       {\n           \"time\": \"2021-05-26 22:21:40 UTC\",\n           \"msg\": \"world\"\n       }\n   ]",
+	"[\n       {\n           \"time\": \"2021-05-25 18:20:58 UTC\",\n           \"msg\": \"hi\"\n       },\n       {\n           \"time\": \"2021-05-26 22:21:40 UTC\",\n           \"msg\": \"seoul\"\n       }\n   ]",
 }
 
 var BeatsFilesContainer_multiline_json_gz = []string{

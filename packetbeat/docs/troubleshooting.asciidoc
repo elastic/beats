@@ -8,6 +8,7 @@ following tips:
 
 * <<getting-help>>
 * <<enable-packetbeat-debugging>>
+* <<understand-{beatname_lc}-logs>>
 * <<recording-trace>>
 * <<faq>>
 
@@ -29,6 +30,18 @@ include::{libbeat-dir}/debugging.asciidoc[]
 
 //sets block macro for recording-trace content included in next section
 
+//sets block macro for metrics-in-logs.asciidoc included in next section
+
+[id="understand-{beatname_lc}-logs"]
+[role="xpack"]
+== Understand metrics in {beatname_uc} logs
+
+++++
+<titleabbrev>Understand logged metrics</titleabbrev>
+++++
+
+include::{libbeat-dir}/metrics-in-logs.asciidoc[]
+
 [[recording-trace]]
 == Record a trace
 
@@ -39,7 +52,7 @@ of 10-20 seconds is usually enough. To record the trace, you can use the followi
 
 [source,shell]
 ------------------------------------------------------------
-packetbeat -e -dump trace.pcap
+packetbeat -e --dump trace.pcap
 ------------------------------------------------------------
 
 This command executes Packetbeat in normal mode (all processing happens as usual), but
