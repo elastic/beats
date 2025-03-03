@@ -68,7 +68,7 @@ func NewTcpServer(base mb.BaseMetricSet) (server.Server, error) {
 		receiveBufferSize: config.ReceiveBufferSize,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
-		delimiter:         byte(config.Delimiter[0]),
+		delimiter:         config.Delimiter[0],
 	}, nil
 }
 
