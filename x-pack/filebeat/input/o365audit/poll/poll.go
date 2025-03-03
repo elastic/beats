@@ -94,7 +94,7 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 		append([]autorest.PrepareDecorator{}, item.RequestDecorators()...),
 		r.decorators...)
 	if r.tp != nil {
-		token, err := r.tp.Token()
+		token, err := r.tp.Token(r.ctx)
 		if err != nil {
 			return fmt.Errorf("failed getting a token: %w", err)
 		}

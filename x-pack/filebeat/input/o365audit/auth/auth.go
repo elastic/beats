@@ -15,7 +15,7 @@ import (
 // allows to obtain tokens.
 type TokenProvider interface {
 	// Token returns a valid OAuth token, or an error.
-	Token() (string, error)
+	Token(ctx context.Context) (string, error)
 }
 
 // credentialTokenProvider extends azidentity.ClientSecretCredential with the
@@ -23,10 +23,10 @@ type TokenProvider interface {
 type credentialTokenProvider azidentity.ClientSecretCredential
 
 // Token returns an oauth token that can be used for bearer authorization.
-func (provider *credentialTokenProvider) Token() (string, error) {
+func (provider *credentialTokenProvider) Token(ctx context.Context) (string, error) {
 	inner := (*azidentity.ClientSecretCredential)(provider)
 	tk, err := inner.GetToken(
-		context.TODO(), policy.TokenRequestOptions{Scopes: []string{"https://manage.office.com/.default"}},
+		ctx, policy.TokenRequestOptions{Scopes: []string{"https://manage.office.com/.default"}},
 	)
 	if err != nil {
 		return "", err
