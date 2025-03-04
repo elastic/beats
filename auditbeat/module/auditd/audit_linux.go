@@ -230,7 +230,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		go func() {
 			defer func() { // Close the most recently allocated "client" instance.
 				if client != nil {
-					closeAuditClient(client, ms.log)
+					client.Close()
 				}
 			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
@@ -244,7 +244,10 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
-						closeAuditClient(client, ms.log)
+						// The logic in closeAuditClient() is only needed if we've called SetPID()
+						// in the client, as the client will need to clear its pid from netlink by sending a message across the socket, which can block
+						// However, this status client never sets a pid, so we can just call close, which will only close the FD.
+						client.Close()
 						client, err = libaudit.NewAuditClient(nil)
 						if err != nil {
 							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
