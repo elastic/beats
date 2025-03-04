@@ -236,6 +236,18 @@ codec:
 `,
 		wantErr: errors.New(`more than one decoder configured accessing 'codec'`),
 	},
+	{
+		name: "confused_ipfix",
+		yaml: `
+codec:
+  csv:
+    enabled: true
+  ipfix:
+    internal_networks: []
+    custom_definitions: []
+`,
+		wantErr: errors.New(`more than one decoder configured accessing 'codec'`),
+	},
 }
 
 func TestCodecConfig(t *testing.T) {
