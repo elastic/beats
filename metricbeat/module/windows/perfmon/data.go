@@ -75,12 +75,14 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 					eventMap[eventKey].Error = fmt.Errorf("failed on query=%v: %w", counterPath, val.Err.Error)
 				}
 				if val.Instance != "" {
-					// will ignore instance index
-					if ok, match := matchesParentProcess(val.Instance); ok {
-						eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, match)
-					} else {
-						eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, val.Instance)
+					instanceName := val.Instance
+					if re.config.ShouldMatchByParentInstance() {
+						if ok, match := matchesParentProcess(val.Instance); ok {
+							// will ignore instance index
+							instanceName = match
+						}
 					}
+					eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, instanceName)
 				}
 			}
 
