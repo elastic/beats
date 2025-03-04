@@ -126,7 +126,7 @@ type RunBeatOptions struct {
 	KeepRunning bool
 }
 
-// Runs a Beat binary with the given config and args.
+// RunBeat runs a Beat binary with the given config and args.
 // Returns a `RunningBeat` that allow to collect the output and wait until the exit.
 func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher OutputWatcher) *RunningBeat {
 	t.Logf("preparing to run %s...", opts.Beatname)
@@ -137,7 +137,7 @@ func RunBeat(ctx context.Context, t *testing.T, opts RunBeatOptions, watcher Out
 	cfgPath := filepath.Join(dir, fmt.Sprintf("%s.yml", opts.Beatname))
 	homePath := filepath.Join(dir, "home")
 
-	err := os.WriteFile(cfgPath, []byte(opts.Config), 0777)
+	err := os.WriteFile(cfgPath, []byte(opts.Config), 0644)
 	if err != nil {
 		t.Fatalf("failed to create a temporary config file: %s", err)
 		return nil
