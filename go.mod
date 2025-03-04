@@ -129,14 +129,23 @@ require (
 	go.etcd.io/bbolt v1.3.10
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.31.0
+	golang.org/x/crypto v0.33.0
 	golang.org/x/mod v0.21.0
+<<<<<<< HEAD
 	golang.org/x/net v0.33.0
 	golang.org/x/oauth2 v0.23.0
 	golang.org/x/sync v0.10.0
 	golang.org/x/sys v0.28.0
 	golang.org/x/text v0.21.0
 	golang.org/x/time v0.6.0
+=======
+	golang.org/x/net v0.35.0
+	golang.org/x/oauth2 v0.24.0
+	golang.org/x/sync v0.11.0
+	golang.org/x/sys v0.30.0
+	golang.org/x/text v0.22.0
+	golang.org/x/time v0.8.0
+>>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 	golang.org/x/tools v0.25.0
 	google.golang.org/api v0.191.0
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
@@ -153,12 +162,21 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	cloud.google.com/go v0.115.0
 	cloud.google.com/go/compute v1.27.4
 	cloud.google.com/go/redis v1.16.4
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.13.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.7.0
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.2.1
+=======
+	cloud.google.com/go v0.116.0
+	cloud.google.com/go/compute v1.29.0
+	cloud.google.com/go/redis v1.17.2
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.17.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.8.2
+	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.0
+>>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.8.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
@@ -235,8 +253,13 @@ require (
 	go.opentelemetry.io/collector/pdata v1.20.0
 	go.opentelemetry.io/collector/receiver v0.114.0
 	go.uber.org/mock v0.5.0
+<<<<<<< HEAD
 	golang.org/x/term v0.27.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28
+=======
+	golang.org/x/term v0.29.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
+>>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
@@ -258,7 +281,14 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
+<<<<<<< HEAD
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
+=======
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.3.3 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.25.0 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.48.1 // indirect
+	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.1 // indirect
+>>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
