@@ -2545,8 +2545,6 @@ logging.files:
   # file. Defaults to false.
   # rotateonstartup: false
 
-# A map of key-value pair appended to beat process logs for additional context.
-#logging.with_fields: 
 # ============================= X-Pack Monitoring ==============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring
 # cluster.  This requires xpack monitoring to be enabled in Elasticsearch.  The

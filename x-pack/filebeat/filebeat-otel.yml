@@ -3,15 +3,15 @@ filebeat.inputs:
     id: filestream-input-id
     enabled: true
     paths:
-      - /tmp/flog.log
+      - ./test.log
 
 output:
   elasticsearch:
-    hosts: ["https://localhost:9200"]
-    username: elastic
-    password: changeme
+    hosts: ["http://localhost:9200"]
+    username: admin
+    password: testing
 
 setup.kibana:
-  host: https://localhost:5601
+  host: http://localhost:5601
   username: elastic
   password: changeme
