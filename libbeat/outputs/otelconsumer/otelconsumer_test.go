@@ -20,10 +20,12 @@ package otelconsumer
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -43,6 +45,7 @@ func TestPublish(t *testing.T) {
 	event1 := beat.Event{Fields: mapstr.M{"field": 1}}
 	event2 := beat.Event{Fields: mapstr.M{"field": 2}}
 	event3 := beat.Event{Fields: mapstr.M{"field": 3}}
+	event4 := beat.Event{Meta: mapstr.M{"_id": "abc123"}}
 
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
@@ -74,6 +77,47 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 		assert.Equal(t, len(batch.Events()), countLogs, "all events should be consumed")
+	})
+
+	t.Run("data_stream fields are set on logrecord.Attribute", func(t *testing.T) {
+		dataStreamField := mapstr.M{
+			"type":      "logs",
+			"namespace": "not_default",
+			"dataset":   "not_elastic_agent",
+		}
+		event1.Fields["data_stream"] = dataStreamField
+
+		batch := outest.NewBatch(event1)
+
+		var countLogs int
+		var attributes pcommon.Map
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			countLogs = countLogs + ld.LogRecordCount()
+			for i := 0; i < ld.ResourceLogs().Len(); i++ {
+				resourceLog := ld.ResourceLogs().At(i)
+				for j := 0; j < resourceLog.ScopeLogs().Len(); j++ {
+					scopeLog := resourceLog.ScopeLogs().At(j)
+					for k := 0; k < scopeLog.LogRecords().Len(); k++ {
+						LogRecord := scopeLog.LogRecords().At(k)
+						attributes = LogRecord.Attributes()
+					}
+				}
+			}
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+
+		var subFields = []string{"dataset", "namespace", "type"}
+		for _, subField := range subFields {
+			gotValue, ok := attributes.Get("data_stream." + subField)
+			require.True(t, ok, fmt.Sprintf("data_stream.%s not found on log record attribute", subField))
+			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
+		}
+
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
@@ -117,210 +161,46 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchRetry, batch.Signals[0].Tag)
 	})
-}
 
-func TestMapstrToPcommonMapString(t *testing.T) {
-	tests := map[string]struct {
-		mapstr_val  interface{}
-		pcommon_val string
-	}{
-		"forty two": {mapstr_val: "forty two", pcommon_val: "forty two"},
-		"empty":     {mapstr_val: "", pcommon_val: ""},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			a := mapstr.M{"test": tc.mapstr_val}
-			want := pcommon.NewMap()
-			want.PutStr("test", tc.pcommon_val)
-			got := mapstrToPcommonMap(a)
-			assert.Equal(t, want, got)
+	t.Run("sets the elasticsearchexporter doc id attribute from metadata", func(t *testing.T) {
+		batch := outest.NewBatch(event4)
+
+		var docID string
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			attr, ok := record.Attributes().Get(esDocumentIDAttribute)
+			assert.True(t, ok, "document ID attribute should be set")
+			docID = attr.AsString()
+
+			return nil
 		})
-	}
-}
 
-func TestMapstrToPcommonMapSliceString(t *testing.T) {
-	inputSlice := []string{"1", "2", "3"}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := pcommon.NewMap()
-	sliceOfInt := want.PutEmptySlice("slice")
-	for _, i := range inputSlice {
-		val := sliceOfInt.AppendEmpty()
-		val.SetStr(i)
-	}
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, event4.Meta["_id"], docID)
+	})
 
-	got := mapstrToPcommonMap(inputMap)
-	assert.Equal(t, want, got)
-}
+	t.Run("sets the @timestamp field with the correct format", func(t *testing.T) {
+		batch := outest.NewBatch(event3)
+		batch.Events()[0].Content.Timestamp = time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
 
-func TestMapstrToPcommonMapInt(t *testing.T) {
-	tests := map[string]struct {
-		mapstr_val  interface{}
-		pcommon_val int
-	}{
-		"int":    {mapstr_val: int(42), pcommon_val: 42},
-		"int8":   {mapstr_val: int8(42), pcommon_val: 42},
-		"int16":  {mapstr_val: int16(42), pcommon_val: 42},
-		"int32":  {mapstr_val: int32(42), pcommon_val: 42},
-		"int64":  {mapstr_val: int32(42), pcommon_val: 42},
-		"uint":   {mapstr_val: uint(42), pcommon_val: 42},
-		"uint8":  {mapstr_val: uint8(42), pcommon_val: 42},
-		"uint16": {mapstr_val: uint16(42), pcommon_val: 42},
-		"uint32": {mapstr_val: uint32(42), pcommon_val: 42},
-		"uint64": {mapstr_val: uint64(42), pcommon_val: 42},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			a := mapstr.M{"test": tc.mapstr_val}
-			want := pcommon.NewMap()
-			want.PutInt("test", int64(tc.pcommon_val))
-			got := mapstrToPcommonMap(a)
-			assert.Equal(t, want, got)
+		var bodyTimestamp string
+		var recordTimestamp string
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			record := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords().At(0)
+			field, ok := record.Body().Map().Get("@timestamp")
+			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			assert.True(t, ok, "timestamp field not found")
+			bodyTimestamp = field.AsString()
+			return nil
 		})
-	}
-}
 
-func TestMapstrToPcommonMapSliceInt(t *testing.T) {
-	inputSlice := []int{42, 43, 44}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := pcommon.NewMap()
-	sliceOfInt := want.PutEmptySlice("slice")
-	for _, i := range inputSlice {
-		val := sliceOfInt.AppendEmpty()
-		val.SetInt(int64(i))
-	}
-
-	got := mapstrToPcommonMap(inputMap)
-	assert.Equal(t, want, got)
-}
-
-func TestMapstrToPcommonMapDouble(t *testing.T) {
-	tests := map[string]struct {
-		mapstr_val  interface{}
-		pcommon_val float64
-	}{
-		"float32": {mapstr_val: float32(4.2), pcommon_val: float64(float32(4.2))},
-		"float64": {mapstr_val: float64(4.2), pcommon_val: 4.2},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			a := mapstr.M{"test": tc.mapstr_val}
-			want := pcommon.NewMap()
-			want.PutDouble("test", tc.pcommon_val)
-			got := mapstrToPcommonMap(a)
-			assert.Equal(t, want, got)
-		})
-	}
-}
-
-func TestMapstrToPcommonMapSliceDouble(t *testing.T) {
-	inputSlice := []float32{4.2, 4.3, 4.4}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := pcommon.NewMap()
-	sliceOfInt := want.PutEmptySlice("slice")
-	for _, i := range inputSlice {
-		val := sliceOfInt.AppendEmpty()
-		val.SetDouble(float64(i))
-	}
-
-	got := mapstrToPcommonMap(inputMap)
-	assert.Equal(t, want, got)
-}
-
-func TestMapstrToPcommonMapBool(t *testing.T) {
-	tests := map[string]struct {
-		mapstr_val  interface{}
-		pcommon_val bool
-	}{
-		"true":  {mapstr_val: true, pcommon_val: true},
-		"false": {mapstr_val: false, pcommon_val: false},
-	}
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			a := mapstr.M{"test": tc.mapstr_val}
-			want := pcommon.NewMap()
-			want.PutBool("test", tc.pcommon_val)
-			got := mapstrToPcommonMap(a)
-			assert.Equal(t, want, got)
-		})
-	}
-}
-
-func TestMapstrToPcommonMapSliceBool(t *testing.T) {
-	inputSlice := []bool{true, false, true}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := pcommon.NewMap()
-	pcommonSlice := want.PutEmptySlice("slice")
-	for _, i := range inputSlice {
-		val := pcommonSlice.AppendEmpty()
-		val.SetBool(i)
-	}
-
-	got := mapstrToPcommonMap(inputMap)
-	assert.Equal(t, want, got)
-}
-
-func TestMapstrToPcommonMapMapstr(t *testing.T) {
-	input := mapstr.M{
-		"inner": mapstr.M{
-			"inner_int": 42,
-		},
-	}
-	want := pcommon.NewMap()
-	inner := want.PutEmptyMap("inner")
-	inner.PutInt("inner_int", 42)
-
-	got := mapstrToPcommonMap(input)
-	assert.Equal(t, want, got)
-}
-
-func TestMapstrToPcommonMapSliceMapstr(t *testing.T) {
-	inputSlice := []mapstr.M{mapstr.M{"item": 1}, mapstr.M{"item": 1}, mapstr.M{"item": 1}}
-	inputMap := mapstr.M{
-		"slice": inputSlice,
-	}
-	want := pcommon.NewMap()
-	sliceOfInt := want.PutEmptySlice("slice")
-	for range inputSlice {
-		val := sliceOfInt.AppendEmpty()
-		newMap := pcommon.NewMap()
-		newMap.PutInt("item", 1)
-		newMap.CopyTo(val.SetEmptyMap())
-	}
-
-	got := mapstrToPcommonMap(inputMap)
-	assert.Equal(t, want, got)
-}
-
-func TestMapstrToPcommonMapSliceTime(t *testing.T) {
-	times := []struct {
-		mapstr_val  string
-		pcommon_val int64
-	}{
-		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: 1136189045000},
-		{mapstr_val: "1970-01-01T00:00:00+00:00", pcommon_val: 0},
-	}
-	var sliceTimes []time.Time
-	pcommonSlice := pcommon.NewSlice()
-	for _, tc := range times {
-		targetTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
-		assert.NoError(t, err, "Error parsing time")
-		sliceTimes = append(sliceTimes, targetTime)
-		pVal := pcommonSlice.AppendEmpty()
-		pVal.SetInt(tc.pcommon_val)
-	}
-	inputMap := mapstr.M{
-		"slice": sliceTimes,
-	}
-	want := pcommon.NewMap()
-	pcommonSlice.CopyTo(want.PutEmptySlice("slice"))
-	got := mapstrToPcommonMap(inputMap)
-	assert.Equal(t, want, got)
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
+		assert.Equal(t, bodyTimestamp, recordTimestamp, "log record timestamp should match body timestamp")
+	})
 }

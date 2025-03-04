@@ -113,9 +113,6 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>>   
 |<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>   
 |<<metricbeat-metricset-elasticsearch-shard,shard>>   
-|<<metricbeat-module-enterprisesearch,Enterprise Search>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-enterprisesearch-health,health>> beta[]  
-|<<metricbeat-metricset-enterprisesearch-stats,stats>> beta[]  
 |<<metricbeat-module-envoyproxy,Envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>>   
 |<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -168,11 +165,10 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kafka-partition,partition>>   
 |<<metricbeat-metricset-kafka-producer,producer>> beta[]  
 |<<metricbeat-module-kibana,Kibana>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
-.7+| .7+|  |<<metricbeat-metricset-kibana-cluster_actions,cluster_actions>> beta[]  
+.6+| .6+|  |<<metricbeat-metricset-kibana-cluster_actions,cluster_actions>> beta[]  
 |<<metricbeat-metricset-kibana-cluster_rules,cluster_rules>> beta[]  
 |<<metricbeat-metricset-kibana-node_actions,node_actions>> beta[]  
 |<<metricbeat-metricset-kibana-node_rules,node_rules>> beta[]  
-|<<metricbeat-metricset-kibana-settings,settings>>   
 |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
@@ -330,8 +326,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-vsphere-resourcepool,resourcepool>> beta[]  
 |<<metricbeat-metricset-vsphere-virtualmachine,virtualmachine>>   
 |<<metricbeat-module-windows,Windows>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
+.3+| .3+|  |<<metricbeat-metricset-windows-perfmon,perfmon>>   
 |<<metricbeat-metricset-windows-service,service>>   
+|<<metricbeat-metricset-windows-wmi,wmi>> beta[]  
 |<<metricbeat-module-zookeeper,ZooKeeper>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .3+| .3+|  |<<metricbeat-metricset-zookeeper-connection,connection>>   
 |<<metricbeat-metricset-zookeeper-mntr,mntr>>   
@@ -360,7 +357,6 @@ include::modules/couchdb.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
-include::modules/enterprisesearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/etcd.asciidoc[]
 include::modules/gcp.asciidoc[]

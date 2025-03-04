@@ -29,7 +29,7 @@ idna==3.7
 importlib-metadata==1.7.0
 iniconfig==1.0.1
 ipaddress==1.0.19
-Jinja2==3.1.4
+Jinja2==3.1.5
 jsondiff==1.1.2
 jsonschema==3.2.0
 kafka-python==1.4.3
