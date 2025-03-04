@@ -115,6 +115,7 @@ func AddLicenseHeaders() error {
 			licenser.Exclude("x-pack"),
 			licenser.Exclude("generator/_templates/beat/{beat}"),
 			licenser.Exclude("generator/_templates/metricbeat/{beat}"),
+			licenser.Exclude("_vendor"),
 		),
 		licenser(
 			licenser.License("Elastic"),
@@ -139,6 +140,7 @@ func CheckLicenseHeaders() error {
 			licenser.Exclude("x-pack"),
 			licenser.Exclude("generator/_templates/beat/{beat}"),
 			licenser.Exclude("generator/_templates/metricbeat/{beat}"),
+			licenser.Exclude("_vendor"),
 		),
 		licenser(
 			licenser.Check(),
