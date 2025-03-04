@@ -19,7 +19,7 @@ package beatconverter
 
 import "strings"
 
-func getOTeLLogLevel(level string) string {
+func getOTelLogLevel(level string) string {
 	switch strings.ToLower(level) {
 	case "debug":
 		return "DEBUG"
