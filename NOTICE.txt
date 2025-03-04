@@ -11,11 +11,11 @@ Third party libraries used by the Elastic Beats project:
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go
-Version: v0.115.0
+Version: v0.116.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go@v0.115.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go@v0.116.0/LICENSE:
 
 
                                  Apache License
@@ -223,11 +223,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go@v0.115.0/LICEN
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/bigquery
-Version: v1.62.0
+Version: v1.63.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/bigquery@v1.62.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/bigquery@v1.63.1/LICENSE:
 
 
                                  Apache License
@@ -435,11 +435,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/bigquery@v1.62
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/compute
-Version: v1.27.4
+Version: v1.29.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.27.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.29.0/LICENSE:
 
 
                                  Apache License
@@ -647,11 +647,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute@v1.27.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/monitoring
-Version: v1.20.4
+Version: v1.21.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.20.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.21.1/LICENSE:
 
 
                                  Apache License
@@ -859,11 +859,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/monitoring@v1.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/pubsub
-Version: v1.41.0
+Version: v1.44.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub@v1.41.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub@v1.44.0/LICENSE:
 
 
                                  Apache License
@@ -1071,11 +1071,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/pubsub@v1.41.0
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/redis
-Version: v1.16.4
+Version: v1.17.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/redis@v1.16.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/redis@v1.17.2/LICENSE:
 
 
                                  Apache License
@@ -1742,19 +1742,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/azcore
-<<<<<<< HEAD
-Version: v1.13.0
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azcore@v1.13.0/LICENSE.txt:
-=======
 Version: v1.17.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azcore@v1.17.0/LICENSE.txt:
->>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 
 MIT License
 
@@ -1781,19 +1773,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/azidentity
-<<<<<<< HEAD
-Version: v1.7.0
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azidentity@v1.7.0/LICENSE.txt:
-=======
 Version: v1.8.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/azidentity@v1.8.2/LICENSE.txt:
->>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 
 MIT License
 
@@ -1820,11 +1804,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs
-Version: v1.2.1
+Version: v1.3.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/messaging/azeventhubs@v1.2.1/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/messaging/azeventhubs@v1.3.0/LICENSE.txt:
 
 Copyright (c) Microsoft Corporation.
 
@@ -2001,11 +1985,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/storage/azblob
-Version: v1.4.0
+Version: v1.5.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/storage/azblob@v1.4.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/storage/azblob@v1.5.0/LICENSE.txt:
 
     MIT License
 
@@ -23871,11 +23855,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/testify
-Version: v1.9.0
+Version: v1.10.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.9.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.10.0/LICENSE:
 
 MIT License
 
@@ -28237,11 +28221,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/oauth2
-Version: v0.23.0
+Version: v0.24.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/oauth2@v0.23.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/oauth2@v0.24.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -28422,11 +28406,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/time
-Version: v0.6.0
+Version: v0.8.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/time@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/time@v0.8.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -28496,11 +28480,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/api
-Version: v0.191.0
+Version: v0.203.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/api@v0.191.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/api@v0.203.0/LICENSE:
 
 Copyright (c) 2011 Google Inc. All rights reserved.
 
@@ -28533,11 +28517,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto/googleapis/api
-Version: v0.0.0-20241104194629-dd2ea8efbc28
+Version: v0.0.0-20241118233622-e639e219e697
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googleapis/api@v0.0.0-20241104194629-dd2ea8efbc28/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googleapis/api@v0.0.0-20241118233622-e639e219e697/LICENSE:
 
 
                                  Apache License
@@ -30632,11 +30616,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/auth
-Version: v0.8.0
+Version: v0.9.9
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/auth@v0.8.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/auth@v0.9.9/LICENSE:
 
 
                                  Apache License
@@ -31056,11 +31040,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/auth/oauth2ada
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/compute/metadata
-Version: v0.5.0
+Version: v0.5.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute/metadata@v0.5.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute/metadata@v0.5.2/LICENSE:
 
 
                                  Apache License
@@ -31268,11 +31252,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/compute/metada
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/datacatalog
-Version: v1.20.5
+Version: v1.22.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/datacatalog@v1.20.5/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/datacatalog@v1.22.1/LICENSE:
 
 
                                  Apache License
@@ -31480,11 +31464,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/datacatalog@v1
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/iam
-Version: v1.1.12
+Version: v1.2.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.1.12/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.2.1/LICENSE:
 
 
                                  Apache License
@@ -31692,11 +31676,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/iam@v1.1.12/LI
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/kms
-Version: v1.18.4
+Version: v1.20.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/kms@v1.18.4/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/kms@v1.20.0/LICENSE:
 
 
                                  Apache License
@@ -31904,11 +31888,11 @@ Contents of probable licence file $GOMODCACHE/cloud.google.com/go/kms@v1.18.4/LI
 
 --------------------------------------------------------------------------------
 Dependency : cloud.google.com/go/longrunning
-Version: v0.5.11
+Version: v0.6.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/cloud.google.com/go/longrunning@v0.5.11/LICENSE:
+Contents of probable licence file $GOMODCACHE/cloud.google.com/go/longrunning@v0.6.1/LICENSE:
 
 
                                  Apache License
@@ -32844,8 +32828,6 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-pipeline-g
     SOFTWARE
 
 --------------------------------------------------------------------------------
-<<<<<<< HEAD
-=======
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/azidentity/cache
 Version: v0.3.2
 Licence type (autodetected): MIT
@@ -32877,7 +32859,6 @@ SOFTWARE
 
 
 --------------------------------------------------------------------------------
->>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/internal
 Version: v1.10.0
 Licence type (autodetected): MIT
@@ -32910,11 +32891,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub
-Version: v1.2.0
+Version: v1.3.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub@v1.2.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/resourcemanager/eventhub/armeventhub@v1.3.0/LICENSE.txt:
 
 MIT License
 
@@ -33091,11 +33072,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-amqp
-Version: v1.0.5
+Version: v1.3.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v1.0.5/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v1.3.0/LICENSE:
 
     MIT License
 
@@ -34792,20 +34773,43 @@ SOFTWARE.
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/AzureAD/microsoft-authentication-library-for-go
-<<<<<<< HEAD
-Version: v1.2.2
+Dependency : github.com/AzureAD/microsoft-authentication-extensions-for-go/cache
+Version: v0.1.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-authentication-library-for-go@v1.2.2/LICENSE:
-=======
+Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-authentication-extensions-for-go/cache@v0.1.1/LICENSE:
+
+    MIT License
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+
+
+--------------------------------------------------------------------------------
+Dependency : github.com/AzureAD/microsoft-authentication-library-for-go
 Version: v1.3.3
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/!azure!a!d/microsoft-authentication-library-for-go@v1.3.3/LICENSE:
->>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 
     MIT License
 
@@ -39730,6 +39734,29 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/coder/websocket
+Version: v1.8.12
+Licence type (autodetected): ISC
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/coder/websocket@v1.8.12/LICENSE.txt:
+
+Copyright (c) 2023 Anmol Sethi <hi@nhooyr.io>
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+--------------------------------------------------------------------------------
 Dependency : github.com/containerd/log
 Version: v0.1.0
 Licence type (autodetected): Apache-2.0
@@ -40442,6 +40469,37 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
+
+
+--------------------------------------------------------------------------------
+Dependency : github.com/dgryski/go-rendezvous
+Version: v0.0.0-20200823014737-9f7001d12a5f
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/dgryski/go-rendezvous@v0.0.0-20200823014737-9f7001d12a5f/LICENSE:
+
+The MIT License (MIT)
+
+Copyright (c) 2017-2020 Damian Gryski <damian@gryski.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
@@ -46593,11 +46651,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/googleapis/enterprise-certificate-proxy
-Version: v0.3.2
+Version: v0.3.4
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/googleapis/enterprise-certificate-proxy@v0.3.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/googleapis/enterprise-certificate-proxy@v0.3.4/LICENSE:
 
 
                                  Apache License
@@ -50868,6 +50926,38 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+--------------------------------------------------------------------------------
+Dependency : github.com/keybase/go-keychain
+Version: v0.0.0-20231219164618-57a3676c3af6
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/keybase/go-keychain@v0.0.0-20231219164618-57a3676c3af6/LICENSE:
+
+The MIT License (MIT)
+
+Copyright (c) 2015 Keybase
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 
 
 --------------------------------------------------------------------------------
@@ -55480,8 +55570,6 @@ Contents of probable licence file $GOMODCACHE/github.com/prometheus/client_golan
 
 
 --------------------------------------------------------------------------------
-<<<<<<< HEAD
-=======
 Dependency : github.com/redis/go-redis/v9
 Version: v9.7.0
 Licence type (autodetected): BSD-2-Clause
@@ -55517,7 +55605,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 --------------------------------------------------------------------------------
->>>>>>> 02c934be7 (build(deps): bump github.com/Azure/azure-sdk-for-go/sdk/azidentity (#42690))
 Dependency : github.com/rogpeppe/go-internal
 Version: v1.13.1
 Licence type (autodetected): BSD-3-Clause
@@ -57544,11 +57631,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : go.einride.tech/aip
-Version: v0.67.1
+Version: v0.68.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.einride.tech/aip@v0.67.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.einride.tech/aip@v0.68.0/LICENSE:
 
 Copyright 2020 Einride AB
 
@@ -71556,11 +71643,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto
-Version: v0.0.0-20240730163845-b1a4ccb954bf
+Version: v0.0.0-20241015192408-796eee8c2d53
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20240730163845-b1a4ccb954bf/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto@v0.0.0-20241015192408-796eee8c2d53/LICENSE:
 
 
                                  Apache License
@@ -73302,29 +73389,6 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
---------------------------------------------------------------------------------
-Dependency : nhooyr.io/websocket
-Version: v1.8.11
-Licence type (autodetected): ISC
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/nhooyr.io/websocket@v1.8.11/LICENSE.txt:
-
-Copyright (c) 2023 Anmol Sethi <hi@nhooyr.io>
-
-Permission to use, copy, modify, and distribute this software for any
-purpose with or without fee is hereby granted, provided that the above
-copyright notice and this permission notice appear in all copies.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 
 --------------------------------------------------------------------------------
