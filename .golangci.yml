@@ -1,5 +1,6 @@
 # options for analysis running
 run:
+  concurrency: 0
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 15m
   build-tags:
