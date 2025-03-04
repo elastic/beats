@@ -180,6 +180,35 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 
 
+[[release-notes-8.16.5]]
+=== Beats version 8.16.5
+https://github.com/elastic/beats/compare/v8.16.4\...v8.16.5[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
+
+*Winlogbeat*
+
+- Sync missing changes in modules pipelines. {pull}42619[42619]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.22.12. {pull}42681[42681]
+
+*Filebeat*
+
+- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+
+*Metricbeat*
+
+- Log every 401 response from Kubernetes API Server. {pull}42714[42714]
+
+
 [[release-notes-8.16.4]]
 === Beats version 8.16.4
 https://github.com/elastic/beats/compare/v8.16.3\...v8.16.4[View commits]
