@@ -180,8 +180,6 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 
 
-<<<<<<< HEAD
-=======
 [[release-notes-8.16.5]]
 === Beats version 8.16.5
 https://github.com/elastic/beats/compare/v8.16.4\...v8.16.5[View commits]
@@ -334,10 +332,15 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 - Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
 
 
->>>>>>> 2050421ad ([main](backport #42976) docs: Prepare Changelog for 8.16.5 (#43005))
 [[release-notes-8.16.1]]
 === Beats version 8.16.1
 https://github.com/elastic/beats/compare/v8.16.0\...v8.16.1[View commits]
+
+==== Known issues
+
+*Metricbeat*
+
+- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 12500 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
 
 ==== Breaking changes
 
@@ -372,6 +375,10 @@ filebeat.inputs:
   number_of_workers: 5
   bucket_arn: 'arn:aws:s3:::test1'
 ----
+
+*Metricbeat*
+
+- Metrics can be lost when using Metricbeat due to the total fields limit of the Metricbeat index template. We recommend increasing the `index.mapping.total_fields.limit` setting of the Metricbeat index template to 12500 and perform a rollover of the Metricbeat data stream. If you've customized the name of the index associated to Metricbeat, apply the same change accordingly.
 
 ==== Breaking changes
 
