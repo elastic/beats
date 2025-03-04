@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -118,6 +119,12 @@ func TestInputFieldsTranslation(t *testing.T) {
 // TestCompareGoSystemdWithJournalctl ensures the new implementation produces
 // events in the same format as the original one. We use the events from the
 // already existing journal file 'input-multiline-parser.journal'
+//
+// Generating golden file: to generate the golden file you need to copy
+// and run this test on a older version that still uses go-systemd,
+// like 8.16.0, so the input run on this older version, call
+// `env.pipeline.GetAllEvents()`, get the events, marshal them as
+// JSON with "  " as the indent argument and write it to the file.
 //
 // The following fields are not currently tested:
 // __CURSOR - it is added to the registry and there are other tests for it
@@ -328,6 +335,33 @@ func TestReaderAdapterCanHandleNonStringFields(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestInputCanReportStatus(t *testing.T) {
+	out := decompress(t, filepath.Join("testdata", "multiple-boots.journal.gz"))
+
+	env := newInputTestingEnvironment(t)
+	cfg := mapstr.M{
+		"paths": []string{out},
+	}
+	inp := env.mustCreateInput(cfg)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	t.Cleanup(cancelInput)
+
+	env.startInput(ctx, inp)
+	env.waitUntilEventCount(6)
+
+	env.RequireStatuses([]statusUpdate{
+		{
+			state: status.Starting,
+			msg:   "Starting",
+		},
+		{
+			state: status.Running,
+			msg:   "Running",
+		},
+	})
 }
 
 func decompress(t *testing.T, namegz string) string {

@@ -20,6 +20,7 @@
 package index
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -41,29 +42,34 @@ var info = elasticsearch.Info{
 	ClusterName: "helloworld",
 }
 
+var testedVersions = []string{"8.17.0", "7.17.27"}
+
 func TestMapper(t *testing.T) {
-	t.Skip("Skipping to fix in a follow up")
 
-	mux := createEsMuxer("7.6.0", "platinum", false)
+	for _, version := range testedVersions {
 
-	server := httptest.NewServer(mux)
-	defer server.Close()
+		mux := createEsMuxer(version, "platinum", false)
 
-	httpClient, err := helper.NewHTTPFromConfig(helper.Config{
-		ConnectTimeout: 30 * time.Second,
-		Transport: httpcommon.HTTPTransportSettings{
-			Timeout: 30 * time.Second,
-		},
-	}, mb.HostData{
-		URI:          server.URL,
-		SanitizedURI: server.URL,
-		Host:         server.URL,
-	})
-	if err != nil {
-		t.Fatal(err)
+		server := httptest.NewServer(mux)
+		defer server.Close()
+
+		httpClient, err := helper.NewHTTPFromConfig(helper.Config{
+			ConnectTimeout: 30 * time.Second,
+			Transport: httpcommon.HTTPTransportSettings{
+				Timeout: 30 * time.Second,
+			},
+		}, mb.HostData{
+			URI:          server.URL,
+			SanitizedURI: server.URL,
+			Host:         server.URL,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		statsFileGlob := fmt.Sprintf("./_meta/test/stats*.%s.json", version)
+		elasticsearch.TestMapperWithHttpHelper(t, statsFileGlob, httpClient, eventsMapping)
 	}
-
-	elasticsearch.TestMapperWithHttpHelper(t, "../index/_meta/test/stats.*.json", httpClient, eventsMapping)
 }
 
 func TestEmpty(t *testing.T) {
@@ -89,16 +95,16 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 	}
 	rootHandler := func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "_stats") {
-			input, _ := ioutil.ReadFile("./_meta/test/stats.800.snapshot.20201118.json")
+			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/stats.%s.json", esVersion))
 			w.Write(input)
 			return
 		} else if r.URL.Path != "/" {
-			input, _ := ioutil.ReadFile("./_meta/test/settings.json")
+			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/settings.%s.json", esVersion))
 			w.Write(input)
 			return
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/root.%s.json", esVersion))
 		w.Write(input)
 
 	}
@@ -114,13 +120,13 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 
 	mux.Handle("/_xpack/usage", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/xpack-usage.710.json")
+			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/xpack-usage.%s.json", esVersion))
 			w.Write(input)
 		}))
 
-	mux.Handle("/_cluster/state/metadata,routing_table", http.HandlerFunc(
+	mux.Handle("/_cluster/state/routing_table", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster_state.710.json")
+			input, _ := ioutil.ReadFile(fmt.Sprintf("./_meta/test/cluster_state.%s.json", esVersion))
 			w.Write(input)
 		}))
 
@@ -130,7 +136,7 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 }
 
 func TestData(t *testing.T) {
-	mux := createEsMuxer("7.6.0", "platinum", false)
+	mux := createEsMuxer("8.17.0", "platinum", false)
 
 	server := httptest.NewServer(mux)
 	defer server.Close()
