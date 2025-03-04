@@ -1267,7 +1267,7 @@ spec:
       description: "Beats serverless tests from elastic-agent repository"
     spec:
       pipeline_file: ".buildkite/serverless.beats.tests.yml"
-      maximum_timeout_in_minutes: 120
+      maximum_timeout_in_minutes: 180
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
       repository: elastic/elastic-agent
