@@ -255,7 +255,7 @@ func (r sqsProcessingResult) Done() {
 			return
 		}
 		p.metrics.sqsMessagesDeletedTotal.Inc()
-		p.log.Errorf("failed processing SQS message (message was deleted): %w", processingErr)
+		p.log.Errorf("failed processing SQS message (message was deleted): %v", processingErr.Error())
 		return
 	}
 
