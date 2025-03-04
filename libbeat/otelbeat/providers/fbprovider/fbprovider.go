@@ -72,11 +72,7 @@ func (fmp *provider) Retrieve(_ context.Context, uri string, _ confmap.WatcherFu
 			},
 		},
 	}
-	// inject log level
-	level, _ := cfg.String("logs.level", -1)
-	if level != "" {
-		cfgMap["service::telemetry::logs::level"] = level
-	}
+
 	return confmap.NewRetrieved(cfgMap)
 }
 
