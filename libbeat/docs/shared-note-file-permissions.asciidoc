@@ -1,3 +1,0 @@
-NOTE: On systems with POSIX file permissions, all Beats configuration files are
-subject to ownership and file permission checks. For more information, see
-{beats-ref}/config-file-permissions.html[Config File Ownership and Permissions].
