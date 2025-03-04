@@ -431,6 +431,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
+- Add Initial Interval for Microsoft Filesets (ATP, Defender) {pull}42309[42309]
 
 *Auditbeat*
 
