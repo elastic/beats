@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -88,8 +89,13 @@ func Package() error {
 				}
 
 				// TODO add filters on fips-enabled beats
-				if pkg.Spec.FIPS && !FIPSBuild {
-					log.Printf("Skipping creation for package type %v because spec.Fips=%b and fips=%b: %v", pkgType, pkg.Spec.FIPS, FIPSBuild)
+				if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
+					log.Printf("Skipping creation for beat %v package type %v because beat is not listed as FIPS compliant %v", BeatName, pkgType, FIPSConfig.Beats)
+					continue
+				}
+
+				if pkg.Spec.FIPS != FIPSBuild {
+					log.Printf("Skipping creation for package type %v because spec.FIPS = %v and FIPSBuild = %v", pkgType, pkg.Spec.FIPS, FIPSBuild)
 					continue
 				}
 
