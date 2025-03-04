@@ -27,7 +27,7 @@ import (
 	"testing"
 
 	"github.com/prometheus/common/model"
-	pl "github.com/prometheus/prometheus/model/labels"
+	pl "github.com/prometheus/prometheus/v2/model/labels"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 

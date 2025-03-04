@@ -208,7 +208,6 @@ require (
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.21
 	github.com/pkg/xattr v0.4.9
-	github.com/prometheus/prometheus v0.54.1
 	github.com/shirou/gopsutil/v4 v4.24.10
 	github.com/teambition/rrule-go v1.8.2
 	github.com/tklauser/go-sysconf v0.3.12
@@ -481,6 +480,7 @@ require (
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/moby/term v0.5.0 // indirect
+	github.com/prometheus/prometheus/v2 v2.54.1
 	github.com/yuin/gopher-lua v1.1.1 // indirect
 )
 
@@ -494,3 +494,5 @@ replace (
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20240913150833-a945473a8f25
 )
+
+replace github.com/prometheus/prometheus/v2 => ./_vendor/github.com/prometheus/prometheus@v0.54.1
