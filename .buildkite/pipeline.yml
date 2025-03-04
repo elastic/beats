@@ -662,5 +662,5 @@ steps:
     # if: build.pull_request.id == null
     trigger: "beats-serverless-tests"
     build:
-      commit: "${BUILDKITE_COMMIT}"
+      # commit: "${BUILDKITE_COMMIT}"
       branch: "ci_serverless_beats_tests_to_beats"
