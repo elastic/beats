@@ -47,7 +47,7 @@ func (s *testSource) Name() string {
 
 type noopProspector struct{}
 
-func (m noopProspector) Init(_, _ ProspectorCleaner, _ func(Source) string) error {
+func (m noopProspector) Init(_, _ StoreUpdater, _ func(Source) string) error {
 	return nil
 }
 

@@ -36,6 +36,7 @@ type config struct {
 	Reader readerConfig `config:",inline"`
 
 	ID           string          `config:"id"`
+	PreviousIDs  []string        `config:"previous_ids"`
 	Paths        []string        `config:"paths"`
 	Close        closerConfig    `config:"close"`
 	FileWatcher  *conf.Namespace `config:"prospector"`

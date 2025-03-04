@@ -20,6 +20,7 @@ package input_logfile
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -358,7 +359,10 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test"}, s}
+		store := &sourceStore{
+			identifier: &sourceIdentifier{"test"},
+			store:      s,
+		}
 
 		store.UpdateIdentifiers(func(v Value) (string, interface{}) {
 			var m testMeta
@@ -400,6 +404,68 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	})
 }
 
+func TestSourceStoreCopyStatesFromPreviousIDs(t *testing.T) {
+	backend := createSampleStore(t, map[string]state{
+		"filestream::previous-id::key1": { // Active resource
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+		"filestream::another-input::key2": { // Active resource from another input
+			TTL:  60 * time.Second,
+			Meta: testMeta{IdentifierName: "test-file-identity"},
+		},
+	})
+	s := testOpenStore(t, "filestream", backend)
+	defer s.Release()
+	store := &sourceStore{
+		identifier:          &sourceIdentifier{"filestream::current-id::"},
+		previousIdentifiers: []*sourceIdentifier{&sourceIdentifier{"filestream::previous-id::"}},
+		store:               s,
+	}
+
+	store.CopyStatesFromPreviousIDs(func(v Value) (string, interface{}) {
+		r, ok := v.(*resource)
+		if !ok {
+			t.Fatalf("expecting v of type '*input_logfile.resource', got '%T' instead", v)
+		}
+
+		var m testMeta
+		err := v.UnpackCursorMeta(&m)
+		if err != nil {
+			t.Fatalf("cannot unpack meta: %v", err)
+		}
+
+		newID := strings.ReplaceAll(r.key, "previous-id", "current-id")
+
+		return newID, m
+	})
+
+	// The persistentStore is a mock that does not consider if a state has
+	// been removed before returning it, thus allowing us to get Updated
+	// timestamp from when the resource was deleted.
+	var deletedState state
+	s.persistentStore.Get("filestream::previous-id::key1", &deletedState)
+
+	want := map[string]state{
+		"filestream::previous-id::key1": { // old resource is deleted, TTL must be zero
+			Updated: deletedState.Updated,
+			TTL:     0 * time.Second,
+			Meta:    map[string]interface{}{"identifiername": "test-file-identity"},
+		},
+		"filestream::another-input::key2": { // Unchanged
+			TTL:  60 * time.Second,
+			Meta: map[string]interface{}{"identifiername": "test-file-identity"},
+		},
+		"filestream::current-id::key1": { // Updated resource
+			Updated: s.Get("filestream::current-id::key1").internalState.Updated,
+			TTL:     60 * time.Second,
+			Meta:    map[string]interface{}{"identifiername": "test-file-identity"},
+		},
+	}
+
+	checkEqualStoreState(t, want, backend.snapshot())
+}
+
 //nolint:dupl // Test code won't be refactored on this commit
 func TestSourceStore_CleanIf(t *testing.T) {
 	t.Run("entries are cleaned when function returns true", func(t *testing.T) {
@@ -413,7 +479,10 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test"}, s}
+		store := &sourceStore{
+			identifier: &sourceIdentifier{"test"},
+			store:      s,
+		}
 
 		store.CleanIf(func(_ Value) bool {
 			return true
@@ -445,7 +514,10 @@ func TestSourceStore_CleanIf(t *testing.T) {
 		})
 		s := testOpenStore(t, "test", backend)
 		defer s.Release()
-		store := &sourceStore{&sourceIdentifier{"test"}, s}
+		store := &sourceStore{
+			identifier: &sourceIdentifier{"test"},
+			store:      s,
+		}
 
 		store.CleanIf(func(v Value) bool {
 			return false
