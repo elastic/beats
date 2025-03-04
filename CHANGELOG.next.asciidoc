@@ -67,6 +67,7 @@ Dropped fields: `syslog.priority` and `syslog.facility` while keeping their dupl
 already present as `container.id` and `container.log.tag` is dropped because it is already present as
 `log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
+- Add per-input pipeline metrics to filestream, cel and httpjson inputs. {pull}42618[42618] {issue}42761[42761]
 
 *Heartbeat*
 

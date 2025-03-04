@@ -23,6 +23,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var testCases = []struct {
@@ -1658,12 +1659,23 @@ func newChainPaginationTestServer(
 
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
+	reg := monitoring.GetNamespace("dataset").
+		GetRegistry().NewRegistry(id)
+	unreg := func() {
+		monitoring.GetNamespace("dataset").
+			GetRegistry().Remove(id)
+	}
 	return v2.Context{
-		Logger:        logp.NewLogger("httpjson_test"),
-		ID:            id,
-		IDWithoutName: id,
-		Cancelation:   ctx,
-	}, cancel
+			MetricsRegistry:       reg,
+			MetricsRegistryCancel: unreg,
+			Logger:                logp.NewLogger("httpjson_test"),
+			ID:                    id,
+			IDWithoutName:         id,
+			Cancelation:           ctx,
+		}, func() {
+			cancel()
+			unreg()
+		}
 }
 
 //nolint:errcheck // We can safely ignore errors here

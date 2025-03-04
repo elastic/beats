@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Pipeline provides access to libbeat event publishing by creating a Client
@@ -45,6 +46,11 @@ type Client interface {
 // ClientConfig defines common configuration options one can pass to
 // Pipeline.ConnectWith to control the clients behavior and provide ACK support.
 type ClientConfig struct {
+	// InputMetricsRegistry is the metrics registry used to aggregate pipeline metrics
+	// per input.
+	InputMetricsRegistry       *monitoring.Registry
+	InputMetricsRegistryCancel func()
+
 	PublishMode PublishMode
 
 	Processing ProcessingConfig

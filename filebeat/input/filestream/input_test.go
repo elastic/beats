@@ -36,6 +36,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -193,11 +194,16 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	input, err := p.Manager.Create(c)
 	require.NoError(b, err)
 
+	beatInfo := beat.Info{}
+	beatInfo.Monitoring.Namespace = monitoring.GetNamespace(b.Name())
 	ctx, cancel := context.WithCancel(ctx)
-	context := v2.Context{
-		Logger:      logger,
-		ID:          testID,
-		Cancelation: ctx,
+	v2ctx := v2.Context{
+		Agent:                 beatInfo,
+		MetricsRegistry:       monitoring.NewRegistry(),
+		MetricsRegistryCancel: func() {},
+		Logger:                logger,
+		ID:                    testID,
+		Cancelation:           ctx,
 	}
 
 	connector, events := newTestPipeline(eventLimit, collectEvents)
@@ -215,7 +221,7 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	}()
 
 	return func(t testing.TB) []beat.Event {
-		err := input.Run(context, connector)
+		err := input.Run(v2ctx, connector)
 		require.NoError(b, err)
 
 		return out

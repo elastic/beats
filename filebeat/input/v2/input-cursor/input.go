@@ -24,6 +24,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -109,6 +110,12 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	// A new context and a new metrics registry will be created for each worker,
+	// therefore this metrics won't be used, so cancel it.
+	if ctx.MetricsRegistryCancel != nil {
+		ctx.MetricsRegistryCancel()
+	}
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
@@ -119,6 +126,24 @@ func (inp *managedInput) Run(
 			inpCtx.IDWithoutName = ctx.ID
 			inpCtx.ID = ctx.ID + "::" + source.Name()
 			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
+
+			// Same situation here as when the original context was created:
+			// There is a bit of a chicken-egg issue here. In general the pipeline
+			// client will be created before the input register its metrics.
+			// Therefore, here just the registry is created. Later, when the input
+			// register its metrics, it'll add the `id` and `input` strings to the
+			// registry, which will make the registry valid to be published in the
+			// '/inputs/' monitoring endpoint. Also, some inputs use a different name
+			// than `r.input.Name()` when registering the metrics, another reason
+			// why it does not make sense to move the call to
+			// `inputmon.NewInputRegistry` here.
+			reg := inpCtx.Agent.Monitoring.Namespace.GetRegistry().
+				NewRegistry(inputmon.SanitizeID(inpCtx.ID))
+			inpCtx.MetricsRegistry = reg
+			inpCtx.MetricsRegistryCancel = func() {
+				inpCtx.Agent.Monitoring.Namespace.GetRegistry().
+					Remove(inputmon.SanitizeID(inpCtx.ID))
+			}
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
 				cancel()
@@ -147,7 +172,9 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: newInputACKHandler(ctx.Logger),
+		InputMetricsRegistry:       ctx.MetricsRegistry,
+		InputMetricsRegistryCancel: ctx.MetricsRegistryCancel,
+		EventListener:              newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
 		return err

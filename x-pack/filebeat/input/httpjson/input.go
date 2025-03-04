@@ -19,18 +19,18 @@ import (
 	"strings"
 	"time"
 
-	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/hashicorp/go-retryablehttp"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/mito/lib/xml"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"

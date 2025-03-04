@@ -211,12 +211,13 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add a configuration option for TCP/UDP network type. {issue}40407[40407] {pull}40623[40623]
 - Added debug logging to parquet reader in x-pack/libbeat/reader. {pull}40651[40651]
 - Added filebeat debug histograms for s3 object size and events per processed s3 object. {pull}40775[40775]
-- Simplified GCS input state checkpoint calculation logic. {issue}40878[40878] {pull}40937[40937] 
+- Simplified GCS input state checkpoint calculation logic. {issue}40878[40878] {pull}40937[40937]
 - Simplified Azure Blob Storage input state checkpoint calculation logic. {issue}40674[40674] {pull}40936[40936]
 - Add field redaction package. {pull}40997[40997]
 - Add support for marked redaction to x-pack/filebeat/input/internal/private {pull}41212[41212]
 - Add support for collecting Okta role and factor data for users with filebeat entityanalytics input. {pull}41044[41044]
 - Add CEL input program evaluation coverage collection support. {pull}41884[41884]
+- The libbeat pipeline client now can track metrics per-input {pull}42618[42618] {issue}42761[42761]
 
 ==== Deprecated
 

@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/go-concert/unison"
 )
@@ -86,9 +87,24 @@ type Context struct {
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
+	// MetricsRegistry to collect metrics for this input.
+	// The context now provides a metrics registry for input metrics,
+	// sourced from beat.Info.Monitoring.Namespace.
+	// For compatibility, beats are configured with the global 'dataset'
+	// namespace in beat.Info.Monitoring.Namespace.
+	// When running as an OTel receiver, each beat.Beat instance has a unique
+	// metrics namespace.
+	// Additionally, inputmon has been updated to consider both the global
+	// 'dataset' namespace and beat.Info.Monitoring.Namespace when retrieving
+	// metrics.
+	// Consequently, inputs are not required to immediately adopt the new
+	// registry for their metrics.
+	MetricsRegistry *monitoring.Registry
+	// MetricsRegistryCancel unregisters MetricsRegistry.
+	MetricsRegistryCancel func()
+
 	// Cancelation is used by Beats to signal the input to shutdown.
 	Cancelation Canceler
-
 	// StatusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.

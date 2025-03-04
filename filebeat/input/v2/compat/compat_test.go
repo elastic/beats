@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/internal/inputest"
@@ -38,6 +39,9 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 	t.Run("does not run or test configured input", func(t *testing.T) {
 		log := logp.NewLogger("test")
 		var countConfigure, countTest, countRun int
+
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace(t.Name())
 
 		// setup
 		plugins := inputest.SinglePlugin("test", &inputest.MockInputManager{
@@ -50,7 +54,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 			},
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		factory := RunnerFactory(log, beatInfo, loader.Loader)
 
 		// run
 		err := factory.CheckConfig(conf.NewConfig())
@@ -71,6 +75,8 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 		var ids = map[string]int{}
 		var idsMu sync.Mutex
 
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace(t.Name())
 		// setup
 		plugins := inputest.SinglePlugin("test", &inputest.MockInputManager{
 			OnConfigure: func(cfg *conf.C) (v2.Input, error) {
@@ -93,7 +99,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 			},
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		factory := RunnerFactory(log, beatInfo, loader.Loader)
 
 		inputID := "filestream-kubernetes-pod-aee2af1c6365ecdd72416f44aab49cd8bdc7522ab008c39784b7fd9d46f794a4"
 		inputCfg := fmt.Sprintf(`
@@ -134,13 +140,89 @@ type: test
 		log := logp.NewLogger("test")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace(t.Name())
+		factory := RunnerFactory(log, beatInfo, loader.Loader)
 
 		// run
 		err := factory.CheckConfig(conf.MustNewConfigFrom(map[string]interface{}{
 			"type": "unknown",
 		}))
 		assert.Error(t, err)
+	})
+
+	t.Run("uses id from config", func(t *testing.T) {
+		log := logp.NewLogger("test")
+
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace(t.Name())
+		// setup
+		plugins := inputest.SinglePlugin("test", &inputest.MockInputManager{
+			OnConfigure: func(cfg *conf.C) (v2.Input, error) {
+				return &inputest.MockInput{}, nil
+			},
+		})
+		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
+		factory := RunnerFactory(log, beatInfo, loader.Loader)
+
+		inputID := "some-id"
+		inputCfg := fmt.Sprintf(`
+id: %s
+parsers:
+  - container: null
+paths:
+  - /some/path/log.log
+prospector:
+  scanner:
+    symlinks: true
+take_over: true
+type: test
+`, inputID)
+
+		inpRunner, err := factory.Create(nil, conf.MustNewConfigFrom(inputCfg))
+		require.NoError(t, err, "could not create runner")
+		got, ok := inpRunner.(*runner)
+		require.Truef(t, ok, "inpRunner should be a %T", &runner{})
+
+		assert.Equal(t, got.id, inputID, "runner id should be the config id")
+		assert.False(t, got.emptyInputID,
+			"config has an ID, thus 'emptyInputID' should be false")
+	})
+
+	t.Run("creates id when absent and sets emptyInputID to true", func(t *testing.T) {
+		log := logp.NewLogger("test")
+
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace(t.Name())
+		// setup
+		plugins := inputest.SinglePlugin("test", &inputest.MockInputManager{
+			OnConfigure: func(cfg *conf.C) (v2.Input, error) {
+				return &inputest.MockInput{}, nil
+			},
+		})
+		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
+		factory := RunnerFactory(log, beatInfo, loader.Loader)
+
+		inputCfg := `
+parsers:
+  - container: null
+paths:
+  - /some/path/log.log
+prospector:
+  scanner:
+    symlinks: true
+take_over: true
+type: test
+`
+
+		inpRunner, err := factory.Create(nil, conf.MustNewConfigFrom(inputCfg))
+		require.NoError(t, err, "could not create runner")
+		got, ok := inpRunner.(*runner)
+		require.Truef(t, ok, "inpRunner should be a %T", &runner{})
+
+		assert.NotEmpty(t, got.id)
+		assert.True(t, got.emptyInputID,
+			"config did not have an ID, thus 'emptyInputID' should be true")
 	})
 }
 
@@ -149,6 +231,9 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		log := logp.NewLogger("test")
 		var countRun int
 		var wg sync.WaitGroup
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace(t.Name())
+
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(&inputest.MockInput{
 			OnRun: func(ctx v2.Context, _ beat.PipelineConnector) error {
 				defer wg.Done()
@@ -158,7 +243,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 			},
 		}))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		factory := RunnerFactory(log, beatInfo, loader.Loader)
 
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
 			"type": "test",
@@ -176,7 +261,9 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		log := logp.NewLogger("test")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
-		factory := RunnerFactory(log, beat.Info{}, loader.Loader)
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace = monitoring.GetNamespace(t.Name())
+		factory := RunnerFactory(log, beatInfo, loader.Loader)
 
 		// run
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
