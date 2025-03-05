@@ -227,7 +227,7 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "darwin/universal":
 		tagSuffix = "darwin-arm64-debian11"
 	case platform == "linux/arm64":
-		tagSuffix = "arm"
+		tagSuffix = "base-arm-debian9"
 	case platform == "linux/armv5":
 		tagSuffix = "armel"
 	case platform == "linux/armv6":
