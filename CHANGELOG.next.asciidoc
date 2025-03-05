@@ -152,6 +152,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
+- Sync missing changes in modules pipelines. {pull}42619[42619]
+- Reset EventLog if error EOF is encountered. {pull}42826[42826]
+- Implement backoff on error retrial. {pull}42826[42826]
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
 
 *Elastic Logging Plugin*
