@@ -26,7 +26,7 @@ processors:
 
   - set:
       field: ecs.version
-      value: '8.0.0'
+      value: '8.17.0'
   - set:
       field: log.level
       copy_from: winlog.level

@@ -5,7 +5,7 @@ processors:
 
   - set:
       field: ecs.version
-      value: '8.0.0'
+      value: '8.17.0'
   - script:
       description: Remove all empty values from event_data.
       lang: painless
