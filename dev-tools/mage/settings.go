@@ -41,7 +41,7 @@ const (
 	fpmVersion = "1.13.1"
 
 	// Docker images. See https://github.com/elastic/golang-crossbuild.
-	beatsFPMImage = "docker.elastic.co/observability-ci/fpm"
+	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
 	// BeatsCrossBuildImage is the image used for crossbuilding Beats.
 	BeatsCrossBuildImage = "docker.elastic.co/beats-dev/golang-crossbuild"
 
