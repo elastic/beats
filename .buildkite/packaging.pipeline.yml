@@ -263,9 +263,8 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
-          - x-pack/osquerybeat
 
-      - label: "STAGING: {{matrix} all artifacts for Linux/arm64"
+      - label: "STAGING: {{matrix}} all artifacts for Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           SNAPSHOT: false
