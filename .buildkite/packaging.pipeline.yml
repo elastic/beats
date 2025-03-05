@@ -121,10 +121,9 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "SNAPSHOT: {{matrix}} docker Linux/arm64"
+      - label: "SNAPSHOT: {{matrix}} Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
-          PACKAGES: "docker"
           SNAPSHOT: true
           # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
@@ -151,30 +150,11 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
-
-      - label: "SNAPSHOT: {{matrix}} all artifacts for Linux/arm64"
-        env:
-          PLATFORMS: "${PLATFORMS_ARM}"
-          SNAPSHOT: true
-          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
-          DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        timeout_in_minutes: 40
-        retry:
-          automatic:
-            - limit: 1
-        artifact_paths:
-          - build/distributions/**/*
-        matrix:
-          - x-pack/agentbeat
           - x-pack/osquerybeat
+          - x-pack/agentbeat
 
       ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "SNAPSHOT: x-pack/agentbeat"
+      - label: "SNAPSHOT: x-pack/agentbeat all artifacts apart from linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
@@ -232,10 +212,9 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "STAGING: {{matrix}} docker Linux/arm64"
+      - label: "STAGING: {{matrix}} Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
-          PACKAGES: "docker"
           SNAPSHOT: false
           DEV: false
         command: |
@@ -263,31 +242,11 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
-
-      - label: "STAGING: {{matrix}} all artifacts for Linux/arm64"
-        env:
-          PLATFORMS: "${PLATFORMS_ARM}"
-          SNAPSHOT: false
-          DEV: false
-        command: |
-          source .buildkite/scripts/version_qualifier.sh
-          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        timeout_in_minutes: 40
-        retry:
-          automatic:
-            - limit: 1
-        artifact_paths:
-          - build/distributions/**/*
-        matrix:
-          - x-pack/agentbeat
           - x-pack/osquerybeat
+          - x-pack/agentbeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "STAGING: x-pack/agentbeat"
+      - label: "STAGING: x-pack/agentbeat all artifacts apart from linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
