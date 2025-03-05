@@ -128,13 +128,13 @@ func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.
 					continue
 				}
 				var counterVal float64
-				switch val.Measurement.(type) {
+				switch m := val.Measurement.(type) {
 				case int64:
-					counterVal = float64(val.Measurement.(int64))
+					counterVal = float64(m)
 				case int:
-					counterVal = float64(val.Measurement.(int))
+					counterVal = float64(m)
 				default:
-					counterVal = val.Measurement.(float64)
+					counterVal, _ = val.Measurement.(float64)
 				}
 				if _, ok := measurements[readerCounter.QueryField]; !ok {
 					measurements[readerCounter.QueryField] = counterVal
