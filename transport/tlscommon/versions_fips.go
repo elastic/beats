@@ -19,6 +19,11 @@
 
 package tlscommon
 
+var (
+	// TLSVersionMin is the min TLS version supported.
+	TLSVersionMin = TLSVersion12
+)
+
 func SetInsecureDefaults() {
 	// noop, use secure defaults in fips
 }

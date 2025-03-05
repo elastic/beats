@@ -19,6 +19,11 @@
 
 package tlscommon
 
+var (
+	// TLSVersionMin is the min TLS version supported.
+	TLSVersionMin = TLSVersion11
+)
+
 // This function is used to avoid a breaking change on previous releases.
 func SetInsecureDefaults() {
 	TLSVersionMin = TLSVersion10
