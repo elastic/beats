@@ -152,6 +152,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
 
 *Elastic Logging Plugin*
