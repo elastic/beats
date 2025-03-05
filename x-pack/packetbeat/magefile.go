@@ -60,7 +60,7 @@ func Build() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	if err := xpacketbeat.CopyNPCAPInstaller(); err != nil {
+	if err := xpacketbeat.CopyNPCAPInstaller("./npcap/installer/"); err != nil {
 		return err
 	}
 
@@ -81,16 +81,6 @@ func CrossBuild() error {
 
 		devtools.ImageSelector(xpacketbeat.ImageSelector),
 	)
-}
-
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -118,7 +108,7 @@ func Package() {
 	packetbeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -137,12 +127,7 @@ func TestPackages() error {
 }
 
 func SystemTest(ctx context.Context) error {
-	// Buildkite (CI) images have preinstalled npcap
-	if os.Getenv("CI") == "true" {
-		mg.SerialDeps(devtools.BuildSystemTestBinary)
-	} else {
-		mg.SerialDeps(xpacketbeat.GetNpcapInstaller, devtools.BuildSystemTestBinary)
-	}
+	mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("./"), devtools.BuildSystemTestBinary)
 
 	args := devtools.DefaultGoTestIntegrationArgs()
 	args.Packages = []string{"./tests/system/..."}

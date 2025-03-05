@@ -207,9 +207,8 @@ steps:
 
       - label: ":windows: x-pack/packetbeat: Win 2022 System Tests"
         key: "mandatory-win-2022-system-tests"
-        skip: "skipping due to elastic/beats#38142"
         command: |
-          source .buildkite/scripts/gcp_auth.sh
+          .buildkite/scripts/gcp_auth.ps1
           Set-Location -Path x-pack/packetbeat
           mage systemTest
         retry:
@@ -322,9 +321,8 @@ steps:
 
       - label: ":windows: x-pack/packetbeat: Win 10 System Tests"
         key: "extended-win-10-system-tests"
-        skip: "skipping due to elastic/beats#38142"
         command: |
-          source .buildkite/scripts/gcp_auth.sh
+          .buildkite/scripts/gcp_auth.ps1
           Set-Location -Path x-pack/packetbeat
           mage systemTest
         retry:
@@ -453,8 +451,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command: |
-          cd x-pack/packetbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/packetbeat
         retry:
           automatic:
             - limit: 1
@@ -475,8 +472,7 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command: |
-          cd x-pack/packetbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/packetbeat
         retry:
           automatic:
             - limit: 1
