@@ -148,17 +148,20 @@ func (t *tokenBucket) setClock(c clockwork.Clock) {
 }
 
 func (t *tokenBucket) getBucket(key uint64) *bucket {
-	v, exists := t.buckets.LoadOrStore(key, &bucket{
+	v, exists := t.buckets.Load(key)
+	if exists {
+		//nolint:errcheck // ignore
+		b := v.(*bucket)
+		b.replenish(t.limit, t.clock)
+		return b
+	}
+
+	v, _ = t.buckets.LoadOrStore(key, &bucket{
 		tokens:        t.depth,
 		lastReplenish: t.clock.Now(),
 	})
 	//nolint:errcheck // ignore
-	b := v.(*bucket)
-	if exists {
-		b.replenish(t.limit, t.clock)
-	}
-
-	return b
+	return v.(*bucket)
 }
 
 func (t *tokenBucket) runGC() {
