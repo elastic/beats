@@ -24,6 +24,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/josephspurrier/goversioninfo"
@@ -44,6 +45,39 @@ type BuildArgs struct {
 	Vars        map[string]string // Vars that are passed as -X key=value with the ldflags.
 	ExtraFlags  []string
 	WinMetadata bool // Add resource metadata to Windows binaries (like add the version number to the .exe properties).
+}
+
+// buildTagRE is a regexp to match strings like "-tags=abcd"
+// but does not match "-tags= "
+var buildTagRE = regexp.MustCompile(`-tags=([\S]+)?`)
+
+// ParseBuildTags returns the ExtraFlags param where all flags that are go build tags are joined by a comma.
+//
+// For example if given -someflag=val1 -tags=buildtag1 -tags=buildtag2
+// It will return -someflag=val1 -tags=buildtag1,buildtag2
+func (b BuildArgs) ParseBuildTags() []string {
+	flags := make([]string, 0)
+	if len(b.ExtraFlags) == 0 {
+		return flags
+	}
+
+	buildTags := make([]string, 0)
+	for _, flag := range b.ExtraFlags {
+		if buildTagRE.MatchString(flag) {
+			arr := buildTagRE.FindStringSubmatch(flag)
+			if len(arr) != 2 || arr[1] == "" {
+				log.Printf("Parsing buildargs.ExtraFlags found strange flag %q ignoring value", flag)
+				continue
+			}
+			buildTags = append(buildTags, arr[1])
+		} else {
+			flags = append(flags, flag)
+		}
+	}
+	if len(buildTags) > 0 {
+		flags = append(flags, "-tags="+strings.Join(buildTags, ","))
+	}
+	return flags
 }
 
 // DefaultBuildArgs returns the default BuildArgs for use in builds.
@@ -73,6 +107,10 @@ func DefaultBuildArgs() BuildArgs {
 		args.LDFlags = append(args.LDFlags, "-s")
 		// Remove all file system paths from the compiled executable, to improve build reproducibility
 		args.ExtraFlags = append(args.ExtraFlags, "-trimpath")
+	}
+	if FIPSBuild {
+		args.ExtraFlags = append(args.ExtraFlags, "-tags=requirefips")
+		args.CGO = true
 	}
 
 	return args
@@ -175,6 +213,10 @@ func Build(params BuildArgs) error {
 	if params.CGO {
 		cgoEnabled = "1"
 	}
+	if FIPSBuild {
+		cgoEnabled = "1"
+		env["GOEXPERIMENT"] = "systemcrypto"
+	}
 	env["CGO_ENABLED"] = cgoEnabled
 
 	// Spec
@@ -186,7 +228,7 @@ func Build(params BuildArgs) error {
 	if params.BuildMode != "" {
 		args = append(args, "-buildmode", params.BuildMode)
 	}
-	args = append(args, params.ExtraFlags...)
+	args = append(args, params.ParseBuildTags()...)
 
 	// ldflags
 	ldflags := params.LDFlags
