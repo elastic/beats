@@ -92,6 +92,12 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 // Validate values the TLSConfig struct making sure certificate sure we have both a certificate and
 // a key.
 func (c *Config) Validate() error {
+	for _, v := range c.Versions {
+		if err := v.Validate(); err != nil {
+			return err
+		}
+
+	}
 	return c.Certificate.Validate()
 }
 

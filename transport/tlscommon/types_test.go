@@ -50,7 +50,7 @@ func TestLoadWithEmptyStringVerificationMode(t *testing.T) {
     certificate: mycert.pem
     key: mycert.key
     verification_mode: ""
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.2, TLSv1.3]
     renegotiation: freely
   `)
 
@@ -58,11 +58,25 @@ func TestLoadWithEmptyStringVerificationMode(t *testing.T) {
 	assert.Equal(t, cfg.VerificationMode, VerifyFull)
 }
 
+func TestLoadUnsupportedProtocols(t *testing.T) {
+	cfg, err := load(`
+    enabled: true
+    certificate: mycert.pem
+    key: mycert.key
+    verification_mode: ""
+    supported_protocols: [TLSv1.0, TLSv1.2]
+    renegotiation: freely
+  `)
+
+	assert.ErrorContains(t, err, "unsupported tls version")
+	assert.Nil(t, cfg)
+}
+
 func TestLoadWithEmptyVerificationMode(t *testing.T) {
 	cfg, err := load(`
     enabled: true
     verification_mode:
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.2, TLSv1.3]
     curve_types:
       - P-521
     renegotiation: freely
@@ -76,7 +90,7 @@ func TestRepackConfig(t *testing.T) {
 	cfg, err := load(`
     enabled: true
     verification_mode: certificate
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.2, TLSv1.3]
     cipher_suites:
       - RSA-AES-256-CBC-SHA
     certificate_authorities:
@@ -106,7 +120,7 @@ func TestRepackConfigFromJSON(t *testing.T) {
 	cfg, err := loadJSON(`{
     "enabled": true,
     "verification_mode": "certificate",
-    "supported_protocols": ["TLSv1.1", "TLSv1.2"],
+    "supported_protocols": ["TLSv1.2", "TLSv1.3"],
     "cipher_suites": ["RSA-AES-256-CBC-SHA"],
     "certificate_authorities": ["/path/to/ca.crt"],
     "certificate": "/path/to/cert.crt",

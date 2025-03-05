@@ -76,7 +76,7 @@ func TestValuesSet(t *testing.T) {
     cipher_suites:
       - ECDHE-ECDSA-AES-256-CBC-SHA
       - ECDHE-ECDSA-AES-256-GCM-SHA384
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.3]
     curve_types:
       - P-521
     renegotiation: freely
@@ -92,7 +92,7 @@ func TestValuesSet(t *testing.T) {
 	assert.Equal(t, VerifyNone, cfg.VerificationMode)
 	assert.Len(t, cfg.CipherSuites, 2)
 	assert.Equal(t,
-		[]TLSVersion{TLSVersion11, TLSVersion12},
+		[]TLSVersion{TLSVersion13},
 		cfg.Versions)
 	assert.Len(t, cfg.CurveTypes, 1)
 	assert.Equal(t,
