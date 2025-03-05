@@ -81,6 +81,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 - Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+- Remove kibana.settings metricset since the API was removed in 8.0 {issue}30592[30592] {pull}42937[42937]
+- Removed support for the Enterprise Search module {pull}42915[42915]
 
 *Osquerybeat*
 
@@ -228,6 +230,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 - Handle unexpectedEOF errors in aws-s3 input. Implemented retry logic on specific error. {pull}42420[42756]
+- Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 
 *Heartbeat*
 
@@ -246,18 +249,12 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
 - Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
 - Fix behavior of pagetypeinfo metrics {pull}39985[39985]
-- Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
-- Set GCP metrics config period to the default (60s) when the value is below the minimum allowed period. {issue}30434[30434] {pull}40020[40020]
-- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
-- Add GCP 'instance_id' resource label in ECS cloud fields. {issue}40033[40033] {pull}40062[40062]
-- Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
 - Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
-- Fix http server helper SSL config. {pull}39405[39405]
 - Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
 - Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
 - Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
@@ -269,6 +266,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
 - Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
 
 *Osquerybeat*
 
@@ -304,7 +303,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
-- Update to Go 1.22.12. {pull}42681[42681]
+- Update to Go 1.23.6. {pull}42705[42705]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 - Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
@@ -556,6 +555,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 ==== Known Issues
+
+
+
 
 
 

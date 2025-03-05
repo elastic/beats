@@ -164,7 +164,9 @@ steps:
 
       - label: ":ubuntu: Metricbeat: Crosscompile"
         key: "mandatory-cross-compile"
-        command: "make -C metricbeat crosscompile"
+        command: |
+          source .buildkite/scripts/qemu.sh
+          make -C metricbeat crosscompile
         retry:
           automatic:
             - limit: 1
