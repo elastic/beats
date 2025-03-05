@@ -1,0 +1,88 @@
+---
+description: Pipeline for Security events
+processors:
+  - set:
+      field: event.module
+      value: security
+  - convert:
+      field: event.code
+      type: string
+      ignore_missing: true
+  - pipeline:
+      name: '{< IngestPipeline "security_standard" >}'
+      if: 'ctx.winlog?.provider_name != null && ["Microsoft-Windows-Eventlog", "Microsoft-Windows-Security-Auditing"].contains(ctx.winlog.provider_name)'
+  - gsub:
+      field: source.ip
+      pattern: '^\[?::ffff:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(?:\](?::[0-9]+)?)?$'
+      replacement: '$1'
+      ignore_missing: true
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+      - asn
+      - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - append:
+      field: related.ip
+      value: '{{source.ip}}'
+      allow_duplicates: false
+      if: |-
+        ctx.source?.ip != null &&
+        ctx.source.ip != "-"
+  - convert:
+      field: winlog.record_id
+      type: string
+      ignore_missing: true
+  - convert:
+      field: winlog.event_id
+      type: string
+      ignore_missing: true
+  - set:
+      field: ecs.version
+      value: '8.17.0'
+  - set:
+      field: log.level
+      copy_from: winlog.level
+      ignore_empty_value: true
+      ignore_failure: true
+      if: ctx.winlog?.level != ""
+  - date:
+      field: winlog.time_created
+      tag: "time_created_date"
+      formats:
+        - ISO8601
+      if: ctx.winlog?.time_created != null
+      on_failure:
+        - remove:
+            field: winlog.time_created
+            ignore_failure: true
+        - append:
+            field: error.message
+            value: "fail-{{{ _ingest.on_failure_processor_tag }}}"
+        - fail:
+            message: "Processor {{ _ingest.on_failure_processor_type }} with tag {{ _ingest.on_failure_processor_tag }} in pipeline {{ _ingest.on_failure_pipeline }} failed with message: {{ _ingest.on_failure_message }}"
+  - convert:
+      field: error.code
+      type: string
+      ignore_missing: true
+on_failure:
+  - set:
+      field: event.kind
+      value: pipeline_error
+  - append:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"
