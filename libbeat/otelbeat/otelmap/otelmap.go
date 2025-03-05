@@ -168,9 +168,55 @@ func FromMapstr(m mapstr.M) pcommon.Map {
 				newVal := dest.AppendEmpty()
 				newVal.SetStr(i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
+		case []any:
+			dest := out.PutEmptySlice(k)
+			convertValue(v.([]interface{}), dest)
 		default:
 			out.PutStr(k, fmt.Sprintf("unknown type: %T", x))
 		}
 	}
 	return out
+}
+
+// convertValue converts a slice of any[] to pcommon.Value
+func convertValue(v []any, dest pcommon.Slice) {
+	// Handling the most common types without reflect is a small perf win.
+	for _, i := range v {
+		newValue := dest.AppendEmpty()
+		switch val := i.(type) {
+		case bool:
+			newValue.SetBool(val)
+		case string:
+			newValue.SetStr(val)
+		case int:
+			newValue.SetInt(int64(val))
+		case int8:
+			newValue.SetInt(int64(val))
+		case int16:
+			newValue.SetInt(int64(val))
+		case int32:
+			newValue.SetInt(int64(val))
+		case int64:
+			newValue.SetInt(val)
+		case uint:
+			newValue.SetInt(int64(val))
+		case uint8:
+			newValue.SetInt(int64(val))
+		case uint16:
+			newValue.SetInt(int64(val))
+		case uint32:
+			newValue.SetInt(int64(val))
+		case uint64:
+			newValue.SetInt(int64(val))
+		case float32:
+			newValue.SetDouble(float64(val))
+		case float64:
+			newValue.SetDouble(val)
+		case time.Time:
+			newValue.SetStr(val.UTC().Format("2006-01-02T15:04:05.000Z"))
+		default:
+			newValue.SetStr(fmt.Sprintf("unknown type: %T", val))
+		}
+
+	}
 }
