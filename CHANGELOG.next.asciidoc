@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 - Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
+- Fix race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Auditbeat*
 
