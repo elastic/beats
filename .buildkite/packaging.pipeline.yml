@@ -272,7 +272,7 @@ steps:
           DEV: false
         command: |
           source .buildkite/scripts/version_qualifier.sh
-          .buildkite/scripts/packaging/package-dra.sh x-pack/osquerybeat
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -285,6 +285,7 @@ steps:
           - build/distributions/**/*
         matrix:
           - x-pack/agentbeat
+          - x-pack/osquerybeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
       - label: "STAGING: x-pack/agentbeat"
