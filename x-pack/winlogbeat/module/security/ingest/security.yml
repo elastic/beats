@@ -1,5 +1,5 @@
 ---
-description: Pipeline for Security events
+description: Pipeline for Windows Security events
 processors:
   - set:
       field: event.module
@@ -8,7 +8,6 @@ processors:
       field: event.code
       type: string
       ignore_missing: true
-<<<<<<< HEAD
   - script:
       lang: painless
       ignore_failure: false
@@ -3786,36 +3785,12 @@ processors:
         ctx.winlog?.event_data?.OldTargetUserName != null &&
         ctx.winlog.event_data.OldTargetUserName != "-"
 
-=======
-  - pipeline:
-      name: '{< IngestPipeline "security_standard" >}'
-      if: 'ctx.winlog?.provider_name != null && ["Microsoft-Windows-Eventlog", "Microsoft-Windows-Security-Auditing"].contains(ctx.winlog.provider_name)'
->>>>>>> 7237209ca (Fix boolean key in security pipelines and sync pipelines with integration. (#43027))
   - gsub:
       field: source.ip
       pattern: '^\[?::ffff:([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)(?:\](?::[0-9]+)?)?$'
       replacement: '$1'
       ignore_missing: true
-  - geoip:
-      field: source.ip
-      target_field: source.geo
-      ignore_missing: true
-  - geoip:
-      database_file: GeoLite2-ASN.mmdb
-      field: source.ip
-      target_field: source.as
-      properties:
-      - asn
-      - organization_name
-      ignore_missing: true
-  - rename:
-      field: source.as.asn
-      target_field: source.as.number
-      ignore_missing: true
-  - rename:
-      field: source.as.organization_name
-      target_field: source.as.organization.name
-      ignore_missing: true
+
   - append:
       field: related.ip
       value: '{{source.ip}}'
@@ -3823,23 +3798,424 @@ processors:
       if: |-
         ctx.source?.ip != null &&
         ctx.source.ip != "-"
+
+  - script:
+      lang: painless
+      ignore_failure: false
+      tag: Object Policy Change and SidListDesc
+      description: Object Policy Change and SidListDesc
+      # SDDL Ace Types
+      # https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4715
+      # https://docs.microsoft.com/en-us/windows/win32/secauthz/ace-strings
+      # https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/f4296d69-1c0f-491f-9587-a960b292d070
+      # SDDL Permissions
+      # https://docs.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4715
+      # https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/f4296d69-1c0f-491f-9587-a960b292d070
+      # Known SIDs
+      # https://support.microsoft.com/en-au/help/243330/well-known-security-identifier"S-in-window"S-operating-systems
+      # https://docs.microsoft.com/en-us/windows/win32/secauthz/sid-strings
+      # Domain-specific SIDs
+      # https://support.microsoft.com/en-au/help/243330/well-known-security-identifiers-in-windows-operating-systems
+      # Object Permission Flags
+      # https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/7a53f60e-e730-4dfe-bbe9-b21b62eb790b
+      params:
+        AccountSIDDescription:
+          AO: Account operators
+          RU: Alias to allow previous Windows 2000
+          AN: Anonymous logon
+          AU: Authenticated users
+          BA: Built-in administrators
+          BG: Built-in guests
+          BO: Backup operators
+          BU: Built-in users
+          CA: Certificate server administrators
+          CG: Creator group
+          CO: Creator owner
+          DA: Domain administrators
+          DC: Domain computers
+          DD: Domain controllers
+          DG: Domain guests
+          DU: Domain users
+          EA: Enterprise administrators
+          ED: Enterprise domain controllers
+          WD: Everyone
+          PA: Group Policy administrators
+          IU: Interactively logged-on user
+          LA: Local administrator
+          LG: Local guest
+          LS: Local service account
+          SY: Local system
+          NU: Network logon user
+          NO: Network configuration operators
+          NS: Network service account
+          PO: Printer operators
+          PS: Personal self
+          PU: Power users
+          RS: RAS servers group
+          RD: Terminal server users
+          RE: Replicator
+          RC: Restricted code
+          SA: Schema administrators
+          SO: Server operators
+          SU: Service logon user
+          S-1-0: Null Authority
+          S-1-0-0: Nobody
+          S-1-1: World Authority
+          S-1-1-0: Everyone
+          S-1-16-0: Untrusted Mandatory Level
+          S-1-16-12288: High Mandatory Level
+          S-1-16-16384: System Mandatory Level
+          S-1-16-20480: Protected Process Mandatory Level
+          S-1-16-28672: Secure Process Mandatory Level
+          S-1-16-4096: Low Mandatory Level
+          S-1-16-8192: Medium Mandatory Level
+          S-1-16-8448: Medium Plus Mandatory Level
+          S-1-2: Local Authority
+          S-1-2-0: Local
+          S-1-2-1: Console Logon
+          S-1-3: Creator Authority
+          S-1-3-0: Creator Owner
+          S-1-3-1: Creator Group
+          S-1-3-2: Creator Owner Server
+          S-1-3-3: Creator Group Server
+          S-1-3-4: Owner Rights
+          S-1-4: Non-unique Authority
+          S-1-5: NT Authority
+          S-1-5-1: Dialup
+          S-1-5-10: Principal Self
+          S-1-5-11: Authenticated Users
+          S-1-5-12: Restricted Code
+          S-1-5-13: Terminal Server Users
+          S-1-5-14: Remote Interactive Logon
+          S-1-5-15: This Organization
+          S-1-5-17: This Organization
+          S-1-5-18: Local System
+          S-1-5-19: NT Authority
+          S-1-5-2: Network
+          S-1-5-20: NT Authority
+          S-1-5-3: Batch
+          S-1-5-32-544: Administrators
+          S-1-5-32-545: Users
+          S-1-5-32-546: Guests
+          S-1-5-32-547: Power Users
+          S-1-5-32-548: Account Operators
+          S-1-5-32-549: Server Operators
+          S-1-5-32-550: Print Operators
+          S-1-5-32-551: Backup Operators
+          S-1-5-32-552: Replicators
+          S-1-5-32-554: Builtin\Pre-Windows 2000 Compatible Access
+          S-1-5-32-555: Builtin\Remote Desktop Users
+          S-1-5-32-556: Builtin\Network Configuration Operators
+          S-1-5-32-557: Builtin\Incoming Forest Trust Builders
+          S-1-5-32-558: Builtin\Performance Monitor Users
+          S-1-5-32-559: Builtin\Performance Log Users
+          S-1-5-32-560: Builtin\Windows Authorization Access Group
+          S-1-5-32-561: Builtin\Terminal Server License Servers
+          S-1-5-32-562: Builtin\Distributed COM Users
+          S-1-5-32-569: Builtin\Cryptographic Operators
+          S-1-5-32-573: Builtin\Event Log Readers
+          S-1-5-32-574: Builtin\Certificate Service DCOM Access
+          S-1-5-32-575: Builtin\RDS Remote Access Servers
+          S-1-5-32-576: Builtin\RDS Endpoint Servers
+          S-1-5-32-577: Builtin\RDS Management Servers
+          S-1-5-32-578: Builtin\Hyper-V Administrators
+          S-1-5-32-579: Builtin\Access Control Assistance Operators
+          S-1-5-32-580: Builtin\Remote Management Users
+          S-1-5-32-582: Storage Replica Administrators
+          S-1-5-4: Interactive
+          S-1-5-5-X-Y: Logon Session
+          S-1-5-6: Service
+          S-1-5-64-10: NTLM Authentication
+          S-1-5-64-14: SChannel Authentication
+          S-1-5-64-21: Digest Authentication
+          S-1-5-7: Anonymous
+          S-1-5-8: Proxy
+          S-1-5-80: NT Service
+          S-1-5-80-0: All Services
+          S-1-5-83-0: NT Virtual Machine\Virtual Machines
+          S-1-5-9: Enterprise Domain Controllers
+          S-1-5-90-0: Windows Manager\Windows Manager Group
+        AceTypes:
+          A: Access Allowed
+          D: Access Denied
+          OA: Object Access Allowed
+          OD: Object Access Denied
+          AU: System Audit
+          AL: System Alarm
+          OU: System Object Audit
+          OL: System Object Alarm
+          ML: System Mandatory Label
+          SP: Central Policy ID
+        DomainSpecificSID:
+          "498": Enterprise Read-only Domain Controllers
+          "500": Administrator
+          "501": Guest
+          "502": KRBTGT
+          "512": Domain Admins
+          "513": Domain Users
+          "514": Domain Guests
+          "515": Domain Computers
+          "516": Domain Controllers
+          "517": Cert Publishers
+          "518": Schema Admins
+          "519": Enterprise Admins
+          "520": Group Policy Creator Owners
+          "521": Read-only Domain Controllers
+          "522": Cloneable Domain Controllers
+          "526": Key Admins
+          "527": Enterprise Key Admins
+          "553": RAS and IAS Servers
+          "571": Allowed RODC Password Replication Group
+          "572": Denied RODC Password Replication Group
+        PermissionDescription:
+          GA: Generic All
+          GR: Generic Read
+          GW: Generic Write
+          GX: Generic Execute
+          RC: Read Permissions
+          SD: Delete
+          WD: Modify Permissions
+          WO: Modify Owner
+          RP: Read All Properties
+          WP: Write All Properties
+          CC: Create All Child Objects
+          DC: Delete All Child Objects
+          LC: List Contents
+          SW: All Validated
+          LO: List Object
+          DT: Delete Subtree
+          CR: All Extended Rights
+          FA: File All Access
+          FR: File Generic Read
+          FX: FILE GENERIC EXECUTE
+          FW: FILE GENERIC WRITE
+          KA: KEY ALL ACCESS
+          KR: KEY READ
+          KW: KEY WRITE
+          KX: KEY EXECUTE
+        PermsFlags:
+          "0x80000000": 'Generic Read'
+          "0x4000000": 'Generic Write'
+          "0x20000000": 'Generic Execute'
+          "0x10000000": 'Generic All'
+          "0x02000000": 'Maximum Allowed'
+          "0x01000000": 'Access System Security'
+          "0x00100000": 'Syncronize'
+          "0x00080000": 'Write Owner'
+          "0x00040000": 'Write DACL'
+          "0x00020000": 'Read Control'
+          "0x00010000": 'Delete'
+      source: |-
+        ArrayList translatePermissionMask(def mask, def params) {
+          ArrayList al = new ArrayList();
+          Long permCode = Long.decode(mask);
+          for (entry in params.PermsFlags.entrySet()) {
+            Long permFlag = Long.decode(entry.getKey());
+            if ((permCode.longValue() & permFlag.longValue()) == permFlag.longValue()) {
+              al.add(entry.getValue());
+            }
+          }
+          if (al.length == 0) {
+            al.add(mask);
+          }
+          return al;
+        }
+
+        HashMap translateACL(def dacl, def params) {
+          def aceArray = dacl.splitOnToken(";");
+          HashMap hm = new HashMap();
+
+          if (aceArray.length >= 6 ) {
+            hm.put("grantee", translateSID(aceArray[5], params));
+          }
+
+          if (aceArray.length >= 1) {
+            hm.put("type", params.AceTypes[aceArray[0]]);
+          }
+
+          if (aceArray.length >= 3) {
+            if (aceArray[2].startsWith("0x")) {
+              hm.put("perms", translatePermissionMask(aceArray[2], params));
+            } else {
+              ArrayList al = new ArrayList();
+              Pattern permPattern = /.{1,2}/;
+              Matcher permMatcher = permPattern.matcher(aceArray[2]);
+              while (permMatcher.find()) {
+                al.add(params.PermissionDescription[permMatcher.group(0)]);
+              }
+              hm.put("perms", al);
+            }
+          }
+          return hm;
+        }
+        String translateSID(def sid, def params) {
+          if (!params.AccountSIDDescription.containsKey(sid)) {
+            if (sid.startsWith("S-1-5-21")) {
+              Pattern uidPattern = /[0-9]{1,5}$/;
+              Matcher uidMatcher = uidPattern.matcher(sid);
+              if (uidMatcher.find()) {
+                return params.DomainSpecificSID[uidMatcher.group(0)];
+              }
+              return sid;
+            }
+            return sid;
+          }
+          return params.AccountSIDDescription[sid];
+        }
+
+        void enrichSDDL(def sddlStr, def Sd, def params, def ctx) {
+          Pattern sdOwnerPattern = /^O\:[A-Z]{2}/;
+          Matcher sdOwnerMatcher = sdOwnerPattern.matcher(sddlStr);
+          if (sdOwnerMatcher.find()) {
+            ctx.winlog.event_data.put(Sd + "Owner", translateSID(sdOwnerMatcher.group(0), params));
+          }
+
+          Pattern sdGroupPattern = /^G\:[A-Z]{2}/;
+          Matcher sdGroupMatcher = sdGroupPattern.matcher(sddlStr);
+          if (sdGroupMatcher.find()) {
+            ctx.winlog.event_data.put(Sd + "Group", translateSID(sdGroupMatcher.group(0), params));
+          }
+
+          Pattern sdDaclPattern = /(D:([A-Z]*(\(.*\))*))/;
+          Matcher sdDaclMatcher = sdDaclPattern.matcher(sddlStr);
+          if (sdDaclMatcher.find()) {
+            Pattern dacListPattern = /\([^*\)]*\)/;
+            Matcher dacListMatcher = dacListPattern.matcher(sdDaclMatcher.group(1));
+            for (def i = 0; dacListMatcher.find(); i++) {
+              def newDacl = translateACL(dacListMatcher.group(0).replace("(","").replace(")",""), params);
+              ctx.winlog.event_data.put(Sd + "Dacl" + i.toString(), newDacl['grantee'] + " :" + newDacl['type'] + " (" + newDacl['perms'] + ")");
+              if (["Administrator", "Guest", "KRBTGT"].contains(newDacl['grantee'])) {
+                if (ctx.related == null) {
+                  HashMap hm = new HashMap();
+                  ctx.put("related", hm);
+                }
+                if (ctx.related?.user == null) {
+                  ArrayList al = new ArrayList();
+                  ctx.related.put("user", al);
+                }
+                if (!ctx.related.user.contains(newDacl['grantee'])) {
+                  ctx.related.user.add(newDacl['grantee']);
+                }
+              }
+            }
+          }
+
+          Pattern sdSaclPattern = /(S:([A-Z]*(\(.*\))*))?$/;
+          Matcher sdSaclMatcher = sdSaclPattern.matcher(sddlStr);
+          if (sdSaclMatcher.find()) {
+            Pattern sacListPattern = /\([^*\)]*\)/;
+            Matcher sacListMatcher = sacListPattern.matcher(sdSaclMatcher.group(0));
+            for (def i = 0; sacListMatcher.find(); i++) {
+              def newSacl = translateACL(sacListMatcher.group(0).replace("(","").replace(")",""), params);
+              ctx.winlog.event_data.put(Sd + "Sacl" + i.toString(), newSacl['grantee'] + " :" + newSacl['type'] + " (" + newSacl['perms'] + ")");
+              if (["Administrator", "Guest", "KRBTGT"].contains(newSacl['grantee'])) {
+                if (ctx.related == null) {
+                  HashMap hm = new HashMap();
+                  ctx.put("related", hm);
+                }
+                if (ctx.related?.user == null) {
+                  ArrayList al = new ArrayList();
+                  ctx.related.put("user", al);
+                }
+                if (!ctx.related.user.contains(newSacl['grantee'])) {
+                  ctx.related.user.add(newSacl['grantee']);
+                }
+              }
+            }
+          }
+        }
+
+        void splitSidList(def sids, def params, def ctx) {
+          ArrayList al = new ArrayList();
+          def sidList = sids.splitOnToken(" ");
+          ctx.winlog.event_data.put("SidList", sidList);
+          for (def i = 0; i < sidList.length; i++ ) {
+            al.add(translateSID(sidList[i].replace("%", "").replace("{", "").replace("}", "").replace(" ",""), params));
+          }
+          ctx.winlog.event_data.put("SidListDesc", al);
+        }
+        
+        if (ctx.event?.code == null ||
+            !["4670", "4817", "4907", "4908"].contains(ctx.event.code)) {
+          return;
+        }
+        if (ctx.winlog?.event_data?.OldSd != null) {
+          enrichSDDL(ctx.winlog.event_data.OldSd, "OldSd", params, ctx);
+        }
+        if (ctx.winlog?.event_data?.NewSd != null) {
+          enrichSDDL(ctx.winlog.event_data.NewSd, "NewSd", params, ctx);
+        }
+        if (ctx.winlog?.event_data?.SidList != null) {
+          splitSidList(ctx.winlog.event_data.SidList, params, ctx);
+        }
+
+  - set:
+      field: file.name
+      copy_from: winlog.event_data.RelativeTargetName
+      if: |-
+        ctx.event?.code != null &&
+        ["5140", "5145"].contains(ctx.event.code) &&
+        ctx.winlog?.event_data?.RelativeTargetName != null &&
+        ctx.winlog.event_data.RelativeTargetName != ""
+  - set:
+      field: file.directory
+      copy_from: winlog.event_data.ShareLocalPath
+      if: |-
+        ctx.event?.code != null &&
+        ["5140", "5145"].contains(ctx.event.code) &&
+        ctx.winlog?.event_data?.ShareLocalPath != null &&
+        ctx.winlog.event_data.ShareLocalPath != ""
+  - set:
+      field: file.path
+      value: "{{file.directory}}\\{{file.name}}"
+      if: ctx.file?.name != null && ctx.file?.directory != null
+  - set:
+      field: file.directory
+      copy_from: winlog.event_data.ShareLocalPath
+      if: |-
+        ctx.event?.code != null &&
+        ["5140", "5145"].contains(ctx.event.code) &&
+        ctx.winlog?.event_data?.ShareLocalPath != null &&
+        ctx.winlog.event_data.ShareLocalPath != ""
+  - set:
+      field: file.target_path
+      value: "{{winlog.event_data.ShareName}}\\{{file.name}}"
+      if: |-
+        ctx.event?.code != null &&
+        ["5140", "5145"].contains(ctx.event.code) &&
+        ctx.winlog?.event_data?.ShareName != null &&
+        ctx.winlog.event_data.ShareName != "" &&
+        ctx.file?.name != null
+  - script:
+      description: Adds file information.
+      lang: painless
+      if: ctx.file?.name != null
+      source: |-
+        def extIdx = ctx.file.name.lastIndexOf(".");
+        if (extIdx > -1) {
+            ctx.file.extension = ctx.file.name.substring(extIdx+1);
+        }
   - convert:
       field: winlog.record_id
       type: string
       ignore_missing: true
+
   - convert:
       field: winlog.event_id
       type: string
       ignore_missing: true
+
   - set:
       field: ecs.version
-      value: '8.17.0'
+      value: '8.0.0'
+
   - set:
       field: log.level
       copy_from: winlog.level
       ignore_empty_value: true
       ignore_failure: true
       if: ctx.winlog?.level != ""
+
   - date:
       field: winlog.time_created
       tag: "time_created_date"
@@ -3855,14 +4231,17 @@ processors:
             value: "fail-{{{ _ingest.on_failure_processor_tag }}}"
         - fail:
             message: "Processor {{ _ingest.on_failure_processor_type }} with tag {{ _ingest.on_failure_processor_tag }} in pipeline {{ _ingest.on_failure_pipeline }} failed with message: {{ _ingest.on_failure_message }}"
-  - convert:
-      field: error.code
-      type: string
+
+  #Cleanup _temp fields as it is not needed anymore
+  - remove:
+      field: _temp
       ignore_missing: true
+      ignore_failure: true
+
 on_failure:
   - set:
       field: event.kind
       value: pipeline_error
   - append:
       field: error.message
-      value: "{{ _ingest.on_failure_message }}"
+      value: "{{{ _ingest.on_failure_message }}}"
