@@ -3,6 +3,7 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-9.0.0-beta1]]
 === Beats version 9.0.0-beta1
 https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
@@ -114,6 +115,8 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 - Remove Functionbeat binaries from CI pipelines. {issue}40745[40745] {pull}41506[41506]
 
 
+=======
+>>>>>>> 37eac6b68 (docs: Prepare Changelog for 8.17.3 (#42980) (#43029) (#43040))
 [[release-notes-8.17.3]]
 === Beats version 8.17.3
 https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
