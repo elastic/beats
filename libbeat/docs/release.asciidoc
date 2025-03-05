@@ -8,6 +8,10 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
+<<<<<<< HEAD
+=======
+* <<release-notes-9.0.0-beta1>>
+>>>>>>> 61a93f045 ([9.0](backport #43029) [main](backport #42980) docs: Prepare Changelog for 8.17.3 (#43041))
 * <<release-notes-8.17.3>>
 * <<release-notes-8.17.2>>
 * <<release-notes-8.17.1>>
