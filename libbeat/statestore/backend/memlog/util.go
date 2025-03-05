@@ -18,11 +18,9 @@
 package memlog
 
 import (
-	"errors"
 	"io"
 	"os"
 	"runtime"
-	"syscall"
 )
 
 // countWriter keeps track of the amount of bytes written over time.
@@ -37,12 +35,6 @@ func (c *countWriter) Write(p []byte) (int, error) {
 	return n, err
 }
 
-var _ = isRetryErr
-
-func isRetryErr(err error) bool {
-	return errors.Is(err, syscall.EINTR) || errors.Is(err, syscall.EAGAIN)
-}
-
 // trySyncPath provides a best-effort fsync on path (directory). The fsync is required by some
 // filesystems, so to update the parents directory metadata to actually
 // contain the new file being rotated in.
@@ -53,7 +45,7 @@ func trySyncPath(path string) {
 	}
 	defer f.Close()
 	//nolint:errcheck // ignore error
-	syncFile(f)
+	f.Sync()
 }
 
 // pathEnsurePermissions checks if the file permissions for the given file match wantPerm.
