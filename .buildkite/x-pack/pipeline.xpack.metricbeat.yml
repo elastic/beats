@@ -139,6 +139,27 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Python Integration Tests (Module)"
 
+
+      - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
+        key: "mandatory-python-int-test-aws"
+        env:
+          TEST_TAGS: "oracle"
+        command: |
+          cd x-pack/metricbeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "aws"
+          imagePrefix: "platform-ingest-beats-ubuntu-2204"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: Python Integration Tests (Module)"
+
 #      - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
 #        command: |
 #          Set-Location -Path x-pack/metricbeat
