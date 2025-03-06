@@ -77,6 +77,10 @@ A predefined URL towards the Oauth2 service for Microsoft. The URL should always
 
 A list of included scopes, should use .default unless different is specified.
 
+*`var.initial_interval`*::
+
+An initial interval can be defined. The first time the module starts, will fetch events from the current moment minus the initial interval value. Following restarts will fetch events starting from the last event read. It defaults to `55m`.
+
 [float]
 ==== 365 Defender ECS fields
 
@@ -152,6 +156,10 @@ The secret related to the client ID.
 *`var.oauth2.token_url`*::
 
 A predefined URL towards the Oauth2 service for Microsoft. The URL should always be the same with the exception of the Tenant ID that needs to be added to the full URL.
+
+*`var.initial_interval`*::
+
+An initial interval can be defined. The first time the module starts, will fetch events from the current moment minus the initial interval value. Following restarts will fetch events starting from the last event read. It defaults to `5m`.
 
 [float]
 ==== Defender ATP ECS fields
