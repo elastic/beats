@@ -288,6 +288,38 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	defer stateStore.Close()
 
+<<<<<<< HEAD
+=======
+	// If notifier is set, configure the listener for output configuration
+	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
+	// in order to allow it fully configure
+	if stateStore.notifier != nil {
+		b.OutputConfigReloader = reload.ReloadableFunc(func(r *reload.ConfigWithMeta) error {
+			outCfg := conf.Namespace{}
+			if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
+				logp.Err("Failed to unpack the output config: %v", err)
+				return nil
+			}
+
+			// Create a new config with the output configuration. Since r.Config is a pointer, a copy is required to
+			// avoid concurrent map read and write.
+			// See https://github.com/elastic/beats/issues/42815
+			configCopy, err := conf.NewConfigFrom(outCfg.Config())
+			if err != nil {
+				logp.Err("Failed to create a new config from the output config: %v", err)
+				return nil
+			}
+			stateStore.notifier.Notify(configCopy)
+			return nil
+		})
+	}
+
+	err = filestream.ValidateInputIDs(config.Inputs, logp.NewLogger("input.filestream"))
+	if err != nil {
+		logp.Err("invalid filestream configuration: %+v", err)
+		return err
+	}
+>>>>>>> f1e42fcaf (filebeat: make deep copy before notifying of config change (#42992))
 	err = processLogInputTakeOver(stateStore, config)
 	if err != nil {
 		logp.Err("Failed to attempt filestream state take over: %+v", err)
