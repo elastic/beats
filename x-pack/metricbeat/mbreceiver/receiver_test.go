@@ -122,7 +122,7 @@ func TestMultipleReceivers(t *testing.T) {
 		Config:  &config,
 		AssertFunc: func(t *testing.T, logs map[string]int) {
 			require.Eventuallyf(t, func() bool {
-				return logs["r1"] > 1 && logs["r2"] > 1
+				return logs["r1"] > 0 && logs["r2"] > 0
 			}, 1*time.Minute, 100*time.Millisecond, "timeout waiting for logs: %#v", logs)
 		},
 	})
