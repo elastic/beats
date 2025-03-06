@@ -279,8 +279,6 @@ service:
 		compareAndAssert(t, expOutput, input)
 
 	})
-
-	// t.Run("test log level",
 }
 
 func TestLogLevel(t *testing.T) {
