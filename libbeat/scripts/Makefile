@@ -70,8 +70,6 @@ BUILD_DIR?=$(shell pwd)/build
 PKG_BUILD_DIR?=$(BUILD_DIR)/package${PKG_SUFFIX}
 PKG_UPLOAD_DIR?=$(BUILD_DIR)/upload
 COVERAGE_DIR?=${BUILD_DIR}/coverage
-COVERAGE_TOOL?=${BEAT_GOPATH}/bin/gotestcover
-COVERAGE_TOOL_REPO?=github.com/pierrre/gotestcover
 TESTIFY_TOOL_REPO?=github.com/stretchr/testify/assert
 NOW=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GOBUILD_FLAGS?=-ldflags "-X github.com/elastic/beats/libbeat/version.buildTime=$(NOW) -X github.com/elastic/beats/libbeat/version.commit=$(COMMIT_ID)"
@@ -188,16 +186,13 @@ ci:  ## @build Shortcut for continuous integration. This should always run befor
 .PHONY: prepare-tests
 prepare-tests:
 	mkdir -p ${COVERAGE_DIR}
-	# gotestcover is needed to fetch coverage for multiple packages
-	go ${INSTALL_CMD} ${COVERAGE_TOOL_REPO}
 	# testify is needed for unit and integration tests
 	go ${INSTALL_CMD} ${TESTIFY_TOOL_REPO}
 
 .PHONY: unit-tests
 unit-tests: ## @testing Runs the unit tests with coverage.  Race is not enabled for unit tests because tests run much slower.
 unit-tests: prepare-tests
-	GOFLAGS="${INSTALL_FLAG}" \
-		$(COVERAGE_TOOL) $(RACE) -coverprofile=${COVERAGE_DIR}/unit.cov  ${GOPACKAGES}
+	echo 'mode: atomic' > "${COVERAGE_DIR}/unit.cov" && echo "${GOPACKAGES}" | xargs -I{} sh -c 'GOFLAGS="${INSTALL_FLAG}" go test $(RACE) -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> ${COVERAGE_DIR}/unit.cov' && rm coverage.tmp
 
 .PHONY: unit
 unit: ## @testing Runs the unit tests without coverage reports.
@@ -207,8 +202,7 @@ unit: ## @testing Runs the unit tests without coverage reports.
 integration-tests: ## @testing Run integration tests. Unit tests are run as part of the integration tests.
 integration-tests: prepare-tests mage
 	rm -f docker-compose.yml.lock
-	GOFLAGS="${INSTALL_FLAG}" \
-		$(COVERAGE_TOOL) -tags=integration $(RACE) -coverprofile=${COVERAGE_DIR}/integration.cov ${GOPACKAGES}
+	echo 'mode: atomic' > "${COVERAGE_DIR}/integration.cov" && echo "${GOPACKAGES}" | xargs -I{} sh -c 'GOFLAGS="${INSTALL_FLAG}" go test $(RACE) -tags=integration -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> ${COVERAGE_DIR}/integration.cov' && rm coverage.tmp
 
 .PHONY: integration-tests-environment
 integration-tests-environment:  ## @testing Runs the integration inside a virtual environment. This can be run on any docker-machine (local, remote)
