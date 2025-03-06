@@ -88,6 +88,7 @@ const (
 // Driver is the interface of docker compose implementations
 type Driver interface {
 	Up(ctx context.Context, opts UpOptions, service string) error
+	Down(ctx context.Context) error
 	Kill(ctx context.Context, signal string, service string) error
 	KillOld(ctx context.Context, except []string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
@@ -252,6 +253,13 @@ func (c *Project) Inspect(service string) (string, error) {
 func (c *Project) Lock() {
 	timeout := time.Now().Add(300 * time.Second)
 	infoShown := false
+	defer func() {
+		if v := recover(); v != nil {
+			panic(fmt.Errorf("timeout after %s: did aqquire lock %s: %v",
+				timeout, c.LockFile(), v))
+		}
+	}()
+
 	for time.Now().Before(timeout) {
 		if acquireLock(c.LockFile()) {
 			if infoShown {
@@ -271,6 +279,8 @@ func (c *Project) Lock() {
 			logp.Info("%s is locked, waiting", c.LockFile())
 			infoShown = true
 		}
+		fmt.Printf("waiting for lock file %s to become available",
+			c.LockFile())
 		time.Sleep(1 * time.Second)
 	}
 
