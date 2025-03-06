@@ -17,19 +17,22 @@
 
 package beatconverter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
-func getOTelLogLevel(level string) string {
+func getOTelLogLevel(level string) (string, error) {
 	switch strings.ToLower(level) {
 	case "debug":
-		return "DEBUG"
+		return "DEBUG", nil
 	case "info":
-		return "INFO"
+		return "INFO", nil
 	case "warning":
-		return "WARN"
+		return "WARN", nil
 	case "error", "critical":
-		return "ERROR"
+		return "ERROR", nil
 	default:
-		return ""
+		return "", fmt.Errorf("unrecognized level: %s", level)
 	}
 }

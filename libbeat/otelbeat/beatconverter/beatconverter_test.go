@@ -19,6 +19,7 @@ package beatconverter
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -278,6 +279,75 @@ service:
 		compareAndAssert(t, expOutput, input)
 
 	})
+
+	// t.Run("test log level",
+}
+
+func TestLogLevel(t *testing.T) {
+	c := converter{}
+	tests := []struct {
+		name          string
+		level         string
+		expectedLevel string
+		expectedError string
+	}{
+		{
+			name:          "test-debug",
+			level:         "debug",
+			expectedLevel: "DEBUG",
+		},
+		{
+			name:          "test-info",
+			level:         "info",
+			expectedLevel: "INFO",
+		},
+		{
+			name:          "test-warn",
+			level:         "warning",
+			expectedLevel: "WARN",
+		},
+		{
+			name:          "test-error",
+			level:         "error",
+			expectedLevel: "ERROR",
+		},
+		{
+			name:          "test-critical",
+			level:         "critical",
+			expectedLevel: "ERROR",
+		},
+		{
+			name:          "test-error",
+			level:         "blabla",
+			expectedError: "unrecognized level: blabla",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			supportedInput := fmt.Sprintf(`
+      receivers:
+        filebeatreceiver:
+          logging: 
+            level: %s
+          filebeat:
+            inputs:
+              - type: filestream
+                enabled: true
+                id: filestream-input-id
+                paths:
+                  - /tmp/flog.log
+      `, test.level)
+			input := newFromYamlString(t, supportedInput)
+			err := c.Convert(context.Background(), input)
+			if test.expectedError != "" {
+				require.ErrorContains(t, err, test.expectedError)
+			} else {
+				require.NoError(t, err)
+				inputMap := input.Get("service::telemetry::logs::level")
+				require.Equal(t, test.expectedLevel, inputMap)
+			}
+		})
+	}
 
 }
 

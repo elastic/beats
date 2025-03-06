@@ -112,9 +112,17 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		}
 
 		// inject log level
-		level, _ := config.MustNewConfigFrom(receiverCfg.ToStringMap()).String("logging.level", -1)
-		if level != "" {
-			out["service::telemetry::logs::level"] = getOTeLLogLevel(level)
+		receiverConfig, err := config.NewConfigFrom(receiverCfg.ToStringMap())
+		if err != nil {
+			return fmt.Errorf("Error getting receiver config: %w", err)
+		}
+
+		if level, _ := receiverConfig.String("logging.level", -1); level != "" {
+			out["service::telemetry::logs::level"], err = getOTelLogLevel(level)
+			if err != nil {
+				return fmt.Errorf("error injecting log level: %w", err)
+
+			}
 		}
 
 		err = conf.Merge(confmap.NewFromStringMap(out))
