@@ -292,6 +292,82 @@ func TestGroupToSingleEvent(t *testing.T) {
 	assert.Equal(t, val, mapstr.M{"processor_count": float64(2)})
 }
 
+func TestMatchByParentInstance(t *testing.T) {
+	_true := true
+	_false := false
+	reader := Reader{
+		query: pdh.Query{},
+		log:   nil,
+		config: Config{
+			MatchByParentInstance: &_true,
+		},
+		counters: []PerfCounter{
+			{
+				QueryField:    "%_processor_time",
+				QueryName:     `\Processor Information(*)\% Processor Time`,
+				Format:        "float",
+				ObjectName:    "Processor Information",
+				ObjectField:   "object",
+				InstanceName:  "*",
+				InstanceField: "instance",
+				ChildQueries:  []string{`\Processor Information(processor)\% Processor Time`, `\Processor Information(processor#1)\% Processor Time`},
+			},
+		},
+	}
+
+	counters := map[string][]pdh.CounterValue{
+		`\Processor Information(processor)\% Processor Time`: {
+			{
+				Instance:    "processor",
+				Measurement: 23,
+			},
+		},
+		`\Processor Information(processor#1)\% Processor Time`: {
+			{
+				Instance:    "processor#1",
+				Measurement: 21,
+			},
+		},
+	}
+
+	{
+		events := reader.groupToEvents(counters)
+		assert.NotNil(t, events)
+		assert.Equal(t, 2, len(events))
+		ok, err := events[0].MetricSetFields.HasKey("instance")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+		ok, err = events[1].MetricSetFields.HasKey("instance")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+		val1, err := events[0].MetricSetFields.GetValue("instance")
+		assert.NoError(t, err)
+		assert.Equal(t, val1, "processor")
+		val2, err := events[1].MetricSetFields.GetValue("instance")
+		assert.NoError(t, err)
+		assert.Equal(t, val2, "processor")
+	}
+
+	reader.config.MatchByParentInstance = &_false
+	{
+		events := reader.groupToEvents(counters)
+		assert.NotNil(t, events)
+		assert.Equal(t, 2, len(events))
+		ok, err := events[0].MetricSetFields.HasKey("instance")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+		ok, err = events[1].MetricSetFields.HasKey("instance")
+		assert.NoError(t, err)
+		assert.True(t, ok)
+		val1, err := events[0].MetricSetFields.GetValue("instance")
+		assert.NoError(t, err)
+		assert.Equal(t, val1, "processor")
+		val2, err := events[1].MetricSetFields.GetValue("instance")
+		assert.NoError(t, err)
+		assert.Equal(t, val2, "processor#1")
+	}
+}
+
 func TestMatchesParentProcess(t *testing.T) {
 	ok, val := matchesParentProcess("svchost")
 	assert.True(t, ok)
