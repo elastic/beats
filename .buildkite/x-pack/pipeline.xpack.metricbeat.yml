@@ -122,6 +122,12 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
+          echo "--- ULIMITS"
+          ulimit -a
+          ulimit -Hn 614400
+          ulimit -a
+
+          echo "--- TESTING"
           cd x-pack/metricbeat
           mage pythonIntegTest
         retry:
@@ -129,8 +135,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          imageProject: "elastic-images-qa"
-          image: "platform-ingest-beats-ubuntu-2204-1741281650"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
@@ -140,25 +145,25 @@ steps:
               context: "x-pack/metricbeat: Python Integration Tests (Module)"
 
 
-      - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
-        key: "mandatory-python-int-test-aws"
-        env:
-          TEST_TAGS: "oracle"
-        command: |
-          cd x-pack/metricbeat
-          mage pythonIntegTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "aws"
-          imagePrefix: "platform-ingest-beats-ubuntu-2204"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Python Integration Tests (Module)"
+#      - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
+#        key: "mandatory-python-int-test-aws"
+#        env:
+#          TEST_TAGS: "oracle"
+#        command: |
+#          cd x-pack/metricbeat
+#          mage pythonIntegTest
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          provider: "aws"
+#          imagePrefix: "platform-ingest-beats-ubuntu-2204"
+#        artifact_paths:
+#          - "x-pack/metricbeat/build/*.xml"
+#          - "x-pack/metricbeat/build/*.json"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/metricbeat: Python Integration Tests (Module)"
 
 #      - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
 #        command: |
