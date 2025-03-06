@@ -130,6 +130,10 @@ steps:
           echo "======================================"
           dig go.mongodb.org/mongo-driver
           echo "======================================"
+          nslookup go.mongodb.org 8.8.8.8
+          echo "======================================"
+          resolvectl query --server=8.8.8.8 go.mongodb.org
+          echo "======================================"
           curl -I -L https://go.mongodb.org/mongo-driver
           echo "======================================"
           cd x-pack/metricbeat
