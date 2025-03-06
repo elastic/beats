@@ -197,6 +197,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
+- Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 
 *Heartbeat*
 
@@ -220,7 +221,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
-- Fix http server helper SSL config. {pull}39405[39405]
 - Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
 - Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
 - Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
@@ -233,6 +233,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
 
 *Osquerybeat*
 
@@ -247,6 +248,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Sync missing changes in modules pipelines. {pull}42619[42619]
 - Reset EventLog if error EOF is encountered. {pull}42826[42826]
 - Implement backoff on error retrial. {pull}42826[42826]
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
 
 *Elastic Logging Plugin*
@@ -484,6 +486,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 ==== Known Issues
+
+
+
 
 
 
