@@ -38,13 +38,13 @@ type pipelineObserver interface {
 
 type clientObserver interface {
 	// The client received a Publish call
-	newEvent()
+	newEvent(inputMetrics)
 	// An event was filtered by processors before being published
-	filteredEvent()
+	filteredEvent(inputMetrics)
 	// An event was published to the queue
-	publishedEvent()
+	publishedEvent(inputMetrics)
 	// An event was rejected by the queue
-	failedPublishEvent()
+	failedPublishEvent(inputMetrics)
 	eventsACKed(count int)
 }
 
@@ -55,8 +55,8 @@ type retryObserver interface {
 	eventsRetry(int)
 }
 
-// metricsObserver is used by many component in the publisher pipeline, to report
-// internal events. The oberserver can call registered global event handlers or
+// metricsObserver is used by many components in the publisher pipeline, to report
+// internal events. The observer can call registered global event handlers or
 // updated shared counters/metrics for reporting.
 // All events required for reporting events/metrics on the pipeline-global level
 // are defined by observer. The components are only allowed to serve localized
@@ -66,14 +66,21 @@ type metricsObserver struct {
 	vars    metricsObserverVars
 }
 
+type inputMetrics struct {
+	inputEventsTotal,
+	inputEventsFiltered,
+	inputEventsPublished *monitoring.Uint
+}
+
 type metricsObserverVars struct {
 	// clients metrics
 	clients *monitoring.Uint
 
 	// eventsTotal publish/dropped stats
 	eventsTotal, eventsFiltered, eventsPublished, eventsFailed *monitoring.Uint
-	eventsDropped, eventsRetry                                 *monitoring.Uint // (retryer) drop/retry counters
-	activeEvents                                               *monitoring.Uint
+
+	eventsDropped, eventsRetry *monitoring.Uint // (retryer) drop/retry counters
+	activeEvents               *monitoring.Uint
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
@@ -84,6 +91,7 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 
 	return &metricsObserver{
 		metrics: metrics,
+
 		vars: metricsObserverVars{
 			// (Gauge) clients measures the number of open pipeline clients.
 			clients: monitoring.NewUint(reg, "clients"),
@@ -138,20 +146,23 @@ func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 //
 
 // (client) client is trying to publish a new event
-func (o *metricsObserver) newEvent() {
+func (o *metricsObserver) newEvent(inputMetrics inputMetrics) {
 	o.vars.eventsTotal.Inc()
 	o.vars.activeEvents.Inc()
+	inputMetrics.inputEventsTotal.Inc()
 }
 
 // (client) event is filtered out (on purpose or failed)
-func (o *metricsObserver) filteredEvent() {
+func (o *metricsObserver) filteredEvent(inputMetrics inputMetrics) {
 	o.vars.eventsFiltered.Inc()
 	o.vars.activeEvents.Dec()
+	inputMetrics.inputEventsFiltered.Inc()
 }
 
 // (client) managed to push an event into the publisher pipeline
-func (o *metricsObserver) publishedEvent() {
+func (o *metricsObserver) publishedEvent(inputMetrics inputMetrics) {
 	o.vars.eventsPublished.Inc()
+	inputMetrics.inputEventsPublished.Inc()
 }
 
 // (client) number of ACKed events from this client
@@ -160,7 +171,7 @@ func (o *metricsObserver) eventsACKed(n int) {
 }
 
 // (client) client closing down or DropIfFull is set
-func (o *metricsObserver) failedPublishEvent() {
+func (o *metricsObserver) failedPublishEvent(inputMetrics inputMetrics) {
 	o.vars.eventsFailed.Inc()
 	o.vars.activeEvents.Dec()
 }
@@ -183,13 +194,13 @@ type emptyObserver struct{}
 
 var nilObserver observer = (*emptyObserver)(nil)
 
-func (*emptyObserver) cleanup()            {}
-func (*emptyObserver) clientConnected()    {}
-func (*emptyObserver) clientClosed()       {}
-func (*emptyObserver) newEvent()           {}
-func (*emptyObserver) filteredEvent()      {}
-func (*emptyObserver) publishedEvent()     {}
-func (*emptyObserver) failedPublishEvent() {}
-func (*emptyObserver) eventsACKed(n int)   {}
-func (*emptyObserver) eventsDropped(int)   {}
-func (*emptyObserver) eventsRetry(int)     {}
+func (*emptyObserver) cleanup()                        {}
+func (*emptyObserver) clientConnected()                {}
+func (*emptyObserver) clientClosed()                   {}
+func (*emptyObserver) newEvent(inputMetrics)           {}
+func (*emptyObserver) filteredEvent(inputMetrics)      {}
+func (*emptyObserver) publishedEvent(inputMetrics)     {}
+func (*emptyObserver) failedPublishEvent(inputMetrics) {}
+func (*emptyObserver) eventsACKed(n int)               {}
+func (*emptyObserver) eventsDropped(int)               {}
+func (*emptyObserver) eventsRetry(int)                 {}

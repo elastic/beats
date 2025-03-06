@@ -20,6 +20,7 @@ package input_logfile
 import (
 	"github.com/rcrowley/go-metrics"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -54,17 +55,29 @@ func (m *Metrics) Close() {
 	m.unregister()
 }
 
-func NewMetrics(id string) *Metrics {
+func NewMetrics(ctx v2.Context, id string) *Metrics {
 	// The log input creates the `filebeat.harvester` registry as a package
 	// variable, so it should always exist before this function runs.
-	// However at least on testing scenarios this does not hold true, so
+	// However, at least on testing scenarios this does not hold true, so
 	// if needed, we create the registry ourselves.
 	harvesterMetrics := monitoring.Default.GetRegistry("filebeat.harvester")
 	if harvesterMetrics == nil {
 		harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
 	}
 
-	reg, unreg := inputmon.NewInputRegistry("filestream", id, nil)
+	var reg *monitoring.Registry
+	var unreg = func() {}
+	if id != "" {
+		reg = ctx.EnhanceMetricRegistry(id, "filestream")
+		err := inputmon.RegisterMetrics(id, reg)
+		if err != nil {
+			ctx.Logger.Warn("failed to register filestream metrics: ", err)
+		}
+		unreg = func() { inputmon.UnregisterMetrics(id) }
+	} else {
+		reg = monitoring.NewRegistry()
+	}
+
 	m := Metrics{
 		unregister:        unreg,
 		FilesOpened:       monitoring.NewUint(reg, "files_opened_total"),

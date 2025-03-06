@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Pipeline provides access to libbeat event publishing by creating a Client
@@ -60,6 +61,10 @@ type ClientConfig struct {
 
 	// ClientListener configures callbacks for monitoring pipeline clients
 	ClientListener ClientListener
+
+	// InputMetricsRegistry is the metrics registry used to aggregate pipeline
+	// metrics per input.
+	InputMetricsRegistry *monitoring.Registry
 }
 
 // EventListener can be registered with a Client when connecting to the pipeline.

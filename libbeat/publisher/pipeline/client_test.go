@@ -20,6 +20,7 @@ package pipeline
 import (
 	"errors"
 	"io"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -95,7 +96,14 @@ func TestClient(t *testing.T) {
 		}, 5, nil)
 
 		// model a processor that we're going to make produce errors after
-		p := &testProcessor{}
+		processorAddField := func(in *beat.Event) (event *beat.Event, err error) {
+			_, err = in.Fields.Put("test", "value")
+			return in, err
+		}
+		processorsErr := func(in *beat.Event) (event *beat.Event, err error) {
+			return nil, errors.New("test error")
+		}
+		p := &testProcessor{processorFn: processorAddField}
 		ps := testProcessorSupporter{Processor: p}
 
 		// now we create a pipeline that makes sure that all
@@ -123,6 +131,7 @@ func TestClient(t *testing.T) {
 					continue
 				}
 				for i := 0; i < batch.Count(); i++ {
+					//nolint:errcheck // it always succeeds
 					e := batch.Entry(i).(publisher.Event)
 					received = append(received, e.Content)
 				}
@@ -165,17 +174,17 @@ func TestClient(t *testing.T) {
 		client.PublishAll(sent[:2]) // first 2
 
 		// this causes our processor to malfunction and produce errors for all events
-		p.ErrorSwitch()
+		p.processorFn = processorsErr
 
 		client.PublishAll(sent[2:3]) // number 3
 
 		// back to normal
-		p.ErrorSwitch()
+		p.processorFn = processorAddField
 
 		client.PublishAll(sent[3:]) // number 4
 
-		client.Close()
-		pipeline.Close()
+		require.NoError(t, client.Close(), "failed closing pipeline client")
+		require.NoError(t, pipeline.Close(), "failed closing pipeline")
 
 		// waiting for all events to be consumed from the queue
 		<-done
@@ -276,65 +285,238 @@ func TestClientWaitClose(t *testing.T) {
 }
 
 func TestMonitoring(t *testing.T) {
-	const (
-		maxEvents  = 123
-		batchSize  = 456
-		numClients = 42
-	)
+	t.Run("output metrics", func(t *testing.T) {
+		const (
+			maxEvents  = 123
+			batchSize  = 456
+			numClients = 42
+		)
+		var config Config
+		err := conf.MustNewConfigFrom(map[string]interface{}{
+			"queue.mem.events":           maxEvents,
+			"queue.mem.flush.min_events": 1,
+		}).Unpack(&config)
+		require.NoError(t, err)
+
+		metrics := monitoring.NewRegistry()
+		telemetry := monitoring.NewRegistry()
+
+		beatInfo := beat.Info{}
+		pipeline, err := Load(
+			beatInfo,
+			Monitors{
+				Metrics:   metrics,
+				Telemetry: telemetry,
+			},
+			config,
+			processing.Supporter(nil),
+			func(outputs.Observer) (string, outputs.Group, error) {
+				clients := make([]outputs.Client, numClients)
+				for i := range clients {
+					clients[i] = newMockClient(func(publisher.Batch) error {
+						return nil
+					})
+				}
+				return "output_name", outputs.Group{
+					BatchSize: batchSize,
+					Clients:   clients,
+				}, nil
+			},
+		)
+
+		require.NoError(t, err)
+		defer pipeline.Close()
+
+		telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
+		assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
+		assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
+		assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
+	})
+
+	t.Run("input metrics", func(t *testing.T) {
+		inputID := "a-input-id"
+
+		beatInfo := beat.Info{}
+		beatInfo.Monitoring.Namespace =
+			monitoring.GetNamespace("TestMonitoring.inputMetrics")
+
+		clientCfg := beat.ClientConfig{
+			InputMetricsRegistry: beatInfo.Monitoring.Registry().
+				NewRegistry(inputID),
+		}
+		testInputMetrics(t, beatInfo, clientCfg, inputID)
+	})
+
+	t.Run("nil input metrics", func(t *testing.T) {
+		testInputMetrics(
+			t, beat.Info{}, beat.ClientConfig{}, "a-input-id-nil-metrics")
+	})
+}
+
+func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig, inputID string) {
+	require.NoError(t, logp.TestingSetup(), "could not setup logger")
+
 	var config Config
 	err := conf.MustNewConfigFrom(map[string]interface{}{
-		"queue.mem.events":           maxEvents,
+		"queue.mem.events":           32,
 		"queue.mem.flush.min_events": 1,
+		"queue.mem.flush.timeout":    time.Millisecond,
 	}).Unpack(&config)
-	require.NoError(t, err)
+	require.NoError(t, err, "failed creating config")
+
+	filterMeKey := "filter_me"
 
 	metrics := monitoring.NewRegistry()
 	telemetry := monitoring.NewRegistry()
+
 	pipeline, err := Load(
-		beat.Info{},
+		beatInfo,
 		Monitors{
 			Metrics:   metrics,
 			Telemetry: telemetry,
 		},
 		config,
-		processing.Supporter(nil),
+		testProcessorSupporter{
+			Processor: processorList{
+				processors: []beat.Processor{
+					&testProcessor{
+						name: "addMeta",
+						processorFn: func(in *beat.Event) (*beat.Event, error) {
+							var err error
+							if in.Meta == nil {
+								in.Meta = mapstr.M{}
+							}
+							_, err = in.Meta.Put("input_id", inputID)
+							assert.NoError(t, err, "add meta processor failed")
+							return in, nil
+						},
+					},
+					&testProcessor{
+						name: "filterProcessor",
+						processorFn: func(in *beat.Event) (*beat.Event, error) {
+							rawFilterMe, err := in.Fields.GetValue(filterMeKey)
+							if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+								require.NoError(t, err, "could not get filter_me from Fields")
+							}
+
+							filterMe, ok := rawFilterMe.(bool)
+							if filterMe && ok {
+								return nil, nil
+							}
+							return in, nil
+						},
+					},
+				},
+			},
+		},
 		func(outputs.Observer) (string, outputs.Group, error) {
-			clients := make([]outputs.Client, numClients)
-			for i := range clients {
-				clients[i] = newMockClient(func(publisher.Batch) error {
-					return nil
-				})
-			}
-			return "output_name", outputs.Group{
-				BatchSize: batchSize,
-				Clients:   clients,
+			return "output_name", outputs.Group{Clients: []outputs.Client{
+				newMockClient(func(publisher.Batch) error { return nil })},
 			}, nil
 		},
 	)
 	require.NoError(t, err)
-	defer pipeline.Close()
 
-	telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
-	assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
-	assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
-	assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
+	c, err := pipeline.ConnectWith(clientCfg)
+	require.NoError(t, err, "pipeline.ConnectWith failed")
+
+	cc, ok := c.(*client)
+	require.True(t, ok, "pipeline.ConnectWith return value cannot be cast to client")
+	cc.producer = &testProducer{publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+		return queue.EntryID(1), true
+	}}
+
+	c.PublishAll([]beat.Event{
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+		{Fields: mapstr.M{filterMeKey: true}, Meta: mapstr.M{}},
+	})
+	c.Publish(beat.Event{Meta: mapstr.M{}})
+	require.NoError(t, c.Close())
+
+	if clientCfg.InputMetricsRegistry != nil {
+		total, filtered, published := getMetrics(t, beatInfo, inputID)
+
+		assert.Equal(t,
+			int(total.Get()),
+			int(filtered.Get()+published.Get()),
+			"total events should be them sum of filtered, dropped and published"+
+				"events")
+		assert.Equal(t, 3, int(filtered.Get()),
+			"should have 3 filtered events")
+		assert.Equal(t, 1, int(published.Get()),
+			"should have 1 published event")
+	}
 }
 
-type testProcessor struct{ error bool }
+func getMetrics(t *testing.T, beatInfo beat.Info, inputID string) (
+	*monitoring.Uint, *monitoring.Uint, *monitoring.Uint) {
+	t.Helper()
+
+	reg := beatInfo.Monitoring.Registry()
+
+	totalMetricName := inputID + "." + "events_pipeline_total"
+	totalRaw := reg.Get(totalMetricName)
+	total, ok := totalRaw.(*monitoring.Uint)
+	require.Truef(t, ok,
+		"did not find metric '%s': "+
+			"could not cast metric to *monitoring.Uint, got: %T",
+		totalMetricName, totalRaw)
+
+	filteredMetricName := inputID + "." + "events_pipeline_filtered_total"
+	filteredRaw := reg.Get(filteredMetricName)
+	filtered, ok := filteredRaw.(*monitoring.Uint)
+	require.Truef(t, ok,
+		"did not find metric '%s': "+
+			"could not cast metric to *monitoring.Uint, got: %T",
+		filteredMetricName, filteredRaw)
+
+	publishedMetricName := inputID + "." + "events_pipeline_published_total"
+	publishedRaw := reg.Get(publishedMetricName)
+	published, ok := publishedRaw.(*monitoring.Uint)
+	require.Truef(t, ok,
+		"did not find metric '%s': "+
+			"could not cast metric to *monitoring.Uint, got: %T",
+		publishedMetricName, publishedRaw)
+
+	return total, filtered, published
+}
+
+type testProcessor struct {
+	name        string
+	processorFn func(in *beat.Event) (event *beat.Event, err error)
+}
 
 func (p *testProcessor) String() string {
-	return "testProcessor"
-}
-func (p *testProcessor) Run(in *beat.Event) (event *beat.Event, err error) {
-	if p.error {
-		return nil, errors.New("test error")
-	}
-	_, err = in.Fields.Put("test", "value")
-	return in, err
+	return "testProcessor-" + p.name
 }
 
-func (p *testProcessor) ErrorSwitch() {
-	p.error = !p.error
+func (p *testProcessor) Run(in *beat.Event) (event *beat.Event, err error) {
+	return p.processorFn(in)
+}
+
+type processorList struct {
+	processors []beat.Processor
+}
+
+func (p processorList) String() string {
+	var names []string
+	for _, processor := range p.processors {
+		names = append(names, processor.String())
+	}
+
+	return strings.Join(names, ", ")
+}
+
+func (p processorList) Run(in *beat.Event) (event *beat.Event, err error) {
+	for _, processor := range p.processors {
+		in, err = processor.Run(in)
+		if in == nil {
+			return nil, err
+		}
+	}
+
+	return in, nil
 }
 
 type testProcessorSupporter struct {

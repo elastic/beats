@@ -133,15 +133,16 @@ func (r *runner) Start() {
 	go func() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
+		ctx := v2.Context{
+			ID:             r.id,
+			IDWithoutName:  r.id,
+			Agent:          *r.agent,
+			Logger:         log,
+			Cancelation:    r.sig,
+			StatusReporter: r.statusReporter,
+		}
 		err := r.input.Run(
-			v2.Context{
-				ID:             r.id,
-				IDWithoutName:  r.id,
-				Agent:          *r.agent,
-				Logger:         log,
-				Cancelation:    r.sig,
-				StatusReporter: r.statusReporter,
-			},
+			ctx,
 			r.connector,
 		)
 		if err != nil && !errors.Is(err, context.Canceled) {
@@ -149,6 +150,9 @@ func (r *runner) Start() {
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
 		}
+
+		// Input finished running, unregister the metrics
+		ctx.UnregisterMetrics()
 	}()
 }
 
@@ -159,6 +163,10 @@ func (r *runner) Stop() {
 	r.statusReporter = nil
 }
 
+// configID extracts or generates an ID for a configuration.
+// If the "id" is present in config and is non-empty, it is returned.
+// If the "id" is absent or empty, the function calculates a hash of the
+// entire configuration and returns it as a hexadecimal string as the ID.
 func configID(config *conf.C) (string, error) {
 	tmp := struct {
 		ID string `config:"id"`

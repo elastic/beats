@@ -100,7 +100,7 @@ func (in winlogInput) Run(
 	api, _ := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 	return eventlog.Run(
-		ctx,
+		&ctx,
 		ctxtool.FromCanceller(ctx.Cancelation),
 		api,
 		initCheckpoint(log, cursor),

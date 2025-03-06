@@ -19,12 +19,14 @@ package v2
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/go-concert/unison"
 )
@@ -79,6 +81,12 @@ type Context struct {
 	// The input ID.
 	ID string
 
+	// GeneratedID is true when the config does not include an ID and therefore
+	// the runner uses a hash from the config as ID. It's used to know if the
+	// v2.Context generated for the input should have a non-discard metric
+	// registry.
+	GeneratedID bool
+
 	// The input ID without name. Some inputs append sourcename, we need the id to be untouched
 	// https://github.com/elastic/beats/blob/43d80af2aea60b0c45711475d114e118d90c4581/filebeat/input/v2/input-cursor/input.go#L118
 	IDWithoutName string
@@ -93,13 +101,89 @@ type Context struct {
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.
 	StatusReporter status.StatusReporter
+
+	// monitoringRegistry is the registry collecting metrics for this input.
+	//
+	// This registry resides in beat.Info.Monitoring.Namespace, which is a
+	// unique namespace for beats running as OTel receivers or the global
+	// 'dataset' for compatibility reasons.
+	//
+	// Inputs without an ID, GeneratedID is true, have a 'discard' registry
+	// which is associated to no namespace resulting in the metrics not being
+	// published.
+	//
+	// Inputs must call EnhanceMetricRegistry to add the necessary variables for
+	// the metrics to be valid to be published by the HTTP monitoring endpoint.
+	// Also, inputs need to register its metrics for publishing by the
+	// monitoring endpoint by calling inputmon.RegisterMetrics.
+	monitoringRegistry       *monitoring.Registry
+	monitoringRegistryCancel func()
 }
 
-func (c Context) UpdateStatus(status status.Status, msg string) {
+func (c *Context) UpdateStatus(status status.Status, msg string) {
 	if c.StatusReporter != nil {
 		c.Logger.Debugf("updating status, status: '%s', message: '%s'", status.String(), msg)
 		c.StatusReporter.UpdateStatus(status, msg)
 	}
+}
+
+// MetricsID is the context ID with any '.' replaced by '_'.
+func (c *Context) MetricsID() string {
+	return strings.ReplaceAll(c.ID, ".", "_")
+}
+
+// MetricRegistry returns the metric registry associated with this context.
+// This should be the metric registry used by inputs to publish their metrics.
+// If this context ID was generated, GeneratedID is true, a 'discard'
+// registry is returned. It's a registry associated to no namespace and
+// therefore its metrics cannot be published.
+// If this context ID comes from the config, GeneratedID false, then a new
+// metric registry named ID will be added to the beat.Info.Monitoring.Namespace
+// or the existing registry will be returned.
+func (c *Context) MetricRegistry() *monitoring.Registry {
+	if c.MetricsID() == "" {
+		return monitoring.NewRegistry()
+	}
+
+	if c.monitoringRegistry == nil {
+		reg := c.Agent.Monitoring.Registry().GetRegistry(c.MetricsID())
+		if reg == nil {
+			reg = c.Agent.Monitoring.Registry().NewRegistry(c.MetricsID())
+		}
+
+		c.monitoringRegistry = reg
+		c.monitoringRegistryCancel = func() {
+			c.Agent.Monitoring.Registry().Remove(c.MetricsID())
+		}
+	}
+
+	return c.monitoringRegistry
+}
+
+// EnhanceMetricRegistry adds `id` and `input` to the metric registry and
+// returns the registry.
+func (c *Context) EnhanceMetricRegistry(id, inputType string) *monitoring.Registry {
+	monitoring.NewString(c.MetricRegistry(), "input").Set(inputType)
+	monitoring.NewString(c.MetricRegistry(), "id").Set(id)
+
+	return c.MetricRegistry()
+}
+
+func (c *Context) UnregisterMetrics() {
+	if c.monitoringRegistryCancel != nil {
+		c.monitoringRegistryCancel()
+	}
+}
+
+// Clone is equivalent to newCtx := ctx, but it clears the monitoring
+// registry, and it's unregister function.
+func (c *Context) Clone() Context {
+	cc := *c
+
+	cc.monitoringRegistry = nil
+	cc.monitoringRegistryCancel = nil
+
+	return cc
 }
 
 // TestContext provides the Input Test function with common environmental

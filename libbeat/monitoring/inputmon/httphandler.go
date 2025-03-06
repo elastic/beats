@@ -72,7 +72,6 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 
 func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
 	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
-
 	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
@@ -81,19 +80,45 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		if id, ok := m["id"].(string); !ok || id == "" {
+		id, ok := m["id"].(string)
+		if !ok || id == "" {
 			continue
 		}
 
-		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+		if filterOutInput(m, requestedType) {
+			continue
+		}
+
+		// Registries using the new API have precedence.
+		if _, found := registeredInputs.Get(id); found {
 			continue
 		}
 
 		filtered = append(filtered, m)
 	}
+
+	registeredInputRegistries := registeredInputs.CollectStructSnapshot()
+	for _, reg := range registeredInputRegistries {
+		if filterOutInput(reg, requestedType) {
+			continue
+		}
+
+		filtered = append(filtered, reg)
+	}
+
 	return filtered
 }
 
+func filterOutInput(m map[string]any, requestedType string) bool {
+	inputType, ok := m["input"].(string)
+	if !ok ||
+		(requestedType != "" &&
+			!strings.EqualFold(inputType, requestedType)) {
+		return true
+	}
+
+	return false
+}
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {
 	w.Header().Set(contentType, applicationJSON)
 	enc := json.NewEncoder(w)
