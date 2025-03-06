@@ -17,7 +17,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/r
 :::::
 
 
-This is the module for parsing [RabbitMQ log files](https://www.rabbitmq.com/logging.md) It will only support RabbitMQ default i.e RFC 3339 timestamp format using TIMESTAMP_ISO8601.
+This is the module for parsing [RabbitMQ log files](https://www.rabbitmq.com/logging.html) It will only support RabbitMQ default i.e RFC 3339 timestamp format using TIMESTAMP_ISO8601.
 
 When you run the module, it performs a few tasks under the hood:
 
@@ -33,7 +33,7 @@ Read the [quick start](/reference/filebeat/filebeat-installation-configuration.m
 
 ## Compatibility [_compatibility_32]
 
-Parses [single file format](https://www.rabbitmq.com/logging.md) introduced in 3.7.0.
+Parses [single file format](https://www.rabbitmq.com/logging.html) introduced in 3.7.0.
 
 Tested with version 3.7.14.
 

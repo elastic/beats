@@ -5,7 +5,7 @@ mapped_pages:
 
 # AWS rds metricset [metricbeat-metricset-aws-rds]
 
-The rds metricset of aws module allows you to monitor your AWS RDS service. `rds` metricset fetches a set of metrics from [Amazon RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MonitoringOverview.md) and [Amazon Aurora DB](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Monitoring.md). with Amazon RDS, users can monitor network throughput, I/O for read, write, and/or metadata operations, client connections, and burst credit balances for their DB instances. Amazon RDS sends metrics and dimensions to Amazon CloudWatch every minute. Amazon Aurora provides a variety of Amazon CloudWatch metrics that users can use to monitor health and performance of their Aurora DB cluster. This metricset by default collects all tags from AWS RDS.
+The rds metricset of aws module allows you to monitor your AWS RDS service. `rds` metricset fetches a set of metrics from [Amazon RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MonitoringOverview.html) and [Amazon Aurora DB](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Monitoring.html). with Amazon RDS, users can monitor network throughput, I/O for read, write, and/or metadata operations, client connections, and burst credit balances for their DB instances. Amazon RDS sends metrics and dimensions to Amazon CloudWatch every minute. Amazon Aurora provides a variety of Amazon CloudWatch metrics that users can use to monitor health and performance of their Aurora DB cluster. This metricset by default collects all tags from AWS RDS.
 
 
 ## AWS Permissions [_aws_permissions_10]

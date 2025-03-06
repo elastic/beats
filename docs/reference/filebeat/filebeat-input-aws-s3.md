@@ -116,7 +116,7 @@ Alternatively, you can remove the `_id` field using an Elasticsearch Ingest Node
 
 ## Handling Compressed Objects [_handling_compressed_objects]
 
-S3 objects that use the gzip format ([RFC 1952](https://rfc-editor.org/rfc/rfc1952.md)) with the DEFLATE compression algorithm are automatically decompressed during processing. This is achieved by checking for the gzip file magic header.
+S3 objects that use the gzip format ([RFC 1952](https://rfc-editor.org/rfc/rfc1952.html)) with the DEFLATE compression algorithm are automatically decompressed during processing. This is achieved by checking for the gzip file magic header.
 
 
 ## Configuration [_configuration]
@@ -657,7 +657,7 @@ sqs:GetQueueAttributes
 
 ## S3 and SQS setup [_s3_and_sqs_setup]
 
-To configure SQS notifications for an existing S3 bucket, you can follow [create-sqs-queue-for-notification](https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.md#step1-create-sqs-queue-for-notification) guide.
+To configure SQS notifications for an existing S3 bucket, you can follow [create-sqs-queue-for-notification](https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification) guide.
 
 Alternatively, you can follow steps given which use a CloudFormation template to create a S3 bucket connected to a SQS with object creation notifications already enabled.
 
@@ -765,12 +765,12 @@ Alternatively, you can follow steps given which use a CloudFormation template to
 
 ## S3 → SNS → SQS setup [_s3_sns_sqs_setup]
 
-If you would like to use the bucket notification in multiple different consumers (others than filebeat), you should use an SNS topic for the bucket notification.  Please see [create-SNS-topic-for-notification](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ways-to-add-notification-config-to-bucket.md#step1-create-sns-topic-for-notification) for more details. SQS queue will be configured as a [subscriber to the SNS topic](https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.md).
+If you would like to use the bucket notification in multiple different consumers (others than filebeat), you should use an SNS topic for the bucket notification.  Please see [create-SNS-topic-for-notification](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ways-to-add-notification-config-to-bucket.html#step1-create-sns-topic-for-notification) for more details. SQS queue will be configured as a [subscriber to the SNS topic](https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html).
 
 
 ## S3 → EventBridge → SQS setup [_s3_eventbridge_sqs_setup]
 
-Amazon S3 can alternatively [send events to EventBridge](https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.md), which can then be used to route these events to SQS. While the S3 input will filter for *Object Created* events, it is more efficient to configure EventBridge to only forward the *Object Created* events.
+Amazon S3 can alternatively [send events to EventBridge](https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventBridge.html), which can then be used to route these events to SQS. While the S3 input will filter for *Object Created* events, it is more efficient to configure EventBridge to only forward the *Object Created* events.
 
 
 ## Parallel Processing [_parallel_processing]
@@ -902,9 +902,9 @@ To configure AWS credentials, either put the credentials into the Filebeat confi
 * **credential_profile_name**: profile name in shared credentials file.
 * **shared_credential_file**: directory of the shared credentials file.
 * **role_arn**: AWS IAM Role to assume.
-* **external_id**: external ID to use when assuming a role in another account, see [the AWS documentation for use of external IDs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.md).
+* **external_id**: external ID to use when assuming a role in another account, see [the AWS documentation for use of external IDs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
 * **proxy_url**: URL of the proxy to use to connect to AWS web services. The syntax is `http(s)://<IP/Hostname>:<port>`
-* **fips_enabled**: Enabling this option instructs Filebeat to use the FIPS endpoint of a service. All services used by Filebeat are FIPS compatible except for `tagging` but only certain regions are FIPS compatible. See [https://aws.amazon.com/compliance/fips/](https://aws.amazon.com/compliance/fips/) or the appropriate service page, [https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html](https://docs.aws.amazon.com/general/latest/gr/aws-service-information.md), for a full list of FIPS endpoints and regions.
+* **fips_enabled**: Enabling this option instructs Filebeat to use the FIPS endpoint of a service. All services used by Filebeat are FIPS compatible except for `tagging` but only certain regions are FIPS compatible. See [https://aws.amazon.com/compliance/fips/](https://aws.amazon.com/compliance/fips/) or the appropriate service page, [https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html](https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html), for a full list of FIPS endpoints and regions.
 * **ssl**: This specifies SSL/TLS configuration. If the ssl section is missing, the host’s CAs are used for HTTPS connections. See [SSL](/reference/filebeat/configuration-ssl.md) for more information.
 * **default_region**: Default region to query if no other region is set. Most AWS services offer a regional endpoint that can be used to make requests. Some services, such as IAM, do not support regions. If a region is not provided by any other way (environment variable, credential or instance profile), the value set here will be used.
 * **assume_role.duration**: The duration of the requested assume role session. Defaults to 15m when not set. AWS allows a maximum session duration between 1h and 12h depending on your maximum session duration policies.
@@ -1027,11 +1027,11 @@ There are two different types of AWS credentials can be used: access keys and te
 
 * Access keys
 
-`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are the two parts of access keys. They are long-term credentials for an IAM user or the AWS account root user. Please see [AWS Access Keys and Secret Access Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.md#access-keys-and-secret-access-keys) for more details.
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are the two parts of access keys. They are long-term credentials for an IAM user or the AWS account root user. Please see [AWS Access Keys and Secret Access Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) for more details.
 
 * IAM role ARN
 
-An IAM role is an IAM identity that you can create in your account that has specific permissions that determine what the identity can and cannot do in AWS. A role does not have standard long-term credentials such as a password or access keys associated with it. Instead, when you assume a role, it provides you with temporary security credentials for your role session. IAM role Amazon Resource Name (ARN) can be used to specify which AWS IAM role to assume to generate temporary credentials. Please see [AssumeRole API documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.md) for more details.
+An IAM role is an IAM identity that you can create in your account that has specific permissions that determine what the identity can and cannot do in AWS. A role does not have standard long-term credentials such as a password or access keys associated with it. Instead, when you assume a role, it provides you with temporary security credentials for your role session. IAM role Amazon Resource Name (ARN) can be used to specify which AWS IAM role to assume to generate temporary credentials. Please see [AssumeRole API documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html) for more details.
 
 Here are the steps to set up IAM role using AWS CLI for Metricbeat. Please replace `123456789012` with your own account ID.
 
@@ -1112,7 +1112,7 @@ After these steps are done, IAM role ARN can be used for authentication in Metri
 
 * Temporary security credentials
 
-Temporary security credentials has a limited lifetime and consists of an access key ID, a secret access key, and a security token which typically returned from `GetSessionToken`. MFA-enabled IAM users would need to submit an MFA code while calling `GetSessionToken`. Please see [Temporary Security Credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.md) for more details. `sts get-session-token` AWS CLI can be used to generate temporary credentials. For example. with MFA-enabled:
+Temporary security credentials has a limited lifetime and consists of an access key ID, a secret access key, and a security token which typically returned from `GetSessionToken`. MFA-enabled IAM users would need to submit an MFA code while calling `GetSessionToken`. Please see [Temporary Security Credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html) for more details. `sts get-session-token` AWS CLI can be used to generate temporary credentials. For example. with MFA-enabled:
 
 ```bash
 aws> sts get-session-token --serial-number arn:aws:iam::1234:mfa/your-email@example.com --token-code 456789 --duration-seconds 129600

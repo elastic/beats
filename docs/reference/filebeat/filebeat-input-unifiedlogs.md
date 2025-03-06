@@ -90,7 +90,7 @@ Shows content up to the provided date. The following date/time formats are accep
 
 Filters messages using the provided predicate based on NSPredicate. A compound predicate or multiple predicates can be provided as a list.
 
-For detailed information on the use of predicate based filtering, please refer to the [Predicate Programming Guide](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Predicates/Articles/pSyntax.md).
+For detailed information on the use of predicate based filtering, please refer to the [Predicate Programming Guide](https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/Predicates/Articles/pSyntax.html).
 
 
 ### `process` [_process]

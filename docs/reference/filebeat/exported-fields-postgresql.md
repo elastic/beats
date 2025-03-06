@@ -104,7 +104,7 @@ type: long
 
 
 **`postgresql.log.sql_state_code`**
-:   State code returned by Postgres (if any). See also [https://www.postgresql.org/docs/current/errcodes-appendix.html](https://www.postgresql.org/docs/current/errcodes-appendix.md)
+:   State code returned by Postgres (if any). See also [https://www.postgresql.org/docs/current/errcodes-appendix.html](https://www.postgresql.org/docs/current/errcodes-appendix.html)
 
 type: keyword
 

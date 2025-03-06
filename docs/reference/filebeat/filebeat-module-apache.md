@@ -101,7 +101,7 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 ## Virtual Host [_virtual_host]
 
-See customlog documentation  [https://httpd.apache.org/docs/2.4/en/mod/mod_log_config.html](https://httpd.apache.org/docs/2.4/en/mod/mod_log_config.md) Add %v config in httpd.conf in log section
+See customlog documentation  [https://httpd.apache.org/docs/2.4/en/mod/mod_log_config.html](https://httpd.apache.org/docs/2.4/en/mod/mod_log_config.html) Add %v config in httpd.conf in log section
 
 ```sh
     # Replace

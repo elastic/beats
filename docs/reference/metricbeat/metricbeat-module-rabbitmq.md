@@ -17,7 +17,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/r
 :::::
 
 
-The RabbitMQ module uses [HTTP API](http://www.rabbitmq.com/management.md) created by the management plugin to collect metrics.
+The RabbitMQ module uses [HTTP API](http://www.rabbitmq.com/management.html) created by the management plugin to collect metrics.
 
 The default metricsets are `connection`, `node`, `queue`, `exchange` and `shovel`.
 

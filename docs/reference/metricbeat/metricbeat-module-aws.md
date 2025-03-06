@@ -17,7 +17,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/a
 :::::
 
 
-This module periodically fetches monitoring metrics from AWS CloudWatch using [GetMetricData API](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.md) for AWS services.
+This module periodically fetches monitoring metrics from AWS CloudWatch using [GetMetricData API](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html) for AWS services.
 
 All metrics are enabled by default.
 
@@ -45,7 +45,7 @@ Some AWS services send monitoring metrics to CloudWatch with a latency to proces
 
 * **data_granularity**
 
-AWS CloudWatch allows to define the granularity of the returned data points, by setting "Period" while querying metrics. Please see [MetricDataQuery parameters](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.md) for more information.
+AWS CloudWatch allows to define the granularity of the returned data points, by setting "Period" while querying metrics. Please see [MetricDataQuery parameters](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html) for more information.
 
 By default, metricbeat will query CloudWatch setting "Period" to Metricbeat collection period. If you wish to set a custom value for "Period", please specify a `data_granularity` parameter. By setting `period` and `data_granularity` together, you can control, respectively, how frequently you want your metrics to be collected and how granular they have to be.
 
@@ -59,15 +59,15 @@ If endpoint is specified, `regions` config becomes required.
 
 * **include_linked_accounts**
 
-The `include_linked_accounts` parameter is used to enable the inclusion of metrics from different accounts linked to a main monitoring account. By setting this parameter to true, users can gather metrics from multiple AWS accounts that are linked through the [CloudWatch cross-account observability](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.md). By default, the `include_linked_accounts` parameter is set to true, meaning that metrics from the main monitoring account and all linked accounts are all collected. When set to false, the parameter allows the CloudWatch service to only retrieve metrics from the monitoring account.
+The `include_linked_accounts` parameter is used to enable the inclusion of metrics from different accounts linked to a main monitoring account. By setting this parameter to true, users can gather metrics from multiple AWS accounts that are linked through the [CloudWatch cross-account observability](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html). By default, the `include_linked_accounts` parameter is set to true, meaning that metrics from the main monitoring account and all linked accounts are all collected. When set to false, the parameter allows the CloudWatch service to only retrieve metrics from the monitoring account.
 
 If you need to collect metrics from a specific linked account, use `owning_account` configuration.
 
-***Note*:** Users should ensure that the necessary IAM roles and policies are properly set up in order to link the monitoring account and source accounts together. Please see [Link monitoring accounts with source accounts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account-Setup.md#CloudWatch-Unified-Cross-Account-Setup-permissions) for more details.
+***Note*:** Users should ensure that the necessary IAM roles and policies are properly set up in order to link the monitoring account and source accounts together. Please see [Link monitoring accounts with source accounts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account-Setup.html#CloudWatch-Unified-Cross-Account-Setup-permissions) for more details.
 
 * **owning_account**
 
-This configuration works together with `include_linked_accounts` configuration and allows to collect metrics from a specific linked account. The configuration accepts a valid account ID and internally it maps to the `OwningAccount` parameter of [ListMetrics API](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.md).
+This configuration works together with `include_linked_accounts` configuration and allows to collect metrics from a specific linked account. The configuration accepts a valid account ID and internally it maps to the `OwningAccount` parameter of [ListMetrics API](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html).
 
 Note that, `include_linked_accounts` should be enabled (which is the default value) to use this parameter.
 
@@ -153,7 +153,7 @@ The billing metricset comes with a predefined dashboard:
 
 ### `cloudwatch` [_cloudwatch]
 
-This metricset allows users to query metrics from AWS CloudWatch with any given namespaces or specific instance with a given period. Please see [AWS Services That Publish CloudWatch Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.md) for a list of AWS services that publish metrics to CloudWatch.
+This metricset allows users to query metrics from AWS CloudWatch with any given namespaces or specific instance with a given period. Please see [AWS Services That Publish CloudWatch Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html) for a list of AWS services that publish metrics to CloudWatch.
 
 
 ### `dynamodb` [_dynamodb]
@@ -180,7 +180,7 @@ The ebs metricset comes with a predefined dashboard:
 
 ### `ec2` [_ec2]
 
-By default, Amazon EC2 sends metric data to CloudWatch every 5 minutes. With this basic monitoring, `period` in aws module configuration should be larger or equal than `300s`. If `period` is set to be less than `300s`, the same cloudwatch metrics will be collected more than once which will cause extra fees without getting more granular metrics. For example, in `US East (N. Virginia)` region, it costs $0.01/1000 metrics requested using GetMetricData. Please see [AWS CloudWatch Pricing](https://aws.amazon.com/cloudwatch/pricing/) for more details. To avoid unnecessary charges, `period` is preferred to be set to `300s` or multiples of `300s`, such as `600s` and `900s`. For more granular monitoring data you can enable detailed monitoring on the instance to get metrics every 1 minute. Please see [Enabling Detailed Monitoring](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.md) for instructions on how to enable detailed monitoring. With detailed monitoring enabled, `period` in aws module configuration can be any number larger than `60s`. Since AWS sends metric data to CloudWatch in 1-minute periods, setting metricbeat module `period` less than `60s` will cause extra API requests which means extra charges on AWS. To avoid unnecessary charges, `period` is preferred to be set to `60s` or multiples of `60s`, such as `120s` and `180s`.
+By default, Amazon EC2 sends metric data to CloudWatch every 5 minutes. With this basic monitoring, `period` in aws module configuration should be larger or equal than `300s`. If `period` is set to be less than `300s`, the same cloudwatch metrics will be collected more than once which will cause extra fees without getting more granular metrics. For example, in `US East (N. Virginia)` region, it costs $0.01/1000 metrics requested using GetMetricData. Please see [AWS CloudWatch Pricing](https://aws.amazon.com/cloudwatch/pricing/) for more details. To avoid unnecessary charges, `period` is preferred to be set to `300s` or multiples of `300s`, such as `600s` and `900s`. For more granular monitoring data you can enable detailed monitoring on the instance to get metrics every 1 minute. Please see [Enabling Detailed Monitoring](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-cloudwatch-new.html) for instructions on how to enable detailed monitoring. With detailed monitoring enabled, `period` in aws module configuration can be any number larger than `60s`. Since AWS sends metric data to CloudWatch in 1-minute periods, setting metricbeat module `period` less than `60s` will cause extra API requests which means extra charges on AWS. To avoid unnecessary charges, `period` is preferred to be set to `60s` or multiples of `60s`, such as `120s` and `180s`.
 
 The ec2 metricset comes with a predefined dashboard:
 
@@ -234,7 +234,7 @@ Daily storage metrics for S3 buckets are reported once per day with no additiona
 
 ### `s3_request` [_s3_request]
 
-Request metrics are available at 1-minute intervals with additional charges. The s3_request metricset will give more granular data to track S3 bucket usage. The `period` for `s3_request` metricset can be set to `60s` or multiples of `60s`. But because of the extra charges for querying these metrics, the `period` is recommended to set to `86400s`. The user can always adjust this to the granularity they want. Request metrics are not enabled by default for S3 buckets. Please see [How to Configure Request Metrics for S3](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/configure-metrics.md) for instructions on how to enable request metrics for each S3 bucket.
+Request metrics are available at 1-minute intervals with additional charges. The s3_request metricset will give more granular data to track S3 bucket usage. The `period` for `s3_request` metricset can be set to `60s` or multiples of `60s`. But because of the extra charges for querying these metrics, the `period` is recommended to set to `86400s`. The user can always adjust this to the granularity they want. Request metrics are not enabled by default for S3 buckets. Please see [How to Configure Request Metrics for S3](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/configure-metrics.html) for instructions on how to enable request metrics for each S3 bucket.
 
 The s3_daily_storage and s3_request metricset comes with a predefined combined dashboard:
 
@@ -281,9 +281,9 @@ This session is to document what are the AWS API called made by each metricset i
 
 Note: some AWS APIs need pagination like ListMetrics and GetMetricData. Count value is depends on the number of results.
 
-ListMetrics max page size: 500, based on [AWS API ListMetrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.md)
+ListMetrics max page size: 500, based on [AWS API ListMetrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_ListMetrics.html)
 
-GetMetricData max page size: 100, based on [AWS API GetMetricData](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.md)
+GetMetricData max page size: 100, based on [AWS API GetMetricData](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html)
 
 |     |     |     |
 | --- | --- | --- |
@@ -311,9 +311,9 @@ To configure AWS credentials, either put the credentials into the Metricbeat con
 * **credential_profile_name**: profile name in shared credentials file.
 * **shared_credential_file**: directory of the shared credentials file.
 * **role_arn**: AWS IAM Role to assume.
-* **external_id**: external ID to use when assuming a role in another account, see [the AWS documentation for use of external IDs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.md).
+* **external_id**: external ID to use when assuming a role in another account, see [the AWS documentation for use of external IDs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html).
 * **proxy_url**: URL of the proxy to use to connect to AWS web services. The syntax is `http(s)://<IP/Hostname>:<port>`
-* **fips_enabled**: Enabling this option instructs Metricbeat to use the FIPS endpoint of a service. All services used by Metricbeat are FIPS compatible except for `tagging` but only certain regions are FIPS compatible. See [https://aws.amazon.com/compliance/fips/](https://aws.amazon.com/compliance/fips/) or the appropriate service page, [https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html](https://docs.aws.amazon.com/general/latest/gr/aws-service-information.md), for a full list of FIPS endpoints and regions.
+* **fips_enabled**: Enabling this option instructs Metricbeat to use the FIPS endpoint of a service. All services used by Metricbeat are FIPS compatible except for `tagging` but only certain regions are FIPS compatible. See [https://aws.amazon.com/compliance/fips/](https://aws.amazon.com/compliance/fips/) or the appropriate service page, [https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html](https://docs.aws.amazon.com/general/latest/gr/aws-service-information.html), for a full list of FIPS endpoints and regions.
 * **ssl**: This specifies SSL/TLS configuration. If the ssl section is missing, the host’s CAs are used for HTTPS connections. See [SSL](/reference/metricbeat/configuration-ssl.md) for more information.
 * **default_region**: Default region to query if no other region is set. Most AWS services offer a regional endpoint that can be used to make requests. Some services, such as IAM, do not support regions. If a region is not provided by any other way (environment variable, credential or instance profile), the value set here will be used.
 * **assume_role.duration**: The duration of the requested assume role session. Defaults to 15m when not set. AWS allows a maximum session duration between 1h and 12h depending on your maximum session duration policies.
@@ -457,11 +457,11 @@ There are two different types of AWS credentials can be used: access keys and te
 
 * Access keys
 
-`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are the two parts of access keys. They are long-term credentials for an IAM user or the AWS account root user. Please see [AWS Access Keys and Secret Access Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.md#access-keys-and-secret-access-keys) for more details.
+`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` are the two parts of access keys. They are long-term credentials for an IAM user or the AWS account root user. Please see [AWS Access Keys and Secret Access Keys](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys) for more details.
 
 * IAM role ARN
 
-An IAM role is an IAM identity that you can create in your account that has specific permissions that determine what the identity can and cannot do in AWS. A role does not have standard long-term credentials such as a password or access keys associated with it. Instead, when you assume a role, it provides you with temporary security credentials for your role session. IAM role Amazon Resource Name (ARN) can be used to specify which AWS IAM role to assume to generate temporary credentials. Please see [AssumeRole API documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.md) for more details.
+An IAM role is an IAM identity that you can create in your account that has specific permissions that determine what the identity can and cannot do in AWS. A role does not have standard long-term credentials such as a password or access keys associated with it. Instead, when you assume a role, it provides you with temporary security credentials for your role session. IAM role Amazon Resource Name (ARN) can be used to specify which AWS IAM role to assume to generate temporary credentials. Please see [AssumeRole API documentation](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html) for more details.
 
 Here are the steps to set up IAM role using AWS CLI for Metricbeat. Please replace `123456789012` with your own account ID.
 
@@ -542,7 +542,7 @@ After these steps are done, IAM role ARN can be used for authentication in Metri
 
 * Temporary security credentials
 
-Temporary security credentials has a limited lifetime and consists of an access key ID, a secret access key, and a security token which typically returned from `GetSessionToken`. MFA-enabled IAM users would need to submit an MFA code while calling `GetSessionToken`. Please see [Temporary Security Credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.md) for more details. `sts get-session-token` AWS CLI can be used to generate temporary credentials. For example. with MFA-enabled:
+Temporary security credentials has a limited lifetime and consists of an access key ID, a secret access key, and a security token which typically returned from `GetSessionToken`. MFA-enabled IAM users would need to submit an MFA code while calling `GetSessionToken`. Please see [Temporary Security Credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html) for more details. `sts get-session-token` AWS CLI can be used to generate temporary credentials. For example. with MFA-enabled:
 
 ```bash
 aws> sts get-session-token --serial-number arn:aws:iam::1234:mfa/your-email@example.com --token-code 456789 --duration-seconds 129600
@@ -557,7 +557,7 @@ IAM policy is an entity that defines permissions to an object within your AWS en
 
 * **WebIdentity authentication flow**
 
-See documentation in order to create a IAM Role for Service account: [https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html](https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.md)
+See documentation in order to create a IAM Role for Service account: [https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html](https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html)
 
 Once you have create the IRSA you can annotate `metricbeat` service account with it
 

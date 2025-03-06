@@ -45,7 +45,7 @@ The aws lambda metricset comes with a predefined dashboard. For example:
 
 ## Metrics [_metrics_5]
 
-Please see more details for each metric in [lambda-cloudwatch-metric](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-functions-metrics.md).
+Please see more details for each metric in [lambda-cloudwatch-metric](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-functions-metrics.html).
 
 |     |     |
 | --- | --- |

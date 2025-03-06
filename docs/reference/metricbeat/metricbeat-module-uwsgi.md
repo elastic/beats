@@ -5,7 +5,7 @@ mapped_pages:
 
 # uWSGI module [metricbeat-module-uwsgi]
 
-This is the uwsgi module. By default collects the `stats` metricset, using [StatsServer](http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.md).
+This is the uwsgi module. By default collects the `stats` metricset, using [StatsServer](http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.html).
 
 
 ## Module-specific configuration notes [_module_specific_configuration_notes_21]

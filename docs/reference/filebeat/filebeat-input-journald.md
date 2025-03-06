@@ -12,7 +12,7 @@ This functionality is in technical preview and may be changed or removed in a fu
 ::::
 
 
-[`journald`](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.md) is a system service that collects and stores logging data. The `journald` input reads this log data and the metadata associated with it. To read this log data Filebeat calls `journalctl` to read from the journal, therefore Filebeat needs permission to execute `journalctl`.
+[`journald`](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) is a system service that collects and stores logging data. The `journald` input reads this log data and the metadata associated with it. To read this log data Filebeat calls `journalctl` to read from the journal, therefore Filebeat needs permission to execute `journalctl`.
 
 If the `journalctl` process exits unexpectedly the journald input will terminate with an error and Filebeat will need to be restarted to start reading from the jouranl again.
 
@@ -24,7 +24,7 @@ filebeat.inputs:
   id: everything
 ```
 
-You may wish to have separate inputs for each service. You can use `include_matches` to specify filtering expressions. A good way to list the [journald fields](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.md) that are available for filtering messages is to run `journalctl -o json` to output logs and metadata as JSON. This example collects logs from the `vault.service` systemd unit.
+You may wish to have separate inputs for each service. You can use `include_matches` to specify filtering expressions. A good way to list the [journald fields](https://www.freedesktop.org/software/systemd/man/systemd.journal-fields.html) that are available for filtering messages is to run `journalctl -o json` to output logs and metadata as JSON. This example collects logs from the `vault.service` systemd unit.
 
 ```yaml
 filebeat.inputs:

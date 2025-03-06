@@ -5,7 +5,7 @@ mapped_pages:
 
 # uWSGI status metricset [metricbeat-metricset-uwsgi-status]
 
-This module periodically fetches metrics from [uWSGI](http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.md) servers.
+This module periodically fetches metrics from [uWSGI](http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.html) servers.
 
 
 ## Compatibility [_compatibility_50]

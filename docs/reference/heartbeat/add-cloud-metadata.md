@@ -28,7 +28,7 @@ The following cloud providers are supported:
 
 The Alibaba Cloud and Tencent cloud providers are disabled by default, because they require to access a remote host. The `providers` setting allows users to select a list of default providers to query.
 
-Cloud providers tend to maintain metadata services compliant with other cloud providers. For example, Openstack supports [EC2 compliant metadat service](https://docs.openstack.org/nova/latest/user/metadata.md#ec2-compatible-metadata). This makes it impossible to differentiate cloud provider (`cloud.provider` property) with auto discovery (when `providers` configuration is omitted). The processor implementation incorporates a priority mechanism where priority is given to some providers over others when there are multiple successful metadata results. Currently, `aws/ec2` and `azure` have priority over any other provider as their metadata retrival rely on SDKs. The expectation here is that SDK methods should fail if run in an environment not configured accordingly (ex:- missing configurations or credentials).
+Cloud providers tend to maintain metadata services compliant with other cloud providers. For example, Openstack supports [EC2 compliant metadat service](https://docs.openstack.org/nova/latest/user/metadata.html#ec2-compatible-metadata). This makes it impossible to differentiate cloud provider (`cloud.provider` property) with auto discovery (when `providers` configuration is omitted). The processor implementation incorporates a priority mechanism where priority is given to some providers over others when there are multiple successful metadata results. Currently, `aws/ec2` and `azure` have priority over any other provider as their metadata retrival rely on SDKs. The expectation here is that SDK methods should fail if run in an environment not configured accordingly (ex:- missing configurations or credentials).
 
 
 ## Configurations [_configurations]
@@ -78,7 +78,7 @@ The metadata that is added to events varies by hosting provider. Below are examp
 
 *AWS*
 
-Metadata given below are extracted from [instance identity document](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-identity-documents.md),
+Metadata given below are extracted from [instance identity document](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-identity-documents.html),
 
 ```json
 {
@@ -94,7 +94,7 @@ Metadata given below are extracted from [instance identity document](https://doc
 }
 ```
 
-If the EC2 instance has IMDS enabled and if tags are allowed through IMDS endpoint, the processor will further append tags in metadata. Please refer official documentation on [IMDS endpoint](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.md) for further details.
+If the EC2 instance has IMDS enabled and if tags are allowed through IMDS endpoint, the processor will further append tags in metadata. Please refer official documentation on [IMDS endpoint](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html) for further details.
 
 ```json
 {

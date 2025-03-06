@@ -5,7 +5,7 @@ mapped_pages:
 
 # CockroachDB status metricset [metricbeat-metricset-cockroachdb-status]
 
-The CockroachDB `status` metricset collects metrics exposed by the [Prometheus endpoint](https://www.cockroachlabs.com/docs/v2.1/monitoring-and-alerting.md#prometheus-endpoint) of CockroachDB.
+The CockroachDB `status` metricset collects metrics exposed by the [Prometheus endpoint](https://www.cockroachlabs.com/docs/v2.1/monitoring-and-alerting.html#prometheus-endpoint) of CockroachDB.
 
 ::::{warning}
 This metricset collects a large number of metrics, what can significantly impact disk usage. Processors can be used to drop unused metrics before they are stored. For example the following configuration will drop all histogram buckets:

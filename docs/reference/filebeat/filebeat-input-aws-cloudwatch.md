@@ -31,7 +31,7 @@ ARN of the log group to collect logs from. The ARN may refer to a log group in a
 
 Note: `log_group_arn` cannot be combined with `log_group_name`, `log_group_name_prefix` and `region_name` properties. If set, values extracted from `log_group_arn` takes precedence over them.
 
-Note: If the log group is in a linked source account and filebeat is configured to use a monitoring account, you must use the `log_group_arn`. You can read more about AWS account linking and cross account observability from the [official documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.md).
+Note: If the log group is in a linked source account and filebeat is configured to use a monitoring account, you must use the `log_group_arn`. You can read more about AWS account linking and cross account observability from the [official documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html).
 
 
 ### `log_group_name` [_log_group_name]
@@ -52,7 +52,7 @@ Note: `region_name` is required when `log_group_name_prefix` is given. `log_grou
 
 Configure whether to include linked source accounts that contains the prefix value defined through `log_group_name_prefix`. Accepts a boolean and this is by default disabled.
 
-Note: Utilize `log_group_arn` if you desire to obtain logs from a known log group (including linked source accounts) You can read more about AWS account linking and cross account observability from the [official documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.md).
+Note: Utilize `log_group_arn` if you desire to obtain logs from a known log group (including linked source accounts) You can read more about AWS account linking and cross account observability from the [official documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html).
 
 
 ### `region_name` [_region_name]

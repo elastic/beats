@@ -35,7 +35,7 @@ For example with the previous configuration two events are sent like the followi
 
 "munin": { "plugin": { "name": "cpu" } "metrics": { "softirq": 680, "guest": 0, "user": 158212, "iowait": 71095, "irq": 1, "system": 35906, "idle": 1185709, "steal": 0, "nice": 1633 } } ---
 
-In principle this module can be used to collect metrics from any agent that implements the munin node protocol ([http://guide.munin-monitoring.org/en/latest/master/network-protocol.html](http://guide.munin-monitoring.org/en/latest/master/network-protocol.md)).
+In principle this module can be used to collect metrics from any agent that implements the munin node protocol ([http://guide.munin-monitoring.org/en/latest/master/network-protocol.html](http://guide.munin-monitoring.org/en/latest/master/network-protocol.html)).
 
 
 ## Limitations [_limitations_2]

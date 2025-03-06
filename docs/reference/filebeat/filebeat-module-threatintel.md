@@ -333,7 +333,7 @@ To filter on specific types, you can define `var.types` as a comma delimited lis
 :   How often the API is polled for updated information.
 
 **`var.types`**
-:   A comma delimited list of indicator types to include, defaults to all. A list of possible types to filter on can be found on the [Stix 2.1 Object types](https://oasis-open.github.io/cti-documentation/stix/intro.md#stix-21-objects) page.
+:   A comma delimited list of indicator types to include, defaults to all. A list of possible types to filter on can be found on the [Stix 2.1 Object types](https://oasis-open.github.io/cti-documentation/stix/intro.html#stix-21-objects) page.
 
 **`var.proxy_url`**
 :   Optional URL to use as HTTP proxy.

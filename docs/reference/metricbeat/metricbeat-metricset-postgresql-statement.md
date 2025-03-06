@@ -30,7 +30,7 @@ Once the server is started with this module, it starts collecting statistics abo
 CREATE EXTENSION pg_stat_statements;
 ```
 
-You can read more about the available options for this module in the [official documentation](https://www.postgresql.org/docs/13/pgstatstatements.md).
+You can read more about the available options for this module in the [official documentation](https://www.postgresql.org/docs/13/pgstatstatements.html).
 
 ::::{note}
 The PostgreSQL module of Filebeat is also able to collect information about statements executed in the server from its logs. You may chose which one is better for your needings. An important difference is that the Metricbeat module collects aggregated information when the statement is executed several times, but cannot know when each statement was executed. This information can be obtained from logs.

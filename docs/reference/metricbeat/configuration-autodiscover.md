@@ -505,7 +505,7 @@ The Amazon EC2 autodiscover provider discovers [EC2 instances](https://aws.amazo
 
 For example, you can use this provider to gather MySQL metrics from MySQL servers running on EC2 instances that have a specific tag, `service: mysql`.
 
-This provider will load AWS credentials using the standard AWS environment variables and shared credentials files see [Best Practices for Managing AWS Access Keys](https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.md) for more information. If you do not wish to use these, you may explicitly set the `access_key_id` and `secret_access_key` variables.
+This provider will load AWS credentials using the standard AWS environment variables and shared credentials files see [Best Practices for Managing AWS Access Keys](https://docs.aws.amazon.com/general/latest/gr/aws-access-keys-best-practices.html) for more information. If you do not wish to use these, you may explicitly set the `access_key_id` and `secret_access_key` variables.
 
 These are the available fields during within config templating. The `aws.ec2.*` fields and `cloud.*` fields will be available on each emitted event.
 

@@ -17,7 +17,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/s
 :::::
 
 
-This is a module to the Suricata IDS/IPS/NSM log. It parses logs that are in the [ Suricata Eve JSON format](https://suricata.readthedocs.io/en/latest/output/eve/eve-json-format.md).
+This is a module to the Suricata IDS/IPS/NSM log. It parses logs that are in the [ Suricata Eve JSON format](https://suricata.readthedocs.io/en/latest/output/eve/eve-json-format.html).
 
 When you run the module, it performs a few tasks under the hood:
 

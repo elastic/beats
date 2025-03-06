@@ -10,7 +10,7 @@ This functionality is in beta and is subject to change. The design and code is l
 ::::
 
 
-The `dynamodb` metricset of aws module allows you to monitor your AWS DynamoDB database. `dynamodb` metricset fetches a set of values from [Amazon DynamoDB Metrics](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.md). For all other DynamoDB metrics, the aggregation granularity is five minutes.
+The `dynamodb` metricset of aws module allows you to monitor your AWS DynamoDB database. `dynamodb` metricset fetches a set of values from [Amazon DynamoDB Metrics](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html). For all other DynamoDB metrics, the aggregation granularity is five minutes.
 
 
 ## Configuration example [_configuration_example_3]
@@ -36,7 +36,7 @@ The aws dynamodb metricset comes with a predefined dashboard. For example:
 
 ## Metrics [_metrics_2]
 
-Please see more details for each metric in [Amazon DynamoDB Metrics](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.md).
+Please see more details for each metric in [Amazon DynamoDB Metrics](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html).
 
 |     |     |
 | --- | --- |

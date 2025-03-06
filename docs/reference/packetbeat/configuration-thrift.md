@@ -7,7 +7,7 @@ mapped_pages:
 # Capture Thrift traffic [configuration-thrift]
 
 
-[Apache Thrift](https://thrift.apache.org/) is a communication protocol and RPC framework initially created at Facebook. It is sometimes used in [microservices](http://martinfowler.com/articles/microservices.md) architectures because it provides better performance when compared to the more obvious HTTP/RESTful API choice, while still supporting a wide range of programming languages and frameworks.
+[Apache Thrift](https://thrift.apache.org/) is a communication protocol and RPC framework initially created at Facebook. It is sometimes used in [microservices](http://martinfowler.com/articles/microservices.html) architectures because it provides better performance when compared to the more obvious HTTP/RESTful API choice, while still supporting a wide range of programming languages and frameworks.
 
 Packetbeat works based on a copy of the traffic, which means that you get performance management features without having to modify your services in any way and without any latency overhead. Packetbeat captures the transactions from the network and indexes them in Elasticsearch so that they can be analyzed and searched.
 

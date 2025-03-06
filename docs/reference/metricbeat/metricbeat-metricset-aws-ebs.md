@@ -45,7 +45,7 @@ The aws ebs metricset comes with a predefined dashboard. For example:
 
 ## Metrics [_metrics_3]
 
-Please see more details for each metric in [ebs-cloudwatch-metric](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.md).
+Please see more details for each metric in [ebs-cloudwatch-metric](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html).
 
 |     |     |
 | --- | --- |

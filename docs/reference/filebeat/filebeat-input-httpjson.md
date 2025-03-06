@@ -1078,7 +1078,7 @@ See [response split parameter](#response-split).
 
 ### `chain[].step.replace` [chain-step-replace]
 
-A [JSONPath](https://goessner.net/articles/JsonPath/index.md#e2) string to parse values from responses JSON, collected from previous chain steps. Place same replace string in url where collected values from previous call should be placed. Required.
+A [JSONPath](https://goessner.net/articles/JsonPath/index.html#e2) string to parse values from responses JSON, collected from previous chain steps. Place same replace string in url where collected values from previous call should be placed. Required.
 
 Example:
 

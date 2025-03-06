@@ -19,7 +19,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/o
 
 This is a module for ingesting Audit Trail logs from Oracle Databases.
 
-The module expects an *.aud audit file that is generated from Oracle Databases by default. If this has been disabled then please see the [Oracle Database Audit Trail Documentation](https://docs.oracle.com/en/database/oracle/oracle-database/19/dbseg/introduction-to-auditing.md#GUID-8D96829C-9151-4FA4-BED9-831D088F12FF).
+The module expects an *.aud audit file that is generated from Oracle Databases by default. If this has been disabled then please see the [Oracle Database Audit Trail Documentation](https://docs.oracle.com/en/database/oracle/oracle-database/19/dbseg/introduction-to-auditing.html#GUID-8D96829C-9151-4FA4-BED9-831D088F12FF).
 
 ::::{tip}
 Read the [quick start](/reference/filebeat/filebeat-installation-configuration.md) to learn how to configure and run modules.

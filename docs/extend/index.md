@@ -95,7 +95,7 @@ Both of these commands should be run before submitting a PR. You can view all th
 These commands have the following dependencies:
 
 * Python >= 3.7
-* Python [venv module](https://docs.python.org/3/library/venv.md)
+* Python [venv module](https://docs.python.org/3/library/venv.html)
 * [Mage](https://github.com/magefile/mage)
 
 Python venv module is included in the standard library in Python 3. On Debian/Ubuntu systems it also requires to install the `python3-venv` package, that includes additional support scripts:

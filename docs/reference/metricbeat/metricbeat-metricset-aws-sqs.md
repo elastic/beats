@@ -5,7 +5,7 @@ mapped_pages:
 
 # AWS sqs metricset [metricbeat-metricset-aws-sqs]
 
-The sqs metricset of aws module allows you to monitor your AWS SQS queues. `sqs` metricset fetches a set of values from [Amazon SQS Metrics](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-available-cloudwatch-metrics.md). CloudWatch metrics for Amazon SQS queues are automatically collected and pushed to CloudWatch every five minutes.
+The sqs metricset of aws module allows you to monitor your AWS SQS queues. `sqs` metricset fetches a set of values from [Amazon SQS Metrics](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-available-cloudwatch-metrics.html). CloudWatch metrics for Amazon SQS queues are automatically collected and pushed to CloudWatch every five minutes.
 
 
 ## AWS Permissions [_aws_permissions_14]

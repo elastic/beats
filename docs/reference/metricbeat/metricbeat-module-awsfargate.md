@@ -30,7 +30,7 @@ One can monitor these containers by deploying Metricbeat on the corresponding EC
 In order to achieve this one will need:
 
 1. to ensure access to these EC2 instances using ssh keys coupled with EC2 instances (attach ssh keys on cluster creation using `Key pair` option)
-2. to enable shh access for the instances with the proper [inbound rules](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/authorizing-access-to-an-instance.md).
+2. to enable shh access for the instances with the proper [inbound rules](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/authorizing-access-to-an-instance.html).
 
 * **ECS Fargate**
 

@@ -5,7 +5,7 @@ mapped_pages:
 
 # AWS s3_daily_storage metricset [metricbeat-metricset-aws-s3_daily_storage]
 
-The s3_daily_storage metricset of aws module allows you to monitor your AWS S3 buckets. `s3_daily_storage` metricset fetches Cloudwatch daily storage metrics for each S3 bucket from [S3 CloudWatch Daily Storage Metrics for Buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.md).
+The s3_daily_storage metricset of aws module allows you to monitor your AWS S3 buckets. `s3_daily_storage` metricset fetches Cloudwatch daily storage metrics for each S3 bucket from [S3 CloudWatch Daily Storage Metrics for Buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.html).
 
 
 ## AWS Permissions [_aws_permissions_11]

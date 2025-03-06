@@ -67,7 +67,7 @@ Dimensions:
 | Type | The type of resource being tracked. Currently, the only valid value is API. |
 | Class | The class of resource being tracked. CloudWatch API usage metrics use this dimension with a value of None. |
 
-Please see [CloudWatch Usage Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Usage-Metrics.md) for more details.
+Please see [CloudWatch Usage Metrics](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Usage-Metrics.html) for more details.
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 

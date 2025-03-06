@@ -69,7 +69,7 @@ Dimensions:
 | Dimension Name | Description |
 | TransitGateway | Filters the metric data by transit gateway. |
 
-Please see [Transit Gateway Metrics](https://docs.aws.amazon.com/vpc/latest/tgw/transit-gateway-cloudwatch-metrics.md) for more details.
+Please see [Transit Gateway Metrics](https://docs.aws.amazon.com/vpc/latest/tgw/transit-gateway-cloudwatch-metrics.html) for more details.
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 

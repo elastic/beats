@@ -40,7 +40,7 @@ Example of tag styles supported by the `statsd` module:
 
 `<metric name>,<k>=<v>,<k>=<v>:<value>|<type>|@samplerate`
 
-[Graphite_1.1.x](https://graphite.readthedocs.io/en/latest/tags.md#graphite-tag-support)
+[Graphite_1.1.x](https://graphite.readthedocs.io/en/latest/tags.html#graphite-tag-support)
 
 `<metric name>;<k>=<v>;<k>=<v>:<value>|<type>|@samplerate`
 

@@ -67,7 +67,7 @@ Dimensions:
 | VpnId | Filters the metric data by the Site-to-Site VPN connection ID. |
 | TunnelIpAddress | Filters the metric data by the IP address of the tunnel for the virtual private gateway. |
 
-Please see [VPN Tunnel CloudWatch Metrics](https://docs.aws.amazon.com/vpn/latest/s2svpn/monitoring-cloudwatch-vpn.md) for more details.
+Please see [VPN Tunnel CloudWatch Metrics](https://docs.aws.amazon.com/vpn/latest/s2svpn/monitoring-cloudwatch-vpn.html) for more details.
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 

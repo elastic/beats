@@ -5,9 +5,9 @@ mapped_pages:
 
 # AWS s3_request metricset [metricbeat-metricset-aws-s3_request]
 
-The s3_request metricset of aws module allows you to monitor your AWS S3 buckets. `s3_request` metricset fetches Cloudwatch daily storage metrics for each S3 bucket from [S3 CloudWatch Request Metrics for Buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.md).
+The s3_request metricset of aws module allows you to monitor your AWS S3 buckets. `s3_request` metricset fetches Cloudwatch daily storage metrics for each S3 bucket from [S3 CloudWatch Request Metrics for Buckets](https://docs.aws.amazon.com/AmazonS3/latest/dev/cloudwatch-monitoring.html).
 
-Note: Request metrics are not enabled by default. You must opt into request metrics by configuring them in the console or using the Amazon S3 API. Please see [How to Configure Request Metrics for S3](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/configure-metrics.md) for instructions on how to enable request metrics for each S3 bucket.
+Note: Request metrics are not enabled by default. You must opt into request metrics by configuring them in the console or using the Amazon S3 API. Please see [How to Configure Request Metrics for S3](https://docs.aws.amazon.com/AmazonS3/latest/user-guide/configure-metrics.html) for instructions on how to enable request metrics for each S3 bucket.
 
 
 ## AWS Permissions [_aws_permissions_12]

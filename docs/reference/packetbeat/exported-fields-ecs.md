@@ -1291,7 +1291,7 @@ example: 6.3.9600.17415
 
 
 **`dll.pe.imphash`**
-:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.md).
+:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html).
 
 type: keyword
 
@@ -2430,7 +2430,7 @@ example: 6.3.9600.17415
 
 
 **`file.pe.imphash`**
-:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.md).
+:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html).
 
 type: keyword
 
@@ -4122,7 +4122,7 @@ example: 6.3.9600.17415
 
 
 **`pe.imphash`**
-:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.md).
+:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html).
 
 type: keyword
 
@@ -4923,7 +4923,7 @@ example: 6.3.9600.17415
 
 
 **`process.parent.pe.imphash`**
-:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.md).
+:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html).
 
 type: keyword
 
@@ -5053,7 +5053,7 @@ example: 6.3.9600.17415
 
 
 **`process.pe.imphash`**
-:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.md).
+:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html).
 
 type: keyword
 
@@ -6628,7 +6628,7 @@ example: 6.3.9600.17415
 
 
 **`threat.enrichments.indicator.file.pe.imphash`**
-:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.md).
+:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html).
 
 type: keyword
 
@@ -8002,7 +8002,7 @@ example: 6.3.9600.17415
 
 
 **`threat.indicator.file.pe.imphash`**
-:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.md).
+:   A hash of the imports in a PE file. An imphash — or import hash — can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values. Learn more at [https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html](https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html).
 
 type: keyword
 
@@ -10135,7 +10135,7 @@ example: CVSS
 
 
 **`vulnerability.description`**
-:   The description of the vulnerability that provides additional context of the vulnerability. For example ([Common Vulnerabilities and Exposure CVE description](https://cve.mitre.org/about/faqs.md#cve_entry_descriptions_created))
+:   The description of the vulnerability that provides additional context of the vulnerability. For example ([Common Vulnerabilities and Exposure CVE description](https://cve.mitre.org/about/faqs.html#cve_entry_descriptions_created))
 
 type: keyword
 
@@ -10155,7 +10155,7 @@ example: CVE
 
 
 **`vulnerability.id`**
-:   The identification (ID) is the number portion of a vulnerability entry. It includes a unique identification number for the vulnerability. For example ([Common Vulnerabilities and Exposure CVE ID](https://cve.mitre.org/about/faqs.md#what_is_cve_id))
+:   The identification (ID) is the number portion of a vulnerability entry. It includes a unique identification number for the vulnerability. For example ([Common Vulnerabilities and Exposure CVE ID](https://cve.mitre.org/about/faqs.html#what_is_cve_id))
 
 type: keyword
 

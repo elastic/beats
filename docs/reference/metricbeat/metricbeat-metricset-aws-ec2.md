@@ -5,7 +5,7 @@ mapped_pages:
 
 # AWS ec2 metricset [metricbeat-metricset-aws-ec2]
 
-The ec2 metricset of aws module allows you to monitor your AWS EC2 instances, including `cpu`, `network`, `disk` and `status`. `ec2` metricset fetches a set of values from [Cloudwatch AWS EC2 Metrics](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.md#ec2-cloudwatch-metrics).
+The ec2 metricset of aws module allows you to monitor your AWS EC2 instances, including `cpu`, `network`, `disk` and `status`. `ec2` metricset fetches a set of values from [Cloudwatch AWS EC2 Metrics](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html#ec2-cloudwatch-metrics).
 
 We fetch the following data:
 

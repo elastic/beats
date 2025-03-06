@@ -59,9 +59,9 @@ To be more focused on `cloudwatch` metricset use cases, the examples below do no
 ```
 
 1. Users can configure the `cloudwatch` metricset to collect all metrics from one specific namespace, such as `AWS/EBS`.
-2. `cloudwatch` metricset also has the ability to collect tags from AWS resources. If `resource_type` is specified, then tags will be collected and stored as a part of the event. Please see [AWS API GetResources](https://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/API_GetResources.md) for more details about `resource_type`.
+2. `cloudwatch` metricset also has the ability to collect tags from AWS resources. If `resource_type` is specified, then tags will be collected and stored as a part of the event. Please see [AWS API GetResources](https://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/API_GetResources.html) for more details about `resource_type`.
 3. If tags are collected (for metricsets with `resource_type` specified), events can also be filtered by tag, using the `tags_filter` field in the module-specific configuration.
-4. If users knows exactly what are the cloudwatch metrics they want to collect, this configuration format can be used. `namespace` and `metricname` need to be specified and `dimensions` can be used to filter cloudwatch metrics. Please see [AWS List Metrics](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/list-metrics.md) for more details.
+4. If users knows exactly what are the cloudwatch metrics they want to collect, this configuration format can be used. `namespace` and `metricname` need to be specified and `dimensions` can be used to filter cloudwatch metrics. Please see [AWS List Metrics](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/list-metrics.html) for more details.
 
 
 
@@ -85,7 +85,7 @@ Depends on the configuration and number of services in the AWS account, the numb
 
 * **metrics.name**: Only collect a sub list of metrics that are useful to your use case.
 * **metrics.statistic**: By default, cloudwatch metricset will make API calls to get all stats like average, max, min, sum and etc. If the user knows which statistics method is most useful, specify it in the configuration.
-* **metrics.dimensions**: Different AWS services report different dimensions in their CloudWatch metrics. For example, [EMR metrics](https://docs.aws.amazon.com/emr/latest/ManagementGuide/UsingEMR_ViewingMetrics.md) can have either `JobFlowId` dimension or `JobId` dimension. If user knows which specific dimension is useful, it can be specified in this configuration option.
+* **metrics.dimensions**: Different AWS services report different dimensions in their CloudWatch metrics. For example, [EMR metrics](https://docs.aws.amazon.com/emr/latest/ManagementGuide/UsingEMR_ViewingMetrics.html) can have either `JobFlowId` dimension or `JobId` dimension. If user knows which specific dimension is useful, it can be specified in this configuration option.
 
 ```yaml
 - module: aws

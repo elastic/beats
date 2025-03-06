@@ -5,7 +5,7 @@ mapped_pages:
 
 # Python in Beats [python-beats]
 
-Python is used for Beats development, it is the language used to implement system tests and some other tools. Python dependencies are managed by the use of virtual environments, supported by [venv](https://docs.python.org/3/library/venv.md).
+Python is used for Beats development, it is the language used to implement system tests and some other tools. Python dependencies are managed by the use of virtual environments, supported by [venv](https://docs.python.org/3/library/venv.html).
 
 Beats development requires Python >= 3.7.
 

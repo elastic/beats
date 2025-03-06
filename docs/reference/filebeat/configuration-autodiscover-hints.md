@@ -304,7 +304,7 @@ You can label Docker containers with useful info to decode logs structured as JS
 
 ## Nomad [_nomad_2]
 
-Nomad autodiscover provider supports hints using the [`meta` stanza](https://www.nomadproject.io/docs/job-specification/meta.md). To enable it just set `hints.enabled`:
+Nomad autodiscover provider supports hints using the [`meta` stanza](https://www.nomadproject.io/docs/job-specification/meta.html). To enable it just set `hints.enabled`:
 
 ```yaml
 filebeat.autodiscover:

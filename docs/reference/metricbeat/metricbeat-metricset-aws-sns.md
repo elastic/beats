@@ -10,7 +10,7 @@ This functionality is in beta and is subject to change. The design and code is l
 ::::
 
 
-The `sns` metricset of aws module allows you to monitor your AWS SNS topic. `sns` metricset fetches a set of values from [Amazon SNS Metrics](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.md#SNS_ViewMetrics). CloudWatch metrics for Amazon SNS topics are automatically collected and pushed to CloudWatch every five minutes.
+The `sns` metricset of aws module allows you to monitor your AWS SNS topic. `sns` metricset fetches a set of values from [Amazon SNS Metrics](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html#SNS_ViewMetrics). CloudWatch metrics for Amazon SNS topics are automatically collected and pushed to CloudWatch every five minutes.
 
 
 ## AWS Permissions [_aws_permissions_13]
@@ -50,7 +50,7 @@ The `aws sns` metricset comes with a predefined dashboard. For example:
 
 ## Metrics [_metrics_6]
 
-Please see more details for each metric in [CloudWatch SNS Metrics](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.md#SNS_ViewMetrics).
+Please see more details for each metric in [CloudWatch SNS Metrics](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html#SNS_ViewMetrics).
 
 |     |     |
 | --- | --- |

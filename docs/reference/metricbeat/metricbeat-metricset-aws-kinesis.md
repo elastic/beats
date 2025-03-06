@@ -13,7 +13,7 @@ This functionality is in beta and is subject to change. The design and code is l
 Amazon Kinesis Data Streams sends data points to CloudWatch for monitoring purpose, such as to track shard usage, monitor incoming bytes and outgoing bytes. These metrics are automatically collected and pushed to CloudWatch every minute. There are two different levels of monitoring metrics:
 
 * **Basic(stream-level)**: Stream-level data is sent automatically every minute at no charge.
-* **Enhanced(shard-level)**: Shard-level data is sent every minute for an additional cost. To get this level of data, you must specifically enable it for the stream using the [EnableEnhancedMonitoring](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_EnableEnhancedMonitoring.md) operation.
+* **Enhanced(shard-level)**: Shard-level data is sent every minute for an additional cost. To get this level of data, you must specifically enable it for the stream using the [EnableEnhancedMonitoring](https://docs.aws.amazon.com/kinesis/latest/APIReference/API_EnableEnhancedMonitoring.html) operation.
 
 
 ## AWS Permissions [_aws_permissions_7]

@@ -120,7 +120,7 @@ It’s important to also add tests for your metricset. There are three different
 * integration tests
 * system tests
 
-We recommend that you use all three when you create a metricset. Unit tests are written in Go and have no dependencies. Integration tests are also written in Go but require the service from which the module collects metrics to also be running. System tests for Metricbeat also require the service to be running in most cases and are written in Python based on our small Python test framework. We use [venv](https://docs.python.org/3/library/venv.md) to deal with Python dependencies. You can simply run the command `make python-env`  and then `. build/python-env/bin/activate` .
+We recommend that you use all three when you create a metricset. Unit tests are written in Go and have no dependencies. Integration tests are also written in Go but require the service from which the module collects metrics to also be running. System tests for Metricbeat also require the service to be running in most cases and are written in Python based on our small Python test framework. We use [venv](https://docs.python.org/3/library/venv.html) to deal with Python dependencies. You can simply run the command `make python-env`  and then `. build/python-env/bin/activate` .
 
 You should use a combination of the three test types to test your metricsets because each method has advantages and disadvantages. To get started with your own tests, it’s best to look at the existing tests. You’ll find the unit and integration tests in the `_test.go` files under existing modules and metricsets. Integration tests usually take the form of `TestFetch` and `TestData`. The system tests are under `tests/systems`.
 

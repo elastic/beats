@@ -53,7 +53,7 @@ This functionality is in beta and is subject to change. The design and code is l
 
 ### `srx` fileset settings [_srx_fileset_settings]
 
-The Juniper-SRX module only supports syslog messages in the format "structured-data + brief" [JunOS Documentation structured-data](https://www.juniper.net/documentation/en_US/junos/topics/reference/configuration-statement/structured-data-edit-system.md)
+The Juniper-SRX module only supports syslog messages in the format "structured-data + brief" [JunOS Documentation structured-data](https://www.juniper.net/documentation/en_US/junos/topics/reference/configuration-statement/structured-data-edit-system.html)
 
 To configure a remote syslog destination, please reference the [SRX Getting Started - Configure System Logging](https://kb.juniper.net/InfoCenter/index?page=content&id=kb16502).
 

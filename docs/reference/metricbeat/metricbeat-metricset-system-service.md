@@ -19,7 +19,7 @@ This metricset is available on:
 
 ## systemd resource accounting and process metrics [_systemd_resource_accounting_and_process_metrics]
 
-If systemd resource accounting is enabled, this metricset will report any resources tracked by systemd. On most distributions, `tasks` and `memory` are the only resources with accounting enabled by default. For more information, [see the systemd manual pages](https://www.freedesktop.org/software/systemd/man/systemd.resource-control.md).
+If systemd resource accounting is enabled, this metricset will report any resources tracked by systemd. On most distributions, `tasks` and `memory` are the only resources with accounting enabled by default. For more information, [see the systemd manual pages](https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html).
 
 
 ## Configuration [_configuration_14]

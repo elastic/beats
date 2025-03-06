@@ -48,7 +48,7 @@ The aws elb metricset comes with a predefined dashboard for classic ELB. For exa
 
 ## Metrics [_metrics_4]
 
-elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-cloudwatch-metrics.md), [application ELB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.md) and [network ELB](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.md).
+elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-cloudwatch-metrics.html), [application ELB](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html) and [network ELB](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-cloudwatch-metrics.html).
 
 
 ### Metrics for Classic ELB [_metrics_for_classic_elb]

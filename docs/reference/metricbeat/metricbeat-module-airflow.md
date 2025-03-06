@@ -10,7 +10,7 @@ This functionality is in beta and is subject to change. The design and code is l
 ::::
 
 
-This module collects metrics from [Airflow metrics](https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/metrics.md). It runs a statsd server where airflow will send metrics to. The default metricset is `statsd`.
+This module collects metrics from [Airflow metrics](https://airflow.apache.org/docs/apache-airflow/stable/logging-monitoring/metrics.html). It runs a statsd server where airflow will send metrics to. The default metricset is `statsd`.
 
 
 ## Compatibility [_compatibility_6]
