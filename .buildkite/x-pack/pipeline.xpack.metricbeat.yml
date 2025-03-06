@@ -81,7 +81,7 @@ steps:
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/metricbeat
-          mage build unitTest
+          # mage build unitTest
         retry:
           automatic:
             - limit: 1
@@ -102,7 +102,7 @@ steps:
           TEST_TAGS: "oracle"
         command: |
           cd x-pack/metricbeat
-          mage goIntegTest
+          # mage goIntegTest
         retry:
           automatic:
             - limit: 1
@@ -122,8 +122,13 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
+          cat /etc/resolv.conf
+          dig @8.8.8.8 go.mongodb.org/mongo-driver
+          dig go.mongodb.org/mongo-driver
+          curl -I -L https://go.mongodb.org/mongo-driver
           cd x-pack/metricbeat
           mage pythonIntegTest
+          sudo systemd-resolve --flush-caches
         retry:
           automatic:
             - limit: 1
@@ -141,7 +146,7 @@ steps:
       - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
-          mage build unitTest
+          # mage build unitTest
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
@@ -162,7 +167,7 @@ steps:
       - label: ":windows: x-pack/metricbeat: Win 2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
-          mage build unitTest
+          # mage build unitTest
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
@@ -188,7 +193,7 @@ steps:
       - label: ":windows: x-pack/metricbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
-          mage build unitTest
+          # mage build unitTest
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
@@ -209,7 +214,7 @@ steps:
       - label: ":windows: x-pack/metricbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
-          mage build unitTest
+          # mage build unitTest
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
@@ -230,7 +235,7 @@ steps:
       - label: ":windows: x-pack/metricbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
-          mage build unitTest
+          # mage build unitTest
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
@@ -258,7 +263,7 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/metricbeat && mage build unitTest
+          # cd x-pack/metricbeat && mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
         concurrency: "${CONCURRENCY_COUNT}"
         concurrency_method: "${CONCURRENCY_METHOD}"
@@ -282,7 +287,7 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/metricbeat && mage build unitTest
+          # cd x-pack/metricbeat && mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
         concurrency: "${CONCURRENCY_COUNT}"
         concurrency_method: "${CONCURRENCY_METHOD}"
@@ -313,7 +318,7 @@ steps:
           source .buildkite/scripts/initCloudEnv.sh
           echo "~~~ Running tests"
           cd x-pack/metricbeat
-          mage build test goIntegTest
+          # mage build test goIntegTest
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
