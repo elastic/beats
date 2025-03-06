@@ -15,12 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memlog
+//go:build requirefips
 
-import "os"
+package cmd
 
-// syncFile implements the fsync operation for Windows. Internally
-// FlushFileBuffers will be used.
-func syncFile(f *os.File) error {
-	return f.Sync() // stdlib already uses FlushFileBuffers, yay
+import (
+	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+)
+
+// genKeystoreCmd returns nil in fips mode as the keystore is disabled.
+func genKeystoreCmd(_ instance.Settings) *cobra.Command {
+	return nil
 }

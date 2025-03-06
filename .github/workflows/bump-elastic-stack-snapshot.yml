@@ -32,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@79983ec58a76fe0c87fc76f5a5c7ef8df0bb36c4 # v2.77.0
+        uses: updatecli/updatecli-action@d2e5d2667ba67a8599e636531baef731f54858bc # v2.78.1
 
       - name: Run Updatecli in Apply mode
         run: updatecli --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/values.d/scm.yml

@@ -15,22 +15,32 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || dragonfly || freebsd || netbsd || openbsd || solaris || aix
+//go:build !requirefips
 
-package memlog
+package cmd
 
 import (
-	"os"
+	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 )
 
-// syncFile implements the fsync operation for most *nix systems.
-// The call is retried if EINTR or EAGAIN is returned.
-func syncFile(f *os.File) error {
-	// best effort.
-	for {
-		err := f.Sync()
-		if err == nil || !isRetryErr(err) {
-			return err
-		}
+// genKeystoreCmd initialize the Keystore command to manage the Keystore
+// with the following subcommands:
+//   - create
+//   - add
+//   - remove
+//   - list
+func genKeystoreCmd(settings instance.Settings) *cobra.Command {
+	keystoreCmd := cobra.Command{
+		Use:   "keystore",
+		Short: "Manage secrets keystore",
 	}
+
+	keystoreCmd.AddCommand(genCreateKeystoreCmd(settings))
+	keystoreCmd.AddCommand(genAddKeystoreCmd(settings))
+	keystoreCmd.AddCommand(genRemoveKeystoreCmd(settings))
+	keystoreCmd.AddCommand(genListKeystoreCmd(settings))
+
+	return &keystoreCmd
 }
