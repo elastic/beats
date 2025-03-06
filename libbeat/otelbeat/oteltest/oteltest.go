@@ -95,13 +95,13 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 	err := r1.Start(ctx, nil)
 	require.NoError(t, err, "Error starting receiver 1")
 	defer func() {
-		require.NoError(t, r1.Shutdown(ctx))
+		require.NoError(t, r1.Shutdown(ctx), "Error shutting down receiver 1")
 	}()
 
 	err = r2.Start(ctx, nil)
 	require.NoError(t, err, "Error starting receiver 2")
 	defer func() {
-		require.NoError(t, r2.Shutdown(ctx))
+		require.NoError(t, r2.Shutdown(ctx), "Error shutting down receiver 2")
 	}()
 
 	params.AssertFunc(t, logs)
