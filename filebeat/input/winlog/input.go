@@ -23,6 +23,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 
@@ -98,8 +99,10 @@ func (in winlogInput) Run(
 	pub cursor.Publisher,
 ) error {
 	api, _ := source.(eventlog.EventLog)
+	ctx.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 	return eventlog.Run(
+		ctx,
 		ctxtool.FromCanceller(ctx.Cancelation),
 		api,
 		initCheckpoint(log, cursor),
