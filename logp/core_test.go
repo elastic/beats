@@ -707,33 +707,65 @@ func TestConfigureWithCore(t *testing.T) {
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.AddSync(&b),
 		zapcore.InfoLevel)
-	err := ConfigureWithCore(Config{}, core)
-	if err != nil {
-		t.Fatalf("Unexpected err: %s", err)
-	}
-	Info("The quick brown %s jumped over the lazy %s.", "fox", "dog")
-	var r map[string]interface{}
 
-	err = json.Unmarshal(b.Bytes(), &r)
-	if err != nil {
-		t.Fatalf("unable to json unmarshal '%s': %s", b.String(), err)
-	}
+	t.Run("test default config", func(t *testing.T) {
+		err := ConfigureWithCore(Config{}, core)
+		if err != nil {
+			t.Fatalf("Unexpected err: %s", err)
+		}
+		Info("The quick brown %s jumped over the lazy %s.", "fox", "dog")
+		var r map[string]interface{}
 
-	val, prs := r["msg"]
-	if !prs {
-		t.Fatalf("expected 'msg' field not present in '%s'", b.String())
-	}
-	if val != testMsg {
-		t.Fatalf("expected msg of '%s', got '%s'", testMsg, val)
-	}
+		err = json.Unmarshal(b.Bytes(), &r)
+		if err != nil {
+			t.Fatalf("unable to json unmarshal '%s': %s", b.String(), err)
+		}
 
-	val, prs = r["level"]
-	if !prs {
-		t.Fatalf("expected 'level' field not present in '%s'", b.String())
-	}
-	if val != "info" {
-		t.Fatalf("expected log.level of 'info', got '%s'", val)
-	}
+		val, prs := r["msg"]
+		if !prs {
+			t.Fatalf("expected 'msg' field not present in '%s'", b.String())
+		}
+		if val != testMsg {
+			t.Fatalf("expected msg of '%s', got '%s'", testMsg, val)
+		}
+		val, prs = r["level"]
+		if !prs {
+			t.Fatalf("expected 'level' field not present in '%s'", b.String())
+		}
+		if val != "info" {
+			t.Fatalf("expected log.level of 'info', got '%s'", val)
+		}
+	})
+
+	b.Reset()
+	t.Run("test `with_fields` config", func(t *testing.T) {
+		config := Config{
+			WithFields: map[string]any{
+				"component": "elastic-agent",
+			},
+		}
+		err := ConfigureWithCore(config, core)
+		if err != nil {
+			t.Fatalf("Unexpected err: %s", err)
+		}
+		Info("The quick brown %s jumped over the lazy %s.", "fox", "dog")
+		var r map[string]interface{}
+
+		err = json.Unmarshal(b.Bytes(), &r)
+		if err != nil {
+			t.Fatalf("unable to json unmarshal '%s': %s", b.String(), err)
+		}
+		// test `with_fields` works correctly
+		expectedMsg := "elastic-agent"
+		val, prs := r["component"]
+		if !prs {
+			t.Fatalf("expected 'component' field not present in '%s'", b.String())
+		}
+		if val != expectedMsg {
+			t.Fatalf("expected msg of '%s', got '%s'", expectedMsg, val)
+		}
+	})
+
 }
 
 func strField(key, val string) zapcore.Field {

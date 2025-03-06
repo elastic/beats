@@ -164,6 +164,15 @@ func ConfigureWithCore(loggerCfg Config, core zapcore.Core) error {
 	)
 
 	level = zap.NewAtomicLevelAt(loggerCfg.Level.ZapLevel())
+
+	if loggerCfg.WithFields != nil {
+		fields := make([]zapcore.Field, 0, len(loggerCfg.WithFields))
+		for key, value := range loggerCfg.WithFields {
+			fields = append(fields, zap.Any(key, value))
+		}
+		core = core.With(fields)
+	}
+
 	sink = wrappedCore(core)
 
 	// Enabled selectors when debug is enabled.
