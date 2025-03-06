@@ -22,6 +22,8 @@ package kafka
 import (
 	"fmt"
 	"strings"
+
+	"github.com/elastic/sarama"
 )
 
 func (c *SaslConfig) Validate() error {
