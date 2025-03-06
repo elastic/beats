@@ -28,10 +28,11 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/model/exemplar"
-	"github.com/prometheus/prometheus/model/labels"
-	"github.com/prometheus/prometheus/model/textparse"
-	"github.com/prometheus/prometheus/model/timestamp"
+
+	"github.com/elastic/prometheus/model/exemplar"
+	"github.com/elastic/prometheus/model/labels"
+	"github.com/elastic/prometheus/model/textparse"
+	"github.com/elastic/prometheus/model/timestamp"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )

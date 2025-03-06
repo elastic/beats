@@ -24,7 +24,8 @@ import (
 	"github.com/gogo/protobuf/proto"
 	"github.com/golang/snappy"
 	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/prompb"
+
+	"github.com/elastic/prometheus/prompb"
 
 	serverhelper "github.com/elastic/beats/v7/metricbeat/helper/server"
 	httpserver "github.com/elastic/beats/v7/metricbeat/helper/server/http"
