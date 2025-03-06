@@ -124,8 +124,7 @@ steps:
         command: |
           echo "--- ULIMITS"
           ulimit -a
-          ulimit -Hn 614400
-          ulimit -a
+          sudo ulimit -n 614400
 
           echo "--- TESTING"
           cd x-pack/metricbeat
@@ -135,7 +134,8 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: "elastic-images-qa"
+          image: "platform-ingest-beats-ubuntu-2204-1741297077"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
