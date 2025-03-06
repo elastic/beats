@@ -122,10 +122,16 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
+          curl https://proxy.golang.org/go.mongodb.org/mongo-driver/@v/list
+          echo "======================================"
           cat /etc/resolv.conf
+          echo "======================================"
           dig @8.8.8.8 go.mongodb.org/mongo-driver
+          echo "======================================"
           dig go.mongodb.org/mongo-driver
+          echo "======================================"
           curl -I -L https://go.mongodb.org/mongo-driver
+          echo "======================================"
           cd x-pack/metricbeat
           mage pythonIntegTest
           sudo systemd-resolve --flush-caches
