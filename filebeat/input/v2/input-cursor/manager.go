@@ -48,8 +48,8 @@ import (
 type InputManager struct {
 	Logger *logp.Logger
 
-	// StateStore gives the InputManager access to the persitent key value store.
-	StateStore StateStore
+	// StateStore gives the InputManager access to the persistent key value store.
+	StateStore statestore.States
 
 	// Type must contain the name of the input type. It is used to create the key name
 	// for all sources the inputs collect from.
@@ -79,12 +79,6 @@ var (
 	errNoSourceConfigured = errors.New("no source has been configured")
 	errNoInputRunner      = errors.New("no input runner available")
 )
-
-// StateStore interface and configurations used to give the Manager access to the persistent store.
-type StateStore interface {
-	Access(typ string) (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
 
 // init initializes the state store
 // This function is called from:

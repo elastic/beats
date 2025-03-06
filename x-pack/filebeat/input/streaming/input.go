@@ -20,6 +20,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/mito/lib"
@@ -42,7 +43,7 @@ const (
 	root      string = "state"
 )
 
-func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Experimental,
@@ -53,7 +54,7 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
-func PluginWebsocketAlias(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func PluginWebsocketAlias(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       "websocket",
 		Stability:  feature.Experimental,
