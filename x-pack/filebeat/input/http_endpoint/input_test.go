@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -430,6 +431,18 @@ func TestServerPool(t *testing.T) {
 			wg.Wait()
 		})
 	}
+}
+
+func TestNewHTTPEndpoint(t *testing.T) {
+	cfg := config{
+		ListenAddress: "0:0:0:0:0:0:0:1",
+		ListenPort:    "9200",
+		ResponseBody:  "{}",
+		Method:        http.MethodPost,
+	}
+	h, err := newHTTPEndpoint(cfg)
+	require.NoError(t, err)
+	require.Equal(t, "[0:0:0:0:0:0:0:1]:9200", h.addr)
 }
 
 func doRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {
