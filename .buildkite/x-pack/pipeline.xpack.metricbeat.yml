@@ -144,8 +144,10 @@ steps:
           echo "======================================"
           export GODEBUG=netdns=go
           echo "======================================"
+          GODEBUG=netdns=go go mod tidy
+          echo "======================================"
           cd x-pack/metricbeat
-          GODEBUG=netdns=go mage pythonIntegTest
+          mage pythonIntegTest
         retry:
           automatic:
             - limit: 1
