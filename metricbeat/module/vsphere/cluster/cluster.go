@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
@@ -75,6 +76,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "cluster", ms.Insecure)
 	return &ClusterMetricSet{ms}, nil
 }
 
