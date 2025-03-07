@@ -195,7 +195,9 @@ class TestCommands(metricbeat.BaseTest):
         open(path, 'a').close()
 
     def write_system_yml(self):
-        with open(self.working_dir + "/modules.d/system.yml", "w") as f:
+        fd = os.open(self.working_dir + "/modules.d/system.yml",
+                     os.O_WRONLY | os.O_CREAT, 0o644)
+        with os.fdopen(fd, "w") as f:
             f.write("""
 - module: system
   period: 10s
@@ -204,7 +206,9 @@ class TestCommands(metricbeat.BaseTest):
     - memory""")
 
     def write_nginx_yml(self):
-        with open(self.working_dir + "/modules.d/nginx.yml", "w") as f:
+        fd = os.open(self.working_dir + "/modules.d/nginx.yml",
+                     os.O_WRONLY | os.O_CREAT, 0o644)
+        with os.fdopen(fd, "w") as f:
             f.write("""
 - module: nginx
   period: 10s
