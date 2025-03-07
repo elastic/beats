@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -180,7 +181,7 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // ConnectWith create a new Client for publishing events to the pipeline.
 // The client behavior on close and ACK handling can be configured by setting
 // the appropriate fields in the passed ClientConfig.
-// If not set otherwise the defaut publish mode is OutputChooses.
+// If not set otherwise the default publish mode is OutputChooses.
 //
 // It is responsibility of the caller to close the client.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
@@ -208,6 +209,13 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
+	reg := cfg.InputMetricsRegistry
+	if reg == nil {
+		// No registry, then create a registry which will not publish any metric,
+		// a 'discard' registry.
+		reg = monitoring.NewRegistry()
+	}
+
 	client := &client{
 		logger:         p.monitors.Logger,
 		clientListener: cfg.ClientListener,
@@ -215,7 +223,15 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
 		observer:       p.observer,
+
+		inputMetricsRegistry: reg,
+		inputMetrics: inputMetrics{
+			inputEventsTotal:     monitoring.NewUint(reg, "events_pipeline_total"),
+			inputEventsFiltered:  monitoring.NewUint(reg, "events_pipeline_filtered_total"),
+			inputEventsPublished: monitoring.NewUint(reg, "events_pipeline_published_total"),
+		},
 	}
+
 	client.isOpen.Store(true)
 
 	ackHandler := cfg.EventListener

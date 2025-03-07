@@ -42,21 +42,64 @@ type Info struct {
 	UserAgent       string    // A string of the user-agent that can be passed to any outputs or network connections
 
 	// Monitoring-related fields
-	Monitoring struct {
-		DefaultUsername string                // The default username to be used to connect to Elasticsearch Monitoring
-		Namespace       *monitoring.Namespace // a monitor namespace that is unique per beat instance
-
-		StateRegistry *monitoring.Registry
-		InfoRegistry  *monitoring.Registry
-	}
+	Monitoring           Monitoring
 	LogConsumer          consumer.Logs // otel log consumer
 	UseDefaultProcessors bool          // Whether to use the default processors
 }
 
-func (i Info) FQDNAwareHostname(useFQDN bool) string {
+type Monitoring struct {
+	DefaultUsername string                // The default username to be used to connect to Elasticsearch Monitoring
+	Namespace       *monitoring.Namespace // a monitor namespace that is unique per beat instance
+
+	StateRegistry *monitoring.Registry
+	InfoRegistry  *monitoring.Registry
+}
+
+func (i *Info) FQDNAwareHostname(useFQDN bool) string {
 	if useFQDN {
 		return i.FQDN
 	}
 
 	return i.Hostname
+}
+
+// Registry returns the monitoring registry from Namespace.
+// If Namespace isn't set, it returns a 'discard' registry, a registry which
+// belongs to no namespace.
+func (m *Monitoring) Registry() *monitoring.Registry {
+	if m.Namespace == nil {
+		return monitoring.NewRegistry()
+	}
+
+	return m.Namespace.GetRegistry()
+}
+
+// SetupRegistries sets up InfoRegistry and StateRegistry.
+// If Namespace is nil, then a global `info` and `state` namespaces are created
+// and InfoRegistry and StateRegistry are theirs respective registries.
+// If Namespace is non-nil, then a `info` and `state` are created on Namespace
+// and InfoRegistry and StateRegistry are those registries respectively.
+func (m *Monitoring) SetupRegistries() {
+	var infoRegistry *monitoring.Registry
+	var stateRegistry *monitoring.Registry
+
+	if m.Namespace != nil {
+		reg := m.Namespace.GetRegistry()
+		infoRegistry = reg.GetRegistry("info")
+		if infoRegistry == nil {
+			infoRegistry = reg.NewRegistry("info")
+		}
+
+		stateRegistry = reg.GetRegistry("state")
+		if stateRegistry == nil {
+			stateRegistry = reg.NewRegistry("state")
+		}
+
+	} else {
+		infoRegistry = monitoring.GetNamespace("info").GetRegistry()
+		stateRegistry = monitoring.GetNamespace("state").GetRegistry()
+	}
+
+	m.InfoRegistry = infoRegistry
+	m.StateRegistry = stateRegistry
 }

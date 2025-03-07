@@ -217,6 +217,12 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add support for marked redaction to x-pack/filebeat/input/internal/private {pull}41212[41212]
 - Add support for collecting Okta role and factor data for users with filebeat entityanalytics input. {pull}41044[41044]
 - Add CEL input program evaluation coverage collection support. {pull}41884[41884]
+- Add a metric registry to the v2.Context. This should be the registry used by
+inputs to publish metrics. This registry is then passed to the pipeline client
+by the input/v2. When receiving a non-nil metrics registry the pipeline client
+will aggregate metrics by input on this registry. It'll collect
+`events_pipeline_total`, `events_pipeline_filtered_total`,
+`events_pipeline_published_total`.{pull}42618[42618] {issue}42761[42761]
 
 ==== Deprecated
 

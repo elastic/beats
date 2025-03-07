@@ -109,12 +109,16 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	// This context isn't directly used, so unregister any metric it might have
+	// registered.
+	ctx.UnregisterMetrics()
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
 		grp.Go(func() (err error) {
 			// refine per worker context
-			inpCtx := ctx
+			inpCtx := ctx.Clone()
+
 			// Preserve IDWithoutName, in case the context was constructed who knows how
 			inpCtx.IDWithoutName = ctx.ID
 			inpCtx.ID = ctx.ID + "::" + source.Name()
@@ -147,7 +151,8 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: newInputACKHandler(ctx.Logger),
+		InputMetricsRegistry: ctx.MetricRegistry(),
+		EventListener:        newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
 		return err
