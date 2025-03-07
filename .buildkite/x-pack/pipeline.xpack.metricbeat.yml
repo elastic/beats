@@ -142,10 +142,11 @@ steps:
           echo "======================================"
           resolvectl status
           echo "======================================"
-          export GODEBUG=netdns=go
+          echo "======================================"
+          go env -w GODEBUG=netdns=go
           echo "======================================"
           cd x-pack/metricbeat
-          mage pythonIntegTest
+          GODEBUG=netdns=go mage pythonIntegTest
         retry:
           automatic:
             - limit: 1
