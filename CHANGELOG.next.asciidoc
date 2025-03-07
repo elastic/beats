@@ -31,6 +31,23 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Redis: Added replication role as a field to submitted slowlogs
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
 
+- Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
+- The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
+- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
+- Add kafka compression support for ZSTD.
+- Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
+- Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
+- Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
+- The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
+- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be using while setting `allow_deprecated_use: true` in their configuration {pull}42295[42295]
+- The fields produced by the Journald input are updated to better match ECS. Renamed fields:
+Dropped fields: `syslog.priority` and `syslog.facility` while keeping their duplicated equivalent:
+`log.syslog.priority`,`log.syslog.facility.code`. Renamed fields: `syslog.identifier` -> `log.syslog.appname`,
+`syslog.pid` -> `log.syslog.procid`. `container.id_truncated` is dropped because the full container ID is
+already present as `container.id` and `container.log.tag` is dropped because it is already present as
+`log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
+otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Heartbeat*
 
