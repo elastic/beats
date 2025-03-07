@@ -15,6 +15,47 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
+- Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
+- Removed deprecated Squid from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Sonicwall from Beats. Use the https://docs.elastic.co/integrations/sonicwall[SonicWall Firewall] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Radware from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Netscout from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Juniper Netscreen from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Impreva from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Cylance from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Bluecoat from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
+- Update Salesforce module to use new Salesforce input. {pull}37509[37509]
+- Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
+- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
+- Enable file ingestion to report detailed status to Elastic Agent {pull}40075[40075]
+- Filebeat, when running with Elastic-Agent, reports status for Filestream input. {pull}40121[40121]
+- Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
+- Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
+- Added support for hyphens in extension keys in `decode_cef` Filebeat processor. {pull}40427[40427]
+- Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
+- Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. Users should carefully update their input configuration. {pull}40061[40061]
+- Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
+- Redis: Added replication role as a field to submitted slowlogs
+- Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
+- Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
+- Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
+- The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
+- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
+- Add kafka compression support for ZSTD.
+- Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
+- Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
+- Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
+- The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
+- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be using while setting `allow_deprecated_use: true` in their configuration {pull}42295[42295]
+- The fields produced by the Journald input are updated to better match ECS. Renamed fields:
+Dropped fields: `syslog.priority` and `syslog.facility` while keeping their duplicated equivalent:
+`log.syslog.priority`,`log.syslog.facility.code`. Renamed fields: `syslog.identifier` -> `log.syslog.appname`,
+`syslog.pid` -> `log.syslog.procid`. `container.id_truncated` is dropped because the full container ID is
+already present as `container.id` and `container.log.tag` is dropped because it is already present as
+`log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
+otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Heartbeat*
 
