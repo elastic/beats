@@ -304,8 +304,7 @@ steps:
       - label: ":ubuntu: x-pack/osquerybeat: Packaging Linux arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+          PLATFORMS: "+all linux/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/osquerybeat
         retry:
