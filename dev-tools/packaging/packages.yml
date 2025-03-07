@@ -49,18 +49,12 @@ shared:
       /usr/share/{{.BeatName}}/kibana:
         source: _meta/kibana.generated
         mode: 0644
-      /usr/share/{{.BeatName}}/bin/{{.BeatName}}-god:
-        source: build/golang-crossbuild/god-{{.GOOS}}-{{.Platform.Arch}}
-        mode: 0755
       /usr/bin/{{.BeatName}}:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/beatname.sh.tmpl'
         mode: 0755
       /lib/systemd/system/{{.BeatServiceName}}.service:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl'
         mode: 0644
-      /etc/init.d/{{.BeatServiceName}}:
-        template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/{{.PackageType}}/init.sh.tmpl'
-        mode: 0755
 
   # MacOS pkg spec for community beats.
   - &macos_beat_pkg_spec
