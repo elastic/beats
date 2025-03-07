@@ -134,7 +134,7 @@ steps:
         agents:
           provider: "gcp"
           imageProject: "elastic-images-qa"
-          image: "platform-ingest-beats-ubuntu-2204-1741300882"
+          image: "platform-ingest-beats-ubuntu-2204-1741285087"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
@@ -143,26 +143,25 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Python Integration Tests (Module)"
 
-
-#      - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
-#        key: "mandatory-python-int-test-aws"
-#        env:
-#          TEST_TAGS: "oracle"
-#        command: |
-#          cd x-pack/metricbeat
-#          mage pythonIntegTest
-#        retry:
-#          automatic:
-#            - limit: 1
-#        agents:
-#          provider: "aws"
-#          imagePrefix: "platform-ingest-beats-ubuntu-2204"
-#        artifact_paths:
-#          - "x-pack/metricbeat/build/*.xml"
-#          - "x-pack/metricbeat/build/*.json"
-#        notify:
-#          - github_commit_status:
-#              context: "x-pack/metricbeat: Python Integration Tests (Module)"
+      - label: ":ubuntu: x-pack/metricbeat: AWS Python Integration Tests (Module)"
+        key: "mandatory-python-int-test-aws"
+        env:
+          TEST_TAGS: "oracle"
+        command: |
+          cd x-pack/metricbeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "aws"
+          imagePrefix: "platform-ingest-beats-ubuntu-2204"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: AWS Python Integration Tests (Module)"
 
 #      - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
 #        command: |
