@@ -142,11 +142,7 @@ steps:
           echo "======================================"
           resolvectl status
           echo "======================================"
-          GODEBUG=netdns=go go get go.mongodb.org/mongo-driver
-          echo "======================================"
-          curl -vvv -I -L https://go.mongodb.org/mongo-driver
-          echo "======================================"
-          curl -I -L https://go.mongodb.org/mongo-driver
+          export GODEBUG=netdns=go
           echo "======================================"
           cd x-pack/metricbeat
           mage pythonIntegTest
