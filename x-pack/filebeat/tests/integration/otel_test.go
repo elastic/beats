@@ -41,7 +41,7 @@ output:
       - localhost:9200
     protocol: http
     username: admin
-    password: testing	
+    password: testing
     index: %s
 queue.mem.flush.timeout: 0s
 processors:
