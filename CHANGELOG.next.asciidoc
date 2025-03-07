@@ -120,6 +120,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 
 *Heartbeat*
 
@@ -169,6 +170,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Sync missing changes in modules pipelines. {pull}42619[42619]
 - Reset EventLog if error EOF is encountered. {pull}42826[42826]
 - Implement backoff on error retrial. {pull}42826[42826]
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
 
 *Elastic Logging Plugin*
@@ -267,6 +269,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
+- Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
 
 *Metricbeat*
 
