@@ -45,6 +45,12 @@ func UseElasticBeatXPackPackaging() {
 	MustUsePackaging("elastic_beat_xpack", packageSpecFile)
 }
 
+// UseElasticBeatXPackFIPSPackaging configures the package target to build Elastic
+// licensed (X-Pack) FIPS compliant packages for agent use.
+func UseElasticBeatXPackFIPSPackaging() {
+	MustUsePackaging("elastic_beat_xpack_fips", packageSpecFile)
+}
+
 // UseElasticBeatXPackReducedPackaging configures the package target to build Elastic
 // licensed (X-Pack) packages for agent use.
 func UseElasticBeatXPackReducedPackaging() {
