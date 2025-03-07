@@ -176,3 +176,31 @@ func TestRateLimit(t *testing.T) {
 		})
 	}
 }
+
+func TestAllocs(t *testing.T) {
+	p, err := new(conf.MustNewConfigFrom(mapstr.M{
+		"limit": "100/s",
+	}))
+	require.NoError(t, err)
+	event := beat.Event{Fields: mapstr.M{"field": 1}}
+
+	allocs := testing.AllocsPerRun(1000, func() {
+		p.Run(&event) //nolint:errcheck // ignore
+	})
+	if allocs > 0 {
+		t.Errorf("allocs = %v; want 0", allocs)
+	}
+}
+
+func BenchmarkRateLimit(b *testing.B) {
+	p, err := new(conf.MustNewConfigFrom(mapstr.M{
+		"limit": "100/s",
+	}))
+	require.NoError(b, err)
+	event := beat.Event{Fields: mapstr.M{"field": 1}}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		p.Run(&event) //nolint:errcheck // ignore
+	}
+}
