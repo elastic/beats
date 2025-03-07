@@ -56,12 +56,28 @@ func (fb *filebeatReceiver) Shutdown(ctx context.Context) error {
 func (fb *filebeatReceiver) startMonitoring() error {
 	if fb.httpConf.Enabled() {
 		var err error
+
 		fb.beat.RegisterMetrics()
-		err = metricreport.SetupMetrics(logp.NewLogger("metrics"), fb.beat.Info.Beat, version.GetDefaultVersion())
+
+		statsReg := fb.beat.Info.Monitoring.StatsRegistry
+
+		// stats.beat
+		processReg := statsReg.GetRegistry("beat")
+		if processReg == nil {
+			processReg = statsReg.NewRegistry("beat")
+		}
+
+		// stats.system
+		systemReg := statsReg.GetRegistry("system")
+		if systemReg == nil {
+			systemReg = statsReg.NewRegistry("system")
+		}
+
+		err = metricreport.SetupMetrics(logp.NewLogger("metrics"), fb.beat.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
 		if err != nil {
 			return err
 		}
-		fb.beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), fb.httpConf, b.Info.Monitoring.Namespace)
+		fb.beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), fb.httpConf, api.RegistryLookupFunc(fb.beat.Info.Monitoring.Namespace))
 		if err != nil {
 			return err
 		}
