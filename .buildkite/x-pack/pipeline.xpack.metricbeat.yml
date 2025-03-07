@@ -125,10 +125,17 @@ steps:
           curl https://proxy.golang.org/go.mongodb.org/mongo-driver/@v/list
           echo "======================================"
           cat /etc/resolv.conf
+           echo "======================================"
+          dig @1.1.1.1 go.mongodb.org/mongo-driver
+          echo "======================================"
           echo "======================================"
           dig @8.8.8.8 go.mongodb.org/mongo-driver
           echo "======================================"
           dig go.mongodb.org/mongo-driver
+          echo "======================================"
+          nslookup go.mongodb.org 1.1.1.1
+          echo "======================================"
+          sudo systemd-resolve --flush-caches
           echo "======================================"
           nslookup go.mongodb.org 8.8.8.8
           echo "======================================"
@@ -138,7 +145,6 @@ steps:
           echo "======================================"
           cd x-pack/metricbeat
           mage pythonIntegTest
-          sudo systemd-resolve --flush-caches
         retry:
           automatic:
             - limit: 1
