@@ -143,6 +143,8 @@ steps:
           echo "======================================"
           curl -vvv -I -L https://go.mongodb.org/mongo-driver
           echo "======================================"
+          curl -I -L https://go.mongodb.org/mongo-driver
+          echo "======================================"
           cd x-pack/metricbeat
           mage pythonIntegTest
         retry:
