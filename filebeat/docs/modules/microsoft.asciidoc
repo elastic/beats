@@ -1,0 +1,236 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/microsoft/_meta/docs.asciidoc
+
+[[filebeat-module-microsoft]]
+[role="xpack"]
+
+:modulename: microsoft
+:has-dashboards: true
+
+== Microsoft module
+
+//temporarily override modulename to create working link
+:modulename: m365_defender
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: microsoft
+
+This is a module for ingesting data from the different Microsoft Products. Currently supports these filesets:
+
+- `defender_atp` fileset: Supports Microsoft Defender for Endpoint (Microsoft Defender ATP)
+- `m365_defender` fileset: Supports Microsoft 365 Defender (Microsoft Threat Protection)
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: defender_atp
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `m365_defender` fileset settings
+
+To configure access for Filebeat to Microsoft 365 Defender you will have to create a new Azure Application registration, this will again return Oauth tokens with access to the Microsoft 365 Defender API
+
+The procedure to create an application is found on the below link:
+
+https://docs.microsoft.com/en-us/microsoft-365/security/mtp/api-create-app-web?view=o365-worldwide#create-an-app[Create a new Azure Application]
+
+When giving the application the API permissions described in the documentation (Incident.Read.All) it will only grant access to read Incidents from 365 Defender and nothing else in the Azure Domain.
+
+After the application has been created, it should contain 3 values that you need to apply to the module configuration.
+
+These values are:
+
+- Client ID
+- Client Secret
+- Tenant ID
+
+Example config:
+
+[source,yaml]
+----
+- module: microsoft
+  m365_defender:
+    enabled: true
+    var.oauth2.client.id: "123abc-879546asd-349587-ad64508"
+    var.oauth2.client.secret: "980453~-Sg99gedf"
+    var.oauth2.token_url: "https://login.microsoftonline.com/INSERT-TENANT-ID/oauth2/v2.0/token"
+    var.oauth2.scopes:
+      - "https://api.security.microsoft.com/.default"
+----
+
+*`var.oauth2.client.id`*::
+
+This is the client ID related to creating a new application on Azure.
+
+*`var.oauth2.client.secret`*::
+
+The secret related to the client ID.
+
+*`var.oauth2.token_url`*::
+
+A predefined URL towards the Oauth2 service for Microsoft. The URL should always be the same with the exception of the Tenant ID that needs to be added to the full URL.
+
+*`var.oauth2.scopes`*::
+
+A list of included scopes, should use .default unless different is specified.
+
+[float]
+==== 365 Defender ECS fields
+
+This is a list of 365 Defender fields that are mapped to ECS.
+
+[options="header"]
+|======================================================================
+| 365 Defender Fields                 | ECS Fields                     |
+| lastUpdateTime                      | @timestamp                     |
+| severity                            | event.severity                 |
+| createdTime                         | event.created                  |
+| alerts.category                     | threat.technique.name          |
+| alerts.description                  | rule.description               |
+| alerts.serviceSource                | event.provider                 |
+| alerts.alertId                      | event.id                       |
+| alerts.firstActivity                | event.start                    |
+| alerts.lastActivity                 | event.end                      |
+| alerts.title                        | message                        |
+| entities.processId                  | process.pid                    |
+| entities.processCommandLine         | process.command_line           |
+| entities.processCreationTime        | process.start                  |
+| entities.parentProcessId            | process.parent.pid             |
+| entities.parentProcessCreationTime  | process.parent.start           |
+| entities.sha1                       | file.hash.sha1                 |
+| entities.sha256                     | file.hash.sha256               |
+| entities.url                        | url.full                       |
+| entities.filePath                   | file.path                      |
+| entities.fileName                   | file.name                      |
+| entities.userPrincipalName          | host.user.name                 |
+| entities.domainName                 | host.user.domain               |
+| entities.aadUserId                  | host.user.id                   |
+|======================================================================
+
+[float]
+==== `defender_atp` fileset settings
+
+To allow the filebeat module to ingest data from the Microsoft Defender API, you would need to create a new application on your Azure domain.
+
+The procedure to create an application is found on the below link:
+
+https://docs.microsoft.com/en-us/windows/security/threat-protection/microsoft-defender-atp/exposed-apis-create-app-webapp[Create a new Azure Application]
+
+When giving the application the API permissions described in the documentation (Windows Defender ATP Alert.Read.All) it will only grant access to read alerts from ATP and nothing else in the Azure Domain.
+
+After the application has been created, it should contain 3 values that you need to apply to the module configuration.
+
+These values are:
+
+- Client ID
+- Client Secret
+- Tenant ID
+
+Example config:
+
+[source,yaml]
+----
+- module: microsoft
+  defender_atp:
+    enabled: true
+    var.oauth2.client.id: "123abc-879546asd-349587-ad64508"
+    var.oauth2.client.secret: "980453~-Sg99gedf"
+    var.oauth2.token_url: "https://login.microsoftonline.com/INSERT-TENANT-ID/oauth2/token"
+----
+
+*`var.oauth2.client.id`*::
+
+This is the client ID related to creating a new application on Azure.
+
+*`var.oauth2.client.secret`*::
+
+The secret related to the client ID.
+
+*`var.oauth2.token_url`*::
+
+A predefined URL towards the Oauth2 service for Microsoft. The URL should always be the same with the exception of the Tenant ID that needs to be added to the full URL.
+
+[float]
+==== Defender ATP ECS fields
+
+This is a list of Defender ATP fields that are mapped to ECS.
+
+[options="header"]
+|======================================================================
+| Defender ATP Fields                 | ECS Fields                     |
+| alertCreationTime                   | @timestamp                     |
+| aadTenantId                         | cloud.account.id               |
+| category                            | threat.technique.name          |
+| computerDnsName                     | host.hostname                  |
+| description                         | rule.description               |
+| detectionSource                     | observer.name                  |
+| evidence.fileName                   | file.name                      |
+| evidence.filePath                   | file.path                      |
+| evidence.processId                  | process.pid                    |
+| evidence.processCommandLine         | process.command_line           |
+| evidence.processCreationTime        | process.start                  |
+| evidence.parentProcessId            | process.parent.pid             |
+| evidence.parentProcessCreationTime  | process.parent.start           |
+| evidence.sha1                       | file.hash.sha1                 |
+| evidence.sha256                     | file.hash.sha256               |
+| evidence.url                        | url.full                       |
+| firstEventTime                      | event.start                    |
+| id                                  | event.id                       |
+| lastEventTime                       | event.end                      |
+| machineId                           | cloud.instance.id              |
+| relatedUser.userName                | host.user.name                 |
+| relatedUser.domainName              | host.user.domain               |
+| title                               | message                        |
+| severity                            | event.severity                 |
+|======================================================================
+
+:has-dashboards!:
+
+[float]
+=== Dashboards
+
+This module comes with a sample dashboard for Defender ATP.
+
+[role="screenshot"]
+image::./images/filebeat-defender-atp-overview.png[]
+
+The best way to view Defender ATP events and alert data is in the SIEM.
+
+[role="screenshot"]
+image::./images/siem-alerts-cs.jpg[]
+
+[float]
+For alerts, go to Detections -> External alerts.
+
+[role="screenshot"]
+image::./images/siem-events-cs.jpg[]
+
+[float]
+And for all other Defender ATP event types, go to Host -> Events.
+
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-microsoft,exported fields>> section.
+
+:edit_url!:

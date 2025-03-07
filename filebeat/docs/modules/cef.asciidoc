@@ -1,0 +1,171 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/cef/_meta/docs.asciidoc
+
+[[filebeat-module-cef]]
+[role="xpack"]
+
+:modulename: cef
+:has-dashboards: false
+
+== CEF module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is a module for receiving Common Event Format (CEF) data over Syslog. When
+messages are received over the syslog protocol the syslog input will parse the
+header and set the timestamp value. Then the
+<<processor-decode-cef, `decode_cef`>> processor is applied to parse the CEF
+encoded data. The decoded data is written into a `cef` object field. Lastly any
+Elastic Common Schema (ECS) fields that can be populated with the CEF data are
+populated.
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to `9003`
+
+NOTE: Ports below 1024 require Filebeat to run as root.
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cef, forwarded]`.
+
+*`var.timezone`*::
+
+IANA time zone name (e.g. `America/New_York`) or fixed time offset (e.g.
+`+0200`) to use when parsing times from the CEF message that do not contain a
+time zone. `Local` may be specified to use the machine's local time zone.
+Defaults to `UTC`.
+
+[float]
+==== Forcepoint NGFW Security Management Center
+
+This module will process CEF data from Forcepoint NGFW Security
+Management Center (SMC).  In the SMC configure the logs to be
+forwarded to the address set in `var.syslog_host` in format CEF and
+service UDP on `var.syslog_port`.  Instructions can be found in
+https://support.forcepoint.com/KBArticle?id=000015002[KB 15002] for
+configuring the SMC.  Testing was done with CEF logs from SMC version
+6.6.1 and custom string mappings were taken from 'CEF Connector
+Configuration Guide' dated December 5, 2011.
+
+[float]
+==== Check Point devices
+
+This module will parse CEF data form Check Point devices as documented in
+https://community.checkpoint.com/t5/Logging-and-Reporting/Log-Exporter-CEF-Field-Mappings/td-p/41060[Log Exporter CEF Field Mappings.]
+
+Check Point CEF extensions are mapped as follows:
+[options="header"]
+|=======================================================================================================================
+| CEF Extension              | CEF Label value             | ECS Fields               | Non-ECS Field                  |
+| cp_app_risk                | -                           | event.risk_score         | checkpoint.app_risk            |
+| cp_severity                | -                           | event.severity           | checkpoint.severity            |
+| baseEventCount             | -                           | -                        | checkpoint.event_count         |
+| deviceExternalId           | -                           | observer.type            | -                              |
+| deviceFacility             | -                           | observer.type            | -                              |
+| deviceInboundInterface     | -                           | observer.ingress.interface.name | -                       |
+| deviceOutboundInterface    | -                           | observer.egress.interface.name | -                        |
+| externalId                 | -                           | -                        | checkpoint.uuid                |
+| fileHash                   | -                           | file.hash.{md5,sha1}     | -                              |
+| reason                     | -                           | -                        | checkpoint.termination_reason  |
+| requestCookies             | -                           | -                        | checkpoint.cookie              |
+| sourceNtDomain             | -                           | dns.question.name        | -                              |
+| Signature                  | -                           | vulnerability.id         | -                              |
+| Recipient                  | -                           | destination.user.email   | -                              |
+| Sender                     | -                           | source.user.email        | -                              |
+| deviceCustomFloatingPoint1 | update version              | observer.version         | -                              |
+| deviceCustomIPv6Address2   | source ipv6 address         | source.ip                | -                              |
+| deviceCustomIPv6Address3   | destination ipv6 address    | destination.ip           | -                              |
+.3+| deviceCustomNumber1     | elapsed time in seconds     | event.duration           | -                              |
+                             | email recipients number     | -                        | checkpoint.email_recipients_num |
+                             | payload                     | network.bytes            | -                              |
+.2+| deviceCustomNumber2     | icmp type                   | -                        | checkpoint.icmp_type           |
+                             | duration in seconds         | event.duration           | -                              |
+| deviceCustomNumber3        | icmp code                   | -                        | checkpoint.icmp_code           |
+.6+| deviceCustomString1     | connectivity state          | -                        | checkpoint.connectivity_state  |
+                             | application rule name       | rule.name                | -                              |
+                             | threat prevention rule name | rule.name                | -                              |
+                             | voip log type               | -                        | checkpoint.voip_log_type       |
+                             | dlp rule name               | rule.name                | -                              |
+                             | email id                    | -                        | checkpoint.email_id            |
+.8+| deviceCustomString2     | category                    | -                        | checkpoint.category            |
+                             | email subject               | -                        | checkpoint.email_subject       |
+                             | sensor mode                 | -                        | checkpoint.sensor_mode         |
+                             | protection id               | -                        | checkpoint.protection_id       |
+                             | scan invoke type            | -                        | checkpoint.integrity_av_invoke_type |
+                             | update status               | -                        | checkpoint.update_status       |
+                             | peer gateway                | -                        | checkpoint.peer_gateway        |
+                             | categories                  | rule.category            | -                              |
+.4+| deviceCustomString6     | application name            | network.application      | -                              |
+                             | virus name                  | -                        | checkpoint.virus_name          |
+                             | malware name                | -                        | checkpoint.spyware_name        |
+                             | malware family              | -                        | checkpoint.malware_family      |
+.5+| deviceCustomString3     | user group                  | group.name               | -                              |
+                             | incident extension          | -                        | checkpoint.incident_extension  |
+                             | protection type             | -                        | checkpoint.protection_type     |
+                             | email spool id              | -                        | checkpoint.email_spool_id      |
+                             | identity type               | -                        | checkpoint.identity_type       |
+.9+| deviceCustomString4     | malware status              | -                        | checkpoint.spyware_status      |
+                             | threat prevention rule id   | rule.id                  | -                              |
+                             | scan result                 | -                        | checkpoint.scan_result         |
+                             | tcp flags                   | -                        | checkpoint.tcp_flags           |
+                             | destination os              | os.name                  | -                              |
+                             | protection name             | -                        | checkpoint.protection_name     |
+                             | email control               | -                        | checkpoint.email_control       |
+                             | frequency                   | -                        | checkpoint.frequency           |
+                             | user response               | -                        | checkpoint.user_status         |
+.4+| deviceCustomString5     | matched category            | rule.category            | -                              |
+                             | vlan id                     | network.vlan.id          | -                              |
+                             | authentication method       | -                        | checkpoint.auth_method         |
+                             | email session id            | -                        | checkpoint.email_session_id    |
+| deviceCustomDate2          | subscription expiration     | -                        | checkpoint.subs_exp            |
+| deviceFlexNumber1          | confidence                  | -                        | checkpoint.confidence_level    |
+.2+| deviceFlexNumber2       | performance impact          | -                        | checkpoint.performance_impact  |
+                             | destination phone number    | -                        | checkpoint.dst_phone_number    |
+| flexString1                | application signature id    | -                        | checkpoint.app_sig_id          |
+.2+| flexString2             | malware action              | rule.description         | -                              |
+                             | attack information          | event.action             | -                              |
+| rule_uid                   | -                           | rule.uuid                | -                              |
+| ifname                     | -                           | observer.ingress.interface.name | -                       |
+| inzone                     | -                           | observer.ingress.zone    | -                              |
+| outzone                    | -                           | observer.egress.zone     | -                              |
+| product                    | -                           | observer.product         | -                              |
+|=======================================================================================================================
+
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-cef,exported fields>> section.
+
+:edit_url!:

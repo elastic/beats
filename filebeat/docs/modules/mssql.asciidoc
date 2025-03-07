@@ -1,0 +1,68 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/mssql/_meta/docs.asciidoc
+
+[[filebeat-module-mssql]]
+:modulename: mssql
+:has-dashboards: false
+
+== MSSQL module
+
+The +{modulename}+ module parses error logs created by MSSQL.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+//[float]
+//=== Compatibility
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for MSSQL logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: mssql
+  log:
+    enabled: true
+    var.paths: ['C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*']
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "mssql.log.var.paths=['C:\Program Files\Microsoft SQL Server\MSSQL.150\MSSQL\LOG\ERRORLOG*']"
+-----
+
+//set the fileset name used in the included example
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-mssql,exported fields>> section.
+
+:edit_url!:

@@ -1,0 +1,151 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/juniper/_meta/docs.asciidoc
+
+[[filebeat-module-juniper]]
+[role="xpack"]
+
+:modulename: juniper
+:has-dashboards: false
+
+== Juniper module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is a module for ingesting data from the different Juniper Products. Currently supports these filesets:
+
+- `srx` fileset: Supports Juniper SRX logs
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+include::../include/config-option-intro.asciidoc[]
+
+:fileset_ex: srx
+beta[]
+
+[float]
+==== `srx` fileset settings
+
+The Juniper-SRX module only supports syslog messages in the format "structured-data + brief" https://www.juniper.net/documentation/en_US/junos/topics/reference/configuration-statement/structured-data-edit-system.html[JunOS Documentation structured-data]
+
+To configure a remote syslog destination, please reference the https://kb.juniper.net/InfoCenter/index?page=content&id=kb16502[SRX Getting Started - Configure System Logging].
+
+The following processes and tags are supported:
+
+[options="header"]
+|==============================================================
+| JunOS processes | JunOS tags                                |
+| RT_FLOW         | RT_FLOW_SESSION_CREATE                    |
+|                 | RT_FLOW_SESSION_CLOSE                     |
+|                 | RT_FLOW_SESSION_DENY                      |
+|                 | APPTRACK_SESSION_CREATE                   |
+|                 | APPTRACK_SESSION_CLOSE                    |
+|                 | APPTRACK_SESSION_VOL_UPDATE               |
+| RT_IDS          | RT_SCREEN_TCP                             |
+|                 | RT_SCREEN_UDP                             |
+|                 | RT_SCREEN_ICMP                            |
+|                 | RT_SCREEN_IP                              |
+|                 | RT_SCREEN_TCP_DST_IP                      |
+|                 | RT_SCREEN_TCP_SRC_IP                      |
+| RT_UTM          | WEBFILTER_URL_PERMITTED                   |
+|                 | WEBFILTER_URL_BLOCKED                     |
+|                 | AV_VIRUS_DETECTED_MT                      |
+|                 | CONTENT_FILTERING_BLOCKED_MT              |
+|                 | ANTISPAM_SPAM_DETECTED_MT                 |
+| RT_IDP          | IDP_ATTACK_LOG_EVENT                      |
+|                 | IDP_APPDDOS_APP_STATE_EVENT               |
+| RT_AAMW         | SRX_AAMW_ACTION_LOG                       |
+|                 | AAMW_MALWARE_EVENT_LOG                    |
+|                 | AAMW_HOST_INFECTED_EVENT_LOG              |
+|                 | AAMW_ACTION_LOG                           |
+| RT_SECINTEL     | SECINTEL_ACTION_LOG                       |
+|==============================================================
+
+The syslog format choosen should be `Default`.
+
+[float]
+=== Compatibility
+
+This module has been tested against JunOS version 19.x and 20.x.
+Versions above this are expected to work but have not been tested.
+
+[source,yaml]
+----
+- module: juniper
+  junos:
+    enabled: true
+    var.input: udp
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9006
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.input`*::
+
+The input to use, can be either the value `tcp`, `udp` or `file`.
+
+*`var.syslog_host`*::
+
+The interface to listen to all syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The port to listen for syslog traffic. Defaults to 9006.
+
+
+[float]
+==== Juniper SRX ECS fields
+
+This is a list of JunOS fields that are mapped to ECS.
+
+[options="header"]
+|==============================================================
+| Juniper SRX Fields         | ECS Fields                     |
+| application-risk           | event.risk_score               |
+| bytes-from-client          | source.bytes                   |
+| bytes-from-server          | destination.bytes              |
+| destination-interface-name | observer.egress.interface.name |
+| destination-zone-name      | observer.egress.zone           |
+| destination-address        | destination.ip                 |
+| destination-port           | destination.port               |
+| dst_domainname             | url.domain                     |
+| elapsed-time               | event.duration                 |
+| filename                   | file.name                      |
+| nat-destination-address    | destination.nat.ip             |
+| nat-destination-port       | destination.nat.port           |
+| nat-source-address         | source.nat.ip                  |
+| nat-source-port            | source.nat.port                |
+| message                    | message                        |
+| obj                        | url.path                       |
+| packets-from-client        | source.packets                 |
+| packets-from-server        | destination.packets            |
+| policy-name                | rule.name                      |
+| protocol                   | network.transport              |
+| source-address             | source.ip                      |
+| source-interface-name      | observer.ingress.interface.name|
+| source-port                | source.port                    |
+| source-zone-name           | observer.ingress.zone          |
+| url                        | url.domain                     |
+|==============================================================
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-juniper,exported fields>> section.
+
+:edit_url!:

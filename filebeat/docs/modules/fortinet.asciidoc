@@ -1,0 +1,187 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/fortinet/_meta/docs.asciidoc
+
+[[filebeat-module-fortinet]]
+[role="xpack"]
+
+:modulename: fortinet
+:has-dashboards: false
+
+== Fortinet module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is a module for Fortinet logs sent in the syslog format. It supports the
+following devices:
+
+- `firewall` fileset: Supports FortiOS Firewall logs.
+
+To configure a remote syslog destination, please reference the https://docs.fortinet.com/document/fortigate/6.0.0/cli-reference/260508/log-syslogd-syslogd2-syslogd3-syslogd4-setting[Fortigate/FortiOS Documentation].
+
+The syslog format choosen should be `Default`.
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+This module has been tested against FortiOS version 6.0.x and 6.2.x.
+Versions above this are expected to work but have not been tested.
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: firewall
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `firewall` fileset settings
+
+[source,yaml]
+----
+- module: fortinet
+  firewall:
+    enabled: true
+    var.input: udp
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9004
+----
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+*`var.input`*::
+
+The input to use, can be either the value `tcp`, `udp` or `file`.
+
+*`var.syslog_host`*::
+
+The interface to listen to all syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The port to listen for syslog traffic. Defaults to 9004.
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[fortinet-firewall, forwarded]`.
+
+:fileset_ex!:
+
+[float]
+==== Fortinet ECS fields
+
+This is a list of FortiOS fields that are mapped to ECS.
+
+[options="header"]
+|==============================================================
+| Fortinet Fields            | ECS Fields                     |
+| action                     | event.action                   |
+| agent                      | user_agent.original            |
+| app                        | network.application            |
+| appcat                     | rule.category                  |
+| applist                    | rule.ruleset                   |
+| catdesc                    | rule.category                  |
+| ccertissuer                | tls.client_issuer              |
+| collectedemail             | source.user.email              |
+| comment                    | rule.description               |
+| daddr                      | destination.address            |
+| devid                      | observer.serial_number         |
+| dir                        | network.direction              |
+| direction                  | network.direction              |
+| dst_host                   | destination.address            |
+| dstcollectedemail          | destination.user.email         |
+| dst_int                    | observer.egress.interface.name |
+| dstintf                    | observer.egress.interface.name |
+| dstip                      | destination.ip                 |
+| dstmac                     | destination.mac                |
+| dstname                    | destination.address            |
+| dst_port                   | destination.port               |
+| dstport                    | destination.port               |
+| dstunauthuser              | destination.user.name          |
+| dtype                      | vulnerability.category         |
+| duration                   | event.duration                 |
+| errorcode                  | error.code                     |
+| event_id                   | event.id                       |
+| eventid                    | event.id                       |
+| eventtime                  | event.start                    |
+| eventtype                  | event.action                   |
+| file                       | file.name                      |
+| filename                   | file.name                      |
+| filesize                   | file.size                      |
+| filetype                   | file.extension                 |
+| filehash                   | file.hash.crc32                |
+| from                       | source.user.email              |
+| group                      | source.user.group              |
+| hostname                   | url.domain                     |
+| infectedfilename           | file.name                      |
+| infectedfilesize           | file.size                      |
+| infectedfiletype           | file.extension                 |
+| ipaddr                     | dns.resolved_ip                |
+| level                      | log.level                      |
+| locip                      | source.ip                      |
+| locport                    | source.port                    |
+| logdesc                    | rule.description               |
+| logid                      | event.code                     |
+| matchfilename              | file.name                      |
+| matchfiletype              | file.extension                 |
+| msg                        | message                        |
+| error_num                  | error.code                     |
+| policyid                   | rule.id                        |
+| policy_id                  | rule.id                        |
+| policyname                 | rule.name                      |
+| policytype                 | rule.ruleset                   |
+| poluuid                    | rule.uuid                      |
+| profile                    | rule.ruleset                   |
+| proto                      | network.iana_number            |
+| qclass                     | dns.question.class             |
+| qname                      | dns.question.name              |
+| qtype                      | dns.question.type              |
+| rcvdbyte                   | source.bytes                   |
+| rcvdpkt                    | source.packets                 |
+| recipient                  | destination.user.email         |
+| ref                        | event.reference                |
+| remip                      | destination.ip                 |
+| remport                    | destination.port               |
+| saddr                      | source.address                 |
+| scertcname                 | tls.client.server_name         |
+| scertissuer                | tls.server.issuer              |
+| sender                     | source.user.email              |
+| sentbyte                   | source.bytes                   |
+| sentpkt                    | source.packets                 |
+| service                    | network.protocol               |
+| sess_duration              | event.duration                 |
+| srcdomain                  | source.domain                  |
+| srcintf                    | observer.ingress.interface.name|
+| srcip                      | source.ip                      |
+| source_mac                 | source.mac                     |
+| srcmac                     | source.mac                     |
+| srcport                    | source.port                    |
+| tranip                     | destination.nat.ip             |
+| tranport                   | destination.nat.port           |
+| transip                    | source.nat.ip                  |
+| transport                  | source.nat.port                |
+| tz                         | event.timezone                 |
+| unauthuser                 | source.user.name               |
+| url                        | url.path                       |
+| user                       | source.user.name               |
+| xid                        | dns.id                         |
+|==============================================================
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-fortinet,exported fields>> section.
+
+:edit_url!:

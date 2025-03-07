@@ -1,0 +1,178 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/gcp/_meta/docs.asciidoc
+
+[[filebeat-module-gcp]]
+[role="xpack"]
+
+:modulename: gcp
+:has-dashboards: false
+
+== Google Cloud module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is a module for Google Cloud logs. It supports reading audit, VPC flow,
+and firewall logs that have been exported from Stackdriver to a
+Google Pub/Sub topic sink.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: audit
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `audit` fileset settings
+
+[role="screenshot"]
+image::./images/filebeat-gcp-audit.png[]
+
+Example config:
+
+[source,yaml]
+----
+- module: gcp
+  audit:
+    enabled: true
+    var.project_id: my-gcp-project-id
+    var.topic: gcp-vpc-audit
+    var.subscription_name: filebeat-gcp-audit-sub
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+    var.keep_original_message: false
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.project_id`*::
+
+Google Cloud project ID.
+
+*`var.topic`*::
+
+Google Cloud Pub/Sub topic name.
+
+*`var.subscription_name`*::
+
+Google Cloud Pub/Sub topic subscription name. If the subscription does not
+exist it will be created.
+
+*`var.credentials_file`*::
+
+Path to a JSON file containing the credentials and key used to subscribe.
+
+*`var.keep_original_message`*::
+
+Flag to control whether the original message is stored in the `log.original`
+field. Defaults to `false`, meaning the original message is not saved.
+
+:fileset_ex!:
+
+:fileset_ex: vpcflow
+
+[float]
+==== `vpcflow` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: gcp
+  vpcflow:
+    enabled: true
+    var.project_id: my-gcp-project-id
+    var.topic: gcp-vpc-flowlogs
+    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+    var.keep_original_message: false
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.project_id`*::
+
+Google Cloud project ID.
+
+*`var.topic`*::
+
+Google Cloud Pub/Sub topic name.
+
+*`var.subscription_name`*::
+
+Google Cloud Pub/Sub topic subscription name. If the subscription does not
+exist it will be created.
+
+*`var.credentials_file`*::
+
+Path to a JSON file containing the credentials and key used to subscribe.
+
+*`var.keep_original_message`*::
+
+Flag to control whether the original message is stored in the `log.original`
+field. Defaults to `false`, meaning the original message is not saved.
+
+:fileset_ex!:
+
+:fileset_ex: firewall
+
+[float]
+==== `firewall` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: gcp
+  firewall:
+    enabled: true
+    var.project_id: my-gcp-project-id
+    var.topic: gcp-vpc-firewall
+    var.subscription_name: filebeat-gcp-vpc-firewall-sub
+    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
+    var.keep_original_message: false
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.project_id`*::
+
+Google Cloud project ID.
+
+*`var.topic`*::
+
+Google Cloud Pub/Sub topic name.
+
+*`var.subscription_name`*::
+
+Google Cloud Pub/Sub topic subscription name. If the subscription does not
+exist it will be created.
+
+*`var.credentials_file`*::
+
+Path to a JSON file containing the credentials and key used to subscribe.
+
+*`var.keep_original_message`*::
+
+Flag to control whether the original message is stored in the `log.original`
+field. Defaults to `false`, meaning the original message is not saved.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-gcp,exported fields>> section.
+
+:edit_url!:

@@ -1,0 +1,68 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/pensando/_meta/docs.asciidoc
+
+[[filebeat-module-pensando]]
+:modulename: pensando
+:has-dashboards: true
+
+== pensando module
+
+The +{modulename}+ module parses distributed firewall logs created by the
+http://pensando.io/[Pensando] distributed services card (DSC).
+
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Pensando module has been tested with 1.12.0-E-54 and later.
+
+include::../include/configuring-intro.asciidoc[]
+The following example shows how to set parameters in the +modules.d/{modulename}.yml+
+file to listen for firewall logs sent from the Pensando DSC(s) on port 5514 (default is 9001):
+
+["source","yaml",subs="attributes"]
+-----
+- module: pensando
+  access:
+    enabled: true
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: [9001]
+-----
+:fileset_ex: dfw
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `dfw` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+[role="screenshot"]
+image::./images/filebeat-pensando-dfw.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-pensando,exported fields>> section.
+
+:edit_url!:

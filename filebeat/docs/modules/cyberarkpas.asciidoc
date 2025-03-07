@@ -1,0 +1,190 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/cyberarkpas/_meta/docs.asciidoc
+
+[[filebeat-module-cyberarkpas]]
+[role="xpack"]
+
+:modulename: cyberarkpas
+:has-dashboards: false
+
+== Cyberark PAS module
+
+beta[]
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is a module for receiving CyberArk Privileged Account Security (PAS) logs over Syslog or a file.
+
+The {plugins}/ingest-geoip.html[ingest-geoip] Elasticsearch plugin is required to run this module.
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: audit
+
+[float]
+==== `audit` fileset settings
+
+The `audit` fileset receives Vault Audit logs for User and Safe activities over the syslog protocol.
+
+[float]
+===== Vault configuration
+
+Follow the steps under https://docs.cyberark.com/Product-Doc/OnlineHelp/PAS/Latest/en/Content/PASIMP/DV-Integrating-with-SIEM-Applications.htm[Security Information and Event Management (SIEM) Applications]
+documentation to setup the integration:
+
+- Copy the https://raw.githubusercontent.com/elastic/beats/{branch}/x-pack/filebeat/module/cyberarkpas/_meta/assets/elastic-json-v1.0.xsl[elastic-json-v1.0.xsl] XSL Translator file to
+the `Server\Syslog` folder.
+
+- Sample syslog configuration for `DBPARM.ini`:
+
+[source,ini]
+----
+[SYSLOG]
+UseLegacySyslogFormat=No
+SyslogTranslatorFile=Syslog\elastic-json-v1.0.xsl
+SyslogServerIP=<INSERT FILEBEAT IP HERE>
+SyslogServerPort=<INSERT FILEBEAT PORT HERE>
+SyslogServerProtocol=TCP
+----
+
+For proper timestamping of events, it's recommended to use the newer RFC5424 Syslog format
+(`UseLegacySyslogFormat=No`). To avoid event loss, use `TCP` or `TLS` protocols instead of `UDP`.
+
+[float]
+===== Filebeat configuration
+
+Edit the `cyberarkpas.yml` configuration. The following sample configuration will accept `TCP`
+protocol connections from all interfaces:
+
+[source,yaml]
+----
+- module: cyberarkpas
+  audit:
+    enabled: true
+
+    # Set which input to use between tcp (default), udp, or file.
+    #
+    var.input: tcp
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9301
+
+    # With tcp input, set the optional tls configuration:
+    #var.ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
+
+    # Uncoment to keep the original syslog event under event.original.
+    # var.preserve_original_event: true
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+----
+
+For encrypted communications, follow the
+https://docs.cyberark.com/Product-Doc/OnlineHelp/PAS/Latest/en/Content/PASIMP/DV-Integrating-with-SIEM-Applications.htm#ConfigureSIEMintegration[CyberArk documentation]
+to configure encrypted protocol in the Vault server and use `tcp` input with `var.ssl` settings in Filebeat:
+
+[source,yaml]
+----
+- module: cyberarkpas
+  audit:
+    enabled: true
+
+    # Set which input to use between tcp (default), udp, or file.
+    #
+    var.input: tcp
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9301
+
+    # With tcp input, set the optional tls configuration:
+    var.ssl:
+      enabled: true
+      certificate: /path/to/cert.pem
+      key: /path/to/privatekey.pem
+      key_passphrase: 'password for my key'
+
+    # Uncoment to keep the original syslog event under event.original.
+    # var.preserve_original_event: true
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+----
+
+[float]
+===== Configuration options
+
+include::../include/config-option-intro.asciidoc[]
+
+*`var.input`*::
+
+The input to use. One of `tcp` (default), `udp` or `file`.
+
+
+*`var.syslog_host`*::
+
+The address to listen to UDP or TCP based syslog traffic. Defaults to `localhost`.
+Set to `0.0.0.0` to bind to all available interfaces.
+
+
+*`var.syslog_port`*::
+
+The port to listen for syslog traffic. Defaults to `9301`.
+
+NOTE: Ports below 1024 require Filebeat to run as root.
+
+
+*`var.ssl`*::
+
+Configuration options for SSL parameters to use when acting as a server for `TLS` protocol.
+See https://www.elastic.co/guide/en/beats/filebeat/current/configuration-ssl.html#ssl-server-config[SSL server configuration options.]
+for a description of the available sub-options.
+
+
+*`var.preserve_original_event`*::
+
+Set to `true` to store the original syslog message under the `event.original` field.
+Defaults to `false`.
+
+
+*`var.paths`*::
+
+An array of glob-based paths that specify where to look for the log files. All
+patterns supported by https://golang.org/pkg/path/filepath/#Glob[Go Glob]
+are also supported here. For example, you can use wildcards to fetch all files
+from a predefined level of subdirectories: `/path/to/log/*/*.log`. This
+fetches all `.log` files from the subfolders of `/path/to/log`. It does not
+fetch log files from the `/path/to/log` folder itself.
+
+This setting is only applicable when `file` input is configured.
+
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard:
+
+[role="screenshot"]
+image::./images/filebeat-cyberarkpas-overview.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-cyberarkpas,exported fields>> section.
+
+:edit_url!:

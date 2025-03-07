@@ -1,0 +1,116 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/nginx/_meta/docs.asciidoc
+
+[[filebeat-module-nginx]]
+:modulename: nginx
+:has-dashboards: true
+
+
+== Nginx module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+The +{modulename}+ module parses access and error logs created by the
+http://nginx.org/[Nginx] HTTP server.
+
+`ingress_controller` fileset parses access logs created by https://github.com/kubernetes/ingress-nginx[ingress-nginx] controller.
+Log patterns could be found on the controllers'
+https://github.com/kubernetes/ingress-nginx/blob/nginx-0.28.0/docs/user-guide/nginx-configuration/log-format.md[docs].
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Nginx module was tested with logs from version 1.10.
+
+On Windows, the module was tested with Nginx installed from the Chocolatey
+repository.
+
+`ingress_controller` fileset was tested with version v0.28.0 and v0.34.1 of `nginx-ingress-controller`.
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for access logs and error logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: nginx
+  access:
+    enabled: true
+    var.paths: ["/path/to/log/nginx/access.log*"]
+  error:
+    enabled: true
+    var.paths: ["/path/to/log/nginx/error.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "nginx.access.var.paths=[/path/to/log/nginx/access.log*]" -M "nginx.error.var.paths=[/path/to/log/nginx/error.log*]"
+-----
+
+The following example shows how to configure `ingress_controller` fileset which can be used in Kubernetes environments
+to parse ingress-nginx logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: nginx
+  ingress_controller:
+    enabled: true
+    var.paths: ["/path/to/log/nginx/ingress.log"]
+-----
+
+
+//set the fileset name used in the included example
+:fileset_ex: access
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `access` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `error` log fileset
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `ingress_controller` log fileset
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-nginx.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-nginx,exported fields>> section.
+
+:edit_url!:

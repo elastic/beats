@@ -1,0 +1,247 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/snyk/_meta/docs.asciidoc
+
+[[filebeat-module-snyk]]
+[role="xpack"]
+
+:modulename: snyk
+:has-dashboards: false
+
+
+== Snyk module
+beta[]
+
+This is a module for ingesting data from the different Snyk API Endpoints. Currently supports these filesets:
+
+- `vulnerabilities` fileset: Collects all found vulnerabilities for the related organizations and projects
+- `audit` fileset: Collects audit logging from Snyk, this can be actions like users, permissions, groups, api access and more.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: audit
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `audit` fileset settings
+
+beta[]
+
+To configure access for Filebeat to the Snyk Audit Log API you will have to generate an API access token as described in the https://snyk.docs.apiary.io/#introduction/authorization[Snyk Documentation]
+
+Example config:
+
+[source,yaml]
+----
+- module: snyk
+  audit:
+    var.input: httpjson
+    var.audit_type: organization
+    var.audit_id: 1235432-asdfdf-2341234-asdgjhg
+    var.interval: 1h
+    var.api_token: 53453Sddf8-7fsf-414234gfd-9sdfb7-5asdfh9f8e342
+----
+
+There is also multiple optional configuration options that can be used to filter out unwanted content, an example below:
+
+[source,yaml]
+----
+- module: snyk
+  audit:
+    var.input: httpjson
+    var.audit_type: organization
+    var.audit_id: 1235432-asdfdf-2341234-asdgjhg
+    var.interval: 1h
+    var.api_token: 53453Sddf8-7fsf-414234gfd-9sdfb7-5asdfh9f8e342
+    var.email_address: "test@example.com"
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.first_interval`*::
+
+How far to look back the first time the module starts, this supports values in full days (24h, 48h etc).
+
+*`var.audit_type`*::
+
+What audit type to collect, can be either "group" or "organization".
+
+*`var.audit_id`*::
+
+The ID related to the audit_type. If audit type is group, then this value should be the group ID, or if it is organization it should be the organization ID to collect from.
+
+*`var.api_token`*::
+
+The API token that is created for a specific user, found in the Snyk management dashboard.
+
+*`var.project_id`*::
+
+Optional field for filtering, will return only logs for this specific project.
+
+*`var.user_id`*::
+
+Optional field for filtering, user public ID. Will fetch only audit logs originated from this user's actions.
+
+*`var.event`*::
+
+Optional field for filtering, will return only logs for this specific event.
+
+*`var.email_address`*::
+
+Optional field for filtering, User email address. Will fetch only audit logs originated from this user's actions.
+
+[float]
+==== Snyk Audit Log ECS Fields
+
+This is a list of Snyk Audit Log fields that are mapped to ECS.
+
+[options="header"]
+|======================================================================
+| Snyk Audit log fields               | ECS Fields                     |
+| groupId                             | user.group.id                  |
+| userId                              | user.id                        |
+| event                               | event.action                   |
+| created                             | @timestamp                     |
+|======================================================================
+
+:fileset_ex: vulnerabilities
+
+[float]
+==== `vulnerabilities` fileset settings
+
+beta[]
+
+To configure access for Filebeat to the Snyk Vulnerabilities API you will have to generate an API access token as described in the https://snyk.docs.apiary.io/#introduction/authorization[Snyk Documentation]
+
+Example config:
+
+[source,yaml]
+----
+- module: snyk
+  vulnerabilities:
+    var.input: httpjson
+    var.interval: 24h
+    var.api_token: 53453Sddf8-7fsf-414234gfd-9sdfb7-5asdfh9f8e342
+    var.orgs:
+      - 12354-asdfdf-123543-asdsdfg
+      - 76554-jhggfd-654342-hgrfasd
+----
+
+There is also multiple optional configuration options that can be used to filter out unwanted content, an example below:
+
+[source,yaml]
+----
+- module: snyk
+  vulnerabilities:
+    var.input: httpjson
+    var.interval: 24h
+    var.api_token: 53453Sddf8-7fsf-414234gfd-9sdfb7-5asdfh9f8e342
+    var.orgs:
+      - 12354-asdfdf-123543-asdsdfg
+      - 76554-jhggfd-654342-hgrfasd
+    var.included_severity:
+      - medium
+      - high
+    var.types:
+      - vuln
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.first_interval`*::
+
+How far to look back the first time the module starts, this supports values in full days (24h, 48h etc).
+
+*`var.api_token`*::
+
+The API token that is created for a specific user, found in the Snyk management dashboard.
+
+*`var.orgs`*::
+
+The list of org IDs to filter the results by. One organization ID per line, starting with a - sign
+
+*`var.included_severity`*::
+
+Optional list of fields for filtering, the severity levels of issues to filter the results by.
+
+*`var.exploit_maturit`*::
+
+Optional list of fields for filtering, the exploit maturity levels of issues to filter the results by.
+
+*`var.types`*::
+
+Optional list of fields for filtering, the type of issues to filter the results by.
+
+*`var.languages`*::
+
+Optional list of fields for filtering, the type of languages to filter the results by.
+
+*`var.identifier`*::
+
+Optional field for filtering, search term to filter issue name by, or an exact CVE or CWE.
+
+*`var.ignored`*::
+
+Optional field for filtering, If set to true, only include issues which are ignored, if set to false, only include issues which are not ignored.
+
+*`var.patched`*::
+
+Optional field for filtering, If set to true, only include issues which are ignored, if set to false, only include issues which are not ignored.
+
+*`var.fixable`*::
+
+Optional field for filtering, If set to true, only include issues which are ignored, if set to false, only include issues which are not ignored.
+
+*`var.is_fixed`*::
+
+Optional field for filtering, If set to true, only include issues which are ignored, if set to false, only include issues which are not ignored.
+
+*`var.is_patchable`*::
+
+Optional field for filtering, If set to true, only include issues which are ignored, if set to false, only include issues which are not ignored.
+
+*`var.is_pinnable`*::
+
+Optional field for filtering, If set to true, only include issues which are ignored, if set to false, only include issues which are not ignored.
+
+*`var.min_priority_score`*::
+
+Optional field for filtering, The minimum priority score ranging between 0-1000
+
+*`var.max_priority_score`*::
+
+Optional field for filtering, The maximum priority score ranging between 0-1000
+
+[float]
+==== Snyk Audit Log ECS Fields
+
+This is a list of Snyk Vulnerability fields that are mapped to ECS.
+
+[options="header"]
+|============================================================|
+| Snyk Fields                   | ECS Fields                 |
+| issue.description             | vulnerability.description  |
+| issue.identifiers.CVE         | vulnerability.id           |
+| issue.identifiers.ALTERNATIVE | vulnerability.id           |
+| issue.cvssScore               | vulnerability.score.base   |
+| issue.severity                | vulnerability.severity     |
+| issue.url                     | vulnerability.reference    |
+|============================================================|
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-snyk,exported fields>> section.
+
+:edit_url!:

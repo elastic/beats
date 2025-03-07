@@ -1,0 +1,91 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/zookeeper/_meta/docs.asciidoc
+
+[[filebeat-module-zookeeper]]
+:modulename: zookeeper
+:has-dashboards: false
+
+== ZooKeeper module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+The +{modulename}+ module collects and parses the logs created by https://zookeeper.apache.org/[Apache ZooKeeper]
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+The +{modulename}+ module was tested with logs from versions 3.7.0.
+
+include::../include/configuring-intro.asciidoc[]
+
+//set the fileset name used in the included example
+:fileset_ex: audit
+
+include::../include/config-option-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for logs:
+
+[source,yaml]
+-----
+- module: zookeeper
+  audit:
+    enabled: true
+    var.paths:
+      - "/path/to/logs/zookeeper_audit.log*"
+  log:
+    enabled: true
+    var.paths:
+      - "/path/to/logs/zookeeper.log*"
+-----
+
+
+To specify the same settings at the command line, you use:
+
+[source,yaml]
+-----
+-M "zookeeper.audit.var.paths=[/path/to/logs/zookeeper_audit.log*]" -M "zookeeper.log.var.paths=[/path/to/logs/zookeeper.log*]"
+-----
+
+[float]
+=== Audit logging
+
+Audit logging is available since Zookeeper 3.6.0, but it is disabled by default. To enable it, you can add the following setting to the configuration file:
+["source","sh"]
+----------------------
+audit.enable=true
+----------------------
+
+[float]
+==== `audit` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+include::../include/timezone-support.asciidoc[]
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-zookeeper,exported fields>> section.
+
+:edit_url!:

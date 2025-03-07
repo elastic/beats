@@ -1,0 +1,85 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/mysqlenterprise/_meta/docs.asciidoc
+
+[[filebeat-module-mysqlenterprise]]
+[role="xpack"]
+
+:modulename: mysqlenterprise
+:has-dashboards: false
+
+
+== MySQL Enterprise module
+
+beta[]
+
+This is a module for different types of MySQL logs. Currently focusing on data from the MySQL Enterprise Audit Plugin in JSON format.
+
+To configure the the Enterprise Audit Plugin to output in JSON format please follow the directions in the https://dev.mysql.com/doc/refman/8.0/en/audit-log-file-formats.html[MySQL Documentation.]
+
+
+include::../include/gs-link.asciidoc[]
+
+
+[float]
+=== Compatibility
+
+This module has been tested against MySQL Enterprise 5.7.x and 8.0.x
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: audit
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `audit` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: mysqlenterprise
+  audit:
+    var.input: file
+    var.paths: /home/user/mysqlauditlogs/audit.*.log
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[mysqlenterprise-audit]`.
+
+[float]
+==== MySQL Enterprise ECS Fields
+
+MySQL Enterprise Audit fields are mapped to ECS in the following way:
+
+[options="header"]
+|==============================================================
+| MySQL Enterprise Fields    | ECS Fields                     |
+| account.user               | server.user.name               |
+| account.host               | client.domain                  |
+| login.os                   | client.user.name               |
+| login.ip                   | client.ip                      |
+| startup_data.os_version    | host.os.full                   |
+| startup_data.args          | process.args                   |
+| connection_attributes._pid | process.pid                    |
+| timestamp                  | @timestamp                     |
+|==============================================================
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-mysqlenterprise,exported fields>> section.
+
+:edit_url!:

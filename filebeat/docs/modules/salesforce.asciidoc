@@ -1,0 +1,571 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/salesforce/_meta/docs.asciidoc
+
+[[filebeat-module-salesforce]]
+[role="xpack"]
+
+:modulename: salesforce
+
+== Salesforce module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+[NOTE]
+
+The Salesforce module has been completely revamped to use a new dedicated Salesforce input for event collection, replacing the previous HTTPJSON input method. This change brings improved performance and reliability. However, please be aware that this update introduces a breaking change. We believe this is the right time to make this necessary improvement as the previous module was in beta.
+
+The Salesforce module collects logs from a Salesforce instance using the Salesforce REST API. It supports real-time and historical data collection for various log types including Login, Logout, APEX, and Setup Audit Trail.
+
+The Salesforce module contains the following filesets for collecting different types of logs:
+
+- The `login` fileset collects Login events from the EventLogFile or Objects (real-time).
+- The `logout` fileset collects Logout events from the EventLogFile or Objects (real-time).
+- The `apex` fileset collects APEX execution logs from the EventLogFile.
+- The `setupaudittrail` fileset collects Audit Trails events generated when admins make configuration changes in the org's Setup area from the Objects (real-time).
+
+[options="header"]
+|===
+| Fileset | EventLogFile | Objects (real-time)
+
+|login
+|yes
+|yes
+
+|logout
+|yes
+|yes
+
+|apex
+|yes
+|no
+
+|setupaudittrail
+|no
+|yes
+|===
+
+
+[IMPORTANT]
+====
+The default interval for collecting logs (`var.real_time_interval` or `var.elf_interval`) is 5m/1h. Exercise caution when reducing this interval, as it directly impacts the Salesforce API rate limit of ~1000 calls per hour. Exceeding the limit will result in errors from the Salesforce API. Refer to the https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm[Salesforce API Rate Limit] documentation for more details.
+====
+
+=== Set up the OAuth App in the Salesforce
+
+In order to use this integration, users need to create a new Salesforce Application using OAuth. Follow the steps below to create a connected application in Salesforce:
+
+1. Login to https://login.salesforce.com/[Salesforce] with the same user credentials that the user wants to collect data with.
+2. Click on Setup on the top right menu bar. On the Setup page, search for `App Manager` in the `Search Setup` search box at the top of the page, then select `App Manager`.
+3. Click _New Connected App_.
+4. Provide a name for the connected application. This will be displayed in the App Manager and on its App Launcher tile.
+5. Enter the API name. The default is a version of the name without spaces. Only letters, numbers, and underscores are allowed. If the original app name contains any other characters, edit the default name.
+6. Enter the contact email for Salesforce.
+7. Under the API (Enable OAuth Settings) section of the page, select _Enable OAuth Settings_.
+8. In the Callback URL, enter the Instance URL (Please refer to `Salesforce Instance URL`).
+9. Select the following OAuth scopes to apply to the connected app:
+- Manage user data via APIs (api).
+- Perform requests at any time (refresh_token, offline_access).
+- (Optional) In case of data collection, if any permission issues arise, add the Full access (full) scope.
+10. Select _Require Secret for the Web Server Flow_ to require the app's client secret in exchange for an access token.
+11. Select _Require Secret for Refresh Token Flow_ to require the app's client secret in the authorization request of a refresh token and hybrid refresh token flow.
+12. Click Save. It may take approximately 10 minutes for the changes to take effect.
+13. Click Continue and then under API details, click Manage Consumer Details. Verify the user account using the Verification Code.
+14. Copy `Consumer Key` and `Consumer Secret` from the Consumer Details section, which should be populated as values for Client ID and Client Secret respectively in the configuration.
+
+For more details on how to create a Connected App, refer to the Salesforce documentation https://help.salesforce.com/apex/HTViewHelpDoc?id=connected_app_create.htm[here].
+
+[NOTE]
+
+====
+
+*Enabling real-time events*
+
+To get started with https://developer.salesforce.com/blogs/2020/05/introduction-to-real-time-event-monitoring[real-time] events, head to setup and into the quick find search for 'Event Manager'. Enterprise and Unlimited environments have access to the Logout Event by default, but the remainder of the events need licensing to access https://help.salesforce.com/s/articleView?id=sf.salesforce_shield.htm&type=5[Shield Event Monitoring].
+
+====
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: login
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+=== Fileset settings
+
+[float]
+==== `login` fileset
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  login:
+    enabled: true
+    var.initial_interval: 1d
+    var.api_version: 56
+
+    var.authentication:
+      jwt_bearer_flow:
+        enabled: false
+        client.id: "my-client-id"
+        client.username: "my.email@here.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
+      user_password_flow:
+        enabled: true
+        client.id: "my-client-id"
+        client.secret: "my-client-secret"
+        token_url: "https://login.salesforce.com"
+        username: "my.email@here.com"
+        password: "password"
+
+    var.url: "https://instance-url.salesforce.com"
+
+    var.event_log_file: true
+    var.elf_interval: 1h
+    var.log_file_interval: Hourly
+
+    var.real_time: true
+    var.real_time_interval: 5m
+----
+
+*`var.initial_interval`*::
+
+The time window for collecting historical data when the input starts. Expects a duration string (e.g. 12h or 7d).
+
+*`var.api_version`*::
+
+The API version of the Salesforce instance.
+
+*`var.authentication`*::
+
+Authentication config for connecting to Salesforce API. Supports JWT or user-password auth flows.
+
+*`var.authentication.jwt_bearer_flow.enabled`*::
+
+Set to true to use JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.id`*::
+
+The client ID for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.username`*::
+
+The username for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.key_path`*::
+
+Path to the client key file for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.url`*::
+
+The audience URL for JWT authentication.
+
+*`var.authentication.user_password_flow.enabled`*::
+
+Set to true to use user-password authentication.
+
+*`var.authentication.user_password_flow.client.id`*::
+
+The client ID for user-password authentication.
+
+*`var.authentication.user_password_flow.client.secret`*::
+
+The client secret for user-password authentication.
+
+*`var.authentication.user_password_flow.token_url`*::
+
+The Salesforce token URL for user-password authentication.
+
+*`var.authentication.user_password_flow.username`*::
+
+The Salesforce username for authentication.
+
+*`var.authentication.user_password_flow.password`*::
+
+The password for the Salesforce user.
+
+*`var.url`*::
+
+The URL of the Salesforce instance.
+
+*`var.event_log_file`*::
+
+Set to true to collect logs from EventLogFile (historical data).
+
+*`var.elf_interval`*::
+
+Interval for collecting EventLogFile logs, e.g. 1h or 5m.
+
+*`var.log_file_interval`*::
+
+Either "Hourly" or "Daily". The time interval of each log file from EventLogFile.
+
+*`var.real_time`*::
+
+Set to true to collect real-time data collection.
+
+*`var.real_time_interval`*::
+
+Interval for collecting real-time logs, e.g. 30s or 5m.
+
+[float]
+==== `logout` fileset
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  logout:
+    enabled: true
+    var.initial_interval: 1d
+    var.api_version: 56
+
+    var.authentication:
+      jwt_bearer_flow:
+        enabled: false
+        client.id: "my-client-id"
+        client.username: "my.email@here.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
+      user_password_flow:
+        enabled: true
+        client.id: "my-client-id"
+        client.secret: "my-client-secret"
+        token_url: "https://login.salesforce.com"
+        username: "my.email@here.com"
+        password: "password"
+
+    var.url: "https://instance-url.salesforce.com"
+
+    var.event_log_file: true
+    var.elf_interval: 1h
+    var.log_file_interval: Hourly
+
+    var.real_time: true
+    var.real_time_interval: 5m
+----
+
+*`var.initial_interval`*::
+
+The time window for collecting historical data when the input starts. Expects a duration string (e.g. 12h or 7d).
+
+*`var.api_version`*::
+
+The API version of the Salesforce instance.
+
+*`var.authentication`*::
+
+Authentication config for connecting to Salesforce API. Supports JWT or user-password auth flows.
+
+*`var.authentication.jwt_bearer_flow.enabled`*::
+
+Set to true to use JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.id`*::
+
+The client ID for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.username`*::
+
+The username for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.key_path`*::
+
+Path to the client key file for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.url`*::
+
+The audience URL for JWT authentication.
+
+*`var.authentication.user_password_flow.enabled`*::
+
+Set to true to use user-password authentication.
+
+*`var.authentication.user_password_flow.client.id`*::
+
+The client ID for user-password authentication.
+
+*`var.authentication.user_password_flow.client.secret`*::
+
+The client secret for user-password authentication.
+
+*`var.authentication.user_password_flow.token_url`*::
+
+The Salesforce token URL for user-password authentication.
+
+*`var.authentication.user_password_flow.username`*::
+
+The Salesforce username for authentication.
+
+*`var.authentication.user_password_flow.password`*::
+
+The password for the Salesforce user.
+
+*`var.url`*::
+
+The URL of the Salesforce instance.
+
+*`var.event_log_file`*::
+
+Set to true to collect logs from EventLogFile (historical data).
+
+*`var.elf_interval`*::
+
+Interval for collecting EventLogFile logs, e.g. 1h or 5m.
+
+*`var.log_file_interval`*::
+
+Either "Hourly" or "Daily". The time interval of each log file from EventLogFile.
+
+*`var.real_time`*::
+
+Set to true to collect real-time data collection.
+
+*`var.real_time_interval`*::
+
+Interval for collecting real-time logs, e.g. 30s or 5m.
+
+[float]
+==== `setupaudittrail` fileset
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  setupaudittrail:
+    enabled: true
+    var.initial_interval: 1d
+    var.api_version: 56
+
+    var.authentication:
+      jwt_bearer_flow:
+        enabled: false
+        client.id: "my-client-id"
+        client.username: "my.email@here.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
+      user_password_flow:
+        enabled: true
+        client.id: "my-client-id"
+        client.secret: "my-client-secret"
+        token_url: "https://login.salesforce.com"
+        username: "my.email@here.com"
+        password: "password"
+
+    var.url: "https://instance-url.salesforce.com"
+
+    var.real_time: true
+    var.real_time_interval: 5m
+----
+
+*`var.initial_interval`*::
+
+The time window for collecting historical data when the input starts. Expects a duration string (e.g. 12h or 7d).
+
+*`var.api_version`*::
+
+The API version of the Salesforce instance.
+
+*`var.authentication`*::
+
+Authentication config for connecting to Salesforce API. Supports JWT or user-password auth flows.
+
+*`var.authentication.jwt_bearer_flow.enabled`*::
+
+Set to true to use JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.id`*::
+
+The client ID for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.username`*::
+
+The username for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.key_path`*::
+
+Path to the client key file for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.url`*::
+
+The audience URL for JWT authentication.
+
+*`var.authentication.user_password_flow.enabled`*::
+
+Set to true to use user-password authentication.
+
+*`var.authentication.user_password_flow.client.id`*::
+
+The client ID for user-password authentication.
+
+*`var.authentication.user_password_flow.client.secret`*::
+
+The client secret for user-password authentication.
+
+*`var.authentication.user_password_flow.token_url`*::
+
+The Salesforce token URL for user-password authentication.
+
+*`var.authentication.user_password_flow.username`*::
+
+The Salesforce username for authentication.
+
+*`var.authentication.user_password_flow.password`*::
+
+The password for the Salesforce user.
+
+*`var.url`*::
+
+The URL of the Salesforce instance.
+
+*`var.real_time`*::
+
+Set to true to collect real-time data collection.
+
+*`var.real_time_interval`*::
+
+Interval for collecting real-time logs, e.g. 30s or 5m.
+
+[float]
+==== `apex` fileset
+
+Example config:
+
+[source,yaml]
+----
+- module: salesforce
+  apex:
+    enabled: true
+    var.initial_interval: 1d
+    var.log_file_interval: Hourly
+    var.api_version: 56
+
+    var.authentication:
+      jwt_bearer_flow:
+        enabled: false
+        client.id: "my-client-id"
+        client.username: "my.email@here.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
+      user_password_flow:
+        enabled: true
+        client.id: "my-client-id"
+        client.secret: "my-client-secret"
+        token_url: "https://login.salesforce.com"
+        username: "my.email@here.com"
+        password: "password"
+
+    var.url: "https://instance-url.salesforce.com"
+
+    var.event_log_file: true
+    var.elf_interval: 1h
+    var.log_file_interval: Hourly
+----
+
+*`var.initial_interval`*::
+
+The time window for collecting historical data when the input starts. Expects a duration string (e.g. 12h or 7d).
+
+*`var.api_version`*::
+
+The API version of the Salesforce instance.
+
+*`var.authentication`*::
+
+Authentication config for connecting to Salesforce API. Supports JWT or user-password auth flows.
+
+*`var.authentication.jwt_bearer_flow.enabled`*::
+
+Set to true to use JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.id`*::
+
+The client ID for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.username`*::
+
+The username for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.key_path`*::
+
+Path to the client key file for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.url`*::
+
+The audience URL for JWT authentication.
+
+*`var.authentication.user_password_flow.enabled`*::
+
+Set to true to use user-password authentication.
+
+*`var.authentication.user_password_flow.client.id`*::
+
+The client ID for user-password authentication.
+
+*`var.authentication.user_password_flow.client.secret`*::
+
+The client secret for user-password authentication.
+
+*`var.authentication.user_password_flow.token_url`*::
+
+The Salesforce token URL for user-password authentication.
+
+*`var.authentication.user_password_flow.username`*::
+
+The Salesforce username for authentication.
+
+*`var.authentication.user_password_flow.password`*::
+
+The password for the Salesforce user.
+
+*`var.url`*::
+
+The URL of the Salesforce instance.
+
+*`var.event_log_file`*::
+
+Set to true to collect logs from EventLogFile (historical data).
+
+*`var.elf_interval`*::
+
+Interval for collecting EventLogFile logs, e.g. 1h or 5m.
+
+*`var.log_file_interval`*::
+
+Either "Hourly" or "Daily". The time interval of each log file from EventLogFile.
+
+[float]
+=== Troubleshooting
+
+Here are some common issues and how to resolve them:
+
+*Hitting Salesforce API limits*::
+Reduce the values of `var.real_time_interval` and `var.elf_interval` to poll the API less frequently. Monitor the API usage in your Salesforce instance.
+
+*Connectivity issues*::
+Verify the `var.url` is correct. Check that the user credentials are valid and have the necessary permissions. Ensure network connectivity between the Elastic Agent and Salesforce instance.
+
+*Not seeing any data*::
+Check the Elastic Agent logs for errors. Verify the module configuration is correct, the filesets are enabled, and the intervals are reasonable. Confirm there is log activity in Salesforce for the log types being collected.
+
+:fileset_ex!:
+
+:modulename!:
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-salesforce,exported fields>> section.
+
+:edit_url!:

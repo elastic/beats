@@ -1,0 +1,81 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/oracle/_meta/docs.asciidoc
+
+[[filebeat-module-oracle]]
+[role="xpack"]
+
+:modulename: oracle
+:has-dashboards: false
+
+
+== Oracle module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is a module for ingesting Audit Trail logs from Oracle Databases.
+
+The module expects an *.aud audit file that is generated from Oracle Databases by default. If this has been disabled then please see the https://docs.oracle.com/en/database/oracle/oracle-database/19/dbseg/introduction-to-auditing.html#GUID-8D96829C-9151-4FA4-BED9-831D088F12FF[Oracle Database Audit Trail Documentation].
+
+
+
+include::../include/gs-link.asciidoc[]
+
+
+[float]
+=== Compatibility
+
+This module has been tested with Oracle Database 19c, and should work for 18c as well though it has not been tested.
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: database_audit
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `database_audit` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: oracle
+  database_audit:
+    var.input: file
+    var.paths: /home/user/oracleauditlogs/*/*.aud
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[oracle-database-audit]`.
+
+[float]
+==== Oracle Database fields
+
+Oracle Database fields are mapped to the current ECS Fields:
+[options="header"]
+|==============================================================
+| Oracle Fields              | ECS Fields                     |
+| privilege                  | host.user.roles                |
+| client_user                | client.user.name               |
+| userhost                   | client.ip/domain               |
+| database_user              | server.user.name               |
+|==============================================================
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-oracle,exported fields>> section.
+
+:edit_url!:

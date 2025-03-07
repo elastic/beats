@@ -1,0 +1,56 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/kibana/_meta/docs.asciidoc
+
+[[filebeat-module-kibana]]
+:modulename: kibana
+:has-dashboards: false
+
+== Kibana module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is the Kibana module.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Kibana modules is compatible with Kibana 6.3 and newer.
+
+include::../include/configuring-intro.asciidoc[]
+
+//set the fileset name used in the included file
+:fileset_ex: log
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `log` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+[float]
+==== `audit` fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-kibana,exported fields>> section.
+
+:edit_url!:

@@ -1,0 +1,437 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/cisco/_meta/docs.asciidoc
+
+[[filebeat-module-cisco]]
+[role="xpack"]
+
+:modulename: cisco
+:has-dashboards: true
+
+== Cisco module
+
+//temporarily override modulename to create working link
+:modulename: cisco_asa
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: cisco
+
+This is a module for Cisco network device's logs and Cisco Umbrella. It includes the following
+filesets for receiving logs over syslog or read from a file:
+
+- `asa` fileset: supports Cisco ASA firewall logs.
+- `amp` fileset: supports Cisco AMP API logs.
+- `ftd` fileset: supports Cisco Firepower Threat Defense logs.
+- `ios` fileset: supports Cisco IOS router and switch logs.
+- `umbrella` fileset: supports Cisco Umbrella logs.
+
+Cisco ASA devices also support exporting flow records using NetFlow, which is
+supported by the {filebeat-ref}/filebeat-module-netflow.html[netflow module] in
+{beatname_uc}.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+The module is by default configured to run via syslog on port 9001 for ASA and
+port 9002 for IOS. However it can also be configured to read from a file path.
+See the following example.
+
+Cisco Umbrella publishes its logs in a compressed CSV format to a S3 bucket.
+
+["source","yaml",subs="attributes"]
+-----
+- module: cisco
+  asa:
+    enabled: true
+    var.paths: ["/var/log/cisco-asa.log"]
+    var.input: "file"
+-----
+
+:fileset_ex: asa
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `asa` fileset settings
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  asa:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9001
+    var.log_level: 5
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.log_level`*::
+
+include::../include/cisco-log-level.asciidoc[]
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9001.
+
+*`var.timezone_offset`*::
+
+IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+timestamps without a time zone. Defaults to UTC.
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-asa, forwarded]`.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `ftd` fileset settings
+
+The Cisco FTD fileset primarily supports parsing IPv4 and IPv6 access list log
+messages similar to that of ASA devices as well as Security Event Syslog
+Messages for Intrusion, Connection, File and Malware events.
+
+*Field mappings*
+
+The `ftd` fileset maps Security Event Syslog Messages to the Elastic Common
+Schema (ECS) format. The following table illustrates the mapping from
+Security Event fields to ECS. The `cisco.ftd` prefix is used when there is no
+corresponding ECS field available.
+
+Mappings for Intrusion events fields:
+[options="header"]
+|====================================
+| FTD Field | Mapped fields
+| ApplicationProtocol | network.protocol
+| DstIP | destination.address
+| DstPort | destination.port
+| EgressInterface | cisco.ftd.destination_interface
+| GID | service.id
+| HTTPResponse | http.response.status_code
+| IngressInterface | cisco.ftd.source_interface
+| InlineResult | event.outcome
+| IntrusionPolicy | cisco.ftd.rule_name
+| Message | message
+| Protocol | network.transport
+| SrcIP | source.address
+| SrcPort | source.port
+| User | user.id, user.name
+| WebApplication | network.application
+|====================================
+
+Mappings for Connection and Security Intelligence events fields:
+[options="header"]
+|====================================
+| FTD Field | Mapped fields
+| ACPolicy | cisco.ftd.rule_name
+| AccessControlRuleAction | event.outcome
+| AccessControlRuleName | cisco.ftd.rule_name
+| ApplicationProtocol | network.protocol
+| ConnectionDuration | event.duration
+| DNSQuery | dns.question.name
+| DNSRecordType | dns.question.type
+| DNSResponseType | dns.response_code
+| DstIP | destination.address
+| DstPort | destination.port
+| EgressInterface | cisco.ftd.destination_interface
+| HTTPReferer | http.request.referrer
+| HTTPResponse | http.response.status_code
+| IngressInterface | cisco.ftd.source_interface
+| InitiatorBytes | source.bytes
+| InitiatorPackets | source.packets
+| NetBIOSDomain | host.hostname
+| Protocol | network.transport
+| ReferencedHost | url.domain
+| ResponderBytes | destination.bytes
+| ResponderPackets | destination.packets
+| SSLActualAction | event.outcome
+| SSLServerName | server.domain
+| SrcIP | source.address
+| SrcPort | source.port
+| URL | url.original
+| User | user.name
+| UserAgent | user_agent.original
+| WebApplication | network.application
+| originalClientSrcIP | client.address
+|====================================
+
+Mappings for File and Malware events fields:
+[options="header"]
+|====================================
+| FTD Field | Mapped fields
+| ApplicationProtocol | network.protocol
+| ArchiveFileName | file.name
+| ArchiveSHA256 | file.hash.sha256
+| Client | network.application
+| DstIP | destination.address
+| DstPort | destination.port
+| FileName | file.name
+| FilePolicy | cisco.ftd.rule_name
+| FileSHA256 | file.hash.sha256
+| FileSize | file.size
+| FirstPacketSecond | event.start
+| Protocol | network.transport
+| SrcIP | source.address
+| SrcPort | source.port
+| URI | url.original
+| User | user.name
+| WebApplication | network.application
+|====================================
+
+*Example configuration:*
+
+[source,yaml]
+----
+- module: cisco
+  ftd:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9003
+    var.log_level: 5
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.log_level`*::
+
+include::../include/cisco-log-level.asciidoc[]
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9003.
+
+*`var.timezone_offset`*::
+
+IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+timestamps without a time zone. Defaults to UTC.
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-ftd, forwarded]`.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `ios` fileset settings
+
+The Cisco IOS fileset primarily supports parsing IPv4 and IPv6 access list log
+messages.
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  ios:
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9002
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.syslog_host`*::
+
+The interface to listen to UDP based syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The UDP port to listen for syslog traffic. Defaults to 9002.
+
+*`var.tags`*::
+
+A list of tags to include in events. Including `forwarded` indicates that the
+events did not originate on this host and causes `host.name` to not be added to
+events. Defaults to `[cisco-ios, forwarded]`.
+
+include::../include/timezone-support.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `umbrella` fileset settings
+
+The Cisco Umbrella fileset primarily focuses on reading CSV files from an S3 bucket using the filebeat S3 input.
+
+To configure Cisco Umbrella to log to a self-managed S3 bucket please follow the https://docs.umbrella.com/deployment-umbrella/docs/log-management[Cisco Umbrella User Guide], and the link:filebeat-input-aws-s3.html[AWS S3 input documentation] to setup the necessary Amazon SQS queue.  Retrieving logs from a Cisco-managed S3 bucket is not currently supported.
+
+This fileset supports all 4 log types:
+- Proxy
+- Cloud Firewall
+- IP Logs
+- DNS logs
+
+The Cisco Umbrella fileset depends on the original file path structure being followed. This structure is documented https://docs.umbrella.com/deployment-umbrella/docs/log-formats-and-versioning[Umbrella Log Formats and Versioning]:
+
+<subfolder>/<YYYY>-<MM>-<DD>/<YYYY>-<MM>-<DD>-<hh>-<mm>-<xxxx>.csv.gz
+dnslogs/<year>-<month>-<day>/<year>-<month>-<day>-<hour>-<minute>.csv.gz
+
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  umbrella:
+    enabled: true
+    var.input: aws-s3
+    var.queue_url: https://sqs.us-east-1.amazonaws.com/ID/CiscoQueue
+    var.access_key_id: 123456
+    var.secret_access_key: PASSWORD
+----
+
+*`var.input`*::
+
+The input from which messages are read. Can be S3 or file.
+
+*`var.queue_url`*::
+
+The URL to the SQS queue if the input type is S3.
+
+*`var.access_key_id`*::
+
+The ID for the access key used to read from the SQS queue.
+
+*`var.secret_access_key`*::
+
+The secret token used for authenticating to the SQS queue.
+
+*`var.visibility_timeout`*::
+
+The duration that the received messages are hidden from ReceiveMessage request.
+Default to be 300 seconds.
+
+*`var.api_timeout`*::
+
+Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+==== `amp` fileset settings
+
+The Cisco AMP fileset focuses on collecting events from your Cisco AMP/Cisco Secure Endpoint API.
+
+To configure the Cisco AMP fileset you will need to retrieve your `client_id` and `api_key` from the AMP dashboard.
+For more information on how to retrieve these credentials, please reference the https://api-docs.amp.cisco.com/api_resources?api_host=api.amp.cisco.com&api_version=v1[Cisco AMP API documentation].
+
+The URL configured for the API depends on which region your AMP is located, currently there are three choices:
+- api.amp.cisco.com
+- api.apjc.amp.cisco.com
+- api.eu.amp.cisco.com
+
+If new endpoints are added by Cisco in the future, please reference the API URL list located at the https://api-docs.amp.cisco.com/[Cisco AMP API Docs].
+
+Example config:
+
+[source,yaml]
+----
+- module: cisco
+  amp:
+    enabled: true
+    var.input: httpjson
+    var.url: https://api.amp.cisco.com/v1/events
+    var.client_id: 123456
+    var.api_key: sfda987gdf90s0df0
+----
+
+When starting up the Filebeat module for the first time, you are able to configure how far back you want Filebeat to collect existing events from.
+It is also possible to select how often Filebeat will check the Cisco AMP API. Another example below which looks back 200 hours and have a custom timeout:
+
+[source,yaml]
+----
+- module: cisco
+  amp:
+    enabled: true
+    var.input: httpjson
+    var.url: https://api.amp.cisco.com/v1/events
+    var.client_id: 123456
+    var.api_key: sfda987gdf90s0df0
+    var.first_interval: 200h
+    var.interval: 60m
+    var.request_timeout: 120s
+    var.limit: 100
+
+----
+
+*`var.input`*::
+
+The input from which messages are read. Supports httpjson.
+
+*`var.url`*::
+
+The URL to the Cisco AMP API endpoint, this url value depends on your region. It will be the same region as your Cisco AMP Dashboard URL.
+
+*`var.client_id`*::
+
+The ID for the user account used to access the API.
+
+*`var.api_key`*::
+
+The API secret used together with the related client_id.
+
+*`var.request_timeout`*::
+
+When handling large influxes of events, especially for large enterprises, the API might take longer to respond. This value is to set a custom
+timeout value for each request sent by Filebeat.
+
+*`var.first_interval`*::
+
+How far back you would want to collect events the first time the Filebeat module starts up. Supports amount in hours(example: 24h), minutes(example: 10m) and seconds(example: 50s).
+
+*`var.limit`*::
+
+This value controls how many events are returned by the Cisco AMP API per page.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard for ASA:
+
+[role="screenshot"]
+image::./images/kibana-cisco-asa.png[]
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-cisco,exported fields>> section.
+
+:edit_url!:

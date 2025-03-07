@@ -1,0 +1,80 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/crowdstrike/_meta/docs.asciidoc
+
+[[filebeat-module-crowdstrike]]
+[role="xpack"]
+
+:modulename: crowdstrike
+:has-dashboards: true
+
+== CrowdStrike module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is the {beatname_uc} module for CrowdStrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. This module collects this data, converts it to ECS, and ingests it to view in the SIEM. By default, the Falcon SIEM connector outputs JSON formatted Falcon Streaming API event data.
+
+This module segments events forwarded by the Falcon SIEM connector into two datasets for endpoint data and Falcon platform audit data.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+This input supports CrowdStrike Falcon SIEM-Connector-v2.0.
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: falcon_endpoint
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `falcon` fileset settings
+
+The fileset is by default configured to collect JSON formated event data from `/var/log/crowdstrike/falconhoseclient/output`. It forwards DetectionSummaryEvent and IncidentSummaryEvent events.
+
+["source","yaml",subs="attributes"]
+-----
+var:
+  - name: paths
+    default:
+      - /var/log/crowdstrike/falconhoseclient/output
+-----
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+=== Dashboards
+
+The best way to view CrowdStrike events and alert data is in the SIEM. 
+
+[role="screenshot"]
+image::./images/siem-alerts-cs.jpg[]
+
+[float]
+For alerts, go to Detections -> External alerts.
+
+[role="screenshot"]
+image::./images/siem-events-cs.jpg[]
+
+[float]
+And for all over event CrowdStrike Falcon event types, go to Host -> Events.
+
+
+:has-dashboards!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-crowdstrike,exported fields>> section.
+
+:edit_url!:

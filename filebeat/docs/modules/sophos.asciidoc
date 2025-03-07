@@ -1,0 +1,160 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/sophos/_meta/docs.asciidoc
+
+[[filebeat-module-sophos]]
+[role="xpack"]
+
+:modulename: sophos
+:has-dashboards: false
+
+== Sophos module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is a module for Sophos Products, currently it accepts
+logs in syslog format or from a file for the following devices:
+
+- `xg` fileset: supports Sophos XG SFOS logs.
+
+To configure a remote syslog destination, please reference the https://docs.sophos.com/nsg/sophos-firewall/18.5/Help/en-us/webhelp/onlinehelp/nsg/tasks/SyslogServerAdd.html[SophosXG/SFOS Documentation].
+
+The syslog format choosen in Sophos configuration should be `Central Reporting Format`.
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+This module has been tested against SFOS version 17.5.x, 18.0.x, and 18.5.x.
+Versions above this and between 18.0 - 18.5 are expected to work but have not been tested.
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: xg
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `xg` fileset settings
+
+The Sophos XG firewalls do not include hostname in either the syslog header or body, and the only unique identifier for each firewall is the related serial number.
+
+Below you will see an example configuration file, that sets the default hostname (if no serial number is included in the config file), and example on how to map serial numbers to a hostname
+
+[source,yaml]
+----
+- module: sophos
+  xg:
+    enabled: true
+    var.input: udp
+    var.syslog_host: 0.0.0.0
+    var.syslog_port: 9005
+    var.default_host_name: firewall.localgroup.local
+    var.known_devices:
+      - serial_number: "1234567890123457"
+        hostname: "a.host.local"
+      - serial_number: "1234234590678557"
+        hostname: "b.host.local"
+----
+
+include::../include/var-paths.asciidoc[]
+
+*`var.input`*::
+
+The input to use, can be either the value `tcp`, `udp` or `file`.
+
+*`var.syslog_host`*::
+
+The interface to listen to all syslog traffic. Defaults to localhost.
+Set to 0.0.0.0 to bind to all available interfaces.
+
+*`var.syslog_port`*::
+
+The port to listen for syslog traffic. Defaults to 9005.
+
+*`var.host_name`*::
+
+Host name / Observer name, since SophosXG does not provide this in the syslog file.
+Default to `firewall.localgroup.local`
+
+
+[float]
+==== SophosXG ECS fields
+
+This is a list of SophosXG fields that are mapped to ECS.
+
+[options="header"]
+|==============================================================
+| SophosXG Fields            | ECS Fields                     |
+| application                | network.protocol               |
+| classification             | rule.category                  |
+| device_id                  | observer.serial_number         |
+| domainname                 | url.domain                     |
+| dst_host                   | destination.address            |
+| dst_int                    | observer.egress.interface.name |
+| dstzonetype                | observer.egress.zone           |
+| dst_ip                     | destination.ip                 |
+| destinationip              | destination.ip                 |
+| dst_mac                    | destination.mac                |
+| dstname                    | destination.address            |
+| dst_port                   | destination.port               |
+| dst_domainname             | url.domain                     |
+| duration                   | event.duration                 |
+| filename                   | file.name                      |
+| filetype                   | file.extension                 |
+| file_size                  | file.size                      |
+| file_path                  | file.directory                 |
+| fw_rule_id                 | rule.id                        |
+| from_email_address         | source.user.email              |
+| httpstatus                 | http.response.status_code      |
+| in_interface               | observer.ingress.interface.name|
+| log_id                     | event.code                     |
+| log_subtype                | event.action                   |
+| message                    | message                        |
+| method                     | http.request.method            |
+| policy_type                | rule.ruleset                   |
+| protocol                   | network.transport              |
+| recv_bytes                 | destination.bytes              |
+| recv_pkts                  | destination.packets            |
+| referer                    | http.request.referrer          |
+| sent_bytes                 | source.bytes                   |
+| sent_pkts                  | source.packets                 |
+| sha1sum                    | file.hash.sha1                 |
+| srczonetype                | observer.ingress.zone          |
+| src_ip                     | source.ip                      |
+| src_domainname             | url.domain                     |
+| sourceip                   | source.ip                      |
+| src_mac                    | source.mac                     |
+| src_port                   | source.port                    |
+| status_code                | http.response.status_code      |
+| time_zone                  | event.timezone                 |
+| to_email_address           | destination.user.email         |
+| tran_dst_ip                | destination.nat.ip             |
+| tran_dst_port              | destination.nat.port           |
+| tran_src_ip                | source.nat.ip                  |
+| tran_src_port              | source.nat.port                |
+| url                        | url.original                   |
+| user_agent                 | user_agent.original            |
+| useragent                  | user_agent.original            |
+| user_gp                    | source.user.group              |
+| user_name                  | source.user.name               |
+| ws_protocol                | http.version                   |
+|==============================================================
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-sophos,exported fields>> section.
+
+:edit_url!:

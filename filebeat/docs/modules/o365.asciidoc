@@ -1,0 +1,234 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/o365/_meta/docs.asciidoc
+
+[[filebeat-module-o365]]
+[role="xpack"]
+
+:modulename: o365
+:has-dashboards: true
+
+== Office 365 module
+
+beta[]
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+This is a module for Office 365 logs received via one of the Office 365 API
+endpoints. It currently supports user, admin, system, and policy actions and
+events from Office 365 and Azure AD activity logs exposed by the Office 365
+Management Activity API.
+
+The {plugins}/ingest-geoip.html[ingest-geoip] and
+{plugins}/ingest-user-agent.html[ingest-user_agent] Elasticsearch plugins are
+required to run this module.
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: audit
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `audit` fileset settings
+
+The `audit` fileset uses the Office 365 Management Activity API to retrieve
+audit messages from Office 365 and Azure AD activity logs. These are the same
+logs that are available under _Audit_ _Log_ _Search_ in the _Security_ _and_
+_Compliance_ _Center._
+
+[float]
+===== Setup
+
+To use this fileset you need to https://docs.microsoft.com/en-us/microsoft-365/compliance/turn-audit-log-search-on-or-off?view=o365-worldwide#turn-on-audit-log-search[enable Audit Log Search]
+ and https://docs.microsoft.com/en-us/office/office-365-management-api/get-started-with-office-365-management-apis#register-your-application-in-azure-ad[register an application in Azure AD.]
+
+Once this application is registered note the _Application (client) ID_ and the
+_Directory (tenant) ID._ Then configure the authentication in the _Certificates & Secrets_
+section.
+
+
+Example configuration `o365.yml` using client-secret authentication:
+
+[source,yaml]
+----
+  audit:
+    enabled: true
+    var.application_id: "<My Azure AD Application ID>"
+    var.tenants:
+      - id: "<My Tenant ID>"
+        name: "mytenant.onmicrosoft.com"
+    var.client_secret: "<My client secret>"
+----
+
+Certificate-based authentication is specially useful when monitoring multiple
+tenants. Example configuration:
+
+[source,yaml]
+----
+  audit:
+    enabled: true
+    var.application_id: "<My Azure AD Application ID>"
+    var.tenants:
+      - id: "<Tenant A ID>"
+        name: "tenantA.onmicrosoft.com"
+      - id: "<Tenant B ID>"
+        name: "tenantB.onmicrosoft.com"
+    var.certificate: "/path/to/certificate.pem"
+    var.key: "/path/to/private_key.pem"
+    var.key_passphrase: "my_passphrase" # (optional) for encrypted keys
+----
+
+Finally you need to add permissions in the _API permissions_ section and grant
+it admin consent. Click on _Add permission_ and select
+_Office 365 Management APIs._ The needed permissions are:
+
+- User.Read
+- ActivityFeed.Read
+- ActivityFeed.ReadDlp
+- ServiceHealth.Read
+
+[role="screenshot"]
+image::./images/filebeat-o365-azure-permissions.png[]
+
+Once the required permissions are added, click the _Grant admin consent_ button.
+Note that it can take a while for the required permissions to be in effect, so
+it's possible that you observe some permission errors when running {beatname_uc}
+right away.
+
+[float]
+===== Alternative endpoints
+
+This module supports custom endpoints for on-prem deployments as well as
+alternative endpoints (GCC High endponts, U.S. DoD, European Union, etc). In
+order to point the module to an alternative endpoint, you need to adjust the
+`authentication_endpoint` and `resource` variables accordingly. For example:
+
+[source,yaml]
+----
+    var.api:
+      # default is https://login.microsoftonline.com/
+      authentication_endpoint: https://login.microsoftonline.us/
+      # default is https://manage.office.com
+      resource: https://manage.office365.us
+----
+
+[float]
+===== Configuration options
+
+*`var.application_id`*::
+
+The Application ID (also known as client ID) of the Azure application.
+
+*`var.tenants`*::
+
+A list of one or more tenant IDs and name pairs. Set the `id` field to the
+tenant ID (also known as Directory ID). Set the name to the host name for the
+tenant, that is, the Office 365 domain for your organization.
+
+*`var.client_secret`*::
+
+The client-secret (api_key) used to authenticate your Azure AD application. This
+option cannot be specified at the same time as the `var.certificate` option.
+
+*`var.certificate`*::
+
+Path to the certificate file used for client authentication. This option cannot
+be specified at the same time as the `var.client_secret` option.
+
+*`var.key`*::
+
+Path to the private key file used for client authentication.
+
+*`var.key_passphrase`*::
+
+The passphrase used to decrypt an encrypted key stored in the configured
+`var.key` file. Only set this option when the key is encrypted.
+
+*`var.content_type`*::
+
+The list of content-types to subscribe to. By default, it subscribes to all
+known content-types:
+- Audit.AzureActiveDirectory
+- Audit.Exchange
+- Audit.SharePoint
+- Audit.General
+- DLP.All
+
+
+[float]
+===== Advanced configuration options
+
+The following configuration options are only recomended in case of problems.
+They must be nested under a single `var.api` key, like this:
+
+[source,yaml]
+----
+    var.api:
+      authentication_endpoint: https://login.microsoftonline.com/
+      resource: https://manage.office.com
+      max_retention: 168h
+      poll_interval: 3m
+      max_requests_per_minute: 2000
+      max_query_size: 24h
+----
+
+*`var.api.authentication_endpoint`*::
+
+The authentication endpoint used to authorize the Azure app. This is
+`https://login.microsoftonline.com/` by default, and can be changed to access
+alternative endpoints.
+
+*`var.api.resource`*::
+
+The API resource to retrieve information from. This is
+`https://manage.office.com` by default, and can be changed to access alternative
+endpoints.
+
+*`var.api.max_retention`*::
+
+The maximum data retention period to support. `168h` by default. {beatname_uc}
+will fetch all retained data for a tenant when run for the first time. The
+default is 7 days, which matches the standard period that Microsoft will keep the
+logs before deleting them. Only increase it if your tenant has a longer retention period.
+
+*`var.api.poll_interval`*::
+
+The interval to wait before polling the API server for new events. Default `3m`.
+
+*`var.api.max_requests_per_minute`*::
+
+The maximum number of requests to perform per minute, for each tenant. The
+default is `2000`, as this is the server-side limit per tenant.
+
+*`var.api.max_query_size`*::
+
+The maximum time window that API allows in a single query. Defaults to `24h`
+to match Microsoft's documented limit.
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard:
+
+[role="screenshot"]
+image::./images/filebeat-o365-audit.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-o365,exported fields>> section.
+
+:edit_url!:

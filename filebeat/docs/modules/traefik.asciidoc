@@ -1,0 +1,78 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/traefik/_meta/docs.asciidoc
+
+[[filebeat-module-traefik]]
+:modulename: traefik
+:has-dashboards: true
+
+== Traefik module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+The +{modulename}+ module parses access logs created by
+https://traefik.io/[Træfik].
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+//[float]
+//=== Compatibility
+
+include::../include/configuring-intro.asciidoc[]
+
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for Træfik logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: traefik
+  access:
+    enabled: true
+    var.paths: ["/usr/local/traefik/access.log*"]
+-----
+
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "traefik.access.var.paths=[/path/to/traefik/access.log*]"
+-----
+
+
+//set the fileset name used in the included example
+:fileset_ex: access
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `access` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboards
+
+This module comes with sample dashboards. For example:
+
+[role="screenshot"]
+image::./images/kibana-traefik.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-traefik,exported fields>> section.
+
+:edit_url!:
