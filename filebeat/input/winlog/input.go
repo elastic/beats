@@ -99,7 +99,6 @@ func (in winlogInput) Run(
 	pub cursor.Publisher,
 ) error {
 	api, _ := source.(eventlog.EventLog)
-	ctx.UpdateStatus(status.Starting, fmt.Sprintf("Starting to read from %s", api.Channel()))
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 	return eventlog.Run(
 		ctx,
