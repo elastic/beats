@@ -22,7 +22,8 @@ import (
 	"regexp"
 
 	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/model/labels"
+
+	"github.com/elastic/prometheus/model/labels"
 
 	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"

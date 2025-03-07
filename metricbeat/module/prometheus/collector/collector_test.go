@@ -27,9 +27,10 @@ import (
 	"testing"
 
 	"github.com/prometheus/common/model"
-	pl "github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
+
+	pl "github.com/elastic/prometheus/model/labels"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 

@@ -21,8 +21,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/prometheus/model/labels"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
