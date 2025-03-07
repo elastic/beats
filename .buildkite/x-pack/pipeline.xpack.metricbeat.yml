@@ -123,7 +123,7 @@ steps:
           TEST_TAGS: "oracle"
         command: |
           cd x-pack/metricbeat
-          GODEBUG=netdns=go go mod tidy
+          GODEBUG=netdns=go go get go.mongodb.org/mongo-driver@v1.14.0
           mage pythonIntegTest
         retry:
           automatic:
