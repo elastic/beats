@@ -33,6 +33,7 @@ func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) erro
 	fb.wg.Add(1)
 	go func() {
 		defer fb.wg.Done()
+		fb.logger.Info("starting filebeat receiver")
 		if err := fb.startMonitoring(); err != nil {
 			fb.logger.Error("could not start the HTTP server for the monitoring API", zap.Error(err))
 		}
