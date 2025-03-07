@@ -18,7 +18,6 @@
 package compose
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -72,10 +71,10 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() {
-		err = compose.Down(context.Background())
-		if err != nil {
-			t.Logf("[ERROR] failed to stop compose project: %v", err)
-		}
+		// err = compose.Down(context.Background())
+		// if err != nil {
+		// 	t.Logf("[ERROR] failed to stop compose project: %v", err)
+		// }
 		compose.Close()
 	})
 
