@@ -1,0 +1,12 @@
+- key: pgbouncer
+  title: "PGBouncer"
+  description: >
+    Metrics collected from pgbouncer.
+  short_config: false
+  release: ga
+  fields:
+    - name: pgbouncer
+      type: group
+      description: >
+        PGBouncer metrics.
+      fields:
