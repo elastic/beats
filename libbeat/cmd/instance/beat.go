@@ -348,14 +348,6 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
 	}
 
-	if logpConfig.WithFields != nil {
-		var fields = []zapcore.Field{}
-		for key, value := range logpConfig.WithFields {
-			fields = append(fields, zap.Any(key, value))
-		}
-		core = core.With(fields)
-	}
-
 	if err := logp.ConfigureWithCore(logpConfig, core); err != nil {
 		return nil, fmt.Errorf("error configuring beats logp: %w", err)
 	}

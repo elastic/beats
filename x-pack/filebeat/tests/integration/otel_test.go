@@ -7,14 +7,12 @@
 package integration
 
 import (
-	"bufio"
 	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
@@ -171,60 +169,4 @@ func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 		flatM2.Delete(f)
 	}
 	require.Equal(t, "", cmp.Diff(flatM1, flatM2), "expected maps to be equal")
-}
-
-// This test ensures the functionality of `logging.with_fields` on beatreceivers
-func TestBeatReceiverLoggingWithFields(t *testing.T) {
-	var filebeatBasicConfig = `
-filebeat.inputs:
-  - type: filestream
-    id: filestream-input-id
-    enabled: true
-    paths:
-     - /tmp/flog.log
-output:
-  elasticsearch:
-    hosts:
-      - localhost:9200
-    protocol: http
-    username: admin
-    password: testing
-logging.with_fields:
-  component: filebeat-otel-test
-path.home: %s
-
-`
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
-
-	tempDir := filebeatOTel.TempDir()
-	s := fmt.Sprintf(filebeatBasicConfig, tempDir)
-	filebeatOTel.WriteConfigFile(s)
-	filebeatOTel.Start()
-
-	require.Eventually(t, func() bool {
-		// we must open it each time in case no logs have arrived yet
-		f, err := os.Open(filepath.Join(tempDir, "stderr"))
-		if err != nil {
-			return false
-		}
-		defer f.Close()
-
-		r := bufio.NewScanner(f)
-
-		for r.Scan() {
-			line := r.Text()
-			if strings.Contains(line, `"name": "filebeatreceiver"`) {
-				fmt.Println(line)
-				return assert.True(t, strings.Contains(line, `"component": "filebeat-otel-test"`))
-			}
-		}
-		return false
-	}, 10*time.Second, 100*time.Millisecond, "additional logging context was not added")
-
 }
