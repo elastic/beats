@@ -68,9 +68,9 @@ func WriteEventsReporterV2Cond(f mb.ReportingMetricSetV2, t testing.TB, path str
 // WriteEventsReporterV2ErrorCond fetches events and writes the first event that matches
 // the condition to a file.
 func WriteEventsReporterV2ErrorCond(f mb.ReportingMetricSetV2Error, t testing.TB, path string, cond func(mapstr.M) bool) error {
-	if !*flags.DataFlag {
-		t.Skip("skip data generation tests")
-	}
+	// if !*flags.DataFlag {
+	// 	t.Skip("skip data generation tests")
+	// }
 
 	events, errs := ReportingFetchV2Error(f)
 	if len(errs) > 0 {
