@@ -22,7 +22,6 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"crypto/sha512"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -31,8 +30,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"sync"
-
-	"golang.org/x/crypto/pbkdf2"
 
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
@@ -342,7 +339,10 @@ func (k *FileKeystore) encrypt(reader io.Reader) (io.Reader, error) {
 
 	// Stretch the user provided key
 	password, _ := k.password.Get()
-	passwordBytes := k.hashPassword(password, salt)
+	passwordBytes, err := k.hashPassword(string(password), salt)
+	if err != nil {
+		return nil, fmt.Errorf("could not hash password, error: %w", err)
+	}
 
 	// Select AES-256: because len(passwordBytes) == 32 bytes
 	block, err := aes.NewCipher(passwordBytes)
@@ -388,7 +388,10 @@ func (k *FileKeystore) decrypt(reader io.Reader) (io.Reader, error) {
 	encodedBytes := data[saltLength+iVLength:]
 
 	password, _ := k.password.Get()
-	passwordBytes := k.hashPassword(password, salt)
+	passwordBytes, err := k.hashPassword(string(password), salt)
+	if err != nil {
+		return nil, fmt.Errorf("could not hash password, error: %w", err)
+	}
 
 	block, err := aes.NewCipher(passwordBytes)
 	if err != nil {
@@ -454,10 +457,6 @@ func (k *FileKeystore) Package() ([]byte, error) {
 // ConfiguredPath returns the path to the keystore.
 func (k *FileKeystore) ConfiguredPath() string {
 	return k.Path
-}
-
-func (k *FileKeystore) hashPassword(password, salt []byte) []byte {
-	return pbkdf2.Key(password, salt, iterationsCount, keyLength, sha512.New)
 }
 
 // randomBytes return a slice of random bytes of the defined length
