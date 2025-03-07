@@ -22,12 +22,13 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
+
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
