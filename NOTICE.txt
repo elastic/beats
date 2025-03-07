@@ -6096,7 +6096,11 @@ Version: v1.24.8
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
+<<<<<<< HEAD
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/apigatewayv2@v1.24.8/LICENSE.txt:
+=======
+Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/apigatewayv2@v1.22.8/LICENSE.txt:
+>>>>>>> fb93eee6c (Remove functionbeat (#41506))
 
 
                                  Apache License
@@ -7580,7 +7584,11 @@ Version: v1.38.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
+<<<<<<< HEAD
 Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/iam@v1.38.3/LICENSE.txt:
+=======
+Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/service/iam@v1.35.0/LICENSE.txt:
+>>>>>>> fb93eee6c (Remove functionbeat (#41506))
 
 
                                  Apache License
