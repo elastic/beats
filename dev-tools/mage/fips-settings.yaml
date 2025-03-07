@@ -5,3 +5,7 @@ beats:
   - cloudbeat
   - filebeat
   - metricbeat
+compile:
+  # placeholder for compiler settings
+package:
+  # placeholder for global packaging settings
