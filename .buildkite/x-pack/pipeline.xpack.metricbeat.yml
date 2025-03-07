@@ -77,45 +77,45 @@ steps:
     key: "x-pack-metricbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-linux-unit-test"
-        command: |
-          cd x-pack/metricbeat
-          # mage build unitTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
+      # - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
+      #   key: "mandatory-linux-unit-test"
+      #   command: |
+      #     cd x-pack/metricbeat
+      #     # mage build unitTest
+      #   retry:
+      #     automatic:
+      #       - limit: 1
+      #   agents:
+      #     provider: "gcp"
+      #     image: "${IMAGE_UBUNTU_X86_64}"
+      #     machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+      #   artifact_paths:
+      #     - "x-pack/metricbeat/build/*.xml"
+      #     - "x-pack/metricbeat/build/*.json"
+      #   notify:
+      #     - github_commit_status:
+      #         context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/metricbeat: Go Integration Tests (Module)"
-        key: "mandatory-int-test"
-        env:
-          TEST_TAGS: "oracle"
-        command: |
-          cd x-pack/metricbeat
-          # mage goIntegTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Go Integration Tests (Module)"
+      # - label: ":ubuntu: x-pack/metricbeat: Go Integration Tests (Module)"
+      #   key: "mandatory-int-test"
+      #   env:
+      #     TEST_TAGS: "oracle"
+      #   command: |
+      #     cd x-pack/metricbeat
+      #     # mage goIntegTest
+      #   retry:
+      #     automatic:
+      #       - limit: 1
+      #   agents:
+      #     provider: "gcp"
+      #     image: "${IMAGE_UBUNTU_X86_64}"
+      #     machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+      #   artifact_paths:
+      #     - "x-pack/metricbeat/build/*.xml"
+      #     - "x-pack/metricbeat/build/*.json"
+      #   notify:
+      #     - github_commit_status:
+      #         context: "x-pack/metricbeat: Go Integration Tests (Module)"
 
       - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
@@ -141,7 +141,7 @@ steps:
           echo "======================================"
           resolvectl status
           echo "======================================"
-          curl -I -L https://go.mongodb.org/mongo-driver
+          curl -vvv -I -L https://go.mongodb.org/mongo-driver
           echo "======================================"
           cd x-pack/metricbeat
           mage pythonIntegTest
