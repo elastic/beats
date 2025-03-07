@@ -427,7 +427,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Add support for RFC7231 methods to http monitors. {pull}41975[41975]
-- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 
 *Metricbeat*
 
@@ -476,6 +475,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
 - Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
