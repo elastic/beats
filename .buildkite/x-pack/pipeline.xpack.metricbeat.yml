@@ -135,9 +135,9 @@ steps:
           echo "======================================"
           nslookup go.mongodb.org 1.1.1.1
           echo "======================================"
-          sudo systemd-resolve --flush-caches
-          echo "======================================"
           nslookup go.mongodb.org 8.8.8.8
+          echo "======================================"
+          resolvectl status
           echo "======================================"
           resolvectl query --server=8.8.8.8 go.mongodb.org
           echo "======================================"
