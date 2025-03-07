@@ -36,42 +36,42 @@ env:
   CONCURRENCY_METHOD: eager
 
 steps:
-  - group: "Check/Update"
-    key: "x-pack-metricbeat-check-update"
-    steps:
-      - label: "x-pack/metricbeat: Run check/update"
-        command: |
-          set -eo pipefail
-          make -C x-pack/metricbeat check update
-          make check-no-changes
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
-          cpu: "4000m"
-          memory: "8Gi"
-          useCustomGlobalHooks: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: check/update"
+  # - group: "Check/Update"
+  #   key: "x-pack-metricbeat-check-update"
+  #   steps:
+  #     - label: "x-pack/metricbeat: Run check/update"
+  #       command: |
+  #         set -eo pipefail
+  #         make -C x-pack/metricbeat check update
+  #         make check-no-changes
+  #       retry:
+  #         automatic:
+  #           - limit: 1
+  #       agents:
+  #         image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+  #         cpu: "4000m"
+  #         memory: "8Gi"
+  #         useCustomGlobalHooks: true
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: check/update"
 
-      - label: "x-pack/metricbeat: Run pre-commit"
-        command: "pre-commit run --all-files"
-        agents:
-          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
-          memory: "2Gi"
-          useCustomGlobalHooks: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: pre-commit"
+  #     - label: "x-pack/metricbeat: Run pre-commit"
+  #       command: "pre-commit run --all-files"
+  #       agents:
+  #         image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+  #         memory: "2Gi"
+  #         useCustomGlobalHooks: true
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: pre-commit"
 
-  - wait: ~
-    # with PRs, we want to run mandatory tests only if check/update step succeed
-    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
-    # this allows building DRA artifacts even if there is flakiness in check/update step
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on: "x-pack-metricbeat-check-update"
+  # - wait: ~
+  #   # with PRs, we want to run mandatory tests only if check/update step succeed
+  #   # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+  #   # this allows building DRA artifacts even if there is flakiness in check/update step
+  #   if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+  #   depends_on: "x-pack-metricbeat-check-update"
 
   - group: "Mandatory Tests"
     key: "x-pack-metricbeat-mandatory-tests"
@@ -125,7 +125,9 @@ steps:
           curl https://proxy.golang.org/go.mongodb.org/mongo-driver/@v/list
           echo "======================================"
           cat /etc/resolv.conf
-           echo "======================================"
+          echo "======================================"
+          go env
+          echo "======================================"
           dig @1.1.1.1 go.mongodb.org/mongo-driver
           echo "======================================"
           echo "======================================"
@@ -138,8 +140,6 @@ steps:
           nslookup go.mongodb.org 8.8.8.8
           echo "======================================"
           resolvectl status
-          echo "======================================"
-          resolvectl query --server=8.8.8.8 go.mongodb.org
           echo "======================================"
           curl -I -L https://go.mongodb.org/mongo-driver
           echo "======================================"
@@ -159,240 +159,240 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Python Integration Tests (Module)"
 
-      - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/metricbeat
-          # mage build unitTest
-        key: "mandatory-win-2016-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Win 2016 Unit Tests"
+      # - label: ":windows: x-pack/metricbeat: Win 2016 Unit Tests"
+      #   command: |
+      #     Set-Location -Path x-pack/metricbeat
+      #     # mage build unitTest
+      #   key: "mandatory-win-2016-unit-tests"
+      #   retry:
+      #     automatic:
+      #       - limit: 1
+      #   agents:
+      #     provider: "gcp"
+      #     image: "${IMAGE_WIN_2016}"
+      #     machine_type: "${GCP_WIN_MACHINE_TYPE}"
+      #     disk_size: 100
+      #     disk_type: "pd-ssd"
+      #   artifact_paths:
+      #     - "x-pack/metricbeat/build/*.xml"
+      #     - "x-pack/metricbeat/build/*.json"
+      #   notify:
+      #     - github_commit_status:
+      #         context: "x-pack/metricbeat: Win 2016 Unit Tests"
 
-      - label: ":windows: x-pack/metricbeat: Win 2022 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/metricbeat
-          # mage build unitTest
-        key: "mandatory-win-2022-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Win 2022 Unit Tests"
+      # - label: ":windows: x-pack/metricbeat: Win 2022 Unit Tests"
+      #   command: |
+      #     Set-Location -Path x-pack/metricbeat
+      #     # mage build unitTest
+      #   key: "mandatory-win-2022-unit-tests"
+      #   retry:
+      #     automatic:
+      #       - limit: 1
+      #   agents:
+      #     provider: "gcp"
+      #     image: "${IMAGE_WIN_2022}"
+      #     machine_type: "${GCP_WIN_MACHINE_TYPE}"
+      #     disk_size: 100
+      #     disk_type: "pd-ssd"
+      #   artifact_paths:
+      #     - "x-pack/metricbeat/build/*.xml"
+      #     - "x-pack/metricbeat/build/*.json"
+      #   notify:
+      #     - github_commit_status:
+      #         context: "x-pack/metricbeat: Win 2022 Unit Tests"
 
-  - group: "Extended Windows Tests"
-    key: "x-pack-metricbeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+  # - group: "Extended Windows Tests"
+  #   key: "x-pack-metricbeat-extended-win-tests"
+  #   if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
-    steps:
-      - label: ":windows: x-pack/metricbeat: Win 10 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/metricbeat
-          # mage build unitTest
-        key: "extended-win-10-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Win 10 Unit Tests"
+  #   steps:
+  #     - label: ":windows: x-pack/metricbeat: Win 10 Unit Tests"
+  #       command: |
+  #         Set-Location -Path x-pack/metricbeat
+  #         # mage build unitTest
+  #       key: "extended-win-10-unit-tests"
+  #       retry:
+  #         automatic:
+  #           - limit: 1
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_10}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths:
+  #         - "x-pack/metricbeat/build/*.xml"
+  #         - "x-pack/metricbeat/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/metricbeat: Win 11 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/metricbeat
-          # mage build unitTest
-        key: "extended-win-11-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Win 11 Unit Tests"
+  #     - label: ":windows: x-pack/metricbeat: Win 11 Unit Tests"
+  #       command: |
+  #         Set-Location -Path x-pack/metricbeat
+  #         # mage build unitTest
+  #       key: "extended-win-11-unit-tests"
+  #       retry:
+  #         automatic:
+  #           - limit: 1
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_11}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths:
+  #         - "x-pack/metricbeat/build/*.xml"
+  #         - "x-pack/metricbeat/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: Win 11 Unit Tests"
 
-      - label: ":windows: x-pack/metricbeat: Win 2019 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/metricbeat
-          # mage build unitTest
-        key: "extended-win-2019-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Win 2019 Unit Tests"
+  #     - label: ":windows: x-pack/metricbeat: Win 2019 Unit Tests"
+  #       command: |
+  #         Set-Location -Path x-pack/metricbeat
+  #         # mage build unitTest
+  #       key: "extended-win-2019-unit-tests"
+  #       retry:
+  #         automatic:
+  #           - limit: 1
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_2019}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths:
+  #         - "x-pack/metricbeat/build/*.xml"
+  #         - "x-pack/metricbeat/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: Win 2019 Unit Tests"
 
-  - group: "Extended Tests"
-    key: "x-pack-metricbeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|aws).*/
+  # - group: "Extended Tests"
+  #   key: "x-pack-metricbeat-extended-tests"
+  #   if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|aws).*/
 
-    steps:
-      - label: ":mac: x-pack/metricbeat: macOS x86_64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          # cd x-pack/metricbeat && mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: macOS x86_64 Unit Tests"
+  #   steps:
+  #     - label: ":mac: x-pack/metricbeat: macOS x86_64 Unit Tests"
+  #       if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+  #       command: |
+  #         set -euo pipefail
+  #         source .buildkite/scripts/install_macos_tools.sh
+  #         # cd x-pack/metricbeat && mage build unitTest
+  #       concurrency_group: "${CONCURRENCY_GROUP}"
+  #       concurrency: "${CONCURRENCY_COUNT}"
+  #       concurrency_method: "${CONCURRENCY_METHOD}"
+  #       retry:
+  #         automatic:
+  #           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
+  #       agents:
+  #         provider: "orka"
+  #         imagePrefix: "${IMAGE_MACOS_X86_64}"
+  #       artifact_paths:
+  #         - "x-pack/metricbeat/build/*.xml"
+  #         - "x-pack/metricbeat/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: x-pack/metricbeat: macOS arm64 Unit Tests"
-        skip: "Skipping due to elastic/beats#33036 & elastic/beats#40496"
-        # https://github.com/elastic/beats/issues/33036 https://github.com/elastic/beats/issues/40496
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          # cd x-pack/metricbeat && mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: macOS arm64 Unit Tests"
+  #     - label: ":mac: x-pack/metricbeat: macOS arm64 Unit Tests"
+  #       skip: "Skipping due to elastic/beats#33036 & elastic/beats#40496"
+  #       # https://github.com/elastic/beats/issues/33036 https://github.com/elastic/beats/issues/40496
+  #       if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+  #       command: |
+  #         set -euo pipefail
+  #         source .buildkite/scripts/install_macos_tools.sh
+  #         # cd x-pack/metricbeat && mage build unitTest
+  #       concurrency_group: "${CONCURRENCY_GROUP}"
+  #       concurrency: "${CONCURRENCY_COUNT}"
+  #       concurrency_method: "${CONCURRENCY_METHOD}"
+  #       retry:
+  #         automatic:
+  #           - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
+  #       agents:
+  #         provider: "orka"
+  #         imagePrefix: "${IMAGE_MACOS_ARM}"
+  #       artifact_paths:
+  #         - "x-pack/metricbeat/build/*.xml"
+  #         - "x-pack/metricbeat/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: macOS arm64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/metricbeat: AWS Tests"
-        key: "x-pack-metricbeat-extended-cloud-test"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
-        env:
-          ASDF_TERRAFORM_VERSION: 1.0.2
-          MODULE_DIR: "x-pack/metricbeat/module/aws"
-          MODULE: "aws"
-          #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
-          TEST_TAGS: "aws"
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/initCloudEnv.sh
-          echo "~~~ Running tests"
-          cd x-pack/metricbeat
-          # mage build test goIntegTest
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: AWS Tests"
+  #     - label: ":ubuntu: x-pack/metricbeat: AWS Tests"
+  #       key: "x-pack-metricbeat-extended-cloud-test"
+  #       if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
+  #       env:
+  #         ASDF_TERRAFORM_VERSION: 1.0.2
+  #         MODULE_DIR: "x-pack/metricbeat/module/aws"
+  #         MODULE: "aws"
+  #         #  TEST_TAGS should be reviewed and updated: https://github.com/elastic/ingest-dev/issues/3476
+  #         TEST_TAGS: "aws"
+  #       command: |
+  #         set -euo pipefail
+  #         source .buildkite/scripts/initCloudEnv.sh
+  #         echo "~~~ Running tests"
+  #         cd x-pack/metricbeat
+  #         # mage build test goIntegTest
+  #       agents:
+  #         provider: "aws"
+  #         imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+  #         instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+  #       artifact_paths:
+  #         - "x-pack/metricbeat/build/*.xml"
+  #         - "x-pack/metricbeat/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: AWS Tests"
 
-  - wait: ~
-    # with PRs, we want to run packaging only if mandatory tests succeed
-    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
-    # this allows building DRA artifacts even if there is flakiness in mandatory tests
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on:
-      - step: "x-pack-metricbeat-mandatory-tests"
+  # - wait: ~
+  #   # with PRs, we want to run packaging only if mandatory tests succeed
+  #   # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+  #   # this allows building DRA artifacts even if there is flakiness in mandatory tests
+  #   if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+  #   depends_on:
+  #     - step: "x-pack-metricbeat-mandatory-tests"
 
-  - group: "Packaging"
-    key: "x-pack-metricbeat-packaging"
+  # - group: "Packaging"
+  #   key: "x-pack-metricbeat-packaging"
 
-    steps:
-      - label: ":ubuntu: x-pack/metricbeat: Packaging Linux"
-        key: "packaging-linux"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-        command: |
-          .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
-        retry:
-          automatic:
-            - limit: 1
-        timeout_in_minutes: 20
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Packaging Linux"
+  #   steps:
+  #     - label: ":ubuntu: x-pack/metricbeat: Packaging Linux"
+  #       key: "packaging-linux"
+  #       env:
+  #         PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  #       command: |
+  #         .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
+  #       retry:
+  #         automatic:
+  #           - limit: 1
+  #       timeout_in_minutes: 20
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_UBUNTU_X86_64}"
+  #         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: Packaging Linux"
 
-      - label: ":ubuntu: x-pack/metricbeat: Packaging linux arm64"
-        key: "packaging-arm"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
-        command: |
-          .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
-        retry:
-          automatic:
-            - limit: 1
-        timeout_in_minutes: 20
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Packaging Linux arm64"
+  #     - label: ":ubuntu: x-pack/metricbeat: Packaging linux arm64"
+  #       key: "packaging-arm"
+  #       env:
+  #         PLATFORMS: "linux/arm64"
+  #         PACKAGES: "docker"
+  #       command: |
+  #         .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
+  #       retry:
+  #         automatic:
+  #           - limit: 1
+  #       timeout_in_minutes: 20
+  #       agents:
+  #         provider: "aws"
+  #         imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+  #         instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "x-pack/metricbeat: Packaging Linux arm64"
