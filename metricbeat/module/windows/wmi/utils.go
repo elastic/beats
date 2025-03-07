@@ -48,9 +48,54 @@ func ConvertSint64(v string) (interface{}, error) {
 	return strconv.ParseInt(v, 10, 64)
 }
 
+const WMI_DATETIME_LAYOUT string = "20060102150405.999999"
+const TIMEZONE_LAYOUT string = "-07:00"
+
+// The CIMDateFormat is defined as "yyyymmddHHMMSS.mmmmmmsUUU".
+// Example: "20231224093045.123456+000"
+// More information: https://learn.microsoft.com/en-us/windows/win32/wmisdk/cim-datetime
+//
+// The "yyyyMMddHHmmSS.mmmmmm" part can be parsed using time.Parse, but Go's time package does not support parsing the "sUUU"
+// part (the sign and minute offset from UTC).
+//
+// Here, "s" represents the sign (+ or -), and "UUU" represents the UTC offset in minutes.
+//
+// The approach for handling this is:
+// 1. Extract the sign ('+' or '-') from the string.
+// 2. Normalize the offset from minutes to the standard `hh:mm` format.
+// 3. Concatenate the "yyyyMMddHHmmSS.mmmmmm" part with the normalized offset.
+// 4. Parse the combined string using time.Parse to return a time.Date object.
 func ConvertDatetime(v string) (interface{}, error) {
-	layout := "20060102150405.999999-0700"
-	return time.Parse(layout, v+"0")
+	if len(v) != 25 {
+		return nil, fmt.Errorf("datetime is invalid: the datetime is expected to be exactly 25 characters long, got: %s", v)
+	}
+
+	// Extract the sign (either '+' or '-')
+	utcOffsetSign := v[21]
+	if utcOffsetSign != '+' && utcOffsetSign != '-' {
+		return nil, fmt.Errorf("datetime is invalid: the offset sign is expected to be either + or -")
+	}
+
+	// Extract UTC offset (last 3 characters)
+	utcOffsetStr := v[22:]
+	utcOffset, err := strconv.ParseInt(utcOffsetStr, 10, 16)
+	if err != nil {
+		return nil, fmt.Errorf("datetime is invalid: error parsing UTC offset: %w", err)
+	}
+	offsetHours := utcOffset / 60
+	offsetMinutes := utcOffset % 60
+
+	// Build the complete date string including the UTC offset in the format yyyyMMddHHmmss.mmmmmm+hh:mm
+	// Concatenate the date string with the offset formatted as "+hh:mm"
+	dateString := fmt.Sprintf("%s%c%02d:%02d", v[:21], utcOffsetSign, offsetHours, offsetMinutes)
+
+	// Parse the combined datetime string using the defined layout
+	date, err := time.Parse(WMI_DATETIME_LAYOUT+TIMEZONE_LAYOUT, dateString)
+	if err != nil {
+		return nil, fmt.Errorf("datetime is invalid: error parsing the final datetime: %w", err)
+	}
+
+	return date, err
 }
 
 func ConvertString(v string) (interface{}, error) {
@@ -59,8 +104,8 @@ func ConvertString(v string) (interface{}, error) {
 
 // Function that determines if a given value requires additional conversion
 // This holds true for strings that encode uint64, sint64 and datetime format
-func RequiresExtraConversion(fieldValue interface{}) bool {
-	stringValue, isString := fieldValue.(string)
+func RequiresExtraConversion(propertyValue interface{}) bool {
+	stringValue, isString := propertyValue.(string)
 	if !isString {
 		return false
 	}
@@ -85,11 +130,11 @@ func getPropertyType(property *ole.IDispatch) (base.WmiType, error) {
 	return base.WmiType(value.(int32)), nil
 }
 
-// Returns the "raw" SWbemProperty containing type information for a given field.
+// Returns the "raw" SWbemProperty containing type information for a given property.
 //
 // The microsoft/wmi library does not have a function that given an instance and a property name
 // returns the wmi.wmiProperty object. This function mimics the behavior of the `GetSystemProperty`
-// method in the wmi.wmiInstance struct and applies it on the Properties_ field
+// method in the wmi.wmiInstance struct and applies it on the Properties_ property
 // https://github.com/microsoft/wmi/blob/v0.25.2/pkg/wmiinstance/WmiInstance.go#L87
 //
 // Note: We are not instantiating a wmi.wmiProperty because of this issue
