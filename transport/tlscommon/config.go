@@ -98,6 +98,11 @@ func (c *Config) Validate() error {
 		}
 
 	}
+	for _, cs := range c.CipherSuites {
+		if err := cs.Validate(); err != nil {
+			return err
+		}
+	}
 	return c.Certificate.Validate()
 }
 

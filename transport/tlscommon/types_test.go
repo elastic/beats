@@ -92,7 +92,7 @@ func TestRepackConfig(t *testing.T) {
     verification_mode: certificate
     supported_protocols: [TLSv1.2, TLSv1.3]
     cipher_suites:
-      - RSA-AES-256-CBC-SHA
+      - ECDHE-ECDSA-AES-256-GCM-SHA384
     certificate_authorities:
       - /path/to/ca.crt
     certificate: /path/to/cert.crt
@@ -121,7 +121,7 @@ func TestRepackConfigFromJSON(t *testing.T) {
     "enabled": true,
     "verification_mode": "certificate",
     "supported_protocols": ["TLSv1.2", "TLSv1.3"],
-    "cipher_suites": ["RSA-AES-256-CBC-SHA"],
+    "cipher_suites": ["ECDHE-ECDSA-AES-256-GCM-SHA384"],
     "certificate_authorities": ["/path/to/ca.crt"],
     "certificate": "/path/to/cert.crt",
     "key": "/path/to/key.crt",

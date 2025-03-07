@@ -71,6 +71,7 @@ var tlsCipherSuites = map[string]CipherSuite{
 	"TLS-CHACHA20-POLY1305-SHA256": CipherSuite(tls.TLS_CHACHA20_POLY1305_SHA256),
 }
 
+var supportedCipherSuites = make(map[CipherSuite]string, len(tlsCipherSuites))
 var tlsCipherSuitesInverse = make(map[CipherSuite]string, len(tlsCipherSuites))
 var tlsRenegotiationSupportTypesInverse = make(map[TLSRenegotiationSupport]string, len(tlsRenegotiationSupportTypes))
 var tlsVerificationModesInverse = make(map[TLSVerificationMode]string, len(tlsVerificationModes))
@@ -252,6 +253,13 @@ func (cs *CipherSuite) Unpack(i interface{}) error {
 		*cs = CipherSuite(o)
 	default:
 		return fmt.Errorf("cipher suite is an unknown type: %T", o)
+	}
+	return nil
+}
+
+func (cs *CipherSuite) Validate() error {
+	if _, ok := supportedCipherSuites[*cs]; !ok {
+		return fmt.Errorf("unsupported tls cipher suite: %s", tls.CipherSuiteName(uint16(*cs)))
 	}
 	return nil
 }
