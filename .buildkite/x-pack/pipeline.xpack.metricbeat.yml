@@ -131,7 +131,7 @@ steps:
         agents:
           provider: "gcp"
           imageProject: "elastic-images-qa"
-          image: "platform-ingest-beats-ubuntu-2204-1741339016"
+          image: "platform-ingest-beats-ubuntu-2204-1741342963"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
