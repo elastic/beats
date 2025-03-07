@@ -21,7 +21,6 @@ package mb
 
 import (
 	"net/url"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -29,7 +28,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_id"
-	"github.com/elastic/beats/v7/testing/testcfg"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -110,12 +108,7 @@ func TestLightModulesAsModuleSource(t *testing.T) {
 			}
 			r.MustAddMetricSet(m.module, m.name, fakeMetricSetFactory, opts...)
 		}
-
-		abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-		require.NoError(t, err, "could not get absolute path")
-		paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-
-		r.SetSecondarySource(NewLightModulesSource(paths))
+		r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 		return r
 	}
 
@@ -258,12 +251,7 @@ func TestNewModuleFromConfig(t *testing.T) {
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
 	r.MustAddMetricSet("foo", "light", newMetricSetWithOption)
 	r.MustAddMetricSet("mixed", "standard", newMetricSetWithOption)
-
-	abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-	require.NoError(t, err, "could not get absolute path")
-	paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-
-	r.SetSecondarySource(NewLightModulesSource(paths))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
@@ -317,11 +305,7 @@ func TestLightMetricSet_VerifyHostDataURI(t *testing.T) {
 				URI:  host,
 			}, nil
 		}))
-	abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-	require.NoError(t, err, "could not get absolute path")
-	paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-
-	r.SetSecondarySource(NewLightModulesSource(paths))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	config, err := conf.NewConfigFrom(
 		mapstr.M{
@@ -344,11 +328,7 @@ func TestLightMetricSet_WithoutHostParser(t *testing.T) {
 
 	r := NewRegister()
 	r.MustAddMetricSet("http", "json", newMetricSetWithOption)
-	abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-	require.NoError(t, err, "could not get absolute path")
-	paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-
-	r.SetSecondarySource(NewLightModulesSource(paths))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	config, err := conf.NewConfigFrom(
 		mapstr.M{
@@ -381,11 +361,7 @@ func TestLightMetricSet_VerifyHostDataURI_NonParsableHost(t *testing.T) {
 				URI:  postgresParsed,
 			}, nil
 		}))
-	abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-	require.NoError(t, err, "could not get absolute path")
-	paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-
-	r.SetSecondarySource(NewLightModulesSource(paths))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	config, err := conf.NewConfigFrom(
 		mapstr.M{
@@ -408,11 +384,7 @@ func TestNewModulesCallModuleFactory(t *testing.T) {
 
 	r := NewRegister()
 	r.MustAddMetricSet("foo", "bar", newMetricSetWithOption)
-	abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-	require.NoError(t, err, "could not get absolute path")
-	paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-
-	r.SetSecondarySource(NewLightModulesSource(paths))
+	r.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 
 	called := false
 	r.AddModule("foo", func(base BaseModule) (Module, error) {
@@ -446,12 +418,8 @@ func TestProcessorsForMetricSet_UnknownMetricSet(t *testing.T) {
 }
 
 func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
-	abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-	require.NoError(t, err, "could not get absolute path")
-	paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-	source := NewLightModulesSource(paths)
-
 	r := NewRegister()
+	source := NewLightModulesSource("testdata/lightmodules")
 	procs, err := source.ProcessorsForMetricSet(r, "unpack", "withprocessors")
 	require.NoError(t, err)
 	require.NotNil(t, procs)
@@ -459,11 +427,7 @@ func TestProcessorsForMetricSet_ProcessorsRead(t *testing.T) {
 }
 
 func TestProcessorsForMetricSet_ListModules(t *testing.T) {
-	abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-	require.NoError(t, err, "could not get absolute path")
-	paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-
-	source := NewLightModulesSource(paths)
+	source := NewLightModulesSource("testdata/lightmodules")
 	modules, err := source.Modules()
 	require.NoError(t, err)
 

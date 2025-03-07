@@ -30,7 +30,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/testing/testcfg"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -82,8 +81,7 @@ func TestNewModuleRegistry(t *testing.T) {
 		},
 	}
 
-	fixedModulesPath := testcfg.CopyDirectoryWithOwnerWriteOnly(t, modulesPath, "")
-	reg, err := newModuleRegistry(fixedModulesPath, configs, nil, beat.Info{Version: "5.2.0"}, FilesetOverrides{})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -150,8 +148,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		},
 	}
 
-	fixedModulesPath := testcfg.CopyDirectoryWithOwnerWriteOnly(t, modulesPath, "")
-	reg, err := newModuleRegistry(fixedModulesPath, configs, nil, beat.Info{Version: "5.2.0"}, FilesetOverrides{})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -177,8 +174,7 @@ func TestMovedModule(t *testing.T) {
 		},
 	}
 
-	fixedModulesPath := testcfg.CopyDirectoryWithOwnerWriteOnly(t, modulesPath, "")
-	reg, err := newModuleRegistry(fixedModulesPath, configs, nil, beat.Info{Version: "5.2.0"}, FilesetOverrides{})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"}, FilesetOverrides{})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }

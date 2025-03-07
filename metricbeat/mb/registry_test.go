@@ -20,13 +20,10 @@
 package mb
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/testing/testcfg"
 )
 
 const (
@@ -242,12 +239,8 @@ func TestProcessorsForMetricSet_UndefinedSecondarySource(t *testing.T) {
 }
 
 func TestProcessorsForMetricSet_FromSource(t *testing.T) {
-	abs, err := filepath.Abs(filepath.Join("testdata", "lightmodules"))
-	require.NoError(t, err, "could not get absolute path")
-	paths := testcfg.CopyDirectoryWithOwnerWriteOnly(t, abs, "")
-
 	registry := NewRegister()
-	registry.SetSecondarySource(NewLightModulesSource(paths))
+	registry.SetSecondarySource(NewLightModulesSource("testdata/lightmodules"))
 	procs, err := registry.ProcessorsForMetricSet("unpack", "withprocessors")
 	require.NoError(t, err)
 	require.NotNil(t, procs)
