@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 - Add `use_kubeadm` config option in kubernetes module in order to toggle kubeadm-config API requests. {pull}40086[40086]
 - Preserve queries for debugging when `merge_results: true` in SQL module. {pull}42271[42271]
 - Collect more fields from ES node/stats metrics and only those that are necessary. {pull}42421[42421]
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 
 *Metricbeat*
 - Add benchmark module. {pull}41801[41801]
