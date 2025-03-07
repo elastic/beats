@@ -26,7 +26,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/testing/testcfg"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -105,20 +104,12 @@ func TestMergeConfigFiles(t *testing.T) {
 	assert.NoError(t, err)
 
 	files, err := getConfigFiles(absPath)
+
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(files))
 
-	// The beats won't accept config files that can be written by the user's
-	// group or others and as git won't save the full permission to a files,
-	// we need to ensure the config files have the right permissions.
-	var filesWithCorrectPermission []string
-	for _, f := range files {
-		filesWithCorrectPermission = append(
-			filesWithCorrectPermission, testcfg.NewFileWith644Perm(t, f))
-	}
-
 	config := &Config{}
-	err = mergeConfigFiles(filesWithCorrectPermission, config)
+	err = mergeConfigFiles(files, config)
 	assert.NoError(t, err)
 
 	assert.Equal(t, 4, len(config.Inputs))
