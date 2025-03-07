@@ -8,6 +8,11 @@ from xpack_metricbeat import XPackTest, metricbeat
 class Test(XPackTest):
     COMPOSE_SERVICES = ['mssql']
 
+    def start_beat():
+        # go 1.23 no longer accepts the negative serials used in mssql test
+        # container certificates, add a debug flag to allow them.
+        super().start_beat(env={"GODEBUG": "x509negativeserial=1"})
+
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_query_without_fetch_from_all_databases(self):
         """
