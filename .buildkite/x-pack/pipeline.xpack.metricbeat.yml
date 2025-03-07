@@ -142,8 +142,7 @@ steps:
           echo "======================================"
           resolvectl status
           echo "======================================"
-          echo "======================================"
-          go env -w GODEBUG=netdns=go
+          export GODEBUG=netdns=go
           echo "======================================"
           cd x-pack/metricbeat
           GODEBUG=netdns=go mage pythonIntegTest
