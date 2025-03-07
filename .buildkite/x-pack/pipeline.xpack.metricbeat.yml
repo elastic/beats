@@ -130,6 +130,7 @@ steps:
           echo "======================================"
           dig @1.1.1.1 go.mongodb.org/mongo-driver
           echo "======================================"
+          dig go.mongodb.org @127.0.0.53
           echo "======================================"
           dig @8.8.8.8 go.mongodb.org/mongo-driver
           echo "======================================"
@@ -140,6 +141,8 @@ steps:
           nslookup go.mongodb.org 8.8.8.8
           echo "======================================"
           resolvectl status
+          echo "======================================"
+          GODEBUG=netdns=go go get go.mongodb.org/mongo-driver
           echo "======================================"
           curl -vvv -I -L https://go.mongodb.org/mongo-driver
           echo "======================================"
