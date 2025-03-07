@@ -212,7 +212,11 @@ func GoIntegTest(ctx context.Context) error {
 	args := devtools.DefaultGoTestIntegrationFromHostArgs()
 	args.Tags = append(args.Tags, "agentbeat")
 	for _, beat := range getIncludedBeats() {
-		args.Packages = append(args.Packages, "../"+beat+"/...")
+		// original code never included metricbeat integration tests, see
+		// https://github.com/elastic/beats/blob/873743b78a16c16eb74fd0e3ac538769e63acfab/x-pack/agentbeat/magefile.go#L208
+		if beat != "metricbeat" {
+			args.Packages = append(args.Packages, "../"+beat+"/...")
+		}
 	}
 	return devtools.GoIntegTestFromHost(ctx, args)
 }
