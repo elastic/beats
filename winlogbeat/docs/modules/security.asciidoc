@@ -1,0 +1,18 @@
+[[winlogbeat-module-security]]
+[role="xpack"]
+== Security Module
+
+The security module processes event log records from the Security log.
+
+[float]
+=== Configuration
+
+[source,yaml,subs="attributes,callouts"]
+----
+winlogbeat.event_logs:
+  - name: Security
+
+output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing <1>
+----
+<1> All module processing is handled via Elasticsearch Ingest Node pipelines.
+See <<{beatname_lc}-modules-setup>> for details.
