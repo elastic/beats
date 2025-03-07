@@ -120,7 +120,6 @@ steps:
       - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
         env:
-          MODULE: "activemq"
           TEST_TAGS: "oracle"
         command: |
           cd x-pack/metricbeat
