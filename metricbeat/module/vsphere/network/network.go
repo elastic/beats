@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
@@ -55,6 +56,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to create vSphere metricset: %w", err)
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "network", ms.Insecure)
 	return &NetworkMetricSet{ms}, nil
 }
 
