@@ -7,14 +7,13 @@
 package helper
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
-	"math/rand"
 	"net"
 	"time"
 	"unsafe"
 
-	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 )
 
@@ -81,7 +80,10 @@ func NewIPv6Loopback() (lo IPv6Loopback, err error) {
 func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 	addr = make(net.IP, 16)
 	addr[0] = 0xFD
-	rand.Read(addr[1:])
+	_, err = rand.Read(addr[1:])
+	if err != nil {
+		return nil, fmt.Errorf("rand.Read failed: %w", err)
+	}
 	var req in6Ifreq
 	copy(req.addr[:], addr)
 	req.ifindex = lo.ifreq.index
@@ -106,7 +108,7 @@ func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 		if err = unix.Bind(fd, &bindAddr); err == nil {
 			break
 		}
-		if errno, ok := err.(unix.Errno); !ok || errno != unix.EADDRNOTAVAIL {
+		if !errors.Is(err, unix.EADDRNOTAVAIL) {
 			break
 		}
 		time.Sleep(time.Millisecond * time.Duration(i))
@@ -119,7 +121,7 @@ func (lo *IPv6Loopback) AddRandomAddress() (addr net.IP, err error) {
 
 // Cleanup removes the addresses registered to this loopback.
 func (lo *IPv6Loopback) Cleanup() error {
-	var errs multierror.Errors
+	var errs []error
 	var req in6Ifreq
 	req.ifindex = lo.ifreq.index
 	req.prefix = 128
@@ -133,5 +135,5 @@ func (lo *IPv6Loopback) Cleanup() error {
 	if lo.fd != -1 {
 		unix.Close(lo.fd)
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
