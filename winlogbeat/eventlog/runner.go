@@ -80,12 +80,11 @@ runLoop:
 		openErr := api.Open(evtCheckpoint)
 		if openErr != nil {
 			if openErrHandler.backoff(cancelCtx, openErr) {
-				continue
+				continue runLoop
 			}
 			//nolint:nilerr // only log error if we are not shutting down
 			if cancelCtx.Err() != nil {
-				reporter.UpdateStatus(status.Stopped, "")
-				return nil
+				break runLoop
 			}
 			reporter.UpdateStatus(status.Failed, fmt.Sprintf("Failed to open %s: %v", api.Channel(), openErr))
 			return fmt.Errorf("failed to open Windows Event Log channel %q: %w", api.Channel(), openErr)
@@ -104,14 +103,12 @@ runLoop:
 
 				if errors.Is(readErr, io.EOF) {
 					log.Debugw("end of Winlog event stream reached", "error", readErr)
-					reporter.UpdateStatus(status.Stopped, "")
-					return nil
+					break runLoop
 				}
 
 				//nolint:nilerr // only log error if we are not shutting down
 				if cancelCtx.Err() != nil {
-					reporter.UpdateStatus(status.Stopped, "")
-					return nil
+					break runLoop
 				}
 
 				reporter.UpdateStatus(status.Failed, fmt.Sprintf("Failed to read from %s: %v", api.Channel(), readErr))
@@ -131,6 +128,7 @@ runLoop:
 			}
 		}
 	}
+	reporter.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
