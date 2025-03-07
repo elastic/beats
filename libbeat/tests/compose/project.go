@@ -264,6 +264,8 @@ func (c *Project) Lock() {
 		if acquireLock(c.LockFile()) {
 			if infoShown {
 				logp.Info("%s lock acquired", c.LockFile())
+				fmt.Printf("%s lock acquired",
+					c.LockFile())
 			}
 			return
 		}
@@ -271,12 +273,16 @@ func (c *Project) Lock() {
 		if stalledLock(c.LockFile()) {
 			if err := os.Remove(c.LockFile()); err == nil {
 				logp.Info("Stalled lockfile %s removed", c.LockFile())
+				fmt.Printf("Stalled lockfile %s removed",
+					c.LockFile())
 				continue
 			}
 		}
 
 		if !infoShown {
 			logp.Info("%s is locked, waiting", c.LockFile())
+			fmt.Printf("%s is locked, waiting",
+				c.LockFile())
 			infoShown = true
 		}
 		fmt.Printf("waiting for lock file %s to become available",
@@ -285,7 +291,8 @@ func (c *Project) Lock() {
 	}
 
 	// This should rarely happen as we lock for start only, less than a second
-	panic("timeout waiting for lock")
+	panic(fmt.Sprintf("timeout after %s waithing for lock %s",
+		timeout, c.LockFile()))
 }
 
 func acquireLock(path string) bool {
