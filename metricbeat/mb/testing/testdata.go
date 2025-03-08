@@ -78,6 +78,7 @@ type DataConfig struct {
 	DataPath string
 
 	// The type of the test to run, usually `http`.
+	// fake line
 	Type string
 
 	// URL of the endpoint that must be tested depending on each module
