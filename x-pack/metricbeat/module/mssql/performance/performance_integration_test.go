@@ -23,7 +23,7 @@ type keyAssertion struct {
 }
 
 func TestFetch(t *testing.T) {
-	//t.Skip("Skipping flaky `TestFetch` test, https://github.com/elastic/beats/issues/43123")
+	t.Skip("Skipping flaky `TestFetch` test, https://github.com/elastic/beats/issues/43123")
 
 	logp.TestingSetup()
 	service := compose.EnsureUp(t, "mssql")

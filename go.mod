@@ -2,8 +2,6 @@ module github.com/elastic/beats/v7
 
 go 1.23.6
 
-godebug x509negativeserial=1
-
 require (
 	cloud.google.com/go/bigquery v1.65.0
 	cloud.google.com/go/monitoring v1.21.2
