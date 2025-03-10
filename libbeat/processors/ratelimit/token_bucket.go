@@ -150,6 +150,7 @@ func (t *tokenBucket) setClock(c clockwork.Clock) {
 func (t *tokenBucket) getBucket(key uint64) *bucket {
 	v, exists := t.buckets.Load(key)
 	if exists {
+		//nolint:errcheck // ignore
 		b := v.(*bucket)
 		b.replenish(t.limit, t.clock)
 		return b
@@ -159,6 +160,7 @@ func (t *tokenBucket) getBucket(key uint64) *bucket {
 		tokens:        t.depth,
 		lastReplenish: t.clock.Now(),
 	})
+	//nolint:errcheck // ignore
 	return v.(*bucket)
 }
 
@@ -181,7 +183,9 @@ func (t *tokenBucket) runGC() {
 		toDelete := make([]uint64, 0)
 		numBucketsBefore := 0
 		t.buckets.Range(func(k, v interface{}) bool {
+			//nolint:errcheck // ignore
 			key := k.(uint64)
+			//nolint:errcheck // ignore
 			b := v.(*bucket)
 
 			tokens := b.replenish(t.limit, t.clock)
@@ -201,7 +205,7 @@ func (t *tokenBucket) runGC() {
 		// Reset GC metrics
 		t.gc.metrics.numCalls.Store(0)
 
-		gcDuration := time.Now().Sub(gcStartTime)
+		gcDuration := time.Since(gcStartTime)
 		numBucketsDeleted := len(toDelete)
 		numBucketsAfter := numBucketsBefore - numBucketsDeleted
 		t.logger.Debugf("gc duration: %v, buckets: (before: %v, deleted: %v, after: %v)",
