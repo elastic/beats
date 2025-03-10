@@ -23,6 +23,7 @@ import (
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
+	xpacketbeat "github.com/elastic/beats/v7/x-pack/packetbeat/scripts/mage"
 
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
@@ -65,6 +66,10 @@ func Build() error {
 
 // BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
 func BuildSystemTestBinary() error {
+	if err := xpacketbeat.CopyNPCAPInstaller("../packetbeat/npcap/installer/"); err != nil {
+		return err
+	}
+
 	args := devtools.DefaultTestBinaryArgs()
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	return devtools.BuildSystemTestGoBinary(args)
@@ -73,6 +78,10 @@ func BuildSystemTestBinary() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	if err := xpacketbeat.CopyNPCAPInstaller("../packetbeat/npcap/installer/"); err != nil {
+		return err
+	}
+
 	// need packetbeat build arguments as it address the requirements for libpcap
 	args := packetbeat.GolangCrossBuildArgs()
 	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
@@ -85,7 +94,9 @@ func GolangCrossBuild() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	return devtools.CrossBuild(
+		devtools.ImageSelector(xpacketbeat.ImageSelector),
+	)
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -212,4 +223,14 @@ func GoIntegTest(ctx context.Context) error {
 func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
+}
+
+func SystemTest(ctx context.Context) error {
+	mg.SerialDeps(xpacketbeat.GetNpcapInstallerFn("../packetbeat"), Update, devtools.BuildSystemTestBinary)
+
+	args := devtools.DefaultGoTestIntegrationArgs()
+	args.Packages = []string{"../packetbeat/tests/system/..."}
+	args.Tags = append(args.Tags, "agentbeat")
+
+	return devtools.GoTest(ctx, args)
 }

@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.16.0
+:mito_version: v1.17.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -160,9 +160,11 @@ As noted above the `cel` input provides functions, macros, and global variables 
 ** {mito_docs}/lib#hdr-Drop[Drop]
 ** {mito_docs}/lib#hdr-Drop_Empty[Drop Empty]
 ** {mito_docs}/lib#hdr-Flatten[Flatten]
+** {mito_docs}/lib#hdr-Front[Front]
 ** {mito_docs}/lib#hdr-Keys[Keys]
 ** {mito_docs}/lib#hdr-Max[Max]
 ** {mito_docs}/lib#hdr-Min[Min]
+** {mito_docs}/lib#hdr-Sum[Sum]
 ** {mito_docs}/lib#hdr-Tail[Tail]
 ** {mito_docs}/lib#hdr-Values[Values]
 ** {mito_docs}/lib#hdr-With[With]
@@ -729,6 +731,7 @@ the filename option to be deleted.
 
 This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
 logs are allowed to reach 1MB before rotation.
+Individual request/response bodies will be truncated to 10% of this size.
 
 [float]
 ==== `resource.tracer.maxage`
@@ -794,6 +797,33 @@ This specifies fields in the `state` to be redacted prior to debug logging. Fiel
 ==== `redact.delete`
 
 This specifies whether fields should be replaced with a `*` or deleted entirely from messages sent to debug logs. If delete is `true`, fields will be deleted rather than replaced.
+
+[float]
+==== `failure_dump.enabled`
+
+It is possible to log CEL program evaluation failures to a local file-system for debugging configurations.
+This option is enabled by setting `failure_dump.enabled` to true and setting the `failure_dump.filename` value.
+To delete existing failure dumps, set `failure_dump.enabled` to false without unsetting the filename option.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `failure_dump.filename`
+
+This specifies a directory path to write failure dumps to. If it is not empty and a CEL program evaluation fails,
+the complete set of states for the CEL program's evaluation will be written as a JSON file, along with the error
+that was reported. This option should only be used when debugging a failure as it imposes a significant performance
+impact on the input and may potentially use large quantities of memory to hold the full set of states. If a failure
+dump is configured, it is recommended that data input sizes be reduced to avoid excessive memory consumption, and
+making dumps that are intractable to analysis. To delete existing failure dumps, set `failure_dump.enabled` to
+false without unsetting the filename option.
+
+[[cel-record-coverage]]
+[float]
+==== `record_coverage`
+
+This specifies that CEL code evaluation coverage should be recorded and logged in debug logs. This is a
+developer-only option.
 
 [float]
 === Metrics

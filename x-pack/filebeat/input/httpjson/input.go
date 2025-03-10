@@ -15,6 +15,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -33,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/private"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -88,6 +90,60 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 		Stability:  feature.Stable,
 		Deprecated: false,
 		Manager:    NewInputManager(log, store),
+	}
+}
+
+type redact struct {
+	value  mapstrM
+	fields []string
+}
+
+func (r redact) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	v, err := private.Redact(r.value, "", r.fields)
+	if err != nil {
+		return fmt.Errorf("could not redact value: %v", err)
+	}
+	return v.MarshalLogObject(enc)
+}
+
+// mapstrM is a non-mutating version of mapstr.M.
+// See https://github.com/elastic/elastic-agent-libs/issues/232.
+type mapstrM mapstr.M
+
+// MarshalLogObject implements the zapcore.ObjectMarshaler interface and allows
+// for more efficient marshaling of mapstrM in structured logging.
+func (m mapstrM) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	if len(m) == 0 {
+		return nil
+	}
+
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		v := m[k]
+		if inner, ok := tryToMapStr(v); ok {
+			err := enc.AddObject(k, inner)
+			if err != nil {
+				return fmt.Errorf("failed to add object: %w", err)
+			}
+			continue
+		}
+		zap.Any(k, v).AddTo(enc)
+	}
+	return nil
+}
+
+func tryToMapStr(v interface{}) (mapstrM, bool) {
+	switch m := v.(type) {
+	case mapstrM:
+		return m, true
+	case map[string]interface{}:
+		return mapstrM(m), true
+	default:
+		return nil, false
 	}
 }
 
@@ -159,7 +215,7 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	}
 	pagination := newPagination(cfg, client, log)
 	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
-	requester := newRequester(client, requestFactory, responseProcessor, log)
+	requester := newRequester(client, requestFactory, responseProcessor, metrics, log)
 
 	trCtx := emptyTransformContext()
 	trCtx.cursor = newCursor(cfg.Cursor, log)
@@ -267,12 +323,8 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		)
 		traceLogger := zap.New(core)
 
-		const margin = 10e3 // 1OkB ought to be enough room for all the remainder of the trace details.
-		maxSize := cfg.Tracer.MaxSize*1e6 - margin
-		if maxSize < 0 {
-			maxSize = 0
-		}
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize, log)
+		maxBodyLen := cfg.Tracer.MaxSize * 1e6 / 10 // 10% of file max
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxBodyLen, log)
 	} else if cfg.Tracer != nil {
 		// We have a trace log name, but we are not enabled,
 		// so remove all trace logs we own.

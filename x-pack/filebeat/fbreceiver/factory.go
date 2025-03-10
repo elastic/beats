@@ -45,7 +45,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
-	b, err := instance.NewBeatReceiver(settings, cfg.Beatconfig, consumer, set.Logger.Core())
+	b, err := instance.NewBeatReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}

@@ -10,9 +10,7 @@
 ++++
 
 Use the `google cloud storage input` to read content from files stored in buckets which reside on your Google Cloud.
-The input can be configured to work with and without polling, though currently, if polling is disabled it will only 
-perform a one time passthrough, list the file contents and end the process. Polling is generally recommented for most cases
-even though it can get expensive with dealing with a very large number of files.
+The input can be configured to work with and without polling, though if polling is disabled it will only perform a single collection of data, list the file contents and end the process.
 
 *To mitigate errors and ensure a stable processing environment, this input employs the following features :* 
 
@@ -24,6 +22,8 @@ even though it can get expensive with dealing with a very large number of files.
 
 3.  If any major error occurs which stops the main thread, the logs will be appropriately generated,
     describing said error.
+
+**Config Option Removal Notice** : The `bucket_timeout` config option has been removed from the google cloud storage input. The intention behind this removal is to simplify the configuration and to make it more user friendly. The `bucket_timeout` option was confusing and had the potential to let users malconfigure the input, which could lead to unexpected behavior. The input now uses a more robust and efficient way to handle the bucket timeout internally.
 
 [id="supported-types-gcs"]
 NOTE: Currently only `JSON` and `NDJSON` are supported object/file formats. Objects/files may be also be gzip compressed. 
@@ -48,33 +48,30 @@ filebeat.inputs:
     max_workers: 3
     poll: true
     poll_interval: 15s
-    bucket_timeout: 60s
   - name: gcs-test-old
     max_workers: 3
     poll: true
     poll_interval: 10s
-    bucket_timeout: 30s
 ----
 
 *Explanation :*
 This `configuration` given above describes a basic gcs config having two buckets named `gcs-test-new` and `gcs-test-old`. 
-Each of these buckets have their own attributes such as `name`, `max_workers`, `poll`, `poll_interval` and `bucket_timeout`. These attributes have detailed explanations 
+Each of these buckets have their own attributes such as `name`, `max_workers`, `poll` and `poll_interval`. These attributes have detailed explanations 
 given <<supported-attributes-gcs,below>>. For now lets try to understand how this config works. 
 
 For google cloud storage input to identify the files it needs to read and process, it will require the bucket names to be specified. We can have as
-many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll`, `poll_interval` and `bucket_timeout` at the root level, which will
+many buckets as we deem fit. We are also able to configure the attributes `max_workers`, `poll` and `poll_interval` at the root level, which will
 then be applied to all buckets which do not specify any of these attributes explicitly. 
 
-NOTE: If the attributes `max_workers`, `poll`, `poll_interval` and `bucket_timeout` are specified at the root level, these can still be overridden at the bucket level with 
-different values, thus offering extensive flexibility and customization. Examples <<bucket-overrides,below>> show this behaviour.
+NOTE: If the attributes `max_workers`, `poll` and `poll_interval` are specified at the root level, these can still be overridden at the bucket level with 
+different values, thus offering extensive flexibility and customization. Examples <<bucket-overrides,below>> show this behavior.
 
 On receiving this config the google cloud storage input will connect to the service and retrieve a `Storage Client` using the given `bucket_name` and 
 `auth.credentials_file`, then it will spawn two main go-routines, one for each bucket. After this each of these routines (threads) will initialize a scheduler 
-which will in turn use the `max_workers` value to initialize an in-memory worker pool (thread pool) with `3` `workers` available. Basically that equates to two instances of a worker pool,
-one per bucket, each having 3 workers. These `workers` will be responsible for performing `jobs` that process a file (in this case read and output the contents of a file).
+which will in turn use the `max_workers` value to initialize an in-memory worker pool (thread pool) with `3` `workers` available. Basically that equates to two instances of a worker pool, one per bucket, each having 3 workers. These `workers` will be responsible for performing `jobs` that process a file (in this case read and output the contents of a file).
 
 NOTE: The scheduler is responsible for scheduling jobs, and uses the `maximum available workers` in the pool, at each iteration, to decide the number of files to retrieve and 
-process. This keeps work distribution efficient. The scheduler uses `poll_interval` attribute value to decide how long to wait after each iteration. The `bucket_timeout` value is used to timeout calls to the bucket list api if it exceeds the given value. Each iteration consists of processing a certain number of files, decided by the `maximum available workers` value.
+process. This keeps work distribution efficient. The scheduler uses `poll_interval` attribute value to decide how long to wait after each iteration. Each iteration consists of processing a certain number of files, decided by the `maximum available workers` value.
 
 *A Sample Response :-*
 ["source","json"]
@@ -159,14 +156,14 @@ Now let's explore the configuration attributes a bit more elaborately.
     3. <<attrib-auth-credentials-file,auth.credentials_file.path>>
     4. <<attrib-buckets,buckets>>
     5. <<attrib-bucket-name,name>>
-    6. <<attrib-bucket-timeout,bucket_timeout>>
-    7. <<attrib-max_workers-gcs,max_workers>>
-    8. <<attrib-poll-gcs,poll>>
-    9. <<attrib-poll_interval-gcs,poll_interval>>
-   10. <<attrib-parse_json,parse_json>>
-   11. <<attrib-file_selectors-gcs,file_selectors>>
-   12. <<attrib-expand_event_list_from_field-gcs,expand_event_list_from_field>>
-   13. <<attrib-timestamp_epoch-gcs,timestamp_epoch>>
+    6. <<attrib-max_workers-gcs,max_workers>>
+    7. <<attrib-poll-gcs,poll>>
+    8. <<attrib-poll_interval-gcs,poll_interval>>
+    9. <<attrib-parse_json,parse_json>>
+   10. <<attrib-file_selectors-gcs,file_selectors>>
+   11. <<attrib-expand_event_list_from_field-gcs,expand_event_list_from_field>>
+   12. <<attrib-timestamp_epoch-gcs,timestamp_epoch>>
+   13. <<attrib-retry-gcs,retry>>
 
 
 [id="attrib-project-id"]
@@ -197,23 +194,13 @@ specified, then the one that occurs first in the configuration will be used.
 [float]
 ==== `buckets`
 
-This attribute contains the details about a specific bucket like `name`, `max_workers`, `poll`, `poll_interval` and `bucket_timeout`. The attribute `name` is specific to a 
-bucket as it describes the bucket name, while the fields `max_workers`, `poll`, `poll_interval` and `bucket_timeout` can exist both at the bucket level and the root level.
-This attribute is internally represented as an array, so we can add as many buckets as we require.
+This attribute contains the details about a specific bucket like `name`, `max_workers`, `poll` and `poll_interval`. The attribute `name` is specific to a bucket as it describes the bucket name, while the fields `max_workers`, `poll` and `poll_interval` can exist both at the bucket level and the root level. This attribute is internally represented as an array, so we can add as many buckets as we require.
 
 [id="attrib-bucket-name"]
 [float]
 ==== `name`
 
 This is a specific subfield of a bucket. It specifies the bucket name.
-
-[id="attrib-bucket-timeout"]
-[float]
-==== `bucket_timeout`
-
-This attribute defines the maximum amount of time after which a bucket operation will give and stop if no response is recieved (example: reading a file / listing a file). 
-It can be defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here `s = seconds`, `m = minutes` and `h = hours`. The value `{{x}}` can be anything we wish.
-If no value is specified for this, by default its initialized to `50 seconds`. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified. The value of `bucket_timeout` that should be used depends on the size of the files and the network speed. If the timeout is too low, the input will not be able to read the file completely and `context_deadline_exceeded` errors will be seen in the logs. If the timeout is too high, the input will wait for a long time for the file to be read, which can cause the input to be slow. The ratio between the `bucket_timeout` and `poll_interval` should be considered while setting both the values. A low `poll_interval` and a very high `bucket_timeout` can cause resource utilization issues as schedule ops will be spawned every poll iteration. If previous poll ops are still running, this could result in concurrently running ops and so could cause a bottleneck over time.
 
 [id="attrib-max_workers-gcs"]
 [float]
@@ -228,9 +215,8 @@ NOTE: The value of `max_workers` is tied to the `batch_size` currently to ensure
 [float]
 ==== `poll`
 
-This attribute informs the scheduler whether to keep polling for new files or not. Default value of this is `false`, so it will not keep polling if not explicitly 
-specified. This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always 
-take priority and override the root level values if both are specified.
+This attribute informs the scheduler whether to keep polling for new files or not. Default value of this is set to `true`. This attribute can be specified both at the 
+root level of the configuration as well at the bucket level. The bucket level values will always take priority and override the root level values if both are specified.
 
 [id="attrib-poll_interval-gcs"]
 [float]
@@ -238,11 +224,9 @@ take priority and override the root level values if both are specified.
 
 This attribute defines the maximum amount of time after which the internal scheduler will make the polling call for the next set of objects/files. It can be 
 defined in the following formats : `{{x}}s`, `{{x}}m`, `{{x}}h`, here `s = seconds`, `m = minutes` and `h = hours`. The value `{{x}}` can be anything we wish.
-Example : `10s` would mean we would like the polling to occur every 10 seconds. If no value is specified for this, by default its initialized to `300 seconds`. 
+Example : `10s` would mean we would like the polling to occur every 10 seconds. If no value is specified for this, by default its initialized to `5 minutes`. 
 This attribute can be specified both at the root level of the configuration as well at the bucket level. The bucket level values will always take priority 
-and override the root level values if both are specified. The `poll_interval` should be set to a value that is equal to the `bucket_timeout` value. This would ensure that another schedule operation is not started before the current buckets have all been processed. If the `poll_interval` is set to a value that is less than the `bucket_timeout`, then the input will start another schedule operation before the current one has finished, which can cause a bottleneck over time. Having a lower `poll_interval` can make the input faster at the cost of more resource utilization. 
-
-NOTE: Some edge case scenarios could require different values for `poll_interval` and `bucket_timeout`. For example, if the files are very large and the network speed is slow, then the `bucket_timeout` value should be set to a higher value than the `poll_interval`. This would ensure that polling operation does not wait too long for the files to be read and moves to the next iteration while the current one is still being processed. This would ensure a higher throughput and better resource utilization.
+and override the root level values if both are specified. Having a lower `poll_interval` can make the input faster at the cost of more resource utilization. 
 
 [id="attrib-parse_json"]
 [float]
@@ -325,7 +309,6 @@ filebeat.inputs:
     max_workers: 3
     poll: true
     poll_interval: 15s
-    bucket_timeout: 60s
     file_selectors:
     - regex: '/Monitoring/'
     - regex: 'docs/'
@@ -371,7 +354,6 @@ filebeat.inputs:
     max_workers: 3
     poll: true
     poll_interval: 15s
-    bucket_timeout: 60s
     expand_event_list_from_field: Records
 ----
 
@@ -395,11 +377,46 @@ filebeat.inputs:
     max_workers: 3
     poll: true
     poll_interval: 15s
-    bucket_timeout: 60s
     timestamp_epoch: 1630444800
 ----
 
 The GCS APIs don't provide a direct way to filter files based on the timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available. This option scales vertically and not horizontally.
+
+[id="attrib-retry-gcs"]
+[float]
+==== `retry`
+
+This attribute can be used to configure a list of sub attributes that directly control how the input should behave when a download for a file/object fails or gets interrupted.
+
+    - `max_attempts`: This attribute defines the maximum number of retry attempts(including the initial api call) that should be attempted for a retryable error. The default value for this is `3`. 
+    - `initial_backoff_duration`: This attribute defines the initial backoff time. The default value for this is `1s`.
+    - `max_backoff_duration`: This attribute defines the maximum backoff time. The default value for this is `30s`.
+    - `backoff_multiplier`: This attribute defines the backoff multiplication factor. The default value for this is `2`.
+
+NOTE: The `initial_backoff_duration` and `max_backoff_duration` attributes must have time units. Valid time units are `ns`, `us` (or `µs`), `ms`, `s`, `m`, `h`.
+
+By configuring these attributes, the user is given the flexibility to control how the input should behave when a download fails or gets interrupted. This attribute can only be 
+specified at the root level of the configuration and not at the bucket level. It applies uniformly to all the buckets.
+
+An example configuration is given below :-
+
+[source, yml]
+----
+filebeat.inputs:
+- type: gcs
+  project_id: my_project_id
+  auth.credentials_file.path: {{file_path}}/{{creds_file_name}}.json
+  retry:
+    max_attempts: 3
+    initial_backoff_duration: 2s
+    max_backoff_duration: 60s
+    backoff_multiplier: 2
+  buckets:
+  - name: obs-bucket
+    max_workers: 3
+    poll: true
+    poll_interval: 11m
+----
 
 [id="bucket-overrides"]
 *The sample configs below will explain the bucket level overriding of attributes a bit further :-*

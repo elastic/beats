@@ -38,6 +38,8 @@ filebeat.inputs:
     id: a-unique-filestream-input-id
     enabled: true
     prospector.scanner.check_interval: 30s
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     paths:
       - %s
 output:

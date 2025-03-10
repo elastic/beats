@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
@@ -80,7 +81,10 @@ type Filebeat struct {
 type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
 
 type StateStore interface {
-	Access() (*statestore.Store, error)
+	// Access returns the storage registry depending on the type.
+	// The value of typ is expected to have been obtained from
+	// cursor.InputManager.Type and represents the input type.
+	Access(typ string) (*statestore.Store, error)
 	CleanupInterval() time.Duration
 }
 
@@ -144,6 +148,13 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 				}
 				return data
 			})
+
+		b.Manager.RegisterDiagnosticHook(
+			"registry",
+			"Filebeat's registry",
+			"registry.tar.gz",
+			"application/octet-stream",
+			gzipRegistry)
 	}
 
 	// Add inputs created by the modules
@@ -271,10 +282,18 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitEvents := newSignalWait()
 
 	// count active events for waiting on shutdown
+	var reg *monitoring.Registry
+
+	if b.Info.Monitoring.Namespace != nil {
+		reg = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("stats")
+		if reg == nil {
+			reg = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("stats")
+		}
+	}
 	wgEvents := &eventCounter{
-		count: monitoring.NewInt(nil, "filebeat.events.active"), // Gauge
-		added: monitoring.NewUint(nil, "filebeat.events.added"),
-		done:  monitoring.NewUint(nil, "filebeat.events.done"),
+		count: monitoring.NewInt(reg, "filebeat.events.active"), // Gauge
+		added: monitoring.NewUint(reg, "filebeat.events.added"),
+		done:  monitoring.NewUint(reg, "filebeat.events.done"),
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
@@ -284,12 +303,43 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	stateStore, err := openStateStore(b.Info, logp.NewLogger("filebeat"), config.Registry)
+	// Use context, like normal people do, hooking up to the beat.done channel
+	ctx, cn := context.WithCancel(context.Background())
+	go func() {
+		<-fb.done
+		cn()
+	}()
+
+	stateStore, err := openStateStore(ctx, b.Info, logp.NewLogger("filebeat"), config.Registry)
 	if err != nil {
 		logp.Err("Failed to open state store: %+v", err)
 		return err
 	}
 	defer stateStore.Close()
+
+	// If notifier is set, configure the listener for output configuration
+	// The notifier passes the elasticsearch output configuration down to the Elasticsearch backed state storage
+	// in order to allow it fully configure
+	if stateStore.notifier != nil {
+		b.OutputConfigReloader = reload.ReloadableFunc(func(r *reload.ConfigWithMeta) error {
+			outCfg := conf.Namespace{}
+			if err := r.Config.Unpack(&outCfg); err != nil || outCfg.Name() != "elasticsearch" {
+				logp.Err("Failed to unpack the output config: %v", err)
+				return nil
+			}
+
+			// Create a new config with the output configuration. Since r.Config is a pointer, a copy is required to
+			// avoid concurrent map read and write.
+			// See https://github.com/elastic/beats/issues/42815
+			configCopy, err := conf.NewConfigFrom(outCfg.Config())
+			if err != nil {
+				logp.Err("Failed to create a new config from the output config: %v", err)
+				return nil
+			}
+			stateStore.notifier.Notify(configCopy)
+			return nil
+		})
+	}
 
 	err = processLogInputTakeOver(stateStore, config)
 	if err != nil {
@@ -336,6 +386,8 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	defer func() {
 		_ = inputTaskGroup.Stop()
 	}()
+
+	// Store needs to be fully configured at this point
 	if err := v2InputLoader.Init(&inputTaskGroup); err != nil {
 		logp.Err("Failed to initialize the input managers: %v", err)
 		return err
@@ -520,7 +572,7 @@ func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
 		return nil
 	}
 
-	store, err := stateStore.Access()
+	store, err := stateStore.Access("")
 	if err != nil {
 		return fmt.Errorf("Failed to access state when attempting take over: %w", err)
 	}

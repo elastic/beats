@@ -18,6 +18,8 @@ import (
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	cloudresourcemanager "google.golang.org/api/cloudresourcemanager/v1"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -101,14 +103,18 @@ type config struct {
 	Zone                string   `config:"zone"`
 	Region              string   `config:"region"`
 	Regions             []string `config:"regions"`
+	LocationLabel       string   `config:"location_label"`
 	ProjectID           string   `config:"project_id" validate:"required"`
 	ExcludeLabels       bool     `config:"exclude_labels"`
 	CredentialsFilePath string   `config:"credentials_file_path"`
 	CredentialsJSON     string   `config:"credentials_json"`
 	Endpoint            string   `config:"endpoint"`
 
-	opt    []option.ClientOption
-	period *durationpb.Duration
+	opt              []option.ClientOption
+	period           *durationpb.Duration
+	organizationID   string
+	organizationName string
+	projectName      string
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -158,6 +164,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	// Get ingest delay and sample period for each metric type
 	ctx := context.Background()
+	// set organization id
+	if errs := m.setOrgAndProjectDetails(ctx); errs != nil {
+		m.Logger().Warnf("error occurred while fetching organization and project details: %s", errs)
+	}
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
 	if err != nil {
 		return nil, fmt.Errorf("error creating Stackdriver client: %w", err)
@@ -357,4 +367,62 @@ func addHostFields(groupedEvents []KeyValuePoint) mapstr.M {
 		}
 	}
 	return hostRootFields
+}
+
+func (m *MetricSet) setOrgAndProjectDetails(ctx context.Context) []error {
+	var errs []error
+
+	// Initialize the Cloud Resource Manager service
+	srv, err := cloudresourcemanager.NewService(ctx, m.config.opt...)
+	if err != nil {
+		errs = append(errs, fmt.Errorf("failed to create cloudresourcemanager service: %w", err))
+		return errs
+	}
+	// Set Project name
+	err = m.setProjectDetails(ctx, srv)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	//Set Organization Details
+	err = m.setOrganizationDetails(ctx, srv)
+	if err != nil {
+		errs = append(errs, err)
+	}
+	return errs
+}
+
+func (m *MetricSet) setProjectDetails(ctx context.Context, service *cloudresourcemanager.Service) error {
+	project, err := service.Projects.Get(m.config.ProjectID).Context(ctx).Do()
+	if err != nil {
+		return fmt.Errorf("failed to get project name: %w", err)
+	}
+	if project != nil {
+		m.config.projectName = project.Name
+	}
+	return nil
+}
+
+func (m *MetricSet) setOrganizationDetails(ctx context.Context, service *cloudresourcemanager.Service) error {
+	// Get the project ancestor details
+	ancestryResponse, err := service.Projects.GetAncestry(m.config.ProjectID, &cloudresourcemanager.GetAncestryRequest{}).Context(ctx).Do()
+	if err != nil {
+		return fmt.Errorf("failed to get project ancestors: %w", err)
+	}
+	if len(ancestryResponse.Ancestor) == 0 {
+		return fmt.Errorf("no ancestors found for project '%s'", m.config.ProjectID)
+	}
+	ancestor := ancestryResponse.Ancestor[len(ancestryResponse.Ancestor)-1]
+
+	if ancestor.ResourceId.Type == "organization" {
+		m.config.organizationID = ancestor.ResourceId.Id
+		orgReq := service.Organizations.Get(fmt.Sprintf("organizations/%s", m.config.organizationID))
+
+		orgDetails, err := orgReq.Context(ctx).Do()
+		if err != nil {
+			return fmt.Errorf("failed to get organization details: %w", err)
+		}
+
+		m.config.organizationName = orgDetails.DisplayName
+	}
+	return nil
 }

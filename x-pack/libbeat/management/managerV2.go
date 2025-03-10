@@ -893,6 +893,13 @@ func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 			apmConfig = expected.APMConfig
 		}
 	}
+
+	if (cm.lastAPMCfg == nil && apmConfig == nil) || (cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig)) {
+		// configuration for the APM tracing did not change; do nothing
+		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
+		return
+	}
+
 	if apmConfig == nil {
 		// APM tracing is being stopped
 		cm.logger.Debug("Stopping APM tracing")
@@ -904,12 +911,6 @@ func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 		cm.lastAPMCfg = nil
 		cm.lastBeatAPMCfg = nil
 		cm.logger.Debug("Stopped APM tracing")
-		return
-	}
-
-	if cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig) {
-		// configuration for the APM tracing did not change; do nothing
-		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
 		return
 	}
 

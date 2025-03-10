@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/licenser"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // BeatsRootCmd handles all application command line interface, parses user
@@ -47,6 +48,7 @@ type BeatsRootCmd struct {
 // run command, which will be called if no args are given (for backwards compatibility),
 // and beat settings
 func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings) *BeatsRootCmd {
+	tlscommon.SetInsecureDefaults()
 	// Add global Elasticsearch license endpoint check.
 	// Check we are actually talking with Elasticsearch, to ensure that used features actually exist.
 	_, _ = elasticsearch.RegisterGlobalCallback(licenser.FetchAndVerify)
@@ -117,7 +119,9 @@ func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings
 	rootCmd.AddCommand(rootCmd.CompletionCmd)
 	rootCmd.AddCommand(rootCmd.ExportCmd)
 	rootCmd.AddCommand(rootCmd.TestCmd)
-	rootCmd.AddCommand(rootCmd.KeystoreCmd)
+	if rootCmd.KeystoreCmd != nil {
+		rootCmd.AddCommand(rootCmd.KeystoreCmd)
+	}
 
 	return rootCmd
 }

@@ -68,6 +68,10 @@ type conf struct {
 	// API limit resets.
 	LimitWindow time.Duration `config:"limit_window"`
 
+	// LimitFixed is a number of requests to allow in each LimitWindow,
+	// overriding the guidance in API responses.
+	LimitFixed *int `config:"limit_fixed"`
+
 	// Request is the configuration for establishing
 	// HTTP requests to the API.
 	Request *requestConfig `config:"request"`

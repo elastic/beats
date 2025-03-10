@@ -1,5 +1,5 @@
 # Module: gcp
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-gcp.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.x/metricbeat-module-gcp.html
 
 - module: gcp
   metricsets:
@@ -37,6 +37,7 @@
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  location_label: "resource.labels.zone"
   metrics:
     - aligner: ALIGN_NONE
       service: compute
