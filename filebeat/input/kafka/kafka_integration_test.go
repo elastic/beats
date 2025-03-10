@@ -22,7 +22,7 @@ package kafka
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"strings"
@@ -452,7 +452,7 @@ func TestTest(t *testing.T) {
 }
 
 func createTestTopicName() string {
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
 	return testTopic
 }
