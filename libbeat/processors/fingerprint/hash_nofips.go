@@ -15,45 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kafka
+//go:build !requirefips
+
+package fingerprint
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/sarama"
+	"crypto/md5"
+	"crypto/sha1"
 )
 
-type kafkaLogger struct {
-	log *logp.Logger
-}
-
-func (kl kafkaLogger) Print(v ...interface{}) {
-	kl.Log("kafka message: %v", v...)
-}
-
-func (kl kafkaLogger) Printf(format string, v ...interface{}) {
-	kl.Log(format, v...)
-}
-
-func (kl kafkaLogger) Println(v ...interface{}) {
-	kl.Log("kafka message: %v", v...)
-}
-
-func (kl kafkaLogger) Log(format string, v ...interface{}) {
-	warn := false
-	for _, val := range v {
-		if err, ok := val.(sarama.KError); ok {
-			if err != sarama.ErrNoError {
-				warn = true
-				break
-			}
-		}
+func init() {
+	nonFipsApprovedHashes := []namedHashMethod{
+		{Name: "md5", Hash: md5.New},
+		{Name: "sha1", Hash: sha1.New},
 	}
-	if kl.log == nil {
-		kl.log = logp.NewLogger(logSelector)
-	}
-	if warn {
-		kl.log.Warnf(format, v...)
-	} else {
-		kl.log.Infof(format, v...)
+	for _, h := range nonFipsApprovedHashes {
+		hashes[h.Name] = h
 	}
 }

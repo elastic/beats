@@ -47,7 +47,8 @@ func TestCompressionReader(t *testing.T) {
 				0x00, 0x00, 0x80, 0x61,
 				0x62, 0x63, 0x0a, 0x00,
 				0x00, 0x00, 0x00, 0x6c,
-				0x3e, 0x7b, 0x08, 0x00},
+				0x3e, 0x7b, 0x08, 0x00,
+			},
 		},
 		"abc compressed with pierrec lz4": {
 			plaintext: []byte("abc"),
@@ -57,7 +58,8 @@ func TestCompressionReader(t *testing.T) {
 				0x00, 0x00, 0x80, 0x61,
 				0x62, 0x63, 0x00, 0x00,
 				0x00, 0x00, 0xff, 0x53,
-				0xd1, 0x32},
+				0xd1, 0x32,
+			},
 		},
 	}
 
@@ -85,7 +87,8 @@ func TestCompressionWriter(t *testing.T) {
 				0x00, 0x00, 0x80, 0x61,
 				0x62, 0x63, 0x00, 0x00,
 				0x00, 0x00, 0xff, 0x53,
-				0xd1, 0x32},
+				0xd1, 0x32,
+			},
 		},
 	}
 
@@ -99,6 +102,16 @@ func TestCompressionWriter(t *testing.T) {
 		assert.Equal(t, tc.compressed, dst.Bytes(), name)
 	}
 }
+
+func NopWriteCloseSyncer(w io.WriteCloser) WriteCloseSyncer {
+	return nopWriteCloseSyncer{w}
+}
+
+type nopWriteCloseSyncer struct {
+	io.WriteCloser
+}
+
+func (nopWriteCloseSyncer) Sync() error { return nil }
 
 func TestCompressionRoundTrip(t *testing.T) {
 	tests := map[string]struct {
@@ -141,7 +154,7 @@ func TestCompressionSync(t *testing.T) {
 			src1 := bytes.NewReader(tc.plaintext)
 			_, err := io.Copy(cw, src1)
 			assert.Nil(t, err, name)
-			//prior to v4.1.15 of pierrec/lz4 there was a
+			// prior to v4.1.15 of pierrec/lz4 there was a
 			// bug that prevented writing after a Flush.
 			// The call to Sync here exercises Flush.
 			err = cw.Sync()

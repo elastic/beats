@@ -15,45 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package kafka
+//go:build !requirefips
+
+package fingerprint
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/sarama"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-type kafkaLogger struct {
-	log *logp.Logger
-}
-
-func (kl kafkaLogger) Print(v ...interface{}) {
-	kl.Log("kafka message: %v", v...)
-}
-
-func (kl kafkaLogger) Printf(format string, v ...interface{}) {
-	kl.Log(format, v...)
-}
-
-func (kl kafkaLogger) Println(v ...interface{}) {
-	kl.Log("kafka message: %v", v...)
-}
-
-func (kl kafkaLogger) Log(format string, v ...interface{}) {
-	warn := false
-	for _, val := range v {
-		if err, ok := val.(sarama.KError); ok {
-			if err != sarama.ErrNoError {
-				warn = true
-				break
-			}
-		}
-	}
-	if kl.log == nil {
-		kl.log = logp.NewLogger(logSelector)
-	}
-	if warn {
-		kl.log.Warnf(format, v...)
-	} else {
-		kl.log.Infof(format, v...)
-	}
+func TestHashMethod(t *testing.T) {
+	require.Len(t, hashes, 6)
+	require.Contains(t, hashes, "md5")
+	require.Contains(t, hashes, "sha1")
+	require.Contains(t, hashes, "sha256")
+	require.Contains(t, hashes, "sha384")
+	require.Contains(t, hashes, "sha512")
+	require.Contains(t, hashes, "xxhash")
 }
