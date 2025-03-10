@@ -1,0 +1,14 @@
+# beats contains the list of beats that are FIPS-enabled
+beats:
+  - agentbeat
+  - auditbeat
+  - filebeat
+  - metricbeat
+compile:
+  cgo: true
+  env:
+    GOEXPERIMENT: systemcrypto
+  tags:
+    - requirefips
+package:
+  # placeholder for global packaging settings
