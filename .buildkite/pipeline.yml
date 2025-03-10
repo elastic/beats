@@ -164,21 +164,16 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                trigger: "beats-xpack-dockerlogbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: beats-xpack-dockerlogbeat"
+                command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for x-pack/dockerlogbeat"
+  - label: ":pipeline: Upload beats-xpack-dockerlogbeat"
     if: build.pull_request.id == null
-    trigger: "beats-xpack-dockerlogbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml"
 
   - label: "Trigger Metricbeat"
     if: build.pull_request.id != null
