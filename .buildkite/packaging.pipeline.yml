@@ -17,7 +17,6 @@ steps:
   # this prevents parallel builds and possibility of publishing out of order DRA artifacts if the first job takes longer than the second
 
   - name: Start of concurrency group for DRA Snapshot
-    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     command: echo "--> Start of concurrency gate dra-snapshot"
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
@@ -26,7 +25,6 @@ steps:
   - name: Start of concurrency group for DRA Staging
     # exceptionally allow building staging from main when VERSION_QUALIFIER is set, to allow prerelease testing
     # TODO remove OR clause below and above comment, and only allow matching /^[0-9]+\.[0-9x]+\$/ for build.branch
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
     command: echo "--> Start of concurrency gate dra-staging"
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
@@ -84,7 +82,6 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     key: packaging-snapshot
     depends_on: start-gate-snapshot
     steps:
@@ -270,7 +267,6 @@ steps:
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
