@@ -39,7 +39,6 @@ grouped in the following categories:
 * <<exported-fields-dropwizard>>
 * <<exported-fields-ecs>>
 * <<exported-fields-elasticsearch>>
-* <<exported-fields-enterprisesearch>>
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
 * <<exported-fields-gcp>>
@@ -7573,6 +7572,91 @@ alias to: beat.stats.apm_server.root.unset
 
 --
 
+
+
+*`beats_stats.apm-server.sampling.tail.dynamic_service_groups`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.dynamic_service_groups
+
+--
+
+
+*`beats_stats.apm-server.sampling.tail.events.dropped`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.dropped
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.failed_writes`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.failed_writes
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.head_unsampled`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.head_unsampled
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.processed`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.processed
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.sampled`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.sampled
+
+--
+
+*`beats_stats.apm-server.sampling.tail.events.stored`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.events.stored
+
+--
+
+
+*`beats_stats.apm-server.sampling.tail.storage.lsm_size`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.lsm_size
+
+--
+
+*`beats_stats.apm-server.sampling.tail.storage.value_log_size`*::
++
+--
+type: alias
+
+alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
+
+--
+
 *`beats_stats.apm-server.sampling.transactions_dropped`*::
 +
 --
@@ -9663,6 +9747,73 @@ type: long
 
 --
 
+
+
+*`beat.stats.apm_server.sampling.tail.dynamic_service_groups`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.sampling.tail.events.dropped`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.failed_writes`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.head_unsampled`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.processed`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.sampled`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.events.stored`*::
++
+--
+type: long
+
+--
+
+
+*`beat.stats.apm_server.sampling.tail.storage.lsm_size`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.apm_server.sampling.tail.storage.value_log_size`*::
++
+--
+type: long
+
+--
+
 *`beat.stats.apm_server.sampling.transactions_dropped`*::
 +
 --
@@ -10184,16 +10335,113 @@ type: long
 
 --
 
+
 *`beat.stats.libbeat.pipeline.queue.acked`*::
 +
 --
+Number of acknowledged events
+
+
 type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.added.bytes`*::
++
+--
+Number of bytes added to the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.added.events`*::
++
+--
+Number of events added to the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.consumed.bytes`*::
++
+--
+Number of bytes consumed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.consumed.events`*::
++
+--
+Number of events consumed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.bytes`*::
++
+--
+Number of bytes filled in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.events`*::
++
+--
+Number of events filled in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.filled.pct`*::
++
+--
+Percentage of the queue filled
+
+
+type: float
 
 --
 
 *`beat.stats.libbeat.pipeline.queue.max_events`*::
 +
 --
+Maximum number of events allowed in the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.removed.bytes`*::
++
+--
+Number of bytes removed from the queue
+
+
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.removed.events`*::
++
+--
+Number of events removed from the queue
+
+
 type: long
 
 --
@@ -10432,6 +10680,43 @@ Number of write errors
 
 
 type: long
+
+--
+
+
+
+*`beat.stats.libbeat.output.write.latency.histogram.count`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.max`*::
++
+--
+type: float
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.median`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.p95`*::
++
+--
+type: float
+
+--
+
+*`beat.stats.libbeat.output.write.latency.histogram.p99`*::
++
+--
+type: float
 
 --
 
@@ -33642,12 +33927,49 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.indices.fielddata.evictions.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.indices.fielddata.memory.bytes`*::
 +
 --
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.flush.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.flush.total.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.indices.get.time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.get.total.count`*::
++
+--
+type: long
 
 --
 
@@ -33674,12 +33996,42 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.indices.merges.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.merges.total.count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.indices.query_cache.memory.bytes`*::
 +
 --
 type: long
 
 format: bytes
+
+--
+
+
+*`elasticsearch.node.stats.indices.refresh.total_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.refresh.total.count`*::
++
+--
+type: long
 
 --
 
@@ -33702,6 +34054,20 @@ type: long
 --
 
 *`elasticsearch.node.stats.indices.search.query_total.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.search.fetch_time.ms`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.search.fetch_total.count`*::
 +
 --
 type: long
@@ -33799,6 +34165,21 @@ format: bytes
 --
 
 
+*`elasticsearch.node.stats.indices.translog.size.bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.translog.operations.count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.jvm.mem.heap.max.bytes`*::
 +
 --
@@ -33824,6 +34205,13 @@ format: bytes
 type: double
 
 format: percent
+
+--
+
+*`elasticsearch.node.stats.jvm.threads.count`*::
++
+--
+type: long
 
 --
 
@@ -34157,7 +34545,59 @@ format: percent
 
 --
 
+*`elasticsearch.node.stats.process.mem.total_virtual.bytes`*::
++
+--
+type: long
 
+--
+
+*`elasticsearch.node.stats.process.open_file_descriptors`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.transport.rx.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.transport.rx.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.transport.tx.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.transport.tx.size.bytes`*::
++
+--
+type: long
+
+--
+
+
+
+*`elasticsearch.node.stats.thread_pool.bulk.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.bulk.queue.count`*::
 +
@@ -34174,6 +34614,35 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.esql_worker.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.esql_worker.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.esql_worker.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.force_merge.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.force_merge.queue.count`*::
 +
 --
@@ -34188,6 +34657,35 @@ type: long
 
 --
 
+
+*`elasticsearch.node.stats.thread_pool.flush.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.flush.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.flush.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.get.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.get.queue.count`*::
 +
@@ -34204,6 +34702,13 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.index.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.index.queue.count`*::
 +
 --
@@ -34219,6 +34724,13 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.thread_pool.search.active.count`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.node.stats.thread_pool.search.queue.count`*::
 +
 --
@@ -34233,6 +34745,101 @@ type: long
 
 --
 
+
+*`elasticsearch.node.stats.thread_pool.search_worker.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search_worker.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.search_worker.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.snapshot.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.snapshot.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.snapshot.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.system_read.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_read.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_read.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.system_write.active.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_write.queue.count`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.node.stats.thread_pool.system_write.rejected.count`*::
++
+--
+type: long
+
+--
+
+
+*`elasticsearch.node.stats.thread_pool.write.active.count`*::
++
+--
+type: long
+
+--
 
 *`elasticsearch.node.stats.thread_pool.write.queue.count`*::
 +
@@ -34492,1214 +35099,6 @@ type: keyword
 +
 --
 type: keyword
-
---
-
-[[exported-fields-enterprisesearch]]
-== Enterprise Search fields
-
-Enterprise Search module
-
-
-
-[float]
-=== enterprisesearch
-
-`enterprisesearch` contains metrics and health information for Enterprise Search
-
-
-
-*`enterprisesearch.cluster_uuid`*::
-+
---
-Cluster UUID for the Elasticsearch cluster used as the data store for Enterprise Search.
-
-type: keyword
-
---
-
-[float]
-=== health
-
-Enterprise Search health
-
-
-*`enterprisesearch.health.name`*::
-+
---
-Host name for the Enterprise Search node
-
-type: keyword
-
---
-
-[float]
-=== version
-
-Enterprise Search version information
-
-
-*`enterprisesearch.health.version.number`*::
-+
---
-Enterprise Search version number using the semantic versioning format
-
-type: keyword
-
---
-
-*`enterprisesearch.health.version.build_hash`*::
-+
---
-A unique build hash for the Enterprise Search package
-
-type: keyword
-
---
-
-[float]
-=== process
-
-Enterprise Search process information
-
-
-*`enterprisesearch.health.process.pid`*::
-+
---
-Process ID for the Enterprise Search instance
-
-type: long
-
---
-
-*`enterprisesearch.health.process.uptime.sec`*::
-+
---
-Process uptime for the Enterprise Search instance
-
-type: long
-
---
-
-[float]
-=== filebeat
-
-Health information for the embedded Filebeat instance
-
-
-*`enterprisesearch.health.process.filebeat.pid`*::
-+
---
-Process ID for the embedded Filebeat instance
-
-type: long
-
---
-
-*`enterprisesearch.health.process.filebeat.restart_count`*::
-+
---
-Number of times embedded Filebeat instance had to be restarted due to some issues
-
-type: long
-
---
-
-*`enterprisesearch.health.process.filebeat.time_since_last_restart.sec`*::
-+
---
-Time since the last embedded Filebeat instance restart (-1 if never restarted)
-
-type: long
-
---
-
-[float]
-=== jvm
-
-JVM health
-
-
-*`enterprisesearch.health.jvm.version`*::
-+
---
-JVM version used to run Enterprise Search
-
-type: keyword
-
---
-
-[float]
-=== gc
-
-Java garbage collection metrics
-
-
-*`enterprisesearch.health.jvm.gc.collection_count`*::
-+
---
-Total number of Java garbage collector invocations since the start of the process
-
-type: long
-
---
-
-*`enterprisesearch.health.jvm.gc.collection_time.ms`*::
-+
---
-Total time spent running Java garbage collector since the start of the process
-
-type: long
-
---
-
-[float]
-=== memory_usage
-
-Memory usage
-
-
-*`enterprisesearch.health.jvm.memory_usage.heap_init.bytes`*::
-+
---
-Heap init used by the JVM in bytes.
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.health.jvm.memory_usage.heap_used.bytes`*::
-+
---
-Heap used by the JVM in bytes.
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.health.jvm.memory_usage.heap_committed.bytes`*::
-+
---
-Committed heap to the JVM in bytes.
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.health.jvm.memory_usage.heap_max.bytes`*::
-+
---
-Max heap used by the JVM in bytes
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.health.jvm.memory_usage.non_heap_init.bytes`*::
-+
---
-Non-Heap initial memory used by the JVM in bytes.
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.health.jvm.memory_usage.non_heap_committed.bytes`*::
-+
---
-Non-Heap committed memory used by the JVM in bytes.
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.health.jvm.memory_usage.object_pending_finalization_count`*::
-+
---
-Displays the approximate number of objects for which finalization is pending.
-
-
-type: long
-
---
-
-[float]
-=== threads
-
-Threads information
-
-
-*`enterprisesearch.health.jvm.threads.current`*::
-+
---
-Current number of live threads.
-
-type: long
-
---
-
-*`enterprisesearch.health.jvm.threads.daemon`*::
-+
---
-Current number of live daemon threads.
-
-type: long
-
---
-
-*`enterprisesearch.health.jvm.threads.max`*::
-+
---
-Peak live thread count since the JVM started or the peak was reset.
-
-type: long
-
---
-
-*`enterprisesearch.health.jvm.threads.total_started`*::
-+
---
-Total number of threads created and/or started since the JVM started.
-
-type: long
-
---
-
-[float]
-=== crawler
-
-Crawler health
-
-
-[float]
-=== workers
-
-Crawler workers
-
-
-*`enterprisesearch.health.crawler.workers.pool_size`*::
-+
---
-Workers pool size.
-
-type: long
-
---
-
-*`enterprisesearch.health.crawler.workers.active`*::
-+
---
-Number of active workers.
-
-type: long
-
---
-
-*`enterprisesearch.health.crawler.workers.available`*::
-+
---
-Number of available workers.
-
-type: long
-
---
-
-[float]
-=== stats
-
-Enterprise Search stats.
-
-
-[float]
-=== connectors
-
-Workplace Search connectors subsystem stats.
-
-
-[float]
-=== job_store
-
-Workplace Search connectors job store stats.
-
-
-*`enterprisesearch.stats.connectors.job_store.waiting`*::
-+
---
-Number of connectors jobs waiting to be processed.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.job_store.working`*::
-+
---
-Number of connectors jobs currently being processed.
-
-type: long
-
---
-
-[float]
-=== job_types
-
-Breakdown of connectors jobs by types.
-
-
-*`enterprisesearch.stats.connectors.job_store.job_types.delete`*::
-+
---
-Number of delete jobs in the jobs store.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.job_store.job_types.full`*::
-+
---
-Number of full sync jobs in the jobs store.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.job_store.job_types.incremental`*::
-+
---
-Number of incremental sync jobs in the jobs store.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.job_store.job_types.permissions`*::
-+
---
-Number of permissions sync jobs in the jobs store.
-
-type: long
-
---
-
-[float]
-=== pool
-
-Workplace Search worker pools stats.
-
-
-[float]
-=== extract_worker_pool
-
-Status information for the extractor workers pool.
-
-
-*`enterprisesearch.stats.connectors.pool.extract_worker_pool.size`*::
-+
---
-Worker pool size.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.extract_worker_pool.busy`*::
-+
---
-Number of busy workers.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.extract_worker_pool.queue_depth`*::
-+
---
-Number of items waiting to be processed.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.extract_worker_pool.idle`*::
-+
---
-Number of idle workers.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.extract_worker_pool.total_completed`*::
-+
---
-Number of jobs completed since the start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.extract_worker_pool.total_scheduled`*::
-+
---
-Number of jobs scheduled since the start.
-
-type: long
-
---
-
-[float]
-=== subextract_worker_pool
-
-Status information for the sub-extractor workers pool.
-
-
-*`enterprisesearch.stats.connectors.pool.subextract_worker_pool.size`*::
-+
---
-Worker pool size.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.subextract_worker_pool.busy`*::
-+
---
-Number of busy workers.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.subextract_worker_pool.queue_depth`*::
-+
---
-Number of items waiting to be processed.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.subextract_worker_pool.idle`*::
-+
---
-Number of idle workers.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.subextract_worker_pool.total_completed`*::
-+
---
-Number of jobs completed since the start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.subextract_worker_pool.total_scheduled`*::
-+
---
-Number of jobs scheduled since the start.
-
-type: long
-
---
-
-[float]
-=== publish_worker_pool
-
-Status information for the publish workers pool.
-
-
-*`enterprisesearch.stats.connectors.pool.publish_worker_pool.size`*::
-+
---
-Worker pool size.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.publish_worker_pool.busy`*::
-+
---
-Number of busy workers.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.publish_worker_pool.queue_depth`*::
-+
---
-Number of items waiting to be processed.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.publish_worker_pool.idle`*::
-+
---
-Number of idle workers.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.publish_worker_pool.total_completed`*::
-+
---
-Number of jobs completed since the start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.connectors.pool.publish_worker_pool.total_scheduled`*::
-+
---
-Number of jobs scheduled since the start.
-
-type: long
-
---
-
-[float]
-=== http
-
-Incoming HTTP request metrics.
-
-
-[float]
-=== connections
-
-Incoming HTTP connection statistics.
-
-
-*`enterprisesearch.stats.http.connections.current`*::
-+
---
-Current number of HTTP connections opened to the Enterprise Search instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.http.connections.max`*::
-+
---
-Maximum number of concurrent HTTP connections open to the Enterprise Search instance since the start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.http.connections.total`*::
-+
---
-Total number of HTTP connections opened to the Enterprise Search instance since the start.
-
-type: long
-
---
-
-[float]
-=== network
-
-Network traffic metrics.
-
-
-*`enterprisesearch.stats.http.network.received.bytes`*::
-+
---
-Total number of bytes received by the Enterprise Search instance since the start.
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.stats.http.network.sent.bytes`*::
-+
---
-Total number of bytes sent by the Enterprise Search instance since the start.
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.stats.http.network.received.bytes_per_sec`*::
-+
---
-Average number of bytes received by the Enterprise Search instance per second since the start.
-
-type: long
-
-format: bytes
-
---
-
-*`enterprisesearch.stats.http.network.sent.bytes_per_sec`*::
-+
---
-Average number of bytes sent by the Enterprise Search instance per second since the start.
-
-type: long
-
-format: bytes
-
---
-
-[float]
-=== request_duration
-
-Aggregate HTTP request duration statistics.
-
-
-*`enterprisesearch.stats.http.request_duration.max.ms`*::
-+
---
-Longest HTTP connection duration since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.http.request_duration.mean.ms`*::
-+
---
-Average HTTP connection duration since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.http.request_duration.std_dev.ms`*::
-+
---
-Standard deviation for HTTP connection duration values since the start of the instance.
-
-type: long
-
---
-
-[float]
-=== responses
-
-Aggregate HTTP response counts broken down by HTTP status type.
-
-
-*`enterprisesearch.stats.http.responses.1xx`*::
-+
---
-Total number of HTTP requests finished with a 1xx response code since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.http.responses.2xx`*::
-+
---
-Total number of HTTP requests finished with a 2xx response code since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.http.responses.3xx`*::
-+
---
-Total number of HTTP requests finished with a 3xx response code since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.http.responses.4xx`*::
-+
---
-Total number of HTTP requests finished with a 4xx response code since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.http.responses.5xx`*::
-+
---
-Total number of HTTP requests finished with a 5xx response code since the start of the instance.
-
-type: long
-
---
-
-[float]
-=== queues
-
-Aggregate stats on the functioning of the background jobs processing pipeline within Enterprise Search.
-
-
-*`enterprisesearch.stats.queues.engine_destroyer.count`*::
-+
---
-Total number of jobs processed via the engine_destroyer queue since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.queues.mailer.count`*::
-+
---
-Total number of jobs processed via the mailer queue since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.queues.process_crawl.count`*::
-+
---
-Total number of jobs processed via the process_crawl queue since the start of the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.queues.failed.count`*::
-+
---
-Total number of jobs waiting in the failed queue.
-
-type: long
-
---
-
-[float]
-=== crawler
-
-Aggregate stats on the functioning of the crawler subsystem within Enterprise Search.
-
-
-[float]
-=== global
-
-Global deployment-wide metrics for the crawler.
-
-
-[float]
-=== crawl_requests
-
-Crawl request summary for the deployment.
-
-
-*`enterprisesearch.stats.crawler.global.crawl_requests.pending`*::
-+
---
-Total number of crawl requests waiting to be processed.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.global.crawl_requests.active`*::
-+
---
-Total number of crawl requests currently being processed (running crawls).
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.global.crawl_requests.successful`*::
-+
---
-Total number of crawl requests that have succeeded.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.global.crawl_requests.failed`*::
-+
---
-Total number of failed crawl requests.
-
-type: long
-
---
-
-[float]
-=== node
-
-Node-level statistics for the crawler.
-
-
-*`enterprisesearch.stats.crawler.node.pages_visited`*::
-+
---
-Total number of pages visited by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.urls_allowed`*::
-+
---
-Total number of URLs allowed by the crawler during discovery since the instance start.
-
-type: long
-
---
-
-[float]
-=== urls_denied
-
-Total number of URLs denied by the crawler during discovery since the instance start, broken down by deny reason.
-
-
-*`enterprisesearch.stats.crawler.node.urls_denied.already_seen`*::
-+
---
-Total number of URLs not followed because of URL de-duplication (each URL is visited only once).
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.urls_denied.domain_filter_denied`*::
-+
---
-Total number of URLs denied because of an unknown domain.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.urls_denied.incorrect_protocol`*::
-+
---
-Total number of URLs with incorrect/invalid/unsupported protocols.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.urls_denied.link_too_deep`*::
-+
---
-Total number of URLs not followed due to crawl depth limits.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.urls_denied.nofollow`*::
-+
---
-Total number of URLs denied due to a nofollow meta tag or an HTML link attribute.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.urls_denied.unsupported_content_type`*::
-+
---
-Total number of URLs denied due to an unsupported content type.
-
-type: long
-
---
-
-[float]
-=== status_codes
-
-HTTP request result counts, by status code.
-
-
-*`enterprisesearch.stats.crawler.node.status_codes.200`*::
-+
---
-Total number of HTTP 200 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.301`*::
-+
---
-Total number of HTTP 301 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.302`*::
-+
---
-Total number of HTTP 302 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.400`*::
-+
---
-Total number of HTTP 400 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.401`*::
-+
---
-Total number of HTTP 401 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.402`*::
-+
---
-Total number of HTTP 402 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.403`*::
-+
---
-Total number of HTTP 403 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.404`*::
-+
---
-Total number of HTTP 404 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.405`*::
-+
---
-Total number of HTTP 405 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.410`*::
-+
---
-Total number of HTTP 410 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.422`*::
-+
---
-Total number of HTTP 422 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.429`*::
-+
---
-Total number of HTTP 429 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.500`*::
-+
---
-Total number of HTTP 500 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.501`*::
-+
---
-Total number of HTTP 501 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.502`*::
-+
---
-Total number of HTTP 502 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.503`*::
-+
---
-Total number of HTTP 503 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.status_codes.504`*::
-+
---
-Total number of HTTP 504 responses seen by the crawler since the instance start.
-
-type: long
-
---
-
-[float]
-=== queue_size
-
-Total current URL queue size for the instance.
-
-
-*`enterprisesearch.stats.crawler.node.queue_size.primary`*::
-+
---
-Total number of URLs waiting to be crawled by the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.queue_size.purge`*::
-+
---
-Total number of URLs waiting to be checked by the purge crawl phase.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.active_threads`*::
-+
---
-Total number of crawler worker threads currently active on the instance.
-
-type: long
-
---
-
-[float]
-=== workers
-
-Crawler workers information for the instance.
-
-
-*`enterprisesearch.stats.crawler.node.workers.pool_size`*::
-+
---
-Total size of the crawl workers pool (number of concurrent crawls possible) for the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.workers.active`*::
-+
---
-Total number of currently active crawl workers (running crawls) for the instance.
-
-type: long
-
---
-
-*`enterprisesearch.stats.crawler.node.workers.available`*::
-+
---
-Total number of currently available (free) crawl workers for the instance.
-
-type: long
-
---
-
-[float]
-=== product_usage
-
-Aggregate product usage statistics for the Enterprise Search deployment.
-
-
-[float]
-=== app_search
-
-App Search product usage statistics.
-
-
-*`enterprisesearch.stats.product_usage.app_search.total_engines`*::
-+
---
-Current number of App Search engines within the deployment.
-
-type: long
-
---
-
-[float]
-=== workplace_search
-
-Workplace Search product usage statistics.
-
-
-*`enterprisesearch.stats.product_usage.workplace_search.total_org_sources`*::
-+
---
-Current number of Workplace Search org-wide content sources within the deployment.
-
-type: long
-
---
-
-*`enterprisesearch.stats.product_usage.workplace_search.total_private_sources`*::
-+
---
-Current number of Workplace Search private content sources within the deployment.
-
-type: long
 
 --
 
@@ -44176,99 +43575,6 @@ type: long
 +
 --
 type: long
-
---
-
-[float]
-=== settings
-
-Kibana stats and run-time metrics.
-
-
-
-*`kibana.settings.uuid`*::
-+
---
-Kibana instance UUID
-
-type: keyword
-
---
-
-*`kibana.settings.name`*::
-+
---
-Kibana instance name
-
-type: keyword
-
---
-
-*`kibana.settings.index`*::
-+
---
-Name of Kibana's internal index
-
-type: keyword
-
---
-
-*`kibana.settings.host`*::
-+
---
-Kibana instance hostname
-
-type: keyword
-
---
-
-*`kibana.settings.transport_address`*::
-+
---
-Kibana server's hostname and port
-
-type: keyword
-
---
-
-*`kibana.settings.version`*::
-+
---
-Kibana version
-
-type: keyword
-
---
-
-*`kibana.settings.snapshot`*::
-+
---
-Whether the Kibana build is a snapshot build
-
-type: boolean
-
---
-
-*`kibana.settings.status`*::
-+
---
-Kibana instance's health status
-
-type: keyword
-
---
-
-*`kibana.settings.locale`*::
-+
---
-type: keyword
-
---
-
-*`kibana.settings.port`*::
-+
---
-type: integer
 
 --
 
@@ -69341,6 +68647,12 @@ format: duration
 
 --
 
+[float]
+=== wmi
+
+wmi
+
+
 [[exported-fields-zookeeper]]
 == ZooKeeper fields
 
@@ -69408,16 +68720,6 @@ type: long
 `mntr` contains the metrics reported by the four-letter `mntr` command.
 
 
-
-*`zookeeper.mntr.hostname`*::
-+
---
-ZooKeeper hostname.
-
-
-type: keyword
-
---
 
 *`zookeeper.mntr.approximate_data_size`*::
 +

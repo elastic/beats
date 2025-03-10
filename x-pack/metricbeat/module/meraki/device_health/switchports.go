@@ -5,6 +5,7 @@
 package device_health
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -23,6 +24,10 @@ func getDeviceSwitchports(client *meraki.Client, organizationID string, devices 
 	switches, res, err := client.Switch.GetOrganizationSwitchPortsBySwitch(organizationID, &meraki.GetOrganizationSwitchPortsBySwitchQueryParams{})
 	if err != nil {
 		return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+	}
+
+	if switches == nil {
+		return errors.New("GetOrganizationSwitchPortsBySwitch returned nil")
 	}
 
 	for _, device := range *switches {
@@ -62,7 +67,13 @@ func getDeviceSwitchports(client *meraki.Client, organizationID string, devices 
 func reportSwitchportMetrics(reporter mb.ReporterV2, organizationID string, devices map[Serial]*Device) {
 	metrics := []mapstr.M{}
 	for _, device := range devices {
+		if device == nil || device.details == nil {
+			continue
+		}
 		for _, switchport := range device.switchports {
+			if switchport == nil {
+				continue
+			}
 			metric := deviceDetailsToMapstr(device.details)
 
 			if switchport.port != nil {

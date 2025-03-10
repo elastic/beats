@@ -121,3 +121,58 @@ func TestJournaldInputRunsAndRecoversFromJournalctlFailures(t *testing.T) {
 		t.Fatalf("expecting 8 published events, got %d instead'", eventsPublished)
 	}
 }
+
+func TestJournaldInputDoesNotDuplicateData(t *testing.T) {
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	// render configuration
+	syslogID := fmt.Sprintf("%s-%s", t.Name(), uuid.Must(uuid.NewV4()).String())
+	yamlCfg := fmt.Sprintf(journaldInputCfg, syslogID, filebeat.TempDir())
+
+	defer func() {
+		if t.Failed() {
+			t.Logf("Syslog ID: %q", syslogID)
+		}
+	}()
+	go generateJournaldLogs(t, context.Background(), syslogID, 3)
+
+	filebeat.WriteConfigFile(yamlCfg)
+	filebeat.Start()
+	// On a normal execution we run journalclt twice, the first time to read all messages from the
+	// previous boot until 'now' and the second one with the --follow flag that should keep on running.
+	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+
+	pidLine := filebeat.GetLastLogLine("journalctl started with PID")
+	logEntry := struct{ Message string }{}
+	if err := json.Unmarshal([]byte(pidLine), &logEntry); err != nil {
+		t.Errorf("could not parse PID log entry as JSON: %s", err)
+	}
+
+	filebeat.WaitForLogs("Count: 003", 5*time.Second, "did not find the third event in published events")
+
+	// Stop Filebeat
+	filebeat.Stop()
+
+	// Generate more logs
+	go generateJournaldLogs(t, context.Background(), syslogID, 5)
+
+	// Restart Filebeat
+	filebeat.Start()
+
+	// Wait for journalctl to start
+	filebeat.WaitForLogs("journalctl started with PID", 10*time.Second, "journalctl did not start")
+
+	// Wait for last even in the debug logs
+	filebeat.WaitForLogs("Count: 005", time.Second, "did not find the last event in published events")
+
+	eventsPublished := filebeat.CountFileLines(filepath.Join(filebeat.TempDir(), "output-*.ndjson"))
+
+	if eventsPublished != 8 {
+		t.Fatalf("expecting 8 published events, got %d instead'", eventsPublished)
+	}
+}

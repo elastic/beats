@@ -67,14 +67,19 @@ linters:
     - noctx # noctx finds sending http request without context.Context
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
-    - gomodguard # check for blocked dependencies
-    - depguard
+    - gomodguard # check for blocked dependencies in go.mod
+    - depguard # check for blocked dependencies in Go files
     - gomoddirectives
 
 # all available settings of specific linters
 linters-settings:
   depguard:
     rules:
+      main:
+        list-mode: lax
+        deny:
+          - pkg: "math/rand$"
+            desc: "superseded by math/rand/v2"
       apache-licensed-code:
         list-mode: lax
         files:
@@ -125,6 +130,10 @@ linters-settings:
               - errors
               - fmt
             reason: "This package is deprecated, use `fmt.Errorf` with `%w` instead"
+        - gotest.tools/v3:
+            recommendations:
+              - github.com/stretchr/testify
+            reason: "Use one assertion library consistently across the codebase"
         - github.com/google/uuid:
             # Recommended modules that should be used instead. (Optional)
             recommendations:
@@ -150,10 +159,6 @@ linters-settings:
       - github.com/meraki/dashboard-api-go/v3
       - github.com/snowflakedb/gosnowflake
 
-  gosimple:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.22.10"
-
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
     max-func-lines: 0
@@ -169,20 +174,12 @@ linters-settings:
     require-specific: false
 
   staticcheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.22.10"
     checks: ["all"]
 
   stylecheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.22.10"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
-
-  unused:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.22.10"
 
   gosec:
     excludes:
