@@ -30,7 +30,8 @@ func TestNewDefaultConfig(t *testing.T) {
 	cfg := NewDefaultConfig()
 
 	assert.False(t, cfg.IncludeQueries, "IncludeQueries should default to false")
-	assert.False(t, cfg.IncludeNull, "IncludeNull should default to false")
+	assert.False(t, cfg.IncludeNullProperties, "IncludeNullProperties should default to false")
+	assert.False(t, cfg.IncludeEmptyStringProperties, "IncludeEmptyStringProperties should default to false")
 	assert.Equal(t, WMIDefaultNamespace, cfg.Namespace, "Namespace should default to WMIDefaultNamespace")
 	assert.Empty(t, cfg.Queries, "Queries should default to an empty slice")
 }
@@ -88,9 +89,9 @@ func TestCompileQueries(t *testing.T) {
 			config: Config{
 				Queries: []QueryConfig{
 					{
-						Class:  "Win32_Process",
-						Fields: []string{"Name", "ID"},
-						Where:  "Name LIKE 'chrome%'",
+						Class:      "Win32_Process",
+						Properties: []string{"Name", "ID"},
+						Where:      "Name LIKE 'chrome%'",
 					},
 				},
 			},
@@ -119,50 +120,50 @@ func TestCompileQueries(t *testing.T) {
 // TestQueryCompile ensures individual query compilation works correctly.
 func TestQueryCompile(t *testing.T) {
 	tests := []struct {
-		name                 string
-		queryConfig          QueryConfig
-		expectedQuery        string
-		expectedFieldsLength int
+		name                     string
+		queryConfig              QueryConfig
+		expectedQuery            string
+		expectedPropertiesLength int
 	}{
 		{
 			name: "Simple query with WHERE clause",
 			queryConfig: QueryConfig{
-				Class:  "Win32_Process",
-				Fields: []string{"Name", "ProcessId"},
-				Where:  "Name = 'notepad.exe'",
+				Class:      "Win32_Process",
+				Properties: []string{"Name", "ProcessId"},
+				Where:      "Name = 'notepad.exe'",
 			},
-			expectedQuery:        "SELECT Name,ProcessId FROM Win32_Process WHERE Name = 'notepad.exe'",
-			expectedFieldsLength: 2,
+			expectedQuery:            "SELECT Name,ProcessId FROM Win32_Process WHERE Name = 'notepad.exe'",
+			expectedPropertiesLength: 2,
 		},
 		{
-			name: "Query with multiple fields and no WHERE clause",
+			name: "Query with multiple properties and no WHERE clause",
 			queryConfig: QueryConfig{
-				Class:  "Win32_Service",
-				Fields: []string{"Name", "State", "StartMode"},
-				Where:  "",
+				Class:      "Win32_Service",
+				Properties: []string{"Name", "State", "StartMode"},
+				Where:      "",
 			},
-			expectedQuery:        "SELECT Name,State,StartMode FROM Win32_Service",
-			expectedFieldsLength: 3,
+			expectedQuery:            "SELECT Name,State,StartMode FROM Win32_Service",
+			expectedPropertiesLength: 3,
 		},
 		{
-			name: "Query with wildcard (*) for fields",
+			name: "Query with  empty list for properties and Where",
 			queryConfig: QueryConfig{
-				Class:  "Win32_ComputerSystem",
-				Fields: []string{},
-				Where:  "Manufacturer = 'Dell'",
+				Class:      "Win32_ComputerSystem",
+				Properties: []string{},
+				Where:      "Manufacturer = 'Dell'",
 			},
-			expectedQuery:        "SELECT * FROM Win32_ComputerSystem WHERE Manufacturer = 'Dell'",
-			expectedFieldsLength: 0,
+			expectedQuery:            "SELECT * FROM Win32_ComputerSystem WHERE Manufacturer = 'Dell'",
+			expectedPropertiesLength: 0,
 		},
 		{
 			name: "Query with wildcard (*) and no WHERE clause",
 			queryConfig: QueryConfig{
-				Class:  "Win32_BIOS",
-				Fields: []string{"*"},
-				Where:  "",
+				Class:      "Win32_BIOS",
+				Properties: []string{"*"},
+				Where:      "",
 			},
-			expectedQuery:        "SELECT * FROM Win32_BIOS",
-			expectedFieldsLength: 0, // The normalization process make sure that ['*'] and [] are the same case
+			expectedQuery:            "SELECT * FROM Win32_BIOS",
+			expectedPropertiesLength: 0, // The normalization process make sure that ['*'] and [] are the same case
 		},
 	}
 
@@ -170,7 +171,7 @@ func TestQueryCompile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.queryConfig.compileQuery()
 			assert.Equal(t, tt.expectedQuery, tt.queryConfig.QueryStr, "QueryStr should match the expected query string")
-			assert.Equal(t, tt.expectedFieldsLength, len(tt.queryConfig.Fields))
+			assert.Equal(t, tt.expectedPropertiesLength, len(tt.queryConfig.Properties))
 		})
 	}
 }
