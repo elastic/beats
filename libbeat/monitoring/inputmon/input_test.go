@@ -24,6 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -87,17 +89,57 @@ func TestMetricSnapshotJSON(t *testing.T) {
 		require.NoError(t, globalRegistry().Clear())
 	})
 
-	r, cancel := NewInputRegistry("test", "my-id", nil)
-	defer cancel()
-	monitoring.NewInt(r, "foo_total").Set(100)
+	bInfo := beat.Info{}
+	bInfo.Monitoring.Namespace = monitoring.GetNamespace("beat")
+
+	inputID := "input-with-pipeline-metrics"
+	ctx := v2.Context{
+		ID:    inputID,
+		Agent: bInfo,
+	}
+
+	// Metrics from the beat.Info namespace
+	r1 := ctx.EnhanceMetricRegistry(inputID, "test")
+	defer ctx.UnregisterMetrics()
+	require.NoError(t, RegisterMetrics(inputID, r1), "could not register metrics")
+	monitoring.NewInt(r1, "foo1_total").Set(100)
+	monitoring.NewInt(r1, "events_pipeline_total").Set(100)
+
+	// an input registering metrics on the global namespace. This simulates an
+	// input without pipeline metrics reported for this input.
+	r2, cancel2 := NewInputRegistry(
+		"test", "input-without-pipeline-metrics", nil)
+	defer cancel2()
+	monitoring.NewInt(r2, "foo2_total").Set(100)
+
+	// unrelated registry in the global namespace, should be ignored.
+	r3 := globalRegistry().NewRegistry("another-registry")
+	monitoring.NewInt(r3, "foo3_total").Set(100)
+
+	// another input registry missing required information.
+	r4 := globalRegistry().NewRegistry("yet-another-registry")
+	monitoring.NewString(r4, "id").Set("some-id")
+	monitoring.NewInt(r4, "foo3_total").Set(100)
+
+	// a input with a duplicated ID, both registering metrics. The new API takes
+	// precedence, so this should be ignored.
+	r5 := globalRegistry().NewRegistry(inputID)
+	monitoring.NewString(r5, "id").Set(inputID)
+	monitoring.NewString(r5, "input").Set("legacy-metrics")
 
 	jsonBytes, err := MetricSnapshotJSON()
 	require.NoError(t, err)
 
 	const expected = `[
   {
-    "foo_total": 100,
-    "id": "my-id",
+    "foo2_total": 100,
+    "id": "input-without-pipeline-metrics",
+    "input": "test"
+  },
+  {
+    "events_pipeline_total": 100,
+    "foo1_total": 100,
+    "id": "input-with-pipeline-metrics",
     "input": "test"
   }
 ]`
