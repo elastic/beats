@@ -53,6 +53,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Functionbeat*
 
+- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}43152[43152]
 
 *Elastic Logging Plugin*
 
