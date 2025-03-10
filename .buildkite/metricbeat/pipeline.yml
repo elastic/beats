@@ -341,7 +341,7 @@ steps:
           - "metricbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "filebeat/build/TEST-*.xml"
+              files: "metricbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
