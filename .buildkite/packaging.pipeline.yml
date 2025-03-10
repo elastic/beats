@@ -10,6 +10,7 @@ env:
 
   PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
   PLATFORMS_ARM: "+all linux/arm64"
+  RUN_STAGING: "true"
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
