@@ -76,7 +76,9 @@ func TestRateLimit(t *testing.T) {
 		out := in
 		out.Fields = in.Fields.Clone()
 
-		out.Fields.Put(key, value)
+		if _, err := out.Fields.Put(key, value); err != nil {
+			t.Error(err)
+		}
 		return out
 	}
 
