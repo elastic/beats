@@ -11,6 +11,7 @@ steps:
             - path:
                 - auditbeat/
                 - .buildkite/auditbeat/
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
                 #OSS
@@ -41,6 +42,7 @@ steps:
             - path:
                 - heartbeat/
                 - .buildkite/heartbeat/
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
                 #OSS
@@ -70,6 +72,7 @@ steps:
           watch:
             - path:
                 - filebeat/
+                - .buildkite/pipeline.yml
                 - .buildkite/filebeat/
                 # CI related scripts
                 - .buildkite/scripts
@@ -104,6 +107,7 @@ steps:
                 - x-pack/filebeat/
                 - x-pack/libbeat/
                 - .buildkite/x-pack/pipeline.xpack.filebeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
                 - .buildkite/deploy/docker/docker-compose.yml
@@ -136,6 +140,7 @@ steps:
                 - x-pack/dockerlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
                 - .buildkite/hooks/
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 #OSS
                 - go.mod
@@ -165,6 +170,7 @@ steps:
             - path:
                 - metricbeat/
                 - .buildkite/metricbeat/
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
                 #OSS
@@ -197,6 +203,7 @@ steps:
                 - x-pack/metricbeat/
                 - x-pack/libbeat/common/aws
                 - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
                 - .buildkite/deploy/docker/docker-compose.yml
@@ -228,6 +235,7 @@ steps:
             - path:
                 - x-pack/osquerybeat/**
                 - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts/**
                 - .buildkite/hooks/**
                 # x-pack
@@ -262,6 +270,7 @@ steps:
                 - winlogbeat/
                 - x-pack/winlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks/
                 #OSS
@@ -292,6 +301,7 @@ steps:
             - path:
                 - .buildkite/deploy/kubernetes/**
                 - .buildkite/hooks/
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - deploy/kubernetes/**
                 - metricbeat/module/kubernetes/**
@@ -318,6 +328,7 @@ steps:
             - path:
                 - libbeat/
                 - .buildkite/libbeat/pipeline.libbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks
                 #OSS
@@ -348,6 +359,7 @@ steps:
                 - libbeat/
                 - x-pack/libbeat/
                 - .buildkite/x-pack/pipeline.xpack.libbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks
                 # x-pack
@@ -379,6 +391,7 @@ steps:
                 - auditbeat/
                 - x-pack/auditbeat/
                 - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts/
                 - .buildkite/hooks/
                 # x-pack
@@ -411,6 +424,7 @@ steps:
                 - heartbeat/
                 - x-pack/heartbeat/
                 - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts/
                 - .buildkite/hooks/
                 # x-pack
@@ -443,6 +457,7 @@ steps:
                 - packetbeat/
                 - x-pack/packetbeat/
                 - .buildkite/x-pack/pipeline.xpack.packetbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts/
                 - .buildkite/hooks/
                 # x-pack
@@ -479,6 +494,7 @@ steps:
             - path:
                 - winlogbeat/
                 - .buildkite/winlogbeat/pipeline.winlogbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts
                 - .buildkite/hooks
                 #OSS
@@ -509,6 +525,7 @@ steps:
             - path:
                 - packetbeat/
                 - .buildkite/packetbeat/pipeline.packetbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts/
                 - .buildkite/hooks/
                 #OSS
@@ -553,6 +570,7 @@ steps:
                 - x-pack/packetbeat/
 
                 - .buildkite/x-pack/pipeline.xpack.agentbeat.yml
+                - .buildkite/pipeline.yml
                 - .buildkite/scripts/
                 - .buildkite/hooks/
                 #OSS
