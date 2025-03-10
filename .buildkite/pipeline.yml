@@ -412,21 +412,16 @@ steps:
                 - libbeat/
                 - testing/
               config:
-                trigger: "beats-xpack-libbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: Upload beats-xpack-libbeat"
+                command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.libbeat.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for x-pack/libbeat"
+  - label: ":pipeline: Upload beats-xpack-libbeat"
     if: build.pull_request.id == null
-    trigger: "beats-xpack-libbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.libbeat.yml"
 
   - label: "Trigger x-pack/auditbeat"
     if: build.pull_request.id != null
