@@ -86,6 +86,14 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
 }
 
+func MultiStepAPIJourneyJob(ctx context.Context, script string, params mapstr.M, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
+	newCmd := func() *SynthCmd {
+		return &SynthCmd{exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)} //nolint:gosec // we are safely building a command here, users can add args at their own risk
+	}
+
+	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
+}
+
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.

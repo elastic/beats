@@ -21,21 +21,74 @@ heartbeat.config.monitors:
 
 # Configure monitors inline
 heartbeat.monitors:
-- type: http
-  # Set enabled to true (or delete the following line) to enable this monitor
-  enabled: false
-  # ID used to uniquely identify this monitor in Elasticsearch even if the config changes
-  id: my-monitor
-  # Human readable display name for this service in Uptime UI and elsewhere
-  name: My Monitor
-  # List of URLs to query
-  urls: ["http://localhost:9200"]
-  # Configure task schedule
-  schedule: '@every 10s'
-  # Total test connection and data exchange timeout
-  #timeout: 16s
-  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
-  #service.name: my-apm-service-name
+- type: api
+  id: 8a67e60b-1878-4284-b80d-df2736e02d57
+  schedule: "@every 10m"
+  enabled: true
+  data_stream:
+    namespace: default
+  streams:
+    - data_stream:
+        dataset: browser
+        type: synthetics
+      type: browser
+      enabled: true
+      schedule: "@every 10m"
+      config_id: 8a67e60b-1878-4284-b80d-df2736e02d57
+      name: "https://fast.com"
+      namespace: default
+      origin: ui
+      id: 8a67e60b-1878-4284-b80d-df2736e02d57
+      max_attempts: 2
+      source.inline.script: |
+        step('Go to https://fast.com', async () => {
+          await page.goto('https://fast.com');
+        });
+      urls: "https://fast.com"
+      ignore_https_errors: false
+      throttling:
+        download: 5
+        upload: 3
+        latency: 20
+      fields:
+        config_id: 8a67e60b-1878-4284-b80d-df2736e02d57
+        meta:
+          space_id: default
+      fields_under_root: true
+- type: api
+  id: 8a67e60b-1878-4284-b80d-df2736e02d57
+  schedule: "@every 10m"
+  enabled: true
+  data_stream:
+    namespace: default
+  streams:
+    - data_stream:
+        dataset: browser
+        type: synthetics
+      type: browser
+      enabled: true
+      schedule: "@every 10m"
+      config_id: 8a67e60b-1878-4284-b80d-df2736e02d57
+      name: "https://fast.com"
+      namespace: default
+      origin: ui
+      id: 8a67e60b-1878-4284-b80d-df2736e02d57
+      max_attempts: 2
+      source.inline.script: |
+        step('Go to https://fast.com', async () => {
+          await page.goto('https://fast.com');
+        });
+      urls: "https://fast.com"
+      ignore_https_errors: false
+      throttling:
+        download: 5
+        upload: 3
+        latency: 20
+      fields:
+        config_id: 8a67e60b-1878-4284-b80d-df2736e02d57
+        meta:
+          space_id: default
+      fields_under_root: true
 
 # Experimental: Set this to true to run heartbeat monitors exactly once at startup
 #heartbeat.run_once: true
@@ -100,7 +153,7 @@ setup.kibana:
 # ---------------------------- Elasticsearch Output ----------------------------
 output.elasticsearch:
   # Array of hosts to connect to.
-  hosts: ["localhost:9200"]
+  hosts: ["https://edge-lite-oblt-ccs-vbdas-shahzad.es.us-west2.gcp.elastic-cloud.com:443"]
 
   # Performance preset - one of "balanced", "throughput", "scale",
   # "latency", or "custom".
@@ -111,8 +164,8 @@ output.elasticsearch:
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
+  username: "elastic"
+  password: "fY003tD2mSOdVOLvaK4kJD4o"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
@@ -133,12 +186,13 @@ output.elasticsearch:
 
 processors:
   - add_observer_metadata:
+      name: "us-east-1a"
       # Optional, but recommended geo settings for the location Heartbeat is running in
-      #geo:
+      geo:
         # Token describing this location
-        #name: us-east-1a
+        name: us-east-1a
         # Lat, Lon "
-        #location: "37.926868, -78.024902"
+        location: "37.926868, -78.024902"
 
 
 # ================================== Logging ===================================
