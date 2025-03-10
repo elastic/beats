@@ -416,6 +416,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 
 *Auditbeat*
 
