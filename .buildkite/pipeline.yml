@@ -174,7 +174,7 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                label: ":pipeline: beats-metricbeat"
+                label: ":pipeline: Upload beats-metricbeat"
                 command: "buildkite-agent pipeline upload .buildkite/metricbeat/pipeline.yml"
                 env:
                   - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
@@ -207,7 +207,7 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                label: ":pipeline: beats-xpack-metricbeat"
+                label: ":pipeline: Upload beats-xpack-metricbeat"
                 command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.metricbeat.yml"
                 env:
                   - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
@@ -240,7 +240,7 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                label: ":pipeline: beats-xpack-osquerybeat"
+                label: ":pipeline: Upload beats-xpack-osquerybeat"
                 command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
                 env:
                   - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
@@ -250,7 +250,6 @@ steps:
   - label: ":pipeline: Upload beats-xpack-osquerybeat"
     if: build.pull_request.id == null
     command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.osquerybeat.yml"
-
 
   - label: "Trigger x-pack/winlogbeat"
     if: build.pull_request.id != null
@@ -272,7 +271,7 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                label: ":pipeline: beats-xpack-winlogbeat"
+                label: ":pipeline: Upload beats-xpack-winlogbeat"
                 command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
                 env:
                   - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
@@ -400,7 +399,6 @@ steps:
   - label: ":pipeline: Upload beats-xpack-auditbeat"
     if: build.pull_request.id == null
     command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.auditbeat.yml"
-
 
   - label: "Trigger x-pack/heartbeat"
     if: build.pull_request.id != null
