@@ -632,18 +632,13 @@ steps:
                 - libbeat/
                 - testing/
               config:
-                trigger: "beats-xpack-agentbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: Upload beats-xpack-agentbeat"
+                command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.agentbeat.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Agentbeat"
+  - label: ":pipeline: Upload beats-xpack-agentbeat"
     if: build.pull_request.id == null
-    trigger: "beats-xpack-agentbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.agentbeat.yml"
