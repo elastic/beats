@@ -342,21 +342,16 @@ steps:
                 - metricbeat/module/kubernetes/**
                 - libbeat/docs/version.asciidoc
               config:
-                trigger: "deploy-k8s"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: Upload deploy-k8s"
+                command: "buildkite-agent pipeline upload .buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Deploy/K8S"
+  - label: ":pipeline: Upload deploy-k8s"
     if: build.pull_request.id == null
-    trigger: "deploy-k8s"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml"
 
   - label: "Trigger Libbeat"
     if: build.pull_request.id != null
