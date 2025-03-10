@@ -23,9 +23,10 @@ import (
 	"testing"
 
 	"github.com/prometheus/common/model"
-	prometheuslabels "github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
+
+	prometheuslabels "github.com/elastic/prometheus/model/labels"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
