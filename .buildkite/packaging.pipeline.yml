@@ -40,7 +40,6 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
         depends_on: start-gate-snapshot
         key: dashboards-snapshot
         # TODO: container with go and make
@@ -63,7 +62,6 @@ steps:
 
       - label: Staging dashboards
         # TODO remove OR clause below (see earlier comment)
-        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         depends_on: start-gate-staging
         key: dashboards-staging
         # TODO: container with go and make
@@ -176,8 +174,6 @@ steps:
   - group: Packaging Staging
     key: packaging-staging
     depends_on: start-gate-staging
-    # TODO remove OR clause below (see earlier comment)
-    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
     steps:
       - label: "STAGING: {{matrix}}"
         env:
@@ -288,8 +284,6 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
 
       - label: DRA Staging
-        # TODO remove OR clause below (see earlier comment)
-        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
@@ -310,13 +304,11 @@ steps:
   - wait
 
   - command: echo "End of concurrency gate dra-snapshot <--"
-    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true") && build.env('VERSION_QUALIFIER') == null
     concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-snapshot
 
   - command: echo "End of concurrency gate dra-staging <--"
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
     concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-staging
