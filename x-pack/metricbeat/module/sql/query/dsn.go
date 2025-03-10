@@ -9,7 +9,6 @@ import (
 	"net/url"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -31,7 +30,7 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 		return mb.HostData{}, fmt.Errorf("error parsing config file: %w", err)
 	}
 	if config.Driver == "oracle" {
-		params, err := godror.ParseDSN(host)
+		params, err := dsn.Parse(host)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 		}
