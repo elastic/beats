@@ -76,7 +76,9 @@ func TestRateLimit(t *testing.T) {
 		out := in
 		out.Fields = in.Fields.Clone()
 
-		out.Fields.Put(key, value)
+		if _, err := out.Fields.Put(key, value); err != nil {
+			t.Error(err)
+		}
 		return out
 	}
 
@@ -173,5 +175,33 @@ func TestRateLimit(t *testing.T) {
 
 			require.Equal(t, test.outEvents, out)
 		})
+	}
+}
+
+func TestAllocs(t *testing.T) {
+	p, err := new(common.MustNewConfigFrom(common.MapStr{
+		"limit": "100/s",
+	}))
+	require.NoError(t, err)
+	event := beat.Event{Fields: common.MapStr{"field": 1}}
+
+	allocs := testing.AllocsPerRun(1000, func() {
+		p.Run(&event) //nolint:errcheck // ignore
+	})
+	if allocs > 0 {
+		t.Errorf("allocs = %v; want 0", allocs)
+	}
+}
+
+func BenchmarkRateLimit(b *testing.B) {
+	p, err := new(common.MustNewConfigFrom(common.MapStr{
+		"limit": "100/s",
+	}))
+	require.NoError(b, err)
+	event := beat.Event{Fields: common.MapStr{"field": 1}}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		p.Run(&event) //nolint:errcheck // ignore
 	}
 }
