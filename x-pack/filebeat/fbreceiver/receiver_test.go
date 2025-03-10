@@ -277,10 +277,8 @@ func TestMultipleReceivers(t *testing.T) {
 		T:       t,
 		Factory: NewFactory(),
 		Config:  &config,
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M) {
-			require.Eventuallyf(t, func() bool {
-				return len(logs["r1"]) == 1 && len(logs["r2"]) == 1
-			}, 1*time.Minute, 100*time.Millisecond, "timeout waiting for logs: %#v", logs)
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M) bool {
+			return len(logs["r1"]) == 1 && len(logs["r2"]) == 1
 		},
 	})
 }

@@ -23,6 +23,7 @@ import (
 	"context"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
@@ -42,7 +43,8 @@ type CheckMultipleReceiversParams struct {
 	// Config of the receiver to use.
 	Config component.Config
 	// AssertFunc is a function that asserts the test conditions.
-	AssertFunc func(t *testing.T, logs map[string][]mapstr.M)
+	// The function is called periodically until it returns true which stops the test.
+	AssertFunc func(t *testing.T, logs map[string][]mapstr.M) bool
 }
 
 // CheckMultipleReceivers checks that multiple receivers can be created and started
@@ -109,7 +111,10 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 		require.NoError(t, r2.Shutdown(ctx), "Error shutting down receiver 2")
 	}()
 
-	logsMu.Lock()
-	defer logsMu.Unlock()
-	params.AssertFunc(t, logs)
+	require.Eventually(t, func() bool {
+		logsMu.Lock()
+		defer logsMu.Unlock()
+
+		return params.AssertFunc(t, logs)
+	}, time.Minute, 100*time.Millisecond)
 }
