@@ -55,21 +55,16 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                trigger: "heartbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: Upload beats-heartbeat"
+                command: "buildkite-agent pipeline upload .buildkite/heartbeat/heartbeat-pipeline.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Heartbeat"
+  - label: ":pipeline: Upload beats-heartbeat"
     if: build.pull_request.id == null
-    trigger: "heartbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/heartbeat/heartbeat-pipeline.yml"
 
   - label: "Trigger Filebeat"
     if: build.pull_request.id != null
