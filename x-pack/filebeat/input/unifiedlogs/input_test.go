@@ -58,6 +58,7 @@ func TestInput(t *testing.T) {
 
 	testCases := []struct {
 		name                 string
+		skip                 func(*testing.T) bool
 		cfg                  config
 		timeUntilClose       time.Duration
 		assertFunc           func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time)
@@ -139,6 +140,19 @@ func TestInput(t *testing.T) {
 		},
 		{
 			name: "With end date",
+			skip: func(t *testing.T) bool {
+				const sequoiaPrefix = "15."
+				version, err := exec.Command("sw_vers", "-productVersion").CombinedOutput()
+				if err != nil {
+					t.Fatalf("failed to get macOS version: %v", err)
+					return true
+				}
+				if strings.HasPrefix(strings.TrimSpace(string(version)), sequoiaPrefix) {
+					t.Skip("macOS 15.x does not support the --end flag correctly")
+					return true
+				}
+				return false
+			},
 			cfg: config{
 				ShowConfig: showConfig{
 					ArchiveFile: archivePath,
@@ -147,7 +161,7 @@ func TestInput(t *testing.T) {
 			},
 			timeUntilClose:     time.Second,
 			expectedLogShowCmd: fmt.Sprintf("/usr/bin/log show --style ndjson --archive %s --end 2024-12-04 13:46:00+0200", archivePath),
-			assertFunc:         eventsAndCursorAssertN(462),
+			assertFunc:         eventsAndCursorAssertN(149),
 		},
 		{
 			name: "With predicate",
@@ -204,6 +218,9 @@ func TestInput(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.skip != nil && tc.skip(t) {
+				return
+			}
 			_, cursorInput := newCursorInput(tc.cfg)
 			input := cursorInput.(*input)
 
