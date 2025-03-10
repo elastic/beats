@@ -20,7 +20,6 @@ Beat  | Description
 --- | ---
 [Auditbeat](https://github.com/elastic/beats/tree/main/auditbeat) | Collect your Linux audit framework data and monitor the integrity of your files.
 [Filebeat](https://github.com/elastic/beats/tree/main/filebeat) | Tails and ships log files
-[Functionbeat](https://github.com/elastic/beats/tree/main/x-pack/functionbeat) | Read and ships events from serverless infrastructure.
 [Heartbeat](https://github.com/elastic/beats/tree/main/heartbeat) | Ping remote services for availability
 [Metricbeat](https://github.com/elastic/beats/tree/main/metricbeat) | Fetches sets of metrics from the operating system and services
 [Packetbeat](https://github.com/elastic/beats/tree/main/packetbeat) | Monitors the network and applications by sniffing packets
@@ -41,7 +40,6 @@ on the [elastic.co site](https://www.elastic.co/guide/):
 * [Beats platform](https://www.elastic.co/guide/en/beats/libbeat/current/index.html)
 * [Auditbeat](https://www.elastic.co/guide/en/beats/auditbeat/current/index.html)
 * [Filebeat](https://www.elastic.co/guide/en/beats/filebeat/current/index.html)
-* [Functionbeat](https://www.elastic.co/guide/en/beats/functionbeat/current/index.html)
 * [Heartbeat](https://www.elastic.co/guide/en/beats/heartbeat/current/index.html)
 * [Metricbeat](https://www.elastic.co/guide/en/beats/metricbeat/current/index.html)
 * [Packetbeat](https://www.elastic.co/guide/en/beats/packetbeat/current/index.html)
