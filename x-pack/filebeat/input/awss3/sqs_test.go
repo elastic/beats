@@ -39,6 +39,7 @@ func TestSQSReceiver(t *testing.T) {
 		mockMsgHandler := NewMockSQSProcessor(ctrl)
 		msg := newSQSMessage(newS3Event("log.json"))
 
+<<<<<<< HEAD
 		gomock.InOrder(
 			// Initial ReceiveMessage for maxMessages.
 			mockAPI.EXPECT().
@@ -60,6 +61,39 @@ func TestSQSReceiver(t *testing.T) {
 					return nil, nil
 				}),
 		)
+=======
+		// Initial ReceiveMessage call returns the mock message.
+		mockSQS.EXPECT().
+			ReceiveMessage(gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
+				// Return single message.
+				return []types.Message{msg}, nil
+			})
+
+		// Follow up ReceiveMessages returns empty message and could be called any times till validation is completed.
+		mockSQS.EXPECT().
+			ReceiveMessage(gomock.Any(), gomock.Any()).
+			AnyTimes().
+			DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
+				return nil, nil
+			})
+
+		mockSQS.EXPECT().
+			GetQueueAttributes(gomock.Any(), gomock.Eq([]types.QueueAttributeName{sqsApproximateNumberOfMessages})).
+			DoAndReturn(func(_ context.Context, _ []types.QueueAttributeName) (map[string]string, error) {
+				return map[string]string{sqsApproximateNumberOfMessages: "10000"}, nil
+			}).AnyTimes()
+
+		// Deletion happens when message is fully processed. Cancel the context and mark for exit.
+		mockSQS.EXPECT().
+			DeleteMessage(gomock.Any(), gomock.Any()).Times(1).Do(
+			func(_ context.Context, _ *types.Message) {
+				cancel()
+			})
+
+		logger := logp.NewLogger(inputName)
+>>>>>>> 1f57a4e37 (fix flakiness and add comments to explain testing logic (#43159))
 
 		// Expect the one message returned to have been processed.
 		mockMsgHandler.EXPECT().
