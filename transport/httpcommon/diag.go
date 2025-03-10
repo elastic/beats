@@ -30,6 +30,7 @@ import (
 	"net/http/httptrace"
 	"net/textproto"
 	"net/url"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -181,15 +182,19 @@ func diagError(err error) string {
 	// keep unwrapping to url.Error as the last error as other failures can be embedded in a url.Error
 	// Can detect if an HTTPS request is made to an HTTP server
 	var uErr *url.Error
+
 	if errors.As(err, &uErr) {
-		switch uErr.Err.Error() {
-		case "http: server gave HTTP response to HTTPS client":
+		errString := uErr.Err.Error()
+		if strings.Contains(errString, "http: server gave HTTP response to HTTPS client") {
 			return fmt.Sprintf("%v: caused by using HTTPS schema on HTTP server.", uErr)
-		case "remote error: tls: certificate required":
-			return fmt.Sprintf("%v: caused by missing mTLS client cert.", uErr)
-		case "remote error: tls: expired certificate":
+		}
+		if strings.Contains(errString, "remote error: tls: certificate required") {
+			return fmt.Sprintf("%v:  caused by missing mTLS client cert.", uErr)
+		}
+		if strings.Contains(errString, "remote error: tls: expired certificate") {
 			return fmt.Sprintf("%v: caused by expired mTLS client cert.", uErr)
-		case "remote error: tls: bad certificate":
+		}
+		if strings.Contains(errString, "remote error: tls: bad certificate") {
 			return fmt.Sprintf("%v: caused by invalid mTLS client cert, does the server trust the CA used for the client cert?.", uErr)
 		}
 	}
