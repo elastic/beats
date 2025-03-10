@@ -26,11 +26,10 @@ import (
 	"math/rand/v2"
 	"strconv"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/sarama"
 )
 
 type partitionBuilder func(*logp.Logger, *config.C) (func() partitioner, error)
@@ -117,7 +116,11 @@ func (p *messagePartitioner) Partition(
 	libMsg *sarama.ProducerMessage,
 	numPartitions int32,
 ) (int32, error) {
-	msg := libMsg.Metadata.(*message)
+	msg, ok := libMsg.Metadata.(*message)
+	if !ok {
+		return 0, fmt.Errorf("failed to assert libMsg.Metadata to *message")
+	}
+
 	if numPartitions == p.partitions { // if reachable is false, this is always true
 		if 0 <= msg.partition && msg.partition < numPartitions {
 			return msg.partition, nil
@@ -126,13 +129,13 @@ func (p *messagePartitioner) Partition(
 
 	partition, err := p.p(msg, numPartitions)
 	if err != nil {
-		return 0, nil
+		return 0, nil //nolint:nilerr //ignoring this error
 	}
 
 	msg.partition = partition
 
 	if _, err := msg.data.Cache.Put("partition", partition); err != nil {
-		return 0, fmt.Errorf("setting kafka partition in publisher event failed: %v", err)
+		return 0, fmt.Errorf("setting kafka partition in publisher event failed: %w", err)
 	}
 
 	p.partitions = numPartitions
