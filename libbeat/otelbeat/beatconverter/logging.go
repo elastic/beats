@@ -15,12 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memlog
+package beatconverter
 
-import "os"
+import (
+	"fmt"
+	"strings"
+)
 
-// syncFile implements the fsync operation for Windows. Internally
-// FlushFileBuffers will be used.
-func syncFile(f *os.File) error {
-	return f.Sync() // stdlib already uses FlushFileBuffers, yay
+func getOTelLogLevel(level string) (string, error) {
+	switch strings.ToLower(level) {
+	case "debug":
+		return "DEBUG", nil
+	case "info":
+		return "INFO", nil
+	case "warning":
+		return "WARN", nil
+	case "error", "critical":
+		return "ERROR", nil
+	default:
+		return "", fmt.Errorf("unrecognized level: %s", level)
+	}
 }
