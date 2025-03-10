@@ -19,7 +19,7 @@ package consumergroup
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
 	"github.com/elastic/sarama"
