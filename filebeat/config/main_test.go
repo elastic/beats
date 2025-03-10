@@ -19,18 +19,15 @@ package config
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"testing"
+
+	"github.com/elastic/beats/v7/testing/testflag"
 )
 
 func TestMain(m *testing.M) {
-	err := flag.Set("strict.perms", "false")
-	if err != nil {
-		fmt.Fprintln(os.Stderr,
-			fmt.Sprintf("failed to set flag strict.perms=false: %v", err))
-		os.Exit(1)
-	}
+	testflag.MustSetStrictPermsFalse()
+
 	flag.Parse()
 
 	os.Exit(m.Run())
