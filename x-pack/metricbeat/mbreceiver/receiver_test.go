@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
@@ -121,9 +122,9 @@ func TestMultipleReceivers(t *testing.T) {
 		T:       t,
 		Factory: NewFactory(),
 		Config:  &config,
-		AssertFunc: func(t *testing.T, logs map[string]int) {
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M) {
 			require.Eventuallyf(t, func() bool {
-				return logs["r1"] > 0 && logs["r2"] > 0
+				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, 1*time.Minute, 100*time.Millisecond, "timeout waiting for logs: %#v", logs)
 		},
 	})

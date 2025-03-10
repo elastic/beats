@@ -23,6 +23,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
@@ -40,14 +41,14 @@ type CheckMultipleReceiversParams struct {
 	// Config of the receiver to use.
 	Config component.Config
 	// AssertFunc is a function that asserts the test conditions.
-	AssertFunc func(t *testing.T, logs map[string]int)
+	AssertFunc func(t *testing.T, logs map[string][]mapstr.M)
 }
 
 // CheckMultipleReceivers checks that multiple receivers can be created and started
 // on the same process without errors.
 func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 	t := params.T
-	logs := make(map[string]int)
+	logs := make(map[string][]mapstr.M)
 
 	ctx := context.Background()
 	createReceiver := func(t *testing.T, name string) receiver.Logs {
@@ -69,7 +70,7 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 					sl := rl.ScopeLogs().At(j)
 					for k := 0; k < sl.LogRecords().Len(); k++ {
 						log := sl.LogRecords().At(k)
-						logs[name] = logs[name] + 1
+						logs[name] = append(logs[name], log.Body().Map().AsRaw())
 						t.Logf("ingested log for %q: %v", name, log.Body().Map().AsRaw())
 					}
 				}
