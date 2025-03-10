@@ -7,9 +7,9 @@ package awss3
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
@@ -17,7 +17,7 @@ import (
 
 const inputName = "aws-s3"
 
-func Plugin(store beater.StateStore) v2.Plugin {
+func Plugin(store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
@@ -28,7 +28,7 @@ func Plugin(store beater.StateStore) v2.Plugin {
 }
 
 type s3InputManager struct {
-	store beater.StateStore
+	store statestore.States
 }
 
 func (im *s3InputManager) Init(grp unison.Group) error {
