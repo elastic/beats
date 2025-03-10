@@ -68,6 +68,7 @@ Dropped fields: `syslog.priority` and `syslog.facility` while keeping their dupl
 already present as `container.id` and `container.log.tag` is dropped because it is already present as
 `log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Heartbeat*
 
@@ -216,6 +217,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 
 *Heartbeat*
 
@@ -413,6 +415,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
+- Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
 
 *Auditbeat*
 
