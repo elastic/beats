@@ -12,6 +12,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 
 *Auditbeat*
 
@@ -132,6 +133,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 
 *Heartbeat*
 
@@ -155,6 +157,16 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
+- Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
+- Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
+- Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
+- Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
+- [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
+- Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
+- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
+- Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
+- Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
+- Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
@@ -167,7 +179,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Sync missing changes in modules pipelines. {pull}42619[42619]
 
 
 *Elastic Logging Plugin*
@@ -188,7 +199,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
-- Update to Go 1.22.12. {pull}42681[42681]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 
@@ -243,8 +253,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
-- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
-- Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
 
 *Auditbeat*
 
@@ -288,8 +296,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added Cisco Meraki module {pull}40836[40836]
 - Added Palo Alto Networks module {pull}40686[40686]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
-- Log every 401 response from Kubernetes API Server {pull}42714[42714]
-- Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
 
 *Metricbeat*
 
@@ -342,6 +348,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
