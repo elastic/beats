@@ -199,21 +199,16 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                trigger: "beats-metricbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: beats-metricbeat"
+                command: "buildkite-agent pipeline upload .buildkite/metricbeat/pipeline.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Metricbeat"
+  - label: ":pipeline: Upload beats-metricbeat"
     if: build.pull_request.id == null
-    trigger: "beats-metricbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/metricbeat/pipeline.yml"
 
   - label: "Trigger x-pack/metricbeat"
     if: build.pull_request.id != null
