@@ -80,7 +80,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Functionbeat*
 
-- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}TODO[TODO]
+- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}43154[43154]
 
 *Elastic Logging Plugin*
 
