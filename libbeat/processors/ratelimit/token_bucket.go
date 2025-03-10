@@ -150,7 +150,6 @@ func (t *tokenBucket) setClock(c clockwork.Clock) {
 func (t *tokenBucket) getBucket(key uint64) *bucket {
 	v, exists := t.buckets.Load(key)
 	if exists {
-		//nolint:errcheck // ignore
 		b := v.(*bucket)
 		b.replenish(t.limit, t.clock)
 		return b
