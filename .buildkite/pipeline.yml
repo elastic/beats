@@ -237,21 +237,16 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                trigger: "beats-xpack-metricbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: beats-xpack-metricbeat"
+                command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.metricbeat.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for x-pack/metricbeat"
+  - label: ":pipeline: Upload beats-xpack-metricbeat"
     if: build.pull_request.id == null
-    trigger: "beats-xpack-metricbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.metricbeat.yml"
 
   - label: "Trigger x-pack/osquerybeat"
     if: build.pull_request.id != null
