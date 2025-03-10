@@ -21,6 +21,7 @@ package oteltest
 import (
 	"bytes"
 	"context"
+	"sync"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -48,6 +49,7 @@ type CheckMultipleReceiversParams struct {
 // on the same process without errors.
 func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 	t := params.T
+	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
 
 	ctx := context.Background()
@@ -70,7 +72,9 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 					sl := rl.ScopeLogs().At(j)
 					for k := 0; k < sl.LogRecords().Len(); k++ {
 						log := sl.LogRecords().At(k)
+						logsMu.Lock()
 						logs[name] = append(logs[name], log.Body().Map().AsRaw())
+						logsMu.Unlock()
 						t.Logf("ingested log for %q: %v", name, log.Body().Map().AsRaw())
 					}
 				}
@@ -105,5 +109,7 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 		require.NoError(t, r2.Shutdown(ctx), "Error shutting down receiver 2")
 	}()
 
+	logsMu.Lock()
+	defer logsMu.Unlock()
 	params.AssertFunc(t, logs)
 }
