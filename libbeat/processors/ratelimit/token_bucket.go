@@ -148,18 +148,8 @@ func (t *tokenBucket) setClock(c clockwork.Clock) {
 }
 
 func (t *tokenBucket) getBucket(key uint64) *bucket {
-<<<<<<< HEAD
-	v, exists := t.buckets.LoadOrStore(key, &bucket{
-		tokens:        t.depth,
-		lastReplenish: t.clock.Now(),
-	})
-	b := v.(*bucket)
-
-=======
 	v, exists := t.buckets.Load(key)
->>>>>>> acce29cf2 (fix(libbeat): mitigate race condition in ratelimit processor (#42966))
 	if exists {
-		//nolint:errcheck // ignore
 		b := v.(*bucket)
 		b.replenish(t.limit, t.clock)
 		return b
@@ -169,7 +159,6 @@ func (t *tokenBucket) getBucket(key uint64) *bucket {
 		tokens:        t.depth,
 		lastReplenish: t.clock.Now(),
 	})
-	//nolint:errcheck // ignore
 	return v.(*bucket)
 }
 
@@ -210,11 +199,7 @@ func (t *tokenBucket) runGC() {
 		}
 
 		// Reset GC metrics
-<<<<<<< HEAD
-		t.gc.metrics.numCalls = atomic.MakeUint(0)
-=======
 		t.gc.metrics.numCalls.Store(0)
->>>>>>> acce29cf2 (fix(libbeat): mitigate race condition in ratelimit processor (#42966))
 
 		gcDuration := time.Now().Sub(gcStartTime)
 		numBucketsDeleted := len(toDelete)
