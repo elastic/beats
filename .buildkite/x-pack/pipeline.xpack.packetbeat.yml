@@ -37,10 +37,6 @@ steps:
 
   - group: "Packaging"
     key: "x-pack-packetbeat-packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on:
-      - step: "x-pack-packetbeat-mandatory-tests"
-        allow_failure: false
 
     steps:
       - label: ":ubuntu: x-pack/packetbeat: Packaging Linux"

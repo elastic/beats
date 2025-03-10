@@ -40,7 +40,6 @@ env:
 steps:
   - group: "Packaging"
     key: "x-pack-heartbeat-packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux"
