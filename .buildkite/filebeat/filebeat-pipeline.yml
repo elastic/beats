@@ -321,6 +321,12 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "filebeat: Win 2025 Unit Tests"
