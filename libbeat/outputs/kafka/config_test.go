@@ -65,6 +65,10 @@ func TestConfigAcceptValid(t *testing.T) {
 				"realm":        "ELASTIC",
 			},
 		},
+		"set max requests": mapstr.M{
+			"topic":             "tomato",
+			"max_open_requests": 50,
+		},
 	}
 
 	for name, test := range tests {

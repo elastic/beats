@@ -68,6 +68,7 @@ type kafkaConfig struct {
 	BulkFlushFrequency time.Duration             `config:"bulk_flush_frequency"`
 	MaxRetries         int                       `config:"max_retries"         validate:"min=-1,nonzero"`
 	Headers            []header                  `config:"headers"`
+	MaxOpenRequests    int                       `config:"max_open_requests"       validate:"min=1"`
 	Backoff            backoffConfig             `config:"backoff"`
 	ClientID           string                    `config:"client_id"`
 	ChanBufferSize     int                       `config:"channel_buffer_size" validate:"min=1"`
@@ -137,6 +138,7 @@ func defaultConfig() kafkaConfig {
 		CompressionLevel: 4,
 		Version:          kafka.Version("2.1.0"),
 		MaxRetries:       3,
+		MaxOpenRequests:  5,
 		Headers:          nil,
 		Backoff: backoffConfig{
 			Init: 1 * time.Second,
@@ -211,6 +213,7 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.Net.ReadTimeout = timeout
 	k.Net.WriteTimeout = timeout
 	k.Net.KeepAlive = config.KeepAlive
+	k.Net.MaxOpenRequests = config.MaxOpenRequests
 	k.Producer.Timeout = config.BrokerTimeout
 	k.Producer.CompressionLevel = config.CompressionLevel
 
