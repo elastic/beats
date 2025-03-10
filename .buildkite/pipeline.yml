@@ -311,21 +311,16 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                trigger: "beats-xpack-winlogbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: beats-xpack-winlogbeat"
+                command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for x-pack/winlogbeat"
+  - label: ":pipeline: Upload beats-xpack-winlogbeat"
     if: build.pull_request.id == null
-    trigger: "beats-xpack-winlogbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
 
   - label: "Trigger Deploy/K8S"
     if: build.pull_request.id != null
