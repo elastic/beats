@@ -19,12 +19,11 @@ package node
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/joeshaw/multierror"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -74,7 +73,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		return fmt.Errorf("failure parsing Elasticsearch Node Stats API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for id, node := range nodesStruct.Nodes {
 		event := mb.Event{}
 
@@ -103,5 +102,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

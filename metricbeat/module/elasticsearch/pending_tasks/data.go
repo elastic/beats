@@ -19,9 +19,8 @@ package pending_tasks
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/joeshaw/multierror"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -54,7 +53,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		return elastic.MakeErrorForMissingField("tasks", elastic.Elasticsearch)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for _, task := range tasksStruct.Tasks {
 		event := mb.Event{}
 
@@ -81,5 +80,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
