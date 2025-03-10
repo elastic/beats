@@ -138,6 +138,11 @@ func Package() error {
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
+	if FIPSBuild {
+		fmt.Println(">> IronBank images are not supported for FIPS builds")
+		return nil
+	}
+
 	if runtime.GOARCH != "amd64" {
 		fmt.Printf(">> IronBank images are only supported for amd64 arch (%s is not supported)\n", runtime.GOARCH)
 		return nil
