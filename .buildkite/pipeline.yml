@@ -558,21 +558,16 @@ steps:
                 - libbeat/
                 - testing/
               config:
-                trigger: "beats-winlogbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: Upload beats-winlogbeat"
+                command: "buildkite-agent pipeline upload .buildkite/winlogbeat/pipeline.winlogbeat.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Winlogbeat"
+  - label: ":pipeline: Upload beats-winlogbeat"
     if: build.pull_request.id == null
-    trigger: "beats-winlogbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/winlogbeat/pipeline.winlogbeat.yml"
 
   - label: "Trigger Packetbeat"
     if: build.pull_request.id != null
