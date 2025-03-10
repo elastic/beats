@@ -376,21 +376,16 @@ steps:
                 - dev-tools/
                 - testing/
               config:
-                trigger: "beats-libbeat"
-                build:
-                  commit: "${BUILDKITE_COMMIT}"
-                  branch: "${BUILDKITE_BRANCH}"
-                  env:
-                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                label: ":pipeline: Upload beats-libbeat"
+                command: "buildkite-agent pipeline upload .buildkite/libbeat/pipeline.libbeat.yml"
+                env:
+                  - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                  - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                  - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Libbeat"
+  - label: ":pipeline: Upload beats-libbeat"
     if: build.pull_request.id == null
-    trigger: "beats-libbeat"
-    build:
-      commit: "${BUILDKITE_COMMIT}"
-      branch: "${BUILDKITE_BRANCH}"
+    command: "buildkite-agent pipeline upload .buildkite/libbeat/pipeline.libbeat.yml"
 
   - label: "Trigger x-pack/libbeat"
     if: build.pull_request.id != null
