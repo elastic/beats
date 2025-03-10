@@ -4849,6 +4849,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 --------------------------------------------------------------------------------
+<<<<<<< HEAD
 Dependency : github.com/aws/aws-lambda-go
 Version: v1.44.0
 Licence type (autodetected): Apache-2.0
@@ -5062,6 +5063,8 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-lambda-go@v1.44
 
 
 --------------------------------------------------------------------------------
+=======
+>>>>>>> 042a541f3 ([8.x](backport #41506) Remove functionbeat (#43090))
 Dependency : github.com/aws/aws-sdk-go-v2
 Version: v1.30.4
 Licence type (autodetected): Apache-2.0
@@ -6122,6 +6125,7 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/featu
 
 
 --------------------------------------------------------------------------------
+<<<<<<< HEAD
 Dependency : github.com/aws/aws-sdk-go-v2/service/cloudformation
 Version: v1.53.5
 Licence type (autodetected): Apache-2.0
@@ -6334,6 +6338,8 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 
 --------------------------------------------------------------------------------
+=======
+>>>>>>> 042a541f3 ([8.x](backport #41506) Remove functionbeat (#43090))
 Dependency : github.com/aws/aws-sdk-go-v2/service/cloudwatch
 Version: v1.40.5
 Licence type (autodetected): Apache-2.0
@@ -7818,6 +7824,7 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 
 --------------------------------------------------------------------------------
+<<<<<<< HEAD
 Dependency : github.com/aws/aws-sdk-go-v2/service/kinesis
 Version: v1.29.5
 Licence type (autodetected): Apache-2.0
@@ -8030,6 +8037,8 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/aws-sdk-go-v2/servi
 
 
 --------------------------------------------------------------------------------
+=======
+>>>>>>> 042a541f3 ([8.x](backport #41506) Remove functionbeat (#43090))
 Dependency : github.com/aws/aws-sdk-go-v2/service/organizations
 Version: v1.30.3
 Licence type (autodetected): Apache-2.0
@@ -9487,6 +9496,7 @@ Contents of probable licence file $GOMODCACHE/github.com/aws/smithy-go@v1.20.4/L
 
 
 --------------------------------------------------------------------------------
+<<<<<<< HEAD
 Dependency : github.com/awslabs/goformation/v7
 Version: v7.14.9
 Licence type (autodetected): Apache-2.0
@@ -9706,6 +9716,8 @@ Licence type (autodetected): Apache-2.0
 No licence file provided.
 
 --------------------------------------------------------------------------------
+=======
+>>>>>>> 042a541f3 ([8.x](backport #41506) Remove functionbeat (#43090))
 Dependency : github.com/blakesmith/ar
 Version: v0.0.0-20150311145944-8bd4349a67f2
 Licence type (autodetected): MIT
