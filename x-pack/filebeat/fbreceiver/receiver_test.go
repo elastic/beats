@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -238,9 +239,48 @@ func BenchmarkFactory(b *testing.B) {
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
 
+	factory := NewFactory()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := NewFactory().CreateLogs(context.Background(), receiverSettings, cfg, nil)
+		_, err := factory.CreateLogs(context.Background(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
+}
+
+func TestMultipleReceivers(t *testing.T) {
+	config := Config{
+		Beatconfig: map[string]interface{}{
+			"filebeat": map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"output": map[string]interface{}{
+				"otelconsumer": map[string]interface{}{},
+			},
+			"logging": map[string]interface{}{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+
+	oteltest.CheckMultipleReceivers(oteltest.CheckMultipleReceiversParams{
+		T:       t,
+		Factory: NewFactory(),
+		Config:  &config,
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M) {
+			require.Eventuallyf(t, func() bool {
+				return len(logs["r1"]) == 1 && len(logs["r2"]) == 1
+			}, 1*time.Minute, 100*time.Millisecond, "timeout waiting for logs: %#v", logs)
+		},
+	})
 }

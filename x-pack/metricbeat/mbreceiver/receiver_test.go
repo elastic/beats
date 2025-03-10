@@ -10,6 +10,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
@@ -86,4 +89,43 @@ func TestNewReceiver(t *testing.T) {
 found:
 	err = r.Shutdown(context.Background())
 	require.NoError(t, err, "Error shutting down metricbeatreceiver")
+}
+
+func TestMultipleReceivers(t *testing.T) {
+	config := Config{
+		Beatconfig: map[string]interface{}{
+			"metricbeat": map[string]interface{}{
+				"modules": []map[string]interface{}{
+					{
+						"module":     "system",
+						"enabled":    true,
+						"period":     "1s",
+						"processes":  []string{".*"},
+						"metricsets": []string{"cpu"},
+					},
+				},
+			},
+			"output": map[string]interface{}{
+				"otelconsumer": map[string]interface{}{},
+			},
+			"logging": map[string]interface{}{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+
+	oteltest.CheckMultipleReceivers(oteltest.CheckMultipleReceiversParams{
+		T:       t,
+		Factory: NewFactory(),
+		Config:  &config,
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M) {
+			require.Eventuallyf(t, func() bool {
+				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
+			}, 1*time.Minute, 100*time.Millisecond, "timeout waiting for logs: %#v", logs)
+		},
+	})
 }
