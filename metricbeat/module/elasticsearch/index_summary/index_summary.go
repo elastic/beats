@@ -40,7 +40,8 @@ func init() {
 const (
 	statsPath = "/_stats"
 
-	allowClosedIndices = "forbid_closed_indices=false"
+	onlyClusterLevel   = "level=cluster"
+	allowClosedIndices = "&forbid_closed_indices=false"
 )
 
 var (
@@ -109,6 +110,7 @@ func getServicePath(esVersion version.V) (string, error) {
 		return "", err
 	}
 
+	u.RawQuery += onlyClusterLevel
 	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
 		u.RawQuery += allowClosedIndices
 	}
