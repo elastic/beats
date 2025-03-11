@@ -38,13 +38,13 @@ type pipelineObserver interface {
 
 type clientObserver interface {
 	// The client received a Publish call
-	newEvent(inputMetrics)
+	newEvent()
 	// An event was filtered by processors before being published
-	filteredEvent(inputMetrics)
+	filteredEvent()
 	// An event was published to the queue
-	publishedEvent(inputMetrics)
+	publishedEvent()
 	// An event was rejected by the queue
-	failedPublishEvent(inputMetrics)
+	failedPublishEvent()
 	eventsACKed(count int)
 }
 
@@ -66,12 +66,6 @@ type metricsObserver struct {
 	vars    metricsObserverVars
 }
 
-type inputMetrics struct {
-	inputEventsTotal,
-	inputEventsFiltered,
-	inputEventsPublished *monitoring.Uint
-}
-
 type metricsObserverVars struct {
 	// clients metrics
 	clients *monitoring.Uint
@@ -81,6 +75,12 @@ type metricsObserverVars struct {
 
 	eventsDropped, eventsRetry *monitoring.Uint // (retryer) drop/retry counters
 	activeEvents               *monitoring.Uint
+}
+
+type inputMetrics struct {
+	eventsTotal,
+	eventsFiltered,
+	eventsPublished *monitoring.Uint
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
@@ -146,23 +146,20 @@ func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 //
 
 // (client) client is trying to publish a new event
-func (o *metricsObserver) newEvent(inputMetrics inputMetrics) {
+func (o *metricsObserver) newEvent() {
 	o.vars.eventsTotal.Inc()
 	o.vars.activeEvents.Inc()
-	inputMetrics.inputEventsTotal.Inc()
 }
 
 // (client) event is filtered out (on purpose or failed)
-func (o *metricsObserver) filteredEvent(inputMetrics inputMetrics) {
+func (o *metricsObserver) filteredEvent() {
 	o.vars.eventsFiltered.Inc()
 	o.vars.activeEvents.Dec()
-	inputMetrics.inputEventsFiltered.Inc()
 }
 
 // (client) managed to push an event into the publisher pipeline
-func (o *metricsObserver) publishedEvent(inputMetrics inputMetrics) {
+func (o *metricsObserver) publishedEvent() {
 	o.vars.eventsPublished.Inc()
-	inputMetrics.inputEventsPublished.Inc()
 }
 
 // (client) number of ACKed events from this client
@@ -171,7 +168,7 @@ func (o *metricsObserver) eventsACKed(n int) {
 }
 
 // (client) client closing down or DropIfFull is set
-func (o *metricsObserver) failedPublishEvent(inputMetrics inputMetrics) {
+func (o *metricsObserver) failedPublishEvent() {
 	o.vars.eventsFailed.Inc()
 	o.vars.activeEvents.Dec()
 }
@@ -190,17 +187,67 @@ func (o *metricsObserver) eventsRetry(n int) {
 	o.vars.eventsRetry.Add(uint64(n))
 }
 
+// inputAwareMetricsObserver wraps a metricsObserver to collect per-input
+// metrics.
+type inputAwareMetricsObserver struct {
+	observer observer
+	input    inputMetrics
+}
+
+func (i inputAwareMetricsObserver) clientConnected() {
+	i.observer.clientConnected()
+}
+
+func (i inputAwareMetricsObserver) clientClosed() {
+	i.observer.clientClosed()
+}
+
+func (i inputAwareMetricsObserver) newEvent() {
+	i.observer.newEvent()
+	i.input.eventsTotal.Inc()
+}
+
+func (i inputAwareMetricsObserver) filteredEvent() {
+	i.observer.filteredEvent()
+	i.input.eventsFiltered.Inc()
+}
+
+func (i inputAwareMetricsObserver) publishedEvent() {
+	i.observer.publishedEvent()
+	i.input.eventsPublished.Inc()
+}
+
+func (i inputAwareMetricsObserver) failedPublishEvent() {
+	i.observer.failedPublishEvent()
+}
+
+func (i inputAwareMetricsObserver) eventsACKed(count int) {
+	i.observer.eventsACKed(count)
+}
+
+func (i inputAwareMetricsObserver) eventsDropped(count int) {
+	i.observer.eventsDropped(count)
+}
+
+func (i inputAwareMetricsObserver) eventsRetry(count int) {
+	i.observer.eventsRetry(count)
+}
+
+func (i inputAwareMetricsObserver) cleanup() {
+	i.observer.cleanup()
+}
+
 type emptyObserver struct{}
 
 var nilObserver observer = (*emptyObserver)(nil)
 
-func (*emptyObserver) cleanup()                        {}
-func (*emptyObserver) clientConnected()                {}
-func (*emptyObserver) clientClosed()                   {}
-func (*emptyObserver) newEvent(inputMetrics)           {}
-func (*emptyObserver) filteredEvent(inputMetrics)      {}
-func (*emptyObserver) publishedEvent(inputMetrics)     {}
-func (*emptyObserver) failedPublishEvent(inputMetrics) {}
-func (*emptyObserver) eventsACKed(n int)               {}
-func (*emptyObserver) eventsDropped(int)               {}
-func (*emptyObserver) eventsRetry(int)                 {}
+func (*emptyObserver) cleanup()            {}
+func (*emptyObserver) clientConnected()    {}
+func (*emptyObserver) clientClosed()       {}
+func (*emptyObserver) newEvent()           {}
+func (*emptyObserver) filteredEvent()      {}
+func (*emptyObserver) publishedEvent()     {}
+func (*emptyObserver) failedPublishEvent() {}
+func (*emptyObserver) eventsACKed(n int)   {}
+func (*emptyObserver) eventsDropped(int)   {}
+func (*emptyObserver) eventsRetry(int)     {}

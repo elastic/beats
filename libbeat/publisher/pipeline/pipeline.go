@@ -222,13 +222,13 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
-		observer:       p.observer,
-
-		inputMetricsRegistry: reg,
-		inputMetrics: inputMetrics{
-			inputEventsTotal:     monitoring.NewUint(reg, "events_pipeline_total"),
-			inputEventsFiltered:  monitoring.NewUint(reg, "events_pipeline_filtered_total"),
-			inputEventsPublished: monitoring.NewUint(reg, "events_pipeline_published_total"),
+		observer: inputAwareMetricsObserver{
+			observer: p.observer,
+			input: inputMetrics{
+				eventsTotal:     monitoring.NewUint(reg, "events_pipeline_total"),
+				eventsFiltered:  monitoring.NewUint(reg, "events_pipeline_filtered_total"),
+				eventsPublished: monitoring.NewUint(reg, "events_pipeline_published_total"),
+			},
 		},
 	}
 
