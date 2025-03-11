@@ -122,7 +122,6 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
-          go env -w GOCACHE=/go/src/github.com/elastic/beats/build/docker-gocache 
           go env -w GOPROXY=file:///gocache,direct
           cd x-pack/metricbeat
           mage pythonIntegTest
