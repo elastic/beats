@@ -10,5 +10,8 @@ compile:
     GOEXPERIMENT: systemcrypto
   tags:
     - requirefips
+  platforms:
+    - linux/amd64
+    - linux/arm64
 package:
   # placeholder for global packaging settings

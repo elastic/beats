@@ -91,9 +91,10 @@ var (
 	FIPSConfig struct {
 		Beats   []string `yaml:"beats"`
 		Compile struct {
-			CGO  bool              `yaml:"cgo"`
-			Env  map[string]string `yaml:"env"`
-			Tags []string          `yaml:"tags"`
+			CGO       bool              `yaml:"cgo"`
+			Env       map[string]string `yaml:"env"`
+			Tags      []string          `yaml:"tags"`
+			Platforms []string          `yaml:"platforms"`
 		} `yaml:"compile"`
 	}
 
