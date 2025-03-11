@@ -20,7 +20,7 @@ package key
 import (
 	"fmt"
 
-	"github.com/pkg/errors" //nolint:gomodguard
+	"github.com/pkg/errors" //nolint:gomodguard // don\t fail CI in current PR
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
