@@ -74,6 +74,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 *Metricbeat*
+- Use user level for HAProxy socket {pull}34846[34846]
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
