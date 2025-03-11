@@ -31,23 +31,23 @@ import (
 )
 
 // RegistryLookupFunc is used for looking up specfic registry inside a namespace
-func RegistryLookupFunc(rootNamespace *monitoring.Namespace) lookupFunc {
+func RegistryLookupFunc(rootNamespace *monitoring.Namespace) LookupFunc {
 	return func(s string) *monitoring.Registry {
 		return rootNamespace.GetRegistry().GetRegistry(s)
 	}
 }
 
 // NamespaceLookupFunc is used for looking up root registry of a given namespace
-func NamespaceLookupFunc() lookupFunc {
+func NamespaceLookupFunc() LookupFunc {
 	return func(s string) *monitoring.Registry {
 		return monitoring.GetNamespace(s).GetRegistry()
 	}
 }
 
-type lookupFunc func(string) *monitoring.Registry
+type LookupFunc func(string) *monitoring.Registry
 
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *config.C, reg lookupFunc) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C, reg LookupFunc) (*Server, error) {
 	api, err := New(log, config)
 	if err != nil {
 		return nil, err
