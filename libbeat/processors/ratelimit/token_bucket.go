@@ -203,7 +203,7 @@ func (t *tokenBucket) runGC() {
 		// Reset GC metrics
 		t.gc.metrics.numCalls.Store(0)
 
-		gcDuration := time.Now().Sub(gcStartTime)
+		gcDuration := time.Since(gcStartTime)
 		numBucketsDeleted := len(toDelete)
 		numBucketsAfter := numBucketsBefore - numBucketsDeleted
 		t.logger.Debugf("gc duration: %v, buckets: (before: %v, deleted: %v, after: %v)",
