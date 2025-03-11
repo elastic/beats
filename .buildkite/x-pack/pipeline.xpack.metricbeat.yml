@@ -122,7 +122,9 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
+          go env -w GOMODCACHE=/gocache
           go env -w GOPROXY=file:///gocache,direct
+          go mod download
           cd x-pack/metricbeat
           mage pythonIntegTest
         retry:
