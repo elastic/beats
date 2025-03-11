@@ -122,8 +122,9 @@ steps:
         env:
           TEST_TAGS: "oracle"
         command: |
+          go env -w GOCACHE=/go/src/github.com/elastic/beats/build/docker-gocache 
+          go env -w GOPROXY=file:///gocache,direct
           cd x-pack/metricbeat
-          GODEBUG=netdns=go go get go.mongodb.org/mongo-driver@v1.14.0
           mage pythonIntegTest
         retry:
           automatic:
