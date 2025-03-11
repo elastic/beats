@@ -1,8 +1,30 @@
-- name: jetstream
+- name: jetstream.stats
   type: group
   release: beta
   description: >
-    jetstream
+    Basic stats about NATS Jetstream
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
+
+- name: jetstream.stream
+  type: group
+  release: beta
+  description: >
+    Stats about NATS Jetstream streams
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
+
+- name: jetstream.consumer
+  type: group
+  release: beta
+  description: >
+    Stats about NATS Jetstream consumers
   fields:
     - name: example
       type: keyword
