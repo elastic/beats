@@ -32,73 +32,67 @@ var (
 	moduleSchema = s.Schema{
 		"server": s.Object{
 			"id":   c.Str("server_id"),
-			"time": c.Str("now"),
+			"time": c.Time("now"),
 		},
 	}
 
 	jetstreamStatsSchema = s.Schema{
-		"stats": s.Object{
-			"streams":   c.Int("streams"),
-			"consumers": c.Int("consumers"),
-			"messages":  c.Int("messages"),
-			"bytes":     c.Int("bytes"),
-			"config": s.Object{
-				"max_memory":    c.Int("max_memory"),
-				"max_storage":   c.Int("max_storage"),
-				"store_dir":     c.Str("store_dir"),
-				"sync_interval": c.Int("sync_interval"),
-				"compress_ok":   c.Bool("compress_ok"),
-			},
+		"streams":   c.Int("streams"),
+		"consumers": c.Int("consumers"),
+		"messages":  c.Int("messages"),
+		"bytes":     c.Int("bytes"),
+		"config": s.Object{
+			"max_memory":    c.Int("max_memory"),
+			"max_storage":   c.Int("max_storage"),
+			"store_dir":     c.Str("store_dir"),
+			"sync_interval": c.Int("sync_interval"),
+			"compress_ok":   c.Bool("compress_ok"),
 		},
 	}
 
 	jetstreamStreamSchema = s.Schema{
-		"stream": s.Object{
-			"name":    c.Str("name"),
-			"created": c.Time("created"),
-			"cluster": s.Object{
-				"leader": c.Str("leader"),
-			},
-			"state": s.Object{
-				"messages":       c.Int("messages"),
-				"bytes":          c.Int("bytes"),
-				"first_seq":      c.Int("first_seq"),
-				"first_ts":       c.Time("first_ts"),
-				"last_seq":       c.Int("last_seq"),
-				"last_ts":        c.Time("last_ts"),
-				"consumer_count": c.Int("consumer_count"),
-			},
-			"account": s.Object{
-				"id":   c.Str("account_id"),
-				"name": c.Str("account_name"),
-			},
+		"name":    c.Str("name"),
+		"created": c.Time("created"),
+		"cluster": s.Object{
+			"leader": c.Str("leader"),
+		},
+		"state": s.Object{
+			"messages":       c.Int("messages"),
+			"bytes":          c.Int("bytes"),
+			"first_seq":      c.Int("first_seq"),
+			"first_ts":       c.Time("first_ts"),
+			"last_seq":       c.Int("last_seq"),
+			"last_ts":        c.Time("last_ts"),
+			"consumer_count": c.Int("consumer_count"),
+		},
+		"account": s.Object{
+			"id":   c.Str("account_id"),
+			"name": c.Str("account_name"),
 		},
 	}
 
 	jetstreamConsumerSchema = s.Schema{
-		"consumer": s.Object{
-			"name":    c.Str("name"),
-			"created": c.Time("created"),
-			"stream": s.Object{
-				"name": c.Str("stream_name"),
-			},
-			"delivered": s.Object{
-				"consumer_seq": c.Int("delivered_consumer_seq"),
-				"stream_seq":   c.Int("delivered_stream_seq"),
-			},
-			"ack_floor": s.Object{
-				"consumer_seq": c.Int("ack_consumer_seq"),
-				"stream_seq":   c.Int("ack_stream_seq"),
-			},
-			"num_ack_pending": c.Int("num_ack_pending"),
-			"num_redelivered": c.Int("num_redelivered"),
-			"num_waiting":     c.Int("num_waiting"),
-			"num_pending":     c.Int("num_pending"),
-			"timestamp":       c.Time("ts"),
-			"account": s.Object{
-				"id":   c.Str("account_id"),
-				"name": c.Str("account_name"),
-			},
+		"name":    c.Str("name"),
+		"created": c.Time("created"),
+		"stream": s.Object{
+			"name": c.Str("stream_name"),
+		},
+		"delivered": s.Object{
+			"consumer_seq": c.Int("delivered_consumer_seq"),
+			"stream_seq":   c.Int("delivered_stream_seq"),
+		},
+		"ack_floor": s.Object{
+			"consumer_seq": c.Int("ack_consumer_seq"),
+			"stream_seq":   c.Int("ack_stream_seq"),
+		},
+		"num_ack_pending": c.Int("num_ack_pending"),
+		"num_redelivered": c.Int("num_redelivered"),
+		"num_waiting":     c.Int("num_waiting"),
+		"num_pending":     c.Int("num_pending"),
+		"timestamp":       c.Time("ts"),
+		"account": s.Object{
+			"id":   c.Str("account_id"),
+			"name": c.Str("account_name"),
 		},
 	}
 )

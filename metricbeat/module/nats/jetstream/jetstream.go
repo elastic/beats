@@ -29,9 +29,8 @@ import (
 
 const (
 	defaultScheme = "http"
-	// Defaults to fetching all details about streams, consumers, and accounts.
 	// Ref: https://docs.nats.io/running-a-nats-service/nats_admin/monitoring#jetstream-information-jsz
-	defaultPath = "/jsz?consumers=true"
+	defaultPath = "/jsz"
 
 	statsMetricset    = "jetstream.stats"
 	streamMetricset   = "jetstream.stream"
@@ -91,6 +90,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	http.SetURI(fmt.Sprintf("%s?consumers=true", http.GetURI()))
+
 	return &MetricSet{
 		base,
 		http,
@@ -102,6 +103,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	fmt.Println("===================================")
+	fmt.Println(m.http.GetURI())
+	fmt.Println("===================================")
+
 	content, err := m.http.FetchContent()
 	if err != nil {
 		return fmt.Errorf("error in fetch: %w", err)
