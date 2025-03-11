@@ -651,10 +651,3 @@ specs:
       spec:
         <<: *deb_rpm_spec_fips
         <<: *elastic_license_for_deb_rpm
-
-    - os: darwin
-      arch: arm64
-      types: [ tgz ]
-      spec:
-        <<: *fips_binary_spec
-        <<: *elastic_license_for_binaries
