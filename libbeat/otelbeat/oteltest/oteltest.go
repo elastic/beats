@@ -40,10 +40,12 @@ type CheckMultipleReceiversParams struct {
 	T *testing.T
 	// Factory that allows to create a receiver.
 	Factory receiver.Factory
-	// Config of the receiver to use.
-	Config component.Config
+	// Receiver1Config is the configuration for the first receiver.
+	Receiver1Config component.Config
+	// Receiver2Config is the configuration for the second receiver.
+	Receiver2Config component.Config
 	// AssertFunc is a function that asserts the test conditions.
-	// The function is called periodically until it returns true which stops the test.
+	// The function is called periodically until it returns true which ends the test.
 	AssertFunc func(t *testing.T, logs map[string][]mapstr.M) bool
 }
 
@@ -55,7 +57,7 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 	logs := make(map[string][]mapstr.M)
 
 	ctx := context.Background()
-	createReceiver := func(t *testing.T, name string) receiver.Logs {
+	createReceiver := func(t *testing.T, name string, cfg component.Config) receiver.Logs {
 		t.Helper()
 
 		var zapLogs bytes.Buffer
@@ -77,7 +79,6 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 						logsMu.Lock()
 						logs[name] = append(logs[name], log.Body().Map().AsRaw())
 						logsMu.Unlock()
-						t.Logf("ingested log for %q: %v", name, log.Body().Map().AsRaw())
 					}
 				}
 			}
@@ -91,13 +92,13 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 			}
 		})
 
-		r, err := params.Factory.CreateLogs(ctx, receiverSettings, params.Config, logConsumer)
+		r, err := params.Factory.CreateLogs(ctx, receiverSettings, cfg, logConsumer)
 		assert.NoErrorf(t, err, "Error creating receiver %q", name)
 		return r
 	}
 
-	r1 := createReceiver(t, "r1")
-	r2 := createReceiver(t, "r2")
+	r1 := createReceiver(t, "r1", params.Receiver1Config)
+	r2 := createReceiver(t, "r2", params.Receiver2Config)
 
 	err := r1.Start(ctx, nil)
 	require.NoError(t, err, "Error starting receiver 1")

@@ -119,9 +119,10 @@ func TestMultipleReceivers(t *testing.T) {
 	}
 
 	oteltest.CheckMultipleReceivers(oteltest.CheckMultipleReceiversParams{
-		T:       t,
-		Factory: NewFactory(),
-		Config:  &config,
+		T:               t,
+		Factory:         NewFactory(),
+		Receiver1Config: &config,
+		Receiver2Config: &config,
 		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M) bool {
 			return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 		},
