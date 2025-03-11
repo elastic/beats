@@ -63,6 +63,8 @@ type StoreUpdater interface {
 	// The function passed to CopyStatesFromPreviousIDs must return an empty
 	// string if the entry should not be copied.
 	CopyStatesFromPreviousIDs(func(v Value) (string, interface{}))
+
+	TakeOverFromLogInput(func(v Value) (string, interface{}))
 }
 
 // Value contains the cursor metadata.

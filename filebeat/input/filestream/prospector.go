@@ -221,6 +221,24 @@ func (p *fileProspector) Init(
 		return newKey, fm
 	})
 
+	prospectorStore.TakeOverFromLogInput(func(v loginp.Value) (string, interface{}) {
+		var fm fileMeta
+		err := v.UnpackCursorMeta(&fm)
+		if err != nil {
+			return "", nil
+		}
+
+		fd, ok := files[fm.Source]
+		if !ok {
+			return "", fm
+		}
+
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+		fm.IdentifierName = identifierName
+		p.logger.Infof("Migrating input ID: '%s' -> '%s'", v.Key(), newKey)
+		return newKey, fm
+	})
+
 	return nil
 }
 

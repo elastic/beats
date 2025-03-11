@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
@@ -299,6 +300,88 @@ func (s *sourceStore) CopyStatesFromPreviousIDs(getNewID func(v Value) (string, 
 	s.updateIdentifiers(matchPreviousIdentifier, getNewID)
 }
 
+func (s *sourceStore) TakeOverFromLogInput(fn func(Value) (string, interface{})) {
+	// state := make(mapstr.M)
+	// This iterates through the WHOLE STORE
+
+	// statesToMigrate := map[string]mapstr.M{}
+	statesToMigrate := map[string]logInputState{}
+	s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
+		if strings.HasPrefix(key, "filebeat::logs::") {
+			// st := mapstr.M{}
+			tmp := mapstr.M{}
+			if err := value.Decode(&tmp); err != nil {
+				return true, err
+			}
+			st := logInputStateFromMapM(tmp)
+			st.key = key
+			statesToMigrate[key] = st
+		}
+
+		return true, nil
+	})
+
+	// Now that we have all the log inputs that match our input, we can migrate
+
+	// Modify the store, aka add the states to the ephemeral and persistent store
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	// Iterate over all states we want to migrate
+	for k, v := range statesToMigrate {
+		fmt.Println("=====", k)
+		// We need to call `fn` to get the new Key and Meta for the registry
+		newKey, updatedMeta := fn(v)
+		r := s.store.ephemeralStore.unsafeFind(newKey, true)
+		r.cursorMeta = updatedMeta
+		// Convert the offset to the correct type
+		r.cursor = struct {
+			Offset int64 `json:"offset" struct:"offset"`
+		}{
+			Offset: v.Offset,
+		}
+
+		// Write to disk
+		s.store.writeState(r)
+
+		// Update in-memory store
+		s.store.ephemeralStore.table[newKey] = r
+		r.Release()
+
+	}
+}
+
+type logInputState struct {
+	key    string `json:"-"`
+	ID     string `json:"id"`
+	Offset int64  `json:"offset"`
+
+	// This matches the filestream.fileMeta struct
+	Source         string `json:"source" struct:"source"`
+	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+}
+
+func logInputStateFromMapM(m mapstr.M) logInputState {
+	state := logInputState{}
+
+	m.Delete("FileStateOS")
+	if err := typeconv.Convert(&state, m); err != nil {
+		panic(err)
+	}
+
+	return state
+}
+
+// UnpackCursorMeta unpacks the cursor metadata's into the provided struct. TBD
+func (l logInputState) UnpackCursorMeta(to interface{}) error {
+	return typeconv.Convert(to, l)
+}
+
+// Key returns the resource's key tbd
+func (l logInputState) Key() string {
+	return l.key
+}
+
 func (s *store) Retain() { s.refCount.Retain() }
 func (s *store) Release() {
 	if s.refCount.Release() {
@@ -429,6 +512,34 @@ func (s *states) Find(key string, create bool) *resource {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if resource := s.table[key]; resource != nil && !resource.isDeleted() {
+		resource.Retain()
+		return resource
+	}
+
+	if !create {
+		return nil
+	}
+
+	// resource is owned by table(session) and input that uses the resource.
+	resource := &resource{
+		stored: false,
+		key:    key,
+		lock:   unison.MakeMutex(),
+	}
+	s.table[key] = resource
+	resource.Retain()
+	return resource
+}
+
+// unsafeFind DOES NOT LOCK THE STORE!!! Only call unsafeFind if you're
+// currently holding the lock from states.mu.
+//
+// unsafeFind returns the resource for a given key. If the key is unknown and
+// create is set to false nil will be returned.
+// The resource returned by unsafeFind is marked as active. (*resource).Release
+// must be called to mark the resource as inactive again.
+func (s *states) unsafeFind(key string, create bool) *resource {
 	if resource := s.table[key]; resource != nil && !resource.isDeleted() {
 		resource.Retain()
 		return resource
