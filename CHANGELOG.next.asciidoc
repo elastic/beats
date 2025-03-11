@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 
 *Auditbeat*
 
@@ -53,6 +54,7 @@ Dropped fields: `syslog.priority` and `syslog.facility` while keeping their dupl
 already present as `container.id` and `container.log.tag` is dropped because it is already present as
 `log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Heartbeat*
 
@@ -84,6 +86,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Functionbeat*
 
+- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}TODO[TODO]
 
 *Elastic Logging Plugin*
 
@@ -198,6 +201,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 
 *Heartbeat*
 
@@ -234,6 +238,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 
 *Osquerybeat*
 
@@ -269,7 +274,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
-- Update to Go 1.22.12. {pull}42681[42681]
+- Update to Go 1.23.6. {pull}42705[42705]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 - Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
@@ -362,6 +367,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
+- Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
 
 *Auditbeat*
 

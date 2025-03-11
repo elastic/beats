@@ -22,7 +22,7 @@ package kafka
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"strings"
@@ -35,8 +35,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
@@ -451,7 +452,7 @@ func TestTest(t *testing.T) {
 }
 
 func createTestTopicName() string {
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
 	return testTopic
 }
@@ -460,7 +461,8 @@ func findMessage(t *testing.T, text string, msgs []testMessage) *testMessage {
 	var msg *testMessage
 	for _, m := range msgs {
 		if text == m.message {
-			msg = &m
+			mCopy := m
+			msg = &mCopy
 			break
 		}
 	}
@@ -605,8 +607,10 @@ func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, f
 	t.Cleanup(cancel)
 
 	pipeline := beattest.ConstClient(client)
-	input := inp.(*kafkaInput)
-	go input.Run(ctx, pipeline)
+	input, _ := inp.(*kafkaInput)
+	go func() {
+		_ = input.Run(ctx, pipeline)
+	}()
 	return input, cancel
 }
 
