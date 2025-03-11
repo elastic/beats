@@ -283,7 +283,7 @@ func consumerMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields m
 				})
 
 				if err != nil {
-					return fmt.Errorf("failure applying jetstream.stream schema: %w", err)
+					return fmt.Errorf("failure applying jetstream.consumer schema: %w", err)
 				}
 
 				// Create and emit the event
