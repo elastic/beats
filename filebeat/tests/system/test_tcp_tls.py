@@ -341,6 +341,7 @@ class Test(BaseTest):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
         context.verify_mode = ssl.CERT_REQUIRED
         context.load_verify_locations(CACERT)
         context.load_cert_chain(certfile=CLIENT2, keyfile=CLIENTKEY2)
