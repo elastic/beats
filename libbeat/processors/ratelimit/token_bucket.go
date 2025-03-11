@@ -183,7 +183,9 @@ func (t *tokenBucket) runGC() {
 		toDelete := make([]uint64, 0)
 		numBucketsBefore := 0
 		t.buckets.Range(func(k, v interface{}) bool {
+			//nolint:errcheck // ignore
 			key := k.(uint64)
+			//nolint:errcheck // ignore
 			b := v.(*bucket)
 
 			tokens := b.replenish(t.limit, t.clock)
