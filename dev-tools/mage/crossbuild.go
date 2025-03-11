@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -130,6 +131,10 @@ type crossBuildParams struct {
 
 // CrossBuild executes a given build target once for each target platform.
 func CrossBuild(options ...CrossBuildOption) error {
+	if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
+		log.Printf("Skipping cross-build for beat %q because it's not included in the FIPS-enabled beat list %v", BeatName, FIPSConfig.Beats)
+	}
+
 	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: CrossBuildImage}
 	for _, opt := range options {
 		opt(&params)
@@ -180,6 +185,11 @@ func CrossBuild(options ...CrossBuildOption) error {
 	for _, buildPlatform := range params.Platforms {
 		if !buildPlatform.Flags.CanCrossBuild() {
 			return fmt.Errorf("unsupported cross build platform %v", buildPlatform.Name)
+		}
+		if FIPSBuild && !slices.Contains(FIPSConfig.Compile.Platforms, buildPlatform.Name) {
+			fmt.Printf("Skipping crossbuild of %q for platform %q since it's not listed in FIPS supported platforms %v\n",
+				BeatName, buildPlatform.Name, FIPSConfig.Compile.Platforms)
+			continue
 		}
 		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
 		if params.Serial {
