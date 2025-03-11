@@ -1,12 +1,6 @@
-<<<<<<< HEAD
 :stack-version: 8.19.0
 :doc-branch: 8.x
-:go-version: 1.23.6
-=======
-:stack-version: 9.1.0
-:doc-branch: main
 :go-version: 1.24.0
->>>>>>> aea1d26f6 (feat: bump go version to 1.24 (#43105))
 :release-state: unreleased
 :python: 3.7
 :docker: 1.12
