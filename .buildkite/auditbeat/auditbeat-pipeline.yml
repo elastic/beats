@@ -37,11 +37,25 @@ env:
   CONCURRENCY_COUNT: 10
   CONCURRENCY_METHOD: eager
 
+  MOD: vendor
+
 steps:
   - group: "Check/Update"
     key: "auditbeat-check-update"
 
     steps:
+      - label: ":golang: Install dependencies"
+        command: "go mod vendor"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          cpu: "4000m"
+          memory: "8Gi"
+          useCustomGlobalHooks: true
+        plugins:
+          - artifacts#v1.9.3:
+              upload: "vendor"
+              compressed: vendor.tgz
+
       - label: "Auditbeat: Run check/update"
         command: |
           set -eo pipefail
@@ -55,6 +69,10 @@ steps:
           cpu: "4000m"
           memory: "8Gi"
           useCustomGlobalHooks: true
+        plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
         notify:
           - github_commit_status:
               context: "auditbeat: check/update"
@@ -96,6 +114,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -121,6 +142,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -147,6 +171,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -173,6 +200,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -219,6 +249,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -252,6 +285,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -285,6 +321,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -314,6 +353,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -343,6 +385,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -375,6 +420,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -402,6 +450,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -429,6 +480,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
+          - artifacts#v1.9.3:
+              download: "vendor"
+              compressed: vendor.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"

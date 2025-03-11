@@ -44,6 +44,9 @@ type goInstall func(opts ...ArgOpt) error
 var Install goInstall = runGoInstall
 
 func runGoInstall(opts ...ArgOpt) error {
+	if os.Getenv("MOD") == "vendor" {
+		opts = append(opts, flagArg("-mod", "vendor"))
+	}
 	args := buildArgs(opts)
 	return runVGo("install", args)
 }
@@ -174,6 +177,9 @@ func (goTest) Out(path string) ArgOpt     { return flagArg("-o", path) }
 func (goTest) Package(path string) ArgOpt { return posArg(path) }
 func (goTest) Verbose() ArgOpt            { return flagArg("-test.v", "") }
 func runGoTest(opts ...ArgOpt) error {
+	if os.Getenv("MOD") == "vendor" {
+		opts = append(opts, flagArg("-mod", "vendor"))
+	}
 	args := buildArgs(opts)
 	if bin := args.Val("use"); bin != "" {
 		flags := map[string][]string{}

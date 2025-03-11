@@ -56,6 +56,7 @@ var (
 	GOARCH       = build.Default.GOARCH
 	GOARM        = EnvOr("GOARM", "")
 	Platform     = MakePlatformAttributes(GOOS, GOARCH, GOARM)
+	MOD          = EnvOr("MOD", "")
 	BinaryExt    = ""
 	XPackDir     = "../x-pack"
 	RaceDetector = false
