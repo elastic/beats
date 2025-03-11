@@ -20,7 +20,6 @@ package inputmon
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 	"sync"
 
@@ -127,15 +126,8 @@ func validStringVar(v monitoring.Var) bool {
 // The returned cancel function *must* be called when the input stops to
 // unregister the metrics and prevent resource leaks.
 //
-// This function might panic.
 // Deprecated.
 func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
-	defer func() {
-		if r := recover(); r != nil {
-			panic(fmt.Errorf("inoutmon.NewInputRegistry panic: %+v", r))
-		}
-	}()
-
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
 	if parentRegistry == nil {

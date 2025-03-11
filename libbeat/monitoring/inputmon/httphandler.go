@@ -85,7 +85,7 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 			continue
 		}
 
-		if filterOutInput(m, requestedType) {
+		if !requestedInput(m["input"], requestedType) {
 			continue
 		}
 
@@ -99,7 +99,7 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 
 	registeredInputRegistries := registeredInputs.CollectStructSnapshot()
 	for _, reg := range registeredInputRegistries {
-		if filterOutInput(reg, requestedType) {
+		if !requestedInput(reg["input"], requestedType) {
 			continue
 		}
 
@@ -109,15 +109,15 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 	return filtered
 }
 
-func filterOutInput(m map[string]any, requestedType string) bool {
-	inputType, ok := m["input"].(string)
+func requestedInput(input any, requestedType string) bool {
+	inputType, ok := input.(string)
 	if !ok ||
 		(requestedType != "" &&
 			!strings.EqualFold(inputType, requestedType)) {
-		return true
+		return false
 	}
 
-	return false
+	return true
 }
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {
 	w.Header().Set(contentType, applicationJSON)

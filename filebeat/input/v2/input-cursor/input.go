@@ -109,9 +109,6 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	// This context isn't directly used, so unregister any metric it might have
-	// registered.
-	ctx.UnregisterMetrics()
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
@@ -127,6 +124,9 @@ func (inp *managedInput) Run(
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
 				cancel()
 			}
+
+			// Input finished running, unregister the metrics
+			inpCtx.UnregisterMetrics()
 			return err
 		})
 	}

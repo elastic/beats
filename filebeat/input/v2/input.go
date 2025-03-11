@@ -81,12 +81,6 @@ type Context struct {
 	// The input ID.
 	ID string
 
-	// GeneratedID is true when the config does not include an ID and therefore
-	// the runner uses a hash from the config as ID. It's used to know if the
-	// v2.Context generated for the input should have a non-discard metric
-	// registry.
-	GeneratedID bool
-
 	// The input ID without name. Some inputs append sourcename, we need the id to be untouched
 	// https://github.com/elastic/beats/blob/43d80af2aea60b0c45711475d114e118d90c4581/filebeat/input/v2/input-cursor/input.go#L118
 	IDWithoutName string
@@ -107,10 +101,6 @@ type Context struct {
 	// This registry resides in beat.Info.Monitoring.Namespace, which is a
 	// unique namespace for beats running as OTel receivers or the global
 	// 'dataset' for compatibility reasons.
-	//
-	// Inputs without an ID, GeneratedID is true, have a 'discard' registry
-	// which is associated to no namespace resulting in the metrics not being
-	// published.
 	//
 	// Inputs must call EnhanceMetricRegistry to add the necessary variables for
 	// the metrics to be valid to be published by the HTTP monitoring endpoint.
@@ -141,21 +131,26 @@ func (c *Context) MetricsID() string {
 // metric registry named ID will be added to the beat.Info.Monitoring.Namespace
 // or the existing registry will be returned.
 func (c *Context) MetricRegistry() *monitoring.Registry {
-	if c.MetricsID() == "" {
-		return monitoring.NewRegistry()
+	if c.monitoringRegistry != nil {
+		return c.monitoringRegistry
 	}
 
-	if c.monitoringRegistry == nil {
-		reg := c.Agent.Monitoring.Registry().GetRegistry(c.MetricsID())
+	var reg *monitoring.Registry
+	var unreg func()
+	if c.MetricsID() == "" {
+		reg = monitoring.NewRegistry()
+		unreg = func() {}
+	} else {
+		reg = c.Agent.Monitoring.Registry().GetRegistry(c.MetricsID())
 		if reg == nil {
 			reg = c.Agent.Monitoring.Registry().NewRegistry(c.MetricsID())
 		}
-
-		c.monitoringRegistry = reg
-		c.monitoringRegistryCancel = func() {
+		unreg = func() {
 			c.Agent.Monitoring.Registry().Remove(c.MetricsID())
 		}
 	}
+	c.monitoringRegistry = reg
+	c.monitoringRegistryCancel = unreg
 
 	return c.monitoringRegistry
 }
