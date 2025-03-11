@@ -256,10 +256,10 @@ class Test(BaseTest):
   basic_auth: true
   username: testuser
   password:
-#- type: benchmark
-#  enabled: true
-#  message: "placeholder"
-#  eps: 1
+- type: benchmark
+  enabled: true
+  message: "placeholder"
+  eps: 1
 """
         self.get_config(options)
         filebeat = self.start_beat()
