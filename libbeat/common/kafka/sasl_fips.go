@@ -15,25 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build tools
-// +build tools
+//go:build requirefips
 
-// This package contains the tool dependencies of the project.
-
-package tools
+package kafka
 
 import (
-	_ "github.com/magefile/mage"
-	_ "github.com/stretchr/testify/assert"
-	_ "golang.org/x/tools/cmd/goimports"
-	_ "golang.org/x/tools/cmd/stringer"
-	_ "gotest.tools/gotestsum/cmd"
+	"fmt"
+	"strings"
 
-	_ "github.com/mitchellh/gox"
-
-	_ "go.elastic.co/go-licence-detector"
-
-	_ "github.com/elastic/go-licenser"
-
-	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
+	"github.com/elastic/sarama"
 )
+
+func (c *SaslConfig) Validate() error {
+	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
+	case "", saslTypePlaintext:
+	default:
+		return fmt.Errorf("not valid SASL mechanism '%v', only supported with PLAIN", c.SaslMechanism)
+	}
+	return nil
+}
+
+func scramClient(mechanism string) func() sarama.SCRAMClient {
+	// This should never happen because `SaslMechanism` is checked on `Validate()`, keeping a panic to detect it earlier if it happens.
+	panic("scram sasl auth not supported in fips mode")
+}

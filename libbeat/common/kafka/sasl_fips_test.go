@@ -15,25 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build tools
-// +build tools
+//go:build requirefips
 
-// This package contains the tool dependencies of the project.
-
-package tools
+package kafka
 
 import (
-	_ "github.com/magefile/mage"
-	_ "github.com/stretchr/testify/assert"
-	_ "golang.org/x/tools/cmd/goimports"
-	_ "golang.org/x/tools/cmd/stringer"
-	_ "gotest.tools/gotestsum/cmd"
+	"testing"
 
-	_ "github.com/mitchellh/gox"
-
-	_ "go.elastic.co/go-licence-detector"
-
-	_ "github.com/elastic/go-licenser"
-
-	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
+	"github.com/stretchr/testify/require"
 )
+
+func TestValidate(t *testing.T) {
+	cfg := SaslConfig{
+		SaslMechanism: saslTypeSCRAMSHA512,
+	}
+	require.Error(t, cfg.Validate())
+
+	cfg.SaslMechanism = saslTypeSCRAMSHA256
+	require.Error(t, cfg.Validate())
+}

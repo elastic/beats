@@ -15,25 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build tools
-// +build tools
-
-// This package contains the tool dependencies of the project.
-
-package tools
+package config
 
 import (
-	_ "github.com/magefile/mage"
-	_ "github.com/stretchr/testify/assert"
-	_ "golang.org/x/tools/cmd/goimports"
-	_ "golang.org/x/tools/cmd/stringer"
-	_ "gotest.tools/gotestsum/cmd"
+	"flag"
+	"os"
+	"testing"
 
-	_ "github.com/mitchellh/gox"
-
-	_ "go.elastic.co/go-licence-detector"
-
-	_ "github.com/elastic/go-licenser"
-
-	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
+	"github.com/elastic/beats/v7/testing/testflag"
 )
+
+func TestMain(m *testing.M) {
+	testflag.MustSetStrictPermsFalse()
+
+	flag.Parse()
+
+	os.Exit(m.Run())
+}
