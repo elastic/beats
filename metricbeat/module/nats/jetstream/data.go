@@ -77,6 +77,9 @@ var (
 		"stream": s.Object{
 			"name": c.Str("stream_name"),
 		},
+		"cluster": s.Object{
+			"leader": c.Str("leader"),
+		},
 		"delivered": s.Object{
 			"consumer_seq": c.Int("delivered_consumer_seq"),
 			"stream_seq":   c.Int("delivered_stream_seq"),
@@ -268,6 +271,7 @@ func consumerMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields m
 				metricSetFields, err := jetstreamStatsSchema.Apply(map[string]interface{}{
 					"stream_name":            stream.Name,
 					"name":                   consumer.Name,
+					"leader":                 stream.Cluster.Leader,
 					"created":                consumer.Created,
 					"delivered_consumer_seq": consumer.Delivered.ConsumerSequence,
 					"delivered_stream_seq":   consumer.Delivered.StreamSequence,
