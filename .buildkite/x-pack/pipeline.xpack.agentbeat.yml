@@ -89,6 +89,34 @@ steps:
           - github_commit_status:
               context: "agentbeat: Packaging"
 
+      - label: ":linux: Agentbeat packaging Linux FIPS"
+        key: "agentbeat-package-linux-fips"
+        depends_on:
+          - mandatory-win-2022-system-tests
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64"
+          SNAPSHOT: true
+          FIPS: "true"
+        command: |
+          .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
+        artifact_paths:
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        retry:
+          automatic:
+            - limit: 2
+        timeout_in_minutes: 60
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Packaging Linux FIPS"
+
       - label: ":linux: Agentbeat/Integration tests Linux"
         key: "agentbeat-it-linux"
         depends_on:

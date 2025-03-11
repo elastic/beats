@@ -14,6 +14,11 @@ shared:
     url: '{{.BeatURL}}'
     description: '{{.BeatDescription}}'
 
+  - &common_fips
+    <<: *common
+    name: '{{.BeatName}}-fips'
+    fips: true
+
   - &binary_files
     '{{.BeatName}}{{.BinaryExt}}':
       source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -56,9 +61,7 @@ shared:
       <<: *windows_osquery_files
 
   - &fips_binary_spec
-    <<: *common
-    name: '{{.BeatName}}-fips'
-    fips: true
+    <<: *common_fips
     files:
       <<: *binary_files
       '{{.BeatName}}{{.BinaryExt}}':
@@ -122,10 +125,4 @@ specs:
       types: [tgz]
       spec:
         <<: *fips_binary_spec
-        <<: *elastic_license_for_binaries
-    - os: darwin
-      arch: arm64
-      types: [ tgz ]
-      spec:
-        <<: *unix_binary_spec
         <<: *elastic_license_for_binaries

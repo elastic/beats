@@ -11,6 +11,7 @@ compile:
   tags:
     - requirefips
   platforms:
+    # If the platform list changes, update the platforms for FIPS packaging in CI pipelines '.buildkite/**/pipeline.<beat>.yml' and '.buildkite/packaging-pipeline.yml'
     - linux/amd64
     - linux/arm64
 package:
