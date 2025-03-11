@@ -5,21 +5,10 @@
 package mbreceiver
 
 import (
-	"context"
-	"sync/atomic"
 	"testing"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/consumer"
-	"go.opentelemetry.io/collector/pdata/plog"
-	"go.opentelemetry.io/collector/receiver"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestNewReceiver(t *testing.T) {
@@ -49,46 +38,20 @@ func TestNewReceiver(t *testing.T) {
 		},
 	}
 
-	core, logs := observer.New(zapcore.DebugLevel)
-
-	receiverSettings := receiver.Settings{}
-	receiverSettings.Logger = zap.New(core)
-
-	var countLogs atomic.Int64
-	logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
-		countLogs.Add(int64(ld.LogRecordCount()))
-		return nil
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T:       t,
+		Factory: NewFactory(),
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:   "r1",
+				Config: &config,
+			},
+		},
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool {
+			_ = zapLogs
+			return len(logs["r1"]) > 0
+		},
 	})
-	require.NoError(t, err, "Error creating log consumer")
-
-	r, err := createReceiver(context.Background(), receiverSettings, &config, logConsumer)
-	require.NoErrorf(t, err, "Error creating receiver. Logs:\n %s", logs.All())
-	err = r.Start(context.Background(), nil)
-	require.NoError(t, err, "Error starting metricbeatreceiver")
-
-	ch := make(chan bool, 1)
-	timer := time.NewTimer(120 * time.Second)
-	defer timer.Stop()
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
-
-	for tick := ticker.C; ; {
-		select {
-		case <-timer.C:
-			t.Fatalf("consumed logs didn't increase\nCount: %d\nLogs: %v\n", countLogs.Load(), logs.All())
-		case <-tick:
-			tick = nil
-			go func() { ch <- countLogs.Load() > 0 }()
-		case v := <-ch:
-			if v {
-				goto found
-			}
-			tick = ticker.C
-		}
-	}
-found:
-	err = r.Shutdown(context.Background())
-	require.NoError(t, err, "Error shutting down metricbeatreceiver")
 }
 
 func TestMultipleReceivers(t *testing.T) {
@@ -118,12 +81,21 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 	}
 
-	oteltest.CheckMultipleReceivers(oteltest.CheckMultipleReceiversParams{
-		T:               t,
-		Factory:         NewFactory(),
-		Receiver1Config: &config,
-		Receiver2Config: &config,
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M) bool {
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T:       t,
+		Factory: NewFactory(),
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:   "r1",
+				Config: &config,
+			},
+			{
+				Name:   "r2",
+				Config: &config,
+			},
+		},
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool {
+			_ = zapLogs
 			return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 		},
 	})

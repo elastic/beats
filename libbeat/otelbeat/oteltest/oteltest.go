@@ -36,37 +36,39 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type CheckMultipleReceiversParams struct {
+type ReceiverConfig struct {
+	Name   string
+	Config component.Config
+}
+
+type CheckReceiversParams struct {
 	T *testing.T
 	// Factory that allows to create a receiver.
 	Factory receiver.Factory
-	// Receiver1Config is the configuration for the first receiver.
-	Receiver1Config component.Config
-	// Receiver2Config is the configuration for the second receiver.
-	Receiver2Config component.Config
+	// Receivers is a list of receiver configurations to create.
+	Receivers []ReceiverConfig
 	// AssertFunc is a function that asserts the test conditions.
 	// The function is called periodically until it returns true which ends the test.
-	AssertFunc func(t *testing.T, logs map[string][]mapstr.M) bool
+	AssertFunc func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool
 }
 
-// CheckMultipleReceivers checks that multiple receivers can be created and started
-// on the same process without errors.
-func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
+// CheckReceivers creates receivers using the provided configuration.
+func CheckReceivers(params CheckReceiversParams) {
 	t := params.T
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
+
+	var zapLogs bytes.Buffer
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.AddSync(&zapLogs),
+		zapcore.DebugLevel)
 
 	ctx := context.Background()
 	createReceiver := func(t *testing.T, name string, cfg component.Config) receiver.Logs {
 		t.Helper()
 
-		var zapLogs bytes.Buffer
-		core := zapcore.NewCore(
-			zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-			zapcore.AddSync(&zapLogs),
-			zapcore.DebugLevel)
-
-		receiverSettings := receiver.Settings{}
+		var receiverSettings receiver.Settings
 		receiverSettings.Logger = zap.New(core).Named(name)
 
 		logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
@@ -97,25 +99,19 @@ func CheckMultipleReceivers(params CheckMultipleReceiversParams) {
 		return r
 	}
 
-	r1 := createReceiver(t, "r1", params.Receiver1Config)
-	r2 := createReceiver(t, "r2", params.Receiver2Config)
-
-	err := r1.Start(ctx, nil)
-	require.NoError(t, err, "Error starting receiver 1")
-	defer func() {
-		require.NoError(t, r1.Shutdown(ctx), "Error shutting down receiver 1")
-	}()
-
-	err = r2.Start(ctx, nil)
-	require.NoError(t, err, "Error starting receiver 2")
-	defer func() {
-		require.NoError(t, r2.Shutdown(ctx), "Error shutting down receiver 2")
-	}()
+	for _, rec := range params.Receivers {
+		r := createReceiver(t, rec.Name, rec.Config)
+		err := r.Start(ctx, nil)
+		require.NoErrorf(t, err, "Error starting receiver %q", rec.Name)
+		defer func() {
+			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %q", rec.Name)
+		}()
+	}
 
 	require.Eventually(t, func() bool {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
-		return params.AssertFunc(t, logs)
-	}, time.Minute, 100*time.Millisecond)
+		return params.AssertFunc(t, logs, zapLogs.Bytes())
+	}, time.Minute, 100*time.Millisecond, "timeout waiting for assertion to pass")
 }
