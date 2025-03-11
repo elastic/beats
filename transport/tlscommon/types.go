@@ -96,6 +96,7 @@ func init() {
 	}
 }
 
+var supportedCurveTypes = make(map[tlsCurveType]string, len(tlsCurveTypes))
 var tlsCurveTypes = map[string]tlsCurveType{
 	"P-256":  tlsCurveType(tls.CurveP256),
 	"P-384":  tlsCurveType(tls.CurveP384),
@@ -288,6 +289,13 @@ func (ct *tlsCurveType) Unpack(i interface{}) error {
 		*ct = tlsCurveType(o)
 	default:
 		return fmt.Errorf("tls curve type is an unsupported input type: %T", o)
+	}
+	return nil
+}
+
+func (ct *tlsCurveType) Validate() error {
+	if _, ok := supportedCurveTypes[*ct]; !ok {
+		return fmt.Errorf("unsupported curve type: %s", tls.CurveID(*ct).String())
 	}
 	return nil
 }

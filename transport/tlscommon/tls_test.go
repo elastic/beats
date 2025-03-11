@@ -78,7 +78,7 @@ func TestValuesSet(t *testing.T) {
       - ECDHE-ECDSA-AES-256-GCM-SHA384
     supported_protocols: [TLSv1.3]
     curve_types:
-      - P-521
+      - P-384
     renegotiation: freely
   `)
 

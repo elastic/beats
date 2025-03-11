@@ -103,6 +103,11 @@ func (c *Config) Validate() error {
 			return err
 		}
 	}
+	for _, ct := range c.CurveTypes {
+		if err := ct.Validate(); err != nil {
+			return err
+		}
+	}
 	return c.Certificate.Validate()
 }
 

@@ -53,3 +53,19 @@ func TestLoadUnsupportedCiphers(t *testing.T) {
 	assert.ErrorContains(t, err, "unsupported tls cipher suite: TLS_RSA_WITH_AES_256_CBC_SHA")
 	assert.Nil(t, cfg)
 }
+
+func TestLoadUnsupportedCurveTypes(t *testing.T) {
+	cfg, err := load(`
+    enabled: true
+    certificate: mycert.pem
+    key: mycert.key
+    verification_mode: ""
+    supported_protocols: [TLSv1.2, TLSv1.3]
+    curve_types:
+      - X25519
+    renegotiation: freely
+  `)
+
+	assert.ErrorContains(t, err, "unsupported curve type: X25519")
+	assert.Nil(t, cfg)
+}

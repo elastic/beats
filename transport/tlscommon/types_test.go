@@ -78,7 +78,7 @@ func TestLoadWithEmptyVerificationMode(t *testing.T) {
     verification_mode:
     supported_protocols: [TLSv1.2, TLSv1.3]
     curve_types:
-      - P-521
+      - P-384
     renegotiation: freely
   `)
 
@@ -98,7 +98,7 @@ func TestRepackConfig(t *testing.T) {
     certificate: /path/to/cert.crt
     key: /path/to/key.crt
     curve_types:
-      - P-521
+      - P-384
     renegotiation: freely
     ca_sha256:
       - example
@@ -125,7 +125,7 @@ func TestRepackConfigFromJSON(t *testing.T) {
     "certificate_authorities": ["/path/to/ca.crt"],
     "certificate": "/path/to/cert.crt",
     "key": "/path/to/key.crt",
-    "curve_types": "P-521",
+    "curve_types": "P-384",
     "renegotiation": "freely",
     "ca_sha256": ["example"],
     "ca_trusted_fingerprint": "fingerprint"

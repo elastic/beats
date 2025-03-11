@@ -113,7 +113,7 @@ func Test_ServerConfig_Repack(t *testing.T) {
     certificate: /path/to/cert.cry
     key: /path/to/key/crt
     curve_types:
-      - P-521
+      - P-384
     client_authentication: optional
     ca_sha256:
       - example`,
@@ -131,7 +131,7 @@ func Test_ServerConfig_Repack(t *testing.T) {
     certificate: /path/to/cert.cry
     key: /path/to/key/crt
     curve_types:
-      - P-521
+      - P-384
     ca_sha256:
       - example`,
 		auth: &required,
@@ -146,7 +146,7 @@ func Test_ServerConfig_Repack(t *testing.T) {
     certificate: /path/to/cert.cry
     key: /path/to/key/crt
     curve_types:
-      - P-521
+      - P-384
     ca_sha256:
       - example`,
 		auth: nil,
@@ -190,7 +190,7 @@ func Test_ServerConfig_RepackJSON(t *testing.T) {
     "certificate_authorities": ["/path/to/ca.crt"],
     "certificate": "/path/to/cert.crt",
     "key": "/path/to/key.crt",
-    "curve_types": "P-521",
+    "curve_types": "P-384",
     "renegotiation": "freely",
     "ca_sha256": ["example"],
     "ca_trusted_fingerprint": "fingerprint",
@@ -207,7 +207,7 @@ func Test_ServerConfig_RepackJSON(t *testing.T) {
     "certificate_authorities": ["/path/to/ca.crt"],
     "certificate": "/path/to/cert.crt",
     "key": "/path/to/key.crt",
-    "curve_types": "P-521",
+    "curve_types": "P-384",
     "renegotiation": "freely",
     "ca_sha256": ["example"],
     "ca_trusted_fingerprint": "fingerprint"
@@ -222,7 +222,7 @@ func Test_ServerConfig_RepackJSON(t *testing.T) {
     "cipher_suites": ["RSA-AES-256-CBC-SHA"],
     "certificate": "/path/to/cert.crt",
     "key": "/path/to/key.crt",
-    "curve_types": "P-521",
+    "curve_types": "P-384",
     "renegotiation": "freely",
     "ca_sha256": ["example"]
     }`,

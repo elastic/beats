@@ -24,4 +24,7 @@ func init() {
 	for cipherName, i := range tlsCipherSuites {
 		supportedCipherSuites[i] = cipherName
 	}
+	for name, curveType := range tlsCurveTypes {
+		supportedCurveTypes[curveType] = name
+	}
 }

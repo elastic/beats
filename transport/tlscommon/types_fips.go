@@ -37,4 +37,11 @@ func init() {
 			supportedCipherSuites[i] = cipherName
 		}
 	}
+	// only allow P256, P384.
+	for name, curveType := range tlsCurveTypes {
+		switch tls.CurveID(curveType) {
+		case tls.CurveP256, tls.CurveP384:
+			supportedCurveTypes[curveType] = name
+		}
+	}
 }
