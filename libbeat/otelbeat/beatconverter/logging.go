@@ -15,25 +15,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build tools
-// +build tools
-
-// This package contains the tool dependencies of the project.
-
-package tools
+package beatconverter
 
 import (
-	_ "github.com/magefile/mage"
-	_ "github.com/stretchr/testify/assert"
-	_ "golang.org/x/tools/cmd/goimports"
-	_ "golang.org/x/tools/cmd/stringer"
-	_ "gotest.tools/gotestsum/cmd"
-
-	_ "github.com/mitchellh/gox"
-
-	_ "go.elastic.co/go-licence-detector"
-
-	_ "github.com/elastic/go-licenser"
-
-	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
+	"fmt"
+	"strings"
 )
+
+func getOTelLogLevel(level string) (string, error) {
+	switch strings.ToLower(level) {
+	case "debug":
+		return "DEBUG", nil
+	case "info":
+		return "INFO", nil
+	case "warning":
+		return "WARN", nil
+	case "error", "critical":
+		return "ERROR", nil
+	default:
+		return "", fmt.Errorf("unrecognized level: %s", level)
+	}
+}

@@ -37,7 +37,8 @@ func TestFilebeat(t *testing.T) {
 	lineCount := 128
 
 	reportOptions := integration.ReportOptions{
-		PrintLinesOnFail: 10,
+		PrintLinesOnFail:  10,
+		PrintConfigOnFail: true,
 	}
 
 	t.Run("Filebeat starts and ingests files", func(t *testing.T) {
