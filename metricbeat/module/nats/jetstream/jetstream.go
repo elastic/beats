@@ -103,10 +103,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	fmt.Println("===================================")
-	fmt.Println(m.http.GetURI())
-	fmt.Println("===================================")
-
 	content, err := m.http.FetchContent()
 	if err != nil {
 		return fmt.Errorf("error in fetch: %w", err)

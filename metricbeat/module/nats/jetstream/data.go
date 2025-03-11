@@ -231,7 +231,7 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields maps
 func streamMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields mapstr.M, timestamp time.Time) error {
 	for _, account := range response.AccountDetails {
 		for _, stream := range account.StreamDetails {
-			metricSetFields, err := jetstreamStatsSchema.Apply(map[string]interface{}{
+			metricSetFields, err := jetstreamStreamSchema.Apply(map[string]interface{}{
 				"name":           stream.Name,
 				"created":        stream.Created,
 				"leader":         stream.Cluster.Leader,
@@ -268,7 +268,7 @@ func consumerMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields m
 	for _, account := range response.AccountDetails {
 		for _, stream := range account.StreamDetails {
 			for _, consumer := range stream.Consumers {
-				metricSetFields, err := jetstreamStatsSchema.Apply(map[string]interface{}{
+				metricSetFields, err := jetstreamConsumerSchema.Apply(map[string]interface{}{
 					"stream_name":            stream.Name,
 					"name":                   consumer.Name,
 					"leader":                 stream.Cluster.Leader,
