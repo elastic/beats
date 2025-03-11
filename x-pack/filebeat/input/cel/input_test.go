@@ -1782,7 +1782,7 @@ func TestInput(t *testing.T) {
 				t.Errorf("unexpected number of cursors events: got:%d want at least:%d", len(client.cursors), len(test.wantCursor))
 				test.wantCursor = test.wantCursor[:len(client.published)]
 			}
-			client.published = client.published[:len(test.want)]
+			client.cursors = client.cursors[:len(test.wantCursor)]
 			for i, got := range client.cursors {
 				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
