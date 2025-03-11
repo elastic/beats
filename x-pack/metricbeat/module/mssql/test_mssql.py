@@ -18,7 +18,7 @@ class Test(XPackTest):
     def asdf_start_beat(self):
         # go 1.23 no longer accepts the negative serials used in mssql test
         # container certificates, add a debug flag to allow them.
-        #super().start_beat()  # env={"GODEBUG": "x509negativeserial=1"})
+        # super().start_beat()  # env={"GODEBUG": "x509negativeserial=1"})
         pass
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
