@@ -15,6 +15,11 @@ shared:
     url: '{{.BeatURL}}'
     description: '{{.BeatDescription}}'
 
+  - &common_fips
+    <<: *common
+    name: '{{.BeatName}}-fips'
+    fips: true
+
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
@@ -55,6 +60,10 @@ shared:
       /lib/systemd/system/{{.BeatServiceName}}.service:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl'
         mode: 0644
+
+  - &deb_rpm_spec_fips
+    <<: *deb_rpm_spec
+    <<: *common_fips
 
   # MacOS pkg spec for community beats.
   - &macos_beat_pkg_spec
@@ -139,9 +148,7 @@ shared:
       <<: *binary_files
 
   - &fips_binary_spec
-    <<: *common
-    name: '{{.BeatName}}-fips'
-    fips: true
+    <<: *common_fips
     files:
       <<: *binary_files
       '{{.BeatName}}{{.BinaryExt}}':
@@ -638,67 +645,16 @@ specs:
       spec:
         <<: *fips_binary_spec
         <<: *elastic_license_for_binaries
-#
-#    - os: linux
-#      types: [deb, rpm]
-#      spec:
-#        <<: *deb_rpm_spec
-#        <<: *elastic_license_for_deb_rpm
-#
-#    - os: linux
-#      arch: amd64
-#      types: [docker]
-#      spec:
-#        <<: *docker_spec
-#        <<: *elastic_docker_spec
-#        <<: *elastic_license_for_binaries
-#
-#    - os: linux
-#      arch: amd64
-#      types: [docker]
-#      spec:
-#        <<: *docker_spec
-#        <<: *docker_ubi_spec
-#        <<: *elastic_docker_spec
-#        <<: *elastic_license_for_binaries
-#
-#    - os: linux
-#      arch: amd64
-#      types: [docker]
-#      spec:
-#        <<: *docker_spec
-#        <<: *docker_wolfi_spec
-#        <<: *elastic_docker_spec
-#        <<: *elastic_license_for_binaries
-#
-#    - os: linux
-#      arch: arm64
-#      types: [docker]
-#      spec:
-#        <<: *docker_arm_spec
-#        <<: *elastic_docker_spec
-#        <<: *elastic_license_for_binaries
-#
-#    - os: linux
-#      arch: arm64
-#      types: [docker]
-#      spec:
-#        <<: *docker_arm_spec
-#        <<: *docker_arm_ubi_spec
-#        <<: *elastic_docker_spec
-#        <<: *elastic_license_for_binaries
-#
-#    - os: linux
-#      arch: arm64
-#      types: [docker]
-#      spec:
-#        <<: *docker_arm_spec
-#        <<: *docker_arm_wolfi_spec
-#        <<: *elastic_docker_spec
-#        <<: *elastic_license_for_binaries
-#
-#    - os: aix
-#      types: [tgz]
-#      spec:
-#        <<: *binary_spec
-#        <<: *elastic_license_for_binaries
+
+    - os: linux
+      types: [deb]
+      spec:
+        <<: *deb_rpm_spec_fips
+        <<: *elastic_license_for_deb_rpm
+
+    - os: darwin
+      arch: arm64
+      types: [ tgz ]
+      spec:
+        <<: *fips_binary_spec
+        <<: *elastic_license_for_binaries
