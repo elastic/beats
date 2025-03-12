@@ -115,7 +115,10 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
+
 		pcommonEvent := otelmap.FromMapstr(beatEvent)
+		// pcommonEvent := pcommon.NewMap()
+		// fmt.Println("okok", pcommonEvent.FromRaw(otelmap.GetRaw(beatEvent)))
 		// if data_stream field is set on beats.Event. Add it to logrecord.Attributes to support dynamic indexing
 		if data, ok := pcommonEvent.Get("data_stream"); ok {
 			// If the below sub fields do not exist, it will return empty string.
@@ -131,6 +134,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 
 		}
 		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
+		// logRecord.Body().FromRaw(pcommonEvent.AsRaw())
 	}
 
 	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
