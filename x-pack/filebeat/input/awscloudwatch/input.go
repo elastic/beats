@@ -93,6 +93,8 @@ func (in *cloudwatchInput) Test(ctx v2.TestContext) error {
 func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
+	defer in.stateHandler.Close()
+
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{})
 	if err != nil {

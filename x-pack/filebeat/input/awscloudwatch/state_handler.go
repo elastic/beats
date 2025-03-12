@@ -1,10 +1,15 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package awscloudwatch
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"sync"
 )
 
 const statePrefix = "filebeat::aws-cloudwatch::state::"
@@ -19,7 +24,7 @@ type stateHandler struct {
 }
 
 func createStateHandler(store beater.StateStore) (*stateHandler, error) {
-	st, err := store.Access()
+	st, err := store.Access("")
 	if err != nil {
 		return nil, fmt.Errorf("error accessing persistence store: %v", err)
 	}
@@ -44,7 +49,7 @@ func (s *stateHandler) GetState(forCfg config) (StorableState, error) {
 	}
 
 	if !got {
-		// Set to Epoch Zero
+		// Set to Epoch Zero, which is as if start from beginning
 		return StorableState{LastSyncEpoch: 0}, err
 	}
 

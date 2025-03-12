@@ -1,14 +1,84 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package awscloudwatch
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
+
+func TestStateHandler(t *testing.T) {
+	tests := []struct {
+		name            string
+		storeWithCfg    config
+		storingState    StorableState
+		retrieveWithCfg config
+		expectEpoch     int64
+	}{
+		{
+			name: "Simple store and retrival",
+			storeWithCfg: config{
+				LogGroupARN: "logGroupARN",
+			},
+			storingState: StorableState{
+				LastSyncEpoch: 1111111111,
+			},
+			retrieveWithCfg: config{
+				LogGroupARN: "logGroupARN",
+			},
+			expectEpoch: 1111111111,
+		},
+		{
+			name: "Missing retrival should return epoch zero - different ARN",
+			storeWithCfg: config{
+				LogGroupARN: "MyLogGroup_A",
+			},
+			storingState: StorableState{
+				LastSyncEpoch: 1111111111,
+			},
+			retrieveWithCfg: config{
+				LogGroupARN: "MyLogGroup_B",
+			},
+			expectEpoch: 0,
+		},
+		{
+			name: "Missing retrival should return epoch zero - different log group identification",
+			storeWithCfg: config{
+				LogGroupARN: "MyLogGroup_A",
+			},
+			storingState: StorableState{
+				LastSyncEpoch: 1111111111,
+			},
+			retrieveWithCfg: config{
+				LogGroupName: "logGroupName",
+				RegionName:   "region-A",
+			},
+			expectEpoch: 0,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			stHandler, err := createStateHandler(createTestInputStore())
+			require.NoError(t, err)
+
+			err = stHandler.StoreState(test.storeWithCfg, test.storingState)
+			require.NoError(t, err)
+
+			retried, err := stHandler.GetState(test.retrieveWithCfg)
+			require.NoError(t, err)
+
+			require.Equal(t, test.expectEpoch, retried.LastSyncEpoch)
+		})
+	}
+}
 
 func Test_getID(t *testing.T) {
 	tests := []struct {
@@ -67,7 +137,7 @@ type testInputStore struct {
 	registry *statestore.Registry
 }
 
-func createTestInputStore() beater.StateStore {
+func createTestInputStore() *testInputStore {
 	return &testInputStore{
 		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
 	}
@@ -81,6 +151,6 @@ func (s *testInputStore) Close() {
 	_ = s.registry.Close()
 }
 
-func (s *testInputStore) Access() (*statestore.Store, error) {
-	return s.registry.Get("filebeat")
+func (s *testInputStore) Access(typ string) (*statestore.Store, error) {
+	return s.registry.Get(typ)
 }

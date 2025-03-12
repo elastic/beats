@@ -16,7 +16,7 @@ import (
 const (
 	Beginning = "beginning"
 	End       = "end"
-	LastSync  = "last_sync"
+	LastSync  = "lastSync"
 )
 
 type config struct {
