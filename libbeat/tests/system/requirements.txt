@@ -4,7 +4,7 @@ docker==7.1.0
 docker-compose @ git+https://github.com/pkoutsovasilis/compose@2c4d825881a624bd87c390a13f362ae76dcd6180
 async-timeout==4.0.3
 attrs==19.3.0
-autopep8==1.5.4
+autopep8==2.3.1
 backoff==2.2.1
 backports.ssl-match-hostname==3.5.0.1
 bcrypt==4.1.2
