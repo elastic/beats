@@ -52,13 +52,9 @@ steps:
           memory: "8Gi"
           useCustomGlobalHooks: true
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: pipeline
-              save:
-                - file
-                - branch
+          - artifacts#v1.9.3:
+              upload: "/root/go/pkg/mod"
+              compressed: mod.tgz
 
       - wait: ~
 
@@ -77,10 +73,9 @@ steps:
           memory: "8Gi"
           useCustomGlobalHooks: true
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
         notify:
           - github_commit_status:
               context: "auditbeat: check/update"
@@ -122,10 +117,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -151,10 +145,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -181,10 +174,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -211,10 +203,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -261,10 +252,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -298,10 +288,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -335,10 +324,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -368,10 +356,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -401,10 +388,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -437,10 +423,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -468,10 +453,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
@@ -499,10 +483,9 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
         plugins:
-          - cache#v1.5.2:
-              manifest: go.mod
-              path: /root/go/pkg/mod
-              restore: file
+          - artifacts#v1.9.3:
+              download: "/root/go/pkg/mod"
+              compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
               format: "junit"
