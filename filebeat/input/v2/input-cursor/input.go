@@ -134,8 +134,6 @@ func (inp *managedInput) Run(
 				ctx.StatusReporter,
 				ctx.Agent.Monitoring.Registry(),
 				ctx.Logger.With("input_source", source.Name()))
-			inpCtx.Cancelation = ctx.Cancelation
-			inpCtx.StatusReporter = ctx.StatusReporter
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
 				cancel()

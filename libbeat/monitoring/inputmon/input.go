@@ -65,7 +65,7 @@ func RegisterMetrics(id string, reg *monitoring.Registry) error {
 	return nil
 }
 
-// UnregisterMetrics removes the registry identified by id/inputType.
+// UnregisterMetrics removes the registry identified by id.
 func UnregisterMetrics(id string) {
 	registeredInputs.Del(id)
 }

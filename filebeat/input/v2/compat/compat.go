@@ -142,10 +142,6 @@ func (r *runner) Start() {
 			r.statusReporter,
 			r.agent.Monitoring.Registry(),
 			log)
-		ctx.IDWithoutName = r.id
-		ctx.Agent = *r.agent
-		ctx.Cancelation = r.sig
-		ctx.StatusReporter = r.statusReporter
 
 		err := r.input.Run(
 			ctx,

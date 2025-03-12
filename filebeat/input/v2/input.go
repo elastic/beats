@@ -111,8 +111,8 @@ type Context struct {
 }
 
 // NewContext creates a new context with a metrics registry populated with
-// 'id: id' and 'input: inputType', and registers it to be published by
-// the HTTP monitoring endpoint. The metrics registry is created on
+// 'id: id' and 'input: inputType'. The registry is registered to be published
+// by the HTTP monitoring endpoint. The metrics registry is created on
 // parentRegistry, if it's not nil, or on a new unregistered registry.
 func NewContext(
 	id, idWithoutName, inputType string,

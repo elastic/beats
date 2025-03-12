@@ -91,7 +91,6 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 
 	return &metricsObserver{
 		metrics: metrics,
-
 		vars: metricsObserverVars{
 			// (Gauge) clients measures the number of open pipeline clients.
 			clients: monitoring.NewUint(reg, "clients"),

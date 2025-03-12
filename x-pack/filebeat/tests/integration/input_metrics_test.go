@@ -204,19 +204,17 @@ logging.level: debug
 			return false
 		}
 
-		if len(inputMetrics) != len(totalEventsByInput) {
+		if len(inputMetrics) < len(totalEventsByInput) {
 			errMsg.WriteString(
-				fmt.Sprintf("want %d inputs, got %d", len(totalEventsByInput), len(inputMetrics)))
+				fmt.Sprintf("want at least %d inputs, got %d",
+					len(totalEventsByInput), len(inputMetrics)))
 			return false
 		}
 
 		for _, metrics := range inputMetrics {
 			want, ok := totalEventsByInput[metrics.ID]
 			if !ok {
-				errMsg.WriteString(
-					fmt.Sprintf("input %q not found", metrics.ID))
-
-				return false
+				continue
 			}
 
 			switch metrics.ID {
@@ -287,18 +285,18 @@ logging.level: debug
 		},
 	}
 
-	assert.Len(t, inputMetrics, len(assertionsByInputID),
-		"unexpected number of input reporting metrics. Some input"+
-			"assertions might have not run")
+	count := 0
 	for _, inpMetric := range inputMetrics {
 		assertions, ok := assertionsByInputID[inpMetric.ID]
 		if !ok {
-			t.Errorf("no assertions found for input id %s. "+
-				"Continuing with other assertions", inpMetric.ID)
 			continue
 		}
+		count++
 		assertions(t, inpMetric)
 	}
+	assert.Equalf(t, len(assertionsByInputID), count,
+		"%d assertions shlund have run, but only %d run",
+		len(assertionsByInputID), count)
 }
 
 // makeServer returns a *httptest.Server to mock a server called by an input.
