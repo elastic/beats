@@ -55,6 +55,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Functionbeat*
 
+- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}43153[43153]
 
 *Elastic Logging Plugin*
 
@@ -118,6 +119,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
+- Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
 
 *Heartbeat*
 
@@ -154,6 +156,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 
 *Osquerybeat*
 
@@ -163,6 +166,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
 
 *Elastic Logging Plugin*
@@ -237,6 +241,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 
 *Auditbeat*
 
