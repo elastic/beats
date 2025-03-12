@@ -75,11 +75,9 @@ func (m *Monitoring) Registry() *monitoring.Registry {
 	return m.Namespace.GetRegistry()
 }
 
-// SetupRegistries sets up InfoRegistry and StateRegistry.
-// If Namespace is nil, then a global `info` and `state` namespaces are created
-// and InfoRegistry and StateRegistry are theirs respective registries.
-// If Namespace is non-nil, then a `info` and `state` are created on Namespace
-// and InfoRegistry and StateRegistry are those registries respectively.
+// SetupRegistries sets up the monitoring registries.
+// If Namespace is nil, a namespace is created for each registry.
+// If Namespace is non-nil, then the registries are created on Namespace.
 func (m *Monitoring) SetupRegistries() {
 	var infoRegistry *monitoring.Registry
 	var stateRegistry *monitoring.Registry
@@ -109,5 +107,5 @@ func (m *Monitoring) SetupRegistries() {
 
 	m.InfoRegistry = infoRegistry
 	m.StateRegistry = stateRegistry
-	m.StateRegistry = statsRegistry
+	m.StatsRegistry = statsRegistry
 }
