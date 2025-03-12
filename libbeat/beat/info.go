@@ -82,6 +82,7 @@ func (m *Monitoring) Registry() *monitoring.Registry {
 func (m *Monitoring) SetupRegistries() {
 	var infoRegistry *monitoring.Registry
 	var stateRegistry *monitoring.Registry
+	var statsRegistry *monitoring.Registry
 
 	if m.Namespace != nil {
 		reg := m.Namespace.GetRegistry()
@@ -95,11 +96,17 @@ func (m *Monitoring) SetupRegistries() {
 			stateRegistry = reg.NewRegistry("state")
 		}
 
+		statsRegistry = reg.GetRegistry("stats")
+		if statsRegistry == nil {
+			statsRegistry = reg.GetRegistry("stats")
+		}
 	} else {
 		infoRegistry = monitoring.GetNamespace("info").GetRegistry()
 		stateRegistry = monitoring.GetNamespace("state").GetRegistry()
+		statsRegistry = monitoring.GetNamespace("stats").GetRegistry()
 	}
 
 	m.InfoRegistry = infoRegistry
 	m.StateRegistry = stateRegistry
+	m.StateRegistry = statsRegistry
 }
