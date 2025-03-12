@@ -120,7 +120,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -148,7 +150,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -177,7 +181,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -206,7 +212,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -255,7 +263,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -291,7 +301,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -327,7 +339,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -359,7 +373,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -391,7 +407,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -426,7 +444,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -456,7 +476,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
@@ -486,7 +508,9 @@ steps:
           - "auditbeat/build/*.json"
         plugins:
           - artifacts#v1.9.3:
-              download: "/root/go/pkg/mod"
+              download:
+                - from: root/go/pkg/mod
+                  to: /root/go/pkg/mod
               compressed: mod.tgz
           - test-collector#v1.10.2:
               files: "auditbeat/build/TEST-*.xml"
