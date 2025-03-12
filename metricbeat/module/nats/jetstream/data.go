@@ -151,16 +151,16 @@ type JetstreamStreamState struct {
 }
 
 type JetstreamConsumerDetail struct {
-	AckFloor          JetstreamConsumerAckFloor  `json:"ack_floor"`
-	Created           time.Time                  `json:"created"`
-	Delivered         JetstreamConsumerDelivered `json:"delivered"`
-	Name              string                     `json:"name"`
-	NumAckPending     int                        `json:"num_ack_pending"`
-	NumAckRedelivered int                        `json:"num_ack_redelivered"`
-	NumPending        int                        `json:"num_pending"`
-	NumWaiting        int                        `json:"num_waiting"`
-	StreamName        string                     `json:"stream_name"`
-	Timestamp         time.Time                  `json:"ts"`
+	AckFloor       JetstreamConsumerAckFloor  `json:"ack_floor"`
+	Created        time.Time                  `json:"created"`
+	Delivered      JetstreamConsumerDelivered `json:"delivered"`
+	Name           string                     `json:"name"`
+	NumAckPending  int                        `json:"num_ack_pending"`
+	NumRedelivered int                        `json:"num_redelivered"`
+	NumPending     int                        `json:"num_pending"`
+	NumWaiting     int                        `json:"num_waiting"`
+	StreamName     string                     `json:"stream_name"`
+	Timestamp      time.Time                  `json:"ts"`
 }
 
 type JetstreamConsumerDelivered struct {
@@ -257,7 +257,10 @@ func streamMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields map
 				Timestamp:       timestamp,
 			}
 
-			r.Event(event)
+			if !r.Event(event) {
+				fmt.Println("============= METRICSET WAS CLOSED ==============")
+				return nil
+			}
 		}
 	}
 
@@ -278,7 +281,7 @@ func consumerMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields m
 					"ack_consumer_seq":       consumer.AckFloor.ConsumerSequence,
 					"ack_stream_seq":         consumer.AckFloor.StreamSequence,
 					"num_ack_pending":        consumer.NumAckPending,
-					"num_ack_redelivered":    consumer.NumAckRedelivered,
+					"num_redelivered":        consumer.NumRedelivered,
 					"num_waiting":            consumer.NumWaiting,
 					"num_pending":            consumer.NumPending,
 					"ts":                     consumer.Timestamp,

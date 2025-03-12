@@ -30,10 +30,13 @@ import (
 const (
 	defaultScheme = "http"
 	// Ref: https://docs.nats.io/running-a-nats-service/nats_admin/monitoring#jetstream-information-jsz
+	// TODO: Make this configurable like the other metricsets
 	defaultPath = "/jsz"
 
-	statsMetricset    = "jetstream.stats"
-	streamMetricset   = "jetstream.stream"
+	statsMetricset = "jetstream.stats"
+	// TODO: This should allow you to specify a list of streams to monitor. Defaults to all.
+	streamMetricset = "jetstream.stream"
+	// TODO: This should allow you to specify a list of consumers to monitor. Defaults to all.
 	consumerMetricset = "jetstream.consumer"
 )
 
@@ -42,6 +45,12 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
+
+	detailLevel = map[string]string{
+		statsMetricset:    "",
+		streamMetricset:   "streams",
+		consumerMetricset: "consumers",
+	}
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -90,7 +99,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	http.SetURI(fmt.Sprintf("%s?consumers=true", http.GetURI()))
+	level := detailLevel[base.Name()]
+	if level != "" {
+		http.SetURI(fmt.Sprintf("%s?%s=true", http.GetURI(), level))
+	}
 
 	return &MetricSet{
 		base,
