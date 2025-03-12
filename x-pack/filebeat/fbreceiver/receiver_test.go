@@ -167,7 +167,7 @@ func BenchmarkFactory(b *testing.B) {
 	var zapLogs bytes.Buffer
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		zapcore.AddSync(&zapLogs),
+		zapcore.Lock(zapcore.AddSync(&zapLogs)),
 		zapcore.DebugLevel)
 
 	receiverSettings := receiver.Settings{}

@@ -53,16 +53,40 @@ type CheckReceiversParams struct {
 	AssertFunc func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool
 }
 
+// concurrentBuffer is a thread-safe buffer.
+type concurrentBuffer struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (b *concurrentBuffer) Write(p []byte) (n int, err error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.Write(p)
+}
+
+func (b *concurrentBuffer) Bytes() []byte {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.Bytes()
+}
+
+func (b *concurrentBuffer) String() string {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.String()
+}
+
 // CheckReceivers creates receivers using the provided configuration.
 func CheckReceivers(params CheckReceiversParams) {
 	t := params.T
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
 
-	var zapLogs bytes.Buffer
+	var zapLogs concurrentBuffer
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		zapcore.AddSync(&zapLogs),
+		zapcore.Lock(zapcore.AddSync(&zapLogs)),
 		zapcore.DebugLevel)
 
 	ctx := context.Background()
