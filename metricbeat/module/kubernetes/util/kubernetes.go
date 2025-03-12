@@ -118,19 +118,20 @@ const selector = "kubernetes"
 const StateMetricsetPrefix = "state_"
 
 const (
-	PodResource                   = "pod"
-	ServiceResource               = "service"
-	DeploymentResource            = "deployment"
-	ReplicaSetResource            = "replicaset"
-	StatefulSetResource           = "statefulset"
-	DaemonSetResource             = "daemonset"
-	JobResource                   = "job"
-	NodeResource                  = "node"
-	CronJobResource               = "cronjob"
-	PersistentVolumeResource      = "persistentvolume"
-	PersistentVolumeClaimResource = "persistentvolumeclaim"
-	StorageClassResource          = "storageclass"
-	NamespaceResource             = "state_namespace"
+	PodResource                     = "pod"
+	ServiceResource                 = "service"
+	DeploymentResource              = "deployment"
+	ReplicaSetResource              = "replicaset"
+	StatefulSetResource             = "statefulset"
+	DaemonSetResource               = "daemonset"
+	JobResource                     = "job"
+	NodeResource                    = "node"
+	CronJobResource                 = "cronjob"
+	PersistentVolumeResource        = "persistentvolume"
+	PersistentVolumeClaimResource   = "persistentvolumeclaim"
+	StorageClassResource            = "storageclass"
+	NamespaceResource               = "state_namespace"
+	HorizontalPodAutoscalerResource = "horizontalpodautoscaler"
 )
 
 func NewWatchers() *Watchers {
@@ -253,6 +254,12 @@ func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddReso
 		return []string{}
 	case NamespaceResource:
 		return []string{}
+	case HorizontalPodAutoscalerResource:
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	default:
 		return []string{}
 	}
