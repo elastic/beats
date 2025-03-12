@@ -467,9 +467,9 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	uniq_reg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
 
-	reg := b.Info.Monitoring.StateRegistry.GetRegistry("libbeat")
+	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
-		reg = b.Info.Monitoring.StateRegistry.NewRegistry("libbeat")
+		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
 	}
 
 	tel := uniq_reg.GetRegistry("state")
@@ -669,7 +669,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, api.NamespaceLookupFunc())
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -979,6 +979,17 @@ func (b *Beat) SetupRegistry() {
 		stateRegistry = monitoring.GetNamespace("state").GetRegistry()
 	}
 	b.Info.Monitoring.StateRegistry = stateRegistry
+
+	var statsRegistry *monitoring.Registry
+	if b.Info.Monitoring.Namespace != nil {
+		statsRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("stats")
+		if statsRegistry == nil {
+			statsRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("stats")
+		}
+	} else {
+		statsRegistry = monitoring.GetNamespace("stats").GetRegistry()
+	}
+	b.Info.Monitoring.StatsRegistry = statsRegistry
 }
 
 // handleFlags converts -flag to --flags, parses the command line
