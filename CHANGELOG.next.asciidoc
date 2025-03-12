@@ -341,6 +341,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 
 *Auditbeat*
 
