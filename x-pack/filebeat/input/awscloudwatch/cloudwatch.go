@@ -171,11 +171,11 @@ func (p *cloudwatchPoller) receive(ctx context.Context, logGroupIDs []string, cl
 	if p.config.StartPosition == LastSync {
 		state, err := p.stateHandler.GetState(p.config)
 		if err != nil {
-			p.log.Errorf("error retriving state from stateHandler: %v", err)
-			return
+			p.log.Errorf("error retriving state from stateHandler: %v, falling back to %s", err, Beginning)
+			startTime = time.Unix(0, 0)
+		} else {
+			startTime = time.UnixMilli(state.LastSyncEpoch)
 		}
-
-		startTime = time.UnixMilli(state.LastSyncEpoch)
 	}
 
 	for ctx.Err() == nil {
@@ -206,8 +206,7 @@ func (p *cloudwatchPoller) receive(ctx context.Context, logGroupIDs []string, cl
 		// Store the last sync timestamp
 		err := p.stateHandler.StoreState(p.config, StorableState{LastSyncEpoch: endTime.UnixMilli()})
 		if err != nil {
-			p.log.Errorf("error storing to stateHandler: %v", err)
-			return
+			p.log.Errorf("error storing state: %v, next sync(s) will continue without state storage support", err)
 		}
 	}
 }
