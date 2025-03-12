@@ -149,6 +149,18 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			m.Logger().Error(err)
 		}
 
+		podPrefix := ""
+
+		podNameValue, _ := e.MetricSetFields.GetValue("name")
+		if podName, ok := podNameValue.(string); ok {
+			podPrefix = util.ExtractWorkloadName(podName)
+		}
+
+		_, err = e.MetricSetFields.Put("prefix", podPrefix)
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
 		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
