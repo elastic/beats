@@ -109,17 +109,33 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	// The metrics from the parent v2.Context needs to be canceled otherwise
+	// there will be a set of metrics being published for this context by the
+	// HTTP monitoring endpoint. There would be an "empty registry", only with
+	// 'id' and 'input' and also the registries for the 'child' contexts being
+	// published. E.g.:
+	//  - registry from parent context:
+	//    - {"id": "my-cel-id", "input": "cel"}
+	//  - registry from child context:
+	//    - {"id": "my-cel-id::source-name", "input": "cel", [ ... ] }
+	ctx.UnregisterMetrics()
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
 		grp.Go(func() (err error) {
 			// refine per worker context
-			inpCtx := ctx.Clone()
-
-			// Preserve IDWithoutName, in case the context was constructed who knows how
-			inpCtx.IDWithoutName = ctx.ID
-			inpCtx.ID = ctx.ID + "::" + source.Name()
-			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
+			inpCtx := input.NewContext(
+				ctx.ID+"::"+source.Name(),
+				ctx.ID, // Preserve IDWithoutName, in case the context was constructed who knows how
+				ctx.Name,
+				ctx.Agent,
+				ctx.Cancelation,
+				ctx.StatusReporter,
+				ctx.Agent.Monitoring.Registry(),
+				ctx.Logger.With("input_source", source.Name()))
+			inpCtx.Cancelation = ctx.Cancelation
+			inpCtx.StatusReporter = ctx.StatusReporter
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
 				cancel()

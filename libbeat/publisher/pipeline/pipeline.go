@@ -180,7 +180,7 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 
 // ConnectWith create a new Client for publishing events to the pipeline.
 // The client behavior on close and ACK handling can be configured by setting
-// the appropriate fields in the passed ClientConfig.
+// the appropriate fields in provided ClientConfig.
 // If not set otherwise the default publish mode is OutputChooses.
 //
 // It is responsibility of the caller to close the client.

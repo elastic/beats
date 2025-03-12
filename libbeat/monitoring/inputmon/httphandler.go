@@ -71,8 +71,28 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 }
 
 func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
+	// 1st collect all input metrics explicitly registered by RegisterMetrics.
+	registeredInputRegistries := registeredInputs.CollectStructSnapshot()
+	filtered := make([]map[string]any, 0, len(registeredInputRegistries))
+	inputs := map[string]struct{}{}
+
+	for _, reg := range registeredInputRegistries {
+		if !requestedInput(reg["input"], requestedType) {
+			continue
+		}
+
+		// it should always succeed, but better safe than sorry.
+		id, ok := reg["id"].(string)
+		if !ok {
+			continue
+		}
+
+		inputs[id] = struct{}{}
+		filtered = append(filtered, reg)
+	}
+
+	// 2nd collect the metrics from globalRegistry()
 	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
-	filtered := make([]map[string]any, 0, len(metrics))
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
 		if !ok {
@@ -85,25 +105,16 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 			continue
 		}
 
+		// if a registry with this id has been already registered, skip it.
+		if _, found := inputs[id]; found {
+			continue
+		}
+
 		if !requestedInput(m["input"], requestedType) {
 			continue
 		}
 
-		// Registries using the new API have precedence.
-		if _, found := registeredInputs.Get(id); found {
-			continue
-		}
-
 		filtered = append(filtered, m)
-	}
-
-	registeredInputRegistries := registeredInputs.CollectStructSnapshot()
-	for _, reg := range registeredInputRegistries {
-		if !requestedInput(reg["input"], requestedType) {
-			continue
-		}
-
-		filtered = append(filtered, reg)
 	}
 
 	return filtered
@@ -119,6 +130,7 @@ func requestedInput(input any, requestedType string) bool {
 
 	return true
 }
+
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {
 	w.Header().Set(contentType, applicationJSON)
 	enc := json.NewEncoder(w)

@@ -150,28 +150,29 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 		reg = parentRegistry.NewRegistry(registryName)
 	}
 
-	uid := EnhanceInputRegistry(reg, inputID, inputType)
+	monitoring.NewString(reg, "input").Set(inputType)
+	monitoring.NewString(reg, "id").Set(inputID)
 
 	// Log the registration to ease tracking down duplicate ID registrations.
 	// Logged at INFO rather than DEBUG since it is not in a hot path and having
 	// the information available by default can short-circuit requests for debug
 	// logs during support interactions.
 	log := logp.NewLogger("metric_registry")
+
+	// Make an orthogonal ID to allow tracking register/deregister pairs.
+	var uid string
+	if rawID, err := uuid.NewV4(); err != nil {
+		log.Errorf("failed to register metrics for '%s', id: %s,: %v",
+			inputType, inputID, err)
+	} else {
+		uid = rawID.String()
+	}
 	log.Infow("registering", "input_type", inputType, "id", inputID, "key", registryName, "uuid", uid)
 
 	return reg, func() {
 		log.Infow("unregistering", "input_type", inputType, "id", inputID, "key", registryName, "uuid", uid)
 		parentRegistry.Remove(registryName)
 	}
-}
-
-func EnhanceInputRegistry(reg *monitoring.Registry, inputID string, inputType string) string {
-	monitoring.NewString(reg, "input").Set(inputType)
-	monitoring.NewString(reg, "id").Set(inputID)
-	// Make an orthogonal ID to allow tracking register/deregister pairs.
-	uid := uuid.Must(uuid.NewV4()).String()
-
-	return uid
 }
 
 func sanitizeID(id string) string {

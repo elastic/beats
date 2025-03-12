@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -64,8 +65,14 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	metrics := NewMetrics(ctx, inp.metricsID)
-	defer metrics.Close()
+	var reg *monitoring.Registry
+	if inp.metricsID != "" {
+		reg = ctx.MetricRegistry()
+	} else {
+		reg = monitoring.NewRegistry()
+	}
+
+	metrics := NewMetrics(reg)
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,

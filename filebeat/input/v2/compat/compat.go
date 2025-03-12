@@ -133,14 +133,20 @@ func (r *runner) Start() {
 	go func() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
-		ctx := v2.Context{
-			ID:             r.id,
-			IDWithoutName:  r.id,
-			Agent:          *r.agent,
-			Logger:         log,
-			Cancelation:    r.sig,
-			StatusReporter: r.statusReporter,
-		}
+		ctx := v2.NewContext(
+			r.id,
+			r.id,
+			r.input.Name(),
+			*r.agent,
+			r.sig,
+			r.statusReporter,
+			r.agent.Monitoring.Registry(),
+			log)
+		ctx.IDWithoutName = r.id
+		ctx.Agent = *r.agent
+		ctx.Cancelation = r.sig
+		ctx.StatusReporter = r.statusReporter
+
 		err := r.input.Run(
 			ctx,
 			r.connector,

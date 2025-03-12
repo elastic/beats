@@ -24,8 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -89,60 +87,83 @@ func TestMetricSnapshotJSON(t *testing.T) {
 		require.NoError(t, globalRegistry().Clear())
 	})
 
-	bInfo := beat.Info{}
-	bInfo.Monitoring.Namespace = monitoring.GetNamespace("beat")
+	// ============== Input using new API and unique namespace ==============
+	// Simulates input using the metrics registry from the v2.Context.
+	// It cannot use the v2.Context directly because it creates an import cycle.
+	inputID := "input-with-pipeline-metrics-new-inputAPI"
+	reg := monitoring.GetNamespace("beat-x").GetRegistry().
+		NewRegistry(inputID)
+	monitoring.NewString(reg, "id").Set(inputID)
+	monitoring.NewString(reg, "input").Set("test")
+	require.NoError(t, RegisterMetrics(inputID+"-test", reg), "could not register metrics")
+	monitoring.NewInt(reg, "foo1_total").Set(100)
+	monitoring.NewInt(reg, "events_pipeline_total").Set(100)
 
-	inputID := "input-with-pipeline-metrics"
-	ctx := v2.Context{
-		ID:    inputID,
-		Agent: bInfo,
-	}
+	// =========== Input using new API and legacy, global namespace ===========
+	// Simulates input unaware of the metrics registry from the v2.Context. In
+	// that case the parent context used by the v2.Context is the legacy
+	// globalRegistry() and the input also registers its metrics directly.
+	inputID = "input-with-pipeline-metrics-globalRegistry()"
+	reg = globalRegistry().NewRegistry(inputID)
+	monitoring.NewString(reg, "id").Set(inputID)
+	monitoring.NewString(reg, "input").Set("test")
+	// Explicitly register those metrics to be published.
+	require.NoError(t, RegisterMetrics(inputID+"-test", reg), "could not register metrics")
+	monitoring.NewInt(reg, "events_pipeline_total").Set(200)
 
-	// Metrics from the beat.Info namespace
-	r1 := ctx.EnhanceMetricRegistry(inputID, "test")
-	defer ctx.UnregisterMetrics()
-	require.NoError(t, RegisterMetrics(inputID, r1), "could not register metrics")
-	monitoring.NewInt(r1, "foo1_total").Set(100)
-	monitoring.NewInt(r1, "events_pipeline_total").Set(100)
+	// now the input also register its metrics with the deprecated
+	// NewInputRegistry.
+	reg, cancel := NewInputRegistry(
+		"test", inputID, nil)
+	defer cancel()
+	monitoring.NewInt(reg, "foo2_total").Set(100)
 
+	// ===== An input registering metrics, but not using the v2.Context =====
 	// an input registering metrics on the global namespace. This simulates an
-	// input without pipeline metrics reported for this input.
-	r2, cancel2 := NewInputRegistry(
-		"test", "input-without-pipeline-metrics", nil)
-	defer cancel2()
-	monitoring.NewInt(r2, "foo2_total").Set(100)
+	// input which does not use the metrics registry from the v2.Context.
+	inputOldAPI := "input-without-pipeline-metrics"
+	reg, cancel = NewInputRegistry(
+		"test", inputOldAPI, nil)
+	defer cancel()
+	monitoring.NewInt(reg, "foo2_total").Set(100)
 
+	// ==== registries in the global registries which aren't input metrics ===
 	// unrelated registry in the global namespace, should be ignored.
-	r3 := globalRegistry().NewRegistry("another-registry")
-	monitoring.NewInt(r3, "foo3_total").Set(100)
+	reg = globalRegistry().NewRegistry("another-registry")
+	monitoring.NewInt(reg, "foo3_total").Set(100)
 
 	// another input registry missing required information.
-	r4 := globalRegistry().NewRegistry("yet-another-registry")
-	monitoring.NewString(r4, "id").Set("some-id")
-	monitoring.NewInt(r4, "foo3_total").Set(100)
-
-	// a input with a duplicated ID, both registering metrics. The new API takes
-	// precedence, so this should be ignored.
-	r5 := globalRegistry().NewRegistry(inputID)
-	monitoring.NewString(r5, "id").Set(inputID)
-	monitoring.NewString(r5, "input").Set("legacy-metrics")
+	reg = globalRegistry().NewRegistry("yet-another-registry")
+	monitoring.NewString(reg, "id").Set("some-id")
+	monitoring.NewInt(reg, "foo3_total").Set(100)
 
 	jsonBytes, err := MetricSnapshotJSON()
 	require.NoError(t, err)
 
 	const expected = `[
   {
-    "foo2_total": 100,
-    "id": "input-without-pipeline-metrics",
+    "events_pipeline_total": 100,
+    "foo1_total": 100,
+    "id": "input-with-pipeline-metrics-new-inputAPI",
     "input": "test"
   },
   {
-    "events_pipeline_total": 100,
-    "foo1_total": 100,
-    "id": "input-with-pipeline-metrics",
+    "events_pipeline_total": 200,
+    "foo2_total": 100,
+    "id": "input-with-pipeline-metrics-globalRegistry()",
+    "input": "test"
+  },
+  {
+    "foo2_total": 100,
+    "id": "input-without-pipeline-metrics",
     "input": "test"
   }
 ]`
 
-	assert.Equal(t, expected, string(jsonBytes))
+	got := string(jsonBytes)
+	assert.Equal(t, expected, got)
+	// It's easier to understand the failure with the full output.
+	if t.Failed() {
+		t.Logf("API reponse:\n%s\n", got)
+	}
 }
