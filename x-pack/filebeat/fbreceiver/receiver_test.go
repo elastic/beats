@@ -7,7 +7,6 @@ package fbreceiver
 import (
 	"bytes"
 	"context"
-	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -115,16 +114,6 @@ func TestReceiverDefaultProcessors(t *testing.T) {
 			return true
 		},
 	})
-}
-
-func stringContainsAll(s string, want []string) bool {
-	for _, w := range want {
-		if !strings.Contains(s, w) {
-			return false
-		}
-	}
-
-	return true
 }
 
 func BenchmarkFactory(b *testing.B) {
