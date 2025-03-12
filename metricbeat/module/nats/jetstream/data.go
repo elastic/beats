@@ -258,7 +258,6 @@ func streamMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields map
 			}
 
 			if !r.Event(event) {
-				fmt.Println("============= METRICSET WAS CLOSED ==============")
 				return nil
 			}
 		}
@@ -300,7 +299,9 @@ func consumerMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields m
 					Timestamp:       timestamp,
 				}
 
-				r.Event(event)
+				if !r.Event(event) {
+					return nil
+				}
 			}
 		}
 	}
