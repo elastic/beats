@@ -465,16 +465,15 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		}
 	}
 
-	uniq_reg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
-
+	uniqReg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
 	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
 		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
 	}
 
-	tel := uniq_reg.GetRegistry("state")
+	tel := uniqReg.GetRegistry("state")
 	if tel == nil {
-		tel = uniq_reg.NewRegistry("state")
+		tel = uniqReg.NewRegistry("state")
 	}
 	monitors := pipeline.Monitors{
 		Metrics:   reg,

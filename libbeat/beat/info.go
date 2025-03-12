@@ -51,8 +51,9 @@ type Monitoring struct {
 	DefaultUsername string                // The default username to be used to connect to Elasticsearch Monitoring
 	Namespace       *monitoring.Namespace // a monitor namespace that is unique per beat instance
 
-	StateRegistry *monitoring.Registry
 	InfoRegistry  *monitoring.Registry
+	StateRegistry *monitoring.Registry
+	StatsRegistry *monitoring.Registry
 }
 
 func (i *Info) FQDNAwareHostname(useFQDN bool) string {
