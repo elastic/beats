@@ -49,7 +49,7 @@ func TestNewReceiver(t *testing.T) {
 				Config: &config,
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool {
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
 			_ = zapLogs
 			return len(logs["r1"]) > 0
 		},
