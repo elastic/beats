@@ -185,7 +185,7 @@ notice:
 python-env:
 	@test -f $(PYTHON_ENV)/bin/activate || ${PYTHON_EXE} -m venv $(VENV_PARAMS) $(PYTHON_ENV)
 	@. $(PYTHON_ENV)/bin/activate; \
-	${PYTHON_EXE} -m pip install -q --upgrade pip autopep8==1.5.4 pylint==2.4.4; \
+	${PYTHON_EXE} -m pip install -q --upgrade pip autopep8==2.3.1 pylint==2.4.4; \
 	find $(PYTHON_ENV) -type d -name dist-packages -exec sh -c "echo dist-packages > {}.pth" ';'
 	@# Work around pip bug. See: https://github.com/pypa/pip/issues/4464
 
