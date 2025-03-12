@@ -17,6 +17,7 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestNewReceiver(t *testing.T) {
@@ -54,7 +55,7 @@ func TestNewReceiver(t *testing.T) {
 				Config: &config,
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool {
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
 			_ = zapLogs
 			return len(logs["r1"]) == 1
 		},
@@ -96,27 +97,17 @@ func TestReceiverDefaultProcessors(t *testing.T) {
 				Config: &config,
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool {
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
 			if len(logs["r1"]) == 0 {
 				return false
 			}
 
-			wantKeywords := []string{
-				"Generated new processors",
-				"add_host_metadata",
-				"add_cloud_metadata",
-				"add_docker_metadata",
-				"add_kubernetes_metadata",
-			}
-
-			var processorsLoaded bool
-			for _, line := range strings.Split(string(zapLogs), "\n") {
-				if stringContainsAll(line, wantKeywords) {
-					processorsLoaded = true
-					break
-				}
-			}
-
+			processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
+				FilterMessageSnippet("add_host_metadata").
+				FilterMessageSnippet("add_cloud_metadata").
+				FilterMessageSnippet("add_docker_metadata").
+				FilterMessageSnippet("add_kubernetes_metadata").
+				Len() == 1
 			require.True(t, processorsLoaded, "processors not loaded")
 			// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 			require.Contains(t, logs["r1"][0].Flatten(), "host.architecture")
@@ -220,7 +211,7 @@ func TestMultipleReceivers(t *testing.T) {
 				Config: &config,
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool {
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
 			_ = zapLogs
 			return len(logs["r1"]) == 1 && len(logs["r2"]) == 1
 		},

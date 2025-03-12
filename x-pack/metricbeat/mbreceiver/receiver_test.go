@@ -8,7 +8,9 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestNewReceiver(t *testing.T) {
@@ -94,7 +96,7 @@ func TestMultipleReceivers(t *testing.T) {
 				Config: &config,
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool {
+		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
 			_ = zapLogs
 			return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 		},

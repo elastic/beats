@@ -19,7 +19,6 @@
 package oteltest
 
 import (
-	"bytes"
 	"context"
 	"sync"
 	"testing"
@@ -35,6 +34,8 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 type ReceiverConfig struct {
@@ -50,31 +51,7 @@ type CheckReceiversParams struct {
 	Receivers []ReceiverConfig
 	// AssertFunc is a function that asserts the test conditions.
 	// The function is called periodically until it returns true which ends the test.
-	AssertFunc func(t *testing.T, logs map[string][]mapstr.M, zapLogs []byte) bool
-}
-
-// concurrentBuffer is a thread-safe buffer.
-type concurrentBuffer struct {
-	mu  sync.Mutex
-	buf bytes.Buffer
-}
-
-func (b *concurrentBuffer) Write(p []byte) (n int, err error) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.buf.Write(p)
-}
-
-func (b *concurrentBuffer) Bytes() []byte {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.buf.Bytes()
-}
-
-func (b *concurrentBuffer) String() string {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.buf.String()
+	AssertFunc func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool
 }
 
 // CheckReceivers creates receivers using the provided configuration.
@@ -83,18 +60,19 @@ func CheckReceivers(params CheckReceiversParams) {
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
 
-	var zapLogs concurrentBuffer
-	core := zapcore.NewCore(
+	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		zapcore.Lock(zapcore.AddSync(&zapLogs)),
-		zapcore.DebugLevel)
+		&zaptest.Discarder{},
+		zapcore.DebugLevel,
+	)
+	observed, zapLogs := observer.New(zapcore.DebugLevel)
 
 	ctx := context.Background()
 	createReceiver := func(t *testing.T, name string, cfg component.Config) receiver.Logs {
 		t.Helper()
 
 		var receiverSettings receiver.Settings
-		receiverSettings.Logger = zap.New(core).Named(name)
+		receiverSettings.Logger = zap.New(zapcore.NewTee(zapCore, observed)).Named(name)
 
 		logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
 			for i := 0; i < ld.ResourceLogs().Len(); i++ {
@@ -112,12 +90,6 @@ func CheckReceivers(params CheckReceiversParams) {
 			return nil
 		})
 		assert.NoErrorf(t, err, "Error creating log consumer for %q", name)
-
-		t.Cleanup(func() {
-			if t.Failed() {
-				t.Logf("Logs for %q: %s\n", name, zapLogs.String())
-			}
-		})
 
 		r, err := params.Factory.CreateLogs(ctx, receiverSettings, cfg, logConsumer)
 		assert.NoErrorf(t, err, "Error creating receiver %q", name)
@@ -137,6 +109,6 @@ func CheckReceivers(params CheckReceiversParams) {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
-		return params.AssertFunc(t, logs, zapLogs.Bytes())
+		return params.AssertFunc(t, logs, zapLogs)
 	}, time.Minute, 100*time.Millisecond, "timeout waiting for assertion to pass")
 }
