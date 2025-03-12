@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
-
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"go.uber.org/zap/zaptest/observer"
 )
 
