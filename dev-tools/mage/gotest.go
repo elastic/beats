@@ -409,10 +409,6 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 		"-o", binArgs.Name + ".test",
 	}
 
-	if MOD == "vendor" {
-		args = append(args, "-mod=vendor")
-	}
-
 	if DevBuild {
 		// Disable optimizations (-N) and inlining (-l) for debugging.
 		args = append(args, `-gcflags=all=-N -l`)
