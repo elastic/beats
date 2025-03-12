@@ -15,12 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memlog
+package config
 
-import "os"
+import (
+	"flag"
+	"os"
+	"testing"
 
-// syncFile implements the fsync operation for Windows. Internally
-// FlushFileBuffers will be used.
-func syncFile(f *os.File) error {
-	return f.Sync() // stdlib already uses FlushFileBuffers, yay
+	"github.com/elastic/beats/v7/testing/testflag"
+)
+
+func TestMain(m *testing.M) {
+	testflag.MustSetStrictPermsFalse()
+
+	flag.Parse()
+
+	os.Exit(m.Run())
 }
