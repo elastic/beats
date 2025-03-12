@@ -3,6 +3,160 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-9.0.0-beta1]]
+=== Beats version 9.0.0-beta1
+https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Set default Kafka version to 2.1.0 in Kafka output and Filebeat. {pull}41662[41662]
+- Replace default Ubuntu-based images with UBI-minimal-based ones. {pull}42150[42150]
+- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
+
+*Filebeat*
+
+- Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
+- Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
+- Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
+- The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false`. {issue}40197[40197] {pull}41762[41762]
+- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be used when `allow_deprecated_use: true` is set in their configuration. {pull}42295[42295]
+
+*Osquerybeat*
+
+- Upgrade osquery version to 5.13.1. {pull}40849[40849]
+
+*Packetbeat*
+
+- Use base-16 for reporting `serial_number` value in TLS fields in line with the ECS recommendation. {pull}41542[41542]
+
+*Winlogbeat*
+
+- Default to use raw API and delete older XML implementation. {pull}42275[42275]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
+- Split common tty definitions. {pull}42004[42004]
+
+*Filebeat*
+
+- Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
+- Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
+- The `_id` generation process for S3 events has been updated to incorporate the LastModified field. This enhancement ensures that the `_id` is unique. {pull}42078[42078]
+- Fix truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size. {pull}42327[42327]
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
+
+*Metricbeat*
+
+- Fix bug where Metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
+- Remove `hostname` field from ZooKeeper's `mntr` data stream. {pull}41887[41887]
+
+*Packetbeat*
+
+- Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names. {pull}42116[42116]
+
+==== Added
+
+*Auditbeat*
+
+- Improve logging in system/socket. {pull}41571[41571]
+
+*Filebeat*
+
+- Added out of the box support for Amazon EventBridge notifications over SQS to S3 input. {pull}40006[40006]
+- Update CEL mito extensions to v1.16.0. {pull}41727[41727]
+- Filebeat's registry is now added to the Elastic-Agent diagnostics bundle. {issue}33238[33238] {pull}41795[41795]
+- Add `unifiedlogs` input for MacOS. {pull}41791[41791]
+- Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
+- Rate limiting operability improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
+- Rate limiting fault tolerance improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42094[42094]
+- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+- Journald input now can report its status to Elastic-Agent. {issue}39791[39791] {pull}42462[42462]
+- Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
+- Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR). {issue}40185[40185] {pull}42517[42517]
+- The journald input is now generally available. {pull}42107[42107]
+
+*Heartbeat*
+
+- Add support for RFC7231 methods to HTTP monitors. {pull}41975[41975]
+
+*Metricbeat*
+
+- Add `use_kubeadm` config option in kubernetes module in order to toggle kubeadm-config API requests. {pull}40086[40086]
+- Preserve queries for debugging when `merge_results: true` in SQL module. {pull}42271[42271]
+- Collect more fields from ES node/stats metrics and only those that are necessary. {pull}42421[42421]
+
+*Metricbeat*
+- Add benchmark module. {pull}41801[41801]
+
+*Osquerybeat*
+
+- Increase maximum query timeout to 24 hours. {pull}42356[42356]
+
+*Winlogbeat*
+
+- Properly set events `UserData` when experimental API is used. {pull}41525[41525]
+- Include XML is respected for experimental API. {pull}41525[41525]
+- Forwarded events use renderedtext info for experimental API. {pull}41525[41525]
+- Language setting is respected for experimental API. {pull}41525[41525]
+- Language setting also added to decode XML wineventlog processor. {pull}41525[41525]
+- Format embedded messages in the experimental API. {pull}41525[41525]
+- Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
+- Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
+- Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
+
+*Functionbeat*
+
+- Remove Functionbeat binaries from CI pipelines. {issue}40745[40745] {pull}41506[41506]
+
+
+[[release-notes-8.17.3]]
+=== Beats version 8.17.3
+https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Restored event Meta fields in the Elasticsearch output's error logs. {pull}42559[42559]
+
+*Filebeat*
+
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
+- Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
+- In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
+
+*Metricbeat*
+
+- Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
+- Only fetch cluster-level index stats summary. {issue}36019[36019] {pull}42901[42901]
+- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
+
+*Winlogbeat*
+
+- Sync missing changes in modules pipelines. {pull}42619[42619]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.22.12. {pull}42681[42681]
+
+*Filebeat*
+
+- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+- Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
+
+*Metricbeat*
+
+- Log every 401 response from Kubernetes API Server. {pull}42714[42714]
+- Collect more fields from ES node/stats metrics and only those that are necessary. {pull}42421[42421]
+
+
 [[release-notes-8.17.2]]
 === Beats version 8.17.2
 https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
@@ -178,6 +332,35 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 
 - Add handling for missing `EvtVarType`s in experimental API. {issue}19337[19337] {pull}41418[41418]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
+
+
+[[release-notes-8.16.5]]
+=== Beats version 8.16.5
+https://github.com/elastic/beats/compare/v8.16.4\...v8.16.5[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
+
+*Winlogbeat*
+
+- Sync missing changes in modules pipelines. {pull}42619[42619]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.22.12. {pull}42681[42681]
+
+*Filebeat*
+
+- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+
+*Metricbeat*
+
+- Log every 401 response from Kubernetes API Server. {pull}42714[42714]
 
 
 [[release-notes-8.16.4]]

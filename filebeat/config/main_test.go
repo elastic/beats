@@ -15,22 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || dragonfly || freebsd || netbsd || openbsd || solaris || aix
-
-package memlog
+package config
 
 import (
+	"flag"
 	"os"
+	"testing"
+
+	"github.com/elastic/beats/v7/testing/testflag"
 )
 
-// syncFile implements the fsync operation for most *nix systems.
-// The call is retried if EINTR or EAGAIN is returned.
-func syncFile(f *os.File) error {
-	// best effort.
-	for {
-		err := f.Sync()
-		if err == nil || !isRetryErr(err) {
-			return err
-		}
-	}
+func TestMain(m *testing.M) {
+	testflag.MustSetStrictPermsFalse()
+
+	flag.Parse()
+
+	os.Exit(m.Run())
 }

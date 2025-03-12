@@ -15,12 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memlog
+//go:build integration && linux
 
-import "os"
+package state_horizontalpodautoscaler
 
-// syncFile implements the fsync operation for Windows. Internally
-// FlushFileBuffers will be used.
-func syncFile(f *os.File) error {
-	return f.Sync() // stdlib already uses FlushFileBuffers, yay
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/test"
+)
+
+func TestFetchMetricset(t *testing.T) {
+	config := test.GetKubeStateMetricsConfig(t, "state_horizontalpodautoscaler")
+	metricSet := mbtest.NewFetcher(t, config)
+	events, errs := metricSet.FetchEvents()
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+	assert.NotEmpty(t, events)
 }

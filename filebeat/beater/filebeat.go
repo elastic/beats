@@ -329,7 +329,15 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 				return nil
 			}
 
-			stateStore.notifier.Notify(outCfg.Config())
+			// Create a new config with the output configuration. Since r.Config is a pointer, a copy is required to
+			// avoid concurrent map read and write.
+			// See https://github.com/elastic/beats/issues/42815
+			configCopy, err := conf.NewConfigFrom(outCfg.Config())
+			if err != nil {
+				logp.Err("Failed to create a new config from the output config: %v", err)
+				return nil
+			}
+			stateStore.notifier.Notify(configCopy)
 			return nil
 		})
 	}
