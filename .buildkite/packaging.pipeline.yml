@@ -8,8 +8,8 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
-  PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-  PLATFORMS_ARM: "linux/arm64"
+  PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
+  PLATFORMS_ARM: "+all linux/arm64"
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
@@ -115,17 +115,15 @@ steps:
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
-          - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/osquerybeat
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "SNAPSHOT: {{matrix}} docker Linux/arm64"
+      - label: "SNAPSHOT: {{matrix}} Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
-          PACKAGES: "docker"
           SNAPSHOT: true
           # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
@@ -152,9 +150,11 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
+          - x-pack/osquerybeat
+          - x-pack/agentbeat
 
       ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "SNAPSHOT: x-pack/agentbeat"
+      - label: "SNAPSHOT: x-pack/agentbeat all artifacts apart from linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
@@ -206,17 +206,15 @@ steps:
           - x-pack/auditbeat
           - x-pack/dockerlogbeat
           - x-pack/filebeat
-          - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/osquerybeat
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "STAGING: {{matrix}} docker Linux/arm64"
+      - label: "STAGING: {{matrix}} Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
-          PACKAGES: "docker"
           SNAPSHOT: false
           DEV: false
         command: |
@@ -244,9 +242,11 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
+          - x-pack/osquerybeat
+          - x-pack/agentbeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "STAGING: x-pack/agentbeat"
+      - label: "STAGING: x-pack/agentbeat all artifacts apart from linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
@@ -279,7 +279,7 @@ steps:
           - packaging-snapshot
           - dashboards-snapshot
         command: |
-          buildkite-agent artifact download "build/**/*" . 
+          buildkite-agent artifact download "build/**/*" .
           .buildkite/scripts/packaging/prepare-release-manager.sh snapshot
           .buildkite/scripts/dra.sh
         agents:
