@@ -83,6 +83,7 @@ steps:
     steps:
       - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Unit Tests"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -euo pipefail
           cd auditbeat
           mage build unitTest
