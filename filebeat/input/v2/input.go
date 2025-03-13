@@ -115,7 +115,9 @@ type Context struct {
 // by the HTTP monitoring endpoint. The metrics registry is created on
 // parentRegistry, if it's not nil, or on a new unregistered registry.
 func NewContext(
-	id, idWithoutName, inputType string,
+	id,
+	idWithoutName,
+	inputType string,
 	agent beat.Info,
 	cancelation Canceler,
 	statusReporter status.StatusReporter,
