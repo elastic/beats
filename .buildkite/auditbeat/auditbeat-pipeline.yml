@@ -109,6 +109,7 @@ steps:
 
       - label: ":rhel: Auditbeat: RHEL9 Unit Tests"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -euo pipefail
           cd auditbeat
           mage build unitTest
@@ -134,6 +135,7 @@ steps:
 
       - label: ":windows: Auditbeat: Win 2016 Unit Tests"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           Set-Location -Path auditbeat
           mage build unitTest
         retry:
@@ -160,6 +162,7 @@ steps:
 
       - label: ":windows: Auditbeat: Win 2022 Unit Tests"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           Set-Location -Path auditbeat
           mage build unitTest
         retry:
@@ -186,6 +189,7 @@ steps:
 
       - label: ":ubuntu: Auditbeat: Crosscompile"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           make -C auditbeat crosscompile
         retry:
           automatic:
