@@ -30,20 +30,34 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-type lookupFunc func(string) *monitoring.Namespace
+// RegistryLookupFunc is used for looking up specfic registry inside a namespace
+func RegistryLookupFunc(rootNamespace *monitoring.Namespace) LookupFunc {
+	return func(s string) *monitoring.Registry {
+		return rootNamespace.GetRegistry().GetRegistry(s)
+	}
+}
+
+// NamespaceLookupFunc is used for looking up root registry of a given namespace
+func NamespaceLookupFunc() LookupFunc {
+	return func(s string) *monitoring.Registry {
+		return monitoring.GetNamespace(s).GetRegistry()
+	}
+}
+
+type LookupFunc func(string) *monitoring.Registry
 
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *config.C, ns lookupFunc) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C, reg LookupFunc) (*Server, error) {
 	api, err := New(log, config)
 	if err != nil {
 		return nil, err
 	}
 
 	err = multierr.Combine(
-		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(ns("info")))),
-		api.AttachHandler("/state", makeAPIHandler(ns("state"))),
-		api.AttachHandler("/stats", makeAPIHandler(ns("stats"))),
-		api.AttachHandler("/dataset", makeAPIHandler(ns("dataset"))),
+		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(reg("info")))),
+		api.AttachHandler("/state", makeAPIHandler(reg("state"))),
+		api.AttachHandler("/stats", makeAPIHandler(reg("stats"))),
+		api.AttachHandler("/dataset", makeAPIHandler(reg("dataset"))),
 	)
 	if err != nil {
 		return nil, err
@@ -62,12 +76,12 @@ func makeRootAPIHandler(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func makeAPIHandler(ns *monitoring.Namespace) http.HandlerFunc {
+func makeAPIHandler(registry *monitoring.Registry) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		data := monitoring.CollectStructSnapshot(
-			ns.GetRegistry(),
+			registry,
 			monitoring.Full,
 			false,
 		)
