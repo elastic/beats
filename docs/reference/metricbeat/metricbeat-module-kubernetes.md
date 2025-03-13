@@ -277,6 +277,7 @@ metricbeat.modules:
     - state_persistentvolume
     - state_persistentvolumeclaim
     - state_storageclass
+    # - state_horizontalpodautoscaler
     # Uncomment this to get k8s events:
     #- event  period: 10s
   hosts: ["kube-state-metrics:8080"]
@@ -417,27 +418,5 @@ The following metricsets are available:
 * [state_storageclass](/reference/metricbeat/metricbeat-metricset-kubernetes-state_storageclass.md)
 * [system](/reference/metricbeat/metricbeat-metricset-kubernetes-system.md)
 * [volume](/reference/metricbeat/metricbeat-metricset-kubernetes-volume.md)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
