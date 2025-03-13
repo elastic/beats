@@ -44,6 +44,7 @@ steps:
     steps:
       - label: "Auditbeat: Run check/update"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -eo pipefail
           make -C auditbeat check update
           make check-no-changes
