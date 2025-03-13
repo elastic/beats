@@ -57,6 +57,8 @@ type CheckReceiversParams struct {
 // CheckReceivers creates receivers using the provided configuration.
 func CheckReceivers(params CheckReceiversParams) {
 	t := params.T
+	ctx := t.Context()
+
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
 
@@ -67,7 +69,6 @@ func CheckReceivers(params CheckReceiversParams) {
 	)
 	observed, zapLogs := observer.New(zapcore.DebugLevel)
 
-	ctx := context.Background()
 	createReceiver := func(t *testing.T, name string, cfg component.Config) receiver.Logs {
 		t.Helper()
 
