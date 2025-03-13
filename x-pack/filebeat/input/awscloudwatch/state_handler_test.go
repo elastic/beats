@@ -92,7 +92,7 @@ func Test_getID(t *testing.T) {
 			cfg: config{
 				LogGroupARN: "logGroupARN",
 			},
-			want: "filebeat::aws-cloudwatch::state::logGroupARN",
+			want: "filebeat::aws-cloudwatch::state::groupArn::logGroupARN",
 		},
 		{
 			name: "ID using Group Name",
@@ -100,7 +100,7 @@ func Test_getID(t *testing.T) {
 				LogGroupName: "logGroupName",
 				RegionName:   "region-A",
 			},
-			want: "filebeat::aws-cloudwatch::state::logGroupName::region-A",
+			want: "filebeat::aws-cloudwatch::state::groupName::logGroupName::region-A",
 		},
 		{
 			name: "ID using Group Name",
@@ -108,7 +108,7 @@ func Test_getID(t *testing.T) {
 				LogGroupNamePrefix: "groupPrefix",
 				RegionName:         "region-A",
 			},
-			want: "filebeat::aws-cloudwatch::state::groupPrefix::region-A",
+			want: "filebeat::aws-cloudwatch::state::groupPrefix::groupPrefix::region-A",
 		},
 		{
 			name:    "Invalid configuration results in an error",
