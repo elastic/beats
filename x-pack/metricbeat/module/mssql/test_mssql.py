@@ -11,6 +11,7 @@ MSSQL_STATUS_FIELDS = ["clients", "cluster", "cpu", "keyspace", "memory",
                        "persistence", "replication", "server", "stats"]
 
 
+@unittest.skip("flaky test suite: https://github.com/elastic/beats/issues/43100")
 class Test(XPackTest):
 
     COMPOSE_SERVICES = ['mssql']

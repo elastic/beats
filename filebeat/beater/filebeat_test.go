@@ -43,14 +43,14 @@ func TestFetchInputConfiguration(t *testing.T) {
   id: external-2
   paths:
     - "/another"
-`), 0777)
+`), 0644)
 	require.NoError(t, err)
 	err = os.WriteFile(filepath.Join(dir, "config2.yml.disabled"), []byte(`
 - type: filestream
   id: disabled
   paths:
     - "/some"
-`), 0777)
+`), 0644)
 	require.NoError(t, err)
 
 	cases := []struct {
