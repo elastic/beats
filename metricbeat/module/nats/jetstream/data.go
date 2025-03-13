@@ -37,10 +37,15 @@ var (
 	}
 
 	jetstreamStatsSchema = s.Schema{
-		"streams":   c.Int("streams"),
-		"consumers": c.Int("consumers"),
-		"messages":  c.Int("messages"),
-		"bytes":     c.Int("bytes"),
+		"streams":          c.Int("streams"),
+		"consumers":        c.Int("consumers"),
+		"messages":         c.Int("messages"),
+		"bytes":            c.Int("bytes"),
+		"memory":           c.Int("memory"),
+		"reserved_memory":  c.Int("reserved_memory"),
+		"storage":          c.Int("storage"),
+		"reserved_storage": c.Int("reserved_storage"),
+		"accounts":         c.Int("accounts"),
 		"config": s.Object{
 			"max_memory":    c.Int("max_memory"),
 			"max_storage":   c.Int("max_storage"),
@@ -64,10 +69,25 @@ var (
 			"last_seq":       c.Int("last_seq"),
 			"last_ts":        c.Time("last_ts"),
 			"consumer_count": c.Int("consumer_count"),
+			"num_deleted":    c.Int("num_deleted"),
+			"num_subjects":   c.Int("num_subjects"),
 		},
 		"account": s.Object{
 			"id":   c.Str("account_id"),
 			"name": c.Str("account_name"),
+		},
+		"config": s.Object{
+			"description":          c.Str("config_description"),
+			"retention":            c.Str("config_retention"),
+			"subjects":             c.Str("config_subjects"),
+			"num_replicas":         c.Int("config_num_replicas"),
+			"storage":              c.Str("config_storage"),
+			"max_consumers":        c.Int("config_max_consumers"),
+			"max_msgs":             c.Int("config_max_msgs"),
+			"max_bytes":            c.Int("config_max_bytes"),
+			"max_age":              c.Int("config_max_age"),
+			"max_msgs_per_subject": c.Int("config_max_msgs_per_subject"),
+			"max_msg_size":         c.Int("config_max_msg_size"),
 		},
 	}
 
@@ -83,10 +103,12 @@ var (
 		"delivered": s.Object{
 			"consumer_seq": c.Int("delivered_consumer_seq"),
 			"stream_seq":   c.Int("delivered_stream_seq"),
+			"last_active":  c.Time("delivered_last_active"),
 		},
 		"ack_floor": s.Object{
 			"consumer_seq": c.Int("ack_consumer_seq"),
 			"stream_seq":   c.Int("ack_stream_seq"),
+			"last_active":  c.Time("ack_last_active"),
 		},
 		"num_ack_pending": c.Int("num_ack_pending"),
 		"num_redelivered": c.Int("num_redelivered"),
@@ -97,18 +119,35 @@ var (
 			"id":   c.Str("account_id"),
 			"name": c.Str("account_name"),
 		},
+		"config": s.Object{
+			"durable_name":    c.Str("config_durable_name"),
+			"deliver_policy":  c.Str("config_deliver_policy"),
+			"filter_subject":  c.Str("config_filter_subject"),
+			"replay_policy":   c.Str("config_replay_policy"),
+			"ack_policy":      c.Str("config_ack_policy"),
+			"ack_wait":        c.Int("config_ack_wait"),
+			"max_deliver":     c.Int("config_max_deliver"),
+			"max_waiting":     c.Int("config_max_waiting"),
+			"max_ack_pending": c.Int("config_max_ack_pending"),
+			"num_replicas":    c.Int("config_num_replicas"),
+		},
 	}
 )
 
 type JetstreamResponse struct {
-	AccountDetails []JetstreamAccountDetails `json:"account_details"`
-	Bytes          int                       `json:"bytes"`
-	Config         JetstreamConfig           `json:"config,omitempty"`
-	Consumers      int                       `json:"consumers"`
-	Messages       int                       `json:"messages"`
-	Now            time.Time                 `json:"now"`
-	ServerID       string                    `json:"server_id"`
-	Streams        int                       `json:"streams"`
+	AccountDetails  []JetstreamAccountDetails `json:"account_details"`
+	Bytes           int                       `json:"bytes"`
+	Config          JetstreamConfig           `json:"config,omitempty"`
+	Consumers       int                       `json:"consumers"`
+	Messages        int                       `json:"messages"`
+	Now             time.Time                 `json:"now"`
+	ServerID        string                    `json:"server_id"`
+	Streams         int                       `json:"streams"`
+	Memory          int                       `json:"memory"`
+	Storage         int                       `json:"storage"`
+	ReservedMemory  int                       `json:"reserved_memory"`
+	ReservedStorage int                       `json:"reserved_storage"`
+	Accounts        int                       `json:"accounts"`
 }
 
 type JetstreamConfig struct {
@@ -134,6 +173,30 @@ type JetstreamStreamDetail struct {
 	Created   time.Time                  `json:"created"`
 	Name      string                     `json:"name"`
 	State     JetstreamStreamState       `json:"state"`
+	Config    JetstreamStreamConfig      `json:"config"`
+}
+
+type JetstreamStreamConfig struct {
+	Description           string   `json:"description"`
+	Retention             string   `json:"retention"`
+	Subjects              []string `json:"subjects"`
+	AllowRollupHeaders    bool     `json:"allow_rollup_hdrs"`
+	DenyPurge             bool     `json:"deny_purge"`
+	DenyDelete            bool     `json:"deny_delete"`
+	Sealed                bool     `json:"sealed"`
+	MirrorDirect          bool     `json:"mirror_direct"`
+	AllowDirect           bool     `json:"allow_direct"`
+	Compression           string   `json:"compression"`
+	DuplicateWindow       int      `json:"duplicate_window"`
+	NumReplicas           int      `json:"num_replicas"`
+	Storage               string   `json:"storage"`
+	MaxConsumers          int      `json:"max_consumers"`
+	MaxMsgs               int      `json:"max_msgs"`
+	MaxBytes              int      `json:"max_bytes"`
+	MaxAge                int      `json:"max_age"`
+	MaxMessagesPerSubject int      `json:"max_msgs_per_subject"`
+	MaxMessageSize        int      `json:"max_msg_size"`
+	Discard               string   `json:"discard"`
 }
 
 type JetstreamStreamClusterInfo struct {
@@ -148,11 +211,14 @@ type JetstreamStreamState struct {
 	LastSequence   int       `json:"last_seq"`
 	LastTimestamp  time.Time `json:"last_ts"`
 	Messages       int       `json:"messages"`
+	NumSubjects    int       `json:"num_subjects"`
+	NumDeleted     int       `json:"num_deleted"`
 }
 
 type JetstreamConsumerDetail struct {
 	AckFloor       JetstreamConsumerAckFloor  `json:"ack_floor"`
 	Created        time.Time                  `json:"created"`
+	Config         JetstreamConsumerConfig    `json:"config"`
 	Delivered      JetstreamConsumerDelivered `json:"delivered"`
 	Name           string                     `json:"name"`
 	NumAckPending  int                        `json:"num_ack_pending"`
@@ -163,14 +229,29 @@ type JetstreamConsumerDetail struct {
 	Timestamp      time.Time                  `json:"ts"`
 }
 
+type JetstreamConsumerConfig struct {
+	DurableName   string `json:"durable_name"`
+	DeliverPolicy string `json:"deliver_policy"`
+	AckPolicy     string `json:"ack_policy"`
+	AckWait       int    `json:"ack_wait"`
+	MaxDeliver    int    `json:"max_deliver"`
+	FilterSubject string `json:"filter_subject"`
+	ReplayPolicy  string `json:"replay_policy"`
+	MaxWaiting    int    `json:"max_waiting"`
+	MaxAckPending int    `json:"max_ack_pending"`
+	NumReplicas   int    `json:"num_replicas"`
+}
+
 type JetstreamConsumerDelivered struct {
-	ConsumerSequence int `json:"consumer_seq"`
-	StreamSequence   int `json:"stream_seq"`
+	ConsumerSequence int       `json:"consumer_seq"`
+	StreamSequence   int       `json:"stream_seq"`
+	LastActive       time.Time `json:"last_active"`
 }
 
 type JetstreamConsumerAckFloor struct {
-	ConsumerSequence int `json:"consumer_seq"`
-	StreamSequence   int `json:"stream_seq"`
+	ConsumerSequence int       `json:"consumer_seq"`
+	StreamSequence   int       `json:"stream_seq"`
+	LastActive       time.Time `json:"last_active"`
 }
 
 func eventMapping(m *MetricSet, r mb.ReporterV2, content []byte) error {
@@ -201,15 +282,20 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 	}
 
 	metricSetFields, err := jetstreamStatsSchema.Apply(map[string]interface{}{
-		"max_memory":    response.Config.MaxMemory,
-		"max_storage":   response.Config.MaxStorage,
-		"store_dir":     response.Config.StoreDir,
-		"sync_interval": response.Config.SyncInterval,
-		"compress_ok":   response.Config.ComrpessOk,
-		"streams":       response.Streams,
-		"consumers":     response.Consumers,
-		"messages":      response.Messages,
-		"bytes":         response.Bytes,
+		"max_memory":       response.Config.MaxMemory,
+		"max_storage":      response.Config.MaxStorage,
+		"store_dir":        response.Config.StoreDir,
+		"sync_interval":    response.Config.SyncInterval,
+		"compress_ok":      response.Config.ComrpessOk,
+		"streams":          response.Streams,
+		"consumers":        response.Consumers,
+		"messages":         response.Messages,
+		"bytes":            response.Bytes,
+		"memory":           response.Memory,
+		"storage":          response.Storage,
+		"reserved_memory":  response.ReservedMemory,
+		"reserved_storage": response.ReservedStorage,
+		"accounts":         response.Accounts,
 	})
 
 	if err != nil {
@@ -284,18 +370,31 @@ func streamMapping(r mb.ReporterV2, response JetstreamResponse, config Metricset
 			}
 
 			metricSetFields, err := jetstreamStreamSchema.Apply(map[string]interface{}{
-				"name":           stream.Name,
-				"created":        stream.Created,
-				"leader":         stream.Cluster.Leader,
-				"messages":       stream.State.Messages,
-				"bytes":          stream.State.Bytes,
-				"first_seq":      stream.State.FirstSequence,
-				"first_ts":       stream.State.FirstTimestamp,
-				"last_seq":       stream.State.LastSequence,
-				"last_ts":        stream.State.LastTimestamp,
-				"consumer_count": stream.State.ConsumerCount,
-				"account_id":     account.Id,
-				"account_name":   account.Name,
+				"name":                        stream.Name,
+				"created":                     stream.Created,
+				"leader":                      stream.Cluster.Leader,
+				"messages":                    stream.State.Messages,
+				"bytes":                       stream.State.Bytes,
+				"first_seq":                   stream.State.FirstSequence,
+				"first_ts":                    stream.State.FirstTimestamp,
+				"last_seq":                    stream.State.LastSequence,
+				"last_ts":                     stream.State.LastTimestamp,
+				"consumer_count":              stream.State.ConsumerCount,
+				"num_deleted":                 stream.State.NumDeleted,
+				"num_subjects":                stream.State.NumSubjects,
+				"account_id":                  account.Id,
+				"account_name":                account.Name,
+				"config_description":          stream.Config.Description,
+				"config_retention":            stream.Config.Retention,
+				"config_subjects":             stream.Config.Subjects,
+				"config_num_replicas":         stream.Config.NumReplicas,
+				"config_storage":              stream.Config.Storage,
+				"config_max_consumers":        stream.Config.MaxConsumers,
+				"config_max_msgs":             stream.Config.MaxMsgs,
+				"config_max_bytes":            stream.Config.MaxBytes,
+				"config_max_age":              stream.Config.MaxAge,
+				"config_max_msgs_per_subject": stream.Config.MaxMessagesPerSubject,
+				"config_max_msg_size":         stream.Config.MaxMessageSize,
 			})
 
 			if err != nil {
@@ -335,8 +434,10 @@ func consumerMapping(r mb.ReporterV2, response JetstreamResponse, config Metrics
 					"created":                consumer.Created,
 					"delivered_consumer_seq": consumer.Delivered.ConsumerSequence,
 					"delivered_stream_seq":   consumer.Delivered.StreamSequence,
+					"delivered_last_active":  consumer.Delivered.LastActive,
 					"ack_consumer_seq":       consumer.AckFloor.ConsumerSequence,
 					"ack_stream_seq":         consumer.AckFloor.StreamSequence,
+					"ack_last_active":        consumer.AckFloor.LastActive,
 					"num_ack_pending":        consumer.NumAckPending,
 					"num_redelivered":        consumer.NumRedelivered,
 					"num_waiting":            consumer.NumWaiting,
@@ -344,6 +445,16 @@ func consumerMapping(r mb.ReporterV2, response JetstreamResponse, config Metrics
 					"ts":                     consumer.Timestamp,
 					"account_id":             account.Id,
 					"account_name":           account.Name,
+					"config_durable_name":    consumer.Config.DurableName,
+					"config_deliver_policy":  consumer.Config.DeliverPolicy,
+					"config_filter_subject":  consumer.Config.FilterSubject,
+					"config_replay_policy":   consumer.Config.ReplayPolicy,
+					"config_ack_policy":      consumer.Config.AckPolicy,
+					"config_ack_wait":        consumer.Config.AckWait,
+					"config_max_deliver":     consumer.Config.MaxDeliver,
+					"config_max_waiting":     consumer.Config.MaxWaiting,
+					"config_max_ack_pending": consumer.Config.MaxAckPending,
+					"config_num_replicas":    consumer.Config.NumReplicas,
 				})
 
 				if err != nil {
