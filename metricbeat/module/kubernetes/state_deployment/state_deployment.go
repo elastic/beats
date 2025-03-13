@@ -118,7 +118,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	for _, event := range events {
 
-		e, err := util.CreateEvent(event, "kubernetes.deployment")
+		e, err := util.CreateEvent(event, "kubernetes.state_deployment")
 		if err != nil {
 			m.Logger().Error(err)
 		}

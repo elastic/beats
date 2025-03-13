@@ -116,7 +116,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Enrich(events)
 	for _, event := range events {
 
-		e, err := util.CreateEvent(event, "kubernetes.daemonset")
+		e, err := util.CreateEvent(event, "kubernetes.state_daemonset")
 		if err != nil {
 			m.Logger().Error(err)
 		}

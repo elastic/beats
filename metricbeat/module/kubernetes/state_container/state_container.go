@@ -210,7 +210,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			kubernetes.ShouldDelete(event, "image", m.Logger())
 		}
 
-		e, err := util.CreateEvent(event, "kubernetes.container")
+		e, err := util.CreateEvent(event, "kubernetes.state_container")
 		if err != nil {
 			m.Logger().Error(err)
 		}
