@@ -6,6 +6,8 @@ buildkite-agent artifact download "$name.tar.gz" . --build "$BUILDKITE_TRIGGERED
 
 mkdir -p $(go env GOMODCACHE)
 
+ls -alh $(go env GOMODCACHE)
+
 tar -xf "$name.tar.gz" -C $(go env GOMODCACHE)
 
 ls -alh $(go env GOMODCACHE)
