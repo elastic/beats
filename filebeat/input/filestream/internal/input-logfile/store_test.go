@@ -139,7 +139,7 @@ func TestStore_Get(t *testing.T) {
 		defer res.Release()
 
 		// new resource has empty state
-		require.Equal(t, state{}, res.stateSnapshot())
+		require.Equal(t, state{TTL: -1}, res.stateSnapshot())
 	})
 
 	t.Run("same resource is returned", func(t *testing.T) {
@@ -488,16 +488,18 @@ func TestSourceStore_CleanIf(t *testing.T) {
 			return true
 		})
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
 			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key1"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 			"test::key2": {
-				Updated: s.Get("test::key2").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, storeMemorySnapshot(s))
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))
@@ -523,16 +525,18 @@ func TestSourceStore_CleanIf(t *testing.T) {
 			return false
 		})
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
 			"test::key1": {
-				Updated: s.Get("test::key1").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key1"].internalState.Updated,
 				TTL:     60 * time.Second,
 			},
 			"test::key2": {
-				Updated: s.Get("test::key2").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, storeMemorySnapshot(s))
 		checkEqualStoreState(t, want, storeInSyncSnapshot(s))

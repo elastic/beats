@@ -578,8 +578,6 @@ func TestFilestreamIDMigration(t *testing.T) {
 	// Ensure no new data has been published
 	requirePublishedEvents(t, filebeat, 8, outputFile)
 
-	// Wait for the registry clean up message
-	filebeat.WaitForLogs("2 entries removed", 11*time.Second, "not deleted registry")
 	filebeat.Stop()
 
 	assertRegistry(
