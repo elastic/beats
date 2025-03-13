@@ -42,7 +42,7 @@ steps:
       - label: ":ubuntu: Heartbeat: Packaging Linux"
         key: "heartbeat-package-linux"
         env:
-          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
           .buildkite/scripts/packaging/packaging.sh heartbeat
         retry:
@@ -60,7 +60,7 @@ steps:
       - label: ":ubuntu: Heartbeat: Packaging Linux arm64"
         key: "heartbeat-package-linux-arm"
         env:
-          PLATFORMS: "+all linux/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh heartbeat
         retry:

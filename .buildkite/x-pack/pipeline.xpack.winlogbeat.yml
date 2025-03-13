@@ -28,7 +28,7 @@ steps:
       - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/winlogbeat
         retry:

@@ -8,8 +8,8 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
-  PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
-  PLATFORMS_ARM: "+all linux/arm64"
+  PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
+  PLATFORMS_ARM: "+all linux/arm64 darwin/arm64"
   RUN_STAGING: "true"
   RUN_SNAPSHOT: "true"
   DRA_BRANCH: "main"

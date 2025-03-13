@@ -47,7 +47,7 @@ steps:
       - label: ":ubuntu: Metricbeat: Packaging Linux"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
           .buildkite/scripts/packaging/packaging.sh metricbeat
         retry:
@@ -67,7 +67,7 @@ steps:
       - label: ":ubuntu: Metricbeat: Packaging Linux arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "+all linux/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh metricbeat
         retry:
