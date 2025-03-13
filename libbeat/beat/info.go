@@ -97,7 +97,7 @@ func (m *Monitoring) SetupRegistries() {
 
 		statsRegistry = reg.GetRegistry("stats")
 		if statsRegistry == nil {
-			statsRegistry = reg.GetRegistry("stats")
+			statsRegistry = reg.NewRegistry("stats")
 		}
 	} else {
 		infoRegistry = monitoring.GetNamespace("info").GetRegistry()
