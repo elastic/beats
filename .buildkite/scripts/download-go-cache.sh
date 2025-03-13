@@ -11,6 +11,6 @@ id
 ls -alh $(go env GOMODCACHE)
 
 echo "extracting cache archive to $(go env GOMODCACHE)"
-tar -xf "$name.tar.gz" -C $(go env GOMODCACHE)
+tar -xf "$name.tar.gz" --skip-old-files -C $(go env GOMODCACHE)
 
 ls -alh $(go env GOMODCACHE)
