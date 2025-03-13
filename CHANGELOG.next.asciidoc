@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 - Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 
 *Auditbeat*
 
@@ -217,6 +218,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
+- Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
 
 *Heartbeat*
 
@@ -254,6 +256,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 
 *Osquerybeat*
 
@@ -290,7 +293,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
-- Update to Go 1.23.6. {pull}42705[42705]
+- Update to Go 1.24.0. {pull}42705[42705]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 - Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
@@ -415,6 +418,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 
 *Auditbeat*
 
@@ -478,6 +482,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
 - Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
 - Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
