@@ -48,6 +48,7 @@ type Info struct {
 
 		StateRegistry *monitoring.Registry
 		InfoRegistry  *monitoring.Registry
+		StatsRegistry *monitoring.Registry
 	}
 	LogConsumer          consumer.Logs // otel log consumer
 	UseDefaultProcessors bool          // Whether to use the default processors

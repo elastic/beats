@@ -37,6 +37,7 @@ type apiValidator struct {
 	hmacKey            string
 	hmacType           string
 	hmacPrefix         string
+	maxBodySize        int64
 }
 
 func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) {
@@ -75,7 +76,11 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 
 		// We need access to the request body to validate the signature, but we
 		// must leave the body intact for future processing.
-		buf, err := io.ReadAll(r.Body)
+		body := io.Reader(r.Body)
+		if v.maxBodySize >= 0 {
+			body = io.LimitReader(body, v.maxBodySize)
+		}
+		buf, err := io.ReadAll(body)
 		if err != nil {
 			return http.StatusInternalServerError, fmt.Errorf("failed to read request body: %w", err)
 		}

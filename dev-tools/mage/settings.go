@@ -18,6 +18,7 @@
 package mage
 
 import (
+	_ "embed"
 	"errors"
 	"fmt"
 	"go/build"
@@ -33,6 +34,7 @@ import (
 	"github.com/magefile/mage/sh"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"gopkg.in/yaml.v3"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -83,6 +85,13 @@ var (
 	DevBuild  bool
 	FIPSBuild bool
 
+	//go:embed fips-settings.yaml
+	fipsConfigRaw []byte
+
+	FIPSConfig struct {
+		Beats []string
+	}
+
 	versionQualified bool
 	versionQualifier string
 
@@ -132,6 +141,13 @@ func init() {
 	FIPSBuild, err = strconv.ParseBool(EnvOr("FIPS", "false"))
 	if err != nil {
 		panic(fmt.Errorf("failed to parse FIPS env value: %w", err))
+	}
+
+	if FIPSBuild {
+		err := yaml.Unmarshal(fipsConfigRaw, &FIPSConfig)
+		if err != nil {
+			panic(fmt.Errorf("failed to parse FIPS config: %w", err))
+		}
 	}
 
 	versionQualifier, versionQualified = os.LookupEnv("VERSION_QUALIFIER")
@@ -186,6 +202,7 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 		"Snapshot":        Snapshot,
 		"DEV":             DevBuild,
 		"FIPS":            FIPSBuild,
+		"FIPSConfig":      FIPSConfig,
 		"Qualifier":       versionQualifier,
 		"CI":              CI,
 	}
@@ -221,6 +238,7 @@ VersionQualifier = {{.Qualifier}}
 PLATFORMS        = {{.PLATFORMS}}
 PACKAGES         = {{.PACKAGES}}
 CI               = {{.CI}}
+FIPSConfig       = {{.FIPSConfig}}
 
 ## Functions
 
@@ -459,7 +477,7 @@ func getBuildVariableSources() *BuildVariableSources {
 
 	panic(fmt.Errorf("magefile must call devtools.SetBuildVariableSources() "+
 		"because it is not an elastic beat (repo=%+v)", repo.RootImportPath))
-}
+} //nolint:typecheck // typecheck linter complains about missing return here, however this is unreachable code with the panic() above
 
 // BuildVariableSources is used to explicitly define what files contain build
 // variables and how to parse the values from that file. This removes ambiguity
