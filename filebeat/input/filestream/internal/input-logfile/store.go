@@ -392,6 +392,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 			// acquire the same lock we hold, causing a deadlock.
 			// See store.remove for details.
 			s.store.UpdateTTL(res, 0)
+			delete(s.store.ephemeralStore.table, res.key)
 			s.store.persistentStore.Remove(k)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
 		}
@@ -425,7 +426,6 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 		s.store.persistentStore.Remove(k)
 		res.Release()
 	}
-
 }
 
 type logInputState struct {
