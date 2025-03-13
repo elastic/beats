@@ -37,6 +37,7 @@ type config struct {
 	URL                   string                  `config:"url" validate:"required"`
 	Prefix                string                  `config:"prefix"`
 	ContentType           string                  `config:"content_type"`
+	MaxBodySize           *int64                  `config:"max_body_bytes"`
 	MaxInFlight           int64                   `config:"max_in_flight_bytes"`
 	RetryAfter            int                     `config:"retry_after"`
 	Program               string                  `config:"program"`
@@ -114,6 +115,10 @@ func (c *config) Validate() error {
 		}
 	} else if c.CRCSecret != "" {
 		return errors.New("crc.provider is required when crc.secret is defined")
+	}
+
+	if c.MaxBodySize != nil && *c.MaxBodySize < 0 {
+		return fmt.Errorf("max_body_bytes is negative: %d", *c.MaxBodySize)
 	}
 
 	return nil

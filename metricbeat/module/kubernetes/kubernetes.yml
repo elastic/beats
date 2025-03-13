@@ -137,3 +137,51 @@ metadata:
 spec:
   hard:
     configmaps: "99"
+---
+# needed for HPA integration tests
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hellohpa
+  labels:
+    app: hello-hpa
+spec:
+  selector:
+    matchLabels:
+      app: hello-hpa
+  template:
+    metadata:
+      labels:
+        app: hello-hpa
+    spec:
+      containers:
+      - name: hello-app
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/sh
+          - -c
+          - date; echo Hello from the Kubernetes cluster
+        resources:
+          requests:
+            cpu: 100m
+---
+# needed for HPA integration tests
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cpu
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hellohpa
+  minReplicas: 1
+  maxReplicas: 2
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 10
