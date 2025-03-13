@@ -469,7 +469,8 @@ func TestSourceStore_CleanIf(t *testing.T) {
 				TTL: 60 * time.Second,
 			},
 			"test::key2": {
-				TTL: 0 * time.Second,
+				TTL:     0 * time.Second,
+				Updated: time.Now(),
 			},
 		})
 		s := testOpenStore(t, "test", backend)
@@ -506,7 +507,8 @@ func TestSourceStore_CleanIf(t *testing.T) {
 				TTL: 60 * time.Second,
 			},
 			"test::key2": {
-				TTL: 0 * time.Second,
+				TTL:     0 * time.Second,
+				Updated: time.Now(),
 			},
 		})
 		s := testOpenStore(t, "test", backend)
