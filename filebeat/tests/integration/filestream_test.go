@@ -594,6 +594,8 @@ func TestFilestreamIDMigration(t *testing.T) {
 }
 
 func TestFilestreamIDMigrationDoesNotMigrateFileIdentity(t *testing.T) {
+	t.Skip("now we support migrating file identity" +
+		"when taking over state from other inputs")
 	oldID := "first-id"
 	newID := "second-id"
 

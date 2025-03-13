@@ -20,6 +20,7 @@ package filestream
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
@@ -199,7 +200,29 @@ func (p *fileProspector) Init(
 	}
 
 	// Last, but not least: migrate the state from an old ID to the current ID
-	prospectorStore.CopyStatesFromPreviousIDs(func(v loginp.Value) (string, interface{}) {
+	// prospectorStore.CopyStatesFromPreviousIDs(func(v loginp.Value) (string, interface{}) {
+	// 	var fm fileMeta
+	// 	err := v.UnpackCursorMeta(&fm)
+	// 	if err != nil {
+	// 		return "", nil
+	// 	}
+
+	// 	fd, ok := files[fm.Source]
+	// 	if !ok {
+	// 		return "", fm
+	// 	}
+
+	// 	if identifierName != fm.IdentifierName {
+	// 		p.logger.Infof("Identifier from '%s' does not match, won't migrate state", fm.Source)
+	// 		return "", fm
+	// 	}
+
+	// 	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+	// 	p.logger.Infof("Migrating input ID: '%s' -> '%s'", v.Key(), newKey)
+	// 	return newKey, fm
+	// })
+
+	prospectorStore.TakeOver(func(v loginp.Value) (string, interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -211,31 +234,58 @@ func (p *fileProspector) Init(
 			return "", fm
 		}
 
-		if identifierName != fm.IdentifierName {
-			p.logger.Infof("Identifier from '%s' does not match, won't migrate state", fm.Source)
-			return "", fm
-		}
-
-		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
-		p.logger.Infof("Migrating input ID: '%s' -> '%s'", v.Key(), newKey)
-		return newKey, fm
-	})
-
-	prospectorStore.TakeOverFromLogInput(func(v loginp.Value) (string, interface{}) {
-		var fm fileMeta
-		err := v.UnpackCursorMeta(&fm)
-		if err != nil {
+		// Return early (do nothing) if:
+		//  - The old identifier is neither native, path or fingerprint
+		oldIdentifierName := fm.IdentifierName
+		if !(oldIdentifierName == nativeName ||
+			oldIdentifierName == pathName ||
+			oldIdentifierName == fingerprintName) {
 			return "", nil
 		}
 
-		fd, ok := files[fm.Source]
+		// Our current file (source) is in the registry, now we need to ensure
+		// this registry entry (resource) actually refers to our file. Sources
+		// are identified by path, however as log files rotate the same path
+		// can point to different files.
+		//
+		// So to ensure we're dealing with the resource from our current file,
+		// we use the old identifier to generate a registry key for the current
+		// file we're trying to migrate, if this key matches with the key in the
+		// registry, then we proceed to update the registry.
+		// registryKey := v.Key()
+		oldIdentifier, ok := identifiersMap[oldIdentifierName]
 		if !ok {
+			// This should never happen, but just in case we properly handle it.
+			// If we cannot find the identifier, move on to the next entry
+			// some identifiers cannot be migrated
+			p.logger.Errorf(
+				"old file identity '%s' not found while migrating entry to"+
+					"new file identity '%s'. If the file still exists, it will be re-ingested",
+				oldIdentifierName,
+				identifierName,
+			)
+			return "", nil
+		}
+
+		fsEvent := loginp.FSEvent{
+			NewPath:    fm.Source,
+			Descriptor: fd,
+		}
+		split := strings.Split(v.Key(), "::")
+		if len(split) != 4 {
+			p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key())
+			return "", fm
+		}
+
+		previousIdentityID := oldIdentifier.GetSource(fsEvent).Name()
+		registryIdentityID := strings.Join(split[2:], "::")
+		if previousIdentityID != registryIdentityID {
 			return "", fm
 		}
 
 		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
 		fm.IdentifierName = identifierName
-		p.logger.Infof("Migrating input ID: '%s' -> '%s'", v.Key(), newKey)
+		p.logger.Infof("Taking over state: '%s' -> '%s'", v.Key(), newKey)
 		return newKey, fm
 	})
 

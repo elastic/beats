@@ -300,55 +300,134 @@ func (s *sourceStore) CopyStatesFromPreviousIDs(getNewID func(v Value) (string, 
 	s.updateIdentifiers(matchPreviousIdentifier, getNewID)
 }
 
-func (s *sourceStore) TakeOverFromLogInput(fn func(Value) (string, interface{})) {
-	// state := make(mapstr.M)
-	// This iterates through the WHOLE STORE
-
-	// statesToMigrate := map[string]mapstr.M{}
-	statesToMigrate := map[string]logInputState{}
-	s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
-		if strings.HasPrefix(key, "filebeat::logs::") {
-			// st := mapstr.M{}
-			tmp := mapstr.M{}
-			if err := value.Decode(&tmp); err != nil {
-				return true, err
+func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
+	matchPreviousFilestreamIDs := func(key string) bool {
+		for _, identifier := range s.previousIdentifiers {
+			if identifier.MatchesInput(key) {
+				return true
 			}
-			st := logInputStateFromMapM(tmp)
-			st.key = key
-			statesToMigrate[key] = st
 		}
 
-		return true, nil
-	})
+		return false
+	}
 
-	// Now that we have all the log inputs that match our input, we can migrate
+	// Iterate through the states from any Filestream input
+	fromFilestreamInput := map[string]struct{}{}
+	for key, res := range s.store.ephemeralStore.table {
+		fmt.Println("++++++++++++++++++++++++++++++", key)
+		if res.isDeleted() {
+			fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++", key, "REMOVED, skipping")
+			continue
+		}
 
-	// Modify the store, aka add the states to the ephemeral and persistent store
+		if !matchPreviousFilestreamIDs(key) {
+			continue
+		}
+
+		fromFilestreamInput[key] = struct{}{}
+	}
+
+	// Iterate through the whole store, no matter input type or input ID.
+	// That's the only way to access the log input states.
+	// We only iterate through the whole store if we're not migrating from
+	// a Filestream input
+	fromLogInput := map[string]logInputState{}
+	if len(fromFilestreamInput) == 0 {
+		s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
+			fmt.Println("==============================", key)
+			// Handle log input states
+			if strings.HasPrefix(key, "filebeat::logs::") {
+				// st := mapstr.M{}
+				tmp := mapstr.M{}
+				if err := value.Decode(&tmp); err != nil {
+					return true, err
+				}
+				st := logInputStateFromMapM(tmp)
+				st.key = key
+				fromLogInput[key] = st
+			}
+
+			return true, nil // Keep going
+		})
+	}
+
+	// Lock the ephemeral store to we can migrate the states in one go
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
-	// Iterate over all states we want to migrate
-	for k, v := range statesToMigrate {
-		fmt.Println("=====", k)
+	// Migrate all states from the Filestream input
+	for k := range fromFilestreamInput {
+		res := s.store.ephemeralStore.unsafeFind(k, false)
+		if res == nil {
+			// The resource does not exist or has been deleted.
+			// This should never happen, but better safe than sorry
+			continue
+		}
+
+		if !res.lock.TryLock() {
+			res.Release()
+			s.store.log.Infof("cannot lock '%s', will not migrate its state", k)
+			continue
+		}
+
+		newKey, updatedMeta := fn(res)
+		if len(newKey) > 0 {
+			// If the new key already exists in the store, do nothing.
+			// Unlock the resource and return
+			if res := s.store.ephemeralStore.unsafeFind(newKey, false); res != nil {
+				res.Release()
+				res.lock.Unlock()
+				continue
+			}
+
+			r := res.copyWithNewKey(newKey)
+			r.cursorMeta = updatedMeta
+			r.stored = false
+			// writeState only writes to the log file (disk)
+			// the write is synchronous
+			s.store.writeState(r)
+
+			// Add the new resource to the ephemeralStore so the rest of the
+			// codebase can have access to the new value
+			s.store.ephemeralStore.table[newKey] = r
+
+			// Remove the old key from the store aka delete. This is also
+			// synchronously written to the disk.
+			// We cannot use store.remove because it will
+			// acquire the same lock we hold, causing a deadlock.
+			// See store.remove for details.
+			s.store.UpdateTTL(res, 0)
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
+		}
+
+		res.Release()
+		res.lock.Unlock()
+	}
+
+	// Migrate all states from the Log input
+	for k, v := range fromLogInput {
+		fmt.Println("===== LOG =====", k)
+
 		// We need to call `fn` to get the new Key and Meta for the registry
 		newKey, updatedMeta := fn(v)
-		r := s.store.ephemeralStore.unsafeFind(newKey, true)
-		r.cursorMeta = updatedMeta
+
+		res := s.store.ephemeralStore.unsafeFind(newKey, true)
+		res.cursorMeta = updatedMeta
 		// Convert the offset to the correct type
-		r.cursor = struct {
+		res.cursor = struct {
 			Offset int64 `json:"offset" struct:"offset"`
 		}{
 			Offset: v.Offset,
 		}
 
 		// Write to disk
-		s.store.writeState(r)
+		s.store.writeState(res)
 
 		// Update in-memory store
-		s.store.ephemeralStore.table[newKey] = r
-		r.Release()
-
+		s.store.ephemeralStore.table[newKey] = res
+		res.Release()
 	}
+
 }
 
 type logInputState struct {

@@ -779,7 +779,7 @@ func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (strin
 // Noop for now
 func (m *mockStoreUpdater) CopyStatesFromPreviousIDs(getNewID func(v loginp.Value) (string, interface{})) {
 }
-func (m *mockStoreUpdater) TakeOverFromLogInput(func(v loginp.Value) (string, interface{})) {}
+func (m *mockStoreUpdater) TakeOver(func(v loginp.Value) (string, interface{})) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier
