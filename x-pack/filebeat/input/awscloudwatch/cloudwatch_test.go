@@ -107,7 +107,7 @@ func TestReceive(t *testing.T) {
 			logGroupIDs: []string{"a"},
 			startTime:   t1,
 			configOverrides: func(c *config) {
-				c.StartPosition = End
+				c.StartPosition = end
 			},
 			steps: []receiveTestStep{
 				{
@@ -128,7 +128,7 @@ func TestReceive(t *testing.T) {
 			logGroupIDs: []string{"a", "b"},
 			startTime:   t1,
 			configOverrides: func(c *config) {
-				c.StartPosition = End
+				c.StartPosition = end
 				c.Latency = time.Second
 			},
 			steps: []receiveTestStep{

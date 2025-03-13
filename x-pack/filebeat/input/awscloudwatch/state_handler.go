@@ -12,7 +12,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
-const statePrefix = "filebeat::aws-cloudwatch::state::"
+const (
+	statePrefix      = "filebeat::aws-cloudwatch::state::"
+	inputGroupArn    = "groupArn"
+	inputGroupName   = "groupName"
+	inputGroupPrefix = "groupPrefix"
+)
 
 type StorableState struct {
 	LastSyncEpoch int64 `json:"last_sync_epoch" struct:"last_sync_epoch"`
@@ -50,7 +55,7 @@ func (s *stateHandler) GetState(forCfg config) (StorableState, error) {
 
 	if !got {
 		// Set to Epoch Zero, which is as if start from beginning
-		return StorableState{LastSyncEpoch: 0}, err
+		return StorableState{LastSyncEpoch: 0}, nil
 	}
 
 	err = s.store.Get(id, &ss)
@@ -88,17 +93,17 @@ func (s *stateHandler) Close() {
 func generateID(forCfg config) (string, error) {
 	// first check group ARN
 	if forCfg.LogGroupARN != "" {
-		return fmt.Sprintf("%s%s", statePrefix, forCfg.LogGroupARN), nil
+		return fmt.Sprintf("%s%s::%s", statePrefix, inputGroupArn, forCfg.LogGroupARN), nil
 	}
 
 	// then fallback to log group name
 	if forCfg.LogGroupName != "" {
-		return fmt.Sprintf("%s%s::%s", statePrefix, forCfg.LogGroupName, forCfg.RegionName), nil
+		return fmt.Sprintf("%s%s::%s::%s", statePrefix, inputGroupName, forCfg.LogGroupName, forCfg.RegionName), nil
 	}
 
 	// finally fallback to log group prefix
 	if forCfg.LogGroupNamePrefix != "" {
-		return fmt.Sprintf("%s%s::%s", statePrefix, forCfg.LogGroupNamePrefix, forCfg.RegionName), nil
+		return fmt.Sprintf("%s%s::%s::%s", statePrefix, inputGroupPrefix, forCfg.LogGroupNamePrefix, forCfg.RegionName), nil
 	}
 
 	return "", fmt.Errorf("incorrect configurations received, missing log_group_arn, log_group_name and log_group_name_prefix properties")
