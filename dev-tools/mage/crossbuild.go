@@ -133,6 +133,7 @@ type crossBuildParams struct {
 func CrossBuild(options ...CrossBuildOption) error {
 	if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
 		log.Printf("Skipping cross-build for beat %q because it's not included in the FIPS-enabled beat list %v", BeatName, FIPSConfig.Beats)
+		return nil
 	}
 
 	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: CrossBuildImage}
