@@ -36,7 +36,9 @@ class Test(metricbeat.BaseTest):
   period: 1s
 """
 
-        with open(self.working_dir + "/configs/system.yml", 'w') as f:
+        fd = os.open(self.working_dir + "/configs/system.yml",
+                     os.O_WRONLY | os.O_CREAT, 0o644)
+        with os.fdopen(fd, 'w') as f:
             f.write(systemConfig)
 
         self.wait_until(lambda: self.output_lines() > 0)
@@ -68,8 +70,9 @@ class Test(metricbeat.BaseTest):
   metricsets: ["cpu"]
   period: 1s
 """
-
-        with open(config_path, 'w') as f:
+        fd = os.open(config_path,
+                     os.O_WRONLY | os.O_CREAT, 0o644)
+        with os.fdopen(fd, 'w') as f:
             f.write(systemConfig)
 
         # Ensure the module is started
@@ -106,7 +109,9 @@ class Test(metricbeat.BaseTest):
   metricsets: ["wrong_metricset"]
   period: 1s
 """
-        with open(config_path, 'w') as f:
+        fd = os.open(config_path,
+                     os.O_WRONLY | os.O_CREAT, 0o644)
+        with os.fdopen(fd, 'w') as f:
             f.write(systemConfig)
 
         exit_code = self.run_beat()
