@@ -160,6 +160,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 
 *Osquerybeat*
 
