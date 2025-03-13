@@ -353,8 +353,9 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 				Meta: testMeta{IdentifierName: "method"},
 			},
 			"test::key2": { // Deleted resource
-				TTL:  0 * time.Second,
-				Meta: testMeta{IdentifierName: "method"},
+				TTL:     0,
+				Meta:    testMeta{IdentifierName: "method"},
+				Updated: time.Now(),
 			},
 		})
 		s := testOpenStore(t, "test", backend)
@@ -382,23 +383,20 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 		var deletedState state
 		s.persistentStore.Get("test::key1", &deletedState)
 
+		s.ephemeralStore.mu.Lock()
 		want := map[string]state{
-			"test::key1": { // old resource is deleted, TTL must be zero
-				Updated: deletedState.Updated,
-				TTL:     0 * time.Second,
-				Meta:    map[string]interface{}{"identifiername": "method"},
-			},
 			"test::key2": { // Unchanged
-				Updated: s.Get("test::key2").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key2"].internalState.Updated,
 				TTL:     0 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "method"},
 			},
 			"test::key1::updated": { // Updated resource
-				Updated: s.Get("test::key1::updated").internalState.Updated,
+				Updated: s.ephemeralStore.table["test::key1::updated"].internalState.Updated,
 				TTL:     60 * time.Second,
 				Meta:    map[string]interface{}{"identifiername": "something"},
 			},
 		}
+		s.ephemeralStore.mu.Unlock()
 
 		checkEqualStoreState(t, want, backend.snapshot())
 	})
@@ -446,22 +444,19 @@ func TestSourceStoreCopyStatesFromPreviousIDs(t *testing.T) {
 	var deletedState state
 	s.persistentStore.Get("filestream::previous-id::key1", &deletedState)
 
+	s.ephemeralStore.mu.Lock()
 	want := map[string]state{
-		"filestream::previous-id::key1": { // old resource is deleted, TTL must be zero
-			Updated: deletedState.Updated,
-			TTL:     0 * time.Second,
-			Meta:    map[string]interface{}{"identifiername": "test-file-identity"},
-		},
 		"filestream::another-input::key2": { // Unchanged
 			TTL:  60 * time.Second,
 			Meta: map[string]interface{}{"identifiername": "test-file-identity"},
 		},
 		"filestream::current-id::key1": { // Updated resource
-			Updated: s.Get("filestream::current-id::key1").internalState.Updated,
+			Updated: s.ephemeralStore.table["filestream::current-id::key1"].internalState.Updated,
 			TTL:     60 * time.Second,
 			Meta:    map[string]interface{}{"identifiername": "test-file-identity"},
 		},
 	}
+	s.ephemeralStore.mu.Unlock()
 
 	checkEqualStoreState(t, want, backend.snapshot())
 }

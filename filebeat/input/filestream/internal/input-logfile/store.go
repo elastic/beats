@@ -227,14 +227,7 @@ func (s *sourceStore) updateIdentifiers(matchesInput matchesInputFn, getNewID ne
 		// they're actually removed from the in-memory registry (ephemeralStore)
 		// and marked as removed in the registry operations log. So we need
 		// to skip all entries that were soft deleted.
-		//
-		//  - res.internalState.TTL == 0: entry has been deleted
-		//  - res.internalState.TTL == -1: entry will never be removed by TTL
-		//  - res.internalState.TTL > 0: entry will be removed once its TTL
-		//    is reached
-		//
-		// If the entry has been deleted, skip it
-		if res.internalState.TTL == 0 {
+		if res.isDeleted() {
 			continue
 		}
 
@@ -270,7 +263,15 @@ func (s *sourceStore) updateIdentifiers(matchesInput matchesInputFn, getNewID ne
 			// We cannot use store.remove because it will
 			// acquire the same lock we hold, causing a deadlock.
 			// See store.remove for details.
+			// Fully remove the old resource from all stores.
+			//  - 1. Update the TLL, which soft-deletes it. This is the
+			//    mechanism used by store.remove. We cannot call store.remove
+			//    because it will acquire a lock we're holding.
+			//  - 2. Remove the resource from the in-memory store
+			//  - 3. Finally, synchronously remove it from the disk store.
 			s.store.UpdateTTL(res, 0)
+			delete(s.store.ephemeralStore.table, res.key)
+			s.store.persistentStore.Remove(res.key)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
 
@@ -314,6 +315,10 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 	// Iterate through the states from any Filestream input
 	fromFilestreamInput := map[string]struct{}{}
 	for key, res := range s.store.ephemeralStore.table {
+		// Entries in the registry are soft deleted, once the gcStore runs,
+		// they're actually removed from the in-memory registry (ephemeralStore)
+		// and marked as removed in the registry operations log. So we need
+		// to skip all entries that were soft deleted.
 		if res.isDeleted() {
 			continue
 		}
@@ -391,6 +396,12 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 			// We cannot use store.remove because it will
 			// acquire the same lock we hold, causing a deadlock.
 			// See store.remove for details.
+			// Fully remove the old resource from all stores.
+			//  - 1. Update the TLL, which soft-deletes it. This is the
+			//    mechanism used by store.remove. We cannot call store.remove
+			//    because it will acquire a lock we're holding.
+			//  - 2. Remove the resource from the in-memory store
+			//  - 3. Finally, synchronously remove it from the disk store.
 			s.store.UpdateTTL(res, 0)
 			delete(s.store.ephemeralStore.table, res.key)
 			s.store.persistentStore.Remove(k)
