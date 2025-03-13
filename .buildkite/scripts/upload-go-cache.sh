@@ -9,7 +9,7 @@ fi
 
 go mod download
 
-tar -czf "$name.tar.gz" $(go env GOMODCACHE)
+tar -czf "$name.tar.gz" -C $(go env GOMODCACHE) .
 
 buildkite-agent artifact upload "$name.tar.gz"
 
