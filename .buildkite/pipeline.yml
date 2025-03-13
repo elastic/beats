@@ -1,6 +1,12 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
+  - label: ":golang: cache dependencies"
+    command: |
+      .buildkite/scripts/upload-go-cache.sh
+
+  - wait: ~
+
   - label: "Trigger Auditbeat"
     if: build.pull_request.id != null
     plugins:
