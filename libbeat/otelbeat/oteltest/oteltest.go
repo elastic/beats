@@ -57,7 +57,7 @@ type CheckReceiversParams struct {
 // CheckReceivers creates receivers using the provided configuration.
 func CheckReceivers(params CheckReceiversParams) {
 	t := params.T
-	ctx := t.Context()
+	ctx := context.Background()
 
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
