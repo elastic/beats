@@ -173,6 +173,7 @@ logging.level: debug
 		celInputID:        2,
 		httpsjonInputID:   1,
 	}
+	wantInputMetricsCount := 4
 	var inputMetrics []inputMetric
 	var body []byte
 	errMsg := strings.Builder{}
@@ -204,10 +205,10 @@ logging.level: debug
 			return false
 		}
 
-		if len(inputMetrics) < len(totalEventsByInput) {
+		if len(inputMetrics) != wantInputMetricsCount {
 			errMsg.WriteString(
-				fmt.Sprintf("want at least %d inputs, got %d",
-					len(totalEventsByInput), len(inputMetrics)))
+				fmt.Sprintf("want %d inputs, got %d",
+					wantInputMetricsCount, len(inputMetrics)))
 			return false
 		}
 
@@ -295,7 +296,7 @@ logging.level: debug
 		assertions(t, inpMetric)
 	}
 	assert.Equalf(t, len(assertionsByInputID), count,
-		"%d assertions shlund have run, but only %d run",
+		"%d assertions should have run, but only %d run",
 		len(assertionsByInputID), count)
 }
 

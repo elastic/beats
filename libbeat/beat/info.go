@@ -65,8 +65,7 @@ func (i *Info) FQDNAwareHostname(useFQDN bool) string {
 }
 
 // Registry returns the monitoring registry from Namespace.
-// If Namespace isn't set, it returns a 'discard' registry, a registry which
-// belongs to no namespace.
+// If Namespace isn't set, it returns a registry associated to no namespace.
 func (m *Monitoring) Registry() *monitoring.Registry {
 	if m.Namespace == nil {
 		return monitoring.NewRegistry()

@@ -30,15 +30,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// TestNewContextParameters ensures when new fields are added to the v2.Contest
-// they also are added to the contractor or the decision of not doing so is
+// TestNewContextParameters ensures when new fields are added to the v2.Context
+// they also are added to the constructor, or the decision of not doing so is
 // explicit.
 func TestNewContextParameters(t *testing.T) {
 	ctx := NewContext(
-		"test-id",
-		"test-id-without-name",
-		"test-name",
-		beat.Info{Beat: "test-beat"},
+		"TestNewContextParameters",
+		"TestNewContextParameters",
+		"test-input",
+		beat.Info{},
 		context.Background(),
 		noopStatusReporter{},
 		monitoring.NewRegistry(),

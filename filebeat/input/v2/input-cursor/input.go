@@ -134,13 +134,12 @@ func (inp *managedInput) Run(
 				ctx.StatusReporter,
 				ctx.Agent.Monitoring.Registry(),
 				ctx.Logger.With("input_source", source.Name()))
+			// Unregister the metrics when input finishes running
+			defer inpCtx.UnregisterMetrics()
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
 				cancel()
 			}
-
-			// Input finished running, unregister the metrics
-			inpCtx.UnregisterMetrics()
 			return err
 		})
 	}

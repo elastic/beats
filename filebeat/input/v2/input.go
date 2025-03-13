@@ -147,10 +147,6 @@ func NewContext(
 			inputType, id, err)
 	}
 
-	// Log the registration to ease tracking down duplicate ID registrations.
-	// Logged at INFO rather than DEBUG since it is not in a hot path and having
-	// the information available by default can short-circuit requests for debug
-	// logs during support interactions.
 	metricsLog := logp.NewLogger("metric_registry")
 	var uid string
 	if uidv4, err := uuid.NewV4(); err != nil {
@@ -161,6 +157,10 @@ func NewContext(
 		uid = uidv4.String()
 	}
 
+	// Log the registration to ease tracking down duplicate ID registrations.
+	// Logged at INFO rather than DEBUG since it is not in a hot path and having
+	// the information available by default can short-circuit requests for debug
+	// logs during support interactions.
 	metricsLog.Infow("registering",
 		"input_type", inputType,
 		"id", id,

@@ -142,6 +142,8 @@ func (r *runner) Start() {
 			r.statusReporter,
 			r.agent.Monitoring.Registry(),
 			log)
+		// Unregister the metrics when input finishes running
+		defer ctx.UnregisterMetrics()
 
 		err := r.input.Run(
 			ctx,
@@ -152,9 +154,6 @@ func (r *runner) Start() {
 		} else {
 			log.Infof("Input '%s' stopped (goroutine)", name)
 		}
-
-		// Input finished running, unregister the metrics
-		ctx.UnregisterMetrics()
 	}()
 }
 
