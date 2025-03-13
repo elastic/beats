@@ -392,6 +392,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 			// acquire the same lock we hold, causing a deadlock.
 			// See store.remove for details.
 			s.store.UpdateTTL(res, 0)
+			s.store.persistentStore.Remove(k)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
 		}
 
@@ -406,6 +407,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 		// We need to call `fn` to get the new Key and Meta for the registry
 		newKey, updatedMeta := fn(v)
 
+		// Find or create a resource. It should always create a new one.
 		res := s.store.ephemeralStore.unsafeFind(newKey, true)
 		res.cursorMeta = updatedMeta
 		// Convert the offset to the correct type
@@ -420,6 +422,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 
 		// Update in-memory store
 		s.store.ephemeralStore.table[newKey] = res
+		s.store.persistentStore.Remove(k)
 		res.Release()
 	}
 
@@ -589,24 +592,7 @@ func (s *states) Find(key string, create bool) *resource {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if resource := s.table[key]; resource != nil && !resource.isDeleted() {
-		resource.Retain()
-		return resource
-	}
-
-	if !create {
-		return nil
-	}
-
-	// resource is owned by table(session) and input that uses the resource.
-	resource := &resource{
-		stored: false,
-		key:    key,
-		lock:   unison.MakeMutex(),
-	}
-	s.table[key] = resource
-	resource.Retain()
-	return resource
+	return s.unsafeFind(key, create)
 }
 
 // unsafeFind DOES NOT LOCK THE STORE!!! Only call unsafeFind if you're
@@ -632,6 +618,10 @@ func (s *states) unsafeFind(key string, create bool) *resource {
 		key:    key,
 		lock:   unison.MakeMutex(),
 	}
+	// -1 means this resource will not be cleaned up due to a timeout.
+	// The zero-value for internalState.TTL means this resource is
+	// soft-deleted.
+	resource.internalState.TTL = -1
 	s.table[key] = resource
 	resource.Retain()
 	return resource
