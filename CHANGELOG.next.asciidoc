@@ -31,7 +31,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Redis: Added replication role as a field to submitted slowlogs
 - Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
-
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Heartbeat*
 
