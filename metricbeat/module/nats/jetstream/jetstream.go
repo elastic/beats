@@ -96,9 +96,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	maxResults := config.Jetstream.MaxResults
+	if maxResults == 0 {
+		maxResults = 1024
+	}
+	http.SetURI(fmt.Sprintf("%s?limit=%d&config=true", http.GetURI(), maxResults))
+
 	level := detailLevel[base.Name()]
 	if level != "" {
-		http.SetURI(fmt.Sprintf("%s?%s=true&config=true", http.GetURI(), level))
+		http.SetURI(fmt.Sprintf("%s&%s=true", http.GetURI(), level))
 	}
 
 	return &MetricSet{
