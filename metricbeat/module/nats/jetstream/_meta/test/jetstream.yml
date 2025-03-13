@@ -1,0 +1,17 @@
+metricbeat.modules:
+- module: nats
+  metricsets:
+    - jetstream.stream
+  period: 5s
+  hosts: ["https://demo.nats.io:8222"]
+
+  jetstream:
+    stream:
+      names:
+        - KV_nlp_cache
+    #consumer:
+    #  names:
+    #    - some-consumer
+
+output.console:
+  pretty: true

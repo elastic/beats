@@ -5,9 +5,14 @@ type ModuleConfig struct {
 }
 
 type MetricsetConfig struct {
-	Stream StreamConfig `config:"stream"`
+	Stream   StreamConfig   `config:"stream"`
+	Consumer ConsumerConfig `config:"consumer"`
 }
 
 type StreamConfig struct {
+	Names []string `config:"names"`
+}
+
+type ConsumerConfig struct {
 	Names []string `config:"names"`
 }

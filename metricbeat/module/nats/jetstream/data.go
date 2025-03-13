@@ -187,7 +187,7 @@ func eventMapping(m *MetricSet, r mb.ReporterV2, content []byte) error {
 	case streamMetricset:
 		return streamMapping(r, response, m.Config)
 	case consumerMetricset:
-		return consumerMapping(r, response)
+		return consumerMapping(r, response, m.Config)
 	default:
 		return nil
 	}
@@ -228,22 +228,55 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 	return nil
 }
 
-func streamMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
-	streamFilters := map[string]bool{}
+func filterStreams(streams []JetstreamStreamDetail, config MetricsetConfig) []JetstreamStreamDetail {
+	// No filters. Return all.
+	if len(config.Stream.Names) == 0 {
+		return streams
+	}
 
+	// Put into map for faster lookup
+	streamFilters := map[string]bool{}
 	for _, name := range config.Stream.Names {
 		streamFilters[name] = true
 	}
 
+	filtered := make([]JetstreamStreamDetail, 0)
+
+	for _, stream := range streams {
+		if streamFilters[stream.Name] {
+			filtered = append(filtered, stream)
+		}
+	}
+
+	return filtered
+}
+
+func filterConsumers(consumers []JetstreamConsumerDetail, config MetricsetConfig) []JetstreamConsumerDetail {
+	// No filters. Return all.
+	if len(config.Consumer.Names) == 0 {
+		return consumers
+	}
+
+	// Put into map for faster lookup
+	consumerFilters := map[string]bool{}
+	for _, name := range config.Consumer.Names {
+		consumerFilters[name] = true
+	}
+
+	filtered := make([]JetstreamConsumerDetail, 0)
+
+	for _, consumer := range consumers {
+		if consumerFilters[consumer.Name] {
+			filtered = append(filtered, consumer)
+		}
+	}
+
+	return filtered
+}
+
+func streamMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
 	for _, account := range response.AccountDetails {
-		for _, stream := range account.StreamDetails {
-
-			if len(streamFilters) > 0 {
-				if !streamFilters[stream.Name] {
-					continue
-				}
-			}
-
+		for _, stream := range filterStreams(account.StreamDetails, config) {
 			moduleFields, timestamp, err := getSharedEventDetails(response)
 
 			if err != nil {
@@ -285,10 +318,10 @@ func streamMapping(r mb.ReporterV2, response JetstreamResponse, config Metricset
 	return nil
 }
 
-func consumerMapping(r mb.ReporterV2, response JetstreamResponse) error {
+func consumerMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
 	for _, account := range response.AccountDetails {
-		for _, stream := range account.StreamDetails {
-			for _, consumer := range stream.Consumers {
+		for _, stream := range filterStreams(account.StreamDetails, config) {
+			for _, consumer := range filterConsumers(stream.Consumers, config) {
 				moduleFields, timestamp, err := getSharedEventDetails(response)
 
 				if err != nil {
