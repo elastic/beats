@@ -158,11 +158,17 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	settings := struct {
 		// All those values are duplicated from the Filestream configuration
 		ID                 string        `config:"id"`
-		PreviousIDs        []string      `config:"previous_ids"`
 		CleanInactive      time.Duration `config:"clean_inactive"`
 		HarvesterLimit     uint64        `config:"harvester_limit"`
 		AllowIDDuplication bool          `config:"allow_deprecated_id_duplication"`
-	}{CleanInactive: cim.DefaultCleanTimeout}
+		TakeOver           struct {
+			Enabled bool     `config:"enabled"`
+			FromIDs []string `config:"from_ids"`
+		} `config:"take_over"`
+	}{
+		CleanInactive: cim.DefaultCleanTimeout,
+	}
+
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
@@ -227,16 +233,18 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	}
 
 	var previousSrcIdentifiers []*sourceIdentifier
-	for _, id := range settings.PreviousIDs {
-		si, err := newSourceIdentifier(cim.Type, id)
-		if err != nil {
-			return nil,
-				fmt.Errorf(
-					"[ID: %q] error while creating source identifier for previous ID %q: %w",
-					settings.ID, id, err)
-		}
+	if settings.TakeOver.Enabled {
+		for _, id := range settings.TakeOver.FromIDs {
+			si, err := newSourceIdentifier(cim.Type, id)
+			if err != nil {
+				return nil,
+					fmt.Errorf(
+						"[ID: %q] error while creating source identifier for previous ID %q: %w",
+						settings.ID, id, err)
+			}
 
-		previousSrcIdentifiers = append(previousSrcIdentifiers, si)
+			previousSrcIdentifiers = append(previousSrcIdentifiers, si)
+		}
 	}
 
 	pStore := cim.getRetainedStore()

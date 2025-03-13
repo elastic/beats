@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -36,7 +37,6 @@ type config struct {
 	Reader readerConfig `config:",inline"`
 
 	ID           string          `config:"id"`
-	PreviousIDs  []string        `config:"previous_ids"`
 	Paths        []string        `config:"paths"`
 	Close        closerConfig    `config:"close"`
 	FileWatcher  *conf.Namespace `config:"prospector"`
@@ -49,11 +49,16 @@ type config struct {
 	IgnoreOlder    time.Duration      `config:"ignore_older"`
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
-	TakeOver       bool               `config:"take_over"`
+	TakeOver       takeOverConfig     `config:"take_over"`
 
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`
+}
+
+type takeOverConfig struct {
+	Enabled bool     `config:"enabled"`
+	FromIDs []string `config:"from_ids"`
 }
 
 type closerConfig struct {
@@ -152,6 +157,11 @@ func (c *config) Validate() error {
 			"setting `allow_deprecated_id_duplication` will lead to data " +
 				"duplication and incomplete input metrics, it's use is " +
 				"highly discouraged.")
+	}
+
+	if c.AllowIDDuplication && c.TakeOver.Enabled {
+		return errors.New("allow_deprecated_id_duplication and take_over " +
+			"cannot be eanbled at the same time")
 	}
 
 	return nil

@@ -79,6 +79,7 @@ type fileProspector struct {
 	ignoreInactiveSince ignoreInactiveType
 	cleanRemoved        bool
 	stateChangeCloser   stateChangeCloserConfig
+	takeOver            takeOverConfig
 }
 
 func (p *fileProspector) Init(
@@ -197,6 +198,11 @@ func (p *fileProspector) Init(
 
 			return newKey, fm
 		})
+	}
+
+	// Last, but not least, take over states if needed/enabled.
+	if !p.takeOver.Enabled {
+		return nil
 	}
 
 	// Take over states from other Filestream inputs or the log input

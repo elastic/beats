@@ -347,11 +347,11 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Err("invalid filestream configuration: %+v", err)
 		return err
 	}
-	err = processLogInputTakeOver(stateStore, config)
-	if err != nil {
-		logp.Err("Failed to attempt filestream state take over: %+v", err)
-		return err
-	}
+	// err = processLogInputTakeOver(stateStore, config)
+	// if err != nil {
+	// 	logp.Err("Failed to attempt filestream state take over: %+v", err)
+	// 	return err
+	// }
 
 	// Setup registrar to persist state
 	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout)
