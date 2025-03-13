@@ -2,7 +2,7 @@
 
 name=$(sha256sum go.mod | head -c 40)
 
-if ! buildkite-agent artifact search "$name.tar.gz"; then
+if buildkite-agent artifact search "$name.tar.gz"; then
 	echo "cache already up to date."
 	exit 0
 fi
