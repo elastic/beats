@@ -22,8 +22,13 @@ type ModuleConfig struct {
 }
 
 type MetricsetConfig struct {
+	Account  AccountConfig  `config:"account"`
 	Stream   StreamConfig   `config:"stream"`
 	Consumer ConsumerConfig `config:"consumer"`
+}
+
+type AccountConfig struct {
+	Names []string `config:"names"`
 }
 
 type StreamConfig struct {

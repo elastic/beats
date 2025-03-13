@@ -134,6 +134,10 @@ var (
 	}
 )
 
+type NamedItem interface {
+	GetName() string
+}
+
 type JetstreamResponse struct {
 	AccountDetails  []JetstreamAccountDetails `json:"account_details"`
 	Bytes           int                       `json:"bytes"`
@@ -167,6 +171,10 @@ type JetstreamAccountDetails struct {
 	StreamDetails []JetstreamStreamDetail `json:"stream_detail"`
 }
 
+func (me JetstreamAccountDetails) GetName() string {
+	return me.Name
+}
+
 type JetstreamStreamDetail struct {
 	Cluster   JetstreamStreamClusterInfo `json:"cluster"`
 	Consumers []JetstreamConsumerDetail  `json:"consumer_detail"`
@@ -174,6 +182,10 @@ type JetstreamStreamDetail struct {
 	Name      string                     `json:"name"`
 	State     JetstreamStreamState       `json:"state"`
 	Config    JetstreamStreamConfig      `json:"config"`
+}
+
+func (me JetstreamStreamDetail) GetName() string {
+	return me.Name
 }
 
 type JetstreamStreamConfig struct {
@@ -227,6 +239,10 @@ type JetstreamConsumerDetail struct {
 	NumWaiting     int                        `json:"num_waiting"`
 	StreamName     string                     `json:"stream_name"`
 	Timestamp      time.Time                  `json:"ts"`
+}
+
+func (me JetstreamConsumerDetail) GetName() string {
+	return me.Name
 }
 
 type JetstreamConsumerConfig struct {
@@ -314,46 +330,22 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 	return nil
 }
 
-func filterStreams(streams []JetstreamStreamDetail, config MetricsetConfig) []JetstreamStreamDetail {
+func filterByName[T NamedItem](collection []T, allowedValues []string) []T {
 	// No filters. Return all.
-	if len(config.Stream.Names) == 0 {
-		return streams
+	if len(allowedValues) == 0 {
+		return collection
 	}
 
 	// Put into map for faster lookup
-	streamFilters := map[string]bool{}
-	for _, name := range config.Stream.Names {
-		streamFilters[name] = true
+	filters := map[string]bool{}
+	for _, val := range allowedValues {
+		filters[val] = true
 	}
 
-	filtered := make([]JetstreamStreamDetail, 0)
-
-	for _, stream := range streams {
-		if streamFilters[stream.Name] {
-			filtered = append(filtered, stream)
-		}
-	}
-
-	return filtered
-}
-
-func filterConsumers(consumers []JetstreamConsumerDetail, config MetricsetConfig) []JetstreamConsumerDetail {
-	// No filters. Return all.
-	if len(config.Consumer.Names) == 0 {
-		return consumers
-	}
-
-	// Put into map for faster lookup
-	consumerFilters := map[string]bool{}
-	for _, name := range config.Consumer.Names {
-		consumerFilters[name] = true
-	}
-
-	filtered := make([]JetstreamConsumerDetail, 0)
-
-	for _, consumer := range consumers {
-		if consumerFilters[consumer.Name] {
-			filtered = append(filtered, consumer)
+	filtered := make([]T, 0)
+	for _, item := range collection {
+		if filters[item.GetName()] {
+			filtered = append(filtered, item)
 		}
 	}
 
@@ -361,8 +353,8 @@ func filterConsumers(consumers []JetstreamConsumerDetail, config MetricsetConfig
 }
 
 func streamMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
-	for _, account := range response.AccountDetails {
-		for _, stream := range filterStreams(account.StreamDetails, config) {
+	for _, account := range filterByName(response.AccountDetails, config.Account.Names) {
+		for _, stream := range filterByName(account.StreamDetails, config.Stream.Names) {
 			moduleFields, timestamp, err := getSharedEventDetails(response)
 
 			if err != nil {
@@ -418,9 +410,9 @@ func streamMapping(r mb.ReporterV2, response JetstreamResponse, config Metricset
 }
 
 func consumerMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
-	for _, account := range response.AccountDetails {
-		for _, stream := range filterStreams(account.StreamDetails, config) {
-			for _, consumer := range filterConsumers(stream.Consumers, config) {
+	for _, account := range filterByName(response.AccountDetails, config.Account.Names) {
+		for _, stream := range filterByName(account.StreamDetails, config.Stream.Names) {
+			for _, consumer := range filterByName(stream.Consumers, config.Consumer.Names) {
 				moduleFields, timestamp, err := getSharedEventDetails(response)
 
 				if err != nil {
