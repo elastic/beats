@@ -4,6 +4,11 @@ steps:
   - label: ":golang: cache dependencies"
     command: |
       .buildkite/scripts/upload-go-cache.sh
+    agents:
+      image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+      cpu: "4000m"
+      memory: "4Gi"
+      useCustomGlobalHooks: true
 
   - wait: ~
 
