@@ -199,29 +199,7 @@ func (p *fileProspector) Init(
 		})
 	}
 
-	// Last, but not least: migrate the state from an old ID to the current ID
-	// prospectorStore.CopyStatesFromPreviousIDs(func(v loginp.Value) (string, interface{}) {
-	// 	var fm fileMeta
-	// 	err := v.UnpackCursorMeta(&fm)
-	// 	if err != nil {
-	// 		return "", nil
-	// 	}
-
-	// 	fd, ok := files[fm.Source]
-	// 	if !ok {
-	// 		return "", fm
-	// 	}
-
-	// 	if identifierName != fm.IdentifierName {
-	// 		p.logger.Infof("Identifier from '%s' does not match, won't migrate state", fm.Source)
-	// 		return "", fm
-	// 	}
-
-	// 	newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
-	// 	p.logger.Infof("Migrating input ID: '%s' -> '%s'", v.Key(), newKey)
-	// 	return newKey, fm
-	// })
-
+	// Take over states from other Filestream inputs or the log input
 	prospectorStore.TakeOver(func(v loginp.Value) (string, interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
@@ -252,7 +230,6 @@ func (p *fileProspector) Init(
 		// we use the old identifier to generate a registry key for the current
 		// file we're trying to migrate, if this key matches with the key in the
 		// registry, then we proceed to update the registry.
-		// registryKey := v.Key()
 		oldIdentifier, ok := identifiersMap[oldIdentifierName]
 		if !ok {
 			// This should never happen, but just in case we properly handle it.
@@ -277,9 +254,9 @@ func (p *fileProspector) Init(
 			return "", fm
 		}
 
-		previousIdentityID := oldIdentifier.GetSource(fsEvent).Name()
-		registryIdentityID := strings.Join(split[2:], "::")
-		if previousIdentityID != registryIdentityID {
+		idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
+		idFromRegistry := strings.Join(split[2:], "::")
+		if idFromPreviousIdentity != idFromRegistry {
 			return "", fm
 		}
 

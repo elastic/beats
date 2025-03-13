@@ -314,9 +314,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 	// Iterate through the states from any Filestream input
 	fromFilestreamInput := map[string]struct{}{}
 	for key, res := range s.store.ephemeralStore.table {
-		fmt.Println("++++++++++++++++++++++++++++++", key)
 		if res.isDeleted() {
-			fmt.Println("++++++++++++++++++++++++++++++++++++++++++++++++++", key, "REMOVED, skipping")
 			continue
 		}
 
@@ -334,15 +332,12 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 	fromLogInput := map[string]logInputState{}
 	if len(fromFilestreamInput) == 0 {
 		s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
-			fmt.Println("==============================", key)
-			// Handle log input states
 			if strings.HasPrefix(key, "filebeat::logs::") {
-				// st := mapstr.M{}
-				tmp := mapstr.M{}
-				if err := value.Decode(&tmp); err != nil {
+				m := mapstr.M{}
+				if err := value.Decode(&m); err != nil {
 					return true, err
 				}
-				st := logInputStateFromMapM(tmp)
+				st := logInputStateFromMapM(m)
 				st.key = key
 				fromLogInput[key] = st
 			}
@@ -436,6 +431,7 @@ type logInputState struct {
 	Offset int64  `json:"offset"`
 
 	// This matches the filestream.fileMeta struct
+	// and are used by UnpackCursorMeta
 	Source         string `json:"source" struct:"source"`
 	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
 }
@@ -443,7 +439,9 @@ type logInputState struct {
 func logInputStateFromMapM(m mapstr.M) logInputState {
 	state := logInputState{}
 
-	m.Delete("FileStateOS")
+	// typeconf.Convert kept failing with an "unsupported" error because
+	// FileStateOS was present, we don't need it, so just delete it.
+	m.Delete("FileStateOS") //nolint:errcheck // The key is always there
 	if err := typeconv.Convert(&state, m); err != nil {
 		panic(err)
 	}
