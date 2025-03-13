@@ -181,25 +181,25 @@ func eventMapping(metricsetName string, r mb.ReporterV2, content []byte) error {
 		return fmt.Errorf("failure parsing NATS Jetstream API response: %w", err)
 	}
 
+	switch metricsetName {
+	case statsMetricset:
+		return statsMapping(r, response)
+	case streamMetricset:
+		return streamMapping(r, response)
+	case consumerMetricset:
+		return consumerMapping(r, response)
+	default:
+		return nil
+	}
+}
+
+func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 	moduleFields, timestamp, err := getSharedEventDetails(response)
 
 	if err != nil {
 		return fmt.Errorf("failure applying module schema: %w", err)
 	}
 
-	switch metricsetName {
-	case statsMetricset:
-		return statsMapping(r, response, moduleFields, timestamp)
-	case streamMetricset:
-		return streamMapping(r, response, moduleFields, timestamp)
-	case consumerMetricset:
-		return consumerMapping(r, response, moduleFields, timestamp)
-	default:
-		return nil
-	}
-}
-
-func statsMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields mapstr.M, timestamp time.Time) error {
 	metricSetFields, err := jetstreamStatsSchema.Apply(map[string]interface{}{
 		"max_memory":    response.Config.MaxMemory,
 		"max_storage":   response.Config.MaxStorage,
@@ -228,9 +228,15 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields maps
 	return nil
 }
 
-func streamMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields mapstr.M, timestamp time.Time) error {
+func streamMapping(r mb.ReporterV2, response JetstreamResponse) error {
 	for _, account := range response.AccountDetails {
 		for _, stream := range account.StreamDetails {
+			moduleFields, timestamp, err := getSharedEventDetails(response)
+
+			if err != nil {
+				return fmt.Errorf("failure applying module schema: %w", err)
+			}
+
 			metricSetFields, err := jetstreamStreamSchema.Apply(map[string]interface{}{
 				"name":           stream.Name,
 				"created":        stream.Created,
@@ -266,10 +272,16 @@ func streamMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields map
 	return nil
 }
 
-func consumerMapping(r mb.ReporterV2, response JetstreamResponse, moduleFields mapstr.M, timestamp time.Time) error {
+func consumerMapping(r mb.ReporterV2, response JetstreamResponse) error {
 	for _, account := range response.AccountDetails {
 		for _, stream := range account.StreamDetails {
 			for _, consumer := range stream.Consumers {
+				moduleFields, timestamp, err := getSharedEventDetails(response)
+
+				if err != nil {
+					return fmt.Errorf("failure applying module schema: %w", err)
+				}
+
 				metricSetFields, err := jetstreamConsumerSchema.Apply(map[string]interface{}{
 					"stream_name":            stream.Name,
 					"name":                   consumer.Name,
