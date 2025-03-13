@@ -173,7 +173,7 @@ type JetstreamConsumerAckFloor struct {
 	StreamSequence   int `json:"stream_seq"`
 }
 
-func eventMapping(metricsetName string, r mb.ReporterV2, content []byte) error {
+func eventMapping(m *MetricSet, r mb.ReporterV2, content []byte) error {
 	var response JetstreamResponse
 
 	err := json.Unmarshal(content, &response)
@@ -181,11 +181,11 @@ func eventMapping(metricsetName string, r mb.ReporterV2, content []byte) error {
 		return fmt.Errorf("failure parsing NATS Jetstream API response: %w", err)
 	}
 
-	switch metricsetName {
+	switch m.Name() {
 	case statsMetricset:
 		return statsMapping(r, response)
 	case streamMetricset:
-		return streamMapping(r, response)
+		return streamMapping(r, response, m.Config)
 	case consumerMetricset:
 		return consumerMapping(r, response)
 	default:
@@ -228,9 +228,22 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 	return nil
 }
 
-func streamMapping(r mb.ReporterV2, response JetstreamResponse) error {
+func streamMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
+	streamFilters := map[string]bool{}
+
+	for _, name := range config.Stream.Names {
+		streamFilters[name] = true
+	}
+
 	for _, account := range response.AccountDetails {
 		for _, stream := range account.StreamDetails {
+
+			if len(streamFilters) > 0 {
+				if !streamFilters[stream.Name] {
+					continue
+				}
+			}
+
 			moduleFields, timestamp, err := getSharedEventDetails(response)
 
 			if err != nil {

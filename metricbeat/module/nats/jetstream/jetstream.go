@@ -80,8 +80,9 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
-	Log  *logp.Logger
+	http   *helper.HTTP
+	Log    *logp.Logger
+	Config MetricsetConfig
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -89,7 +90,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta(fmt.Sprintf("The nats %s metricset is beta.", base.Name()))
 
-	config := struct{}{}
+	var config ModuleConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
@@ -108,6 +109,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		base,
 		http,
 		logp.NewLogger("nats"),
+		config.Jetstream,
 	}, nil
 }
 
@@ -119,7 +121,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("error in fetch: %w", err)
 	}
-	err = eventMapping(m.Name(), report, content)
+	err = eventMapping(m, report, content)
 	if err != nil {
 		return fmt.Errorf("error in mapping: %w", err)
 	}
