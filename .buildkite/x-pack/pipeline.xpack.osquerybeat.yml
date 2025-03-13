@@ -2,6 +2,9 @@
 name: "beats-xpack-osquerybeat"
 
 env:
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
@@ -297,3 +300,21 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Packaging Linux"
+
+      - label: ":ubuntu: x-pack/osquerybeat: Packaging Linux arm64"
+        key: "packaging-arm"
+        env:
+          PLATFORMS: "+all linux/arm64"
+        command: |
+          .buildkite/scripts/packaging/packaging.sh x-pack/osquerybeat
+        retry:
+          automatic:
+            - limit: 1
+        timeout_in_minutes: 20
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/osquerybeat: Packaging Linux arm64"
