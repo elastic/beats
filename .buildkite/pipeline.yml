@@ -668,3 +668,10 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
+
+  # Triggers Serverless Beats tests in the elastic-agent repo for main/release branches
+  - label: "Serverless beats tests(elastic-agent)"
+    if: build.pull_request.id == null
+    trigger: "beats-agent-serverless-tests"
+    build:
+      branch: "main"
