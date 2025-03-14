@@ -182,10 +182,16 @@ class Test(BaseTest):
         """
         Test http_endpoint input with missing basic auth values.
         """
+        # Include a benchmark input to keep the beat alive, otherwise it might
+        # shut down before logging the error we're looking for
         options = """
   basic_auth: true
   username: testuser
   password:
+- type: benchmark
+  enabled: true
+  message: "placeholder"
+  eps: 1
 """
         self.get_config(options)
         filebeat = self.start_beat()
