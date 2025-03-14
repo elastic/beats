@@ -69,11 +69,22 @@ func CheckReceivers(params CheckReceiversParams) {
 	)
 	observed, zapLogs := observer.New(zapcore.DebugLevel)
 
+	core := zapcore.NewTee(zapCore, observed)
+
 	createReceiver := func(t *testing.T, name string, cfg component.Config) receiver.Logs {
 		t.Helper()
 
 		var receiverSettings receiver.Settings
-		receiverSettings.Logger = zap.New(zapcore.NewTee(zapCore, observed)).Named(name)
+
+		// Replicate the behavior of the collector logger
+		receiverCore := core.
+			With([]zapcore.Field{
+				zap.String("name", name),
+				zap.String("kind", "receiver"),
+				zap.String("data_type", "logs"),
+			})
+
+		receiverSettings.Logger = zap.New(receiverCore)
 
 		logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
 			for i := 0; i < ld.ResourceLogs().Len(); i++ {
@@ -97,18 +108,32 @@ func CheckReceivers(params CheckReceiversParams) {
 		return r
 	}
 
+	// Replicate the collector behavior to instantiate components first and then start them.
+	var receivers []receiver.Logs
 	for _, rec := range params.Receivers {
-		r := createReceiver(t, rec.Name, rec.Config)
+		receivers = append(receivers, createReceiver(t, rec.Name, rec.Config))
+	}
+
+	for i, r := range receivers {
+		i++
 		err := r.Start(ctx, nil)
-		require.NoErrorf(t, err, "Error starting receiver %q", rec.Name)
+		require.NoErrorf(t, err, "Error starting receiver %d", i)
 		defer func() {
-			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %q", rec.Name)
+			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
 		}()
 	}
 
 	require.Eventually(t, func() bool {
 		logsMu.Lock()
 		defer logsMu.Unlock()
+
+		// Ensure the logger fields from the otel collector are present in the logs.
+		for _, zl := range zapLogs.All() {
+			require.Contains(t, zl.ContextMap(), "name")
+			require.Equal(t, zl.ContextMap()["kind"], "receiver")
+			require.Equal(t, zl.ContextMap()["data_type"], "logs")
+			break
+		}
 
 		return params.AssertFunc(t, logs, zapLogs)
 	}, time.Minute, 100*time.Millisecond, "timeout waiting for assertion to pass")
