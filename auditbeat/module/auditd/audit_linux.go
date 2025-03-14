@@ -154,7 +154,10 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 	// Drain the netlink channel in parallel to Close() to prevent a deadlock.
 	// This goroutine will terminate once receive from netlink errors (EBADF,
 	// EBADFD, or any other error). This happens because the fd is closed.
+	closeWaiter := &sync.WaitGroup{}
+	closeWaiter.Add(1)
 	go func() {
+		defer closeWaiter.Done()
 		for {
 			_, err := client.Netlink.Receive(true, discard)
 			switch {
@@ -162,6 +165,7 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 			case errors.Is(err, syscall.EAGAIN):
 				time.Sleep(50 * time.Millisecond)
 			default:
+
 				return
 			}
 		}
@@ -169,6 +173,10 @@ func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
 	if err := client.Close(); err != nil {
 		log.Errorw("Error closing audit monitoring client", "error", err)
 	}
+	// If we don't wait for the socket to drain, the calling function can
+	// assign a new client instance to the same FD while our goroutine is using it.
+	// This guarantees that we're not trying to read from the file descriptor by the time we return.
+	closeWaiter.Wait()
 }
 
 // Run initializes the audit client and receives audit messages from the
@@ -218,10 +226,11 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 			reporter.Error(err)
 			ms.log.Errorw("Failure creating audit monitoring client", "error", err)
 		}
+
 		go func() {
 			defer func() { // Close the most recently allocated "client" instance.
 				if client != nil {
-					closeAuditClient(client, ms.log)
+					client.Close()
 				}
 			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
@@ -235,7 +244,10 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
-						closeAuditClient(client, ms.log)
+						// The logic in closeAuditClient() is only needed if we've called SetPID()
+						// in the client, as the client will need to clear its pid from netlink by sending a message across the socket, which can block
+						// However, this status client never sets a pid, so we can just call close, which will only close the FD.
+						client.Close()
 						client, err = libaudit.NewAuditClient(nil)
 						if err != nil {
 							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
