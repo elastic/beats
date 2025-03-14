@@ -51,7 +51,6 @@ var (
 			"max_storage":   c.Int("max_storage"),
 			"store_dir":     c.Str("store_dir"),
 			"sync_interval": c.Int("sync_interval"),
-			"compress_ok":   c.Bool("compress_ok"),
 		},
 	}
 
@@ -170,7 +169,6 @@ type JetstreamResponse struct {
 }
 
 type JetstreamConfig struct {
-	ComrpessOk   bool   `json:"compress_ok"`
 	MaxMemory    int    `json:"max_memory"`
 	MaxStorage   int    `json:"max_storage"`
 	StoreDir     string `json:"store_dir"`
@@ -317,7 +315,6 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 		"max_storage":      response.Config.MaxStorage,
 		"store_dir":        response.Config.StoreDir,
 		"sync_interval":    response.Config.SyncInterval,
-		"compress_ok":      response.Config.ComrpessOk,
 		"streams":          response.Streams,
 		"consumers":        response.Consumers,
 		"messages":         response.Messages,

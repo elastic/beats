@@ -2,12 +2,65 @@
   type: group
   release: beta
   description: >
-    Basic stats about NATS Jetstream
+    Basic stats about the NATS JetStream server
   fields:
-    - name: example
-      type: keyword
+    - name: streams
+      type: integer
       description: >
-        Example field
+        The total number of streams on the JetStream server
+    - name: consumers
+      type: integer
+      description: >
+        The total number of consumers on the JetStream server
+    - name: messages
+      type: integer
+      description: >
+        The total number of messages on the JetStream server
+    - name: bytes
+      type: unsigned_long
+      description: >
+        The total number of message bytes on the JetStream server
+    - name: memory
+      type: unsigned_long
+      description: >
+        The total amount of memory (bytes) used by the JetStream server
+    - name: reserved_memory
+      type: unsigned_long
+      description: >
+        The of memory (bytes) reserved by the JetStream server
+    - name: storage
+      type: unsigned_long
+      description: >
+        The total amount of storage (bytes) used by the JetStream server
+    - name: reserved_storage
+      type: unsigned_long
+      description: >
+        The total amount of storage (bytes) reserved by the JetStream server
+    - name: accounts
+      type: integer
+      description: >
+        The total number of accounts on the JetStream server
+    - name: config
+      type: group
+      description: >
+        Configuration of the JetStream server
+      fields:
+        - name: max_memory
+          type: unsigned_long
+          description: >
+            The maximum amount of memory (bytes) the JetStream server can use
+        - name: max_storage
+          type: unsigned_long
+          description: >
+            The maximum amount of storage (bytes) the JetStream server can use
+        - name: store_dir
+          type: keyword
+          description: >
+            The path on disk where the JetStream storage lives
+        - name: sync_interval
+          type: unsigned_long
+          description: >
+            The fsync/sync interval for page cache in the filestore
 
 - name: jetstream.stream
   type: group
