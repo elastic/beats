@@ -50,8 +50,8 @@ type CheckReceiversParams struct {
 	// Receivers is a list of receiver configurations to create.
 	Receivers []ReceiverConfig
 	// AssertFunc is a function that asserts the test conditions.
-	// The function is called periodically until it returns true which ends the test.
-	AssertFunc func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool
+	// The function is called periodically until the assertions are met or the timeout is reached.
+	AssertFunc func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs)
 }
 
 // CheckReceivers creates receivers using the provided configuration.
@@ -122,7 +122,7 @@ func CheckReceivers(params CheckReceiversParams) {
 		}()
 	}
 
-	require.Eventually(t, func() bool {
+	require.EventuallyWithT(t, func(ct *assert.CollectT) {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
@@ -134,6 +134,6 @@ func CheckReceivers(params CheckReceiversParams) {
 			break
 		}
 
-		return params.AssertFunc(t, logs, zapLogs)
+		params.AssertFunc(ct, logs, zapLogs)
 	}, time.Minute, 100*time.Millisecond, "timeout waiting for assertion to pass")
 }
