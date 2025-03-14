@@ -35,8 +35,34 @@ func init() {
 }
 
 type bucket struct {
+	mu sync.Mutex
+
 	tokens        float64
 	lastReplenish time.Time
+}
+
+func (b *bucket) withdraw() bool {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	if b.tokens < 1 {
+		return false
+	}
+
+	b.tokens--
+	return true
+}
+
+func (b *bucket) replenish(rate rate, clock clockwork.Clock) float64 {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	secsSinceLastReplenish := clock.Now().Sub(b.lastReplenish).Seconds()
+	tokensToReplenish := secsSinceLastReplenish * rate.valuePerSecond()
+
+	b.tokens += tokensToReplenish
+	b.lastReplenish = clock.Now()
+	return b.tokens
 }
 
 type tokenBucket struct {
@@ -122,34 +148,20 @@ func (t *tokenBucket) setClock(c clockwork.Clock) {
 }
 
 func (t *tokenBucket) getBucket(key uint64) *bucket {
-	v, exists := t.buckets.LoadOrStore(key, &bucket{
-		tokens:        t.depth,
-		lastReplenish: t.clock.Now(),
-	})
-	b := v.(*bucket)
-
+	v, exists := t.buckets.Load(key)
 	if exists {
+		//nolint:errcheck // ignore
+		b := v.(*bucket)
 		b.replenish(t.limit, t.clock)
 		return b
 	}
 
-	return b
-}
-
-func (b *bucket) withdraw() bool {
-	if b.tokens < 1 {
-		return false
-	}
-	b.tokens--
-	return true
-}
-
-func (b *bucket) replenish(rate rate, clock clockwork.Clock) {
-	secsSinceLastReplenish := clock.Now().Sub(b.lastReplenish).Seconds()
-	tokensToReplenish := secsSinceLastReplenish * rate.valuePerSecond()
-
-	b.tokens += tokensToReplenish
-	b.lastReplenish = clock.Now()
+	v, _ = t.buckets.LoadOrStore(key, &bucket{
+		tokens:        t.depth,
+		lastReplenish: t.clock.Now(),
+	})
+	//nolint:errcheck // ignore
+	return v.(*bucket)
 }
 
 func (t *tokenBucket) runGC() {
@@ -171,12 +183,13 @@ func (t *tokenBucket) runGC() {
 		toDelete := make([]uint64, 0)
 		numBucketsBefore := 0
 		t.buckets.Range(func(k, v interface{}) bool {
+			//nolint:errcheck // ignore
 			key := k.(uint64)
+			//nolint:errcheck // ignore
 			b := v.(*bucket)
 
-			b.replenish(t.limit, t.clock)
-
-			if b.tokens >= t.depth {
+			tokens := b.replenish(t.limit, t.clock)
+			if tokens >= t.depth {
 				toDelete = append(toDelete, key)
 			}
 
@@ -190,9 +203,9 @@ func (t *tokenBucket) runGC() {
 		}
 
 		// Reset GC metrics
-		t.gc.metrics.numCalls = atomic.MakeUint(0)
+		t.gc.metrics.numCalls.Store(0)
 
-		gcDuration := time.Now().Sub(gcStartTime)
+		gcDuration := time.Since(gcStartTime)
 		numBucketsDeleted := len(toDelete)
 		numBucketsAfter := numBucketsBefore - numBucketsDeleted
 		t.logger.Debugf("gc duration: %v, buckets: (before: %v, deleted: %v, after: %v)",
