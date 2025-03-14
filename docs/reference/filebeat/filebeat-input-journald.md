@@ -448,16 +448,16 @@ You can use the following translated names in filter expressions to reference jo
 :   `process.pid`
 
 `_PRIORITY`
-:   `syslog.priority`
+:   `logs.syslog.priority`
 
 `_SYSLOG_FACILITY`
-:   `syslog.facility`
+:   `logs.syslog.facility.code`
 
 `_SYSLOG_IDENTIFIER`
-:   `syslog.identifier`
+:   `logs.syslog.identifier.appname`
 
 `_SYSLOG_PID`
-:   `syslog.pid`
+:   `log.syslog.procid`
 
 `_SYSTEMD_CGROUP`
 :   `systemd.cgroup`
@@ -500,24 +500,16 @@ You can use the following translated names in filter expressions to reference jo
 
 The following translated fields for [Docker](https://docs.docker.com/config/containers/logging/journald/) are also available:
 
-`CONTAINER_ID`
-:   `container.id_truncated`
-
 `CONTAINER_ID_FULL`
 :   `container.id`
 
 `CONTAINER_NAME`
 :   `container.name`
 
-`CONTAINER_PARTIAL_MESSAGE`
-:   `container.partial`
-
-`CONTAINER_TAG`
-:   `container.log.tag`
-
 `IMAGE_NAME`
 :   `container.image.name`
 
+If `CONTAINER_PARTIAL_MESSAGE` is present and it is true, then the tag `partial_message` is added to the final event.
 
 ## Common options [filebeat-input-journald-common-options]
 
