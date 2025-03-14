@@ -1,5 +1,5 @@
 MAGE_IMPORT_PATH ?= github.com/magefile/mage
-MAGE_VERSION     ?= $(shell go list -m $(MAGE_IMPORT_PATH) | cut -d' ' -f2)
+MAGE_VERSION     ?= $(shell go list -m -f '{{.Version}}' $(MAGE_IMPORT_PATH))
 MAGE_PRESENT     := $(shell mage --version 2> /dev/null | grep $(MAGE_VERSION))
 export MAGE_IMPORT_PATH
 
