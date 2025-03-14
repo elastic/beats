@@ -128,7 +128,6 @@ steps:
 
       - label: ":windows: x-pack/winlogbeat: Win 2025 Unit Tests"
         command: |
-          .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "mandatory-win-2025-unit-tests"
@@ -144,12 +143,6 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/winlogbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/winlogbeat: Win 2025 Unit Tests"
