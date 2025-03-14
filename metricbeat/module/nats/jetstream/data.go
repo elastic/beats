@@ -79,7 +79,6 @@ var (
 		"config": s.Object{
 			"description":          c.Str("config_description"),
 			"retention":            c.Str("config_retention"),
-			"subjects":             c.Str("config_subjects"),
 			"num_replicas":         c.Int("config_num_replicas"),
 			"storage":              c.Str("config_storage"),
 			"max_consumers":        c.Int("config_max_consumers"),
@@ -88,6 +87,22 @@ var (
 			"max_age":              c.Int("config_max_age"),
 			"max_msgs_per_subject": c.Int("config_max_msgs_per_subject"),
 			"max_msg_size":         c.Int("config_max_msg_size"),
+			"subjects": s.Conv{
+				Key: "config_subjects",
+				Func: func(key string, data map[string]interface{}) (interface{}, error) {
+					emptyIface, err := mapstr.M(data).GetValue(key)
+					if err != nil {
+						return []string{}, s.NewKeyNotFoundError(key)
+					}
+					switch val := emptyIface.(type) {
+					case []string:
+						return val, nil
+					default:
+						msg := fmt.Sprintf("expected []string, found %T", emptyIface)
+						return []string{}, s.NewWrongFormatError(key, msg)
+					}
+				},
+			},
 		},
 	}
 
@@ -378,10 +393,10 @@ func streamMapping(r mb.ReporterV2, response JetstreamResponse, config Metricset
 				"account_name":                account.Name,
 				"config_description":          stream.Config.Description,
 				"config_retention":            stream.Config.Retention,
-				"config_subjects":             stream.Config.Subjects,
 				"config_num_replicas":         stream.Config.NumReplicas,
 				"config_storage":              stream.Config.Storage,
 				"config_max_consumers":        stream.Config.MaxConsumers,
+				"config_subjects":             stream.Config.Subjects,
 				"config_max_msgs":             stream.Config.MaxMsgs,
 				"config_max_bytes":            stream.Config.MaxBytes,
 				"config_max_age":              stream.Config.MaxAge,
