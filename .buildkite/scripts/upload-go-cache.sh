@@ -15,7 +15,7 @@ go mod tidy
 
 ls -alh $(go env GOMODCACHE)
 
-tar -czf "$name.tar.gz" -C $(go env GOMODCACHE) .
+tar -czf "$name.tar.gz" -C "$(go env GOMODCACHE)/cache" .
 
 buildkite-agent artifact upload "$name.tar.gz"
 
