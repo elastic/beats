@@ -57,14 +57,11 @@ type StoreUpdater interface {
 	// UpdateIdentifiers updates ID in the registry.
 	// The function passed to UpdateIdentifiers must return an empty string if the key
 	// remains the same.
-	UpdateIdentifiers(func(v Value) (string, interface{}))
-	// CopyStatesFromPreviousIDs copies the state from a previous input ID to the
-	// current input ID.
-	// The function passed to CopyStatesFromPreviousIDs must return an empty
-	// string if the entry should not be copied.
-	CopyStatesFromPreviousIDs(func(v Value) (string, interface{}))
-
-	TakeOver(func(v Value) (string, interface{}))
+	UpdateIdentifiers(func(v Value) (string, any))
+	// TakeOver takes over states from other inputs. This allows a Filestream
+	// input to take over states from the Log input or other Filestream
+	// inputs with different IDs.
+	TakeOver(func(v Value) (string, any))
 }
 
 // Value contains the cursor metadata.

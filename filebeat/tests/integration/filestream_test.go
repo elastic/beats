@@ -524,7 +524,7 @@ logging:
 //   - 02.log: db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a
 //   - 01.txt: 9ef9433360a276b14e8eae3864594c0108042c0828d3504b34c082dfc1cd43da
 //   - 02.txt: 10c6577e45f2b06631e11285210d8bd967ebf9786cf81ccfc9fef64bc01725cd
-func TestFilestreamIDMigration(t *testing.T) {
+func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	oldID := "first-id"
 	newID := "second-id"
 
@@ -552,7 +552,7 @@ func TestFilestreamIDMigration(t *testing.T) {
 		"homePath": workDir,
 		"testdata": testDataPath,
 	}
-	cfgYAML := getMigrateIDConfig(t, vars, "happy-path.yml")
+	cfgYAML := getTakeOverConfig(t, vars, "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
@@ -564,7 +564,7 @@ func TestFilestreamIDMigration(t *testing.T) {
 	vars["previousID"] = oldID
 	vars["inputID"] = newID
 
-	cfgYAML = getMigrateIDConfig(t, vars, "happy-path.yml")
+	cfgYAML = getTakeOverConfig(t, vars, "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
 	removeOldLogFiles(t, workDir)
@@ -587,83 +587,6 @@ func TestFilestreamIDMigration(t *testing.T) {
 		filepath.Join(testDataPath,
 			"take-over",
 			"expected-registry-happy-paty.json"),
-		"Entries in the registry are different from the expectation",
-	)
-}
-
-func TestFilestreamIDMigrationDoesNotMigrateFileIdentity(t *testing.T) {
-	t.Skip("now we support migrating file identity" +
-		"when taking over state from other inputs")
-	oldID := "first-id"
-	newID := "second-id"
-
-	testDataPath, err := filepath.Abs("./testdata")
-	if err != nil {
-		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
-	}
-
-	// Get the absolute path for all files Filebeat will ingest
-	logFiles := []string{}
-	for _, f := range []string{"01.log", "02.log"} {
-		logFiles = append(logFiles, filepath.Join(testDataPath, "take-over", f))
-	}
-
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-	workDir := filebeat.TempDir()
-	outputFile := filepath.Join(workDir, "output-file*")
-
-	vars := map[string]string{
-		"inputID":     oldID,
-		"homePath":    workDir,
-		"testdata":    testDataPath,
-		"fileIentity": "fingerprint",
-	}
-	cfgYAML := getMigrateIDConfig(t, vars, "file-idenity-error.yml")
-	filebeat.WriteConfigFile(cfgYAML)
-	filebeat.Start()
-
-	// Wait for the file to be fully ingested
-	waitForEOF(t, filebeat, logFiles)
-	requirePublishedEvents(t, filebeat, 4, outputFile)
-	filebeat.Stop()
-
-	vars["previousID"] = oldID
-	vars["inputID"] = newID
-	vars["fileIentity"] = "path"
-
-	cfgYAML = getMigrateIDConfig(t, vars, "file-idenity-error.yml")
-	filebeat.WriteConfigFile(cfgYAML)
-
-	removeOldLogFiles(t, workDir)
-
-	// Start Filebeat again.
-	// This time the states must be migrated and no new data ingested
-	filebeat.Start()
-	// Make sure we've "read" the files to the end
-	waitForEOF(t, filebeat, logFiles)
-
-	// Ensure no new data has been published
-	requirePublishedEvents(t, filebeat, 8, outputFile) //this should already fail
-
-	// Wait for the registry clean up message
-	msg := fmt.Sprintf("Identifier from '%s' does not match, won't migrate state", logFiles[0])
-	if runtime.GOOS == "windows" {
-		msg = strings.Replace(msg, `\`, `\\`, -1)
-	}
-	filebeat.WaitForLogs(msg, 5*time.Second, "ID migration was not skipped because of different file identity")
-	filebeat.Stop()
-
-	assertRegistry(
-		t,
-		workDir,
-		testDataPath,
-		filepath.Join(testDataPath,
-			"take-over",
-			"expected-registry-do-no-migrate-identity.json"),
 		"Entries in the registry are different from the expectation",
 	)
 }
@@ -724,7 +647,7 @@ func createFileAndWaitIngestion(
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }
 
-func getMigrateIDConfig(t *testing.T, vars map[string]string, tmplPath string) string {
+func getTakeOverConfig(t *testing.T, vars map[string]string, tmplPath string) string {
 	t.Helper()
 	tmpl := template.Must(
 		template.ParseFiles(
@@ -791,7 +714,7 @@ func parseRegistry(entries []registryEntry) map[string]registryEntry {
 }
 
 // assertRegistry reads Filebeat's registry from 'workDir' and compares
-// with the expected registry encoded as JSON in the file 'expectedRegistry'
+// with the expected registry encoded as JSON in the file 'registry'
 func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 	t.Helper()
 	data, err := os.ReadFile(registry)

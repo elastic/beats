@@ -767,7 +767,7 @@ func (m *mockStoreUpdater) CleanIf(pred func(v loginp.Value) bool) {
 	}
 }
 
-func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (string, interface{})) {
+func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (string, any)) {
 	for key, meta := range m.available {
 		k, _ := updater(meta)
 		if k != "" {
@@ -776,10 +776,8 @@ func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (strin
 	}
 }
 
-// Noop for now
-func (m *mockStoreUpdater) CopyStatesFromPreviousIDs(getNewID func(v loginp.Value) (string, interface{})) {
-}
-func (m *mockStoreUpdater) TakeOver(func(v loginp.Value) (string, interface{})) {}
+// TakeOver is a noop on this mock
+func (m *mockStoreUpdater) TakeOver(func(v loginp.Value) (string, any)) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier
