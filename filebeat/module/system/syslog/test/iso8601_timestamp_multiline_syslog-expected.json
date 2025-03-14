@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "1986-04-25T19:23:45.101-02:00",
+        "@timestamp": "2020-12-25T23:59:59-02:00",
         "event.dataset": "system.syslog",
         "event.kind": "event",
         "event.module": "system",
