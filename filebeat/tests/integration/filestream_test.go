@@ -536,7 +536,7 @@ func TestFilestreamIDMigration(t *testing.T) {
 	// Get the absolute path for all files Filebeat will ingest
 	logFiles := []string{}
 	for _, f := range []string{"01.log", "02.log", "01.txt", "02.txt"} {
-		logFiles = append(logFiles, filepath.Join(testDataPath, "update-filestream-id", f))
+		logFiles = append(logFiles, filepath.Join(testDataPath, "take-over", f))
 	}
 
 	filebeat := integration.NewBeat(
@@ -585,7 +585,7 @@ func TestFilestreamIDMigration(t *testing.T) {
 		workDir,
 		testDataPath,
 		filepath.Join(testDataPath,
-			"update-filestream-id",
+			"take-over",
 			"expected-registry-happy-paty.json"),
 		"Entries in the registry are different from the expectation",
 	)
@@ -605,7 +605,7 @@ func TestFilestreamIDMigrationDoesNotMigrateFileIdentity(t *testing.T) {
 	// Get the absolute path for all files Filebeat will ingest
 	logFiles := []string{}
 	for _, f := range []string{"01.log", "02.log"} {
-		logFiles = append(logFiles, filepath.Join(testDataPath, "update-filestream-id", f))
+		logFiles = append(logFiles, filepath.Join(testDataPath, "take-over", f))
 	}
 
 	filebeat := integration.NewBeat(
@@ -662,7 +662,7 @@ func TestFilestreamIDMigrationDoesNotMigrateFileIdentity(t *testing.T) {
 		workDir,
 		testDataPath,
 		filepath.Join(testDataPath,
-			"update-filestream-id",
+			"take-over",
 			"expected-registry-do-no-migrate-identity.json"),
 		"Entries in the registry are different from the expectation",
 	)
@@ -728,7 +728,7 @@ func getMigrateIDConfig(t *testing.T, vars map[string]string, tmplPath string) s
 	t.Helper()
 	tmpl := template.Must(
 		template.ParseFiles(
-			filepath.Join("testdata", "update-filestream-id", tmplPath)))
+			filepath.Join("testdata", "take-over", tmplPath)))
 
 	str := strings.Builder{}
 	if err := tmpl.Execute(&str, vars); err != nil {

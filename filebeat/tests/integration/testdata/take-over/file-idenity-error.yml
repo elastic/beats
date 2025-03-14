@@ -2,10 +2,12 @@ filebeat.inputs:
   - type: filestream
     id: "{{.inputID}}"
     paths:
-      - {{.testdata}}/update-filestream-id/*.log
+      - {{.testdata}}/take-over/*.log
 {{ if .previousID }}
-    previous_ids:
-      - {{ .previousID }}
+    take_over:
+      enabled: true
+      from_ids:
+        - {{ .previousID }}
 {{ end }}
     file_identity.{{ .fileIentity }}: ~
     prospector:
