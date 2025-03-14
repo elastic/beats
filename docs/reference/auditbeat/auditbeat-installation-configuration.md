@@ -212,10 +212,6 @@ Auditbeat comes with predefined assets for parsing, indexing, and visualizing yo
 sudo service auditbeat start
 ```
 
-::::{note}
-If you use an `init.d` script to start Auditbeat, you can’t specify command line flags (see [Command reference](/reference/auditbeat/command-line-options.md)). To specify flags, start Auditbeat in the foreground.
-::::
-
 
 Also see [Auditbeat and systemd](/reference/auditbeat/running-with-systemd.md).
 ::::::
@@ -224,10 +220,6 @@ Also see [Auditbeat and systemd](/reference/auditbeat/running-with-systemd.md).
 ```sh
 sudo service auditbeat start
 ```
-
-::::{note}
-If you use an `init.d` script to start Auditbeat, you can’t specify command line flags (see [Command reference](/reference/auditbeat/command-line-options.md)). To specify flags, start Auditbeat in the foreground.
-::::
 
 
 Also see [Auditbeat and systemd](/reference/auditbeat/running-with-systemd.md).
