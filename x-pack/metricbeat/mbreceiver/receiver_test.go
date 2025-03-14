@@ -9,6 +9,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/stretchr/testify/assert"
 
 	"go.uber.org/zap/zaptest/observer"
