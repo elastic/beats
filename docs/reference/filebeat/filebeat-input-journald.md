@@ -133,7 +133,9 @@ Filter entries by facilities, facilities must be specified using their numeric c
 
 ### `include_matches` [filebeat-input-journald-include-matches]
 
-A collection of filter expressions used to match fields. The format of the expression is `field=value`. Filebeat fetches all events that exactly match the expressions. Pattern matching is not supported.
+A collection of filter expressions used to match fields. The format of the expression is `field=value` or `+` representing disjunction (i.e. logical OR). Filebeat fetches all events that exactly match the expressions. Pattern matching is not supported.
+
+When `+` is used, it will cause all matches before and after to be combined in a disjunction (i.e. logical OR).
 
 If you configured a filter expression, only entries with this field set will be iterated by the journald reader of Filebeat. If the filter expressions apply to different fields, only entries with all fields set will be iterated. If they apply to the same fields, only entries where the field takes one of the specified values will be iterated.
 
@@ -158,6 +160,25 @@ include_matches:
     - "systemd.transport=kernel"
     - "systemd.transport=syslog"
 ```
+
+The following include matches configuration is the equivalent of the following logical expression:
+ 
+ ```
+ A=a OR (B=b AND C=c) OR (D=d AND B=1)
+ ```
+ 
+```yaml
+ include_matches:
+   match:
+     - A=a
+     - +
+     - B=b
+     - C=c
+     - +
+     - B=1
+```
+ 
+`include_matches` translates to `journalctl` `MATCHES`, its [documentation](https://www.man7.org/linux/man-pages/man1/journalctl.1.html)  is not clear about how multiple disjunctions are handled. The previous example was tested with journalctl version 257.
 
 To reference fields, use one of the following:
 
