@@ -30,3 +30,30 @@ func ExtractWorkloadName(podName string) string {
 	// 如果都没有匹配到，则返回原始名称
 	return podName
 }
+
+func EnrichWorkloadInfo(fields mapstr.M, podNameKey string, event mb.Event) {
+	workloadName := ""
+
+	podNameValue, _ := fields.GetValue(podNameKey)
+	if podName, ok := podNameValue.(string); ok {
+		workloadName = ExtractWorkloadName(podName)
+	}
+
+	event.ModuleFields.DeepUpdate(mapstr.M{
+		"workload": mapstr.M{
+			"name": workloadName,
+		},
+	})
+}
+
+func DuplicateWorkloadInfo(fields mapstr.M, workloadNameKey string, event mb.Event) {
+	workloadNameValue, _ := fields.GetValue(workloadNameKey)
+
+	workloadName, _ := workloadNameValue.(string)
+
+	event.ModuleFields.DeepUpdate(mapstr.M{
+		"workload": mapstr.M{
+			"name": workloadName,
+		},
+	})
+}

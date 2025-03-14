@@ -122,6 +122,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 			m.Logger().Error(err)
 		}
 
+		util.DuplicateWorkloadInfo(e.MetricSetFields, "name", e)
+		
 		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return

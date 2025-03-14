@@ -51,7 +51,9 @@ func eventMapping(content []byte, logger *logp.Logger, mapping *prometheus.Metri
 					},
 					"pod": mapstr.M{
 						"name": pod.PodRef.Name,
-						"prefix": util.ExtractWorkloadName(pod.PodRef.Name),
+					},
+					"workload": mapstr.M{
+						"name": util.ExtractWorkloadName(pod.PodRef.Name),
 					},
 				},
 

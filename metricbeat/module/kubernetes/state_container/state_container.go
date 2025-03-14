@@ -227,18 +227,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 		}
 
-		podPrefix := ""
-
-		podNameValue, _ := e.ModuleFields.GetValue("pod.name")
-		if podName, ok := podNameValue.(string); ok {
-			podPrefix = util.ExtractWorkloadName(podName)
-		}
-
-		e.ModuleFields.DeepUpdate(mapstr.M{
-			"pod": mapstr.M{
-				"prefix": podPrefix,
-			},
-		})
+		util.EnrichWorkloadInfo(e.ModuleFields, "pod.name", e)
 
 		if reported := reporter.Event(e); !reported {
 			return nil
