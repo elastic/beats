@@ -32,6 +32,7 @@ const (
 	// Ref: https://docs.nats.io/running-a-nats-service/nats_admin/monitoring#jetstream-information-jsz
 	defaultPath      = "/jsz"
 	statsCategory    = "stats"
+	accountCategory  = "account"
 	streamCategory   = "stream"
 	consumerCategory = "consumer"
 )
@@ -50,7 +51,6 @@ var (
 func init() {
 	mb.Registry.MustAddMetricSet("nats", "jetstream", New,
 		mb.WithHostParser(hostParser),
-		mb.DefaultMetricSet(),
 	)
 }
 
@@ -80,14 +80,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	// Default detail will just get us stats about JetStream
 	detailLevel := ""
+
+	// Enables gathering the top-most layer of data, which is about accounts
+	if config.Jetstream.Account.Enabled {
+		detailLevel = "accounts"
+	}
+
+	// Enables gathering the second layer of data, which is about accounts + streams
 	if config.Jetstream.Stream.Enabled {
 		detailLevel = "streams"
 	}
 
+	// Enables gathering the lowest layer of data, which is about accounts + streams + consumers
 	if config.Jetstream.Consumer.Enabled {
 		detailLevel = "consumers"
 	}
+
 	http.SetURI(fmt.Sprintf("%s?config=true", http.GetURI()))
 	if detailLevel != "" {
 		http.SetURI(fmt.Sprintf("%s&%s=true", http.GetURI(), detailLevel))

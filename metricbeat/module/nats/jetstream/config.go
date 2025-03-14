@@ -29,7 +29,8 @@ type MetricsetConfig struct {
 }
 
 type AccountConfig struct {
-	Names []string `config:"names"`
+	Enabled bool     `config:"enabled"`
+	Names   []string `config:"names"`
 }
 
 type StatsConfig struct {

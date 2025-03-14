@@ -70,6 +70,56 @@
               type: long
               description: >
                 The fsync/sync interval for page cache in the filestore
+    - name: account
+      type: group
+      description: >
+        Information about a NATS JetStream account
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            The ID of the JetStream account
+        - name: name
+          type: keyword
+          description: >
+            The name of the JetStream account
+        - name: accounts
+          type: integer
+          description: >
+            The number of accounts using JetStream on the server
+        - name: high_availability_assets
+          type: integer
+          description: >
+            Indicates the number of JetStream high-availability (HA) assets allocated for an account.
+        - name: memory
+          type: long
+          description: >
+            The amount of memory in bytes currently used by JetStream for this account
+        - name: storage
+          type: long
+          description: >
+            The amount of storage in bytes currently used by JetStream for this account.
+        - name: reserved_memory
+          type: long
+          description: >
+            The maximum memory quota reserved for this account (in bytes).
+        - name: reserved_storage
+          type: long
+          description: >
+            The maximum disk storage quota reserved for this account (in bytes).
+        - name: api
+          type: group
+          description: >
+            API stats pertaining to this account.
+          fields:
+            - name: total
+              type: long
+              description: >
+                The total number of JetStream API calls made by this account.
+            - name: errors
+              type: long
+              description: >
+                The total number of JetStream API errors encountered by this account.
     - name: stream
       type: group
       description: >

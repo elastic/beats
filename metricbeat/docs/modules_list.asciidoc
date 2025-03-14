@@ -231,8 +231,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-mysql-query,query>> beta[]  
 |<<metricbeat-metricset-mysql-status,status>>   
 |<<metricbeat-module-nats,NATS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.6+| .6+|  |<<metricbeat-metricset-nats-connection,connection>>   
+.7+| .7+|  |<<metricbeat-metricset-nats-connection,connection>>   
 |<<metricbeat-metricset-nats-connections,connections>>   
+|<<metricbeat-metricset-nats-jetstream,jetstream>> beta[]  
 |<<metricbeat-metricset-nats-route,route>>   
 |<<metricbeat-metricset-nats-routes,routes>>   
 |<<metricbeat-metricset-nats-stats,stats>>   

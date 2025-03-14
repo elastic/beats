@@ -126,6 +126,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats/connection"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats/connections"
+	_ "github.com/elastic/beats/v7/metricbeat/module/nats/jetstream"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats/route"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats/routes"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats/stats"

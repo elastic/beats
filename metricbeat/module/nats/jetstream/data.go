@@ -57,6 +57,24 @@ var (
 		},
 	}
 
+	jetstreamAccountSchema = s.Schema{
+		"category": c.Str("category"),
+		"account": s.Object{
+			"id":                       c.Str("id"),
+			"name":                     c.Str("name"),
+			"memory":                   c.Int("memory"),
+			"storage":                  c.Int("storage"),
+			"reserved_memory":          c.Int("reserved_memory"),
+			"reserved_storage":         c.Int("reserved_storage"),
+			"accounts":                 c.Int("accounts"),
+			"high_availability_assets": c.Int("ha_assets"),
+			"api": s.Object{
+				"total":  c.Int("api_total"),
+				"errors": c.Int("api_errors"),
+			},
+		},
+	}
+
 	jetstreamStreamSchema = s.Schema{
 		"category": c.Str("category"),
 		"stream": s.Object{
@@ -186,12 +204,21 @@ type JetstreamConfig struct {
 }
 
 type JetstreamAccountDetails struct {
-	Id            string                  `json:"id"`
-	Name          string                  `json:"name"`
-	Memory        int                     `json:"memory"`
-	Storage       int                     `json:"storage"`
-	Accounts      int                     `json:"accounts"`
-	StreamDetails []JetstreamStreamDetail `json:"stream_detail"`
+	Id                     string                  `json:"id"`
+	Name                   string                  `json:"name"`
+	Memory                 int                     `json:"memory"`
+	Storage                int                     `json:"storage"`
+	Accounts               int                     `json:"accounts"`
+	ReservedMemory         int                     `json:"reserved_memory"`
+	ReservedStorage        int                     `json:"reserved_storage"`
+	HighAvailabilityAssets int                     `json:"ha_assets"`
+	ApiStats               AccountApiStats         `json:"api"`
+	StreamDetails          []JetstreamStreamDetail `json:"stream_detail"`
+}
+
+type AccountApiStats struct {
+	Total  int `json:"total"`
+	Errors int `json:"errors"`
 }
 
 func (me JetstreamAccountDetails) GetName() string {
@@ -305,6 +332,10 @@ func eventMapping(m *MetricSet, r mb.ReporterV2, content []byte) error {
 		err = statsMapping(r, response)
 	}
 
+	if m.Config.Account.Enabled {
+		err = accountMapping(r, response, m.Config)
+	}
+
 	if m.Config.Stream.Enabled {
 		err = streamMapping(r, response, m.Config)
 	}
@@ -376,6 +407,47 @@ func filterByName[T NamedItem](collection []T, allowedValues []string) []T {
 	}
 
 	return filtered
+}
+
+func accountMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
+	for _, account := range filterByName(response.AccountDetails, config.Account.Names) {
+		moduleFields, timestamp, err := getSharedEventDetails(response)
+
+		if err != nil {
+			return fmt.Errorf("failure applying module schema: %w", err)
+		}
+
+		metricSetFields, err := jetstreamAccountSchema.Apply(map[string]interface{}{
+			"category":         accountCategory,
+			"id":               account.Id,
+			"name":             account.Name,
+			"memory":           account.Memory,
+			"storage":          account.Storage,
+			"reserved_memory":  account.ReservedMemory,
+			"reserved_storage": account.ReservedStorage,
+			"accounts":         account.Accounts,
+			"ha_assets":        account.HighAvailabilityAssets,
+			"api_total":        account.ApiStats.Total,
+			"api_errors":       account.ApiStats.Errors,
+		})
+
+		if err != nil {
+			return fmt.Errorf("failure applying jetstream.account schema: %w", err)
+		}
+
+		// Create and emit the event
+		event := mb.Event{
+			MetricSetFields: metricSetFields,
+			ModuleFields:    moduleFields,
+			Timestamp:       timestamp,
+		}
+
+		if !r.Event(event) {
+			return nil
+		}
+	}
+
+	return nil
 }
 
 func streamMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
