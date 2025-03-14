@@ -870,6 +870,40 @@ metricbeat.modules:
     include: []
     exclude: []
 
+#------------------------------ PGBouncer Module ------------------------------
+- module: pgbouncer
+  enabled: true
+  metricsets:
+    # Monitors the current state of the connection pools including metrics like active connections, idle connections, waiting connections, and max allowed connections
+    # Essential for assessing load and capacity
+    - pools
+
+    # Provides comprehensive data on connections, pools, and queries including total queries, average query duration, and query rates
+    # Useful for performance tuning and identifying bottlenecks
+    - stats
+
+    # Details current activity of the PgBouncer service showing lists of databases and users
+    # Helps in auditing access and understanding user distribution
+    - lists
+
+    # Reports on the sizes of internal memory allocations to track memory usage and potential leaks, critical for maintaining system stability
+    - memory
+
+  period: 10s
+
+  # The host must be passed as PostgreSQL URL. Example:
+  # postgres://localhost/pgbouncer:6432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  # You have to specify the pgbouncer as the database name.
+  hosts: ["postgres://localhost/pgbouncer:6432"]
+
+  # Username to use when connecting to PostgreSQL. Empty by default.
+  #username: user
+
+  # Password to use when connecting to PostgreSQL. Empty by default.
+  #password: pass
+
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:

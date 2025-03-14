@@ -1359,6 +1359,40 @@ metricbeat.modules:
   hosts: ["localhost"]
 
 
+#------------------------------ PGBouncer Module ------------------------------
+- module: pgbouncer
+  enabled: true
+  metricsets:
+    # Monitors the current state of the connection pools including metrics like active connections, idle connections, waiting connections, and max allowed connections
+    # Essential for assessing load and capacity
+    - pools
+
+    # Provides comprehensive data on connections, pools, and queries including total queries, average query duration, and query rates
+    # Useful for performance tuning and identifying bottlenecks
+    - stats
+
+    # Details current activity of the PgBouncer service showing lists of databases and users
+    # Helps in auditing access and understanding user distribution
+    - lists
+
+    # Reports on the sizes of internal memory allocations to track memory usage and potential leaks, critical for maintaining system stability
+    - memory
+
+  period: 10s
+
+  # The host must be passed as PostgreSQL URL. Example:
+  # postgres://localhost/pgbouncer:6432?sslmode=disable
+  # The available parameters are documented here:
+  # https://godoc.org/github.com/lib/pq#hdr-Connection_String_Parameters
+  # You have to specify the pgbouncer as the database name.
+  hosts: ["postgres://localhost/pgbouncer:6432"]
+
+  # Username to use when connecting to PostgreSQL. Empty by default.
+  #username: user
+
+  # Password to use when connecting to PostgreSQL. Empty by default.
+  #password: pass
+
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
   metricsets:
@@ -1399,6 +1433,67 @@ metricbeat.modules:
 
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
+
+#------------------------------ Prometheus Module ------------------------------
+# Metrics collected from a Prometheus endpoint
+- module: prometheus
+  period: 10s
+  metricsets: ["collector"]
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  #metrics_filters:
+  #  include: []
+  #  exclude: []
+  #username: "user"
+  #password: "secret"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
+  # This can be used for service account based authorization:
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+
+# Metrics sent by a Prometheus server using remote_write option
+#- module: prometheus
+#  metricsets: ["remote_write"]
+#  host: "localhost"
+#  port: "9201"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+#- module: prometheus
+#  metricsets: ["query"]
+#  hosts: ["localhost:9090"]
+#  period: 10s
+#  queries:
+#  - name: "instant_vector"
+#    path: "/api/v1/query"
+#    params:
+#      query: "sum(rate(prometheus_http_requests_total[1m]))"
+#  - name: "range_vector"
+#    path: "/api/v1/query_range"
+#    params:
+#      query: "up"
+#      start: "2019-12-20T00:00:00.000Z"
+#      end:  "2019-12-21T00:00:00.000Z"
+#      step: 1h
+#  - name: "scalar"
+#    path: "/api/v1/query"
+#    params:
+#      query: "100"
+#  - name: "string"
+#    path: "/api/v1/query"
+#    params:
+#      query: "some_value"
 
 #----------------------- Prometheus Typed Metrics Module -----------------------
 - module: prometheus
@@ -1450,67 +1545,6 @@ metricbeat.modules:
   #types_patterns:
   #  counter_patterns: []
   #  histogram_patterns: []
-
-# Metrics that will be collected using a PromQL
-#- module: prometheus
-#  metricsets: ["query"]
-#  hosts: ["localhost:9090"]
-#  period: 10s
-#  queries:
-#  - name: "instant_vector"
-#    path: "/api/v1/query"
-#    params:
-#      query: "sum(rate(prometheus_http_requests_total[1m]))"
-#  - name: "range_vector"
-#    path: "/api/v1/query_range"
-#    params:
-#      query: "up"
-#      start: "2019-12-20T00:00:00.000Z"
-#      end:  "2019-12-21T00:00:00.000Z"
-#      step: 1h
-#  - name: "scalar"
-#    path: "/api/v1/query"
-#    params:
-#      query: "100"
-#  - name: "string"
-#    path: "/api/v1/query"
-#    params:
-#      query: "some_value"
-
-#------------------------------ Prometheus Module ------------------------------
-# Metrics collected from a Prometheus endpoint
-- module: prometheus
-  period: 10s
-  metricsets: ["collector"]
-  hosts: ["localhost:9090"]
-  metrics_path: /metrics
-  #metrics_filters:
-  #  include: []
-  #  exclude: []
-  #username: "user"
-  #password: "secret"
-
-  # Count number of metrics present in Elasticsearch document (default: false)
-  #metrics_count: false
-
-  # This can be used for service account based authorization:
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  #ssl.certificate_authorities:
-  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-
-
-# Metrics sent by a Prometheus server using remote_write option
-#- module: prometheus
-#  metricsets: ["remote_write"]
-#  host: "localhost"
-#  port: "9201"
-
-  # Count number of metrics present in Elasticsearch document (default: false)
-  #metrics_count: false
-
-  # Secure settings for the server using TLS/SSL:
-  #ssl.certificate: "/etc/pki/server/cert.pem"
-  #ssl.key: "/etc/pki/server/cert.key"
 
 # Metrics that will be collected using a PromQL
 #- module: prometheus
