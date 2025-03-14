@@ -343,6 +343,46 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 					return true, err
 				}
 				st := logInputStateFromMapM(m)
+				// That is a workaround for the big problem with the
+				// Log input Registrar (`filebeat/registrar`) and the way it
+				// handles states.
+				// There are two problems:
+				//  - 1. The log input store/registrar does not have an API for
+				//       removing states
+				//  - 2. When `registrar.Registrar` starts, it copies all states
+				//       belonging to the Log input from the disk store into
+				//       memory and when the Registrar is shutting down, it
+				//       it writes all states to the disk. This all happens even
+				//       if no Log input was started.
+				// This means that no matter what we do here, the states from
+				// the Log input are always re-written to disk.
+				// See filebeat/registrar/migrate.go:367 (resetStates)
+				//
+				// However, there is a "reset state" code, that runs
+				// during the Registrar initialisation and sets the
+				// TTL to -2, once the Log input havesting that file starts
+				// the TTL is set to -1 (never expires) or the configured
+				// value.
+				// See filebeat/registrar/registrar.go:296 (readStatesFrom) and
+				// filebeat/beater/filebeat.go:433 (registrar.Start())
+				//
+				// This means that while the Log input is running and the file
+				// has been active at any moment during the Filebeat's execution
+				// the TTL is never going to be -2 during the shutdown.
+				//
+				// So, if TTL == -2, then in the previous run of Filebeat, there
+				// was no Log input using this state, which likely means, it is
+				// a state that has already been migrated to Filestream. Another
+				// possibility is that the Log input was removed, Filebeat was
+				// restarted one or more time, then the take_over was enabled.
+				// This is a very unlikely case, so we skip migrating the state.
+				//
+				// The worst case that can happen is that we re-ingest the file
+				// once, which is still better than copying an old state with
+				// an incorrect offset every time Filebeat starts.
+				if st.TTL == -2 {
+					return true, nil
+				}
 				st.key = key
 				fromLogInput[key] = st
 			}
@@ -440,9 +480,10 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, interface{})) {
 }
 
 type logInputState struct {
-	key    string `json:"-"`
-	ID     string `json:"id"`
-	Offset int64  `json:"offset"`
+	ID     string        `json:"id"`
+	Offset int64         `json:"offset"`
+	TTL    time.Duration `json:"ttl" struct:"ttl"`
+	key    string        `json:"-"`
 
 	// This matches the filestream.fileMeta struct
 	// and are used by UnpackCursorMeta
