@@ -7,7 +7,11 @@ if buildkite-agent artifact search "$name.tar.gz"; then
 	exit 0
 fi
 
+echo "downloading deps"
 go mod download
+
+echo "running go mod tidy"
+go mod tidy
 
 ls -alh $(go env GOMODCACHE)
 
