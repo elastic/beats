@@ -64,6 +64,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		cleanRemoved:        config.CleanRemoved,
 		stateChangeCloser:   config.Close.OnStateChange,
 		logger:              logger.Named("prospector"),
+		takeOver:            config.TakeOver,
 	}
 	if config.Rotation == nil {
 		return &fileprospector, nil

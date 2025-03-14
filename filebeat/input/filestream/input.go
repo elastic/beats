@@ -63,7 +63,7 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	closerConfig    closerConfig
 	parsers         parser.Config
-	takeOver        bool
+	takeOver        takeOverConfig
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -395,7 +395,7 @@ func (inp *filestream) readFromSource(
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 
 		// add "take_over" tag if `take_over` is set to true
-		if inp.takeOver {
+		if inp.takeOver.Enabled {
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 

@@ -86,14 +86,14 @@ func TestProspector_InitCleanIfRemoved(t *testing.T) {
 		testCase := testCase
 
 		t.Run(name, func(t *testing.T) {
-			testStore := newMockProspectorCleaner(testCase.entries)
+			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
 				logger:       logp.L(),
 				identifier:   mustPathIdentifier(false),
 				cleanRemoved: testCase.cleanRemoved,
 				filewatcher:  newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
-			p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return "" })
+			p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return "" })
 
 			assert.ElementsMatch(t, testCase.expectedCleanedKeys, testStore.cleanedKeys)
 		})
@@ -157,13 +157,13 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 		testCase := testCase
 
 		t.Run(name, func(t *testing.T) {
-			testStore := newMockProspectorCleaner(testCase.entries)
+			testStore := newMockStoreUpdater(testCase.entries)
 			p := fileProspector{
 				logger:      logp.L(),
 				identifier:  mustPathIdentifier(false),
 				filewatcher: newMockFileWatcherWithFiles(testCase.filesOnDisk),
 			}
-			err := p.Init(testStore, newMockProspectorCleaner(nil), func(loginp.Source) string { return testCase.newKey })
+			err := p.Init(testStore, newMockStoreUpdater(nil), func(loginp.Source) string { return testCase.newKey })
 			require.NoError(t, err, "prospector Init must succeed")
 			assert.EqualValues(t, testCase.expectedUpdatedKeys, testStore.updatedKeys)
 		})
@@ -253,7 +253,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 				},
 			}
 
-			testStore := newMockProspectorCleaner(entries)
+			testStore := newMockStoreUpdater(entries)
 			filesOnDisk := map[string]loginp.FileDescriptor{
 				tmpFileName: fd,
 			}
@@ -266,7 +266,7 @@ func TestMigrateRegistryToFingerprint(t *testing.T) {
 
 			err = p.Init(
 				testStore,
-				newMockProspectorCleaner(nil),
+				newMockStoreUpdater(nil),
 				newIDFunc,
 			)
 			require.NoError(t, err, "prospector Init must succeed")
@@ -745,39 +745,39 @@ func (u *mockUnpackValue) Key() string {
 	return u.key
 }
 
-type mockProspectorCleaner struct {
+type mockStoreUpdater struct {
 	available   map[string]loginp.Value
 	cleanedKeys []string
 	updatedKeys map[string]string
 }
 
-func newMockProspectorCleaner(available map[string]loginp.Value) *mockProspectorCleaner {
-	return &mockProspectorCleaner{
+func newMockStoreUpdater(available map[string]loginp.Value) *mockStoreUpdater {
+	return &mockStoreUpdater{
 		available:   available,
 		cleanedKeys: make([]string, 0),
 		updatedKeys: make(map[string]string, 0),
 	}
 }
 
-func (c *mockProspectorCleaner) CleanIf(pred func(v loginp.Value) bool) {
-	for key, meta := range c.available {
+func (m *mockStoreUpdater) CleanIf(pred func(v loginp.Value) bool) {
+	for key, meta := range m.available {
 		if pred(meta) {
-			c.cleanedKeys = append(c.cleanedKeys, key)
+			m.cleanedKeys = append(m.cleanedKeys, key)
 		}
 	}
 }
 
-func (c *mockProspectorCleaner) UpdateIdentifiers(updater func(v loginp.Value) (string, interface{})) {
-	for key, meta := range c.available {
+func (m *mockStoreUpdater) UpdateIdentifiers(updater func(v loginp.Value) (string, any)) {
+	for key, meta := range m.available {
 		k, _ := updater(meta)
 		if k != "" {
-			c.updatedKeys[key] = k
+			m.updatedKeys[key] = k
 		}
 	}
 }
 
-// FixUpIdentifiers does nothing
-func (c *mockProspectorCleaner) FixUpIdentifiers(func(loginp.Value) (string, interface{})) {}
+// TakeOver is a noop on this mock
+func (m *mockStoreUpdater) TakeOver(func(v loginp.Value) (string, any)) {}
 
 type renamedPathIdentifier struct {
 	fileIdentifier
