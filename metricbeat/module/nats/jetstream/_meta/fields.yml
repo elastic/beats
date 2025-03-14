@@ -66,7 +66,7 @@
   type: group
   release: beta
   description: >
-    Stats about NATS Jetstream streams
+    Information about a NATS JetStream stream
   fields:
     - name: name
       type: keyword
@@ -79,12 +79,12 @@
     - name: cluster
       type: group
       description: >
-        The cluster this stream belongs to
+        Cluster information for the stream
       fields:
         - name: leader
           type: keyword
           description: >
-            The ID of the leader
+            The ID of the leader in the cluster
     - name: state
       type: group
       description: >
@@ -129,7 +129,7 @@
     - name: account
       type: group
       description: >
-        Information about the account this stream relates to
+        Information about the account for this stream
       fields:
         - name: id
           type: keyword
@@ -155,7 +155,7 @@
         - name: num_replicas
           type: integer
           description: >
-            How many replicas to keep for each message in a clustered JetStream, maximum 5.
+            How many replicas to keep for each message in a clustered JetStream.
         - name: storage
           type: keyword
           description: >
@@ -193,9 +193,151 @@
   type: group
   release: beta
   description: >
-    Stats about NATS Jetstream consumers
+    Information about a NATS JetStream consumer
   fields:
-    - name: example
+    - name: name
       type: keyword
       description: >
-        Example field
+        The name of the consumer
+    - name: created
+      type: date
+      description: >
+        The date/time the consumer was created
+    - name: stream
+      type: group
+      description: >
+        Information about the stream for this consumer
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            The name of the stream
+    - name: cluster
+      type: group
+      description: >
+        Cluster information for the consumer
+      fields:
+        - name: leader
+          type: keyword
+          description: >
+            The ID of the leader in the cluster
+    - name: ack_floor
+      type: group
+      description: >
+        Information about message acknowledgements pertaining to AckFloor, which indicates the highest contiguous sequence number that has been fully acknowledged.
+      fields:
+        - name: consumer_seq
+          type: unsigned_long
+          description: >
+            The lowest contiguous consumer sequence number that has been acknowledged.
+        - name: stream_seq
+          type: unsigned_long
+          description: >
+            The lowest contiguous stream sequence number that has been acknowledged by the consumer.
+        - name: last_active
+          type: date
+          description: >
+            The timestamp of the last acknowledged message.
+    - name: delivered
+      type: group
+      description: >
+        Information about delivered messages
+      fields:
+        - name: consumer_seq
+          type: unsigned_long
+          description: >
+            The number of messages delivered to this consumer, starting from 1 when the consumer was created.
+        - name: stream_seq
+          type: unsigned_long
+          description: >
+            The last stream sequence number of a message delivered to the consumer. Corresponds to the global sequence of messages in the stream.
+        - name: last_active
+          type: date
+          description: >
+            The timestamp of the last message delivered to the consumer.
+    - name: num_ack_pending
+      type: unsigned_long
+      description: >
+        The number of messages that have been delivered to the consumer but not yet acknowledged.
+    - name: num_redelivered
+      type: unsigned_long
+      description: >
+        The number of messages that had to be resent because they were previously delivered but not acknowledged within the Ack Wait time.
+    - name: num_waiting
+      type: unsigned_long
+      description: >
+        The number of pull requests currently waiting for messages to be delivered.
+    - name: num_pending
+      type: unsigned_long
+      description: >
+        The number of messages remaining in the stream that the consumer has not yet delivered to any client.
+    - name: num_pending
+      type: unsigned_long
+      description: >
+        The number of messages remaining in the stream that the consumer has not yet delivered to any client.
+    - name: last_active_time
+      type: date
+      description: >
+        Represents the last activity time of the consumer.
+    - name: account
+      type: group
+      description: >
+        Information about the account for this consumer
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            The ID of the account
+        - name: name
+          type: keyword
+          description: >
+            The name of the account
+    - name: config
+      type: group
+      description: >
+        Information about the configuration for this consumer
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            The name of the consumer
+        - name: durable_name
+          type: keyword
+          description: >
+            The durable name of the consumer. If set, clients can have subscriptions bind to the consumer and resume until the consumer is explicitly deleted.
+        - name: deliver_policy
+          type: keyword
+          description: >
+            The point in the stream from which to receive messages.
+        - name: filter_subject
+          type: keyword
+          description: >
+            A subject that overlaps with the subjects bound to the stream to filter delivery to subscribers.
+        - name: replay_policy
+          type: keyword
+          description: >
+            The configured replay policy for the consumer.
+        - name: ack_policy
+          type: keyword
+          description: >
+            The configured ack policy for the consumer.
+        - name: ack_wait
+          type: unsigned_long
+          description: >
+            The duration (in nanoseconds) that the server will wait for an acknowledgment for any individual message once it has been delivered to a consumer. If an acknowledgment is not received in time, the message will be redelivered.
+        - name: max_deliver
+          type: integer
+          description: >
+            The maximum number of times a message will be redelivered if not acknowledged.
+        - name: max_waiting
+          type: integer
+          description: >
+            The maximum number of pull requests a consumer can have waiting for messages.
+        - name: max_ack_pending
+          type: integer
+          description: >
+            The maximum number of messages the consumer can have in-flight (delivered but unacknowledged) at any time.
+        - name: num_replicas
+          type: integer
+          description: >
+            The number of replicas for the consumer’s state in a JetStream cluster.
