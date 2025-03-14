@@ -2,6 +2,9 @@ package util
 
 import (
 	"regexp"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ExtractWorkloadName 根据 Pod 名称提取出非随机的前缀部分，即工作负载名称
