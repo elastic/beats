@@ -157,6 +157,8 @@ func TestFetchTimeout(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
+
+		// make sure the request takes longer than the configured timeout.
 		time.Sleep(timeout + 5*time.Millisecond)
 		w.Write([]byte(response))
 	}))
