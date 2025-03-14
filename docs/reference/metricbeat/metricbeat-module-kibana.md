@@ -67,7 +67,6 @@ The following metricsets are available:
 * [cluster_rules](/reference/metricbeat/metricbeat-metricset-kibana-cluster_rules.md)
 * [node_actions](/reference/metricbeat/metricbeat-metricset-kibana-node_actions.md)
 * [node_rules](/reference/metricbeat/metricbeat-metricset-kibana-node_rules.md)
-* [settings](/reference/metricbeat/metricbeat-metricset-kibana-settings.md)
 * [stats](/reference/metricbeat/metricbeat-metricset-kibana-stats.md)
 * [status](/reference/metricbeat/metricbeat-metricset-kibana-status.md)
 

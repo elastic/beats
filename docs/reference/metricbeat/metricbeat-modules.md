@@ -173,7 +173,6 @@ This section contains detailed information about the metric collecting modules c
 | [cluster_rules](/reference/metricbeat/metricbeat-metricset-kibana-cluster_rules.md) [beta] |
 | [node_actions](/reference/metricbeat/metricbeat-metricset-kibana-node_actions.md) [beta] |
 | [node_rules](/reference/metricbeat/metricbeat-metricset-kibana-node_rules.md) [beta] |
-| [settings](/reference/metricbeat/metricbeat-metricset-kibana-settings.md) |
 | [stats](/reference/metricbeat/metricbeat-metricset-kibana-stats.md) |
 | [status](/reference/metricbeat/metricbeat-metricset-kibana-status.md) |
 | [Kubernetes](/reference/metricbeat/metricbeat-module-kubernetes.md) | ![Prebuilt dashboards are available](images/icon-yes.png "") |  |

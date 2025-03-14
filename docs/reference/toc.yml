@@ -1000,7 +1000,6 @@ toc:
               - file: metricbeat/metricbeat-metricset-kibana-cluster_rules.md
               - file: metricbeat/metricbeat-metricset-kibana-node_actions.md
               - file: metricbeat/metricbeat-metricset-kibana-node_rules.md
-              - file: metricbeat/metricbeat-metricset-kibana-settings.md
               - file: metricbeat/metricbeat-metricset-kibana-stats.md
               - file: metricbeat/metricbeat-metricset-kibana-status.md
           - file: metricbeat/metricbeat-module-kubernetes.md
