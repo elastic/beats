@@ -135,7 +135,7 @@ You can send data to other [outputs](/reference/heartbeat/configuring-output.md)
 
 ## Step 3: Configure Heartbeat monitors [configuration]
 
-Heartbeat provides monitors to check the status of hosts at set intervals. Heartbeat currently provides monitors for ICMP, TCP, and HTTP (see [*Heartbeat overview*](/reference/heartbeat/heartbeat-overview.md) for more about these monitors).
+Heartbeat provides monitors to check the status of hosts at set intervals. Heartbeat currently provides monitors for ICMP, TCP, and HTTP (see [*Heartbeat overview*](/reference/heartbeat/index.md) for more about these monitors).
 
 You configure each monitor individually. In `heartbeat.yml`, specify the list of monitors that you want to enable. Each item in the list begins with a dash (-). The following example configures Heartbeat to use three monitors: an `icmp` monitor, a `tcp` monitor, and an `http` monitor.
 
