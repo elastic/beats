@@ -71,9 +71,28 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 }
 
 func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
-	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
+	// 1st collect all input metrics explicitly registered by RegisterMetrics.
+	registeredInputRegistries := registeredInputs.CollectStructSnapshot()
+	filtered := make([]map[string]any, 0, len(registeredInputRegistries))
+	inputs := map[string]struct{}{}
 
-	filtered := make([]map[string]any, 0, len(metrics))
+	for _, reg := range registeredInputRegistries {
+		if !requestedInput(reg["input"], requestedType) {
+			continue
+		}
+
+		// it should always succeed, but better safe than sorry.
+		id, ok := reg["id"].(string)
+		if !ok {
+			continue
+		}
+
+		inputs[id] = struct{}{}
+		filtered = append(filtered, reg)
+	}
+
+	// 2nd collect the metrics from globalRegistry()
+	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
 		if !ok {
@@ -81,17 +100,35 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		if id, ok := m["id"].(string); !ok || id == "" {
+		id, ok := m["id"].(string)
+		if !ok || id == "" {
 			continue
 		}
 
-		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+		// if a registry with this id has been already registered, skip it.
+		if _, found := inputs[id]; found {
+			continue
+		}
+
+		if !requestedInput(m["input"], requestedType) {
 			continue
 		}
 
 		filtered = append(filtered, m)
 	}
+
 	return filtered
+}
+
+func requestedInput(input any, requestedType string) bool {
+	inputType, ok := input.(string)
+	if !ok ||
+		(requestedType != "" &&
+			!strings.EqualFold(inputType, requestedType)) {
+		return false
+	}
+
+	return true
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {

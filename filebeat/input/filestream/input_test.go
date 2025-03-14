@@ -36,6 +36,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -179,7 +180,7 @@ func runFilestreamBenchmark(b *testing.B, testID string, cfg string, expEventCou
 // with the given configuration and event limit.
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
-// `eventLimit` is an amount of produced events after which the filestream will shutdown
+// `eventLimit` is an amount of produced events after which the filestream will shut down
 // `collectEvents` if `true` the runner will return a list of all events produced by the filestream input.
 // Events should not be collected in benchmarks due to high extra costs of using the channel.
 //
@@ -194,11 +195,15 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	require.NoError(b, err)
 
 	ctx, cancel := context.WithCancel(ctx)
-	context := v2.Context{
-		Logger:      logger,
-		ID:          testID,
-		Cancelation: ctx,
-	}
+	v2ctx := v2.NewContext(
+		testID,
+		testID,
+		"filestream-test",
+		beat.Info{},
+		ctx,
+		nil,
+		monitoring.NewRegistry(),
+		logger)
 
 	connector, events := newTestPipeline(eventLimit, collectEvents)
 	var out []beat.Event
@@ -215,7 +220,7 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	}()
 
 	return func(t testing.TB) []beat.Event {
-		err := input.Run(context, connector)
+		err := input.Run(v2ctx, connector)
 		require.NoError(b, err)
 
 		return out

@@ -42,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -123,12 +124,20 @@ func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	return e.plugin.Manager
 }
 
-func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) {
+func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp v2.Input) {
 	e.wg.Add(1)
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
-		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
+
+		inputCtx := v2.NewContext(
+			id,
+			id,
+			inp.Name(),
+			beat.Info{},
+			ctx, nil,
+			monitoring.GetNamespace("dataset").GetRegistry(),
+			logp.L())
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }

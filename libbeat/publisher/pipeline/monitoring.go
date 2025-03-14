@@ -55,8 +55,8 @@ type retryObserver interface {
 	eventsRetry(int)
 }
 
-// metricsObserver is used by many component in the publisher pipeline, to report
-// internal events. The oberserver can call registered global event handlers or
+// metricsObserver is used by many components in the publisher pipeline, to report
+// internal events. The observer can call registered global event handlers or
 // updated shared counters/metrics for reporting.
 // All events required for reporting events/metrics on the pipeline-global level
 // are defined by observer. The components are only allowed to serve localized
@@ -72,8 +72,15 @@ type metricsObserverVars struct {
 
 	// eventsTotal publish/dropped stats
 	eventsTotal, eventsFiltered, eventsPublished, eventsFailed *monitoring.Uint
-	eventsDropped, eventsRetry                                 *monitoring.Uint // (retryer) drop/retry counters
-	activeEvents                                               *monitoring.Uint
+
+	eventsDropped, eventsRetry *monitoring.Uint // (retryer) drop/retry counters
+	activeEvents               *monitoring.Uint
+}
+
+type inputMetrics struct {
+	eventsTotal,
+	eventsFiltered,
+	eventsPublished *monitoring.Uint
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
@@ -177,6 +184,56 @@ func (o *metricsObserver) eventsDropped(n int) {
 // (retryer) number of events pushed to the output worker queue
 func (o *metricsObserver) eventsRetry(n int) {
 	o.vars.eventsRetry.Add(uint64(n))
+}
+
+// inputAwareMetricsObserver wraps a metricsObserver to collect per-input
+// metrics.
+type inputAwareMetricsObserver struct {
+	observer observer
+	input    inputMetrics
+}
+
+func (i inputAwareMetricsObserver) clientConnected() {
+	i.observer.clientConnected()
+}
+
+func (i inputAwareMetricsObserver) clientClosed() {
+	i.observer.clientClosed()
+}
+
+func (i inputAwareMetricsObserver) newEvent() {
+	i.observer.newEvent()
+	i.input.eventsTotal.Inc()
+}
+
+func (i inputAwareMetricsObserver) filteredEvent() {
+	i.observer.filteredEvent()
+	i.input.eventsFiltered.Inc()
+}
+
+func (i inputAwareMetricsObserver) publishedEvent() {
+	i.observer.publishedEvent()
+	i.input.eventsPublished.Inc()
+}
+
+func (i inputAwareMetricsObserver) failedPublishEvent() {
+	i.observer.failedPublishEvent()
+}
+
+func (i inputAwareMetricsObserver) eventsACKed(count int) {
+	i.observer.eventsACKed(count)
+}
+
+func (i inputAwareMetricsObserver) eventsDropped(count int) {
+	i.observer.eventsDropped(count)
+}
+
+func (i inputAwareMetricsObserver) eventsRetry(count int) {
+	i.observer.eventsRetry(count)
+}
+
+func (i inputAwareMetricsObserver) cleanup() {
+	i.observer.cleanup()
 }
 
 type emptyObserver struct{}

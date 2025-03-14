@@ -87,20 +87,83 @@ func TestMetricSnapshotJSON(t *testing.T) {
 		require.NoError(t, globalRegistry().Clear())
 	})
 
-	r, cancel := NewInputRegistry("test", "my-id", nil)
+	// ============== Input using new API and unique namespace ==============
+	// Simulates input using the metrics registry from the v2.Context.
+	// It cannot use the v2.Context directly because it creates an import cycle.
+	inputID := "input-with-pipeline-metrics-new-inputAPI"
+	reg := monitoring.GetNamespace("beat-x").GetRegistry().
+		NewRegistry(inputID)
+	monitoring.NewString(reg, "id").Set(inputID)
+	monitoring.NewString(reg, "input").Set("test")
+	require.NoError(t, RegisterMetrics(inputID+"-test", reg), "could not register metrics")
+	monitoring.NewInt(reg, "foo1_total").Set(100)
+	monitoring.NewInt(reg, "events_pipeline_total").Set(100)
+
+	// =========== Input using new API and legacy, global namespace ===========
+	// Simulates input unaware of the metrics registry from the v2.Context. In
+	// that case the parent context used by the v2.Context is the legacy
+	// globalRegistry() and the input also registers its metrics directly.
+	inputID = "input-with-pipeline-metrics-globalRegistry()"
+	reg = globalRegistry().NewRegistry(inputID)
+	monitoring.NewString(reg, "id").Set(inputID)
+	monitoring.NewString(reg, "input").Set("test")
+	// Explicitly register those metrics to be published.
+	require.NoError(t, RegisterMetrics(inputID+"-test", reg), "could not register metrics")
+	monitoring.NewInt(reg, "events_pipeline_total").Set(200)
+
+	// now the input also register its metrics with the deprecated
+	// NewInputRegistry.
+	reg, cancel := NewInputRegistry(
+		"test", inputID, nil)
 	defer cancel()
-	monitoring.NewInt(r, "foo_total").Set(100)
+	monitoring.NewInt(reg, "foo2_total").Set(100)
+
+	// ===== An input registering metrics, but not using the v2.Context =====
+	// an input registering metrics on the global namespace. This simulates an
+	// input which does not use the metrics registry from the v2.Context.
+	inputOldAPI := "input-without-pipeline-metrics"
+	reg, cancel = NewInputRegistry(
+		"test", inputOldAPI, nil)
+	defer cancel()
+	monitoring.NewInt(reg, "foo2_total").Set(100)
+
+	// ==== registries in the global registries which aren't input metrics ===
+	// unrelated registry in the global namespace, should be ignored.
+	reg = globalRegistry().NewRegistry("another-registry")
+	monitoring.NewInt(reg, "foo3_total").Set(100)
+
+	// another input registry missing required information.
+	reg = globalRegistry().NewRegistry("yet-another-registry")
+	monitoring.NewString(reg, "id").Set("some-id")
+	monitoring.NewInt(reg, "foo3_total").Set(100)
 
 	jsonBytes, err := MetricSnapshotJSON()
 	require.NoError(t, err)
 
 	const expected = `[
   {
-    "foo_total": 100,
-    "id": "my-id",
+    "events_pipeline_total": 100,
+    "foo1_total": 100,
+    "id": "input-with-pipeline-metrics-new-inputAPI",
+    "input": "test"
+  },
+  {
+    "events_pipeline_total": 200,
+    "foo2_total": 100,
+    "id": "input-with-pipeline-metrics-globalRegistry()",
+    "input": "test"
+  },
+  {
+    "foo2_total": 100,
+    "id": "input-without-pipeline-metrics",
     "input": "test"
   }
 ]`
 
-	assert.Equal(t, expected, string(jsonBytes))
+	got := string(jsonBytes)
+	assert.Equal(t, expected, got)
+	// It's easier to understand the failure with the full output.
+	if t.Failed() {
+		t.Logf("API reponse:\n%s\n", got)
+	}
 }

@@ -19,12 +19,17 @@ package v2
 
 import (
 	"context"
+	"strings"
 	"time"
+
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/go-concert/unison"
 )
@@ -83,22 +88,140 @@ type Context struct {
 	// https://github.com/elastic/beats/blob/43d80af2aea60b0c45711475d114e118d90c4581/filebeat/input/v2/input-cursor/input.go#L118
 	IDWithoutName string
 
+	// Name is the input name, sometimes referred as input type.
+	Name string
+
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
-	// Cancelation is used by Beats to signal the input to shutdown.
+	// Cancelation is used by Beats to signal the input to shut down.
 	Cancelation Canceler
 
 	// StatusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.
 	StatusReporter status.StatusReporter
+
+	// monitoringRegistry is the registry collecting metrics for the input using
+	// this context.
+	monitoringRegistry *monitoring.Registry
+	// monitoringRegistryCancel removes the registry from its parent and from
+	// the HTTP monitoring endpoint.
+	monitoringRegistryCancel func()
 }
 
-func (c Context) UpdateStatus(status status.Status, msg string) {
+// NewContext creates a new context with a metrics registry populated with
+// 'id: id' and 'input: inputType'. The registry is registered to be published
+// by the HTTP monitoring endpoint. The metrics registry is created on
+// parentRegistry, if it's not nil, or on a new unregistered registry.
+func NewContext(
+	id,
+	idWithoutName,
+	inputType string,
+	agent beat.Info,
+	cancelation Canceler,
+	statusReporter status.StatusReporter,
+	parentRegistry *monitoring.Registry,
+	log *logp.Logger) Context {
+	if parentRegistry == nil || id == "" {
+		log.Warn("registering metrics for %s, id: %s, with empty parent registry or empty ID",
+			inputType, id)
+		parentRegistry = monitoring.NewRegistry()
+	}
+
+	metricsID := strings.ReplaceAll(id, ".", "_")
+	reg := parentRegistry.GetRegistry(metricsID)
+	if reg == nil {
+		reg = parentRegistry.NewRegistry(metricsID)
+	}
+
+	// add the necessary information so the registry can be published by the
+	// HTTP monitoring endpoint.
+	monitoring.NewString(reg, "input").Set(inputType)
+	monitoring.NewString(reg, "id").Set(id)
+
+	// register to be published by the HTTP monitoring endpoint.
+	err := inputmon.RegisterMetrics(metricsID, reg)
+	if err != nil {
+		log.Errorf("failed to register metrics for '%s', id: %s,: %v",
+			inputType, id, err)
+	}
+
+	metricsLog := logp.NewLogger("metric_registry")
+	var uid string
+	if uidv4, err := uuid.NewV4(); err != nil {
+		metricsLog.Errorf(
+			"failed to generate uuid to track input metrics register/unregister: %v",
+			err)
+	} else {
+		uid = uidv4.String()
+	}
+
+	// Log the registration to ease tracking down duplicate ID registrations.
+	// Logged at INFO rather than DEBUG since it is not in a hot path and having
+	// the information available by default can short-circuit requests for debug
+	// logs during support interactions.
+	metricsLog.Infow("registering",
+		"input_type", inputType,
+		"id", id,
+		"registry_name", metricsID,
+		"uuid", uid)
+
+	unreg := func() {
+		metricsLog.Infow("unregistering",
+			"input_type", inputType,
+			"id", id,
+			"registry_name",
+			metricsID, "uuid", uid)
+		parentRegistry.Remove(metricsID)
+		// it's safe to make this call even if registering them failed.
+		inputmon.UnregisterMetrics(metricsID)
+	}
+	return Context{
+		ID:            id,
+		IDWithoutName: idWithoutName,
+		Name:          inputType,
+
+		Agent:          agent,
+		Cancelation:    cancelation,
+		StatusReporter: statusReporter,
+
+		Logger: log,
+
+		monitoringRegistry:       reg,
+		monitoringRegistryCancel: unreg,
+	}
+}
+
+func (c *Context) UpdateStatus(status status.Status, msg string) {
 	if c.StatusReporter != nil {
 		c.Logger.Debugf("updating status, status: '%s', message: '%s'", status.String(), msg)
 		c.StatusReporter.UpdateStatus(status, msg)
+	}
+}
+
+// MetricRegistry returns the metrics registry associated with this context.
+// This should be the metrics registry used by inputs to register their metrics.
+// It's already registered to be published by the HTTP monitoring endpoint.
+func (c *Context) MetricRegistry() *monitoring.Registry {
+	return c.monitoringRegistry
+}
+
+// UpdateMetricRegistry overrides the `id` and `input` entries in the metrics
+// registry and returns the registry. It exists for backwards compatibility as
+// some inputs set a different input type/name than their name.
+func (c *Context) UpdateMetricRegistry(id, inputType string) *monitoring.Registry {
+	monitoring.NewString(c.MetricRegistry(), "input").Set(inputType)
+	monitoring.NewString(c.MetricRegistry(), "id").Set(id)
+
+	return c.MetricRegistry()
+}
+
+// UnregisterMetrics removes the metrics registry from its parent registry and
+// from the HTTP monitoring endpoint.
+func (c *Context) UnregisterMetrics() {
+	if c.monitoringRegistryCancel != nil {
+		c.monitoringRegistryCancel()
 	}
 }
 
@@ -112,7 +235,7 @@ type TestContext struct {
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
-	// Cancelation is used by Beats to signal the input to shutdown.
+	// Cancelation is used by Beats to signal the input to shut down.
 	Cancelation Canceler
 }
 
