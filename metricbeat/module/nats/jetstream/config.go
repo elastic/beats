@@ -22,11 +22,10 @@ type ModuleConfig struct {
 }
 
 type MetricsetConfig struct {
-	Account    AccountConfig  `config:"account"`
-	Stats      StatsConfig    `config:"stats"`
-	Stream     StreamConfig   `config:"stream"`
-	Consumer   ConsumerConfig `config:"consumer"`
-	MaxResults int            `config:"max_results"`
+	Account  AccountConfig  `config:"account"`
+	Stats    StatsConfig    `config:"stats"`
+	Stream   StreamConfig   `config:"stream"`
+	Consumer ConsumerConfig `config:"consumer"`
 }
 
 type AccountConfig struct {

@@ -80,11 +80,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	maxResults := config.Jetstream.MaxResults
-	if maxResults == 0 {
-		maxResults = 1024
+	detailLevel := ""
+	if config.Jetstream.Stream.Enabled {
+		detailLevel = "streams"
 	}
-	http.SetURI(fmt.Sprintf("%s?limit=%d&config=true&consumers=true", http.GetURI(), maxResults))
+
+	if config.Jetstream.Consumer.Enabled {
+		detailLevel = "consumers"
+	}
+	http.SetURI(fmt.Sprintf("%s?config=true", http.GetURI()))
+	if detailLevel != "" {
+		http.SetURI(fmt.Sprintf("%s&%s=true", http.GetURI(), detailLevel))
+	}
 
 	return &MetricSet{
 		base,
