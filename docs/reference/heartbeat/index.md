@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/index.html
 ---
 
-# Heartbeat overview [heartbeat-overview]
+# Heartbeat
 
 Heartbeat is a lightweight daemon that you install on a remote server to periodically check the status of your services and determine whether they are available. Unlike [Metricbeat](/reference/metricbeat/index.md), which only tells you if your servers are up or down, Heartbeat tells you whether your services are reachable.
 

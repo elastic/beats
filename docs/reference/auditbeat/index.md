@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/index.html
 ---
 
-# Auditbeat overview [auditbeat-overview]
+# Auditbeat
 
 Auditbeat is a lightweight shipper that you can install on your servers to audit the activities of users and processes on your systems. For example, you can use Auditbeat to collect and centralize audit events from the Linux Audit Framework. You can also use Auditbeat to detect changes to critical files, like binaries and configuration files, and identify potential security policy violations.
 

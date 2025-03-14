@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/index.html
 ---
 
-# Packetbeat overview [packetbeat-overview]
+# Packetbeat
 
 Packetbeat is a real-time network packet analyzer that you can use with Elasticsearch to provide an *application monitoring and performance analytics system*. Packetbeat completes the [Beats platform](/reference/index.md) by providing visibility between the servers of your network.
 

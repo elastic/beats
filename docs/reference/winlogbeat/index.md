@@ -4,7 +4,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html
 ---
 
-# Winlogbeat Overview [_winlogbeat_overview]
+# Winlogbeat
 
 Winlogbeat ships Windows event logs to Elasticsearch or Logstash. You can install it as a Windows service.
 

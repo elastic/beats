@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules-overview.html
 ---
 
-# Modules overview [filebeat-modules-overview]
+# Modules
 
 Filebeat modules simplify the collection, parsing, and visualization of common log formats.
 
