@@ -1522,6 +1522,8 @@ This input exposes metrics under the [HTTP monitoring endpoint](/reference/fileb
 
 | Metric | Description |
 | --- | --- |
+| `events_published_total` | Total number of events published.
+| `pages_published_total` | Total number of pages of event published.
 | `http_request_total` | Total number of processed requests. |
 | `http_request_errors_total` | Total number of request errors. |
 | `http_request_delete_total` | Total number of `DELETE` requests. |
