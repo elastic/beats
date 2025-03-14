@@ -6,12 +6,6 @@ mapped_pages:
 
 # Journald input [filebeat-input-journald]
 
-
-::::{warning}
-This functionality is in technical preview and may be changed or removed in a future release. Elastic will work to fix any issues, but features in technical preview are not subject to the support SLA of official GA features.
-::::
-
-
 [`journald`](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) is a system service that collects and stores logging data. The `journald` input reads this log data and the metadata associated with it. To read this log data Filebeat calls `journalctl` to read from the journal, therefore Filebeat needs permission to execute `journalctl`.
 
 If the `journalctl` process exits unexpectedly the journald input will terminate with an error and Filebeat will need to be restarted to start reading from the jouranl again.
