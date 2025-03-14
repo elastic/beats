@@ -131,6 +131,22 @@ func (c *ServerConfig) Validate() error {
 			return ErrCertificateUnspecified
 		}
 	}
+	for _, v := range c.Versions {
+		if err := v.Validate(); err != nil {
+			return err
+		}
+
+	}
+	for _, cs := range c.CipherSuites {
+		if err := cs.Validate(); err != nil {
+			return err
+		}
+	}
+	for _, ct := range c.CurveTypes {
+		if err := ct.Validate(); err != nil {
+			return err
+		}
+	}
 	return c.Certificate.Validate()
 }
 

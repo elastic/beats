@@ -105,9 +105,9 @@ func Test_ServerConfig_Repack(t *testing.T) {
 		yaml: `
     enabled: true
     verification_mode: certificate
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.2, TLSv1.3]
     cipher_suites:
-      - RSA-AES-256-CBC-SHA
+      - ECDHE-ECDSA-AES-128-GCM-SHA256
     certificate_authorities:
       - /path/to/ca.crt
     certificate: /path/to/cert.cry
@@ -123,9 +123,9 @@ func Test_ServerConfig_Repack(t *testing.T) {
 		yaml: `
     enabled: true
     verification_mode: certificate
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.2, TLSv1.3]
     cipher_suites:
-      - RSA-AES-256-CBC-SHA
+      - ECDHE-ECDSA-AES-128-GCM-SHA256
     certificate_authorities:
       - /path/to/ca.crt
     certificate: /path/to/cert.cry
@@ -140,9 +140,9 @@ func Test_ServerConfig_Repack(t *testing.T) {
 		yaml: `
     enabled: true
     verification_mode: certificate
-    supported_protocols: [TLSv1.1, TLSv1.2]
+    supported_protocols: [TLSv1.2, TLSv1.3]
     cipher_suites:
-      - RSA-AES-256-CBC-SHA
+      - ECDHE-ECDSA-AES-128-GCM-SHA256
     certificate: /path/to/cert.cry
     key: /path/to/key/crt
     curve_types:
@@ -185,8 +185,8 @@ func Test_ServerConfig_RepackJSON(t *testing.T) {
 		json: `{
     "enabled": true,
     "verification_mode": "certificate",
-    "supported_protocols": ["TLSv1.1", "TLSv1.2"],
-    "cipher_suites": ["RSA-AES-256-CBC-SHA"],
+    "supported_protocols": ["TLSv1.2", "TLSv1.3"],
+    "cipher_suites": ["ECDHE-ECDSA-AES-128-GCM-SHA256"],
     "certificate_authorities": ["/path/to/ca.crt"],
     "certificate": "/path/to/cert.crt",
     "key": "/path/to/key.crt",
@@ -202,8 +202,8 @@ func Test_ServerConfig_RepackJSON(t *testing.T) {
 		json: `{
     "enabled": true,
     "verification_mode": "certificate",
-    "supported_protocols": ["TLSv1.1", "TLSv1.2"],
-    "cipher_suites": ["RSA-AES-256-CBC-SHA"],
+    "supported_protocols": ["TLSv1.2", "TLSv1.3"],
+    "cipher_suites": ["ECDHE-ECDSA-AES-128-GCM-SHA256"],
     "certificate_authorities": ["/path/to/ca.crt"],
     "certificate": "/path/to/cert.crt",
     "key": "/path/to/key.crt",
@@ -218,8 +218,8 @@ func Test_ServerConfig_RepackJSON(t *testing.T) {
 		json: `{
     "enabled": true,
     "verification_mode": "certificate",
-    "supported_protocols": ["TLSv1.1", "TLSv1.2"],
-    "cipher_suites": ["RSA-AES-256-CBC-SHA"],
+    "supported_protocols": ["TLSv1.2", "TLSv1.3"],
+    "cipher_suites": ["ECDHE-ECDSA-AES-128-GCM-SHA256"],
     "certificate": "/path/to/cert.crt",
     "key": "/path/to/key.crt",
     "curve_types": "P-384",

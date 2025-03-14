@@ -213,7 +213,7 @@ func TestApplyWithServerConfig(t *testing.T) {
     verification_mode: none
     client_authentication: optional
     cipher_suites:
-      - "ECDHE-ECDSA-AES-256-CBC-SHA"
+      - "ECDHE-ECDSA-AES-128-GCM-SHA256"
       - "ECDHE-ECDSA-AES-256-GCM-SHA384"
     curve_types: [P-384]
   `
