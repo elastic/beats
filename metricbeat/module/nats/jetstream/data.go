@@ -37,114 +37,123 @@ var (
 	}
 
 	jetstreamStatsSchema = s.Schema{
-		"streams":          c.Int("streams"),
-		"consumers":        c.Int("consumers"),
-		"messages":         c.Int("messages"),
-		"bytes":            c.Int("bytes"),
-		"memory":           c.Int("memory"),
-		"reserved_memory":  c.Int("reserved_memory"),
-		"storage":          c.Int("storage"),
-		"reserved_storage": c.Int("reserved_storage"),
-		"accounts":         c.Int("accounts"),
-		"config": s.Object{
-			"max_memory":    c.Int("max_memory"),
-			"max_storage":   c.Int("max_storage"),
-			"store_dir":     c.Str("store_dir"),
-			"sync_interval": c.Int("sync_interval"),
+		"category": c.Str("category"),
+		"stats": s.Object{
+			"streams":          c.Int("streams"),
+			"consumers":        c.Int("consumers"),
+			"messages":         c.Int("messages"),
+			"bytes":            c.Int("bytes"),
+			"memory":           c.Int("memory"),
+			"reserved_memory":  c.Int("reserved_memory"),
+			"storage":          c.Int("storage"),
+			"reserved_storage": c.Int("reserved_storage"),
+			"accounts":         c.Int("accounts"),
+			"config": s.Object{
+				"max_memory":    c.Int("max_memory"),
+				"max_storage":   c.Int("max_storage"),
+				"store_dir":     c.Str("store_dir"),
+				"sync_interval": c.Int("sync_interval"),
+			},
 		},
 	}
 
 	jetstreamStreamSchema = s.Schema{
-		"name":    c.Str("name"),
-		"created": c.Time("created"),
-		"cluster": s.Object{
-			"leader": c.Str("leader"),
-		},
-		"state": s.Object{
-			"messages":       c.Int("messages"),
-			"bytes":          c.Int("bytes"),
-			"first_seq":      c.Int("first_seq"),
-			"first_ts":       c.Time("first_ts"),
-			"last_seq":       c.Int("last_seq"),
-			"last_ts":        c.Time("last_ts"),
-			"consumer_count": c.Int("consumer_count"),
-			"num_deleted":    c.Int("num_deleted"),
-			"num_subjects":   c.Int("num_subjects"),
-		},
-		"account": s.Object{
-			"id":   c.Str("account_id"),
-			"name": c.Str("account_name"),
-		},
-		"config": s.Object{
-			"description":          c.Str("config_description"),
-			"retention":            c.Str("config_retention"),
-			"num_replicas":         c.Int("config_num_replicas"),
-			"storage":              c.Str("config_storage"),
-			"max_consumers":        c.Int("config_max_consumers"),
-			"max_msgs":             c.Int("config_max_msgs"),
-			"max_bytes":            c.Int("config_max_bytes"),
-			"max_age":              c.Int("config_max_age"),
-			"max_msgs_per_subject": c.Int("config_max_msgs_per_subject"),
-			"max_msg_size":         c.Int("config_max_msg_size"),
-			"subjects": s.Conv{
-				Key: "config_subjects",
-				Func: func(key string, data map[string]interface{}) (interface{}, error) {
-					emptyIface, err := mapstr.M(data).GetValue(key)
-					if err != nil {
-						return []string{}, s.NewKeyNotFoundError(key)
-					}
-					switch val := emptyIface.(type) {
-					case []string:
-						return val, nil
-					default:
-						msg := fmt.Sprintf("expected []string, found %T", emptyIface)
-						return []string{}, s.NewWrongFormatError(key, msg)
-					}
+		"category": c.Str("category"),
+		"stream": s.Object{
+			"name":    c.Str("name"),
+			"created": c.Time("created"),
+			"cluster": s.Object{
+				"leader": c.Str("leader"),
+			},
+			"state": s.Object{
+				"messages":       c.Int("messages"),
+				"bytes":          c.Int("bytes"),
+				"first_seq":      c.Int("first_seq"),
+				"first_ts":       c.Time("first_ts"),
+				"last_seq":       c.Int("last_seq"),
+				"last_ts":        c.Time("last_ts"),
+				"consumer_count": c.Int("consumer_count"),
+				"num_deleted":    c.Int("num_deleted"),
+				"num_subjects":   c.Int("num_subjects"),
+			},
+			"account": s.Object{
+				"id":   c.Str("account_id"),
+				"name": c.Str("account_name"),
+			},
+			"config": s.Object{
+				"description":          c.Str("config_description"),
+				"retention":            c.Str("config_retention"),
+				"num_replicas":         c.Int("config_num_replicas"),
+				"storage":              c.Str("config_storage"),
+				"max_consumers":        c.Int("config_max_consumers"),
+				"max_msgs":             c.Int("config_max_msgs"),
+				"max_bytes":            c.Int("config_max_bytes"),
+				"max_age":              c.Int("config_max_age"),
+				"max_msgs_per_subject": c.Int("config_max_msgs_per_subject"),
+				"max_msg_size":         c.Int("config_max_msg_size"),
+				"subjects": s.Conv{
+					Key: "config_subjects",
+					Func: func(key string, data map[string]interface{}) (interface{}, error) {
+						emptyIface, err := mapstr.M(data).GetValue(key)
+						if err != nil {
+							return []string{}, s.NewKeyNotFoundError(key)
+						}
+						switch val := emptyIface.(type) {
+						case []string:
+							return val, nil
+						default:
+							msg := fmt.Sprintf("expected []string, found %T", emptyIface)
+							return []string{}, s.NewWrongFormatError(key, msg)
+						}
+					},
 				},
 			},
 		},
 	}
 
 	jetstreamConsumerSchema = s.Schema{
-		"name":    c.Str("name"),
-		"created": c.Time("created"),
-		"stream": s.Object{
-			"name": c.Str("stream_name"),
-		},
-		"cluster": s.Object{
-			"leader": c.Str("leader"),
-		},
-		"delivered": s.Object{
-			"consumer_seq": c.Int("delivered_consumer_seq"),
-			"stream_seq":   c.Int("delivered_stream_seq"),
-			"last_active":  c.Time("delivered_last_active"),
-		},
-		"ack_floor": s.Object{
-			"consumer_seq": c.Int("ack_consumer_seq"),
-			"stream_seq":   c.Int("ack_stream_seq"),
-			"last_active":  c.Time("ack_last_active"),
-		},
-		"num_ack_pending":  c.Int("num_ack_pending"),
-		"num_redelivered":  c.Int("num_redelivered"),
-		"num_waiting":      c.Int("num_waiting"),
-		"num_pending":      c.Int("num_pending"),
-		"last_active_time": c.Time("ts"),
-		"account": s.Object{
-			"id":   c.Str("account_id"),
-			"name": c.Str("account_name"),
-		},
-		"config": s.Object{
-			"name":            c.Str("name"),
-			"durable_name":    c.Str("config_durable_name"),
-			"deliver_policy":  c.Str("config_deliver_policy"),
-			"filter_subject":  c.Str("config_filter_subject"),
-			"replay_policy":   c.Str("config_replay_policy"),
-			"ack_policy":      c.Str("config_ack_policy"),
-			"ack_wait":        c.Int("config_ack_wait"),
-			"max_deliver":     c.Int("config_max_deliver"),
-			"max_waiting":     c.Int("config_max_waiting"),
-			"max_ack_pending": c.Int("config_max_ack_pending"),
-			"num_replicas":    c.Int("config_num_replicas"),
+		"category": c.Str("category"),
+		"consumer": s.Object{
+			"name":    c.Str("name"),
+			"created": c.Time("created"),
+			"stream": s.Object{
+				"name": c.Str("stream_name"),
+			},
+			"cluster": s.Object{
+				"leader": c.Str("leader"),
+			},
+			"delivered": s.Object{
+				"consumer_seq": c.Int("delivered_consumer_seq"),
+				"stream_seq":   c.Int("delivered_stream_seq"),
+				"last_active":  c.Time("delivered_last_active"),
+			},
+			"ack_floor": s.Object{
+				"consumer_seq": c.Int("ack_consumer_seq"),
+				"stream_seq":   c.Int("ack_stream_seq"),
+				"last_active":  c.Time("ack_last_active"),
+			},
+			"num_ack_pending":  c.Int("num_ack_pending"),
+			"num_redelivered":  c.Int("num_redelivered"),
+			"num_waiting":      c.Int("num_waiting"),
+			"num_pending":      c.Int("num_pending"),
+			"last_active_time": c.Time("ts"),
+			"account": s.Object{
+				"id":   c.Str("account_id"),
+				"name": c.Str("account_name"),
+			},
+			"config": s.Object{
+				"name":            c.Str("name"),
+				"durable_name":    c.Str("config_durable_name"),
+				"deliver_policy":  c.Str("config_deliver_policy"),
+				"filter_subject":  c.Str("config_filter_subject"),
+				"replay_policy":   c.Str("config_replay_policy"),
+				"ack_policy":      c.Str("config_ack_policy"),
+				"ack_wait":        c.Int("config_ack_wait"),
+				"max_deliver":     c.Int("config_max_deliver"),
+				"max_waiting":     c.Int("config_max_waiting"),
+				"max_ack_pending": c.Int("config_max_ack_pending"),
+				"num_replicas":    c.Int("config_num_replicas"),
+			},
 		},
 	}
 )
@@ -292,16 +301,19 @@ func eventMapping(m *MetricSet, r mb.ReporterV2, content []byte) error {
 		return fmt.Errorf("failure parsing NATS Jetstream API response: %w", err)
 	}
 
-	switch m.Name() {
-	case statsMetricset:
-		return statsMapping(r, response)
-	case streamMetricset:
-		return streamMapping(r, response, m.Config)
-	case consumerMetricset:
-		return consumerMapping(r, response, m.Config)
-	default:
-		return nil
+	if m.Config.Stats.Enabled {
+		err = statsMapping(r, response)
 	}
+
+	if m.Config.Stream.Enabled {
+		err = streamMapping(r, response, m.Config)
+	}
+
+	if m.Config.Consumer.Enabled {
+		err = consumerMapping(r, response, m.Config)
+	}
+
+	return err
 }
 
 func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
@@ -312,6 +324,7 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 	}
 
 	metricSetFields, err := jetstreamStatsSchema.Apply(map[string]interface{}{
+		"category":         statsCategory,
 		"max_memory":       response.Config.MaxMemory,
 		"max_storage":      response.Config.MaxStorage,
 		"store_dir":        response.Config.StoreDir,
@@ -375,6 +388,7 @@ func streamMapping(r mb.ReporterV2, response JetstreamResponse, config Metricset
 			}
 
 			metricSetFields, err := jetstreamStreamSchema.Apply(map[string]interface{}{
+				"category":                    streamCategory,
 				"name":                        stream.Name,
 				"created":                     stream.Created,
 				"leader":                      stream.Cluster.Leader,
@@ -433,6 +447,7 @@ func consumerMapping(r mb.ReporterV2, response JetstreamResponse, config Metrics
 				}
 
 				metricSetFields, err := jetstreamConsumerSchema.Apply(map[string]interface{}{
+					"category":               consumerCategory,
 					"stream_name":            stream.Name,
 					"name":                   consumer.Name,
 					"leader":                 stream.Cluster.Leader,

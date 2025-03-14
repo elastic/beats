@@ -30,10 +30,10 @@ import (
 const (
 	defaultScheme = "http"
 	// Ref: https://docs.nats.io/running-a-nats-service/nats_admin/monitoring#jetstream-information-jsz
-	defaultPath       = "/jsz"
-	statsMetricset    = "jetstream.stats"
-	streamMetricset   = "jetstream.stream"
-	consumerMetricset = "jetstream.consumer"
+	defaultPath      = "/jsz"
+	statsCategory    = "stats"
+	streamCategory   = "stream"
+	consumerCategory = "consumer"
 )
 
 var (
@@ -41,12 +41,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	detailLevel = map[string]string{
-		statsMetricset:    "",
-		streamMetricset:   "streams",
-		consumerMetricset: "consumers",
-	}
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -54,17 +48,7 @@ var (
 // the MetricSet for each host is defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("nats", statsMetricset, New,
-		mb.WithHostParser(hostParser),
-		mb.DefaultMetricSet(),
-	)
-
-	mb.Registry.MustAddMetricSet("nats", streamMetricset, New,
-		mb.WithHostParser(hostParser),
-		mb.DefaultMetricSet(),
-	)
-
-	mb.Registry.MustAddMetricSet("nats", consumerMetricset, New,
+	mb.Registry.MustAddMetricSet("nats", "jetstream", New,
 		mb.WithHostParser(hostParser),
 		mb.DefaultMetricSet(),
 	)
@@ -100,12 +84,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if maxResults == 0 {
 		maxResults = 1024
 	}
-	http.SetURI(fmt.Sprintf("%s?limit=%d&config=true", http.GetURI(), maxResults))
-
-	level := detailLevel[base.Name()]
-	if level != "" {
-		http.SetURI(fmt.Sprintf("%s&%s=true", http.GetURI(), level))
-	}
+	http.SetURI(fmt.Sprintf("%s?limit=%d&config=true&consumers=true", http.GetURI(), maxResults))
 
 	return &MetricSet{
 		base,

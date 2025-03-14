@@ -23,6 +23,7 @@ type ModuleConfig struct {
 
 type MetricsetConfig struct {
 	Account    AccountConfig  `config:"account"`
+	Stats      StatsConfig    `config:"stats"`
 	Stream     StreamConfig   `config:"stream"`
 	Consumer   ConsumerConfig `config:"consumer"`
 	MaxResults int            `config:"max_results"`
@@ -32,10 +33,16 @@ type AccountConfig struct {
 	Names []string `config:"names"`
 }
 
+type StatsConfig struct {
+	Enabled bool `config:"enabled"`
+}
+
 type StreamConfig struct {
-	Names []string `config:"names"`
+	Enabled bool     `config:"enabled"`
+	Names   []string `config:"names"`
 }
 
 type ConsumerConfig struct {
-	Names []string `config:"names"`
+	Enabled bool     `config:"enabled"`
+	Names   []string `config:"names"`
 }
