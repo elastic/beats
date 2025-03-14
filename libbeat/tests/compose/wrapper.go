@@ -149,7 +149,7 @@ func (c *wrapperContainer) HostForPort(port int) string {
 }
 
 func (d *wrapperDriver) LockFile() string {
-	return d.Files[0] + ".lock"
+	return fmt.Sprintf("%s.%s.lock", d.Files[0], d.Name)
 }
 
 func (d *wrapperDriver) Close() error {
@@ -210,6 +210,16 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	if opts.SetupAdvertisedHostEnvFile {
 		return d.setupAdvertisedHost(ctx, service, opts.SetupAdvertisedHostEnvFilePort)
 	}
+	return nil
+}
+
+func (d *wrapperDriver) Down(ctx context.Context) error {
+	errDown := d.cmd(ctx, "down").Run()
+	if errDown != nil {
+		return fmt.Errorf("failed to bring project %q down: %w",
+			d.Name, errDown)
+	}
+
 	return nil
 }
 
