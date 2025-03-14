@@ -373,6 +373,7 @@ func TestOCSPStatus(t *testing.T) {
 				"hash": mapstr.M{
 					"sha1": "D8A11028DAD7E34F5D7F6D41DE01743D8B3CE553",
 				},
+				"ja3s":       "e1fc420d200523e65caeb1d8c7fa121e",
 				"not_after":  time.Date(2022, 6, 3, 13, 38, 16, 0, time.UTC),
 				"not_before": time.Date(2021, 6, 3, 13, 38, 16, 0, time.UTC),
 				"x509": mapstr.M{
