@@ -12,9 +12,8 @@ toc:
       - file: libbeat/config-file-permissions.md
       - file: libbeat/config-file-format-cli.md
       - file: libbeat/config-file-format-tips.md
-  - file: auditbeat/auditbeat.md
+  - file: auditbeat/index.md
     children:
-      - file: auditbeat/auditbeat-overview.md
       - file: auditbeat/auditbeat-installation-configuration.md
       - file: auditbeat/setting-up-running.md
         children:
@@ -178,9 +177,8 @@ toc:
               - file: auditbeat/could-not-locate-index-pattern.md
               - file: auditbeat/madvdontneed-rss.md
       - file: auditbeat/contributing-to-beats.md
-  - file: filebeat/filebeat.md
+  - file: filebeat/index.md
     children:
-      - file: filebeat/filebeat-overview.md
       - file: filebeat/filebeat-installation-configuration.md
       - file: filebeat/setting-up-running.md
         children:
@@ -523,9 +521,8 @@ toc:
               - file: filebeat/could-not-locate-index-pattern.md
               - file: filebeat/madvdontneed-rss.md
       - file: filebeat/contributing-to-beats.md
-  - file: heartbeat/heartbeat.md
+  - file: heartbeat/index.md
     children:
-      - file: heartbeat/heartbeat-overview.md
       - file: heartbeat/heartbeat-installation-configuration.md
       - file: heartbeat/setting-up-running.md
         children:
@@ -688,9 +685,8 @@ toc:
               - file: heartbeat/monitoring-shows-fewer-than-expected-beats.md
               - file: heartbeat/madvdontneed-rss.md
       - file: heartbeat/contributing-to-beats.md
-  - file: metricbeat/metricbeat.md
+  - file: metricbeat/index.md
     children:
-      - file: metricbeat/metricbeat-overview.md
       - file: metricbeat/metricbeat-installation-configuration.md
       - file: metricbeat/setting-up-running.md
         children:
@@ -1317,9 +1313,8 @@ toc:
               - file: metricbeat/could-not-locate-index-pattern.md
               - file: metricbeat/madvdontneed-rss.md
       - file: metricbeat/contributing-to-beats.md
-  - file: packetbeat/packetbeat.md
+  - file: packetbeat/index.md
     children:
-      - file: packetbeat/packetbeat-overview.md
       - file: packetbeat/packetbeat-installation-configuration.md
       - file: packetbeat/setting-up-running.md
         children:
@@ -1513,9 +1508,8 @@ toc:
               - file: packetbeat/madvdontneed-rss.md
               - file: packetbeat/refresh-index-pattern.md
       - file: packetbeat/contributing-to-beats.md
-  - file: winlogbeat/winlogbeat.md
+  - file: winlogbeat/index.md
     children:
-      - file: winlogbeat/_winlogbeat_overview.md
       - file: winlogbeat/winlogbeat-installation-configuration.md
       - file: winlogbeat/setting-up-running.md
         children:
@@ -1673,7 +1667,7 @@ toc:
   - file: libbeat/upgrading.md
   - file: libbeat/community-beats.md
   - file: libbeat/contributing-to-beats.md
-  - file: loggingplugin/elastic-logging-plugin-for-docker.md
+  - file: loggingplugin/index.md
     children:
       - file: loggingplugin/log-driver-installation.md
       - file: loggingplugin/log-driver-configuration.md

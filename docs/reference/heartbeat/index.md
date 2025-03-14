@@ -6,7 +6,7 @@ mapped_pages:
 
 # Heartbeat overview [heartbeat-overview]
 
-Heartbeat is a lightweight daemon that you install on a remote server to periodically check the status of your services and determine whether they are available. Unlike [Metricbeat](/reference/metricbeat/metricbeat.md), which only tells you if your servers are up or down, Heartbeat tells you whether your services are reachable.
+Heartbeat is a lightweight daemon that you install on a remote server to periodically check the status of your services and determine whether they are available. Unlike [Metricbeat](/reference/metricbeat/index.md), which only tells you if your servers are up or down, Heartbeat tells you whether your services are reachable.
 
 Heartbeat is useful when you need to verify that you’re meeting your service level agreements for service uptime. It’s also useful for other scenarios, such as security use cases, when you need to verify that no one from the outside can access services on your private enterprise server.
 
