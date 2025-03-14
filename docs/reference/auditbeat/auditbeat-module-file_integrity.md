@@ -12,7 +12,7 @@ The module is implemented for Linux, macOS (Darwin), and Windows.
 
 ## How it works [_how_it_works_2]
 
-This module uses features of the operating system to monitor file changes in realtime. When the module starts it creates a subscription with the OS to receive notifications of changes to the specified files or directories. Upon receiving notification of a change the module will read the file’s metadata and the compute a hash of the file’s contents.
+This module uses features of the operating system to monitor file changes in realtime. When the module starts it creates a subscription with the OS to receive notifications of changes to the specified files or directories. Upon receiving notification of a change the module will read the file’s metadata and then compute a hash of the file’s contents.
 
 At startup this module will perform an initial scan of the configured files and directories to generate baseline data for the monitored paths and detect changes since the last time it was run. It uses locally persisted data in order to only send events for new or modified files.
 
@@ -37,6 +37,7 @@ This module has some configuration options for tuning its behavior. The followin
   - /sbin
   - /usr/sbin
   - /etc
+  recursive: false
   exclude_files:
   - '(?i)\.sw[nop]$'
   - '~$'
@@ -46,7 +47,6 @@ This module has some configuration options for tuning its behavior. The followin
   scan_rate_per_sec: 50 MiB
   max_file_size: 100 MiB
   hash_types: [sha1]
-  recursive: false
 ```
 
 This module also supports the [standard configuration options](#module-standard-options-file_integrity) described later.
@@ -54,8 +54,11 @@ This module also supports the [standard configuration options](#module-standard-
 **`paths`**
 :   A list of paths (directories or files) to watch. Globs are not supported. The specified paths should exist when the metricset is started. Paths should be absolute, although the file integrity module will attempt to resolve relative path events to their absolute file path. Symbolic links will be resolved on module start and the link target will be watched if link resolution is successful. Changes to the symbolic link after module start will not change the watch target. If the link does not resolve to a valid target, the symbolic link itself will be watched; if the symlink target becomes valid after module start up this will not be picked up by the file system watches.
 
+**`recursive`**
+:   By default, the watches set to the paths specified in `paths` are not recursive. This means that only changes to the contents of this directories are watched. If `recursive` is set to `true`, the `file_integrity` module will watch for changes on this directory and all its subdirectories.
+
 **`exclude_files`**
-:   A list of regular expressions used to filter out events for unwanted files. The expressions are matched against the full path of every file and directory. When used in conjunction with `include_files`, file paths need to match both `include_files` and not match `exclude_files` to be selected. By default, no files are excluded. See [*Regular expression support*](/reference/auditbeat/regexp-support.md) for a list of supported regexp patterns. It is recommended to wrap regular expressions in single quotation marks to avoid issues with YAML escaping rules.
+:   A list of regular expressions used to filter out events for unwanted files. The expressions are matched against the full path of every file and directory. When used in conjunction with `include_files`, file paths need to match both `include_files` and not match `exclude_files` to be selected. By default, no files are excluded. See [*Regular expression support*](/reference/auditbeat/regexp-support.md) for a list of supported regexp patterns. It is recommended to wrap regular expressions in single quotation marks to avoid issues with YAML escaping rules. If `recursive` is set to true, subdirectories can also be excluded here by specifying them.
 
 **`include_files`**
 :   A list of regular expressions used to specify which files to select. When configured, only files matching the pattern will be monitored. The expressions are matched against the full path of every file and directory. When used in conjunction with `exclude_files`, file paths need to match both `include_files` and not match `exclude_files` to be selected. By default, all files are selected. See [*Regular expression support*](/reference/auditbeat/regexp-support.md) for a list of supported regexp patterns. It is recommended to wrap regular expressions in single quotation marks to avoid issues with YAML escaping rules.
@@ -77,9 +80,6 @@ This module also supports the [standard configuration options](#module-standard-
 
 **`file_parsers`**
 :   A list of `file_integrity` fields under `file` that will be populated by file format parsers. The available fields that can be analysed are listed in the auditbeat.reference.yml file. File parsers are run on all files within the `max_file_size` limit in the configured paths during a scan or when a file event involves the file. Files that are not targets of the specific file parser are only sniffed to examine whether analysis should proceed. This will usually only involve reading a small number of bytes.
-
-**`recursive`**
-:   By default, the watches set to the paths specified in `paths` are not recursive. This means that only changes to the contents of this directories are watched. If `recursive` is set to `true`, the `file_integrity` module will watch for changes on this directories and all their subdirectories.
 
 **`backend`**
 :   (**Linux only**) Select the backend which will be used to source events. Valid values: `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
