@@ -306,11 +306,11 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	}
 
 	if settings.DisableConfigResolver {
-		config.OverwriteConfigOpts(obfuscateConfigOpts())
+		cfg.MergeWithOpts(obfuscateConfigOpts())
 	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
 		// note that if the store is nil it should be excluded as an option
-		config.OverwriteConfigOpts(configOptsWithKeystore(store))
+		cfg.MergeWithOpts(configOptsWithKeystore(store))
 	}
 
 	b.Beat.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
