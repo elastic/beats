@@ -115,7 +115,6 @@ func CheckReceivers(params CheckReceiversParams) {
 	}
 
 	for i, r := range receivers {
-		i++
 		err := r.Start(ctx, nil)
 		require.NoErrorf(t, err, "Error starting receiver %d", i)
 		defer func() {
