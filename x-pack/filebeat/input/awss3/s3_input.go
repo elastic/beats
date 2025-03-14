@@ -13,10 +13,10 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
@@ -30,7 +30,7 @@ type s3PollerInput struct {
 	pipeline        beat.Pipeline
 	config          config
 	awsConfig       awssdk.Config
-	store           beater.StateStore
+	store           statestore.States
 	provider        string
 	s3              s3API
 	metrics         *inputMetrics
@@ -42,7 +42,7 @@ type s3PollerInput struct {
 func newS3PollerInput(
 	config config,
 	awsConfig awssdk.Config,
-	store beater.StateStore,
+	store statestore.States,
 ) (v2.Input, error) {
 	return &s3PollerInput{
 		config:         config,
