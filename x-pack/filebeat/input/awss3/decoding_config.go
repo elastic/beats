@@ -8,6 +8,8 @@ import (
 	"errors"
 	"fmt"
 	"unicode/utf8"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/reader/ipfix"
 )
 
 // decoderConfig contains the configuration options for instantiating a decoder.
@@ -19,10 +21,22 @@ type decoderConfig struct {
 type codecConfig struct {
 	Parquet *parquetCodecConfig `config:"parquet"`
 	CSV     *csvCodecConfig     `config:"csv"`
+	IPFIX   *ipfix.Config       `config:"ipfix"`
 }
 
 func (c *codecConfig) Validate() error {
-	if c.Parquet != nil && c.CSV != nil {
+	count := 0
+	if c.Parquet != nil {
+		count++
+	}
+	if c.CSV != nil {
+		count++
+	}
+	if c.IPFIX != nil {
+		count++
+	}
+
+	if count > 1 {
 		return errors.New("more than one decoder configured")
 	}
 	return nil

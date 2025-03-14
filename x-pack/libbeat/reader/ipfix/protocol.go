@@ -13,23 +13,55 @@ import (
 	"math"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+
 	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
 )
 
 const (
-	TemplateFlowSetID           = 2
-	TemplateOptionsSetID        = 3
-	TemplateFlowSetIDForFile    = 0
-	TemplateOptionsSetIDForFile = 1
+	ProtocolName        = "rfc5655"
+	ProtocolID   uint16 = 10
+	LogPrefix           = "[ipfix] "
+
+	TemplateFlowSetID           = 0 // should be 2
+	TemplateOptionsSetID        = 1 // should be 3
 	EnterpriseBit        uint16 = 0x8000
 	SizeOfIPFIXHeader    uint16 = 16
 )
 
+type ExporterAddr struct {
+	ip4       string
+	ip6       string
+	transport string
+}
+
+func (ea ExporterAddr) String() string {
+	return ea.ip4
+}
+
+func (ea ExporterAddr) Network() string {
+	return ea.transport
+}
+
+func DefaultExporterAddr() ExporterAddr {
+	return ExporterAddr{
+		ip4:       "192.168.1.1",
+		ip6:       "::fe80",
+		transport: "tcp",
+	}
+}
+
+func NewDecoder(config *Config, logger *logp.Logger) *DecoderIPFIX {
+	return &DecoderIPFIX{
+		DecoderV9: v9.DecoderV9{Logger: logger.Named(LogPrefix), Fields: config.Fields()},
+	}
+}
+
 type DecoderIPFIX struct {
 	v9.DecoderV9
-	FileBased      bool
 }
 
 var _ v9.Decoder = (*DecoderIPFIX)(nil)
@@ -60,14 +92,6 @@ func (DecoderIPFIX) ReadPacketHeader(buf *bytes.Buffer) (header v9.PacketHeader,
 }
 
 func (d DecoderIPFIX) ReadTemplateSet(setID uint16, buf *bytes.Buffer) ([]*template.Template, error) {
-	// ugly hack to make the file we were given work properly
-	// XXX Remove this! This is not valid.
-	if d.FileBased && setID == TemplateFlowSetIDForFile {
-		setID = TemplateFlowSetID
-	} else if d.FileBased && setID == TemplateOptionsSetIDForFile {
-		setID = TemplateOptionsSetID
-	}
-
 	switch setID {
 	case TemplateFlowSetID:
 		return v9.ReadTemplateFlowSet(d, buf)
