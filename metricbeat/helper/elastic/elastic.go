@@ -47,9 +47,6 @@ const (
 
 	// Beats product
 	Beats
-
-	// Enterprise Search product
-	EnterpriseSearch
 )
 
 func (p Product) xPackMonitoringIndexString() string {
@@ -58,7 +55,6 @@ func (p Product) xPackMonitoringIndexString() string {
 		"kibana",
 		"logstash",
 		"beats",
-		"ent-search",
 	}
 
 	if int(p) < 0 || int(p) > len(indexProductNames) {
@@ -74,7 +70,6 @@ func (p Product) String() string {
 		"kibana",
 		"logstash",
 		"beats",
-		"enterprisesearch",
 	}
 
 	if int(p) < 0 || int(p) > len(productNames) {
@@ -87,7 +82,7 @@ func (p Product) String() string {
 // MakeXPackMonitoringIndexName method returns the name of the monitoring index for
 // a given product { elasticsearch, kibana, logstash, beats }
 func MakeXPackMonitoringIndexName(product Product) string {
-	const version = "9"
+	const version = "8"
 
 	return fmt.Sprintf(".monitoring-%v-%v-mb", product.xPackMonitoringIndexString(), version)
 }

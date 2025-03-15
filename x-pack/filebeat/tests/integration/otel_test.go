@@ -49,6 +49,9 @@ processors:
     - add_cloud_metadata: ~
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
+http.enabled: true
+http.host: localhost
+http.port: 5066
 `
 
 func TestFilebeatOTelE2E(t *testing.T) {
@@ -129,6 +132,7 @@ setup.template.pattern: logs-filebeat-default
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assertMonitoring(t)
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
@@ -169,4 +173,18 @@ func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 		flatM2.Delete(f)
 	}
 	require.Equal(t, "", cmp.Diff(flatM1, flatM2), "expected maps to be equal")
+}
+
+func assertMonitoring(t *testing.T) {
+	r, err := http.Get("http://localhost:5066") //nolint:noctx // fine for tests
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
+
+	r, err = http.Get("http://localhost:5066/stats") //nolint:noctx // fine for tests
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
+
+	r, err = http.Get("http://localhost:5066/not-exist") //nolint:noctx // fine for tests
+	require.NoError(t, err)
+	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }

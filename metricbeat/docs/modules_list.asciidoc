@@ -113,9 +113,6 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>>   
 |<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>   
 |<<metricbeat-metricset-elasticsearch-shard,shard>>   
-|<<metricbeat-module-enterprisesearch,Enterprise Search>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.2+| .2+|  |<<metricbeat-metricset-enterprisesearch-health,health>> beta[]  
-|<<metricbeat-metricset-enterprisesearch-stats,stats>> beta[]  
 |<<metricbeat-module-envoyproxy,Envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>>   
 |<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -175,7 +172,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.23+| .23+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.24+| .24+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>   
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -187,6 +184,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>   
 |<<metricbeat-metricset-kubernetes-state_daemonset,state_daemonset>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
+|<<metricbeat-metricset-kubernetes-state_horizontalpodautoscaler,state_horizontalpodautoscaler>> beta[]  
 |<<metricbeat-metricset-kubernetes-state_job,state_job>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
 |<<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>   
@@ -360,7 +358,6 @@ include::modules/couchdb.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
-include::modules/enterprisesearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/etcd.asciidoc[]
 include::modules/gcp.asciidoc[]
