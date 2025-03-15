@@ -35,7 +35,7 @@ var (
 		},
 	}
 	connectionsSchema = s.Schema{
-		"name":          c.Str("name"),
+		"name":          c.Str("name", s.Optional),
 		"subscriptions": c.Int("subscriptions"),
 		"in": s.Object{
 			"messages": c.Int("in_msgs"),
