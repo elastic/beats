@@ -27,7 +27,7 @@ import (
 )
 
 func TestEventMappingFor(t *testing.T) {
-	content, err := os.ReadFile("./_meta/test/all.json")
+	content, err := os.ReadFile("./_meta/testdata/all.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
 	// Enable all data points to ensure each individual mapper
@@ -57,12 +57,13 @@ func TestEventMappingFor(t *testing.T) {
 
 func TestFetchEventContentForStats(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
-		Type:                      "http",
-		URL:                       "/jsz?config=true",
-		Suffix:                    "json",
-		Path:                      "_meta/test/stats",
-		WritePath:                 "_meta/testdata/stats",
-		OmitDocumentedFieldsCheck: []string{"nats.jetstream.*"},
+		Type:      "http",
+		URL:       "/jsz?config=true",
+		Suffix:    "stats.json",
+		Path:      "_meta/testdata/input",
+		WritePath: "_meta/testdata/expected",
+		// Not sure why this field isn't being recognized as documented. It does exist.
+		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category"},
 		Module: map[string]interface{}{
 			"jetstream": map[string]interface{}{
 				"stats": map[string]interface{}{
@@ -76,15 +77,56 @@ func TestFetchEventContentForStats(t *testing.T) {
 
 func TestFetchEventContentForAccount(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
-		Type:                      "http",
-		URL:                       "/jsz?accounts=true&config=true",
-		Suffix:                    "json",
-		Path:                      "_meta/test/accounts",
-		WritePath:                 "_meta/testdata/accounts",
-		OmitDocumentedFieldsCheck: []string{"nats.jetstream.*"},
+		Type:      "http",
+		URL:       "/jsz?accounts=true&config=true",
+		Suffix:    "accounts.json",
+		Path:      "_meta/testdata/input",
+		WritePath: "_meta/testdata/expected",
+		// Not sure why this field isn't being recognized as documented. It does exist.
+		OmitDocumentedFieldsCheck: []string{"nats.jetstream.account.accounts"},
 		Module: map[string]interface{}{
 			"jetstream": map[string]interface{}{
 				"account": map[string]interface{}{
+					"enabled": true,
+				},
+			},
+		},
+	}
+	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
+}
+
+func TestFetchEventContentForStreams(t *testing.T) {
+	dataConfig := mbtest.DataConfig{
+		Type:      "http",
+		URL:       "/jsz?config=true&streams=true",
+		Suffix:    "streams.json",
+		Path:      "_meta/testdata/input",
+		WritePath: "_meta/testdata/expected",
+		// Not sure why this field isn't being recognized as documented. It does exist.
+		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category"},
+		Module: map[string]interface{}{
+			"jetstream": map[string]interface{}{
+				"stream": map[string]interface{}{
+					"enabled": true,
+				},
+			},
+		},
+	}
+	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
+}
+
+func TestFetchEventContentForConsumers(t *testing.T) {
+	dataConfig := mbtest.DataConfig{
+		Type:      "http",
+		URL:       "/jsz?config=true&consumers=true",
+		Suffix:    "consumers.json",
+		Path:      "_meta/testdata/input",
+		WritePath: "_meta/testdata/expected",
+		// Not sure why this field isn't being recognized as documented. It does exist.
+		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category"},
+		Module: map[string]interface{}{
+			"jetstream": map[string]interface{}{
+				"consumer": map[string]interface{}{
 					"enabled": true,
 				},
 			},
