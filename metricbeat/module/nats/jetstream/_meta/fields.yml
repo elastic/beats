@@ -7,86 +7,86 @@
     - name: category
       type: keyword
       description: >
-        The category of metrics represented in this event (stats, account, stream, or consumer)
+        The category of metrics represented in this event (stats, account, stream, or consumer).
     - name: stats
       type: group
       description: >
-        General stats about the NATS JetStream server
+        General stats about the NATS JetStream server.
       fields:
         - name: streams
           type: integer
           description: >
-            The total number of streams on the JetStream server
+            The total number of streams on the JetStream server.
         - name: consumers
           type: integer
           description: >
-            The total number of consumers on the JetStream server
+            The total number of consumers on the JetStream server.
         - name: messages
           type: long
           description: >
-            The total number of messages on the JetStream server
+            The total number of messages on the JetStream server.
         - name: bytes
           type: long
           description: >
-            The total number of message bytes on the JetStream server
+            The total number of message bytes on the JetStream server.
         - name: memory
           type: long
           description: >
-            The total amount of memory (bytes) used by the JetStream server
+            The total amount of memory (bytes) used by the JetStream server.
         - name: reserved_memory
           type: long
           description: >
-            The of memory (bytes) reserved by the JetStream server
+            The of memory (bytes) reserved by the JetStream server.
         - name: storage
           type: long
           description: >
-            The total amount of storage (bytes) used by the JetStream server
+            The total amount of storage (bytes) used by the JetStream server.
         - name: reserved_storage
           type: long
           description: >
-            The total amount of storage (bytes) reserved by the JetStream server
+            The total amount of storage (bytes) reserved by the JetStream server.
         - name: accounts
           type: integer
           description: >
-            The total number of accounts on the JetStream server
+            The total number of accounts on the JetStream server.
         - name: config
           type: group
           description: >
-            Configuration of the JetStream server
+            Configuration of the JetStream server.
           fields:
             - name: max_memory
               type: long
               description: >
-                The maximum amount of memory (bytes) the JetStream server can use
+                The maximum amount of memory (bytes) the JetStream server can use.
             - name: max_storage
               type: long
               description: >
-                The maximum amount of storage (bytes) the JetStream server can use
+                The maximum amount of storage (bytes) the JetStream server can use.
             - name: store_dir
               type: keyword
               description: >
-                The path on disk where the JetStream storage lives
+                The path on disk where the JetStream storage lives.
             - name: sync_interval
               type: long
               description: >
-                The fsync/sync interval for page cache in the filestore
+                The fsync/sync interval for page cache in the filestore.
     - name: account
       type: group
       description: >
-        Information about a NATS JetStream account
+        Information about a NATS JetStream account.
       fields:
         - name: id
           type: keyword
           description: >
-            The ID of the JetStream account
+            The ID of the JetStream account.
         - name: name
           type: keyword
           description: >
-            The name of the JetStream account
+            The name of the JetStream account.
         - name: accounts
           type: integer
           description: >
-            The number of accounts using JetStream on the server
+            The number of accounts using JetStream on the server.
         - name: high_availability_assets
           type: integer
           description: >
@@ -94,7 +94,7 @@
         - name: memory
           type: long
           description: >
-            The amount of memory in bytes currently used by JetStream for this account
+            The amount of memory in bytes currently used by JetStream for this account.
         - name: storage
           type: long
           description: >
@@ -123,92 +123,92 @@
     - name: stream
       type: group
       description: >
-        Information about a NATS JetStream stream
+        Information about a NATS JetStream stream.
       fields:
         - name: name
           type: keyword
           description: >
-            The name of the JetStream stream
+            The name of the JetStream stream.
         - name: created
           type: date
           description: >
-            The date/time the stream was created
+            The date/time the stream was created.
         - name: cluster
           type: group
           description: >
-            Cluster information for the stream
+            Cluster information for the stream.
           fields:
             - name: leader
               type: keyword
               description: >
-                The ID of the leader in the cluster
+                The ID of the leader in the cluster.
         - name: state
           type: group
           description: >
-            The state of the stream
+            The state of the stream.
           fields:
             - name: messages
               type: long
               description: >
-                The number of messages on the stream
+                The number of messages on the stream.
             - name: bytes
               type: long
               description: >
-                The number of bytes of messages on the stream
+                The number of bytes of messages on the stream.
             - name: consumer_count
               type: integer
               description: >
-                The number of consumers on the stream
+                The number of consumers on the stream.
             - name: num_subjects
               type: integer
               description: >
-                The number of subjects on the stream
+                The number of subjects on the stream.
             - name: num_deleted
               type: long
               description: >
-                The number of messages deleted from the stream
+                The number of messages deleted from the stream.
             - name: first_seq
               type: long
               description: >
-                The first sequence number on the stream
+                The first sequence number on the stream.
             - name: first_ts
               type: date
               description: >
-                The date/time corresponding to first_seq
+                The date/time corresponding to first_seq.
             - name: last_seq
               type: long
               description: >
-                The last sequence number on the stream
+                The last sequence number on the stream.
             - name: last_ts
               type: date
               description: >
-                The date/time corresponding to last_seq
+                The date/time corresponding to last_seq.
         - name: account
           type: group
           description: >
-            Information about the account for this stream
+            Information about the account for this stream.
           fields:
             - name: id
               type: keyword
               description: >
-                The ID of the account
+                The ID of the account.
             - name: name
               type: keyword
               description: >
-                The name of the account
+                The name of the account.
         - name: config
           type: group
           description: >
-            Information regarding how the stream is configured
+            Information regarding how the stream is configured.
           fields:
             - name: description
               type: text
               description: >
-                The description of the stream
+                The description of the stream.
             - name: retention
               type: keyword
               description: >
-                The retention policy for the stream
+                The retention policy for the stream.
             - name: num_replicas
               type: integer
               description: >
@@ -220,7 +220,7 @@
             - name: max_consumers
               type: integer
               description: >
-                The maximum number of consumers allowed for this stream
+                The maximum number of consumers allowed for this stream.
             - name: max_msgs
               type: long
               description: >
@@ -248,34 +248,34 @@
     - name: consumer
       type: group
       description: >
-        Information about a NATS JetStream consumer
+        Information about a NATS JetStream consumer.
       fields:
         - name: name
           type: keyword
           description: >
-            The name of the consumer
+            The name of the consumer.
         - name: created
           type: date
           description: >
-            The date/time the consumer was created
+            The date/time the consumer was created.
         - name: stream
           type: group
           description: >
-            Information about the stream for this consumer
+            Information about the stream for this consumer.
           fields:
             - name: name
               type: keyword
               description: >
-                The name of the stream
+                The name of the stream.
         - name: cluster
           type: group
           description: >
-            Cluster information for the consumer
+            Cluster information for the consumer.
           fields:
             - name: leader
               type: keyword
               description: >
-                The ID of the leader in the cluster
+                The ID of the leader in the cluster.
         - name: ack_floor
           type: group
           description: >
@@ -296,7 +296,7 @@
         - name: delivered
           type: group
           description: >
-            Information about delivered messages
+            Information about delivered messages.
           fields:
             - name: consumer_seq
               type: long
@@ -337,25 +337,25 @@
         - name: account
           type: group
           description: >
-            Information about the account for this consumer
+            Information about the account for this consumer.
           fields:
             - name: id
               type: keyword
               description: >
-                The ID of the account
+                The ID of the account.
             - name: name
               type: keyword
               description: >
-                The name of the account
+                The name of the account.
         - name: config
           type: group
           description: >
-            Information about the configuration for this consumer
+            Information about the configuration for this consumer.
           fields:
             - name: name
               type: keyword
               description: >
-                The name of the consumer
+                The name of the consumer.
             - name: durable_name
               type: keyword
               description: >
@@ -395,4 +395,4 @@
             - name: num_replicas
               type: integer
               description: >
-                The number of replicas for the consumer’s state in a JetStream cluster.
+                The number of replicas for the consumer's state in a JetStream cluster.
