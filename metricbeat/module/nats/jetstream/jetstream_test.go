@@ -26,8 +26,8 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func TestEventMappingFor(t *testing.T) {
-	content, err := os.ReadFile("./_meta/testdata/all.json")
+func TestEventMappingForErrors(t *testing.T) {
+	content, err := os.ReadFile("./_meta/testdata/full-results.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
 	// Enable all data points to ensure each individual mapper
@@ -55,6 +55,7 @@ func TestEventMappingFor(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+// This is a basic happy-path test for only reporting on stats
 func TestFetchEventContentForStats(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
 		Type:      "http",
@@ -75,6 +76,7 @@ func TestFetchEventContentForStats(t *testing.T) {
 	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
 }
 
+// This is a basic happy-path test for only reporting on accounts
 func TestFetchEventContentForAccount(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
 		Type:      "http",
@@ -95,6 +97,7 @@ func TestFetchEventContentForAccount(t *testing.T) {
 	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
 }
 
+// This is a basic happy-path test for only reporting on streams
 func TestFetchEventContentForStreams(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
 		Type:      "http",
@@ -115,6 +118,7 @@ func TestFetchEventContentForStreams(t *testing.T) {
 	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
 }
 
+// This is a basic happy-path test for only reporting on consumers
 func TestFetchEventContentForConsumers(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
 		Type:      "http",
@@ -128,6 +132,99 @@ func TestFetchEventContentForConsumers(t *testing.T) {
 			"jetstream": map[string]interface{}{
 				"consumer": map[string]interface{}{
 					"enabled": true,
+				},
+			},
+		},
+	}
+	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
+}
+
+// This is a basic happy-path test for reporting on all data points
+func TestFetchEventContentForAll(t *testing.T) {
+	dataConfig := mbtest.DataConfig{
+		Type:      "http",
+		URL:       "/jsz?config=true&consumers=true",
+		Suffix:    "all.json",
+		Path:      "_meta/testdata/input",
+		WritePath: "_meta/testdata/expected",
+		// Not sure why this field isn't being recognized as documented. It does exist.
+		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category", "nats.jetstream.account.accounts"},
+		Module: map[string]interface{}{
+			"jetstream": map[string]interface{}{
+				"stats": map[string]interface{}{
+					"enabled": true,
+				},
+				"account": map[string]interface{}{
+					"enabled": true,
+				},
+				"stream": map[string]interface{}{
+					"enabled": true,
+				},
+				"consumer": map[string]interface{}{
+					"enabled": true,
+				},
+			},
+		},
+	}
+	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
+}
+
+// This is a basic happy-path test for reporting on all data points
+func TestFetchEventContentForAllWithNothingEnabled(t *testing.T) {
+	dataConfig := mbtest.DataConfig{
+		Type:      "http",
+		URL:       "/jsz?config=true",
+		Suffix:    "all.disabled.json",
+		Path:      "_meta/testdata/input",
+		WritePath: "_meta/testdata/expected",
+		// Not sure why this field isn't being recognized as documented. It does exist.
+		OmitDocumentedFieldsCheck: []string{},
+		Module: map[string]interface{}{
+			"jetstream": map[string]interface{}{
+				"stats": map[string]interface{}{
+					"enabled": false,
+				},
+				"account": map[string]interface{}{
+					"enabled": false,
+				},
+				"stream": map[string]interface{}{
+					"enabled": false,
+				},
+				"consumer": map[string]interface{}{
+					"enabled": false,
+				},
+			},
+		},
+	}
+	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
+}
+
+// This is a basic happy-path test for testing filters
+func TestFetchEventContentForAllWithFilters(t *testing.T) {
+	dataConfig := mbtest.DataConfig{
+		Type:      "http",
+		URL:       "/jsz?config=true&consumers=true",
+		Suffix:    "all.filters.json",
+		Path:      "_meta/testdata/input",
+		WritePath: "_meta/testdata/expected",
+		// Not sure why this field isn't being recognized as documented. It does exist.
+		OmitDocumentedFieldsCheck: []string{"nats.jetstream.category", "nats.jetstream.account.accounts"},
+		Module: map[string]interface{}{
+			"jetstream": map[string]interface{}{
+				"stats": map[string]interface{}{
+					"enabled": true,
+				},
+				"account": map[string]interface{}{
+					"enabled": true,
+					"names":   []string{"account-2"},
+				},
+				"stream": map[string]interface{}{
+					"enabled": true,
+					"names":   []string{"test-stream-2"},
+				},
+				"consumer": map[string]interface{}{
+					"enabled": true,
+					"names":   []string{"test-stream-2-consumer-2"},
 				},
 			},
 		},
