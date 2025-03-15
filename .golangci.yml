@@ -36,7 +36,8 @@ issues:
         - typecheck
     # From mage we are printing to the console to ourselves
     - path: (.*magefile.go|.*dev-tools/mage/.*)
-      linters: forbidigo
+      linters: 
+        - forbidigo
 
 output:
   sort-results: true
@@ -114,8 +115,6 @@ linters-settings:
     # Forbid the following identifiers
     forbid:
       - fmt.Print.* # too much log noise
-    # Exclude godoc examples from forbidigo checks.  Default is true.
-    exclude_godoc_examples: true
 
   goimports:
     local-prefixes: github.com/elastic
