@@ -7,7 +7,7 @@
     - name: category
       type: keyword
       description: >
-        The category of metrics represented in this event (stats, stream, or consumer)
+        The category of metrics represented in this event (stats, account, stream, or consumer)
     - name: stats
       type: group
       description: >

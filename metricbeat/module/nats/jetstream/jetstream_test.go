@@ -18,10 +18,7 @@
 package jetstream
 
 import (
-	"net/http"
-	"net/http/httptest"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,10 +26,12 @@ import (
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
 
-func TestEventMapping(t *testing.T) {
-	content, err := os.ReadFile("./_meta/test/example.json")
+func TestEventMappingFor(t *testing.T) {
+	content, err := os.ReadFile("./_meta/test/all.json")
 	assert.NoError(t, err)
 	reporter := &mbtest.CapturingReporterV2{}
+	// Enable all data points to ensure each individual mapper
+	// does not result in error.
 	config := ModuleConfig{
 		Jetstream: MetricsetConfig{
 			Stats: StatsConfig{
@@ -56,46 +55,40 @@ func TestEventMapping(t *testing.T) {
 	assert.NoError(t, err)
 }
 
-func TestFetchEventContent(t *testing.T) {
-	absPath, _ := filepath.Abs("./_meta/test")
-
-	response, _ := os.ReadFile(absPath + "/example.json")
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
-	}))
-	defer server.Close()
-
-	config := map[string]interface{}{
-		"module":     "nats",
-		"metricsets": []string{"jetstream"},
-		"hosts":      []string{server.URL},
-		"jetstream": map[string]interface{}{
-			"stats": map[string]interface{}{
-				"enabled": true,
-			},
-			"account": map[string]interface{}{
-				"enabled": true,
-			},
-			"stream": map[string]interface{}{
-				"enabled": true,
-			},
-			"consumer": map[string]interface{}{
-				"enabled": true,
+func TestFetchEventContentForStats(t *testing.T) {
+	dataConfig := mbtest.DataConfig{
+		Type:                      "http",
+		URL:                       "/jsz?config=true",
+		Suffix:                    "json",
+		Path:                      "_meta/test/stats",
+		WritePath:                 "_meta/testdata/stats",
+		OmitDocumentedFieldsCheck: []string{"nats.jetstream.*"},
+		Module: map[string]interface{}{
+			"jetstream": map[string]interface{}{
+				"stats": map[string]interface{}{
+					"enabled": true,
+				},
 			},
 		},
 	}
-	reporter := &mbtest.CapturingReporterV2{}
+	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
+}
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
-
-	for _, event := range reporter.GetEvents() {
-		e := mbtest.StandardizeEvent(metricSet, event)
-		t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
+func TestFetchEventContentForAccount(t *testing.T) {
+	dataConfig := mbtest.DataConfig{
+		Type:                      "http",
+		URL:                       "/jsz?accounts=true&config=true",
+		Suffix:                    "json",
+		Path:                      "_meta/test/accounts",
+		WritePath:                 "_meta/testdata/accounts",
+		OmitDocumentedFieldsCheck: []string{"nats.jetstream.*"},
+		Module: map[string]interface{}{
+			"jetstream": map[string]interface{}{
+				"account": map[string]interface{}{
+					"enabled": true,
+				},
+			},
+		},
 	}
-
-	errors := reporter.GetErrors()
-	assert.Len(t, errors, 0)
+	mbtest.TestDataFilesWithConfig(t, "nats", "jetstream", dataConfig, "")
 }
