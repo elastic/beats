@@ -182,43 +182,43 @@ type NamedItem interface {
 
 type JetstreamResponse struct {
 	AccountDetails  []JetstreamAccountDetails `json:"account_details"`
-	Bytes           int                       `json:"bytes"`
+	Bytes           uint64                    `json:"bytes"`
 	Config          JetstreamConfig           `json:"config,omitempty"`
-	Consumers       int                       `json:"consumers"`
-	Messages        int                       `json:"messages"`
+	Consumers       uint64                    `json:"consumers"`
+	Messages        uint64                    `json:"messages"`
 	Now             time.Time                 `json:"now"`
 	ServerID        string                    `json:"server_id"`
-	Streams         int                       `json:"streams"`
-	Memory          int                       `json:"memory"`
-	Storage         int                       `json:"storage"`
-	ReservedMemory  int                       `json:"reserved_memory"`
-	ReservedStorage int                       `json:"reserved_storage"`
-	Accounts        int                       `json:"accounts"`
+	Streams         uint64                    `json:"streams"`
+	Memory          uint64                    `json:"memory"`
+	Storage         uint64                    `json:"storage"`
+	ReservedMemory  uint64                    `json:"reserved_memory"`
+	ReservedStorage uint64                    `json:"reserved_storage"`
+	Accounts        uint64                    `json:"accounts"`
 }
 
 type JetstreamConfig struct {
-	MaxMemory    int    `json:"max_memory"`
-	MaxStorage   int    `json:"max_storage"`
+	MaxMemory    uint64 `json:"max_memory"`
+	MaxStorage   uint64 `json:"max_storage"`
 	StoreDir     string `json:"store_dir"`
-	SyncInterval int    `json:"sync_interval"`
+	SyncInterval uint64 `json:"sync_interval"`
 }
 
 type JetstreamAccountDetails struct {
 	Id                     string                  `json:"id"`
 	Name                   string                  `json:"name"`
-	Memory                 int                     `json:"memory"`
-	Storage                int                     `json:"storage"`
-	Accounts               int                     `json:"accounts"`
-	ReservedMemory         int                     `json:"reserved_memory"`
-	ReservedStorage        int                     `json:"reserved_storage"`
-	HighAvailabilityAssets int                     `json:"ha_assets"`
+	Memory                 uint64                  `json:"memory"`
+	Storage                uint64                  `json:"storage"`
+	Accounts               uint64                  `json:"accounts"`
+	ReservedMemory         uint64                  `json:"reserved_memory"`
+	ReservedStorage        uint64                  `json:"reserved_storage"`
+	HighAvailabilityAssets uint64                  `json:"ha_assets"`
 	ApiStats               AccountApiStats         `json:"api"`
 	StreamDetails          []JetstreamStreamDetail `json:"stream_detail"`
 }
 
 type AccountApiStats struct {
-	Total  int `json:"total"`
-	Errors int `json:"errors"`
+	Total  int64 `json:"total"`
+	Errors int64 `json:"errors"`
 }
 
 func (me JetstreamAccountDetails) GetName() string {
@@ -249,15 +249,15 @@ type JetstreamStreamConfig struct {
 	MirrorDirect          bool     `json:"mirror_direct"`
 	AllowDirect           bool     `json:"allow_direct"`
 	Compression           string   `json:"compression"`
-	DuplicateWindow       int      `json:"duplicate_window"`
-	NumReplicas           int      `json:"num_replicas"`
+	DuplicateWindow       int64    `json:"duplicate_window"`
+	NumReplicas           int64    `json:"num_replicas"`
 	Storage               string   `json:"storage"`
-	MaxConsumers          int      `json:"max_consumers"`
-	MaxMsgs               int      `json:"max_msgs"`
-	MaxBytes              int      `json:"max_bytes"`
-	MaxAge                int      `json:"max_age"`
-	MaxMessagesPerSubject int      `json:"max_msgs_per_subject"`
-	MaxMessageSize        int      `json:"max_msg_size"`
+	MaxConsumers          int64    `json:"max_consumers"`
+	MaxMsgs               int64    `json:"max_msgs"`
+	MaxBytes              int64    `json:"max_bytes"`
+	MaxAge                int64    `json:"max_age"`
+	MaxMessagesPerSubject int64    `json:"max_msgs_per_subject"`
+	MaxMessageSize        int64    `json:"max_msg_size"`
 	Discard               string   `json:"discard"`
 }
 
@@ -266,15 +266,15 @@ type JetstreamStreamClusterInfo struct {
 }
 
 type JetstreamStreamState struct {
-	Bytes          int       `json:"bytes"`
-	ConsumerCount  int       `json:"consumer_count"`
-	FirstSequence  int       `json:"first_seq"`
+	Bytes          int64     `json:"bytes"`
+	ConsumerCount  int64     `json:"consumer_count"`
+	FirstSequence  int64     `json:"first_seq"`
 	FirstTimestamp time.Time `json:"first_ts"`
-	LastSequence   int       `json:"last_seq"`
+	LastSequence   int64     `json:"last_seq"`
 	LastTimestamp  time.Time `json:"last_ts"`
-	Messages       int       `json:"messages"`
-	NumSubjects    int       `json:"num_subjects"`
-	NumDeleted     int       `json:"num_deleted"`
+	Messages       int64     `json:"messages"`
+	NumSubjects    int64     `json:"num_subjects"`
+	NumDeleted     int64     `json:"num_deleted"`
 }
 
 type JetstreamConsumerDetail struct {
@@ -283,10 +283,10 @@ type JetstreamConsumerDetail struct {
 	Config         JetstreamConsumerConfig    `json:"config"`
 	Delivered      JetstreamConsumerDelivered `json:"delivered"`
 	Name           string                     `json:"name"`
-	NumAckPending  int                        `json:"num_ack_pending"`
-	NumRedelivered int                        `json:"num_redelivered"`
-	NumPending     int                        `json:"num_pending"`
-	NumWaiting     int                        `json:"num_waiting"`
+	NumAckPending  int64                      `json:"num_ack_pending"`
+	NumRedelivered int64                      `json:"num_redelivered"`
+	NumPending     int64                      `json:"num_pending"`
+	NumWaiting     int64                      `json:"num_waiting"`
 	StreamName     string                     `json:"stream_name"`
 	Timestamp      time.Time                  `json:"ts"`
 }
@@ -299,24 +299,24 @@ type JetstreamConsumerConfig struct {
 	DurableName   string `json:"durable_name"`
 	DeliverPolicy string `json:"deliver_policy"`
 	AckPolicy     string `json:"ack_policy"`
-	AckWait       int    `json:"ack_wait"`
-	MaxDeliver    int    `json:"max_deliver"`
+	AckWait       int64  `json:"ack_wait"`
+	MaxDeliver    int64  `json:"max_deliver"`
 	FilterSubject string `json:"filter_subject"`
 	ReplayPolicy  string `json:"replay_policy"`
-	MaxWaiting    int    `json:"max_waiting"`
-	MaxAckPending int    `json:"max_ack_pending"`
-	NumReplicas   int    `json:"num_replicas"`
+	MaxWaiting    int64  `json:"max_waiting"`
+	MaxAckPending int64  `json:"max_ack_pending"`
+	NumReplicas   int64  `json:"num_replicas"`
 }
 
 type JetstreamConsumerDelivered struct {
-	ConsumerSequence int       `json:"consumer_seq"`
-	StreamSequence   int       `json:"stream_seq"`
+	ConsumerSequence int64     `json:"consumer_seq"`
+	StreamSequence   int64     `json:"stream_seq"`
 	LastActive       time.Time `json:"last_active"`
 }
 
 type JetstreamConsumerAckFloor struct {
-	ConsumerSequence int       `json:"consumer_seq"`
-	StreamSequence   int       `json:"stream_seq"`
+	ConsumerSequence int64     `json:"consumer_seq"`
+	StreamSequence   int64     `json:"stream_seq"`
 	LastActive       time.Time `json:"last_active"`
 }
 

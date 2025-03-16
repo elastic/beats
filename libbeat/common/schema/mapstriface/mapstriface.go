@@ -216,6 +216,8 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 		return int64(val), nil
 	case float64:
 		return int64(val), nil
+	case uint64:
+		return uint64(val), nil
 	case json.Number:
 		i64, err := val.Int64()
 		if err == nil {
@@ -269,7 +271,7 @@ func toFloat(key string, data map[string]interface{}) (interface{}, error) {
 }
 
 // Int creates a Conv object for converting integers. Acceptable input
-// types are int64, int, and float64.
+// types are int64, uint64, int, and float64.
 func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toInteger}, opts)
 }

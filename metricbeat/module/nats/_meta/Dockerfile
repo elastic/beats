@@ -1,4 +1,4 @@
-ARG NATS_VERSION=2.2.6
+ARG NATS_VERSION=2.10.26
 FROM nats:$NATS_VERSION
 
 # create an enhanced container with nc command available since nats is based
