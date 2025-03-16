@@ -160,5 +160,33 @@ class TestNats(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    def test_jetstream(self):
+        """
+        nats jetstream test
+        """
+        self.render_config_template(modules=[{
+            "name": "nats",
+            "metricsets": ["jetstream"],
+            "hosts": self.get_hosts(),
+            "period": "5s",
+            "jetstream.stats.enabled": True,
+            "jetstream.account.enabled": True,
+            "jetstream.stream.enabled": True,
+            "jetstream.consumer.enabled": True,
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+        self.assert_no_logged_warnings()
+
+        output = self.read_output_json()
+        self.assertEqual(len(output), 1)
+        evt = output[0]
+
+        self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
+
+        self.assert_fields_are_documented(evt)
+
     def get_hosts(self):
         return [self.compose_host("nats")]
