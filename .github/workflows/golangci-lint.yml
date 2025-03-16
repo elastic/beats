@@ -53,5 +53,7 @@ jobs:
           # into fixing all linting issues in the whole file instead
           args: --timeout=30m --whole-files
 
+          install-mode: "goinstall"
+
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true
