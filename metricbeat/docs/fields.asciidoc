@@ -55644,6 +55644,16 @@ Contains nats connection related metrics
 
 
 
+*`nats.connection.id`*::
++
+--
+The id of the connection
+
+
+type: keyword
+
+--
+
 *`nats.connection.name`*::
 +
 --
@@ -55651,6 +55661,86 @@ The name of the connection
 
 
 type: keyword
+
+--
+
+*`nats.connection.kind`*::
++
+--
+The kind of connection
+
+
+type: keyword
+
+--
+
+*`nats.connection.type`*::
++
+--
+The type of connection
+
+
+type: keyword
+
+--
+
+*`nats.connection.ip`*::
++
+--
+The IP address of the connection
+
+
+type: ip
+
+--
+
+*`nats.connection.port`*::
++
+--
+The port of the connection
+
+
+type: integer
+
+--
+
+*`nats.connection.lang`*::
++
+--
+The language of the client connection
+
+
+type: keyword
+
+--
+
+*`nats.connection.version`*::
++
+--
+The version of the client connection
+
+
+type: keyword
+
+--
+
+*`nats.connection.start`*::
++
+--
+The time the connection was started
+
+
+type: date
+
+--
+
+*`nats.connection.last_activity`*::
++
+--
+The last activity time of the connection
+
+
+type: date
 
 --
 
