@@ -14,11 +14,11 @@
         General stats about the NATS JetStream server.
       fields:
         - name: streams
-          type: integer
+          type: long
           description: >
             The total number of streams on the JetStream server.
         - name: consumers
-          type: integer
+          type: long
           description: >
             The total number of consumers on the JetStream server.
         - name: messages
@@ -27,26 +27,31 @@
             The total number of messages on the JetStream server.
         - name: bytes
           type: long
+          format: bytes
           description: >
             The total number of message bytes on the JetStream server.
         - name: memory
           type: long
+          format: bytes
           description: >
             The total amount of memory (bytes) used by the JetStream server.
         - name: reserved_memory
           type: long
+          format: bytes
           description: >
             The of memory (bytes) reserved by the JetStream server.
         - name: storage
           type: long
+          format: bytes
           description: >
             The total amount of storage (bytes) used by the JetStream server.
         - name: reserved_storage
           type: long
+          format: bytes
           description: >
             The total amount of storage (bytes) reserved by the JetStream server.
         - name: accounts
-          type: integer
+          type: long
           description: >
             The total number of accounts on the JetStream server.
         - name: config
@@ -56,10 +61,12 @@
           fields:
             - name: max_memory
               type: long
+              format: bytes
               description: >
                 The maximum amount of memory (bytes) the JetStream server can use.
             - name: max_storage
               type: long
+              format: bytes
               description: >
                 The maximum amount of storage (bytes) the JetStream server can use.
             - name: store_dir
@@ -93,18 +100,22 @@
             Indicates the number of JetStream high-availability (HA) assets allocated for an account.
         - name: memory
           type: long
+          format: bytes
           description: >
             The amount of memory in bytes currently used by JetStream for this account.
         - name: storage
           type: long
+          format: bytes
           description: >
             The amount of storage in bytes currently used by JetStream for this account.
         - name: reserved_memory
           type: long
+          format: bytes
           description: >
             The maximum memory quota reserved for this account (in bytes).
         - name: reserved_storage
           type: long
+          format: bytes
           description: >
             The maximum disk storage quota reserved for this account (in bytes).
         - name: api
@@ -153,14 +164,15 @@
                 The number of messages on the stream.
             - name: bytes
               type: long
+              format: bytes
               description: >
                 The number of bytes of messages on the stream.
             - name: consumer_count
-              type: integer
+              type: long
               description: >
                 The number of consumers on the stream.
             - name: num_subjects
-              type: integer
+              type: long
               description: >
                 The number of subjects on the stream.
             - name: num_deleted
@@ -218,7 +230,7 @@
               description: >
                 The storage type for stream data.
             - name: max_consumers
-              type: integer
+              type: long
               description: >
                 The maximum number of consumers allowed for this stream.
             - name: max_msgs
@@ -227,6 +239,7 @@
                 Maximum number of messages stored in the stream. Adheres to Discard Policy, removing oldest or refusing new messages if the Stream exceeds this number of messages.
             - name: max_bytes
               type: long
+              format: bytes
               description: >
                 Maximum number of bytes stored in the stream. Adheres to Discard Policy, removing oldest or refusing new messages if the Stream exceeds this size.
             - name: max_age
@@ -234,11 +247,12 @@
               description: >
                 Maximum age of any message in the stream, expressed in nanoseconds.	
             - name: max_msgs_per_subject
-              type: integer
+              type: long
               description: >
                 Limits maximum number of messages in the stream to retain per subject.	
             - name: max_msgs_size
               type: long
+              format: bytes
               description: >
                 The largest message (bytes) that will be accepted by the stream. The size of a message is a sum of payload and headers.
             - name: subjects
@@ -381,18 +395,18 @@
               description: >
                 The duration (in nanoseconds) that the server will wait for an acknowledgment for any individual message once it has been delivered to a consumer. If an acknowledgment is not received in time, the message will be redelivered.
             - name: max_deliver
-              type: integer
+              type: long
               description: >
                 The maximum number of times a message will be redelivered if not acknowledged.
             - name: max_waiting
-              type: integer
+              type: long
               description: >
                 The maximum number of pull requests a consumer can have waiting for messages.
             - name: max_ack_pending
-              type: integer
+              type: long
               description: >
                 The maximum number of messages the consumer can have in-flight (delivered but unacknowledged) at any time.
             - name: num_replicas
-              type: integer
+              type: long
               description: >
                 The number of replicas for the consumer's state in a JetStream cluster.

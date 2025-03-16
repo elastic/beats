@@ -55785,7 +55785,7 @@ Information pertaining to a NATS JetStream server
 *`nats.jetstream.category`*::
 +
 --
-The category of metrics represented in this event (stats, stream, or consumer)
+The category of metrics represented in this event (stats, account, stream, or consumer).
 
 
 type: keyword
@@ -55795,34 +55795,34 @@ type: keyword
 [float]
 === stats
 
-General stats about the NATS JetStream server
+General stats about the NATS JetStream server.
 
 
 
 *`nats.jetstream.stats.streams`*::
 +
 --
-The total number of streams on the JetStream server
+The total number of streams on the JetStream server.
 
 
-type: integer
+type: long
 
 --
 
 *`nats.jetstream.stats.consumers`*::
 +
 --
-The total number of consumers on the JetStream server
+The total number of consumers on the JetStream server.
 
 
-type: integer
+type: long
 
 --
 
 *`nats.jetstream.stats.messages`*::
 +
 --
-The total number of messages on the JetStream server
+The total number of messages on the JetStream server.
 
 
 type: long
@@ -55832,94 +55832,108 @@ type: long
 *`nats.jetstream.stats.bytes`*::
 +
 --
-The total number of message bytes on the JetStream server
+The total number of message bytes on the JetStream server.
 
 
 type: long
+
+format: bytes
 
 --
 
 *`nats.jetstream.stats.memory`*::
 +
 --
-The total amount of memory (bytes) used by the JetStream server
+The total amount of memory (bytes) used by the JetStream server.
 
 
 type: long
+
+format: bytes
 
 --
 
 *`nats.jetstream.stats.reserved_memory`*::
 +
 --
-The of memory (bytes) reserved by the JetStream server
+The of memory (bytes) reserved by the JetStream server.
 
 
 type: long
+
+format: bytes
 
 --
 
 *`nats.jetstream.stats.storage`*::
 +
 --
-The total amount of storage (bytes) used by the JetStream server
+The total amount of storage (bytes) used by the JetStream server.
 
 
 type: long
+
+format: bytes
 
 --
 
 *`nats.jetstream.stats.reserved_storage`*::
 +
 --
-The total amount of storage (bytes) reserved by the JetStream server
+The total amount of storage (bytes) reserved by the JetStream server.
 
 
 type: long
+
+format: bytes
 
 --
 
 *`nats.jetstream.stats.accounts`*::
 +
 --
-The total number of accounts on the JetStream server
+The total number of accounts on the JetStream server.
 
 
-type: integer
+type: long
 
 --
 
 [float]
 === config
 
-Configuration of the JetStream server
+Configuration of the JetStream server.
 
 
 
 *`nats.jetstream.stats.config.max_memory`*::
 +
 --
-The maximum amount of memory (bytes) the JetStream server can use
+The maximum amount of memory (bytes) the JetStream server can use.
 
 
 type: long
+
+format: bytes
 
 --
 
 *`nats.jetstream.stats.config.max_storage`*::
 +
 --
-The maximum amount of storage (bytes) the JetStream server can use
+The maximum amount of storage (bytes) the JetStream server can use.
 
 
 type: long
+
+format: bytes
 
 --
 
 *`nats.jetstream.stats.config.store_dir`*::
 +
 --
-The path on disk where the JetStream storage lives
+The path on disk where the JetStream storage lives.
 
 
 type: keyword
@@ -55929,7 +55943,7 @@ type: keyword
 *`nats.jetstream.stats.config.sync_interval`*::
 +
 --
-The fsync/sync interval for page cache in the filestore
+The fsync/sync interval for page cache in the filestore.
 
 
 type: long
@@ -55939,14 +55953,14 @@ type: long
 [float]
 === account
 
-Information about a NATS JetStream account
+Information about a NATS JetStream account.
 
 
 
 *`nats.jetstream.account.id`*::
 +
 --
-The ID of the JetStream account
+The ID of the JetStream account.
 
 
 type: keyword
@@ -55956,7 +55970,7 @@ type: keyword
 *`nats.jetstream.account.name`*::
 +
 --
-The name of the JetStream account
+The name of the JetStream account.
 
 
 type: keyword
@@ -55966,7 +55980,7 @@ type: keyword
 *`nats.jetstream.account.accounts`*::
 +
 --
-The number of accounts using JetStream on the server
+The number of accounts using JetStream on the server.
 
 
 type: integer
@@ -55986,10 +56000,12 @@ type: integer
 *`nats.jetstream.account.memory`*::
 +
 --
-The amount of memory in bytes currently used by JetStream for this account
+The amount of memory in bytes currently used by JetStream for this account.
 
 
 type: long
+
+format: bytes
 
 --
 
@@ -56001,6 +56017,8 @@ The amount of storage in bytes currently used by JetStream for this account.
 
 type: long
 
+format: bytes
+
 --
 
 *`nats.jetstream.account.reserved_memory`*::
@@ -56011,6 +56029,8 @@ The maximum memory quota reserved for this account (in bytes).
 
 type: long
 
+format: bytes
+
 --
 
 *`nats.jetstream.account.reserved_storage`*::
@@ -56020,6 +56040,8 @@ The maximum disk storage quota reserved for this account (in bytes).
 
 
 type: long
+
+format: bytes
 
 --
 
@@ -56053,14 +56075,14 @@ type: long
 [float]
 === stream
 
-Information about a NATS JetStream stream
+Information about a NATS JetStream stream.
 
 
 
 *`nats.jetstream.stream.name`*::
 +
 --
-The name of the JetStream stream
+The name of the JetStream stream.
 
 
 type: keyword
@@ -56070,7 +56092,7 @@ type: keyword
 *`nats.jetstream.stream.created`*::
 +
 --
-The date/time the stream was created
+The date/time the stream was created.
 
 
 type: date
@@ -56080,14 +56102,14 @@ type: date
 [float]
 === cluster
 
-Cluster information for the stream
+Cluster information for the stream.
 
 
 
 *`nats.jetstream.stream.cluster.leader`*::
 +
 --
-The ID of the leader in the cluster
+The ID of the leader in the cluster.
 
 
 type: keyword
@@ -56097,14 +56119,14 @@ type: keyword
 [float]
 === state
 
-The state of the stream
+The state of the stream.
 
 
 
 *`nats.jetstream.stream.state.messages`*::
 +
 --
-The number of messages on the stream
+The number of messages on the stream.
 
 
 type: long
@@ -56114,37 +56136,39 @@ type: long
 *`nats.jetstream.stream.state.bytes`*::
 +
 --
-The number of bytes of messages on the stream
+The number of bytes of messages on the stream.
 
 
 type: long
+
+format: bytes
 
 --
 
 *`nats.jetstream.stream.state.consumer_count`*::
 +
 --
-The number of consumers on the stream
+The number of consumers on the stream.
 
 
-type: integer
+type: long
 
 --
 
 *`nats.jetstream.stream.state.num_subjects`*::
 +
 --
-The number of subjects on the stream
+The number of subjects on the stream.
 
 
-type: integer
+type: long
 
 --
 
 *`nats.jetstream.stream.state.num_deleted`*::
 +
 --
-The number of messages deleted from the stream
+The number of messages deleted from the stream.
 
 
 type: long
@@ -56154,7 +56178,7 @@ type: long
 *`nats.jetstream.stream.state.first_seq`*::
 +
 --
-The first sequence number on the stream
+The first sequence number on the stream.
 
 
 type: long
@@ -56164,7 +56188,7 @@ type: long
 *`nats.jetstream.stream.state.first_ts`*::
 +
 --
-The date/time corresponding to first_seq
+The date/time corresponding to first_seq.
 
 
 type: date
@@ -56174,7 +56198,7 @@ type: date
 *`nats.jetstream.stream.state.last_seq`*::
 +
 --
-The last sequence number on the stream
+The last sequence number on the stream.
 
 
 type: long
@@ -56184,7 +56208,7 @@ type: long
 *`nats.jetstream.stream.state.last_ts`*::
 +
 --
-The date/time corresponding to last_seq
+The date/time corresponding to last_seq.
 
 
 type: date
@@ -56194,14 +56218,14 @@ type: date
 [float]
 === account
 
-Information about the account for this stream
+Information about the account for this stream.
 
 
 
 *`nats.jetstream.stream.account.id`*::
 +
 --
-The ID of the account
+The ID of the account.
 
 
 type: keyword
@@ -56211,7 +56235,7 @@ type: keyword
 *`nats.jetstream.stream.account.name`*::
 +
 --
-The name of the account
+The name of the account.
 
 
 type: keyword
@@ -56221,14 +56245,14 @@ type: keyword
 [float]
 === config
 
-Information regarding how the stream is configured
+Information regarding how the stream is configured.
 
 
 
 *`nats.jetstream.stream.config.description`*::
 +
 --
-The description of the stream
+The description of the stream.
 
 
 type: text
@@ -56238,7 +56262,7 @@ type: text
 *`nats.jetstream.stream.config.retention`*::
 +
 --
-The retention policy for the stream
+The retention policy for the stream.
 
 
 type: keyword
@@ -56268,10 +56292,10 @@ type: keyword
 *`nats.jetstream.stream.config.max_consumers`*::
 +
 --
-The maximum number of consumers allowed for this stream
+The maximum number of consumers allowed for this stream.
 
 
-type: integer
+type: long
 
 --
 
@@ -56293,6 +56317,8 @@ Maximum number of bytes stored in the stream. Adheres to Discard Policy, removin
 
 type: long
 
+format: bytes
+
 --
 
 *`nats.jetstream.stream.config.max_age`*::
@@ -56311,7 +56337,7 @@ type: long
 Limits maximum number of messages in the stream to retain per subject.	
 
 
-type: integer
+type: long
 
 --
 
@@ -56322,6 +56348,8 @@ The largest message (bytes) that will be accepted by the stream. The size of a m
 
 
 type: long
+
+format: bytes
 
 --
 
@@ -56338,14 +56366,14 @@ type: keyword
 [float]
 === consumer
 
-Information about a NATS JetStream consumer
+Information about a NATS JetStream consumer.
 
 
 
 *`nats.jetstream.consumer.name`*::
 +
 --
-The name of the consumer
+The name of the consumer.
 
 
 type: keyword
@@ -56355,7 +56383,7 @@ type: keyword
 *`nats.jetstream.consumer.created`*::
 +
 --
-The date/time the consumer was created
+The date/time the consumer was created.
 
 
 type: date
@@ -56365,14 +56393,14 @@ type: date
 [float]
 === stream
 
-Information about the stream for this consumer
+Information about the stream for this consumer.
 
 
 
 *`nats.jetstream.consumer.stream.name`*::
 +
 --
-The name of the stream
+The name of the stream.
 
 
 type: keyword
@@ -56382,14 +56410,14 @@ type: keyword
 [float]
 === cluster
 
-Cluster information for the consumer
+Cluster information for the consumer.
 
 
 
 *`nats.jetstream.consumer.cluster.leader`*::
 +
 --
-The ID of the leader in the cluster
+The ID of the leader in the cluster.
 
 
 type: keyword
@@ -56436,7 +56464,7 @@ type: date
 [float]
 === delivered
 
-Information about delivered messages
+Information about delivered messages.
 
 
 
@@ -56533,14 +56561,14 @@ type: date
 [float]
 === account
 
-Information about the account for this consumer
+Information about the account for this consumer.
 
 
 
 *`nats.jetstream.consumer.account.id`*::
 +
 --
-The ID of the account
+The ID of the account.
 
 
 type: keyword
@@ -56550,7 +56578,7 @@ type: keyword
 *`nats.jetstream.consumer.account.name`*::
 +
 --
-The name of the account
+The name of the account.
 
 
 type: keyword
@@ -56560,14 +56588,14 @@ type: keyword
 [float]
 === config
 
-Information about the configuration for this consumer
+Information about the configuration for this consumer.
 
 
 
 *`nats.jetstream.consumer.config.name`*::
 +
 --
-The name of the consumer
+The name of the consumer.
 
 
 type: keyword
@@ -56640,7 +56668,7 @@ type: long
 The maximum number of times a message will be redelivered if not acknowledged.
 
 
-type: integer
+type: long
 
 --
 
@@ -56650,7 +56678,7 @@ type: integer
 The maximum number of pull requests a consumer can have waiting for messages.
 
 
-type: integer
+type: long
 
 --
 
@@ -56660,17 +56688,17 @@ type: integer
 The maximum number of messages the consumer can have in-flight (delivered but unacknowledged) at any time.
 
 
-type: integer
+type: long
 
 --
 
 *`nats.jetstream.consumer.config.num_replicas`*::
 +
 --
-The number of replicas for the consumer’s state in a JetStream cluster.
+The number of replicas for the consumer's state in a JetStream cluster.
 
 
-type: integer
+type: long
 
 --
 
@@ -56812,6 +56840,26 @@ type: integer
 Contains nats var related metrics
 
 
+
+*`nats.stats.server_name`*::
++
+--
+The name of the NATS server
+
+
+type: keyword
+
+--
+
+*`nats.stats.version`*::
++
+--
+The version of the NATS server
+
+
+type: keyword
+
+--
 
 *`nats.stats.uptime`*::
 +
@@ -57012,6 +57060,66 @@ type: long
 +
 --
 The number of hits on root monitoring uri
+
+
+type: long
+
+--
+
+*`nats.stats.http.req_stats.uri.jsz`*::
++
+--
+The number of hits on jsz monitoring uri
+
+
+type: long
+
+--
+
+*`nats.stats.http.req_stats.uri.accountz`*::
++
+--
+The number of hits on accountz monitoring uri
+
+
+type: long
+
+--
+
+*`nats.stats.http.req_stats.uri.accstatz`*::
++
+--
+The number of hits on accstatz monitoring uri
+
+
+type: long
+
+--
+
+*`nats.stats.http.req_stats.uri.gatewayz`*::
++
+--
+The number of hits on gatewayz monitoring uri
+
+
+type: long
+
+--
+
+*`nats.stats.http.req_stats.uri.healthz`*::
++
+--
+The number of hits on healthz monitoring uri
+
+
+type: long
+
+--
+
+*`nats.stats.http.req_stats.uri.leafz`*::
++
+--
+The number of hits on leafz monitoring uri
 
 
 type: long
