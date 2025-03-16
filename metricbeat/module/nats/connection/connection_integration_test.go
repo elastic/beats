@@ -27,23 +27,25 @@ import (
 )
 
 func TestData(t *testing.T) {
-	service := compose.EnsureUp(t, "nats")
-	compose.EnsureUp(t, "nats-routes")
+	compose.EnsureUp(t, "nats")
+	service := compose.EnsureUp(t, "nats-routes")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
 	m.WriteEvents(t, "")
 }
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUp(t, "nats")
-	compose.EnsureUp(t, "nats-routes")
+	compose.EnsureUp(t, "nats")
+	service := compose.EnsureUp(t, "nats-routes")
 
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	metricSet.Fetch(reporter)
 
-	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
+	events := reporter.GetEvents()
+
+	e := mbtest.StandardizeEvent(metricSet, events[0])
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 

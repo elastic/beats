@@ -7,7 +7,6 @@ services:
       args:
         NATS_VERSION: ${NATS_VERSION:-2.2.6}
     ports:
-      - 4222
       - 8222
   nats-routes:
     extends:

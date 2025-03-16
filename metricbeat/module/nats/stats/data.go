@@ -49,8 +49,8 @@ var (
 		"leafz_uri":    c.Int("/leafz", s.Optional),
 	}
 	statsSchema = s.Schema{
-		"server_name": c.Str("server_name"),
-		"version":     c.Str("version"),
+		"server_name": c.Str("server_name", s.Optional),
+		"version":     c.Str("version", s.Optional),
 		"uptime":      c.Str("uptime"),
 		"mem": s.Object{
 			"bytes": c.Int("mem"),
@@ -103,23 +103,34 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 		return fmt.Errorf("failure deleting http_req_stats key: %w", err)
 
 	}
+
+	httpMetrics := []string{
+		"root",
+		"connz",
+		"routez",
+		"subsz",
+		"varz",
+		"jsz",
+		"accountz",
+		"accstatz",
+		"gatewayz",
+		"healthz",
+		"leafz",
+	}
+
 	metricsetMetrics["http"] = mapstr.M{
 		"req_stats": mapstr.M{
-			"uri": mapstr.M{
-				"root":     httpStats["root_uri"],
-				"connz":    httpStats["connz_uri"],
-				"routez":   httpStats["routez_uri"],
-				"subsz":    httpStats["subsz_uri"],
-				"varz":     httpStats["varz_uri"],
-				"jsz":      httpStats["jsz_uri"],
-				"accountz": httpStats["accountz_uri"],
-				"accstatz": httpStats["accstatz_uri"],
-				"gatewayz": httpStats["gatewayz_uri"],
-				"healthz":  httpStats["healthz_uri"],
-				"leafz":    httpStats["leafz_uri"],
-			},
+			"uri": mapstr.M{},
 		},
 	}
+
+	for _, name := range httpMetrics {
+		key := fmt.Sprintf("%s_uri", name)
+		if httpStats[key] != nil {
+			metricsetMetrics.Put(fmt.Sprintf("http.req_stats.uri.%s", name), httpStats[key])
+		}
+	}
+
 	cpu, err := metricsetMetrics.GetValue("cpu")
 	if err != nil {
 		return fmt.Errorf("failure retrieving cpu key: %w", err)
