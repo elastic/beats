@@ -36,14 +36,22 @@ var (
 		},
 	}
 	httpReqStatsSchema = s.Schema{
-		"root_uri":   c.Int("/"),
-		"connz_uri":  c.Int("/connz"),
-		"routez_uri": c.Int("/routez"),
-		"subsz_uri":  c.Int("/subsz"),
-		"varz_uri":   c.Int("/varz"),
+		"root_uri":     c.Int("/", s.Optional),
+		"connz_uri":    c.Int("/connz", s.Optional),
+		"routez_uri":   c.Int("/routez", s.Optional),
+		"subsz_uri":    c.Int("/subsz", s.Optional),
+		"varz_uri":     c.Int("/varz", s.Optional),
+		"jsz_uri":      c.Int("/jsz", s.Optional),
+		"accountz_uri": c.Int("/accountz", s.Optional),
+		"accstatz_uri": c.Int("/accstatz", s.Optional),
+		"gatewayz_uri": c.Int("/gatewayz", s.Optional),
+		"healthz_uri":  c.Int("/healthz", s.Optional),
+		"leafz_uri":    c.Int("/leafz", s.Optional),
 	}
 	statsSchema = s.Schema{
-		"uptime": c.Str("uptime"),
+		"server_name": c.Str("server_name"),
+		"version":     c.Str("version"),
+		"uptime":      c.Str("uptime"),
 		"mem": s.Object{
 			"bytes": c.Int("mem"),
 		},
@@ -98,11 +106,17 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	metricsetMetrics["http"] = mapstr.M{
 		"req_stats": mapstr.M{
 			"uri": mapstr.M{
-				"root":   httpStats["root_uri"],
-				"connz":  httpStats["connz_uri"],
-				"routez": httpStats["routez_uri"],
-				"subsz":  httpStats["subsz_uri"],
-				"varz":   httpStats["varz_uri"],
+				"root":     httpStats["root_uri"],
+				"connz":    httpStats["connz_uri"],
+				"routez":   httpStats["routez_uri"],
+				"subsz":    httpStats["subsz_uri"],
+				"varz":     httpStats["varz_uri"],
+				"jsz":      httpStats["jsz_uri"],
+				"accountz": httpStats["accountz_uri"],
+				"accstatz": httpStats["accstatz_uri"],
+				"gatewayz": httpStats["gatewayz_uri"],
+				"healthz":  httpStats["healthz_uri"],
+				"leafz":    httpStats["leafz_uri"],
 			},
 		},
 	}
