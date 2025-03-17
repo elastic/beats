@@ -314,6 +314,12 @@ func entype(attr *ldap.EntryAttribute) any {
 			if err != nil {
 				return attr.Values
 			}
+	
+			// Check for special values of accountExpires
+			if attr.Name == "accountExpires" && (ts == 0 || ts == 9223372036854775807) {
+				return v // Return the raw string instead of converting to time
+			}
+	
 			if len(attr.Values) == 1 {
 				return fromWindowsNT(ts)
 			}
