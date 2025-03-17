@@ -2344,13 +2344,6 @@ filebeat.inputs:
   # Change to true to enable this input configuration.
   enabled: false
 
-  # Previous IDs from this input. This allows migrating the state from files
-  # ingested when running this input with a different ID.
-  # Only the state of existing files currently being harvested by the
-  # input will be migrated.
-  #previous_ids:
-    #- "old-id"
-
   # Paths that should be crawled and fetched. Glob based paths.
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
@@ -2570,10 +2563,18 @@ filebeat.inputs:
   # Available options: since_first_start, since_last_start.
   #ignore_inactive: ""
 
-  # If `take_over` is set to `true`, this `filestream` will take over all files
-  # from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+  # When `take_over.enabled` is set to true this `filestream` input
+  # will take over states from the `log` input or `filestream` input
+  # with different ID.
+  # Taking over states of active `log` or `filestream` inputs is not
+  # supported and will lead to inconsistent data ingestion (data
+  # duplication or data loss)
   # This functionality is still in beta.
-  #take_over: false
+  #take_over:
+  #  enabled: true
+  #  If `from_ids` is provided, then the states are taken over are
+  #  from `filestream` inputs that used those IDs.
+  #  from_ids: ["foo", "bar"]
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
