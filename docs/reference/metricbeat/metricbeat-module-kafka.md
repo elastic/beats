@@ -36,7 +36,7 @@ kafka-acls --authorizer-properties zookeeper.connect=localhost:2181 --add --allo
 
 ## Compatibility [_compatibility_26]
 
-This module is tested with Kafka 0.10.2.1, 1.1.0, 2.1.1, and 2.2.2.
+This module is tested with Kafka 0.10.2.1, 1.1.0, 2.1.1, 2.2.2 and 3.6.0.
 
 The Broker, Producer, Consumer metricsets require [Jolokia](/reference/metricbeat/metricbeat-module-jolokia.md) to fetch JMX metrics. Refer to the link for Jolokia’s compatibility notes.
 

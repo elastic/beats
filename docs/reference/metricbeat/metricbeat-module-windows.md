@@ -45,9 +45,6 @@ metricbeat.modules:
   metricsets: ["service"]
   enabled: true
   period: 60s
-<<<<<<< HEAD:metricbeat/docs/modules/windows.asciidoc
-----
-=======
 
 - module: windows
   metricsets: ["wmi"]
@@ -73,7 +70,7 @@ metricbeat.modules:
       # If set, this takes precedence over the default namespace above.
       # namespace: "root\\cimv2" # Overrides the metric
 ```
->>>>>>> 3102f5eba ([docs] Migrate docs from AsciiDoc to Markdown (#42897)):docs/reference/metricbeat/metricbeat-module-windows.md
+
 
 
 ## Metricsets [_metricsets_78]
@@ -85,15 +82,3 @@ The following metricsets are available:
 * [wmi](/reference/metricbeat/metricbeat-metricset-windows-wmi.md)
 
 
-<<<<<<< HEAD:metricbeat/docs/modules/windows.asciidoc
-include::windows/perfmon.asciidoc[]
-=======
-
->>>>>>> 3102f5eba ([docs] Migrate docs from AsciiDoc to Markdown (#42897)):docs/reference/metricbeat/metricbeat-module-windows.md
-
-
-<<<<<<< HEAD:metricbeat/docs/modules/windows.asciidoc
-:edit_url!:
-=======
-
->>>>>>> 3102f5eba ([docs] Migrate docs from AsciiDoc to Markdown (#42897)):docs/reference/metricbeat/metricbeat-module-windows.md

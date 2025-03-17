@@ -419,7 +419,6 @@ The following metricsets are available:
 * [volume](/reference/metricbeat/metricbeat-metricset-kubernetes-volume.md)
 
 
-<<<<<<< HEAD:metricbeat/docs/modules/kubernetes.asciidoc
 * <<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>
 
 * <<metricbeat-metricset-kubernetes-event,event>>
@@ -508,6 +507,3 @@ include::kubernetes/system.asciidoc[]
 
 include::kubernetes/volume.asciidoc[]
 
-:edit_url!:
-=======
->>>>>>> 3102f5eba ([docs] Migrate docs from AsciiDoc to Markdown (#42897)):docs/reference/metricbeat/metricbeat-module-kubernetes.md
