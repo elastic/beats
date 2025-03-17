@@ -124,7 +124,7 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.9.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
 	github.com/vmware/govmomi v0.39.0
@@ -187,7 +187,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.18.9
 	github.com/elastic/elastic-agent-system-metrics v0.11.7
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
-	github.com/elastic/go-quark v0.3.0
+	github.com/elastic/go-quark v0.2.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.15.0
 	github.com/elastic/sarama v1.19.0
