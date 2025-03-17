@@ -153,11 +153,15 @@ func TestFetchEventContents(t *testing.T) {
 // TestFetchTimeout verifies that the HTTP request times out and an error is
 // returned.
 func TestFetchTimeout(t *testing.T) {
+	timeout := 50 * time.Millisecond
+
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
+
+		// make sure the request takes longer than the configured timeout.
+		time.Sleep(timeout + 5*time.Millisecond)
 		w.Write([]byte(response))
-		<-r.Context().Done()
 	}))
 	defer server.Close()
 
@@ -165,7 +169,7 @@ func TestFetchTimeout(t *testing.T) {
 		"module":     "apache",
 		"metricsets": []string{"status"},
 		"hosts":      []string{server.URL},
-		"timeout":    "50ms",
+		"timeout":    timeout.String(),
 	}
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
@@ -179,7 +183,8 @@ func TestFetchTimeout(t *testing.T) {
 	elapsed := time.Since(start)
 	var found bool
 	for _, err := range errs {
-		if strings.Contains(err.Error(), "Client.Timeout exceeded") {
+		if strings.Contains(err.Error(), "Client.Timeout exceeded") ||
+			strings.Contains(err.Error(), "context deadline exceeded") {
 			found = true
 		}
 	}
