@@ -1,0 +1,1 @@
+This is the `lists` metricset of the PgBouncer module.

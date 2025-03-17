@@ -252,6 +252,11 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-panw-routing,routing>> beta[]  
 |<<metricbeat-metricset-panw-system,system>> beta[]  
 |<<metricbeat-metricset-panw-vpn,vpn>> beta[]  
+|<<metricbeat-module-pgbouncer,PGBouncer>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.4+| .4+|  |<<metricbeat-metricset-pgbouncer-lists,lists>>   
+|<<metricbeat-metricset-pgbouncer-mem,mem>>   
+|<<metricbeat-metricset-pgbouncer-pools,pools>>   
+|<<metricbeat-metricset-pgbouncer-stats,stats>>   
 |<<metricbeat-module-php_fpm,PHP_FPM>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-php_fpm-pool,pool>>   
 |<<metricbeat-metricset-php_fpm-process,process>>   
@@ -387,6 +392,7 @@ include::modules/openai.asciidoc[]
 include::modules/openmetrics.asciidoc[]
 include::modules/oracle.asciidoc[]
 include::modules/panw.asciidoc[]
+include::modules/pgbouncer.asciidoc[]
 include::modules/php_fpm.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/prometheus.asciidoc[]

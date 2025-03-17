@@ -1,0 +1,86 @@
+{
+    "@timestamp": "2024-08-04T17:38:47.013Z",
+    "event": {
+        "dataset": "pgbouncer.mem",
+        "duration": 3184900,
+        "module": "pgbouncer"
+    },
+    "metricset": {
+        "name": "mem",
+        "period": 10000
+    },
+    "pgbouncer": {
+        "mem": {
+            "credentials_cache": {
+              "size": 616,
+              "used": 1,
+              "free": 49,
+              "memtotal": 30800
+            },
+            "peer_pool_cache": {
+              "size": 616,
+              "used": 1,
+              "free": 49,
+              "memtotal": 30800
+            },
+            "iobuf_cache": {
+              "memtotal": 30800,
+              "size": 616,
+              "used": 1,
+              "free": 49
+            },
+            "pool_cache": {
+              "used": 1,
+              "free": 49,
+              "memtotal": 30800,
+              "size": 616
+            },
+            "outstanding_request_cache": {
+              "memtotal": 30800,
+              "size": 616,
+              "used": 1,
+              "free": 49
+            },
+            "user_cache": {
+              "size": 616,
+              "used": 1,
+              "free": 49,
+              "memtotal": 30800
+            },
+            "server_cache": {
+              "memtotal": 30800,
+              "size": 616,
+              "used": 1,
+              "free": 49
+            },
+            "server_prepared_statement_cache": {
+              "size": 616,
+              "used": 1,
+              "free": 49,
+              "memtotal": 30800
+            },
+            "db_cache": {
+              "free": 49,
+              "memtotal": 30800,
+              "size": 616,
+              "used": 1
+            },
+            "peer_cache": {
+              "memtotal": 30800,
+              "size": 616,
+              "used": 1,
+              "free": 49
+            },
+            "var_list_cache": {
+              "used": 1,
+              "free": 49,
+              "memtotal": 30800,
+              "size": 616
+            }
+          }
+    },
+    "service": {
+        "address": "postgresql://localhost:6432/pgbouncer?connect_timeout=10&sslmode=disable",
+        "type": "pgbouncer"
+    }
+}

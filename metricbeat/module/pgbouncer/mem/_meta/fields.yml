@@ -1,0 +1,182 @@
+- name: mem
+  type: group
+  description: >
+    Shows cache memory information for various PgBouncer caches.
+  release: ga
+  fields:
+    - name: user_cache.size
+      type: long
+      description: >
+        The size of a single slot in the user cache.
+    - name: user_cache.used
+      type: long
+      description: >
+        Number of used slots in the user cache.
+    - name: user_cache.free
+      type: long
+      description: >
+        Number of available slots in the user cache.
+    - name: user_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the user cache.
+    - name: credentials_cache.size
+      type: long
+      description: >
+        The size of a single slot in the credentials cache.
+    - name: credentials_cache.used
+      type: long
+      description: >
+        Number of used slots in the credentials cache.
+    - name: credentials_cache.free
+      type: long
+      description: >
+        Number of available slots in the credentials cache.
+    - name: credentials_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the credentials cache.
+    - name: db_cache.size
+      type: long
+      description: >
+        The size of a single slot in the db cache.
+    - name: db_cache.used
+      type: long
+      description: >
+        Number of used slots in the db cache.
+    - name: db_cache.free
+      type: long
+      description: >
+        Number of available slots in the db cache.
+    - name: db_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the db cache.
+    - name: peer_cache.size
+      type: long
+      description: >
+        The size of a single slot in the peer cache.
+    - name: peer_cache.used
+      type: long
+      description: >
+        Number of used slots in the peer cache.
+    - name: peer_cache.free
+      type: long
+      description: >
+        Number of available slots in the peer cache.
+    - name: peer_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the peer cache.
+    - name: peer_pool_cache.size
+      type: long
+      description: >
+        The size of a single slot in the peer pool cache.
+    - name: peer_pool_cache.used
+      type: long
+      description: >
+        Number of used slots in the peer pool cache.
+    - name: peer_pool_cache.free
+      type: long
+      description: >
+        Number of available slots in the peer pool cache.
+    - name: peer_pool_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the peer pool cache.
+    - name: pool_cache.size
+      type: long
+      description: >
+        The size of a single slot in the pool cache.
+    - name: pool_cache.used
+      type: long
+      description: >
+        Number of used slots in the pool cache.
+    - name: pool_cache.free
+      type: long
+      description: >
+        Number of available slots in the pool cache.
+    - name: pool_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the pool cache.
+    - name: outstanding_request_cache.size
+      type: long
+      description: >
+        The size of a single slot in the outstanding request cache.
+    - name: outstanding_request_cache.used
+      type: long
+      description: >
+        Number of used slots in the outstanding request cache.
+    - name: outstanding_request_cache.free
+      type: long
+      description: >
+        Number of available slots in the outstanding request cache.
+    - name: outstanding_request_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the outstanding request cache.
+    - name: server_cache.size
+      type: long
+      description: >
+        The size of a single slot in the server cache.
+    - name: server_cache.used
+      type: long
+      description: >
+        Number of used slots in the server cache.
+    - name: server_cache.free
+      type: long
+      description: >
+        Number of available slots in the server cache.
+    - name: server_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the server cache.
+    - name: iobuf_cache.size
+      type: long
+      description: >
+        The size of a single slot in the iobuf cache.
+    - name: iobuf_cache.used
+      type: long
+      description: >
+        Number of used slots in the iobuf cache.
+    - name: iobuf_cache.free
+      type: long
+      description: >
+        Number of available slots in the iobuf cache.
+    - name: iobuf_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the iobuf cache.
+    - name: var_list_cache.size
+      type: long
+      description: >
+        The size of a single slot in the var list cache.
+    - name: var_list_cache.used
+      type: long
+      description: >
+        Number of used slots in the var list cache.
+    - name: var_list_cache.free
+      type: long
+      description: >
+        Number of available slots in the var list cache.
+    - name: var_list_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the var list cache.
+    - name: server_prepared_statement_cache.size
+      type: long
+      description: >
+        The size of a single slot in the server prepared statement cache.
+    - name: server_prepared_statement_cache.used
+      type: long
+      description: >
+        Number of used slots in the server prepared statement cache.
+    - name: server_prepared_statement_cache.free
+      type: long
+      description: >
+        Number of available slots in the server prepared statement cache.
+    - name: server_prepared_statement_cache.memtotal
+      type: long
+      description: >
+        Total bytes used by the server prepared statement cache.
