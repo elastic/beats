@@ -20,7 +20,7 @@ The default metricsets are `stats`, `connections`, `routes` and `subscriptions`.
 [float]
 === Compatibility
 
-The NATS module is tested with NATS 2.2.6 and 2.10.36. Versions in between are expected to be compatible as well.
+The NATS module is tested with NATS 2.2.6 and 2.10.x. Versions in between are expected to be compatible as well.
 
 
 [float]
