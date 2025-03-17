@@ -402,7 +402,7 @@ func TestSourceStore_UpdateIdentifiers(t *testing.T) {
 	})
 }
 
-func TestSourceStoreCopyStatesFromPreviousIDs(t *testing.T) {
+func TestSourceStoreTakeOver(t *testing.T) {
 	backend := createSampleStore(t, map[string]state{
 		"filestream::previous-id::key1": { // Active resource
 			TTL:  60 * time.Second,
@@ -417,11 +417,11 @@ func TestSourceStoreCopyStatesFromPreviousIDs(t *testing.T) {
 	defer s.Release()
 	store := &sourceStore{
 		identifier:          &sourceIdentifier{"filestream::current-id::"},
-		previousIdentifiers: []*sourceIdentifier{&sourceIdentifier{"filestream::previous-id::"}},
+		previousIdentifiers: []*sourceIdentifier{{"filestream::previous-id::"}},
 		store:               s,
 	}
 
-	store.CopyStatesFromPreviousIDs(func(v Value) (string, interface{}) {
+	store.TakeOver(func(v Value) (string, any) {
 		r, ok := v.(*resource)
 		if !ok {
 			t.Fatalf("expecting v of type '*input_logfile.resource', got '%T' instead", v)
