@@ -10,7 +10,7 @@ env:
 
   PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
   PLATFORMS_ARM: "+all linux/arm64 darwin/arm64"
-  PLATFORMS_FIPS: "+all linux/amd64"
+  PLATFORMS_AMD64_FIPS: "+all linux/amd64"
   PLATFORMS_ARM_FIPS: "+all linux/arm64"
 
 steps:
@@ -174,7 +174,7 @@ steps:
         artifact_paths:
           - build/distributions/**/*
 
-      - label: "SNAPSHOT: {{matrix}} FIPS"
+      - label: "SNAPSHOT: {{matrix}} Linux/amd64 FIPS"
         env:
           PLATFORMS: "${PLATFORMS_FIPS}"
           SNAPSHOT: true
@@ -222,7 +222,7 @@ steps:
           - x-pack/agentbeat
 
       ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "SNAPSHOT: x-pack/agentbeat all artifacts apart from linux/arm64 FIPS"
+      - label: "SNAPSHOT: x-pack/agentbeat Linux/amd64 FIPS"
         env:
           PLATFORMS: "${PLATFORMS_FIPS}"
           SNAPSHOT: true
