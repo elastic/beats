@@ -147,7 +147,7 @@ shared:
     files:
       <<: *binary_files
 
-  - &fips_binary_spec
+  - &binary_spec_fips
     <<: *common_fips
     files:
       <<: *binary_files
@@ -643,7 +643,7 @@ specs:
     - os: linux
       types: [tgz]
       spec:
-        <<: *fips_binary_spec
+        <<: *binary_spec_fips
         <<: *elastic_license_for_binaries
 
     - os: linux
