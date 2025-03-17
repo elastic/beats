@@ -418,6 +418,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 
 *Auditbeat*
 
@@ -480,6 +481,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
 - Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
+- Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
