@@ -45,6 +45,10 @@ type Info struct {
 	Monitoring struct {
 		DefaultUsername string                // The default username to be used to connect to Elasticsearch Monitoring
 		Namespace       *monitoring.Namespace // a monitor namespace that is unique per beat instance
+
+		StateRegistry *monitoring.Registry
+		InfoRegistry  *monitoring.Registry
+		StatsRegistry *monitoring.Registry
 	}
 	LogConsumer          consumer.Logs // otel log consumer
 	UseDefaultProcessors bool          // Whether to use the default processors

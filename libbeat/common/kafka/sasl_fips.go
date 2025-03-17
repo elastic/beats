@@ -15,22 +15,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || dragonfly || freebsd || netbsd || openbsd || solaris || aix
+//go:build requirefips
 
-package memlog
+package kafka
 
 import (
-	"os"
+	"fmt"
+	"strings"
+
+	"github.com/elastic/sarama"
 )
 
-// syncFile implements the fsync operation for most *nix systems.
-// The call is retried if EINTR or EAGAIN is returned.
-func syncFile(f *os.File) error {
-	// best effort.
-	for {
-		err := f.Sync()
-		if err == nil || !isRetryErr(err) {
-			return err
-		}
+func (c *SaslConfig) Validate() error {
+	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
+	case "", saslTypePlaintext:
+	default:
+		return fmt.Errorf("not valid SASL mechanism '%v', only supported with PLAIN", c.SaslMechanism)
 	}
+	return nil
+}
+
+func scramClient(mechanism string) func() sarama.SCRAMClient {
+	// This should never happen because `SaslMechanism` is checked on `Validate()`, keeping a panic to detect it earlier if it happens.
+	panic("scram sasl auth not supported in fips mode")
 }

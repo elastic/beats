@@ -15,28 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package feature
+//go:build integration && linux
 
-import "fmt"
+package state_horizontalpodautoscaler
 
-// Details minimal information that you must provide when creating a feature.
-type Details struct {
-	Name       string
-	Stability  Stability
-	Deprecated bool
-	Info       string // short info string
-	Doc        string // long doc string
-}
+import (
+	"testing"
 
-func (d Details) String() string {
-	fmtStr := "name: %s, description: %s (%s)"
-	if d.Deprecated {
-		fmtStr = "name: %s, description: %s (deprecated, %s)"
+	"github.com/stretchr/testify/assert"
+
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/test"
+)
+
+func TestFetchMetricset(t *testing.T) {
+	config := test.GetKubeStateMetricsConfig(t, "state_horizontalpodautoscaler")
+	metricSet := mbtest.NewFetcher(t, config)
+	events, errs := metricSet.FetchEvents()
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
-	return fmt.Sprintf(fmtStr, d.Name, d.Info, d.Stability)
-}
-
-// MakeDetails return the minimal information a new feature must provide.
-func MakeDetails(fullName string, doc string, stability Stability) Details {
-	return Details{Name: fullName, Info: doc, Stability: stability}
+	assert.NotEmpty(t, events)
 }
