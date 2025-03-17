@@ -14315,11 +14315,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-quark
-Version: v0.3.0
+Version: v0.2.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-quark@v0.3.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/go-quark@v0.2.0/LICENSE.txt:
 
 
                                  Apache License
@@ -22726,11 +22726,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/stretchr/testify
-Version: v1.10.0
+Version: v1.9.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.10.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/stretchr/testify@v1.9.0/LICENSE:
 
 MIT License
 
