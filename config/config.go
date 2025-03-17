@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/elastic/elastic-agent-libs/str"
 	ucfg "github.com/elastic/go-ucfg"
@@ -41,7 +42,8 @@ type Namespace struct {
 const mask = "xxxxx"
 
 var (
-	configOpts = []ucfg.Option{
+	configOptsMu sync.RWMutex
+	configOpts   = []ucfg.Option{
 		ucfg.PathSep("."),
 		ucfg.ResolveEnv,
 		ucfg.VarExp,
@@ -62,6 +64,18 @@ var (
 	)
 )
 
+func getGlobalConfigOpts() []ucfg.Option {
+	configOptsMu.RLock()
+	defer configOptsMu.RUnlock()
+	return configOpts
+}
+
+func setGlobalConfigOpts(opts []ucfg.Option) {
+	configOptsMu.Lock()
+	defer configOptsMu.Unlock()
+	configOpts = opts
+}
+
 func NewConfig() *C {
 	return fromConfig(ucfg.New())
 }
@@ -74,11 +88,11 @@ func NewConfig() *C {
 // result.
 func NewConfigFrom(from interface{}) (*C, error) {
 	if str, ok := from.(string); ok {
-		c, err := yaml.NewConfig([]byte(str), configOpts...)
+		c, err := yaml.NewConfig([]byte(str), getGlobalConfigOpts()...)
 		return fromConfig(c), err
 	}
 
-	c, err := ucfg.NewFrom(from, configOpts...)
+	c, err := ucfg.NewFrom(from, getGlobalConfigOpts()...)
 	return fromConfig(c), err
 }
 
@@ -130,7 +144,7 @@ func NewConfigWithYAML(in []byte, source string) (*C, error) {
 		[]ucfg.Option{
 			ucfg.MetaData(ucfg.Meta{Source: source}),
 		},
-		configOpts...,
+		getGlobalConfigOpts()...,
 	)
 	c, err := yaml.NewConfig(in, opts...)
 	return fromConfig(c), err
@@ -138,17 +152,17 @@ func NewConfigWithYAML(in []byte, source string) (*C, error) {
 
 // OverwriteConfigOpts allow to change the globally set config option
 func OverwriteConfigOpts(options []ucfg.Option) {
-	configOpts = options
+	setGlobalConfigOpts(options)
 }
 
 // Merge merges the parameter into the C object.
 func (c *C) Merge(from interface{}) error {
-	return c.access().Merge(from, configOpts...)
+	return c.access().Merge(from, getGlobalConfigOpts()...)
 }
 
 // Merge merges the parameter into the C object based on the provided options.
 func (c *C) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
-	o := configOpts
+	o := getGlobalConfigOpts()
 	if opts != nil {
 		o = append(o, opts...)
 	}
@@ -156,7 +170,7 @@ func (c *C) MergeWithOpts(from interface{}, opts ...ucfg.Option) error {
 }
 
 func (c *C) Unpack(to interface{}) error {
-	return c.access().Unpack(to, configOpts...)
+	return c.access().Unpack(to, getGlobalConfigOpts()...)
 }
 
 func (c *C) Path() string {
@@ -168,11 +182,11 @@ func (c *C) PathOf(field string) string {
 }
 
 func (c *C) Remove(name string, idx int) (bool, error) {
-	return c.access().Remove(name, idx, configOpts...)
+	return c.access().Remove(name, idx, getGlobalConfigOpts()...)
 }
 
 func (c *C) Has(name string, idx int) (bool, error) {
-	return c.access().Has(name, idx, configOpts...)
+	return c.access().Has(name, idx, getGlobalConfigOpts()...)
 }
 
 func (c *C) HasField(name string) bool {
@@ -184,44 +198,44 @@ func (c *C) CountField(name string) (int, error) {
 }
 
 func (c *C) Bool(name string, idx int) (bool, error) {
-	return c.access().Bool(name, idx, configOpts...)
+	return c.access().Bool(name, idx, getGlobalConfigOpts()...)
 }
 
 func (c *C) String(name string, idx int) (string, error) {
-	return c.access().String(name, idx, configOpts...)
+	return c.access().String(name, idx, getGlobalConfigOpts()...)
 }
 
 func (c *C) Int(name string, idx int) (int64, error) {
-	return c.access().Int(name, idx, configOpts...)
+	return c.access().Int(name, idx, getGlobalConfigOpts()...)
 }
 
 func (c *C) Float(name string, idx int) (float64, error) {
-	return c.access().Float(name, idx, configOpts...)
+	return c.access().Float(name, idx, getGlobalConfigOpts()...)
 }
 
 func (c *C) Child(name string, idx int) (*C, error) {
-	sub, err := c.access().Child(name, idx, configOpts...)
+	sub, err := c.access().Child(name, idx, getGlobalConfigOpts()...)
 	return fromConfig(sub), err
 }
 
 func (c *C) SetBool(name string, idx int, value bool) error {
-	return c.access().SetBool(name, idx, value, configOpts...)
+	return c.access().SetBool(name, idx, value, getGlobalConfigOpts()...)
 }
 
 func (c *C) SetInt(name string, idx int, value int64) error {
-	return c.access().SetInt(name, idx, value, configOpts...)
+	return c.access().SetInt(name, idx, value, getGlobalConfigOpts()...)
 }
 
 func (c *C) SetFloat(name string, idx int, value float64) error {
-	return c.access().SetFloat(name, idx, value, configOpts...)
+	return c.access().SetFloat(name, idx, value, getGlobalConfigOpts()...)
 }
 
 func (c *C) SetString(name string, idx int, value string) error {
-	return c.access().SetString(name, idx, value, configOpts...)
+	return c.access().SetString(name, idx, value, getGlobalConfigOpts()...)
 }
 
 func (c *C) SetChild(name string, idx int, value *C) error {
-	return c.access().SetChild(name, idx, value.access(), configOpts...)
+	return c.access().SetChild(name, idx, value.access(), getGlobalConfigOpts()...)
 }
 
 func (c *C) IsDict() bool {
@@ -234,7 +248,7 @@ func (c *C) IsArray() bool {
 
 // FlattenedKeys return a sorted flattened views of the set keys in the configuration.
 func (c *C) FlattenedKeys() []string {
-	return c.access().FlattenedKeys(configOpts...)
+	return c.access().FlattenedKeys(getGlobalConfigOpts()...)
 }
 
 // Enabled return the configured enabled value or true by default.
