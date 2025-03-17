@@ -157,7 +157,9 @@ func TestFetchTimeout(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
-		time.Sleep(timeout)
+
+		// make sure the request takes longer than the configured timeout.
+		time.Sleep(timeout + 5*time.Millisecond)
 		w.Write([]byte(response))
 	}))
 	defer server.Close()
@@ -180,7 +182,8 @@ func TestFetchTimeout(t *testing.T) {
 	elapsed := time.Since(start)
 	var found bool
 	for _, err := range errs {
-		if strings.Contains(err.Error(), "Client.Timeout exceeded") {
+		if strings.Contains(err.Error(), "Client.Timeout exceeded") ||
+			strings.Contains(err.Error(), "context deadline exceeded") {
 			found = true
 		}
 	}

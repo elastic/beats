@@ -15,26 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build tools
-// +build tools
-
-// This package contains the tool dependencies of the project.
-
-package tools
+package testflag
 
 import (
-	_ "github.com/magefile/mage"
-	_ "github.com/stretchr/testify/assert"
-	_ "github.com/tsg/go-daemon"
-	_ "golang.org/x/tools/cmd/goimports"
-	_ "golang.org/x/tools/cmd/stringer"
-	_ "gotest.tools/gotestsum/cmd"
-
-	_ "github.com/mitchellh/gox"
-
-	_ "go.elastic.co/go-licence-detector"
-
-	_ "github.com/elastic/go-licenser"
-
-	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
+	"flag"
+	"fmt"
+	"os"
 )
+
+// MustSetStrictPermsFalse sets the flag `strict.perms` to false. On error, it
+// logs the error to stderr and call os.Exit(1).
+func MustSetStrictPermsFalse() {
+	err := flag.Set("strict.perms", "false")
+	if err != nil {
+		fmt.Fprintln(os.Stderr,
+			fmt.Sprintf("failed to set flag strict.perms=false: %v", err))
+		os.Exit(1)
+	}
+}

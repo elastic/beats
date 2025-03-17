@@ -15,26 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build tools
-// +build tools
+//go:build !requirefips
 
-// This package contains the tool dependencies of the project.
-
-package tools
+package kafka
 
 import (
-	_ "github.com/magefile/mage"
-	_ "github.com/stretchr/testify/assert"
-	_ "github.com/tsg/go-daemon"
-	_ "golang.org/x/tools/cmd/goimports"
-	_ "golang.org/x/tools/cmd/stringer"
-	_ "gotest.tools/gotestsum/cmd"
+	"fmt"
+	"strings"
 
-	_ "github.com/mitchellh/gox"
-
-	_ "go.elastic.co/go-licence-detector"
-
-	_ "github.com/elastic/go-licenser"
-
-	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
+	"github.com/elastic/sarama"
 )
+
+func (c *SaslConfig) Validate() error {
+	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
+	case "", saslTypePlaintext, saslTypeSCRAMSHA256, saslTypeSCRAMSHA512:
+	default:
+		return fmt.Errorf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+	}
+	return nil
+}
+
+func scramClient(mechanism string) func() sarama.SCRAMClient {
+	if mechanism == saslTypeSCRAMSHA512 {
+		return func() sarama.SCRAMClient {
+			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
+		}
+	}
+	return func() sarama.SCRAMClient {
+		return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
+	}
+}
