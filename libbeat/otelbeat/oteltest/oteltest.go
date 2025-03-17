@@ -39,14 +39,13 @@ import (
 )
 
 type ReceiverConfig struct {
-	Name   string
-	Config component.Config
+	Name    string
+	Config  component.Config
+	Factory receiver.Factory
 }
 
 type CheckReceiversParams struct {
 	T *testing.T
-	// Factory that allows to create a receiver.
-	Factory receiver.Factory
 	// Receivers is a list of receiver configurations to create.
 	Receivers []ReceiverConfig
 	// AssertFunc is a function that asserts the test conditions.
@@ -71,7 +70,7 @@ func CheckReceivers(params CheckReceiversParams) {
 
 	core := zapcore.NewTee(zapCore, observed)
 
-	createReceiver := func(t *testing.T, name string, cfg component.Config) receiver.Logs {
+	createReceiver := func(t *testing.T, rc ReceiverConfig) receiver.Logs {
 		t.Helper()
 
 		var receiverSettings receiver.Settings
@@ -79,7 +78,7 @@ func CheckReceivers(params CheckReceiversParams) {
 		// Replicate the behavior of the collector logger
 		receiverCore := core.
 			With([]zapcore.Field{
-				zap.String("name", name),
+				zap.String("name", rc.Name),
 				zap.String("kind", "receiver"),
 				zap.String("data_type", "logs"),
 			})
@@ -94,24 +93,24 @@ func CheckReceivers(params CheckReceiversParams) {
 					for k := 0; k < sl.LogRecords().Len(); k++ {
 						log := sl.LogRecords().At(k)
 						logsMu.Lock()
-						logs[name] = append(logs[name], log.Body().Map().AsRaw())
+						logs[rc.Name] = append(logs[rc.Name], log.Body().Map().AsRaw())
 						logsMu.Unlock()
 					}
 				}
 			}
 			return nil
 		})
-		assert.NoErrorf(t, err, "Error creating log consumer for %q", name)
+		assert.NoErrorf(t, err, "Error creating log consumer for %q", rc.Name)
 
-		r, err := params.Factory.CreateLogs(ctx, receiverSettings, cfg, logConsumer)
-		assert.NoErrorf(t, err, "Error creating receiver %q", name)
+		r, err := rc.Factory.CreateLogs(ctx, receiverSettings, rc.Config, logConsumer)
+		assert.NoErrorf(t, err, "Error creating receiver %q", rc.Name)
 		return r
 	}
 
 	// Replicate the collector behavior to instantiate components first and then start them.
 	var receivers []receiver.Logs
 	for _, rec := range params.Receivers {
-		receivers = append(receivers, createReceiver(t, rec.Name, rec.Config))
+		receivers = append(receivers, createReceiver(t, rec))
 	}
 
 	for i, r := range receivers {

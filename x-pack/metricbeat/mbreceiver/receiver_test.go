@@ -43,12 +43,12 @@ func TestNewReceiver(t *testing.T) {
 	}
 
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T:       t,
-		Factory: NewFactory(),
+		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
-				Name:   "r1",
-				Config: &config,
+				Name:    "r1",
+				Config:  &config,
+				Factory: NewFactory(),
 			},
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
@@ -87,17 +87,19 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 	}
 
+	factory := NewFactory()
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T:       t,
-		Factory: NewFactory(),
+		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
-				Name:   "r1",
-				Config: &config,
+				Name:    "r1",
+				Config:  &config,
+				Factory: factory,
 			},
 			{
-				Name:   "r2",
-				Config: &config,
+				Name:    "r2",
+				Config:  &config,
+				Factory: factory,
 			},
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
