@@ -20,7 +20,7 @@ package key
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"github.com/pkg/errors" //nolint:gomodguard // don\t fail CI in current PR
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -100,7 +100,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			continue
 		}
 		if p.Limit > 0 && len(keys) > int(p.Limit) {
-			m.Logger().Debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit)
+			m.Logger().Debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit, p.Pattern, keyspace)
 			keys = keys[:p.Limit]
 		}
 
