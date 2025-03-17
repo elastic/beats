@@ -18,6 +18,7 @@
 package inputmon
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -91,13 +92,15 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	// Simulates input using the metrics registry from the v2.Context.
 	// It cannot use the v2.Context directly because it creates an import cycle.
 	inputID := "input-with-pipeline-metrics-new-inputAPI"
-	reg := monitoring.GetNamespace("beat-x").GetRegistry().
+	parent := monitoring.GetNamespace("beat-x").GetRegistry()
+	reg := parent.
 		NewRegistry(inputID)
 	monitoring.NewString(reg, "id").Set(inputID)
 	monitoring.NewString(reg, "input").Set("test")
 	require.NoError(t, RegisterMetrics(inputID+"-test", reg), "could not register metrics")
-	monitoring.NewInt(reg, "foo1_total").Set(100)
+	monitoring.NewInt(reg, "foo_total").Set(100)
 	monitoring.NewInt(reg, "events_pipeline_total").Set(100)
+	defer parent.Remove(inputID)
 
 	// =========== Input using new API and legacy, global namespace ===========
 	// Simulates input unaware of the metrics registry from the v2.Context. In
@@ -110,13 +113,14 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	// Explicitly register those metrics to be published.
 	require.NoError(t, RegisterMetrics(inputID+"-test", reg), "could not register metrics")
 	monitoring.NewInt(reg, "events_pipeline_total").Set(200)
+	defer globalRegistry().Remove(inputID)
 
 	// now the input also register its metrics with the deprecated
 	// NewInputRegistry.
 	reg, cancel := NewInputRegistry(
 		"test", inputID, nil)
 	defer cancel()
-	monitoring.NewInt(reg, "foo2_total").Set(100)
+	monitoring.NewInt(reg, "foo_total").Set(100)
 
 	// ===== An input registering metrics, but not using the v2.Context =====
 	// an input registering metrics on the global namespace. This simulates an
@@ -125,45 +129,72 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	reg, cancel = NewInputRegistry(
 		"test", inputOldAPI, nil)
 	defer cancel()
-	monitoring.NewInt(reg, "foo2_total").Set(100)
+	monitoring.NewInt(reg, "foo_total").Set(100)
 
 	// ==== registries in the global registries which aren't input metrics ===
 	// unrelated registry in the global namespace, should be ignored.
 	reg = globalRegistry().NewRegistry("another-registry")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
+	defer globalRegistry().Remove("another-registry")
 
 	// another input registry missing required information.
 	reg = globalRegistry().NewRegistry("yet-another-registry")
 	monitoring.NewString(reg, "id").Set("some-id")
 	monitoring.NewInt(reg, "foo3_total").Set(100)
+	defer globalRegistry().Remove("yet-another-registry")
 
 	jsonBytes, err := MetricSnapshotJSON()
 	require.NoError(t, err)
 
-	const expected = `[
-  {
-    "events_pipeline_total": 100,
-    "foo1_total": 100,
-    "id": "input-with-pipeline-metrics-new-inputAPI",
-    "input": "test"
-  },
-  {
-    "events_pipeline_total": 200,
-    "foo2_total": 100,
-    "id": "input-with-pipeline-metrics-globalRegistry()",
-    "input": "test"
-  },
-  {
-    "foo2_total": 100,
-    "id": "input-without-pipeline-metrics",
-    "input": "test"
-  }
-]`
+	type Resp struct {
+		EventsPipelineTotal int    `json:"events_pipeline_total,omitempty"`
+		FooTotal            int    `json:"foo_total"`
+		ID                  string `json:"id"`
+		Input               string `json:"input"`
+	}
+	var got []Resp
 
-	got := string(jsonBytes)
-	assert.Equal(t, expected, got)
+	err = json.Unmarshal(jsonBytes, &got)
+	require.NoError(t, err, "failed to unmarshal response")
+	want := map[string]Resp{
+		"input-with-pipeline-metrics-new-inputAPI": {
+			EventsPipelineTotal: 100,
+			FooTotal:            100,
+			ID:                  "input-with-pipeline-metrics-new-inputAPI",
+			Input:               "test",
+		},
+		"input-with-pipeline-metrics-globalRegistry()": {
+			EventsPipelineTotal: 200,
+			FooTotal:            100,
+			ID:                  "input-with-pipeline-metrics-globalRegistry()",
+			Input:               "test",
+		},
+		"input-without-pipeline-metrics": {
+			FooTotal: 100,
+			ID:       "input-without-pipeline-metrics",
+			Input:    "test",
+		},
+	}
+	found := map[string]bool{}
+
+	assert.Equal(t, len(want), len(got), "got a different number of metrics than wanted")
+	for _, m := range got {
+		if found[m.ID] {
+			t.Error("found duplicate id")
+		}
+
+		w, ok := want[m.ID]
+		if !assert.True(t, ok, "unexpected input ID in metrics: %s", m.ID) {
+			continue
+		}
+
+		if assert.Equal(t, w, m) {
+			found[m.ID] = true
+		}
+	}
+
 	// It's easier to understand the failure with the full output.
 	if t.Failed() {
-		t.Logf("API reponse:\n%s\n", got)
+		t.Logf("API reponse:\n%s\n", string(jsonBytes))
 	}
 }
