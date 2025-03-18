@@ -147,6 +147,7 @@ func TestTakeOverTags(t *testing.T) {
 			filename := generateFile(t, t.TempDir(), 5)
 			cfg := fmt.Sprintf(`
 type: filestream
+id: foo
 prospector.scanner.check_interval: 1s
 prospector.scanner.fingerprint.enabled: false
 take_over.enabled: %t

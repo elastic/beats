@@ -164,6 +164,10 @@ func (c *config) Validate() error {
 			"cannot be eanbled at the same time")
 	}
 
+	if c.ID == "" && c.TakeOver.Enabled {
+		return errors.New("'take_over' mode is only allowed if an input ID is set")
+	}
+
 	return nil
 }
 

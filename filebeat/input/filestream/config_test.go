@@ -36,6 +36,25 @@ func TestConfigValidate(t *testing.T) {
 		err := c.Validate()
 		require.Error(t, err)
 	})
+
+	t.Run("take_over requires ID", func(t *testing.T) {
+		c := config{
+			Paths:    []string{"/foo/bar"},
+			TakeOver: takeOverConfig{Enabled: true},
+		}
+		err := c.Validate()
+		require.Error(t, err, "take_over.enabled can only be true if ID is set")
+	})
+
+	t.Run("take_over works with ID set", func(t *testing.T) {
+		c := config{
+			Paths:    []string{"/foo/bar"},
+			ID:       "some id",
+			TakeOver: takeOverConfig{Enabled: true},
+		}
+		err := c.Validate()
+		require.NoError(t, err)
+	})
 }
 
 func TestValidateInputIDs(t *testing.T) {
