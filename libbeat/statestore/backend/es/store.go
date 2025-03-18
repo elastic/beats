@@ -296,7 +296,7 @@ func (s *store) Each(fn func(string, backend.ValueDecoder) (bool, error)) error 
 }
 
 func (s *store) configure(ctx context.Context, c *conf.C) {
-	s.log.Debugf("Configure ES store")
+	s.log.Info("Configuring ES store")
 	s.mx.Lock()
 	defer s.mx.Unlock()
 

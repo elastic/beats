@@ -114,6 +114,10 @@ type ReportOptions struct {
 	//
 	// It uses `PrintOutput`, see its documentation for details.
 	PrintLinesOnFail int
+
+	// PrintConfig defines if the test prints out the entire configuration file
+	// in case of failure.
+	PrintConfigOnFail bool
 }
 
 // BeatTestOptions describes all options to run the test
@@ -182,7 +186,7 @@ func (b *beatTest) Wait() {
 
 	if b.expectedExitCode != nil && exitCode != *b.expectedExitCode {
 		b.t.Cleanup(func() {
-			b.t.Logf("expected exit code %d, actual %d", b.expectedExitCode, exitCode)
+			b.t.Logf("expected exit code %d, actual %d", *b.expectedExitCode, exitCode)
 		})
 
 		b.t.Fail()
@@ -193,6 +197,9 @@ func (b *beatTest) Wait() {
 			b.t.Logf("\n\nExpectations are not met:\n\n%s\n\n", b.beat.watcher.String())
 			if b.reportOpts.PrintLinesOnFail != 0 {
 				b.PrintOutput(b.reportOpts.PrintLinesOnFail)
+			}
+			if b.reportOpts.PrintConfigOnFail {
+				b.PrintConfig()
 			}
 		})
 		b.t.Fail()
@@ -296,6 +303,18 @@ func (b *beatTest) PrintOutput(lineCount int) {
 	}
 
 	b.t.Logf("\n\nLast %d lines of the output:\n\n%s\n\n", lineCount, b.beat.CollectOutput(lineCount))
+}
+
+// PrintConfig prints the entire configuration file the Beat test ran with
+func (b *beatTest) PrintConfig() {
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+
+	if b.beat == nil {
+		return
+	}
+
+	b.t.Logf("\n\nConfig file %s ran with:\n\n%s\n\n", b.opts.Beatname, b.opts.Config)
 }
 
 // WithReportOptions implements the BeatTest interface.
