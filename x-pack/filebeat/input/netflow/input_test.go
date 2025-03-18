@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -35,7 +36,7 @@ func TestConfig_CustomDefinitions(t *testing.T) {
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	wantDefinitions, err := LoadFieldDefinitionsFromFile("testdata/fields/netflow9_cisco_asa_custom.yaml")
+	wantDefinitions, err := decoder.LoadFieldDefinitionsFromFile("testdata/fields/netflow9_cisco_asa_custom.yaml")
 	require.NoError(t, err)
 	want := []fields.FieldDict{wantDefinitions}
 
