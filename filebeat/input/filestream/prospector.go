@@ -280,6 +280,8 @@ func (p *fileProspector) Init(
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
 //
+// 2 - run the prospector
+//
 //nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
@@ -317,6 +319,7 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 	}
 }
 
+// 4 - handle the events produced by the watcher
 func (p *fileProspector) onFSEvent(
 	log *logp.Logger,
 	ctx input.Context,

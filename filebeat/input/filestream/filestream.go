@@ -105,6 +105,7 @@ func newFileReader(
 // If the file is inactive, ErrInactive is returned
 // If f.readerCtx is cancelled for any reason, then
 // ErrClosed is returned
+// 6 - actually read the files
 func (f *logFile) Read(buf []byte) (int, error) {
 	totalN := 0
 

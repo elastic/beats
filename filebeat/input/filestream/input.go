@@ -398,6 +398,7 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
+// 5 - open files
 func (inp *filestream) open(
 	log *logp.Logger,
 	canceler input.Canceler,
@@ -478,8 +479,9 @@ func (inp *filestream) open(
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned.
 //
-// openFile will also detect and hadle file truncation. If a file is truncated
+// openFile will also detect and handle file truncation. If a file is truncated
 // then the 3rd return value is true.
+// here - opens a file
 func (inp *filestream) openFile(
 	log *logp.Logger,
 	path string,
@@ -574,6 +576,7 @@ func (inp *filestream) readFromSource(
 	defer metrics.HarvesterClosed.Inc()
 
 	for ctx.Cancelation.Err() == nil {
+		// next line - r needs to be reading from a gzipped file
 		message, err := r.Next()
 		if err != nil {
 			if errors.Is(err, ErrFileTruncate) {
@@ -596,6 +599,7 @@ func (inp *filestream) readFromSource(
 			return nil
 		}
 
+		// sate offset increase
 		s.Offset += int64(message.Bytes) + int64(message.Offset)
 
 		flags, err := message.Fields.GetValue("log.flags")

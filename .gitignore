@@ -45,3 +45,4 @@ x-pack/dockerlogbeat/temproot.tar
 
 # Files generated with the bump version automations
 *.bck
+
