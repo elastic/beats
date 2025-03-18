@@ -147,34 +147,10 @@ func newAuditClient(c *Config, log *logp.Logger) (*libaudit.AuditClient, error) 
 	return libaudit.NewAuditClient(nil)
 }
 
-func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
-	discard := func(bytes []byte) ([]syscall.NetlinkMessage, error) {
-		return nil, nil
-	}
-	// Drain the netlink channel in parallel to Close() to prevent a deadlock.
-	// This goroutine will terminate once receive from netlink errors (EBADF,
-	// EBADFD, or any other error). This happens because the fd is closed.
-	go func() {
-		for {
-			_, err := client.Netlink.Receive(true, discard)
-			switch {
-			case err == nil, errors.Is(err, syscall.EINTR):
-			case errors.Is(err, syscall.EAGAIN):
-				time.Sleep(50 * time.Millisecond)
-			default:
-				return
-			}
-		}
-	}()
-	if err := client.Close(); err != nil {
-		log.Errorw("Error closing audit monitoring client", "error", err)
-	}
-}
-
 // Run initializes the audit client and receives audit messages from the
 // kernel until the reporter's done channel is closed.
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
-	defer closeAuditClient(ms.client, ms.log)
+	defer ms.client.Close()
 	defer ms.control.Close()
 
 	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
@@ -221,7 +197,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		go func() {
 			defer func() { // Close the most recently allocated "client" instance.
 				if client != nil {
-					closeAuditClient(client, ms.log)
+					ms.client.Close()
 				}
 			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
@@ -235,7 +211,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
-						closeAuditClient(client, ms.log)
+						client.Close()
 						client, err = libaudit.NewAuditClient(nil)
 						if err != nil {
 							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
@@ -288,7 +264,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("failed to create audit client for adding rules: %w", err)
 	}
-	defer closeAuditClient(client, ms.log)
+	defer client.Close()
 
 	// Delete existing rules.
 	n, err := client.DeleteRules()
@@ -421,7 +397,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 	}
 	// At this point the netlink channel is congested (ENOBUFS).
 	// Drain and close the client, then retry with a new client.
-	closeAuditClient(ms.client, ms.log)
+	ms.client.Close()
 	if ms.client, err = newAuditClient(&ms.config, ms.log); err != nil {
 		return fmt.Errorf("failed to recover from ENOBUFS: %w", err)
 	}

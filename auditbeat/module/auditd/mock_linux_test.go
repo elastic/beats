@@ -96,6 +96,10 @@ func (n *MockNetlinkSendReceiver) Send(msg syscall.NetlinkMessage) (uint32, erro
 	return 0, nil
 }
 
+func (n *MockNetlinkSendReceiver) SendNoWait(msg syscall.NetlinkMessage) (uint32, error) {
+	return 0, nil
+}
+
 func (n *MockNetlinkSendReceiver) Receive(nonBlocking bool, p libaudit.NetlinkParser) ([]syscall.NetlinkMessage, error) {
 	if len(n.messages) > 0 {
 		msg := n.messages[0]
