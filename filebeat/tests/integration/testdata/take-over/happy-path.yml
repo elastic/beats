@@ -46,8 +46,6 @@ filebeat.registry:
 logging:
   level: debug
   selectors:
-    - input
-    - input.filestream
-    - input.filestream.prospector
+    - "*"
   metrics:
     enabled: false

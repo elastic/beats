@@ -1,8 +1,8 @@
 filebeat.inputs:
-  - type: {{ if .take_over }}filestream{{ else }}log{{ end}}
+  - type: {{ if .takeOver }}filestream{{ else }}log{{ end}}
     paths:
       - {{.testdata}}/take-over/*.log
-{{ if .take_over }}
+{{ if .takeOver }}
     id: take-over-from-log-input
     take_over:
       enabled: true
@@ -42,8 +42,5 @@ logging:
   level: debug
   selectors:
     - "*"
-    - input
-    - input.filestream
-    - input.filestream.prospector
   metrics:
     enabled: false

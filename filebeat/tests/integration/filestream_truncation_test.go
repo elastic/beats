@@ -217,6 +217,7 @@ func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[
 			Op:       lastOperation,
 		}
 
+		// Handle the log input entries, they have a different format.
 		if strings.HasPrefix(e.Key, "filebeat::logs") {
 			et.Offset = e.Value.Offset
 			et.Filename = e.Value.Source

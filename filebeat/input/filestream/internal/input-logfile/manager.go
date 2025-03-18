@@ -258,9 +258,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
-	defaultIDStore := newSourceStore(pStore, globalIdentifier, nil)
+	globalStore := newSourceStore(pStore, globalIdentifier, nil)
 
-	err = prospector.Init(prospectorStore, defaultIDStore, srcIdentifier.ID)
+	err = prospector.Init(prospectorStore, globalStore, srcIdentifier.ID)
 	if err != nil {
 		return nil, err
 	}

@@ -312,7 +312,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	// We only iterate through the whole store if we're not migrating from
 	// a Filestream input
 	fromLogInput := map[string]logInputState{}
-	if len(fromFilestreamInput) == 0 {
+	if len(s.previousIdentifiers) == 0 {
 		s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
 			if strings.HasPrefix(key, "filebeat::logs::") {
 				m := mapstr.M{}
@@ -338,7 +338,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 				//       if no Log input was ever started.
 				// This means that no matter what we do here, the states from
 				// the Log input are always re-written to disk.
-				// See: filebeat/registrar/migrate.go:367 (resetStates)
+				// See: filebeat/registrar/registrar.go:144
 				//
 				// However, there is a "reset state" code, that runs
 				// during the Registrar initialisation and sets the
@@ -346,7 +346,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 				// the TTL is set to -1 (never expires) or the configured
 				// value.
 				// See: filebeat/registrar/registrar.go:296 (readStatesFrom) and
-				// filebeat/beater/filebeat.go:433 (registrar.Start())
+				// filebeat/beater/filebeat.go:425 (registrar.Start())
 				//
 				// This means that while the Log input is running and the file
 				// has been active at any moment during the Filebeat's execution
@@ -354,10 +354,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 				//
 				// So, if TTL == -2, then in the previous run of Filebeat, there
 				// was no Log input using this state, which likely means, it is
-				// a state that has already been migrated to Filestream. Another
-				// possibility is that the Log input was removed, Filebeat was
-				// restarted one or more time, then the take_over was enabled.
-				// This is a very unlikely case, anyway skip migrating the state.
+				// a state that has already been migrated to Filestream.
 				//
 				// The worst case that can happen is that we re-ingest the file
 				// once, which is still better than copying an old state with
@@ -373,7 +370,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 		})
 	}
 
-	// Lock the ephemeral store to we can migrate the states in one go
+	// Lock the ephemeral store so we can migrate the states in one go
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
@@ -436,7 +433,6 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 
 	// Migrate all states from the Log input
 	for k, v := range fromLogInput {
-		// We need to call `fn` to get the new Key and Meta for the registry
 		newKey, updatedMeta := fn(v)
 
 		// Find or create a resource. It should always create a new one.

@@ -84,7 +84,7 @@ type fileProspector struct {
 
 func (p *fileProspector) Init(
 	prospectorStore,
-	defaultIDStore loginp.StoreUpdater,
+	globalStore loginp.StoreUpdater,
 	newID func(loginp.Source) string,
 ) error {
 	files := p.filewatcher.GetFiles()
@@ -92,7 +92,7 @@ func (p *fileProspector) Init(
 	// If this fileProspector belongs to an input that did not have an ID
 	// this will find its files in the registry and update them to use the
 	// new ID.
-	defaultIDStore.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+	globalStore.UpdateIdentifiers(func(v loginp.Value) (id string, val interface{}) {
 		var fm fileMeta
 		err := v.UnpackCursorMeta(&fm)
 		if err != nil {
@@ -242,7 +242,7 @@ func (p *fileProspector) Init(
 			// If we cannot find the identifier, move on to the next entry
 			// some identifiers cannot be migrated
 			p.logger.Errorf(
-				"old file identity '%s' not found while migrating entry to"+
+				"old file identity '%s' not found while taking over old states,"+
 					"new file identity '%s'. If the file still exists, it will be re-ingested",
 				oldIdentifierName,
 				identifierName,
@@ -256,12 +256,13 @@ func (p *fileProspector) Init(
 		}
 		split := strings.Split(v.Key(), "::")
 		if len(split) != 4 {
+			// This should never happen.
 			p.logger.Errorf("registry key '%s' is in the wrong format, cannot migrate state", v.Key())
 			return "", fm
 		}
 
-		idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
 		idFromRegistry := strings.Join(split[2:], "::")
+		idFromPreviousIdentity := oldIdentifier.GetSource(fsEvent).Name()
 		if idFromPreviousIdentity != idFromRegistry {
 			return "", fm
 		}

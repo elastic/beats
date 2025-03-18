@@ -25,8 +25,10 @@ import (
 // based on the retrieved information about the configured paths.
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
-	// Init updates the store before starting the prospector
-	// it receives two StoreUpdater: one global and another local
+	// Init updates the store before starting the prospector.
+	// It cleans up the store, migrates file identities and takes over
+	// states from log or other filestream inputs.
+	// It receives two StoreUpdater: one global and another local
 	// to this prospector instance.
 	Init(local, global StoreUpdater, newID func(Source) string) error
 	// Run starts the event loop and handles the incoming events

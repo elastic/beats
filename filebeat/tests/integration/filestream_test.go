@@ -512,7 +512,7 @@ logging:
 // TestFilestreamTakeOverFromFilestream ensures the Filestream input can migrate state
 // when its ID is changed.
 // The way this test works is:
-//   - It uses a set of known files (testdata/migrate-id/) so the registry keys
+//   - It uses a set of known files (testdata/take-over/) so the registry keys
 //     are known in advance because fingerprint is used
 //   - We ran Filebeat to populate the registry/ingest the files
 //   - We stop Filebeat and update the configuration
@@ -586,7 +586,7 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 		testDataPath,
 		filepath.Join(testDataPath,
 			"take-over",
-			"expected-registry-happy-paty.json"),
+			"expected-registry-happy-path.json"),
 		"Entries in the registry are different from the expectation",
 	)
 }
@@ -624,7 +624,7 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 	requirePublishedEvents(t, filebeat, 8, outputFile)
 	filebeat.Stop()
 
-	vars["take_over"] = "true"
+	vars["takeOver"] = "true"
 
 	cfgYAML = getTakeOverConfig(t, vars, "happy-path-log-input.yml")
 	filebeat.WriteConfigFile(cfgYAML)
@@ -638,7 +638,7 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 	// This is only for the files being harvested by Filestream.
 	waitForEOF(t, filebeat, logFiles[:2])
 	// The log input logs a different entry for files that have
-	// not changed, wait for them.
+	// not changed, since Filebeat started. Wait for them.
 	waitForDidnotChange(t, filebeat, logFiles[2:])
 
 	// Ensure no new data has been published
