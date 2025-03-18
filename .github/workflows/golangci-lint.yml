@@ -30,7 +30,9 @@ jobs:
 
       - name: clrf fix
         if: runner.os == 'Windows'
-        run: echo "*.go text eol=lf" > .gitattributes 
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
 
       - name: golangci-lint
         env:
