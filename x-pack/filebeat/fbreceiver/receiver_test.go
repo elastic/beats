@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
@@ -46,17 +47,17 @@ func TestNewReceiver(t *testing.T) {
 	}
 
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T:       t,
-		Factory: NewFactory(),
+		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
-				Name:   "r1",
-				Config: &config,
+				Name:    "r1",
+				Config:  &config,
+				Factory: NewFactory(),
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			return len(logs["r1"]) == 1
+			assert.Len(t, logs["r1"], 1)
 		},
 	})
 }
@@ -88,18 +89,16 @@ func TestReceiverDefaultProcessors(t *testing.T) {
 	}
 
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T:       t,
-		Factory: NewFactory(),
+		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
-				Name:   "r1",
-				Config: &config,
+				Name:    "r1",
+				Config:  &config,
+				Factory: NewFactory(),
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
-			if len(logs["r1"]) == 0 {
-				return false
-			}
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			require.Len(t, logs["r1"], 1)
 
 			processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
 				FilterMessageSnippet("add_host_metadata").
@@ -110,8 +109,6 @@ func TestReceiverDefaultProcessors(t *testing.T) {
 			require.True(t, processorsLoaded, "processors not loaded")
 			// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 			require.Contains(t, logs["r1"][0].Flatten(), "host.architecture")
-
-			return true
 		},
 	})
 }
@@ -187,22 +184,25 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 	}
 
+	factory := NewFactory()
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T:       t,
-		Factory: NewFactory(),
+		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
-				Name:   "r1",
-				Config: &config,
+				Name:    "r1",
+				Config:  &config,
+				Factory: factory,
 			},
 			{
-				Name:   "r2",
-				Config: &config,
+				Name:    "r2",
+				Config:  &config,
+				Factory: factory,
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			return len(logs["r1"]) == 1 && len(logs["r2"]) == 1
+			require.Len(t, logs["r1"], 1)
+			require.Len(t, logs["r2"], 1)
 		},
 	})
 }

@@ -10,6 +10,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/stretchr/testify/assert"
+
 	"go.uber.org/zap/zaptest/observer"
 )
 
@@ -41,17 +43,19 @@ func TestNewReceiver(t *testing.T) {
 	}
 
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T:       t,
-		Factory: NewFactory(),
+		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
-				Name:   "r1",
-				Config: &config,
+				Name:    "r1",
+				Config:  &config,
+				Factory: NewFactory(),
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			return len(logs["r1"]) > 0
+			assert.Conditionf(t, func() bool {
+				return len(logs["r1"]) > 0
+			}, "expected at least one ingest log, got logs: %v", logs["r1"])
 		},
 	})
 }
@@ -83,22 +87,26 @@ func TestMultipleReceivers(t *testing.T) {
 		},
 	}
 
+	factory := NewFactory()
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T:       t,
-		Factory: NewFactory(),
+		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
-				Name:   "r1",
-				Config: &config,
+				Name:    "r1",
+				Config:  &config,
+				Factory: factory,
 			},
 			{
-				Name:   "r2",
-				Config: &config,
+				Name:    "r2",
+				Config:  &config,
+				Factory: factory,
 			},
 		},
-		AssertFunc: func(t *testing.T, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) bool {
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
+			assert.Conditionf(t, func() bool {
+				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
+			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
 		},
 	})
 }
