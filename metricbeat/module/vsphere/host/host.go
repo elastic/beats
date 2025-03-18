@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
@@ -54,7 +55,55 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+<<<<<<< HEAD
 	return &MetricSet{ms}, nil
+=======
+
+	security.WarnIfInsecure(ms.Logger(), "host", ms.Insecure)
+	return &HostMetricSet{ms}, nil
+}
+
+type triggeredAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
+}
+
+type metricData struct {
+	perfMetrics     map[string]interface{}
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
+}
+
+type assetNames struct {
+	outputNetworkNames []string
+	outputDsNames      []string
+	outputVmNames      []string
+}
+
+// Define metrics to be collected
+var metricSet = map[string]struct{}{
+	"disk.capacity.usage.average": {},
+	"disk.deviceLatency.average":  {},
+	"disk.maxTotalLatency.latest": {},
+	"disk.usage.average":          {},
+	"disk.read.average":           {},
+	"disk.write.average":          {},
+	"net.transmitted.average":     {},
+	"net.received.average":        {},
+	"net.usage.average":           {},
+	"net.packetsTx.summation":     {},
+	"net.packetsRx.summation":     {},
+	"net.errorsTx.summation":      {},
+	"net.errorsRx.summation":      {},
+	"net.multicastTx.summation":   {},
+	"net.multicastRx.summation":   {},
+	"net.droppedTx.summation":     {},
+	"net.droppedRx.summation":     {},
+>>>>>>> 4c7d45c26 (feat: add warning log message to indicate vSphere connection is configured as insecure (#43104))
 }
 
 // Fetch methods implements the data gathering and data conversion to the right

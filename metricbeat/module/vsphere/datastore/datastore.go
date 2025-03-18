@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/view"
@@ -49,7 +50,42 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+<<<<<<< HEAD
 	return &MetricSet{ms}, nil
+=======
+
+	security.WarnIfInsecure(ms.Logger(), "datastore", ms.Insecure)
+	return &DataStoreMetricSet{ms}, nil
+}
+
+type triggeredAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
+}
+
+type metricData struct {
+	perfMetrics     map[string]interface{}
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
+}
+
+type assetNames struct {
+	outputVmNames   []string
+	outputHostNames []string
+}
+
+// Define metrics to be collected
+var metricSet = map[string]struct{}{
+	"datastore.read.average":      {},
+	"datastore.write.average":     {},
+	"disk.capacity.latest":        {},
+	"disk.capacity.usage.average": {},
+	"disk.provisioned.latest":     {},
+>>>>>>> 4c7d45c26 (feat: add warning log message to indicate vSphere connection is configured as insecure (#43104))
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
