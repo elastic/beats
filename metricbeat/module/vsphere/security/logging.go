@@ -17,7 +17,7 @@
 
 package security
 
-import "github.com/elastic/elastic-agent-libs/logp"
+import "github.com/elastic/beats/v7/libbeat/logp"
 
 func WarnIfInsecure(logger *logp.Logger, metricSet string, isInsecure bool) {
 	if isInsecure {
