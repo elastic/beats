@@ -86,7 +86,7 @@ func (s *filebeatStore) Close() {
 	s.registry.Close()
 }
 
-// AccessType returns the storage registry depending on the type. Default is the file store.
+// StoreFor returns the storage registry depending on the type. Default is the file store.
 func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
 	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.esRegistry != nil {
 		return s.esRegistry.Get(s.storeName)
