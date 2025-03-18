@@ -9,7 +9,7 @@
         "input.type": "log",
         "log.file.path": "test-syslog.log",
         "log.offset": 0,
-        "message": "greedy multiline\nsyslog",
+        "message": "greedy multiline\n  syslog",
         "service.type": "system"
     }
 ]
