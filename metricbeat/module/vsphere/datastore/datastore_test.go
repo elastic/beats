@@ -27,19 +27,11 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-<<<<<<< HEAD
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/43252")
 	model := simulator.ESX()
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
 	}
-=======
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/43252")
-	// Creating a new simulator model with VPX server to collect broad range of data.
-	model := simulator.VPX()
-	err := model.Create()
-	require.NoError(t, err, "failed to create model")
-	t.Cleanup(model.Remove)
->>>>>>> cd2ff1333 (Skip flaky vsphere datastore TestFetchEventContents (#43254))
 
 	ts := model.Service.NewServer()
 	defer ts.Close()
