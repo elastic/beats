@@ -11,6 +11,11 @@ All `filestream` inputs require an ID. Ensure you set a unique identifier for ev
 Never change the ID of an input, or you will end up with duplicate events.
 ::::
 
+:::{tip}
+The [take over](filebeat-input-filestream-take-over) mode can be used
+to migrate states from old `filestream` inputs with different IDs.
+:::
+
 
 ```yaml
 filebeat.inputs:
