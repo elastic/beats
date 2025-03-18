@@ -319,7 +319,7 @@ To remove the state of previously harvested files from the registry file, use th
 
 ## Take over [filebeat-input-filestream-take-over]
 When `take_over` is enabled, this `filestream` input will take over
-states from the [`log`](/reference/filebeat/filebeat-input-log) input
+states from the [`log`](/reference/filebeat/filebeat-input-log.md) input
 or other `filestream` inputs. Only states of files being actively
 harvested by this input are taken over.
 

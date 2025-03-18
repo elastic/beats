@@ -12,7 +12,7 @@ Never change the ID of an input, or you will end up with duplicate events.
 ::::
 
 :::{tip}
-The [take over](filebeat-input-filestream-take-over) mode can be used
+The [take over](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-take-over) mode can be used
 to migrate states from old `filestream` inputs with different IDs.
 :::
 
