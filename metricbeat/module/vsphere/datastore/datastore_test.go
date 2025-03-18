@@ -27,6 +27,7 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/43252")
 	model := simulator.ESX()
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
