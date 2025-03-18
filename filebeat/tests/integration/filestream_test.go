@@ -509,7 +509,7 @@ logging:
 	requireRegistryEntryRemoved(t, workDir, "native")
 }
 
-// TestFilestreamIDMigration ensures the Filestream input can migrate state
+// TestFilestreamTakeOverFromFilestream ensures the Filestream input can migrate state
 // when its ID is changed.
 // The way this test works is:
 //   - It uses a set of known files (testdata/migrate-id/) so the registry keys
@@ -591,11 +591,77 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	)
 }
 
+func TestFilestreamTakeOverFromLogInput(t *testing.T) {
+	testDataPath, err := filepath.Abs("./testdata")
+	if err != nil {
+		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+	}
+
+	// Get the absolute path for all files Filebeat will ingest
+	logFiles := []string{}
+	for _, f := range []string{"01.log", "02.log", "01.txt", "02.txt"} {
+		logFiles = append(logFiles, filepath.Join(testDataPath, "take-over", f))
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	outputFile := filepath.Join(workDir, "output-file*")
+
+	vars := map[string]string{
+		"homePath": workDir,
+		"testdata": testDataPath,
+	}
+	cfgYAML := getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	// Wait for the file to be fully ingested
+	waitForEOF(t, filebeat, logFiles)
+	requirePublishedEvents(t, filebeat, 8, outputFile)
+	filebeat.Stop()
+
+	vars["take_over"] = "true"
+
+	cfgYAML = getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+
+	removeOldLogFiles(t, workDir)
+
+	// Start Filebeat again.
+	// This time the states must be migrated and no new data ingested
+	filebeat.Start()
+	// Make sure we've "read" the files to the end.
+	// This is only for the files being harvested by Filestream.
+	waitForEOF(t, filebeat, logFiles[:2])
+	// The log input logs a different entry for files that have
+	// not changed, wait for them.
+	waitForDidnotChange(t, filebeat, logFiles[2:])
+
+	// Ensure no new data has been published
+	requirePublishedEvents(t, filebeat, 8, outputFile)
+
+	filebeat.Stop()
+
+	assertRegistry(
+		t,
+		workDir,
+		testDataPath,
+		filepath.Join(testDataPath,
+			"take-over",
+			"expected-registry-happy-path-log-input.json"),
+		"Entries in the registry are different from the expectation",
+	)
+}
+
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
 	t.Helper()
 
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries := readFilestreamRegistryLog(t, registryFile)
+	entries, _ := readFilestreamRegistryLog(t, registryFile)
 	inputEntries := []registryEntry{}
 	for _, currentEntry := range entries {
 		if strings.Contains(currentEntry.Key, identity) {
@@ -681,6 +747,25 @@ func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
 	}
 }
 
+func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []string) {
+	for _, path := range files {
+		if runtime.GOOS == "windows" {
+			path = strings.Replace(path, `\`, `\\`, -1)
+		}
+		eofMsg := fmt.Sprintf("File didn't change: %s", path)
+
+		require.Eventuallyf(
+			t,
+			func() bool {
+				return filebeat.GetLogLine(eofMsg) != ""
+			},
+			5*time.Second,
+			100*time.Millisecond,
+			"'File didn't change' log not found for %q", path,
+		)
+	}
+}
+
 func removeOldLogFiles(t *testing.T, workDir string) {
 	// Remove old log file so we can correctly search stuff
 	glob := filepath.Join(workDir, "filebeat-*.ndjson")
@@ -736,7 +821,7 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 	}
 
 	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries := readFilestreamRegistryLog(t, registryFile)
+	entries, nameToInode := readFilestreamRegistryLog(t, registryFile)
 	reg := parseRegistry(entries)
 
 	// More Windows workarounds.
@@ -747,6 +832,19 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 		for k, v := range reg {
 			v.Offset = v.Offset - 2
 			reg[k] = v
+		}
+	}
+
+	// Last, but not least, update the file identity
+	// from the Log input entries
+	for k, v := range expectedRegistry {
+		if strings.Contains(v.Key, "NATIVE-") {
+			name := filepath.Base(v.Filename)
+			placeholder := fmt.Sprintf("native::NATIVE-%s", name)
+			newKey := strings.ReplaceAll(v.Key, placeholder, nameToInode[name])
+			v.Key = newKey
+			expectedRegistry[v.Key] = v
+			delete(expectedRegistry, k)
 		}
 	}
 
