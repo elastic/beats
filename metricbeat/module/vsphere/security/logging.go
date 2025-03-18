@@ -15,31 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package op
+package security
 
-import "sync"
+import "github.com/elastic/elastic-agent-libs/logp"
 
-type Canceler struct {
-	lock   sync.RWMutex
-	done   chan struct{}
-	active bool
-}
-
-func NewCanceler() *Canceler {
-	return &Canceler{
-		done:   make(chan struct{}),
-		active: true,
+func WarnIfInsecure(logger *logp.Logger, metricSet string, isInsecure bool) {
+	if isInsecure {
+		logger.With("metricset", metricSet).Warn("Your vSphere connection is configured as insecure. This can lead to man-in-the-middle attack.")
 	}
-}
-
-func (c *Canceler) Cancel() {
-	c.lock.Lock()
-	c.active = false
-	c.lock.Unlock()
-
-	close(c.done)
-}
-
-func (c *Canceler) Done() <-chan struct{} {
-	return c.done
 }
