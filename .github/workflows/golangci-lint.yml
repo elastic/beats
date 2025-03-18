@@ -57,4 +57,4 @@ jobs:
       - name: diff
         if: runner.os == 'Windows'
         run: |
-          git diff
+          git diff x-pack\dockerlogbeat\pipereader\
