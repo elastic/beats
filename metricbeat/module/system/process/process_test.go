@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
@@ -55,6 +56,36 @@ func TestFetch(t *testing.T) {
 		events[0].BeatEvent("system", "process").Fields.StringToPrint())
 }
 
+<<<<<<< HEAD
+=======
+func TestFetchDegradeOnPartial(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42809")
+	logp.DevelopmentSetup()
+	config := getConfig()
+	config["degrade_on_partial"] = true
+
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+	events, errs := mbtest.ReportingFetchV2Error(f)
+	if len(errs) > 0 {
+		for _, err := range errs {
+			assert.NotErrorIsf(t, err, &mb.PartialMetricsError{}, "Expected non-fatal error, got %v", err)
+		}
+	} else {
+		assert.NotEmpty(t, events)
+
+		events, errs = mbtest.ReportingFetchV2Error(f)
+		for _, err := range errs {
+			assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
+		}
+		require.NotEmpty(t, events)
+
+		t.Logf("fetched %d events, showing events[0]:", len(events))
+		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+			events[0].BeatEvent("system", "process").Fields.StringToPrint())
+	}
+}
+
+>>>>>>> 0b2e66afa (disable flaky metricbeat process test (#43342))
 func TestFetchSinglePid(t *testing.T) {
 	logp.DevelopmentSetup()
 
