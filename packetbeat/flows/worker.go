@@ -443,9 +443,11 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 		}
 
 		if v, found := stats["bytes"]; found {
+			//nolint:errcheck // ignore
 			totalBytes += v.(uint64)
 		}
 		if v, found := stats["packets"]; found {
+			//nolint:errcheck // ignore
 			totalPackets += v.(uint64)
 		}
 	}
@@ -461,15 +463,18 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 		}
 
 		if v, found := stats["bytes"]; found {
+			//nolint:errcheck // ignore
 			totalBytes += v.(uint64)
 		}
 		if v, found := stats["packets"]; found {
+			//nolint:errcheck // ignore
 			totalPackets += v.(uint64)
 		}
 	}
 	if communityID.Protocol > 0 && len(communityID.SourceIP) > 0 && len(communityID.DestinationIP) > 0 {
-		hash := flowhash.CommunityID.Hash(communityID)
-		network["community_id"] = hash
+		if hash := flowhash.CommunityID.Hash(communityID); hash != "" {
+			network["community_id"] = hash
+		}
 	}
 	network["bytes"] = totalBytes
 	network["packets"] = totalPackets
