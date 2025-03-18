@@ -12,7 +12,6 @@ import (
 	"io/ioutil"
 	"syscall"
 
-	"github.com/containerd/fifo"
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/gogo/protobuf/proto"
 )
@@ -28,7 +27,7 @@ type PipeReader struct {
 
 // NewReaderFromPath creates a new FIFO pipe reader from a docker log pipe location
 func NewReaderFromPath(file string) (*PipeReader, error) {
-	inputFile, err := fifo.OpenFifo(context.Background(), file, syscall.O_RDONLY, 0700)
+	inputFile, err := openFifo(context.Background(), file, syscall.O_RDONLY, 0700)
 	if err != nil {
 		return nil, fmt.Errorf("error opening logger fifo: %q: %w", file, err)
 	}
