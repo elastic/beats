@@ -11,7 +11,7 @@ env:
   PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
   PLATFORMS_ARM: "+all linux/arm64 darwin/arm64"
   PLATFORMS_AMD64_FIPS: "+all linux/amd64"
-  PLATFORMS_ARM_FIPS: "+all linux/arm64"
+  PLATFORMS_ARM64_FIPS: "+all linux/arm64"
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
@@ -176,7 +176,7 @@ steps:
 
       - label: "SNAPSHOT: {{matrix}} Linux/amd64 FIPS"
         env:
-          PLATFORMS: "${PLATFORMS_FIPS}"
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: true
           # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
@@ -199,7 +199,7 @@ steps:
 
       - label: "SNAPSHOT: {{matrix}} Linux/arm64 FIPS"
         env:
-          PLATFORMS: "${PLATFORMS_ARM_FIPS}"
+          PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           SNAPSHOT: true
           # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
@@ -224,7 +224,7 @@ steps:
       ## Agentbeat needs more CPUs because it builds many other beats
       - label: "SNAPSHOT: x-pack/agentbeat Linux/amd64 FIPS"
         env:
-          PLATFORMS: "${PLATFORMS_FIPS}"
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: true
           # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
@@ -334,9 +334,9 @@ steps:
         artifact_paths:
           - build/distributions/**/*
 
-      - label: "STAGING: {{matrix}} FIPS"
+      - label: "STAGING: {{matrix}} Linux/amd64 FIPS"
         env:
-          PLATFORMS: "${PLATFORMS_FIPS}"
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: false
           DEV: false
           FIPS: true
@@ -360,7 +360,7 @@ steps:
 
       - label: "STAGING: {{matrix}} Linux/arm64 FIPS"
         env:
-          PLATFORMS: "${PLATFORMS_ARM_FIPS}"
+          PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           SNAPSHOT: false
           DEV: false
           FIPS: true
@@ -384,9 +384,9 @@ steps:
           - x-pack/agentbeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "STAGING: x-pack/agentbeat all artifacts apart from linux/arm64 FIPS"
+      - label: "STAGING: x-pack/agentbeat Linux/amd64 FIPS"
         env:
-          PLATFORMS: "${PLATFORMS_FIPS}"
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: false
           DEV: false
           FIPS: true
