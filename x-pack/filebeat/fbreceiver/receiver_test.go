@@ -208,6 +208,10 @@ func TestMultipleReceivers(t *testing.T) {
 }
 
 func TestUniqueLoggerNamePerReceiver(t *testing.T) {
+	// This test ensures that each receiver has a separate logger
+	// instance and does not interfere with others. Previously, the
+	// logger in Beats was global, causing logger fields to be
+	// overwritten when multiple receivers started in the same process.
 	config := Config{
 		Beatconfig: map[string]interface{}{
 			"filebeat": map[string]interface{}{
