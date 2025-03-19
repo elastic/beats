@@ -16,7 +16,7 @@ If you’re upgrading other products in the stack, also read the [Elastic Stack 
 
 ## Upgrade between minor versions [upgrade-minor-versions]
 
-As a general rule, you can upgrade between minor versions (for example, 9.x to 9.y, where x < y) by simply installing the new release and restarting the Beat process. {{beats}} typically maintain backwards compatibility for configuration settings and exported fields. Please review the [release notes](/release-notes/index.md) for potential exceptions.
+As a general rule, you can upgrade between minor versions (for example, 9.x to 9.y, where x < y) by simply installing the new release and restarting the Beat process. {{beats}} typically maintain backwards compatibility for configuration settings and exported fields. Please review the review the [release notes](docs-content://release-notes/index.md) for potential exceptions.
 
 Upgrading between non-consecutive major versions (e.g. 7.x to 9.x) is not supported.
 
