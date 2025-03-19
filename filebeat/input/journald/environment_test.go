@@ -125,6 +125,8 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
+var _ statestore.States = (*testInputStore)(nil)
+
 type testInputStore struct {
 	registry *statestore.Registry
 }
@@ -139,7 +141,7 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) Access(_ string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
