@@ -20,7 +20,7 @@ Upgrading between non-consecutive major versions (e.g. 7.x to 9.x) is not suppor
 
 ## Upgrade from 8.x to 9.x [upgrade-8-to-9]
 
-Before upgrading your {{beats}}, review the [release notes](docs-content://release-notes/index.md) for any breaking changes.
+Before upgrading your {{beats}}, review the [release notes](docs-content://release-notes/index.md) and be aware of any documented breaking changes.
 
 If you’re upgrading other products in the stack, also read the {{stack}} [upgrade steps](docs-content://deploy-manage/upgrade/deployment-or-cluster.md).
 
@@ -28,30 +28,9 @@ We recommend that you fully upgrade {{es}} and {{kib}} to version 9.0 before upg
 
 If you use the Uptime app in {{kib}}, make sure you add `heartbeat-9*` and `synthetics-*` to **Uptime indices** on the [Settings page](docs-content://solutions/observability/apps/configure-settings.md). The first index is used by newer versions of a Beat, while the latter is used by {{fleet}}.
 
-If you’re on {{beats}} 8.x, upgrade the {{stack}} and {{beats}} to the most recent 8.x version before proceeding with the 9.0 upgrade.
-
-Upgrading between non-consecutive major versions (e.g. 7.x to 9.x) is not supported.
-
 ::::{important}
 Please read through all upgrade steps before proceeding. These steps are required before running the software for the first time.
 ::::
-
-
-
-### Upgrade to the most recent {{beats}} 8.x version before upgrading to 9.0 [upgrade-to-8.x]
-
-The upgrade procedure assumes that you have the most recent {{beats}} 8.x version installed. If you’re on an earlier 8.x version of {{beats}}, **upgrade to the latest version first**. If you’re using other products in the {{stack}}, upgrade {{beats}} as part of the [{{stack}} upgrade process](docs-content://deploy-manage/upgrade/deployment-or-cluster.md).
-
-After upgrading to the most recent 8.x version, go to **Index Management** in {{kib}} and verify that the index template for that version has been loaded into {{es}}.
-
-:::{image} images/confirm-index-template.png
-:alt: Screen capture showing that metricbeat-1.17.0 index template is loaded
-:class: screenshot
-:::
-
-If the index template is not loaded, load it now.
-
-If you created custom dashboards prior to the most recent 8.x version, you must upgrade them to the most recent versionbefore proceeding. Otherwise, the dashboards will stop working because {{kib}} no longer provides the API used for dashboards in earlier versions.
 
 
 ### Upgrade {{beats}} binaries to 9.0 [upgrade-beats-binaries]
