@@ -348,7 +348,8 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
 	}
 
-	if err := logp.ConfigureWithCore(logpConfig, core); err != nil {
+	b.Logger, err = logp.ConfigureWithCoreLocal(logpConfig, core)
+	if err != nil {
 		return nil, fmt.Errorf("error configuring beats logp: %w", err)
 	}
 
@@ -372,7 +373,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	}
 
 	// log paths values to help with troubleshooting
-	logp.Info("%s", paths.Paths.String())
+	b.Logger.Infof("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
@@ -380,7 +381,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		return nil, fmt.Errorf("error loading meta data: %w", err)
 	}
 
-	logp.Info("Beat ID: %v", b.Info.ID)
+	b.Logger.Infof("Beat ID: %v", b.Info.ID)
 
 	// Try to get the host's FQDN and set it.
 	h, err := sysinfo.Host()
@@ -1072,12 +1073,20 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
 	}
 
+	// TODO: Should be eventually removed. This is not removed so that we do not break the existing dependency on global loggers
 	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
+	beatLogger, err := configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	if err != nil {
+		return fmt.Errorf("error initializing logging: %w", err)
+	}
+
+	b.Logger = beatLogger
+
 	// log paths values to help with troubleshooting
-	logp.Info("%s", paths.Paths.String())
+	b.Logger.Infof("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
@@ -1085,7 +1094,7 @@ func (b *Beat) configure(settings Settings) error {
 		return err
 	}
 
-	logp.Info("Beat ID: %v", b.Info.ID)
+	b.Logger.Infof("Beat ID: %v", b.Info.ID)
 
 	// Try to get the host's FQDN and set it.
 	h, err := sysinfo.Host()
@@ -1100,7 +1109,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
-		logp.Warn("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+		b.Logger.Infof("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
 		b.Info.FQDN = b.Info.Hostname
 	} else {
 		b.Info.FQDN = fqdn
@@ -1135,11 +1144,11 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
-		logp.Info("Set max procs limit: %v", maxProcs)
+		b.Logger.Infof("Set max procs limit: %v", maxProcs)
 		runtime.GOMAXPROCS(maxProcs)
 	}
 	if gcPercent := b.Config.GCPercent; gcPercent > 0 {
-		logp.Info("Set gc percentage to: %v", gcPercent)
+		b.Logger.Infof("Set gc percentage to: %v", gcPercent)
 		debug.SetGCPercent(gcPercent)
 	}
 
@@ -1163,7 +1172,7 @@ func (b *Beat) configure(settings Settings) error {
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
-	b.processors, err = processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+	b.processors, err = processingFactory(b.Info, b.Logger.Named("processors"), b.RawConfig)
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
@@ -1172,7 +1181,7 @@ func (b *Beat) configure(settings Settings) error {
 			m := monitoring.CollectStructSnapshot(monitoring.Default, monitoring.Full, true)
 			data, err := json.MarshalIndent(m, "", "  ")
 			if err != nil {
-				logp.L().Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
+				b.Logger.Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
 				return []byte(err.Error())
 			}
 			return data
@@ -1201,7 +1210,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 		FirstStart time.Time `json:"first_start"`
 	}
 
-	logp.Debug("beat", "Beat metadata path: %v", metaPath)
+	b.Logger.Debug("beat", "Beat metadata path: %v", metaPath)
 
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
