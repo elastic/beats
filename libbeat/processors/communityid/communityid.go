@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package communityid
 
 import (
@@ -66,10 +68,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 }
 
 func newFromConfig(c config) (*processor, error) {
-	hasher := flowhash.CommunityID
-	if c.Seed != 0 {
-		hasher = flowhash.NewCommunityID(c.Seed, flowhash.Base64Encoding, crypto.SHA1)
-	}
+	hasher := flowhash.NewCommunityID(c.Seed, flowhash.Base64Encoding, crypto.SHA1)
 
 	return &processor{
 		config: c,

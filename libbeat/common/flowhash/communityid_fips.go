@@ -15,26 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration && linux
+//go:build requirefips
 
-package state_job
+package flowhash
 
-import (
-	"testing"
+var CommunityID = NewCommunityID()
 
-	"github.com/stretchr/testify/assert"
+type communityIDHasher struct{}
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/test"
-)
+// NewCommunityID allows to instantiate a flow hasher with custom settings.
+func NewCommunityID() Hasher {
+	return &communityIDHasher{}
+}
 
-func TestFetchMetricset(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/43253")
-	config := test.GetKubeStateMetricsConfig(t, "state_job")
-	metricSet := mbtest.NewFetcher(t, config)
-	events, errs := metricSet.FetchEvents()
-	if len(errs) > 0 {
-		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
-	}
-	assert.NotEmpty(t, events)
+// Hash returns the hash for the given flow.
+func (h *communityIDHasher) Hash(flow Flow) string {
+	return ""
 }
