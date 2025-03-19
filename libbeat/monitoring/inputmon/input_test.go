@@ -22,11 +22,99 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
+
+func TestRegisterMetrics(t *testing.T) {
+	type args struct {
+		id    string
+		input string
+	}
+	tests := []struct {
+		name       string
+		args       args
+		wantErr    bool
+		wantErrMsg string
+	}{
+		{
+			name: "Valid Input",
+			args: args{
+				id:    "testID",
+				input: "validInput",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Invalid Input - Missing ID",
+			args: args{
+				id:    "",
+				input: "validInput",
+			},
+			wantErr:    true,
+			wantErrMsg: "invalid metrics registry: 'id' empty or absent",
+		},
+		{
+			name: "Invalid Input - Missing Input",
+			args: args{
+				id:    "testID",
+				input: "",
+			},
+			wantErr:    true,
+			wantErrMsg: "invalid metrics registry: 'input' empty or absent",
+		},
+		{
+			name: "Invalid Input - Both Missing",
+			args: args{
+				id:    "",
+				input: "",
+			},
+			wantErr:    true,
+			wantErrMsg: "invalid metrics registry: 'id' empty or absent, 'input' empty or absent",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// set up the registry
+			reg := monitoring.NewRegistry()
+			if tt.args.input != "" {
+				monitoring.NewString(reg, "input").Set(tt.args.input)
+			}
+			if tt.args.id != "" {
+				monitoring.NewString(reg, "id").Set(tt.args.id)
+			}
+
+			inputID := "input-id"
+			err := RegisterMetrics(inputID, reg)
+			if tt.wantErr {
+				assert.ErrorContains(t, err, tt.wantErrMsg)
+			} else {
+				registeredInputs.mu.Lock()
+				got, found := registeredInputs.registries[inputID]
+				assert.True(t, found, "metrics registry was not registered")
+				assert.Equal(t, reg, got)
+				registeredInputs.mu.Unlock()
+			}
+		})
+	}
+}
+
+func TestUnregisterMetrics(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	monitoring.NewString(reg, "input").Set("some-id")
+	monitoring.NewString(reg, "id").Set("some-input-type")
+
+	id := uuid.Must(uuid.NewV4()).String()
+	err := RegisterMetrics(id, reg)
+	require.NoError(t, err, "could not register metrics")
+
+	UnregisterMetrics(id)
+	_, found := registeredInputs.Get(id)
+	assert.False(t, found, "metrics registry was not unregistered")
+}
 
 func TestNewInputMonitor(t *testing.T) {
 	const (

@@ -49,15 +49,15 @@ func RegisterMetrics(id string, reg *monitoring.Registry) error {
 	idValid := validStringVar(reg.Get("id"))
 	inputValid := validStringVar(reg.Get("input"))
 
-	errMgs := ""
+	var errMgs []string
 	if !idValid {
-		errMgs = "'id' empty or absent"
+		errMgs = append(errMgs, "'id' empty or absent")
 	}
 	if !inputValid {
-		errMgs += ", 'input' empty or absent"
+		errMgs = append(errMgs, "'input' empty or absent")
 	}
-	if errMgs != "" {
-		return errors.New("invalid metrics registry: " + errMgs)
+	if len(errMgs) > 0 {
+		return errors.New("invalid metrics registry: " + strings.Join(errMgs, ", "))
 	}
 
 	registeredInputs.Set(id, reg)
