@@ -42,7 +42,7 @@ var registeredInputs = inputRegistry{
 // the `/inputs/` endpoint. The registry must have at least a `id` and `input`
 // string variables, otherwise the registry is rejected and an error is
 // returned.
-// If an id/inputType registry has benn already registered, it'll be overridden.
+// If an id/inputType registry has been already registered, it'll be overridden.
 // When the input finishes, it should call UnregisterMetrics to
 // release the associated resources.
 func RegisterMetrics(id string, reg *monitoring.Registry) error {
