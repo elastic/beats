@@ -53,8 +53,3 @@ jobs:
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true
-
-      - name: diff
-        if: runner.os == 'Windows'
-        run: |
-          git diff x-pack\dockerlogbeat\pipereader\
