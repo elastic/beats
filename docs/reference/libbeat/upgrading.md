@@ -22,7 +22,7 @@ Upgrading between non-consecutive major versions (e.g. 7.x to 9.x) is not suppor
 
 Before upgrading your {{beats}}, review the [release notes](docs-content://release-notes/index.md) for any breaking changes.
 
-If you’re upgrading other products in the stack, also read the [installation and upgrade steps](docs-content://deploy-manage/upgrade/deployment-or-cluster.md).
+If you’re upgrading other products in the stack, also read the {{stack}} [upgrade steps](docs-content://deploy-manage/upgrade/deployment-or-cluster.md).
 
 We recommend that you fully upgrade {{es}} and {{kib}} to version 9.0 before upgrading {{beats}}. The {{beats}} version must be lower than or equal to the {{es}} version. {{beats}} cannot send data to older versions of {{es}}.
 
