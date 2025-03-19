@@ -392,17 +392,45 @@ func (ms *MetricSet) initClient() error {
 }
 
 func (ms *MetricSet) setPID(retries int) (err error) {
-	if err = ms.client.SetPID(libaudit.WaitForReply); err == nil || !errors.Is(err, syscall.ENOBUFS) || retries == 0 {
-		return err
+	noParse := func([]byte) ([]syscall.NetlinkMessage, error) {
+		return nil, nil
 	}
-	// At this point the netlink channel is congested (ENOBUFS).
-	// Drain and close the client, then retry with a new client.
-	ms.client.Close()
-	if ms.client, err = newAuditClient(&ms.config, ms.log); err != nil {
-		return fmt.Errorf("failed to recover from ENOBUFS: %w", err)
+
+	for i := 0; i < retries; i++ {
+		// This call will block on send, which scares me a little, but the reply can time out
+		// or return something like ENOBUFS.
+		err = ms.client.SetPID(libaudit.WaitForReply)
+		switch {
+		case err == nil:
+			return nil
+		case errors.Is(err, syscall.ENOBUFS):
+			ms.log.Info("Recovering from ENOBUFS during setup...")
+			// the netlink connection is losing data. Try to drain and send again.
+			// This is technically dropping data, but auditbeat is configured as best-effort anyway, and we'll drop events under high load anyway.
+			maxRecv := 10000
+			for i := 0; i < maxRecv; i++ {
+				retryOuter := false // hack because of how switch/break statements work
+				_, err = ms.client.Netlink.Receive(true, noParse)
+				switch {
+				case err == nil, errors.Is(err, syscall.EINTR), errors.Is(err, syscall.ENOBUFS):
+					continue
+				case errors.Is(err, syscall.EAGAIN):
+					// means receive would block, try to set our PID again
+					retryOuter = true
+				default:
+					return fmt.Errorf("failed to recover from ENOBUFS: %s", err)
+				}
+
+				if retryOuter {
+					break
+				}
+			}
+		default:
+			return fmt.Errorf("failed to set PID for auditbeat, got %w", err)
+		}
 	}
-	ms.log.Info("Recovering from ENOBUFS ...")
-	return ms.setPID(retries - 1)
+
+	return fmt.Errorf("could not set PID for audit process after %d attempts", setPIDMaxRetries)
 }
 
 func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
