@@ -8,7 +8,7 @@ mapped_pages:
 This section gives general recommendations for upgrading {{beats}} shippers:
 
 * [Upgrade between minor versions](#upgrade-minor-versions)
-* [Upgrade from 7.x to 8.x](#upgrade-7-to-8)
+* [Upgrade from 8.x to 9.x](#upgrade-8-to-9)
 * [Troubleshoot {{beats}} upgrade issues](#troubleshooting-upgrade)
 
 If you’re upgrading other products in the stack, also read the [Elastic Stack Installation and Upgrade Guide](docs-content://deploy-manage/index.md).
@@ -16,24 +16,24 @@ If you’re upgrading other products in the stack, also read the [Elastic Stack 
 
 ## Upgrade between minor versions [upgrade-minor-versions]
 
-As a general rule, you can upgrade between minor versions (for example, 8.x to 8.y, where x < y) by simply installing the new release and restarting the Beat process. {{beats}} typically maintain backwards compatibility for configuration settings and exported fields. Please review the [release notes](/release-notes/index.md) for potential exceptions.
+As a general rule, you can upgrade between minor versions (for example, 9.x to 9.y, where x < y) by simply installing the new release and restarting the Beat process. {{beats}} typically maintain backwards compatibility for configuration settings and exported fields. Please review the [release notes](/release-notes/index.md) for potential exceptions.
 
-Upgrading between non-consecutive major versions (e.g. 6.x to 8.x) is not supported.
+Upgrading between non-consecutive major versions (e.g. 7.x to 9.x) is not supported.
 
 
-## Upgrade from 7.x to 8.x [upgrade-7-to-8]
+## Upgrade from 8.x to 9.x [upgrade-8-to-9]
 
-Before upgrading your {{beats}}, review the [breaking changes](/release-notes/breaking-changes.md) and the [*Release notes*](/release-notes/index.md).
+Before upgrading your {{beats}}, review the [breaking changes](docs-content://release-notes/breaking-changes/index.md) and the [*Release notes*](docs-content://release-notes/index.md).
 
-If you’re upgrading other products in the stack, also read the [Elastic Stack Installation and Upgrade Guide](docs-content://deploy-manage/index.md).
+If you’re upgrading other products in the stack, also read the [installation and upgrade steps](docs-content://deploy-manage/index.md).
 
-We recommend that you fully upgrade {{es}} and {{kib}} to version 8.0 before upgrading {{beats}}. The {{beats}} version must be lower than or equal to the {{es}} version. {{beats}} cannot send data to older versions of {{es}}.
+We recommend that you fully upgrade {{es}} and {{kib}} to version 9.0 before upgrading {{beats}}. The {{beats}} version must be lower than or equal to the {{es}} version. {{beats}} cannot send data to older versions of {{es}}.
 
-If you use the Uptime app in {{kib}}, make sure you add `heartbeat-8*` and `synthetics-*` to **Uptime indices** on the [Settings page](docs-content://solutions/observability/apps/configure-settings.md). The first index is used by newer versions of a Beat, while the latter is used by {{fleet}}.
+If you use the Uptime app in {{kib}}, make sure you add `heartbeat-9*` and `synthetics-*` to **Uptime indices** on the [Settings page](docs-content://solutions/observability/apps/configure-settings.md). The first index is used by newer versions of a Beat, while the latter is used by {{fleet}}.
 
-If you’re on {{beats}} 7.0 through 7.16, upgrade the {{stack}} and {{beats}} to version 7.17 **before** proceeding with the 8.0 upgrade.
+If you’re on {{beats}} 8.x, upgrade the {{stack}} and {{beats}} to the most recent 8.x version before proceeding with the 9.0 upgrade.
 
-Upgrading between non-consecutive major versions (e.g. 6.x to 8.x) is not supported.
+Upgrading between non-consecutive major versions (e.g. 7.x to 9.x) is not supported.
 
 ::::{important}
 Please read through all upgrade steps before proceeding. These steps are required before running the software for the first time.
@@ -41,23 +41,23 @@ Please read through all upgrade steps before proceeding. These steps are require
 
 
 
-### Upgrade to {{beats}} 7.17 before upgrading to 8.0 [upgrade-to-7.17]
+### Upgrade to the most recent {{beats}} 8.x version before upgrading to 9.0 [upgrade-to-8.x]
 
-The upgrade procedure assumes that you have {{beats}} 7.17 installed. If you’re on a previous 7.x version of {{beats}}, **upgrade to version 7.17 first**. If you’re using other products in the {{stack}}, upgrade {{beats}} as part of the [{{stack}} upgrade process](docs-content://deploy-manage/upgrade/deployment-or-cluster.md).
+The upgrade procedure assumes that you have the most recent {{beats}} 8.x version installed. If you’re on an earlier 8.x version of {{beats}}, **upgrade to the latest version first**. If you’re using other products in the {{stack}}, upgrade {{beats}} as part of the [{{stack}} upgrade process](docs-content://deploy-manage/upgrade/deployment-or-cluster.md).
 
-After upgrading to 7.17, go to **Index Management** in {{kib}} and verify that the 7.17 index template has been loaded into {{es}}.
+After upgrading to the most recent 8.x version, go to **Index Management** in {{kib}} and verify that the index template for that version has been loaded into {{es}}.
 
 :::{image} images/confirm-index-template.png
 :alt: Screen capture showing that metricbeat-1.17.0 index template is loaded
 :class: screenshot
 :::
 
-If the 7.17 index template is not loaded, load it now.
+If the index template is not loaded, load it now.
 
-If you created custom dashboards prior to version 7.17, you must upgrade them to 7.17 before proceeding. Otherwise, the dashboards will stop working because {{kib}} no longer provides the API used for dashboards in 7.x.
+If you created custom dashboards prior to the most recent 8.x version, you must upgrade them to the most recent versionbefore proceeding. Otherwise, the dashboards will stop working because {{kib}} no longer provides the API used for dashboards in earlier versions.
 
 
-### Upgrade {{beats}} binaries to 8.0 [upgrade-beats-binaries]
+### Upgrade {{beats}} binaries to 9.0 [upgrade-beats-binaries]
 
 Before upgrading:
 
@@ -86,68 +86,9 @@ To upgrade using a zip or compressed tarball:
 Complete the upgrade tasks described in the following sections **before** restarting the {{beats}} process.
 
 
-### Migrate configuration files [migrate-config-files]
+### Load 9.0 dashboards [load-9.0-dashboards]
 
-{{beats}} 8.0 comes with several backwards incompatible configuration changes. Before upgrading, review the [8.0](https://www.elastic.co/guide/en/beats/libbeat/8.x/breaking-changes-8.0.html) document. Also review the full list of breaking changes in the [Beats version 8.0.0](https://www.elastic.co/guide/en/beats/libbeat/8.x/release-notes-8.0.0.html).
-
-Where possible, we kept the old configuration options working, but deprecated them. However, deprecation was not always possible, so if you use any of the settings described under breaking changes, make sure you understand the alternatives that we provide.
-
-
-### Load the 8.0 {{es}} index templates [upgrade-index-template]
-
-Starting in version 8.0, the default {{es}} index templates configure data streams instead of traditional {{es}} indices. Data streams are optimized for storing append-only time series data. They are well-suited for logs, events, metrics, and other continuously generated data. However, unlike traditional {{es}} indices, data streams support create operations only; they do not support update and delete operations.
-
-To use data streams, load the default index templates **before** ingesting any data into {{es}}.
-
-:::::::{tab-set}
-
-::::::{tab-item} DEB
-```sh
-beatname setup --index-management
-```
-::::::
-
-::::::{tab-item} RPM
-```sh
-beatname setup --index-management
-```
-::::::
-
-::::::{tab-item} MacOS
-```sh
-./beatname setup --index-management
-```
-::::::
-
-::::::{tab-item} Linux
-```sh
-./beatname setup --index-management
-```
-::::::
-
-::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/beatname:9.0.0-beta1 setup --index-management
-```
-::::::
-
-::::::{tab-item} Windows
-Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select **Run As Administrator**).
-
-From the PowerShell prompt, change to the directory where you installed a Beat, and run:
-
-```sh
-PS > .\beatname.exe setup --index-management
-```
-::::::
-
-:::::::
-If you’re not collecting time series data, you can continue to use {{beats}} to send data to aliases and indices. To do this, create a custom index template and load it manually. To learn more about creating index templates, refer to [Index templates](docs-content://manage-data/data-store/templates.md).
-
-
-### Load 8.0 dashboards [load-8.0-dashboards]
-
-We recommend that you load the 8.0 {{kib}} dashboards after upgrading {{kib}} and {{beats}}. That way, you can take advantage of improvements added in 8.0. To load the dashboards, run:
+We recommend that you load the 9.0 {{kib}} dashboards after upgrading {{kib}} and {{beats}}. That way, you can take advantage of improvements added in 8.0. To load the dashboards, run:
 
 :::::::{tab-set}
 
@@ -177,7 +118,7 @@ beatname setup --dashboards
 
 ::::::{tab-item} Docker
 ```sh
-docker run --rm --net="host" docker.elastic.co/beats/beatname:9.0.0-beta1 setup --dashboards
+docker run --rm --net="host" docker.elastic.co/beats/beatname:{{stack-version}} setup --dashboards
 ```
 ::::::
 
@@ -199,11 +140,6 @@ All Elastic {{beats}} send events with ECS-compliant field names. If you have an
 
 To learn more about ECS, refer to the [ECS overview](ecs://reference/index.md).
 
-::::{note}
-If you enabled the compatibility layer in 7.x (that is, if you set `migration.6_to_7.enabled: true`), make sure your custom dashboards no longer rely on the old aliases created by that setting. The old aliases are no longer supported. They may continue to work, but will be removed without notice in a future release.
-::::
-
-
 
 ### Start your upgraded {{beats}} [start-beats]
 
@@ -216,9 +152,7 @@ In {{kib}}, go to **Discover** and verify that events are streaming into {{es}}.
 
 ## Troubleshoot {{beats}} upgrade issues [troubleshooting-upgrade]
 
-This section describes common problems you might encounter when upgrading to {{beats}} 8.x.
-
-You can avoid some of these problems by reading [Upgrade from 7.x to 8.x](#upgrade-7-to-8) before upgrading {{beats}}.
+This section describes common problems you might encounter when upgrading to {{beats}} 9.x.
 
 
 ### {{beats}} is unable to send update or deletion requests to a data stream [unable-to-update-or-delete]
@@ -232,27 +166,4 @@ If needed, you can update or delete documents by submitting requests directly to
 
 {{beats}} requires a timestamp field to send data to data streams. If the timestamp field added by {{beats}} is inadvertently removed by a processor, {{beats}} will be unable to index the event. To fix the problem, modify your processor configuration to avoid removing the timestamp field.
 
-
-### Missing fields or too many fields in the index [missing-fields]
-
-You may have run the Beat before loading the required index template. To clean up and start again:
-
-1. Delete the index that was created when you ran the Beat. For example:
-
-    ```sh
-    DELETE metricbeat-9.0.0-beta1-2019.04.02*
-    ```
-
-    ::::{warning}
-    Be careful when using wildcards to delete indices. Make sure the pattern matches only the indices you want to delete. The example shown here deletes all data indexed into the metricbeat-9.0.0-beta1 indices on 2019.04.02.
-    ::::
-
-2. Delete the index template that was loaded earlier. For example:
-
-    ```sh
-    DELETE /_index_template/metricbeat-9.0.0-beta1
-    ```
-
-3. Load the correct index template. See [Load the 8.0 {{es}} index templates](#upgrade-index-template).
-4. Restart {{beats}}.
 
