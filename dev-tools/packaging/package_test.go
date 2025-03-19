@@ -68,8 +68,8 @@ var (
 	modulesDFilePattern    = regexp.MustCompile(`modules.d/.+`)
 	monitorsDFilePattern   = regexp.MustCompile(`monitors.d/.+`)
 	systemdUnitFilePattern = regexp.MustCompile(`/lib/systemd/system/.*\.service`)
-
-	licenseFiles = []string{"LICENSE.txt", "NOTICE.txt"}
+	fipsPackagePattern     = regexp.MustCompile(`\w+-fips-\w+`)
+	licenseFiles           = []string{"LICENSE.txt", "NOTICE.txt"}
 )
 
 var (
@@ -80,7 +80,6 @@ var (
 	monitorsd         = flag.Bool("monitors.d", false, "check monitors.d folder contents")
 	rootOwner         = flag.Bool("root-owner", false, "expect root to own package files")
 	rootUserContainer = flag.Bool("root-user-container", false, "expect root in container user")
-	fips              = flag.Bool("fips", false, "check agent binary for FIPS compliance")
 )
 
 func TestRPM(t *testing.T) {
@@ -94,23 +93,20 @@ func TestDeb(t *testing.T) {
 	debs := getFiles(t, regexp.MustCompile(`\.deb$`))
 	buf := new(bytes.Buffer)
 	for _, deb := range debs {
-		checkDeb(t, deb, buf)
+		fipsPackage := fipsPackagePattern.MatchString(deb)
+		checkDeb(t, deb, buf, fipsPackage)
 	}
 }
 
 func TestTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
-	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
-	for _, tar := range tars {
-		checkTar(t, tar, false)
-	}
-}
-
-func TestFIPSTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
-	tars := getFiles(t, regexp.MustCompile(`-\w+-fips\.tar\.gz$`))
-	for _, tar := range tars {
-		checkTar(t, tar, *fips)
+	tars := getFiles(t, regexp.MustCompile(`^-\w+\.tar\.gz$`))
+	for _, tarFile := range tars {
+		if strings.HasSuffix(tarFile, "docker.tar.gz") {
+			// We should skip the docker images archives , since those have their dedicated check
+			continue
+		}
+		fipsPackage := fipsPackagePattern.MatchString(tarFile)
+		checkTar(t, tarFile, fipsPackage)
 	}
 }
 
@@ -152,7 +148,7 @@ func checkRPM(t *testing.T, file string) {
 	ensureNoBuildIDLinks(t, p)
 }
 
-func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
+func checkDeb(t *testing.T, file string, buf *bytes.Buffer, fipsCheck bool) {
 	p, err := readDeb(file, buf)
 	if err != nil {
 		t.Error(err)
@@ -171,6 +167,18 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkModulesOwner(t, p, true)
 	checkModulesPermissions(t, p)
 	checkSystemdUnitPermissions(t, p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			t.Skip("FIPS check for .deb is not yet supported")
+			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err)
+			containingDir := strings.TrimSuffix(filepath.Base(file), ".tar.gz")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			checkFIPS(t, beatName, filepath.Join(extractDir, containingDir))
+		})
+	}
 }
 
 func checkTar(t *testing.T, file string, fipsCheck bool) {
