@@ -23,7 +23,7 @@ Upgrading between non-consecutive major versions (e.g. 7.x to 9.x) is not suppor
 
 ## Upgrade from 8.x to 9.x [upgrade-8-to-9]
 
-Before upgrading your {{beats}}, review the [breaking changes](docs-content://release-notes/breaking-changes/index.md) and the [*Release notes*](docs-content://release-notes/index.md).
+Before upgrading your {{beats}}, review the [release notes](docs-content://release-notes/index.md) for any breaking changes.
 
 If you’re upgrading other products in the stack, also read the [installation and upgrade steps](docs-content://deploy-manage/index.md).
 
