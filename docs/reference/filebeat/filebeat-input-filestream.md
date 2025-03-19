@@ -323,10 +323,14 @@ states from the [`log`](/reference/filebeat/filebeat-input-log.md) input
 or other `filestream` inputs. Only states of files being actively
 harvested by this input are taken over.
 
-To take over states from the log input, simply set `take_over.enabled:
-true`. To take over states from other `filestream` inputs, set
-`take_over.enabled: true` and set `take_over.from_ids` as list of
-previous `filestream` IDs you want to migrate states from.
+To take over files from a `log` input, simply set `take_over.enabled: true`.
+
+To take over states from other `filestream` inputs, set
+`take_over.enabled: true` and set `take_over.from_ids` to a list of
+existing `filestream` IDs you want to migrate files from.
+
+When `take_over.from_ids` is set, files are not taken over from `log`
+input. The migration is limited to `filestream` inputs only.
 
 ```yaml
 take_over:
