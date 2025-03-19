@@ -11,9 +11,6 @@ This section gives general recommendations for upgrading {{beats}} shippers:
 * [Upgrade from 8.x to 9.x](#upgrade-8-to-9)
 * [Troubleshoot {{beats}} upgrade issues](#troubleshooting-upgrade)
 
-If you’re upgrading other products in the stack, also read the [Elastic Stack Installation and Upgrade Guide](docs-content://deploy-manage/index.md).
-
-
 ## Upgrade between minor versions [upgrade-minor-versions]
 
 As a general rule, you can upgrade between minor versions (for example, 9.x to 9.y, where x < y) by simply installing the new release and restarting the Beat process. {{beats}} typically maintain backwards compatibility for configuration settings and exported fields. Please review the review the [release notes](docs-content://release-notes/index.md) for potential exceptions.
