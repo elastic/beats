@@ -88,7 +88,7 @@ Complete the upgrade tasks described in the following sections **before** restar
 
 ### Load 9.0 dashboards [load-9.0-dashboards]
 
-We recommend that you load the 9.x {{kib}} dashboards after upgrading {{kib}} and {{beats}}. That way, you can take advantage of improvements added in 8.0. To load the dashboards, run:
+We recommend that you load the 9.x {{kib}} dashboards after upgrading {{kib}} and {{beats}}. That way, you can take advantage of improvements added in 9.0. To load the dashboards, run:
 
 :::::::{tab-set}
 
