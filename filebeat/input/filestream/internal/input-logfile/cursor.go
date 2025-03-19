@@ -40,3 +40,9 @@ func (c Cursor) Unpack(to interface{}) error {
 	}
 	return c.resource.UnpackCursor(to)
 }
+
+// Finished returns true if the cursor is not in use and if there are no
+// pending updates that still need to be written to the registry.
+func (c Cursor) Finished() bool {
+	return c.resource.Finished()
+}

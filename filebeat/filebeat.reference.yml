@@ -941,6 +941,24 @@ filebeat.inputs:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close.reader.after_interval: 0
 
+  ### File deleting options
+  # Filestream cam delete the file after it has been fully ingested
+  # and it has reached EOF or the file became inactive
+
+  # Delete the file after EOF is reached
+  #delete.on_close.eof: true
+
+  # Delete the file after it became inactive
+  #delete.on_close.inactive: true
+
+  # If deleting the file fails, Filestream will keep retrying in
+  # `retry_tick` intervals.
+  #delete.on_close.retry_tick: 2s
+
+  # The maximum time Filebeat will wait before giving up on
+  # deleting the file.
+  #delete.on_close.retry_timeout: 10s
+
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
 #- type: stdin

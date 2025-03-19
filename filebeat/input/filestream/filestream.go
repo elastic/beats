@@ -35,8 +35,9 @@ import (
 )
 
 var (
-	ErrFileTruncate = errors.New("detected file being truncated")
 	ErrClosed       = errors.New("reader closed")
+	ErrFileTruncate = errors.New("detected file being truncated")
+	ErrInactive     = errors.New("inactive file, reader closed")
 )
 
 // logFile contains all log related data
@@ -52,6 +53,8 @@ type logFile struct {
 	closeInactive time.Duration
 	closeRemoved  bool
 	closeRenamed  bool
+
+	isInactive bool
 
 	offset       int64
 	lastTimeRead time.Time
@@ -98,6 +101,9 @@ func newFileReader(
 
 // Read reads from the reader and updates the offset
 // The total number of bytes read is returned.
+// If the file is inactive, ErrInactive is returned
+// If f.readerCtx is cancelled for any reason, then
+// ErrClosed is returned
 func (f *logFile) Read(buf []byte) (int, error) {
 	totalN := 0
 
@@ -130,6 +136,10 @@ func (f *logFile) Read(buf []byte) (int, error) {
 
 		f.log.Debugf("End of file reached: %s; Backoff now.", f.file.Name())
 		f.backoff.Wait()
+	}
+
+	if f.isInactive {
+		return 0, ErrInactive
 	}
 
 	return 0, ErrClosed
@@ -180,6 +190,8 @@ func (f *logFile) periodicStateCheck(ctx unison.Canceler) {
 func (f *logFile) shouldBeClosed() bool {
 	if f.closeInactive > 0 {
 		if time.Since(f.lastTimeRead) > f.closeInactive {
+			f.isInactive = true
+			f.log.Debugf("'%s' is inactive", f.file.Name())
 			return true
 		}
 	}

@@ -62,6 +62,7 @@ type filestream struct {
 	readerConfig    readerConfig
 	encodingFactory encoding.EncodingFactory
 	closerConfig    closerConfig
+	deleterConfig   deleterConfig
 	parsers         parser.Config
 	takeOver        bool
 }
@@ -86,8 +87,19 @@ func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 
 func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 	config := defaultConfig()
+	defaultInactive := config.Close.OnStateChange.Inactive
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
+	}
+
+	if config.Delete.OnClose.Inactive {
+		// This means the `close.on_state_change.inactive` is either not set or
+		// it is set to the default value, in either case, overwrite it to
+		// 30min
+		if config.Close.OnStateChange.Inactive == defaultInactive {
+			logp.L().Named("filestream").Info("setting 'close.on_state_change.inactive' to 30min because 'delete.on_close.inactive' is true.")
+			config.Close.OnStateChange.Inactive = 30 * time.Minute
+		}
 	}
 
 	prospector, err := newProspector(config)
@@ -106,6 +118,7 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		closerConfig:    config.Close,
 		parsers:         config.Reader.Parsers,
 		takeOver:        config.TakeOver,
+		deleterConfig:   config.Delete,
 	}
 
 	return prospector, filestream, nil
@@ -167,7 +180,53 @@ func (inp *filestream) Run(
 
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	err = inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	if err != nil {
+		deleteFile := false
+		switch {
+		case errors.Is(err, io.EOF):
+			if inp.deleterConfig.OnClose.EOF {
+				log.Infof("'%s' will be removed because 'delete.on_close.eof' is set", fs.newPath)
+				deleteFile = true
+			}
+		case errors.Is(err, ErrInactive):
+			if inp.deleterConfig.OnClose.Inactive {
+				log.Infof("'%s' will be removed because 'delete.on_close.inactive' is set", fs.newPath)
+				deleteFile = true
+			}
+		}
+
+		if deleteFile {
+			// Use a goroutine not to lock the harvester shutdown process
+			go func(path string) {
+				for !cursor.Finished() {
+					log.Debugf("'%s' is not finished, waiting...", fs.newPath)
+					time.Sleep(inp.deleterConfig.RetryTick)
+				}
+				if err := os.Remove(path); err != nil {
+					log.Errorf("could not remove '%s', retrying in 2s. Error: %s", path, err)
+					maxWait := inp.deleterConfig.RetryTimeout
+					ticker := time.NewTicker(inp.deleterConfig.RetryTick)
+					defer ticker.Stop()
+					for maxWait >= 0 {
+						maxWait -= inp.deleterConfig.RetryTick
+						select {
+						case <-ticker.C:
+							if err := os.Remove(path); err == nil {
+								log.Infof("'%s' removed", path)
+								return
+							}
+						}
+					}
+				}
+			}(fs.newPath)
+			return nil
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -368,6 +427,12 @@ func (inp *filestream) readFromSource(
 				log.Infof("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
+				if inp.deleterConfig.OnClose.EOF {
+					return err
+				}
+			} else if errors.Is(err, ErrInactive) {
+				log.Debugf("File is inactive. Closing. Path='%s'", path)
+				return err
 			} else {
 				log.Errorf("Read line error: %v", err)
 				metrics.ProcessingErrors.Inc()
