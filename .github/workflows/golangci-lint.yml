@@ -49,7 +49,7 @@ jobs:
           # which can lead to some frustration from developers who would like to
           # fix a single line in an existing codebase and the linter would force them
           # into fixing all linting issues in the whole file instead
-          args: --timeout=30m --whole-files --fix
+          args: --timeout=30m --whole-files
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true
