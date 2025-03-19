@@ -125,30 +125,8 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
-<<<<<<< HEAD
-=======
-func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
-	t := e.t
-	t.Helper()
-	got := e.statusReporter.GetUpdates()
-	if len(got) != len(expected) {
-		t.Fatalf("expecting %d updates, got %d", len(expected), len(got))
-	}
-
-	for i := range expected {
-		g, e := got[i], expected[i]
-		if g != e {
-			t.Errorf(
-				"expecting [%d] status update to be {state:%s, msg:%s}, got  {state:%s, msg:%s}",
-				i, e.state.String(), e.msg, g.state.String(), g.msg,
-			)
-		}
-	}
-}
-
 var _ statestore.States = (*testInputStore)(nil)
 
->>>>>>> df62e10c1 (filebeat,libbeat,x-pack/filebeat: clean up state store types (#43063))
 type testInputStore struct {
 	registry *statestore.Registry
 }

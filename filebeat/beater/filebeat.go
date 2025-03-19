@@ -78,18 +78,7 @@ type Filebeat struct {
 	pipeline       beat.PipelineConnector
 }
 
-<<<<<<< HEAD
-type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
-
-type StateStore interface {
-	// Access returns the storage registry depending on the type. This is needed for the Elasticsearch state store which
-	// is guarded by the feature.IsElasticsearchStateStoreEnabledForInput(typ) check.
-	Access(typ string) (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
-=======
 type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
->>>>>>> df62e10c1 (filebeat,libbeat,x-pack/filebeat: clean up state store types (#43063))
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
