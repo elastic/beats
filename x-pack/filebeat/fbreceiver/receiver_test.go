@@ -233,18 +233,19 @@ func TestUniqueLoggerNamePerReceiver(t *testing.T) {
 		},
 	}
 
+        factory := NewFactory()
 	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
 		T: t,
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
 				Config:  &config,
-				Factory: NewFactory(),
+				Factory: factory,
 			},
 			{
 				Name:    "r2",
 				Config:  &config,
-				Factory: NewFactory(),
+				Factory: factory,
 			},
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
