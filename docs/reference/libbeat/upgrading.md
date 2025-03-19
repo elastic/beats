@@ -88,7 +88,7 @@ Complete the upgrade tasks described in the following sections **before** restar
 
 ### Load 9.0 dashboards [load-9.0-dashboards]
 
-We recommend that you load the 9.0 {{kib}} dashboards after upgrading {{kib}} and {{beats}}. That way, you can take advantage of improvements added in 8.0. To load the dashboards, run:
+We recommend that you load the 9.x {{kib}} dashboards after upgrading {{kib}} and {{beats}}. That way, you can take advantage of improvements added in 8.0. To load the dashboards, run:
 
 :::::::{tab-set}
 
@@ -117,8 +117,8 @@ beatname setup --dashboards
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/beatname:{{stack-version}} setup --dashboards
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/beatname:9.0.0 setup --dashboards
 ```
 ::::::
 
