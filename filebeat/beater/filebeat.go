@@ -24,7 +24,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/filebeat/backup"
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -79,6 +78,7 @@ type Filebeat struct {
 	pipeline       beat.PipelineConnector
 }
 
+<<<<<<< HEAD
 type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
 
 type StateStore interface {
@@ -87,6 +87,9 @@ type StateStore interface {
 	Access(typ string) (*statestore.Store, error)
 	CleanupInterval() time.Duration
 }
+=======
+type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
+>>>>>>> df62e10c1 (filebeat,libbeat,x-pack/filebeat: clean up state store types (#43063))
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -568,7 +571,7 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.Pip
 
 // some of the filestreams might want to take over the loginput state
 // if their `take_over` flag is set to `true`.
-func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
+func processLogInputTakeOver(stateStore statestore.States, config *cfg.Config) error {
 	inputs, err := fetchInputConfiguration(config)
 	if err != nil {
 		return fmt.Errorf("Failed to fetch input configuration when attempting take over: %w", err)
@@ -577,7 +580,7 @@ func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
 		return nil
 	}
 
-	store, err := stateStore.Access("")
+	store, err := stateStore.StoreFor("")
 	if err != nil {
 		return fmt.Errorf("Failed to access state when attempting take over: %w", err)
 	}
