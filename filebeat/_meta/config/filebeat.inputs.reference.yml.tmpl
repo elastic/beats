@@ -475,8 +475,9 @@ filebeat.inputs:
   # This functionality is still in beta.
   #take_over:
   #  enabled: true
-  #  If `from_ids` is provided, then the states are taken over are
-  #  from `filestream` inputs that used those IDs.
+  #  If `from_ids` is set, then the files are taken over
+  #  from `filestream` inputs that were assigned these IDs.
+  #  Taking over from `log` inputs is disabled when `from_ids` is set.
   #  from_ids: ["foo", "bar"]
 
   # Defines the buffer size every harvester uses when fetching the file
