@@ -338,10 +338,7 @@ take_over:
   from_ids: ["foo", "bar"] # omit to take over from the log input
 ```
 :::{important}
-Take over can only be used if the inputs it is taking states from are
-not active any more. If old inputs harvesting the file are still
-active, the data ingestion will be inconsistent (data duplication or
-data loss will occur).
+The `take over` mode can work correctly only if the source (taken from) inputs are no longer active. If source inputs are still harvesting the files which are being migrated, it will lead to data duplication and in some cases might cause data loss.
 :::
 
 ::::{important}

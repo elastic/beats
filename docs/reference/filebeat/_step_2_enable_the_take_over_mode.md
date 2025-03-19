@@ -21,8 +21,7 @@ The `take over` mode is in beta.
 
 
 ::::{important}
-Only files `filestream` find during its initialisation will have the
-state migrated.
+Only states of still existing files will be migrated during the `filestream` initialization.
 
 
 If this parameter is not set, all the files will be re-ingested from the beginning and this will lead to data duplication. Please, double-check that this parameter is set.

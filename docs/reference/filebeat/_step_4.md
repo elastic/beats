@@ -11,5 +11,5 @@ and see the events which came from a filestream in the "take_over"
 mode.
 
 Once you start receiving events with this tag, you can remove
-`take_over.enabled: true` and restart the fileinput again.
+`take_over.enabled: true` and restart Filebeat.
 
