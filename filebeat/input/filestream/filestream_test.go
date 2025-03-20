@@ -39,7 +39,7 @@ func TestLogFileTimedClosing(t *testing.T) {
 	}{
 		"read from file and close inactive": {
 			inactive:    2 * time.Second,
-			expectedErr: ErrClosed,
+			expectedErr: ErrInactive,
 		},
 		"read from file and close after interval": {
 			afterInterval: 3 * time.Second,
