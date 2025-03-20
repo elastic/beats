@@ -31,6 +31,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -97,7 +98,11 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		// it is set to the default value, in either case, overwrite it to
 		// 30min
 		if config.Close.OnStateChange.Inactive == defaultInactive {
-			logp.L().Named("filestream").Info("setting 'close.on_state_change.inactive' to 30min because 'delete.on_close.inactive' is true.")
+			logp.
+				L().
+				Named("filestream").
+				Info("setting 'close.on_state_change.inactive' to 30min" +
+					" because 'delete.on_close.inactive' is true.")
 			config.Close.OnStateChange.Inactive = 30 * time.Minute
 		}
 	}
@@ -184,46 +189,95 @@ func (inp *filestream) Run(
 	if err != nil {
 		deleteFile := false
 		switch {
-		case errors.Is(err, io.EOF):
-			if inp.deleterConfig.OnClose.EOF {
-				log.Infof("'%s' will be removed because 'delete.on_close.eof' is set", fs.newPath)
-				deleteFile = true
-			}
-		case errors.Is(err, ErrInactive):
-			if inp.deleterConfig.OnClose.Inactive {
-				log.Infof("'%s' will be removed because 'delete.on_close.inactive' is set", fs.newPath)
-				deleteFile = true
-			}
+		case errors.Is(err, io.EOF) && inp.deleterConfig.OnClose.EOF:
+			log.Infof(
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+				fs.newPath,
+			)
+			deleteFile = true
+		case errors.Is(err, ErrInactive) && inp.deleterConfig.OnClose.Inactive:
+			log.Infof(
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+				fs.newPath,
+			)
+			deleteFile = true
 		}
 
 		if deleteFile {
-			// Use a goroutine not to lock the harvester shutdown process
-			go func(path string) {
-				for !cursor.Finished() {
-					log.Debugf("'%s' is not finished, waiting...", fs.newPath)
-					time.Sleep(inp.deleterConfig.RetryTick)
-				}
-				if err := os.Remove(path); err != nil {
-					log.Errorf("could not remove '%s', retrying in 2s. Error: %s", path, err)
-					maxWait := inp.deleterConfig.RetryTimeout
-					ticker := time.NewTicker(inp.deleterConfig.RetryTick)
-					defer ticker.Stop()
-					for maxWait >= 0 {
-						maxWait -= inp.deleterConfig.RetryTick
-						select {
-						case <-ticker.C:
-							if err := os.Remove(path); err == nil {
-								log.Infof("'%s' removed", path)
-								return
-							}
-						}
-					}
-				}
-			}(fs.newPath)
-			return nil
+			if err := inp.deleteFile(ctx, log, cursor, fs); err != nil {
+				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
+			}
 		}
 
-		return err
+		return fmt.Errorf("error reading from source: %w", err)
+	}
+
+	return nil
+}
+
+func (inp *filestream) deleteFile(
+	ctx input.Context,
+	logger *logp.Logger,
+	cursor loginp.Cursor,
+	fs fileSource,
+) error {
+
+	bkoff := backoff.NewExpBackoff(ctx.Cancelation.Done(), time.Second, time.Minute)
+	// Wait until the resource is finished.
+	// The resource is finished when all events are acknowledged by the output.
+	// If it is not finished, this usually means one of two things:
+	//   - The output is down
+	//   - Filebeat is experiencing back pressure
+	// Either way, we wait until all events have been published.
+	for !cursor.Finished() {
+		if !bkoff.Wait() {
+			// This means that context was cancelled and the backoff
+			//  returned early
+			return ctx.Cancelation.Err()
+		}
+		logger.Debugf("'%s' is not finished, waiting...", fs.newPath)
+	}
+	logger.Debugf("'%s' finished", fs.newPath)
+
+	if err := os.Remove(fs.newPath); err != nil {
+		// The first try at removing the file failed,
+		// retry with a constant backoff
+		lastTry := time.Now()
+
+		maxWait := inp.deleterConfig.RetryTimeout
+		ticker := time.NewTicker(inp.deleterConfig.RetryTick)
+		defer ticker.Stop()
+
+		retries := 0
+		for maxWait >= 0 {
+			logger.Errorf(
+				"could not remove '%s', retrying in %s. Error: %s",
+				fs.newPath,
+				inp.deleterConfig.RetryTick.String(),
+				err,
+			)
+
+			select {
+			case <-ticker.C:
+				retries++
+				if err := os.Remove(fs.newPath); err == nil {
+					logger.Infof("'%s' removed", fs.newPath)
+					return nil
+				}
+				now := time.Now()
+				maxWait -= now.Sub(lastTry)
+				lastTry = now
+
+			case <-ctx.Cancelation.Done():
+				return ctx.Cancelation.Err()
+			}
+		}
+
+		return fmt.Errorf(
+			"cannot remove '%s' after %d retries. Last error: %w",
+			fs.newPath,
+			retries,
+			err)
 	}
 
 	return nil
