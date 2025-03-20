@@ -1,0 +1,14 @@
+packages:
+  github.com/elastic/beats/v7/auditbeat/helper/hasher:
+    - TestHasher
+  github.com/elastic/beats/v7/auditbeat/module/file_integrity:
+    - TestHashFile
+    - TestHashFile/valid_hashes
+    - TestHashFile/size_over_hash_limit
+    - TestHashFile/size_at_hash_limit
+    - TestHashFile/size_below_hash_limit
+    - TestHashFile/no_size_limit
+    - TestNewEventFromFileInfoHash
+    - TestNewEventFromFileInfoHash/file_stays_the_same
+    - TestNewEventFromFileInfoHash/file_grows_before_hashing
+    - TestNewEventFromFileInfoHash/file_shrinks_before_hashing

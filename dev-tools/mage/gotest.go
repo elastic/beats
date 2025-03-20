@@ -19,9 +19,11 @@ package mage
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"iter"
 	"log"
 	"os"
 	"os/exec"
@@ -40,16 +42,17 @@ import (
 // GoTestArgs are the arguments used for the "go*Test" targets and they define
 // how "go test" is invoked. "go test" is always invoked with -v for verbose.
 type GoTestArgs struct {
-	TestName            string            // Test name used in logging.
-	Race                bool              // Enable race detector.
-	Tags                []string          // Build tags to enable.
-	ExtraFlags          []string          // Extra flags to pass to 'go test'.
-	Packages            []string          // Packages to test.
-	Env                 map[string]string // Env vars to add to the current env.
-	OutputFile          string            // File to write verbose test output to.
-	JUnitReportFile     string            // File to write a JUnit XML test report to.
-	CoverageProfileFile string            // Test coverage profile file (enables -cover).
-	Output              io.Writer         // Write stderr and stdout to Output if set
+	TestName            string                   // Test name used in logging.
+	Race                bool                     // Enable race detector.
+	Tags                []string                 // Build tags to enable.
+	ExtraFlags          []string                 // Extra flags to pass to 'go test'.
+	Packages            []string                 // Packages to test.
+	Env                 map[string]string        // Env vars to add to the current env.
+	OutputFile          string                   // File to write verbose test output to.
+	JUnitReportFile     string                   // File to write a JUnit XML test report to.
+	CoverageProfileFile string                   // Test coverage profile file (enables -cover).
+	ExpectedFIPSErrors  ExpectedFIPSTestFailures // Track the expected tests that fail with the very strict fips140=only check
+	Output              io.Writer                // Write stderr and stdout to Output if set
 }
 
 // TestBinaryArgs are the arguments used when building binary for testing.
@@ -102,6 +105,15 @@ func testTagsFromEnv() []string {
 // DefaultGoTestUnitArgs returns a default set of arguments for running
 // all unit tests. We tag unit test files with '!integration'.
 func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
+
+// DefaultGoTestUnitFIPSArgs returns a default set of arguments for running
+// all unit tests with the FIPS args. We tag unit test files with '!integration'.
+func DefaultGoTestUnitFIPSArgs() GoTestArgs {
+	args := makeGoTestArgs("Unit-FIPS")
+	args.Env["GODEBUG"] = "fips140=only"
+	args.Tags = append(args.Tags, "requirefips")
+	return args
+}
 
 // DefaultGoTestIntegrationArgs returns a default set of arguments for running
 // all integration tests. We tag integration test files with 'integration'.
@@ -338,14 +350,27 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	var goTestErr *exec.ExitError
 	if err != nil {
 		// Command ran.
+
 		var exitErr *exec.ExitError
+		// go test command exited with non-zero status
 		if errors.As(err, &exitErr) {
+			// Check if there are expected test errors from FIPS checks
+			// Expected errors should not fail the command
+			if len(params.ExpectedFIPSErrors.Packages) != 0 {
+				fipsErr := checkFIPSExpectedErrors(params.ExpectedFIPSErrors, params.OutputFile+".json")
+				if fipsErr != nil {
+					return fmt.Errorf("%w: %w", fipsErr, err)
+				}
+				goto fipsIgnoreTestExitCode // test target should not return an error
+			}
+
 			return fmt.Errorf("failed to execute go: %w", err)
 		}
 
 		// Command ran but failed. Process the output.
 		goTestErr = exitErr
 	}
+fipsIgnoreTestExitCode:
 
 	if goTestErr != nil {
 		// No packages were tested. Probably the code didn't compile.
@@ -375,6 +400,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	}
 
 	fmt.Println(">> go test:", params.TestName, "Test Passed")
+	if len(params.ExpectedFIPSErrors.Packages) != 0 {
+		fmt.Println("    Matched FIPS expected errors.")
+	}
 	return nil
 }
 
@@ -427,4 +455,85 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 		log.Printf("BuildSystemTestGoBinary (go %v) took %v.", strings.Join(args, " "), time.Since(start))
 	}()
 	return sh.RunV("go", args...)
+}
+
+// JSONTestEvent is the minimal fields needed to parse test results
+type JSONTestEvent struct {
+	Action  string `json:"action"`
+	Package string `json:"package"`
+	Test    string `json:"test"`
+}
+
+// jsonTestEventIter reads returns an iterator that yiels JSONTestEvents or errors from the passed file
+func jsonTestEventIter(fileName string) iter.Seq2[JSONTestEvent, error] {
+	return func(yield func(JSONTestEvent, error) bool) {
+		f, err := os.Open(fileName)
+		if err != nil {
+			yield(JSONTestEvent{}, fmt.Errorf("unable to open file %q: %w", fileName, err))
+			return
+		}
+		defer f.Close()
+		dec := json.NewDecoder(f)
+		for dec.More() {
+			event := &JSONTestEvent{}
+			err := dec.Decode(event)
+			if !yield(*event, err) {
+				return
+			}
+		}
+	}
+}
+
+func checkFIPSExpectedErrors(fipsErrors ExpectedFIPSTestFailures, fileName string) error {
+	unexpectedErrors := make([]JSONTestEvent, 0)
+	expectedErrors := make(map[string]map[string]bool) // map of packageName:TestName:found
+	for packageName, pkg := range fipsErrors.Packages {
+		tests := make(map[string]bool)
+		for _, test := range pkg {
+			tests[test] = false
+		}
+		expectedErrors[packageName] = tests
+	}
+
+	// iterate over json test file output
+	it := jsonTestEventIter(fileName)
+	for event, err := range it {
+		if err != nil {
+			fmt.Println("Error reading test json file:", err)
+			continue
+		}
+		// Only check test failures
+		// Test names are empty for records that mark the pacakge as failed
+		if event.Action != "fail" || event.Test == "" {
+			continue
+		}
+
+		tests, ok := expectedErrors[event.Package]
+		// failure is unexpected
+		if !ok {
+			unexpectedErrors = append(unexpectedErrors, event)
+			continue
+		}
+		if _, ok := tests[event.Test]; !ok {
+			unexpectedErrors = append(unexpectedErrors, event)
+			continue
+		}
+
+		// failure is expected, mark that we've found it
+		expectedErrors[event.Package][event.Test] = true
+	}
+
+	// Warn if we did not see an expected error
+	for packageName, tests := range expectedErrors {
+		for testName, found := range tests {
+			if !found {
+				fmt.Printf("Warning: Did not detect expected FIPS failure for %s/%s\n", packageName, testName)
+			}
+		}
+	}
+	if len(unexpectedErrors) > 0 {
+		return fmt.Errorf("unexpected errors in FIPS tests: %+v", unexpectedErrors)
+
+	}
+	return nil
 }

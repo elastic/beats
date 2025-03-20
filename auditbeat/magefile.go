@@ -162,3 +162,12 @@ func Dashboards() error {
 func Docs() {
 	mg.Deps(auditbeat.ModuleDocs, auditbeat.FieldDocs)
 }
+
+// UnitTestFIPS runs unit tests with go 1.24 GODEBUG=fips140=only flag set and filters out expected failures.
+func UnitTestFIPS() error {
+	expectedErrors, err := devtools.ParseFIPSExceptions(devtools.AuditbeatExceptions)
+	if err != nil {
+		return err
+	}
+	return unittest.GoUnitTestFIPS(expectedErrors)
+}

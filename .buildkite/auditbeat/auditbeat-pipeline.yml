@@ -105,6 +105,31 @@ steps:
           - github_commit_status:
               context: "auditbeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: Auditbeat: Ubuntu x86_64 FIPS Unit Tests"
+        command: |
+          set -euo pipefail
+          cd auditbeat
+          mage build UnitTestFIPS
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "auditbeat: Ubuntu x86_64 FIPS Unit Tests"
+
       - label: ":rhel: Auditbeat: RHEL9 Unit Tests"
         command: |
           set -euo pipefail
