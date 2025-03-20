@@ -124,6 +124,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 
 *Heartbeat*
 
