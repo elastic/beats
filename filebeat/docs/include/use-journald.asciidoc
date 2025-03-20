@@ -1,4 +1,0 @@
-*`var.use_journald`*::
-
-A boolean that when set to `true` will read logs from Journald. When
-Journald is used all events contain the tag `journald`.
