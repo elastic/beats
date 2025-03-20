@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -137,16 +138,46 @@ func (in *sqsReaderInput) cleanup() {
 func (in *sqsReaderInput) run(ctx context.Context) {
 	in.logConfigSummary()
 
-	// Poll metrics periodically in the background
+	// If we have received a batch, allow SQS grace time to collect
+	// and process all the messages before we respect the parent
+	// context. This is used only for processing and publication,
+	// not for the reader loop, otherwise a new collection could
+	// start, and we are back where we started.
+	graceCtx := ctx
+	if in.config.SQSGraceTime > 0 {
+		var cancel context.CancelFunc
+		graceCtx, cancel = cancelWithGrace(ctx, in.config.SQSGraceTime)
+		defer cancel()
+	}
+
+	// Poll metrics periodically in the background.
+	//
+	// Use the graceCtx here also to ensure that all metrics have
+	// been collected; this is much less likely to be an issue.
 	go messageCountMonitor{
 		sqs:     in.sqs,
 		metrics: in.metrics,
-	}.run(ctx)
+	}.run(graceCtx)
 
-	in.startWorkers(ctx)
+	in.startWorkers(graceCtx)
 	in.readerLoop(ctx)
 
 	in.workerWg.Wait()
+}
+
+// cancelWithGrace provides a context.Context that will be cancelled by a call
+// to the parent's cancellation, but with a delayed timeout. The returned cancel
+// function should be called when the returned context.Context is no longer
+// needed.
+func cancelWithGrace(parent context.Context, timeout time.Duration) (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithCancel(context.WithoutCancel(parent))
+	stop := context.AfterFunc(parent, func() {
+		time.AfterFunc(timeout, cancel)
+	})
+	return ctx, func() {
+		stop()
+		cancel()
+	}
 }
 
 func (in *sqsReaderInput) readerLoop(ctx context.Context) {
