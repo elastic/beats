@@ -17,6 +17,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -51,7 +52,7 @@ type apiEnvironment struct {
 	Clock       func() time.Time
 }
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Experimental,

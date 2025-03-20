@@ -54,10 +54,6 @@ type successLogger interface {
 	Published(n int) bool
 }
 
-type StateStore interface {
-	Access(typ string) (*statestore.Store, error)
-}
-
 var (
 	statesUpdate    = monitoring.NewInt(nil, "registrar.states.update")
 	statesCleanup   = monitoring.NewInt(nil, "registrar.states.cleanup")
@@ -71,8 +67,8 @@ const fileStatePrefix = "filebeat::logs::"
 
 // New creates a new Registrar instance, updating the registry file on
 // `file.State` updates. New fails if the file can not be opened or created.
-func New(stateStore StateStore, out successLogger, flushTimeout time.Duration) (*Registrar, error) {
-	store, err := stateStore.Access("")
+func New(stateStore statestore.States, out successLogger, flushTimeout time.Duration) (*Registrar, error) {
+	store, err := stateStore.StoreFor("")
 	if err != nil {
 		return nil, err
 	}
