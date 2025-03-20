@@ -1,5 +1,7 @@
 env:
   ASDF_MAGE_VERSION: 1.15.0
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
@@ -7,6 +9,9 @@ env:
 
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+
+  PLATFORMS_AMD64_FIPS: "+all linux/amd64"
+  PLATFORMS_ARM64_FIPS: "+all linux/arm64"
 
 steps:
   - group: "Check/Update"
@@ -88,13 +93,12 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: Packaging"
-
-      - label: ":linux: Agentbeat packaging Linux FIPS"
-        key: "agentbeat-package-linux-fips"
+      - label: ":linux: Agentbeat packaging linux/amd64 FIPS"
+        key: "agentbeat-package-linux-x86-fips"
         depends_on:
           - mandatory-win-2022-system-tests
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64"
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: true
           FIPS: "true"
         command: |
@@ -115,7 +119,32 @@ steps:
           disk_type: "pd-ssd"
         notify:
           - github_commit_status:
-              context: "agentbeat: Packaging Linux FIPS"
+              context: "agentbeat: Packaging linux/amd64 FIPS"
+      - label: ":linux: Agentbeat packaging linux/arm FIPS"
+        key: "agentbeat-package-linux-arm-fips"
+        depends_on:
+          - mandatory-win-2022-system-tests
+        env:
+          PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
+          SNAPSHOT: true
+          FIPS: "true"
+        command: |
+          .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
+        artifact_paths:
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        retry:
+          automatic:
+            - limit: 2
+        timeout_in_minutes: 60
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Packaging linux/arm64 FIPS"
 
       - label: ":linux: Agentbeat/Integration tests Linux"
         key: "agentbeat-it-linux"
