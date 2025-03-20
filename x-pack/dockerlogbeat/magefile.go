@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -374,6 +375,9 @@ func GolangCrossBuild() error {
 
 // Package builds a "release" tarball that can be used later with `docker plugin create`
 func Package() {
+	if devtools.FIPSBuild && !slices.Contains(devtools.FIPSConfig.Beats, "dockerlogbeat") {
+		return
+	}
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 

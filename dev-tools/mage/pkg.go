@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -50,6 +51,11 @@ func Package() error {
 	var tasks []interface{}
 	for _, target := range platforms {
 		for _, pkg := range Packages {
+
+			if mg.Verbose() {
+				log.Printf("Evaluating package %v for target %s", pkg.Spec, target)
+			}
+
 			if pkg.OS != target.GOOS() || pkg.Arch != "" && pkg.Arch != target.Arch() {
 				continue
 			}
@@ -82,13 +88,24 @@ func Package() error {
 					continue
 				}
 
+				// Filter out non fips-enabled beats
+				if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
+					log.Printf("Skipping creation for beat %v package type %v because beat is not listed as FIPS compliant %v", BeatName, pkgType, FIPSConfig.Beats)
+					continue
+				}
+
+				// Filter out non fips specs
+				if pkg.Spec.FIPS != FIPSBuild {
+					log.Printf("Skipping creation for package type %v because spec.FIPS = %v and FIPSBuild = %v", pkgType, pkg.Spec.FIPS, FIPSBuild)
+					continue
+				}
+
 				agentPackageDrop, _ := os.LookupEnv("AGENT_DROP_PATH")
 
 				spec := pkg.Spec.Clone()
 				spec.OS = target.GOOS()
 				spec.Arch = packageArch
 				spec.Snapshot = Snapshot
-				spec.FIPS = FIPSBuild
 				spec.evalContext = map[string]interface{}{
 					"GOOS":          target.GOOS(),
 					"GOARCH":        target.GOARCH(),
@@ -121,6 +138,11 @@ func Package() error {
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
+	if FIPSBuild {
+		fmt.Println(">> IronBank images are not supported for FIPS builds")
+		return nil
+	}
+
 	if runtime.GOARCH != "amd64" {
 		fmt.Printf(">> IronBank images are only supported for amd64 arch (%s is not supported)\n", runtime.GOARCH)
 		return nil
@@ -343,10 +365,6 @@ func TestPackages(options ...TestPackagesOption) error {
 
 	if BeatUser == "root" {
 		args = append(args, "-root-owner")
-	}
-
-	if FIPSBuild {
-		args = append(args, "-fips")
 	}
 
 	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
