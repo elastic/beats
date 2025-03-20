@@ -51,7 +51,7 @@ func newCrawler(
 	logger *logp.Logger,
 ) (*crawler, error) {
 	return &crawler{
-		log:            logger.Named("crawler"),
+		log:            logp.NewLogger("crawler"),
 		inputs:         map[uint64]cfgfile.Runner{},
 		inputsFactory:  inputFactory,
 		modulesFactory: module,
