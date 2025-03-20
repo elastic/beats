@@ -185,6 +185,8 @@ steps:
       - label: ":ubuntu: Auditbeat: Crosscompile"
         command: |
           make -C auditbeat crosscompile
+        env:
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         retry:
           automatic:
             - limit: 1
