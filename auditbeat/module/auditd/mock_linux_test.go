@@ -133,13 +133,11 @@ func (n *MockNetlinkSendReceiver) Receive(nonBlocking bool, p libaudit.NetlinkPa
 	if len(n.errors) > 0 {
 		err := n.errors[0]
 		n.errors = n.errors[1:]
-		//fmt.Printf("returning error %s\n", err)
 		return nil, err
 	}
 	if len(n.messages) > 0 {
 		msg := n.messages[0]
 		n.messages = n.messages[1:]
-		//fmt.Printf("returning message header %#v\n", msg.Header)
 		return []syscall.NetlinkMessage{msg}, nil
 	}
 
