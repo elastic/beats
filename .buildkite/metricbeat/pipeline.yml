@@ -163,27 +163,6 @@ steps:
           - github_commit_status:
               context: "metricbeat: Python Integration Tests"
 
-      - label: ":ubuntu: Metricbeat: Crosscompile"
-        key: "mandatory-cross-compile"
-        command: |
-          source .buildkite/scripts/qemu.sh
-          make -C metricbeat crosscompile
-        env:
-          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "metricbeat/build/*.xml"
-          - "metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "metricbeat: Crosscompile"
-
       - label: ":windows: Metricbeat: Win 2016 Unit Tests"
         command: |
           Set-Location -Path metricbeat
