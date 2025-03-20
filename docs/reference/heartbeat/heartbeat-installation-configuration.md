@@ -73,7 +73,7 @@ tar xzvf heartbeat-{{stack-version}}-linux-x86_64.tar.gz
 ::::::
 
 ::::::{tab-item} Windows
-1. Download the Heartbeat Windows zip file: https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-windows-x86_64.zip
+1. Download the [Heartbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
