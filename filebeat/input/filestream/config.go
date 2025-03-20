@@ -57,9 +57,8 @@ type config struct {
 }
 
 type deleterConfig struct {
-	OnClose      deleterReasonConfig `config:"on_close"`
-	RetryTimeout time.Duration       `config:"retry_timeout"`
-	RetryTick    time.Duration       `config:"retry_tick"`
+	OnClose deleterReasonConfig `config:"on_close"`
+	Backoff backoffConfig       `config:"backoff"`
 }
 
 type deleterReasonConfig struct {
@@ -156,8 +155,10 @@ func defaultReaderConfig() readerConfig {
 
 func defaultDeleterConfig() deleterConfig {
 	return deleterConfig{
-		RetryTimeout: 30 * time.Second,
-		RetryTick:    2 * time.Second,
+		Backoff: backoffConfig{
+			Init: 1 * time.Second,
+			Max:  10 * time.Second,
+		},
 	}
 }
 

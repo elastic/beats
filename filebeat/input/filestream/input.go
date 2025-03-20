@@ -244,8 +244,8 @@ func (inp *filestream) deleteFile(
 		// retry with a constant backoff
 		lastTry := time.Now()
 
-		maxWait := inp.deleterConfig.RetryTimeout
-		ticker := time.NewTicker(inp.deleterConfig.RetryTick)
+		maxWait := inp.deleterConfig.Backoff.Max
+		ticker := time.NewTicker(inp.deleterConfig.Backoff.Init)
 		defer ticker.Stop()
 
 		retries := 0
@@ -253,7 +253,7 @@ func (inp *filestream) deleteFile(
 			logger.Errorf(
 				"could not remove '%s', retrying in %s. Error: %s",
 				fs.newPath,
-				inp.deleterConfig.RetryTick.String(),
+				inp.deleterConfig.Backoff.Init.String(),
 				err,
 			)
 
