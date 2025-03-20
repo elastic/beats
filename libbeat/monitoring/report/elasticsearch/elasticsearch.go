@@ -96,8 +96,8 @@ func defaultConfig(settings report.Settings) config {
 	return c
 }
 
-func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
-	log := logp.NewLogger(logSelector)
+func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C, logger *logp.Logger) (report.Reporter, error) {
+	log := logger.Named(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
-		client, err := makeClient(host, params, &config, beat)
+		client, err := makeClient(host, params, &config, beat, logger)
 		if err != nil {
 			return nil, err
 		}
@@ -299,7 +299,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 	}
 }
 
-func makeClient(host string, params map[string]string, config *config, beat beat.Info) (outputs.NetworkClient, error) {
+func makeClient(host string, params map[string]string, config *config, beat beat.Info, logger *logp.Logger) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)
 	if err != nil {
 		return nil, err
@@ -321,7 +321,7 @@ func makeClient(host string, params map[string]string, config *config, beat beat
 		return nil, err
 	}
 
-	return newPublishClient(esClient, params)
+	return newPublishClient(esClient, params, logger)
 }
 
 func closing(log *logp.Logger, c io.Closer) {

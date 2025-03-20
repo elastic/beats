@@ -332,8 +332,7 @@ output:
 			err = cfg.Unpack(&config)
 			require.NoError(t, err)
 
-			logger, err := logp.NewDevelopmentLogger("")
-			require.NoError(t, err)
+			logger := logp.NewTestingLogger(t, "")
 
 			b := &Beat{Config: config, Beat: beat.Beat{
 				Logger: logger,

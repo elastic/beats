@@ -64,12 +64,11 @@ func TestLocker(t *testing.T) {
 	b2 := beat.Info{}
 	b2.Beat = beatName
 
-	logger, err := logp.NewDevelopmentLogger("")
-	require.NoError(t, err)
+	logger := logp.NewTestingLogger(t, "")
 
 	// Try to get a lock for the first beat. Expect it to succeed.
 	bl1 := New(b1, logger)
-	err = bl1.Lock()
+	err := bl1.Lock()
 	require.NoError(t, err)
 
 	// Try to get a lock for the second beat. Expect it to fail because the
@@ -82,7 +81,7 @@ func TestLocker(t *testing.T) {
 
 func TestUnlock(t *testing.T) {
 	const beatName = "testbeat-testunlock"
-	logger, err := logp.NewDevelopmentLogger("")
+	logger := logp.NewTestingLogger(t, "")
 
 	b1 := beat.Info{}
 	b1.Beat = beatName
@@ -93,7 +92,7 @@ func TestUnlock(t *testing.T) {
 
 	// Try to get a lock for the first beat. Expect it to succeed.
 	bl1 := New(b1, logger)
-	err = bl1.Lock()
+	err := bl1.Lock()
 	require.NoError(t, err)
 
 	// now unlock
@@ -108,7 +107,7 @@ func TestUnlock(t *testing.T) {
 
 func TestUnlockWithRemainingFile(t *testing.T) {
 	const beatName = "testbeat-testunlockwithfile"
-	logger, err := logp.NewDevelopmentLogger("")
+	logger := logp.NewTestingLogger(t, "")
 
 	b1 := beat.Info{}
 	b1.Beat = beatName
@@ -119,7 +118,7 @@ func TestUnlockWithRemainingFile(t *testing.T) {
 
 	// Try to get a lock for the first beat. Expect it to succeed.
 	bl1 := New(b1, logger)
-	err = bl1.Lock()
+	err := bl1.Lock()
 	require.NoError(t, err)
 
 	// unlock the underlying FD, so we don't remove the file
