@@ -94,7 +94,7 @@ func SetupMetrics(logger *logp.Logger, name, version string, opts ...OptionFunc)
 	monitoring.NewFunc(opt.processMetrics, "runtime", ReportRuntime, monitoring.Report)
 	monitoring.NewFunc(opt.processMetrics, "info", infoReporter(name, version), monitoring.Report)
 
-	setupPlatformSpecificMetrics(logger, processStats, systemMetrics, processMetrics)
+	setupPlatformSpecificMetrics(logger, processStats, opt.systemMetrics, opt.processMetrics)
 
 	return nil
 }
