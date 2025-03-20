@@ -83,7 +83,7 @@ tar xzvf metricbeat-{{stack-version}}-linux-x86_64.tar.gz
 
 4. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
 
-5. From the PowerShell prompt, run the following commands to install Heartbeat as a Windows service:
+5. From the PowerShell prompt, run the following commands to install Metricbeat as a Windows service:
 
   ```shell subs=true
   PS > cd 'C:\Program Files\Metricbeat'
