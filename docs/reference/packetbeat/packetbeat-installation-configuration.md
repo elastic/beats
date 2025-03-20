@@ -100,23 +100,22 @@ tar xzvf packetbeat-{{stack-version}}-linux-x86_64.tar.gz
 ::::::
 
 ::::::{tab-item} Windows
-1. Download the Heartbeat Windows zip file: https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-windows-x86_64.zip
+1. Download the [Packetbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
-3. Rename the +packetbeat-{{stack-version}}-windows-x86_64+ directory to +Heartbeat+.
+3. Rename the `packetbeat-{{stack-version}}-windows-x86_64` directory to `Packetbeat`.
 
 4. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
 
-5. From the PowerShell prompt, run the following commands to install Heartbeat as a Windows service:
+5. From the PowerShell prompt, run the following commands to install Packetbeat as a Windows service:
 
   ```shell subs=true
-  PS > cd 'C:\Program Files\Heartbeat'
-  PS C:\Program Files\Heartbeat> .\install-service-packetbeat.ps1
+  PS > cd 'C:\Program Files\Packetbeat'
+  PS C:\Program Files\Packetbeat> .\install-service-packetbeat.ps1
   ```
 
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For
-example: `+PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-packetbeat.ps1+.`
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-packetbeat.ps1`.
 ::::::
 
 :::::::
