@@ -187,6 +187,12 @@ func (inp *filestream) Run(
 	// must not be reported, like 'context cancelled'.
 	err = inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 	if err != nil {
+		// First handle actual errors
+		if !errors.Is(err, io.EOF) && !errors.Is(err, ErrInactive) {
+			return fmt.Errorf("error reading from source: %w", err)
+		}
+
+		// Now handle EOF and inactive for file removal
 		deleteFile := false
 		switch {
 		case errors.Is(err, io.EOF) && inp.deleterConfig.OnClose.EOF:
@@ -207,11 +213,7 @@ func (inp *filestream) Run(
 			if err := inp.deleteFile(ctx, log, cursor, fs); err != nil {
 				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
 			}
-
-			return nil
 		}
-
-		return fmt.Errorf("error reading from source: %w", err)
 	}
 
 	return nil
