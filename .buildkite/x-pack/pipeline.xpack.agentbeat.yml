@@ -67,11 +67,7 @@ steps:
         depends_on:
           - mandatory-win-2022-system-tests
         env:
-<<<<<<< HEAD
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-=======
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
->>>>>>> f2a390242 (bk(packaging): use arm64 for darwin/arm64 (#43280))
           SNAPSHOT: true
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
@@ -99,11 +95,7 @@ steps:
           - agentbeat-package-linux
         env:
           ASDF_NODEJS_VERSION: 18.17.1
-<<<<<<< HEAD
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-=======
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
->>>>>>> f2a390242 (bk(packaging): use arm64 for darwin/arm64 (#43280))
           SNAPSHOT: true
         command: |
           set -euo pipefail
