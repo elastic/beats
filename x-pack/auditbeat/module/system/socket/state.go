@@ -962,13 +962,6 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"transport": f.proto.String(),
 			"packets":   f.local.packets + f.remote.packets,
 			"bytes":     f.local.bytes + f.remote.bytes,
-			"community_id": flowhash.CommunityID.Hash(flowhash.Flow{
-				SourceIP:        localAddr.IP,
-				SourcePort:      uint16(localAddr.Port),
-				DestinationIP:   remoteAddr.IP,
-				DestinationPort: uint16(remoteAddr.Port),
-				Protocol:        uint8(f.proto),
-			}),
 		},
 		"event": mapstr.M{
 			"kind":     "event",
@@ -984,6 +977,16 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"complete": f.complete,
 		},
 	}
+	if communityid := flowhash.CommunityID.Hash(flowhash.Flow{
+		SourceIP:        localAddr.IP,
+		SourcePort:      uint16(localAddr.Port),
+		DestinationIP:   remoteAddr.IP,
+		DestinationPort: uint16(remoteAddr.Port),
+		Protocol:        uint8(f.proto),
+	}); communityid != "" {
+		(root["network"].(mapstr.M))["community_id"] = communityid
+	}
+
 	var errs multierror.Errors
 	rootPut := func(key string, value interface{}) {
 		if _, err := root.Put(key, value); err != nil {

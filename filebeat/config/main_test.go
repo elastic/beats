@@ -15,31 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package op
+package config
 
-import "sync"
+import (
+	"flag"
+	"os"
+	"testing"
 
-type Canceler struct {
-	lock   sync.RWMutex
-	done   chan struct{}
-	active bool
-}
+	"github.com/elastic/beats/v7/testing/testflag"
+)
 
-func NewCanceler() *Canceler {
-	return &Canceler{
-		done:   make(chan struct{}),
-		active: true,
-	}
-}
+func TestMain(m *testing.M) {
+	testflag.MustSetStrictPermsFalse()
 
-func (c *Canceler) Cancel() {
-	c.lock.Lock()
-	c.active = false
-	c.lock.Unlock()
+	flag.Parse()
 
-	close(c.done)
-}
-
-func (c *Canceler) Done() <-chan struct{} {
-	return c.done
+	os.Exit(m.Run())
 }
