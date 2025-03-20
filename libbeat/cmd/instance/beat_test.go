@@ -335,7 +335,9 @@ output:
 			logger := logp.NewTestingLogger(t, "")
 
 			b := &Beat{Config: config, Beat: beat.Beat{
-				Logger: logger,
+				Info: beat.Info{
+					Logger: logger,
+				},
 			}}
 
 			err = promoteOutputQueueSettings(b)
@@ -471,7 +473,7 @@ func TestLogSystemInfo(t *testing.T) {
 	log.WithOptions()
 
 	b, err := NewBeat("testingbeat", "test-idx", "42", false, nil)
-	b.Logger = log
+	b.Info.Logger = log
 	require.NoError(t, err, "could not create beat")
 
 	for _, tc := range tcs {
