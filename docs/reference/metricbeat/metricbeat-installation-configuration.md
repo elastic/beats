@@ -86,8 +86,8 @@ tar xzvf metricbeat-{{stack-version}}-linux-x86_64.tar.gz
 5. From the PowerShell prompt, run the following commands to install Heartbeat as a Windows service:
 
   ```shell subs=true
-  PS > cd 'C:\Program Files\Heartbeat'
-  PS C:\Program Files\Heartbeat> .\install-service-metricbeat.ps1
+  PS > cd 'C:\Program Files\Metricbeat'
+  PS C:\Program Files\Metricbeat> .\install-service-metricbeat.ps1
   ```
 
 NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-metricbeat.ps1`.
