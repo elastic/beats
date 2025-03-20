@@ -61,7 +61,7 @@ To add the Beats repository for APT:
     sudo apt-get update && sudo apt-get install filebeat
     ```
 
-5. To configure filebeat to start automatically during boot, run:
+5. To configure Filebeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable filebeat
