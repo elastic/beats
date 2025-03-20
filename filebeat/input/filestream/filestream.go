@@ -280,5 +280,6 @@ func (f *logFile) Close() error {
 	f.readerCtx.Cancel()
 	err := f.file.Close()
 	_ = f.tg.Stop() // Wait until all resources are released for sure.
+	f.log.Infof("Closed reader. Path='%s'", f.file.Name())
 	return err
 }

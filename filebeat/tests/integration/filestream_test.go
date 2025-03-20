@@ -93,14 +93,18 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	integration.GenerateLogFile(t, logFilePath, 10, false)
 
 	// 4. Wait for Filebeat to start scanning for files
-	//
 	filebeat.WaitForLogs(
 		fmt.Sprintf("A new file %s has been found", logFilePath),
 		10*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
 	filebeat.WaitForLogs(
-		fmt.Sprintf("Reader was closed. Closing. Path='%s", logFilePath),
+		fmt.Sprintf("File is inactive. Closing. Path='%s'", logFilePath),
+		10*time.Second,
+		"File did not became inactive")
+
+	filebeat.WaitForLogs(
+		fmt.Sprintf("Closed reader. Path='%s'", logFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
 	// 5. Now that the reader has been closed, nothing is holding the state
