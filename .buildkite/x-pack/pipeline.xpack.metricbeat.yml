@@ -340,7 +340,11 @@ steps:
       - label: ":ubuntu: x-pack/metricbeat: Packaging Linux"
         key: "packaging-linux"
         env:
+<<<<<<< HEAD
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+=======
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
+>>>>>>> f2a390242 (bk(packaging): use arm64 for darwin/arm64 (#43280))
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
         retry:
@@ -360,8 +364,12 @@ steps:
       - label: ":ubuntu: x-pack/metricbeat: Packaging linux arm64"
         key: "packaging-arm"
         env:
+<<<<<<< HEAD
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
+=======
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
+>>>>>>> f2a390242 (bk(packaging): use arm64 for darwin/arm64 (#43280))
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
         retry:
