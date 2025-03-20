@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
@@ -56,6 +57,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchDegradeOnPartial(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42809")
 	logp.DevelopmentSetup()
 	config := getConfig()
 	config["degrade_on_partial"] = true
