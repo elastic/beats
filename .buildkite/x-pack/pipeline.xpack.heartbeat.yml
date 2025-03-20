@@ -305,7 +305,7 @@ steps:
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:
@@ -325,7 +325,7 @@ steps:
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "+all linux/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:
