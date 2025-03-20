@@ -48,7 +48,6 @@ func newCrawler(
 	inputConfigs []*conf.C,
 	beatDone chan struct{},
 	once bool,
-	logger *logp.Logger,
 ) (*crawler, error) {
 	return &crawler{
 		log:            logp.NewLogger("crawler"),
