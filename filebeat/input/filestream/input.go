@@ -207,6 +207,8 @@ func (inp *filestream) Run(
 			if err := inp.deleteFile(ctx, log, cursor, fs); err != nil {
 				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
 			}
+
+			return nil
 		}
 
 		return fmt.Errorf("error reading from source: %w", err)

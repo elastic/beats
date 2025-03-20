@@ -41,8 +41,16 @@ func (c Cursor) Unpack(to interface{}) error {
 	return c.resource.UnpackCursor(to)
 }
 
-// Finished returns true if the cursor is not in use and if there are no
-// pending updates that still need to be written to the registry.
+// Finished returns true if there are no pending operations and the harvester
+// is the single 'owner' of underlying resource.
+//
+// Owners of an resource can be active inputs or pending update operations
+// not yet written to disk. The harvester locks this resource
+// (see `startHarvester`) and only releases when it is shutdown.
+//
+// So if there is only one 'owner' of this resource, it is safe
+// to assume it is the harvester, there fore there are no pending
+// operations on the underlying resource.
 func (c Cursor) Finished() bool {
-	return c.resource.Finished()
+	return c.resource.pending.Load() == 1
 }
