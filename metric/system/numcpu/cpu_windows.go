@@ -20,19 +20,15 @@ package numcpu
 import (
 	"fmt"
 
-	"github.com/elastic/gosigar/sys/windows"
+	"golang.org/x/sys/windows"
 )
 
 // getCPU implements NumCPU on windows
 // For now, this is a bit of a hack that just asks for per-CPU performance data, and reports the CPU count
 func getCPU() (int, bool, error) {
-
-	// get per-cpu data
-	cpus, err := windows.NtQuerySystemProcessorPerformanceInformation()
-	if err != nil {
-		return -1, false, fmt.Errorf("syscall NtQuerySystemProcessorPerformanceInformation failed: %w", err)
+	numCPU := windows.GetActiveProcessorCount(windows.ALL_PROCESSOR_GROUPS)
+	if numCPU == 0 {
+		return -1, false, fmt.Errorf("received an error while fetching cpu count: %w", windows.GetLastError())
 	}
-
-	return len(cpus), true, nil
-
+	return int(numCPU), true, nil
 }
