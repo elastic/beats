@@ -404,6 +404,9 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 		switch {
 		case err == nil:
 			return nil
+		case errors.Is(err, syscall.EINTR):
+			// SetPID wraps a lot of logic, so we'll only ever get an EINTR on a send, the receive will always retry
+			continue
 		case errors.Is(err, syscall.ENOBUFS):
 			ms.log.Info("Recovering from ENOBUFS during setup...")
 			// the netlink connection is losing data. Try to drain and send again.
