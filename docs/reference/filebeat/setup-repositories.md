@@ -70,7 +70,7 @@ To add the Beats repository for APT:
     If your system does not use `systemd` then run:
 
     ```
-    sudo update-rc.d {beatname_pkg} defaults 95 10
+    sudo update-rc.d filebeat defaults 95 10
     ```
 
 
