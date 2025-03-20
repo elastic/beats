@@ -986,7 +986,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		(root["network"].(mapstr.M))["community_id"] = communityid
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	rootPut := func(key string, value interface{}) {
 		if _, err := root.Put(key, value); err != nil {
 			errs = append(errs, err)
