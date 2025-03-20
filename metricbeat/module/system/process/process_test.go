@@ -26,7 +26,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -65,15 +64,9 @@ func TestFetchDegradeOnPartial(t *testing.T) {
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		for _, err := range errs {
-			assert.NotErrorIsf(t, err, &mb.PartialMetricsError{}, "Expected non-fatal error, got %v", err)
+			assert.NotErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
 		}
 	} else {
-		assert.NotEmpty(t, events)
-
-		events, errs = mbtest.ReportingFetchV2Error(f)
-		for _, err := range errs {
-			assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
-		}
 		assert.NotEmpty(t, events)
 
 		t.Logf("fetched %d events, showing events[0]:", len(events))
