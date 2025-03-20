@@ -45,23 +45,51 @@ To download and install Filebeat, use the commands that work with your system:
 :::::::{tab-set}
 
 ::::::{tab-item} DEB
-Version 9.0.0-beta1 of Filebeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-amd64.deb
+sudo dpkg -i filebeat-{{stack-version}}-amd64.deb
+```
 ::::::
 
 ::::::{tab-item} RPM
-Version 9.0.0-beta1 of Filebeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-x86_64.rpm
+sudo rpm -vi filebeat-{{stack-version}}-x86_64.rpm
+```
 ::::::
 
 ::::::{tab-item} MacOS
-Version 9.0.0-beta1 of Filebeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-darwin-x86_64.tar.gz
+tar xzvf filebeat-{{stack-version}}-darwin-x86_64.tar.gz
+```
 ::::::
 
 ::::::{tab-item} Linux
-Version 9.0.0-beta1 of Filebeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-linux-x86_64.tar.gz
+tar xzvf filebeat-{{stack-version}}-linux-x86_64.tar.gz
+```
 ::::::
 
 ::::::{tab-item} Windows
-Version 9.0.0-beta1 of Filebeat has not yet been released.
+1. Download the Filebeat Windows zip file: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-windows-x86_64.zip
+
+2. Extract the contents of the zip file into `C:\Program Files`.
+
+3. Rename the +filebeat-{{stack-version}}-windows-x86_64+ directory to +Filebeat+.
+
+4. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+5. From the PowerShell prompt, run the following commands to install Filebeat as a Windows service:
+
+  ```shell subs=true
+  PS > cd 'C:\Program Files\Filebeat'
+  PS C:\Program Files\Filebeat> .\install-service-filebeat.ps1
+  ```
+
+NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For
+example: `+PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-filebeat.ps1+.`
 ::::::
 
 :::::::
