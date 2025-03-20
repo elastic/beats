@@ -396,8 +396,9 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 		return nil, nil
 	}
 
+	// run the SetPID logic in a retry loop, since the startup process can be fragile.
 	for i := 0; i < retries; i++ {
-		// This call will block on send, which scares me a little, but the reply can time out
+		// This call will block on send, which isn't great, but the reply can *also* time out
 		// or return something like ENOBUFS.
 		err = ms.client.SetPID(libaudit.WaitForReply)
 		switch {
