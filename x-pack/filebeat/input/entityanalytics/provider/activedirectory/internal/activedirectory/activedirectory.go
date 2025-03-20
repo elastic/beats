@@ -314,8 +314,9 @@ func entype(attr *ldap.EntryAttribute) any {
 			if err != nil {
 				return attr.Values
 			}
-			// Check for special values of accountExpires. See https://learn.microsoft.com/en-us/windows/win32/adschema/a-accountexpires.
-			if attr.Name == "accountExpires" && (ts == 0 || ts == 9223372036854775807) {
+			// Check for special values of accountExpires.
+			// See https://learn.microsoft.com/en-us/windows/win32/adschema/a-accountexpires.
+			if attr.Name == "accountExpires" && (ts == 0 || ts == 0x7fff_ffff_ffff_ffff) {
 				return v // Return the raw string instead of converting to time
 			}
 			if len(attr.Values) == 1 {
