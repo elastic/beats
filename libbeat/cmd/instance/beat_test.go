@@ -25,6 +25,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -331,10 +332,17 @@ output:
 			err = cfg.Unpack(&config)
 			require.NoError(t, err)
 
-			err = promoteOutputQueueSettings(&config)
+			logger, err := logp.NewDevelopmentLogger("")
 			require.NoError(t, err)
 
-			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
+			b := &Beat{Config: config, Beat: beat.Beat{
+				Logger: logger,
+			}}
+
+			err = promoteOutputQueueSettings(b)
+			require.NoError(t, err)
+
+			ms, err := memqueue.SettingsForUserConfig(b.Config.Pipeline.Queue.Config())
 			require.NoError(t, err)
 			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
 		})
@@ -460,10 +468,11 @@ func TestLogSystemInfo(t *testing.T) {
 			},
 		},
 	}
-	log, buff := logp.NewInMemory("beat", logp.ConsoleEncoderConfig())
+	log, buff := logp.NewInMemoryLocal("beat", logp.ConsoleEncoderConfig())
 	log.WithOptions()
 
 	b, err := NewBeat("testingbeat", "test-idx", "42", false, nil)
+	b.Logger = log
 	require.NoError(t, err, "could not create beat")
 
 	for _, tc := range tcs {

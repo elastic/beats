@@ -82,9 +82,6 @@ func LoadWithSettings(
 	settings Settings,
 ) (*Pipeline, error) {
 	log := monitors.Logger
-	if log == nil {
-		log = logp.L()
-	}
 
 	if publishDisabled {
 		log.Info("Dry run mode. All output types except the file based one are disabled.")
