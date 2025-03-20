@@ -23,12 +23,13 @@ var CommunityID = newEmptyCommunityID()
 
 type emptyCommunityIDHasher struct{}
 
-// NewCommunityID allows to instantiate a flow hasher with custom settings.
+// newEmptyCommunityID returns an empty Hasher
 func newEmptyCommunityID() Hasher {
 	return &emptyCommunityIDHasher{}
 }
 
-// Hash returns the hash for the given flow.
-func (h *emptyCommunityIDHasher) Hash(flow Flow) string {
+// Hash returns an empty string
+func (h *emptyCommunityIDHasher) Hash(_ Flow) string {
+	// no op
 	return ""
 }
