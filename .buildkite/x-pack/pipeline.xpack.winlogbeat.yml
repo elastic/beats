@@ -8,6 +8,7 @@ env:
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_WIN_2025: "family/platform-ingest-beats-windows-2025"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
 
@@ -124,6 +125,27 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/winlogbeat: Win 2022 Unit Tests"
+
+      - label: ":windows: x-pack/winlogbeat: Win 2025 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/winlogbeat
+          mage build unitTest
+        key: "mandatory-win-2025-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2025}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/winlogbeat/build/*.xml"
+          - "x-pack/winlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/winlogbeat: Win 2025 Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
