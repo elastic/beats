@@ -85,7 +85,6 @@ func LoadWithSettings(
 	if log == nil {
 		log = logp.L()
 	}
-
 	if publishDisabled {
 		log.Info("Dry run mode. All output types except the file based one are disabled.")
 	}

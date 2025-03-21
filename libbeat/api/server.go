@@ -41,10 +41,6 @@ type Server struct {
 
 // New creates a new API Server with no routes attached.
 func New(log *logp.Logger, config *config.C) (*Server, error) {
-	if log == nil {
-		log = logp.NewLogger("")
-	}
-
 	cfg := DefaultConfig
 	err := config.Unpack(&cfg)
 	if err != nil {

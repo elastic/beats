@@ -49,12 +49,13 @@ type publishClient struct {
 func newPublishClient(
 	es *eslegclient.Connection,
 	params map[string]string,
+	logger *logp.Logger,
 ) (*publishClient, error) {
 	p := &publishClient{
 		es:     es,
 		params: params,
 
-		log: logp.NewLogger(logSelector),
+		log: logger.Named(logSelector),
 	}
 	return p, nil
 }
