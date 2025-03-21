@@ -239,7 +239,10 @@ func (inp *filestream) deleteFile(
 			//  returned early
 			return ctx.Cancelation.Err()
 		}
-		logger.Debugf("'%s' is not finished, waiting...", fs.newPath)
+		logger.Debugf(
+			"not all events from '%s' have been published, "+
+				"waiting before removing the file",
+			fs.newPath)
 	}
 	logger.Debugf("'%s' finished", fs.newPath)
 

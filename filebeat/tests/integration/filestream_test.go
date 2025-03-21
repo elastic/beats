@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -507,6 +508,73 @@ logging:
 
 	requirePublishedEvents(t, filebeat, 220, outputFile)
 	requireRegistryEntryRemoved(t, workDir, "native")
+}
+
+func TestFilestreamDelete(t *testing.T) {
+	s, es, _ := integration.StartMockES(t, 0, 100, 0, 0, 0)
+	defer s.Close()
+
+	testDataPath, err := filepath.Abs("./testdata")
+	if err != nil {
+		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+
+	logFile := filepath.Join(workDir, "log.log")
+	integration.GenerateLogFile(t, logFile, 100, false)
+
+	vars := map[string]any{
+		"homePath": workDir,
+		"logfile":  logFile,
+		"testdata": testDataPath,
+		"esHost":   s.Listener.Addr(),
+	}
+	cfgYAML := getConfig(t, vars, "delete", "eof.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+
+	filebeat.Start()
+	// Wait a few times for the 'not finished' logs
+	notFinishedMsg := fmt.Sprintf(
+		"not all events from '%s' have been published, "+
+			"waiting before removing the file",
+		logFile)
+	for i := range 2 {
+		filebeat.WaitForLogs(
+			notFinishedMsg,
+			10*time.Second,
+			"[%d] Filebeat did not wait for the resource to be finished",
+			i,
+		)
+	}
+
+	if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
+		t.Fatalf("cannot update mock-es odds: %s", err)
+	}
+
+	msg := fmt.Sprintf("File %s has been removed", logFile)
+	filebeat.WaitForLogs(msg, 30*time.Second, "log file '%s' was not removed", logFile)
+}
+
+// getConfig renders the template in testdata/<folder>/<tmplPath> using vars
+func getConfig(t *testing.T, vars map[string]any, folder, tmplPath string) string {
+	t.Helper()
+	tmpl := template.Must(
+		template.ParseFiles(
+			filepath.Join("testdata", folder, tmplPath)))
+
+	str := strings.Builder{}
+	if err := tmpl.Execute(&str, vars); err != nil {
+		t.Fatalf("cannot execute template: %s", err)
+	}
+
+	ret := str.String()
+	return ret
 }
 
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {

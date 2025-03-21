@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"os/exec"
@@ -41,8 +42,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/mock-es/pkg/api"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 )
 
 type BeatProc struct {
@@ -997,4 +1000,56 @@ func (b *BeatProc) CountFileLines(glob string) int {
 // ConfigFilePath returns the config file path
 func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
+}
+
+func StartMockES(
+	t *testing.T,
+	percentDuplicate,
+	percentTooMany,
+	percentNonIndex,
+	percentTooLarge,
+	historyCap uint,
+) (*httptest.Server, *api.APIHandler, *sdkmetric.ManualReader) {
+
+	uid := uuid.Must(uuid.NewV4())
+
+	rdr := sdkmetric.NewManualReader()
+	provider := sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(rdr),
+	)
+
+	es := api.NewAPIHandler(
+		uid,
+		t.Name(),
+		provider,
+		time.Now().Add(24*time.Hour),
+		0,
+		percentDuplicate,
+		percentTooMany,
+		percentNonIndex,
+		percentTooLarge,
+		historyCap,
+	)
+
+	s := httptest.NewServer(es)
+	addr := "http://" + s.Listener.Addr().String()
+
+	// Ensure the Server is up and running before returning
+	require.Eventually(
+		t,
+		func() bool {
+			resp, err := http.Get(addr) //nolint: noctx // It's just a test
+			if err != nil {
+				//nolint: errcheck // We're just draining the body, we can ignore the error
+				io.Copy(io.Discard, resp.Body)
+				resp.Body.Close()
+				return false
+			}
+			return true
+		},
+		time.Second,
+		time.Millisecond,
+		"mock-es server did not start on '%s'", addr)
+
+	return s, es, rdr
 }
