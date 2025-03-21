@@ -61,7 +61,7 @@ To add the Beats repository for APT:
     sudo apt-get update && sudo apt-get install metricbeat
     ```
 
-5. To configure metricbeat to start automatically during boot, run:
+5. To configure Metricbeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable metricbeat
