@@ -46,13 +46,15 @@ func TestData(t *testing.T) {
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
 
-	c, err := startConsumer(t, service.HostForPort(9092), "test-group")
+	hostForPort := service.HostForPort(9092)
+	t.Logf("hostForPort: %s", hostForPort)
+	c, err := startConsumer(t, hostForPort, "test-group")
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
 	defer c.Close()
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092)))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(hostForPort))
 	for retries := 0; retries < 3; retries++ {
 		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {

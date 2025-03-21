@@ -26,6 +26,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/gofrs/uuid/v5"
+	"github.com/stretchr/testify/require"
 )
 
 // HostInfo exposes information about started scenario
@@ -50,11 +53,30 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		return hostInfo
 	}
 
-	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"))
+	// force a random project name
+	envVar := "DOCKER_COMPOSE_PROJECT_NAME"
+	name := os.Getenv(envVar)
+	if name == "" {
+		id, err := uuid.NewV4()
+		require.NoErrorf(t, err,
+			"failed to generate uuid for docker compose project name")
+		name = id.String()
+		t.Logf("%q not defines, using a random docker compose project name: %s",
+			envVar,
+			name)
+	}
+
+	compose, err := getComposeProject(name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer compose.Close()
+	t.Cleanup(func() {
+		// err = compose.Down(context.Background())
+		// if err != nil {
+		// 	t.Logf("[ERROR] failed to stop compose project: %v", err)
+		// }
+		compose.Close()
+	})
 
 	// Kill no longer used containers
 	err = compose.KillOld([]string{service})
