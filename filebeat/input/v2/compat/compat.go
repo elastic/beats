@@ -145,10 +145,7 @@ func (r *runner) Start() {
 		// Unregister the metrics when input finishes running
 		defer ctx.UnregisterMetrics()
 
-		err := r.input.Run(
-			ctx,
-			r.connector,
-		)
+		err := r.input.Run(ctx, r.connector)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {

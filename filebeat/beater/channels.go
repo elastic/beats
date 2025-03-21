@@ -147,6 +147,8 @@ func (c *countingClient) Close() error {
 
 func (*countingClientListener) Closing()   {}
 func (*countingClientListener) Closed()    {}
+func (*countingClientListener) NewEvent()  {}
+func (*countingClientListener) Filtered()  {}
 func (*countingClientListener) Published() {}
 
 func (c *countingClientListener) DroppedOnPublish(_ beat.Event) {
@@ -161,6 +163,16 @@ func (c *combinedClientListener) Closing() {
 func (c *combinedClientListener) Closed() {
 	c.a.Closed()
 	c.b.Closed()
+}
+
+func (c *combinedClientListener) NewEvent() {
+	c.a.NewEvent()
+	c.b.NewEvent()
+}
+
+func (c *combinedClientListener) Filtered() {
+	c.a.Filtered()
+	c.b.Filtered()
 }
 
 func (c *combinedClientListener) Published() {

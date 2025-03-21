@@ -108,6 +108,7 @@ type Context struct {
 	// monitoringRegistryCancel removes the registry from its parent and from
 	// the HTTP monitoring endpoint.
 	monitoringRegistryCancel func()
+	pipelineClientListener   *PipelineClientListener
 }
 
 // NewContext creates a new context with a metrics registry populated with
@@ -203,7 +204,14 @@ func (c *Context) UpdateStatus(status status.Status, msg string) {
 // MetricRegistry returns the metrics registry associated with this context.
 // This should be the metrics registry used by inputs to register their metrics.
 // It's already registered to be published by the HTTP monitoring endpoint.
+// If the context wasn't created by NewContext and its monitoring registry is
+// nil, a new registry is created and returned.
 func (c *Context) MetricRegistry() *monitoring.Registry {
+	// It's a precaution in case the context wasn't created by NewContext.
+	if c.monitoringRegistry == nil {
+		c.monitoringRegistry = monitoring.NewRegistry()
+	}
+
 	return c.monitoringRegistry
 }
 
@@ -224,6 +232,49 @@ func (c *Context) UnregisterMetrics() {
 		c.monitoringRegistryCancel()
 	}
 }
+
+func (c *Context) PipelineClientListener() *PipelineClientListener {
+	if c.pipelineClientListener != nil {
+		return c.pipelineClientListener
+	}
+
+	c.pipelineClientListener = &PipelineClientListener{
+		eventsTotal: monitoring.NewUint(
+			c.MetricRegistry(), "events_pipeline_total"),
+		eventsFiltered: monitoring.NewUint(
+			c.MetricRegistry(), "events_pipeline_filtered_total"),
+		eventsPublished: monitoring.NewUint(
+			c.MetricRegistry(), "events_pipeline_published_total"),
+	}
+
+	return c.pipelineClientListener
+}
+
+type PipelineClientListener struct {
+	eventsTotal,
+	eventsFiltered,
+	eventsPublished *monitoring.Uint
+}
+
+func (i *PipelineClientListener) Closing() {
+}
+
+func (i *PipelineClientListener) Closed() {
+}
+
+func (i *PipelineClientListener) NewEvent() {
+	i.eventsTotal.Inc()
+}
+
+func (i *PipelineClientListener) Filtered() {
+	i.eventsFiltered.Inc()
+}
+
+func (i *PipelineClientListener) Published() {
+	i.eventsPublished.Inc()
+}
+
+func (i *PipelineClientListener) DroppedOnPublish(beat.Event) {}
 
 // TestContext provides the Input Test function with common environmental
 // information and services.

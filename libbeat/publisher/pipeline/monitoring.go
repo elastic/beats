@@ -186,56 +186,6 @@ func (o *metricsObserver) eventsRetry(n int) {
 	o.vars.eventsRetry.Add(uint64(n))
 }
 
-// inputAwareMetricsObserver wraps a metricsObserver to collect per-input
-// metrics.
-type inputAwareMetricsObserver struct {
-	observer observer
-	input    inputMetrics
-}
-
-func (i inputAwareMetricsObserver) clientConnected() {
-	i.observer.clientConnected()
-}
-
-func (i inputAwareMetricsObserver) clientClosed() {
-	i.observer.clientClosed()
-}
-
-func (i inputAwareMetricsObserver) newEvent() {
-	i.observer.newEvent()
-	i.input.eventsTotal.Inc()
-}
-
-func (i inputAwareMetricsObserver) filteredEvent() {
-	i.observer.filteredEvent()
-	i.input.eventsFiltered.Inc()
-}
-
-func (i inputAwareMetricsObserver) publishedEvent() {
-	i.observer.publishedEvent()
-	i.input.eventsPublished.Inc()
-}
-
-func (i inputAwareMetricsObserver) failedPublishEvent() {
-	i.observer.failedPublishEvent()
-}
-
-func (i inputAwareMetricsObserver) eventsACKed(count int) {
-	i.observer.eventsACKed(count)
-}
-
-func (i inputAwareMetricsObserver) eventsDropped(count int) {
-	i.observer.eventsDropped(count)
-}
-
-func (i inputAwareMetricsObserver) eventsRetry(count int) {
-	i.observer.eventsRetry(count)
-}
-
-func (i inputAwareMetricsObserver) cleanup() {
-	i.observer.cleanup()
-}
-
 type emptyObserver struct{}
 
 var nilObserver observer = (*emptyObserver)(nil)

@@ -35,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -209,27 +208,18 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
-	reg := cfg.InputMetricsRegistry
-	if reg == nil {
-		// No registry, then create a registry which will not publish any metric,
-		// a 'discard' registry.
-		reg = monitoring.NewRegistry()
+	clientListener := cfg.ClientListener
+	if clientListener == nil {
+		clientListener = noopClientListener{}
 	}
 
 	client := &client{
 		logger:         p.monitors.Logger,
-		clientListener: cfg.ClientListener,
+		clientListener: clientListener,
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
-		observer: inputAwareMetricsObserver{
-			observer: p.observer,
-			input: inputMetrics{
-				eventsTotal:     monitoring.NewUint(reg, "events_pipeline_total"),
-				eventsFiltered:  monitoring.NewUint(reg, "events_pipeline_filtered_total"),
-				eventsPublished: monitoring.NewUint(reg, "events_pipeline_published_total"),
-			},
-		},
+		observer:       p.observer,
 	}
 
 	client.isOpen.Store(true)
@@ -306,3 +296,12 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.Queu
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
 }
+
+type noopClientListener struct{}
+
+func (n noopClientListener) Closing()                    {}
+func (n noopClientListener) Closed()                     {}
+func (n noopClientListener) NewEvent()                   {}
+func (n noopClientListener) Filtered()                   {}
+func (n noopClientListener) Published()                  {}
+func (n noopClientListener) DroppedOnPublish(beat.Event) {}

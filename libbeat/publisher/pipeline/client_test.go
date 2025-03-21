@@ -334,26 +334,18 @@ func TestMonitoring(t *testing.T) {
 	})
 
 	t.Run("input metrics", func(t *testing.T) {
-		inputID := "a-input-id"
-
-		beatInfo := beat.Info{}
-		beatInfo.Monitoring.Namespace =
-			monitoring.GetNamespace("TestMonitoring.inputMetrics")
-
-		clientCfg := beat.ClientConfig{
-			InputMetricsRegistry: beatInfo.Monitoring.Registry().
-				NewRegistry(inputID),
-		}
-		testInputMetrics(t, beatInfo, clientCfg, inputID)
+		testInputMetrics(t,
+			beat.Info{},
+			beat.ClientConfig{ClientListener: &mockClientListener{}})
 	})
 
-	t.Run("nil input metrics", func(t *testing.T) {
+	t.Run("no input metrics - nil ClientConfig", func(t *testing.T) {
 		testInputMetrics(
-			t, beat.Info{}, beat.ClientConfig{}, "a-input-id-nil-metrics")
+			t, beat.Info{}, beat.ClientConfig{})
 	})
 }
 
-func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig, inputID string) {
+func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig) {
 	require.NoError(t, logp.TestingSetup(), "could not setup logger")
 
 	var config Config
@@ -379,18 +371,6 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 		testProcessorSupporter{
 			Processor: processorList{
 				processors: []beat.Processor{
-					&testProcessor{
-						name: "addMeta",
-						processorFn: func(in *beat.Event) (*beat.Event, error) {
-							var err error
-							if in.Meta == nil {
-								in.Meta = mapstr.M{}
-							}
-							_, err = in.Meta.Put("input_id", inputID)
-							assert.NoError(t, err, "add meta processor failed")
-							return in, nil
-						},
-					},
 					&testProcessor{
 						name: "filterProcessor",
 						processorFn: func(in *beat.Event) (*beat.Event, error) {
@@ -434,52 +414,21 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 	c.Publish(beat.Event{Meta: mapstr.M{}})
 	require.NoError(t, c.Close())
 
-	if clientCfg.InputMetricsRegistry != nil {
-		total, filtered, published := getMetrics(t, beatInfo, inputID)
-
+	if clientCfg.ClientListener != nil {
+		got, ok := clientCfg.ClientListener.(*mockClientListener)
+		require.Truef(t, ok, "ClientListener must be of type %T, but got %T",
+			&mockClientListener{},
+			clientCfg.ClientListener)
 		assert.Equal(t,
-			int(total.Get()),
-			int(filtered.Get()+published.Get()),
+			got.eventsTotal,
+			got.eventsFiltered+got.eventsPublished,
 			"total events should be them sum of filtered, dropped and published"+
 				"events")
-		assert.Equal(t, 3, int(filtered.Get()),
+		assert.Equal(t, 3, got.eventsFiltered,
 			"should have 3 filtered events")
-		assert.Equal(t, 1, int(published.Get()),
+		assert.Equal(t, 1, got.eventsPublished,
 			"should have 1 published event")
 	}
-}
-
-func getMetrics(t *testing.T, beatInfo beat.Info, inputID string) (
-	*monitoring.Uint, *monitoring.Uint, *monitoring.Uint) {
-	t.Helper()
-
-	reg := beatInfo.Monitoring.Registry()
-
-	totalMetricName := inputID + "." + "events_pipeline_total"
-	totalRaw := reg.Get(totalMetricName)
-	total, ok := totalRaw.(*monitoring.Uint)
-	require.Truef(t, ok,
-		"did not find metric '%s': "+
-			"could not cast metric to *monitoring.Uint, got: %T",
-		totalMetricName, totalRaw)
-
-	filteredMetricName := inputID + "." + "events_pipeline_filtered_total"
-	filteredRaw := reg.Get(filteredMetricName)
-	filtered, ok := filteredRaw.(*monitoring.Uint)
-	require.Truef(t, ok,
-		"did not find metric '%s': "+
-			"could not cast metric to *monitoring.Uint, got: %T",
-		filteredMetricName, filteredRaw)
-
-	publishedMetricName := inputID + "." + "events_pipeline_published_total"
-	publishedRaw := reg.Get(publishedMetricName)
-	published, ok := publishedRaw.(*monitoring.Uint)
-	require.Truef(t, ok,
-		"did not find metric '%s': "+
-			"could not cast metric to *monitoring.Uint, got: %T",
-		publishedMetricName, publishedRaw)
-
-	return total, filtered, published
 }
 
 type testProcessor struct {
@@ -536,4 +485,26 @@ func (p testProcessorSupporter) Processors() []string {
 // Close the processor supporter
 func (p testProcessorSupporter) Close() error {
 	return processors.Close(p.Processor)
+}
+
+type mockClientListener struct {
+	eventsTotal            int
+	eventsFiltered         int
+	eventsPublished        int
+	eventsDroppedOnPublish int
+}
+
+func (m *mockClientListener) Closing() {}
+func (m *mockClientListener) Closed()  {}
+func (m *mockClientListener) NewEvent() {
+	m.eventsTotal++
+}
+func (m *mockClientListener) Filtered() {
+	m.eventsFiltered++
+}
+func (m *mockClientListener) Published() {
+	m.eventsPublished++
+}
+func (m *mockClientListener) DroppedOnPublish(beat.Event) {
+	m.eventsDroppedOnPublish++
 }

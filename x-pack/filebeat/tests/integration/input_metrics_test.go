@@ -156,7 +156,6 @@ logging.level: debug
 
 	type inputMetric struct {
 		EventsPipelineTotal          int `json:"events_pipeline_total"`
-		EventsPipelineDroppedTotal   int `json:"events_pipeline_failed_total"`
 		EventsPipelineFilteredTotal  int `json:"events_pipeline_filtered_total"`
 		EventsPipelinePublishedTotal int `json:"events_pipeline_published_total"`
 
@@ -255,34 +254,45 @@ logging.level: debug
 			assert.Equal(t,
 				metrics.EventsPipelineTotal,
 				metrics.EventsPipelinePublishedTotal+
-					metrics.EventsPipelineFilteredTotal+
-					metrics.EventsPipelineDroppedTotal)
-			assert.Equal(t, metrics.EventsProcessedTotal, metrics.EventsPipelineTotal)
-			assert.Equal(t, 10, metrics.EventsProcessedTotal)
-			assert.Equal(t, 9, metrics.EventsPipelinePublishedTotal)
-			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal)
+					metrics.EventsPipelineFilteredTotal,
+				"filestream EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
+			assert.Equal(t, metrics.EventsProcessedTotal,
+				metrics.EventsPipelineTotal,
+				"filestream EventsPipelineTotal != EventsProcessedTotal")
+			assert.Equal(t, 10, metrics.EventsProcessedTotal,
+				"filestream EventsProcessedTotal")
+			assert.Equal(t, 9, metrics.EventsPipelinePublishedTotal,
+				"filestream EventsPipelinePublishedTotal")
+			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
+				"filestream EventsPipelineFilteredTotal")
 		},
 		celInputID: func(t *testing.T, metrics inputMetric) {
 			assert.Equal(t, "cel", metrics.Input)
 			assert.Equal(t,
 				metrics.EventsPipelineTotal,
 				metrics.EventsPipelinePublishedTotal+
-					metrics.EventsPipelineFilteredTotal+
-					metrics.EventsPipelineDroppedTotal)
-			assert.Equal(t, metrics.EventsPublishedTotal, metrics.EventsPipelineTotal)
+					metrics.EventsPipelineFilteredTotal,
+				"cel EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
+			assert.Equal(t, metrics.EventsPublishedTotal,
+				metrics.EventsPipelineTotal,
+				"cel EventsPublishedTotal != EventsPipelineTotal")
 			assert.Equal(t, 2, metrics.EventsPublishedTotal)
-			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal)
-			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal)
+			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal,
+				"cel EventsPipelinePublishedTotal")
+			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
+				"cel EventsPipelineFilteredTotal")
 		},
 		httpsjonInputID: func(t *testing.T, metrics inputMetric) {
 			assert.Equal(t, "httpjson", metrics.Input)
 			assert.Equal(t,
 				metrics.EventsPipelineTotal,
 				metrics.EventsPipelinePublishedTotal+
-					metrics.EventsPipelineFilteredTotal+
-					metrics.EventsPipelineDroppedTotal)
-			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal)
-			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal)
+					metrics.EventsPipelineFilteredTotal,
+				"httpjson EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
+			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal,
+				"httpjson EventsPipelinePublishedTotal")
+			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
+				"httpjson EventsPipelineFilteredTotal")
 		},
 	}
 
