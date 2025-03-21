@@ -61,7 +61,7 @@ To add the Beats repository for APT:
     sudo apt-get update && sudo apt-get install packetbeat
     ```
 
-5. To configure packetbeat to start automatically during boot, run:
+5. To configure Packetbeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable packetbeat
