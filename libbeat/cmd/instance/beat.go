@@ -1080,7 +1080,6 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// TODO: Should be eventually removed. This is not removed so that we do not break the existing dependency on global loggers
-	fmt.Println("configuring global logger")
 	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
