@@ -106,15 +106,15 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		event := common.MapStr{}
 
 		event["name"] = hs.Summary.Config.Name
-		event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)
-		event.Put("memory.used.bytes", int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024)
+		_, _ = event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)
+		_, _ = event.Put("memory.used.bytes", int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024)
 
 		if hs.Summary.Hardware != nil {
 			totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-			event.Put("cpu.total.mhz", totalCPU)
-			event.Put("cpu.free.mhz", int64(totalCPU)-int64(hs.Summary.QuickStats.OverallCpuUsage))
-			event.Put("memory.free.bytes", int64(hs.Summary.Hardware.MemorySize)-(int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024))
-			event.Put("memory.total.bytes", hs.Summary.Hardware.MemorySize)
+			_, _ = event.Put("cpu.total.mhz", totalCPU)
+			_, _ = event.Put("cpu.free.mhz", int64(totalCPU)-int64(hs.Summary.QuickStats.OverallCpuUsage))
+			_, _ = event.Put("memory.free.bytes", int64(hs.Summary.Hardware.MemorySize)-(int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024))
+			_, _ = event.Put("memory.total.bytes", hs.Summary.Hardware.MemorySize)
 		} else {
 			m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 		}
