@@ -30,12 +30,6 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev
 
-      - name: clrf fix
-        if: runner.os == 'Windows'
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-
       - name: golangci-lint
         env:
           CGO_ENABLED: 1
@@ -51,9 +45,7 @@ jobs:
           # which can lead to some frustration from developers who would like to
           # fix a single line in an existing codebase and the linter would force them
           # into fixing all linting issues in the whole file instead
-          args: --timeout=30m --whole-files
+          args: -v --timeout=30m --whole-files
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           only-new-issues: true
-
-          install-mode: "goinstall"
