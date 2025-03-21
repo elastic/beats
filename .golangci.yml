@@ -1,9 +1,9 @@
 # options for analysis running
 run:
+  concurrency: 0
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 15m
   build-tags:
-    - synthetics
     - integration
 
 issues:
@@ -35,7 +35,8 @@ issues:
         - typecheck
     # From mage we are printing to the console to ourselves
     - path: (.*magefile.go|.*dev-tools/mage/.*)
-      linters: forbidigo
+      linters: 
+        - forbidigo
 
 output:
   sort-results: true
@@ -59,7 +60,6 @@ linters:
     - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
     - bodyclose # checks whether HTTP response body is closed successfully
     - durationcheck # check for two durations multiplied together
-    - exportloopref # checks for pointers to enclosing loop variables
     - goimports # Goimports does everything that gofmt does. Additionally it checks unused imports
     - gosec # inspects source code for security problems
     - importas # enforces consistent import aliases
@@ -113,8 +113,6 @@ linters-settings:
     # Forbid the following identifiers
     forbid:
       - fmt.Print.* # too much log noise
-    # Exclude godoc examples from forbidigo checks.  Default is true.
-    exclude_godoc_examples: true
 
   goimports:
     local-prefixes: github.com/elastic
