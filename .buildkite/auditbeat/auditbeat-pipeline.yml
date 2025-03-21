@@ -182,20 +182,6 @@ steps:
           - github_commit_status:
               context: "auditbeat: Win 2022 Unit Tests"
 
-      - label: ":ubuntu: Auditbeat: Crosscompile"
-        command: |
-          make -C auditbeat crosscompile
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_2204_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        notify:
-          - github_commit_status:
-              context: "auditbeat: Crosscompile"
-
   - group: "Extended Tests"
     key: "auditbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
