@@ -89,6 +89,7 @@ func TestRegisterMetrics(t *testing.T) {
 
 			inputID := "input-id"
 			err := RegisterMetrics(inputID, reg)
+			defer UnregisterMetrics(inputID)
 			if tt.wantErr {
 				assert.ErrorContains(t, err, tt.wantErrMsg)
 			} else {
