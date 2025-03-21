@@ -124,6 +124,8 @@ func TestInitKibanaConfig(t *testing.T) {
 
 func TestEmptyMetaJson(t *testing.T) {
 	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logp.NewTestingLogger(t, "")
+	b.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
@@ -145,6 +147,8 @@ func TestEmptyMetaJson(t *testing.T) {
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
 	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logp.NewTestingLogger(t, "")
+	firstBeat.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
@@ -164,6 +168,7 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	secondBeat.Info.Logger = logger
 	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
 	err = secondBeat.loadMeta(metaPath)
 	require.NoError(t, err)

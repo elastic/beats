@@ -25,7 +25,7 @@ import (
 
 // doReexec is a noop on Windows, it only logs a message explaining it.
 func (b *Beat) doReexec() error {
-	logger := b.Logger.Named("ssl.cert.reloader")
+	logger := b.Info.Logger.Named("ssl.cert.reloader")
 	logger.Info("reloading certs/reexecing is not supported on %s. %s will not restart", runtime.GOOS, b.Info.Beat)
 	return nil
 }

@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 - Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
 
 *Auditbeat*
 
@@ -219,6 +220,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 
 *Heartbeat*
 
