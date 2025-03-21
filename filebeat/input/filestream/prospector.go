@@ -156,10 +156,10 @@ func (p *fileProspector) Init(
 
 			// Our current file (source) is in the registry, now we need to ensure
 			// this registry entry (resource) actually refers to our file. Sources
-			// are identified by path, however as log files rotate the same path
-			// can point to different files.
+			// are identified by path. However, as log files rotate the same path
+			// can point to a different file.
 			//
-			// So to ensure we're dealing with the resource from our current file,
+			// So, to ensure we're dealing with the resource from our current file,
 			// we use the old identifier to generate a registry key for the current
 			// file we're trying to migrate, if this key matches with the key in the
 			// registry, then we proceed to update the registry.
@@ -170,7 +170,7 @@ func (p *fileProspector) Init(
 				// If we cannot find the identifier, move on to the next entry
 				// some identifiers cannot be migrated
 				p.logger.Errorf(
-					"old file identity '%s' not found while migrating entry to"+
+					"old file identity '%s' not found while migrating entry to "+
 						"new file identity '%s'. If the file still exists, it will be re-ingested",
 					oldIdentifierName,
 					identifierName,
@@ -221,9 +221,9 @@ func (p *fileProspector) Init(
 		// Return early (do nothing) if:
 		//  - The old identifier is neither native, path or fingerprint
 		oldIdentifierName := fm.IdentifierName
-		if !(oldIdentifierName == nativeName ||
-			oldIdentifierName == pathName ||
-			oldIdentifierName == fingerprintName) {
+		if oldIdentifierName != nativeName &&
+			oldIdentifierName != pathName &&
+			oldIdentifierName != fingerprintName {
 			return "", nil
 		}
 
@@ -242,7 +242,7 @@ func (p *fileProspector) Init(
 			// If we cannot find the identifier, move on to the next entry
 			// some identifiers cannot be migrated
 			p.logger.Errorf(
-				"old file identity '%s' not found while taking over old states,"+
+				"old file identity '%s' not found while taking over old states, "+
 					"new file identity '%s'. If the file still exists, it will be re-ingested",
 				oldIdentifierName,
 				identifierName,

@@ -161,7 +161,7 @@ func (c *config) Validate() error {
 
 	if c.AllowIDDuplication && c.TakeOver.Enabled {
 		return errors.New("allow_deprecated_id_duplication and take_over " +
-			"cannot be eanbled at the same time")
+			"cannot be enabled at the same time")
 	}
 
 	if c.ID == "" && c.TakeOver.Enabled {
