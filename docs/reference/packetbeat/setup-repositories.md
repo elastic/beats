@@ -55,7 +55,7 @@ To add the Beats repository for APT:
     Simply delete the `deb-src` entry from the `/etc/apt/sources.list` file, and the installation should work as expected.
     :::
 
-4.  Run `apt-get update`, and the repository is ready for use. For example, you can install packetbeat by running:
+4.  Run `apt-get update`, and the repository is ready for use. For example, you can install Packetbeat by running:
 
     ```shell
     sudo apt-get update && sudo apt-get install packetbeat
