@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
 
 *Auditbeat*
@@ -28,7 +27,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Removed deprecated Cylance from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Removed deprecated Bluecoat from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
-- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Heartbeat*
 
@@ -54,7 +52,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Functionbeat*
 
-- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}43152[43152]
 
 *Elastic Logging Plugin*
 
@@ -77,7 +74,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- The Kafka output now drops events when there is an authorisation error {issue}42343[42343] {pull}42401[42401]
 
 *Auditbeat*
 
@@ -110,9 +106,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
-- Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
-- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
-- Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
 
 *Heartbeat*
 
@@ -130,26 +123,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
 - Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
 - Fix behavior of pagetypeinfo metrics {pull}39985[39985]
-- Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
-- Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
-- Remove excessive info-level logs in cgroups setup {pull}40491[40491]
-- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
-- Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
-- Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
-- Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
-- Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
-- Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
-- Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
-- [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
-- Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
-- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
-- Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
-- Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
-- Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
-- Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
-- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
-- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
-- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 
 *Osquerybeat*
 
@@ -177,7 +150,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
-- Update to Go 1.23.6. {pull}42705[42705]
 
 *Auditbeat*
 
@@ -224,7 +196,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
-- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 
 *Auditbeat*
 
@@ -301,6 +272,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
