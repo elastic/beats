@@ -37,9 +37,9 @@ docker pull docker.elastic.co/beats/packetbeat-wolfi:9.0.0-beta1
 
 You can use the [Cosign application](https://docs.sigstore.dev/cosign/installation/) to verify the Packetbeat Docker image signature.
 
-::::{warning}
-Version 9.0.0-beta1 of Packetbeat has not yet been released. No Docker image is currently available for Packetbeat 9.0.0-beta1.
-::::
+% ::::{warning}
+% Version 9.0.0-beta1 of Packetbeat has not yet been released. No Docker image is currently available for Packetbeat 9.0.0-beta1.
+% ::::
 
 
 ```sh

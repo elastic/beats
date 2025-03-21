@@ -37,9 +37,9 @@ docker pull docker.elastic.co/beats/metricbeat-wolfi:9.0.0-beta1
 
 You can use the [Cosign application](https://docs.sigstore.dev/cosign/installation/) to verify the Metricbeat Docker image signature.
 
-::::{warning}
-Version 9.0.0-beta1 of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat 9.0.0-beta1.
-::::
+% ::::{warning}
+% Version 9.0.0-beta1 of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat 9.0.0-beta1.
+% ::::
 
 
 ```sh
