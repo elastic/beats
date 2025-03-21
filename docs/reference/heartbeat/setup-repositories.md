@@ -106,7 +106,7 @@ To add the Beats repository for YUM:
     ```
     :::
 
-    Your repository is ready to use. For example, you can install heartbeat by running:
+    Your repository is ready to use. For example, you can install Heartbeat by running:
 
     ```shell subs=true
     sudo yum install heartbeat
