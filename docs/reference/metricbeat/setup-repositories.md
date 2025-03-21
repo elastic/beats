@@ -112,7 +112,7 @@ To add the Beats repository for YUM:
     sudo yum install metricbeat
     ```
 
-4. To configure metricbeat to start automatically during boot, run:
+4. To configure Metricbeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable metricbeat
