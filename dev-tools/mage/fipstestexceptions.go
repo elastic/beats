@@ -27,7 +27,12 @@ import (
 var AuditbeatExceptions []byte
 
 type ExpectedFIPSTestFailures struct {
-	Packages map[string][]string `yaml:"packages"`
+	Packages map[string][]TestSpecifier `yaml:"packages"` // Map of packages to test-list
+}
+
+type TestSpecifier struct {
+	Name string   `yaml:"name"` // Name of the test case
+	OS   []string `yaml:"os"`   // OSs the test should run on, an empty or missing list indicates all OSs
 }
 
 func ParseFIPSExceptions(p []byte) (ExpectedFIPSTestFailures, error) {

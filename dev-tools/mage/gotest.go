@@ -29,6 +29,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 	"time"
@@ -490,7 +491,9 @@ func checkFIPSExpectedErrors(fipsErrors ExpectedFIPSTestFailures, fileName strin
 	for packageName, pkg := range fipsErrors.Packages {
 		tests := make(map[string]bool)
 		for _, test := range pkg {
-			tests[test] = false
+			if len(test.OS) == 0 || slices.Contains(test.OS, runtime.GOOS) {
+				tests[test.Name] = false
+			}
 		}
 		expectedErrors[packageName] = tests
 	}
