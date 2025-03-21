@@ -61,7 +61,7 @@ To add the Beats repository for APT:
     sudo apt-get update && sudo apt-get install auditbeat
     ```
 
-5. To configure auditbeat to start automatically during boot, run:
+5. To configure Auditbeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable auditbeat
