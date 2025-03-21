@@ -25,10 +25,12 @@ import (
 	"os/exec"
 	"sort"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/prometheus/procfs"
 
@@ -71,6 +73,100 @@ var (
 		`type=EOE msg=audit(1492752520.441:8832):`,
 	}
 )
+
+func TestSetPID(t *testing.T) {
+	logp.TestingSetup()
+
+	cases := []struct {
+		clientMock    *MockNetlinkSendReceiver
+		controlMock   *MockNetlinkSendReceiver
+		name          string
+		expectedError bool
+		retries       int
+	}{
+		{
+			name: "enobufs-retry",
+			clientMock: NewMock().
+				returnSendValue(1).
+				returnReceiveError(syscall.ENOBUFS). // first recv fails
+				returnReceiveError(syscall.EAGAIN).  // second is eagain, indicating it would block
+				// now we retry the send
+				returnSendValue(1).
+				returnReceiveAckWithSeq(1),
+
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: false,
+			retries:       2,
+		},
+		{
+			name: "no-error",
+			clientMock: NewMock().
+				returnSendValue(0).
+				returnACK(),
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: false,
+			retries:       1,
+		},
+		{
+			name: "enobufs-retry-failure",
+			clientMock: NewMock().
+				returnSendValue(1).
+				returnReceiveError(syscall.ENOBUFS). // first recv fails
+				returnReceiveError(syscall.EAGAIN).  // second is eagain from the drain loop, indicating it would block
+				// now we retry the send with error again
+				returnSendValue(2).
+				returnReceiveError(syscall.ENOBUFS).
+				// drain, after two errors we'll return
+				returnReceiveError(syscall.EAGAIN),
+
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: true,
+			retries:       1,
+		},
+		{
+			name: "write-return-badfd",
+			clientMock: NewMock().
+				returnSendValue(1).
+				returnReceiveError(syscall.EBADFD), // non-recoverable error
+
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: true,
+			retries:       1,
+		},
+		{
+			name: "read-return-badfd",
+			clientMock: NewMock().
+				returnSendValue(1).
+				returnReceiveError(syscall.ENOBUFS). // first recv fails
+				returnReceiveError(syscall.EBADFD),  // non-recoverable error
+
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: true,
+			retries:       1,
+		},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			config := getConfig()
+			config["immutable"] = true
+
+			testMS := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
+			auditMetricSet, ok := testMS.(*MetricSet)
+			if !ok {
+				t.Fatalf("Expected *MetricSet but got %T", testMS)
+			}
+
+			auditMetricSet.control.Close()
+			auditMetricSet.control = &libaudit.AuditClient{Netlink: testCase.controlMock}
+			auditMetricSet.client.Close()
+			auditMetricSet.client = &libaudit.AuditClient{Netlink: testCase.clientMock}
+
+			err := auditMetricSet.setPID(testCase.retries)
+			require.Equal(t, testCase.expectedError, err != nil, "got error '%s', expected '%v'", err, testCase.expectedError)
+		})
+	}
+
+}
 
 func TestImmutable(t *testing.T) {
 	logp.TestingSetup()
