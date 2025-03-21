@@ -61,7 +61,7 @@ To add the Beats repository for APT:
     sudo apt-get update && sudo apt-get install heartbeat
     ```
 
-5. To configure heartbeat to start automatically during boot, run:
+5. To configure Heartbeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable heartbeat
