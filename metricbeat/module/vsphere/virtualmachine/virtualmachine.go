@@ -25,8 +25,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
-	"github.com/pkg/errors"
+	"github.com/pkg/errors" //nolint:gomodguard // don't fail CI in current PR
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/object"
 	"github.com/vmware/govmomi/property"
@@ -65,6 +66,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "virtualmachine", ms.Insecure)
 	return &MetricSet{
 		MetricSet:       ms,
 		GetCustomFields: config.GetCustomFields,
@@ -152,8 +155,8 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			if freeCPU < 0 {
 				freeCPU = 0
 			}
-			event.Put("cpu.total.mhz", totalCPU)
-			event.Put("cpu.free.mhz", freeCPU)
+			_, _ = event.Put("cpu.total.mhz", totalCPU)
+			_, _ = event.Put("cpu.free.mhz", freeCPU)
 		}
 
 		totalMemory := int64(vm.Summary.Config.MemorySizeMB) * 1024 * 1024
@@ -163,8 +166,8 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			if freeMemory < 0 {
 				freeMemory = 0
 			}
-			event.Put("memory.total.guest.bytes", totalMemory)
-			event.Put("memory.free.guest.bytes", freeMemory)
+			_, _ = event.Put("memory.total.guest.bytes", totalMemory)
+			_, _ = event.Put("memory.free.guest.bytes", freeMemory)
 		}
 
 		if host := vm.Summary.Runtime.Host; host != nil {
@@ -221,7 +224,7 @@ func getCustomFields(customFields []types.BaseCustomFieldValue, customFieldsMap 
 		if ok {
 			// If key has '.', is replaced with '_' to be compatible with ES2.x.
 			fmtKey := strings.Replace(key, ".", "_", -1)
-			outputFields.Put(fmtKey, customFieldString.Value)
+			_, _ = outputFields.Put(fmtKey, customFieldString.Value)
 		}
 	}
 
@@ -239,7 +242,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	var vm mo.VirtualMachine
 	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &vm)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving virtual machine information: %v", err)
+		return nil, fmt.Errorf("error retrieving virtual machine information: %v", err) //nolint // changing to %w makes tests to fail
 	}
 
 	if len(vm.Network) == 0 {
@@ -261,7 +264,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	var nets []mo.Network
 	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving network from virtual machine: %v", err)
+		return nil, fmt.Errorf("error retrieving network from virtual machine: %v", err) //nolint // changing to %w makes tests to fail
 	}
 
 	for _, net := range nets {
@@ -298,7 +301,7 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 	var hs mo.HostSystem
 	err := pc.RetrieveOne(ctx, ref, []string{"summary"}, &hs)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving host information: %v", err)
+		return nil, fmt.Errorf("error retrieving host information: %v", err) //nolint // changing to %w makes tests to fail
 	}
 	return &hs, nil
 }
