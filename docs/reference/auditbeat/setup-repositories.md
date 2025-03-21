@@ -46,7 +46,7 @@ To add the Beats repository for APT:
     :::
 
     :::{warning}
-    To add the Elastic repository, make sure that you use the `echo` method  shown in the example. Do not use `add-apt-repository` because it will add a `deb-src` entry, but we do not provide a source package.
+    To add the Elastic repository, make sure that you use the `echo` method shown in the example. Do not use `add-apt-repository` because it will add a `deb-src` entry, but we do not provide a source package.
 
     If you have added the `deb-src` entry by mistake, you will see an error like the following:
 
