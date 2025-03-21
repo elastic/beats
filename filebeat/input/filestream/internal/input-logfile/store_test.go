@@ -416,9 +416,9 @@ func TestSourceStoreTakeOver(t *testing.T) {
 	s := testOpenStore(t, "filestream", backend)
 	defer s.Release()
 	store := &sourceStore{
-		identifier:          &sourceIdentifier{"filestream::current-id::"},
-		previousIdentifiers: []*sourceIdentifier{{"filestream::previous-id::"}},
-		store:               s,
+		identifier:            &sourceIdentifier{"filestream::current-id::"},
+		identifiersToTakeOver: []*sourceIdentifier{{"filestream::previous-id::"}},
+		store:                 s,
 	}
 
 	store.TakeOver(func(v Value) (string, any) {

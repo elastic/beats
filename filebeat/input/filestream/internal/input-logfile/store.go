@@ -37,9 +37,14 @@ import (
 // sourceStore is a store which can access resources using the Source
 // from an input.
 type sourceStore struct {
-	identifier          *sourceIdentifier
-	previousIdentifiers []*sourceIdentifier
-	store               *store
+	// identifier is the sourceIdentifier used to generate IDs fro this store.
+	identifier *sourceIdentifier
+	// identifiersToTakeOver are sourceIdentifier from previous input instances
+	// that this sourceStore will take states over.
+	identifiersToTakeOver []*sourceIdentifier
+	// store is the underlying store that encapsulates
+	// the in-memory and persistent store.
+	store *store
 }
 
 // store encapsulates the persistent store and the in memory state store, that
@@ -165,11 +170,21 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}, nil
 }
 
-func newSourceStore(s *store, identifier *sourceIdentifier, previousIdentifiers []*sourceIdentifier) *sourceStore {
+// newSourceStore store returns a souceStore that will operate on the provided
+// store. identifier is required and is used to generate the ID for the
+// resources stored on store. identifiersToTakeOver is used by the TakeOver
+// method when taking over states from other Filestream inputs.
+// identifiersToTakeOver is optional and can be nil.
+func newSourceStore(
+	s *store,
+	identifier *sourceIdentifier,
+	identifiersToTakeOver []*sourceIdentifier,
+) *sourceStore {
+
 	return &sourceStore{
-		store:               s,
-		identifier:          identifier,
-		previousIdentifiers: previousIdentifiers,
+		store:                 s,
+		identifier:            identifier,
+		identifiersToTakeOver: identifiersToTakeOver,
 	}
 }
 
@@ -278,9 +293,22 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 	}
 }
 
+// TakeOver allows one Filestream input to take over states from other
+// Filestream inputs or the Log input. fn should return the new registry ID
+// and new CursorMeta. If fn returns an empty string, the entry is skipped.
+//
+// When fn returns a valid ID, the old resource is removed from both,
+// the in-memory and persistent store. The operations are synchronous.
+//
+// If the resource migrated was from the Log input, `TakeOver` will
+// remove it from the persistent store, however the Log input reigstrar
+// will write it back when Filebeat is shutting down. However,
+// there is a mechanism in place to detect this situation and avoid
+// migrating the same state over and over again.
+// See the comments on this method for more details.
 func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	matchPreviousFilestreamIDs := func(key string) bool {
-		for _, identifier := range s.previousIdentifiers {
+		for _, identifier := range s.identifiersToTakeOver {
 			if identifier.MatchesInput(key) {
 				return true
 			}
@@ -312,7 +340,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 	// We only iterate through the whole store if we're not migrating from
 	// a Filestream input
 	fromLogInput := map[string]logInputState{}
-	if len(s.previousIdentifiers) == 0 {
+	if len(s.identifiersToTakeOver) == 0 {
 		s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
 			if strings.HasPrefix(key, "filebeat::logs::") {
 				m := mapstr.M{}
@@ -338,15 +366,16 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 				//       if no Log input was ever started.
 				// This means that no matter what we do here, the states from
 				// the Log input are always re-written to disk.
-				// See: filebeat/registrar/registrar.go:144
+				// See: filebeat/registrar/registrar.go, deferred statement on
+				// `Registrar.Run`.
 				//
 				// However, there is a "reset state" code, that runs
 				// during the Registrar initialisation and sets the
 				// TTL to -2, once the Log input havesting that file starts
 				// the TTL is set to -1 (never expires) or the configured
 				// value.
-				// See: filebeat/registrar/registrar.go:296 (readStatesFrom) and
-				// filebeat/beater/filebeat.go:425 (registrar.Start())
+				// See: filebeat/registrar/registrar.go (readStatesFrom) and
+				// filebeat/beater/filebeat.go (registrar.Start())
 				//
 				// This means that while the Log input is running and the file
 				// has been active at any moment during the Filebeat's execution
@@ -416,9 +445,7 @@ func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
 			// acquire the same lock we hold, causing a deadlock.
 			// See store.remove for details.
 			// Fully remove the old resource from all stores.
-			//  - 1. Update the TLL, which soft-deletes it. This is the
-			//    mechanism used by store.remove. We cannot call store.remove
-			//    because it will acquire a lock we're holding.
+			//  - 1. Update the TTL, which soft-deletes it.
 			//  - 2. Remove the resource from the in-memory store
 			//  - 3. Finally, synchronously remove it from the disk store.
 			s.store.UpdateTTL(res, 0)

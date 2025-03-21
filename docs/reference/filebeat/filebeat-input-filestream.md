@@ -329,8 +329,11 @@ To take over states from other `filestream` inputs, set
 `take_over.enabled: true` and set `take_over.from_ids` to a list of
 existing `filestream` IDs you want to migrate files from.
 
+On both cases make sure the files you want this input to take over
+match the configured globs in `paths`.
+
 When `take_over.from_ids` is set, files are not taken over from `log`
-input. The migration is limited to `filestream` inputs only.
+inputs. The migration is limited to `filestream` inputs only.
 
 ```yaml
 take_over:

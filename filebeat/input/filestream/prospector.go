@@ -166,7 +166,7 @@ func (p *fileProspector) Init(
 			registryKey := v.Key()
 			oldIdentifier, ok := identifiersMap[oldIdentifierName]
 			if !ok {
-				// This should never happen, but just in case we properly handle it.
+				// This should never happen, but we properly handle it just in case.
 				// If we cannot find the identifier, move on to the next entry
 				// some identifiers cannot be migrated
 				p.logger.Errorf(
