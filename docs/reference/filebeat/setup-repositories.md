@@ -112,7 +112,7 @@ To add the Beats repository for YUM:
     sudo yum install filebeat
     ```
 
-4. To configure filebeat to start automatically during boot, run:
+4. To configure Filebeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable filebeat
