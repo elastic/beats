@@ -112,7 +112,7 @@ To add the Beats repository for YUM:
     sudo yum install packetbeat
     ```
 
-4. To configure packetbeat to start automatically during boot, run:
+4. To configure Packetbeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable packetbeat
