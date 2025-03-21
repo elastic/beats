@@ -15,18 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package inputs
+//go:build requirefips
+
+package flowhash
 
 import (
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/filebeat/input/winlog"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
-func osInputs(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
-	return []v2.Plugin{
-		winlog.Plugin(log, components),
-	}
+func TestCommunityID(t *testing.T) {
+	s := CommunityID.Hash(Flow{SourcePort: 1})
+	require.Empty(t, s)
 }

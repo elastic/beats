@@ -25,22 +25,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 )
-
-// Create constructors for most of the Beat processors.
-// Note that script is omitted to avoid nesting.
-var registry = processors.NewNamespace()
-
-// RegisterPlugin registeres processor plugins for the javascript processor.
-func RegisterPlugin(name string, c processors.Constructor) {
-	logp.L().Named("javascript").Debugf("Register script processor %s", name)
-
-	err := registry.Register(name, c)
-	if err != nil {
-		panic(err)
-	}
-}
 
 // beatProcessor wraps a processor for javascript.
 type beatProcessor struct {
@@ -113,7 +99,7 @@ func newConstructor(
 func Require(runtime *goja.Runtime, module *goja.Object) {
 	o := module.Get("exports").(*goja.Object)
 
-	for name, fn := range registry.Constructors() {
+	for name, fn := range registry.Registry.Constructors() {
 		o.Set(name, newConstructor(runtime, fn))
 	}
 

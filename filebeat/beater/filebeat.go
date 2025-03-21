@@ -24,7 +24,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
@@ -76,15 +75,7 @@ type Filebeat struct {
 	pipeline       beat.PipelineConnector
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
-
-type StateStore interface {
-	// Access returns the storage registry depending on the type.
-	// The value of typ is expected to have been obtained from
-	// cursor.InputManager.Type and represents the input type.
-	Access(typ string) (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
+type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {

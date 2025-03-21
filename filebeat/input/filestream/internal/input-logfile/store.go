@@ -148,10 +148,10 @@ type (
 // hook into store close for testing purposes
 var closeStore = (*store).close
 
-func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, error) {
+func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*store, error) {
 	ok := false
 
-	persistentStore, err := statestore.Access("")
+	persistentStore, err := statestore.StoreFor("")
 	if err != nil {
 		return nil, err
 	}

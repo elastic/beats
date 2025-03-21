@@ -15,18 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package inputs
+package registry
 
 import (
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/filebeat/input/winlog"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func osInputs(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
-	return []v2.Plugin{
-		winlog.Plugin(log, components),
+// Create constructors for most of the Beat processors.
+// Note that script is omitted to avoid nesting.
+var Registry = processors.NewNamespace()
+
+// RegisterPlugin registeres processor plugins for the javascript processor.
+func RegisterPlugin(name string, c processors.Constructor) {
+	logp.L().Named("javascript").Debugf("Register script processor %s", name)
+
+	err := Registry.Register(name, c)
+	if err != nil {
+		panic(err)
 	}
 }
