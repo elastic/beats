@@ -99,7 +99,7 @@ To add the Beats repository for YUM:
     ```
 
     :::{note}
-    The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0     license is also available. To install it, use the following `baseurl` in your `.repo` file:
+    The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0 license is also available. To install it, use the following `baseurl` in your `.repo` file:
 
     ```shell subs=true
     baseurl=https://artifacts.elastic.co/packages/oss-{{major-version}}/yum
