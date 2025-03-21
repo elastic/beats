@@ -336,7 +336,6 @@ toc:
               - file: filebeat/_step_2_enable_the_take_over_mode.md
               - file: filebeat/_step_3_use_new_option_names.md
               - file: filebeat/_step_4.md
-              - file: filebeat/_if_something_went_wrong.md
               - file: filebeat/_debugging_on_kibana.md
           - file: filebeat/migrate-from-deprecated-module.md
       - file: filebeat/filebeat-modules.md

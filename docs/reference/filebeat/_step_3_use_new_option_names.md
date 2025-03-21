@@ -15,7 +15,8 @@ The example configuration shown earlier needs to be adjusted as well:
 - type: filestream
   enabled: true
   id: my-java-collector
-  take_over: true
+  take_over:
+    enabled: true
   paths:
     - /var/log/java-exceptions*.log
   parsers:
@@ -29,7 +30,8 @@ The example configuration shown earlier needs to be adjusted as well:
 - type: filestream
   enabled: true
   id: my-application-input
-  take_over: true
+  take_over:
+    enabled: true
   paths:
     - /var/log/my-application*.json
   prospector.scanner.check_interval: 1m
@@ -40,7 +42,8 @@ The example configuration shown earlier needs to be adjusted as well:
 - type: filestream
   enabled: true
   id: my-old-files
-  take_over: true
+  take_over:
+    enabled: true
   paths:
     - /var/log/my-old-files*.log
   ignore_inactive: since_last_start
@@ -48,7 +51,7 @@ The example configuration shown earlier needs to be adjusted as well:
 
 |     |     |
 | --- | --- |
-| Option name in log input | Option name in filestream input |
+| **Option name in log input** | **Option name in filestream input** |
 | recursive_glob.enabled | prospector.scanner.recursive_glob |
 | harvester_buffer_size | buffer_size |
 | max_bytes | message_max_bytes |

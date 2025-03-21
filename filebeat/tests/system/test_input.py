@@ -65,21 +65,16 @@ class Test(BaseTest):
         self.wait_until(reg.exists)
         entries = [entry for entry in reg.load()]
 
-        # We got the latest entry for each key in the registry,
-        # this means 2 entries.
-        # They're ordered by the time of creation, so we can be sure the
-        # first uses the old, '.global' ID, and the second is the 'fixed' one
-        assert len(entries) == 2, "the registry must contain one entry with the '.globa' ID and another with the 'fixed' ID"
-        global_entry = entries[0]
-        fixed_entry = entries[1]
+        # The old state with the '.global' identifier is removed right away
+        # so the only active entry in the registry is the new one.
+        assert len(entries) == 1, "the registry must contain one entry with the 'fixed' ID"
+        fixed_entry = entries[0]
 
         # Compare the key excluding the inode and device ID bits
-        assert global_entry['_key'].startswith('filestream::.global::native::'), "old key must contain '.global' ID"
         assert fixed_entry['_key'].startswith(
             'filestream::test-fix-global-id::native::'), "key in registry does not have the expected ID"
 
         # Compare the TTL because it indicates if the entry has been 'removed' or not
-        assert global_entry['ttl'] == 0, "ttl must be 0 because that's the effect of 'removing' the entry from the registry"
         assert fixed_entry['ttl'] != 0, "ttl must not be 0 because the entry has been added recently"
 
     def test_ignore_older_files(self):
