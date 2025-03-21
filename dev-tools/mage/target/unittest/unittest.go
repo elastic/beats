@@ -51,6 +51,16 @@ func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
 }
 
+// GoUnitTestFIPS executes the Go unit tests with go 1.24's GODEBUG=fips140=only and the requirefips tag.
+func GoUnitTestFIPS(expectedErrors devtools.ExpectedFIPSTestFailures) error {
+	ctx := context.Background()
+	mg.SerialCtxDeps(ctx, goTestDeps...)
+
+	fipsArgs := devtools.DefaultGoTestUnitFIPSArgs()
+	fipsArgs.ExpectedFIPSErrors = expectedErrors
+	return devtools.GoTest(ctx, fipsArgs)
+}
+
 // GoUnitTest executes the Go unit tests.
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
