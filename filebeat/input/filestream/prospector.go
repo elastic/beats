@@ -159,7 +159,7 @@ func (p *fileProspector) Init(
 			// are identified by path, however as log files rotate the same path
 			// can point to different files.
 			//
-			// So to ensure we're dealing with the resource from our current file,
+			// So, to ensure we're dealing with the resource from our current file,
 			// we use the old identifier to generate a registry key for the current
 			// file we're trying to migrate, if this key matches with the key in the
 			// registry, then we proceed to update the registry.
