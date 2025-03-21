@@ -100,7 +100,7 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 		return err
 	}
 
-	if _, err := auth.Token(); err != nil {
+	if _, err := auth.Token(ctxtool.FromCanceller(ctx.Cancelation)); err != nil {
 		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", tenantID, err)
 	}
 
@@ -136,21 +136,22 @@ func (inp *o365input) Run(
 }
 
 func (inp *o365input) runOnce(
-	ctx v2.Context,
+	v2ctx v2.Context,
 	src cursor.Source,
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
 	stream := src.(*stream)
 	tenantID, contentType := stream.tenantID, stream.contentType
-	log := ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
+	log := v2ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
+	ctx := ctxtool.FromCanceller(v2ctx.Cancelation)
 
 	tokenProvider, err := inp.config.NewTokenProvider(stream.tenantID)
 	if err != nil {
 		return err
 	}
 
-	if _, err := tokenProvider.Token(); err != nil {
+	if _, err := tokenProvider.Token(ctx); err != nil {
 		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", stream.tenantID, err)
 	}
 
@@ -163,7 +164,7 @@ func (inp *o365input) runOnce(
 		poll.WithTokenProvider(tokenProvider),
 		poll.WithMinRequestInterval(delay),
 		poll.WithLogger(log),
-		poll.WithContext(ctxtool.FromCanceller(ctx.Cancelation)),
+		poll.WithContext(ctx),
 		poll.WithRequestDecorator(
 			autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+pluginName, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())),
 			autorest.WithQueryParameters(mapstr.M{
