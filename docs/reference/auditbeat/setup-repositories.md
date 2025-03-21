@@ -112,7 +112,7 @@ To add the Beats repository for YUM:
     sudo yum install auditbeat
     ```
 
-4. To configure auditbeat to start automatically during boot, run:
+4. To configure Auditbeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable auditbeat
