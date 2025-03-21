@@ -112,7 +112,7 @@ To add the Beats repository for YUM:
     sudo yum install heartbeat
     ```
 
-4. To configure heartbeat to start automatically during boot, run:
+4. To configure Heartbeat to start automatically during boot, run:
 
     ```
     sudo systemctl enable heartbeat
