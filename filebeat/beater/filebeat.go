@@ -24,7 +24,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/elastic/beats/v7/filebeat/backup"
 	"github.com/elastic/beats/v7/filebeat/channel"
@@ -78,15 +77,7 @@ type Filebeat struct {
 	pipeline       beat.PipelineConnector
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
-
-type StateStore interface {
-	// Access returns the storage registry depending on the type.
-	// The value of typ is expected to have been obtained from
-	// cursor.InputManager.Type and represents the input type.
-	Access(typ string) (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
+type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -328,7 +319,15 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 				return nil
 			}
 
-			stateStore.notifier.Notify(outCfg.Config())
+			// Create a new config with the output configuration. Since r.Config is a pointer, a copy is required to
+			// avoid concurrent map read and write.
+			// See https://github.com/elastic/beats/issues/42815
+			configCopy, err := conf.NewConfigFrom(outCfg.Config())
+			if err != nil {
+				logp.Err("Failed to create a new config from the output config: %v", err)
+				return nil
+			}
+			stateStore.notifier.Notify(configCopy)
 			return nil
 		})
 	}
@@ -555,7 +554,7 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.Pip
 
 // some of the filestreams might want to take over the loginput state
 // if their `take_over` flag is set to `true`.
-func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
+func processLogInputTakeOver(stateStore statestore.States, config *cfg.Config) error {
 	inputs, err := fetchInputConfiguration(config)
 	if err != nil {
 		return fmt.Errorf("Failed to fetch input configuration when attempting take over: %w", err)
@@ -564,7 +563,7 @@ func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
 		return nil
 	}
 
-	store, err := stateStore.Access("")
+	store, err := stateStore.StoreFor("")
 	if err != nil {
 		return fmt.Errorf("Failed to access state when attempting take over: %w", err)
 	}

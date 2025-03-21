@@ -307,12 +307,15 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	if settings.DisableConfigResolver {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
-	} else {
+	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
-		config.OverwriteConfigOpts(configOpts(store))
+		// note that if the store is nil it should be excluded as an option
+		config.OverwriteConfigOpts(configOptsWithKeystore(store))
 	}
 
 	b.Beat.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
+
+	b.SetupRegistry()
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
 	if err != nil {
@@ -464,12 +467,17 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	uniq_reg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
 
+	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
+	if reg == nil {
+		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
+	}
+
 	tel := uniq_reg.GetRegistry("state")
 	if tel == nil {
 		tel = uniq_reg.NewRegistry("state")
 	}
 	monitors := pipeline.Monitors{
-		Metrics:   uniq_reg,
+		Metrics:   reg,
 		Telemetry: tel,
 		Logger:    logp.L().Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
@@ -571,7 +579,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	// Report central management state
-	mgmt := monitoring.GetNamespace("state").GetRegistry().NewRegistry("management")
+	mgmt := b.Info.Monitoring.StateRegistry.NewRegistry("management")
 	monitoring.NewBool(mgmt, "enabled").Set(b.Manager.Enabled())
 
 	debugf("Initializing output plugins")
@@ -589,7 +597,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	var publisher *pipeline.Pipeline
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
-		Telemetry: monitoring.GetNamespace("state").GetRegistry(),
+		Telemetry: b.Info.Monitoring.StateRegistry,
 		Logger:    logp.L().Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
@@ -654,14 +662,14 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	svc.BeforeRun()
 	defer svc.Cleanup()
 
-	b.registerMetrics()
+	b.RegisterMetrics()
 
 	// Start the API Server before the Seccomp lock down, we do this so we can create the unix socket
 	// set the appropriate permission on the unix domain file without having to whitelist anything
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, monitoring.GetNamespace)
+		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger(""), b.Config.HTTP, api.NamespaceLookupFunc())
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
@@ -762,46 +770,43 @@ func (b *Beat) reexec() error {
 	return b.doReexec()
 }
 
-// registerMetrics registers metrics with the internal monitoring API. This data
+// RegisterMetrics registers metrics with the internal monitoring API. This data
 // is then exposed through the HTTP monitoring endpoint (e.g. /info and /state)
 // and/or pushed to Elasticsearch through the x-pack monitoring feature.
-func (b *Beat) registerMetrics() {
+func (b *Beat) RegisterMetrics() {
 	// info
-	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
-	monitoring.NewString(infoRegistry, "version").Set(b.Info.Version)
-	monitoring.NewString(infoRegistry, "beat").Set(b.Info.Beat)
-	monitoring.NewString(infoRegistry, "name").Set(b.Info.Name)
-	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
-	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
-	monitoring.NewString(infoRegistry, "binary_arch").Set(runtime.GOARCH)
-	monitoring.NewString(infoRegistry, "build_commit").Set(version.Commit())
-	monitoring.NewTimestamp(infoRegistry, "build_time").Set(version.BuildTime())
-	monitoring.NewBool(infoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "version").Set(b.Info.Version)
+	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "beat").Set(b.Info.Beat)
+	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "name").Set(b.Info.Name)
+	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
+	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "binary_arch").Set(runtime.GOARCH)
+	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "build_commit").Set(version.Commit())
+	monitoring.NewTimestamp(b.Info.Monitoring.InfoRegistry, "build_time").Set(version.BuildTime())
+	monitoring.NewBool(b.Info.Monitoring.InfoRegistry, "elastic_licensed").Set(b.Info.ElasticLicensed)
 
 	// Add user metadata data asynchronously (on Windows the lookup can take up to 60s).
 	go func() {
 		if u, err := user.Current(); err != nil {
 			// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
 			// if the user set securityContext.runAsUser to an arbitrary value.
-			monitoring.NewString(infoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
-			monitoring.NewString(infoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
+			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uid").Set(strconv.Itoa(os.Getuid()))
+			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "gid").Set(strconv.Itoa(os.Getgid()))
 		} else {
-			monitoring.NewString(infoRegistry, "username").Set(u.Username)
-			monitoring.NewString(infoRegistry, "uid").Set(u.Uid)
-			monitoring.NewString(infoRegistry, "gid").Set(u.Gid)
+			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "username").Set(u.Username)
+			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "uid").Set(u.Uid)
+			monitoring.NewString(b.Info.Monitoring.InfoRegistry, "gid").Set(u.Gid)
 		}
 	}()
 
-	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-
 	// state.service
-	serviceRegistry := stateRegistry.NewRegistry("service")
+	serviceRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("service")
 	monitoring.NewString(serviceRegistry, "version").Set(b.Info.Version)
 	monitoring.NewString(serviceRegistry, "name").Set(b.Info.Beat)
 	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
 
 	// state.beat
-	beatRegistry := stateRegistry.NewRegistry("beat")
+	beatRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("beat")
 	monitoring.NewString(beatRegistry, "name").Set(b.Info.Name)
 }
 
@@ -809,28 +814,10 @@ func (b *Beat) RegisterHostname(useFQDN bool) {
 	hostname := b.Info.FQDNAwareHostname(useFQDN)
 
 	// info.hostname
-	var infoRegistry *monitoring.Registry
-	if b.Info.Monitoring.Namespace != nil {
-		infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("info")
-		if infoRegistry == nil {
-			infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("info")
-		}
-	} else {
-		infoRegistry = monitoring.GetNamespace("info").GetRegistry()
-	}
-	monitoring.NewString(infoRegistry, "hostname").Set(hostname)
+	monitoring.NewString(b.Info.Monitoring.InfoRegistry, "hostname").Set(hostname)
 
 	// state.host
-	var stateRegistry *monitoring.Registry
-	if b.Info.Monitoring.Namespace != nil {
-		stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("state")
-		if stateRegistry == nil {
-			stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("state")
-		}
-	} else {
-		stateRegistry = monitoring.GetNamespace("state").GetRegistry()
-	}
-	monitoring.NewFunc(stateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
+	monitoring.NewFunc(b.Info.Monitoring.StateRegistry, "host", host.ReportInfo(hostname), monitoring.Report)
 }
 
 // TestConfig check all settings are ok and the beat can be run
@@ -970,6 +957,41 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
+func (b *Beat) SetupRegistry() {
+	var infoRegistry *monitoring.Registry
+	if b.Info.Monitoring.Namespace != nil {
+		infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("info")
+		if infoRegistry == nil {
+			infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("info")
+		}
+	} else {
+		infoRegistry = monitoring.GetNamespace("info").GetRegistry()
+	}
+	b.Info.Monitoring.InfoRegistry = infoRegistry
+
+	var stateRegistry *monitoring.Registry
+	if b.Info.Monitoring.Namespace != nil {
+		stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("state")
+		if stateRegistry == nil {
+			stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("state")
+		}
+	} else {
+		stateRegistry = monitoring.GetNamespace("state").GetRegistry()
+	}
+	b.Info.Monitoring.StateRegistry = stateRegistry
+
+	var statsRegistry *monitoring.Registry
+	if b.Info.Monitoring.Namespace != nil {
+		statsRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("stats")
+		if statsRegistry == nil {
+			statsRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("stats")
+		}
+	} else {
+		statsRegistry = monitoring.GetNamespace("stats").GetRegistry()
+	}
+	b.Info.Monitoring.StatsRegistry = statsRegistry
+}
+
 // handleFlags converts -flag to --flags, parses the command line
 // flags, and it invokes the HandleFlags callback if implemented by
 // the Beat.
@@ -992,6 +1014,8 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
 
+	b.SetupRegistry()
+
 	if err := initPaths(cfg); err != nil {
 		return err
 	}
@@ -1005,9 +1029,10 @@ func (b *Beat) configure(settings Settings) error {
 
 	if settings.DisableConfigResolver {
 		config.OverwriteConfigOpts(obfuscateConfigOpts())
-	} else {
+	} else if store != nil {
 		// TODO: Allow the options to be more flexible for dynamic changes
-		config.OverwriteConfigOpts(configOpts(store))
+		// note that if the store is nil it should be excluded as an option
+		config.OverwriteConfigOpts(configOptsWithKeystore(store))
 	}
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
@@ -1514,8 +1539,7 @@ func (b *Beat) registerClusterUUIDFetching() {
 
 // Build and return a callback to fetch the Elasticsearch cluster_uuid for monitoring
 func (b *Beat) clusterUUIDFetchingCallback() elasticsearch.ConnectCallback {
-	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-	elasticsearchRegistry := stateRegistry.NewRegistry("outputs.elasticsearch")
+	elasticsearchRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("outputs.elasticsearch")
 	clusterUUIDRegVar := monitoring.NewString(elasticsearchRegistry, "cluster_uuid")
 
 	callback := func(esClient *eslegclient.Connection) error {
@@ -1552,8 +1576,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 
 	// Expose monitoring.cluster_uuid in state API
 	if monitoringClusterUUID != "" {
-		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
-		monitoringRegistry := stateRegistry.NewRegistry("monitoring")
+		monitoringRegistry := b.Info.Monitoring.StateRegistry.NewRegistry("monitoring")
 		clusterUUIDRegVar := monitoring.NewString(monitoringRegistry, "cluster_uuid")
 		clusterUUIDRegVar.Set(monitoringClusterUUID)
 	}
@@ -1668,9 +1691,9 @@ func (b *Beat) logSystemInfo(log *logp.Logger) {
 	}
 }
 
-// configOpts returns ucfg config options with a resolver linked to the current keystore.
+// configOptsWithKeystore returns ucfg config options with a resolver linked to the current keystore.
 // Refactor to allow insert into the config option array without having to redefine everything
-func configOpts(store keystore.Keystore) []ucfg.Option {
+func configOptsWithKeystore(store keystore.Keystore) []ucfg.Option {
 	return []ucfg.Option{
 		ucfg.PathSep("."),
 		ucfg.Resolve(keystore.ResolverWrap(store)),
@@ -1686,13 +1709,6 @@ func obfuscateConfigOpts() []ucfg.Option {
 		ucfg.PathSep("."),
 		ucfg.ResolveNOOP,
 	}
-}
-
-// LoadKeystore returns the appropriate keystore based on the configuration.
-func LoadKeystore(cfg *config.C, name string) (keystore.Keystore, error) {
-	keystoreCfg, _ := cfg.Child("keystore", -1)
-	defaultPathConfig := paths.Resolve(paths.Data, fmt.Sprintf("%s.keystore", name))
-	return keystore.Factory(keystoreCfg, defaultPathConfig, common.IsStrictPerms())
 }
 
 func InitKibanaConfig(beatConfig beatConfig) *config.C {
