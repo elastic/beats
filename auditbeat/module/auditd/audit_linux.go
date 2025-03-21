@@ -434,7 +434,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 		}
 	}
 
-	return fmt.Errorf("could not set PID for audit process after %d attempts", setPIDMaxRetries)
+	return fmt.Errorf("could not set PID for audit process after %d attempts", retries)
 }
 
 func (ms *MetricSet) updateKernelLostMetric(lost uint32) {
