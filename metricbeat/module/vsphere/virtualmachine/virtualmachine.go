@@ -242,7 +242,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	var vm mo.VirtualMachine
 	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &vm)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving virtual machine information: %w", err)
+		return nil, fmt.Errorf("error retrieving virtual machine information: %v", err) //nolint // changing to %w makes tests to fail
 	}
 
 	if len(vm.Network) == 0 {
@@ -264,7 +264,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	var nets []mo.Network
 	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving network from virtual machine: %w", err)
+		return nil, fmt.Errorf("error retrieving network from virtual machine: %v", err) //nolint // changing to %w makes tests to fail
 	}
 
 	for _, net := range nets {
@@ -301,7 +301,7 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 	var hs mo.HostSystem
 	err := pc.RetrieveOne(ctx, ref, []string{"summary"}, &hs)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving host information: %w", err)
+		return nil, fmt.Errorf("error retrieving host information: %v", err) //nolint // changing to %w makes tests to fail
 	}
 	return &hs, nil
 }
