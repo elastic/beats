@@ -105,7 +105,7 @@ func (c *client) publish(e beat.Event) {
 
 	c.eventListener.AddEvent(e, publish)
 	if !publish {
-		c.onFilteredOut(e)
+		c.onFilteredOut()
 		return
 	}
 
@@ -182,7 +182,7 @@ func (c *client) onPublished() {
 	}
 }
 
-func (c *client) onFilteredOut(e beat.Event) {
+func (c *client) onFilteredOut() {
 	c.observer.filteredEvent()
 }
 

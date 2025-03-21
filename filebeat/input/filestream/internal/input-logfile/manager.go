@@ -163,7 +163,6 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
 	}
 
-	metricsID := settings.ID
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
 		duplicatedInput := map[string]any{}
@@ -181,7 +180,6 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 				" input will start only because "+
 				"'allow_deprecated_id_duplication' is set to true",
 				settings.ID)
-			metricsID = ""
 		} else {
 			cim.Logger.Errorw(
 				fmt.Sprintf(
@@ -240,7 +238,6 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		manager:          cim,
 		ackCH:            cim.ackCH,
 		userID:           settings.ID,
-		metricsID:        metricsID,
 		prospector:       prospector,
 		harvester:        harvester,
 		sourceIdentifier: sourceIdentifier,

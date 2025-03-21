@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Pipeline provides access to libbeat event publishing by creating a Client
@@ -60,6 +61,10 @@ type ClientConfig struct {
 
 	// ClientListener configures callbacks for monitoring pipeline clients
 	ClientListener ClientListener
+
+	// InputMetricsRegistry is the metrics registry used to aggregate pipeline
+	// metrics per input.
+	InputMetricsRegistry *monitoring.Registry
 }
 
 // EventListener can be registered with a Client when connecting to the pipeline.
@@ -76,14 +81,14 @@ type EventListener interface {
 	// This allows the ACKer to do some bookkeeping for dropped events.
 	AddEvent(event Event, published bool)
 
-	// ACK Events from the output and pipeline queue are forwarded to ACKEvents.
+	// ACKEvents ack events from the output and pipeline queue are forwarded to ACKEvents.
 	// The number of reported events only matches the known number of events downstream.
 	// ACKers might need to keep track of dropped events by themselves.
 	ACKEvents(n int)
 
 	// ClientClosed informs the ACKer that the Client used to publish to the pipeline has been closed.
 	// No new events should be published anymore. The ACKEvents method still will be called as long
-	// as long as there are pending events for the client in the pipeline. The Close signal can be used
+	// as there are pending events for the client in the pipeline. The Close signal can be used
 	// to suppress any ACK event propagation if required.
 	// Close might be called from another go-routine than AddEvent and ACKEvents.
 	ClientClosed()
@@ -95,7 +100,7 @@ type ProcessingConfig struct {
 	// EventMetadata configures additional fields/tags to be added to published events.
 	EventMetadata mapstr.EventMetadata
 
-	// Meta provides additional meta data to be added to the Meta field in the beat.Event
+	// Meta provides additional metadata to be added to the Meta field in the beat.Event
 	// structure.
 	Meta mapstr.M
 
