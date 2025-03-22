@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -93,14 +94,18 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	integration.GenerateLogFile(t, logFilePath, 10, false)
 
 	// 4. Wait for Filebeat to start scanning for files
-	//
 	filebeat.WaitForLogs(
 		fmt.Sprintf("A new file %s has been found", logFilePath),
 		10*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
 	filebeat.WaitForLogs(
-		fmt.Sprintf("Reader was closed. Closing. Path='%s", logFilePath),
+		fmt.Sprintf("File is inactive. Closing. Path='%s'", logFilePath),
+		10*time.Second,
+		"File did not became inactive")
+
+	filebeat.WaitForLogs(
+		fmt.Sprintf("Closed reader. Path='%s'", logFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
 	// 5. Now that the reader has been closed, nothing is holding the state
@@ -503,6 +508,107 @@ logging:
 
 	requirePublishedEvents(t, filebeat, 220, outputFile)
 	requireRegistryEntryRemoved(t, workDir, "native")
+}
+
+func TestFilestreamDelete(t *testing.T) {
+	testCases := map[string]struct {
+		configTmpl string
+		msgs       []string
+	}{
+		"EOF": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+		},
+		"Inactive": {
+			configTmpl: "inactive.yml",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			s, es, _ := integration.StartMockES(t, 0, 100, 0, 0, 0)
+			defer s.Close()
+
+			testDataPath, err := filepath.Abs("./testdata")
+			if err != nil {
+				t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+			}
+
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+			workDir := filebeat.TempDir()
+
+			logFile := filepath.Join(workDir, "log.log")
+			integration.GenerateLogFile(t, logFile, 100, false)
+
+			vars := map[string]any{
+				"homePath": workDir,
+				"logfile":  logFile,
+				"testdata": testDataPath,
+				"esHost":   s.Listener.Addr(),
+			}
+			cfgYAML := getConfig(t, vars, "delete", tc.configTmpl)
+			filebeat.WriteConfigFile(cfgYAML)
+			filebeat.Start()
+
+			for _, msgFmt := range tc.msgs {
+				msg := fmt.Sprintf(msgFmt, logFile)
+				filebeat.WaitForLogs(
+					msg,
+					10*time.Second,
+					"did not find '%s' in the logs",
+					msg,
+				)
+			}
+
+			// Wait a few times for the 'not finished' logs
+			notFinishedMsg := fmt.Sprintf(
+				"not all events from '%s' have been published, "+
+					"waiting before removing the file",
+				logFile)
+			for i := range 2 {
+				filebeat.WaitForLogs(
+					notFinishedMsg,
+					10*time.Second,
+					"[%d] Filebeat did not wait for the resource to be finished",
+					i,
+				)
+			}
+
+			if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
+				t.Fatalf("cannot update mock-es odds: %s", err)
+			}
+
+			msg := fmt.Sprintf("File %s has been removed", logFile)
+			filebeat.WaitForLogs(msg, 30*time.Second, "log file '%s' was not removed", logFile)
+		})
+	}
+}
+
+// getConfig renders the template in testdata/<folder>/<tmplPath> using vars
+func getConfig(t *testing.T, vars map[string]any, folder, tmplPath string) string {
+	t.Helper()
+	tmpl := template.Must(
+		template.ParseFiles(
+			filepath.Join("testdata", folder, tmplPath)))
+
+	str := strings.Builder{}
+	if err := tmpl.Execute(&str, vars); err != nil {
+		t.Fatalf("cannot execute template: %s", err)
+	}
+
+	ret := str.String()
+	return ret
 }
 
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {

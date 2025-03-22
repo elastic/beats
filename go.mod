@@ -227,6 +227,7 @@ require (
 	go.opentelemetry.io/collector/otelcol v0.114.0
 	go.opentelemetry.io/collector/pdata v1.20.0
 	go.opentelemetry.io/collector/receiver v0.114.0
+	go.opentelemetry.io/otel/sdk/metric v1.32.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.29.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
@@ -456,7 +457,6 @@ require (
 	go.opentelemetry.io/otel/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.7.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v1.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
@@ -493,3 +493,5 @@ replace (
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20240913150833-a945473a8f25
 )
+
+replace github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015 => github.com/belimawr/mock-es v0.0.0-20250321210139-a616e145f79e

@@ -22,6 +22,7 @@ package filestream
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -1159,4 +1160,52 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+func TestFilestreamDelete(t *testing.T) {
+	testCases := map[string]map[string]any{
+		"on EOF": {
+			"prospector.scanner.check_interval":     "1s",
+			"close.reader.on_eof":                   true,
+			"delete.on_close.eof":                   true,
+			"prospector.scanner.fingerprint.length": 64,
+		},
+		"on Inactive": {
+			"prospector.scanner.check_interval":     "1s",
+			"close.on_state_change.inactive":        "1s",
+			"delete.on_close.inactive":              true,
+			"prospector.scanner.fingerprint.length": 64,
+		},
+	}
+
+	for name, conf := range testCases {
+		t.Run(name, func(t *testing.T) {
+			env := newInputTestingEnvironment(t)
+			logfile := strings.ReplaceAll(t.Name(), "/", "_") + ".log"
+			conf["id"] = "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+			conf["paths"] = []string{env.abspath(logfile)}
+			inp := env.mustCreateInput(conf)
+
+			testlines := bytes.NewBuffer(nil)
+			for i := range 10 {
+				fmt.Fprintf(testlines, "[%02d] sample log line\n", i)
+			}
+			env.mustWriteToFile(logfile, testlines.Bytes())
+
+			ctx, cancelInput := context.WithCancel(context.Background())
+			env.startInput(ctx, inp)
+			defer cancelInput()
+
+			env.waitUntilEventCount(10)
+			logFile := env.abspath(logfile)
+			require.Eventuallyf(t,
+				func() bool {
+					_, err := os.Stat(logFile)
+					return errors.Is(err, os.ErrNotExist)
+				},
+				10*time.Second,
+				time.Second,
+				"%q was not deleted", logFile)
+		})
+	}
 }

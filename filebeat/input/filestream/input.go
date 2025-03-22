@@ -31,6 +31,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -63,6 +64,7 @@ type filestream struct {
 	readerConfig    readerConfig
 	encodingFactory encoding.EncodingFactory
 	closerConfig    closerConfig
+	deleterConfig   deleterConfig
 	parsers         parser.Config
 	takeOver        bool
 }
@@ -87,8 +89,23 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 
 func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 	config := defaultConfig()
+	defaultInactive := config.Close.OnStateChange.Inactive
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
+	}
+
+	if config.Delete.OnClose.Inactive {
+		// This means the `close.on_state_change.inactive` is either not set or
+		// it is set to the default value, in either case, overwrite it to
+		// 30min
+		if config.Close.OnStateChange.Inactive == defaultInactive {
+			logp.
+				L().
+				Named("filestream").
+				Info("setting 'close.on_state_change.inactive' to 30min" +
+					" because 'delete.on_close.inactive' is true.")
+			config.Close.OnStateChange.Inactive = 30 * time.Minute
+		}
 	}
 
 	prospector, err := newProspector(config)
@@ -107,6 +124,7 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		closerConfig:    config.Close,
 		parsers:         config.Reader.Parsers,
 		takeOver:        config.TakeOver,
+		deleterConfig:   config.Delete,
 	}
 
 	return prospector, filestream, nil
@@ -168,7 +186,109 @@ func (inp *filestream) Run(
 
 	// The caller of Run already reports the error and filters out errors that
 	// must not be reported, like 'context cancelled'.
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	err = inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
+	if err != nil {
+		// First handle actual errors
+		if !errors.Is(err, io.EOF) && !errors.Is(err, ErrInactive) {
+			return fmt.Errorf("error reading from source: %w", err)
+		}
+
+		// Now handle EOF and inactive for file removal
+		deleteFile := false
+		switch {
+		case errors.Is(err, io.EOF) && inp.deleterConfig.OnClose.EOF:
+			log.Infof(
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+				fs.newPath,
+			)
+			deleteFile = true
+		case errors.Is(err, ErrInactive) && inp.deleterConfig.OnClose.Inactive:
+			log.Infof(
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+				fs.newPath,
+			)
+			deleteFile = true
+		}
+
+		if deleteFile {
+			if err := inp.deleteFile(ctx, log, cursor, fs); err != nil {
+				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (inp *filestream) deleteFile(
+	ctx input.Context,
+	logger *logp.Logger,
+	cursor loginp.Cursor,
+	fs fileSource,
+) error {
+
+	bkoff := backoff.NewExpBackoff(ctx.Cancelation.Done(), time.Second, time.Minute)
+	// Wait until the resource is finished.
+	// The resource is finished when all events are acknowledged by the output.
+	// If it is not finished, this usually means one of two things:
+	//   - The output is down
+	//   - Filebeat is experiencing back pressure
+	// Either way, we wait until all events have been published.
+	for !cursor.Finished() {
+		if !bkoff.Wait() {
+			// This means that context was cancelled and the backoff
+			//  returned early
+			return ctx.Cancelation.Err()
+		}
+		logger.Debugf(
+			"not all events from '%s' have been published, "+
+				"waiting before removing the file",
+			fs.newPath)
+	}
+	logger.Debugf("'%s' finished", fs.newPath)
+
+	if err := os.Remove(fs.newPath); err != nil {
+		// The first try at removing the file failed,
+		// retry with a constant backoff
+		lastTry := time.Now()
+
+		maxWait := inp.deleterConfig.Backoff.Max
+		ticker := time.NewTicker(inp.deleterConfig.Backoff.Init)
+		defer ticker.Stop()
+
+		retries := 0
+		for maxWait >= 0 {
+			logger.Errorf(
+				"could not remove '%s', retrying in %s. Error: %s",
+				fs.newPath,
+				inp.deleterConfig.Backoff.Init.String(),
+				err,
+			)
+
+			select {
+			case <-ticker.C:
+				retries++
+				if err := os.Remove(fs.newPath); err == nil {
+					logger.Infof("'%s' removed", fs.newPath)
+					return nil
+				}
+				now := time.Now()
+				maxWait -= now.Sub(lastTry)
+				lastTry = now
+
+			case <-ctx.Cancelation.Done():
+				return ctx.Cancelation.Err()
+			}
+		}
+
+		return fmt.Errorf(
+			"cannot remove '%s' after %d retries. Last error: %w",
+			fs.newPath,
+			retries,
+			err)
+	}
+
+	return nil
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -369,6 +489,12 @@ func (inp *filestream) readFromSource(
 				log.Infof("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
+				if inp.deleterConfig.OnClose.EOF {
+					return err
+				}
+			} else if errors.Is(err, ErrInactive) {
+				log.Debugf("File is inactive. Closing. Path='%s'", path)
+				return err
 			} else {
 				log.Errorf("Read line error: %v", err)
 				metrics.ProcessingErrors.Inc()

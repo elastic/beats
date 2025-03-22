@@ -49,10 +49,21 @@ type config struct {
 	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
 	Rotation       *conf.Namespace    `config:"rotation"`
 	TakeOver       bool               `config:"take_over"`
+	Delete         deleterConfig      `config:"delete"`
 
 	// AllowIDDuplication is used by InputManager.Create
 	// (see internal/input-logfile/manager.go).
 	AllowIDDuplication bool `config:"allow_deprecated_id_duplication"`
+}
+
+type deleterConfig struct {
+	OnClose deleterReasonConfig `config:"on_close"`
+	Backoff backoffConfig       `config:"backoff"`
+}
+
+type deleterReasonConfig struct {
+	EOF      bool `config:"eof"`
+	Inactive bool `config:"inactive"`
 }
 
 type closerConfig struct {
@@ -110,6 +121,7 @@ func defaultConfig() config {
 		CleanRemoved:   true,
 		HarvesterLimit: 0,
 		IgnoreOlder:    0,
+		Delete:         defaultDeleterConfig(),
 	}
 }
 
@@ -138,6 +150,15 @@ func defaultReaderConfig() readerConfig {
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
 		Tail:           false,
+	}
+}
+
+func defaultDeleterConfig() deleterConfig {
+	return deleterConfig{
+		Backoff: backoffConfig{
+			Init: 1 * time.Second,
+			Max:  10 * time.Second,
+		},
 	}
 }
 
