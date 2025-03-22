@@ -511,54 +511,77 @@ logging:
 }
 
 func TestFilestreamDelete(t *testing.T) {
-	s, es, _ := integration.StartMockES(t, 0, 100, 0, 0, 0)
-	defer s.Close()
-
-	testDataPath, err := filepath.Abs("./testdata")
-	if err != nil {
-		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+	testCases := map[string]struct {
+		configTmpl string
+		reasonMsg  string
+	}{
+		"EOF": {
+			configTmpl: "eof.yml",
+			reasonMsg:  "'%s' will be removed because 'delete.on_close.eof' is set",
+		},
+		"Inactive": {
+			configTmpl: "inactive.yml",
+			reasonMsg:  "'%s' will be removed because 'delete.on_close.inactive' is set",
+		},
 	}
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			s, es, _ := integration.StartMockES(t, 0, 100, 0, 0, 0)
+			defer s.Close()
 
-	filebeat := integration.NewBeat(
-		t,
-		"filebeat",
-		"../../filebeat.test",
-	)
-	workDir := filebeat.TempDir()
+			testDataPath, err := filepath.Abs("./testdata")
+			if err != nil {
+				t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+			}
 
-	logFile := filepath.Join(workDir, "log.log")
-	integration.GenerateLogFile(t, logFile, 100, false)
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+			workDir := filebeat.TempDir()
 
-	vars := map[string]any{
-		"homePath": workDir,
-		"logfile":  logFile,
-		"testdata": testDataPath,
-		"esHost":   s.Listener.Addr(),
+			logFile := filepath.Join(workDir, "log.log")
+			integration.GenerateLogFile(t, logFile, 100, false)
+
+			vars := map[string]any{
+				"homePath": workDir,
+				"logfile":  logFile,
+				"testdata": testDataPath,
+				"esHost":   s.Listener.Addr(),
+			}
+			cfgYAML := getConfig(t, vars, "delete", tc.configTmpl)
+			filebeat.WriteConfigFile(cfgYAML)
+			filebeat.Start()
+
+			// Wait for the "reason for delete" message
+			filebeat.WaitForLogs(
+				fmt.Sprintf(tc.reasonMsg, logFile),
+				10*time.Second,
+				"reason for removing the file was not logged")
+
+			// Wait a few times for the 'not finished' logs
+			notFinishedMsg := fmt.Sprintf(
+				"not all events from '%s' have been published, "+
+					"waiting before removing the file",
+				logFile)
+			for i := range 2 {
+				filebeat.WaitForLogs(
+					notFinishedMsg,
+					10*time.Second,
+					"[%d] Filebeat did not wait for the resource to be finished",
+					i,
+				)
+			}
+
+			if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
+				t.Fatalf("cannot update mock-es odds: %s", err)
+			}
+
+			msg := fmt.Sprintf("File %s has been removed", logFile)
+			filebeat.WaitForLogs(msg, 30*time.Second, "log file '%s' was not removed", logFile)
+		})
 	}
-	cfgYAML := getConfig(t, vars, "delete", "eof.yml")
-	filebeat.WriteConfigFile(cfgYAML)
-
-	filebeat.Start()
-	// Wait a few times for the 'not finished' logs
-	notFinishedMsg := fmt.Sprintf(
-		"not all events from '%s' have been published, "+
-			"waiting before removing the file",
-		logFile)
-	for i := range 2 {
-		filebeat.WaitForLogs(
-			notFinishedMsg,
-			10*time.Second,
-			"[%d] Filebeat did not wait for the resource to be finished",
-			i,
-		)
-	}
-
-	if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
-		t.Fatalf("cannot update mock-es odds: %s", err)
-	}
-
-	msg := fmt.Sprintf("File %s has been removed", logFile)
-	filebeat.WaitForLogs(msg, 30*time.Second, "log file '%s' was not removed", logFile)
 }
 
 // getConfig renders the template in testdata/<folder>/<tmplPath> using vars
