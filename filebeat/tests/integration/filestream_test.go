@@ -513,17 +513,24 @@ logging:
 func TestFilestreamDelete(t *testing.T) {
 	testCases := map[string]struct {
 		configTmpl string
-		reasonMsg  string
+		msgs       []string
 	}{
 		"EOF": {
 			configTmpl: "eof.yml",
-			reasonMsg:  "'%s' will be removed because 'delete.on_close.eof' is set",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
 		},
 		"Inactive": {
 			configTmpl: "inactive.yml",
-			reasonMsg:  "'%s' will be removed because 'delete.on_close.inactive' is set",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
 		},
 	}
+
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			s, es, _ := integration.StartMockES(t, 0, 100, 0, 0, 0)
@@ -554,11 +561,15 @@ func TestFilestreamDelete(t *testing.T) {
 			filebeat.WriteConfigFile(cfgYAML)
 			filebeat.Start()
 
-			// Wait for the "reason for delete" message
-			filebeat.WaitForLogs(
-				fmt.Sprintf(tc.reasonMsg, logFile),
-				10*time.Second,
-				"reason for removing the file was not logged")
+			for _, msgFmt := range tc.msgs {
+				msg := fmt.Sprintf(msgFmt, logFile)
+				filebeat.WaitForLogs(
+					msg,
+					10*time.Second,
+					"did not find '%s' in the logs",
+					msg,
+				)
+			}
 
 			// Wait a few times for the 'not finished' logs
 			notFinishedMsg := fmt.Sprintf(
