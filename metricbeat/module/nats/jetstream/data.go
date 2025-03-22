@@ -334,16 +334,22 @@ func eventMapping(m *MetricSet, r mb.ReporterV2, content []byte) error {
 		err = statsMapping(r, response)
 	}
 
-	if m.Config.Account.Enabled {
-		err = accountMapping(r, response, m.Config)
-	}
+	for _, account := range filterByName(response.AccountDetails, m.Config.Account.Names) {
+		if m.Config.Account.Enabled {
+			err = accountMapping(r, account, response)
+		}
 
-	if m.Config.Stream.Enabled {
-		err = streamMapping(r, response, m.Config)
-	}
+		for _, stream := range filterByName(account.StreamDetails, m.Config.Stream.Names) {
+			if m.Config.Stream.Enabled {
+				err = streamMapping(r, stream, account, response)
+			}
 
-	if m.Config.Consumer.Enabled {
-		err = consumerMapping(r, response, m.Config)
+			for _, consumer := range filterByName(stream.Consumers, m.Config.Consumer.Names) {
+				if m.Config.Consumer.Enabled {
+					err = consumerMapping(r, consumer, stream, account, response)
+				}
+			}
+		}
 	}
 
 	return err
@@ -411,162 +417,150 @@ func filterByName[T NamedItem](collection []T, allowedValues []string) []T {
 	return filtered
 }
 
-func accountMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
-	for _, account := range filterByName(response.AccountDetails, config.Account.Names) {
-		moduleFields, timestamp, err := getSharedEventDetails(response)
+func accountMapping(r mb.ReporterV2, account JetstreamAccountDetails, response JetstreamResponse) error {
+	moduleFields, timestamp, err := getSharedEventDetails(response)
 
-		if err != nil {
-			return fmt.Errorf("failure applying module schema: %w", err)
-		}
+	if err != nil {
+		return fmt.Errorf("failure applying module schema: %w", err)
+	}
 
-		metricSetFields, err := jetstreamAccountSchema.Apply(map[string]interface{}{
-			"category":         accountCategory,
-			"id":               account.Id,
-			"name":             account.Name,
-			"memory":           account.Memory,
-			"storage":          account.Storage,
-			"reserved_memory":  account.ReservedMemory,
-			"reserved_storage": account.ReservedStorage,
-			"accounts":         account.Accounts,
-			"ha_assets":        account.HighAvailabilityAssets,
-			"api_total":        account.ApiStats.Total,
-			"api_errors":       account.ApiStats.Errors,
-		})
+	metricSetFields, err := jetstreamAccountSchema.Apply(map[string]interface{}{
+		"category":         accountCategory,
+		"id":               account.Id,
+		"name":             account.Name,
+		"memory":           account.Memory,
+		"storage":          account.Storage,
+		"reserved_memory":  account.ReservedMemory,
+		"reserved_storage": account.ReservedStorage,
+		"accounts":         account.Accounts,
+		"ha_assets":        account.HighAvailabilityAssets,
+		"api_total":        account.ApiStats.Total,
+		"api_errors":       account.ApiStats.Errors,
+	})
 
-		if err != nil {
-			return fmt.Errorf("failure applying jetstream.account schema: %w", err)
-		}
+	if err != nil {
+		return fmt.Errorf("failure applying jetstream.account schema: %w", err)
+	}
 
-		// Create and emit the event
-		event := mb.Event{
-			MetricSetFields: metricSetFields,
-			ModuleFields:    moduleFields,
-			Timestamp:       timestamp,
-		}
+	// Create and emit the event
+	event := mb.Event{
+		MetricSetFields: metricSetFields,
+		ModuleFields:    moduleFields,
+		Timestamp:       timestamp,
+	}
 
-		if !r.Event(event) {
-			return nil
-		}
+	if !r.Event(event) {
+		return nil
 	}
 
 	return nil
 }
 
-func streamMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
-	for _, account := range filterByName(response.AccountDetails, config.Account.Names) {
-		for _, stream := range filterByName(account.StreamDetails, config.Stream.Names) {
-			moduleFields, timestamp, err := getSharedEventDetails(response)
+func streamMapping(r mb.ReporterV2, stream JetstreamStreamDetail, account JetstreamAccountDetails, response JetstreamResponse) error {
+	moduleFields, timestamp, err := getSharedEventDetails(response)
 
-			if err != nil {
-				return fmt.Errorf("failure applying module schema: %w", err)
-			}
+	if err != nil {
+		return fmt.Errorf("failure applying module schema: %w", err)
+	}
 
-			metricSetFields, err := jetstreamStreamSchema.Apply(map[string]interface{}{
-				"category":                    streamCategory,
-				"name":                        stream.Name,
-				"created":                     stream.Created,
-				"leader":                      stream.Cluster.Leader,
-				"messages":                    stream.State.Messages,
-				"bytes":                       stream.State.Bytes,
-				"first_seq":                   stream.State.FirstSequence,
-				"first_ts":                    stream.State.FirstTimestamp,
-				"last_seq":                    stream.State.LastSequence,
-				"last_ts":                     stream.State.LastTimestamp,
-				"consumer_count":              stream.State.ConsumerCount,
-				"num_deleted":                 stream.State.NumDeleted,
-				"num_subjects":                stream.State.NumSubjects,
-				"account_id":                  account.Id,
-				"account_name":                account.Name,
-				"config_description":          stream.Config.Description,
-				"config_retention":            stream.Config.Retention,
-				"config_num_replicas":         stream.Config.NumReplicas,
-				"config_storage":              stream.Config.Storage,
-				"config_max_consumers":        stream.Config.MaxConsumers,
-				"config_subjects":             stream.Config.Subjects,
-				"config_max_msgs":             stream.Config.MaxMsgs,
-				"config_max_bytes":            stream.Config.MaxBytes,
-				"config_max_age":              stream.Config.MaxAge,
-				"config_max_msgs_per_subject": stream.Config.MaxMessagesPerSubject,
-				"config_max_msg_size":         stream.Config.MaxMessageSize,
-			})
+	metricSetFields, err := jetstreamStreamSchema.Apply(map[string]interface{}{
+		"category":                    streamCategory,
+		"name":                        stream.Name,
+		"created":                     stream.Created,
+		"leader":                      stream.Cluster.Leader,
+		"messages":                    stream.State.Messages,
+		"bytes":                       stream.State.Bytes,
+		"first_seq":                   stream.State.FirstSequence,
+		"first_ts":                    stream.State.FirstTimestamp,
+		"last_seq":                    stream.State.LastSequence,
+		"last_ts":                     stream.State.LastTimestamp,
+		"consumer_count":              stream.State.ConsumerCount,
+		"num_deleted":                 stream.State.NumDeleted,
+		"num_subjects":                stream.State.NumSubjects,
+		"account_id":                  account.Id,
+		"account_name":                account.Name,
+		"config_description":          stream.Config.Description,
+		"config_retention":            stream.Config.Retention,
+		"config_num_replicas":         stream.Config.NumReplicas,
+		"config_storage":              stream.Config.Storage,
+		"config_max_consumers":        stream.Config.MaxConsumers,
+		"config_subjects":             stream.Config.Subjects,
+		"config_max_msgs":             stream.Config.MaxMsgs,
+		"config_max_bytes":            stream.Config.MaxBytes,
+		"config_max_age":              stream.Config.MaxAge,
+		"config_max_msgs_per_subject": stream.Config.MaxMessagesPerSubject,
+		"config_max_msg_size":         stream.Config.MaxMessageSize,
+	})
 
-			if err != nil {
-				return fmt.Errorf("failure applying jetstream.stream schema: %w", err)
-			}
+	if err != nil {
+		return fmt.Errorf("failure applying jetstream.stream schema: %w", err)
+	}
 
-			// Create and emit the event
-			event := mb.Event{
-				MetricSetFields: metricSetFields,
-				ModuleFields:    moduleFields,
-				Timestamp:       timestamp,
-			}
+	// Create and emit the event
+	event := mb.Event{
+		MetricSetFields: metricSetFields,
+		ModuleFields:    moduleFields,
+		Timestamp:       timestamp,
+	}
 
-			if !r.Event(event) {
-				return nil
-			}
-		}
+	if !r.Event(event) {
+		return nil
 	}
 
 	return nil
 }
 
-func consumerMapping(r mb.ReporterV2, response JetstreamResponse, config MetricsetConfig) error {
-	for _, account := range filterByName(response.AccountDetails, config.Account.Names) {
-		for _, stream := range filterByName(account.StreamDetails, config.Stream.Names) {
-			for _, consumer := range filterByName(stream.Consumers, config.Consumer.Names) {
-				moduleFields, timestamp, err := getSharedEventDetails(response)
+func consumerMapping(r mb.ReporterV2, consumer JetstreamConsumerDetail, stream JetstreamStreamDetail, account JetstreamAccountDetails, response JetstreamResponse) error {
+	moduleFields, timestamp, err := getSharedEventDetails(response)
 
-				if err != nil {
-					return fmt.Errorf("failure applying module schema: %w", err)
-				}
+	if err != nil {
+		return fmt.Errorf("failure applying module schema: %w", err)
+	}
 
-				metricSetFields, err := jetstreamConsumerSchema.Apply(map[string]interface{}{
-					"category":               consumerCategory,
-					"stream_name":            stream.Name,
-					"name":                   consumer.Name,
-					"leader":                 stream.Cluster.Leader,
-					"created":                consumer.Created,
-					"delivered_consumer_seq": consumer.Delivered.ConsumerSequence,
-					"delivered_stream_seq":   consumer.Delivered.StreamSequence,
-					"delivered_last_active":  consumer.Delivered.LastActive,
-					"ack_consumer_seq":       consumer.AckFloor.ConsumerSequence,
-					"ack_stream_seq":         consumer.AckFloor.StreamSequence,
-					"ack_last_active":        consumer.AckFloor.LastActive,
-					"num_ack_pending":        consumer.NumAckPending,
-					"num_redelivered":        consumer.NumRedelivered,
-					"num_waiting":            consumer.NumWaiting,
-					"num_pending":            consumer.NumPending,
-					"ts":                     consumer.Timestamp,
-					"account_id":             account.Id,
-					"account_name":           account.Name,
-					"config_durable_name":    consumer.Config.DurableName,
-					"config_deliver_policy":  consumer.Config.DeliverPolicy,
-					"config_filter_subject":  consumer.Config.FilterSubject,
-					"config_replay_policy":   consumer.Config.ReplayPolicy,
-					"config_ack_policy":      consumer.Config.AckPolicy,
-					"config_ack_wait":        consumer.Config.AckWait,
-					"config_max_deliver":     consumer.Config.MaxDeliver,
-					"config_max_waiting":     consumer.Config.MaxWaiting,
-					"config_max_ack_pending": consumer.Config.MaxAckPending,
-					"config_num_replicas":    consumer.Config.NumReplicas,
-				})
+	metricSetFields, err := jetstreamConsumerSchema.Apply(map[string]interface{}{
+		"category":               consumerCategory,
+		"stream_name":            stream.Name,
+		"name":                   consumer.Name,
+		"leader":                 stream.Cluster.Leader,
+		"created":                consumer.Created,
+		"delivered_consumer_seq": consumer.Delivered.ConsumerSequence,
+		"delivered_stream_seq":   consumer.Delivered.StreamSequence,
+		"delivered_last_active":  consumer.Delivered.LastActive,
+		"ack_consumer_seq":       consumer.AckFloor.ConsumerSequence,
+		"ack_stream_seq":         consumer.AckFloor.StreamSequence,
+		"ack_last_active":        consumer.AckFloor.LastActive,
+		"num_ack_pending":        consumer.NumAckPending,
+		"num_redelivered":        consumer.NumRedelivered,
+		"num_waiting":            consumer.NumWaiting,
+		"num_pending":            consumer.NumPending,
+		"ts":                     consumer.Timestamp,
+		"account_id":             account.Id,
+		"account_name":           account.Name,
+		"config_durable_name":    consumer.Config.DurableName,
+		"config_deliver_policy":  consumer.Config.DeliverPolicy,
+		"config_filter_subject":  consumer.Config.FilterSubject,
+		"config_replay_policy":   consumer.Config.ReplayPolicy,
+		"config_ack_policy":      consumer.Config.AckPolicy,
+		"config_ack_wait":        consumer.Config.AckWait,
+		"config_max_deliver":     consumer.Config.MaxDeliver,
+		"config_max_waiting":     consumer.Config.MaxWaiting,
+		"config_max_ack_pending": consumer.Config.MaxAckPending,
+		"config_num_replicas":    consumer.Config.NumReplicas,
+	})
 
-				if err != nil {
-					return fmt.Errorf("failure applying jetstream.consumer schema: %w", err)
-				}
+	if err != nil {
+		return fmt.Errorf("failure applying jetstream.consumer schema: %w", err)
+	}
 
-				// Create and emit the event
-				event := mb.Event{
-					MetricSetFields: metricSetFields,
-					ModuleFields:    moduleFields,
-					Timestamp:       timestamp,
-				}
+	// Create and emit the event
+	event := mb.Event{
+		MetricSetFields: metricSetFields,
+		ModuleFields:    moduleFields,
+		Timestamp:       timestamp,
+	}
 
-				if !r.Event(event) {
-					return nil
-				}
-			}
-		}
+	if !r.Event(event) {
+		return nil
 	}
 
 	return nil
