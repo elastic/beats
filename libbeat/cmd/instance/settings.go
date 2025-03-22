@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Settings contains basic settings for any beat to pass into GenRootCmd
@@ -53,4 +55,7 @@ type Settings struct {
 
 	// Initialize functions that are called in-order to initialize unique items for the beat.
 	Initialize []func()
+
+	// InitializeRegistries are functions that requires a per-beat unique registries and they are called after Beat instance is created
+	InitializeReg []func(*monitoring.Namespace)
 }
