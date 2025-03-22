@@ -540,11 +540,11 @@ filebeat.inputs:
 
   # If deleting the file fails, Filestream will keep retrying in
   # `retry_tick` intervals.
-  #delete.on_close.retry_tick: 2s
+  #delete.backoff.init: 1s
 
   # The maximum time Filebeat will wait before giving up on
   # deleting the file.
-  #delete.on_close.retry_timeout: 10s
+  #delete.backoff.max: 10s
 
 #----------------------------- Stdin input -------------------------------
 # Configuration to use stdin input
