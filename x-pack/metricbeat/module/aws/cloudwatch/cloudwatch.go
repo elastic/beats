@@ -5,6 +5,7 @@
 package cloudwatch
 
 import (
+	"crypto/fips140"
 	"fmt"
 	"maps"
 	"reflect"
@@ -289,14 +290,14 @@ func (m *MetricSet) createAwsRequiredClients(beatsConfig awssdk.Config, regionNa
 
 	APIClients := APIClients{}
 	APIClients.CloudWatchClient = cloudwatch.NewFromConfig(beatsConfig, func(o *cloudwatch.Options) {
-		if config.AWSConfig.FIPSEnabled {
+		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 
 	})
 
 	APIClients.Resourcegroupstaggingapi = resourcegroupstaggingapi.NewFromConfig(beatsConfig, func(o *resourcegroupstaggingapi.Options) {
-		if config.AWSConfig.FIPSEnabled {
+		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})

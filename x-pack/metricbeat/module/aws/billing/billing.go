@@ -6,6 +6,7 @@ package billing
 
 import (
 	"context"
+	"crypto/fips140"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -128,7 +129,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// get cost metrics from cost explorer
 	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
 	svcCostExplorer := costexplorer.NewFromConfig(awsBeatsConfig, func(o *costexplorer.Options) {
-		if config.AWSConfig.FIPSEnabled {
+		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 
@@ -136,7 +137,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	awsBeatsConfig.Region = regionName
 	svcCloudwatch := cloudwatch.NewFromConfig(awsBeatsConfig, func(o *cloudwatch.Options) {
-		if config.AWSConfig.FIPSEnabled {
+		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
@@ -231,7 +232,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 
 		svcOrg := organizations.NewFromConfig(awsConfig, func(o *organizations.Options) {
-			if config.AWSConfig.FIPSEnabled {
+			if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
 		})

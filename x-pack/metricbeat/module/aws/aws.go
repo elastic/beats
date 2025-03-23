@@ -6,6 +6,7 @@ package aws
 
 import (
 	"context"
+	"crypto/fips140"
 	"fmt"
 	"strconv"
 	"time"
@@ -186,7 +187,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 
 	// Get IAM account id
 	svcSts := sts.NewFromConfig(awsConfig, func(o *sts.Options) {
-		if config.AWSConfig.FIPSEnabled {
+		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
@@ -201,7 +202,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 	// Get account name/alias
 	svcIam := iam.NewFromConfig(awsConfig, func(o *iam.Options) {
-		if config.AWSConfig.FIPSEnabled {
+		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 
@@ -223,7 +224,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
 		svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
-			if config.AWSConfig.FIPSEnabled {
+			if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
 		})

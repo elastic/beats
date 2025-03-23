@@ -6,6 +6,7 @@ package awshealth
 
 import (
 	"context"
+	"crypto/fips140"
 	"fmt"
 	"time"
 
@@ -120,7 +121,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	awsConfig := m.MetricSet.AwsConfig.Copy()
 
 	health_client := health.NewFromConfig(awsConfig, func(o *health.Options) {
-		if config.AWSConfig.FIPSEnabled {
+		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
