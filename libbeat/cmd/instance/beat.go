@@ -442,7 +442,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	imFactory := settings.IndexManagement
 	if imFactory == nil {
-		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
+		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, b.Info.Logger)
 	}
 	b.IdxSupporter, err = imFactory(nil, b.Beat.Info, b.RawConfig)
 	if err != nil {
@@ -1084,15 +1084,15 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
-	beatLogger, err := configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	logger, err := configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
-	b.Info.Logger = beatLogger
+	b.Info.Logger = logger
 
 	// log paths values to help with troubleshooting
-	beatLogger.Infof("%s", paths.Paths.String())
+	logger.Infof("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
@@ -1100,7 +1100,7 @@ func (b *Beat) configure(settings Settings) error {
 		return err
 	}
 
-	beatLogger.Infof("Beat ID: %v", b.Info.ID)
+	logger.Infof("Beat ID: %v", b.Info.ID)
 
 	// Try to get the host's FQDN and set it.
 	h, err := sysinfo.Host()
@@ -1115,7 +1115,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
-		beatLogger.Infof("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+		logger.Infof("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
 		b.Info.FQDN = b.Info.Hostname
 	} else {
 		b.Info.FQDN = fqdn
@@ -1150,11 +1150,11 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	if maxProcs := b.Config.MaxProcs; maxProcs > 0 {
-		beatLogger.Infof("Set max procs limit: %v", maxProcs)
+		logger.Infof("Set max procs limit: %v", maxProcs)
 		runtime.GOMAXPROCS(maxProcs)
 	}
 	if gcPercent := b.Config.GCPercent; gcPercent > 0 {
-		beatLogger.Infof("Set gc percentage to: %v", gcPercent)
+		logger.Infof("Set gc percentage to: %v", gcPercent)
 		debug.SetGCPercent(gcPercent)
 	}
 
@@ -1167,7 +1167,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	imFactory := settings.IndexManagement
 	if imFactory == nil {
-		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
+		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, logger)
 	}
 	b.IdxSupporter, err = imFactory(nil, b.Beat.Info, b.RawConfig)
 	if err != nil {
@@ -1178,7 +1178,7 @@ func (b *Beat) configure(settings Settings) error {
 	if processingFactory == nil {
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
-	b.processors, err = processingFactory(b.Info, beatLogger.Named("processors"), b.RawConfig)
+	b.processors, err = processingFactory(b.Info, logger.Named("processors"), b.RawConfig)
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
@@ -1187,7 +1187,7 @@ func (b *Beat) configure(settings Settings) error {
 			m := monitoring.CollectStructSnapshot(monitoring.Default, monitoring.Full, true)
 			data, err := json.MarshalIndent(m, "", "  ")
 			if err != nil {
-				beatLogger.Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
+				logger.Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
 				return []byte(err.Error())
 			}
 			return data

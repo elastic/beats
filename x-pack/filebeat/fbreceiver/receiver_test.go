@@ -159,6 +159,9 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
+	// This test verifies that multiple receivers can be instantiated
+	// in isolation, started, and can ingest logs without interfering
+	// with each other.
 	config := Config{
 		Beatconfig: map[string]interface{}{
 			"filebeat": map[string]interface{}{
@@ -200,67 +203,17 @@ func TestMultipleReceivers(t *testing.T) {
 			},
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
-			_ = zapLogs
-			require.Len(t, logs["r1"], 1)
-			require.Len(t, logs["r2"], 1)
-		},
-	})
-}
-
-func TestUniqueLoggerNamePerReceiver(t *testing.T) {
-	// This test ensures that each receiver has a separate logger
-	// instance and does not interfere with others. Previously, the
-	// logger in Beats was global, causing logger fields to be
-	// overwritten when multiple receivers started in the same process.
-	config := Config{
-		Beatconfig: map[string]interface{}{
-			"filebeat": map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{
-						"type":    "benchmark",
-						"enabled": true,
-						"message": "test",
-						"count":   1,
-					},
-				},
-			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
-			},
-			"logging": map[string]interface{}{
-				"level": "debug",
-				"selectors": []string{
-					"*",
-				},
-			},
-			"path.home": t.TempDir(),
-		},
-	}
-
-        factory := NewFactory()
-	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T: t,
-		Receivers: []oteltest.ReceiverConfig{
-			{
-				Name:    "r1",
-				Config:  &config,
-				Factory: factory,
-			},
-			{
-				Name:    "r2",
-				Config:  &config,
-				Factory: factory,
-			},
-		},
-		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			require.Conditionf(t, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected receivers to have logs, got logs: %v", logs)
 
-			r1StartLogs := zapLogs.FilterMessageSnippet("Starting input").FilterField(zap.String("name", "r1"))
+			// Make sure that each receiver has a separate logger
+			// instance and does not interfere with others. Previously, the
+			// logger in Beats was global, causing logger fields to be
+			// overwritten when multiple receivers started in the same process.
+			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("name", "r1"))
 			assert.Equal(t, 1, r1StartLogs.Len(), "r1 should have a single start log")
-
-			r2StartLogs := zapLogs.FilterMessageSnippet("Starting input").FilterField(zap.String("name", "r2"))
+			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("name", "r2"))
 			require.Equal(t, 1, r2StartLogs.Len(), "r2 should have a single start log")
 		},
 	})
