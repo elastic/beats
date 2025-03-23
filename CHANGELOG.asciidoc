@@ -14,191 +14,41 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
 
-*Auditbeat*
-
-
 *Filebeat*
 
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}43153[43153]
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
-- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42420]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
-
-*Heartbeat*
-
-
 
 *Metricbeat*
 
-- Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
-- Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
-- Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
-- [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
 - Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
 - Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
 
 *Winlogbeat*
 
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
-
-*Elastic Logging Plugin*
-
-
 ==== Added
 
 *Affecting all Beats*
 
-- Update to Go 1.23.6. {pull}42705[42705]
-
-*Auditbeat*
-
-
-*Auditbeat*
-
-*Auditbeat*
-
+- Update Go version to 1.23.6. {pull}42705[42705]
 
 *Filebeat*
 
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 
-*Auditbeat*
-
-
-*Libbeat*
-
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Metricbeat*
-
-
 *Osquerybeat*
 
-- Increase maximum query timeout to 24 hours {pull}42356[42356]
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-
-*Functionbeat*
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Increase maximum query timeout to 24 hours. {pull}42356[42356]
 
 
 [[release-notes-8.17.3]]
