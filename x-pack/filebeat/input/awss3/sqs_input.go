@@ -206,7 +206,13 @@ type sqsWorker struct {
 	input      *sqsReaderInput
 	client     beat.Client
 	ackHandler *awsACKHandler
-	pending    atomic.Int64
+	// wg is shared with the owning sqsReaderInput. It
+	// is incremented prior to the call to newSQSWorker
+	// and must be Done either in the unhappy path in
+	// that function, or after completion of the work
+	// loop.
+	wg      *sync.WaitGroup
+	pending atomic.Int64
 }
 
 func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
@@ -221,18 +227,23 @@ func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
 		},
 	})
 	if err != nil {
+		in.workerWg.Done()
 		return nil, fmt.Errorf("connecting to pipeline: %w", err)
 	}
 	return &sqsWorker{
 		input:      in,
 		client:     client,
 		ackHandler: ackHandler,
+		wg:         &in.workerWg,
 	}, nil
 }
 
 func (w *sqsWorker) run(ctx, graceCtx context.Context) {
-	defer w.client.Close()
-	defer w.ackHandler.Close()
+	defer func() {
+		w.ackHandler.Close()
+		w.client.Close()
+		w.wg.Done()
+	}()
 
 	for graceCtx.Err() == nil {
 		// Send a work request
@@ -292,7 +303,6 @@ func (in *sqsReaderInput) startWorkers(ctx, graceCtx context.Context) {
 	for i := 0; i < in.config.NumberOfWorkers; i++ {
 		in.workerWg.Add(1)
 		go func() {
-			defer in.workerWg.Done()
 			worker, err := in.newSQSWorker()
 			if err != nil {
 				in.log.Error(err)
