@@ -10,6 +10,7 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
+  # Platforms to be used for FIPS packaging nodes
   PLATFORMS_AMD64_FIPS: "+all linux/amd64"
   PLATFORMS_ARM64_FIPS: "+all linux/arm64"
 

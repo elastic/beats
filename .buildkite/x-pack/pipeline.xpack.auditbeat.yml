@@ -36,6 +36,10 @@ env:
   CONCURRENCY_COUNT: 10
   CONCURRENCY_METHOD: eager
 
+  # Platforms to be used for FIPS packaging nodes
+  PLATFORMS_AMD64_FIPS: "+all linux/amd64"
+  PLATFORMS_ARM64_FIPS: "+all linux/arm64"
+
 steps:
   - group: "Check/Update"
     key: "x-pack-auditbeat-check-update"
@@ -407,10 +411,10 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: Packaging Linux arm64"
 
-      - label: ":ubuntu: x-pack/auditbeat: Packaging Linux FIPS"
+      - label: ":ubuntu: x-pack/auditbeat: Packaging Linux amd64 FIPS"
         key: "packaging-linux-fips"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64"
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           FIPS: "true"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/auditbeat
@@ -426,4 +430,23 @@ steps:
           disk_type: "pd-ssd"
         notify:
           - github_commit_status:
-              context: "x-pack/auditbeat: Packaging Linux FIPS"
+              context: "x-pack/auditbeat: Packaging Linux amd64 FIPS"
+
+      - label: ":ubuntu: x-pack/auditbeat: Packaging Linux arm64 FIPS"
+        key: "packaging-arm-fips"
+        env:
+          PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
+          FIPS: "true"
+        command: |
+          .buildkite/scripts/packaging/packaging.sh x-pack/auditbeat
+        retry:
+          automatic:
+            - limit: 1
+        timeout_in_minutes: 20
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: Packaging Linux arm64 FIPS"
