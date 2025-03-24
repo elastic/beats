@@ -42,10 +42,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/mock-es/pkg/api"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 type BeatProc struct {
