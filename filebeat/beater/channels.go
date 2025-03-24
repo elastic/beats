@@ -56,10 +56,6 @@ type countingClientListener struct {
 	wgEvents *eventCounter
 }
 
-type combinedClientListener struct {
-	a, b beat.ClientListener
-}
-
 func newRegistrarLogger(reg *registrar.Registrar) *registrarLogger {
 	return &registrarLogger{
 		done: make(chan struct{}),
@@ -115,7 +111,7 @@ func withPipelineEventCounter(pipeline beat.PipelineConnector, counter *eventCou
 
 	pipeline = pipetool.WithClientConfigEdit(pipeline, func(config beat.ClientConfig) (beat.ClientConfig, error) {
 		if evts := config.ClientListener; evts != nil {
-			config.ClientListener = &combinedClientListener{evts, counterListener}
+			config.ClientListener = &beat.CombinedClientListener{evts, counterListener}
 		} else {
 			config.ClientListener = counterListener
 		}
@@ -153,34 +149,4 @@ func (*countingClientListener) Published() {}
 
 func (c *countingClientListener) DroppedOnPublish(_ beat.Event) {
 	c.wgEvents.Done()
-}
-
-func (c *combinedClientListener) Closing() {
-	c.a.Closing()
-	c.b.Closing()
-}
-
-func (c *combinedClientListener) Closed() {
-	c.a.Closed()
-	c.b.Closed()
-}
-
-func (c *combinedClientListener) NewEvent() {
-	c.a.NewEvent()
-	c.b.NewEvent()
-}
-
-func (c *combinedClientListener) Filtered() {
-	c.a.Filtered()
-	c.b.Filtered()
-}
-
-func (c *combinedClientListener) Published() {
-	c.a.Published()
-	c.b.Published()
-}
-
-func (c *combinedClientListener) DroppedOnPublish(event beat.Event) {
-	c.a.DroppedOnPublish(event)
-	c.b.DroppedOnPublish(event)
 }

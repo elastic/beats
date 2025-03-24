@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -145,7 +146,14 @@ func (r *runner) Start() {
 		// Unregister the metrics when input finishes running
 		defer ctx.UnregisterMetrics()
 
-		err := r.input.Run(ctx, r.connector)
+		pc := pipetool.WithClientConfigEdit(r.connector,
+			func(orig beat.ClientConfig) (beat.ClientConfig, error) {
+				orig.ClientListener =
+					ctx.PipelineClientListener(orig.ClientListener)
+				return orig, nil
+			})
+
+		err := r.input.Run(ctx, pc)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {

@@ -84,8 +84,7 @@ func (si configuredInput) Run(ctx v2.Context, pipeline beat.PipelineConnector) (
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		ClientListener: ctx.PipelineClientListener(),
-		PublishMode:    beat.DefaultGuarantees,
+		PublishMode: beat.DefaultGuarantees,
 	})
 	if err != nil {
 		return err

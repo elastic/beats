@@ -170,3 +170,37 @@ const (
 	// state up-to-date.
 	DropIfFull
 )
+
+type CombinedClientListener struct {
+	A, B ClientListener
+}
+
+func (c *CombinedClientListener) Closing() {
+	c.A.Closing()
+	c.B.Closing()
+}
+
+func (c *CombinedClientListener) Closed() {
+	c.A.Closed()
+	c.B.Closed()
+}
+
+func (c *CombinedClientListener) NewEvent() {
+	c.A.NewEvent()
+	c.B.NewEvent()
+}
+
+func (c *CombinedClientListener) Filtered() {
+	c.A.Filtered()
+	c.B.Filtered()
+}
+
+func (c *CombinedClientListener) Published() {
+	c.A.Published()
+	c.B.Published()
+}
+
+func (c *CombinedClientListener) DroppedOnPublish(event Event) {
+	c.A.DroppedOnPublish(event)
+	c.B.DroppedOnPublish(event)
+}

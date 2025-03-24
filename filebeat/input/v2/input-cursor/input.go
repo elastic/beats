@@ -24,6 +24,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -137,7 +138,14 @@ func (inp *managedInput) Run(
 			// Unregister the metrics when input finishes running
 			defer inpCtx.UnregisterMetrics()
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
+			pc := pipetool.WithClientConfigEdit(pipeline,
+				func(orig beat.ClientConfig) (beat.ClientConfig, error) {
+					orig.ClientListener =
+						inpCtx.PipelineClientListener(orig.ClientListener)
+					return orig, nil
+				})
+
+			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
 				cancel()
 			}
 			return err
@@ -164,8 +172,7 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		ClientListener: ctx.PipelineClientListener(),
-		EventListener:  newInputACKHandler(ctx.Logger),
+		EventListener: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
 		return err
