@@ -8,15 +8,16 @@ import (
 	"bytes"
 	"context"
 	"testing"
-	"time"
+
+	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.opentelemetry.io/collector/consumer"
-	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 func TestNewReceiver(t *testing.T) {
@@ -45,50 +46,71 @@ func TestNewReceiver(t *testing.T) {
 		},
 	}
 
-	var zapLogs bytes.Buffer
-	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		zapcore.AddSync(&zapLogs),
-		zapcore.DebugLevel)
-
-	receiverSettings := receiver.Settings{}
-	receiverSettings.Logger = zap.New(core)
-
-	var countLogs int
-	logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
-		countLogs = countLogs + ld.LogRecordCount()
-		return nil
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T: t,
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:    "r1",
+				Config:  &config,
+				Factory: NewFactory(),
+			},
+		},
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			_ = zapLogs
+			assert.Len(t, logs["r1"], 1)
+		},
 	})
-	assert.NoError(t, err, "Error creating log consumer")
+}
 
-	r, err := createReceiver(context.Background(), receiverSettings, &config, logConsumer)
-	assert.NoErrorf(t, err, "Error creating receiver. Logs:\n %s", zapLogs.String())
-	err = r.Start(context.Background(), nil)
-	assert.NoError(t, err, "Error starting filebeatreceiver")
-
-	ch := make(chan bool, 1)
-	timer := time.NewTimer(120 * time.Second)
-	defer timer.Stop()
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
-
-	for tick := ticker.C; ; {
-		select {
-		case <-timer.C:
-			t.Fatalf("consumed logs didn't increase\nCount: %d\nLogs: %s\n", countLogs, zapLogs.String())
-		case <-tick:
-			tick = nil
-			go func() { ch <- countLogs > 0 }()
-		case v := <-ch:
-			if v {
-				goto found
-			}
-			tick = ticker.C
-		}
+func TestReceiverDefaultProcessors(t *testing.T) {
+	config := Config{
+		Beatconfig: map[string]interface{}{
+			"filebeat": map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"output": map[string]interface{}{
+				"otelconsumer": map[string]interface{}{},
+			},
+			"logging": map[string]interface{}{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": t.TempDir(),
+		},
 	}
-found:
-	err = r.Shutdown(context.Background())
-	assert.NoError(t, err, "Error shutting down filebeatreceiver")
+
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T: t,
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:    "r1",
+				Config:  &config,
+				Factory: NewFactory(),
+			},
+		},
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			require.Len(t, logs["r1"], 1)
+
+			processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
+				FilterMessageSnippet("add_host_metadata").
+				FilterMessageSnippet("add_cloud_metadata").
+				FilterMessageSnippet("add_docker_metadata").
+				FilterMessageSnippet("add_kubernetes_metadata").
+				Len() == 1
+			require.True(t, processorsLoaded, "processors not loaded")
+			// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
+			require.Contains(t, logs["r1"][0].Flatten(), "host.architecture")
+		},
+	})
 }
 
 func BenchmarkFactory(b *testing.B) {
@@ -122,15 +144,65 @@ func BenchmarkFactory(b *testing.B) {
 	var zapLogs bytes.Buffer
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-		zapcore.AddSync(&zapLogs),
+		zapcore.Lock(zapcore.AddSync(&zapLogs)),
 		zapcore.DebugLevel)
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
 
+	factory := NewFactory()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := NewFactory().CreateLogs(context.Background(), receiverSettings, cfg, nil)
+		_, err := factory.CreateLogs(context.Background(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
+}
+
+func TestMultipleReceivers(t *testing.T) {
+	config := Config{
+		Beatconfig: map[string]interface{}{
+			"filebeat": map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+					},
+				},
+			},
+			"output": map[string]interface{}{
+				"otelconsumer": map[string]interface{}{},
+			},
+			"logging": map[string]interface{}{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+
+	factory := NewFactory()
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T: t,
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:    "r1",
+				Config:  &config,
+				Factory: factory,
+			},
+			{
+				Name:    "r2",
+				Config:  &config,
+				Factory: factory,
+			},
+		},
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			_ = zapLogs
+			require.Len(t, logs["r1"], 1)
+			require.Len(t, logs["r2"], 1)
+		},
+	})
 }

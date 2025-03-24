@@ -18,24 +18,49 @@
 package beater
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/beats/v7/filebeat/config"
+	"github.com/elastic/beats/v7/filebeat/features"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend"
+	"github.com/elastic/beats/v7/libbeat/statestore/backend/es"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend/memlog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+var _ statestore.States = (*filebeatStore)(nil)
+
 type filebeatStore struct {
 	registry      *statestore.Registry
+	esRegistry    *statestore.Registry
 	storeName     string
 	cleanInterval time.Duration
+
+	// Notifies the Elasticsearch store about configuration change
+	// which is available only after the beat runtime manager connects to the Agent
+	// and receives the output configuration
+	notifier *es.Notifier
 }
 
-func openStateStore(info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
-	memlog, err := memlog.New(logger, memlog.Settings{
+func openStateStore(ctx context.Context, info beat.Info, logger *logp.Logger, cfg config.Registry) (*filebeatStore, error) {
+	var (
+		reg backend.Registry
+		err error
+
+		esreg    *es.Registry
+		notifier *es.Notifier
+	)
+
+	if features.IsElasticsearchStateStoreEnabled() {
+		notifier = es.NewNotifier()
+		esreg = es.New(ctx, logger, notifier)
+	}
+
+	reg, err = memlog.New(logger, memlog.Settings{
 		Root:     paths.Resolve(paths.Data, cfg.Path),
 		FileMode: cfg.Permissions,
 	})
@@ -43,18 +68,29 @@ func openStateStore(info beat.Info, logger *logp.Logger, cfg config.Registry) (*
 		return nil, err
 	}
 
-	return &filebeatStore{
-		registry:      statestore.NewRegistry(memlog),
+	store := &filebeatStore{
+		registry:      statestore.NewRegistry(reg),
 		storeName:     info.Beat,
 		cleanInterval: cfg.CleanInterval,
-	}, nil
+		notifier:      notifier,
+	}
+
+	if esreg != nil {
+		store.esRegistry = statestore.NewRegistry(esreg)
+	}
+
+	return store, nil
 }
 
 func (s *filebeatStore) Close() {
 	s.registry.Close()
 }
 
-func (s *filebeatStore) Access() (*statestore.Store, error) {
+// StoreFor returns the storage registry depending on the type. Default is the file store.
+func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
+	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.esRegistry != nil {
+		return s.esRegistry.Get(s.storeName)
+	}
 	return s.registry.Get(s.storeName)
 }
 

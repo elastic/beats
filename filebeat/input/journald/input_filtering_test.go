@@ -142,7 +142,7 @@ func TestInputIncludeMatches(t *testing.T) {
 		"single match condition": {
 			includeMatches: map[string]interface{}{
 				"match": []string{
-					"syslog.facility=3",
+					"log.syslog.facility.code=3",
 				},
 			},
 			expectedMessages: []string{
@@ -159,7 +159,7 @@ func TestInputIncludeMatches(t *testing.T) {
 			includeMatches: map[string]interface{}{
 				"match": []string{
 					"journald.process.name=systemd",
-					"syslog.facility=3",
+					"log.syslog.facility.code=3",
 				},
 			},
 			expectedMessages: []string{
@@ -256,7 +256,7 @@ func TestInputSeek(t *testing.T) {
 			env := newInputTestingEnvironment(t)
 
 			if testCase.cursor != "" {
-				store, _ := env.stateStore.Access()
+				store, _ := env.stateStore.StoreFor("")
 				tmp := map[string]any{}
 				if err := json.Unmarshal([]byte(testCase.cursor), &tmp); err != nil {
 					t.Fatal(err)

@@ -24,7 +24,7 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 
 	"github.com/elastic/beats/v7/libbeat/cloudid"
-	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
+	elasticsearchtranslate "github.com/elastic/beats/v7/libbeat/otelbeat/oteltranslate/outputs/elasticsearch"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -48,19 +48,20 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 	for _, beatreceiver := range supportedReceivers {
 		var out map[string]any
 
+		var beatReceiverConfigKey = "receivers::" + beatreceiver
 		// check if supported beat receiver is configured. Skip translation logic if not
-		if v := conf.Get("receivers::" + beatreceiver); v == nil {
+		if v := conf.Get(beatReceiverConfigKey); v == nil {
 			continue
 		}
 
 		// handle cloud id if set
-		if conf.IsSet("receivers::" + beatreceiver + "::cloud") {
+		if conf.IsSet(beatReceiverConfigKey + "::cloud") {
 			if err := handleCloudId(beatreceiver, conf); err != nil {
 				return fmt.Errorf("error handling cloud id %w", err)
 			}
 		}
 
-		receiverCfg, _ := conf.Sub("receivers::" + beatreceiver)
+		receiverCfg, _ := conf.Sub(beatReceiverConfigKey)
 		output, _ := receiverCfg.Sub("output")
 
 		if len(output.ToStringMap()) > 1 {
@@ -71,10 +72,18 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			switch key {
 			case "elasticsearch":
 				esConfig := config.MustNewConfigFrom(output)
-				esOTelConfig, err := elasticsearch.ToOTelConfig(esConfig)
+				esOTelConfig, err := elasticsearchtranslate.ToOTelConfig(esConfig)
 				if err != nil {
 					return fmt.Errorf("cannot convert elasticsearch config: %w", err)
 				}
+
+				// when output.queue is set by user or it comes from "preset" config, promote it to global level
+				if ok := esConfig.HasField("queue"); ok {
+					if err := promoteOutputQueueSettings(beatreceiver, esConfig, conf); err != nil {
+						return err
+					}
+				}
+
 				out = map[string]any{
 					"service::pipelines::logs::exporters": []string{"elasticsearch"},
 					"exporters": map[string]any{
@@ -92,14 +101,28 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 		// Replace output.[configured-output] with output.otelconsumer
 		out = map[string]any{
-			"receivers::" + beatreceiver + "::output": nil,
+			beatReceiverConfigKey + "::output": nil,
 		}
 		err := conf.Merge(confmap.NewFromStringMap(out))
 		if err != nil {
 			return err
 		}
 		out = map[string]any{
-			"receivers::" + beatreceiver + "::output::otelconsumer": nil,
+			beatReceiverConfigKey + "::output::otelconsumer": nil,
+		}
+
+		// inject log level
+		receiverConfig, err := config.NewConfigFrom(receiverCfg.ToStringMap())
+		if err != nil {
+			return fmt.Errorf("Error getting receiver config: %w", err)
+		}
+
+		if level, _ := receiverConfig.String("logging.level", -1); level != "" {
+			out["service::telemetry::logs::level"], err = getOTelLogLevel(level)
+			if err != nil {
+				return fmt.Errorf("error injecting log level: %w", err)
+
+			}
 		}
 
 		err = conf.Merge(confmap.NewFromStringMap(out))
@@ -111,9 +134,9 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 	return nil
 }
 
-func handleCloudId(beatreceiver string, conf *confmap.Conf) error {
+func handleCloudId(beatReceiverConfigKey string, conf *confmap.Conf) error {
 
-	receiverCfg, _ := conf.Sub("receivers::" + beatreceiver)
+	receiverCfg, _ := conf.Sub("receivers::" + beatReceiverConfigKey)
 	beatCfg := config.MustNewConfigFrom(receiverCfg.ToStringMap())
 
 	// Handle cloud.id the same way Beats does, this will also handle
@@ -129,7 +152,7 @@ func handleCloudId(beatreceiver string, conf *confmap.Conf) error {
 	}
 
 	out := map[string]any{
-		"receivers::" + beatreceiver: beatOutput,
+		"receivers::" + beatReceiverConfigKey: beatOutput,
 	}
 	err = conf.Merge(confmap.NewFromStringMap(out))
 	if err != nil {
@@ -138,7 +161,26 @@ func handleCloudId(beatreceiver string, conf *confmap.Conf) error {
 
 	// we set this to nil to ensure cloudid check does not throw error when output is next set to otelconsumer
 	out = map[string]any{
-		"receivers::" + beatreceiver + "::cloud": nil,
+		"receivers::" + beatReceiverConfigKey + "::cloud": nil,
+	}
+	err = conf.Merge(confmap.NewFromStringMap(out))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// promoteOutputQueueSettings promotes output.queue settings to global level
+func promoteOutputQueueSettings(beatReceiverConfigKey string, outputConfig *config.C, conf *confmap.Conf) error {
+
+	var queueOutput map[string]any
+	err := outputConfig.Unpack(&queueOutput)
+	if err != nil {
+		return err
+	}
+	out := map[string]any{
+		"receivers::" + beatReceiverConfigKey + "::queue": queueOutput["queue"],
 	}
 	err = conf.Merge(confmap.NewFromStringMap(out))
 	if err != nil {
