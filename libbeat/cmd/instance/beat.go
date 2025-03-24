@@ -1613,6 +1613,8 @@ func handleError(err error) error {
 		return nil
 	}
 
+	// logp may not be initialized so log the err to stderr too.
+	logp.Critical("Exiting: %v", err)
 	fmt.Fprintf(os.Stderr, "Exiting: %v\n", err)
 	return err
 }
