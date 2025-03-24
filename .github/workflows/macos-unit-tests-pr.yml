@@ -21,21 +21,30 @@ jobs:
         with:
           fetch-depth: '2'
 
-      - id: set-matrix
+      - name: "Define matrix"
+        id: set-matrix
         run: |
           changedDirs=$(git diff --dirstat=files HEAD~1 | sed 's/^[ 0-9.]\+% //g' | awk -F/ '{print $1}' | sort -u)
           relevantDirs=($(echo "$changedDirs" | grep -Fxf .github/workflows/macos.d/values.d/whitelisted-dirs))
-          json=$(printf '%s\n' "${relevantDirs[@]}" | jq -R '{"beat": .}' | jq -s .)
 
-          echo $json
+          # Available image list: https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+          # macos-13-xlarge and macos-14 - arm64 images
+          # macos-13 and macos-14-large - x86 images
+          os=(macos-13, macos-13-xlarge, macos-14, macos-14-large)
 
-          echo "matrix={\"include\":$(echo $json)}" >> $GITHUB_OUTPUT
+          matrix=$(jq -n --argjson beat "$(printf '%s\n' "${relevantDirs[@]}" | jq -R . | jq -s .)" \
+             --argjson os "$(printf '%s\n' "${os[@]}" | jq -R . | jq -s .)" \
+             '{beat: $dir, os: $os}')
+
+          echo "matrix={\"include\":$(echo $matrix)}" >> $GITHUB_OUTPUT
 
   unit-test-macos-15:
     needs: matrix_prep
-    runs-on: macos-15
     strategy:
+      fail-fast: false
+      max-parallel: 10
       matrix: ${{fromJson(needs.matrix_prep.outputs.matrix)}}
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
