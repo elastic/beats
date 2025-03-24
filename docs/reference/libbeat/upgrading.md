@@ -32,7 +32,6 @@ If you use the Uptime app in {{kib}}, make sure you add `heartbeat-9*` and `synt
 Please read through all upgrade steps before proceeding. These steps are required before running the software for the first time.
 ::::
 
-
 ### Upgrade {{beats}} binaries to 9.0 [upgrade-beats-binaries]
 
 Before upgrading:
@@ -60,7 +59,6 @@ To upgrade using a zip or compressed tarball:
 
 
 Complete the upgrade tasks described in the following sections **before** restarting the {{beats}} process.
-
 
 ### Load 9.0 dashboards [load-9.0-dashboards]
 
@@ -116,7 +114,6 @@ All Elastic {{beats}} send events with ECS-compliant field names. If you have an
 
 To learn more about ECS, refer to the [ECS overview](ecs://reference/index.md).
 
-
 ### Start your upgraded {{beats}} [start-beats]
 
 After you’ve completed the migration, start the upgraded Beat. Use the command that works with your system.
@@ -130,7 +127,6 @@ In {{kib}}, go to **Discover** and verify that events are streaming into {{es}}.
 
 This section describes common problems you might encounter when upgrading to {{beats}} 9.x.
 
-
 ### {{beats}} is unable to send update or deletion requests to a data stream [unable-to-update-or-delete]
 
 Data streams are designed for use cases where existing data is rarely, if ever, updated. You cannot send update or deletion requests for existing documents directly to a data stream.
@@ -141,5 +137,3 @@ If needed, you can update or delete documents by submitting requests directly to
 ### Timestamp field is missing [missing-timestamp-field]
 
 {{beats}} requires a timestamp field to send data to data streams. If the timestamp field added by {{beats}} is inadvertently removed by a processor, {{beats}} will be unable to index the event. To fix the problem, modify your processor configuration to avoid removing the timestamp field.
-
-
