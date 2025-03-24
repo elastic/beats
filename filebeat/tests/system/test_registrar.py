@@ -129,6 +129,14 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*"
         )
         os.mkdir(self.working_dir + "/log/")
+        testfile_path1 = self.working_dir + "/log/test1.log"
+        file1 = open(testfile_path1, 'w')
+        file1.write("hello world")  # 11 chars
+        file1.write("\n")  # 1 char
+        file1.write("goodbye world")  # 11 chars
+        file1.write("\n")  # 1 char
+        file1.close()
+
         filebeat = self.start_beat()
         self.wait_until(
             lambda: self.output_lines() >= 5,
