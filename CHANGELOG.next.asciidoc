@@ -19,6 +19,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
 
 *Auditbeat*
 
@@ -430,6 +431,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
 - Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]

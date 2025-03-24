@@ -15,21 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build requirefips
+package security
 
-package flowhash
+import "github.com/elastic/elastic-agent-libs/logp"
 
-var CommunityID = newEmptyCommunityID()
-
-type emptyCommunityIDHasher struct{}
-
-// newEmptyCommunityID returns an empty Hasher
-func newEmptyCommunityID() Hasher {
-	return &emptyCommunityIDHasher{}
-}
-
-// Hash returns an empty string
-func (h *emptyCommunityIDHasher) Hash(_ Flow) string {
-	// no op
-	return ""
+func WarnIfInsecure(logger *logp.Logger, metricSet string, isInsecure bool) {
+	if isInsecure {
+		logger.With("metricset", metricSet).Warn("Your vSphere connection is configured as insecure. This can lead to man-in-the-middle attack.")
+	}
 }
