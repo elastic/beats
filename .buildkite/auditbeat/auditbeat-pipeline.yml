@@ -44,6 +44,7 @@ steps:
     steps:
       - label: "Auditbeat: Run check/update"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -eo pipefail
           make -C auditbeat check update
           make check-no-changes
@@ -82,6 +83,7 @@ steps:
     steps:
       - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Unit Tests"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -euo pipefail
           cd auditbeat
           mage build unitTest
@@ -107,6 +109,7 @@ steps:
 
       - label: ":rhel: Auditbeat: RHEL9 Unit Tests"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -euo pipefail
           cd auditbeat
           mage build unitTest
@@ -184,6 +187,7 @@ steps:
 
       - label: ":ubuntu: Auditbeat: Crosscompile"
         command: |
+          .buildkite/scripts/download-go-cache.sh
           make -C auditbeat crosscompile
         retry:
           automatic:
@@ -205,6 +209,7 @@ steps:
         key: "auditbeat-extended-integ-tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -euo pipefail
           cd auditbeat
           mage build integTest
@@ -238,6 +243,7 @@ steps:
         key: "auditbeat-extended-arm64-integ-tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -euo pipefail
           cd auditbeat
           mage build integTest
@@ -271,6 +277,7 @@ steps:
         key: "auditbeat-extended-arm64-unit-tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
+          .buildkite/scripts/download-go-cache.sh
           set -euo pipefail
           cd auditbeat
           mage build unitTest
@@ -299,6 +306,7 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
+          .buildkite/scripts/download-go-cache.sh
           cd auditbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
@@ -328,6 +336,7 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
+          .buildkite/scripts/download-go-cache.sh
           cd auditbeat
           mage build unitTest
         concurrency_group: "${CONCURRENCY_GROUP}"
