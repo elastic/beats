@@ -32,9 +32,9 @@ jobs:
           # macos-13 and macos-14-large - x86 images
           os=(macos-13, macos-13-xlarge, macos-14, macos-14-large)
 
-          matrix=$(jq -n --argjson beat "$(printf '%s\n' "${relevantDirs[@]}" | jq -R . | jq -s .)" \
+          matrix=$(jq -n --argjson beats "$(printf '%s\n' "${relevantDirs[@]}" | jq -R . | jq -s .)" \
              --argjson os "$(printf '%s\n' "${os[@]}" | jq -R . | jq -s .)" \
-             '{beat: $dir, os: $os}')
+             '{beats: $beats, os: $os}')
 
           echo "matrix={\"include\":$(echo $matrix)}" >> $GITHUB_OUTPUT
 
