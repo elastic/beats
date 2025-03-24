@@ -386,6 +386,18 @@ class TestCase(unittest.TestCase, ComposeMixin):
         start = datetime.now()
         while not cond():
             if datetime.now() - start > timedelta(seconds=max_timeout):
+<<<<<<< HEAD
+=======
+                print("Test has failed, here are the Beat logs")
+                for l in self.get_log_lines():
+                    print(l)
+                if self.output_lines() == 0:
+                    print("\n\nBeat had no output file")
+                else:
+                    print("\n\nHere is the beat's output file:")
+                    for entry in self.read_output():
+                        print(entry)
+>>>>>>> 8acde395b (Add more complete failure logs to python tests (#43453))
                 raise WaitTimeoutError(
                     f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
             time.sleep(poll_interval)
