@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -69,7 +70,7 @@ type filestream struct {
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
-func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
