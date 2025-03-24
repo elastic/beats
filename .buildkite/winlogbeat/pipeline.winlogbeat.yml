@@ -66,22 +66,6 @@ steps:
     key: "winlogbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Winlogbeat: Crossccompile"
-        key: "mandatory-cross-compile"
-        command: "make -C winlogbeat crosscompile"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "winlogbeat/build/*.xml"
-          - "winlogbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "winlogbeat: Crosscompile"
 
       - label: ":windows: Winlogbeat: Win 2019 Unit Tests"
         command: |

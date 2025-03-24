@@ -120,6 +120,7 @@ steps:
           - github_commit_status:
               context: "libbeat: Python Integration Tests"
 
+<<<<<<< HEAD
       - label: ":ubuntu: Libbeat: next major"
         # Run module integration tests under next major of Elastic stack.
         env:
@@ -161,6 +162,8 @@ steps:
           - github_commit_status:
               context: "libbeat: Crosscompile"
 
+=======
+>>>>>>> a57c3dbae (bk(crosscompile): packaging already runs in the CI (#43406))
       - label: ":ubuntu: Libbeat: Stress Tests"
         key: "mandatory-stress-test"
         command: |

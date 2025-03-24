@@ -143,6 +143,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Python Integration Tests"
 
+<<<<<<< HEAD
       - label: ":ubuntu: Metricbeat: Crosscompile"
         key: "mandatory-cross-compile"
         command: "make -C metricbeat crosscompile"
@@ -161,6 +162,9 @@ steps:
               context: "metricbeat: Crosscompile"
 
       - label: ":windows: Metricbeat: Win 2019 Unit Tests"
+=======
+      - label: ":windows: Metricbeat: Win 2016 Unit Tests"
+>>>>>>> a57c3dbae (bk(crosscompile): packaging already runs in the CI (#43406))
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
