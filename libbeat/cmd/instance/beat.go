@@ -444,7 +444,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	if imFactory == nil {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, b.Info.Logger)
 	}
-	b.IdxSupporter, err = imFactory(nil, b.Beat.Info, b.RawConfig)
+	b.IdxSupporter, err = imFactory(b.Info.Logger, b.Beat.Info, b.RawConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error setting index supporter: %w", err)
 	}
