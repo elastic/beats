@@ -23,12 +23,12 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha3"
 	"crypto/sha512"
 	"hash"
 
 	"github.com/cespare/xxhash/v2"
 	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/sha3"
 )
 
 var (
@@ -45,15 +45,23 @@ var (
 			h, _ := blake2b.New512(nil)
 			return h
 		},
-		MD5:        md5.New,
-		SHA1:       sha1.New,
-		SHA224:     sha256.New224,
-		SHA256:     sha256.New,
-		SHA384:     sha512.New384,
-		SHA3_224:   sha3.New224,
-		SHA3_256:   sha3.New256,
-		SHA3_384:   sha3.New384,
-		SHA3_512:   sha3.New512,
+		MD5:    md5.New,
+		SHA1:   sha1.New,
+		SHA224: sha256.New224,
+		SHA256: sha256.New,
+		SHA384: sha512.New384,
+		SHA3_224: func() hash.Hash {
+			return sha3.New224()
+		},
+		SHA3_256: func() hash.Hash {
+			return sha3.New256()
+		},
+		SHA3_384: func() hash.Hash {
+			return sha3.New384()
+		},
+		SHA3_512: func() hash.Hash {
+			return sha3.New512()
+		},
 		SHA512:     sha512.New,
 		SHA512_224: sha512.New512_224,
 		SHA512_256: sha512.New512_256,
