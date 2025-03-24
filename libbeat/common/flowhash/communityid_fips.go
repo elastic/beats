@@ -15,18 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package inputs
+//go:build requirefips
 
-import (
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/filebeat/input/winlog"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
-)
+package flowhash
 
-func osInputs(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
-	return []v2.Plugin{
-		winlog.Plugin(log, components),
-	}
+var CommunityID = newEmptyCommunityID()
+
+type emptyCommunityIDHasher struct{}
+
+// newEmptyCommunityID returns an empty Hasher
+func newEmptyCommunityID() Hasher {
+	return &emptyCommunityIDHasher{}
+}
+
+// Hash returns an empty string
+func (h *emptyCommunityIDHasher) Hash(_ Flow) string {
+	// no op
+	return ""
 }
