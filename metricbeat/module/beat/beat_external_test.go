@@ -20,6 +20,7 @@ package beat_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -30,6 +31,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/beat/stats"
 )
 
+<<<<<<< HEAD:metricbeat/module/beat/beat_external_test.go
 func TestXPackEnabledMetricsets(t *testing.T) {
 	config := map[string]interface{}{
 		"module":        beat.ModuleName,
@@ -46,5 +48,44 @@ func TestXPackEnabledMetricsets(t *testing.T) {
 		default:
 			t.Errorf("unexpected metricset name = %v", name)
 		}
+=======
+func TestDeadlockListener(t *testing.T) {
+	const timeout = time.Second
+	var currentTime time.Time
+	getTime := func() time.Time { return currentTime }
+
+	dl := idleDeadlockListener(logp.NewLogger("test"), timeout, getTime)
+
+	// Channels get a buffer so we can trigger them deterministically in
+	// one goroutine.
+	tickerChan := make(chan time.Time, 1)
+	dl.tickerChan = tickerChan
+	dl.ackChan = make(chan int, 1)
+
+	// Verify that the listener doesn't trigger when receiving regular acks
+	for i := 0; i < 5; i++ {
+		// Advance the "current time" and ping the ticker channel to refresh
+		// the timeout check, then send an ack and confirm that it hasn't timed
+		// out yet.
+		currentTime = currentTime.Add(timeout - 1)
+		tickerChan <- currentTime
+		dl.runIteration()
+
+		dl.ack(1)
+		dl.runIteration()
+		assert.Equal(t, currentTime, dl.lastTime)
+		assert.Nil(t, dl.ctx.Err(), "Deadlock listener context shouldn't expire until the timeout is reached")
+	}
+
+	// Verify that the listener does trigger when the acks stop
+	currentTime = currentTime.Add(timeout)
+	tickerChan <- currentTime
+	dl.runIteration()
+
+	select {
+	case <-dl.ctx.Done():
+	default:
+		require.Fail(t, "Deadlock listener should trigger when there is no progress for the configured time interval")
+>>>>>>> 6d92a4017 (Fix flaky logstash output test (#43402)):libbeat/outputs/logstash/deadlock_test.go
 	}
 }
