@@ -18,7 +18,6 @@
 package file_integrity
 
 import (
-	"crypto/sha256"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -108,12 +107,18 @@ func TestActions(t *testing.T) {
 	}
 
 	// Insert fake file event into db to simulate when a file has changed
-	digest := sha256.New().Sum([]byte("different string"))
 	updatedFileEvent := &Event{
 		Timestamp: time.Now().UTC(),
 		Path:      updatedFilepath,
 		Action:    Created,
-		Hashes:    map[HashType]Digest{SHA256: digest},
+		Hashes:    map[HashType]Digest{},
+	}
+	for _, h := range defaultHashes {
+		fn, ok := hashTypes[h]
+		require.Truef(t, ok, "missing hash type %s", h)
+
+		digest := fn().Sum([]byte("different string"))
+		updatedFileEvent.Hashes[h] = digest
 	}
 	if err = store(bucket, updatedFileEvent); err != nil {
 		t.Fatal(err)
