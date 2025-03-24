@@ -516,7 +516,7 @@ func logInputStateFromMapM(m mapstr.M) (logInputState, error) {
 }
 
 // UnpackCursorMeta unpacks the cursor metadata's into the provided struct. TBD
-func (l logInputState) UnpackCursorMeta(to interface{}) error {
+func (l logInputState) UnpackCursorMeta(to any) error {
 	return typeconv.Convert(to, l)
 }
 

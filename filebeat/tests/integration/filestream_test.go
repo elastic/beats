@@ -826,7 +826,7 @@ func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
 
 	// More Windows workarounds.
 	// I don't know why, but on Windows, the offset of files is always 2 bytes
-	// more than on Linux, even for files commited to git.
+	// more than on Linux, even for files committed to git.
 	// So we fix it here.
 	if runtime.GOOS == "windows" {
 		for k, v := range reg {
