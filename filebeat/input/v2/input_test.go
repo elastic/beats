@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
+var _ beat.ClientListener = &PipelineClientListener{}
+
 // TestNewContextParameters ensures when new fields are added to the v2.Context
 // they also are added to the constructor, or the decision of not doing so is
 // explicit.

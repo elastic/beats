@@ -132,10 +132,10 @@ type ClientListener interface {
 	Closing() // Closing indicates the client is being shutdown next
 	Closed()  // Closed indicates the client being fully shutdown
 
-	NewEvent()  // event has arrived at the pipeline
-	Filtered()  // event has been filtered by the pipeline
-	Published() // event has successfully entered the queue
-	DroppedOnPublish(Event)
+	NewEvent()              // event has arrived at the pipeline
+	Filtered()              // event has been filtered by the pipeline
+	Published()             // event has successfully entered the queue
+	DroppedOnPublish(Event) // event has been dropped, while waiting for the queue
 }
 
 type ProcessorList interface {

@@ -108,7 +108,10 @@ type Context struct {
 	// monitoringRegistryCancel removes the registry from its parent and from
 	// the HTTP monitoring endpoint.
 	monitoringRegistryCancel func()
-	pipelineClientListener   *PipelineClientListener
+	// pipelineClientListener implements beat.ClientListener to aggregate
+	// pipeline metrics for this input. PipelineClientListener() return the
+	// PipelineClientListener and creates one if necessary.
+	pipelineClientListener *PipelineClientListener
 }
 
 // NewContext creates a new context with a metrics registry populated with
@@ -233,6 +236,9 @@ func (c *Context) UnregisterMetrics() {
 	}
 }
 
+// PipelineClientListener returns the PipelineClientListener for this context.
+// It collects pipeline metrics for this input on the metrics registry
+// associated with this context.
 func (c *Context) PipelineClientListener() *PipelineClientListener {
 	if c.pipelineClientListener != nil {
 		return c.pipelineClientListener
@@ -250,6 +256,8 @@ func (c *Context) PipelineClientListener() *PipelineClientListener {
 	return c.pipelineClientListener
 }
 
+// PipelineClientListener implements beat.ClientListener to collect pipeline
+// metrics per-input.
 type PipelineClientListener struct {
 	eventsTotal,
 	eventsFiltered,

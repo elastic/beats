@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat"
 )
 
-func TestOTel(t *testing.T) {
+func TestOtel(t *testing.T) {
 	rootDir, _ := filepath.Abs("../filebeat-otel.yml")
 
 	// Create the command
