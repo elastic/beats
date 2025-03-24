@@ -124,30 +124,6 @@ class Test(BaseTest):
         # Check that 2 files are port of the registrar file
         assert len(data) == 2
 
-    def test_fae_verbose_log_always_fails(self):
-        self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
-        )
-        os.mkdir(self.working_dir + "/log/")
-        testfile_path1 = self.working_dir + "/log/test1.log"
-        file1 = open(testfile_path1, 'w')
-        file1.write("hello world")  # 11 chars
-        file1.write("\n")  # 1 char
-        file1.write("goodbye world")  # 11 chars
-        file1.write("\n")  # 1 char
-        file1.close()
-
-        filebeat = self.start_beat()
-        self.wait_until(
-            lambda: self.output_lines() >= 5,
-            max_timeout=30)
-
-        filebeat.check_kill_and_wait()
-
-        logs = self.read_output_json()
-        print(logs)
-        assert len(logs) == 0
-
     def test_custom_registry_file_location(self):
         """
         Check that when a custom registry file is used, the path
