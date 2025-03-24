@@ -1,0 +1,62 @@
+name: macos-unit-tests-pr
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+# to configure for PRs then cancel them
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  matrix_prep:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '2'
+
+      - id: set-matrix
+        run: |
+          changedDirs=$(git diff --dirstat=files HEAD~1 | sed 's/^[ 0-9.]\+% //g' | awk -F/ '{print $1}' | sort -u)
+          relevantDirs=($(echo "$changedDirs" | grep -Fxf .github/workflows/macos.d/values.d/whitelisted-dirs))
+          json=$(printf '%s\n' "${relevantDirs[@]}" | jq -R '{"beat": .}' | jq -s .)
+
+          echo $json
+
+          echo "matrix={\"include\":$(echo $json)}" >> $GITHUB_OUTPUT
+
+  unit-test-macos-15:
+    needs: matrix_prep
+    runs-on: macos-15
+    strategy:
+      matrix: ${{fromJson(needs.matrix_prep.outputs.matrix)}}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - uses: actions/setup-python@v5
+        with:
+          cache: "pip"
+          python-version-file: .python-version
+
+      - name: Install mage
+        run: go install github.com/magefile/mage
+
+      - name: Run build / ${{ matrix.beat }}
+        run: mage build
+        working-directory: ${{ matrix.beat }}
+
+      - name: Run unitTest / ${{ matrix.beat }}
+        run: mage unitTest
+        working-directory: ${{ matrix.beat }}
+
+  # TODO: centralise github job with the status.
