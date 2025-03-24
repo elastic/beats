@@ -346,11 +346,6 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
 	}
 
-	// TODO: Eventually remove this. Currently required to not break any dependent code on global loggers
-	if err := logp.ConfigureWithCore(logpConfig, core); err != nil {
-		return nil, fmt.Errorf("error configuring beats logp: %w", err)
-	}
-
 	b.Info.Logger, err = logp.ConfigureWithCoreLocal(logpConfig, core)
 	if err != nil {
 		return nil, fmt.Errorf("error configuring beats logp: %w", err)
@@ -1077,11 +1072,6 @@ func (b *Beat) configure(settings Settings) error {
 
 	if err := common.SetTimestampPrecision(b.Config.TimestampPrecision); err != nil {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
-	}
-
-	// TODO: Should be eventually removed. This is not removed so that we do not break the existing dependency on global loggers
-	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
-		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
 	logger, err := configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
