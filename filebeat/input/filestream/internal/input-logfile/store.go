@@ -520,7 +520,7 @@ func (l logInputState) UnpackCursorMeta(to interface{}) error {
 	return typeconv.Convert(to, l)
 }
 
-// Key returns the resource's key tbd
+// Key returns the resource's key
 func (l logInputState) Key() string {
 	return l.key
 }

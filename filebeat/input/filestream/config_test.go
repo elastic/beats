@@ -34,7 +34,7 @@ func TestConfigValidate(t *testing.T) {
 	t.Run("paths cannot be empty", func(t *testing.T) {
 		c := config{Paths: []string{}}
 		err := c.Validate()
-		require.Error(t, err)
+		assert.Error(t, err)
 	})
 
 	t.Run("take_over requires ID", func(t *testing.T) {
@@ -43,7 +43,7 @@ func TestConfigValidate(t *testing.T) {
 			TakeOver: takeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
-		require.Error(t, err, "take_over.enabled can only be true if ID is set")
+		assert.Error(t, err, "take_over.enabled can only be true if ID is set")
 	})
 
 	t.Run("take_over works with ID set", func(t *testing.T) {
@@ -53,7 +53,7 @@ func TestConfigValidate(t *testing.T) {
 			TakeOver: takeOverConfig{Enabled: true},
 		}
 		err := c.Validate()
-		require.NoError(t, err)
+		assert.NoError(t, err)
 	})
 }
 
