@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"strings"
 
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
@@ -94,7 +95,9 @@ func (m *NetworkMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) er
 	}
 
 	defer func() {
-		if err := client.Logout(ctx); err != nil {
+		err := vSphereClientUtil.Logout(ctx, client)
+
+		if err != nil {
 			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()

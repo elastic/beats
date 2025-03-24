@@ -171,6 +171,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.24.8
 	github.com/aws/aws-sdk-go-v2/service/health v1.29.2
 	github.com/aws/smithy-go v1.22.1
+	github.com/cenkalti/backoff/v5 v5.0.2
 	github.com/dgraph-io/badger/v4 v4.4.0
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
@@ -258,6 +259,7 @@ require (
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.48.1 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.1 // indirect
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
+	github.com/adriansr/mkwinsyscall v0.0.0-20201104100255-1111b1ab7ffc // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/apache/arrow/go/v15 v15.0.2 // indirect

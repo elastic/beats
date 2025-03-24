@@ -151,6 +151,8 @@ github.com/PaloAltoNetworks/pango v0.10.2 h1:Tjn6vIzzAq6Dd7N0mDuiP8w8pz8k5W9zz/T
 github.com/PaloAltoNetworks/pango v0.10.2/go.mod h1:GztcRnVLur7G+VFG7Z5ZKNFgScLtsycwPMp1qVebE5g=
 github.com/StackExchange/wmi v1.2.1 h1:VIkavFPXSjcnS+O8yTq7NI32k0R5Aj+v39y29VYDOSA=
 github.com/StackExchange/wmi v1.2.1/go.mod h1:rcmrprowKIVzvc+NUiLncP2uuArMWLCbu9SBzvHz7e8=
+github.com/adriansr/mkwinsyscall v0.0.0-20201104100255-1111b1ab7ffc h1:52SZjnGQCu+p3yQkKxJ8Ol9Ai06wxH3TBuB6MZW2Ilk=
+github.com/adriansr/mkwinsyscall v0.0.0-20201104100255-1111b1ab7ffc/go.mod h1:+aGZsHFkXwrWyV+3KXUTzokd24TpTymzTn5DSXN1TPc=
 github.com/aerospike/aerospike-client-go/v7 v7.7.1 h1:lcskBtPZYe6ESObhIEQEp4XO1axYZpaFD3ie4iwr6tg=
 github.com/aerospike/aerospike-client-go/v7 v7.7.1/go.mod h1:STlBtOkKT8nmp7iD+sEkr/JGEOu+4e2jGlNN0Jiu2a4=
 github.com/akavel/rsrc v0.8.0 h1:zjWn7ukO9Kc5Q62DOJCcxGpXC18RawVtYAGdz2aLlfw=
@@ -252,6 +254,8 @@ github.com/cavaliergopher/rpm v1.2.0 h1:s0h+QeVK252QFTolkhGiMeQ1f+tMeIMhGl8B1HUm
 github.com/cavaliergopher/rpm v1.2.0/go.mod h1:R0q3vTqa7RUvPofAZYrnjJ63hh2vngjFfphuXiExVos=
 github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=
 github.com/cenkalti/backoff/v4 v4.3.0/go.mod h1:Y3VNntkOUPxTVeUxJ/G5vcM//AlwfmyYozVcomhLiZE=
+github.com/cenkalti/backoff/v5 v5.0.2 h1:rIfFVxEf1QsI7E1ZHfp/B4DF/6QBAUhmgkxc0H7Zss8=
+github.com/cenkalti/backoff/v5 v5.0.2/go.mod h1:rkhZdG3JZukswDf7f0cwqPNk4K0sa+F97BxZthm/crw=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/census-instrumentation/opencensus-proto v0.4.1 h1:iKLQ0xPNFxR/2hzXZMrBo8f1j86j5WHzznCCQxV/b8g=
 github.com/census-instrumentation/opencensus-proto v0.4.1/go.mod h1:4T9NM4+4Vw91VeyqjLS6ao50K5bOcLKN6Q42XnYaRYw=
