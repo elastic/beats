@@ -1169,7 +1169,7 @@ func (b *Beat) configure(settings Settings) error {
 	if imFactory == nil {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, logger)
 	}
-	b.IdxSupporter, err = imFactory(nil, b.Beat.Info, b.RawConfig)
+	b.IdxSupporter, err = imFactory(logger, b.Beat.Info, b.RawConfig)
 	if err != nil {
 		return err
 	}
@@ -1216,7 +1216,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 		FirstStart time.Time `json:"first_start"`
 	}
 
-	b.Info.Logger.Debug("beat", "Beat metadata path: %v", metaPath)
+	b.Info.Logger.Debugf("beat", "Beat metadata path: %v", metaPath)
 
 	f, err := openRegular(metaPath)
 	if err != nil && !os.IsNotExist(err) {
