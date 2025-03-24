@@ -546,6 +546,39 @@ file_identity.path: ~
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ```
 
+## Removing fully ingested files [filebeat-input-filestream-delete-options]
+Filebeat can delete files after they reach EOF or become inactive and
+all events from the file have been published.
+
+If there is an issue while deleting the file, the operation is retried
+with an exponential backoff until the maximum wait is reached.
+
+Removing files is disabled by default.
+
+### `delete.on_close.eof` [filebeat-input-filestream-delete-eof]
+When set to `true`, files will be removed after EOF is reached and the
+reader is closed. If you set `delete.on_close.eof: ture`, you must
+also set `close.reader.on_eof: true`. The default is `false`.
+
+### `delete.on_close.inactive` [filebeat-input-filestream-delete-inactive]
+When set to `true`, files will be removed after they are inactive and
+the reader is closed. If you enable `delete.on_close.inactive` you
+must also enable
+[`close.on_state_change.inactive`](#filebeat-input-filestream-close-inactive). The
+default is `false`.
+
+### `delete.backoff.init` [filebeat-input-filestream-delete-backoff-init]
+The `delete.backoff.init` option defines how long Filebeat waits
+before retrying removing the file. The backoff intervals increase
+exponentially. The default is 1s. Thus, removing the file is retried
+after 1 second, then 2 seconds, then 4 seconds and so on until it
+reaches the limit defined in `delete.backoff.max`.
+
+### `delete.backoff.max` [filebeat-input-filestream-delete-backoff-max]
+The maximum time Filebeat will wait until giving up on removing the
+file. After the maximum wait is reached Filebeat stops trying to
+remove the file. For Filebeat to try removing the file again either
+the input or Filebeat need to be restarted. The default is 10s.
 
 ## Log rotation [filestream-log-rotation-support]
 
