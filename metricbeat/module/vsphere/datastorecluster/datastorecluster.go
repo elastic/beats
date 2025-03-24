@@ -22,12 +22,13 @@ import (
 	"fmt"
 	"strings"
 
-	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
+
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
 
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
