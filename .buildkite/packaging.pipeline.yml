@@ -338,6 +338,7 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: false
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
           FIPS: true
         command: |
@@ -362,6 +363,7 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           SNAPSHOT: false
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
           FIPS: true
         command: |
@@ -388,6 +390,7 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: false
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
           FIPS: true
         command: |
