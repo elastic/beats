@@ -123,6 +123,23 @@ class Test(BaseTest):
 
         # Check that 2 files are port of the registrar file
         assert len(data) == 2
+    
+    def test_fae_verbose_log_always_fails(self):
+        self.render_config_template(
+            path=os.path.abspath(self.working_dir) + "/log/*"
+        )
+        os.mkdir(self.working_dir + "/log/")
+        filebeat = self.start_beat()
+        self.wait_until(
+            lambda: len(self.read_output_json()) >= 5,
+            max_timeout=30)
+
+        filebeat.check_kill_and_wait()
+
+        logs = self.read_output_json()
+        print(logs)
+        assert len(logs) == 0
+
 
     def test_custom_registry_file_location(self):
         """
