@@ -15,21 +15,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build requirefips
+package registry
 
-package flowhash
+import (
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/logp"
+)
 
-var CommunityID = newEmptyCommunityID()
+// Create constructors for most of the Beat processors.
+// Note that script is omitted to avoid nesting.
+var Registry = processors.NewNamespace()
 
-type emptyCommunityIDHasher struct{}
+// RegisterPlugin registeres processor plugins for the javascript processor.
+func RegisterPlugin(name string, c processors.Constructor) {
+	logp.L().Named("javascript").Debugf("Register script processor %s", name)
 
-// newEmptyCommunityID returns an empty Hasher
-func newEmptyCommunityID() Hasher {
-	return &emptyCommunityIDHasher{}
-}
-
-// Hash returns an empty string
-func (h *emptyCommunityIDHasher) Hash(_ Flow) string {
-	// no op
-	return ""
+	err := Registry.Register(name, c)
+	if err != nil {
+		panic(err)
+	}
 }
