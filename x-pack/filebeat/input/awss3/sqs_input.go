@@ -270,6 +270,11 @@ func (w *sqsWorker) run(ctx, graceCtx context.Context) {
 			return
 		case msg := <-w.input.workResponseChan:
 			w.processMessage(graceCtx, msg)
+		case <-ctx.Done():
+			// We're shutting down, so spin in the
+			// loop until we have exceeded our
+			// grace time, or we have no pending
+			// messages.
 		}
 	}
 }
