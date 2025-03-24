@@ -270,12 +270,12 @@ func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
 		w.client.Publish(e)
 		publishCount++
 	})
-	w.pending.Add(int64(publishCount))
 
 	if publishCount == 0 {
 		// No events made it through (probably an error state), wrap up immediately
 		result.Done()
 	} else {
+		w.pending.Add(1)
 		// Add this result's Done callback to the pending ACKs list
 		w.ackHandler.Add(publishCount, func() {
 			result.Done()
