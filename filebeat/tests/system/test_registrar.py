@@ -131,7 +131,7 @@ class Test(BaseTest):
         os.mkdir(self.working_dir + "/log/")
         filebeat = self.start_beat()
         self.wait_until(
-            lambda: len(self.read_output_json()) >= 5,
+            lambda: self.output_lines() >= 5,
             max_timeout=30)
 
         filebeat.check_kill_and_wait()
