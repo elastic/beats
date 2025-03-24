@@ -13,6 +13,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
 
 *Auditbeat*
 
@@ -284,6 +285,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
 - Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 
 *Metricbeat*
 

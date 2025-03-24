@@ -32,6 +32,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
+var _ statestore.States = (*filebeatStore)(nil)
+
 type filebeatStore struct {
 	registry      *statestore.Registry
 	esRegistry    *statestore.Registry
@@ -84,8 +86,8 @@ func (s *filebeatStore) Close() {
 	s.registry.Close()
 }
 
-// Access returns the storage registry depending on the type. Default is the file store.
-func (s *filebeatStore) Access(typ string) (*statestore.Store, error) {
+// StoreFor returns the storage registry depending on the type. Default is the file store.
+func (s *filebeatStore) StoreFor(typ string) (*statestore.Store, error) {
 	if features.IsElasticsearchStateStoreEnabledForInput(typ) && s.esRegistry != nil {
 		return s.esRegistry.Get(s.storeName)
 	}
