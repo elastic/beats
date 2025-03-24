@@ -67,11 +67,6 @@ To add the Beats repository for APT:
     sudo systemctl enable filebeat
     ```
 
-    If your system does not use `systemd` then run:
-
-    ```
-    sudo update-rc.d filebeat defaults 95 10
-    ```
 
 
 
@@ -118,10 +113,5 @@ To add the Beats repository for YUM:
     sudo systemctl enable filebeat
     ```
 
-    If your system does not use `systemd` then run:
-
-    ```
-    sudo update-rc.d filebeat defaults 95 10
-    ```
 
 
