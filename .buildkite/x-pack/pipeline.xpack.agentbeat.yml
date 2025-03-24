@@ -101,7 +101,7 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: true
-          FIPS: "true"
+          FIPS: true
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
         artifact_paths:
@@ -121,14 +121,14 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: Packaging linux/amd64 FIPS"
-      - label: ":linux: Agentbeat packaging linux/arm FIPS"
+      - label: ":linux: Agentbeat packaging linux/arm64 FIPS"
         key: "agentbeat-package-linux-arm-fips"
         depends_on:
           - mandatory-win-2022-system-tests
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           SNAPSHOT: true
-          FIPS: "true"
+          FIPS: true
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
         artifact_paths:

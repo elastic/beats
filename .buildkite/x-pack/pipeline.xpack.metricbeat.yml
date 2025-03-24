@@ -449,7 +449,7 @@ steps:
         key: "packaging-linux-fips"
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
-          FIPS: "true"
+          FIPS: true
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
         retry:
@@ -470,7 +470,7 @@ steps:
         key: "packaging-arm-fips"
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
-          FIPS: "true"
+          FIPS: true
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/metricbeat
         retry:
