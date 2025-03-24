@@ -22,7 +22,7 @@ https://github.com/elastic/beats/compare/v9.0.0-beta1\...v9.0.0-rc1[View commits
 
 *Filebeat*
 
-- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly. {pull}42966[42966]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error. {pull}42420[42756]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
