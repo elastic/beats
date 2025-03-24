@@ -446,6 +446,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 print("Test has failed, here are the Beat logs")
                 for l in self.get_log_lines():
                     print(l)
+                if self.output_lines() == 0:
+                    print("\n\nBeat had no output file")
+                else:
+                    print("\n\nHere is the beat's output file:")
+                    for entry in self.read_output():
+                        print(entry)
                 raise WaitTimeoutError(
                     f"Timeout waiting for condition '{name}'. Waited {max_timeout} seconds: {err_msg}")
             time.sleep(poll_interval)
