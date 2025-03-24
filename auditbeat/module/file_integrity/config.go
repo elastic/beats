@@ -221,7 +221,7 @@ func (c *Config) IsIncludedPath(path string) bool {
 }
 
 var defaultConfig = Config{
-	HashTypes:        []HashType{SHA256},
+	HashTypes:        defaultHashes,
 	MaxFileSize:      "100 MiB",
 	MaxFileSizeBytes: 100 * 1024 * 1024,
 	ScanAtStart:      true,
