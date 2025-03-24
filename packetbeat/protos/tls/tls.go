@@ -248,8 +248,7 @@ func (plugin *tlsPlugin) sendEvent(conn *tlsConnectionData) {
 	if !conn.eventSent {
 		conn.eventSent = true
 		if conn.hasInfo() {
-			event := plugin.createEvent(conn)
-			plugin.results(event)
+			plugin.results(plugin.createEvent(conn))
 		}
 	}
 }
