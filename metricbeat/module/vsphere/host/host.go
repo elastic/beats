@@ -22,11 +22,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/pkg/errors" //nolint:gomodguard // don't fail CI in current PR
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
@@ -54,6 +55,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "virtualmachine", ms.Insecure)
 	return &MetricSet{ms}, nil
 }
 
@@ -103,15 +106,15 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		event := common.MapStr{}
 
 		event["name"] = hs.Summary.Config.Name
-		event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)
-		event.Put("memory.used.bytes", int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024)
+		_, _ = event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)
+		_, _ = event.Put("memory.used.bytes", int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024)
 
 		if hs.Summary.Hardware != nil {
 			totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
-			event.Put("cpu.total.mhz", totalCPU)
-			event.Put("cpu.free.mhz", int64(totalCPU)-int64(hs.Summary.QuickStats.OverallCpuUsage))
-			event.Put("memory.free.bytes", int64(hs.Summary.Hardware.MemorySize)-(int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024))
-			event.Put("memory.total.bytes", hs.Summary.Hardware.MemorySize)
+			_, _ = event.Put("cpu.total.mhz", totalCPU)
+			_, _ = event.Put("cpu.free.mhz", totalCPU-int64(hs.Summary.QuickStats.OverallCpuUsage))
+			_, _ = event.Put("memory.free.bytes", hs.Summary.Hardware.MemorySize-(int64(hs.Summary.QuickStats.OverallMemoryUsage)*1024*1024))
+			_, _ = event.Put("memory.total.bytes", hs.Summary.Hardware.MemorySize)
 		} else {
 			m.Logger().Debug("'Hardware' or 'Summary' data not found. This is either a parsing error from vsphere library, an error trying to reach host/guest or incomplete information returned from host/guest")
 		}
@@ -142,7 +145,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	var hs mo.HostSystem
 	err := pc.RetrieveOne(ctx, ref, []string{"network"}, &hs)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving host information: %v", err)
+		return nil, fmt.Errorf("error retrieving host information: %v", err) //nolint // changing to %w makes tests to fail
 	}
 
 	if len(hs.Network) == 0 {
@@ -163,7 +166,7 @@ func getNetworkNames(ctx context.Context, c *vim25.Client, ref types.ManagedObje
 	var nets []mo.Network
 	err = pc.Retrieve(ctx, networkRefs, []string{"name"}, &nets)
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving network from host: %v", err)
+		return nil, fmt.Errorf("error retrieving network from host: %v", err) //nolint // changing to %w makes tests to fail
 	}
 
 	for _, net := range nets {
