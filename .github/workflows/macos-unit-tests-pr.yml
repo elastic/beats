@@ -6,6 +6,11 @@ on:
 permissions:
   contents: read
 
+# Available image list: https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+env:
+  MACOS_13_X64: macos-13
+  MACOS_14_ARM: macos-14
+
 # to configure for PRs then cancel them
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,29 +26,26 @@ jobs:
         with:
           fetch-depth: '2'
 
+      #ToDo: add case when only macos-unit-tests-pr.yml is changed && when macos-unit-tests-pr.yml && some beat is changed
       - name: "Define matrix"
         id: set-matrix
         run: |
           changedDirs=$(git diff --dirstat=files HEAD~1 | sed 's/^[ 0-9.]\+% //g' | awk -F/ '{print $1}' | sort -u)
           relevantDirs=($(echo "$changedDirs" | grep -Fxf .github/workflows/macos.d/values.d/whitelisted-dirs))
+          osArray=($MACOS_13_X64 $MACOS_14_ARM)
 
-          # Available image list: https://github.com/actions/runner-images?tab=readme-ov-file#available-images
-          # macos-13-xlarge and macos-14 - arm64 images
-          # macos-13 and macos-14-large - x86 images
-          os=(macos-13, macos-13-xlarge, macos-14, macos-14-large)
-
-          matrix=$(jq -n --argjson beats "$(printf '%s\n' "${relevantDirs[@]}" | jq -R . | jq -s .)" \
-             --argjson os "$(printf '%s\n' "${os[@]}" | jq -R . | jq -s .)" \
-             '{beats: $beats, os: $os}')
+          matrix=$(jq -n --argjson dirs "$(printf '%s\n' "${relevantDirs[@]}" | jq -R . | jq -s .)" \
+              --argjson osArray "$(printf '%s\n' "${osArray[@]}" | jq -R . | jq -s .)" \
+              '[ $dirs[] as $dir | $osArray[] as $os | {beat: $dir, os: $os} ]')
 
           echo "matrix={\"include\":$(echo $matrix)}" >> $GITHUB_OUTPUT
 
-  unit-test-macos-15:
+  unit-tests:
     needs: matrix_prep
     strategy:
       fail-fast: false
       max-parallel: 10
-      matrix: ${{fromJson(needs.matrix_prep.outputs.matrix)}}
+      matrix: ${{ fromJson(needs.matrix_prep.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -60,11 +62,11 @@ jobs:
       - name: Install mage
         run: go install github.com/magefile/mage
 
-      - name: Run build / ${{ matrix.beat }}
+      - name: Run build
         run: mage build
         working-directory: ${{ matrix.beat }}
 
-      - name: Run unitTest / ${{ matrix.beat }}
+      - name: Run unitTest
         run: mage unitTest
         working-directory: ${{ matrix.beat }}
 
