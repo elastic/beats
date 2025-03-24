@@ -152,6 +152,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: Win 2022 Unit Tests"
 
+<<<<<<< HEAD
       - label: ":ubuntu: Auditbeat: Crosscompile"
         command: |
           make -C auditbeat crosscompile
@@ -166,6 +167,8 @@ steps:
           - github_commit_status:
               context: "auditbeat: Crosscompile"
 
+=======
+>>>>>>> a57c3dbae (bk(crosscompile): packaging already runs in the CI (#43406))
   - group: "Extended Tests"
     key: "auditbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
