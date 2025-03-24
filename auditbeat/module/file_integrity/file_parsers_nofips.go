@@ -72,4 +72,3 @@ var fileParserFor = map[string]string{
 	"file.pe.go_imports_names_var_entropy": "executable_object",
 	"file.pe.go_stripped":                  "executable_object",
 }
-
