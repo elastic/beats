@@ -15727,12 +15727,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.17.0/LI
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/belimawr/mock-es
-Version: v0.0.0-20250321210139-a616e145f79e
+Dependency : github.com/elastic/mock-es
+Version: v0.0.0-20250324153755-573fc6c0ac4b
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/belimawr/mock-es@v0.0.0-20250321210139-a616e145f79e/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mock-es@v0.0.0-20250324153755-573fc6c0ac4b/LICENSE:
 
 Copyright 2024 Elasticsearch B.V.
 
