@@ -15,49 +15,47 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package op
+//go:build requirefips
 
-// Sig will send the Completed or Failed event to s depending
-// on err being set if s is not nil.
-func Sig(s Signaler, err error) {
-	if s != nil {
-		if err == nil {
-			s.Completed()
-		} else {
-			s.Failed()
-		}
-	}
-}
+package file_integrity
 
-// SigCompleted sends the Completed event to s if s is not nil.
-func SigCompleted(s Signaler) {
-	if s != nil {
-		s.Completed()
-	}
-}
+import (
+	"crypto/sha256"
+	"crypto/sha3"
+	"crypto/sha512"
+	"hash"
 
-// SigFailed sends the Failed event to s if s is not nil.
-func SigFailed(s Signaler, err error) {
-	if s != nil {
-		s.Failed()
-	}
-}
+	"github.com/cespare/xxhash/v2"
+)
 
-// SigAll send the Completed or Failed event to all given signalers
-// depending on err being set.
-func SigAll(signalers []Signaler, err error) {
-	if signalers == nil {
-		return
+var (
+	validHashes = []HashType{
+		SHA224, SHA256, SHA384, SHA512, SHA512_224, SHA512_256,
+		SHA3_224, SHA3_256, SHA3_384, SHA3_512,
+		XXH64,
 	}
 
-	if err != nil {
-		for _, s := range signalers {
-			s.Failed()
-		}
-		return
+	hashTypes = map[HashType]func() hash.Hash{
+		SHA224: sha256.New224,
+		SHA256: sha256.New,
+		SHA384: sha512.New384,
+		SHA3_224: func() hash.Hash {
+			return sha3.New224()
+		},
+		SHA3_256: func() hash.Hash {
+			return sha3.New256()
+		},
+		SHA3_384: func() hash.Hash {
+			return sha3.New384()
+		},
+		SHA3_512: func() hash.Hash {
+			return sha3.New512()
+		},
+		SHA512:     sha512.New,
+		SHA512_224: sha512.New512_224,
+		SHA512_256: sha512.New512_256,
+		XXH64: func() hash.Hash {
+			return xxhash.New()
+		},
 	}
-
-	for _, s := range signalers {
-		s.Failed()
-	}
-}
+)
