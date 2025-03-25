@@ -15,49 +15,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package op
+package config
 
-// Sig will send the Completed or Failed event to s depending
-// on err being set if s is not nil.
-func Sig(s Signaler, err error) {
-	if s != nil {
-		if err == nil {
-			s.Completed()
-		} else {
-			s.Failed()
-		}
-	}
-}
+import (
+	"flag"
+	"os"
+	"testing"
 
-// SigCompleted sends the Completed event to s if s is not nil.
-func SigCompleted(s Signaler) {
-	if s != nil {
-		s.Completed()
-	}
-}
+	"github.com/elastic/beats/v7/testing/testflag"
+)
 
-// SigFailed sends the Failed event to s if s is not nil.
-func SigFailed(s Signaler, err error) {
-	if s != nil {
-		s.Failed()
-	}
-}
+func TestMain(m *testing.M) {
+	testflag.MustSetStrictPermsFalse()
 
-// SigAll send the Completed or Failed event to all given signalers
-// depending on err being set.
-func SigAll(signalers []Signaler, err error) {
-	if signalers == nil {
-		return
-	}
+	flag.Parse()
 
-	if err != nil {
-		for _, s := range signalers {
-			s.Failed()
-		}
-		return
-	}
-
-	for _, s := range signalers {
-		s.Failed()
-	}
+	os.Exit(m.Run())
 }
