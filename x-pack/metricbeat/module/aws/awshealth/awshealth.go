@@ -118,8 +118,6 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 		return err
 	}
 
-	awsConfig := m.MetricSet.AwsConfig.Copy()
-
 	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
 	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
 	// resolver will resolve to the FIPS endpoint.
@@ -127,6 +125,8 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	if fips140.Enabled() {
 		config.AWSConfig.FIPSEnabled = true
 	}
+
+	awsConfig := m.MetricSet.AwsConfig.Copy()
 
 	health_client := health.NewFromConfig(awsConfig, func(o *health.Options) {
 		if config.AWSConfig.FIPSEnabled {
