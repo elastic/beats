@@ -404,8 +404,8 @@ github.com/elastic/mock-es v0.0.0-20250324153755-573fc6c0ac4b h1:gaMtsr25lreEBrr
 github.com/elastic/mock-es v0.0.0-20250324153755-573fc6c0ac4b/go.mod h1:cXqWcLnmu5y4QveTb2hjk7rgzkHMuZsqeXtbJpNAcu0=
 github.com/elastic/pkcs8 v1.0.0 h1:HhitlUKxhN288kcNcYkjW6/ouvuwJWd9ioxpjnD9jVA=
 github.com/elastic/pkcs8 v1.0.0/go.mod h1:ipsZToJfq1MxclVTwpG7U/bgeDtf+0HkUiOxebk95+0=
-github.com/elastic/sarama v1.19.1-0.20241120141909-c7eabfcee7e5 h1:U7rts7RrrzQSDKkMuECpw9QCafSn2nRp36eRnWyR14E=
-github.com/elastic/sarama v1.19.1-0.20241120141909-c7eabfcee7e5/go.mod h1:EEdpKWvuZ46X7OEOENvSH5jEJXosi4fn7xjIeTajf+M=
+github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996 h1:bgsq8RD7lg4Jcn3QOqmQKhQzoUhD3N+ZKyNDRNo434U=
+github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996/go.mod h1:EEdpKWvuZ46X7OEOENvSH5jEJXosi4fn7xjIeTajf+M=
 github.com/elastic/tk-btf v0.1.0 h1:T4rbsnfaRH/MZKSLwZFd3sndt/NexsQb0IXWtMQ9PAA=
 github.com/elastic/tk-btf v0.1.0/go.mod h1:caLQPEcMbyKmPUQb2AsbX3ZAj1yCz06lOxfhn0esLR8=
 github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb h1:8SvKmGOYyxKi6jB0nvV1lpxEHfIS6tQ40x1BXBhKMsE=
