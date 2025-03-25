@@ -13,14 +13,6 @@ https://github.com/elastic/beats/compare/v8.16.5\...v8.16.6[View commits]
 
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 
-*Filebeat*
-
-- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
-
-*Functionbeat*
-
-- Removal of Functionbeat binaries from CI pipelines. {issue}40745[40745] {pull}43152[43152]
-
 ==== Bugfixes
 
 *Affecting all Beats*
@@ -32,6 +24,7 @@ https://github.com/elastic/beats/compare/v8.16.5\...v8.16.6[View commits]
 - Prevent computer details being returned for user queries by Active Directory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error. {pull}42420[42756]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Metricbeat*
 
