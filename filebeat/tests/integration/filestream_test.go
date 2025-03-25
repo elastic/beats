@@ -20,13 +20,17 @@
 package integration
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/stretchr/testify/assert"
@@ -107,7 +111,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	// of the file, so once the TTL of its state expires and the store GC runs,
 	// it will be removed from the registry.
 	// Wait for the log message stating 1 entry has been removed from the registry
-	filebeat.WaitForLogs("1 entries removed", 20*time.Second, "entry was not removed from registtry")
+	filebeat.WaitForLogs("1 entries removed", 20*time.Second, "entry was not removed from registry")
 
 	// 6. Then assess it has been removed in the registry
 	registryFile := filepath.Join(filebeat.TempDir(), "data", "registry", "filebeat", "log.json")
@@ -505,11 +509,159 @@ logging:
 	requireRegistryEntryRemoved(t, workDir, "native")
 }
 
+// TestFilestreamTakeOverFromFilestream ensures the Filestream input can migrate state
+// when its ID is changed.
+// The way this test works is:
+//   - It uses a set of known files (testdata/take-over/) so the registry keys
+//     are known in advance because fingerprint is used
+//   - We ran Filebeat to populate the registry/ingest the files
+//   - We stop Filebeat and update the configuration
+//   - We ran Filebeat again and assert: no new data is ingested, all registry
+//     keys are correctly updated
+//
+// Filenames and their fingerprints:
+//   - 01.log: 6fb3cb6c565bdba1354f64a42dd47ef937964019400dd571f25c2cd13a9fb5be
+//   - 02.log: db8399294e69089070405b13d4f057672f3852fa8e0f56ce4b6c92398aef1b6a
+//   - 01.txt: 9ef9433360a276b14e8eae3864594c0108042c0828d3504b34c082dfc1cd43da
+//   - 02.txt: 10c6577e45f2b06631e11285210d8bd967ebf9786cf81ccfc9fef64bc01725cd
+func TestFilestreamTakeOverFromFilestream(t *testing.T) {
+	oldID := "first-id"
+	newID := "second-id"
+
+	testDataPath, err := filepath.Abs("./testdata")
+	if err != nil {
+		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+	}
+
+	// Get the absolute path for all files Filebeat will ingest
+	logFiles := []string{}
+	for _, f := range []string{"01.log", "02.log", "01.txt", "02.txt"} {
+		logFiles = append(logFiles, filepath.Join(testDataPath, "take-over", f))
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	outputFile := filepath.Join(workDir, "output-file*")
+
+	vars := map[string]string{
+		"inputID":  oldID,
+		"homePath": workDir,
+		"testdata": testDataPath,
+	}
+	cfgYAML := getTakeOverConfig(t, vars, "happy-path.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	// Wait for the file to be fully ingested
+	waitForEOF(t, filebeat, logFiles)
+	requirePublishedEvents(t, filebeat, 8, outputFile)
+	filebeat.Stop()
+
+	vars["previousID"] = oldID
+	vars["inputID"] = newID
+
+	cfgYAML = getTakeOverConfig(t, vars, "happy-path.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+
+	removeOldLogFiles(t, workDir)
+
+	// Start Filebeat again.
+	// This time the states must be migrated and no new data ingested
+	filebeat.Start()
+	// Make sure we've "read" the files to the end
+	waitForEOF(t, filebeat, logFiles)
+
+	// Ensure no new data has been published
+	requirePublishedEvents(t, filebeat, 8, outputFile)
+
+	filebeat.Stop()
+
+	assertRegistry(
+		t,
+		workDir,
+		testDataPath,
+		filepath.Join(testDataPath,
+			"take-over",
+			"expected-registry-happy-path.json"),
+		"Entries in the registry are different from the expectation",
+	)
+}
+
+func TestFilestreamTakeOverFromLogInput(t *testing.T) {
+	testDataPath, err := filepath.Abs("./testdata")
+	if err != nil {
+		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+	}
+
+	// Get the absolute path for all files Filebeat will ingest
+	logFiles := []string{}
+	for _, f := range []string{"01.log", "02.log", "01.txt", "02.txt"} {
+		logFiles = append(logFiles, filepath.Join(testDataPath, "take-over", f))
+	}
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+	outputFile := filepath.Join(workDir, "output-file*")
+
+	vars := map[string]string{
+		"homePath": workDir,
+		"testdata": testDataPath,
+	}
+	cfgYAML := getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	// Wait for the file to be fully ingested
+	waitForEOF(t, filebeat, logFiles)
+	requirePublishedEvents(t, filebeat, 8, outputFile)
+	filebeat.Stop()
+
+	vars["takeOver"] = "true"
+
+	cfgYAML = getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+
+	removeOldLogFiles(t, workDir)
+
+	// Start Filebeat again.
+	// This time the states must be migrated and no new data ingested
+	filebeat.Start()
+	// Make sure we've "read" the files to the end.
+	// This is only for the files being harvested by Filestream.
+	waitForEOF(t, filebeat, logFiles[:2])
+	// The log input logs a different entry for files that have
+	// not changed, since Filebeat started. Wait for them.
+	waitForDidnotChange(t, filebeat, logFiles[2:])
+
+	// Ensure no new data has been published
+	requirePublishedEvents(t, filebeat, 8, outputFile)
+
+	filebeat.Stop()
+
+	assertRegistry(
+		t,
+		workDir,
+		testDataPath,
+		filepath.Join(testDataPath,
+			"take-over",
+			"expected-registry-happy-path-log-input.json"),
+		"Entries in the registry are different from the expectation",
+	)
+}
+
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
 	t.Helper()
 
-	registryLogFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
-	entries := readFilestreamRegistryLog(t, registryLogFile)
+	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
+	entries, _ := readFilestreamRegistryLog(t, registryFile)
 	inputEntries := []registryEntry{}
 	for _, currentEntry := range entries {
 		if strings.Contains(currentEntry.Key, identity) {
@@ -559,4 +711,142 @@ func createFileAndWaitIngestion(
 	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
 	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
+}
+
+func getTakeOverConfig(t *testing.T, vars map[string]string, tmplPath string) string {
+	t.Helper()
+	tmpl := template.Must(
+		template.ParseFiles(
+			filepath.Join("testdata", "take-over", tmplPath)))
+
+	str := strings.Builder{}
+	if err := tmpl.Execute(&str, vars); err != nil {
+		t.Fatalf("cannot execute template: %s", err)
+	}
+
+	ret := str.String()
+	return ret
+}
+
+func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
+	for _, path := range files {
+		if runtime.GOOS == "windows" {
+			path = strings.Replace(path, `\`, `\\`, -1)
+		}
+		eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", path)
+
+		require.Eventuallyf(
+			t,
+			func() bool {
+				return filebeat.GetLogLine(eofMsg) != ""
+			},
+			5*time.Second,
+			100*time.Millisecond,
+			"EOF log not found for %q", path,
+		)
+	}
+}
+
+func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []string) {
+	for _, path := range files {
+		if runtime.GOOS == "windows" {
+			path = strings.Replace(path, `\`, `\\`, -1)
+		}
+		eofMsg := fmt.Sprintf("File didn't change: %s", path)
+
+		require.Eventuallyf(
+			t,
+			func() bool {
+				return filebeat.GetLogLine(eofMsg) != ""
+			},
+			5*time.Second,
+			100*time.Millisecond,
+			"'File didn't change' log not found for %q", path,
+		)
+	}
+}
+
+func removeOldLogFiles(t *testing.T, workDir string) {
+	// Remove old log file so we can correctly search stuff
+	glob := filepath.Join(workDir, "filebeat-*.ndjson")
+	files, err := filepath.Glob(glob)
+	if err != nil {
+		t.Fatalf("cannot list log files: %s", err)
+	}
+
+	for _, f := range files {
+		if err := os.Remove(f); err != nil {
+			t.Fatalf("cannot remove old log file: %s", err)
+		}
+	}
+}
+
+func parseRegistry(entries []registryEntry) map[string]registryEntry {
+	registry := map[string]registryEntry{}
+
+	for _, e := range entries {
+		switch e.Op {
+		case "set":
+			registry[e.Key] = e
+		case "remove":
+			tmp := registry[e.Key]
+			tmp.Removed = true
+			registry[e.Key] = tmp
+		}
+	}
+
+	return registry
+}
+
+// assertRegistry reads Filebeat's registry from 'workDir' and compares
+// with the expected registry encoded as JSON in the file 'registry'
+func assertRegistry(t *testing.T, workDir, testdataDir, registry, msg string) {
+	t.Helper()
+	data, err := os.ReadFile(registry)
+	if err != nil {
+		t.Fatalf("canot read registry file '%q': %s", registry, err)
+	}
+
+	data = bytes.ReplaceAll(data, []byte("TESTDATA-PATH"), []byte(testdataDir))
+
+	// Replace the Linux path separator with Windows path separator and
+	// escape the path separator
+	if runtime.GOOS == "windows" {
+		data = bytes.ReplaceAll(data, []byte(`/`), []byte(`\`))
+		data = bytes.ReplaceAll(data, []byte(`\`), []byte(`\\`))
+	}
+	expectedRegistry := map[string]registryEntry{}
+	if err := json.Unmarshal(data, &expectedRegistry); err != nil {
+		t.Fatalf("cannot unmarshal expected registry file: %s", err)
+	}
+
+	registryFile := filepath.Join(workDir, "data", "registry", "filebeat", "log.json")
+	entries, nameToInode := readFilestreamRegistryLog(t, registryFile)
+	reg := parseRegistry(entries)
+
+	// More Windows workarounds.
+	// I don't know why, but on Windows, the offset of files is always 2 bytes
+	// more than on Linux, even for files committed to git.
+	// So we fix it here.
+	if runtime.GOOS == "windows" {
+		for k, v := range reg {
+			v.Offset = v.Offset - 2
+			reg[k] = v
+		}
+	}
+
+	// Last, but not least, update the file identity
+	// from the Log input entries
+	for k, v := range expectedRegistry {
+		if strings.Contains(v.Key, "NATIVE-") {
+			name := filepath.Base(v.Filename)
+			placeholder := fmt.Sprintf("native::NATIVE-%s", name)
+			newKey := strings.ReplaceAll(v.Key, placeholder, nameToInode[name])
+			v.Key = newKey
+			expectedRegistry[v.Key] = v
+			delete(expectedRegistry, k)
+		}
+	}
+
+	assert.Equal(t, expectedRegistry, reg, msg)
 }
