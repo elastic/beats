@@ -26,8 +26,8 @@ const (
 	ProtocolID   uint16 = 10
 	LogPrefix           = "[ipfix] "
 
-	TemplateFlowSetID           = 0 // should be 2
-	TemplateOptionsSetID        = 1 // should be 3
+	TemplateFlowSetID           = 2 // example data is 0
+	TemplateOptionsSetID        = 3 // example data is 1
 	EnterpriseBit        uint16 = 0x8000
 	SizeOfIPFIXHeader    uint16 = 16
 )
@@ -93,8 +93,16 @@ func (DecoderIPFIX) ReadPacketHeader(buf *bytes.Buffer) (header v9.PacketHeader,
 
 func (d DecoderIPFIX) ReadTemplateSet(setID uint16, buf *bytes.Buffer) ([]*template.Template, error) {
 	switch setID {
+	case TemplateFlowSetID-2:
+		d.Logger.Errorf("Template Flow Set ID is still invalid: Should be [%v], but is [%v]",
+			TemplateFlowSetID, setID)
+		return v9.ReadTemplateFlowSet(d, buf)
 	case TemplateFlowSetID:
 		return v9.ReadTemplateFlowSet(d, buf)
+	case TemplateOptionsSetID-2:
+		d.Logger.Errorf("Template Flow Set ID is still invalid: Should be [%v], but is [%v]",
+			TemplateOptionsSetID, setID)
+		return d.ReadOptionsTemplateFlowSet(buf)
 	case TemplateOptionsSetID:
 		return d.ReadOptionsTemplateFlowSet(buf)
 	default:
@@ -146,5 +154,10 @@ func (d DecoderIPFIX) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates [
 		template.IsOptions = true
 		templates = append(templates, &template)
 	}
+
+	for ind,temp := range templates {
+		d.Logger.Infof("%v: options template: %v", ind, temp)
+	}
+
 	return templates, nil
 }
