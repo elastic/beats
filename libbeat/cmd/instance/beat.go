@@ -315,12 +315,6 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	b.SetupRegistry()
 
-	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, b.Info.Logger)
-	if err != nil {
-		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
-	}
-	b.Beat.Instrumentation = instrumentation
-
 	b.keystore = store
 	b.Beat.Keystore = store
 	err = cloudid.OverwriteSettings(cfg)
@@ -352,6 +346,12 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	}
 	// extracting it here for ease of use
 	logger := b.Info.Logger
+
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, logger)
+	if err != nil {
+		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
+	}
+	b.Beat.Instrumentation = instrumentation
 
 	if err := promoteOutputQueueSettings(b); err != nil {
 		return nil, fmt.Errorf("could not promote output queue settings: %w", err)
@@ -437,9 +437,9 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	imFactory := settings.IndexManagement
 	if imFactory == nil {
-		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, b.Info.Logger)
+		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, logger)
 	}
-	b.IdxSupporter, err = imFactory(b.Info.Logger, b.Beat.Info, b.RawConfig)
+	b.IdxSupporter, err = imFactory(logger, b.Beat.Info, b.RawConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error setting index supporter: %w", err)
 	}
