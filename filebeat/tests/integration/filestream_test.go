@@ -512,8 +512,9 @@ logging:
 
 func TestFilestreamDelete(t *testing.T) {
 	testCases := map[string]struct {
-		configTmpl string
-		msgs       []string
+		configTmpl          string
+		msgs                []string
+		resourceNotFinished bool
 	}{
 		"EOF": {
 			configTmpl: "eof.yml",
@@ -522,6 +523,14 @@ func TestFilestreamDelete(t *testing.T) {
 				"'%s' will be removed because 'delete.on_close.eof' is set",
 			},
 		},
+		"EOF and resource not finished": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+			resourceNotFinished: true,
+		},
 		"Inactive": {
 			configTmpl: "inactive.yml",
 			msgs: []string{
@@ -529,12 +538,26 @@ func TestFilestreamDelete(t *testing.T) {
 				"'%s' will be removed because 'delete.on_close.inactive' is set",
 			},
 		},
+		"Inactive and resource not finished": {
+			configTmpl: "inactive.yml",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
+			resourceNotFinished: true,
+		},
 	}
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			s, esAddr, es, _ := integration.StartMockES(t, "", 0, 100, 0, 0, 0)
+			s, esAddr, es, _ := integration.StartMockES(t, "", 0, 0, 0, 0, 0)
 			defer s.Close()
+
+			if tc.resourceNotFinished {
+				if err := es.UpdateOdds(0, 100, 0, 0); err != nil {
+					t.Fatalf("cannot update odds from Mock-ES: %s", err)
+				}
+			}
 
 			testDataPath, err := filepath.Abs("./testdata")
 			if err != nil {
@@ -571,22 +594,24 @@ func TestFilestreamDelete(t *testing.T) {
 				)
 			}
 
-			// Wait a few times for the 'not finished' logs
-			notFinishedMsg := fmt.Sprintf(
-				"not all events from '%s' have been published, "+
-					"waiting before removing the file",
-				logFile)
-			for i := range 2 {
-				filebeat.WaitForLogs(
-					notFinishedMsg,
-					10*time.Second,
-					"[%d] Filebeat did not wait for the resource to be finished",
-					i,
-				)
-			}
+			if tc.resourceNotFinished {
+				// Wait a few times for the 'not finished' logs
+				notFinishedMsg := fmt.Sprintf(
+					"not all events from '%s' have been published, "+
+						"waiting before removing the file",
+					logFile)
+				for i := range 2 {
+					filebeat.WaitForLogs(
+						notFinishedMsg,
+						10*time.Second,
+						"[%d] Filebeat did not wait for the resource to be finished",
+						i,
+					)
+				}
 
-			if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
-				t.Fatalf("cannot update mock-es odds: %s", err)
+				if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
+					t.Fatalf("cannot update mock-es odds: %s", err)
+				}
 			}
 
 			msg := fmt.Sprintf("File %s has been removed", logFile)

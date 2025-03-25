@@ -354,7 +354,9 @@ Setting `close.on_state_change.inactive` to a lower value means that file handle
 
 The timestamp for closing a file does not depend on the modification time of the file. Instead, Filebeat uses an internal timestamp that reflects when the file was last harvested. For example, if `close.on_state_change.inactive` is set to 5 minutes, the countdown for the 5 minutes starts after the harvester reads the last line of the file.
 
-You can use time strings like 2h (2 hours) and 5m (5 minutes). The default is 5m.
+You can use time strings like 2h (2 hours) and 5m (5 minutes). The
+default is 5m. If `delete.on_close.inactive` is `true`, then the
+default is 30m (30 minutes).
 
 
 #### `close.on_state_change.renamed` [filebeat-input-filestream-close-renamed]
@@ -566,6 +568,10 @@ the reader is closed. If you enable `delete.on_close.inactive` you
 must also enable
 [`close.on_state_change.inactive`](#filebeat-input-filestream-close-inactive). The
 default is `false`.
+
+When `delete.on_close.inactive` is true, if
+`close.on_state_change.inactive` is not set, it defaults to 30m (30
+minutes).
 
 ### `delete.backoff.init` [filebeat-input-filestream-delete-backoff-init]
 The `delete.backoff.init` option defines how long Filebeat waits
