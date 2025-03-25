@@ -298,6 +298,8 @@ func (inp *filestream) deleteFile(
 			lastErr)
 	}
 
+	logger.Infof("'%s' removed", fs.newPath)
+
 	return nil
 }
 
