@@ -8,8 +8,8 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
-  PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
-  PLATFORMS_ARM: "+all linux/arm64"
+  PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
+  PLATFORMS_ARM: "+all linux/arm64 darwin/arm64"
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
@@ -121,7 +121,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "SNAPSHOT: {{matrix}} Linux/arm64"
+      - label: "SNAPSHOT: {{matrix}} Linux/arm64 and Darwin/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           SNAPSHOT: true
@@ -154,7 +154,7 @@ steps:
           - x-pack/agentbeat
 
       ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "SNAPSHOT: x-pack/agentbeat all artifacts apart from linux/arm64"
+      - label: "SNAPSHOT: x-pack/agentbeat all artifacts apart from linux/arm64 and darwin/arm64"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
@@ -212,7 +212,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "STAGING: {{matrix}} Linux/arm64"
+      - label: "STAGING: {{matrix}} Linux/arm64 and Darwin/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           SNAPSHOT: false
@@ -246,7 +246,7 @@ steps:
           - x-pack/agentbeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "STAGING: x-pack/agentbeat all artifacts apart from linux/arm64"
+      - label: "STAGING: x-pack/agentbeat all artifacts apart from linux/arm64 and darwin/arm64"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false

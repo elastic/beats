@@ -372,7 +372,7 @@ steps:
       - label: ":ubuntu: x-pack/auditbeat: Packaging Linux"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/auditbeat
         retry:
@@ -392,8 +392,7 @@ steps:
       - label: ":ubuntu: x-pack/auditbeat: Packaging Linux arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/auditbeat
         retry:
