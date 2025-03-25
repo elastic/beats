@@ -1,0 +1,788 @@
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-aws.html
+---
+
+# AWS fields [exported-fields-aws]
+
+Module for handling logs from AWS.
+
+
+## aws [_aws]
+
+Fields from AWS logs.
+
+
+## cloudtrail [_cloudtrail]
+
+Fields for AWS CloudTrail logs.
+
+**`aws.cloudtrail.event_version`**
+:   The CloudTrail version of the log event format.
+
+type: keyword
+
+
+
+## user_identity [_user_identity]
+
+The userIdentity element contains details about the type of IAM identity that made the request, and which credentials were used. If temporary credentials were used, the element shows how the credentials were obtained.
+
+**`aws.cloudtrail.user_identity.type`**
+:   The type of the identity
+
+type: keyword
+
+
+**`aws.cloudtrail.user_identity.arn`**
+:   The Amazon Resource Name (ARN) of the principal that made the call.
+
+type: keyword
+
+
+**`aws.cloudtrail.user_identity.access_key_id`**
+:   The access key ID that was used to sign the request.
+
+type: keyword
+
+
+
+## session_context [_session_context]
+
+If the request was made with temporary security credentials, an element that provides information about the session that was created for those credentials
+
+**`aws.cloudtrail.user_identity.session_context.mfa_authenticated`**
+:   The value is true if the root user or IAM user whose credentials were used for the request also was authenticated with an MFA device; otherwise, false.
+
+type: keyword
+
+
+**`aws.cloudtrail.user_identity.session_context.creation_date`**
+:   The date and time when the temporary security credentials were issued.
+
+type: date
+
+
+
+## session_issuer [_session_issuer]
+
+If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
+
+**`aws.cloudtrail.user_identity.session_context.session_issuer.type`**
+:   The source of the temporary security credentials, such as Root, IAMUser, or Role.
+
+type: keyword
+
+
+**`aws.cloudtrail.user_identity.session_context.session_issuer.principal_id`**
+:   The internal ID of the entity that was used to get credentials.
+
+type: keyword
+
+
+**`aws.cloudtrail.user_identity.session_context.session_issuer.arn`**
+:   The ARN of the source (account, IAM user, or role) that was used to get temporary security credentials.
+
+type: keyword
+
+
+**`aws.cloudtrail.user_identity.session_context.session_issuer.account_id`**
+:   The account that owns the entity that was used to get credentials.
+
+type: keyword
+
+
+**`aws.cloudtrail.user_identity.invoked_by`**
+:   The name of the AWS service that made the request, such as Amazon EC2 Auto Scaling or AWS Elastic Beanstalk.
+
+type: keyword
+
+
+**`aws.cloudtrail.error_code`**
+:   The AWS service error if the request returns an error.
+
+type: keyword
+
+
+**`aws.cloudtrail.error_message`**
+:   If the request returns an error, the description of the error.
+
+type: keyword
+
+
+**`aws.cloudtrail.request_parameters`**
+:   The parameters, if any, that were sent with the request.
+
+type: keyword
+
+
+**`aws.cloudtrail.request_parameters.text`**
+:   type: text
+
+
+**`aws.cloudtrail.response_elements`**
+:   The response element for actions that make changes (create, update, or delete actions).
+
+type: keyword
+
+
+**`aws.cloudtrail.response_elements.text`**
+:   type: text
+
+
+**`aws.cloudtrail.additional_eventdata`**
+:   Additional data about the event that was not part of the request or response.
+
+type: keyword
+
+
+**`aws.cloudtrail.additional_eventdata.text`**
+:   type: text
+
+
+**`aws.cloudtrail.request_id`**
+:   The value that identifies the request. The service being called generates this value.
+
+type: keyword
+
+
+**`aws.cloudtrail.event_type`**
+:   Identifies the type of event that generated the event record.
+
+type: keyword
+
+
+**`aws.cloudtrail.api_version`**
+:   Identifies the API version associated with the AwsApiCall eventType value.
+
+type: keyword
+
+
+**`aws.cloudtrail.management_event`**
+:   A Boolean value that identifies whether the event is a management event.
+
+type: keyword
+
+
+**`aws.cloudtrail.read_only`**
+:   Identifies whether this operation is a read-only operation.
+
+type: keyword
+
+
+
+## resources [_resources]
+
+A list of resources accessed in the event.
+
+**`aws.cloudtrail.resources.arn`**
+:   Resource ARNs
+
+type: keyword
+
+
+**`aws.cloudtrail.resources.account_id`**
+:   Account ID of the resource owner
+
+type: keyword
+
+
+**`aws.cloudtrail.resources.type`**
+:   Resource type identifier in the format: AWS::aws-service-name::data-type-name
+
+type: keyword
+
+
+**`aws.cloudtrail.recipient_account_id`**
+:   Represents the account ID that received this event.
+
+type: keyword
+
+
+**`aws.cloudtrail.service_event_details`**
+:   Identifies the service event, including what triggered the event and the result.
+
+type: keyword
+
+
+**`aws.cloudtrail.service_event_details.text`**
+:   type: text
+
+
+**`aws.cloudtrail.shared_event_id`**
+:   GUID generated by CloudTrail to uniquely identify CloudTrail events from the same AWS action that is sent to different AWS accounts.
+
+type: keyword
+
+
+**`aws.cloudtrail.vpc_endpoint_id`**
+:   Identifies the VPC endpoint in which requests were made from a VPC to another AWS service, such as Amazon S3.
+
+type: keyword
+
+
+**`aws.cloudtrail.event_category`**
+:   Shows the event category that is used in LookupEvents calls.
+
+* For management events, the value is management.
+* For data events, the value is data.
+* For Insights events, the value is insight.
+
+type: keyword
+
+
+
+## console_login [_console_login]
+
+Fields specific to ConsoleLogin events
+
+
+## additional_eventdata [_additional_eventdata]
+
+Additional Event Data for ConsoleLogin events
+
+**`aws.cloudtrail.console_login.additional_eventdata.mobile_version`**
+:   Identifies whether ConsoleLogin was from mobile version
+
+type: boolean
+
+
+**`aws.cloudtrail.console_login.additional_eventdata.login_to`**
+:   URL for ConsoleLogin
+
+type: keyword
+
+
+**`aws.cloudtrail.console_login.additional_eventdata.mfa_used`**
+:   Identifies whether multi factor authentication was used during ConsoleLogin
+
+type: boolean
+
+
+
+## flattened [_flattened]
+
+ES flattened datatype for objects where the subfields aren’t known in advance.
+
+**`aws.cloudtrail.flattened.additional_eventdata`**
+:   Additional data about the event that was not part of the request or response.
+
+type: flattened
+
+
+**`aws.cloudtrail.flattened.request_parameters`**
+:   The parameters, if any, that were sent with the request.
+
+type: flattened
+
+
+**`aws.cloudtrail.flattened.response_elements`**
+:   The response element for actions that make changes (create, update, or delete actions).
+
+type: flattened
+
+
+**`aws.cloudtrail.flattened.service_event_details`**
+:   Identifies the service event, including what triggered the event and the result.
+
+type: flattened
+
+
+
+## digest [_digest]
+
+Fields from Cloudtrail Digest Logs
+
+**`aws.cloudtrail.digest.log_files`**
+:   A list of Logfiles contained in the digest.
+
+type: nested
+
+
+**`aws.cloudtrail.digest.start_time`**
+:   The starting UTC time range that the digest file covers, taking as a reference the time in which log files have been delivered by CloudTrail.
+
+type: date
+
+
+**`aws.cloudtrail.digest.end_time`**
+:   The ending UTC time range that the digest file covers, taking as a reference the time in which log files have been delivered by CloudTrail.
+
+type: date
+
+
+**`aws.cloudtrail.digest.s3_bucket`**
+:   The name of the Amazon S3 bucket to which the current digest file has been delivered.
+
+type: keyword
+
+
+**`aws.cloudtrail.digest.s3_object`**
+:   The Amazon S3 object key (that is, the Amazon S3 bucket location) of the current digest file.
+
+type: keyword
+
+
+**`aws.cloudtrail.digest.newest_event_time`**
+:   The UTC time of the most recent event among all of the events in the log files in the digest.
+
+type: date
+
+
+**`aws.cloudtrail.digest.oldest_event_time`**
+:   The UTC time of the oldest event among all of the events in the log files in the digest.
+
+type: date
+
+
+**`aws.cloudtrail.digest.previous_s3_bucket`**
+:   The Amazon S3 bucket to which the previous digest file was delivered.
+
+type: keyword
+
+
+**`aws.cloudtrail.digest.previous_hash_algorithm`**
+:   The name of the hash algorithm that was used to hash the previous digest file.
+
+type: keyword
+
+
+**`aws.cloudtrail.digest.public_key_fingerprint`**
+:   The hexadecimal encoded fingerprint of the public key that matches the private key used to sign this digest file.
+
+type: keyword
+
+
+**`aws.cloudtrail.digest.signature_algorithm`**
+:   The algorithm used to sign the digest file.
+
+type: keyword
+
+
+**`aws.cloudtrail.insight_details`**
+:   Shows information about the underlying triggers of an Insights event, such as event source, user agent, statistics, API name, and whether the event is the start or end of the Insights event.
+
+type: flattened
+
+
+
+## cloudwatch [_cloudwatch]
+
+Fields for AWS CloudWatch logs.
+
+**`aws.cloudwatch.message`**
+:   CloudWatch log message.
+
+type: text
+
+
+
+## ec2 [_ec2]
+
+Fields for AWS EC2 logs in CloudWatch.
+
+**`aws.ec2.ip_address`**
+:   The internet address of the requester.
+
+type: keyword
+
+
+
+## elb [_elb]
+
+Fields for AWS ELB logs.
+
+**`aws.elb.name`**
+:   The name of the load balancer.
+
+type: keyword
+
+
+**`aws.elb.type`**
+:   The type of the load balancer for v2 Load Balancers.
+
+type: keyword
+
+
+**`aws.elb.target_group.arn`**
+:   The ARN of the target group handling the request.
+
+type: keyword
+
+
+**`aws.elb.listener`**
+:   The ELB listener that received the connection.
+
+type: keyword
+
+
+**`aws.elb.protocol`**
+:   The protocol of the load balancer (http or tcp).
+
+type: keyword
+
+
+**`aws.elb.request_processing_time.sec`**
+:   The total time in seconds since the connection or request is received until it is sent to a registered backend.
+
+type: float
+
+
+**`aws.elb.backend_processing_time.sec`**
+:   The total time in seconds since the connection is sent to the backend till the backend starts responding.
+
+type: float
+
+
+**`aws.elb.response_processing_time.sec`**
+:   The total time in seconds since the response is received from the backend till it is sent to the client.
+
+type: float
+
+
+**`aws.elb.connection_time.ms`**
+:   The total time of the connection in milliseconds, since it is opened till it is closed.
+
+type: long
+
+
+**`aws.elb.tls_handshake_time.ms`**
+:   The total time for the TLS handshake to complete in milliseconds once the connection has been established.
+
+type: long
+
+
+**`aws.elb.backend.ip`**
+:   The IP address of the backend processing this connection.
+
+type: keyword
+
+
+**`aws.elb.backend.port`**
+:   The port in the backend processing this connection.
+
+type: keyword
+
+
+**`aws.elb.backend.http.response.status_code`**
+:   The status code from the backend (status code sent to the client from ELB is stored in `http.response.status_code`
+
+type: keyword
+
+
+**`aws.elb.ssl_cipher`**
+:   The SSL cipher used in TLS/SSL connections.
+
+type: keyword
+
+
+**`aws.elb.ssl_protocol`**
+:   The SSL protocol used in TLS/SSL connections.
+
+type: keyword
+
+
+**`aws.elb.chosen_cert.arn`**
+:   The ARN of the chosen certificate presented to the client in TLS/SSL connections.
+
+type: keyword
+
+
+**`aws.elb.chosen_cert.serial`**
+:   The serial number of the chosen certificate presented to the client in TLS/SSL connections.
+
+type: keyword
+
+
+**`aws.elb.incoming_tls_alert`**
+:   The integer value of TLS alerts received by the load balancer from the client, if present.
+
+type: keyword
+
+
+**`aws.elb.tls_named_group`**
+:   The TLS named group.
+
+type: keyword
+
+
+**`aws.elb.trace_id`**
+:   The contents of the `X-Amzn-Trace-Id` header.
+
+type: keyword
+
+
+**`aws.elb.matched_rule_priority`**
+:   The priority value of the rule that matched the request, if a rule matched.
+
+type: keyword
+
+
+**`aws.elb.action_executed`**
+:   The action executed when processing the request (forward, fixed-response, authenticate…​). It can contain several values.
+
+type: keyword
+
+
+**`aws.elb.redirect_url`**
+:   The URL used if a redirection action was executed.
+
+type: keyword
+
+
+**`aws.elb.error.reason`**
+:   The error reason if the executed action failed.
+
+type: keyword
+
+
+**`aws.elb.target_port`**
+:   List of IP addresses and ports for the targets that processed this request.
+
+type: keyword
+
+
+**`aws.elb.target_status_code`**
+:   List of status codes from the responses of the targets.
+
+type: keyword
+
+
+**`aws.elb.classification`**
+:   The classification for desync mitigation.
+
+type: keyword
+
+
+**`aws.elb.classification_reason`**
+:   The classification reason code.
+
+type: keyword
+
+
+
+## s3access [_s3access]
+
+Fields for AWS S3 server access logs.
+
+**`aws.s3access.bucket_owner`**
+:   The canonical user ID of the owner of the source bucket.
+
+type: keyword
+
+
+**`aws.s3access.bucket`**
+:   The name of the bucket that the request was processed against.
+
+type: keyword
+
+
+**`aws.s3access.remote_ip`**
+:   The apparent internet address of the requester.
+
+type: ip
+
+
+**`aws.s3access.requester`**
+:   The canonical user ID of the requester, or a - for unauthenticated requests.
+
+type: keyword
+
+
+**`aws.s3access.request_id`**
+:   A string generated by Amazon S3 to uniquely identify each request.
+
+type: keyword
+
+
+**`aws.s3access.operation`**
+:   The operation listed here is declared as SOAP.operation, REST.HTTP_method.resource_type, WEBSITE.HTTP_method.resource_type, or BATCH.DELETE.OBJECT.
+
+type: keyword
+
+
+**`aws.s3access.key`**
+:   The "key" part of the request, URL encoded, or "-" if the operation does not take a key parameter.
+
+type: keyword
+
+
+**`aws.s3access.request_uri`**
+:   The Request-URI part of the HTTP request message.
+
+type: keyword
+
+
+**`aws.s3access.http_status`**
+:   The numeric HTTP status code of the response.
+
+type: long
+
+
+**`aws.s3access.error_code`**
+:   The Amazon S3 Error Code, or "-" if no error occurred.
+
+type: keyword
+
+
+**`aws.s3access.bytes_sent`**
+:   The number of response bytes sent, excluding HTTP protocol overhead, or "-" if zero.
+
+type: long
+
+
+**`aws.s3access.object_size`**
+:   The total size of the object in question.
+
+type: long
+
+
+**`aws.s3access.total_time`**
+:   The number of milliseconds the request was in flight from the server’s perspective.
+
+type: long
+
+
+**`aws.s3access.turn_around_time`**
+:   The number of milliseconds that Amazon S3 spent processing your request.
+
+type: long
+
+
+**`aws.s3access.referrer`**
+:   The value of the HTTP Referrer header, if present.
+
+type: keyword
+
+
+**`aws.s3access.user_agent`**
+:   The value of the HTTP User-Agent header.
+
+type: keyword
+
+
+**`aws.s3access.version_id`**
+:   The version ID in the request, or "-" if the operation does not take a versionId parameter.
+
+type: keyword
+
+
+**`aws.s3access.host_id`**
+:   The x-amz-id-2 or Amazon S3 extended request ID.
+
+type: keyword
+
+
+**`aws.s3access.signature_version`**
+:   The signature version, SigV2 or SigV4, that was used to authenticate the request or a - for unauthenticated requests.
+
+type: keyword
+
+
+**`aws.s3access.cipher_suite`**
+:   The Secure Sockets Layer (SSL) cipher that was negotiated for HTTPS request or a - for HTTP.
+
+type: keyword
+
+
+**`aws.s3access.authentication_type`**
+:   The type of request authentication used, AuthHeader for authentication headers, QueryString for query string (pre-signed URL) or a - for unauthenticated requests.
+
+type: keyword
+
+
+**`aws.s3access.host_header`**
+:   The endpoint used to connect to Amazon S3.
+
+type: keyword
+
+
+**`aws.s3access.tls_version`**
+:   The Transport Layer Security (TLS) version negotiated by the client.
+
+type: keyword
+
+
+
+## vpcflow [_vpcflow]
+
+Fields for AWS VPC flow logs.
+
+**`aws.vpcflow.version`**
+:   The VPC Flow Logs version. If you use the default format, the version is 2. If you specify a custom format, the version is 3.
+
+type: keyword
+
+
+**`aws.vpcflow.account_id`**
+:   The AWS account ID for the flow log.
+
+type: keyword
+
+
+**`aws.vpcflow.interface_id`**
+:   The ID of the network interface for which the traffic is recorded.
+
+type: keyword
+
+
+**`aws.vpcflow.action`**
+:   The action that is associated with the traffic, ACCEPT or REJECT.
+
+type: keyword
+
+
+**`aws.vpcflow.log_status`**
+:   The logging status of the flow log, OK, NODATA or SKIPDATA.
+
+type: keyword
+
+
+**`aws.vpcflow.instance_id`**
+:   The ID of the instance that’s associated with network interface for which the traffic is recorded, if the instance is owned by you.
+
+type: keyword
+
+
+**`aws.vpcflow.pkt_srcaddr`**
+:   The packet-level (original) source IP address of the traffic.
+
+type: ip
+
+
+**`aws.vpcflow.pkt_dstaddr`**
+:   The packet-level (original) destination IP address for the traffic.
+
+type: ip
+
+
+**`aws.vpcflow.vpc_id`**
+:   The ID of the VPC that contains the network interface for which the traffic is recorded.
+
+type: keyword
+
+
+**`aws.vpcflow.subnet_id`**
+:   The ID of the subnet that contains the network interface for which the traffic is recorded.
+
+type: keyword
+
+
+**`aws.vpcflow.tcp_flags`**
+:   The bitmask value for the following TCP flags: 2=SYN,18=SYN-ACK,1=FIN,4=RST
+
+type: keyword
+
+
+**`aws.vpcflow.tcp_flags_array`**
+:   List of TCP flags: *fin, syn, rst, psh, ack, urg*
+
+type: keyword
+
+
+**`aws.vpcflow.type`**
+:   The type of traffic: IPv4, IPv6, or EFA.
+
+type: keyword
+
+
