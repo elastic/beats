@@ -29,7 +29,7 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 *Metricbeat*
 
 - Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
-- Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
+- Remove `hostname` field from Zookeeper's `mntr` data stream. {pull}41887[41887]
 - Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 
 *Winlogbeat*
