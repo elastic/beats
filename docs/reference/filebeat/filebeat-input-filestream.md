@@ -317,25 +317,54 @@ The setting relies on the modification time of the file to determine if a file i
 
 To remove the state of previously harvested files from the registry file, use the `clean_inactive` configuration option.
 
+## Take over [filebeat-input-filestream-take-over]
+When `take_over` is enabled, this `filestream` input will take over
+states from the [`log`](/reference/filebeat/filebeat-input-log.md) input
+or other `filestream` inputs. Only states of files being actively
+harvested by this input are taken over.
 
-#### `take_over` [filebeat-input-filestream-take-over]
+To take over files from a `log` input, simply set `take_over.enabled: true`.
 
-If `take_over` is set to `true`, this `filestream` will take over all files from `log` inputs if they match at least one of the `paths` set in the `filestream`.
+To take over states from other `filestream` inputs, set
+`take_over.enabled: true` and set `take_over.from_ids` to a list of
+existing `filestream` IDs you want to migrate files from.
+
+On both cases make sure the files you want this input to take over
+match the configured globs in `paths`.
+
+When `take_over.from_ids` is set, files are not taken over from `log`
+inputs. The migration is limited to `filestream` inputs only.
+
+```yaml
+take_over:
+  enabled: true
+  from_ids: ["foo", "bar"] # omit to take over from the log input
+```
+:::{important}
+The `take over` mode can work correctly only if the source (taken from) inputs are no longer active. If source inputs are still harvesting the files which are being migrated, it will lead to data duplication and in some cases might cause data loss.
+:::
 
 ::::{important}
-`take_over: true` requires the `filestream` to have a unique ID.
+`take_over.enabled: true` requires the `filestream` to have a unique ID.
 ::::
 
 
-This `take over` mode was created to enable smooth migration from deprecated `log` inputs to the new `filestream` inputs.
+This `take over` mode was created to enable smooth migration from
+deprecated `log` inputs to the new `filestream` inputs and to allow
+changing `filestream` input IDs without data re-ingestion.
 
 See [*Migrate `log` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md) for more details about the migration process.
 
 ::::{warning}
-The `take over` mode is still in beta, however, it’s manually reversible due to backups created in the [`registry.path/filebeat` directory](/reference/filebeat/configuration-general-options.md#configuration-global-options) and should be generally safe to use.
+The `take over` mode is still in beta, however, it should be generally safe to use.
 ::::
 
 
+### Limitations
+Take over can only migrate states from existing files that are not
+ignored during the `filestream` input start up. Once the input is
+ingesting data, if a new file appears, `filestream` will not try to
+migrate its state.
 
 #### `close.*` [filebeat-input-filestream-close-options]
 
