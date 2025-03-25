@@ -551,12 +551,12 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	workDir := filebeat.TempDir()
 	outputFile := filepath.Join(workDir, "output-file*")
 
-	vars := map[string]string{
+	vars := map[string]any{
 		"inputID":  oldID,
 		"homePath": workDir,
 		"testdata": testDataPath,
 	}
-	cfgYAML := getTakeOverConfig(t, vars, "happy-path.yml")
+	cfgYAML := getConfig(t, vars, "take-over", "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
@@ -568,7 +568,7 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	vars["previousID"] = oldID
 	vars["inputID"] = newID
 
-	cfgYAML = getTakeOverConfig(t, vars, "happy-path.yml")
+	cfgYAML = getConfig(t, vars, "take-over", "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
 	removeOldLogFiles(t, workDir)
@@ -615,11 +615,11 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 	workDir := filebeat.TempDir()
 	outputFile := filepath.Join(workDir, "output-file*")
 
-	vars := map[string]string{
+	vars := map[string]any{
 		"homePath": workDir,
 		"testdata": testDataPath,
 	}
-	cfgYAML := getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	cfgYAML := getConfig(t, vars, "take-over", "happy-path-log-input.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
@@ -630,7 +630,7 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 
 	vars["takeOver"] = "true"
 
-	cfgYAML = getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	cfgYAML = getConfig(t, vars, "take-over", "happy-path-log-input.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
 	removeOldLogFiles(t, workDir)
@@ -841,21 +841,6 @@ func createFileAndWaitIngestion(
 	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
 	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
-}
-
-func getTakeOverConfig(t *testing.T, vars map[string]string, tmplPath string) string {
-	t.Helper()
-	tmpl := template.Must(
-		template.ParseFiles(
-			filepath.Join("testdata", "take-over", tmplPath)))
-
-	str := strings.Builder{}
-	if err := tmpl.Execute(&str, vars); err != nil {
-		t.Fatalf("cannot execute template: %s", err)
-	}
-
-	ret := str.String()
-	return ret
 }
 
 func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
