@@ -115,7 +115,9 @@ tar xzvf packetbeat-{{stack-version}}-linux-x86_64.tar.gz
   PS C:\Program Files\Packetbeat> .\install-service-packetbeat.ps1
   ```
 
-NOTE: If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-packetbeat.ps1`.
+:::{note}
+If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-packetbeat.ps1`.
+:::
 ::::::
 
 :::::::
