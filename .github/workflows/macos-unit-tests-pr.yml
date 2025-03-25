@@ -2,11 +2,14 @@ name: macos-unit-tests-pr
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
 
-# Available image list: https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+# Available image list: https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
 env:
   MACOS_13_X64: macos-13
   MACOS_14_ARM: macos-14
@@ -17,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  matrix_prep:
+  matrix-prep:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -26,20 +29,18 @@ jobs:
         with:
           fetch-depth: '2'
 
-      #ToDo: add case when only macos-unit-tests-pr.yml is changed && when macos-unit-tests-pr.yml && some beat is changed
       - name: "Define matrix"
         id: set-matrix
         run: |
           .github/workflows/macos.d/generate-matrix.sh
 
-
   unit-tests:
-    needs: matrix_prep
-    if: ${{ needs.matrix_prep.outputs.matrix != '' }}
+    needs: matrix-prep
+    if: ${{ needs.matrix-prep.outputs.matrix != '' }}
     strategy:
       fail-fast: false
       max-parallel: 10
-      matrix: ${{ fromJson(needs.matrix_prep.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
