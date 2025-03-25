@@ -6,7 +6,6 @@ package rds
 
 import (
 	"context"
-	"crypto/fips140"
 	"fmt"
 	"strings"
 
@@ -23,7 +22,7 @@ const metadataPrefix = "aws.rds.db_instance."
 // AddMetadata adds metadata for RDS instances from a specific region
 func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
 	svc := rds.NewFromConfig(awsConfig, func(o *rds.Options) {
-		if fips_enabled || fips140.Enabled() {
+		if fips_enabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
