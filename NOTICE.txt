@@ -12699,11 +12699,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-l
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-system-metrics
-Version: v0.11.9
+Version: v0.11.10
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.11.9/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-system-metrics@v0.11.10/LICENSE.txt:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -15751,11 +15751,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/sarama
-Version: v1.19.1-0.20241120141909-c7eabfcee7e5
+Version: v1.19.1-0.20250304185506-df6449b5c996
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20241120141909-c7eabfcee7e5/LICENSE.md:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/sarama@v1.19.1-0.20250304185506-df6449b5c996/LICENSE.md:
 
 # MIT License
 

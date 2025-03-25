@@ -45,15 +45,6 @@ func (t *HashType) Unpack(v string) error {
 	return nil
 }
 
-var validHashes = []HashType{
-	BLAKE2B_256, BLAKE2B_384, BLAKE2B_512,
-	MD5,
-	SHA1,
-	SHA224, SHA256, SHA384, SHA512, SHA512_224, SHA512_256,
-	SHA3_224, SHA3_256, SHA3_384, SHA3_512,
-	XXH64,
-}
-
 // Enum of hash types.
 const (
 	BLAKE2B_256 HashType = "blake2b_256"
@@ -230,7 +221,7 @@ func (c *Config) IsIncludedPath(path string) bool {
 }
 
 var defaultConfig = Config{
-	HashTypes:        []HashType{SHA1},
+	HashTypes:        defaultHashes,
 	MaxFileSize:      "100 MiB",
 	MaxFileSizeBytes: 100 * 1024 * 1024,
 	ScanAtStart:      true,

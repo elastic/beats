@@ -17,19 +17,39 @@
 
 //go:build requirefips
 
-package flowhash
+package hasher
 
-var CommunityID = newEmptyCommunityID()
+import (
+	"crypto/sha256"
+	"crypto/sha3"
+	"crypto/sha512"
+	"hash"
 
-type emptyCommunityIDHasher struct{}
+	"github.com/cespare/xxhash/v2"
+)
 
-// newEmptyCommunityID returns an empty Hasher
-func newEmptyCommunityID() Hasher {
-	return &emptyCommunityIDHasher{}
-}
-
-// Hash returns an empty string
-func (h *emptyCommunityIDHasher) Hash(_ Flow) string {
-	// no op
-	return ""
-}
+var (
+	validHashes = map[HashType]func() hash.Hash{
+		SHA224: sha256.New224,
+		SHA256: sha256.New,
+		SHA384: sha512.New384,
+		SHA3_224: func() hash.Hash {
+			return sha3.New224()
+		},
+		SHA3_256: func() hash.Hash {
+			return sha3.New256()
+		},
+		SHA3_384: func() hash.Hash {
+			return sha3.New384()
+		},
+		SHA3_512: func() hash.Hash {
+			return sha3.New512()
+		},
+		SHA512:     sha512.New,
+		SHA512_224: sha512.New512_224,
+		SHA512_256: sha512.New512_256,
+		XXH64: func() hash.Hash {
+			return xxhash.New()
+		},
+	}
+)
