@@ -111,7 +111,8 @@ func withPipelineEventCounter(pipeline beat.PipelineConnector, counter *eventCou
 
 	pipeline = pipetool.WithClientConfigEdit(pipeline, func(config beat.ClientConfig) (beat.ClientConfig, error) {
 		if evts := config.ClientListener; evts != nil {
-			config.ClientListener = &beat.CombinedClientListener{evts, counterListener}
+			config.ClientListener = &beat.CombinedClientListener{
+				A: evts, B: counterListener}
 		} else {
 			config.ClientListener = counterListener
 		}
