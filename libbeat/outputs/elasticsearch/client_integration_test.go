@@ -83,7 +83,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 	// drop old index preparing test
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
-	batch := encodeBatch(client, outest.NewBatch(beat.Event{
+	batch := encodeBatch[outest.Batch](client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":    "libbeat",
