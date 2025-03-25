@@ -533,7 +533,7 @@ func TestFilestreamDelete(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			s, es, _ := integration.StartMockES(t, 0, 100, 0, 0, 0)
+			s, esAddr, es, _ := integration.StartMockES(t, "", 0, 100, 0, 0, 0)
 			defer s.Close()
 
 			testDataPath, err := filepath.Abs("./testdata")
@@ -555,7 +555,7 @@ func TestFilestreamDelete(t *testing.T) {
 				"homePath": workDir,
 				"logfile":  logFile,
 				"testdata": testDataPath,
-				"esHost":   s.Listener.Addr(),
+				"esHost":   esAddr,
 			}
 			cfgYAML := getConfig(t, vars, "delete", tc.configTmpl)
 			filebeat.WriteConfigFile(cfgYAML)

@@ -20,17 +20,14 @@
 package integration
 
 import (
-	"errors"
-	"io"
-	"net/http"
+	"context"
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid/v5"
-	"github.com/rcrowley/go-metrics"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/mock-es/pkg/api"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/metric/metricdata"
 )
 
 var esCfg = `
@@ -47,7 +44,7 @@ queue.mem:
 output.elasticsearch:
   allow_older_versions: true
   hosts:
-    - "http://localhost:4242"
+    - "%s"
   backoff:
     init: 0.1s
     max: 0.2s
@@ -55,10 +52,11 @@ output.elasticsearch:
 
 func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
-	mockbeat.WriteConfigFile(esCfg)
 
-	s, mr := startMockES(t, "localhost:4242")
+	s, esIPPort, _, mr := StartMockES(t, ":4242", 0, 0, 0, 0, 0)
+	esAddr := "http://" + esIPPort
 
+	mockbeat.WriteConfigFile(fmt.Sprintf(esCfg, esAddr))
 	mockbeat.Start()
 
 	// 1. Wait for one _bulk call
@@ -71,21 +69,21 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 
 	// 3. Wait for connection error logs
 	mockbeat.WaitForLogs(
-		`Get \"http://localhost:4242\": dial tcp 127.0.0.1:4242: connect: connection refused`,
+		fmt.Sprintf(`Get \"%s\": dial tcp %s: connect: connection refused`, esAddr, esIPPort),
 		2*time.Second,
 		"did not find connection refused error")
 
 	mockbeat.WaitForLogs(
-		"Attempting to reconnect to backoff(elasticsearch(http://localhost:4242)) with 2 reconnect attempt(s)",
+		fmt.Sprintf("Attempting to reconnect to backoff(elasticsearch(%s)) with 2 reconnect attempt(s)", esAddr),
 		2*time.Second,
 		"did not find two tries to reconnect")
 
 	// 4. Restart mock-es on the same port
-	s, mr = startMockES(t, "localhost:4242")
+	s, esIPPort, _, mr = StartMockES(t, ":4242", 0, 0, 0, 0, 0)
 
 	// 5. Wait for reconnection logs
 	mockbeat.WaitForLogs(
-		"Connection to backoff(elasticsearch(http://localhost:4242)) established",
+		fmt.Sprintf("Connection to backoff(elasticsearch(%s)) established", esAddr),
 		5*time.Second, // There is a backoff, so ensure we wait enough
 		"did not find re connection confirmation")
 
@@ -94,55 +92,38 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	s.Close()
 }
 
-func startMockES(t *testing.T, addr string) (*http.Server, metrics.Registry) {
-	uid := uuid.Must(uuid.NewV4())
-	mr := metrics.NewRegistry()
-	es := api.NewAPIHandler(uid, "foo2", mr, time.Now().Add(24*time.Hour), 0, 0, 0, 0, 0)
-
-	s := http.Server{Addr: addr, Handler: es, ReadHeaderTimeout: time.Second}
-	go func() {
-		if err := s.ListenAndServe(); !errors.Is(http.ErrServerClosed, err) {
-			t.Errorf("could not start mock-es server: %s", err)
-		}
-	}()
-
-	require.Eventually(t, func() bool {
-		resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
-		if err != nil {
-			//nolint: errcheck // We're just draining the body, we can ignore the error
-			io.Copy(io.Discard, resp.Body)
-			resp.Body.Close()
-			return false
-		}
-		return true
-	},
-		time.Second, time.Millisecond, "mock-es server did not start on '%s'", addr)
-
-	return &s, mr
-}
-
 // waitForEventToBePublished waits for at least one event published
 // by inspecting the count for `bulk.create.total` in `mr`. Once
 // the counter is > 1, waitForEventToBePublished returns. If that
 // does not happen within 10min, then the test fails with a call to
 // t.Fatal.
-func waitForEventToBePublished(t *testing.T, mr metrics.Registry) {
+func waitForEventToBePublished(t *testing.T, rdr *sdkmetric.ManualReader) {
 	t.Helper()
+
 	require.Eventually(t, func() bool {
-		total := mr.Get("bulk.create.total")
-		if total == nil {
+		rm := metricdata.ResourceMetrics{}
+		err := rdr.Collect(context.Background(), &rm)
+
+		if err != nil {
+			t.Fatalf("failed to collect metrics: %v", err)
+		}
+
+		for _, sm := range rm.ScopeMetrics {
+			for _, m := range sm.Metrics {
+				if m.Name == "bulk.create.total" {
+					total := int64(0)
+					for _, dp := range m.Data.(metricdata.Sum[int64]).DataPoints {
+						total += dp.Value
+					}
+					return total >= 1
+				}
+			}
+
 			return false
 		}
-
-		sc, ok := total.(*metrics.StandardCounter)
-		if !ok {
-			t.Fatalf("expecting 'bulk.create.total' to be *metrics.StandardCounter, but got '%T' instead",
-				total,
-			)
-		}
-
-		return sc.Count() > 1
+		return false
 	},
-		10*time.Second, 100*time.Millisecond,
+		10*time.Second,
+		100*time.Millisecond,
 		"at least one bulk request must be made")
 }

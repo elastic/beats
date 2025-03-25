@@ -27,8 +27,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
-	"net/http/httptest"
 	"net/url"
 	"os"
 	"os/exec"
@@ -1003,14 +1003,22 @@ func (b *BeatProc) ConfigFilePath() string {
 	return b.configFile
 }
 
+// StartMockES starts mock-es on the specified address.
+// If add is an empty string a random local port is used.
+// The return values are:
+//   - The HTTP server
+//   - The server address in the form ip:port
+//   - The mock-es API handler
+//   - The ManualReader for accessing the metrics
 func StartMockES(
 	t *testing.T,
+	addr string,
 	percentDuplicate,
 	percentTooMany,
 	percentNonIndex,
 	percentTooLarge,
 	historyCap uint,
-) (*httptest.Server, *api.APIHandler, *sdkmetric.ManualReader) {
+) (*http.Server, string, *api.APIHandler, *sdkmetric.ManualReader) {
 
 	uid := uuid.Must(uuid.NewV4())
 
@@ -1032,25 +1040,41 @@ func StartMockES(
 		historyCap,
 	)
 
-	s := httptest.NewServer(es)
-	addr := "http://" + s.Listener.Addr().String()
+	if addr == "" {
+		addr = ":0"
+	}
+
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		if l, err = net.Listen("tcp6", addr); err != nil {
+			t.Fatalf("failed to listen on a port: %v", err)
+		}
+	}
+
+	addr = l.Addr().String()
+	s := http.Server{Handler: es, ReadHeaderTimeout: time.Second}
+	go func() {
+		if err := s.Serve(l); !errors.Is(http.ErrServerClosed, err) {
+			t.Errorf("could not start mock-es server: %s", err)
+		}
+	}()
 
 	// Ensure the Server is up and running before returning
 	require.Eventually(
 		t,
 		func() bool {
-			resp, err := http.Get(addr) //nolint: noctx // It's just a test
+			resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
 			if err != nil {
-				//nolint: errcheck // We're just draining the body, we can ignore the error
-				io.Copy(io.Discard, resp.Body)
-				resp.Body.Close()
 				return false
 			}
+			//nolint: errcheck // We're just draining the body, we can ignore the error
+			io.Copy(io.Discard, resp.Body)
+			resp.Body.Close()
 			return true
 		},
 		time.Second,
 		time.Millisecond,
 		"mock-es server did not start on '%s'", addr)
 
-	return s, es, rdr
+	return &s, addr, es, rdr
 }

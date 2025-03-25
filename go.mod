@@ -181,7 +181,7 @@ require (
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.17.0
-	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
+	github.com/elastic/mock-es v0.0.0-20250324153755-573fc6c0ac4b
 	github.com/elastic/sarama v1.19.1-0.20241120141909-c7eabfcee7e5
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
@@ -493,5 +493,3 @@ replace (
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20240913150833-a945473a8f25
 )
-
-replace github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015 => github.com/belimawr/mock-es v0.0.0-20250321210139-a616e145f79e
