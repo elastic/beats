@@ -17,19 +17,6 @@
 
 //go:build requirefips
 
-package flowhash
+package file_integrity
 
-var CommunityID = newEmptyCommunityID()
-
-type emptyCommunityIDHasher struct{}
-
-// newEmptyCommunityID returns an empty Hasher
-func newEmptyCommunityID() Hasher {
-	return &emptyCommunityIDHasher{}
-}
-
-// Hash returns an empty string
-func (h *emptyCommunityIDHasher) Hash(_ Flow) string {
-	// no op
-	return ""
-}
+var defaultHashes = []HashType{SHA256}
