@@ -3,6 +3,51 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.17.4]]
+=== Beats version 8.17.4
+https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Prevent computer details being returned for user queries by Active Directory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in `aws-s3` input and enforce retrying using download failed error. {pull}42420[42420]
+- Prevent `azureblobstorage` input from logging key details during blob fetch operations. {pull}43169[43169]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
+
+*Metricbeat*
+
+- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
+- Remove `hostname` field from Zookeeper's `mntr` data stream. {pull}41887[41887]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+
+*Winlogbeat*
+
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.23.6. {pull}42705[42705]
+
+*Filebeat*
+
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+
+*Osquerybeat*
+
+- Increase maximum query timeout to 24 hours. {pull}42356[42356]
+
+
 [[release-notes-8.17.3]]
 === Beats version 8.17.3
 https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
