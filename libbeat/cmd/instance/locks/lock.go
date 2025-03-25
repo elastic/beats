@@ -45,17 +45,17 @@ var (
 
 // New returns a new file locker
 func New(beatInfo beat.Info) *Locker {
-	return NewWithRetry(beatInfo, 4, time.Millisecond*400, beatInfo.Logger)
+	return NewWithRetry(beatInfo, 4, time.Millisecond*400)
 }
 
 // NewWithRetry returns a new file locker with the given settings
-func NewWithRetry(beatInfo beat.Info, retryCount int, retrySleep time.Duration, logger *logp.Logger) *Locker {
+func NewWithRetry(beatInfo beat.Info, retryCount int, retrySleep time.Duration) *Locker {
 	lockfilePath := paths.Resolve(paths.Data, beatInfo.Beat+".lock")
 	return &Locker{
 		fileLock:   flock.New(lockfilePath),
 		retryCount: retryCount,
 		retrySleep: retrySleep,
-		logger:     logger,
+		logger:     beatInfo.Logger,
 	}
 }
 
