@@ -567,13 +567,13 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 }
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
-	batch := encodeBatch(t.encoder, outest.NewBatch(event))
+	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(event))
 	t.Publish(context.Background(), batch)
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 	ok := false
-	batch := encodeBatch(t.encoder, outest.NewBatch(events...))
+	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(events...))
 
 	var wg sync.WaitGroup
 	wg.Add(1)
