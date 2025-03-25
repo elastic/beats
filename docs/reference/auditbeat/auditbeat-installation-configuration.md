@@ -77,7 +77,7 @@ tar xzvf auditbeat-{{stack-version}}-linux-x86_64.tar.gz
 
 2. Extract the contents of the zip file into `C:\Program Files`.
 
-3. Rename the `auditbeat-{{stack-version}}-windows-x86_64` directory to `Auditbeat`.
+3. Rename the `auditbeat-[version]-windows-x86_64` directory to `Auditbeat`.
 
 4. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
 

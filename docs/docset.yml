@@ -39,3 +39,5 @@ subs:
   elastic-sec:   "Elastic Security"
   monitoring:   "X-Pack monitoring"
   monitor-features:   "monitoring features"
+  stack-version: "9.0.0"
+  major-version: "9.0"
