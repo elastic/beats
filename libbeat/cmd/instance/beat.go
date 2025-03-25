@@ -649,7 +649,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Try to acquire exclusive lock on data path to prevent another beat instance
 	// sharing same data path. This is disabled under elastic-agent.
 	if !fleetmode.Enabled() {
-		bl := locks.New(b.Info, logger)
+		bl := locks.New(b.Info)
 		err := bl.Lock()
 		if err != nil {
 			return err
@@ -1036,12 +1036,6 @@ func (b *Beat) configure(settings Settings) error {
 		config.OverwriteConfigOpts(configOptsWithKeystore(store))
 	}
 
-	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, b.Info.Logger)
-	if err != nil {
-		return err
-	}
-	b.Beat.Instrumentation = instrumentation
-
 	b.keystore = store
 	b.Beat.Keystore = store
 	err = cloudid.OverwriteSettings(cfg)
@@ -1074,12 +1068,19 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
 	}
 
-	logger, err := configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
-	b.Info.Logger = logger
+	// extracting here for ease of use
+	logger := b.Info.Logger
+
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, b.Info.Logger)
+	if err != nil {
+		return err
+	}
+	b.Beat.Instrumentation = instrumentation
 
 	// log paths values to help with troubleshooting
 	logger.Infof("%s", paths.Paths.String())

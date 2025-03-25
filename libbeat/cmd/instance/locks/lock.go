@@ -44,8 +44,8 @@ var (
 )
 
 // New returns a new file locker
-func New(beatInfo beat.Info, logger *logp.Logger) *Locker {
-	return NewWithRetry(beatInfo, 4, time.Millisecond*400, logger)
+func New(beatInfo beat.Info) *Locker {
+	return NewWithRetry(beatInfo, 4, time.Millisecond*400, beatInfo.Logger)
 }
 
 // NewWithRetry returns a new file locker with the given settings
