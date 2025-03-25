@@ -30,18 +30,12 @@ jobs:
       - name: "Define matrix"
         id: set-matrix
         run: |
-          changedDirs=$(git diff --dirstat=files HEAD~1 | sed 's/^[ 0-9.]\+% //g' | awk -F/ '{print $1}' | sort -u)
-          relevantDirs=($(echo "$changedDirs" | grep -Fxf .github/workflows/macos.d/values.d/whitelisted-dirs))
-          osArray=($MACOS_13_X64 $MACOS_14_ARM)
+          .github/workflows/macos.d/generate-matrix.sh
 
-          matrix=$(jq -n --argjson dirs "$(printf '%s\n' "${relevantDirs[@]}" | jq -R . | jq -s .)" \
-              --argjson osArray "$(printf '%s\n' "${osArray[@]}" | jq -R . | jq -s .)" \
-              '[ $dirs[] as $dir | $osArray[] as $os | {beat: $dir, os: $os} ]')
-
-          echo "matrix={\"include\":$(echo $matrix)}" >> $GITHUB_OUTPUT
 
   unit-tests:
     needs: matrix_prep
+    if: ${{ needs.matrix_prep.outputs.matrix != '' }}
     strategy:
       fail-fast: false
       max-parallel: 10
