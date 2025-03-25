@@ -192,11 +192,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
 
-<<<<<<< HEAD
-	indicesSettingsPattern := "*,.*"
-=======
 	indicesSettingsPattern := "*,-.*"
->>>>>>> f402559f8 (Exclude dotted indices from settings pull (#43306))
 	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created"}
 	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern, indicesSettingsFilterPaths)
 	if err != nil {
