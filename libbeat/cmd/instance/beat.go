@@ -315,7 +315,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	b.SetupRegistry()
 
-	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, b.Info.Logger)
 	if err != nil {
 		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
 	}
@@ -555,7 +555,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	log := b.Info.Logger.Named("beat")
 	log.Infof("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
-	b.logSystemInfo(log)
+	b.logSystemInfo()
 
 	err = b.registerESVersionCheckCallback()
 	if err != nil {
@@ -1036,7 +1036,7 @@ func (b *Beat) configure(settings Settings) error {
 		config.OverwriteConfigOpts(configOptsWithKeystore(store))
 	}
 
-	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, b.Info.Logger)
 	if err != nil {
 		return err
 	}
@@ -1623,7 +1623,8 @@ func handleError(err error) error {
 // in debugging. This information includes data about the beat, build, go
 // runtime, host, and process. If any of the data is not available it will be
 // omitted.
-func (b *Beat) logSystemInfo(log *logp.Logger) {
+func (b *Beat) logSystemInfo() {
+	log := b.Beat.Info.Logger
 	defer log.Recover("An unexpected error occurred while collecting " +
 		"information about the system.")
 	log = log.With(logp.Namespace("system_info"))
