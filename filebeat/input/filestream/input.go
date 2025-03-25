@@ -259,6 +259,7 @@ func (inp *filestream) deleteFile(
 		// The first try at removing the file failed,
 		// retry with a constant backoff
 		lastTry := time.Now()
+		lastErr := err
 
 		maxWait := inp.deleterConfig.Backoff.Max
 		ticker := time.NewTicker(inp.deleterConfig.Backoff.Init)
@@ -276,7 +277,8 @@ func (inp *filestream) deleteFile(
 			select {
 			case <-ticker.C:
 				retries++
-				if err := os.Remove(fs.newPath); err == nil {
+				lastErr = os.Remove(fs.newPath)
+				if lastErr == nil {
 					logger.Infof("'%s' removed", fs.newPath)
 					return nil
 				}
@@ -293,7 +295,7 @@ func (inp *filestream) deleteFile(
 			"cannot remove '%s' after %d retries. Last error: %w",
 			fs.newPath,
 			retries,
-			err)
+			lastErr)
 	}
 
 	return nil
