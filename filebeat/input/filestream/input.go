@@ -234,6 +234,12 @@ func (inp *filestream) deleteFile(
 	//   - The output is down
 	//   - Filebeat is experiencing back pressure
 	// Either way, we wait until all events have been published.
+	if !cursor.Finished() {
+		logger.Infof(
+			"not all events from '%s' have been published, "+
+				"waiting before removing the file",
+			fs.newPath)
+	}
 	for !cursor.Finished() {
 		if !bkoff.Wait() {
 			// This means that context was cancelled and the backoff
@@ -245,7 +251,9 @@ func (inp *filestream) deleteFile(
 				"waiting before removing the file",
 			fs.newPath)
 	}
-	logger.Debugf("'%s' finished", fs.newPath)
+	logger.Infof(
+		"all events from '%s' have been published, it will be removed now",
+		fs.newPath)
 
 	if err := os.Remove(fs.newPath); err != nil {
 		// The first try at removing the file failed,
