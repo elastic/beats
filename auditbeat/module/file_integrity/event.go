@@ -19,10 +19,6 @@ package file_integrity
 
 import (
 	"bytes"
-	"crypto/md5"
-	"crypto/sha1"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
@@ -36,10 +32,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/cespare/xxhash/v2"
-	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/sha3"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -583,43 +575,9 @@ func hashFile(name string, maxSize uint64, hashType ...HashType) (nameToHash map
 
 	var hashes []hash.Hash
 	for _, name := range hashType {
-		switch name {
-		case BLAKE2B_256:
-			h, _ := blake2b.New256(nil)
-			hashes = append(hashes, h)
-		case BLAKE2B_384:
-			h, _ := blake2b.New384(nil)
-			hashes = append(hashes, h)
-		case BLAKE2B_512:
-			h, _ := blake2b.New512(nil)
-			hashes = append(hashes, h)
-		case MD5:
-			hashes = append(hashes, md5.New())
-		case SHA1:
-			hashes = append(hashes, sha1.New())
-		case SHA224:
-			hashes = append(hashes, sha256.New224())
-		case SHA256:
-			hashes = append(hashes, sha256.New())
-		case SHA384:
-			hashes = append(hashes, sha512.New384())
-		case SHA3_224:
-			hashes = append(hashes, sha3.New224())
-		case SHA3_256:
-			hashes = append(hashes, sha3.New256())
-		case SHA3_384:
-			hashes = append(hashes, sha3.New384())
-		case SHA3_512:
-			hashes = append(hashes, sha3.New512())
-		case SHA512:
-			hashes = append(hashes, sha512.New())
-		case SHA512_224:
-			hashes = append(hashes, sha512.New512_224())
-		case SHA512_256:
-			hashes = append(hashes, sha512.New512_256())
-		case XXH64:
-			hashes = append(hashes, xxhash.New())
-		default:
+		if fn, ok := hashTypes[name]; ok {
+			hashes = append(hashes, fn())
+		} else {
 			return nil, 0, fmt.Errorf("unknown hash type '%v'", name)
 		}
 	}

@@ -49,7 +49,7 @@ import (
 type inputTestingEnvironment struct {
 	t          *testing.T
 	workingDir string
-	stateStore loginp.StateStore
+	stateStore statestore.States
 	pipeline   *mockPipelineConnector
 
 	pluginInitOnce sync.Once
@@ -203,7 +203,7 @@ func (e *inputTestingEnvironment) abspath(filename string) string {
 }
 
 func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
-	inputStore, _ := e.stateStore.Access("")
+	inputStore, _ := e.stateStore.StoreFor("")
 
 	actual := 0
 	err := inputStore.Each(func(_ string, _ statestore.ValueDecoder) (bool, error) {
@@ -340,7 +340,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID str
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	inputStore, _ := e.stateStore.Access("")
+	inputStore, _ := e.stateStore.StoreFor("")
 	id := getIDFromPath(filepath, inputID, fi)
 
 	var entry registryEntry
@@ -361,7 +361,7 @@ func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expect
 }
 
 func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, error) {
-	inputStore, _ := e.stateStore.Access("")
+	inputStore, _ := e.stateStore.StoreFor("")
 
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)
@@ -548,11 +548,13 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
 }
 
+var _ statestore.States = (*testInputStore)(nil)
+
 type testInputStore struct {
 	registry *statestore.Registry
 }
 
-func openTestStatestore() loginp.StateStore {
+func openTestStatestore() statestore.States {
 	return &testInputStore{
 		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
 	}
@@ -562,7 +564,7 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) Access(_ string) (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
