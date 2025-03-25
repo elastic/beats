@@ -178,7 +178,7 @@ func (m *SuccessfulMockNetworkHealthService) GetOrganizationWirelessDevicesChann
 	percentage55 := 55.0
 
 	dummyData := &meraki.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice{
-		{
+		meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice{
 			ByBand: &[]meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand{
 				{
 					Band: "2.4",
