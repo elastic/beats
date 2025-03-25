@@ -185,9 +185,17 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		awsConfig.Region = config.Regions[0]
 	}
 
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
+	}
+
 	// Get IAM account id
 	svcSts := sts.NewFromConfig(awsConfig, func(o *sts.Options) {
-		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
+		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
@@ -202,7 +210,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	}
 	// Get account name/alias
 	svcIam := iam.NewFromConfig(awsConfig, func(o *iam.Options) {
-		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
+		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 
@@ -224,7 +232,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	// Construct MetricSet with a full regions list
 	if config.Regions == nil {
 		svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
-			if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
+			if config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
 		})

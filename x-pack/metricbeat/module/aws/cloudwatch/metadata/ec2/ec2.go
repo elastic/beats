@@ -6,7 +6,6 @@ package ec2
 
 import (
 	"context"
-	"crypto/fips140"
 	"fmt"
 	"strings"
 
@@ -24,7 +23,7 @@ const metadataPrefix = "aws.ec2.instance."
 // AddMetadata adds metadata for EC2 instances from a specific region
 func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
 	svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
-		if fips_enabled || fips140.Enabled() {
+		if fips_enabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 

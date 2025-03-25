@@ -119,6 +119,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
+
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
+	}
+
 	// Get startDate and endDate
 	startDate, endDate := getStartDateEndDate(m.Period)
 
@@ -129,7 +138,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	// get cost metrics from cost explorer
 	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
 	svcCostExplorer := costexplorer.NewFromConfig(awsBeatsConfig, func(o *costexplorer.Options) {
-		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
+		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 
@@ -137,7 +146,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	awsBeatsConfig.Region = regionName
 	svcCloudwatch := cloudwatch.NewFromConfig(awsBeatsConfig, func(o *cloudwatch.Options) {
-		if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
+		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
@@ -228,11 +237,20 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 	if err != nil {
 		return nil
 	}
+
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
+	}
+
 	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 
 		svcOrg := organizations.NewFromConfig(awsConfig, func(o *organizations.Options) {
-			if config.AWSConfig.FIPSEnabled || fips140.Enabled() {
+			if config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
 		})

@@ -6,7 +6,6 @@ package sqs
 
 import (
 	"context"
-	"crypto/fips140"
 	"fmt"
 	"strings"
 
@@ -21,7 +20,7 @@ const metadataPrefix = "aws.sqs.queue"
 // AddMetadata adds metadata for SQS queues from a specific region
 func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
 	svc := sqs.NewFromConfig(awsConfig, func(o *sqs.Options) {
-		if fips_enabled || fips140.Enabled() {
+		if fips_enabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 
