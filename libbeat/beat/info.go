@@ -23,6 +23,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"go.opentelemetry.io/collector/consumer"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -45,6 +46,7 @@ type Info struct {
 	Monitoring           Monitoring
 	LogConsumer          consumer.Logs // otel log consumer
 	UseDefaultProcessors bool          // Whether to use the default processors
+	Logger               *logp.Logger
 }
 
 type Monitoring struct {

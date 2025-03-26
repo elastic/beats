@@ -15,17 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !unix
-
-package instance
-
-import (
-	"runtime"
-)
-
-// doReexec is a noop on Windows, it only logs a message explaining it.
-func (b *Beat) doReexec() error {
-	logger := b.Info.Logger.Named("ssl.cert.reloader")
-	logger.Info("reloading certs/reexecing is not supported on %s. %s will not restart", runtime.GOOS, b.Info.Beat)
-	return nil
-}
+// Package status is a Metricbeat module that contains MetricSets.
+package status
