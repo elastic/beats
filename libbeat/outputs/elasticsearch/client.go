@@ -122,6 +122,7 @@ var bulkRequestParams = map[string]string{
 func NewClient(
 	s clientSettings,
 	onConnect *callbacksRegistry,
+	logger *logp.Logger,
 ) (*Client, error) {
 	pipeline := s.pipelineSelector
 	if pipeline != nil && pipeline.IsEmpty() {
@@ -164,7 +165,7 @@ func NewClient(
 		observer = outputs.NewNilObserver()
 	}
 
-	log := logp.NewLogger("elasticsearch")
+	log := logger.Named("elasticsearch")
 
 	pLogDeadLetter := periodic.NewDoer(10*time.Second,
 		func(count uint64, d time.Duration) {
@@ -236,6 +237,7 @@ func (client *Client) Clone() *Client {
 			deadLetterIndex:  client.deadLetterIndex,
 		},
 		nil, // XXX: do not pass connection callback?
+		client.log,
 	)
 	return c
 }

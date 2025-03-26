@@ -63,7 +63,7 @@ func newAsyncClient(
 	config *Config,
 ) (*asyncClient, error) {
 
-	log := logp.NewLogger("logstash")
+	log := beat.Logger.Named("logstash")
 	c := &asyncClient{
 		log:      log,
 		Client:   conn,

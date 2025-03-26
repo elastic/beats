@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -69,7 +70,8 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 		t.Fatal(err)
 	}
 	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
-	loader, err := NewESLoader(client, handler)
+	logger := logp.NewTestingLogger(t, "")
+	loader, err := NewESLoader(client, handler, logger)
 	require.NoError(t, err)
 	s := testSetup{t: t, client: client, loader: loader, config: cfg}
 	// don't care if the cleanup fails, since they might just return a 404
@@ -86,7 +88,8 @@ func newTestSetupWithESClient(t *testing.T, client ESClient, cfg TemplateConfig)
 		cfg.Name = fmt.Sprintf("load-test-%+v", rand.Int())
 	}
 	handler := &mockClientHandler{serverless: false, mode: lifecycle.ILM}
-	loader, err := NewESLoader(client, handler)
+	logger := logp.NewTestingLogger(t, "")
+	loader, err := NewESLoader(client, handler, logger)
 	require.NoError(t, err)
 	return &testSetup{t: t, client: client, loader: loader, config: cfg}
 }

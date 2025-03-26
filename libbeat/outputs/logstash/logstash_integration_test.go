@@ -193,8 +193,8 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	})
 
 	logger := logp.NewTestingLogger(t, "")
-	info := beat.Info{Beat: "libbeat"}
-	im, err := idxmgmt.DefaultSupport(logger, info, conf.MustNewConfigFrom(
+	info := beat.Info{Beat: "libbeat", Logger: logger}
+	im, err := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(
 		map[string]interface{}{
 			"setup.ilm.enabled": false,
 		},
@@ -308,7 +308,6 @@ func TestSendMessageViaLogstashTLS(t *testing.T) {
 }
 
 func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
-	enableLogging([]string{"*"})
 
 	ls := newTestLogstashOutput(t, name, tls)
 	defer ls.Cleanup()
@@ -505,9 +504,6 @@ func TestLogstashElasticOutputPluginBulkCompatibleMessageTLS(t *testing.T) {
 }
 
 func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name string, tls bool) {
-	if testing.Verbose() {
-		enableLogging([]string{"*"})
-	}
 
 	timeout := 10 * time.Second
 

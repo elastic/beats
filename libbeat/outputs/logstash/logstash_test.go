@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
@@ -42,7 +43,6 @@ const (
 )
 
 func TestLogstashTCP(t *testing.T) {
-	enableLogging([]string{"*"})
 
 	timeout := 2 * time.Second
 	server := transptest.NewMockServerTCP(t, timeout, "", nil)
@@ -56,7 +56,6 @@ func TestLogstashTCP(t *testing.T) {
 }
 
 func TestLogstashTLS(t *testing.T) {
-	enableLogging([]string{"*"})
 
 	certName := "ca_test"
 
@@ -182,8 +181,9 @@ func newTestLumberjackOutput(
 		}
 	}
 
+	logger := logp.NewTestingLogger(t, "")
 	cfg, _ := conf.NewConfigFrom(config)
-	grp, err := outputs.Load(nil, beat.Info{}, nil, "logstash", cfg)
+	grp, err := outputs.Load(nil, beat.Info{Logger: logger}, nil, "logstash", cfg)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)
 	}

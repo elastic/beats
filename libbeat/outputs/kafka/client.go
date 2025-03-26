@@ -96,9 +96,10 @@ func newKafkaClient(
 	headers []header,
 	writer codec.Codec,
 	cfg *sarama.Config,
+	logger *logp.Logger,
 ) (*client, error) {
 	c := &client{
-		log:      logp.NewLogger(logSelector),
+		log:      logger.Named(logSelector),
 		observer: observer,
 		hosts:    hosts,
 		topic:    topic,

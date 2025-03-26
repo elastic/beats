@@ -92,9 +92,9 @@ func (m *LoadMode) Enabled() bool {
 }
 
 // DefaultSupport initializes the default index management support used by most Beats.
-func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
-	factory := MakeDefaultSupport(nil, log)
-	return factory(log, info, configRoot)
+func DefaultSupport(info beat.Info, configRoot *config.C) (Supporter, error) {
+	factory := MakeDefaultSupport(nil, info.Logger)
+	return factory(info.Logger, info, configRoot)
 }
 
 // MakeDefaultSupport creates some default index management support, with a

@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -39,7 +38,7 @@ func makeES(
 	observer outputs.Observer,
 	cfg *config.C,
 ) (outputs.Group, error) {
-	log := logp.NewLogger(logSelector)
+	log := beatInfo.Logger.Named(logSelector)
 	esConfig := defaultConfig
 	indexSelector, pipelineSelector, err := buildSelectors(im, beatInfo, cfg)
 	if err != nil {
@@ -121,7 +120,7 @@ func makeES(
 			pipelineSelector: pipelineSelector,
 			observer:         observer,
 			deadLetterIndex:  deadLetterIndex,
-		}, &connectCallbackRegistry)
+		}, &connectCallbackRegistry, log)
 		if err != nil {
 			return outputs.Fail(err)
 		}
