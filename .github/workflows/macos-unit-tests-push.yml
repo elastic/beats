@@ -49,7 +49,7 @@ jobs:
           workflow-name: ${{ github.workflow }}
 
       - name: "Print out matrix"
-        run:  printf "%s\n" "${steps.run-composite.outputs.matrix[@]}"
+        run:  printf "%s\n" ${{ steps.run-composite.outputs.matrix }}
 
   unit-tests:
     needs: matrix-prep
