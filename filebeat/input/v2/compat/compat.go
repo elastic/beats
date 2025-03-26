@@ -141,7 +141,7 @@ func (r *runner) Start() {
 			*r.agent,
 			r.sig,
 			r.statusReporter,
-			r.agent.Monitoring.Registry(),
+			r.agent.Monitoring.NamespaceRegistry(),
 			log)
 		// Unregister the metrics when input finishes running
 		defer ctx.UnregisterMetrics()

@@ -145,7 +145,7 @@ func NewContext(
 	monitoring.NewString(reg, "id").Set(id)
 
 	// register to be published by the HTTP monitoring endpoint.
-	err := inputmon.RegisterMetrics(metricsID, reg)
+	err := inputmon.RegisterMetrics(reg)
 	if err != nil {
 		log.Errorf("failed to register metrics for '%s', id: %s,: %v",
 			inputType, id, err)
@@ -237,9 +237,12 @@ func (c *Context) UnregisterMetrics() {
 }
 
 // PipelineClientListener returns the PipelineClientListener for this context.
-// It collects pipeline metrics for this input on the metrics registry
-// associated with this context. If clientListener isn't nil, it returns a
-// beat.CombinedClientListener.
+// If creates a `beat.ClientListener`, which might be the PipelineClientListener
+// or a beat.CombinedClientListener when clientListener is non-nil.
+// The result is cached, subsequent calls to PipelineClientListener will always
+// return the same beat.ClientListener.
+// The PipelineClientListener collects pipeline metrics for this input on the
+// metrics registry associated with this context.
 func (c *Context) PipelineClientListener(clientListener beat.ClientListener) beat.ClientListener {
 	if c.pipelineClientListener != nil {
 		return c.pipelineClientListener

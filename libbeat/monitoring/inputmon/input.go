@@ -42,22 +42,25 @@ var registeredInputs = inputRegistry{
 // the `/inputs/` endpoint. The registry must have at least a `id` and `input`
 // string variables, otherwise the registry is rejected and an error is
 // returned.
+// The registry is associated with the `id`, calling UnregisterMetrics(id) will
+// unregister reg.
 // If an id/inputType registry has been already registered, it'll be overridden.
 // When the input finishes, it should call UnregisterMetrics to
 // release the associated resources.
-func RegisterMetrics(id string, reg *monitoring.Registry) error {
-	idValid := validStringVar(reg.Get("id"))
-	inputValid := validStringVar(reg.Get("input"))
+func RegisterMetrics(reg *monitoring.Registry) error {
+	id := getStringVar(reg.Get("id"))
+	input := getStringVar(reg.Get("input"))
 
 	var errMgs []string
-	if !idValid {
+	if id == "" {
 		errMgs = append(errMgs, "'id' empty or absent")
 	}
-	if !inputValid {
+	if input == "" {
 		errMgs = append(errMgs, "'input' empty or absent")
 	}
 	if len(errMgs) > 0 {
-		return errors.New("invalid metrics registry: " + strings.Join(errMgs, ", "))
+		return errors.New("invalid metrics registry: " +
+			strings.Join(errMgs, ", "))
 	}
 
 	registeredInputs.Set(id, reg)
@@ -70,6 +73,10 @@ func UnregisterMetrics(id string) {
 	registeredInputs.Del(id)
 }
 
+// Get retrieves a monitoring.Registry by its ID.
+// It returns the registry and a boolean indicating whether the registry was
+// found.
+// The operation is goroutine-safe.
 func (i *inputRegistry) Get(id string) (*monitoring.Registry, bool) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
@@ -78,6 +85,9 @@ func (i *inputRegistry) Get(id string) (*monitoring.Registry, bool) {
 	return v, found
 }
 
+// Set stores a monitoring.Registry with the given ID.
+// If a registry with the same ID already exists, it is overwritten.
+// The operation is goroutine-safe.
 func (i *inputRegistry) Set(id string, reg *monitoring.Registry) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
@@ -85,6 +95,9 @@ func (i *inputRegistry) Set(id string, reg *monitoring.Registry) {
 	i.registries[id] = reg
 }
 
+// Del removes a monitoring.Registry by its ID.
+// If no registry with the given ID exists, this operation has no effect.
+// The operation is // The operation is goroutine-safe.-safe.
 func (i *inputRegistry) Del(id string) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
@@ -105,14 +118,14 @@ func (i *inputRegistry) CollectStructSnapshot() map[string]map[string]any {
 	return registeredInputRegistries
 }
 
-func validStringVar(v monitoring.Var) bool {
+func getStringVar(v monitoring.Var) string {
 	if v != nil {
 		if s, ok := v.(*monitoring.String); ok {
-			return s.Get() != ""
+			return s.Get()
 		}
 	}
 
-	return false
+	return ""
 }
 
 // NewInputRegistry returns the *monitoring.Registry for metrics related to

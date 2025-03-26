@@ -88,7 +88,7 @@ func TestRegisterMetrics(t *testing.T) {
 			}
 
 			inputID := "input-id"
-			err := RegisterMetrics(inputID, reg)
+			err := RegisterMetrics(reg)
 			defer UnregisterMetrics(inputID)
 			if tt.wantErr {
 				assert.ErrorContains(t, err, tt.wantErrMsg)
@@ -109,7 +109,7 @@ func TestUnregisterMetrics(t *testing.T) {
 	monitoring.NewString(reg, "id").Set("some-input-type")
 
 	id := uuid.Must(uuid.NewV4()).String()
-	err := RegisterMetrics(id, reg)
+	err := RegisterMetrics(reg)
 	require.NoError(t, err, "could not register metrics")
 
 	UnregisterMetrics(id)
@@ -186,7 +186,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 		NewRegistry(inputID)
 	monitoring.NewString(reg, "id").Set(inputID)
 	monitoring.NewString(reg, "input").Set("test")
-	require.NoError(t, RegisterMetrics(inputID+"-test", reg), "could not register metrics")
+	require.NoError(t, RegisterMetrics(reg), "could not register metrics")
 	monitoring.NewInt(reg, "foo_total").Set(100)
 	monitoring.NewInt(reg, "events_pipeline_total").Set(100)
 	defer parent.Remove(inputID)
@@ -200,7 +200,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	monitoring.NewString(reg, "id").Set(inputID)
 	monitoring.NewString(reg, "input").Set("test")
 	// Explicitly register those metrics to be published.
-	require.NoError(t, RegisterMetrics(inputID+"-test", reg), "could not register metrics")
+	require.NoError(t, RegisterMetrics(reg), "could not register metrics")
 	monitoring.NewInt(reg, "events_pipeline_total").Set(200)
 	defer globalRegistry().Remove(inputID)
 

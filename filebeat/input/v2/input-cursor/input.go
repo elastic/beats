@@ -133,7 +133,7 @@ func (inp *managedInput) Run(
 				ctx.Agent,
 				ctx.Cancelation,
 				ctx.StatusReporter,
-				ctx.Agent.Monitoring.Registry(),
+				ctx.Agent.Monitoring.NamespaceRegistry(),
 				ctx.Logger.With("input_source", source.Name()))
 			// Unregister the metrics when input finishes running
 			defer inpCtx.UnregisterMetrics()

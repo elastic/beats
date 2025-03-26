@@ -56,7 +56,7 @@ type Monitoring struct {
 	StatsRegistry *monitoring.Registry
 }
 
-func (i *Info) FQDNAwareHostname(useFQDN bool) string {
+func (i Info) FQDNAwareHostname(useFQDN bool) string {
 	if useFQDN {
 		return i.FQDN
 	}
@@ -64,9 +64,9 @@ func (i *Info) FQDNAwareHostname(useFQDN bool) string {
 	return i.Hostname
 }
 
-// Registry returns the monitoring registry from Namespace.
+// NamespaceRegistry returns the monitoring registry from Namespace.
 // If Namespace isn't set, it returns a registry associated to no namespace.
-func (m *Monitoring) Registry() *monitoring.Registry {
+func (m *Monitoring) NamespaceRegistry() *monitoring.Registry {
 	if m.Namespace == nil {
 		return monitoring.NewRegistry()
 	}
