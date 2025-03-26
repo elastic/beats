@@ -35,7 +35,7 @@ jobs:
   matrix-prep:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.run-composite.outputs.matrix }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -49,7 +49,7 @@ jobs:
           workflow-name: ${{ github.workflow }}
 
       - name: "Print out matrix"
-        run:  echo ${{ steps.run-composite.outputs.matrix }}
+        run:  echo ${{ steps.set-matrix.outputs.matrix }}
 
   unit-tests:
     needs: matrix-prep
