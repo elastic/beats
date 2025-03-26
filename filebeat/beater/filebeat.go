@@ -223,7 +223,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
 			}
-			modulesLoader := cfgfile.NewReloader(logp.L().Named("module.reloader"), fb.pipeline, fb.config.ConfigModules)
+			modulesLoader := cfgfile.NewReloader(b.Info.Logger.Named("module.reloader"), fb.pipeline, fb.config.ConfigModules)
 			modulesLoader.Load(modulesFactory)
 		}
 
@@ -402,7 +402,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		logp.Warn(pipelinesWarning)
 	}
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
-	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once)
+	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, b.Info.Logger)
 	if err != nil {
 		logp.Err("Could not init crawler: %v", err)
 		return err
@@ -454,10 +454,10 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Register reloadable list of inputs and modules
-	inputs := cfgfile.NewRunnerList(management.DebugK, inputLoader, fb.pipeline)
+	inputs := cfgfile.NewRunnerList(management.DebugK, inputLoader, fb.pipeline, b.Info.Logger)
 	b.Registry.MustRegisterInput(inputs)
 
-	modules := cfgfile.NewRunnerList(management.DebugK, moduleLoader, fb.pipeline)
+	modules := cfgfile.NewRunnerList(management.DebugK, moduleLoader, fb.pipeline, b.Info.Logger)
 
 	var adiscover *autodiscover.Autodiscover
 	if fb.config.Autodiscover != nil {
