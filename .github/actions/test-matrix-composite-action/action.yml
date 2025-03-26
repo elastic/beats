@@ -1,10 +1,11 @@
-name: run-unit-tests
+name: create-matrix
+
 inputs:
   os-versions:
     description: "Required OS versions to run tests on"
     required: true
   workflow-name:
-    description: "Name of current workflow"
+    description: "Name of the current workflow"
     required: true
 outputs:
   matrix:

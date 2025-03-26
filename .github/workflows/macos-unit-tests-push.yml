@@ -24,11 +24,6 @@ on:
 permissions:
   contents: read
 
-## Available image list: https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
-env:
-  MACOS_13_X64: macos-13
-  MACOS_14_ARM: macos-14
-
 ## Concurrency only allowed in the main branch.
 ## So old builds running for old commits within the same Pull Request are cancelled
 concurrency:
@@ -46,7 +41,7 @@ jobs:
       - id: set-matrix
         uses: ./.github/actions/test-matrix-composite-action
         with:
-          os-versions: $MACOS_13_X64 $MACOS_14_ARM
+          os-versions: macos-13 macos-14
           workflow-name: macos-unit-tests-push.yml
 
 ##      - name: "Define matrix"
