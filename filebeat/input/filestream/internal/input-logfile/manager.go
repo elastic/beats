@@ -150,11 +150,19 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	}
 
 	settings := struct {
+		// All those values are duplicated from the Filestream configuration
 		ID                 string        `config:"id"`
 		CleanInactive      time.Duration `config:"clean_inactive"`
 		HarvesterLimit     uint64        `config:"harvester_limit"`
 		AllowIDDuplication bool          `config:"allow_deprecated_id_duplication"`
-	}{CleanInactive: cim.DefaultCleanTimeout}
+		TakeOver           struct {
+			Enabled bool     `config:"enabled"`
+			FromIDs []string `config:"from_ids"`
+		} `config:"take_over"`
+	}{
+		CleanInactive: cim.DefaultCleanTimeout,
+	}
+
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
@@ -211,15 +219,30 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, errNoInputRunner
 	}
 
-	sourceIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
+	srcIdentifier, err := newSourceIdentifier(cim.Type, settings.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating source identifier for input: %w", err)
+	}
+
+	var previousSrcIdentifiers []*sourceIdentifier
+	if settings.TakeOver.Enabled {
+		for _, id := range settings.TakeOver.FromIDs {
+			si, err := newSourceIdentifier(cim.Type, id)
+			if err != nil {
+				return nil,
+					fmt.Errorf(
+						"[ID: %q] error while creating source identifier for previous ID %q: %w",
+						settings.ID, id, err)
+			}
+
+			previousSrcIdentifiers = append(previousSrcIdentifiers, si)
+		}
 	}
 
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
 
-	prospectorStore := newSourceStore(pStore, sourceIdentifier)
+	prospectorStore := newSourceStore(pStore, srcIdentifier, previousSrcIdentifiers)
 
 	// create a store with the deprecated global ID. This will be used to
 	// migrate the entries in the registry to use the new input ID.
@@ -227,9 +250,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot create global identifier for input: %w", err)
 	}
-	globalStore := newSourceStore(pStore, globalIdentifier)
+	globalStore := newSourceStore(pStore, globalIdentifier, nil)
 
-	err = prospector.Init(prospectorStore, globalStore, sourceIdentifier.ID)
+	err = prospector.Init(prospectorStore, globalStore, srcIdentifier.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +263,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		userID:           settings.ID,
 		prospector:       prospector,
 		harvester:        harvester,
-		sourceIdentifier: sourceIdentifier,
+		sourceIdentifier: srcIdentifier,
 		cleanTimeout:     settings.CleanInactive,
 		harvesterLimit:   settings.HarvesterLimit,
 	}, nil

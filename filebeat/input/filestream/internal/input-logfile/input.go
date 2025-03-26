@@ -84,7 +84,7 @@ func (inp *managedInput) Run(
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, nil)
 
 	// Mark it as running for now.
 	// Any errors encountered by harvester will change state to Degraded
