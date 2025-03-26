@@ -1,0 +1,24 @@
+name: run-unit-tests
+inputs:
+  os-versions:
+    description: "Required OS versions to run tests on"
+    required: true
+  workflow-name:
+    description: "Name of current workflow"
+    required: true
+outputs:
+  matrix:
+    description: "Matrix with beats and OS versions"
+    value: ${{ steps.set-matrix.outputs.matrix }}
+runs:
+  using: "composite"
+  steps:
+    - name: Define Matrix
+      run: .github/actions/unit-tests-composite-action/generate-matrix.sh ${{ inputs.os-versions }}
+      shell: bash
+
+    - name: Set GitHub Path
+      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}

@@ -1,0 +1,92 @@
+name: macos-unit-tests-push
+
+on:
+## `pull_request` to be removed after the testing
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - auditbeat
+      - filebeat
+      - heartbeat
+      - metricbeat
+      - packetbeat
+      - x-pack/auditbeat
+      - x-pack/filebeat
+      - x-pack/heartbeat
+      - x-pack/metricbeat
+      - x-pack/osquerybeat
+      - x-pack/packetbeat
+      - .github/actions/unit-tests-composite-action
+      - .github/workflows/macos-unit-tests-push.yml
+
+permissions:
+  contents: read
+
+## Available image list: https://docs.github.com/en/actions/using-github-hosted-runners/using-github-hosted-runners/about-github-hosted-runners#standard-github-hosted-runners-for-public-repositories
+env:
+  MACOS_13_X64: macos-13
+  MACOS_14_ARM: macos-14
+
+## Concurrency only allowed in the main branch.
+## So old builds running for old commits within the same Pull Request are cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  matrix-prep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: '2'
+
+      - id: set-matrix
+        uses: ./.github/actions/test-matrix-composite-action
+        with:
+          os-versions: ("${MACOS_13_X64}" "${MACOS_14_ARM}")
+          workflow-name: macos-unit-tests-push.yml
+
+##      - name: "Define matrix"
+##        id: set-matrix
+##        run: |
+##          changesetFile=".github/workflows/macos.d/values.d/beats-macos"
+##          osVersions=("${MACOS_13_X64}" "${MACOS_14_ARM}")
+##          workflowFile="macos-unit-tests-push.yml"
+##
+##          .github/workflows/macos.d/generate-matrix.sh $changesetFile $osVersions $workflowFile
+
+  unit-tests:
+    needs: matrix-prep
+    if: ${{ needs.matrix-prep.outputs.matrix != '' }}
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix: ${{ fromJson(needs.matrix-prep.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: .go-version
+
+      - uses: actions/setup-python@v5
+        with:
+          cache: "pip"
+          python-version-file: .python-version
+
+      - name: Install mage
+        run: go install github.com/magefile/mage
+
+      - name: Run build
+        run: mage build
+        working-directory: ${{ matrix.beat }}
+
+      - name: Run unitTest
+        run: mage unitTest
+        working-directory: ${{ matrix.beat }}
+
+  # TODO: centralise github job with the status.
