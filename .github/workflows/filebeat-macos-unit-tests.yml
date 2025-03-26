@@ -1,13 +1,31 @@
 name: filebeat-macos-unit-tests
 
+env:
+  BEAT: "filebeat"
+
 on:
   pull_request:
+    paths:
+      - filebeat/
+      # OSS
+      - go.mod
+      - dev-tools
+      - libbeat/**
+      # Workflow
+      - .github/workflows/filebeat-macos-unit-tests.yml
+      - .github/actions/unit-test/action.yml
   push:
     branches:
       - main
     paths:
-      - filebeat
+      - filebeat/
+      # OSS
+      - go.mod
+      - dev-tools
+      - libbeat/**
+      # Workflow
       - .github/workflows/filebeat-macos-unit-tests.yml
+      - .github/actions/unit-test/action.yml
 
 permissions:
   contents: read
@@ -20,29 +38,29 @@ concurrency:
 
 jobs:
   unit-tests-push:
-    name: Unit tests on push/ ${{ matrix.os }}
-    if: github.event_name == 'pull_request'
-#    if: github.event_name == 'push'
+    name: Unit tests ${{ matrix.os }}
+    if: github.event_name == 'push'
     strategy:
       fail-fast: false
-      max-parallel: 10
       matrix:
         os: [macos-13, macos-14]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/workflows/actions/unit-test-composite-action
+      - uses: ./.github/actions/unit-test
         with:
-          beat: 'filebeat'
+          beat: ${{ env.BEAT }}
 
   unit-tests-pr:
-    name: Unit tests for PR/ macOS 15
+    name: Unit tests macos-15
     if: github.event_name == 'pull_request'
-    runs-on: [ macos-15 ]
+    runs-on: [macos-15]
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/workflows/actions/unit-test-composite-action
+      - uses: ./.github/actions/unit-test
         with:
-          beat: 'filebeat'
+          beat: ${{ env.BEAT }}
