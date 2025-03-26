@@ -31,16 +31,10 @@ type Device struct {
 	haStatus         *meraki.ResponseItemApplianceGetOrganizationApplianceUplinkStatusesHighAvailability
 	performanceScore *meraki.ResponseApplianceGetDeviceAppliancePerformance
 	license          *meraki.ResponseItemOrganizationsGetOrganizationLicenses
-	bandUtilization  map[string]*BandUtilization
+	bandUtilization  map[string]*meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand
 
 	uplinks     []*uplink
 	switchports []*switchport
-}
-
-type BandUtilization struct {
-	Wifi    float64 // Utilization for Wifi (802.11)
-	NonWifi float64 // Utilization for NonWifi
-	Total   float64 // Total utilization
 }
 
 func getDevices(client *meraki.Client, organizationID string) (map[Serial]*Device, error) {
@@ -132,19 +126,14 @@ func (w *DeviceServiceWrapper) GetOrganizationWirelessDevicesChannelUtilizationB
 	return w.service.GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams)
 }
 
-func derefFloat64(val *float64) float64 {
-	if val != nil {
-		return *val
-	}
-	return 0
-}
-
 func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Device, period time.Duration, organizations []string) error {
-	// There are two ways to get this information from the API.
-	// An alternative to this would be to use `/organizations/{organizationId}/wireless/devices/channelUtilization/byDevice`,
-	// avoids the need to extract the filtered network IDs below.
-	// However, the SDK's implementation of that operation doesn't have proper type handling, so we perfer this one.
-	// (The naming is also a bit different in the returned data, e.g. wifi0/wifi1 vs band 2.4/5; 80211/non80211 vs wifi/nonwifi)
+	// Updated API endpoint for getting Channel Utilization data.
+	// Previously, we used `GetNetworkNetworkHealthChannelUtilization`, but the Meraki SDK
+	// did not properly parse its response, leading to loss of channel utilization data.
+	// We are now using `GetOrganizationWirelessDevicesChannelUtilizationByDevice`.
+	// However, the response format differs slightly:
+	// - Bands are now labeled as 2.4/5 (GHz) instead of wifi0/wifi1.
+	// - Utilization categories are now named `wifi/nonWifi` instead of `80211/non80211`.
 
 	// The timespan (period) cannot be smaller than the interval.
 	// By default, the interval is 3600 seconds if not explicitly set.
@@ -157,9 +146,6 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 			Timespan: period.Seconds(),
 		})
 		if err != nil {
-			if strings.Contains(string(res.Body()), "MR 27.0") {
-				continue
-			}
 			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed; [%d] %s. %w", orgID, res.StatusCode(), res.Body(), err)
 		}
 
@@ -168,16 +154,16 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 			return fmt.Errorf("failed to unmarshal response body for organization %s: %w", orgID, err)
 		}
 
-		for _, p := range result {
-			for _, band := range *p.ByBand {
-				if device, ok := devices[Serial(p.Serial)]; ok {
+		for _, d := range result {
+			for _, band := range *d.ByBand {
+				if device, ok := devices[Serial(d.Serial)]; ok {
 					if device.bandUtilization == nil {
-						device.bandUtilization = make(map[string]*BandUtilization)
+						device.bandUtilization = make(map[string]*meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand)
 					}
-					device.bandUtilization[band.Band] = &BandUtilization{
-						Wifi:    derefFloat64(band.Wifi.Percentage),    // 80211
-						NonWifi: derefFloat64(band.NonWifi.Percentage), // Non80211
-						Total:   derefFloat64(band.Total.Percentage),   // Total
+					device.bandUtilization[band.Band] = &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand{
+						Wifi:    band.Wifi,
+						NonWifi: band.NonWifi,
+						Total:   band.Total,
 					}
 				}
 			}
@@ -259,9 +245,9 @@ func reportDeviceMetrics(reporter mb.ReporterV2, organizationID string, devices 
 			for band, v := range device.bandUtilization {
 				// Avoid nested object mappings
 				metricBand := strings.ReplaceAll(band, ".", "_")
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_80211", metricBand)] = v.Wifi
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_non_80211", metricBand)] = v.NonWifi
-				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_total", metricBand)] = v.Total
+				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_80211", metricBand)] = v.Wifi.Percentage
+				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_non_80211", metricBand)] = v.NonWifi.Percentage
+				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_total", metricBand)] = v.Total.Percentage
 			}
 		}
 
