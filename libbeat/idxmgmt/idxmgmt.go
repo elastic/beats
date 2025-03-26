@@ -93,24 +93,20 @@ func (m *LoadMode) Enabled() bool {
 
 // DefaultSupport initializes the default index management support used by most Beats.
 func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
-	factory := MakeDefaultSupport(nil)
+	factory := MakeDefaultSupport(nil, log)
 	return factory(log, info, configRoot)
 }
 
 // MakeDefaultSupport creates some default index management support, with a
 // custom ILM support implementation.
-func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
+func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory, logger *logp.Logger) SupportFactory {
 	if ilmSupport == nil {
 		ilmSupport = lifecycle.DefaultSupport
 	}
 
 	return func(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
 		const logName = "index-management"
-		if log == nil {
-			log = logp.NewLogger(logName)
-		} else {
-			log = log.Named(logName)
-		}
+		log = log.Named(logName)
 
 		// now that we have the "correct" default, unpack the rest of the config
 		cfg := struct {
