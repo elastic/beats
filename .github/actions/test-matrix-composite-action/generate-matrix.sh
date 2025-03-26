@@ -12,6 +12,9 @@ os=("${OS_VERSIONS}")
 changeList=$(git diff --name-only HEAD~1)
 changedDirs=($(echo "$changeList" | sed 's/^[ 0-9.]\+% //g' | awk -F/ '{print $1}' | sort -u))
 
+printf "%s\n" "${changeList[@]}"
+echo $WORKFLOW
+
 # If the workflow changed - run all tests, no matter of what were the other changes
 if [[ $changeList == *"$WORKFLOW"* || $changeList == *"test-matrix-composite-action"* ]]; then
   # Since GH actions do not support accessing the `paths` section in a runtime, get required beats manually
