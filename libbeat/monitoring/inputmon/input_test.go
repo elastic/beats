@@ -87,28 +87,30 @@ func TestRegisterMetrics(t *testing.T) {
 				monitoring.NewString(reg, "id").Set(tt.args.id)
 			}
 
-			inputID := "input-id"
+			inputID := tt.args.id
 			err := RegisterMetrics(reg)
 			defer UnregisterMetrics(inputID)
 			if tt.wantErr {
 				assert.ErrorContains(t, err, tt.wantErrMsg)
 			} else {
 				registeredInputs.mu.Lock()
+				defer registeredInputs.mu.Unlock()
+
 				got, found := registeredInputs.registries[inputID]
-				assert.True(t, found, "metrics registry was not registered")
+				require.True(t, found, "metrics registry was not registered")
 				assert.Equal(t, reg, got)
-				registeredInputs.mu.Unlock()
 			}
 		})
 	}
 }
 
 func TestUnregisterMetrics(t *testing.T) {
-	reg := monitoring.NewRegistry()
-	monitoring.NewString(reg, "input").Set("some-id")
-	monitoring.NewString(reg, "id").Set("some-input-type")
-
 	id := uuid.Must(uuid.NewV4()).String()
+
+	reg := monitoring.NewRegistry()
+	monitoring.NewString(reg, "id").Set(id)
+	monitoring.NewString(reg, "input").Set("some-input-type")
+
 	err := RegisterMetrics(reg)
 	require.NoError(t, err, "could not register metrics")
 
