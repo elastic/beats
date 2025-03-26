@@ -7,6 +7,8 @@ inputs:
   workflow-name:
     description: "Name of the current workflow"
     required: true
+  pr-target-branch:
+    description: "Target branch of current PR"
 outputs:
   matrix:
     description: "Matrix with beats and OS versions"
