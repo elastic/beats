@@ -17,7 +17,7 @@ runs:
   using: "composite"
   steps:
     - id: generate-matrix
-      run: .github/actions/test-matrix-composite-action/generate-matrix.sh ${{ inputs.os-versions }}
+      run: ./.github/actions/test-matrix-composite-action/generate-matrix.sh ${{ inputs.os-versions }}
       shell: bash
       env:
         WORKFLOW_NAME: ${{ inputs.workflow-name }}

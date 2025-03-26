@@ -43,7 +43,7 @@ jobs:
 
       - name: "Define matrix"
         id: set-matrix
-        uses: .github/actions/test-matrix-composite-action
+        uses: ./.github/actions/test-matrix-composite-action
         with:
           os-versions: macos-13 macos-14
           workflow-name: ${{ github.workflow }}
