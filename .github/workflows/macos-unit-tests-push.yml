@@ -19,7 +19,7 @@ on:
       - x-pack/metricbeat
       - x-pack/osquerybeat
       - x-pack/packetbeat
-      - .github/actions/unit-tests-composite-action
+      - .github/actions/test-matrix-composite-action
       - .github/workflows/macos-unit-tests-push.yml
 
 permissions:

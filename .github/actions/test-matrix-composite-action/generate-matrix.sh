@@ -6,14 +6,17 @@
 # Array of OS versions (GH runner names) to execute tests
 OS_VERSIONS=${1:?"OS_VERSIONS parameter not set"}
 # Name of a workflow file to track if changed
-WORKFLOW_NAME=${WORKFLOW_NAME:?"WORKFLOW parameter not set"}
+WORKFLOW=${WORKFLOW_NAME:?"WORKFLOW parameter not set"}
 
 os=("${OS_VERSIONS}")
 changeList=$(git diff --name-only HEAD~1)
 changedDirs=($(echo "$changeList" | sed 's/^[ 0-9.]\+% //g' | awk -F/ '{print $1}' | sort -u))
 
+echo $WORKFLOW
+printf "%s\n" "${changeList[@]}"
+
 # If the workflow changed - run all tests, no matter of what were the other changes
-if [[ $changeList == *"$WORKFLOW_NAME"* || $changeList == *"test-matrix-composite-action"* ]]; then
+if [[ $changeList == *"$WORKFLOW"* || $changeList == *"test-matrix-composite-action"* ]]; then
   # Since GH actions do not support accessing the `paths` section in a runtime, get required beats manually
   beats=($(awk '/paths:/ {flag=1; next} /^[^ ]/ {flag=0} flag && $2 !~ /^\.github/ {print $2}'))
   matrix=$(jq -n --argjson dirs "$(printf '%s\n' "${beats[@]}" | jq -R . | jq -s .)" \
