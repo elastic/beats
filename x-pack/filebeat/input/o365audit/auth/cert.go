@@ -9,37 +9,25 @@ import (
 	"crypto/x509"
 	"fmt"
 
-	"github.com/Azure/go-autorest/autorest/adal"
+	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // NewProviderFromCertificate returns a TokenProvider that uses certificate-based
 // authentication.
-func NewProviderFromCertificate(
-	endpoint, resource, applicationID, tenantID string,
-	conf tlscommon.CertificateConfig) (sptp TokenProvider, err error) {
+func NewProviderFromCertificate(resource, applicationID, tenantID string, conf tlscommon.CertificateConfig) (sptp TokenProvider, err error) {
 	cert, privKey, err := loadConfigCerts(conf)
 	if err != nil {
 		return nil, fmt.Errorf("failed loading certificates: %w", err)
 	}
-	oauth, err := adal.NewOAuthConfig(endpoint, tenantID)
-	if err != nil {
-		return nil, fmt.Errorf("error generating OAuthConfig: %w", err)
-	}
 
-	spt, err := adal.NewServicePrincipalTokenFromCertificate(
-		*oauth,
-		applicationID,
-		cert,
-		privKey,
-		resource,
-	)
+	cred, err := azidentity.NewClientCertificateCredential(tenantID, applicationID, []*x509.Certificate{cert}, privKey, nil)
 	if err != nil {
 		return nil, err
 	}
-	spt.SetAutoRefresh(true)
-	return (*servicePrincipalToken)(spt), nil
+
+	return (*credentialTokenProvider)(cred), nil
 }
 
 func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, key *rsa.PrivateKey, err error) {
