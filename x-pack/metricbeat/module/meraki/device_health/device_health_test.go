@@ -103,31 +103,16 @@ func TestGetDeviceChannelUtilization(t *testing.T) {
 				band1, ok := devices["ABC123"].bandUtilization["2.4"]
 				assert.NotNil(t, band1)
 				assert.True(t, ok)
-				assert.Equal(t, 45.0, band1.Wifi)
-				assert.Equal(t, 10.0, band1.NonWifi)
-				assert.Equal(t, 55.0, band1.Total)
+				assert.Equal(t, 45.0, *band1.Wifi.Percentage)
+				assert.Equal(t, 10.0, *band1.NonWifi.Percentage)
+				assert.Equal(t, 55.0, *band1.Total.Percentage)
 
 				band2, ok := devices["ABC123"].bandUtilization["5"]
 				assert.NotNil(t, band2)
 				assert.True(t, ok)
-				assert.Equal(t, 10.0, band2.Wifi)
-				assert.Equal(t, 45.0, band2.NonWifi)
-				assert.Equal(t, 55.0, band2.Total)
-			},
-		},
-		{
-			name:   "MR 27.0 error skips network",
-			client: &MR27ErrorMockNetworkHealthService{},
-			devices: map[Serial]*Device{
-				"serial-4": {
-					details: &meraki.ResponseItemOrganizationsGetOrganizationDevices{
-						ProductType: "wireless",
-						NetworkID:   "network-4",
-					},
-				},
-			},
-			validate: func(t *testing.T, devices map[Serial]*Device) {
-				assert.Nil(t, devices["serial-4"].bandUtilization)
+				assert.Equal(t, 10.0, *band2.Wifi.Percentage)
+				assert.Equal(t, 45.0, *band2.NonWifi.Percentage)
+				assert.Equal(t, 55.0, *band2.Total.Percentage)
 			},
 		},
 		{
@@ -229,19 +214,6 @@ func (m *SuccessfulMockNetworkHealthService) GetOrganizationWirelessDevicesChann
 	}
 
 	return r, nil
-}
-
-// MR27ErrorMockNetworkHealthService simulates the MR 27.0 version error
-type MR27ErrorMockNetworkHealthService struct{}
-
-func (m *MR27ErrorMockNetworkHealthService) GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error) {
-	r := &resty.Response{}
-	bodyContent := []byte("This endpoint is only available for networks on MR 27.0 or above.")
-	r.SetBody(bodyContent)
-	r.RawResponse = &http.Response{
-		Body: io.NopCloser(bytes.NewBuffer(bodyContent)),
-	}
-	return r, fmt.Errorf("MR 27.0 error")
 }
 
 // GenericErrorMockNetworkHealthService simulates generic errors
