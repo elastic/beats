@@ -15,33 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package backup
+//go:build requirefips
+
+package hasher
 
 import (
-	"errors"
-	"os"
+	"crypto/sha256"
+	"crypto/sha3"
+	"crypto/sha512"
+	"hash"
+
+	"github.com/cespare/xxhash/v2"
 )
 
-const (
-	backupSuffix = ".bak"
+var (
+	validHashes = map[HashType]func() hash.Hash{
+		SHA224: sha256.New224,
+		SHA256: sha256.New,
+		SHA384: sha512.New384,
+		SHA3_224: func() hash.Hash {
+			return sha3.New224()
+		},
+		SHA3_256: func() hash.Hash {
+			return sha3.New256()
+		},
+		SHA3_384: func() hash.Hash {
+			return sha3.New384()
+		},
+		SHA3_512: func() hash.Hash {
+			return sha3.New512()
+		},
+		SHA512:     sha512.New,
+		SHA512_224: sha512.New512_224,
+		SHA512_256: sha512.New512_256,
+		XXH64: func() hash.Hash {
+			return xxhash.New()
+		},
+	}
 )
-
-// Backuper defines backup-related operations
-type Backuper interface {
-	// Backup performs the backup
-	Backup() error
-	// Removes all backups created by this backuper
-	Remove() error
-}
-
-// fileExists checks if the given file exists
-func fileExists(name string) (bool, error) {
-	_, err := os.Stat(name)
-	if err == nil {
-		return true, nil
-	}
-	if errors.Is(err, os.ErrNotExist) {
-		return false, nil
-	}
-	return false, err
-}

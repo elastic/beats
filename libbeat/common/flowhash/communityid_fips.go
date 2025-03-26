@@ -15,34 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package takeover
+//go:build requirefips
 
-type scanner struct {
-	RecursiveGlob bool `config:"recursive_glob"`
+package flowhash
+
+var CommunityID = newEmptyCommunityID()
+
+type emptyCommunityIDHasher struct{}
+
+// newEmptyCommunityID returns an empty Hasher
+func newEmptyCommunityID() Hasher {
+	return &emptyCommunityIDHasher{}
 }
 
-type prospector struct {
-	Scanner scanner `config:"scanner"`
-}
-
-type inputConfig struct {
-	Type       string     `config:"type"`
-	ID         string     `config:"id"`
-	Paths      []string   `config:"paths"`
-	TakeOver   bool       `config:"take_over"`
-	Prospector prospector `config:"prospector"`
-}
-
-func defaultInputConfig() inputConfig {
-	return inputConfig{
-		Type:     "",
-		ID:       "",
-		Paths:    []string{},
-		TakeOver: false,
-		Prospector: prospector{
-			Scanner: scanner{
-				RecursiveGlob: true,
-			},
-		},
-	}
+// Hash returns an empty string
+func (h *emptyCommunityIDHasher) Hash(_ Flow) string {
+	// no op
+	return ""
 }

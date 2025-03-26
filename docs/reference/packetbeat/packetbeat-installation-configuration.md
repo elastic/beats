@@ -26,14 +26,14 @@ This guide describes how to get started quickly with network packets analytics. 
 
 * You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
-    :::::::{tab-set}
+:::::::{tab-set}
 
 ::::::{tab-item} Elasticsearch Service
 To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
 ::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/deploy-cluster.md).
+To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
 ::::::{tab-item} DEB
@@ -64,24 +64,60 @@ You probably do not need to install libpcap. The default distribution of {{packe
     If you use Npcap, make sure you install it in WinPcap API-compatible mode. If you plan to capture traffic from the loopback device (127.0.0.1 traffic), also select the option to support loopback traffic.
 ::::::
 
+:::::::
+
+
+## Step 1: Install Packetbeat [install]
+
+:::::::{tab-set}
+
 ::::::{tab-item} DEB
-Version 9.0.0-beta1 of Packetbeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-amd64.deb
+sudo dpkg -i packetbeat-{{stack-version}}-amd64.deb
+```
 ::::::
 
 ::::::{tab-item} RPM
-Version 9.0.0-beta1 of Packetbeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-x86_64.rpm
+sudo rpm -vi packetbeat-{{stack-version}}-x86_64.rpm
+```
 ::::::
 
 ::::::{tab-item} MacOS
-Version 9.0.0-beta1 of Packetbeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
+tar xzvf packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
+```
 ::::::
 
 ::::::{tab-item} Linux
-Version 9.0.0-beta1 of Packetbeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-linux-x86_64.tar.gz
+tar xzvf packetbeat-{{stack-version}}-linux-x86_64.tar.gz
+```
 ::::::
 
 ::::::{tab-item} Windows
-Version 9.0.0-beta1 of Packetbeat has not yet been released.
+1. Download the [Packetbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-windows-x86_64.zip).
+
+2. Extract the contents of the zip file into `C:\Program Files`.
+
+3. Rename the `packetbeat-[version]-windows-x86_64` directory to `Packetbeat`.
+
+4. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+5. From the PowerShell prompt, run the following commands to install Packetbeat as a Windows service:
+
+  ```shell subs=true
+  PS > cd 'C:\Program Files\Packetbeat'
+  PS C:\Program Files\Packetbeat> .\install-service-packetbeat.ps1
+  ```
+
+:::{note}
+If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-packetbeat.ps1`.
+:::
 ::::::
 
 :::::::
