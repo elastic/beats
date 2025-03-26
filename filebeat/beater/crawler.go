@@ -153,7 +153,7 @@ func (c *crawler) startInput(
 }
 
 func (c *crawler) Stop() {
-	logp.Info("Stopping Crawler")
+	c.log.Info("Stopping Crawler")
 
 	asyncWaitStop := func(stop func()) {
 		c.wg.Add(1)
@@ -163,7 +163,7 @@ func (c *crawler) Stop() {
 		}()
 	}
 
-	logp.Info("Stopping %d inputs", len(c.inputs))
+	c.log.Info("Stopping %d inputs", len(c.inputs))
 	// Stop inputs in parallel
 	for id, p := range c.inputs {
 		id, p := id, p
@@ -183,7 +183,7 @@ func (c *crawler) Stop() {
 
 	c.WaitForCompletion()
 
-	logp.Info("Crawler stopped")
+	c.log.Info("Crawler stopped")
 }
 
 func (c *crawler) WaitForCompletion() {

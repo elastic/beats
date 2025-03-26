@@ -910,7 +910,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 				Logger:      logger,
 			}
 
-			im, err := idxmgmt.DefaultSupport(info, c.NewConfig())
+			im, err := idxmgmt.DefaultSupport(logger, info, c.NewConfig())
 			require.NoError(t, err)
 
 			index, pipeline, err := buildSelectors(im, info, cfg)
@@ -981,7 +981,8 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		Logger:      logger,
 	}
 
-	im, err := idxmgmt.DefaultSupport(info, c.NewConfig())
+	logger := logp.NewTestingLogger(t, "")
+	im, err := idxmgmt.DefaultSupport(logger, info, c.NewConfig())
 	require.NoError(t, err)
 
 	index, pipeline, err := buildSelectors(im, info, cfg)
