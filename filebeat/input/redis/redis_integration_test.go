@@ -141,6 +141,10 @@ func TestInput(t *testing.T) {
 		val, err := event.GetValue("message")
 		require.NoError(t, err)
 		require.Equal(t, message, val)
+		val, err = event.GetValue("redis")
+		require.NoError(t, err)
+		role := val.(mapstr.M)["slowlog"].(mapstr.M)["role"]
+		require.Equal(t, "master", role)
 	case <-time.After(30 * time.Second):
 		t.Fatal("Timeout waiting for event")
 	}

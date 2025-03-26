@@ -31,7 +31,7 @@ To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www
 ::::::
 
 ::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/deploy-cluster.md).
+To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
 :::::::
@@ -45,23 +45,52 @@ To download and install Auditbeat, use the commands that work with your system:
 :::::::{tab-set}
 
 ::::::{tab-item} DEB
-Version 9.0.0-beta1 of Auditbeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-amd64.deb
+sudo dpkg -i auditbeat-{{stack-version}}-amd64.deb
+```
 ::::::
 
 ::::::{tab-item} RPM
-Version 9.0.0-beta1 of Auditbeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-x86_64.rpm
+sudo rpm -vi auditbeat-{{stack-version}}-x86_64.rpm
+```
 ::::::
 
 ::::::{tab-item} MacOS
-Version 9.0.0-beta1 of Auditbeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-darwin-x86_64.tar.gz
+tar xzvf auditbeat-{{stack-version}}-darwin-x86_64.tar.gz
+```
 ::::::
 
 ::::::{tab-item} Linux
-Version 9.0.0-beta1 of Auditbeat has not yet been released.
+```shell subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-linux-x86_64.tar.gz
+tar xzvf auditbeat-{{stack-version}}-linux-x86_64.tar.gz
+```
 ::::::
 
 ::::::{tab-item} Windows
-Version 9.0.0-beta1 of Auditbeat has not yet been released.
+1. Download the [Auditbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{stack-version}}-windows-x86_64.zip).
+
+2. Extract the contents of the zip file into `C:\Program Files`.
+
+3. Rename the `auditbeat-[version]-windows-x86_64` directory to `Auditbeat`.
+
+4. Open a PowerShell prompt as an Administrator (right-click the PowerShell icon and select *Run As Administrator*).
+
+5. From the PowerShell prompt, run the following commands to install Auditbeat as a Windows service:
+
+  ```shell subs=true
+  PS > cd 'C:\Program Files\Auditbeat'
+  PS C:\Program Files\Auditbeat> .\install-service-auditbeat.ps1
+  ```
+
+:::{note}
+If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-auditbeat.ps1`.
+:::
 ::::::
 
 :::::::

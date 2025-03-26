@@ -31,7 +31,7 @@ To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www
 ::::::
 
 ::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/deploy-cluster.md).
+To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
 :::::::
@@ -60,14 +60,14 @@ Status   Name               DisplayName
 Stopped  winlogbeat         winlogbeat
 ```
 
-::::{note}
+:::{note}
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-winlogbeat.ps1`.
-::::
+:::
 
 
-::::{note}
+:::{note}
 To use a local non-Administrator account to run Winlogbeat, follow [these additional steps](#local-user-account-setup).
-::::
+:::
 
 
 

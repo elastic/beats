@@ -15,33 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package backup
+//go:build requirefips
 
-import (
-	"errors"
-	"os"
-)
+package flowhash
 
-const (
-	backupSuffix = ".bak"
-)
+var CommunityID = newEmptyCommunityID()
 
-// Backuper defines backup-related operations
-type Backuper interface {
-	// Backup performs the backup
-	Backup() error
-	// Removes all backups created by this backuper
-	Remove() error
+type emptyCommunityIDHasher struct{}
+
+// newEmptyCommunityID returns an empty Hasher
+func newEmptyCommunityID() Hasher {
+	return &emptyCommunityIDHasher{}
 }
 
-// fileExists checks if the given file exists
-func fileExists(name string) (bool, error) {
-	_, err := os.Stat(name)
-	if err == nil {
-		return true, nil
-	}
-	if errors.Is(err, os.ErrNotExist) {
-		return false, nil
-	}
-	return false, err
+// Hash returns an empty string
+func (h *emptyCommunityIDHasher) Hash(_ Flow) string {
+	// no op
+	return ""
 }

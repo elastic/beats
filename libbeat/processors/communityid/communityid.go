@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package communityid
 
 import (
@@ -27,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -66,10 +68,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 }
 
 func newFromConfig(c config) (*processor, error) {
-	hasher := flowhash.CommunityID
-	if c.Seed != 0 {
-		hasher = flowhash.NewCommunityID(c.Seed, flowhash.Base64Encoding, crypto.SHA1)
-	}
+	hasher := flowhash.NewCommunityID(c.Seed, flowhash.Base64Encoding, crypto.SHA1)
 
 	return &processor{
 		config: c,

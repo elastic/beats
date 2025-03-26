@@ -15,34 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package takeover
-
-type scanner struct {
-	RecursiveGlob bool `config:"recursive_glob"`
-}
-
-type prospector struct {
-	Scanner scanner `config:"scanner"`
-}
-
-type inputConfig struct {
-	Type       string     `config:"type"`
-	ID         string     `config:"id"`
-	Paths      []string   `config:"paths"`
-	TakeOver   bool       `config:"take_over"`
-	Prospector prospector `config:"prospector"`
-}
-
-func defaultInputConfig() inputConfig {
-	return inputConfig{
-		Type:     "",
-		ID:       "",
-		Paths:    []string{},
-		TakeOver: false,
-		Prospector: prospector{
-			Scanner: scanner{
-				RecursiveGlob: true,
-			},
-		},
-	}
-}
+// Package status is a Metricbeat module that contains MetricSets.
+package status

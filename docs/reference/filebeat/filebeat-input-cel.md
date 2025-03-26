@@ -34,7 +34,7 @@ filebeat.inputs:
   interval: 1m
   resource.url: https://api.ipify.org/?format=json
   program: |
-    bytes(get(state.url).Body).as(body, {
+    get(state.url).Body.as(body, {
         "events": [body.decode_json()]
     })
 ```
@@ -69,7 +69,7 @@ filebeat.inputs:
                 "application/json",
                 {"scroll": state.scroll}.encode_json()
             )
-    ).as(resp, bytes(resp.Body).decode_json().as(body, {
+    ).as(resp, resp.Body.decode_json().as(body, {
             "events": body.hits.hits,
             "cursor": {"scroll_id": body._scroll_id},
     }))
@@ -338,7 +338,7 @@ filebeat.inputs:
   interval: 1m
   resource.url: https://api.ipify.org/?format=json
   program: |
-    bytes(get(state.url).Body).as(body, {
+    get(state.url).Body.as(body, {
         "events": [body.decode_json().with({
             "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
                 state.cursor.last_requested_at
@@ -630,6 +630,24 @@ Duration before declaring that the HTTP client connection has timed out. Valid t
 ### `resource.ssl` [_resource_ssl]
 
 This specifies SSL/TLS configuration. If the ssl section is missing, the host’s CAs are used for HTTPS connections. See [SSL](/reference/filebeat/configuration-ssl.md) for more information.
+
+
+### `resource.proxy_url` [_resource_proxy_url]
+
+This specifies proxy configuration in the form of `http[s]://<user>:<password>@<server name/ip>:<port>`. Proxy headers may be configured using the `resource.proxy_headers` field which accepts a set of key/value pairs.
+
+```yaml
+filebeat.inputs:
+# Fetch your public IP every minute.
+- type: cel
+  interval: 1m
+  resource.url: https://api.ipify.org/?format=text
+  resource.proxy_url: http://proxy.example:8080
+  program: |
+    {
+        "events": [{"ip": string(get(state.url).Body)}]
+    }
+```
 
 
 ### `resource.keep_alive.disable` [_resource_keep_alive_disable]

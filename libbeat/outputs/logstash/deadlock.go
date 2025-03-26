@@ -18,19 +18,25 @@
 package logstash
 
 import (
+	"context"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type deadlockListener struct {
-	log     *logp.Logger
-	timeout time.Duration
-	ticker  *time.Ticker
+	log        *logp.Logger
+	timeout    time.Duration
+	tickerChan <-chan time.Time
+
+	// getTime returns the current time (allows overriding time.Now in the tests)
+	getTime  func() time.Time
+	lastTime time.Time
 
 	ackChan chan int
 
-	doneChan chan struct{}
+	ctx       context.Context
+	ctxCancel context.CancelFunc
 }
 
 const logstashDeadlockTimeout = 5 * time.Minute
@@ -39,57 +45,82 @@ func newDeadlockListener(log *logp.Logger, timeout time.Duration) *deadlockListe
 	if timeout <= 0 {
 		return nil
 	}
-	r := &deadlockListener{
-		log:     log,
-		timeout: timeout,
-		ticker:  time.NewTicker(timeout),
 
-		ackChan:  make(chan int),
-		doneChan: make(chan struct{}),
-	}
-	go r.run()
-	return r
+	dl := idleDeadlockListener(log, timeout, time.Now)
+
+	// Check timeouts at a steady interval of once a second. This loses
+	// sub-second granularity (which we don't need) in exchange for making
+	// the API deterministically testable (using real timers in the tests
+	// was causing flakiness).
+	ticker := time.NewTicker(time.Second)
+	dl.tickerChan = ticker.C
+	go func() {
+		defer ticker.Stop()
+		dl.run()
+	}()
+
+	return dl
 }
 
-func (r *deadlockListener) run() {
-	defer r.ticker.Stop()
-	defer close(r.doneChan)
-	for {
-		select {
-		case n, ok := <-r.ackChan:
-			if !ok {
-				// Listener has been closed
-				return
-			}
-			if n > 0 {
-				// If progress was made, reset the countdown.
-				r.ticker.Reset(r.timeout)
-			}
-		case <-r.ticker.C:
+// Initialize the listener without an active ticker, and don't start the run()
+// goroutine, so unit tests can control the execution timing.
+func idleDeadlockListener(log *logp.Logger, timeout time.Duration, getTime func() time.Time) *deadlockListener {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &deadlockListener{
+		log:      log,
+		timeout:  timeout,
+		getTime:  getTime,
+		lastTime: getTime(),
+
+		ackChan: make(chan int),
+
+		ctx:       ctx,
+		ctxCancel: cancel,
+	}
+}
+
+func (dl *deadlockListener) run() {
+	for dl.ctx.Err() == nil {
+		dl.runIteration()
+	}
+}
+
+func (dl *deadlockListener) runIteration() {
+	select {
+	case <-dl.ctx.Done():
+		// Listener has been closed
+		return
+	case n := <-dl.ackChan:
+		if n > 0 {
+			// If progress was made, reset the countdown.
+			dl.lastTime = dl.getTime()
+		}
+	case <-dl.tickerChan:
+		if dl.getTime().Sub(dl.lastTime) >= dl.timeout {
 			// No progress was made within the timeout, log error so users
 			// know there is likely a problem with the upstream host
-			r.log.Errorf("Logstash batch hasn't reported progress in the last %v, the Logstash host may be stalled. This problem can be prevented by configuring Logstash to use PipelineBusV1 or by upgrading Logstash to 8.17+, for details see https://github.com/elastic/logstash/issues/16657", r.timeout)
-			return
+			dl.log.Errorf("Logstash batch hasn't reported progress in the last %v, the Logstash host may be stalled. This problem can be prevented by configuring Logstash to use PipelineBusV1 or by upgrading Logstash to 8.17+, for details see https://github.com/elastic/logstash/issues/16657", dl.timeout)
+			dl.ctxCancel()
 		}
 	}
 }
 
-func (r *deadlockListener) ack(n int) {
-	if r == nil {
+func (dl *deadlockListener) ack(n int) {
+	if dl == nil {
 		return
 	}
 	// Send the new ack to the run loop, unless it has already shut down in
 	// which case it can be safely ignored.
 	select {
-	case r.ackChan <- n:
-	case <-r.doneChan:
+	case dl.ackChan <- n:
+	case <-dl.ctx.Done():
 	}
 }
 
-func (r *deadlockListener) close() {
-	if r == nil {
+func (dl *deadlockListener) close() {
+	if dl == nil {
 		return
 	}
 	// Signal the run loop to shut down
-	close(r.ackChan)
+	dl.ctxCancel()
 }
