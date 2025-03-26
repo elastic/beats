@@ -15,35 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !requirefips
-
+// Package status is a Metricbeat module that contains MetricSets.
 package status
-
-import (
-	"net"
-	"os/exec"
-	"testing"
-	"time"
-
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-)
-
-func TestData(t *testing.T) {
-	sockPath := "/var/run/libvirt/libvirt-sock"
-	checkLibvirt(t, sockPath)
-
-	f := mbtest.NewFetcher(t, getConfig("unix://"+sockPath))
-	f.WriteEvents(t, "")
-}
-
-func checkLibvirt(t *testing.T, sockPath string) {
-	if exec.Command("kvm-ok").Run() != nil {
-		t.Skip("kvm not available")
-	}
-
-	c, err := net.DialTimeout("unix", sockPath, 5*time.Second)
-	if err != nil {
-		t.Skipf("cannot connect to %s: %v", sockPath, err)
-	}
-	c.Close()
-}
