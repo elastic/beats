@@ -3,21 +3,14 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
 [[release-notes-9.0.0-beta1]]
 === Beats version 9.0.0-beta1
 https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
-=======
-[[release-notes-8.17.4]]
-=== Beats version 8.17.4
-https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
->>>>>>> d6cb6e488 (docs: Prepare Changelog for 8.17.4 (#43432))
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-<<<<<<< HEAD
 - Set default Kafka version to 2.1.0 in Kafka output and Filebeat. {pull}41662[41662]
 - Replace default Ubuntu-based images with UBI-minimal-based ones. {pull}42150[42150]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
@@ -99,7 +92,32 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 
 *Metricbeat*
 - Add benchmark module. {pull}41801[41801]
-=======
+
+*Osquerybeat*
+
+- Increase maximum query timeout to 24 hours. {pull}42356[42356]
+
+*Winlogbeat*
+
+- Properly set events `UserData` when experimental API is used. {pull}41525[41525]
+- Include XML is respected for experimental API. {pull}41525[41525]
+- Forwarded events use renderedtext info for experimental API. {pull}41525[41525]
+- Language setting is respected for experimental API. {pull}41525[41525]
+- Language setting also added to decode XML wineventlog processor. {pull}41525[41525]
+- Format embedded messages in the experimental API. {pull}41525[41525]
+- Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
+- Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
+- Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
+
+
+[[release-notes-8.17.4]]
+=== Beats version 8.17.4
+https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
 
@@ -131,31 +149,11 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 *Filebeat*
 
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
->>>>>>> d6cb6e488 (docs: Prepare Changelog for 8.17.4 (#43432))
 
 *Osquerybeat*
 
 - Increase maximum query timeout to 24 hours. {pull}42356[42356]
 
-<<<<<<< HEAD
-*Winlogbeat*
-
-- Properly set events `UserData` when experimental API is used. {pull}41525[41525]
-- Include XML is respected for experimental API. {pull}41525[41525]
-- Forwarded events use renderedtext info for experimental API. {pull}41525[41525]
-- Language setting is respected for experimental API. {pull}41525[41525]
-- Language setting also added to decode XML wineventlog processor. {pull}41525[41525]
-- Format embedded messages in the experimental API. {pull}41525[41525]
-- Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
-- Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
-- Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
-
-*Functionbeat*
-
-- Remove Functionbeat binaries from CI pipelines. {issue}40745[40745] {pull}41506[41506]
-
-=======
->>>>>>> d6cb6e488 (docs: Prepare Changelog for 8.17.4 (#43432))
 
 [[release-notes-8.17.3]]
 === Beats version 8.17.3
