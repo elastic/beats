@@ -37,6 +37,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -330,7 +331,8 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Cli
 		t.Fatalf("redis output module not registered")
 	}
 
-	out, err := plugin(nil, beat.Info{Beat: testBeatname, Version: testBeatversion}, outputs.NewNilObserver(), config)
+	logger := logp.NewTestingLogger(t, "")
+	out, err := plugin(nil, beat.Info{Beat: testBeatname, Version: testBeatversion, Logger: logger}, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}
