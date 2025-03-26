@@ -295,6 +295,7 @@ subs:
   hive:   "TheHive"
   monitoring:   "X-Pack monitoring"
   monitor-features:   "monitoring features"
+<<<<<<< HEAD
   stack-monitor-features:   "Elastic Stack monitoring features"
   watcher:   "Watcher"
   alert-features:   "alerting features"
@@ -489,3 +490,7 @@ subs:
   icon-bug:   "pass:[<span class=\"eui-icon icon-bug\"></span>]"
   icon-checkInCircleFilled:   "pass:[<span class=\"eui-icon icon-checkInCircleFilled\"></span>]"
   icon-warningFilled:   "pass:[<span class=\"eui-icon icon-warningFilled\"></span>]"
+=======
+  stack-version: "9.0.0"
+  major-version: "9.0"
+>>>>>>> e8294b8ac (Add missing install steps (#43386))
