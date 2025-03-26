@@ -1,5 +1,9 @@
 ARG VSPHERE_GOLANG_VERSION
+<<<<<<< HEAD
 FROM golang:1.23.8
+=======
+FROM golang:1.24.1
+>>>>>>> 33da6ddb8 ([Automation] Bump Golang version to 1.24.1 (#43488))
 
 RUN apt-get install curl git
 RUN go install github.com/vmware/govmomi/vcsim@v0.30.4
