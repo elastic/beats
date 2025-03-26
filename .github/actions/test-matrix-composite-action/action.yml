@@ -12,7 +12,7 @@ inputs:
 outputs:
   matrix:
     description: "Matrix with beats and OS versions"
-    value: ${{ steps.define-matrix.outputs.matrix }}
+    value: ${{ steps.generate-matrix.outputs.matrix }}
 runs:
   using: "composite"
   steps:
