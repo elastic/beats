@@ -1,3 +1,4 @@
+## NB! Name of the workflow should be same as a filename
 name: macos-unit-tests-push
 
 on:
@@ -42,7 +43,8 @@ jobs:
         uses: ./.github/actions/test-matrix-composite-action
         with:
           os-versions: macos-13 macos-14
-          workflow-name: macos-unit-tests-push.yml
+          workflow-name: ${{ github.workflow }}
+
 
 ##      - name: "Define matrix"
 ##        id: set-matrix

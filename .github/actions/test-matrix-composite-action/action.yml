@@ -17,6 +17,9 @@ runs:
     - name: Define Matrix
       run: ./.github/actions/test-matrix-composite-action/generate-matrix.sh ${{ inputs.os-versions }}
       shell: bash
+      env:
+        WORKFLOW_NAME: ${{ inputs.workflow-name }}
+
 
     - name: Set GitHub Path
       run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
