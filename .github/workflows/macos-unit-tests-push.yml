@@ -48,6 +48,9 @@ jobs:
           os-versions: macos-13 macos-14
           workflow-name: ${{ github.workflow }}
 
+      - name: "Print out matrix"
+        run:  printf "%s\n" "${steps.run-composite.outputs.matrix[@]}"
+
   unit-tests:
     needs: matrix-prep
     if: ${{ needs.matrix-prep.outputs.matrix != '' }}

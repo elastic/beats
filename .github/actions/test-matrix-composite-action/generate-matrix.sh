@@ -27,8 +27,6 @@ if [[ $changeList == *"$WORKFLOW"* || $changeList == *"test-matrix-composite-act
     --argjson osArray "$(printf '%s\n' "${os[@]}" | jq -R . | jq -s .)" \
     '[ $dirs[] as $dir | $osArray[] as $os | {beat: $dir, os: $os} ]')
 
- printf "%s\n" "${matrix[@]}"
-
   echo "matrix={\"include\":$(echo $matrix)}" >>$GITHUB_OUTPUT
 else
     matrix=$(jq -n --argjson dirs "$(printf '%s\n' "${changedDirs[@]}" | jq -R . | jq -s .)" \
