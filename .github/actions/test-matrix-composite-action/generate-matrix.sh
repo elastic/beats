@@ -20,9 +20,6 @@ if [[ $changeList == *"$WORKFLOW"* || $changeList == *"test-matrix-composite-act
   # Since GH actions do not support accessing the `paths` section in a runtime, get required beats manually
   beats=($(awk '/paths:/ {flag=1; next} /^[^ ]/ {flag=0} flag && $2 !~ /^\.github/ {print $2}' ./.github/workflows/$WORKFLOW.yml))
 
-  echo "BEATS:"
-  printf "%s\n" "${beats[@]}"
-
   matrix=$(jq -n --argjson dirs "$(printf '%s\n' "${beats[@]}" | jq -R . | jq -s .)" \
     --argjson osArray "$(printf '%s\n' "${os[@]}" | jq -R . | jq -s .)" \
     '[ $dirs[] as $dir | $osArray[] as $os | {beat: $dir, os: $os} ]')

@@ -35,7 +35,7 @@ jobs:
   matrix-prep:
     runs-on: ubuntu-latest
     outputs:
-      matrix-output: ${{ steps.run-composite.outputs.matrix }}
+      matrix: ${{ steps.run-composite.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
         with:
