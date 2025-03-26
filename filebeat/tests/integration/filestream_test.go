@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -87,7 +86,11 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	tempDir := filebeat.TempDir()
 
 	// 1. Generate the log file path, but do not write data to it
-	logFilePath := path.Join(tempDir, "log.log")
+	logFilePath := filepath.Join(tempDir, "log.log")
+	msgLogFilePath := logFilePath
+	if runtime.GOOS == "windows" {
+		msgLogFilePath = strings.Replace(logFilePath, `\`, `\\`, -1)
+	}
 
 	// 2. Write configuration file ans start Filebeat
 	filebeat.WriteConfigFile(fmt.Sprintf(filestreamCleanInactiveCfg, logFilePath, tempDir))
@@ -98,17 +101,17 @@ func TestFilestreamCleanInactive(t *testing.T) {
 
 	// 4. Wait for Filebeat to start scanning for files
 	filebeat.WaitForLogs(
-		fmt.Sprintf("A new file %s has been found", logFilePath),
+		fmt.Sprintf("A new file %s has been found", msgLogFilePath),
 		10*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
 	filebeat.WaitForLogs(
-		fmt.Sprintf("File is inactive. Closing. Path='%s'", logFilePath),
+		fmt.Sprintf("File is inactive. Closing. Path='%s'", msgLogFilePath),
 		10*time.Second,
 		"File did not became inactive")
 
 	filebeat.WaitForLogs(
-		fmt.Sprintf("Closed reader. Path='%s'", logFilePath),
+		fmt.Sprintf("Closed reader. Path='%s'", msgLogFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
 	// 5. Now that the reader has been closed, nothing is holding the state
@@ -367,6 +370,10 @@ logging:
 			workDir := filebeat.TempDir()
 			outputFile := filepath.Join(workDir, "output-file*")
 			logFilepath := filepath.Join(workDir, "log.log")
+			msgLogFilepath := logFilepath
+			if runtime.GOOS == "windows" {
+				msgLogFilepath = strings.Replace(logFilepath, `\`, `\\`, -1)
+			}
 			integration.GenerateLogFile(t, logFilepath, 25, false)
 
 			cfgYAML := fmt.Sprintf(cfgTemplate, logFilepath, tc.oldIdentityCfg, workDir)
@@ -374,7 +381,7 @@ logging:
 			filebeat.Start()
 
 			// Wait for the file to be fully ingested
-			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
 			filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 			requirePublishedEvents(t, filebeat, 25, outputFile)
 			filebeat.Stop()
@@ -389,7 +396,7 @@ logging:
 			// The happy path is to migrate keys, so we assert it first
 			if tc.expectMigration {
 				// Test the case where the registry migration happens
-				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", logFilepath)
+				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", msgLogFilepath)
 				filebeat.WaitForLogs(migratingMsg, time.Second*5, "prospector did not migrate registry entry")
 				filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
 				filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
@@ -424,7 +431,7 @@ logging:
 	}
 }
 
-func TestFilestreamMigrateIdentityCornerCases(t *testing.T) {
+func TestFilestreamCanMigrateIdentityCornerCases(t *testing.T) {
 	cfgTemplate := `
 filebeat.inputs:
   - type: filestream
@@ -723,6 +730,11 @@ func TestFilestreamDelete(t *testing.T) {
 			workDir := filebeat.TempDir()
 
 			logFile := filepath.Join(workDir, "log.log")
+			// Escape filepaths for Windows
+			msgLogFilePath := logFile
+			if runtime.GOOS == "windows" {
+				msgLogFilePath = strings.Replace(logFile, `\`, `\\`, -1)
+			}
 			integration.GenerateLogFile(t, logFile, 100, false)
 
 			vars := map[string]any{
@@ -736,7 +748,7 @@ func TestFilestreamDelete(t *testing.T) {
 			filebeat.Start()
 
 			for _, msgFmt := range tc.msgs {
-				msg := fmt.Sprintf(msgFmt, logFile)
+				msg := fmt.Sprintf(msgFmt, msgLogFilePath)
 				filebeat.WaitForLogs(
 					msg,
 					10*time.Second,
@@ -750,7 +762,7 @@ func TestFilestreamDelete(t *testing.T) {
 				notFinishedMsg := fmt.Sprintf(
 					"not all events from '%s' have been published, "+
 						"waiting before removing the file",
-					logFile)
+					msgLogFilePath)
 				for i := range 2 {
 					filebeat.WaitForLogs(
 						notFinishedMsg,
@@ -765,8 +777,8 @@ func TestFilestreamDelete(t *testing.T) {
 				}
 			}
 
-			msg := fmt.Sprintf("File %s has been removed", logFile)
-			filebeat.WaitForLogs(msg, 30*time.Second, "log file '%s' was not removed", logFile)
+			msg := fmt.Sprintf("File %s has been removed", msgLogFilePath)
+			filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
 		})
 	}
 }
@@ -837,8 +849,12 @@ func createFileAndWaitIngestion(
 	}
 
 	integration.GenerateLogFile(t, logFilepath, n, false)
+	msgLogFilepath := logFilepath
+	if runtime.GOOS == "windows" {
+		msgLogFilepath = strings.Replace(logFilepath, `\`, `\\`, -1)
+	}
 
-	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
 	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }
@@ -864,9 +880,6 @@ func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
 
 func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []string) {
 	for _, path := range files {
-		if runtime.GOOS == "windows" {
-			path = strings.Replace(path, `\`, `\\`, -1)
-		}
 		eofMsg := fmt.Sprintf("File didn't change: %s", path)
 
 		require.Eventuallyf(
