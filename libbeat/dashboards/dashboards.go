@@ -54,13 +54,13 @@ func ImportDashboards(
 		return errors.New("kibana configuration missing for loading dashboards")
 	}
 
-	return setupAndImportDashboardsViaKibana(ctx, beatInfo.Hostname, beatInfo.Beat, kibanaConfig, &dashConfig, msgOutputter, pattern)
+	return setupAndImportDashboardsViaKibana(ctx, beatInfo, kibanaConfig, &dashConfig, msgOutputter, pattern)
 }
 
-func setupAndImportDashboardsViaKibana(ctx context.Context, hostname, beatname string, kibanaConfig *config.C,
+func setupAndImportDashboardsViaKibana(ctx context.Context, beatInfo beat.Info, kibanaConfig *config.C,
 	dashboardsConfig *Config, msgOutputter MessageOutputter, fields mapstr.M) error {
 
-	kibanaLoader, err := NewKibanaLoader(ctx, kibanaConfig, dashboardsConfig, hostname, msgOutputter, beatname)
+	kibanaLoader, err := NewKibanaLoader(ctx, kibanaConfig, dashboardsConfig, msgOutputter, beatInfo)
 	if err != nil {
 		return fmt.Errorf("fail to create the Kibana loader: %v", err)
 	}

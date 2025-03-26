@@ -44,12 +44,12 @@ type RunnerList struct {
 }
 
 // NewRunnerList builds and returns a RunnerList
-func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector) *RunnerList {
+func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector, logger *logp.Logger) *RunnerList {
 	return &RunnerList{
 		runners:  map[uint64]Runner{},
 		factory:  factory,
 		pipeline: pipeline,
-		logger:   logp.NewLogger(name),
+		logger:   logger.Named(name),
 	}
 }
 

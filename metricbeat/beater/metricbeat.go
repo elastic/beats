@@ -246,7 +246,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Centrally managed modules
 	factory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
-	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
+	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {
@@ -264,7 +264,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
-		moduleReloader := cfgfile.NewReloader(logp.L().Named("module.reload"), b.Publisher, bt.config.ConfigModules)
+		moduleReloader := cfgfile.NewReloader(b.Info.Logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules)
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err
