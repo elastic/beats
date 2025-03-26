@@ -105,6 +105,10 @@ func (i *inputRegistry) Del(id string) {
 	delete(i.registries, id)
 }
 
+// CollectStructSnapshot returns the result of calling
+// monitoring.CollectStructSnapshot with mode Full and expvar false on each of
+// the registered metrics registry. It returns a map using the metrics registry
+// id as key and the structured snapshot is the associated value.
 func (i *inputRegistry) CollectStructSnapshot() map[string]map[string]any {
 	registeredInputRegistries := map[string]map[string]any{}
 
