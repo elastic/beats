@@ -75,8 +75,9 @@ func NewAutodiscover(
 	configurer EventConfigurer,
 	c *Config,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (*Autodiscover, error) {
-	logger := logp.NewLogger("autodiscover")
+	logger = logger.Named("autodiscover")
 
 	// Init Event bus
 	bus := bus.New(logger, name)

@@ -22,8 +22,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGlobManagerInit(t *testing.T) {
