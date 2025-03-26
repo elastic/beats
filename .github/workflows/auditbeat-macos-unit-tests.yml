@@ -6,8 +6,16 @@ on:
     branches:
       - main
     paths:
-      - auditbeat
+      - auditbeat/
+      # OSS
+      - go.mod
+      - pytest.ini
+      - dev-tools/
+      - libbeat/**
+      - testing/**
+      # Workflow
       - .github/workflows/auditbeat-macos-unit-tests.yml
+      - .github/workflows/actions/unit-test-composite-action/action.yml
 
 permissions:
   contents: read
@@ -36,7 +44,7 @@ jobs:
           beat: 'auditbeat'
 
   unit-tests-pr:
-    name: Unit tests macOS 15
+    name: Unit tests macos-15
     if: github.event_name == 'pull_request'
     runs-on: [ macos-15 ]
     steps:
