@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid/v5"
@@ -123,7 +124,7 @@ func TestInitKibanaConfig(t *testing.T) {
 
 func TestEmptyMetaJson(t *testing.T) {
 	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	b.Info.Logger = logger
 	if err != nil {
 		panic(err)
@@ -146,12 +147,8 @@ func TestEmptyMetaJson(t *testing.T) {
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
 	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
-<<<<<<< HEAD
-
-=======
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	firstBeat.Info.Logger = logger
->>>>>>> 019fe1d13 ([Chore][libbeat] Replace global logger with single logger instance (#43356))
 	if err != nil {
 		panic(err)
 	}
@@ -338,11 +335,9 @@ output:
 
 			config := beatConfig{}
 			err = cfg.Unpack(&config)
+			require.NoError(t, err)
 
-<<<<<<< HEAD
-			err = PromoteOutputQueueSettings(&config)
-=======
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 
 			b := &Beat{Config: config, Beat: beat.Beat{
 				Info: beat.Info{
@@ -350,8 +345,7 @@ output:
 				},
 			}}
 
-			err = promoteOutputQueueSettings(b)
->>>>>>> 019fe1d13 ([Chore][libbeat] Replace global logger with single logger instance (#43356))
+			err = PromoteOutputQueueSettings(b)
 			require.NoError(t, err)
 
 			ms, err := memqueue.SettingsForUserConfig(b.Config.Pipeline.Queue.Config())
