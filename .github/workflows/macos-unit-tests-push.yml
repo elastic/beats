@@ -46,7 +46,7 @@ jobs:
       - id: set-matrix
         uses: ./.github/actions/test-matrix-composite-action
         with:
-          os-versions: ("${MACOS_13_X64}" "${MACOS_14_ARM}")
+          os-versions: $MACOS_13_X64 $MACOS_14_ARM
           workflow-name: macos-unit-tests-push.yml
 
 ##      - name: "Define matrix"
