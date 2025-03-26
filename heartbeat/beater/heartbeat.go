@@ -311,6 +311,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 		autodiscover.QueryConfig(),
 		bt.config.Autodiscover,
 		b.Keystore,
+		b.Info.Logger,
 	)
 	if err != nil {
 		return nil, err

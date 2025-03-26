@@ -214,6 +214,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 			factory, autodiscover.QueryConfig(),
 			config.Autodiscover,
 			b.Keystore,
+			b.Info.Logger,
 		)
 		if err != nil {
 			return nil, err
