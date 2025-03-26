@@ -57,7 +57,7 @@ jobs:
 
   unit-tests:
     needs: matrix-prep
-    if: ${{ needs.matrix-prep.outputs.matrix != '' }}
+    if: ${{ needs.set-matrix.outputs.matrix != '' }}
     strategy:
       fail-fast: false
       max-parallel: 10
