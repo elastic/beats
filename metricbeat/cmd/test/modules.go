@@ -58,7 +58,7 @@ func GenTestModulesCmd(name, beatVersion string, create beat.Creator) *cobra.Com
 				os.Exit(1)
 			}
 
-			modules, err := mb.(*beater.Metricbeat).Modules()
+			modules, err := mb.(*beater.Metricbeat).Modules(b.Info.Logger)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error getting metricbeat modules: %s\n", err)
 				os.Exit(1)
