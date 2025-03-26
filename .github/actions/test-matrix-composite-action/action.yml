@@ -14,7 +14,7 @@ runs:
   using: "composite"
   steps:
     - name: Define Matrix
-      run: .github/actions/unit-tests-composite-action/generate-matrix.sh ${{ inputs.os-versions }}
+      run: ./.github/actions/test-matrix-composite-action/action.yml ${{ inputs.os-versions }}
       shell: bash
 
     - name: Set GitHub Path
