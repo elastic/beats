@@ -34,30 +34,23 @@ concurrency:
 jobs:
   matrix-prep:
     runs-on: ubuntu-latest
+    outputs:
+      matrix-output: ${{ steps.run-composite.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: '2'
 
-      - id: set-matrix
+      - name: "Define matrix"
+        id: set-matrix
         uses: ./.github/actions/test-matrix-composite-action
         with:
           os-versions: macos-13 macos-14
           workflow-name: ${{ github.workflow }}
 
-
-##      - name: "Define matrix"
-##        id: set-matrix
-##        run: |
-##          changesetFile=".github/workflows/macos.d/values.d/beats-macos"
-##          osVersions=("${MACOS_13_X64}" "${MACOS_14_ARM}")
-##          workflowFile="macos-unit-tests-push.yml"
-##
-##          .github/workflows/macos.d/generate-matrix.sh $changesetFile $osVersions $workflowFile
-
   unit-tests:
     needs: matrix-prep
-    if: ${{ needs.set-matrix.outputs.matrix != '' }}
+    if: ${{ needs.matrix-prep.outputs.matrix != '' }}
     strategy:
       fail-fast: false
       max-parallel: 10
