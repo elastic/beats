@@ -87,7 +87,7 @@ func TestFilebeatRunsAndLogsJSONToFile(t *testing.T) {
 		line := r.Bytes()
 		m := map[string]any{}
 		if err := json.Unmarshal(line, &m); err != nil {
-			t.Fatalf("line %d is not a valid JSON: %s", count, err)
+			t.Fatalf("line %d is not a valid JSON: %s: %s", count, err, string(line))
 		}
 		count++
 	}

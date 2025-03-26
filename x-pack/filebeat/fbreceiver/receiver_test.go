@@ -121,6 +121,7 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
+<<<<<<< HEAD
 	// Receivers need distinct home directories so wrap the config in a function.
 	config := func() *Config {
 		return &Config{
@@ -133,6 +134,20 @@ func TestMultipleReceivers(t *testing.T) {
 							"message": "test",
 							"count":   1,
 						},
+=======
+	// This test verifies that multiple receivers can be instantiated
+	// in isolation, started, and can ingest logs without interfering
+	// with each other.
+	config := Config{
+		Beatconfig: map[string]interface{}{
+			"filebeat": map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   1,
+>>>>>>> 019fe1d13 ([Chore][libbeat] Replace global logger with single logger instance (#43356))
 					},
 				},
 				"output": map[string]interface{}{
@@ -164,18 +179,32 @@ func TestMultipleReceivers(t *testing.T) {
 				Factory: factory,
 			},
 		},
+<<<<<<< HEAD
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
+=======
+		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			require.Conditionf(t, func() bool {
+				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
+			}, "expected receivers to have logs, got logs: %v", logs)
+>>>>>>> 019fe1d13 ([Chore][libbeat] Replace global logger with single logger instance (#43356))
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
 			// logger in Beats was global, causing logger fields to be
 			// overwritten when multiple receivers started in the same process.
+<<<<<<< HEAD
 			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r1"))
 			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
+=======
+			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("name", "r1"))
+			assert.Equal(t, 1, r1StartLogs.Len(), "r1 should have a single start log")
+			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("name", "r2"))
+			require.Equal(t, 1, r2StartLogs.Len(), "r2 should have a single start log")
+>>>>>>> 019fe1d13 ([Chore][libbeat] Replace global logger with single logger instance (#43356))
 		},
 	})
 }

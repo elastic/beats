@@ -870,13 +870,14 @@ func TestBulkEncodeEvents(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
+			logger := logp.NewTestingLogger(t, "")
 			cfg := c.MustNewConfigFrom(test.config)
 			info := beat.Info{
 				IndexPrefix: "test",
 				Version:     test.version,
 			}
 
-			im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
+			im, err := idxmgmt.DefaultSupport(logger, info, c.NewConfig())
 			require.NoError(t, err)
 
 			index, pipeline, err := buildSelectors(im, info, cfg)
@@ -944,7 +945,8 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		Version:     version.GetDefaultVersion(),
 	}
 
-	im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
+	logger := logp.NewTestingLogger(t, "")
+	im, err := idxmgmt.DefaultSupport(logger, info, c.NewConfig())
 	require.NoError(t, err)
 
 	index, pipeline, err := buildSelectors(im, info, cfg)
