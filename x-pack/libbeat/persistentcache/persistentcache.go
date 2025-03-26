@@ -46,8 +46,8 @@ type Options struct {
 // New creates and returns a new persistent cache.
 // Cache returned by this method must be closed with Close() when
 // not needed anymore.
-func New(name string, opts Options) (*PersistentCache, error) {
-	logger := logp.NewLogger("persistentcache")
+func New(name string, opts Options, logger *logp.Logger) (*PersistentCache, error) {
+	logger = logger.Named("persistentcache")
 
 	rootPath := opts.RootPath
 	if rootPath == "" {

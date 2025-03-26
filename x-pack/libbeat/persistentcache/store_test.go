@@ -27,7 +27,8 @@ func TestStandaloneStore(t *testing.T) {
 	require.NoError(t, err)
 	t.Cleanup(func() { os.RemoveAll(tempDir) })
 
-	store, err := newStore(logp.NewLogger("test"), tempDir, "store-cache")
+	log := logp.NewTestingLogger(t, "")
+	store, err := newStore(log, tempDir, "store-cache")
 	require.NoError(t, err)
 
 	err = store.Set(key, value, 0)
