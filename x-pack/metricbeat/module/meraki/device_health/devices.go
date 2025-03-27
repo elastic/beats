@@ -135,15 +135,12 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 	// - Bands are now labeled as 2.4/5 (GHz) instead of wifi0/wifi1.
 	// - Utilization categories are now named `wifi/nonWifi` instead of `80211/non80211`.
 
-	// The timespan (period) cannot be smaller than the interval.
-	// By default, the interval is 3600 seconds if not explicitly set.
-	if period.Seconds() < 3600 {
-		period = time.Second * 3600
-	}
-
 	for _, orgID := range organizations {
 		res, err := client.GetOrganizationWirelessDevicesChannelUtilizationByDevice(orgID, &meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams{
-			Timespan: period.Seconds(),
+			// The API requires the interval to be at least 300s, and the timespan can't be less than the interval.
+			// Since our max collection period is also 300s, we set both values to 300s.
+			Timespan: 300,
+			Interval: 300,
 		})
 		if err != nil {
 			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed; [%d] %s. %w", orgID, res.StatusCode(), res.Body(), err)
