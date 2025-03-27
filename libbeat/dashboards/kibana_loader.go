@@ -49,12 +49,12 @@ var (
 
 // KibanaLoader loads Kibana files
 type KibanaLoader struct {
-	client        *kibana.Client
-	config        *Config
-	version       version.V
-	hostname      string
-	msgOutputter  MessageOutputter
-	defaultLogger *logp.Logger
+	client       *kibana.Client
+	config       *Config
+	version      version.V
+	hostname     string
+	msgOutputter MessageOutputter
+	logger       *logp.Logger
 
 	loadedAssets map[string]bool
 }
@@ -71,13 +71,13 @@ func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Confi
 	}
 
 	loader := KibanaLoader{
-		client:        client,
-		config:        dashboardsConfig,
-		version:       client.GetVersion(),
-		hostname:      beatInfo.Hostname,
-		msgOutputter:  msgOutputter,
-		defaultLogger: beatInfo.Logger.Named("dashboards"),
-		loadedAssets:  make(map[string]bool, 0),
+		client:       client,
+		config:       dashboardsConfig,
+		version:      client.GetVersion(),
+		hostname:     beatInfo.Hostname,
+		msgOutputter: msgOutputter,
+		logger:       beatInfo.Logger.Named("dashboards"),
+		loadedAssets: make(map[string]bool, 0),
 	}
 
 	version := client.GetVersion()
@@ -257,6 +257,6 @@ func (loader KibanaLoader) statusMsg(msg string, a ...interface{}) {
 	if loader.msgOutputter != nil {
 		loader.msgOutputter(msg, a...)
 	} else {
-		loader.defaultLogger.Debugf(msg, a...)
+		loader.logger.Debugf(msg, a...)
 	}
 }
