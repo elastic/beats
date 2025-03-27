@@ -15,9 +15,9 @@ These images are free to use under the Elastic license. They contain open source
 
 Obtaining Heartbeat for Docker is as simple as issuing a `docker pull` command against the Elastic Docker registry.
 
-::::{warning}
-Version 9.0.0-beta1 of Heartbeat has not yet been released. No Docker image is currently available for Heartbeat 9.0.0-beta1.
-::::
+% ::::{warning}
+% Version 9.0.0-beta1 of Heartbeat has not yet been released. No Docker image is currently available for Heartbeat 9.0.0-beta1.
+% ::::
 
 
 ```sh
@@ -37,9 +37,9 @@ docker pull docker.elastic.co/beats/heartbeat-wolfi:9.0.0-beta1
 
 You can use the [Cosign application](https://docs.sigstore.dev/cosign/installation/) to verify the Heartbeat Docker image signature.
 
-::::{warning}
-Version 9.0.0-beta1 of Heartbeat has not yet been released. No Docker image is currently available for Heartbeat 9.0.0-beta1.
-::::
+% ::::{warning}
+% Version 9.0.0-beta1 of Heartbeat has not yet been released. No Docker image is currently available for Heartbeat 9.0.0-beta1.
+% ::::
 
 
 ```sh

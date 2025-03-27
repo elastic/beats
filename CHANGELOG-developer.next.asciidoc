@@ -111,6 +111,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix documentation and implementation of raw message handling in Filebeat http_endpoint by removing it. {pull}41498[41498]
 - Fix flaky test in filebeat Okta entity analytics provider. {issue}42059[42059] {pull}42123[42123]
 - Fix IIS module logging errors in case application pool PDH counter is not found. {pull}42274[42274]
+- Removed direct dependency on Azure/go-autorest/autorest/adal, which is deprecated. {issue}41463[41463] {pull}42959[42959]
 
 ==== Added
 
