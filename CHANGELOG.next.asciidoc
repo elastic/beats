@@ -215,6 +215,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 
 *Auditbeat*
 
