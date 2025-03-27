@@ -45,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/unit-test/action.yml
+      - uses: ./.github/actions/unit-test
         with:
           beat: 'auditbeat'
 
@@ -57,6 +57,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/actions/unit-test/action.yml
+      - uses: ./.github/actions/unit-test
         with:
           beat: 'auditbeat'
