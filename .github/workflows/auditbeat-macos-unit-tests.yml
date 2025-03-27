@@ -52,7 +52,7 @@ jobs:
   unit-tests-pr:
     name: Unit tests macos-15
     if: github.event_name == 'pull_request'
-    runs-on: [ macos-15 ]
+    runs-on: [macos-15]
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
