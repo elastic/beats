@@ -14,7 +14,7 @@ This functionality is in beta and is subject to change. The design and code is l
 Refer to the [Elastic Integrations documentation](integration-docs://reference/cyberarkpas.md).
 
 ::::{dropdown} Learn more
-{{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/ingestion-tools/fleet/index.md).
+{{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
 
 ::::
 
@@ -24,7 +24,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/c
 
 This is a module for receiving CyberArk Privileged Account Security (PAS) logs over Syslog or a file.
 
-The [ingest-geoip](elasticsearch://reference/ingestion-tools/enrich-processor/geoip-processor.md) Elasticsearch plugin is required to run this module.
+The [ingest-geoip](elasticsearch://reference/enrich-processor/geoip-processor.md) Elasticsearch plugin is required to run this module.
 
 ::::{tip}
 Read the [quick start](/reference/filebeat/filebeat-installation-configuration.md) to learn how to configure and run modules.
