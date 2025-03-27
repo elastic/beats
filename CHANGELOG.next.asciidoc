@@ -427,6 +427,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Add support for RFC7231 methods to http monitors. {pull}41975[41975]
+- Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
 
 *Metricbeat*
 
@@ -487,7 +488,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 *Packetbeat*
-
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
