@@ -43,7 +43,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-13, macos-14]
+        # Disabled due to: https://github.com/elastic/beats/issues/43482
+        # TODO uncomment for testing or once solved
+        os: [macos-13] #, macos-14]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
@@ -55,7 +57,10 @@ jobs:
 
   unit-tests-pr:
     name: Unit tests macos-15
-    if: github.event_name == 'pull_request'
+    # Disabled due to: https://github.com/elastic/beats/issues/43482
+    # TODO: remove the `if: false` and uncomment `if: github.event_name == 'pull_request'`for testing or once solved
+    if: false
+#    if: github.event_name == 'pull_request'
     runs-on: [macos-15]
     timeout-minutes: 60
     steps:
