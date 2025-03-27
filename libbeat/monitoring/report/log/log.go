@@ -118,7 +118,7 @@ func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
 	r := &reporter{
 		config:     config,
 		done:       make(chan struct{}),
-		logger:     logp.NewLogger("monitoring"),
+		logger:     beat.Logger.Named("monitoring"),
 		registries: map[string]*monitoring.Registry{},
 	}
 

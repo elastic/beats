@@ -40,7 +40,7 @@ func GenTestOutputCmd(settings instance.Settings) *cobra.Command {
 				os.Exit(1)
 			}
 
-			im, _ := idxmgmt.DefaultSupport(nil, b.Info, nil)
+			im, _ := idxmgmt.DefaultSupport(b.Info.Logger, b.Info, nil)
 			output, err := outputs.Load(im, b.Info, nil, b.Config.Output.Name(), b.Config.Output.Config())
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error initializing output: %s\n", err)

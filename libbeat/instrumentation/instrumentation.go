@@ -134,7 +134,7 @@ type HeapProfiling struct {
 }
 
 // New configures and returns an instrumentation object for tracing
-func New(cfg *config.C, beatName, beatVersion string) (Instrumentation, error) {
+func New(cfg *config.C, beatName, beatVersion string, logger *logp.Logger) (Instrumentation, error) {
 	if !cfg.HasField("instrumentation") {
 		return &instrumentation{}, nil
 	}
@@ -155,12 +155,12 @@ func New(cfg *config.C, beatName, beatVersion string) (Instrumentation, error) {
 		return nil, fmt.Errorf("could not create tracer, err: %v", err)
 	}
 
-	return initTracer(c, beatName, beatVersion)
+	return initTracer(c, beatName, beatVersion, logger)
 }
 
-func initTracer(cfg Config, beatName, beatVersion string) (*instrumentation, error) {
+func initTracer(cfg Config, beatName, beatVersion string, logger *logp.Logger) (*instrumentation, error) {
 
-	logger := logp.NewLogger("tracing")
+	logger = logger.Named("tracing")
 
 	if !cfg.IsEnabled() {
 		os.Setenv("ELASTIC_APM_ACTIVE", "false")

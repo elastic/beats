@@ -12,7 +12,7 @@ The {{ls}} output sends events directly to {{ls}} by using the lumberjack protoc
 ::::{admonition} Prerequisite
 :class: important
 
-To send events to {{ls}}, you also need to create a {{ls}} configuration pipeline that listens for incoming Beats connections and indexes the received events into {{es}}. For more information, see [Getting Started with {{ls}}](logstash://reference/getting-started-with-logstash.md). Also see the documentation for the [{{beats}} input](logstash://reference/plugins-inputs-beats.md) and [{{es}} output](logstash://reference/plugins-outputs-elasticsearch.md) plugins.
+To send events to {{ls}}, you also need to create a {{ls}} configuration pipeline that listens for incoming Beats connections and indexes the received events into {{es}}. For more information, see [Getting Started with {{ls}}](logstash://reference/getting-started-with-logstash.md). Also see the documentation for the [{{beats}} input](logstash-docs-md://lsr/plugins-inputs-beats.md) and [{{es}} output](logstash-docs-md://lsr/plugins-outputs-elasticsearch.md) plugins.
 ::::
 
 
@@ -188,7 +188,7 @@ This parameter’s value will be assigned to the `metadata.beat` field. It can t
 
 ### `ssl` [_ssl_2]
 
-Configuration options for SSL parameters like the root CA for {{ls}} connections. See [SSL](/reference/packetbeat/configuration-ssl.md) for more information. To use SSL, you must also configure the [Beats input plugin for Logstash](logstash://reference/plugins-inputs-beats.md) to use SSL/TLS.
+Configuration options for SSL parameters like the root CA for {{ls}} connections. See [SSL](/reference/packetbeat/configuration-ssl.md) for more information. To use SSL, you must also configure the [Beats input plugin for Logstash](logstash-docs-md://lsr/plugins-inputs-beats.md) to use SSL/TLS.
 
 
 ### `timeout` [_timeout_3]

@@ -32,7 +32,7 @@ To use SSL mutual authentication:
 
         For more information about these configuration options, see [SSL](/reference/heartbeat/configuration-ssl.md).
 
-3. Configure Logstash to use SSL. In the Logstash config file, specify the following settings for the [Beats input plugin for Logstash](logstash://reference/plugins-inputs-beats.md):
+3. Configure Logstash to use SSL. In the Logstash config file, specify the following settings for the [Beats input plugin for Logstash](logstash-docs-md://lsr/plugins-inputs-beats.md):
 
     * `ssl`: When set to true, enables Logstash to use SSL/TLS.
     * `ssl_certificate_authorities`: Configures Logstash to trust any certificates signed by the specified CA.
@@ -54,7 +54,7 @@ To use SSL mutual authentication:
         }
         ```
 
-        For more information about these options, see the [documentation for the Beats input plugin](logstash://reference/plugins-inputs-beats.md).
+        For more information about these options, see the [documentation for the Beats input plugin](logstash-docs-md://lsr/plugins-inputs-beats.md).
 
 
 
