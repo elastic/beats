@@ -1,0 +1,61 @@
+name: xpack-metricbeat-macos-unit-tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+    paths:
+      - metricbeat/
+      - x-pack/metricbeat/
+      - x-pack/libbeat/common/aws
+      # OSS
+      - go.mod
+      - pytest.ini
+      - dev-tools/
+      - libbeat/**
+      - testing/**
+      # Workflow
+      - .github/workflows/xpack-metricbeat-macos-unit-tests.yml
+      - .github/workflows/actions/unit-test-composite-action/action.yml
+
+permissions:
+  contents: read
+
+## Concurrency only allowed in the main branch.
+## So old builds running for old commits within the same Pull Request are cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# Known issues with tests:
+# https://github.com/elastic/beats/issues/33036
+# https://github.com/elastic/beats/issues/40496
+jobs:
+  unit-tests-push:
+    name: Unit tests ${{ matrix.os }}
+    if: github.event_name == 'pull_request'
+#    if: github.event_name == 'push'
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        os: [macos-13, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/actions/unit-test-composite-action
+        with:
+          beat: 'x-pack/metricbeat'
+
+  unit-tests-pr:
+    name: Unit tests macos-15
+    if: github.event_name == 'pull_request'
+    runs-on: [ macos-15 ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/workflows/actions/unit-test-composite-action
+        with:
+          beat: 'x-pack/metricbeat'
