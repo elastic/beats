@@ -40,8 +40,7 @@ concurrency:
 jobs:
   unit-tests-push:
     name: Unit tests ${{ matrix.os }}
-    if: github.event_name == 'pull_request'
-#    if: github.event_name == 'push'
+    if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
