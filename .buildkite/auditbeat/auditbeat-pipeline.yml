@@ -8,8 +8,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_2004_X86_64: "family/platform-ingest-beats-ubuntu-2004"
   IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64"
@@ -252,6 +250,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: Ubuntu arm64 Unit Tests"
 
+<<<<<<< HEAD
       - label: ":mac: Auditbeat: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -298,6 +297,8 @@ steps:
           - github_commit_status:
               context: "auditbeat: macOS arm64 Unit Tests"
 
+=======
+>>>>>>> d6d8eed0c (Auditbeat: GH action for macOS 13/14/15 unit tests (#43514))
   - group: "Extended Windows Tests"
     key: "auditbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
