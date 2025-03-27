@@ -414,7 +414,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
-
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
