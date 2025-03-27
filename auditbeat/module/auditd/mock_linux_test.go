@@ -104,13 +104,6 @@ func (n *MockNetlinkSendReceiver) returnMessage(msg ...string) *MockNetlinkSendR
 	return n
 }
 
-func (n *MockNetlinkSendReceiver) returnRawMessage(msg ...syscall.NetlinkMessage) *MockNetlinkSendReceiver {
-	for _, m := range msg {
-		n.messages = append(n.messages, m)
-	}
-	return n
-}
-
 func (n *MockNetlinkSendReceiver) Close() error {
 	close(n.done)
 	return nil

@@ -165,7 +165,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 
 	if status.Enabled == auditLocked {
-		err := errors.New("Skipping rule configuration: Audit rules are locked")
+		err := errors.New("skipping rule configuration: Audit rules are locked")
 		reporter.Error(err)
 	} else if err := ms.addRules(reporter); err != nil {
 		reporter.Error(err)
@@ -413,7 +413,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 			// This is technically dropping data, but auditbeat is configured as best-effort anyway, and we'll drop events under high load anyway.
 			maxRecv := 10000
 			for i := 0; i < maxRecv; i++ {
-				retryOuter := false // hack because of how switch/break statements work
+				var retryOuter bool // hack because of how switch/break statements work
 				_, err = ms.client.Netlink.Receive(true, noParse)
 				switch {
 				case err == nil, errors.Is(err, syscall.EINTR), errors.Is(err, syscall.ENOBUFS):
@@ -422,7 +422,7 @@ func (ms *MetricSet) setPID(retries int) (err error) {
 					// means receive would block, try to set our PID again
 					retryOuter = true
 				default:
-					return fmt.Errorf("failed to recover from ENOBUFS: %s", err)
+					return fmt.Errorf("failed to recover from ENOBUFS: %w", err)
 				}
 
 				if retryOuter {

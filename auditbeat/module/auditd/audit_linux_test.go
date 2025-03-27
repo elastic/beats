@@ -39,7 +39,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/auparse"
@@ -75,8 +74,6 @@ var (
 )
 
 func TestSetPID(t *testing.T) {
-	logp.TestingSetup()
-
 	cases := []struct {
 		clientMock    *MockNetlinkSendReceiver
 		controlMock   *MockNetlinkSendReceiver
@@ -169,8 +166,6 @@ func TestSetPID(t *testing.T) {
 }
 
 func TestImmutable(t *testing.T) {
-	logp.TestingSetup()
-
 	// Create mocks of netlink client and control that provide the expected responses.
 	controlMock := NewMock().
 		// Get Status response for initClient
@@ -212,8 +207,6 @@ func TestImmutable(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	logp.TestingSetup()
-
 	// Create mocks of netlink client and control that provide the expected responses.
 	controlMock := NewMock().
 		// Get Status response for initClient
@@ -252,8 +245,6 @@ func TestData(t *testing.T) {
 }
 
 func TestLoginType(t *testing.T) {
-	logp.TestingSetup()
-
 	// Create mocks of netlink client and control that provide the expected responses.
 	controlMock := NewMock().
 		// Get Status response for initClient
@@ -290,7 +281,7 @@ func TestLoginType(t *testing.T) {
 
 	sort.Slice(events,
 		func(i, j int) bool {
-			return events[i].ModuleFields["sequence"].(uint32) < events[j].ModuleFields["sequence"].(uint32)
+			return events[i].ModuleFields["sequence"].(uint32) < events[j].ModuleFields["sequence"].(uint32) //nolint: errcheck //testcode
 		})
 
 	for idx, expected := range []mapstr.M{
@@ -378,7 +369,6 @@ func TestUnicastClient(t *testing.T) {
 		t.Skip("-audit was not specified")
 	}
 
-	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -408,7 +398,6 @@ func TestMulticastClient(t *testing.T) {
 		t.Skip("no multicast support")
 	}
 
-	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
