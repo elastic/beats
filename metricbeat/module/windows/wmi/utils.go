@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-	"unicode"
 
 	"github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
@@ -114,7 +113,7 @@ func RequiresExtraConversion(propertyValue interface{}) bool {
 	// Heuristic to avoid fetching the raw properties for every string property
 	//   If the string is empty, no need to convert the string
 	//   If the string does not end with a digit, it's not an uint64, sint64, datetime
-	return !isEmptyString && unicode.IsDigit(rune(stringValue[len(stringValue)-1]))
+	return !isEmptyString && stringValue[len(stringValue)-1] >= '0' && stringValue[len(stringValue)-1] <= '9'
 }
 
 // Given a Property it returns its CIM Type Qualifier
