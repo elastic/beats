@@ -1,18 +1,14 @@
 packages:
-  github.com/elastic/beats/v7/auditbeat/helper/hasher:
-    - name: TestHasher
-    - name: TestCachedHasher
-      os: [linux]
-    - name: TestCachedHasherWithStat
-      os: [linux]
   github.com/elastic/beats/v7/auditbeat/module/file_integrity:
-    - name: TestHashFile
-    - name: TestHashFile/valid_hashes
-    - name: TestHashFile/size_over_hash_limit
-    - name: TestHashFile/size_at_hash_limit
-    - name: TestHashFile/size_below_hash_limit
-    - name: TestHashFile/no_size_limit
-    - name: TestNewEventFromFileInfoHash
-    - name: TestNewEventFromFileInfoHash/file_stays_the_same
-    - name: TestNewEventFromFileInfoHash/file_grows_before_hashing
-    - name: TestNewEventFromFileInfoHash/file_shrinks_before_hashing
+    - name: TestExeObjParser
+    - name: TestExeObjParser/executableObject_elf_go
+    - name: TestExeObjParser/executableObject_elf_garble
+    - name: TestExeObjParser/executableObject_macho_go
+    - name: TestExeObjParser/executableObject_macho_garble
+    - name: TestExeObjParser/executableObject_pe_go
+    - name: TestFileParsers
+    - name: TestActions
+    - name: TestExcludedFiles
+    - name: TestIncludedExcludedFiles
+    - name: TestScanner
+    - name: TestScanner/executable
