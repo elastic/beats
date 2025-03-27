@@ -19,16 +19,17 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Dataproc cluster
-func NewMetadataService(projectID string, regions []string, organizationID, organizationName string, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID string, regions []string, organizationID, organizationName string, projectName string, collectUserLabels bool, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
-		projectID:        projectID,
-		projectName:      projectName,
-		organizationID:   organizationID,
-		organizationName: organizationName,
-		regions:          regions,
-		opt:              opt,
-		clusters:         make(map[string]*dataproc.Cluster),
-		logger:           logp.NewLogger("metrics-dataproc"),
+		projectID:         projectID,
+		projectName:       projectName,
+		organizationID:    organizationID,
+		organizationName:  organizationName,
+		regions:           regions,
+		collectUserLabels: collectUserLabels,
+		opt:               opt,
+		clusters:          make(map[string]*dataproc.Cluster),
+		logger:            logp.NewLogger("metrics-dataproc"),
 	}, nil
 }
 
@@ -47,13 +48,14 @@ type dataprocMetadata struct {
 }
 
 type metadataCollector struct {
-	projectID        string
-	projectName      string
-	organizationID   string
-	organizationName string
-	zone             string
-	regions          []string
-	opt              []option.ClientOption
+	projectID         string
+	projectName       string
+	organizationID    string
+	organizationName  string
+	zone              string
+	regions           []string
+	collectUserLabels bool
+	opt               []option.ClientOption
 	// NOTE: clusters holds data used for all metrics collected in a given period
 	// this avoids calling the remote endpoint for each metric, which would take a long time overall
 	clusters map[string]*dataproc.Cluster
@@ -62,11 +64,6 @@ type metadataCollector struct {
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Dataproc TimeSeries single point of data.
 func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.TimeSeries) (gcp.MetadataCollectorData, error) {
-	metadata, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceRegion(resp))
-	if err != nil {
-		return gcp.MetadataCollectorData{}, err
-	}
-
 	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp, s.organizationID, s.organizationName, s.projectName)
 
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
@@ -78,18 +75,25 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels["cluster_uuid"])
 	}
 
-	_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, metadata.clusterName)
+	_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Resource.Labels["cluster_name"])
 
-	if metadata.machineType != "" {
-		lastIndex := strings.LastIndex(metadata.machineType, "/")
-		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, metadata.machineType[lastIndex+1:])
-	}
+	if s.collectUserLabels {
+		metadata, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceRegion(resp))
+		if err != nil {
+			return gcp.MetadataCollectorData{}, err
+		}
 
-	metadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
-	metadata.System = metadataCollectorData.Labels[gcp.LabelSystem]
+		if metadata.machineType != "" {
+			lastIndex := strings.LastIndex(metadata.machineType, "/")
+			_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, metadata.machineType[lastIndex+1:])
+		}
 
-	if metadata.User != nil {
-		metadataCollectorData.Labels[gcp.LabelUser] = metadata.User
+		metadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
+		metadata.System = metadataCollectorData.Labels[gcp.LabelSystem]
+
+		if metadata.User != nil {
+			metadataCollectorData.Labels[gcp.LabelUser] = metadata.User
+		}
 	}
 
 	return metadataCollectorData, nil
@@ -181,7 +185,7 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 		go func(region string) {
 			defer wg.Done()
 
-			listCall := clustersService.List(s.projectID, region).Fields("clusters.labels", "clusters.clusterUuid", "clusters.clusterName").Context(ctx)
+			listCall := clustersService.List(s.projectID, region).Fields("clusters.labels", "clusters.clusterUuid").Context(ctx)
 			resp, err := listCall.Do()
 			if err != nil {
 				s.logger.Errorf("dataproc ListClusters error in region %s: %v", region, err)
