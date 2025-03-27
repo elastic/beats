@@ -5,6 +5,7 @@ cross_links:
   - elasticsearch
   - integration-docs
   - logstash
+  - logstash-docs-md
 toc:
   - toc: reference
   - toc: release-notes
