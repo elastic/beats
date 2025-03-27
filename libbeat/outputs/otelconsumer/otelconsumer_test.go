@@ -50,7 +50,7 @@ func TestPublish(t *testing.T) {
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
 
-		assert.NoError(t, logp.TestingSetup(logp.WithSelectors("otelconsumer")))
+		logger := logp.NewTestingLogger(t, "otelconsumer")
 
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
@@ -58,7 +58,7 @@ func TestPublish(t *testing.T) {
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
 			beatInfo:     beat.Info{},
-			log:          logp.NewLogger("otelconsumer"),
+			log:          logger,
 		}
 		return consumer
 	}
