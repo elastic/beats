@@ -266,3 +266,36 @@ func TestSQSReaderLoop(t *testing.T) {
 func TestSQSWorkerLoop(t *testing.T) {
 
 }
+
+func TestCancelWithGrace(t *testing.T) {
+	// TODO: Rewrite this to use testing/synctest when it is available without
+	// GOEXPERIMENT=synctest. See https://go.dev/blog/synctest.
+
+	const (
+		wait    = time.Second
+		tooLong = time.Second
+		tol     = 10 * time.Millisecond
+	)
+	parentCtx, parentCancel := context.WithCancel(context.Background())
+	childCtx, childCancel := cancelWithGrace(parentCtx, wait)
+	defer childCancel()
+
+	var parentCancelled, childCancelled time.Time
+	parentCancel()
+	select {
+	case <-time.After(tooLong):
+		t.Fatal("parent context failed to cancel within timeout")
+	case <-parentCtx.Done():
+		parentCancelled = time.Now()
+	}
+	select {
+	case <-time.After(wait + tooLong):
+		t.Fatal("child context failed to cancel within timeout after wait time")
+	case <-childCtx.Done():
+		childCancelled = time.Now()
+	}
+	waited := childCancelled.Sub(parentCancelled)
+	if waited.Round(tol) != wait {
+		t.Errorf("unexpected wait time between parent and child cancellation: got=%v want=%v", waited, wait)
+	}
+}
