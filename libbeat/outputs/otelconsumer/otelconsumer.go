@@ -79,7 +79,6 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 	default:
 		panic(fmt.Errorf("an otel consumer must be specified"))
 	}
-	//nolint:typecheck // no return statement required
 }
 
 func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch) error {
