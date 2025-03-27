@@ -9,7 +9,7 @@ mapped_pages:
 Refer to the [Elastic Integrations documentation](integration-docs://reference/gcp/index.md).
 
 ::::{dropdown} Learn more
-{{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/ingestion-tools/fleet/index.md).
+{{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
 
 ::::
 
@@ -170,7 +170,7 @@ To restore the previous version, you can add a custom ingest pipeline to the Ela
 }
 ```
 
-For more information on creating custom ingest pipelines and processors, please see the [Custom Ingest Pipelines](docs-content://reference/ingestion-tools/fleet/data-streams-pipeline-tutorial.md#data-streams-pipeline-two) guide.
+For more information on creating custom ingest pipelines and processors, please see the [Custom Ingest Pipelines](docs-content://reference/fleet/data-streams-pipeline-tutorial.md#data-streams-pipeline-two) guide.
 
 If `period` value is set to 5-minute and sample period of the metric type is 60-second, then this module will collect data from this metric type once every 5 minutes with aggregation. GCP monitoring data has a up to 240 seconds latency, which means latest monitoring data will be up to 4 minutes old. Please see [Latency of GCP Monitoring Metric Data](https://cloud.google.com/monitoring/api/v3/latency-n-retention) for more details. In `gcp` module, metrics are collected based on this ingest delay, which is also obtained from ListMetricDescriptors API.
 
