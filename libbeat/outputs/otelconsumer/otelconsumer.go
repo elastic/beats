@@ -77,7 +77,7 @@ func (out *otelConsumer) Publish(ctx context.Context, batch publisher.Batch) err
 	case out.logsConsumer != nil:
 		return out.logsPublish(ctx, batch)
 	default:
-		panic(fmt.Errorf("an otel consumer must be specified")) //nolint:staticcheck
+		panic(fmt.Errorf("an otel consumer must be specified"))
 	}
 }
 
