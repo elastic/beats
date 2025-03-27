@@ -2,6 +2,15 @@ name: auditbeat-macos-unit-tests
 
 on:
   pull_request:
+    paths:
+      - auditbeat/
+      # OSS
+      - go.mod
+      - dev-tools/
+      - libbeat/**
+      # Workflow
+      - .github/workflows/auditbeat-macos-unit-tests.yml
+      - .github/actions/unit-test/action.yml
   push:
     branches:
       - main
@@ -9,13 +18,11 @@ on:
       - auditbeat/
       # OSS
       - go.mod
-      - pytest.ini
       - dev-tools/
       - libbeat/**
-      - testing/**
       # Workflow
       - .github/workflows/auditbeat-macos-unit-tests.yml
-      - .github/workflows/actions/unit-test-composite-action/action.yml
+      - .github/actions/unit-test/action.yml
 
 permissions:
   contents: read
@@ -27,19 +34,18 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  unit-tests-push:
+  unit-tests-branch:
     name: Unit tests ${{ matrix.os }}
     if: github.event_name == 'push'
     strategy:
       fail-fast: false
-      max-parallel: 10
       matrix:
         os: [macos-13, macos-14]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/workflows/actions/unit-test-composite-action
+      - uses: ./.github/actions/unit-test/action.yml
         with:
           beat: 'auditbeat'
 
@@ -47,9 +53,10 @@ jobs:
     name: Unit tests macos-15
     if: github.event_name == 'pull_request'
     runs-on: [ macos-15 ]
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
-      - uses: ./.github/workflows/actions/unit-test-composite-action
+      - uses: ./.github/actions/unit-test/action.yml
         with:
           beat: 'auditbeat'
