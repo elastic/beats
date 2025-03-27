@@ -51,7 +51,7 @@ jobs:
 
       - uses: ./.github/actions/unit-test
         with:
-          beat: $BEAT
+          beat: ${{ env.BEAT }}
 
   unit-tests-pr:
     name: Unit tests macos-15
@@ -63,4 +63,4 @@ jobs:
 
       - uses: ./.github/actions/unit-test
         with:
-          beat: $BEAT
+          beat: ${{ env.BEAT }}
