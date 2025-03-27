@@ -23,7 +23,7 @@ func NewMetadataServiceForConfig(c config, serviceName string) (gcp.MetadataServ
 	case gcp.ServiceRedis:
 		return redis.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
 	case gcp.ServiceDataproc:
-		return dataproc.NewMetadataService(c.ProjectID, c.Zone, c.Region, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
+		return dataproc.NewMetadataService(c.ProjectID, c.Regions, c.organizationID, c.organizationName, c.projectName, c.opt...)
 	default:
 		return nil, nil
 	}

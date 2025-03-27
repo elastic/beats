@@ -19,14 +19,12 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Dataproc cluster
-func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID string, regions []string, organizationID, organizationName string, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:        projectID,
 		projectName:      projectName,
 		organizationID:   organizationID,
 		organizationName: organizationName,
-		zone:             zone,
-		region:           region,
 		regions:          regions,
 		opt:              opt,
 		clusters:         make(map[string]*dataproc.Cluster),
@@ -54,7 +52,6 @@ type metadataCollector struct {
 	organizationID   string
 	organizationName string
 	zone             string
-	region           string
 	regions          []string
 	opt              []option.ClientOption
 	// NOTE: clusters holds data used for all metrics collected in a given period
@@ -166,9 +163,6 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 	var mu sync.Mutex
 
 	regionsToQuery := s.regions
-	if len(regionsToQuery) == 0 && s.region != "" {
-		regionsToQuery = []string{s.region}
-	}
 	if len(regionsToQuery) == 0 {
 		regionsToQuery = []string{
 			"us-central1", "us-east1", "us-east4", "us-west1", "us-west2", "us-west3", "us-west4",
