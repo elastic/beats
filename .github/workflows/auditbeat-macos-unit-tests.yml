@@ -1,5 +1,8 @@
 name: auditbeat-macos-unit-tests
 
+env:
+  BEAT: "auditbeat"
+
 on:
   pull_request:
     paths:
@@ -42,12 +45,13 @@ jobs:
       matrix:
         os: [macos-13, macos-14]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
       - uses: ./.github/actions/unit-test
         with:
-          beat: 'auditbeat'
+          beat: $BEAT
 
   unit-tests-pr:
     name: Unit tests macos-15
@@ -59,4 +63,4 @@ jobs:
 
       - uses: ./.github/actions/unit-test
         with:
-          beat: 'auditbeat'
+          beat: $BEAT

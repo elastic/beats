@@ -1,4 +1,4 @@
-name: unit-tests
+name: unit-test
 
 inputs:
   beat:
@@ -17,8 +17,14 @@ runs:
         cache: "pip"
         python-version-file: .python-version
 
+    - name: Install make
+      run: |
+        brew install make
+        export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+      shell: bash
+
     - name: Install mage
-      run: go install github.com/magefile/mage
+      run: make mage
       shell: bash
 
     - name: Run build
