@@ -6,9 +6,3 @@ packages:
     - name: TestExeObjParser/executableObject_macho_go
     - name: TestExeObjParser/executableObject_macho_garble
     - name: TestExeObjParser/executableObject_pe_go
-    - name: TestFileParsers
-    - name: TestActions
-    - name: TestExcludedFiles
-    - name: TestIncludedExcludedFiles
-    - name: TestScanner
-    - name: TestScanner/executable
