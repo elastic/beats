@@ -37,7 +37,7 @@ func Test_Scanner_Executable(t *testing.T) {
 		filepath.Join(dir, "a"),
 		"/does/not/exist",
 	}
-	c.FileParsers = []string{"file.pe.import_hash"}
+	c.FileParsers = []string{"file.pe.go_stripped"}
 
 	target := filepath.Join(dir, "executable")
 	err := copyFile(filepath.Join("testdata", "go_pe_executable"), target)
@@ -67,9 +67,9 @@ func Test_Scanner_Executable(t *testing.T) {
 		events = append(events, event)
 		if filepath.Base(event.Path) == "executable" {
 			foundExecutable = true
-			h, err := event.ParserResults.GetValue("pe.import_hash")
-			assert.NoError(t, err, "no value for pe.import_hash")
-			assert.Len(t, h, 16, "wrong length for hash")
+			h, err := event.ParserResults.GetValue("pe.go_stripped")
+			assert.NoError(t, err, "no value for pe.go_stripped")
+			assert.NotNil(t, h, "expected pe.go_stripped to not be nil")
 		}
 	}
 
