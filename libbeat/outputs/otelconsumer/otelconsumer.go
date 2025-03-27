@@ -20,6 +20,7 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
@@ -115,6 +116,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
+		logRecord.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now().UTC()))
 		pcommonEvent := otelmap.FromMapstr(beatEvent)
 		// if data_stream field is set on beats.Event. Add it to logrecord.Attributes to support dynamic indexing
 		if data, ok := pcommonEvent.Get("data_stream"); ok {
