@@ -1,49 +1,11 @@
-# options for analysis running
+version: "2"
 run:
-  # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 15m
   build-tags:
-    - synthetics
     - integration
-
-issues:
-  # Maximum count of issues with the same text.
-  # Set to 0 to disable.
-  # Default: 3
-  max-same-issues: 3
-  # Maximum issues count per one linter.
-  # Set to 0 to disable.
-  # Default: 50
-  max-issues-per-linter: 50
-  exclude-rules:
-    # Exclude package name contains '-' issue because we have at least one package with
-    # it on its name.
-    - text: "ST1003:"
-      linters:
-        - stylecheck
-    - text: "undefined"
-      linters:
-        - typecheck
-    - text: "undeclared name:"
-      linters:
-        - typecheck
-    - text: "imported and not used"
-      linters:
-        - typecheck
-    - text: "previous case"
-      linters:
-        - typecheck
-    # From mage we are printing to the console to ourselves
-    - path: (.*magefile.go|.*dev-tools/mage/.*)
-      linters: forbidigo
-
-output:
-  sort-results: true
-
-# Find the whole list here https://golangci-lint.run/usage/linters/
 linters:
-  disable-all: true
+  default: none
   enable:
+<<<<<<< HEAD
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
     - forbidigo # forbids identifiers matched by reg exps
@@ -69,12 +31,118 @@ linters:
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies
     - depguard
+=======
+    - asciicheck
+    - bodyclose
+    - depguard
+    - durationcheck
+    - errcheck
+    - errorlint
+    - forbidigo
+>>>>>>> a6cb1bf98 (ci(golangci): bump golangci-lint to 2.0.2 (#42026))
     - gomoddirectives
-
-# all available settings of specific linters
-linters-settings:
-  depguard:
+    - gomodguard
+    - gosec
+    - govet
+    - importas
+    - ineffassign
+    - misspell
+    - nakedret
+    - nilerr
+    - noctx
+    - nolintlint
+    - staticcheck
+    - unconvert
+    - unused
+    - wastedassign
+  settings:
+    depguard:
+      rules:
+        apache-licensed-code:
+          list-mode: lax
+          files:
+            - '!**/x-pack/**/*.go'
+          deny:
+            - pkg: github.com/elastic/beats/v7/x-pack
+              desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (x-pack/).
+        main:
+          list-mode: lax
+          deny:
+            - pkg: math/rand$
+              desc: superseded by math/rand/v2
+    errcheck:
+      check-type-assertions: true
+      check-blank: false
+      exclude-functions:
+        - (github.com/elastic/elastic-agent-libs/mapstr.M).Delete
+        - (github.com/elastic/elastic-agent-libs/mapstr.M).Put
+        - github.com/elastic/elastic-agent-libs/logp.TestingSetup
+        - github.com/elastic/elastic-agent-libs/logp.DevelopmentSetup
+    errorlint:
+      errorf: true
+      asserts: true
+      comparison: true
+    forbidigo:
+      forbid:
+        - pattern: fmt.Print.*
+    gomoddirectives:
+      replace-allow-list:
+        - github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
+        - github.com/Shopify/sarama
+        - github.com/apoydence/eachers
+        - github.com/dop251/goja
+        - github.com/dop251/goja_nodejs
+        - github.com/fsnotify/fsevents
+        - github.com/fsnotify/fsnotify
+        - github.com/google/gopacket
+        - github.com/insomniacslk/dhcp
+        - github.com/meraki/dashboard-api-go/v3
+        - github.com/snowflakedb/gosnowflake
+      replace-local: false
+    gomodguard:
+      blocked:
+        modules:
+          - github.com/pkg/errors:
+              recommendations:
+                - errors
+                - fmt
+              reason: This package is deprecated, use `fmt.Errorf` with `%w` instead
+          - gotest.tools/v3:
+              recommendations:
+                - github.com/stretchr/testify
+              reason: Use one assertion library consistently across the codebase
+          - github.com/google/uuid:
+              recommendations:
+                - github.com/gofrs/uuid/v5
+              reason: Use one uuid library consistently across the codebase
+    gosec:
+      excludes:
+        - G306
+        - G404
+        - G401
+        - G501
+        - G505
+    nolintlint:
+      require-explanation: true
+      require-specific: false
+      allow-unused: false
+    prealloc:
+      simple: false
+      range-loops: true
+      for-loops: true
+    staticcheck:
+      checks:
+        - -ST1005
+        - all
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
     rules:
+<<<<<<< HEAD
       apache-licensed-code:
         list-mode: lax
         files:
@@ -193,3 +261,31 @@ linters-settings:
     # Report pre-allocation suggestions on for loops.
     # Default: false
     for-loops: true
+=======
+      - linters:
+          - staticcheck
+        text: 'ST1003:'
+      - linters:
+          - forbidigo
+        path: (.*magefile.go|.*dev-tools/mage/.*)
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 3
+formatters:
+  enable:
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/elastic
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+>>>>>>> a6cb1bf98 (ci(golangci): bump golangci-lint to 2.0.2 (#42026))
