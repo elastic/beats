@@ -183,7 +183,7 @@ func TestPublish(t *testing.T) {
 	})
 
 	t.Run("sets the @timestamp field with the correct format", func(t *testing.T) {
-		testStartedAt := time.Now()
+		testStartedAt := time.Now().UTC()
 		batch := outest.NewBatch(event3)
 		batch.Events()[0].Content.Timestamp = time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
 
@@ -197,8 +197,8 @@ func TestPublish(t *testing.T) {
 			bodyTimestamp = field.AsString()
 			observedTime := record.ObservedTimestamp().AsTime()
 			assert.Conditionf(t, func() bool {
-				return observedTime.After(testStartedAt) && observedTime.Before(time.Now())
-			}, "observed timestamp should be between %s and %s", testStartedAt, time.Now())
+				return observedTime.After(testStartedAt) && observedTime.Before(time.Now().UTC())
+			}, "observed timestamp should be between %s and %s", testStartedAt, time.Now().UTC())
 			return nil
 		})
 
