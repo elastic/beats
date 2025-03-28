@@ -221,57 +221,6 @@ steps:
     key: "extended-tests"
 
     steps:
-<<<<<<< HEAD
-      - label: ":mac: Packetbeat: macOS x86_64 Unit Tests"
-        key: "macos-x86-64-unit-tests-extended"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd packetbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "packetbeat/build/*.xml"
-          - "packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "packetbeat: macOS x86_64 Unit Tests"
-
-      - label: ":mac: Packetbeat: macOS arm64 Unit Tests"
-        key: "macos-arm64-unit-tests-extended"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd packetbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "packetbeat/build/*.xml"
-          - "packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "packetbeat: macOS arm64 Unit Tests"
-
-=======
->>>>>>> 302adca29 (Packetbeat: GH action for macOS 13/14/15 unit tests (#43522))
       - label: ":ubuntu: Packetbeat: Ubuntu arm64 Unit Tests"
         key: "linux-arm64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
