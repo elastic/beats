@@ -422,7 +422,8 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		outputs.NetworkClient
 		Client() outputs.NetworkClient
 	}
-	client := randomClient(output).(clientWrap).Client().(*Client)
+	client, ok := randomClient(output).(clientWrap).Client().(*Client)
+	assert.True(t, ok)
 
 	// Load version ctx
 	ctx, cancel := context.WithCancel(context.Background())
@@ -468,5 +469,5 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 	}
 
 	client := grp.Clients[rand.IntN(L)]
-	return client.(outputs.NetworkClient)
+	return client.(outputs.NetworkClient) //nolint:errcheck //This is a test file, can ignore
 }

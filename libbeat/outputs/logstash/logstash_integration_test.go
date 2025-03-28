@@ -205,7 +205,8 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	}
 
 	es := &testOutputer{}
-	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient)
+	es.NetworkClient, ok = grp.Clients[0].(outputs.NetworkClient)
+	assert.True(t, ok)
 	es.esConnection = connection
 	// The Elasticsearch output requires events to be encoded
 	// before calling Publish, so create an event encoder.
@@ -541,8 +542,10 @@ func testLogstashElasticOutputPluginBulkCompatibleMessage(t *testing.T, name str
 }
 
 func checkEvent(t *testing.T, ls, es map[string]interface{}) {
-	lsEvent := ls["_source"].(map[string]interface{})
-	esEvent := es["_source"].(map[string]interface{})
+	lsEvent, ok := ls["_source"].(map[string]interface{})
+	assert.True(t, ok)
+	esEvent, ok := es["_source"].(map[string]interface{})
+	assert.True(t, ok)
 	commonFields := []string{"@timestamp", "host", "type", "message"}
 	for _, field := range commonFields {
 		assert.NotNil(t, lsEvent[field])
@@ -588,7 +591,7 @@ func encodeEvents(encoder queue.Encoder, events []publisher.Event) []publisher.E
 		// Skip encoding if there's already encoded data present
 		if events[i].EncodedEvent == nil {
 			encoded, _ := encoder.EncodeEntry(events[i])
-			event := encoded.(publisher.Event)
+			event := encoded.(publisher.Event) //nolint:errcheck //This is a test file, can ignore
 			events[i] = event
 		}
 	}

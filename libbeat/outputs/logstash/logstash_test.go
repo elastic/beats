@@ -147,7 +147,8 @@ func testConnectionType(
 
 		events := batch.Events
 		assert.Equal(t, 1, len(events))
-		msg := events[0].(map[string]interface{})
+		msg, ok := events[0].(map[string]interface{})
+		assert.True(t, ok)
 		assert.Equal(t, 10.0, msg["extra"])
 		assert.Equal(t, "message", msg["message"])
 	}
