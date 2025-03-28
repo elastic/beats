@@ -147,7 +147,7 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 
 	// delete old key if present
 	defer conn.Close()
-	err = conn.Do("DEL", key)
+	_, err = conn.Do("DEL", key)
 	require.NoError(t, err)
 
 	out := newRedisTestingOutput(t, cfg)
