@@ -20,6 +20,7 @@ package testing
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -290,12 +291,12 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 
 	// Overwrites the golden files if run with -generate
 	if *flags.DataFlag {
-		outputIndented, err := json.MarshalIndent(&data, "", "    ")
-		if err != nil {
-			t.Fatal(err)
+		outputIndented, errMarshal := json.MarshalIndent(&data, "", "    ")
+		if errMarshal != nil {
+			t.Fatal(errMarshal)
 		}
-		if err = os.WriteFile(expectedFile, outputIndented, 0644); err != nil {
-			t.Fatal(err)
+		if errWrite := os.WriteFile(expectedFile, outputIndented, 0644); errWrite != nil {
+			t.Fatal(errWrite)
 		}
 	}
 
@@ -509,7 +510,11 @@ func server(t *testing.T, path string, url string, contentType string) *httptest
 		if r.URL.Path+query == url {
 			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(200)
-			w.Write(body)
+			_, err := w.Write(body)
+			if err != nil {
+				log.Printf("Failed to write response: %v", err)
+				return
+			}
 		} else {
 			w.WriteHeader(404)
 		}
