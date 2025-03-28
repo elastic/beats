@@ -228,9 +228,9 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	total := batches & batchSize
 
 	db := 0
-	key := cfg["key"].(string)
+	key := cfg["key"].(string) //nolint:errcheck //this is a test file, can ignore
 	if v, ok := cfg["db"]; ok {
-		db = v.(int)
+		db = v.(int) //nolint:errcheck //this is a test file, can ignore
 	}
 
 	conn, err := redis.Dial("tcp", getRedisAddr(), redis.DialDatabase(db))
