@@ -97,17 +97,6 @@ https://github.com/elastic/beats/compare/v8.17.1\...v8.17.2[View commits]
 
 ==== Bugfixes
 
-*Affecting all Beats*
-
-- Fix incorrect cloud provider identification in `add_cloud_metadata` processor using provider priority mechanism. {pull}41636[41636]
-- Prevent panic if Libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
-- Allow network condition to handle field values that are arrays of IP addresses. {pull}41918[41918]
-- Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled. {issue}41894[41894] {pull}41895[41895]
-- Fix setting unique registry for non Beat receivers. {issue}42288[42288] {pull}42292[42292]
-- The Kafka output now drops events when there is an authorization error. {issue}42343[42343] {pull}42401[42401]
-- All standard queue metrics are now included in metrics monitoring, including: `added.{events, bytes}`, `consumed.{events, bytes}`, `removed.{events, bytes}`, and `filled.{events, bytes, pct}`. {pull}42439[42439]
-- The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
-
 *Filebeat*
 
 - Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
@@ -199,9 +188,6 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 
 *Affecting all Beats*
 
-- Ensure Elasticsearch output can always recover from network errors. {pull}40794[40794]
-- Add `translate_ldap_attribute` processor. {pull}41472[41472]
-- Remove unnecessary debug logs during idle connection teardown. {issue}40824[40824]
 - Remove unnecessary reload for Elastic Agent managed beats when APM tracing config changes from nil to nil. {pull}41794[41794]
 
 *Auditbeat*
@@ -372,7 +358,6 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.16.2[View commits]
 
 *Affecting all Beats*
 
-- Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil. {pull}41794[41794]
 - Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism. {pull}41636[41636]
 
 *Auditbeat*
@@ -587,10 +572,6 @@ https://github.com/elastic/beats/compare/v8.15.3\...v8.15.4[View commits]
 - Disable `allow_unsafe` osquery configuration. {pull}40130[40130]
 
 ==== Bugfixes
-
-*Affecting all Beats*
-
-- Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use. {pull}41356[41356]
 
 *Filebeat*
 
