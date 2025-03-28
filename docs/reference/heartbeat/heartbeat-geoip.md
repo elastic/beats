@@ -5,7 +5,7 @@ mapped_pages:
 
 # Enrich events with geoIP information [heartbeat-geoip]
 
-You can use Heartbeat along with the [GeoIP Processor](elasticsearch://reference/ingestion-tools/enrich-processor/geoip-processor.md) in {{es}} to export geographic location information based on IP addresses. Then you can use this information to visualize the location of IP addresses on a map in {{kib}}.
+You can use Heartbeat along with the [GeoIP Processor](elasticsearch://reference/enrich-processor/geoip-processor.md) in {{es}} to export geographic location information based on IP addresses. Then you can use this information to visualize the location of IP addresses on a map in {{kib}}.
 
 The `geoip` processor adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 City Database. Because the processor uses a geoIP database that’s installed on {{es}}, you don’t need to install a geoIP database on the machines running Heartbeat.
 
@@ -171,7 +171,7 @@ To configure Heartbeat and the `geoip` processor:
 
     In this example, the pipeline ID is `geoip-info`. `field` specifies the field that contains the IP address to use for the geographical lookup, and `target_field` is the field that will hold the geographical information. `"ignore_missing": true` configures the pipeline to continue processing when it encounters an event that doesn’t have the specified field.
 
-    See [GeoIP Processor](elasticsearch://reference/ingestion-tools/enrich-processor/geoip-processor.md) for more options.
+    See [GeoIP Processor](elasticsearch://reference/enrich-processor/geoip-processor.md) for more options.
 
     To learn more about adding host information to an event, see [add_host_metadata](/reference/heartbeat/add-host-metadata.md).
 
