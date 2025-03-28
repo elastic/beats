@@ -5,6 +5,7 @@ cross_links:
   - elasticsearch
   - integration-docs
   - logstash
+  - logstash-docs-md
 toc:
   - toc: reference
   - toc: release-notes
@@ -39,3 +40,5 @@ subs:
   elastic-sec:   "Elastic Security"
   monitoring:   "X-Pack monitoring"
   monitor-features:   "monitoring features"
+  stack-version: "9.0.0"
+  major-version: "9.0"
