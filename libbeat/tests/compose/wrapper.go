@@ -48,7 +48,7 @@ const (
 )
 
 type wrapperDriver struct {
-	Name  string
+	name  string
 	Files []string
 
 	Environment []string
@@ -148,8 +148,13 @@ func (c *wrapperContainer) HostForPort(port int) string {
 	return c.exposedHost(port)
 }
 
+func (d *wrapperDriver) Name() string {
+	return d.name
+}
+
 func (d *wrapperDriver) LockFile() string {
 	return d.Files[0] + ".lock"
+	// return fmt.Sprintf("%s.%s.lock", d.Files[0], d.Name)
 }
 
 func (d *wrapperDriver) Close() error {
@@ -162,7 +167,7 @@ func (d *wrapperDriver) Close() error {
 
 func (d *wrapperDriver) cmd(ctx context.Context, command string, arg ...string) *exec.Cmd {
 	args := make([]string, 0, 4+len(d.Files)+len(arg)) // preallocate as much as possible
-	args = append(args, "--ansi", "never", "--project-name", d.Name)
+	args = append(args, "--ansi", "never", "--project-name", d.Name())
 	for _, f := range d.Files {
 		args = append(args, "--file", f)
 	}
@@ -210,6 +215,16 @@ func (d *wrapperDriver) Up(ctx context.Context, opts UpOptions, service string) 
 	if opts.SetupAdvertisedHostEnvFile {
 		return d.setupAdvertisedHost(ctx, service, opts.SetupAdvertisedHostEnvFilePort)
 	}
+	return nil
+}
+
+func (d *wrapperDriver) Down(ctx context.Context) error {
+	errDown := d.cmd(ctx, "down").Run()
+	if errDown != nil {
+		return fmt.Errorf("failed to bring project %q down: %w",
+			d.Name(), errDown)
+	}
+
 	return nil
 }
 
@@ -332,11 +347,11 @@ func (d *wrapperDriver) Containers(ctx context.Context, projectFilter Filter, fi
 func (d *wrapperDriver) containers(ctx context.Context, projectFilter Filter, filter ...string) ([]types.Container, error) {
 	var serviceFilters []filters.Args
 	if len(filter) == 0 {
-		f := makeFilter(d.Name, "", projectFilter)
+		f := makeFilter(d.Name(), "", projectFilter)
 		serviceFilters = append(serviceFilters, f)
 	} else {
 		for _, service := range filter {
-			f := makeFilter(d.Name, service, projectFilter)
+			f := makeFilter(d.Name(), service, projectFilter)
 			serviceFilters = append(serviceFilters, f)
 		}
 	}
