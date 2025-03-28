@@ -42,7 +42,7 @@ import (
 
 const (
 	expectedExtension  = "-expected.json"
-	applicationJson    = "application/json"
+	textPlain          = "text/plain"
 	expectedFolder     = "_meta/testdata"
 	expectedDataFolder = "_meta"
 )
@@ -122,7 +122,7 @@ func defaultDataConfig() DataConfig {
 		WritePath:   expectedFolder,
 		DataPath:    expectedDataFolder,
 		Suffix:      "json",
-		ContentType: applicationJson,
+		ContentType: textPlain,
 	}
 }
 
