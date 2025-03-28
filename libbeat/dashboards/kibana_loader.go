@@ -150,7 +150,7 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing dashboard from %s", file)

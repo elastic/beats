@@ -93,7 +93,7 @@ func makeKafka(
 func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
 
 	if cfg == nil {
-		return outil.Selector{}, fmt.Errorf("Kafka config cannot be nil")
+		return outil.Selector{}, fmt.Errorf("kafka config cannot be nil")
 	}
 
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{

@@ -135,9 +135,17 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 	total := batches & batchSize
 
 	db := 0
-	key := cfg["key"].(string) //nolint:errcheck //This is a test file, can ignore
+	key, ok := cfg["key"].(string)
+	if !ok {
+		t.Fatalf("expected string for key, but got %T", cfg["key"])
+	}
+
 	if v, ok := cfg["db"]; ok {
-		db = v.(int)
+		if dbValue, ok := v.(int); ok {
+			db = dbValue
+		} else {
+			t.Fatalf("expected int for db, but got %T", v)
+		}
 	}
 
 	conn, err := redis.Dial("tcp", getRedisAddr(), redis.DialDatabase(db))
@@ -228,9 +236,17 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	total := batches & batchSize
 
 	db := 0
-	key := cfg["key"].(string) //nolint:errcheck //this is a test file, can ignore
+	key, ok := cfg["key"].(string)
+	if !ok {
+		t.Fatalf("expected string for key, but got %T", cfg["key"])
+	}
+
 	if v, ok := cfg["db"]; ok {
-		db = v.(int) //nolint:errcheck //this is a test file, can ignore
+		if dbValue, ok := v.(int); ok {
+			db = dbValue
+		} else {
+			t.Fatalf("expected int for db, but got %T", v)
+		}
 	}
 
 	conn, err := redis.Dial("tcp", getRedisAddr(), redis.DialDatabase(db))
@@ -341,6 +357,9 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Cli
 	}
 
 	client := out.Clients[0].(outputs.NetworkClient)
+	if !ok {
+		t.Fatalf("expected *backoffClient, but got %T", group.Clients[index])
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 	if err := client.Connect(ctx); err != nil {
