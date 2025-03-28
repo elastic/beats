@@ -353,7 +353,7 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 			client.log.Error("Elasticsearch output received unencoded publisher.Event")
 			continue
 		}
-		event := data[i].EncodedEvent.(*encodedEvent)
+		event := data[i].EncodedEvent.(*encodedEvent) //nolint:errcheck //safe to ignore type check
 		if event.err != nil {
 			// This means there was an error when encoding the event and it isn't
 			// ingestable, so report the error and continue.
@@ -479,7 +479,7 @@ func (client *Client) applyItemStatus(
 	itemMessage []byte,
 	stats *bulkResultStats,
 ) bool {
-	encodedEvent := event.EncodedEvent.(*encodedEvent)
+	encodedEvent := event.EncodedEvent.(*encodedEvent) //nolint:errcheck //safe to ignore type check
 	if itemStatus < 300 {
 		if encodedEvent.deadLetter {
 			// This was ingested into the dead letter index, not the original target

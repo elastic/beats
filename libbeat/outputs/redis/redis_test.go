@@ -48,7 +48,7 @@ func clientsLen(required int) checker {
 
 func clientPassword(index int, pass string) checker {
 	return func(t *testing.T, group outputs.Group) {
-		redisClient := group.Clients[index].(*backoffClient)
+		redisClient := group.Clients[index].(*backoffClient) //nolint:errcheck //This is a test file, can ignore
 		assert.Equal(t, redisClient.client.password, pass)
 	}
 }
