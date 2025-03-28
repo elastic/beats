@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
-
 package logstash
 
 import (
@@ -205,8 +203,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	}
 
 	es := &testOutputer{}
-	es.NetworkClient, ok = grp.Clients[0].(outputs.NetworkClient)
-	assert.True(t, ok)
+	es.NetworkClient = grp.Clients[0].(outputs.NetworkClient) //nolint:errcheck //safe to ignore in tests
 	es.esConnection = connection
 	// The Elasticsearch output requires events to be encoded
 	// before calling Publish, so create an event encoder.

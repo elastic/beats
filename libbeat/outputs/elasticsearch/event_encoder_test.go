@@ -145,5 +145,5 @@ func encodeEvent(client *Client, event publisher.Event) publisher.Event {
 		client.pipelineSelector,
 	)
 	encoded, _ := encoder.EncodeEntry(event)
-	return encoded.(publisher.Event) //nolint:errcheck //safe to ignore
+	return encoded.(publisher.Event)
 }
