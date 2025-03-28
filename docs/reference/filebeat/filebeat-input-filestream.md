@@ -507,6 +507,8 @@ This configuration option applies per input. You can use this option to indirect
 
 Different `file_identity` methods can be configured to suit the environment where you are collecting log messages.
 
+Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
+
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.
 ::::

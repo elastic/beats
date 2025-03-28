@@ -18,5 +18,5 @@ Learn how to perform common Filebeat configuration tasks.
 * [*Use environment variables in the configuration*](/reference/filebeat/using-environ-vars.md)
 * [*Avoid YAML formatting problems*](/reference/filebeat/yaml-tips.md)
 * [*Migrate `log` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md)
+* [*Choose file identity for `filestream`*](/reference/filebeat/file-identity.md)
 * [*Migrating from a Deprecated Filebeat Module*](/reference/filebeat/migrate-from-deprecated-module.md)
-

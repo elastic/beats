@@ -1,4 +1,4 @@
-project: 'Beats'
+project: "Beats"
 toc:
   # TO DO: Do we want these to be separate pages?
   - file: index.md
@@ -337,6 +337,7 @@ toc:
               - file: filebeat/_step_3_use_new_option_names.md
               - file: filebeat/_step_4.md
               - file: filebeat/_debugging_on_kibana.md
+          - file: filebeat/file-identity.md
           - file: filebeat/migrate-from-deprecated-module.md
       - file: filebeat/filebeat-modules.md
         children:
