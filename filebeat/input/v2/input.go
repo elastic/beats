@@ -108,10 +108,6 @@ type Context struct {
 	// monitoringRegistryCancel removes the registry from its parent and from
 	// the HTTP monitoring endpoint.
 	monitoringRegistryCancel func()
-	// pipelineClientListener is a beat.ClientListener implementation to
-	// aggregate pipeline metrics for this input. It's either the
-	// PipelineClientListener or a beat.CombinedClientListener when necessary.
-	pipelineClientListener beat.ClientListener
 }
 
 // NewContext creates a new context with a metrics registry populated with
@@ -125,15 +121,37 @@ func NewContext(
 	agent beat.Info,
 	cancelation Canceler,
 	statusReporter status.StatusReporter,
-	parentRegistry *monitoring.Registry,
+	reg *monitoring.Registry,
+	unreg func(),
 	log *logp.Logger) Context {
-	if parentRegistry == nil || id == "" {
+	return Context{
+		ID:            id,
+		IDWithoutName: idWithoutName,
+		Name:          inputType,
+
+		Agent:          agent,
+		Cancelation:    cancelation,
+		StatusReporter: statusReporter,
+
+		Logger: log,
+
+		monitoringRegistry:       reg,
+		monitoringRegistryCancel: unreg,
+	}
+}
+
+func NewMetricsRegistry(
+	inputId string,
+	inputType string,
+	parentRegistry *monitoring.Registry,
+	log *logp.Logger) (*monitoring.Registry, func()) {
+	if parentRegistry == nil || inputId == "" {
 		log.Warn("registering metrics for %s, id: %s, with empty parent registry or empty ID",
-			inputType, id)
+			inputType, inputId)
 		parentRegistry = monitoring.NewRegistry()
 	}
 
-	metricsID := strings.ReplaceAll(id, ".", "_")
+	metricsID := strings.ReplaceAll(inputId, ".", "_")
 	reg := parentRegistry.GetRegistry(metricsID)
 	if reg == nil {
 		reg = parentRegistry.NewRegistry(metricsID)
@@ -142,13 +160,13 @@ func NewContext(
 	// add the necessary information so the registry can be published by the
 	// HTTP monitoring endpoint.
 	monitoring.NewString(reg, "input").Set(inputType)
-	monitoring.NewString(reg, "id").Set(id)
+	monitoring.NewString(reg, "id").Set(inputId)
 
 	// register to be published by the HTTP monitoring endpoint.
 	err := inputmon.RegisterMetrics(reg)
 	if err != nil {
 		log.Errorf("failed to register metrics for '%s', id: %s,: %v",
-			inputType, id, err)
+			inputType, inputId, err)
 	}
 
 	metricsLog := logp.NewLogger("metric_registry")
@@ -167,34 +185,22 @@ func NewContext(
 	// logs during support interactions.
 	metricsLog.Infow("registering",
 		"input_type", inputType,
-		"id", id,
+		"id", inputId,
 		"registry_name", metricsID,
 		"uuid", uid)
 
 	unreg := func() {
 		metricsLog.Infow("unregistering",
 			"input_type", inputType,
-			"id", id,
+			"id", inputId,
 			"registry_name",
 			metricsID, "uuid", uid)
 		parentRegistry.Remove(metricsID)
 		// it's safe to make this call even if registering them failed.
 		inputmon.UnregisterMetrics(metricsID)
 	}
-	return Context{
-		ID:            id,
-		IDWithoutName: idWithoutName,
-		Name:          inputType,
 
-		Agent:          agent,
-		Cancelation:    cancelation,
-		StatusReporter: statusReporter,
-
-		Logger: log,
-
-		monitoringRegistry:       reg,
-		monitoringRegistryCancel: unreg,
-	}
+	return reg, unreg
 }
 
 func (c *Context) UpdateStatus(status status.Status, msg string) {
@@ -236,35 +242,31 @@ func (c *Context) UnregisterMetrics() {
 	}
 }
 
-// PipelineClientListener returns the PipelineClientListener for this context.
-// If creates a `beat.ClientListener`, which might be the PipelineClientListener
-// or a beat.CombinedClientListener when clientListener is non-nil.
-// The result is cached, subsequent calls to PipelineClientListener will always
-// return the same beat.ClientListener.
-// The PipelineClientListener collects pipeline metrics for this input on the
-// metrics registry associated with this context.
-func (c *Context) PipelineClientListener(clientListener beat.ClientListener) beat.ClientListener {
-	if c.pipelineClientListener != nil {
-		return c.pipelineClientListener
-	}
+// NewPipelineClientListener returns a new beat.ClientListener which might be
+// the PipelineClientListener or a beat.CombinedClientListener when
+// clientListener is non-nil.
+// The PipelineClientListener collects pipeline metrics for an input. The
+// metrics are created on reg.
+func NewPipelineClientListener(
+	reg *monitoring.Registry,
+	clientListener beat.ClientListener) beat.ClientListener {
 
 	var pcl beat.ClientListener = &PipelineClientListener{
 		eventsTotal: monitoring.NewUint(
-			c.MetricRegistry(), "events_pipeline_total"),
+			reg, "events_pipeline_total"),
 		eventsFiltered: monitoring.NewUint(
-			c.MetricRegistry(), "events_pipeline_filtered_total"),
+			reg, "events_pipeline_filtered_total"),
 		eventsPublished: monitoring.NewUint(
-			c.MetricRegistry(), "events_pipeline_published_total"),
+			reg, "events_pipeline_published_total"),
 	}
+
 	if clientListener != nil {
 		pcl = &beat.CombinedClientListener{
 			A: clientListener,
 			B: pcl,
 		}
 	}
-
-	c.pipelineClientListener = pcl
-	return c.pipelineClientListener
+	return pcl
 }
 
 // PipelineClientListener implements beat.ClientListener to collect pipeline

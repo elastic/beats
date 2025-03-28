@@ -40,30 +40,26 @@ func TestNewContextParameters(t *testing.T) {
 		"TestNewContextParameters",
 		"TestNewContextParameters",
 		"test-input",
-		beat.Info{},
+		beat.Info{Beat: "test"},
 		context.Background(),
 		noopStatusReporter{},
 		monitoring.NewRegistry(),
+		func() {},
 		logp.NewLogger("test"),
 	)
 
 	v := reflect.ValueOf(ctx)
 	typeOfCtx := v.Type()
 
-	for i := 0; i < v.NumField(); i++ {
-		field := v.Field(i)
-		fieldName := typeOfCtx.Field(i).Name
-
-		// ignore unexported fields
-		if !field.CanSet() {
-			continue
+	fields := reflect.VisibleFields(typeOfCtx)
+	for _, f := range fields {
+		if f.IsExported() {
+			assert.Falsef(t, v.FieldByIndex(f.Index).IsZero(),
+				"v2.Context field %q was not set by the constructor. A new field "+
+					"might have been added, please consider if you need to change "+
+					"the constructor or to skip the field in this test",
+				f.Name)
 		}
-
-		assert.Falsef(t, field.IsZero(),
-			"v2.Context field %s was not set by the constructor. A new field"+
-				"might have been added, please consider if you need to change "+
-				"the constructor or to skip the field in this test",
-			fieldName)
 	}
 }
 

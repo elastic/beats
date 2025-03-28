@@ -134,6 +134,10 @@ func (r *runner) Start() {
 	go func() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
+
+		reg, unreg := v2.NewMetricsRegistry(
+			r.id, r.input.Name(), r.agent.Monitoring.NamespaceRegistry(), log)
+
 		ctx := v2.NewContext(
 			r.id,
 			r.id,
@@ -141,15 +145,17 @@ func (r *runner) Start() {
 			*r.agent,
 			r.sig,
 			r.statusReporter,
-			r.agent.Monitoring.NamespaceRegistry(),
+			reg,
+			unreg,
 			log)
-		// Unregister the metrics when input finishes running
+		// Unregister the metrics when the input finishes running.
 		defer ctx.UnregisterMetrics()
 
 		pc := pipetool.WithClientConfigEdit(r.connector,
 			func(orig beat.ClientConfig) (beat.ClientConfig, error) {
 				orig.ClientListener =
-					ctx.PipelineClientListener(orig.ClientListener)
+					v2.NewPipelineClientListener(
+						ctx.MetricRegistry(), orig.ClientListener)
 				return orig, nil
 			})
 

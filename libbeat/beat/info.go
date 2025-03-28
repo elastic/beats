@@ -67,7 +67,8 @@ func (i Info) FQDNAwareHostname(useFQDN bool) string {
 }
 
 // NamespaceRegistry returns the monitoring registry from Namespace.
-// If Namespace isn't set, it returns a registry associated to no namespace.
+// If Namespace isn't set, it returns a new registry associated to no namespace
+// for every call.
 func (m *Monitoring) NamespaceRegistry() *monitoring.Registry {
 	if m.Namespace == nil {
 		return monitoring.NewRegistry()

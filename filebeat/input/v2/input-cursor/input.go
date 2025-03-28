@@ -126,22 +126,30 @@ func (inp *managedInput) Run(
 		source := source
 		grp.Go(func() (err error) {
 			// refine per worker context
+			inpCtxID := ctx.ID + "::" + source.Name()
+			log := ctx.Logger.With("input_source", source.Name())
+
+			reg, unreg := input.NewMetricsRegistry(
+				inpCtxID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), log)
+
 			inpCtx := input.NewContext(
-				ctx.ID+"::"+source.Name(),
+				inpCtxID,
 				ctx.ID, // Preserve IDWithoutName, in case the context was constructed who knows how
 				ctx.Name,
 				ctx.Agent,
 				ctx.Cancelation,
 				ctx.StatusReporter,
-				ctx.Agent.Monitoring.NamespaceRegistry(),
-				ctx.Logger.With("input_source", source.Name()))
+				reg,
+				unreg,
+				log)
 			// Unregister the metrics when input finishes running
 			defer inpCtx.UnregisterMetrics()
 
 			pc := pipetool.WithClientConfigEdit(pipeline,
 				func(orig beat.ClientConfig) (beat.ClientConfig, error) {
 					orig.ClientListener =
-						inpCtx.PipelineClientListener(orig.ClientListener)
+						input.NewPipelineClientListener(
+							inpCtx.MetricRegistry(), orig.ClientListener)
 					return orig, nil
 				})
 
