@@ -203,6 +203,7 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 		ctx,
 		nil,
 		monitoring.NewRegistry(),
+		func() {},
 		logger)
 
 	connector, events := newTestPipeline(eventLimit, collectEvents)
