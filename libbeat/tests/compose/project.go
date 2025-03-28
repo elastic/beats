@@ -146,9 +146,6 @@ func (c *Project) Start(service string, options UpOptions) error {
 		}
 	}
 
-	c.Lock()
-	defer c.Unlock()
-
 	return c.Driver.Up(context.Background(), options, service)
 }
 
@@ -209,17 +206,11 @@ func (c *Project) HostInformation(service string) (ServiceInfo, error) {
 
 // Kill a container
 func (c *Project) Kill(service string) error {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.Driver.Kill(context.Background(), "KILL", service)
 }
 
 // Remove a container
 func (c *Project) Remove(service string, force bool) error {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.Driver.Remove(context.Background(), service, force)
 }
 
@@ -240,9 +231,6 @@ func (c *Project) KillOld(except []string) error {
 
 // Inspect a container
 func (c *Project) Inspect(service string) (string, error) {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.Driver.Inspect(context.Background(), service)
 }
 
@@ -250,8 +238,10 @@ func (c *Project) Inspect(service string) (string, error) {
 // Normally it should only be seconds that the lock is used, but in some cases it can take longer.
 // Pid is written to the lock file, and it is used to check if process holding the process is still
 // alive to avoid deadlocks on unexpected finalizations.
+// TODO: fix me
 func (c *Project) Lock() {
-	timeout := time.Now().Add(500 * time.Second)
+	timeoutDur := 500 * time.Second
+	timeout := time.Now().Add(timeoutDur)
 	infoShown := false
 	defer func() {
 		if v := recover(); v != nil {
@@ -265,9 +255,9 @@ func (c *Project) Lock() {
 			if infoShown {
 				logp.Info("[%s] %s lock acquired",
 					c.Name(), c.LockFile())
+				fmt.Printf("[%s] acquired lock: %s\n",
+					c.Name(), c.LockFile())
 			}
-			fmt.Printf("[%s] acquired lock: %s\n",
-				c.Name(), c.LockFile())
 			return
 		}
 
@@ -284,17 +274,17 @@ func (c *Project) Lock() {
 		if !infoShown {
 			logp.Info("[%s] %s is locked, waiting",
 				c.Name(), c.LockFile())
+			fmt.Printf("[%s] waiting for lock file %s to become available\n",
+				c.Name(), c.LockFile())
 			infoShown = true
 		}
 
-		fmt.Printf("[%s] waiting for lock file %s to become available\n",
-			c.Name(), c.LockFile())
 		time.Sleep(1 * time.Second)
 	}
 
 	// This should rarely happen as we lock for start only, less than a second
 	panic(fmt.Sprintf("[%s] timeout after %s waithing for lock %s",
-		c.Name(), timeout, c.LockFile()))
+		c.Name(), timeoutDur, c.LockFile()))
 }
 
 func acquireLock(path string) bool {
@@ -359,9 +349,6 @@ type ServiceInfo interface {
 }
 
 func (c *Project) getServices(filter ...string) (map[string]ServiceInfo, error) {
-	c.Lock()
-	defer c.Unlock()
-
 	result := make(map[string]ServiceInfo)
 	services, err := c.Driver.Ps(context.Background(), filter...)
 	if err != nil {
