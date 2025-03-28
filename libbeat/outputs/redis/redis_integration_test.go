@@ -135,7 +135,7 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 	total := batches & batchSize
 
 	db := 0
-	key := cfg["key"].(string)
+	key := cfg["key"].(string) //nolint:errcheck //This is a test file, can ignore
 	if v, ok := cfg["db"]; ok {
 		db = v.(int)
 	}
@@ -240,7 +240,8 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 
 	// delete old key if present
 	defer conn.Close()
-	conn.Do("DEL", key)
+	_, err = conn.Do("DEL", key)
+	require.NoError(t, err)
 
 	// subscribe to packetbeat channel
 	psc := redis.PubSubConn{Conn: conn}

@@ -533,7 +533,7 @@ func (tt *testTemplate) NumberOfShards() int {
 	val, err := tt.GetValue("template.settings.index.number_of_shards")
 	require.NoError(tt.t, err)
 
-	i, err := strconv.Atoi(val.(string))
+	i, err := strconv.Atoi(val.(string)) //nolint:errcheck //safe to ignore
 	require.NoError(tt.t, err)
 	return i
 }

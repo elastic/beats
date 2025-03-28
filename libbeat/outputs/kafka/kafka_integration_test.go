@@ -319,7 +319,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			validate := validateJSON
 			if fmt, exists := test.config["codec.format.string"]; exists {
-				validate = makeValidateFmtStr(fmt.(string))
+				validate = makeValidateFmtStr(fmt.(string)) //nolint:errcheck //This is a test file
 			}
 
 			cfgHeaders, headersSet := test.config["headers"]

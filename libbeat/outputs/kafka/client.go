@@ -174,7 +174,7 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 
 	ref := &msgRef{
 		client: c,
-		count:  int32(len(events)),
+		count:  int32(len(events)), //nolint:gosec //keep old behavior
 		total:  len(events),
 		failed: nil,
 		batch:  batch,

@@ -546,7 +546,7 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.Pip
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
 		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat")
 		if err != nil {
-			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err)
+			return nil, fmt.Errorf("error creating Elasticsearch client: %w", err)
 		}
 		return esClient, nil
 	}

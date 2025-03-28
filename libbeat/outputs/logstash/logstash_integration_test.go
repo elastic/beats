@@ -239,7 +239,7 @@ func (es *esConnection) Read() ([]map[string]interface{}, error) {
 
 	hits := make([]map[string]interface{}, len(resp.Hits.Hits))
 	for i, hit := range resp.Hits.Hits {
-		json.Unmarshal(hit, &hits[i])
+		json.Unmarshal(hit, &hits[i]) //nolint:errcheck //This is a test file, can ignore
 	}
 
 	return hits, err
