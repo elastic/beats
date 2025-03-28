@@ -42,6 +42,7 @@ TEST_BOXES = [
   {:name => "win2012", :box => "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-10-28_1224.box", :platform => "windows"},
   {:name => "win2016", :box => "StefanScherer/windows_2016", :platform => "windows"},
   {:name => "win2019", :box => "StefanScherer/windows_2019", :platform => "windows"},
+  {:name => "win2022", :box => "StefanScherer/windows_2022", :platform => "windows"},
 
   {:name => "ubuntu1404", :box => "ubuntu/trusty64", :platform => "ubuntu"},
   {:name => "ubuntu1604", :box => "ubuntu/xenial64", :platform => "ubuntu"},
