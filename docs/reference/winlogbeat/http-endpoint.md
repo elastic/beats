@@ -60,13 +60,13 @@ curl -XGET --unix-socket '/var/run/{beatname_lc}.sock' 'http:/stats/?pretty'
 curl -XGET 'localhost:5066/?pretty'
 ```
 
-```js
+```js subs=true
 {
   "beat": "winlogbeat",
   "hostname": "example.lan",
   "name": "example.lan",
   "uuid": "34f6c6e1-45a8-4b12-9125-11b3e6e89866",
-  "version": "9.0.0-beta1"
+  "version": "{{stack-version}}"
 }
 ```
 

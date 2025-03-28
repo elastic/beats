@@ -191,9 +191,9 @@ Additional headers to send to proxies during CONNECT requests.
 
 ### `index` [index-option-es]
 
-The indexing target to write events to. Can point to an [index](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-mgmt.html), [alias](docs-content://manage-data/data-store/aliases.md), or [data stream](docs-content://manage-data/data-store/data-streams.md). When using daily indices, this will be the index name. The default is `"heartbeat-%{[agent.version]}-%{+yyyy.MM.dd}"`, for example, `"heartbeat-9.0.0-beta1-2025-01-30"`. If you change this setting, you also need to configure the `setup.template.name` and `setup.template.pattern` options (see [Elasticsearch index template](/reference/heartbeat/configuration-template.md)).
+The indexing target to write events to. Can point to an [index](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-mgmt.html), [alias](docs-content://manage-data/data-store/aliases.md), or [data stream](docs-content://manage-data/data-store/data-streams.md). When using daily indices, this will be the index name. The default is `"heartbeat-%{[agent.version]}-%{+yyyy.MM.dd}"`, for example, `"heartbeat-[version]-2025-01-30"`. If you change this setting, you also need to configure the `setup.template.name` and `setup.template.pattern` options (see [Elasticsearch index template](/reference/heartbeat/configuration-template.md)).
 
-When [index lifecycle management (ILM)](/reference/heartbeat/ilm.md) is enabled, the default `index` is `"heartbeat-%{[agent.version]}-%{+yyyy.MM.dd}-%{{index_num}}"`, for example, `"heartbeat-9.0.0-beta1-2025-01-30-000001"`. Custom `index` settings are ignored when ILM is enabled. If you’re sending events to a cluster that supports index lifecycle management, see [Index lifecycle management (ILM)](/reference/heartbeat/ilm.md) to learn how to change the index name.
+When [index lifecycle management (ILM)](/reference/heartbeat/ilm.md) is enabled, the default `index` is `"heartbeat-%{[agent.version]}-%{+yyyy.MM.dd}-%{{index_num}}"`, for example, `"heartbeat-[version]-2025-01-30-000001"`. Custom `index` settings are ignored when ILM is enabled. If you’re sending events to a cluster that supports index lifecycle management, see [Index lifecycle management (ILM)](/reference/heartbeat/ilm.md) to learn how to change the index name.
 
 You can set the index dynamically by using a format string to access any event field. For example, this configuration uses a custom field, `fields.log_type`, to set the index:
 
@@ -206,7 +206,7 @@ output.elasticsearch:
 1. We recommend including `agent.version` in the name to avoid mapping issues when you upgrade.
 
 
-With this configuration, all events with `log_type: normal` are sent to an index named `normal-9.0.0-beta1-2025-01-30`, and all events with `log_type: critical` are sent to an index named `critical-9.0.0-beta1-2025-01-30`.
+With this configuration, all events with `log_type: normal` are sent to an index named `normal-[version]-2025-01-30`, and all events with `log_type: critical` are sent to an index named `critical-[version]-2025-01-30`.
 
 ::::{tip}
 To learn how to add custom fields to events, see the [`fields`](/reference/heartbeat/configuration-general-options.md#libbeat-configuration-fields) option.
@@ -250,7 +250,7 @@ output.elasticsearch:
         message: "ERR"
 ```
 
-This configuration results in indices named `warning-9.0.0-beta1-2025-01-30` and `error-9.0.0-beta1-2025-01-30` (plus the default index if no matches are found).
+This configuration results in indices named `warning-[version]-2025-01-30` and `error-[version]-2025-01-30` (plus the default index if no matches are found).
 
 The following example sets the index by taking the name returned by the `index` format string and mapping it to a new name that’s used for the index:
 

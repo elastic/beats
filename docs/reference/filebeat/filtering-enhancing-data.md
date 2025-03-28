@@ -85,13 +85,13 @@ output.console.pretty: true
 
 The resulting output looks something like this:
 
-```json
+```json subs=true
 {
   "@timestamp": "2016-12-06T17:38:11.541Z",
   "beat": {
     "hostname": "host.example.com",
     "name": "host.example.com",
-    "version": "9.0.0-beta1"
+    "version": "{{stack-version}}"
   },
   "inner": {
     "data": "value"
