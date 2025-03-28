@@ -465,7 +465,7 @@ type JSONTestEvent struct {
 	Test    string `json:"test"`
 }
 
-// jsonTestEventIter reads returns an iterator that yiels JSONTestEvents or errors from the passed file
+// jsonTestEventIter returns an iterator that yields JSONTestEvents or errors from the passed file
 func jsonTestEventIter(fileName string) iter.Seq2[JSONTestEvent, error] {
 	return func(yield func(JSONTestEvent, error) bool) {
 		f, err := os.Open(fileName)
