@@ -362,9 +362,12 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 func writeDataJSON(t *testing.T, data mapstr.M, path string) {
 	// Add hardcoded timestamp
 	data.Put("@timestamp", "2019-03-01T08:05:34.853Z")
-	output, err := json.MarshalIndent(&data, "", "    ")
-	if err = os.WriteFile(path, output, 0644); err != nil {
-		t.Fatal(err)
+	output, errMarshal := json.MarshalIndent(&data, "", "    ")
+	if errMarshal != nil {
+		t.Fatal(errMarshal)
+	}
+	if errWrite := os.WriteFile(path, output, 0644); errWrite != nil {
+		t.Fatal(errWrite)
 	}
 }
 
