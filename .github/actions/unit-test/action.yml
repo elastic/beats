@@ -1,0 +1,38 @@
+name: unit-test
+
+inputs:
+  beat:
+    description: "Beat name"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: .go-version
+
+    - uses: actions/setup-python@v5
+      with:
+        cache: "pip"
+        python-version-file: .python-version
+
+    - name: Install make
+      run: |
+        brew install make
+        export PATH="/usr/local/opt/make/libexec/gnubin:$PATH"
+      shell: bash
+
+    - name: Install mage
+      run: make mage
+      shell: bash
+
+    - name: Run build
+      run: mage build
+      shell: bash
+      working-directory: ${{ inputs.beat }}
+
+    - name: Run unitTest
+      run: mage unitTest
+      shell: bash
+      working-directory: ${{ inputs.beat }}
