@@ -26,7 +26,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -110,10 +109,7 @@ type Context struct {
 	monitoringRegistryCancel func()
 }
 
-// NewContext creates a new context with a metrics registry populated with
-// 'id: id' and 'input: inputType'. The registry is registered to be published
-// by the HTTP monitoring endpoint. The metrics registry is created on
-// parentRegistry, if it's not nil, or on a new unregistered registry.
+// NewContext creates a new context.
 func NewContext(
 	id,
 	idWithoutName,
@@ -124,6 +120,7 @@ func NewContext(
 	reg *monitoring.Registry,
 	unreg func(),
 	log *logp.Logger) Context {
+
 	return Context{
 		ID:            id,
 		IDWithoutName: idWithoutName,
@@ -140,17 +137,24 @@ func NewContext(
 	}
 }
 
+// NewMetricsRegistry creates and registers a monitoring.Registry for an input
+// with the HTTP monitoring endpoint. It returns the metrics registry and a
+// function to unregister it.
+//
+// The metric registry is created on the metrics namespace from beatInfo with
+// name 'inputId' and populated with 'id: inputId' and 'input: inputType'.
+// An error is logged if the new registry cannot be registered with the HTTP
+// monitoring endpoint.
+//
+// The unregister function removes the registry the beatInfo monitoring
+// namespace as well as from the monitoring HTTP endpoint.
 func NewMetricsRegistry(
 	inputId string,
 	inputType string,
-	parentRegistry *monitoring.Registry,
+	beatInfo *beat.Info,
 	log *logp.Logger) (*monitoring.Registry, func()) {
-	if parentRegistry == nil || inputId == "" {
-		log.Warn("registering metrics for %s, id: %s, with empty parent registry or empty ID",
-			inputType, inputId)
-		parentRegistry = monitoring.NewRegistry()
-	}
 
+	parentRegistry := beatInfo.Monitoring.NamespaceRegistry()
 	metricsID := strings.ReplaceAll(inputId, ".", "_")
 	reg := parentRegistry.GetRegistry(metricsID)
 	if reg == nil {
@@ -163,7 +167,7 @@ func NewMetricsRegistry(
 	monitoring.NewString(reg, "id").Set(inputId)
 
 	// register to be published by the HTTP monitoring endpoint.
-	err := inputmon.RegisterMetrics(reg)
+	err := beatInfo.Monitoring.InputHTTPMetrics.RegisterMetrics(reg)
 	if err != nil {
 		log.Errorf("failed to register metrics for '%s', id: %s,: %v",
 			inputType, inputId, err)
@@ -197,7 +201,7 @@ func NewMetricsRegistry(
 			metricsID, "uuid", uid)
 		parentRegistry.Remove(metricsID)
 		// it's safe to make this call even if registering them failed.
-		inputmon.UnregisterMetrics(metricsID)
+		beatInfo.Monitoring.InputHTTPMetrics.UnregisterMetrics(metricsID)
 	}
 
 	return reg, unreg
@@ -224,16 +228,6 @@ func (c *Context) MetricRegistry() *monitoring.Registry {
 	return c.monitoringRegistry
 }
 
-// UpdateMetricRegistry overrides the `id` and `input` entries in the metrics
-// registry and returns the registry. It exists for backwards compatibility as
-// some inputs set a different input type/name than their name.
-func (c *Context) UpdateMetricRegistry(id, inputType string) *monitoring.Registry {
-	monitoring.NewString(c.MetricRegistry(), "input").Set(inputType)
-	monitoring.NewString(c.MetricRegistry(), "id").Set(id)
-
-	return c.MetricRegistry()
-}
-
 // UnregisterMetrics removes the metrics registry from its parent registry and
 // from the HTTP monitoring endpoint.
 func (c *Context) UnregisterMetrics() {
@@ -243,8 +237,8 @@ func (c *Context) UnregisterMetrics() {
 }
 
 // NewPipelineClientListener returns a new beat.ClientListener which might be
-// the PipelineClientListener or a beat.CombinedClientListener when
-// clientListener is non-nil.
+// the PipelineClientListener or a beat.CombinedClientListener. It's the latter
+// when clientListener is non-nil.
 // The PipelineClientListener collects pipeline metrics for an input. The
 // metrics are created on reg.
 func NewPipelineClientListener(

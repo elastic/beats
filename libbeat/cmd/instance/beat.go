@@ -252,6 +252,9 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
 			EphemeralID:     metricreport.EphemeralID(),
+			Monitoring: beat.Monitoring{
+				InputHTTPMetrics: beat.NewInputHTTPMetrics(),
+			},
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),

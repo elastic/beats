@@ -19,118 +19,13 @@ package inputmon
 
 import (
 	"encoding/json"
-	"errors"
 	"strings"
-	"sync"
 
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
-
-type inputRegistry struct {
-	mu         sync.RWMutex
-	registries map[string]*monitoring.Registry
-}
-
-var registeredInputs = inputRegistry{
-	registries: make(map[string]*monitoring.Registry),
-}
-
-// RegisterMetrics adds reg to the collection of registries to be returned by
-// the `/inputs/` endpoint. The registry must have at least a `id` and `input`
-// string variables, otherwise the registry is rejected and an error is
-// returned.
-// The registry is associated with the `id`, calling UnregisterMetrics(id) will
-// unregister reg.
-// If an id/inputType registry has been already registered, it'll be overridden.
-// When the input finishes, it should call UnregisterMetrics to
-// release the associated resources.
-func RegisterMetrics(reg *monitoring.Registry) error {
-	id := getStringVar(reg.Get("id"))
-	input := getStringVar(reg.Get("input"))
-
-	var errMgs []string
-	if id == "" {
-		errMgs = append(errMgs, "'id' empty or absent")
-	}
-	if input == "" {
-		errMgs = append(errMgs, "'input' empty or absent")
-	}
-	if len(errMgs) > 0 {
-		return errors.New("invalid metrics registry: " +
-			strings.Join(errMgs, ", "))
-	}
-
-	registeredInputs.Set(id, reg)
-
-	return nil
-}
-
-// UnregisterMetrics removes the registry identified by id.
-func UnregisterMetrics(id string) {
-	registeredInputs.Del(id)
-}
-
-// Get retrieves a monitoring.Registry by its ID.
-// It returns the registry and a boolean indicating whether the registry was
-// found.
-// The operation is goroutine-safe.
-func (i *inputRegistry) Get(id string) (*monitoring.Registry, bool) {
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	v, found := i.registries[id]
-	return v, found
-}
-
-// Set stores a monitoring.Registry with the given ID.
-// If a registry with the same ID already exists, it is overwritten.
-// The operation is goroutine-safe.
-func (i *inputRegistry) Set(id string, reg *monitoring.Registry) {
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	i.registries[id] = reg
-}
-
-// Del removes a monitoring.Registry by its ID.
-// If no registry with the given ID exists, this operation has no effect.
-// The operation is // The operation is goroutine-safe.-safe.
-func (i *inputRegistry) Del(id string) {
-	i.mu.Lock()
-	defer i.mu.Unlock()
-
-	delete(i.registries, id)
-}
-
-// CollectStructSnapshot returns the result of calling
-// monitoring.CollectStructSnapshot with mode Full and expvar false on each of
-// the registered metrics registry. It returns a map using the metrics registry
-// id as key and the structured snapshot is the associated value.
-func (i *inputRegistry) CollectStructSnapshot() map[string]map[string]any {
-	registeredInputRegistries := map[string]map[string]any{}
-
-	registeredInputs.mu.Lock()
-	for id, reg := range registeredInputs.registries {
-		registeredInputRegistries[id] = monitoring.CollectStructSnapshot(
-			reg, monitoring.Full, false)
-	}
-	registeredInputs.mu.Unlock()
-
-	return registeredInputRegistries
-}
-
-func getStringVar(v monitoring.Var) string {
-	if v != nil {
-		if s, ok := v.(*monitoring.String); ok {
-			return s.Get()
-		}
-	}
-
-	return ""
-}
 
 // NewInputRegistry returns the *monitoring.Registry for metrics related to
 // an input instance, identified by ID. If a registry with the given ID
@@ -143,7 +38,7 @@ func getStringVar(v monitoring.Var) string {
 // The returned cancel function *must* be called when the input stops to
 // unregister the metrics and prevent resource leaks.
 //
-// Deprecated.
+// Deprecated. Use beat.Info.Monitoring.InputHTTPMetrics.RegisterMetrics instead.
 func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
@@ -201,7 +96,14 @@ func globalRegistry() *monitoring.Registry {
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' monitoring namespace encoded as a JSON array (pretty formatted).
-func MetricSnapshotJSON() ([]byte, error) {
-	return json.MarshalIndent(filteredSnapshot(globalRegistry(), ""), "", "  ")
+// global 'dataset' monitoring namespace and from the inputMetrics parameter
+// encoded as a JSON array (pretty formatted). It's safe to pass in a nil
+// inputMetrics.
+func MetricSnapshotJSON(inputMetrics StructSnapshotCollector) ([]byte, error) {
+	snapCollector := inputMetrics
+	if snapCollector == nil {
+		snapCollector = &noopStructSnapshotCollector{}
+	}
+
+	return json.MarshalIndent(filteredSnapshot(globalRegistry(), snapCollector, ""), "", "  ")
 }

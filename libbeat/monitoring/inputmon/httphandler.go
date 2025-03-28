@@ -35,21 +35,40 @@ const (
 	applicationJSON = "application/json; charset=utf-8"
 )
 
+type StructSnapshotCollector interface {
+	CollectStructSnapshot() map[string]map[string]any
+}
+
 type handler struct {
-	registry *monitoring.Registry
+	registry     *monitoring.Registry
+	inputMetrics StructSnapshotCollector
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
-// requests to /inputs.
-func AttachHandler(r *mux.Router) error {
-	return attachHandler(r, globalRegistry())
+// requests to /inputs. It will publish the metrics returned by the
+// StructSnapshotCollector as well as the ones registered in the global
+// 'dataset' metrics namespace. It's safe to pass a nil StructSnapshotCollector.
+func AttachHandler(
+	r *mux.Router,
+	snapCollector StructSnapshotCollector,
+) error {
+	return attachHandler(r, globalRegistry(), snapCollector)
 }
 
-func attachHandler(r *mux.Router, registry *monitoring.Registry) error {
-	h := &handler{registry: registry}
+func attachHandler(r *mux.Router, registry *monitoring.Registry, metrics StructSnapshotCollector) error {
+	snapCollector := metrics
+	if snapCollector == nil {
+		snapCollector = &noopStructSnapshotCollector{}
+	}
+
+	h := &handler{registry: registry, inputMetrics: snapCollector}
 	r = r.PathPrefix(route).Subrouter()
 	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
 }
+
+type noopStructSnapshotCollector struct{}
+
+func (n *noopStructSnapshotCollector) CollectStructSnapshot() map[string]map[string]any { return nil }
 
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 	requestedPretty, err := getPretty(req)
@@ -64,15 +83,19 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	filtered := filteredSnapshot(h.registry, requestedType)
+	filtered := filteredSnapshot(h.registry, h.inputMetrics, requestedType)
 
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
 
-func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
+func filteredSnapshot(
+	r *monitoring.Registry,
+	inputMetrics StructSnapshotCollector,
+	requestedType string) []map[string]any {
+
 	// 1st collect all input metrics explicitly registered by RegisterMetrics.
-	registeredInputRegistries := registeredInputs.CollectStructSnapshot()
+	registeredInputRegistries := inputMetrics.CollectStructSnapshot()
 	filtered := make([]map[string]any, 0, len(registeredInputRegistries))
 	inputs := map[string]struct{}{}
 

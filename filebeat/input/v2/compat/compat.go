@@ -136,7 +136,7 @@ func (r *runner) Start() {
 		log.Infof("Input '%s' starting", name)
 
 		reg, unreg := v2.NewMetricsRegistry(
-			r.id, r.input.Name(), r.agent.Monitoring.NamespaceRegistry(), log)
+			r.id, r.input.Name(), r.agent, log)
 
 		ctx := v2.NewContext(
 			r.id,

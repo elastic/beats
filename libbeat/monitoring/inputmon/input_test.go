@@ -22,102 +22,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
-
-func TestRegisterMetrics(t *testing.T) {
-	type args struct {
-		id    string
-		input string
-	}
-	tests := []struct {
-		name       string
-		args       args
-		wantErr    bool
-		wantErrMsg string
-	}{
-		{
-			name: "Valid Input",
-			args: args{
-				id:    "testID",
-				input: "validInput",
-			},
-			wantErr: false,
-		},
-		{
-			name: "Invalid Input - Missing ID",
-			args: args{
-				id:    "",
-				input: "validInput",
-			},
-			wantErr:    true,
-			wantErrMsg: "invalid metrics registry: 'id' empty or absent",
-		},
-		{
-			name: "Invalid Input - Missing Input",
-			args: args{
-				id:    "testID",
-				input: "",
-			},
-			wantErr:    true,
-			wantErrMsg: "invalid metrics registry: 'input' empty or absent",
-		},
-		{
-			name: "Invalid Input - Both Missing",
-			args: args{
-				id:    "",
-				input: "",
-			},
-			wantErr:    true,
-			wantErrMsg: "invalid metrics registry: 'id' empty or absent, 'input' empty or absent",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// set up the registry
-			reg := monitoring.NewRegistry()
-			if tt.args.input != "" {
-				monitoring.NewString(reg, "input").Set(tt.args.input)
-			}
-			if tt.args.id != "" {
-				monitoring.NewString(reg, "id").Set(tt.args.id)
-			}
-
-			inputID := tt.args.id
-			err := RegisterMetrics(reg)
-			defer UnregisterMetrics(inputID)
-			if tt.wantErr {
-				assert.ErrorContains(t, err, tt.wantErrMsg)
-			} else {
-				registeredInputs.mu.Lock()
-				defer registeredInputs.mu.Unlock()
-
-				got, found := registeredInputs.registries[inputID]
-				require.True(t, found, "metrics registry was not registered")
-				assert.Equal(t, reg, got)
-			}
-		})
-	}
-}
-
-func TestUnregisterMetrics(t *testing.T) {
-	id := uuid.Must(uuid.NewV4()).String()
-
-	reg := monitoring.NewRegistry()
-	monitoring.NewString(reg, "id").Set(id)
-	monitoring.NewString(reg, "input").Set("some-input-type")
-
-	err := RegisterMetrics(reg)
-	require.NoError(t, err, "could not register metrics")
-
-	UnregisterMetrics(id)
-	_, found := registeredInputs.Get(id)
-	assert.False(t, found, "metrics registry was not unregistered")
-}
 
 func TestNewInputMonitor(t *testing.T) {
 	const (
@@ -186,9 +95,12 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	parent := monitoring.GetNamespace("beat-x").GetRegistry()
 	reg := parent.
 		NewRegistry(inputID)
+	msn := &mockSnapshotCollector{
+		registries: map[string]*monitoring.Registry{inputID: reg},
+	}
+
 	monitoring.NewString(reg, "id").Set(inputID)
 	monitoring.NewString(reg, "input").Set("test")
-	require.NoError(t, RegisterMetrics(reg), "could not register metrics")
 	monitoring.NewInt(reg, "foo_total").Set(100)
 	monitoring.NewInt(reg, "events_pipeline_total").Set(100)
 	defer parent.Remove(inputID)
@@ -199,10 +111,10 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	// globalRegistry() and the input also registers its metrics directly.
 	inputID = "input-with-pipeline-metrics-globalRegistry()"
 	reg = globalRegistry().NewRegistry(inputID)
+	msn.registries[inputID] = reg
+
 	monitoring.NewString(reg, "id").Set(inputID)
 	monitoring.NewString(reg, "input").Set("test")
-	// Explicitly register those metrics to be published.
-	require.NoError(t, RegisterMetrics(reg), "could not register metrics")
 	monitoring.NewInt(reg, "events_pipeline_total").Set(200)
 	defer globalRegistry().Remove(inputID)
 
@@ -234,7 +146,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("yet-another-registry")
 
-	jsonBytes, err := MetricSnapshotJSON()
+	jsonBytes, err := MetricSnapshotJSON(msn)
 	require.NoError(t, err)
 
 	type Resp struct {
@@ -288,4 +200,19 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	if t.Failed() {
 		t.Logf("API reponse:\n%s\n", string(jsonBytes))
 	}
+}
+
+type mockSnapshotCollector struct {
+	registries map[string]*monitoring.Registry
+}
+
+func (i *mockSnapshotCollector) CollectStructSnapshot() map[string]map[string]any {
+	registeredInputRegistries := map[string]map[string]any{}
+
+	for id, reg := range i.registries {
+		registeredInputRegistries[id] = monitoring.CollectStructSnapshot(
+			reg, monitoring.Full, false)
+	}
+
+	return registeredInputRegistries
 }

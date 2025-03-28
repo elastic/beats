@@ -130,7 +130,7 @@ func (inp *managedInput) Run(
 			log := ctx.Logger.With("input_source", source.Name())
 
 			reg, unreg := input.NewMetricsRegistry(
-				inpCtxID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), log)
+				inpCtxID, ctx.Name, &ctx.Agent, log)
 
 			inpCtx := input.NewContext(
 				inpCtxID,
