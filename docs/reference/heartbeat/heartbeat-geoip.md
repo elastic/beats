@@ -10,7 +10,7 @@ You can use Heartbeat along with the [GeoIP Processor](elasticsearch://reference
 The `geoip` processor adds information about the geographical location of IP addresses, based on data from the Maxmind GeoLite2 City Database. Because the processor uses a geoIP database that’s installed on {{es}}, you don’t need to install a geoIP database on the machines running Heartbeat.
 
 ::::{note}
-If your use case involves using {{ls}}, you can use the [GeoIP filter](logstash://reference/plugins-filters-geoip.md) available in {{ls}} instead of using the `geoip` processor. However, using the `geoip` processor is the simplest approach when you don’t require the additional processing power of {{ls}}.
+If your use case involves using {{ls}}, you can use the [GeoIP filter](logstash-docs-md://lsr/plugins-filters-geoip.md) available in {{ls}} instead of using the `geoip` processor. However, using the `geoip` processor is the simplest approach when you don’t require the additional processing power of {{ls}}.
 ::::
 
 
