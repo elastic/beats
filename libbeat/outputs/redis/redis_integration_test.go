@@ -356,9 +356,9 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Cli
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}
 
-	client := out.Clients[0].(outputs.NetworkClient)
+	client, ok := out.Clients[0].(outputs.NetworkClient)
 	if !ok {
-		t.Fatalf("expected *backoffClient, but got %T", group.Clients[index])
+		t.Fatalf("expected outputs.NetworkClient, but got %T", out.Clients[0])
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
