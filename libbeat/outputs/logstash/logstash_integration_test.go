@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -69,11 +70,6 @@ type testOutputer struct {
 
 type esSource interface {
 	RefreshIndex()
-}
-
-type esValueReader interface {
-	esSource
-	Read() ([]map[string]interface{}, error)
 }
 
 type esCountReader interface {
@@ -216,8 +212,8 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 	es.encoder = grp.EncoderFactory()
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
-	es.Connect(ctx)
-
+	err = es.Connect(ctx)
+	require.NoError(t, err)
 	return es
 }
 
@@ -250,7 +246,10 @@ func (es *esConnection) Read() ([]map[string]interface{}, error) {
 }
 
 func (es *esConnection) RefreshIndex() {
-	es.Refresh(es.index)
+	_, _, err := es.Refresh(es.index)
+	if err != nil {
+		es.t.Errorf("Failed to refresh: %s", err)
+	}
 }
 
 func (es *esConnection) Count() (int, error) {
@@ -288,17 +287,6 @@ func checkIndex(reader esCountReader, minValues int) func() bool {
 	}
 }
 
-func checkAll(checks ...func() bool) func() bool {
-	return func() bool {
-		for _, check := range checks {
-			if !check() {
-				return false
-			}
-		}
-		return true
-	}
-}
-
 func TestSendMessageViaLogstashTCP(t *testing.T) {
 	testSendMessageViaLogstash(t, "basic-tcp", false)
 }
@@ -321,7 +309,8 @@ func testSendMessageViaLogstash(t *testing.T, name string, tls bool) {
 			},
 		},
 	)
-	ls.Publish(context.Background(), batch)
+	err := ls.Publish(context.Background(), batch)
+	require.NoError(t, err)
 
 	// wait for logstash event flush + elasticsearch
 	waitUntilTrue(5*time.Second, checkIndex(ls, 1))
@@ -564,7 +553,7 @@ func checkEvent(t *testing.T, ls, es map[string]interface{}) {
 
 func (t *testOutputer) PublishEvent(event beat.Event) {
 	batch := encodeBatch[*outest.Batch](t.encoder, outest.NewBatch(event))
-	t.Publish(context.Background(), batch)
+	t.Publish(context.Background(), batch) //nolint:errcheck //This is a test file
 }
 
 func (t *testOutputer) BulkPublish(events []beat.Event) bool {
@@ -578,7 +567,7 @@ func (t *testOutputer) BulkPublish(events []beat.Event) bool {
 		wg.Done()
 	}
 
-	t.Publish(context.Background(), batch)
+	t.Publish(context.Background(), batch) //nolint:errcheck //This is a test file
 	wg.Wait()
 	return ok
 }

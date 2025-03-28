@@ -62,12 +62,12 @@ func setupAndImportDashboardsViaKibana(ctx context.Context, beatInfo beat.Info, 
 
 	kibanaLoader, err := NewKibanaLoader(ctx, kibanaConfig, dashboardsConfig, msgOutputter, beatInfo)
 	if err != nil {
-		return fmt.Errorf("fail to create the Kibana loader: %v", err)
+		return fmt.Errorf("fail to create the Kibana loader: %w", err)
 	}
 
 	defer kibanaLoader.Close()
 
-	kibanaLoader.statusMsg("Kibana URL %v", kibanaLoader.client.Connection.URL)
+	kibanaLoader.statusMsg("Kibana URL %v", kibanaLoader.client.URL)
 
 	return ImportDashboardsViaKibana(kibanaLoader, fields)
 }
@@ -85,7 +85,7 @@ func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields mapstr.M) erro
 
 	importer, err := NewImporter(version, kibanaLoader.config, *kibanaLoader, fields)
 	if err != nil {
-		return fmt.Errorf("fail to create a Kibana importer for loading the dashboards: %v", err)
+		return fmt.Errorf("fail to create a Kibana importer for loading the dashboards: %w", err)
 	}
 
 	if err := importer.Import(); err != nil {

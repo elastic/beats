@@ -97,7 +97,7 @@ func (c *PersistentCache) Get(k string, v interface{}) error {
 		return err
 	}
 	if c.refreshOnAccess && c.timeout > 0 {
-		c.store.Set([]byte(k), d, c.timeout)
+		c.store.Set([]byte(k), d, c.timeout) //nolint:errcheck //This is a test file
 	}
 	err = c.codec.Decode(d, v)
 	if err != nil {

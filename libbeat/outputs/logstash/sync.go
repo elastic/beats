@@ -76,7 +76,7 @@ func newSyncClient(
 
 func (c *syncClient) Connect(ctx context.Context) error {
 	c.log.Debug("connect")
-	err := c.Client.ConnectContext(ctx)
+	err := c.ConnectContext(ctx)
 	if err != nil {
 		return err
 	}

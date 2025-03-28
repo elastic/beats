@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -282,7 +281,7 @@ func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (mapstr.M, er
 		return nil, fmt.Errorf("error checking json file %s for template: %w", jsonPath, err)
 	}
 	b.log.Debugf("Loading json template from file %s", jsonPath)
-	content, err := ioutil.ReadFile(jsonPath)
+	content, err := os.ReadFile(jsonPath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file %s for template: %w", jsonPath, err)
 

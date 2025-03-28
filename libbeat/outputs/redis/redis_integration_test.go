@@ -30,6 +30,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -146,7 +147,8 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 
 	// delete old key if present
 	defer conn.Close()
-	conn.Do("DEL", key)
+	err = conn.Do("DEL", key)
+	require.NoError(t, err)
 
 	out := newRedisTestingOutput(t, cfg)
 	err = sendTestEvents(out, batches, batchSize)
@@ -245,7 +247,7 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	if err := psc.Subscribe(key); err != nil {
 		t.Fatal(err)
 	}
-	defer psc.Unsubscribe(key)
+	defer psc.Unsubscribe(key) //nolint:errcheck //This is a test file
 
 	// connect and publish events
 	var wg sync.WaitGroup

@@ -123,13 +123,9 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory, logger *logp.Logger
 
 		// consider lifecycles enabled if the user has explicitly enabled them,
 		// or if no `enabled` setting has been set by the user, thus reverting to a default of enabled.
-		enabled := false
-		if cfg.Lifecycle.DSL.Enabled() || cfg.Lifecycle.ILM.Enabled() {
-			enabled = true
-		}
-		if (cfg.Lifecycle.DSL == nil || !cfg.Lifecycle.DSL.HasField("enabled")) && (cfg.Lifecycle.ILM == nil || !cfg.Lifecycle.ILM.HasField("enabled")) {
-			enabled = true
-		}
+		enabled := cfg.Lifecycle.DSL.Enabled() || cfg.Lifecycle.ILM.Enabled() ||
+			((cfg.Lifecycle.DSL == nil || !cfg.Lifecycle.DSL.HasField("enabled")) &&
+				(cfg.Lifecycle.ILM == nil || !cfg.Lifecycle.ILM.HasField("enabled")))
 
 		if err := checkTemplateESSettings(cfg.Template, cfg.Output); err != nil {
 			return nil, err

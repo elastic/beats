@@ -6,7 +6,7 @@ package persistentcache
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -396,7 +396,7 @@ func BenchmarkGet(b *testing.B) {
 
 					b.ResetTimer()
 					for i := 0; i < b.N; i++ {
-						expected := objects[rand.Intn(size)]
+						expected := objects[rand.IntN(size)]
 						//nolint:errcheck // benchmarks
 						cache.Get(expected.ID, &result)
 						if expected.ID != result.ID {

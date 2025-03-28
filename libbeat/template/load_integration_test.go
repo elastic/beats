@@ -507,7 +507,7 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 	return testTemplate{
 		t:      t,
 		client: client,
-		M:      mapstr.M(templateElem["index_template"].(map[string]interface{})),
+		M:      mapstr.M(templateElem["index_template"].(map[string]interface{})), //nolint:errcheck //This is a test file
 	}
 }
 
@@ -526,7 +526,7 @@ func (tt *testTemplate) SourceEnabled() bool {
 		tt.t.Fatalf("failed to read '%v' in %s", key, doc)
 	}
 
-	return val.(bool)
+	return val.(bool) //nolint:errcheck //This is a test file
 }
 
 func (tt *testTemplate) NumberOfShards() int {

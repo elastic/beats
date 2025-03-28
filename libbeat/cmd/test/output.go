@@ -50,7 +50,7 @@ func GenTestOutputCmd(settings instance.Settings) *cobra.Command {
 			for _, client := range output.Clients {
 				tClient, ok := client.(testing.Testable)
 				if !ok {
-					fmt.Printf("%s output doesn't support testing\n", b.Config.Output.Name())
+					fmt.Printf("%s output doesn't support testing\n", b.Config.Output.Name()) //nolint:forbidigo //output to stderr before exiting
 					os.Exit(1)
 				}
 

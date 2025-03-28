@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -60,7 +61,8 @@ func TestLogstashTLS(t *testing.T) {
 	certName := "ca_test"
 
 	timeout := 2 * time.Second
-	transptest.GenCertForTestingPurpose(t, certName, "", "127.0.0.1", "127.0.1.1")
+	err := transptest.GenCertForTestingPurpose(t, certName, "", "127.0.0.1", "127.0.1.1")
+	require.NoError(t, err)
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
 	// create lumberjack output client
@@ -78,7 +80,8 @@ func TestLogstashInvalidTLSInsecure(t *testing.T) {
 	ip := "1.2.3.4"
 
 	timeout := 2 * time.Second
-	transptest.GenCertForTestingPurpose(t, certName, "", ip)
+	err := transptest.GenCertForTestingPurpose(t, certName, "", ip)
+	require.NoError(t, err)
 	server := transptest.NewMockServerTLS(t, timeout, certName, nil)
 
 	config := map[string]interface{}{

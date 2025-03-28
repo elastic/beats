@@ -264,7 +264,7 @@ func TestStopAll(t *testing.T) {
 	assert.Equal(t, len(list.copyRunnerList()), 0)
 
 	for _, r := range list.runners {
-		assert.False(t, r.(*runner).stopped)
+		assert.False(t, r.(*runner).stopped) //nolint:errcheck //false positive
 	}
 }
 

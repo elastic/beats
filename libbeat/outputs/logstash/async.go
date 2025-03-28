@@ -92,7 +92,7 @@ func newAsyncClient(
 	}
 
 	c.connect = func() error {
-		err := c.Client.ConnectContext(context.Background())
+		err := c.ConnectContext(context.Background())
 		if err == nil {
 			c.client, err = clientFactory(c.Client)
 		}

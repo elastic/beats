@@ -88,7 +88,7 @@ func New(plugins PluginFactory) beat.Creator {
 func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %w", err)
+		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
 	if err := cfgwarn.CheckRemoved6xSettings(
@@ -406,7 +406,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger)
 	if err != nil {
-		fb.logger.Errorf("Could not init crawler: %v", err)
+		fb.logger.Errorf("could not init crawler: %v", err)
 		return err
 	}
 
@@ -417,7 +417,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the registrar
 	err = registrar.Start()
 	if err != nil {
-		return fmt.Errorf("Could not start registrar: %w", err)
+		return fmt.Errorf("could not start registrar: %w", err)
 	}
 
 	// Stopping registrar will write last state
@@ -442,7 +442,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if err != nil {
 		crawler.Stop()
 		cancelPipelineFactoryCtx()
-		return fmt.Errorf("Failed to start crawler: %w", err)
+		return fmt.Errorf("failed to start crawler: %w", err)
 	}
 
 	// If run once, add crawler completion check as alternative to done signal
