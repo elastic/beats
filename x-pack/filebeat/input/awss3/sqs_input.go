@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
+	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -137,16 +139,46 @@ func (in *sqsReaderInput) cleanup() {
 func (in *sqsReaderInput) run(ctx context.Context) {
 	in.logConfigSummary()
 
-	// Poll metrics periodically in the background
+	// If we have received a batch, allow SQS grace time to collect
+	// and process all the messages before we respect the parent
+	// context. This is used only for processing and publication,
+	// not for the reader loop, otherwise a new collection could
+	// start, and we are back where we started.
+	graceCtx := ctx
+	if in.config.SQSGraceTime > 0 {
+		var cancel context.CancelFunc
+		graceCtx, cancel = cancelWithGrace(ctx, in.config.SQSGraceTime)
+		defer cancel()
+	}
+
+	// Poll metrics periodically in the background.
+	//
+	// Use the graceCtx here also to ensure that all metrics have
+	// been collected; this is much less likely to be an issue.
 	go messageCountMonitor{
 		sqs:     in.sqs,
 		metrics: in.metrics,
-	}.run(ctx)
+	}.run(graceCtx)
 
-	in.startWorkers(ctx)
+	in.startWorkers(ctx, graceCtx)
 	in.readerLoop(ctx)
 
 	in.workerWg.Wait()
+}
+
+// cancelWithGrace provides a context.Context that will be cancelled by a call
+// to the parent's cancellation, but with a delayed timeout. The returned cancel
+// function should be called when the returned context.Context is no longer
+// needed.
+func cancelWithGrace(parent context.Context, timeout time.Duration) (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithCancel(context.WithoutCancel(parent))
+	stop := context.AfterFunc(parent, func() {
+		time.AfterFunc(timeout, cancel)
+	})
+	return ctx, func() {
+		stop()
+		cancel()
+	}
 }
 
 func (in *sqsReaderInput) readerLoop(ctx context.Context) {
@@ -174,6 +206,13 @@ type sqsWorker struct {
 	input      *sqsReaderInput
 	client     beat.Client
 	ackHandler *awsACKHandler
+	// wg is shared with the owning sqsReaderInput. It
+	// is incremented prior to the call to newSQSWorker
+	// and must be Done either in the unhappy path in
+	// that function, or after completion of the work
+	// loop.
+	wg      *sync.WaitGroup
+	pending atomic.Int64
 }
 
 func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
@@ -188,33 +227,54 @@ func (in *sqsReaderInput) newSQSWorker() (*sqsWorker, error) {
 		},
 	})
 	if err != nil {
+		in.workerWg.Done()
 		return nil, fmt.Errorf("connecting to pipeline: %w", err)
 	}
 	return &sqsWorker{
 		input:      in,
 		client:     client,
 		ackHandler: ackHandler,
+		wg:         &in.workerWg,
 	}, nil
 }
 
-func (w *sqsWorker) run(ctx context.Context) {
-	defer w.client.Close()
-	defer w.ackHandler.Close()
+func (w *sqsWorker) run(ctx, graceCtx context.Context) {
+	defer func() {
+		w.ackHandler.Close()
+		w.client.Close()
+		w.wg.Done()
+	}()
 
-	for ctx.Err() == nil {
+	for graceCtx.Err() == nil {
 		// Send a work request
 		select {
-		case <-ctx.Done():
+		case <-graceCtx.Done():
 			// Shutting down
 			return
+		case <-ctx.Done():
+			// Requests will no longer be received
+			// since the parent context has been
+			// cancelled, so do not wait for this.
+			// But do check to see whether we have
+			// completed our pending publications.
+			if w.pending.Load() == 0 {
+				// If we have zero pending, we
+				// can exit early.
+				return
+			}
 		case w.input.workRequestChan <- struct{}{}:
 		}
 		// The request is sent, wait for a response
 		select {
-		case <-ctx.Done():
+		case <-graceCtx.Done():
 			return
 		case msg := <-w.input.workResponseChan:
-			w.processMessage(ctx, msg)
+			w.processMessage(graceCtx, msg)
+		case <-ctx.Done():
+			// We're shutting down, so spin in the
+			// loop until we have exceeded our
+			// grace time, or we have no pending
+			// messages.
 		}
 	}
 }
@@ -231,26 +291,29 @@ func (w *sqsWorker) processMessage(ctx context.Context, msg types.Message) {
 		// No events made it through (probably an error state), wrap up immediately
 		result.Done()
 	} else {
+		w.pending.Add(1)
 		// Add this result's Done callback to the pending ACKs list
-		w.ackHandler.Add(publishCount, result.Done)
+		w.ackHandler.Add(publishCount, func() {
+			result.Done()
+			w.pending.Add(-1)
+		})
 	}
 
 	w.input.metrics.endSQSWorker(id)
 }
 
-func (in *sqsReaderInput) startWorkers(ctx context.Context) {
+func (in *sqsReaderInput) startWorkers(ctx, graceCtx context.Context) {
 	// Start the worker goroutines that will fetch messages via workRequestChan
 	// and workResponseChan until the input shuts down.
 	for i := 0; i < in.config.NumberOfWorkers; i++ {
 		in.workerWg.Add(1)
 		go func() {
-			defer in.workerWg.Done()
 			worker, err := in.newSQSWorker()
 			if err != nil {
 				in.log.Error(err)
 				return
 			}
-			go worker.run(ctx)
+			go worker.run(ctx, graceCtx)
 		}()
 	}
 }

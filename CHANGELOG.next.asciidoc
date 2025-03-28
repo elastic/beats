@@ -412,6 +412,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 
 *Auditbeat*
 
@@ -426,6 +427,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Add support for RFC7231 methods to http monitors. {pull}41975[41975]
+- Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
 
 *Metricbeat*
 
@@ -486,7 +488,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 *Packetbeat*
-
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
@@ -505,7 +507,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Functionbeat*
 
-- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}41506[41506]
 
 *Elastic Log Driver*
 *Elastic Logging Plugin*
