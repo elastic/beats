@@ -3,6 +3,7 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-9.0.0-beta1]]
 === Beats version 9.0.0-beta1
 https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
@@ -113,12 +114,18 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 [[release-notes-8.17.4]]
 === Beats version 8.17.4
 https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
+=======
+[[release-notes-8.16.6]]
+=== Beats version 8.16.6
+https://github.com/elastic/beats/compare/v8.16.5\...v8.16.6[View commits]
+>>>>>>> 909cf61a2 (docs: Prepare Changelog for 8.16.6 (#43411))
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
 - The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+<<<<<<< HEAD
 - Allow faccessat(2) in seccomp. {pull}43322[43322]
 
 ==== Bugfixes
@@ -128,10 +135,25 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 - Prevent computer details being returned for user queries by Active Directory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in `aws-s3` input and enforce retrying using download failed error. {pull}42420[42420]
 - Prevent `azureblobstorage` input from logging key details during blob fetch operations. {pull}43169[43169]
+=======
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- The Kafka output now drops events when there is an authorisation error. {issue}42343[42343] {pull}42401[42401]
+
+*Filebeat*
+
+- Prevent computer details being returned for user queries by Active Directory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error. {pull}42420[42756]
+- Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+>>>>>>> 909cf61a2 (docs: Prepare Changelog for 8.16.6 (#43411))
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Metricbeat*
 
+<<<<<<< HEAD
 - Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
 - Remove `hostname` field from Zookeeper's `mntr` data stream. {pull}41887[41887]
 - Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
@@ -140,6 +162,25 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 
 - Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
+=======
+- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true`. {issue}40437[40437] {pull}40467[40467]
+- Add AWS OwningAccount support for cross account monitoring. {issue}40570[40570] {pull}40691[40691]
+- Use namespace for GetListMetrics when exists in AWS. {pull}41022[41022]
+- Fix Kubernetes metadata sometimes not being present after startup. {pull}41216[41216]
+- Do not report non-existant 0 values for RSS metrics in docker/memory. {pull}41449[41449]
+- Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
+- Don't skip first bucket value in GCP metrics metricset for distribution type metrics. {pull}41822[41822]
+- Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
+- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
+- Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
+- Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
+- Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
+- Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
+- Only fetch cluster-level index stats summary. {issue}36019[36019] {pull}42901[42901]
+- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+
+>>>>>>> 909cf61a2 (docs: Prepare Changelog for 8.16.6 (#43411))
 ==== Added
 
 *Affecting all Beats*
@@ -150,6 +191,7 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
 
+<<<<<<< HEAD
 *Osquerybeat*
 
 - Increase maximum query timeout to 24 hours. {pull}42356[42356]
@@ -374,6 +416,8 @@ https://github.com/elastic/beats/compare/v8.16.1\...v8.17.0[View commits]
 - Add handling for missing `EvtVarType`s in experimental API. {issue}19337[19337] {pull}41418[41418]
 - Implement exclusion range support for event_id. {issue}38623[38623] {pull}41639[41639]
 
+=======
+>>>>>>> 909cf61a2 (docs: Prepare Changelog for 8.16.6 (#43411))
 
 [[release-notes-8.16.5]]
 === Beats version 8.16.5
