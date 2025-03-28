@@ -194,7 +194,7 @@ func newTestLumberjackOutput(
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	client := grp.Clients[0].(outputs.NetworkClient)
+	client := grp.Clients[0].(outputs.NetworkClient) //nolint:errcheck //safe to ignore
 	if err := client.Connect(ctx); err != nil {
 		t.Fatalf("Client failed to connected: %v", err)
 	}
