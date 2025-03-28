@@ -79,7 +79,7 @@ Kibana supports regular expression for filters and expressions. For example, to 
 http.response_headers.content_type: *json
 ```
 
-See [Elasticsearch regexp query](elasticsearch://reference/query-languages/query-dsl-regexp-query.md) for more details about the syntax.
+See [Elasticsearch regexp query](elasticsearch://reference/query-languages/query-dsl/query-dsl-regexp-query.md) for more details about the syntax.
 
 
 ### Range queries [_range_queries]

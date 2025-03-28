@@ -8,7 +8,7 @@ mapped_pages:
 
 [8.14.0]
 
-The o365audit input is deprecated. For collecting Microsoft Office 365 log data, please use the [Microsoft 365](integration-docs://reference/o365.md) integration package. For more complex or user-specific use cases, similar functionality can be achieved using the [`CEL input`](/reference/filebeat/filebeat-input-cel.md) .
+The o365audit input is deprecated. For collecting Microsoft Office 365 log data, please use the [Microsoft 365](integration-docs://reference/o365/index.md) integration package. For more complex or user-specific use cases, similar functionality can be achieved using the [`CEL input`](/reference/filebeat/filebeat-input-cel.md) .
 
 
 ::::{warning}
