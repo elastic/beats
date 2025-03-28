@@ -60,7 +60,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.15.0
 	github.com/elastic/go-concert v0.3.0
-	github.com/elastic/go-libaudit/v2 v2.6.1
+	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v1.0.1
 	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
@@ -130,7 +130,7 @@ require (
 	golang.org/x/net v0.35.0
 	golang.org/x/oauth2 v0.24.0
 	golang.org/x/sync v0.11.0
-	golang.org/x/sys v0.30.0
+	golang.org/x/sys v0.31.0
 	golang.org/x/text v0.22.0
 	golang.org/x/time v0.8.0
 	golang.org/x/tools v0.26.0
