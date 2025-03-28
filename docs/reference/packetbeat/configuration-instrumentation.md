@@ -38,17 +38,17 @@ Set the environment in which Packetbeat is running, for example, `staging`, `pro
 
 ### `hosts` [_hosts_3]
 
-The APM integration [host](docs-content://reference/ingestion-tools/observability/apm-settings.md) to report instrumentation data to. Defaults to `http://localhost:8200`.
+The APM integration [host](docs-content://reference/apm/observability/apm-settings.md) to report instrumentation data to. Defaults to `http://localhost:8200`.
 
 
 ### `api_key` [_api_key_2]
 
-The [API Key](docs-content://reference/ingestion-tools/observability/apm-settings.md) used to secure communication with the APM Integration. If `api_key` is set then `secret_token` will be ignored.
+The [API Key](docs-content://reference/apm/observability/apm-settings.md) used to secure communication with the APM Integration. If `api_key` is set then `secret_token` will be ignored.
 
 
 ### `secret_token` [_secret_token]
 
-The [Secret token](docs-content://reference/ingestion-tools/observability/apm-settings.md) used to secure communication with the APM Integration.
+The [Secret token](docs-content://reference/apm/observability/apm-settings.md) used to secure communication with the APM Integration.
 
 
 ### `profiling.cpu.enabled` [_profiling_cpu_enabled]

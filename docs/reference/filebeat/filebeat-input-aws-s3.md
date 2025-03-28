@@ -421,6 +421,11 @@ This sets the maximum number of JavaScript VM sessions that will be cached to av
 The maximum duration that an SQS `ReceiveMessage` call should wait for a message to arrive in the queue before returning. The default value is `20s`. The maximum value is `20s`.
 
 
+### `sqs.shutdown_grace_time` [_shutdown_grace_time]
+
+The duration that an SQS message processor will wait for a messages to arrive in the queue and be processed before allowing the input to terminate when a cancelation has been received. The default value is `20s`. It must not be negative.
+
+
 ### `bucket_arn` [_bucket_arn]
 
 ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url`, `access_point_arn, and `non_aws_bucket_name` are not set).
