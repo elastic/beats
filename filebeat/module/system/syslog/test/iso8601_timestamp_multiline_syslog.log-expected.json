@@ -1,0 +1,24 @@
+[
+    {
+        "@timestamp": "2020-12-25T23:59:59-02:00",
+        "event.dataset": "system.syslog",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "syslog",
+        "input.type": "log",
+        "log.file.path": "test-syslog.log",
+        "log.offset": 0,
+        "log.flags": [
+            "multiline"
+        ],
+        "host.hostname": "a-mac-with-esc-key",
+        "message": "2016-12-13 11:35:28.421\n\t\tGoogleSoftwareUpdateAgent[21412/0x700007399000] [lvl=2] -[KSUpdateEngine updateAllExceptProduct:] KSUpdateEngine updating all\n\t\tinstalled products, except:'com.google.Keystone'.",
+        "service.type": "system",
+        "related.hosts": [
+            "a-mac-with-esc-key"
+        ],
+        "process.name": "GoogleSoftwareUpdateAgent",
+        "process.pid": 21412
+    }
+]
