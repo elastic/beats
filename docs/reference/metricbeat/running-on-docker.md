@@ -15,21 +15,21 @@ These images are free to use under the Elastic license. They contain open source
 
 Obtaining Metricbeat for Docker is as simple as issuing a `docker pull` command against the Elastic Docker registry.
 
-::::{warning}
-Version 9.0.0-beta1 of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat 9.0.0-beta1.
-::::
+% ::::{warning} subs=true
+% Version {{stack-version}} of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat {{stack-version}}.
+% ::::
 
 
-```sh
-docker pull docker.elastic.co/beats/metricbeat:9.0.0-beta1
+```sh subs=true
+docker pull docker.elastic.co/beats/metricbeat:{{stack-version}}
 ```
 
 Alternatively, you can download other Docker images that contain only features available under the Apache 2.0 license. To download the images, go to [www.docker.elastic.co](https://www.docker.elastic.co).
 
 As another option, you can use the hardened [Wolfi](https://wolfi.dev/) image. Using Wolfi images requires Docker version 20.10.10 or higher. For details about why the Wolfi images have been introduced, refer to our article [Reducing CVEs in Elastic container images](https://www.elastic.co/blog/reducing-cves-in-elastic-container-images).
 
-```bash
-docker pull docker.elastic.co/beats/metricbeat-wolfi:9.0.0-beta1
+```bash subs=true
+docker pull docker.elastic.co/beats/metricbeat-wolfi:{{stack-version}}
 ```
 
 
@@ -37,20 +37,20 @@ docker pull docker.elastic.co/beats/metricbeat-wolfi:9.0.0-beta1
 
 You can use the [Cosign application](https://docs.sigstore.dev/cosign/installation/) to verify the Metricbeat Docker image signature.
 
-::::{warning}
-Version 9.0.0-beta1 of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat 9.0.0-beta1.
-::::
+% ::::{warning}
+% Version {{stack-version}} of Metricbeat has not yet been released. No Docker image is currently available for Metricbeat {{stack-version}}.
+% ::::
 
 
-```sh
+```sh subs=true
 wget https://artifacts.elastic.co/cosign.pub
-cosign verify --key cosign.pub docker.elastic.co/beats/metricbeat:9.0.0-beta1
+cosign verify --key cosign.pub docker.elastic.co/beats/metricbeat:{{stack-version}}
 ```
 
 The `cosign` command prints the check results and the signature payload in JSON format:
 
-```sh
-Verification for docker.elastic.co/beats/metricbeat:9.0.0-beta1 --
+```sh subs=true
+Verification for docker.elastic.co/beats/metricbeat:{{stack-version}} --
 The following checks were performed on each of these signatures:
   - The cosign claims were validated
   - Existence of the claims in the transparency log was verified offline
@@ -67,9 +67,9 @@ A [known issue](https://github.com/elastic/beats/issues/42038) in version 8.17.0
 
 Running Metricbeat with the setup command will create the index pattern and load visualizations , dashboards, and machine learning jobs.  Run this command:
 
-```sh
+```sh subs=true
 docker run --rm \
-docker.elastic.co/beats/metricbeat:9.0.0-beta1 \
+docker.elastic.co/beats/metricbeat:{{stack-version}} \
 setup -E setup.kibana.host=kibana:5601 \
 -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 ```
@@ -90,11 +90,11 @@ If you’d like to run Metricbeat in a Docker container on a read-only file syst
 
 For example:
 
-```sh
+```sh subs=true
 docker run --rm \
   --mount type=bind,source=$(pwd)/data,destination=/usr/share/metricbeat/data \
   --read-only \
-  docker.elastic.co/beats/metricbeat:9.0.0-beta1
+  docker.elastic.co/beats/metricbeat:{{stack-version}}
 ```
 
 
@@ -115,7 +115,7 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/docker/
 
 One way to configure Metricbeat on Docker is to provide `metricbeat.docker.yml` via a volume mount. With `docker run`, the volume mount can be specified like this.
 
-```sh
+```sh subs=true
 docker run -d \
   --name=metricbeat \
   --user=root \
@@ -124,7 +124,7 @@ docker run -d \
   --volume="/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro" \
   --volume="/proc:/hostfs/proc:ro" \
   --volume="/:/hostfs:ro" \
-  docker.elastic.co/beats/metricbeat:9.0.0-beta1 metricbeat -e \
+  docker.elastic.co/beats/metricbeat:{{stack-version}} metricbeat -e \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 ```
 
@@ -156,8 +156,8 @@ docker run \
 
 It’s possible to embed your Metricbeat configuration in a custom image. Here is an example Dockerfile to achieve this:
 
-```dockerfile
-FROM docker.elastic.co/beats/metricbeat:9.0.0-beta1
+```dockerfile subs=true
+FROM docker.elastic.co/beats/metricbeat:{{stack-version}}
 COPY --chown=root:metricbeat metricbeat.yml /usr/share/metricbeat/metricbeat.yml
 ```
 
@@ -168,7 +168,7 @@ When executing Metricbeat in a container, there are some important things to be 
 
 This example highlights the changes required to make the system module work properly inside of a container. This enables Metricbeat to monitor the host machine from within the container.
 
-```sh
+```sh subs=true
 docker run \
   --mount type=bind,source=/proc,target=/hostfs/proc,readonly \ <1>
   --mount type=bind,source=/sys/fs/cgroup,target=/hostfs/sys/fs/cgroup,readonly \ <2>
@@ -177,7 +177,7 @@ docker run \
   --env DBUS_SYSTEM_BUS_ADDRESS='unix:path=/hostfs/var/run/dbus/system_bus_socket' \ <4>
   --net=host \ <5>
   --cgroupns=host \ <6>
-  docker.elastic.co/beats/metricbeat:9.0.0-beta1 -e --system.hostfs=/hostfs
+  docker.elastic.co/beats/metricbeat:{{stack-version}} -e --system.hostfs=/hostfs
 ```
 
 1. Metricbeat’s [system module](/reference/metricbeat/metricbeat-module-system.md) collects much of its data through the Linux proc filesystem, which is normally located at `/proc`. Because containers are isolated as much as possible from the host, the data inside of the container’s `/proc` is different than the host’s `/proc`. To account for this, you can mount the host’s `/proc` filesystem inside of the container and tell Metricbeat to look inside the `/hostfs` directory when looking for `/proc` by using the `hostfs=/hostfs` config value.
@@ -204,11 +204,11 @@ If the [system socket metricset](/reference/metricbeat/metricbeat-metricset-syst
 
 Next, let’s look at an example of monitoring a containerized service from a Metricbeat container.
 
-```sh
+```sh subs=true
 docker run \
   --network=mysqlnet \ <1>
   -e MYSQL_PASSWORD=secret \ <2>
-  docker.elastic.co/beats/metricbeat:9.0.0-beta1
+  docker.elastic.co/beats/metricbeat:{{stack-version}}
 ```
 
 1. Placing the Metricbeat and MySQL containers on the same Docker network allows Metricbeat access to the exposed ports of the MySQL container, and makes the hostname `mysql` resolvable to Metricbeat.

@@ -15,33 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package backup
-
-import (
-	"errors"
-	"os"
-)
-
-const (
-	backupSuffix = ".bak"
-)
-
-// Backuper defines backup-related operations
-type Backuper interface {
-	// Backup performs the backup
-	Backup() error
-	// Removes all backups created by this backuper
-	Remove() error
-}
-
-// fileExists checks if the given file exists
-func fileExists(name string) (bool, error) {
-	_, err := os.Stat(name)
-	if err == nil {
-		return true, nil
-	}
-	if errors.Is(err, os.ErrNotExist) {
-		return false, nil
-	}
-	return false, err
-}
+// Package dommemstat is a Metricbeat module that contains MetricSets.
+package dommemstat
