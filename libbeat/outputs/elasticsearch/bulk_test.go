@@ -72,16 +72,19 @@ func TestBulkReadToItems(t *testing.T) {
 
 func TestBulkReadItemStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
+	logger := logp.NewTestingLogger(t, "")
 
 	reader := newJSONReader(response)
-	code, _, err := bulkReadItemStatus(logp.L(), reader)
+	code, _, err := bulkReadItemStatus(logger, reader)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
 }
 
 func TestESNoErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
-	code, msg, err := readStatusItem(response)
+	logger := logp.NewTestingLogger(t, "")
+
+	code, msg, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 200, code)
@@ -90,7 +93,9 @@ func TestESNoErrorStatus(t *testing.T) {
 
 func TestES1StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": "test error"}}`)
-	code, msg, err := readStatusItem(response)
+	logger := logp.NewTestingLogger(t, "")
+
+	code, msg, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
@@ -99,7 +104,9 @@ func TestES1StyleErrorStatus(t *testing.T) {
 
 func TestES2StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": {"reason": "test_error"}}}`)
-	code, msg, err := readStatusItem(response)
+	logger := logp.NewTestingLogger(t, "")
+
+	code, msg, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
@@ -118,14 +125,15 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
         }
       }
     }`)
-	code, _, err := readStatusItem(response)
+	logger := logp.NewTestingLogger(t, "")
+	code, _, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
 	assert.Equal(t, 400, code)
 }
 
-func readStatusItem(in []byte) (int, string, error) {
+func readStatusItem(in []byte, logger *logp.Logger) (int, string, error) {
 	reader := newJSONReader(in)
-	code, msg, err := bulkReadItemStatus(logp.L(), reader)
+	code, msg, err := bulkReadItemStatus(logger, reader)
 	return code, string(msg), err
 }

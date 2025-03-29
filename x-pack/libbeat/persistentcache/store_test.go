@@ -5,7 +5,6 @@
 package persistentcache
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -16,18 +15,16 @@ import (
 )
 
 func TestStandaloneStore(t *testing.T) {
-	type valueType struct {
-		Something string
-	}
 
 	var key = []byte("somekey")
 	var value = []byte("somevalue")
 
-	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
+	tempDir, err := os.MkdirTemp("", "beat-data-dir-")
 	require.NoError(t, err)
 	t.Cleanup(func() { os.RemoveAll(tempDir) })
 
-	store, err := newStore(logp.NewLogger("test"), tempDir, "store-cache")
+	log := logp.NewTestingLogger(t, "")
+	store, err := newStore(log, tempDir, "store-cache")
 	require.NoError(t, err)
 
 	err = store.Set(key, value, 0)

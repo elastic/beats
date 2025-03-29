@@ -59,7 +59,7 @@ func makeFileout(
 	}
 
 	fo := &fileOutput{
-		log:      logp.NewLogger("file"),
+		log:      beat.Logger.Named("file"),
 		beat:     beat,
 		observer: observer,
 	}
@@ -91,7 +91,7 @@ func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {
 		file.MaxBackups(c.NumberOfFiles),
 		file.Permissions(os.FileMode(c.Permissions)),
 		file.RotateOnStartup(c.RotateOnStartup),
-		file.WithLogger(logp.NewLogger("rotator").With(logp.Namespace("rotator"))),
+		file.WithLogger(beat.Logger.Named("rotator").With(logp.Namespace("rotator"))),
 	)
 	if err != nil {
 		return err

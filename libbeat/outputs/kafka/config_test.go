@@ -71,6 +71,7 @@ func TestConfigAcceptValid(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
+			logger := logp.NewTestingLogger(t, "")
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
@@ -78,7 +79,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Can not create test configuration: %v", err)
 			}
-			if _, err := newSaramaConfig(logp.L(), cfg); err != nil {
+			if _, err := newSaramaConfig(logger, cfg); err != nil {
 				t.Fatalf("Failure creating sarama config: %v", err)
 			}
 		})

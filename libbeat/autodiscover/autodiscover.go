@@ -75,8 +75,9 @@ func NewAutodiscover(
 	configurer EventConfigurer,
 	c *Config,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (*Autodiscover, error) {
-	logger := logp.NewLogger("autodiscover")
+	logger = logger.Named("autodiscover")
 
 	// Init Event bus
 	bus := bus.New(logger, name)
@@ -98,7 +99,7 @@ func NewAutodiscover(
 		factory:         factory,
 		configurer:      configurer,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
-		runners:         cfgfile.NewRunnerList("autodiscover.cfgfile", factory, pipeline),
+		runners:         cfgfile.NewRunnerList("autodiscover.cfgfile", factory, pipeline, logger),
 		providers:       providers,
 		meta:            meta.NewMap(),
 		logger:          logger,

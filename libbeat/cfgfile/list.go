@@ -44,12 +44,12 @@ type RunnerList struct {
 }
 
 // NewRunnerList builds and returns a RunnerList
-func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector) *RunnerList {
+func NewRunnerList(name string, factory RunnerFactory, pipeline beat.PipelineConnector, logger *logp.Logger) *RunnerList {
 	return &RunnerList{
 		runners:  map[uint64]Runner{},
 		factory:  factory,
 		pipeline: pipeline,
-		logger:   logp.NewLogger(name),
+		logger:   logger.Named(name),
 	}
 }
 
@@ -94,8 +94,8 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 	for _, config := range configs {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
-			r.logger.Errorf("Unable to hash given config: %s", err)
-			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err))
+			r.logger.Errorf("unable to hash given config: %s", err)
+			errs = append(errs, fmt.Errorf("unable to hash given config: %w", err))
 			continue
 		}
 
