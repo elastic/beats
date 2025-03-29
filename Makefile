@@ -205,16 +205,6 @@ release: beats-dashboards
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
       mkdir -p build/distributions/$(subst $(XPACK_SUFFIX),'',$(var)) && mv -f $(var)/build/distributions/* build/distributions/$(subst $(XPACK_SUFFIX),'',$(var))/ || exit 1;)
 
-## release-manager-snapshot : Builds a snapshot release. The Go version defined in .go-version will be installed and used for the build.
-.PHONY: release-manager-snapshot
-release-manager-snapshot:
-	@$(MAKE) SNAPSHOT=true release-manager-release
-
-## release-manager-release : Builds a snapshot release. The Go version defined in .go-version will be installed and used for the build.
-.PHONY: release-manager-release
-release-manager-release:
-	GO_VERSION=$(shell cat ./.go-version) ./dev-tools/run_with_go_ver $(MAKE) release
-
 ## beats-dashboards : Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards
 beats-dashboards: mage update
