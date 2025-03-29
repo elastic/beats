@@ -18,6 +18,7 @@
 package compose
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
@@ -50,11 +51,50 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 		return hostInfo
 	}
 
-	compose, err := getComposeProject(os.Getenv("DOCKER_COMPOSE_PROJECT_NAME"))
+	// id, err := uuid.NewV4()
+	// require.NoErrorf(t, err,
+	// 	"failed to generate uuid for docker compose project name")
+	// name := id.String()
+	//
+	// // force a random project name
+	// envVar := "DOCKER_COMPOSE_PROJECT_NAME"
+	// nameEnvVar := os.Getenv(envVar)
+	// if nameEnvVar != "" {
+	// 	t.Logf("%q=%s defined, but will be ignored. Using %s as docker compose project name",
+	// 		envVar, nameEnvVar, name)
+	// }
+	//
+	// t.Logf("%q not defined, using a '%s' as docker compose project name",
+	// 	envVar,
+	// 	name)
+
+	envVar := "DOCKER_COMPOSE_PROJECT_NAME"
+	name := os.Getenv(envVar)
+	t.Logf("using %q as docker compose project name", name)
+
+	compose, err := getComposeProject(name)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer compose.Close()
+	// Locks the docker compose file so no other test can use the same file.
+	// This will prevent tests sharing the same containers and allow for proper
+	// clean up without interfering with other tests.
+	// Ideally every test would use its own project name for isolation, and they
+	// would not bind to the host ports, avoiding port conflict.
+	compose.Lock()
+
+	t.Cleanup(func() {
+		err = compose.Down(context.TODO())
+		if err != nil {
+			t.Logf("[ERROR] compose down failed: %v", err)
+		}
+
+		compose.Unlock()
+		err = compose.Close()
+		if err != nil {
+			t.Logf("[ERROR] closing compose client failed: %v", err)
+		}
+	})
 
 	// Kill no longer used containers
 	err = compose.KillOld([]string{service})
