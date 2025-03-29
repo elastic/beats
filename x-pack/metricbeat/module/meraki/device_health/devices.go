@@ -5,6 +5,7 @@
 package device_health
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -29,9 +30,8 @@ type Device struct {
 	status           *meraki.ResponseItemOrganizationsGetOrganizationDevicesStatuses
 	haStatus         *meraki.ResponseItemApplianceGetOrganizationApplianceUplinkStatusesHighAvailability
 	performanceScore *meraki.ResponseApplianceGetDeviceAppliancePerformance
-	wifi0            *meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0
-	wifi1            *meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi1
 	license          *meraki.ResponseItemOrganizationsGetOrganizationLicenses
+	bandUtilization  map[string]*meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand
 
 	uplinks     []*uplink
 	switchports []*switchport
@@ -114,68 +114,58 @@ func (w *NetworkHealthServiceWrapper) GetNetworkNetworkHealthChannelUtilization(
 	return w.service.GetNetworkNetworkHealthChannelUtilization(networkID, getNetworkNetworkHealthChannelUtilizationQueryParams)
 }
 
-func getDeviceChannelUtilization(client NetworkHealthService, devices map[Serial]*Device, period time.Duration) error {
-	// There are two ways to get this information from the API.
-	// An alternative to this would be to use `/organizations/{organizationId}/wireless/devices/channelUtilization/byDevice`,
-	// avoids the need to extract the filtered network IDs below.
-	// However, the SDK's implementation of that operation doesn't have proper type handling, so we perfer this one.
-	// (The naming is also a bit different in the returned data, e.g. wifi0/wifi1 vs band 2.4/5; 80211/non80211 vs wifi/nonwifi)
+type DeviceService interface {
+	GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error)
+}
 
-	networkIDs := make(map[string]bool)
-	for _, device := range devices {
-		if device == nil || device.details == nil {
-			continue
-		}
+type DeviceServiceWrapper struct {
+	service *meraki.DevicesService
+}
 
-		if device.details.ProductType != "wireless" {
-			continue
-		}
+func (w *DeviceServiceWrapper) GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID string, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams *meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams) (*resty.Response, error) {
+	return w.service.GetOrganizationWirelessDevicesChannelUtilizationByDevice(organizationID, getOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams)
+}
 
-		if _, ok := networkIDs[device.details.NetworkID]; !ok {
-			networkIDs[device.details.NetworkID] = true
-		}
-	}
+func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Device, period time.Duration, organizations []string) error {
+	// Updated API endpoint for getting Channel Utilization data.
+	// Previously, we used `GetNetworkNetworkHealthChannelUtilization`, but the Meraki SDK
+	// did not properly parse its response, leading to loss of channel utilization data.
+	// We are now using `GetOrganizationWirelessDevicesChannelUtilizationByDevice`.
+	// However, the response format differs slightly:
+	// - Bands are now labeled as 2.4/5 (GHz) instead of wifi0/wifi1.
+	// - Utilization categories are now named `wifi/nonWifi` instead of `80211/non80211`.
 
-	for networkID := range networkIDs {
-		val, res, err := client.GetNetworkNetworkHealthChannelUtilization(
-			networkID,
-			&meraki.GetNetworkNetworkHealthChannelUtilizationQueryParams{
-				Timespan: period.Seconds(),
-			},
-		)
-
+	for _, orgID := range organizations {
+		res, err := client.GetOrganizationWirelessDevicesChannelUtilizationByDevice(orgID, &meraki.GetOrganizationWirelessDevicesChannelUtilizationByDeviceQueryParams{
+			// The API requires the interval to be at least 300s, and the timespan can't be less than the interval.
+			// Since our max collection period is also 300s, we set both values to 300s.
+			Timespan: 300,
+			Interval: 300,
+		})
 		if err != nil {
-			if strings.Contains(string(res.Body()), "MR 27.0") {
-				// "This endpoint is only available for networks on MR 27.0 or above."
-				continue
-			}
-
-			return fmt.Errorf("GetNetworkNetworkHealthChannelUtilization failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed; [%d] %s. %w", orgID, res.StatusCode(), res.Body(), err)
 		}
 
-		for _, utilization := range *val {
-			if device, ok := devices[Serial(utilization.Serial)]; ok {
-				if utilization.Wifi0 != nil && len(*utilization.Wifi0) != 0 {
-					// only take the first bucket - collection intervals which result in multiple buckets are not supported
-					if device.wifi0 == nil {
-						device.wifi0 = &meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{}
+		var result meraki.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice
+		if err := json.Unmarshal(res.Body(), &result); err != nil {
+			return fmt.Errorf("failed to unmarshal response body for organization %s: %w", orgID, err)
+		}
+
+		for _, d := range result {
+			for _, band := range *d.ByBand {
+				if device, ok := devices[Serial(d.Serial)]; ok {
+					if device.bandUtilization == nil {
+						device.bandUtilization = make(map[string]*meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand)
 					}
-					device.wifi0.Utilization80211 = (*utilization.Wifi0)[0].Utilization80211
-					device.wifi0.UtilizationNon80211 = (*utilization.Wifi0)[0].UtilizationNon80211
-					device.wifi0.UtilizationTotal = (*utilization.Wifi0)[0].UtilizationTotal
-				}
-				if utilization.Wifi1 != nil && len(*utilization.Wifi1) != 0 {
-					if device.wifi1 == nil {
-						device.wifi1 = &meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi1{}
+					device.bandUtilization[band.Band] = &meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand{
+						Wifi:    band.Wifi,
+						NonWifi: band.NonWifi,
+						Total:   band.Total,
 					}
-					device.wifi1.Utilization80211 = (*utilization.Wifi1)[0].Utilization80211
-					device.wifi1.UtilizationNon80211 = (*utilization.Wifi1)[0].UtilizationNon80211
-					device.wifi1.UtilizationTotal = (*utilization.Wifi1)[0].UtilizationTotal
 				}
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -248,16 +238,14 @@ func reportDeviceMetrics(reporter mb.ReporterV2, organizationID string, devices 
 			metric["device.performance_score"] = device.performanceScore.PerfScore
 		}
 
-		if device.wifi0 != nil {
-			metric["device.channel_utilization.wifi0.utilization_80211"] = device.wifi0.Utilization80211
-			metric["device.channel_utilization.wifi0.utilization_non_80211"] = device.wifi0.UtilizationNon80211
-			metric["device.channel_utilization.wifi0.utilization_total"] = device.wifi0.UtilizationTotal
-		}
-
-		if device.wifi1 != nil {
-			metric["device.channel_utilization.wifi1.utilization_80211"] = device.wifi1.Utilization80211
-			metric["device.channel_utilization.wifi1.utilization_non_80211"] = device.wifi1.UtilizationNon80211
-			metric["device.channel_utilization.wifi1.utilization_total"] = device.wifi1.UtilizationTotal
+		if device.bandUtilization != nil {
+			for band, v := range device.bandUtilization {
+				// Avoid nested object mappings
+				metricBand := strings.ReplaceAll(band, ".", "_")
+				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_80211", metricBand)] = v.Wifi.Percentage
+				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_non_80211", metricBand)] = v.NonWifi.Percentage
+				metric[fmt.Sprintf("device.channel_utilization.%s.utilization_total", metricBand)] = v.Total.Percentage
+			}
 		}
 
 		if device.license != nil {
