@@ -119,7 +119,7 @@ func TestNewLeaderElectionManager(t *testing.T) {
 	stopLeadingFunc := func(uuid string, eventID string) {
 		waitForLosingLeader <- eventID
 	}
-	logger := logp.NewLogger("kubernetes-test")
+	logger := logp.NewLogger("kubernetes-test2")
 
 	cfg := Config{
 		LeaderLease:   leaseName,
