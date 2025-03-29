@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -281,9 +282,9 @@ var serverPoolTests = []struct {
 			},
 		}},
 		events: []target{
-			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"a":1}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
-			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"b":2}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
-			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"c":3}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": {"10"}}},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"a":1}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": []string{"10"}}},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"b":2}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": []string{"10"}}},
+			{url: "http://127.0.0.1:9001/?wait_for_completion_timeout=1s", event: `{"c":3}`, wantBody: `{"warn":"max in flight message memory exceeded","max_in_flight":2,"in_flight":7}`, wantHeader: http.Header{"Retry-After": []string{"10"}}},
 		},
 		wantStatus: http.StatusServiceUnavailable,
 		want:       nil,
@@ -430,6 +431,18 @@ func TestServerPool(t *testing.T) {
 			wg.Wait()
 		})
 	}
+}
+
+func TestNewHTTPEndpoint(t *testing.T) {
+	cfg := config{
+		ListenAddress: "0:0:0:0:0:0:0:1",
+		ListenPort:    "9200",
+		ResponseBody:  "{}",
+		Method:        http.MethodPost,
+	}
+	h, err := newHTTPEndpoint(cfg)
+	require.NoError(t, err)
+	require.Equal(t, "[0:0:0:0:0:0:0:1]:9200", h.addr)
 }
 
 func doRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {
