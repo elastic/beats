@@ -50,7 +50,7 @@ func TestPublish(t *testing.T) {
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
 
-		assert.NoError(t, logp.TestingSetup(logp.WithSelectors("otelconsumer")))
+		logger := logp.NewTestingLogger(t, "otelconsumer")
 
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
@@ -58,7 +58,7 @@ func TestPublish(t *testing.T) {
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
 			beatInfo:     beat.Info{},
-			log:          logp.NewLogger("otelconsumer"),
+			log:          logger,
 		}
 		return consumer
 	}
@@ -183,6 +183,7 @@ func TestPublish(t *testing.T) {
 	})
 
 	t.Run("sets the @timestamp field with the correct format", func(t *testing.T) {
+		testStartedAt := time.Now().UTC()
 		batch := outest.NewBatch(event3)
 		batch.Events()[0].Content.Timestamp = time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
 
@@ -194,6 +195,10 @@ func TestPublish(t *testing.T) {
 			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
 			assert.True(t, ok, "timestamp field not found")
 			bodyTimestamp = field.AsString()
+			observedTime := record.ObservedTimestamp().AsTime()
+			assert.Conditionf(t, func() bool {
+				return observedTime.After(testStartedAt) && observedTime.Before(time.Now().UTC())
+			}, "observed timestamp should be between %s and %s", testStartedAt, time.Now().UTC())
 			return nil
 		})
 
