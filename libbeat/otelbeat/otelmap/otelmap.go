@@ -20,6 +20,7 @@ package otelmap
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -219,4 +220,29 @@ func convertValue(v []any, dest pcommon.Slice) {
 		}
 
 	}
+}
+
+func GetRaw(m mapstr.M) map[string]any {
+	ma := make(map[string]any, len(m))
+	for k, v := range m {
+		switch x := v.(type) {
+		case mapstr.M:
+			ma[k] = GetRaw(x)
+		case time.Time:
+			ma[k] = x.UTC().Format("2006-01-02T15:04:05.000Z")
+		default:
+			val := reflect.ValueOf(v)
+			switch val.Kind() {
+			case reflect.Slice, reflect.Array:
+				slice := make([]any, 0, val.Len())
+				for i := 0; i < val.Len(); i++ {
+					slice = append(slice, val.Index(i).Interface())
+				}
+				ma[k] = slice
+			default:
+				ma[k] = v
+			}
+		}
+	}
+	return ma
 }
