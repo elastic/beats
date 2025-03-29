@@ -35,21 +35,40 @@ const (
 	applicationJSON = "application/json; charset=utf-8"
 )
 
+type StructSnapshotCollector interface {
+	CollectStructSnapshot() map[string]map[string]any
+}
+
 type handler struct {
-	registry *monitoring.Registry
+	registry     *monitoring.Registry
+	inputMetrics StructSnapshotCollector
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
-// requests to /inputs.
-func AttachHandler(r *mux.Router) error {
-	return attachHandler(r, globalRegistry())
+// requests to /inputs. It will publish the metrics returned by the
+// StructSnapshotCollector as well as the ones registered in the global
+// 'dataset' metrics namespace. It's safe to pass a nil StructSnapshotCollector.
+func AttachHandler(
+	r *mux.Router,
+	snapCollector StructSnapshotCollector,
+) error {
+	return attachHandler(r, globalRegistry(), snapCollector)
 }
 
-func attachHandler(r *mux.Router, registry *monitoring.Registry) error {
-	h := &handler{registry: registry}
+func attachHandler(r *mux.Router, registry *monitoring.Registry, metrics StructSnapshotCollector) error {
+	snapCollector := metrics
+	if snapCollector == nil {
+		snapCollector = &noopStructSnapshotCollector{}
+	}
+
+	h := &handler{registry: registry, inputMetrics: snapCollector}
 	r = r.PathPrefix(route).Subrouter()
 	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
 }
+
+type noopStructSnapshotCollector struct{}
+
+func (n *noopStructSnapshotCollector) CollectStructSnapshot() map[string]map[string]any { return nil }
 
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 	requestedPretty, err := getPretty(req)
@@ -64,16 +83,39 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	filtered := filteredSnapshot(h.registry, requestedType)
+	filtered := filteredSnapshot(h.registry, h.inputMetrics, requestedType)
 
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
 
-func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
-	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
+func filteredSnapshot(
+	r *monitoring.Registry,
+	inputMetrics StructSnapshotCollector,
+	requestedType string) []map[string]any {
 
-	filtered := make([]map[string]any, 0, len(metrics))
+	// 1st collect all input metrics explicitly registered by RegisterMetrics.
+	registeredInputRegistries := inputMetrics.CollectStructSnapshot()
+	filtered := make([]map[string]any, 0, len(registeredInputRegistries))
+	inputs := map[string]struct{}{}
+
+	for _, reg := range registeredInputRegistries {
+		if !requestedInput(reg["input"], requestedType) {
+			continue
+		}
+
+		// it should always succeed, but better safe than sorry.
+		id, ok := reg["id"].(string)
+		if !ok {
+			continue
+		}
+
+		inputs[id] = struct{}{}
+		filtered = append(filtered, reg)
+	}
+
+	// 2nd collect the metrics from globalRegistry()
+	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
 		if !ok {
@@ -81,17 +123,35 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		if id, ok := m["id"].(string); !ok || id == "" {
+		id, ok := m["id"].(string)
+		if !ok || id == "" {
 			continue
 		}
 
-		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+		// if a registry with this id has been already registered, skip it.
+		if _, found := inputs[id]; found {
+			continue
+		}
+
+		if !requestedInput(m["input"], requestedType) {
 			continue
 		}
 
 		filtered = append(filtered, m)
 	}
+
 	return filtered
+}
+
+func requestedInput(input any, requestedType string) bool {
+	inputType, ok := input.(string)
+	if !ok ||
+		(requestedType != "" &&
+			!strings.EqualFold(inputType, requestedType)) {
+		return false
+	}
+
+	return true
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {

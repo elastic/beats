@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -133,17 +134,32 @@ func (r *runner) Start() {
 	go func() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
-		err := r.input.Run(
-			v2.Context{
-				ID:             r.id,
-				IDWithoutName:  r.id,
-				Agent:          *r.agent,
-				Logger:         log,
-				Cancelation:    r.sig,
-				StatusReporter: r.statusReporter,
-			},
-			r.connector,
-		)
+
+		reg, unreg := v2.NewMetricsRegistry(
+			r.id, r.input.Name(), r.agent, log)
+
+		ctx := v2.NewContext(
+			r.id,
+			r.id,
+			r.input.Name(),
+			*r.agent,
+			r.sig,
+			r.statusReporter,
+			reg,
+			unreg,
+			log)
+		// Unregister the metrics when the input finishes running.
+		defer ctx.UnregisterMetrics()
+
+		pc := pipetool.WithClientConfigEdit(r.connector,
+			func(orig beat.ClientConfig) (beat.ClientConfig, error) {
+				orig.ClientListener =
+					v2.NewPipelineClientListener(
+						ctx.MetricRegistry(), orig.ClientListener)
+				return orig, nil
+			})
+
+		err := r.input.Run(ctx, pc)
 		if err != nil && !errors.Is(err, context.Canceled) {
 			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {
@@ -159,6 +175,10 @@ func (r *runner) Stop() {
 	r.statusReporter = nil
 }
 
+// configID extracts or generates an ID for a configuration.
+// If the "id" is present in config and is non-empty, it is returned.
+// If the "id" is absent or empty, the function calculates a hash of the
+// entire configuration and returns it as a hexadecimal string as the ID.
 func configID(config *conf.C) (string, error) {
 	tmp := struct {
 		ID string `config:"id"`

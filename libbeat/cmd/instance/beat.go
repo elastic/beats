@@ -252,6 +252,9 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
 			EphemeralID:     metricreport.EphemeralID(),
+			Monitoring: beat.Monitoring{
+				InputHTTPMetrics: beat.NewInputHTTPMetrics(),
+			},
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),
@@ -313,7 +316,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 
 	b.Beat.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
 
-	b.SetupRegistry()
+	b.Info.Monitoring.SetupRegistries()
 
 	b.keystore = store
 	b.Beat.Keystore = store
@@ -466,16 +469,15 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		}
 	}
 
-	uniq_reg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
-
+	uniqReg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
 	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
 		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
 	}
 
-	tel := uniq_reg.GetRegistry("state")
+	tel := uniqReg.GetRegistry("state")
 	if tel == nil {
-		tel = uniq_reg.NewRegistry("state")
+		tel = uniqReg.NewRegistry("state")
 	}
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
@@ -959,41 +961,6 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 	}())
 }
 
-func (b *Beat) SetupRegistry() {
-	var infoRegistry *monitoring.Registry
-	if b.Info.Monitoring.Namespace != nil {
-		infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("info")
-		if infoRegistry == nil {
-			infoRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("info")
-		}
-	} else {
-		infoRegistry = monitoring.GetNamespace("info").GetRegistry()
-	}
-	b.Info.Monitoring.InfoRegistry = infoRegistry
-
-	var stateRegistry *monitoring.Registry
-	if b.Info.Monitoring.Namespace != nil {
-		stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("state")
-		if stateRegistry == nil {
-			stateRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("state")
-		}
-	} else {
-		stateRegistry = monitoring.GetNamespace("state").GetRegistry()
-	}
-	b.Info.Monitoring.StateRegistry = stateRegistry
-
-	var statsRegistry *monitoring.Registry
-	if b.Info.Monitoring.Namespace != nil {
-		statsRegistry = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("stats")
-		if statsRegistry == nil {
-			statsRegistry = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("stats")
-		}
-	} else {
-		statsRegistry = monitoring.GetNamespace("stats").GetRegistry()
-	}
-	b.Info.Monitoring.StatsRegistry = statsRegistry
-}
-
 // handleFlags converts -flag to --flags, parses the command line
 // flags, and it invokes the HandleFlags callback if implemented by
 // the Beat.
@@ -1015,7 +982,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
 
-	b.SetupRegistry()
+	b.Info.Monitoring.SetupRegistries()
 
 	if err := initPaths(cfg); err != nil {
 		return err

@@ -27,15 +27,19 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// NewInputRegistry returns a new monitoring.Registry for metrics related to
-// an input instance. The returned registry will be initialized with a static
-// string values for the input and id. When the input stops it should invoke
-// the returned cancel function to unregister the metrics. For testing purposes
-// an optional monitoring.Registry may be provided as an alternative to using
-// the global 'dataset' monitoring namespace. The inputType and id must be
-// non-empty for the metrics to be published to the global 'dataset' monitoring
-// namespace.
-func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
+// NewInputRegistry returns the *monitoring.Registry for metrics related to
+// an input instance, identified by ID. If a registry with the given ID
+// already exists, it is returned. Otherwise, a new registry is created.
+// If a parent registry is provided, it will be used instead of the default
+// 'dataset' monitoring namespace.
+// If parent is nil, inputType and id must be non-empty. Otherwise, the metrics
+// will not be published.
+//
+// The returned cancel function *must* be called when the input stops to
+// unregister the metrics and prevent resource leaks.
+//
+// Deprecated. Use beat.Info.Monitoring.InputHTTPMetrics.RegisterMetrics instead.
+func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
 	if parentRegistry == nil {
@@ -44,31 +48,42 @@ func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry)
 
 	// If an ID has not been assigned to an input then metrics cannot be exposed
 	// in the global metric registry. The returned registry still behaves the same.
-	if (id == "" || inputType == "") && parentRegistry == globalRegistry() {
+	if (inputID == "" || inputType == "") && parentRegistry == globalRegistry() {
 		// Null route metrics without ID or input type.
 		parentRegistry = monitoring.NewRegistry()
 	}
 
 	// Sanitize dots from the id because they created nested objects within
 	// the monitoring registry, and we want a consistent flat level of nesting
-	key := sanitizeID(id)
+	registryName := sanitizeID(inputID)
+
+	reg = parentRegistry.GetRegistry(registryName)
+	if reg == nil {
+		reg = parentRegistry.NewRegistry(registryName)
+	}
+
+	monitoring.NewString(reg, "input").Set(inputType)
+	monitoring.NewString(reg, "id").Set(inputID)
 
 	// Log the registration to ease tracking down duplicate ID registrations.
 	// Logged at INFO rather than DEBUG since it is not in a hot path and having
 	// the information available by default can short-circuit requests for debug
 	// logs during support interactions.
 	log := logp.NewLogger("metric_registry")
-	// Make an orthogonal ID to allow tracking register/deregister pairs.
-	uuid := uuid.Must(uuid.NewV4()).String()
-	log.Infow("registering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
 
-	reg = parentRegistry.NewRegistry(key)
-	monitoring.NewString(reg, "input").Set(inputType)
-	monitoring.NewString(reg, "id").Set(id)
+	// Make an orthogonal ID to allow tracking register/deregister pairs.
+	var uid string
+	if rawID, err := uuid.NewV4(); err != nil {
+		log.Errorf("failed to register metrics for '%s', id: %s,: %v",
+			inputType, inputID, err)
+	} else {
+		uid = rawID.String()
+	}
+	log.Infow("registering", "input_type", inputType, "id", inputID, "key", registryName, "uuid", uid)
 
 	return reg, func() {
-		log.Infow("unregistering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
-		parentRegistry.Remove(key)
+		log.Infow("unregistering", "input_type", inputType, "id", inputID, "key", registryName, "uuid", uid)
+		parentRegistry.Remove(registryName)
 	}
 }
 
@@ -81,7 +96,14 @@ func globalRegistry() *monitoring.Registry {
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' monitoring namespace encoded as a JSON array (pretty formatted).
-func MetricSnapshotJSON() ([]byte, error) {
-	return json.MarshalIndent(filteredSnapshot(globalRegistry(), ""), "", "  ")
+// global 'dataset' monitoring namespace and from the inputMetrics parameter
+// encoded as a JSON array (pretty formatted). It's safe to pass in a nil
+// inputMetrics.
+func MetricSnapshotJSON(inputMetrics StructSnapshotCollector) ([]byte, error) {
+	snapCollector := inputMetrics
+	if snapCollector == nil {
+		snapCollector = &noopStructSnapshotCollector{}
+	}
+
+	return json.MarshalIndent(filteredSnapshot(globalRegistry(), snapCollector, ""), "", "  ")
 }

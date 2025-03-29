@@ -24,6 +24,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -109,18 +110,50 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	// The metrics from the parent v2.Context needs to be canceled otherwise
+	// there will be a set of metrics being published for this context by the
+	// HTTP monitoring endpoint. There would be an "empty registry", only with
+	// 'id' and 'input' and also the registries for the 'child' contexts being
+	// published. E.g.:
+	//  - registry from parent context:
+	//    - {"id": "my-cel-id", "input": "cel"}
+	//  - registry from child context:
+	//    - {"id": "my-cel-id::source-name", "input": "cel", [ ... ] }
+	ctx.UnregisterMetrics()
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
 		grp.Go(func() (err error) {
 			// refine per worker context
-			inpCtx := ctx
-			// Preserve IDWithoutName, in case the context was constructed who knows how
-			inpCtx.IDWithoutName = ctx.ID
-			inpCtx.ID = ctx.ID + "::" + source.Name()
-			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
+			inpCtxID := ctx.ID + "::" + source.Name()
+			log := ctx.Logger.With("input_source", source.Name())
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
+			reg, unreg := input.NewMetricsRegistry(
+				inpCtxID, ctx.Name, &ctx.Agent, log)
+
+			inpCtx := input.NewContext(
+				inpCtxID,
+				ctx.ID, // Preserve IDWithoutName, in case the context was constructed who knows how
+				ctx.Name,
+				ctx.Agent,
+				ctx.Cancelation,
+				ctx.StatusReporter,
+				reg,
+				unreg,
+				log)
+			// Unregister the metrics when input finishes running
+			defer inpCtx.UnregisterMetrics()
+
+			pc := pipetool.WithClientConfigEdit(pipeline,
+				func(orig beat.ClientConfig) (beat.ClientConfig, error) {
+					orig.ClientListener =
+						input.NewPipelineClientListener(
+							inpCtx.MetricRegistry(), orig.ClientListener)
+					return orig, nil
+				})
+
+			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
 				cancel()
 			}
 			return err
