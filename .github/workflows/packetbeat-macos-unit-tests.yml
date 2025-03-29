@@ -1,31 +1,30 @@
-name: heartbeat-macos-unit-tests
+name: packetbeat-macos-unit-tests
 
 env:
-  BEAT: "heartbeat"
+  BEAT: "packetbeat"
 
 on:
   pull_request:
     paths:
-      - heartbeat/
+      - packetbeat/
       # OSS
       - go.mod
       - dev-tools/
-      - libbeat/**
+      - libbeat/
       # Workflow
-      - .github/workflows/heartbeat-macos-unit-tests.yml
+      - .github/workflows/packetbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
-
   push:
     branches:
       - main
     paths:
-      - heartbeat/
+      - packetbeat/
       # OSS
       - go.mod
       - dev-tools/
-      - libbeat/**
+      - libbeat/
       # Workflow
-      - .github/workflows/heartbeat-macos-unit-tests.yml
+      - .github/workflows/packetbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
 
 permissions:

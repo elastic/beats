@@ -89,9 +89,9 @@ Also see [Global flags](#global-flags).
 
 **EXAMPLES**
 
-```sh
+```sh subs=true
 auditbeat export config
-auditbeat export template --es.version 9.0.0-beta1
+auditbeat export template --es.version {{stack-version}}
 auditbeat export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 ```
 

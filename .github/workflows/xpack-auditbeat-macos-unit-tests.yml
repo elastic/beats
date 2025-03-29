@@ -1,31 +1,34 @@
-name: heartbeat-macos-unit-tests
+name: xpack-auditbeat-macos-unit-tests
 
 env:
-  BEAT: "heartbeat"
+  BEAT: "x-pack/auditbeat"
 
 on:
   pull_request:
     paths:
-      - heartbeat/
+      - auditbeat/
+      - x-pack/auditbeat/
       # OSS
       - go.mod
       - dev-tools/
-      - libbeat/**
+      - libbeat/
+      - x-pack/libbeat/
       # Workflow
-      - .github/workflows/heartbeat-macos-unit-tests.yml
+      - .github/workflows/auditbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
-
   push:
     branches:
       - main
     paths:
-      - heartbeat/
+      - auditbeat/
+      - x-pack/auditbeat/
       # OSS
       - go.mod
       - dev-tools/
-      - libbeat/**
+      - libbeat/
+      - x-pack/libbeat/
       # Workflow
-      - .github/workflows/heartbeat-macos-unit-tests.yml
+      - .github/workflows/auditbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
 
 permissions:
