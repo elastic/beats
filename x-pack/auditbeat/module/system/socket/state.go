@@ -17,7 +17,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -987,7 +986,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		(root["network"].(mapstr.M))["community_id"] = communityid
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	rootPut := func(key string, value interface{}) {
 		if _, err := root.Put(key, value); err != nil {
 			errs = append(errs, err)
@@ -1055,7 +1054,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	return mb.Event{
 		RootFields:      root,
 		MetricSetFields: metricset,
-	}, errs.Err()
+	}, errors.Join(errs...)
 }
 
 func (s *state) SyncClocks(kernelNanos, userNanos uint64) error {
