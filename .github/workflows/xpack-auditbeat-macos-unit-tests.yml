@@ -10,11 +10,12 @@ on:
       - x-pack/auditbeat/
       # OSS
       - go.mod
+      - pytest.ini
       - dev-tools/
       - libbeat/
       - x-pack/libbeat/
       # Workflow
-      - .github/workflows/auditbeat-macos-unit-tests.yml
+      - .github/workflows/xpack-auditbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
   push:
     branches:
@@ -24,6 +25,7 @@ on:
       - x-pack/auditbeat/
       # OSS
       - go.mod
+      - pytest.ini
       - dev-tools/
       - libbeat/
       - x-pack/libbeat/
