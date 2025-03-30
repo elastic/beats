@@ -5,6 +5,7 @@ cross_links:
   - elasticsearch
   - integration-docs
   - logstash
+  - logstash-docs-md
 toc:
   - toc: reference
   - toc: release-notes
@@ -489,3 +490,5 @@ subs:
   icon-bug:   "pass:[<span class=\"eui-icon icon-bug\"></span>]"
   icon-checkInCircleFilled:   "pass:[<span class=\"eui-icon icon-checkInCircleFilled\"></span>]"
   icon-warningFilled:   "pass:[<span class=\"eui-icon icon-warningFilled\"></span>]"
+  stack-version: "9.0.0"
+  major-version: "9.0"
