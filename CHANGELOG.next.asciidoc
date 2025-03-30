@@ -207,6 +207,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 
 *Heartbeat*
 
@@ -374,6 +375,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 
 *Auditbeat*
 
@@ -434,6 +436,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
 - Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
+- Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 
 *Metricbeat*
@@ -445,7 +449,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
-
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
