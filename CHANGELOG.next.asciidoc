@@ -39,12 +39,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
-- Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
-- Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
-- Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
-- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
-- Remove kibana.settings metricset since the API was removed in 8.0 {issue}30592[30592] {pull}42937[42937]
-- Removed support for the Enterprise Search module {pull}42915[42915]
 - Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
 
 *Osquerybeat*
