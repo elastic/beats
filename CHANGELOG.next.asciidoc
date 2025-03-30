@@ -345,6 +345,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 
 *Auditbeat*
 
@@ -414,7 +415,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
-
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
