@@ -66,8 +66,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
-- Remove kibana.settings metricset since the API was removed in 8.0 {issue}30592[30592] {pull}42937[42937]
-- Removed support for the Enterprise Search module {pull}42915[42915]
 - Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
 
 *Osquerybeat*
