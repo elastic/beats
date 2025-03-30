@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.23.6
+go 1.23.7
 
 require (
 	cloud.google.com/go/bigquery v1.62.0
@@ -187,11 +187,7 @@ require (
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
 	github.com/elastic/elastic-agent-libs v0.18.9
-<<<<<<< HEAD
-	github.com/elastic/elastic-agent-system-metrics v0.11.7
-=======
 	github.com/elastic/elastic-agent-system-metrics v0.11.10
->>>>>>> 754ad9859 (bump elastic-agent-system-metrics (#43409))
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/elastic/go-quark v0.2.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
