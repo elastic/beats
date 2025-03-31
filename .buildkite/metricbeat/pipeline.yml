@@ -108,7 +108,7 @@ steps:
               context: "metricbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: Metricbeat: Ubuntu x86_64 Unit Tests FIPS"
-        key: "mandatory-linux-unit-test"
+        key: "mandatory-linux-unit-test-fips"
         command: |
           cd metricbeat
           mage unitTest
