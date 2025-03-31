@@ -21,6 +21,10 @@
 package process
 
 import (
+<<<<<<< HEAD
+=======
+	"os"
+>>>>>>> b7eb6d4a4 (fix metricbeat/module/system/process TestFetchDegradeOnPartial (#43602))
 	"runtime"
 	"testing"
 	"time"
@@ -40,6 +44,7 @@ func TestFetch(t *testing.T) {
 		t.FailNow()
 	}
 
+<<<<<<< HEAD
 	// We have root cgroups disabled
 	// This will pick a "populated" event to print
 	if runtime.GOOS == "linux" {
@@ -58,6 +63,42 @@ func TestFetch(t *testing.T) {
 	} else {
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 			events[0].BeatEvent("system", "process").Fields.StringToPrint())
+=======
+	time.Sleep(2 * time.Second)
+
+	events, errs = mbtest.ReportingFetchV2Error(f)
+	for _, err := range errs {
+		assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
+	}
+	assert.NotEmpty(t, events)
+
+	t.Logf("fetched %d events, showing events[0]:", len(events))
+	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+		events[0].BeatEvent("system", "process").Fields.StringToPrint())
+}
+
+func TestFetchDegradeOnPartial(t *testing.T) {
+	if runtime.GOOS == "windows" && os.Getenv("CI") == "true" {
+		t.Skip("Skip: CI run on windows. It is run as admin, but the test requires to run as non-admin")
+	}
+	if runtime.GOOS != "windows" && os.Getuid() == 0 {
+		t.Skip("Skip: running as root on non-windows, but the test requires to run as non-root")
+	}
+
+	logp.DevelopmentSetup()
+	config := getConfig()
+	config["degrade_on_partial"] = true
+
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+
+	var errs []error
+	_, errs = mbtest.ReportingFetchV2Error(f)
+	assert.NotEmpty(t, errs, "expected at least one error, got none")
+
+	for _, err := range errs {
+		assert.NotErrorIsf(t, err, &mb.PartialMetricsError{},
+			"Expected non-fatal error, got %v", err)
+>>>>>>> b7eb6d4a4 (fix metricbeat/module/system/process TestFetchDegradeOnPartial (#43602))
 	}
 
 }
