@@ -64,7 +64,7 @@ If you're completely certain that your environment does not have log rotation, d
 This file identity implementation is using:
 
 * For Unix-like systems: the `device` number and [`inode`](https://www.man7.org/linux/man-pages/man7/inode.7.html) from the [`stat`](https://www.man7.org/linux/man-pages/man2/stat.2.html) call. Can be viewed by using the `stat` command on any file.
-* For Windodws: `dwVolumeSerialNumber`, `nFileIndexLow` and `nFileIndexHigh` values from the [file handler](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/ns-fileapi-by_handle_file_information).
+* For Windows: `dwVolumeSerialNumber`, `nFileIndexLow` and `nFileIndexHigh` values from the [file handler](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/ns-fileapi-by_handle_file_information).
 
 It combines these values together into a unique file identifier.
 
