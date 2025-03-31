@@ -357,6 +357,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
+- Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
 
 *Metricbeat*
 
