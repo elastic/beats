@@ -106,6 +106,33 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: Build Tests (Module)"
 
+      - label: ":ubuntu: x-pack/auditbeat: Ubuntu Unit Tests FIPS"
+        key: "mandatory-linux-unit-test-fips"
+        command: |
+          cd x-pack/auditbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: Ubuntu Unit Tests FIPS"
+
       - label: ":rhel: x-pack/auditbeat: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
         command: |

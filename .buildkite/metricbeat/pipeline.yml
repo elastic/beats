@@ -107,6 +107,33 @@ steps:
           - github_commit_status:
               context: "metricbeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: Metricbeat: Ubuntu x86_64 Unit Tests FIPS"
+        key: "mandatory-linux-unit-test"
+        command: |
+          cd metricbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Ubuntu x86_64 Unit Tests FIPS"
+
       - label: ":ubuntu: Metricbeat: Go Integration Tests (Module)"
         key: "mandatory-int-test"
         command: |

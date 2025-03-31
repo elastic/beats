@@ -105,6 +105,33 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: x-pack/filebeat: Ubuntu x86_64 Unit Tests FIPS"
+        key: "x-pack-filebeat-mandatory-linux-unit-test-FIPS"
+        command: |
+          cd x-pack/filebeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests FIPS"
+
       - label: ":ubuntu: x-pack/filebeat: Go Integration Tests"
         key: "x-pack-filebeat-mandatory-int-test"
         command: |
