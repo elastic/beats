@@ -109,7 +109,7 @@ steps:
         key: "x-pack-filebeat-mandatory-linux-unit-test-FIPS"
         command: |
           cd x-pack/filebeat
-          mage unitTest
+          mage crossBuild unitTest
         retry:
           automatic:
             - limit: 1
@@ -119,6 +119,7 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
+          PLATFORMS: "linux/amd64"
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
