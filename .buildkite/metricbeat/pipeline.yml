@@ -111,7 +111,7 @@ steps:
         key: "mandatory-linux-unit-test"
         command: |
           cd metricbeat
-          mage build unitTest
+          mage unitTest
         retry:
           automatic:
             - limit: 1

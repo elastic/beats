@@ -107,7 +107,7 @@ steps:
         command: |
           set -euo pipefail
           cd auditbeat
-          mage build unitTest
+          mage unitTest
         retry:
           automatic:
             - limit: 1

@@ -104,7 +104,7 @@ steps:
       - label: ":ubuntu: Filebeat: Ubuntu x86_64 Unit Tests FIPS"
         command: |
           cd filebeat
-          mage build unitTest
+          mage unitTest
         retry:
           automatic:
             - limit: 1

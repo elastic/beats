@@ -109,7 +109,7 @@ steps:
         key: "x-pack-filebeat-mandatory-linux-unit-test-FIPS"
         command: |
           cd x-pack/filebeat
-          mage build unitTest
+          mage unitTest
         retry:
           automatic:
             - limit: 1

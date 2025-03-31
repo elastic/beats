@@ -110,7 +110,7 @@ steps:
         key: "mandatory-linux-unit-test-fips"
         command: |
           cd x-pack/metricbeat
-          mage build unitTest
+          mage unitTest
         retry:
           automatic:
             - limit: 1
