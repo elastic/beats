@@ -104,7 +104,7 @@ steps:
       - label: ":ubuntu: Filebeat: Ubuntu x86_64 Unit Tests FIPS"
         command: |
           cd filebeat
-          mage crossBuild unitTest
+          mage unitTest
         retry:
           automatic:
             - limit: 1
@@ -114,7 +114,6 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         env:
           FIPS: "true"
-          PLATFORMS: "linux/amd64"
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
