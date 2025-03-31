@@ -130,16 +130,22 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
 
+		info := beat.Info{Monitoring: beat.Monitoring{
+			Namespace:        monitoring.GetNamespace("dataset"),
+			InputHTTPMetrics: beat.NewInputHTTPMetrics()},
+		}
+		reg, unreg := v2.NewMetricsRegistry(
+			id, inp.Name(), &info, logp.L())
+
 		inputCtx := v2.NewContext(
 			id,
 			id,
 			inp.Name(),
-			beat.Info{Monitoring: beat.Monitoring{
-				InputHTTPMetrics: beat.NewInputHTTPMetrics()}},
+			info,
 			ctx,
 			nil,
-			monitoring.NewRegistry(),
-			func() {},
+			reg,
+			unreg,
 			logp.L())
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
