@@ -442,6 +442,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
+- Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 
 *Metricbeat*
 
