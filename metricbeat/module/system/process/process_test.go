@@ -21,6 +21,7 @@ package process
 
 import (
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
@@ -55,6 +56,33 @@ func TestFetch(t *testing.T) {
 		events[0].BeatEvent("system", "process").Fields.StringToPrint())
 }
 
+<<<<<<< HEAD
+=======
+func TestFetchDegradeOnPartial(t *testing.T) {
+	if runtime.GOOS == "windows" && os.Getenv("CI") == "true" {
+		t.Skip("Skip: CI run on windows. It is run as admin, but the test requires to run as non-admin")
+	}
+	if runtime.GOOS != "windows" && os.Getuid() == 0 {
+		t.Skip("Skip: running as root on non-windows, but the test requires to run as non-root")
+	}
+
+	logp.DevelopmentSetup()
+	config := getConfig()
+	config["degrade_on_partial"] = true
+
+	f := mbtest.NewReportingMetricSetV2Error(t, config)
+
+	var errs []error
+	_, errs = mbtest.ReportingFetchV2Error(f)
+	assert.NotEmpty(t, errs, "expected at least one error, got none")
+
+	for _, err := range errs {
+		assert.NotErrorIsf(t, err, &mb.PartialMetricsError{},
+			"Expected non-fatal error, got %v", err)
+	}
+}
+
+>>>>>>> b7eb6d4a4 (fix metricbeat/module/system/process TestFetchDegradeOnPartial (#43602))
 func TestFetchSinglePid(t *testing.T) {
 	logp.DevelopmentSetup()
 
