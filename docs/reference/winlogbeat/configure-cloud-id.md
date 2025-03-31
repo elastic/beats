@@ -24,7 +24,7 @@ winlogbeat -e -E cloud.id="<cloud-id>" -E cloud.auth="<cloud.auth>"
 
 ## `cloud.id` [_cloud_id]
 
-The Cloud ID, which can be found in the {{ess}} web console, is used by Winlogbeat to resolve the {{es}} and {{kib}} URLs. This setting overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings. For more on locating and configuring the Cloud ID, see [Configure Beats and Logstash with Cloud ID](docs-content://deploy-manage/deploy/cloud-enterprise/find-cloud-id.md).
+The Cloud ID, which can be found in the {{ess}} web console, is used by Winlogbeat to resolve the {{es}} and {{kib}} URLs. This setting overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings. For more on locating and configuring the Cloud ID, see [Configure Beats and Logstash with Cloud ID](docs-content://deploy-manage/deploy/cloud-enterprise/connect-elasticsearch.md).
 
 
 ## `cloud.auth` [_cloud_auth]

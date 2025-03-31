@@ -50,16 +50,6 @@ setup-commit-hook:
 stop-environments:
 	@$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
 
-## test : Runs unit and system tests without coverage and race detection.
-.PHONY: test
-test:
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) test || exit 1;)
-
-## unit : Runs unit tests without coverage and race detection.
-.PHONY: unit
-unit:
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) unit || exit 1;)
-
 ## crosscompile : Crosscompile all beats.
 .PHONY: crosscompile
 crosscompile:

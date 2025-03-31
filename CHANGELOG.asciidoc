@@ -3,6 +3,59 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-9.0.0-rc1]]
+=== Beats version 9.0.0-rc1
+https://github.com/elastic/beats/compare/v9.0.0-beta1\...v9.0.0-rc1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+
+*Metricbeat*
+
+- Remove kibana.settings metricset since the API was removed in 8.0. {issue}30592[30592] {pull}42937[42937]
+- Removed support for the Enterprise Search module. {pull}42915[42915]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly. {pull}42966[42966]
+- Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error. {pull}42420[42756]
+- Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+
+*Metricbeat*
+
+- Add AWS OwningAccount support for cross account monitoring. {issue}40570[40570] {pull}40691[40691]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+
+*Winlogbeat*
+
+- Reset EventLog if error EOF is encountered. {pull}42826[42826]
+- Implement backoff on error retrial. {pull}42826[42826]
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.24.0. {pull}42705[42705]
+
+*Filebeat*
+
+- Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
+- Update CEL mito extensions to v1.17.0. {pull}42851[42851]
+- Winlog input now can report its status to Elastic-Agent. {pull}43089[43089]
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+
+*Metricbeat*
+
+- Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+
+
 [[release-notes-9.0.0-beta1]]
 === Beats version 9.0.0-beta1
 https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
@@ -13,7 +66,7 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 
 - Set default Kafka version to 2.1.0 in Kafka output and Filebeat. {pull}41662[41662]
 - Replace default Ubuntu-based images with UBI-minimal-based ones. {pull}42150[42150]
-- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
+- Removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 
 *Filebeat*
 
@@ -109,9 +162,50 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
 
-*Functionbeat*
 
-- Remove Functionbeat binaries from CI pipelines. {issue}40745[40745] {pull}41506[41506]
+[[release-notes-8.17.4]]
+=== Beats version 8.17.4
+https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Prevent computer details being returned for user queries by Active Directory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in `aws-s3` input and enforce retrying using download failed error. {pull}42420[42420]
+- Prevent `azureblobstorage` input from logging key details during blob fetch operations. {pull}43169[43169]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
+
+*Metricbeat*
+
+- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
+- Remove `hostname` field from Zookeeper's `mntr` data stream. {pull}41887[41887]
+- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+
+*Winlogbeat*
+
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.23.6. {pull}42705[42705]
+
+*Filebeat*
+
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+
+*Osquerybeat*
+
+- Increase maximum query timeout to 24 hours. {pull}42356[42356]
 
 
 [[release-notes-8.17.3]]
