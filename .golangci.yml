@@ -2,6 +2,7 @@
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 1m
+  go: "1.24.1"
 
 issues:
   # Maximum count of issues with the same text.
@@ -24,22 +25,16 @@ linters:
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
     - forbidigo # forbids identifiers	matched by reg exps
     - gomoddirectives # manage the use of 'replace', 'retract', and 'excludes' directives in go.mod.
-    - gosimple # linter for Go source code that specializes in simplifying a code
     - misspell # finds commonly misspelled English words in comments
     - nakedret # finds naked returns in functions greater than a specified function length
     - nolintlint # reports ill-formed or insufficient nolint directives
-    - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
-    - stylecheck # a replacement for golint
     - unused # checks Go code for unused constants, variables, functions and types
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
-    - structcheck # finds unused struct fields
     - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
-    - varcheck # Finds unused global variables and constants
     - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
     - bodyclose # checks whether HTTP response body is closed successfully
     - durationcheck # check for two durations multiplied together
-    - exportloopref # checks for pointers to enclosing loop variables
     - goimports # Goimports does everything that gofmt does. Additionally it checks unused imports
     - gosec # inspects source code for security problems
     - importas # enforces consistent import aliases
@@ -49,6 +44,7 @@ linters:
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies in go.mod
     - depguard # check for blocked dependencies in Go files
+    - copyloopvar
 
 # all available settings of specific linters
 linters-settings:
@@ -81,10 +77,6 @@ linters-settings:
   gomoddirectives:
     # Allow local `replace` directives. Default is false.
     replace-local: false
-
-  gosimple:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.22.12"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -124,21 +116,7 @@ linters-settings:
           - pkg: "math/rand$"
             desc: "superseded by math/rand/v2"
 
-  staticcheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.22.12"
-    # https://staticcheck.io/docs/options#checks
-    checks: ["all"]
-
-  stylecheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.22.12"
-    # https://staticcheck.io/docs/options#checks
-    checks: ["all"]
-
   unused:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.22.12"
 
   gosec:
     excludes:
