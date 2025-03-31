@@ -134,9 +134,12 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 			id,
 			id,
 			inp.Name(),
-			beat.Info{},
-			ctx, nil,
-			monitoring.GetNamespace("dataset").GetRegistry(),
+			beat.Info{Monitoring: beat.Monitoring{
+				InputHTTPMetrics: beat.NewInputHTTPMetrics()}},
+			ctx,
+			nil,
+			monitoring.NewRegistry(),
+			func() {},
 			logp.L())
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
