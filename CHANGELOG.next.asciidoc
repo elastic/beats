@@ -260,8 +260,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added Palo Alto Networks module {pull}40686[40686]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 - Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
-- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
-- Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 
 *Metricbeat*
