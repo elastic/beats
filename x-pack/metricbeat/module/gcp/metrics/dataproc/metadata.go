@@ -52,7 +52,6 @@ type metadataCollector struct {
 	projectName       string
 	organizationID    string
 	organizationName  string
-	zone              string
 	regions           []string
 	collectUserLabels bool
 	opt               []option.ClientOption
