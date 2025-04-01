@@ -11,6 +11,7 @@ processors:
     - '%{SYSLOGTIMESTAMP:system.syslog.timestamp} %{GREEDYMULTILINE:system.syslog.message}'
     - '%{TIMESTAMP_ISO8601:system.syslog.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
       %{GREEDYMULTILINE:system.syslog.message}'
+    - '%{TIMESTAMP_ISO8601:system.syslog.timestamp} %{GREEDYMULTILINE:system.syslog.message}'
     pattern_definitions:
       GREEDYMULTILINE: |-
         (.|
