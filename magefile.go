@@ -16,16 +16,18 @@
 // under the License.
 
 //go:build mage
-// +build mage
 
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"github.com/magefile/mage/mg"
+	"github.com/magefile/mage/sh"
 	"go.uber.org/multierr"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -45,6 +47,31 @@ var (
 		"x-pack/auditbeat",
 		"x-pack/filebeat",
 		"x-pack/metricbeat",
+	}
+
+	// Beats are all beats projects, including libbeat
+	Beats = []string{
+		"auditbeat",
+		"filebeat",
+		"heartbeat",
+		"libbeat",
+		"metricbeat",
+		"packetbeat",
+		"winlogbeat",
+	}
+
+	// XPack are all x-pack beats projects, including libbeat
+	XPack = []string{
+		"agentbeat",
+		"auditbeat",
+		"dockerlogbeat",
+		"filebeat",
+		"heartbeat",
+		"libbeat",
+		"metricbeat",
+		"osquerybeat",
+		"packetbeat",
+		"winlogbeat",
 	}
 )
 
@@ -151,4 +178,108 @@ func CheckLicenseHeaders() error {
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
 	return devtools.DumpVariables()
+}
+
+// UnitTest runs unit tests for all OSS and x-pack beats projects
+// (Go and Python).
+func UnitTest() error {
+	fmt.Println(">> running UnitTest for all beats")
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("could not ger current working directory: %v", err)
+	}
+	defer func() {
+		err = os.Chdir(wd)
+		if err != nil {
+			err = fmt.Errorf("could not restore work directory: %w", err)
+		}
+	}()
+
+	var beats []string
+	for _, d := range Beats {
+		beats = append(beats, filepath.Join(wd, d))
+	}
+	for _, d := range XPack {
+		if d == "agentbeat" {
+			fmt.Println(">> skipping x-pack/agentbeat")
+			continue
+		}
+		beats = append(beats, filepath.Join(wd, "x-pack", d))
+	}
+
+	return runOnEveryBeat(beats, "unitTest")
+}
+
+// IntegTest runs integration tests for all OSS and x-pack beats projects (it
+// uses Docker to run the tests).
+func IntegTest() error {
+	fmt.Println(">> running IntegTest for all beats")
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("could not ger current working directory: %v", err)
+	}
+	defer func() {
+		err = os.Chdir(wd)
+		if err != nil {
+			err = fmt.Errorf("could not restore work directory: %w", err)
+		}
+	}()
+
+	var beats []string
+
+	for _, d := range Beats {
+		if d == "winlogbeat" {
+			fmt.Println(">> skipping winlogbeat")
+			continue
+		}
+		beats = append(beats, filepath.Join(wd, d))
+	}
+
+	xpackSkip := []string{"packetbeat", "winlogbeat"}
+	for _, d := range XPack {
+		if slices.Contains(xpackSkip, d) {
+			fmt.Printf(">> skipping x-pack/%s\n", d)
+			continue
+		}
+		beats = append(beats, filepath.Join(wd, "x-pack", d))
+	}
+
+	return runOnEveryBeat(beats, "integTest")
+}
+
+func runOnEveryBeat(beatDirs []string, mageTarget string) error {
+	failedBeats := map[string]error{}
+
+	fmt.Println("")
+	for _, p := range beatDirs {
+		fmt.Println(">> entering", p)
+		err := os.Chdir(p)
+		if err != nil {
+			return fmt.Errorf("could not change to %q: %v", p, err)
+		}
+
+		err = sh.RunV("mage", mageTarget)
+		if err != nil {
+			failedBeats[p] = err
+		}
+		fmt.Println("")
+	}
+
+	if len(failedBeats) > 0 {
+		fmt.Print("\n\n")
+		fmt.Println(">> some tests failed:\n")
+		var errs error
+
+		for p, err := range failedBeats {
+			fmt.Printf("%s failed: %v\n", p, err)
+			errs = errors.Join(errs, err)
+		}
+
+		fmt.Println("")
+		return errs
+	}
+
+	return nil
 }

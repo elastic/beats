@@ -48,8 +48,8 @@ metricbeat setup --dashboards
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/metricbeat:9.0.0-beta1 setup --dashboards
+```sh  subs=true
+docker run --rm --net="host" docker.elastic.co/beats/metricbeat:{{stack-version}} setup --dashboards
 ```
 ::::::
 
@@ -123,8 +123,8 @@ metricbeat setup -e \
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/metricbeat:9.0.0-beta1 setup -e \
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/metricbeat:{{stack-version}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=metricbeat_internal \
