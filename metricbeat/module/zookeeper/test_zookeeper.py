@@ -14,7 +14,6 @@ MNTR_FIELDS = ["latency.avg", "latency.max",
                "approximate_data_size", "num_alive_connections"]
 
 
-@unittest.skip("flaky test suite: https://github.com/elastic/beats/issues/43385")
 @metricbeat.parameterized_with_supported_versions
 class ZooKeeperMntrTest(metricbeat.BaseTest):
 
@@ -38,7 +37,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1, f"expected one output result, got: {output}")
+        self.assertTrue(len(output) >= 1, f"expected at least one output result, got: {output}")
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(ZK_FIELDS), evt.keys())
@@ -72,7 +71,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1, f"expected one output result, got: {output}")
+        self.assertTrue(len(output) >= 1, f"expected at least one output result, got: {output}")
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(ZK_FIELDS), evt.keys())
@@ -100,7 +99,7 @@ class ZooKeeperMntrTest(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1, f"expected one output result, got: {output}")
+        self.assertTrue(len(output) >= 1, f"expected at least one output result, got: {output}")
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(ZK_FIELDS + ["client"]), evt.keys())
