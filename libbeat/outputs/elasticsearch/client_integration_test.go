@@ -409,7 +409,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		t.Fatal(err)
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logp.NewTestingLogger(t, "elasticsearch")
 	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
 	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))

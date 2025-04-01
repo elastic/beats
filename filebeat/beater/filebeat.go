@@ -406,7 +406,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	moduleLoader := fileset.NewFactory(inputLoader, b.Info, pipelineLoaderFactory, config.OverwritePipelines)
 	crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once, fb.logger)
 	if err != nil {
-		fb.logger.Errorf("could not init crawler: %v", err)
+		fb.logger.Errorf("Could not init crawler: %v", err)
 		return err
 	}
 

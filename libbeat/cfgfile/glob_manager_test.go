@@ -37,15 +37,11 @@ func TestGlobManagerInit(t *testing.T) {
 
 func TestGlobManager(t *testing.T) {
 	// Create random temp directory
-	dir, err := os.MkdirTemp("", "glob_manager")
-	defer os.RemoveAll(dir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := t.TempDir()
 
 	// Prepare scenario:
 	content := []byte("test\n")
-	err = os.WriteFile(dir+"/config1.yml", content, 0644)
+	err := os.WriteFile(dir+"/config1.yml", content, 0644)
 	assert.NoError(t, err)
 	err = os.WriteFile(dir+"/config2.yml", content, 0644)
 	assert.NoError(t, err)

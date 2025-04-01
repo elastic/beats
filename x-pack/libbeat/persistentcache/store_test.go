@@ -5,7 +5,6 @@
 package persistentcache
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -19,9 +18,7 @@ func TestStandaloneStore(t *testing.T) {
 	var key = []byte("somekey")
 	var value = []byte("somevalue")
 
-	tempDir, err := os.MkdirTemp("", "beat-data-dir-")
-	require.NoError(t, err)
-	t.Cleanup(func() { os.RemoveAll(tempDir) })
+	tempDir := t.TempDir()
 
 	log := logp.NewTestingLogger(t, "")
 	store, err := newStore(log, tempDir, "store-cache")
