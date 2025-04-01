@@ -140,7 +140,7 @@ See [Processors](/reference/heartbeat/filtering-enhancing-data.md) for informati
 
 ### `data_stream` [monitor-data-stream]
 
-Contains options pertaining to data stream naming, following the conventions followed by [Fleet Data Streams](docs-content://reference/ingestion-tools/fleet/data-streams.md). By default Heartbeat will write to a datastream named `heartbeat-VERSION`.
+Contains options pertaining to data stream naming, following the conventions followed by [Fleet Data Streams](docs-content://reference/fleet/data-streams.md). By default Heartbeat will write to a datastream named `heartbeat-VERSION`.
 
 ```yaml
 # To enable data streams with the default namespace
