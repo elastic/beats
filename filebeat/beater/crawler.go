@@ -163,7 +163,7 @@ func (c *crawler) Stop() {
 		}()
 	}
 
-	c.log.Info("Stopping %d inputs", len(c.inputs))
+	c.log.Infof("Stopping %d inputs", len(c.inputs))
 	// Stop inputs in parallel
 	for id, p := range c.inputs {
 		id, p := id, p
