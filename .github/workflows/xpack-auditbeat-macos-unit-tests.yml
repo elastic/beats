@@ -30,7 +30,7 @@ on:
       - libbeat/
       - x-pack/libbeat/
       # Workflow
-      - .github/workflows/auditbeat-macos-unit-tests.yml
+      - .github/workflows/xpack-auditbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
 
 permissions:
