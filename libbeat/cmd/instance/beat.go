@@ -311,7 +311,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		config.OverwriteConfigOpts(configOptsWithKeystore(store))
 	}
 
-	b.Beat.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
+	b.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
 
 	b.SetupRegistry()
 
@@ -351,7 +351,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	if err != nil {
 		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
 	}
-	b.Beat.Instrumentation = instrumentation
+	b.Instrumentation = instrumentation
 
 	if err := promoteOutputQueueSettings(b); err != nil {
 		return nil, fmt.Errorf("could not promote output queue settings: %w", err)
@@ -439,7 +439,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	if imFactory == nil {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, logger)
 	}
-	b.IdxSupporter, err = imFactory(logger, b.Beat.Info, b.RawConfig)
+	b.IdxSupporter, err = imFactory(logger, b.Info, b.RawConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error setting index supporter: %w", err)
 	}
@@ -466,7 +466,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		}
 	}
 
-	uniq_reg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
+	uniq_reg := b.Info.Monitoring.Namespace.GetRegistry()
 
 	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
@@ -574,7 +574,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		reg = monitoring.Default.NewRegistry("libbeat")
 	}
 
-	err = metricreport.SetupMetrics(b.Beat.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
+	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
 	if err != nil {
 		return nil, err
 	}
@@ -1080,7 +1080,7 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return err
 	}
-	b.Beat.Instrumentation = instrumentation
+	b.Instrumentation = instrumentation
 
 	// log paths values to help with troubleshooting
 	logger.Infof("%s", paths.Paths.String())
@@ -1160,7 +1160,7 @@ func (b *Beat) configure(settings Settings) error {
 	if imFactory == nil {
 		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, logger)
 	}
-	b.IdxSupporter, err = imFactory(logger, b.Beat.Info, b.RawConfig)
+	b.IdxSupporter, err = imFactory(logger, b.Info, b.RawConfig)
 	if err != nil {
 		return err
 	}
@@ -1216,7 +1216,7 @@ func (b *Beat) loadMeta(metaPath string) error {
 
 	if err == nil {
 		m := meta{}
-		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF { //nolint:errorlint // keep old behaviour
+		if err := json.NewDecoder(f).Decode(&m); err != nil && err != io.EOF {
 			f.Close()
 			return fmt.Errorf("Beat meta file reading error: %w", err)
 		}
@@ -1498,7 +1498,6 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 
 	// Watch for file changes while the Beat is alive
 	go func() {
-		//nolint:staticcheck // this is an endless function
 		ticker := time.Tick(extendedTLSCfg.Reload.Period)
 
 		for {
@@ -1625,7 +1624,7 @@ func handleError(err error) error {
 // runtime, host, and process. If any of the data is not available it will be
 // omitted.
 func (b *Beat) logSystemInfo() {
-	log := b.Beat.Info.Logger
+	log := b.Info.Logger
 	defer log.Recover("An unexpected error occurred while collecting " +
 		"information about the system.")
 	log = log.With(logp.Namespace("system_info"))
