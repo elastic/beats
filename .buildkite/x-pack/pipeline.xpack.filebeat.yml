@@ -342,8 +342,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Packaging Linux arm64"
-<<<<<<< HEAD
-=======
 
       - label: ":linux: x-pack/filebeat: Packaging Linux amd64 FIPS"
         key: "packaging-linux-fips"
