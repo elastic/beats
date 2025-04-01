@@ -100,7 +100,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		getDevicePerformanceScores(m.logger, m.client, devices)
 
-		err = getDeviceChannelUtilization(m.client, devices, collectionPeriod)
+		deviceService := &DeviceServiceWrapper{
+			service: m.client.Devices,
+		}
+
+		err = getDeviceChannelUtilization(deviceService, devices, collectionPeriod, m.organizations)
 		if err != nil {
 			return fmt.Errorf("getDeviceChannelUtilization failed; %w", err)
 		}

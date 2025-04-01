@@ -197,7 +197,6 @@ func (c *Config) NewTokenProvider(tenantID string) (auth.TokenProvider, error) {
 		)
 	}
 	return auth.NewProviderFromCertificate(
-		c.API.AuthenticationEndpoint,
 		c.API.Resource,
 		c.ApplicationID,
 		tenantID,

@@ -96,6 +96,35 @@ var inputTests = []struct {
 		}},
 	},
 	{
+		name: "hello_world_sum",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":string(sum([1,2,3,4]))}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{{
+			"message": "10",
+		}},
+	},
+	{
+		name: "hello_world_front_and_tail_2",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":front([1,2,3,4,5],2)}, {"message":tail([1,2,3,4,5],2)}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": []any{1.0, 2.0}},
+			{"message": []any{3.0, 4.0, 5.0}},
+		},
+	},
+	{
 		name: "bad_events_type",
 		config: map[string]interface{}{
 			"interval": 1,
@@ -1948,7 +1977,7 @@ func TestInput(t *testing.T) {
 				t.Errorf("unexpected number of cursors events: got:%d want at least:%d", len(client.cursors), len(test.wantCursor))
 				test.wantCursor = test.wantCursor[:len(client.published)]
 			}
-			client.published = client.published[:len(test.want)]
+			client.cursors = client.cursors[:len(test.wantCursor)]
 			for i, got := range client.cursors {
 				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))

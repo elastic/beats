@@ -20,6 +20,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
 - Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
 - removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
+- Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
 
 *Auditbeat*
 
@@ -66,6 +69,7 @@ Dropped fields: `syslog.priority` and `syslog.facility` while keeping their dupl
 already present as `container.id` and `container.log.tag` is dropped because it is already present as
 `log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
 
 *Heartbeat*
 
@@ -80,6 +84,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
 - Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+- Remove kibana.settings metricset since the API was removed in 8.0 {issue}30592[30592] {pull}42937[42937]
+- Removed support for the Enterprise Search module {pull}42915[42915]
+- Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
 
 *Osquerybeat*
 
@@ -87,6 +94,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Disable allow_unsafe osquery configuration. {pull}40130[40130]
 - Upgrade to osquery 5.12.1. {pull}40368[40368]
 - Upgrade to osquery 5.13.1. {pull}40849[40849]
+- Upgrade to osquery 5.15.0 {pull}43426[43426]
 
 
 *Packetbeat*
@@ -124,20 +132,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- Fix issue where old data could be saved in the memory queue after acknowledgment, increasing memory use {pull}41356[41356]
-- Ensure Elasticsearch output can always recover from network errors {pull}40794[40794]
-- Add `translate_ldap_attribute` processor. {pull}41472[41472]
-- Remove unnecessary debug logs during idle connection teardown {issue}40824[40824]
-- Remove unnecessary reload for Elastic Agent managed beats when apm tracing config changes from nil to nil {pull}41794[41794]
-- Fix incorrect cloud provider identification in add_cloud_metadata processor using provider priority mechanism {pull}41636[41636]
-- Prevent panic if libbeat processors are loaded more than once. {issue}41475[41475] {pull}41857[51857]
-- Allow network condition to handle field values that are arrays of IP addresses. {pull}41918[41918]
-- Fix a bug where log files are rotated on startup when interval is configured and rotateonstartup is disabled {issue}41894[41894] {pull}41895[41895]
-- Fix setting unique registry for non beat receivers {issue}42288[42288] {pull}42292[42292]
-- The Kafka output now drops events when there is an authorisation error {issue}42343[42343] {pull}42401[42401]
-- Fix autodiscovery memory leak related to metadata of start events {pull}41748[41748]
-- All standard queue metrics are now included in metrics monitoring, including: `added.{events, bytes}`, `consumed.{events, bytes}`, `removed.{events, bytes}`, and `filled.{events, bytes, pct}`. {pull}42439[42439]
-- The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
 
 *Auditbeat*
 
@@ -147,6 +141,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - hasher: Geneneral improvements and fixes. {pull}41863[41863]
 - hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
 - Split common tty definitions. {pull}42004[42004]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
 
 *Filebeat*
 
@@ -221,9 +216,17 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
 - Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
 - Fix truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size. {pull}42327[42327]
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
+- Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
+- In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
+- Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
+- Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 
 *Heartbeat*
 
+- Added maintenance windows support for Heartbeat. {pull}41508[41508]
 
 
 *Metricbeat*
@@ -238,28 +241,13 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
 - Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
 - Fix behavior of pagetypeinfo metrics {pull}39985[39985]
-- Fix query logic for temp and non-temp tablespaces in Oracle module. {issue}38051[38051] {pull}39787[39787]
-- Set GCP metrics config period to the default (60s) when the value is below the minimum allowed period. {issue}30434[30434] {pull}40020[40020]
-- Fix statistic methods for metrics collected for SQS. {pull}40207[40207]
-- Add GCP 'instance_id' resource label in ECS cloud fields. {issue}40033[40033] {pull}40062[40062]
-- Fix missing metrics from CloudWatch when include_linked_accounts set to false. {issue}40071[40071] {pull}40135[40135]
 - Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
-- Fix http server helper SSL config. {pull}39405[39405]
-- Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
-- Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
-- Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
-- Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
-- [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
-- Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
-- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
-- Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
-- Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
-- Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 
 *Osquerybeat*
 
@@ -272,6 +260,10 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Winlogbeat*
 
 - Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
+- Sync missing changes in modules pipelines. {pull}42619[42619]
+- Reset EventLog if error EOF is encountered. {pull}42826[42826]
+- Implement backoff on error retrial. {pull}42826[42826]
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
 
 *Elastic Logging Plugin*
@@ -292,13 +284,14 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
-- Update to Go 1.22.10. {pull}42095[42095]
+- Update to Go 1.24.0. {pull}42705[42705]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Reduce memory consumption of k8s autodiscovery and the add_kubernetes_metadata processor when Deployment metadata is enabled
 - Add `lowercase` processor. {issue}22254[22254] {pull}41424[41424]
 - Add `uppercase` processor. {issue}22254[22254] {pull}41535[41535]
 - Replace `compress/gzip` with https://github.com/klauspost/compress/gzip library for gzip compression {pull}41584[41584]
 - Add regex pattern matching to add_kubernetes_metadata processor {pull}41903[41903]
+- Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 
 *Auditbeat*
 
@@ -411,8 +404,16 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
 - Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
 - Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
+- Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
 - The journald input is now generally available. {pull}42107[42107]
 - Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
+- Filestram take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic-Agent). {issue}42472[42472] {issue}42884[42884] {pull}42624[42624]
+- Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
+- Update CEL mito extensions to v1.17.0. {pull}42851[42851]
+- Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 
 *Auditbeat*
 
@@ -427,6 +428,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
 - Add support for RFC7231 methods to http monitors. {pull}41975[41975]
+- Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
 
 *Metricbeat*
 
@@ -473,6 +475,12 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
 - Add new metricset wmi for the windows module. {pull}42017[42017]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
+- Log every 401 response from Kubernetes API Server {pull}42714[42714]
+- Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
+- Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
+- Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
@@ -480,10 +488,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Osquerybeat*
 
-- Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
-
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
@@ -502,7 +509,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Functionbeat*
 
-- Removal of functionbeat binaries from CI pipelines {issue}40745[40745] {pull}41506[41506]
 
 *Elastic Log Driver*
 *Elastic Logging Plugin*
@@ -540,6 +546,21 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 ==== Known Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

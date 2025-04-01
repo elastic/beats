@@ -8,6 +8,7 @@ env:
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_WIN_2025: "family/platform-ingest-beats-windows-2025"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
 
@@ -146,6 +147,34 @@ steps:
           - github_commit_status:
               context: "x-pack/winlogbeat: Win 2022 Unit Tests"
 
+      - label: ":windows: x-pack/winlogbeat: Win 2025 Unit Tests"
+        command: |
+          .buildkite/scripts/install_sysmon.ps1
+          Set-Location -Path x-pack/winlogbeat
+          mage build unitTest
+        key: "mandatory-win-2025-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2025}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/winlogbeat/build/*.xml"
+          - "x-pack/winlogbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/winlogbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/winlogbeat: Win 2025 Unit Tests"
+
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
@@ -250,10 +279,9 @@ steps:
       - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
-          cd x-pack/winlogbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/winlogbeat
         retry:
           automatic:
             - limit: 1

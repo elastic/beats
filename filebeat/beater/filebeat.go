@@ -24,16 +24,13 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
-	"github.com/elastic/beats/v7/filebeat/backup"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/filestream"
-	"github.com/elastic/beats/v7/filebeat/input/filestream/takeover"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
 	"github.com/elastic/beats/v7/filebeat/registrar"
@@ -51,7 +48,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -79,14 +75,7 @@ type Filebeat struct {
 	pipeline       beat.PipelineConnector
 }
 
-type PluginFactory func(beat.Info, *logp.Logger, StateStore) []v2.Plugin
-
-type StateStore interface {
-	// Access returns the storage registry depending on the type. This is needed for the Elasticsearch state store which
-	// is guarded by the feature.IsElasticsearchStateStoreEnabledForInput(typ) check.
-	Access(typ string) (*statestore.Store, error)
-	CleanupInterval() time.Duration
-}
+type PluginFactory func(beat.Info, *logp.Logger, statestore.States) []v2.Plugin
 
 // New creates a new Filebeat pointer instance.
 func New(plugins PluginFactory) beat.Creator {
@@ -328,7 +317,15 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 				return nil
 			}
 
-			stateStore.notifier.Notify(outCfg.Config())
+			// Create a new config with the output configuration. Since r.Config is a pointer, a copy is required to
+			// avoid concurrent map read and write.
+			// See https://github.com/elastic/beats/issues/42815
+			configCopy, err := conf.NewConfigFrom(outCfg.Config())
+			if err != nil {
+				logp.Err("Failed to create a new config from the output config: %v", err)
+				return nil
+			}
+			stateStore.notifier.Notify(configCopy)
 			return nil
 		})
 	}
@@ -336,11 +333,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	err = filestream.ValidateInputIDs(config.Inputs, logp.NewLogger("input.filestream"))
 	if err != nil {
 		logp.Err("invalid filestream configuration: %+v", err)
-		return err
-	}
-	err = processLogInputTakeOver(stateStore, config)
-	if err != nil {
-		logp.Err("Failed to attempt filestream state take over: %+v", err)
 		return err
 	}
 
@@ -556,32 +548,6 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.Pip
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
-}
-
-// some of the filestreams might want to take over the loginput state
-// if their `take_over` flag is set to `true`.
-func processLogInputTakeOver(stateStore StateStore, config *cfg.Config) error {
-	inputs, err := fetchInputConfiguration(config)
-	if err != nil {
-		return fmt.Errorf("Failed to fetch input configuration when attempting take over: %w", err)
-	}
-	if len(inputs) == 0 {
-		return nil
-	}
-
-	store, err := stateStore.Access("")
-	if err != nil {
-		return fmt.Errorf("Failed to access state when attempting take over: %w", err)
-	}
-	defer store.Close()
-	logger := logp.NewLogger("filestream-takeover")
-
-	registryHome := paths.Resolve(paths.Data, config.Registry.Path)
-	registryHome = filepath.Join(registryHome, "filebeat")
-
-	backuper := backup.NewRegistryBackuper(logger, registryHome)
-
-	return takeover.TakeOverLogInputStates(logger, store, backuper, inputs)
 }
 
 // fetches all the defined input configuration available at Filebeat startup including external files.

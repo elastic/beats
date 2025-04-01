@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -130,6 +131,11 @@ type crossBuildParams struct {
 
 // CrossBuild executes a given build target once for each target platform.
 func CrossBuild(options ...CrossBuildOption) error {
+	if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
+		log.Printf("Skipping cross-build for beat %q because it's not included in the FIPS-enabled beat list %v", BeatName, FIPSConfig.Beats)
+		return nil
+	}
+
 	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: CrossBuildImage}
 	for _, opt := range options {
 		opt(&params)
@@ -181,6 +187,11 @@ func CrossBuild(options ...CrossBuildOption) error {
 		if !buildPlatform.Flags.CanCrossBuild() {
 			return fmt.Errorf("unsupported cross build platform %v", buildPlatform.Name)
 		}
+		if FIPSBuild && !slices.Contains(FIPSConfig.Compile.Platforms, buildPlatform.Name) {
+			fmt.Printf("Skipping crossbuild of %q for platform %q since it's not listed in FIPS supported platforms %v\n",
+				BeatName, buildPlatform.Name, FIPSConfig.Compile.Platforms)
+			continue
+		}
 		builder := GolangCrossBuilder{buildPlatform.Name, params.Target, params.InDir, params.ImageSelector}
 		if params.Serial {
 			if err := builder.Build(); err != nil {
@@ -227,7 +238,7 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "darwin/universal":
 		tagSuffix = "darwin-arm64-debian11"
 	case platform == "linux/arm64":
-		tagSuffix = "arm"
+		tagSuffix = "base-arm-debian9"
 	case platform == "linux/armv5":
 		tagSuffix = "armel"
 	case platform == "linux/armv6":
@@ -247,6 +258,9 @@ func CrossBuildImage(platform string) (string, error) {
 	goVersion, err := GoVersion()
 	if err != nil {
 		return "", err
+	}
+	if FIPSBuild {
+		tagSuffix += "-fips"
 	}
 
 	return BeatsCrossBuildImage + ":" + goVersion + "-" + tagSuffix, nil
@@ -331,6 +345,7 @@ func (b GolangCrossBuilder) Build() error {
 		"--env", "MAGEFILE_VERBOSE="+verbose,
 		"--env", "MAGEFILE_TIMEOUT="+EnvOr("MAGEFILE_TIMEOUT", ""),
 		"--env", fmt.Sprintf("SNAPSHOT=%v", Snapshot),
+		"--env", fmt.Sprintf("FIPS=%v", FIPSBuild),
 		"-v", repoInfo.RootDir+":"+mountPoint,
 		"-w", workDir,
 	)
