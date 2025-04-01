@@ -16,7 +16,7 @@ on:
       - libbeat/**
       # Workflow
       - .github/workflows/xpack-filebeat-macos-unit-tests.yml
-      - .github/actions/unit-test-composite-action/action.yml
+      - .github/actions/unit-test/action.yml
   push:
     branches:
       - main
@@ -31,7 +31,7 @@ on:
       - libbeat/**
       # Workflow
       - .github/workflows/xpack-filebeat-macos-unit-tests.yml
-      - .github/actions/unit-test-composite-action/action.yml
+      - .github/actions/unit-test/action.yml
 
 permissions:
   contents: read
