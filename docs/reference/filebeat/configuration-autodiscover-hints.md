@@ -5,6 +5,12 @@ mapped_pages:
 
 # Hints based autodiscover [configuration-autodiscover-hints]
 
+::::{warning}
+If you still have `log` or `container` inputs in your autodiscover templates please follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log` inputs to `filestream` inputs.
+
+The `log` input is deprecated in version 7.16 and disabled in version 9.0.
+::::
+
 Filebeat supports autodiscover based on hints from the provider. The hints system looks for hints in Kubernetes Pod annotations or Docker labels that have the prefix `co.elastic.logs`. As soon as the container starts, Filebeat will check if it contains any hints and launch the proper config for it. Hints tell Filebeat how to get logs for the given container. By default logs will be retrieved from the container using the `filestream` input. You can use hints to modify this behavior. This is the full list of supported hints:
 
 
@@ -146,7 +152,11 @@ filebeat.autodiscover.providers:
   - type: docker
     hints.enabled: true
     hints.default_config:
-      type: container
+      type: filestream
+      id: container-${data.container.id}
+      prospector.scanner.symlinks: true
+      parsers:
+        - container: ~
       paths:
         - /var/lib/docker/containers/${data.container.id}/*.log
     templates:
@@ -154,7 +164,11 @@ filebeat.autodiscover.providers:
           equals:
             docker.container.labels.type: "pipeline"
         config:
-          - type: container
+          - type: filestream
+            id: container-${data.container.id}
+            prospector.scanner.symlinks: true
+            parsers:
+              - container: ~
             paths:
               - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
             pipeline: my-pipeline
@@ -182,7 +196,11 @@ filebeat.autodiscover:
     - type: kubernetes
       hints.enabled: true
       hints.default_config:
-        type: container
+        type: filestream
+        id: container-${data.container.id}
+        prospector.scanner.symlinks: true
+        parsers:
+          - container: ~
         paths:
           - /var/log/containers/*-${data.container.id}.log  # CRI path
 ```
@@ -268,7 +286,11 @@ filebeat.autodiscover:
     - type: docker
       hints.enabled: true
       hints.default_config:
-        type: container
+        type: filestream
+        id: container-${data.container.id}
+        prospector.scanner.symlinks: true
+        parsers:
+          - container: ~
         paths:
           - /var/log/containers/*-${data.container.id}.log  # CRI path
 ```
@@ -391,5 +413,3 @@ processors:
 2. Unique ID is required.
 3. The `add_fields` processor populates the `nomad.allocation.id` field with the Nomad allocation UUID.
 4. The `add_nomad_metadata` processor is configured at the global level so that it is only instantiated one time which saves resources.
-
-

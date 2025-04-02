@@ -5,6 +5,12 @@ mapped_pages:
 
 # Autodiscover [configuration-autodiscover]
 
+::::{warning}
+If you still have `log` or `container` inputs in your autodiscover templates please follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log` inputs to `filestream` inputs.
+
+The `log` input is deprecated in version 7.16 and disabled in version 9.0.
+::::
+
 When you run applications on containers, they become moving targets to the monitoring system. Autodiscover allows you to track them and adapt settings as changes happen. By defining configuration templates, the autodiscover subsystem can monitor services as they start running.
 
 You define autodiscover settings in the  `filebeat.autodiscover` section of the `filebeat.yml` config file. To enable autodiscover, you specify a list of providers.
@@ -81,7 +87,11 @@ filebeat.autodiscover:
             contains:
               docker.container.image: redis
           config:
-            - type: container
+            - type: filestream
+              id: container-${data.docker.container.id}
+              prospector.scanner.symlinks: true
+              parsers:
+                - container: ~
               paths:
                 - /var/lib/docker/containers/${data.docker.container.id}/*.log
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
@@ -103,7 +113,11 @@ filebeat.autodiscover:
             - module: redis
               log:
                 input:
-                  type: container
+                  type: filestream
+                  id: container-${data.docker.container.id}
+                  prospector.scanner.symlinks: true
+			      parsers:
+			        - container: ~
                   paths:
                     - /var/lib/docker/containers/${data.docker.container.id}/*.log
 ```
@@ -124,7 +138,8 @@ autodiscover.providers:
       - condition.contains:
           docker.container.image: nginx
         config:
-          - type: log
+          - type: filestream
+            id: "some-unique-id"
             paths:
               - "/mnt/logs/*/*.log"
 ```
@@ -138,7 +153,8 @@ autodiscover.providers:
       - condition.contains:
           docker.container.image: nginx
         config:
-          - type: log
+          - type: filestream
+            id: "some-unique-id"
             paths:
               - "/mnt/logs/${data.docker.container.id}/*.log"
 ```
@@ -325,7 +341,11 @@ filebeat.autodiscover:
             equals:
               kubernetes.namespace: kube-system
           config:
-            - type: container
+            - type: filestream
+              id: container-${data.docker.container.id}
+              prospector.scanner.symlinks: true
+			  parsers:
+			    - container: ~
               paths:
                 - /var/log/containers/*-${data.kubernetes.container.id}.log
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
@@ -347,7 +367,11 @@ filebeat.autodiscover:
             - module: redis
               log:
                 input:
-                  type: container
+                  type: filestream
+                  id: container-${data.docker.container.id}
+                  prospector.scanner.symlinks: true
+                  parsers:
+                    - container: ~
                   paths:
                     - /var/log/containers/*-${data.kubernetes.container.id}.log
 ```
