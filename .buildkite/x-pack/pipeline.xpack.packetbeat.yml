@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
@@ -289,7 +287,7 @@ steps:
 
   - group: "Extended Tests"
     key: "x-pack-packetbeat-extended-linux-arm-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(arm).*/
 
     steps:
       - label: ":ubuntu: x-pack/packetbeat: Ubuntu arm64 Unit Tests"
@@ -312,6 +310,7 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu arm64 Unit Tests"
 
+<<<<<<< HEAD
       - label: ":mac: x-pack/packetbeat: macOS x86_64 Unit Tests"
         key: "extended-macos-unit-tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -360,6 +359,8 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: macOS arm64 Unit Tests"
 
+=======
+>>>>>>> 70fdd8ce2 (x-pack/packetbeat: GH action for macOS 13/14/15 unit tests (#43528))
   - group: "Packaging"
     key: "x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
