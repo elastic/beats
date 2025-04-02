@@ -29,12 +29,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-<<<<<<< HEAD
-=======
-	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
->>>>>>> 8920a0598 ([Chore][libbeat] Replace global logger with single logger instance (#43493))
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -43,6 +39,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -122,10 +119,14 @@ func (m *mockAdapter) CheckConfig(c *conf.C) error {
 	return nil
 }
 
+// Create returns a mockRunner with the provided config. If
+// the config contains `err_non_reloadable: true`, then a
+// common.ErrNonReloadable is returned alongside a nil runner.
 func (m *mockAdapter) Create(_ beat.PipelineConnector, config *conf.C) (cfgfile.Runner, error) {
 	runner := &mockRunner{
 		config: config,
 	}
+
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	m.runners = append(m.runners, runner)
@@ -199,7 +200,7 @@ func TestAutodiscover(t *testing.T) {
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
@@ -353,7 +354,7 @@ func TestAutodiscoverHash(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
@@ -418,7 +419,7 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
@@ -487,7 +488,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
@@ -547,7 +548,7 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
@@ -664,7 +665,7 @@ func TestAutodiscoverDebounce(t *testing.T) {
 	k, _ := keystore.NewFileKeystore("test")
 
 	adapter := mockAdapter{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// Create autodiscover manager
 	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
@@ -810,111 +811,3 @@ func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopp
 	}
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }
-<<<<<<< HEAD
-=======
-
-func TestErrNonReloadableIsNotRetried(t *testing.T) {
-	// Register mock autodiscover provider
-	busChan := make(chan bus.Bus, 1)
-	Registry = NewRegistry()
-	err := Registry.AddProvider(
-		"mock",
-		func(beatName string,
-			b bus.Bus,
-			uuid uuid.UUID,
-			c *conf.C,
-			k keystore.Keystore) (Provider, error) {
-
-			// intercept bus to mock events
-			busChan <- b
-
-			return &mockProvider{}, nil
-		})
-	if err != nil {
-		t.Fatalf("cannot add provider to registry: %s", err)
-	}
-
-	// Create a mock adapter, 'err_non_reloadable' will make its Create method
-	// to return a common.ErrNonReloadable.
-	adapter := mockAdapter{
-		configs: []*conf.C{
-			conf.MustNewConfigFrom(map[string]any{
-				"err_non_reloadable": true,
-			}),
-		},
-	}
-
-	// and settings:
-	providerConfig, _ := conf.NewConfigFrom(map[string]string{
-		"type": "mock",
-	})
-	config := Config{
-		Providers: []*conf.C{providerConfig},
-	}
-	k, _ := keystore.NewFileKeystore(filepath.Join(t.TempDir(), "keystore"))
-	logger := logp.NewTestingLogger(t, "")
-	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	logger, logsBuffer := newBufferLogger()
-	autodiscover.logger = logger
-	// set the debounce period to something small in order to
-	// speed up the tests. This seems to be the sweet stop
-	// for the fastest test run
-	autodiscover.debouncePeriod = time.Millisecond
-
-	// Start it
-	autodiscover.Start()
-	defer autodiscover.Stop()
-	eventBus := <-busChan
-
-	// Send an event to the bus, the event itself is not important
-	// because the mockAdapter will return the same configs regardless
-	// of the event
-	eventBus.Publish(bus.Event{
-		// That's used in the last assertion, the config key is
-		// <provider name>:<id>
-		"id":       "foo",
-		"provider": "mock",
-		"start":    true,
-		"meta": mapstr.M{
-			"test_name": t.Name(),
-		},
-	})
-
-	// Ensure we logged the error about not retrying reloading input
-	require.Eventually(
-		t,
-		func() bool {
-			return strings.Contains(
-				logsBuffer.String(),
-				`all new inputs failed to start with a non-retriable error","error":"Error creating runner from config: ErrNonReloadable: a non reloadable error`,
-			)
-		},
-		time.Second*10,
-		time.Millisecond*10,
-		"foo error")
-
-	// Ensure nothing is running
-	requireRunningRunners(t, autodiscover, 0)
-	runners := adapter.Runners()
-	require.Equal(t, len(runners), 0)
-
-	// Ensure the autodiscover got the config
-	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-}
-
-func newBufferLogger() (*logp.Logger, *bytes.Buffer) {
-	buf := &bytes.Buffer{}
-	encoderConfig := zap.NewProductionEncoderConfig()
-	encoder := zapcore.NewJSONEncoder(encoderConfig)
-	writeSyncer := zapcore.AddSync(buf)
-	log := logp.NewLogger("", zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
-		return zapcore.NewCore(encoder, writeSyncer, zapcore.DebugLevel)
-	}))
-	return log, buf
-}
->>>>>>> 8920a0598 ([Chore][libbeat] Replace global logger with single logger instance (#43493))

@@ -184,11 +184,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
-<<<<<<< HEAD
-		bt.monitorReloader = cfgfile.NewReloader(b.Publisher, bt.config.ConfigMonitors)
-=======
 		bt.monitorReloader = cfgfile.NewReloader(b.Info.Logger.Named("module.reload"), b.Publisher, bt.config.ConfigMonitors)
->>>>>>> 8920a0598 ([Chore][libbeat] Replace global logger with single logger instance (#43493))
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors()

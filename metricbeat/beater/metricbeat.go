@@ -267,11 +267,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
-<<<<<<< HEAD
-		moduleReloader := cfgfile.NewReloader(b.Publisher, bt.config.ConfigModules)
-=======
 		moduleReloader := cfgfile.NewReloader(bt.logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules)
->>>>>>> 8920a0598 ([Chore][libbeat] Replace global logger with single logger instance (#43493))
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err

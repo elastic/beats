@@ -25,13 +25,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/filebeat/backup"
 	"github.com/elastic/beats/v7/filebeat/channel"
 	cfg "github.com/elastic/beats/v7/filebeat/config"
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	_ "github.com/elastic/beats/v7/filebeat/include"
 	"github.com/elastic/beats/v7/filebeat/input"
-	"github.com/elastic/beats/v7/filebeat/input/filestream/takeover"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/compat"
 	"github.com/elastic/beats/v7/filebeat/registrar"
@@ -49,7 +47,6 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/elastic-agent-libs/paths"
 	"github.com/elastic/go-concert/unison"
 
 	// Add filebeat level processors
@@ -125,7 +122,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if b.API != nil {
-		if err = inputmon.AttachHandler(b.API.Router(), b.Info.Monitoring.NamespaceRegistry()); err != nil {
+		if err = inputmon.AttachHandler(b.API.Router(), nil); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
@@ -133,7 +130,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON(b.Info.Monitoring.NamespaceRegistry())
+				data, err := inputmon.MetricSnapshotJSON(nil)
 				if err != nil {
 					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
@@ -168,7 +165,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if *once && config.ConfigInput.Enabled() && config.ConfigModules.Enabled() {
-		return nil, fmt.Errorf("input configs and -once cannot be used together")
+		return nil, fmt.Errorf("input configs and --once cannot be used together")
 	}
 
 	if config.IsInputEnabled("stdin") && len(enabledInputs) > 1 {
@@ -227,11 +224,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 				newPath := strings.TrimSuffix(origPath, ".yml")
 				_ = fb.config.ConfigModules.SetString("path", -1, newPath)
 			}
-<<<<<<< HEAD
-			modulesLoader := cfgfile.NewReloader(fb.pipeline, fb.config.ConfigModules)
-=======
 			modulesLoader := cfgfile.NewReloader(fb.logger.Named("module.reloader"), fb.pipeline, fb.config.ConfigModules)
->>>>>>> 8920a0598 ([Chore][libbeat] Replace global logger with single logger instance (#43493))
 			modulesLoader.Load(modulesFactory)
 		}
 
@@ -336,18 +329,6 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 			stateStore.notifier.Notify(configCopy)
 			return nil
 		})
-	}
-
-<<<<<<< HEAD
-	err = processLogInputTakeOver(stateStore, config)
-	if err != nil {
-		logp.Err("Failed to attempt filestream state take over: %+v", err)
-=======
-	err = filestream.ValidateInputIDs(config.Inputs, fb.logger.Named("input.filestream"))
-	if err != nil {
-		fb.logger.Errorf("invalid filestream configuration: %+v", err)
->>>>>>> 8920a0598 ([Chore][libbeat] Replace global logger with single logger instance (#43493))
-		return err
 	}
 
 	// Setup registrar to persist state
@@ -563,32 +544,6 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.Pip
 		return esClient, nil
 	}
 	return pipelineLoaderFactory
-}
-
-// some of the filestreams might want to take over the loginput state
-// if their `take_over` flag is set to `true`.
-func processLogInputTakeOver(stateStore statestore.States, config *cfg.Config) error {
-	inputs, err := fetchInputConfiguration(config)
-	if err != nil {
-		return fmt.Errorf("Failed to fetch input configuration when attempting take over: %w", err)
-	}
-	if len(inputs) == 0 {
-		return nil
-	}
-
-	store, err := stateStore.StoreFor("")
-	if err != nil {
-		return fmt.Errorf("Failed to access state when attempting take over: %w", err)
-	}
-	defer store.Close()
-	logger := logp.NewLogger("filestream-takeover")
-
-	registryHome := paths.Resolve(paths.Data, config.Registry.Path)
-	registryHome = filepath.Join(registryHome, "filebeat")
-
-	backuper := backup.NewRegistryBackuper(logger, registryHome)
-
-	return takeover.TakeOverLogInputStates(logger, store, backuper, inputs)
 }
 
 // fetches all the defined input configuration available at Filebeat startup including external files.

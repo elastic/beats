@@ -188,15 +188,9 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		"template.enabled": false,
 	})
 
-<<<<<<< HEAD
 	logger := logptest.NewTestingLogger(t, "")
-	info := beat.Info{Beat: "libbeat"}
-	im, err := idxmgmt.DefaultSupport(logger, info, conf.MustNewConfigFrom(
-=======
-	logger := logp.NewTestingLogger(t, "")
 	info := beat.Info{Beat: "libbeat", Logger: logger}
 	im, err := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(
->>>>>>> 8920a0598 ([Chore][libbeat] Replace global logger with single logger instance (#43493))
 		map[string]interface{}{
 			"setup.ilm.enabled": false,
 		},
