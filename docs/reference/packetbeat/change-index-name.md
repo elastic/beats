@@ -5,7 +5,7 @@ mapped_pages:
 
 # Change the index name [change-index-name]
 
-Packetbeat uses data streams named `packetbeat-9.0.0-beta1`. To use a different name, set the [`index`](/reference/packetbeat/elasticsearch-output.md#index-option-es) option in the {{es}} output. You also need to configure the `setup.template.name` and `setup.template.pattern` options to match the new name. For example:
+Packetbeat uses data streams named `packetbeat-[version]`. To use a different name, set the [`index`](/reference/packetbeat/elasticsearch-output.md#index-option-es) option in the {{es}} output. You also need to configure the `setup.template.name` and `setup.template.pattern` options to match the new name. For example:
 
 ```sh
 output.elasticsearch.index: "customname-%{[agent.version]}"

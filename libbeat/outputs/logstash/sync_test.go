@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 )
 
@@ -67,7 +68,11 @@ func makeTestClient(conn *transport.Client) testClientDriver {
 	config := defaultConfig()
 	config.Timeout = 1 * time.Second
 	config.TTL = 5 * time.Second
-	client, err := newSyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		panic(err)
+	}
+	client, err := newSyncClient(beat.Info{Logger: logger}, conn, outputs.NewNilObserver(), &config)
 	if err != nil {
 		panic(err)
 	}
