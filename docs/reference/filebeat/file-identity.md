@@ -51,7 +51,7 @@ Here is the brief high-level comparison of all currently available options:
 | path | Files are never moved or renamed, file names are never re-used. | Simple and fast. | The most unstable option, requires to maintain immutable file paths. |
 | native | Stable file systems, files < 64 bytes in size, ingestion without delays. | Low CPU / memory overhead. | Might cause data duplication or data loss if the file system provides unstable `inode` or `device` values. No support for network shares, containers or VMs.
 | inode_marker | Same as `native` but `device` number is changing. | Same as `native` + no dependency on `device` number. | Can still cause data duplication or data loss due to unstable `inode` values provided by the file system. Also, no support for network shares, containers or VMs. |
-| fingerprint | Files > 64 bytes in size (1 KB is a recommended default). Log files with unique content. | The most stable. Support for network shares, containers and VMs. | Slightly higher CPU / memory usage, does not start to ingest files before they reach the required size (1 KB by default). |
+| fingerprint | Files > 64 bytes in size (1 KB is a recommended default). Log files with unique content. | The most stable. Support for any OS, any file system, network shares, containers and VMs. | Slightly higher CPU / memory usage, does not start to ingest files before they reach the required size (1 KB by default). |
 
 ### `path`
 
@@ -68,7 +68,7 @@ This file identity implementation is using:
 
 It combines these values together into a unique file identifier.
 
-It's stable on most common file systems. However, when used on some uncommon file systems, network shares, in containers or in virtualized environments it might lead to data duplication. This happens due to the re-use of `inode` values by the file system or a change of device numbers after reboot or reconnected network.
+It's stable under normal circumstances. However, when used in some environments with uncommon file systems, on network shares, in containers or in virtualized environments it might lead to data duplication. This happens due to the re-use of `inode` values by the file system or a change of device numbers after reboot or reconnected network.
 
 This Bash script can demonstrate whether your file system is susceptible to the inode re-use problem:
 
@@ -160,9 +160,9 @@ In the context of the filestream input, fingerprint is a hash string computed fr
 
 By default, the hashed part of the file is the first 1024 bytes (`offset: 0`, `length: 1024`). Most of the log files have timestamps and other unique segments on each line that make sure that the first 1024 bytes combined together constitute a unique set of characters. This makes sure that a produced fingerprint is a stable unique identifier for each file.
 
-If necessary it's possible to move this hashed byte range farther in the file by adjusting `prospector.scanner.fingerprint.offset`. It's also possible to change the amount of bytes used for hashing by adjusting `prospector.scanner.fingerprint.length` (minimum value is 64). Keep in mind, the smaller the range, the more likely it is to hit a collision, so the fingerprint (ID) is not unique anymore. If this happens only the first file with a collided ID will be ingested.
+If necessary it's possible to move this hashed byte range farther in the file by adjusting `prospector.scanner.fingerprint.offset`. It's also possible to change the amount of bytes used for hashing by adjusting `prospector.scanner.fingerprint.length` (minimum value is 64 bytes). Keep in mind, the smaller the range, the more likely it is to hit a collision, so the fingerprint (ID) is not unique anymore. If this happens only the first file with a collided ID will be ingested.
 
-This file identity covers most of the use-cases. It's OS-agnostic, supports any file system including network shares and it makes sure to avoid data duplication or data loss.
+This file identity covers most of the use-cases, it's OS-agnostic, supports any file system including network shares and it makes sure to avoid data duplication or data loss.
 
 However, there is a trade off: using this file identity delays ingesting data from files smaller than the required amount of bytes for computing the fingerprint.
 
