@@ -15,21 +15,21 @@ These images are free to use under the Elastic license. They contain open source
 
 Obtaining Auditbeat for Docker is as simple as issuing a `docker pull` command against the Elastic Docker registry.
 
-::::{warning}
-Version 9.0.0-beta1 of Auditbeat has not yet been released. No Docker image is currently available for Auditbeat 9.0.0-beta1.
-::::
+% ::::{warning} subs=true
+% Version {{stack-version}} of Auditbeat has not yet been released. No Docker image is currently available for Auditbeat {{stack-version}}.
+% ::::
 
 
-```sh
-docker pull docker.elastic.co/beats/auditbeat:9.0.0-beta1
+```sh subs=true
+docker pull docker.elastic.co/beats/auditbeat:{{stack-version}}
 ```
 
 Alternatively, you can download other Docker images that contain only features available under the Apache 2.0 license. To download the images, go to [www.docker.elastic.co](https://www.docker.elastic.co).
 
 As another option, you can use the hardened [Wolfi](https://wolfi.dev/) image. Using Wolfi images requires Docker version 20.10.10 or higher. For details about why the Wolfi images have been introduced, refer to our article [Reducing CVEs in Elastic container images](https://www.elastic.co/blog/reducing-cves-in-elastic-container-images).
 
-```bash
-docker pull docker.elastic.co/beats/auditbeat-wolfi:9.0.0-beta1
+```bash subs=true
+docker pull docker.elastic.co/beats/auditbeat-wolfi:{{stack-version}}
 ```
 
 
@@ -37,20 +37,20 @@ docker pull docker.elastic.co/beats/auditbeat-wolfi:9.0.0-beta1
 
 You can use the [Cosign application](https://docs.sigstore.dev/cosign/installation/) to verify the Auditbeat Docker image signature.
 
-::::{warning}
-Version 9.0.0-beta1 of Auditbeat has not yet been released. No Docker image is currently available for Auditbeat 9.0.0-beta1.
-::::
+% ::::{warning} subs=true
+% Version {{stack-version}} of Auditbeat has not yet been released. No Docker image is currently available for Auditbeat {{stack-version}}.
+% ::::
 
 
-```sh
+```sh subs=true
 wget https://artifacts.elastic.co/cosign.pub
-cosign verify --key cosign.pub docker.elastic.co/beats/auditbeat:9.0.0-beta1
+cosign verify --key cosign.pub docker.elastic.co/beats/auditbeat:{{stack-version}}
 ```
 
 The `cosign` command prints the check results and the signature payload in JSON format:
 
-```sh
-Verification for docker.elastic.co/beats/auditbeat:9.0.0-beta1 --
+```sh subs=true
+Verification for docker.elastic.co/beats/auditbeat:{{stack-version}} --
 The following checks were performed on each of these signatures:
   - The cosign claims were validated
   - Existence of the claims in the transparency log was verified offline
@@ -67,11 +67,11 @@ A [known issue](https://github.com/elastic/beats/issues/42038) in version 8.17.0
 
 Running Auditbeat with the setup command will create the index pattern and load visualizations , dashboards, and machine learning jobs.  Run this command:
 
-```sh
+```sh subs=true
 docker run --rm \
   --cap-add="AUDIT_CONTROL" \
   --cap-add="AUDIT_READ" \
-  docker.elastic.co/beats/auditbeat:9.0.0-beta1 \
+  docker.elastic.co/beats/auditbeat:{{stack-version}} \
   setup -E setup.kibana.host=kibana:5601 \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 ```
@@ -92,11 +92,11 @@ If you’d like to run Auditbeat in a Docker container on a read-only file syste
 
 For example:
 
-```sh
+```sh subs=true
 docker run --rm \
   --mount type=bind,source=$(pwd)/data,destination=/usr/share/auditbeat/data \
   --read-only \
-  docker.elastic.co/beats/auditbeat:9.0.0-beta1
+  docker.elastic.co/beats/auditbeat:{{stack-version}}
 ```
 
 
@@ -117,7 +117,7 @@ curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/docker/
 
 One way to configure Auditbeat on Docker is to provide `auditbeat.docker.yml` via a volume mount. With `docker run`, the volume mount can be specified like this.
 
-```sh
+```sh subs=true
 docker run -d \
   --name=auditbeat \
   --user=root \
@@ -125,7 +125,7 @@ docker run -d \
   --cap-add="AUDIT_CONTROL" \
   --cap-add="AUDIT_READ" \
   --pid=host \
-  docker.elastic.co/beats/auditbeat:9.0.0-beta1 -e \
+  docker.elastic.co/beats/auditbeat:{{stack-version}} -e \
   --strict.perms=false \
   -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
 ```
@@ -144,8 +144,8 @@ The `auditbeat.docker.yml` downloaded earlier should be customized for your envi
 
 It’s possible to embed your Auditbeat configuration in a custom image. Here is an example Dockerfile to achieve this:
 
-```dockerfile
-FROM docker.elastic.co/beats/auditbeat:9.0.0-beta1
+```dockerfile subs=true
+FROM docker.elastic.co/beats/auditbeat:{{stack-version}}
 COPY auditbeat.yml /usr/share/auditbeat/auditbeat.yml
 ```
 
@@ -157,8 +157,8 @@ Under Docker, Auditbeat runs as a non-root user, but requires some privileged ca
 
 It is also essential to run Auditbeat in the host PID namespace.
 
-```sh
-docker run --cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --user=root --pid=host docker.elastic.co/beats/auditbeat:9.0.0-beta1
+```sh subs=true
+docker run --cap-add=AUDIT_CONTROL --cap-add=AUDIT_READ --user=root --pid=host docker.elastic.co/beats/auditbeat:{{stack-version}}
 ```
 
 
