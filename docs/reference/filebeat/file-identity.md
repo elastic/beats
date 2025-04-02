@@ -49,9 +49,9 @@ Here is the brief high-level comparison of all currently available options:
 | Name | Use case | Pros | Cons |
 |------|----------|------|------|
 | path | Files are never moved or renamed, file names are never re-used. | Simple and fast. | The most unstable option, requires to maintain immutable file paths. |
-| native | Stable file systems, files < 64 bytes in size, ingestion without delays. | Low CPU / memory overhead. | Might cause data duplication or data loss if the file system provides unstable `inode` or `device` values. No support for network shares, containers or VMs.
+| native **(default in Filebeat < 9.0)** | Stable file systems, files < 64 bytes in size, ingestion without delays. | Low CPU / memory overhead. | Might cause data duplication or data loss if the file system provides unstable `inode` or `device` values. No support for network shares, containers or VMs.
 | inode_marker | Same as `native` but `device` number is changing. | Same as `native` + no dependency on `device` number. | Can still cause data duplication or data loss due to unstable `inode` values provided by the file system. Also, no support for network shares, containers or VMs. |
-| fingerprint | Files > 64 bytes in size (1 KB is a recommended default). Log files with unique content. | The most stable. Support for any OS, any file system, network shares, containers and VMs. | Slightly higher CPU / memory usage, does not start to ingest files before they reach the required size (1 KB by default). |
+| fingerprint **(default in Filebeat >= 9.0)** | Files > 64 bytes in size (1 KB is a recommended default). Log files with unique content. | The most stable. Support for any OS, any file system, network shares, containers and VMs. | Slightly higher CPU / memory usage, does not start to ingest files before they reach the required size (1 KB by default). |
 
 ### `path`
 
