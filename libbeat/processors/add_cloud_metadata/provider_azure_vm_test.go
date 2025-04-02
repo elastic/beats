@@ -37,7 +37,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -162,8 +161,6 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 			return clientFactory.NewManagedClustersClient()
 		}
 	}()
-
-	logp.TestingSetup()
 
 	server := initAzureTestServer()
 	defer server.Close()
