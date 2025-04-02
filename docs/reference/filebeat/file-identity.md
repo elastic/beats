@@ -38,7 +38,13 @@ File identity is controlled by the `file_identity` configuration [option](/refer
 
 It's possible to try out multiple file identities during test runs and see how well each file identity works in your environment.
 
-After changing the file identity configuration, on its next startup Filebeat tries to migrate all known file offsets from one file identity to another indicating this process in logs. However, it's important to choose your file identity before the production deployment since, due to the nature of the problem, the offset migration between file identities is not considered to be stable enough to have any guarantees. There are edge-cases that make identification ambiguous and prevent offsets from being migrated.
+After changing the file identity configuration, on its next startup Filebeat tries to migrate all known file offsets from one file identity to another indicating this process in logs.
+
+::::{important}
+Filebeat supports switching only from `path` or `native` file identity to the `fingerprint` file identity. Any other switch would start ingesting files from the beginning causing data duplication.
+::::
+
+It's important to choose your file identity before the production deployment to avoid any risks related to the offset migration between file identities. For example, accidentally choosing to migrate from `fingerprint` to `native` which is not supported.
 
 ## Supported options
 
