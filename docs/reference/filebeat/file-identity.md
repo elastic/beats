@@ -14,7 +14,7 @@ Files can be renamed, moved or replaced during ingestion and filestream must be 
 One of the most common examples is log rotation:
 
 * Let's say we just track files by their names / paths.
-* Imagine that after reaching 10 MB in size a log file `important.log` gets renamed to `important.log.old` and a new file is started in its place
+* Imagine that after reaching 10 MB in size a log file `important.log` gets renamed to `important.log.old` and a new file is started in its place.
 * This log rotation happens before we reach the end of file (EOF) on `important.log`.
 
 Depending on your configuration 2 different things can happen:
