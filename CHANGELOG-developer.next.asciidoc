@@ -220,6 +220,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add CEL input program evaluation coverage collection support. {pull}41884[41884]
 - Fix test framework and python tests saving config file with wrong permission. {issue}42779[42779]
 - Tests reading testdata config file now set flag `strict.perms=false`. They use the new `testflag` package helper function MustSetStrictPermsFalse. {issue}42779[42779]
+- Updated github.com/dgraph-io/badger/v4 package to version 4.6.0. {issue}42443[42443]
 
 ==== Deprecated
 
