@@ -1,6 +1,6 @@
 The vSphere module uses the https://github.com/vmware/govmomi[Govmomi] library to collect metrics from any VMware SDK URL (ESXi/VCenter).
 
-This module has been tested against ESXi and vCenter versions 5.5, 6.0, 6.5, and 7.0.3.
+This module has been tested against ESXi and vCenter versions 5.5, 6.0, 6.5, 7.0.3 and 8.0.
 
 By default, the vSphere module enables the following metricsets:
 
