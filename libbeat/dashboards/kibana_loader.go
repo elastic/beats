@@ -67,7 +67,7 @@ func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Confi
 
 	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatInfo.Beat)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating Kibana client: %w", err) //nolint:staticcheck //Keep old behavior
+		return nil, fmt.Errorf("Error creating Kibana client: %w", err)
 	}
 
 	loader := KibanaLoader{
@@ -97,7 +97,7 @@ func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryA
 				return getKibanaClient(ctx, cfg, retryCfg, retryAttempt+1, beatname)
 			}
 		}
-		return nil, fmt.Errorf("Error creating Kibana client: %w", err) //nolint:staticcheck //Keep old behavior
+		return nil, fmt.Errorf("Error creating Kibana client: %w", err)
 	}
 	return client, nil
 }
