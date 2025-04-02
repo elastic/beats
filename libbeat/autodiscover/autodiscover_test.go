@@ -34,6 +34,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest/observer"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
@@ -211,7 +212,8 @@ func TestAutodiscover(t *testing.T) {
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	logger := logp.NewTestingLogger(t, "")
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -364,8 +366,9 @@ func TestAutodiscoverHash(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
+	logger := logp.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -428,8 +431,9 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
+	logger := logp.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -496,8 +500,9 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
+	logger := logp.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -555,8 +560,9 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
+	logger := logp.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -671,9 +677,9 @@ func TestAutodiscoverDebounce(t *testing.T) {
 	k, _ := keystore.NewFileKeystore("test")
 
 	adapter := mockAdapter{}
-
+	logger := logp.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -748,15 +754,14 @@ func TestAutodiscoverDebounce(t *testing.T) {
 }
 
 func printDebugLogsOnFailure(t *testing.T) {
-	// Use the following line to have the logs being printed
-	// in real time.
-	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
-	logp.DevelopmentSetup(logp.ToObserverOutput())
+	observed, zapLogs := observer.New(zapcore.DebugLevel)
+	_, err := logp.ConfigureWithCoreLocal(logp.Config{}, observed)
+	require.NoError(t, err)
 
 	t.Cleanup(func() {
 		if t.Failed() {
 			t.Logf("Debug Logs:\n")
-			for _, log := range logp.ObserverLogs().TakeAll() {
+			for _, log := range zapLogs.TakeAll() {
 				data, err := json.Marshal(log)
 				if err != nil {
 					t.Errorf("failed encoding log as JSON: %s", err)
@@ -858,8 +863,9 @@ func TestErrNonReloadableIsNotRetried(t *testing.T) {
 		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore(filepath.Join(t.TempDir(), "keystore"))
+	logger := logp.NewTestingLogger(t, "")
 	// Create autodiscover manager
-	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k, logger)
 	if err != nil {
 		t.Fatal(err)
 	}

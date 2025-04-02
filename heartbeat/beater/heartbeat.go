@@ -184,7 +184,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	}
 
 	if bt.config.ConfigMonitors.Enabled() {
-		bt.monitorReloader = cfgfile.NewReloader(logp.L().Named("module.reload"), b.Publisher, bt.config.ConfigMonitors)
+		bt.monitorReloader = cfgfile.NewReloader(b.Info.Logger.Named("module.reload"), b.Publisher, bt.config.ConfigMonitors)
 		defer bt.monitorReloader.Stop()
 
 		err := bt.RunReloadableMonitors()
@@ -285,7 +285,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 		return nil
 	})
 
-	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher)
+	inputs := cfgfile.NewRunnerList(management.DebugK, bt.monitorFactory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(inputs)
 }
 
@@ -311,6 +311,7 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 		autodiscover.QueryConfig(),
 		bt.config.Autodiscover,
 		b.Keystore,
+		b.Info.Logger,
 	)
 	if err != nil {
 		return nil, err

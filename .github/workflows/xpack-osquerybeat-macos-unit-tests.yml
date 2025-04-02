@@ -1,36 +1,32 @@
-name: xpack-auditbeat-macos-unit-tests
+name: xpack-osquerybeat-macos-unit-tests
 
 env:
-  BEAT: "x-pack/auditbeat"
+  BEAT: "x-pack/osquerybeat"
 
 on:
   pull_request:
     paths:
-      - auditbeat/
-      - x-pack/auditbeat/
+      - x-pack/osquerybeat
+      - x-pack/libbeat/**
       # OSS
       - go.mod
-      - pytest.ini
       - dev-tools/
-      - libbeat/
-      - x-pack/libbeat/
+      - libbeat/**
       # Workflow
-      - .github/workflows/xpack-auditbeat-macos-unit-tests.yml
+      - .github/workflows/xpack-osquerybeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
   push:
     branches:
       - main
     paths:
-      - auditbeat/
-      - x-pack/auditbeat/
+      - x-pack/osquerybeat
+      - x-pack/libbeat/**
       # OSS
       - go.mod
-      - pytest.ini
       - dev-tools/
-      - libbeat/
-      - x-pack/libbeat/
+      - libbeat/**
       # Workflow
-      - .github/workflows/xpack-auditbeat-macos-unit-tests.yml
+      - .github/workflows/xpack-osquerybeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
 
 permissions:
@@ -48,6 +44,7 @@ jobs:
     if: github.event_name == 'push'
     strategy:
       fail-fast: false
+      max-parallel: 10
       matrix:
         os: [macos-13, macos-14]
     runs-on: ${{ matrix.os }}
