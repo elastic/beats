@@ -87,7 +87,7 @@ func makeRedis(
 	case "channel":
 		dataType = redisChannelType
 	default:
-		return outputs.Fail(errors.New("Bad Redis data type"))
+		return outputs.Fail(errors.New("Bad Redis data type")) //nolint:staticcheck //Keep old behavior
 	}
 
 	key, err := buildKeySelector(cfg)
@@ -161,7 +161,7 @@ func makeRedis(
 		}
 
 		client := newClient(conn, observer, rConfig.Timeout,
-			pass, rConfig.Db, key, dataType, rConfig.Index, enc)
+			pass, rConfig.Db, key, dataType, rConfig.Index, enc, beat.Logger)
 		clients[i] = newBackoffClient(client, rConfig.Backoff.Init, rConfig.Backoff.Max)
 	}
 
