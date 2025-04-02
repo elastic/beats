@@ -55,8 +55,8 @@ Here is the brief high-level comparison of all currently available options:
 | Name | Use case | Pros | Cons |
 |------|----------|------|------|
 | path | Files are never moved or renamed, file names are never re-used. | Simple and fast. | The most unstable option, requires to maintain immutable file paths. |
-| native (default in Filebeat < 9.0) | Stable file systems, files < 64 bytes in size, ingestion without delays. | Low CPU / memory overhead. | Might cause data duplication or data loss if the file system provides unstable `inode` or `device` values. No support for network shares, containers or VMs.
-| inode_marker | Same as `native` but `device` number is changing. | Same as `native` + no dependency on `device` number. | Can still cause data duplication or data loss due to unstable `inode` values provided by the file system. Also, no support for network shares, containers or VMs. |
+| native (default in Filebeat < 9.0) | Stable file systems, files < 64 bytes in size, ingestion without delays. | Low CPU / memory overhead. | Might cause data duplication or data loss if the file system provides unstable `inode` or `device ID` values. No support for network shares, containers or VMs.
+| inode_marker | Same as `native` but `device ID` is changing. | Same as `native` + no dependency on `device ID`. | Can still cause data duplication or data loss due to unstable `inode` values provided by the file system. Also, no support for network shares, containers or VMs. |
 | fingerprint (default in Filebeat >= 9.0) | Files > 64 bytes in size (1 KB is a recommended default). Log files with unique content. | The most stable. Support for any OS, any file system, network shares, containers and VMs. | Slightly higher CPU / memory usage, does not start to ingest files before they reach the required size (1 KB by default). |
 
 ### `path`
@@ -69,12 +69,12 @@ If you're completely certain that your environment does not have log rotation, d
 
 This file identity implementation is using:
 
-* For Unix-like systems: the `device` number and [`inode`](https://www.man7.org/linux/man-pages/man7/inode.7.html) from the [`stat`](https://www.man7.org/linux/man-pages/man2/stat.2.html) call. Can be viewed by using the `stat` command on any file.
+* For Unix-like systems: the `device ID` (`st_dev`, also known as a "device number") and [`inode`](https://www.man7.org/linux/man-pages/man7/inode.7.html) (`ino_t`) from the [`stat`](https://www.man7.org/linux/man-pages/man3/stat.3type.html) call. Can be viewed by using the `stat` command on any file.
 * For Windows: `dwVolumeSerialNumber`, `nFileIndexLow` and `nFileIndexHigh` values from the [file handler](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/ns-fileapi-by_handle_file_information).
 
 It combines these values together into a unique file identifier.
 
-It's stable under normal circumstances. However, when used in some environments with uncommon file systems, on network shares, in containers or in virtualized environments it might lead to data duplication. This happens due to the re-use of `inode` values by the file system or a change of device numbers after reboot or reconnected network.
+It's stable under normal circumstances. However, when used in some environments with uncommon file systems, on network shares, in containers or in virtualized environments it might lead to data duplication. This happens due to the re-use of `inode` values by the file system or a change of device IDs after reboot or reconnected network.
 
 This Bash script can demonstrate whether your file system is susceptible to the inode re-use problem:
 
@@ -144,15 +144,15 @@ As mentioned before, it's common for containerized environments and network shar
 
 It's not only `inode` values: when using the Linux [LVM](https://en.wikipedia.org/wiki/Logical_Volume_Manager_%28Linux%29) (Logical Volume Manager), device numbers are allocated dynamically at module load (refer to [Persistent Device Numbers](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/lv#persistent_numbers) in the Red Hat Enterprise Linux documentation).
 
-However, this problem with device numbers can be fixed by our next file identity option.
+However, this problem with device numbers (IDs) can be fixed by our next file identity option.
 
 ### `inode_marker`
 
-Let's say you verified that your file system does not re-use `inode` values and it's safe to rely on them. But you found out that the device number was changing and caused Filebeat to re-ingest all the data from the beginning causing data duplication.
+Let's say you verified that your file system does not re-use `inode` values and it's safe to rely on them. But you found out that the `device ID` was changing and caused Filebeat to re-ingest all the data from the beginning causing data duplication.
 
-This can be fixed by using a special marker file on your file system instead of asking the OS for a device number.
+This can be fixed by using a special marker file on your file system instead of asking the OS for a `device ID`.
 
-Users specify a path by setting `file_identity.inode_marker.path`. This path leads to a file that has some short unique text that remains unchanged forever. The content of this file replaces the `device` number in the `native` file identity. The rest remains the same as `native`.
+Users specify a path by setting `file_identity.inode_marker.path`. This path leads to a file that has some short unique text that remains unchanged forever. The content of this file replaces the `device ID` in the `native` file identity. The rest remains the same as `native`.
 
 ### `fingerprint`
 
