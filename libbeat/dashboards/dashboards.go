@@ -76,11 +76,11 @@ func setupAndImportDashboardsViaKibana(ctx context.Context, beatInfo beat.Info, 
 func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields mapstr.M) error {
 	version := kibanaLoader.version
 	if !version.IsValid() {
-		return errors.New("no valid kibana version available")
+		return errors.New("No valid kibana version available") //nolint:staticcheck //Keep old behavior
 	}
 
 	if !isKibanaAPIavailable(kibanaLoader.version) {
-		return fmt.Errorf("kibana API is not available in Kibana version %s", kibanaLoader.version.String())
+		return fmt.Errorf("Kibana API is not available in Kibana version %s", kibanaLoader.version.String()) //nolint:staticcheck //Keep old behavior
 	}
 
 	importer, err := NewImporter(version, kibanaLoader.config, *kibanaLoader, fields)

@@ -87,7 +87,7 @@ func makeRedis(
 	case "channel":
 		dataType = redisChannelType
 	default:
-		return outputs.Fail(errors.New("bad Redis data type"))
+		return outputs.Fail(errors.New("Bad Redis data type")) //nolint:staticcheck //Keep old behavior
 	}
 
 	key, err := buildKeySelector(cfg)

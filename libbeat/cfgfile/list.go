@@ -95,7 +95,7 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 		hash, err := HashConfig(config.Config)
 		if err != nil {
 			r.logger.Errorf("Unable to hash given config: %s", err)
-			errs = append(errs, fmt.Errorf("unable to hash given config: %w", err))
+			errs = append(errs, fmt.Errorf("Unable to hash given config: %w", err)) //nolint:staticcheck //Keep old behavior
 			continue
 		}
 

@@ -88,7 +88,7 @@ func New(plugins PluginFactory) beat.Creator {
 func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Beater, error) {
 	config := cfg.DefaultConfig
 	if err := rawConfig.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("error reading config file: %w", err)
+		return nil, fmt.Errorf("Error reading config file: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 
 	if err := cfgwarn.CheckRemoved6xSettings(
@@ -417,7 +417,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	// Start the registrar
 	err = registrar.Start()
 	if err != nil {
-		return fmt.Errorf("could not start registrar: %w", err)
+		return fmt.Errorf("Could not start registrar: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 
 	// Stopping registrar will write last state
@@ -442,7 +442,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	if err != nil {
 		crawler.Stop()
 		cancelPipelineFactoryCtx()
-		return fmt.Errorf("failed to start crawler: %w", err)
+		return fmt.Errorf("Failed to start crawler: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 
 	// If run once, add crawler completion check as alternative to done signal
@@ -546,7 +546,7 @@ func newPipelineLoaderFactory(ctx context.Context, esConfig *conf.C) fileset.Pip
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
 		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat")
 		if err != nil {
-			return nil, fmt.Errorf("error creating Elasticsearch client: %w", err)
+			return nil, fmt.Errorf("Error creating Elasticsearch client: %w", err)
 		}
 		return esClient, nil
 	}

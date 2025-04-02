@@ -52,7 +52,7 @@ type CfgFile struct {
 //   - disabledExtension - extension to append for disabled confs (ie: .disabled)
 func NewGlobManager(glob, enabledExtension, disabledExtension string, logger *logp.Logger) (*GlobManager, error) {
 	if !strings.HasSuffix(glob, enabledExtension) {
-		return nil, errors.New("glob should have the enabledExtension as suffix")
+		return nil, errors.New("Glob should have the enabledExtension as suffix") //nolint:staticcheck //Keep old behavior
 	}
 
 	g := &GlobManager{

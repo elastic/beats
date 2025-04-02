@@ -67,7 +67,7 @@ func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Confi
 
 	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatInfo.Beat)
 	if err != nil {
-		return nil, fmt.Errorf("error creating Kibana client: %w", err)
+		return nil, fmt.Errorf("Error creating Kibana client: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 
 	loader := KibanaLoader{
@@ -97,7 +97,7 @@ func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryA
 				return getKibanaClient(ctx, cfg, retryCfg, retryAttempt+1, beatname)
 			}
 		}
-		return nil, fmt.Errorf("error creating Kibana client: %w", err)
+		return nil, fmt.Errorf("Error creating Kibana client: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 	return client, nil
 }
@@ -105,7 +105,7 @@ func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryA
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String()) //nolint:staticcheck //Keep old behavior
 	}
 
 	loader.statusMsg("Importing index file from %s", file)
@@ -150,7 +150,7 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String()) //nolint:staticcheck //Keep old behavior
 	}
 
 	loader.statusMsg("Importing dashboard from %s", file)

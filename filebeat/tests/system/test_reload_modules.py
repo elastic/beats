@@ -113,7 +113,7 @@ class Test(BaseTest):
         os.rename(self.working_dir + "/configs/system.yml.test",
                   self.working_dir + "/configs/system.yml")
 
-        self.wait_until(lambda: self.log_contains("Error loading pipeline: error creating Elasticsearch client"))
+        self.wait_until(lambda: self.log_contains("Error loading pipeline: Error creating Elasticsearch client"))
         proc.check_kill_and_wait(0)
 
     def test_start_stop(self):
