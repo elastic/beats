@@ -36,7 +36,7 @@ import (
 // The returned cancel function *must* be called when the input stops to
 // unregister the metrics and prevent resource leaks.
 //
-// Deprecated. Use input/v2.NewMetricsRegistry instead.
+// Deprecated. Use NewMetricsRegistry instead.
 func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
@@ -74,7 +74,6 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 		"input_id", inputID,
 		"metrics_id", metricsID)
 
-	// TODO: test adding and removing an new input to ensure the registry is removed
 	return reg, func() {
 		log.Infow("unregistering", "input_type", inputType,
 			"input_id", inputID,
@@ -102,8 +101,8 @@ func MetricSnapshotJSON(reg *monitoring.Registry) ([]byte, error) {
 // NewMetricsRegistry creates a monitoring.Registry for an input.
 //
 // The metric registry is created on parent with
-// name 'inputID' ('.' are replaced by '_') and populated with 'id: inputID' and
-// 'input: inputType'.
+// name 'inputID' (all '.' are replaced by '_') and populated with
+// 'id: inputID' and 'input: inputType'.
 //
 // Call CancelMetricsRegistry to remove it from the parent registry and free up
 // the associated resources.
@@ -132,10 +131,11 @@ func NewMetricsRegistry(
 	return reg
 }
 
+// CancelMetricsRegistry removes the metrics registry for inputID from parent.
 func CancelMetricsRegistry(
 	inputID string,
 	inputType string,
-	reg *monitoring.Registry,
+	parent *monitoring.Registry,
 	log *logp.Logger) {
 
 	metricsID := sanitizeID(inputID)
@@ -144,5 +144,5 @@ func CancelMetricsRegistry(
 		"input_id", inputID,
 		"input_type", inputType)
 
-	reg.Remove(metricsID)
+	parent.Remove(metricsID)
 }

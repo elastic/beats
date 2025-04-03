@@ -35,10 +35,6 @@ const (
 	applicationJSON = "application/json; charset=utf-8"
 )
 
-type StructSnapshotCollector interface {
-	CollectStructSnapshot() map[string]map[string]any
-}
-
 type handler struct {
 	globalReg *monitoring.Registry
 	localReg  *monitoring.Registry
