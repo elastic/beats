@@ -38,6 +38,9 @@ var includeMatchesWarnOnce sync.Once
 
 // Config stores the options of a journald input.
 type config struct {
+	// ID is the input ID, each instance must have a unique ID
+	ID string `config:"id"`
+
 	// Paths stores the paths to the journal files to be read.
 	Paths []string `config:"paths"`
 
@@ -62,6 +65,9 @@ type config struct {
 
 	// SaveRemoteHostname defines if the original source of the entry needs to be saved.
 	SaveRemoteHostname bool `config:"save_remote_hostname"`
+
+	// Facility is a list of facilities to filter journal messages
+	Facilities []int `config:"facilities"`
 
 	// Parsers configuration
 	Parsers parser.Config `config:",inline"`

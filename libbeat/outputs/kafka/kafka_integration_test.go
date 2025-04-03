@@ -23,15 +23,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -55,9 +56,8 @@ type eventInfo struct {
 }
 
 func TestKafkaPublish(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("kafka"))
 
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
 	logType := fmt.Sprintf("log-type-%s", id)
 
@@ -240,6 +240,18 @@ func TestKafkaPublish(t *testing.T) {
 				"host": "test-host",
 			}),
 		},
+		{
+			"publish message with zstd compression to test topic",
+			map[string]interface{}{
+				"compression": "zstd",
+				"version":     "2.2",
+			},
+			testTopic,
+			single(mapstr.M{
+				"host":    "test-host",
+				"message": id,
+			}),
+		},
 	}
 
 	defaultConfig := map[string]interface{}{
@@ -254,17 +266,22 @@ func TestKafkaPublish(t *testing.T) {
 
 		cfg := makeConfig(t, defaultConfig)
 		if test.config != nil {
-			cfg.Merge(makeConfig(t, test.config))
+			err := cfg.Merge(makeConfig(t, test.config))
+			if err != nil {
+				t.Fatal(err)
+			}
 		}
 
 		t.Run(name, func(t *testing.T) {
-			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"}, outputs.NewNilObserver(), cfg)
+			logger := logp.NewTestingLogger(t, "")
+			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			output := grp.Clients[0].(*client)
-			if err := output.Connect(); err != nil {
+			output, ok := grp.Clients[0].(*client)
+			assert.True(t, ok, "grp.Clients[0] didn't contain a ptr to client")
+			if err := output.Connect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
 			assert.Equal(t, output.index, "testbeat")
@@ -279,7 +296,10 @@ func TestKafkaPublish(t *testing.T) {
 				}
 
 				wg.Add(1)
-				output.Publish(context.Background(), batch)
+				err := output.Publish(context.Background(), batch)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 
 			// wait for all published batches to be ACKed
@@ -299,7 +319,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			validate := validateJSON
 			if fmt, exists := test.config["codec.format.string"]; exists {
-				validate = makeValidateFmtStr(fmt.(string))
+				validate = makeValidateFmtStr(fmt.(string)) //nolint:errcheck //This is a test file
 			}
 
 			cfgHeaders, headersSet := test.config["headers"]
@@ -335,7 +355,8 @@ func validateJSON(t *testing.T, value []byte, events []beat.Event) string {
 		return ""
 	}
 
-	msg := decoded["message"].(string)
+	msg, ok := decoded["message"].(string)
+	assert.True(t, ok, "type of decoded message was not string")
 	event := findEvent(events, msg)
 	if event == nil {
 		t.Errorf("could not find expected event with message: %v", msg)

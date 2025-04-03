@@ -29,9 +29,11 @@ func TestParsersAgentLogs(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"ndjson": map[string]interface{}{
@@ -65,9 +67,11 @@ func TestParsersIncludeMessage(t *testing.T) {
 	testlogName := "test.log"
 	readLine := "include this"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "100ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "100ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"include_message": map[string]interface{}{
@@ -98,9 +102,11 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"ndjson": map[string]interface{}{
@@ -137,9 +143,11 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"ndjson": map[string]interface{}{
@@ -173,9 +181,11 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"ndjson": map[string]interface{}{
@@ -214,9 +224,11 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -249,9 +261,11 @@ func TestParsersCStyleLog(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -290,9 +304,11 @@ func TestParsersRabbitMQMultilineLog(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -335,9 +351,11 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -379,9 +397,11 @@ func TestParsersMultilineTimeout(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -444,10 +464,12 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
-		"message_max_bytes":                 50,
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"message_max_bytes":                      50,
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -486,10 +508,12 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
-		"close.reader.after_interval":       "1s",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"close.reader.after_interval":            "1s",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{
@@ -551,10 +575,12 @@ func TestParsersConsecutiveNewline(t *testing.T) {
 
 	testlogName := "test.log"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                                "fake-ID",
-		"paths":                             []string{env.abspath(testlogName)},
-		"prospector.scanner.check_interval": "1ms",
-		"close.reader.after_interval":       "1s",
+		"id":                                     "fake-ID",
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "1ms",
+		"close.reader.after_interval":            "1s",
+		"file_identity.native":                   map[string]any{},
+		"prospector.scanner.fingerprint.enabled": false,
 		"parsers": []map[string]interface{}{
 			{
 				"multiline": map[string]interface{}{

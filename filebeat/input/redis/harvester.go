@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	rd "github.com/gomodule/redigo/redis"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -72,6 +72,33 @@ func NewHarvester(conn rd.Conn) (*Harvester, error) {
 	}, nil
 }
 
+// Expected response
+//
+// 1) "master"
+// 2) (integer) 100
+// 3) 1) 1) "10.0.0.2"
+//       2) "6379"
+//       3) "100"
+//    2) 1) "10.0.0.3"
+//       2) "6379"
+//       3) "100"
+//
+// OR
+//
+// 1) "slave"
+// 2) "10.0.0.1"
+// 3) (integer) 6379
+// 4) "connected"
+// 5) (integer) 100
+
+func (h *Harvester) parseReplicationRole(reply []interface{}) (string, error) {
+	role, ok := reply[0].([]byte)
+	if !ok {
+		return "", fmt.Errorf("unexpected type for role response: %T", reply[0])
+	}
+	return string(role), nil
+}
+
 // Run starts a new redis harvester
 func (h *Harvester) Run() error {
 	defer h.conn.Close()
@@ -81,23 +108,40 @@ func (h *Harvester) Run() error {
 		return nil
 	default:
 	}
-	// Writes Slowlog get and slowlog reset both to the buffer so they are executed together
-	h.conn.Send("SLOWLOG", "GET")
-	h.conn.Send("SLOWLOG", "RESET")
-
-	// Flush the buffer to execute both commands and receive the reply from SLOWLOG GET
-	h.conn.Flush()
-
-	// Receives first reply from redis which is the one from GET
-	logs, err := rd.Values(h.conn.Receive())
-	if err != nil {
-		return fmt.Errorf("error receiving slowlog data: %s", err)
+	// Writes Slowlog get, slowlog reset, and role to the buffer so they are executed together
+	if err := h.conn.Send("SLOWLOG", "GET"); err != nil {
+		return fmt.Errorf("error sending slowlog get: %w", err)
+	}
+	if err := h.conn.Send("SLOWLOG", "RESET"); err != nil {
+		return fmt.Errorf("error sending slowlog reset: %w", err)
+	}
+	if err := h.conn.Send("ROLE"); err != nil {
+		return fmt.Errorf("error sending role: %w", err)
 	}
 
-	// Read reply from RESET
+	// Flush the buffer to execute all commands and receive the replies
+	h.conn.Flush()
+
+	// Receives first reply from redis which is the one from SLOWLOG GET
+	logs, err := rd.Values(h.conn.Receive())
+	if err != nil {
+		return fmt.Errorf("error receiving slowlog data: %w", err)
+	}
+
+	// Read reply from SLOWLOG RESET
 	_, err = h.conn.Receive()
 	if err != nil {
-		return fmt.Errorf("error receiving reset data: %s", err)
+		return fmt.Errorf("error receiving reset data: %w", err)
+	}
+
+	// Read reply from ROLE
+	roleReply, err := rd.Values(h.conn.Receive())
+	if err != nil {
+		return fmt.Errorf("error receiving replication role: %w", err)
+	}
+	role, err := h.parseReplicationRole(roleReply)
+	if err != nil {
+		return fmt.Errorf("error parsing replication role: %w", err)
 	}
 
 	for _, item := range logs {
@@ -115,7 +159,11 @@ func (h *Harvester) Run() error {
 
 		var log log
 		var args []string
-		rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		_, err = rd.Scan(entry, &log.id, &log.timestamp, &log.duration, &args)
+		if err != nil {
+			logp.Err("Error scanning slowlog entry: %s", err)
+			continue
+		}
 
 		// This splits up the args into cmd, key, args.
 		argsLen := len(args)
@@ -138,13 +186,14 @@ func (h *Harvester) Run() error {
 			"duration": mapstr.M{
 				"us": log.duration,
 			},
+			"role": role,
 		}
 
 		if log.args != nil {
 			slowlogEntry["args"] = log.args
 		}
 
-		h.forwarder.Send(beat.Event{
+		err = h.forwarder.Send(beat.Event{
 			Timestamp: time.Unix(log.timestamp, 0).UTC(),
 			Fields: mapstr.M{
 				"message": strings.Join(args, " "),
@@ -156,6 +205,10 @@ func (h *Harvester) Run() error {
 				},
 			},
 		})
+		if err != nil {
+			logp.Err("Error sending beat event: %s", err)
+			continue
+		}
 	}
 	return nil
 }

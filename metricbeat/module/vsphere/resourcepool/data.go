@@ -32,6 +32,7 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 	event := mapstr.M{
 		"name":   rp.Name,
 		"status": rp.OverallStatus,
+		"id":     rp.Self.Value,
 	}
 
 	quickStats := rp.Summary.GetResourcePoolSummary().QuickStats
@@ -58,6 +59,10 @@ func (m *ResourcePoolMetricSet) mapEvent(rp mo.ResourcePool, data *metricData) m
 	if len(data.assetNames.outputVmNames) > 0 {
 		event.Put("vm.names", data.assetNames.outputVmNames)
 		event.Put("vm.count", len(data.assetNames.outputVmNames))
+	}
+
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
 	}
 
 	return event

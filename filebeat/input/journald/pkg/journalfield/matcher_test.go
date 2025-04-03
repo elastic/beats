@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux && cgo
+//go:build linux
 
 package journalfield
 
@@ -28,24 +28,6 @@ func TestValidate(t *testing.T) {
 		error bool
 	}{
 		{
-			name: "OR condition exists",
-			im: IncludeMatches{
-				OR: []IncludeMatches{
-					{},
-				},
-			},
-			error: true,
-		},
-		{
-			name: "AND condition exists",
-			im: IncludeMatches{
-				AND: []IncludeMatches{
-					{},
-				},
-			},
-			error: true,
-		},
-		{
 			name: "empty include matches succeeds validation",
 			im:   IncludeMatches{},
 		},
@@ -53,8 +35,10 @@ func TestValidate(t *testing.T) {
 			name: "matches are allowed",
 			im: IncludeMatches{
 				Matches: []Matcher{
-					{"foo"},
-					{"bar"},
+					{"foo=bar"},
+					{"+"},
+					{"FOO=bar"},
+					{"foo.bar=foo"},
 				},
 			},
 		},

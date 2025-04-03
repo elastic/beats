@@ -18,23 +18,15 @@
 package hasher
 
 import (
-	"crypto/md5"
-	"crypto/sha1"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
-	"os"
 	"strings"
 	"time"
 
-	"github.com/cespare/xxhash/v2"
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
-	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/sha3"
 	"golang.org/x/time/rate"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -53,36 +45,6 @@ func (t *HashType) Unpack(v string) error {
 func (t *HashType) IsValid() bool {
 	_, valid := validHashes[*t]
 	return valid
-}
-
-var validHashes = map[HashType](func() hash.Hash){
-	BLAKE2B_256: func() hash.Hash {
-		h, _ := blake2b.New256(nil)
-		return h
-	},
-	BLAKE2B_384: func() hash.Hash {
-		h, _ := blake2b.New384(nil)
-		return h
-	},
-	BLAKE2B_512: func() hash.Hash {
-		h, _ := blake2b.New512(nil)
-		return h
-	},
-	MD5:        md5.New,
-	SHA1:       sha1.New,
-	SHA224:     sha256.New224,
-	SHA256:     sha256.New,
-	SHA384:     sha512.New384,
-	SHA512:     sha512.New,
-	SHA512_224: sha512.New512_224,
-	SHA512_256: sha512.New512_256,
-	SHA3_224:   sha3.New224,
-	SHA3_256:   sha3.New256,
-	SHA3_384:   sha3.New384,
-	SHA3_512:   sha3.New512,
-	XXH64: func() hash.Hash {
-		return xxhash.New()
-	},
 }
 
 // Enum of hash types.
@@ -124,7 +86,7 @@ type FileTooLargeError struct {
 
 // Error returns the error message for FileTooLargeError.
 func (e FileTooLargeError) Error() string {
-	return fmt.Sprintf("hasher: file size %d exceeds max file size", e.fileSize)
+	return fmt.Sprintf("size %d exceeds max file size", e.fileSize)
 }
 
 // Config contains the configuration of a FileHasher.
@@ -174,11 +136,19 @@ type FileHasher struct {
 
 // NewFileHasher creates a new FileHasher.
 func NewFileHasher(c Config, done <-chan struct{}) (*FileHasher, error) {
+	var limit rate.Limit
+
+	if c.ScanRateBytesPerSec == 0 {
+		limit = rate.Inf
+	} else {
+		limit = rate.Limit(c.ScanRateBytesPerSec)
+	}
+
 	return &FileHasher{
 		config: c,
 		limiter: rate.NewLimiter(
-			rate.Limit(c.ScanRateBytesPerSec), // Rate
-			int(c.MaxFileSizeBytes),           // Burst
+			limit,                   // Rate
+			int(c.MaxFileSizeBytes), // Burst
 		),
 		done: done,
 	}, nil
@@ -186,16 +156,26 @@ func NewFileHasher(c Config, done <-chan struct{}) (*FileHasher, error) {
 
 // HashFile hashes the contents of a file.
 func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
-	info, err := os.Stat(path)
+	f, err := file.ReadOpen(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to stat file %v: %w", path, err)
+		return nil, fmt.Errorf("open: %w", err)
+	}
+	defer f.Close()
+
+	info, err := f.Stat()
+	if err != nil {
+		return nil, fmt.Errorf("stat: %w", err)
+	}
+	if !info.Mode().IsRegular() {
+		return nil, fmt.Errorf("not a regular file")
+
 	}
 
 	// Throttle reading and hashing rate.
 	if len(hasher.config.HashTypes) > 0 {
 		err = hasher.throttle(info.Size())
 		if err != nil {
-			return nil, fmt.Errorf("failed to hash file %v: %w", path, err)
+			return nil, err
 		}
 	}
 
@@ -210,15 +190,9 @@ func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 	}
 
 	if len(hashes) > 0 {
-		f, err := file.ReadOpen(path)
-		if err != nil {
-			return nil, fmt.Errorf("failed to open file for hashing: %w", err)
-		}
-		defer f.Close()
-
 		hashWriter := multiWriter(hashes)
 		if _, err := io.Copy(hashWriter, f); err != nil {
-			return nil, fmt.Errorf("failed to calculate file hashes: %w", err)
+			return nil, err
 		}
 
 		nameToHash := make(map[HashType]Digest, len(hashes))
@@ -233,6 +207,10 @@ func (hasher *FileHasher) HashFile(path string) (map[HashType]Digest, error) {
 }
 
 func (hasher *FileHasher) throttle(fileSize int64) error {
+	// Burst is ignored if limit is infinite, so check it manually
+	if hasher.limiter.Limit() == rate.Inf && int(fileSize) > hasher.limiter.Burst() {
+		return FileTooLargeError{fileSize}
+	}
 	reservation := hasher.limiter.ReserveN(time.Now(), int(fileSize))
 	if !reservation.OK() {
 		// File is bigger than the max file size

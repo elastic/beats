@@ -7,6 +7,8 @@ package awss3
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -24,44 +26,48 @@ import (
 )
 
 type config struct {
-	APITimeout          time.Duration        `config:"api_timeout"`
-	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
-	SQSWaitTime         time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
-	SQSMaxReceiveCount  int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
-	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
-	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
-	QueueURL            string               `config:"queue_url"`
-	RegionName          string               `config:"region"`
-	BucketARN           string               `config:"bucket_arn"`
-	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
-	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
-	BucketListPrefix    string               `config:"bucket_list_prefix"`
-	NumberOfWorkers     int                  `config:"number_of_workers"`
-	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
-	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
-	PathStyle           bool                 `config:"path_style"`
-	ProviderOverride    string               `config:"provider"`
-	BackupConfig        backupConfig         `config:",inline"`
+	APITimeout         time.Duration        `config:"api_timeout"`
+	AWSConfig          awscommon.ConfigAWS  `config:",inline"`
+	AccessPointARN     string               `config:"access_point_arn"`
+	BackupConfig       backupConfig         `config:",inline"`
+	BucketARN          string               `config:"bucket_arn"`
+	BucketListInterval time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix   string               `config:"bucket_list_prefix"`
+	FileSelectors      []fileSelectorConfig `config:"file_selectors"`
+	IgnoreOlder        time.Duration        `config:"ignore_older"`
+	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
+	NumberOfWorkers    int                  `config:"number_of_workers"`
+	PathStyle          bool                 `config:"path_style"`
+	ProviderOverride   string               `config:"provider"`
+	QueueURL           string               `config:"queue_url"`
+	ReaderConfig       readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	RegionName         string               `config:"region"`
+	SQSMaxReceiveCount int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
+	SQSScript          *scriptConfig        `config:"sqs.notification_parsing_script"`
+	SQSWaitTime        time.Duration        `config:"sqs.wait_time"`           // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSGraceTime       time.Duration        `config:"sqs.shutdown_grace_time"` // The time that the processing loop will wait for messages before shutting down.
+	StartTimestamp     string               `config:"start_timestamp"`
+	VisibilityTimeout  time.Duration        `config:"visibility_timeout"`
 }
 
 func defaultConfig() config {
 	c := config{
-		APITimeout:          120 * time.Second,
-		VisibilityTimeout:   300 * time.Second,
-		BucketListInterval:  120 * time.Second,
-		BucketListPrefix:    "",
-		SQSWaitTime:         20 * time.Second,
-		SQSMaxReceiveCount:  5,
-		MaxNumberOfMessages: 5,
-		PathStyle:           false,
+		APITimeout:         120 * time.Second,
+		VisibilityTimeout:  300 * time.Second,
+		BucketListInterval: 120 * time.Second,
+		BucketListPrefix:   "",
+		SQSWaitTime:        20 * time.Second,
+		SQSGraceTime:       20 * time.Second,
+		SQSMaxReceiveCount: 5,
+		NumberOfWorkers:    5,
+		PathStyle:          false,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
 }
 
 func (c *config) Validate() error {
-	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.NonAWSBucketName != ""}
+	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.AccessPointARN != "", c.NonAWSBucketName != ""}
 	enabled := []bool{}
 	for i := range configs {
 		if configs[i] {
@@ -69,18 +75,22 @@ func (c *config) Validate() error {
 		}
 	}
 	if len(enabled) == 0 {
-		return errors.New("neither queue_url, bucket_arn nor non_aws_bucket_name were provided")
+		return errors.New("neither queue_url, bucket_arn, access_point_arn, nor non_aws_bucket_name were provided")
 	} else if len(enabled) > 1 {
-		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, non_aws_bucket_name <%v> "+
-			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.NonAWSBucketName)
+		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, access_point_arn <%v>, non_aws_bucket_name <%v> "+
+			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.AccessPointARN, c.NonAWSBucketName)
 	}
 
-	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.BucketListInterval <= 0 {
+	if (c.BucketARN != "" || c.AccessPointARN != "" || c.NonAWSBucketName != "") && c.BucketListInterval <= 0 {
 		return fmt.Errorf("bucket_list_interval <%v> must be greater than 0", c.BucketListInterval)
 	}
 
-	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
+	if (c.BucketARN != "" || c.AccessPointARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
 		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
+	}
+
+	if c.AccessPointARN != "" && !isValidAccessPointARN(c.AccessPointARN) {
+		return fmt.Errorf("invalid format for access_point_arn <%v>", c.AccessPointARN)
 	}
 
 	if c.QueueURL != "" && (c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12) {
@@ -93,9 +103,8 @@ func (c *config) Validate() error {
 			"less than or equal to 20s", c.SQSWaitTime)
 	}
 
-	if c.QueueURL != "" && c.MaxNumberOfMessages <= 0 {
-		return fmt.Errorf("max_number_of_messages <%v> must be greater than 0",
-			c.MaxNumberOfMessages)
+	if c.QueueURL != "" && c.SQSGraceTime < 0 {
+		return fmt.Errorf("shutdown_grace_time <%v> must not be negative", c.SQSGraceTime)
 	}
 
 	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
@@ -112,17 +121,25 @@ func (c *config) Validate() error {
 	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
 		return errors.New("provider can only be overridden when polling non-AWS S3 services")
 	}
+	if c.AWSConfig.Endpoint != "" {
+		// Make sure the given endpoint can be parsed
+		_, err := url.Parse(c.AWSConfig.Endpoint)
+		if err != nil {
+			return fmt.Errorf("failed to parse endpoint: %w", err)
+		}
+	}
 	if c.BackupConfig.NonAWSBackupToBucketName != "" && c.NonAWSBucketName == "" {
 		return errors.New("backup to non-AWS bucket can only be used for non-AWS sources")
 	}
-	if c.BackupConfig.BackupToBucketArn != "" && c.BucketARN == "" {
+	if c.BackupConfig.BackupToBucketArn != "" && c.BucketARN == "" && c.AccessPointARN == "" {
 		return errors.New("backup to AWS bucket can only be used for AWS sources")
 	}
 	if c.BackupConfig.BackupToBucketArn != "" && c.BackupConfig.NonAWSBackupToBucketName != "" {
 		return errors.New("backup_to_bucket_arn and non_aws_backup_to_bucket_name cannot be used together")
 	}
 	if c.BackupConfig.GetBucketName() != "" && c.QueueURL == "" {
-		if (c.BackupConfig.BackupToBucketArn != "" && c.BackupConfig.BackupToBucketArn == c.BucketARN) ||
+		if (c.BackupConfig.BackupToBucketArn != "" &&
+			(c.BackupConfig.BackupToBucketArn == c.BucketARN || c.BackupConfig.BackupToBucketArn == c.AccessPointARN)) ||
 			(c.BackupConfig.NonAWSBackupToBucketName != "" && c.BackupConfig.NonAWSBackupToBucketName == c.NonAWSBucketName) {
 			if c.BackupConfig.BackupToBucketPrefix == "" {
 				return errors.New("backup_to_bucket_prefix is a required property when source and backup bucket are the same")
@@ -130,6 +147,13 @@ func (c *config) Validate() error {
 			if c.BackupConfig.BackupToBucketPrefix == c.BucketListPrefix {
 				return errors.New("backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop")
 			}
+		}
+	}
+
+	if c.StartTimestamp != "" {
+		_, err := time.Parse(time.RFC3339, c.StartTimestamp)
+		if err != nil {
+			return fmt.Errorf("invalid input for start_timestamp: %w", err)
 		}
 	}
 
@@ -231,6 +255,9 @@ func (c config) getBucketName() string {
 	if c.NonAWSBucketName != "" {
 		return c.NonAWSBucketName
 	}
+	if c.AccessPointARN != "" {
+		return c.AccessPointARN
+	}
 	if c.BucketARN != "" {
 		return getBucketNameFromARN(c.BucketARN)
 	}
@@ -244,6 +271,9 @@ func (c config) getBucketARN() string {
 	if c.BucketARN != "" {
 		return c.BucketARN
 	}
+	if c.AccessPointARN != "" {
+		return c.AccessPointARN
+	}
 	return ""
 }
 
@@ -251,12 +281,17 @@ func (c config) getBucketARN() string {
 // options struct.
 // Should be provided as a parameter to s3.NewFromConfig.
 func (c config) s3ConfigModifier(o *s3.Options) {
-	if c.NonAWSBucketName != "" {
-		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
-	}
-
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+	}
+	// Apply slightly different endpoint resolvers depending on whether we're in S3 or SQS mode.
+	if c.AWSConfig.Endpoint != "" {
+		//nolint:staticcheck // haven't migrated to the new interface yet
+		o.EndpointResolver = s3.EndpointResolverFromURL(c.AWSConfig.Endpoint,
+			func(e *awssdk.Endpoint) {
+				// The S3 hostname is immutable in bucket polling mode, mutable otherwise.
+				e.HostnameImmutable = (c.getBucketARN() != "")
+			})
 	}
 	o.UsePathStyle = c.PathStyle
 
@@ -274,6 +309,10 @@ func (c config) sqsConfigModifier(o *sqs.Options) {
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 	}
+	if c.AWSConfig.Endpoint != "" {
+		//nolint:staticcheck // not changing through this PR
+		o.EndpointResolver = sqs.EndpointResolverFromURL(c.AWSConfig.Endpoint)
+	}
 }
 
 func (c config) getFileSelectors() []fileSelectorConfig {
@@ -281,4 +320,12 @@ func (c config) getFileSelectors() []fileSelectorConfig {
 		return c.FileSelectors
 	}
 	return []fileSelectorConfig{{ReaderConfig: c.ReaderConfig}}
+}
+
+// Helper function to detect if an ARN is an Access Point
+func isValidAccessPointARN(arn string) bool {
+	parts := strings.Split(arn, ":")
+	return len(parts) >= 6 &&
+		strings.HasPrefix(parts[5], "accesspoint/") &&
+		len(strings.TrimPrefix(parts[5], "accesspoint/")) > 0
 }

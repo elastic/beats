@@ -71,16 +71,6 @@ func CrossBuild() error {
 	return devtools.CrossBuild()
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
-}
-
 // UnitTest executes the unit tests (Go and Python).
 func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
@@ -164,7 +154,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -234,6 +224,10 @@ func IntegTest() {
 // Use TEST_TAGS=tag1,tag2 to add additional build tags.
 // Use MODULE=module to run only tests for `module`.
 func GoIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
@@ -246,6 +240,10 @@ func GoIntegTest(ctx context.Context) error {
 // Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.
 // Use any other PYTEST_* environment variable to influence the behavior of pytest.
 func PythonIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}

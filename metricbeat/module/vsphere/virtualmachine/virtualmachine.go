@@ -23,8 +23,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
@@ -49,13 +51,32 @@ type MetricSet struct {
 	GetCustomFields bool
 }
 
+type triggeredAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
+}
+
 type VMData struct {
-	VM             mo.VirtualMachine
-	HostID         string
-	HostName       string
-	NetworkNames   []string
-	DatastoreNames []string
-	CustomFields   mapstr.M
+	VM              mo.VirtualMachine
+	HostID          string
+	HostName        string
+	NetworkNames    []string
+	DatastoreNames  []string
+	CustomFields    mapstr.M
+	Snapshots       []VMSnapshotData
+	triggeredAlarms []triggeredAlarm
+}
+
+type VMSnapshotData struct {
+	ID          int32                          `json:"id"`
+	Name        string                         `json:"name"`
+	Description string                         `json:"description"`
+	CreateTime  common.Time                    `json:"createtime"`
+	State       types.VirtualMachinePowerState `json:"state"`
 }
 
 // New creates a new instance of the MetricSet.
@@ -74,6 +95,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "virtualmachine", ms.Insecure)
 	return &MetricSet{
 		MetricSet:       ms,
 		GetCustomFields: config.GetCustomFields,
@@ -94,7 +117,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debugf("Error logging out from vsphere: %v", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -120,13 +143,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug("Error destroying view from vsphere %w", err)
+			m.Logger().Debugf("Error destroying view from vsphere %v", err)
 		}
 	}()
 
 	// Retrieve summary property for all machines
 	var vmt []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore"}, &vmt)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"summary", "datastore", "triggeredAlarmState", "snapshot"}, &vmt)
 	if err != nil {
 		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}
@@ -136,6 +159,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		var hostID, hostName string
 		var networkNames, datastoreNames []string
 		var customFields mapstr.M
+		var snapshots []VMSnapshotData
 
 		if host := vm.Summary.Runtime.Host; host != nil {
 			hostID = host.Value
@@ -179,13 +203,24 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			}
 		}
 
+		if vm.Snapshot != nil {
+			snapshots = fetchSnapshots(vm.Snapshot.RootSnapshotList)
+		}
+
+		triggeredAlarm, err := getTriggeredAlarm(ctx, pc, vm.TriggeredAlarmState)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve alerts from VM %s: %w", vm.Name, err)
+		}
+
 		data := VMData{
-			VM:             vm,
-			HostID:         hostID,
-			HostName:       hostName,
-			NetworkNames:   networkNames,
-			DatastoreNames: datastoreNames,
-			CustomFields:   customFields,
+			VM:              vm,
+			HostID:          hostID,
+			HostName:        hostName,
+			NetworkNames:    networkNames,
+			DatastoreNames:  datastoreNames,
+			CustomFields:    customFields,
+			Snapshots:       snapshots,
+			triggeredAlarms: triggeredAlarm,
 		}
 
 		reporter.Event(mb.Event{
@@ -269,4 +304,63 @@ func getHostSystem(ctx context.Context, c *vim25.Client, ref types.ManagedObject
 		return nil, fmt.Errorf("error retrieving host information: %w", err)
 	}
 	return &hs, nil
+}
+
+func fetchSnapshots(snapshotTree []types.VirtualMachineSnapshotTree) []VMSnapshotData {
+	snapshots := make([]VMSnapshotData, 0, len(snapshotTree))
+	for _, snapshot := range snapshotTree {
+		snapshots = append(snapshots, VMSnapshotData{
+			ID:          snapshot.Id,
+			Name:        snapshot.Name,
+			Description: snapshot.Description,
+			CreateTime:  common.Time(snapshot.CreateTime),
+			State:       snapshot.State,
+		})
+
+		// Recursively add child snapshots
+		if len(snapshot.ChildSnapshotList) > 0 {
+			snapshots = append(snapshots, fetchSnapshots(snapshot.ChildSnapshotList)...)
+		}
+	}
+	return snapshots
+}
+
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggeredAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
+		}
+		triggeredAlarm.Name = alarm.Info.Name
+
+		var entityName string
+		if alarmState.Entity.Type == "Network" {
+			var entity mo.Network
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		} else {
+			var entity mo.ManagedEntity
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		}
+		triggeredAlarm.EntityName = entityName
+
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.TriggeredTime = common.Time(alarmState.Time)
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
+	}
+
+	return triggeredAlarms, nil
 }

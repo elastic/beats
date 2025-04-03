@@ -33,6 +33,11 @@ func TestEventMapping(t *testing.T) {
 		ComputeResource: mo.ComputeResource{
 			ManagedEntity: mo.ManagedEntity{
 				Name: "Cluster_0",
+				ExtensibleManagedObject: mo.ExtensibleManagedObject{
+					Self: types.ManagedObjectReference{
+						Value: "CS_0",
+					},
+				},
 			},
 		},
 		Configuration: types.ClusterConfigInfo{
@@ -49,7 +54,11 @@ func TestEventMapping(t *testing.T) {
 		outputNetworkNames:   []string{"Network_0"},
 	}
 
-	outputEvent := m.mapEvent(ClusterTest, &assetNames)
+	var metricDataTest = metricData{
+		assetNames: assetNames,
+	}
+
+	outputEvent := m.mapEvent(ClusterTest, &metricDataTest)
 	testEvent := mapstr.M{
 		"das_config": mapstr.M{
 			"enabled": false,
@@ -60,6 +69,7 @@ func TestEventMapping(t *testing.T) {
 			},
 		},
 		"name": "Cluster_0",
+		"id":   "CS_0",
 		"host": mapstr.M{
 			"count": 1,
 			"names": []string{"Host_0"},

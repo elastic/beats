@@ -14,6 +14,7 @@ import (
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -44,25 +45,27 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 		expectedRecords    []string
 		sanitizationOption []string
 		// Expected results
-		receivedMessages  uint64
-		sanitizedMessages uint64
-		processedMessages uint64
-		receivedEvents    uint64
-		sentEvents        uint64
-		processingTime    uint64
-		decodeErrors      uint64
-		processorRestarts uint64
+		receivedMessages    uint64
+		invalidJSONMessages uint64
+		sanitizedMessages   uint64
+		processedMessages   uint64
+		receivedEvents      uint64
+		sentEvents          uint64
+		processingTime      uint64
+		decodeErrors        uint64
+		processorRestarts   uint64
 	}{
 		{
-			event:             []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
-			expectedRecords:   []string{"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"},
-			receivedMessages:  1,
-			sanitizedMessages: 0,
-			processedMessages: 1,
-			receivedEvents:    1,
-			sentEvents:        1,
-			decodeErrors:      0,
-			processorRestarts: 0,
+			event:               []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
+			expectedRecords:     []string{"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}"},
+			receivedMessages:    1,
+			invalidJSONMessages: 0,
+			sanitizedMessages:   0,
+			processedMessages:   1,
+			receivedEvents:      1,
+			sentEvents:          1,
+			decodeErrors:        0,
+			processorRestarts:   0,
 		},
 		{
 			event: []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}, {\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
@@ -70,53 +73,56 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 				"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 				"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 			},
-			receivedMessages:  1,
-			sanitizedMessages: 0,
-			processedMessages: 1,
-			receivedEvents:    2,
-			sentEvents:        2,
-			decodeErrors:      0,
-			processorRestarts: 0,
+			receivedMessages:    1,
+			invalidJSONMessages: 0,
+			sanitizedMessages:   0,
+			processedMessages:   1,
+			receivedEvents:      2,
+			sentEvents:          2,
+			decodeErrors:        0,
+			processorRestarts:   0,
 		},
 		{
 			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"), // Thank you, Azure Functions logs.
 			expectedRecords: []string{
 				"{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}",
 			},
-			sanitizationOption: []string{"SINGLE_QUOTES"},
-			receivedMessages:   1,
-			sanitizedMessages:  1,
-			processedMessages:  1,
-			receivedEvents:     1,
-			sentEvents:         1,
-			decodeErrors:       0,
-			processorRestarts:  0,
+			sanitizationOption:  []string{"SINGLE_QUOTES"},
+			receivedMessages:    1,
+			invalidJSONMessages: 1,
+			sanitizedMessages:   1,
+			processedMessages:   1,
+			receivedEvents:      1,
+			sentEvents:          1,
+			decodeErrors:        0,
+			processorRestarts:   0,
 		},
 		{
 			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"),
 			expectedRecords: []string{
 				"{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}",
 			},
-			sanitizationOption: []string{}, // no sanitization options
-			receivedMessages:   1,
-			sanitizedMessages:  0, // Since we have no sanitization options, we don't try to sanitize.
-			processedMessages:  1,
-			decodeErrors:       1,
-			receivedEvents:     0, // If we can't decode the message, we can't count the events in it.
-			sentEvents:         1, // The input sends the unmodified message as a string to the outlet.
-			processorRestarts:  0,
+			sanitizationOption:  []string{}, // no sanitization options
+			receivedMessages:    1,
+			invalidJSONMessages: 1,
+			sanitizedMessages:   0, // Since we have no sanitization options, we don't try to sanitize.
+			processedMessages:   1,
+			decodeErrors:        1,
+			receivedEvents:      0, // If we can't decode the message, we can't count the events in it.
+			sentEvents:          1, // The input sends the unmodified message as a string to the outlet.
+			processorRestarts:   0,
 		},
 	}
 
 	for _, tc := range cases {
 
 		inputConfig := azureInputConfig{
-			SAKey:            "",
-			SAName:           "",
-			SAContainer:      ephContainerName,
-			ConnectionString: "",
-			ConsumerGroup:    "",
-			SanitizeOptions:  tc.sanitizationOption,
+			SAKey:                 "",
+			SAName:                "",
+			SAContainer:           ephContainerName,
+			ConnectionString:      "",
+			ConsumerGroup:         "",
+			LegacySanitizeOptions: tc.sanitizationOption,
 		}
 
 		reg := monitoring.NewRegistry()
@@ -124,15 +130,19 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 
 		fakeClient := fakeClient{}
 
+		sanitizers, err := newSanitizers(inputConfig.Sanitizers, inputConfig.LegacySanitizeOptions)
+		require.NoError(t, err)
+
 		input := eventHubInputV1{
 			config:         inputConfig,
 			metrics:        metrics,
 			pipelineClient: &fakeClient,
 			log:            log,
 			messageDecoder: messageDecoder{
-				config:  inputConfig,
-				metrics: metrics,
-				log:     log,
+				config:     inputConfig,
+				metrics:    metrics,
+				log:        log,
+				sanitizers: sanitizers,
 			},
 		}
 
@@ -158,6 +168,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 		// Messages
 		assert.Equal(t, tc.receivedMessages, metrics.receivedMessages.Get())
 		assert.Equal(t, uint64(len(tc.event)), metrics.receivedBytes.Get())
+		assert.Equal(t, tc.invalidJSONMessages, metrics.invalidJSONMessages.Get())
 		assert.Equal(t, tc.sanitizedMessages, metrics.sanitizedMessages.Get())
 		assert.Equal(t, tc.processedMessages, metrics.processedMessages.Get())
 

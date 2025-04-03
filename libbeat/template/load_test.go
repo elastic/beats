@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 
@@ -170,7 +171,7 @@ func TestFileLoader_Load(t *testing.T) {
 							"refresh_interval": "5s",
 							"mapping": mapstr.M{
 								"total_fields": mapstr.M{
-									"limit": 10000,
+									"limit": defaultTotalFieldsLimit,
 								},
 							},
 							"query": mapstr.M{
@@ -226,7 +227,8 @@ func TestFileLoader_Load(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			fc := newFileClient(ver)
-			fl := NewFileLoader(fc, test.isServerless)
+			logger := logp.NewTestingLogger(t, "")
+			fl := NewFileLoader(fc, test.isServerless, logger)
 
 			cfg := DefaultConfig(info)
 			cfg.Settings = test.settings

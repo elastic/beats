@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/hashicorp/nomad/api"
 	"github.com/stretchr/testify/assert"
 
@@ -149,12 +149,10 @@ func TestEmitEvent(t *testing.T) {
 									},
 									Services: []*api.Service{
 										{
-											Id:   "service-a",
 											Name: "web",
 											Tags: []string{"tag-a", "tag-b"},
 										},
 										{
-											Id:   "service-b",
 											Name: "nginx",
 											Tags: []string{"tag-c", "tag-d"},
 										},
@@ -257,12 +255,10 @@ func TestEmitEvent(t *testing.T) {
 									},
 									Services: []*api.Service{
 										{
-											Id:   "service-a",
 											Name: "web",
 											Tags: []string{"tag-a", "tag-b"},
 										},
 										{
-											Id:   "service-b",
 											Name: "nginx",
 											Tags: []string{"tag-c", "tag-d"},
 										},

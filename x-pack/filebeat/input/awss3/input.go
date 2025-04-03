@@ -7,11 +7,9 @@ package awss3
 import (
 	"fmt"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
@@ -19,7 +17,7 @@ import (
 
 const inputName = "aws-s3"
 
-func Plugin(store beater.StateStore) v2.Plugin {
+func Plugin(store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
@@ -30,7 +28,7 @@ func Plugin(store beater.StateStore) v2.Plugin {
 }
 
 type s3InputManager struct {
-	store beater.StateStore
+	store statestore.States
 }
 
 func (im *s3InputManager) Init(grp unison.Group) error {
@@ -48,22 +46,17 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, fmt.Errorf("initializing AWS config: %w", err)
 	}
 
-	if config.AWSConfig.Endpoint != "" {
-		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
-		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-			return awssdk.Endpoint{
-				PartitionID:   "aws",
-				URL:           config.AWSConfig.Endpoint,
-				SigningRegion: awsConfig.Region,
-			}, nil
-		})
+	if config.RegionName != "" {
+		// The awsConfig now contains the region from the credential profile or default region
+		// if the region is explicitly set in the config, then it wins
+		awsConfig.Region = config.RegionName
 	}
 
 	if config.QueueURL != "" {
 		return newSQSReaderInput(config, awsConfig), nil
 	}
 
-	if config.BucketARN != "" || config.NonAWSBucketName != "" {
+	if config.BucketARN != "" || config.AccessPointARN != "" || config.NonAWSBucketName != "" {
 		return newS3PollerInput(config, awsConfig, im.store)
 	}
 

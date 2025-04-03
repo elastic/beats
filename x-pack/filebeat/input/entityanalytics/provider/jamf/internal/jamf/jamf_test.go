@@ -6,7 +6,6 @@ package jamf
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -19,8 +18,8 @@ import (
 
 	_ "embed"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
-	"github.com/google/uuid"
 )
 
 var logResponses = flag.Bool("log_response", false, "use to log users/devices returned from the API")
@@ -70,16 +69,18 @@ var jamfTests = []struct {
 				if !ok || user != username || pass != password {
 					w.WriteHeader(http.StatusUnauthorized)
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
+					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ ]\n}"))
 					return
 				}
 				if r.Method != http.MethodPost {
 					w.WriteHeader(http.StatusMethodNotAllowed)
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
+					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 					return
 				}
-				tok.Token = uuid.New().String()
+				tok.Token = uuid.Must(uuid.NewV4()).String()
 				tok.Expires = time.Now().In(time.UTC).Add(time.Hour)
 				fmt.Fprintf(w, "{\n  \"token\" : \"%s\",\n  \"expires\" : \"%s\"\n}", tok.Token, tok.Expires.Format(time.RFC3339))
 			}))
@@ -87,12 +88,14 @@ var jamfTests = []struct {
 				if r.Header.Get("Authorization") != "Bearer "+tok.Token || !tok.IsValidFor(0) {
 					w.WriteHeader(http.StatusUnauthorized)
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
+					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 401,\n  \"errors\" : [ {\n    \"code\" : \"INVALID_TOKEN\",\n    \"description\" : \"Unauthorized\",\n    \"id\" : \"0\",\n    \"field\" : null\n  } ]\n}"))
 					return false
 				}
 				if r.Method != http.MethodGet {
 					w.WriteHeader(http.StatusMethodNotAllowed)
 					w.Header().Set("content-type", "application/json;charset=UTF-8")
+					//nolint:errcheck // no error handling
 					w.Write([]byte("{\n  \"httpStatus\" : 405,\n  \"errors\" : [ ]\n}"))
 					return false
 				}
@@ -100,11 +103,13 @@ var jamfTests = []struct {
 			}
 			mux.Handle("/api/preview/computers", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if isValidRequest(w, r) {
+					//nolint:errcheck // no error handling
 					w.Write(computers)
 				}
 			}))
 			mux.Handle("/JSSResource/users", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if isValidRequest(w, r) {
+					//nolint:errcheck // no error handling
 					w.Write(users)
 				}
 			}))
@@ -117,13 +122,7 @@ var jamfTests = []struct {
 			}
 			tenant = u.Host
 
-			cli := &http.Client{
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{
-						InsecureSkipVerify: true,
-					},
-				},
-			}
+			cli := srv.Client()
 
 			return tenant, username, password, cli, srv.Close, nil
 		},
@@ -147,6 +146,7 @@ func TestJamf(t *testing.T) {
 	for _, test := range jamfTests {
 		t.Run(test.name, func(t *testing.T) {
 			tenant, username, password, client, cleanup, err := test.context()
+			//nolint:errorlint // false positive
 			switch err := err.(type) {
 			case nil:
 			case skipError:

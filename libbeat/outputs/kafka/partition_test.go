@@ -25,8 +25,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -199,7 +200,8 @@ func TestPartitioners(t *testing.T) {
 			continue
 		}
 
-		constr, err := makePartitioner(logp.L(), pcfg.Partition)
+		logger := logp.NewTestingLogger(t, "")
+		constr, err := makePartitioner(logger, pcfg.Partition)
 		if err != nil {
 			t.Error(err)
 			continue

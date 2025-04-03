@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -32,6 +33,7 @@ type Metricset struct {
 	prometheusClient   prometheus.Prometheus
 	prometheusMappings *prometheus.MetricsMapping
 	clusterMeta        mapstr.M
+	mod                k8smod.Module
 }
 
 var _ mb.ReportingMetricSetV2Error = (*Metricset)(nil)
@@ -41,11 +43,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
+
 	ms := &Metricset{
 		BaseMetricSet:      base,
 		prometheusClient:   pc,
 		prometheusMappings: mapping,
 		clusterMeta:        util.AddClusterECSMeta(base),
+		mod:                mod,
 	}
 
 	return ms, nil
@@ -54,10 +63,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch gathers information from the apiserver and reports events with this information.
 func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
+	// We need to check for err again in case error is not 401 or RefreshAuthorizationHeader has failed
 	if err != nil {
 		return fmt.Errorf("error getting metrics: %w", err)
 	}
-
 	for _, e := range events {
 		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
 		if len(m.clusterMeta) != 0 {
@@ -68,6 +77,5 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			return nil
 		}
 	}
-
 	return nil
 }

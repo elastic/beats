@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
@@ -18,6 +16,8 @@ env:
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+
+  IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
   # pipeline specific
   ELASTIC_SYNTHETICS_CAPABLE: "true"
@@ -29,6 +29,11 @@ env:
   # Unit tests
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
+
+  # Concurrency definition
+  CONCURRENCY_GROUP: "orka-concurrency-group"
+  CONCURRENCY_COUNT: 10
+  CONCURRENCY_METHOD: eager
 
 steps:
   - group: "Check/Update"
@@ -44,13 +49,23 @@ steps:
           automatic:
             - limit: 1
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
           memory: "8Gi"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: check/update"
+
+      - label: "x-pack/heartbeat: Run pre-commit"
+        command: "pre-commit run --all-files"
+        agents:
+          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+          memory: "2Gi"
+          useCustomGlobalHooks: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: pre-commit"
 
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
@@ -82,6 +97,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Ubuntu x86_64 Unit Tests"
@@ -105,16 +126,21 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Go Integration Tests"
 
       - label: ":windows: x-pack/heartbeat: Win 2016 Unit Tests"
         key: "mandatory-win-2016-unit-tests"
-        skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build test
+          mage build unitTest
         retry:
           automatic:
             - limit: 1
@@ -127,14 +153,18 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2016 Unit Tests"
 
-      # Doesn't exist in Jenkins
       - label: ":windows: x-pack/heartbeat: Win 2022 Unit Tests"
         key: "mandatory-win-2022-unit-tests"
-        skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build unitTest
@@ -150,6 +180,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2022 Unit Tests"
@@ -157,13 +193,12 @@ steps:
   - group: "Extended Windows Tests"
     key: "x-pack-heartbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-    skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
 
     steps:
       - label: ":windows: x-pack/heartbeat: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build test
+          mage build unitTest
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
@@ -177,15 +212,20 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 10 Unit Tests"
 
-      # Doesn't exist in Jenkins
       - label: ":windows: x-pack/heartbeat: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build test
+          mage build unitTest
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
@@ -199,6 +239,12 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 11 Unit Tests"
@@ -206,7 +252,7 @@ steps:
       - label: ":windows: x-pack/heartbeat: Win 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build test
+          mage build unitTest
         retry:
           automatic:
             - limit: 1
@@ -220,56 +266,15 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2019 Unit Tests"
-
-  - group: "Extended Tests"
-    key: "x-pack-heartbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-
-    steps:
-      - label: ":mac: x-pack/heartbeat: macOS x86_64 Unit Tests"
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          withNodeJSEnv $ASDF_NODEJS_VERSION
-          installNodeJsDependencies
-          cd x-pack/heartbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "x-pack/heartbeat/build/*.xml"
-          - "x-pack/heartbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/heartbeat: macOS x86_64 Extended Tests"
-
-      - label: ":mac: x-pack/heartbeat: macOS arm64 Unit Tests"
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          withNodeJSEnv $ASDF_NODEJS_VERSION
-          installNodeJsDependencies
-          cd x-pack/heartbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "x-pack/heartbeat/build/*.xml"
-          - "x-pack/heartbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/heartbeat: macOS arm64 Extended Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -287,10 +292,9 @@ steps:
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
-          cd x-pack/heartbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:
           automatic:
             - limit: 1
@@ -308,11 +312,9 @@ steps:
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
-          cd x-pack/heartbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:
           automatic:
             - limit: 1

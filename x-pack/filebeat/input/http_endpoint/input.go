@@ -108,7 +108,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	defer metrics.Close()
 
 	if e.config.Tracer != nil {
-		id := sanitizeFileName(ctx.ID)
+		id := sanitizeFileName(ctx.IDWithoutName)
 		e.config.Tracer.Filename = strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
 	}
 
@@ -346,7 +346,10 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			hmacKey:      c.HMACKey,
 			hmacType:     c.HMACType,
 			hmacPrefix:   c.HMACPrefix,
+			maxBodySize:  -1,
 		},
+		maxInFlight:           c.MaxInFlight,
+		retryAfter:            c.RetryAfter,
 		program:               prg,
 		messageField:          c.Prefix,
 		responseCode:          c.ResponseCode,
@@ -354,6 +357,9 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
+	}
+	if c.MaxBodySize != nil {
+		h.validator.maxBodySize = *c.MaxBodySize
 	}
 	if c.Tracer.enabled() {
 		w := zapcore.AddSync(c.Tracer)

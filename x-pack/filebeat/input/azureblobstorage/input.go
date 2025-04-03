@@ -14,6 +14,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -33,7 +34,7 @@ const (
 	inputName string = "azure-blob-storage"
 )
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
@@ -71,6 +72,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			TimeStampEpoch:           container.TimeStampEpoch,
 			ExpandEventListFromField: container.ExpandEventListFromField,
 			FileSelectors:            container.FileSelectors,
+			ReaderConfig:             container.ReaderConfig,
 		})
 	}
 
@@ -120,6 +122,7 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
+	c.ReaderConfig = cfg.ReaderConfig
 	return c
 }
 

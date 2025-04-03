@@ -6,6 +6,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - auditbeat/
@@ -40,6 +41,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - heartbeat/
@@ -74,6 +76,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - filebeat/
@@ -109,6 +112,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - filebeat/
@@ -146,6 +150,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - x-pack/dockerlogbeat/
@@ -180,6 +185,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - metricbeat/
@@ -214,6 +220,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - metricbeat/
@@ -251,6 +258,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - x-pack/osquerybeat/**
@@ -288,6 +296,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - winlogbeat/
@@ -323,6 +332,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - .buildkite/deploy/kubernetes/**
@@ -353,6 +363,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - libbeat/
@@ -386,6 +397,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - libbeat/
@@ -421,6 +433,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - auditbeat/
@@ -457,6 +470,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - heartbeat/
@@ -493,6 +507,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - packetbeat/
@@ -529,6 +544,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - winlogbeat/
@@ -563,6 +579,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - packetbeat/
@@ -597,6 +614,7 @@ steps:
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          interpolation: false
           watch:
             - path:
                 - auditbeat/
@@ -639,3 +657,10 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
+
+  # Triggers Serverless Beats tests in the elastic-agent repo for main/release branches
+  - label: "Serverless beats tests(elastic-agent)"
+    if: build.pull_request.id == null
+    trigger: "beats-agent-serverless-tests"
+    build:
+      branch: "main"

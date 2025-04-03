@@ -43,12 +43,10 @@ const (
 	NodeRulesPath      = "api/monitoring_collection/node_rules"
 	ClusterActionsPath = "api/monitoring_collection/cluster_actions"
 	NodeActionsPath    = "api/monitoring_collection/node_actions"
-	SettingsPath       = "api/settings"
 )
 
 var (
 	v6_4_0 = version.MustNew("6.4.0")
-	v6_5_0 = version.MustNew("6.5.0")
 	v6_7_2 = version.MustNew("6.7.2")
 	v7_0_0 = version.MustNew("7.0.0")
 	v7_0_1 = version.MustNew("7.0.1")
@@ -56,9 +54,6 @@ var (
 
 	// StatsAPIAvailableVersion is the version of Kibana since when the stats API is available
 	StatsAPIAvailableVersion = v6_4_0
-
-	// SettingsAPIAvailableVersion is the version of Kibana since when the settings API is available
-	SettingsAPIAvailableVersion = v6_5_0
 
 	// Version of Kibana since when the rules and task manager APIs are available
 	RulesAPIAvailableVersion   = v8_2_0
@@ -96,8 +91,8 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 }
 
 // GetVersion returns the version of the Kibana instance
-func GetVersion(http *helper.HTTP, currentPath string) (*version.V, error) {
-	content, err := fetchPath(http, currentPath, StatusPath)
+func GetVersion(http *helper.HTTP, currentPath string, apiKey string) (*version.V, error) {
+	content, err := fetchPath(http, currentPath, StatusPath, apiKey)
 	if err != nil {
 		return nil, err
 	}
@@ -121,11 +116,6 @@ func IsStatsAPIAvailable(currentKibanaVersion *version.V) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, StatsAPIAvailableVersion)
 }
 
-// IsSettingsAPIAvailable returns whether the settings API is available in the given version of Kibana
-func IsSettingsAPIAvailable(currentKibanaVersion *version.V) bool {
-	return elastic.IsFeatureAvailable(currentKibanaVersion, SettingsAPIAvailableVersion)
-}
-
 // IsRulesAPIAvailable returns whether the rules API is available in the given version of Kibana
 func IsRulesAPIAvailable(currentKibanaVersion *version.V) bool {
 	return elastic.IsFeatureAvailable(currentKibanaVersion, RulesAPIAvailableVersion)
@@ -144,7 +134,7 @@ func IsUsageExcludable(currentKibanaVersion *version.V) bool {
 		v7_0_1.LessThanOrEqual(false, currentKibanaVersion)
 }
 
-func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
+func fetchPath(http *helper.HTTP, currentPath, newPath string, apiKey string) ([]byte, error) {
 	currentURI := http.GetURI()
 	defer http.SetURI(currentURI) // Reset after this request
 
@@ -159,5 +149,8 @@ func fetchPath(http *helper.HTTP, currentPath, newPath string) ([]byte, error) {
 
 	// Http helper includes the HostData with username and password
 	http.SetURI(u.String())
+	if apiKey != "" {
+		http.SetHeader("Authorization", "ApiKey "+apiKey)
+	}
 	return http.FetchContent()
 }

@@ -25,10 +25,12 @@ import (
 	"os/exec"
 	"sort"
 	"strings"
+	"syscall"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/prometheus/procfs"
 
@@ -37,7 +39,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/auparse"
@@ -72,13 +73,105 @@ var (
 	}
 )
 
-func TestImmutable(t *testing.T) {
-	logp.TestingSetup()
+func TestSetPID(t *testing.T) {
+	cases := []struct {
+		clientMock    *MockNetlinkSendReceiver
+		controlMock   *MockNetlinkSendReceiver
+		name          string
+		expectedError bool
+		retries       int
+	}{
+		{
+			name: "enobufs-retry",
+			clientMock: NewMock().
+				returnSendValue(1).
+				returnReceiveError(syscall.ENOBUFS). // first recv fails
+				returnReceiveError(syscall.EAGAIN).  // second is eagain, indicating it would block
+				// now we retry the send
+				returnSendValue(1).
+				returnReceiveAckWithSeq(1),
 
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: false,
+			retries:       2,
+		},
+		{
+			name: "no-error",
+			clientMock: NewMock().
+				returnSendValue(0).
+				returnACK(),
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: false,
+			retries:       1,
+		},
+		{
+			name: "enobufs-retry-failure",
+			clientMock: NewMock().
+				returnSendValue(1).
+				returnReceiveError(syscall.ENOBUFS). // first recv fails
+				returnReceiveError(syscall.EAGAIN).  // second is eagain from the drain loop, indicating it would block
+				// now we retry the send with error again
+				returnSendValue(2).
+				returnReceiveError(syscall.ENOBUFS).
+				// drain, after two errors we'll return
+				returnReceiveError(syscall.EAGAIN),
+
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: true,
+			retries:       1,
+		},
+		{
+			name: "write-return-badfd",
+			clientMock: NewMock().
+				returnSendValue(1).
+				returnReceiveError(syscall.EBADFD), // non-recoverable error
+
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: true,
+			retries:       1,
+		},
+		{
+			name: "read-return-badfd",
+			clientMock: NewMock().
+				returnSendValue(1).
+				returnReceiveError(syscall.ENOBUFS). // first recv fails
+				returnReceiveError(syscall.EBADFD),  // non-recoverable error
+
+			controlMock:   NewMock().returnACK().returnStatus(),
+			expectedError: true,
+			retries:       1,
+		},
+	}
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			config := getConfig()
+			config["immutable"] = true
+
+			testMS := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
+			auditMetricSet, ok := testMS.(*MetricSet)
+			if !ok {
+				t.Fatalf("Expected *MetricSet but got %T", testMS)
+			}
+
+			auditMetricSet.control.Close()
+			auditMetricSet.control = &libaudit.AuditClient{Netlink: testCase.controlMock}
+			auditMetricSet.client.Close()
+			auditMetricSet.client = &libaudit.AuditClient{Netlink: testCase.clientMock}
+
+			err := auditMetricSet.setPID(testCase.retries)
+			require.Equal(t, testCase.expectedError, err != nil, "got error '%s', expected '%v'", err, testCase.expectedError)
+		})
+	}
+
+}
+
+func TestImmutable(t *testing.T) {
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		// With one extra for SetImmutable
 		returnACK().returnStatus().returnACK().returnACK().
@@ -91,7 +184,13 @@ func TestImmutable(t *testing.T) {
 	config["immutable"] = true
 
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
-	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet, ok := ms.(*MetricSet)
+	if !ok {
+		t.Fatalf("Expected *MetricSet but got %T", ms)
+	}
+
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
@@ -108,12 +207,12 @@ func TestImmutable(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	logp.TestingSetup()
-
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		returnACK().returnStatus().returnACK().returnACK().
 		returnACK().returnACK().returnACK().
@@ -124,7 +223,12 @@ func TestData(t *testing.T) {
 
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
-	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet, ok := ms.(*MetricSet)
+	if !ok {
+		t.Fatalf("Expected *MetricSet but got %T", ms)
+	}
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
@@ -141,12 +245,12 @@ func TestData(t *testing.T) {
 }
 
 func TestLoginType(t *testing.T) {
-	logp.TestingSetup()
-
-	// Create a mock netlink client that provides the expected responses.
-	mock := NewMock().
+	// Create mocks of netlink client and control that provide the expected responses.
+	controlMock := NewMock().
 		// Get Status response for initClient
-		returnACK().returnStatus().
+		returnACK().returnStatus()
+
+	mock := NewMock().
 		// Send expected ACKs for initialization
 		returnACK().returnStatus().returnACK().returnACK().
 		returnACK().returnACK().returnACK().
@@ -157,7 +261,12 @@ func TestLoginType(t *testing.T) {
 
 	// Replace the default AuditClient with a mock.
 	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
-	auditMetricSet := ms.(*MetricSet)
+	auditMetricSet, ok := ms.(*MetricSet)
+	if !ok {
+		t.Fatalf("Expected *MetricSet but got %T", ms)
+	}
+	auditMetricSet.control.Close()
+	auditMetricSet.control = &libaudit.AuditClient{Netlink: controlMock}
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
 
@@ -172,7 +281,7 @@ func TestLoginType(t *testing.T) {
 
 	sort.Slice(events,
 		func(i, j int) bool {
-			return events[i].ModuleFields["sequence"].(uint32) < events[j].ModuleFields["sequence"].(uint32)
+			return events[i].ModuleFields["sequence"].(uint32) < events[j].ModuleFields["sequence"].(uint32) //nolint: errcheck //testcode
 		})
 
 	for idx, expected := range []mapstr.M{
@@ -260,7 +369,6 @@ func TestUnicastClient(t *testing.T) {
 		t.Skip("-audit was not specified")
 	}
 
-	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{
@@ -290,7 +398,6 @@ func TestMulticastClient(t *testing.T) {
 		t.Skip("no multicast support")
 	}
 
-	logp.TestingSetup()
 	FailIfAuditdIsRunning(t)
 
 	c := map[string]interface{}{

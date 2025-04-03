@@ -21,7 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -36,15 +36,21 @@ type noopLogger struct{}
 
 func (n noopLogger) Errorf(string, ...interface{}) {}
 
-type testLogger strings.Builder
+type testLogger struct {
+	mu sync.Mutex
+	b  strings.Builder
+}
 
 func (tl *testLogger) Errorf(format string, args ...interface{}) {
-	sb := (*strings.Builder)(tl)
-	sb.WriteString(fmt.Sprintf(format, args...))
-	sb.WriteString("\n")
+	tl.mu.Lock()
+	defer tl.mu.Unlock()
+	tl.b.WriteString(fmt.Sprintf(format, args...))
+	tl.b.WriteString("\n")
 }
 func (tl *testLogger) String() string {
-	return (*strings.Builder)(tl).String()
+	tl.mu.Lock()
+	defer tl.mu.Unlock()
+	return tl.b.String()
 }
 
 func TestNewGroup(t *testing.T) {
@@ -89,7 +95,7 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t,
 			func() bool { return want == runningCount.Load() },
-			time.Second, 100*time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 	})
 
 	t.Run("workloads wait for available worker", func(t *testing.T) {
@@ -152,7 +158,7 @@ func TestGroup_Go(t *testing.T) {
 		// Wait to ensure f1 and f2 are running, thus there is no workers free.
 		assert.Eventually(t,
 			func() bool { return int64(2) == runningCount.Load() },
-			100*time.Millisecond, time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 
 		err = g.Go(f3)
 		require.NoError(t, err)
@@ -164,7 +170,7 @@ func TestGroup_Go(t *testing.T) {
 			func() bool {
 				return f3Started.Load()
 			},
-			100*time.Millisecond, time.Millisecond)
+			1*time.Second, 10*time.Millisecond)
 
 		// If f3 started, f2 must have finished
 		assert.True(t, f2Finished.Load())
@@ -180,8 +186,8 @@ func TestGroup_Go(t *testing.T) {
 
 		assert.Eventually(t,
 			func() bool { return doneCount.Load() == 3 },
-			50*time.Millisecond,
-			time.Millisecond,
+			1*time.Second,
+			10*time.Millisecond,
 			"not all goroutines finished")
 	})
 
@@ -196,14 +202,13 @@ func TestGroup_Go(t *testing.T) {
 
 	t.Run("without limit, all goroutines run", func(t *testing.T) {
 		// 100 <= limit <= 10000
-		limit := rand.Int63n(10000-100) + 100
+		limit := rand.IntN(10000-100) + 100
 		t.Logf("running %d goroutines", limit)
 		g := NewGroup(uint64(limit), time.Second, noopLogger{}, "")
 
 		done := make(chan struct{})
 		var runningCounter atomic.Int64
-		var i int64
-		for i = 0; i < limit; i++ {
+		for i := 0; i < limit; i++ {
 			err := g.Go(func(context.Context) error {
 				runningCounter.Add(1)
 				defer runningCounter.Add(-1)
@@ -215,9 +220,9 @@ func TestGroup_Go(t *testing.T) {
 		}
 
 		assert.Eventually(t,
-			func() bool { return limit == runningCounter.Load() },
-			100*time.Millisecond,
-			time.Millisecond)
+			func() bool { return int64(limit) == runningCounter.Load() },
+			1*time.Second,
+			10*time.Millisecond)
 
 		close(done)
 		err := g.Stop()
@@ -226,14 +231,12 @@ func TestGroup_Go(t *testing.T) {
 
 	t.Run("all workloads return an error", func(t *testing.T) {
 		logger := &testLogger{}
-		runCunt := atomic.Uint64{}
-		wg := sync.WaitGroup{}
+		var count atomic.Uint64
 
 		wantErr := errors.New("a error")
 		workload := func(i int) func(context.Context) error {
 			return func(_ context.Context) error {
-				defer runCunt.Add(1)
-				defer wg.Done()
+				defer count.Add(1)
 				return fmt.Errorf("[%d]: %w", i, wantErr)
 			}
 		}
@@ -241,23 +244,24 @@ func TestGroup_Go(t *testing.T) {
 		want := uint64(2)
 		g := NewGroup(want, time.Second, logger, "errorPrefix")
 
-		wg.Add(1)
 		err := g.Go(workload(1))
 		require.NoError(t, err)
-		wg.Wait()
 
-		wg.Add(1)
 		err = g.Go(workload(2))
 		require.NoError(t, err)
-		wg.Wait()
+
+		assert.Eventually(t, func() bool {
+			return count.Load() == want && logger.String() != ""
+		}, 1*time.Second, 10*time.Millisecond)
 
 		err = g.Stop()
-
 		require.NoError(t, err)
+
 		logs := logger.String()
 		assert.Contains(t, logs, wantErr.Error())
 		assert.Contains(t, logs, "[2]")
 		assert.Contains(t, logs, "[1]")
+
 	})
 
 	t.Run("some workloads return an error", func(t *testing.T) {
@@ -267,17 +271,26 @@ func TestGroup_Go(t *testing.T) {
 
 		g := NewGroup(want, time.Second, logger, "")
 
-		err := g.Go(func(_ context.Context) error { return nil })
+		var count atomic.Uint64
+		err := g.Go(func(_ context.Context) error {
+			count.Add(1)
+			return nil
+		})
 		require.NoError(t, err)
-		err = g.Go(func(_ context.Context) error { return wantErr })
+		err = g.Go(func(_ context.Context) error {
+			count.Add(1)
+			return wantErr
+		})
 		require.NoError(t, err)
 
-		time.Sleep(time.Millisecond)
+		assert.Eventually(t, func() bool {
+			return count.Load() == want && logger.String() != ""
+		}, 1*time.Second, 10*time.Millisecond, "not all workloads finished")
+
+		assert.Contains(t, logger.String(), wantErr.Error())
 
 		err = g.Stop()
-
 		assert.NoError(t, err)
-		assert.Contains(t, logger.String(), wantErr.Error())
 	})
 
 	t.Run("workload returns no error", func(t *testing.T) {

@@ -15,6 +15,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -33,7 +34,7 @@ const (
 	inputName = "gcs"
 )
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
@@ -50,7 +51,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 }
 
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	config := config{}
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
@@ -63,7 +64,6 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		sources = append(sources, &Source{
 			ProjectId:                config.ProjectId,
 			BucketName:               bucket.Name,
-			BucketTimeOut:            *bucket.BucketTimeOut,
 			MaxWorkers:               *bucket.MaxWorkers,
 			Poll:                     *bucket.Poll,
 			PollInterval:             *bucket.PollInterval,
@@ -71,50 +71,27 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			TimeStampEpoch:           bucket.TimeStampEpoch,
 			ExpandEventListFromField: bucket.ExpandEventListFromField,
 			FileSelectors:            bucket.FileSelectors,
+			ReaderConfig:             bucket.ReaderConfig,
+			Retry:                    config.Retry,
 		})
 	}
 
 	return sources, &gcsInput{config: config}, nil
 }
 
-// tryOverrideOrDefault, overrides global values with local
-// bucket level values if present. If both global & local values
-// are absent, assigns default values
+// tryOverrideOrDefault, overrides the bucket level values with global values if the bucket fields are not set
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
-		maxWorkers := 1
-		if cfg.MaxWorkers != nil {
-			maxWorkers = *cfg.MaxWorkers
-		}
-		b.MaxWorkers = &maxWorkers
+		b.MaxWorkers = &cfg.MaxWorkers
 	}
 	if b.Poll == nil {
-		var poll bool
-		if cfg.Poll != nil {
-			poll = *cfg.Poll
-		}
-		b.Poll = &poll
+		b.Poll = &cfg.Poll
 	}
 	if b.PollInterval == nil {
-		interval := time.Second * 300
-		if cfg.PollInterval != nil {
-			interval = *cfg.PollInterval
-		}
-		b.PollInterval = &interval
+		b.PollInterval = &cfg.PollInterval
 	}
 	if b.ParseJSON == nil {
-		parse := false
-		if cfg.ParseJSON != nil {
-			parse = *cfg.ParseJSON
-		}
-		b.ParseJSON = &parse
-	}
-	if b.BucketTimeOut == nil {
-		timeOut := time.Second * 50
-		if cfg.BucketTimeOut != nil {
-			timeOut = *cfg.BucketTimeOut
-		}
-		b.BucketTimeOut = &timeOut
+		b.ParseJSON = &cfg.ParseJSON
 	}
 	if b.TimeStampEpoch == nil {
 		b.TimeStampEpoch = cfg.TimeStampEpoch
@@ -125,6 +102,7 @@ func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if len(b.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		b.FileSelectors = cfg.FileSelectors
 	}
+	b.ReaderConfig = cfg.ReaderConfig
 
 	return b
 }
@@ -150,9 +128,15 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
+	// create a new inputMetrics instance
+	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
+	metrics.url.Set("gs://" + currentSource.BucketName)
+	defer metrics.Close()
+
 	var cp *Checkpoint
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
+			metrics.errorsTotal.Inc()
 			return err
 		}
 
@@ -165,20 +149,26 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		cancel()
 	}()
 
-	client, err := fetchStorageClient(ctx, input.config, log)
+	client, err := fetchStorageClient(ctx, input.config)
 	if err != nil {
+		metrics.errorsTotal.Inc()
 		return err
 	}
+
 	bucket := client.Bucket(currentSource.BucketName).Retryer(
+		// Use WithMaxAttempts to change the maximum number of attempts.
+		storage.WithMaxAttempts(currentSource.Retry.MaxAttempts),
 		// Use WithBackoff to change the timing of the exponential backoff.
 		storage.WithBackoff(gax.Backoff{
-			Initial: 2 * time.Second,
+			Initial:    currentSource.Retry.InitialBackOffDuration,
+			Max:        currentSource.Retry.MaxBackOffDuration,
+			Multiplier: currentSource.Retry.BackOffMultiplier,
 		}),
 		// RetryAlways will retry the operation even if it is non-idempotent.
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, log)
+	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, metrics, log)
 
 	return scheduler.schedule(ctx)
 }

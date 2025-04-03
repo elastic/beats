@@ -26,7 +26,11 @@ import (
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25/mo"
+	"github.com/vmware/govmomi/vim25/types"
 
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 )
@@ -54,12 +58,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "resourcepool", ms.Insecure)
 	return &ResourcePoolMetricSet{ms}, nil
 }
 
 // metricData holds performance metrics values.
+type triggeredAlarm struct {
+	Name          string      `json:"name"`
+	ID            string      `json:"id"`
+	Status        string      `json:"status"`
+	TriggeredTime common.Time `json:"triggered_time"`
+	Description   string      `json:"description"`
+	EntityName    string      `json:"entity_name"`
+}
+
 type metricData struct {
-	assetNames assetNames
+	assetNames      assetNames
+	triggeredAlarms []triggeredAlarm
 }
 
 type assetNames struct {
@@ -80,7 +96,7 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Errorf("error trying to log out from vSphere: %w", err)
+			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
 
@@ -96,13 +112,13 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Errorf("error trying to destroy view from vSphere: %w", err)
+			m.Logger().Errorf("error trying to destroy view from vSphere: %v", err)
 		}
 	}()
 
 	// Retrieve property for all ResourcePools.
 	var rps []mo.ResourcePool
-	err = v.Retrieve(ctx, []string{"ResourcePool"}, []string{"name", "overallStatus", "vm", "summary"}, &rps)
+	err = v.Retrieve(ctx, []string{"ResourcePool"}, []string{"name", "overallStatus", "vm", "summary", "triggeredAlarmState"}, &rps)
 	if err != nil {
 		return fmt.Errorf("error in Retrieve: %w", err)
 	}
@@ -115,11 +131,16 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 		default:
 			assetNames, err := getAssetNames(ctx, pc, &rps[i])
 			if err != nil {
-				m.Logger().Errorf("Failed to retrieve object from resource pool %s: %w", rps[i].Name, err)
+				m.Logger().Errorf("Failed to retrieve object from resource pool %s: %v", rps[i].Name, err)
+			}
+
+			triggeredAlarm, err := getTriggeredAlarm(ctx, pc, rps[i].TriggeredAlarmState)
+			if err != nil {
+				m.Logger().Errorf("Failed to retrieve alerts from resource pool %s: %w", rps[i].Name, err)
 			}
 
 			reporter.Event(mb.Event{
-				MetricSetFields: m.mapEvent(rps[i], &metricData{assetNames: assetNames}),
+				MetricSetFields: m.mapEvent(rps[i], &metricData{assetNames: assetNames, triggeredAlarms: triggeredAlarm}),
 			})
 		}
 	}
@@ -147,4 +168,44 @@ func getAssetNames(ctx context.Context, pc *property.Collector, rp *mo.ResourceP
 	}
 
 	return assetNames{outputVmNames: outputVmNames}, nil
+}
+
+func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAlarmState []types.AlarmState) ([]triggeredAlarm, error) {
+	var triggeredAlarms []triggeredAlarm
+	for _, alarmState := range triggeredAlarmState {
+		var triggeredAlarm triggeredAlarm
+		var alarm mo.Alarm
+		err := pc.RetrieveOne(ctx, alarmState.Alarm, nil, &alarm)
+		if err != nil {
+			return nil, err
+		}
+		triggeredAlarm.Name = alarm.Info.Name
+
+		var entityName string
+		if alarmState.Entity.Type == "Network" {
+			var entity mo.Network
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		} else {
+			var entity mo.ManagedEntity
+			if err := pc.RetrieveOne(ctx, alarmState.Entity, []string{"name"}, &entity); err != nil {
+				return nil, err
+			}
+
+			entityName = entity.Name
+		}
+		triggeredAlarm.EntityName = entityName
+
+		triggeredAlarm.Description = alarm.Info.Description
+		triggeredAlarm.ID = alarmState.Key
+		triggeredAlarm.Status = string(alarmState.OverallStatus)
+		triggeredAlarm.TriggeredTime = common.Time(alarmState.Time)
+
+		triggeredAlarms = append(triggeredAlarms, triggeredAlarm)
+	}
+
+	return triggeredAlarms, nil
 }

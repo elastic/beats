@@ -21,10 +21,11 @@ func newInputMetrics(id string, parentRegistry *monitoring.Registry) *inputMetri
 		unregister: unregister,
 
 		// Messages
-		receivedMessages:  monitoring.NewUint(reg, "received_messages_total"),
-		receivedBytes:     monitoring.NewUint(reg, "received_bytes_total"),
-		sanitizedMessages: monitoring.NewUint(reg, "sanitized_messages_total"),
-		processedMessages: monitoring.NewUint(reg, "processed_messages_total"),
+		receivedMessages:    monitoring.NewUint(reg, "received_messages_total"),
+		receivedBytes:       monitoring.NewUint(reg, "received_bytes_total"),
+		invalidJSONMessages: monitoring.NewUint(reg, "invalid_json_messages_total"),
+		sanitizedMessages:   monitoring.NewUint(reg, "sanitized_messages_total"),
+		processedMessages:   monitoring.NewUint(reg, "processed_messages_total"),
 
 		// Events
 		receivedEvents: monitoring.NewUint(reg, "received_events_total"),
@@ -73,10 +74,11 @@ type inputMetrics struct {
 	unregister func()
 
 	// Messages
-	receivedMessages  *monitoring.Uint // receivedMessages tracks the number of messages received from eventhub.
-	receivedBytes     *monitoring.Uint // receivedBytes tracks the number of bytes received from eventhub.
-	sanitizedMessages *monitoring.Uint // sanitizedMessages tracks the number of messages that were sanitized successfully.
-	processedMessages *monitoring.Uint // processedMessages tracks the number of messages that were processed successfully.
+	receivedMessages    *monitoring.Uint // receivedMessages tracks the number of messages received from eventhub.
+	receivedBytes       *monitoring.Uint // receivedBytes tracks the number of bytes received from eventhub.
+	invalidJSONMessages *monitoring.Uint // invalidJSONMessages tracks the number of messages containing invalid JSON.
+	sanitizedMessages   *monitoring.Uint // sanitizedMessages tracks the number of messages containing invalid JSON that were sanitized.
+	processedMessages   *monitoring.Uint // processedMessages tracks the number of messages that were processed successfully.
 
 	// Events
 	receivedEvents *monitoring.Uint // receivedEvents tracks the number of events received decoding messages.

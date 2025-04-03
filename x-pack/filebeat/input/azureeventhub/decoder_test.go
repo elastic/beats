@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -90,16 +91,20 @@ func TestDecodeRecords(t *testing.T) {
 
 func TestDecodeRecordsWithSanitization(t *testing.T) {
 	config := defaultConfig()
-	config.SanitizeOptions = []string{"SINGLE_QUOTES", "NEW_LINES"}
+	config.LegacySanitizeOptions = []string{"SINGLE_QUOTES", "NEW_LINES"}
 	log := logp.NewLogger(fmt.Sprintf("%s test for input", inputName))
 	reg := monitoring.NewRegistry()
 	metrics := newInputMetrics("test", reg)
 	defer metrics.Close()
 
+	sanitizers, err := newSanitizers(config.Sanitizers, config.LegacySanitizeOptions)
+	require.NoError(t, err)
+
 	decoder := messageDecoder{
-		config:  config,
-		log:     log,
-		metrics: metrics,
+		config:     config,
+		log:        log,
+		metrics:    metrics,
+		sanitizers: sanitizers,
 	}
 
 	msg := "{\"records\":[{'test':\"this is some message\",\n\n\"time\":\"2019-12-17T13:43:44.4946995Z\"}," +

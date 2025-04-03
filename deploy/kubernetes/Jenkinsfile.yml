@@ -18,5 +18,5 @@ stages:
             make check-no-changes;
         stage: checks
     k8sTest:
-        k8sTest: "v1.30.0,v1.29.4,v1.28.9,v1.27.13"
+        k8sTest: "v1.31.0,v1.30.4,v1.29.8,v1.28.13"
         stage: mandatory

@@ -24,6 +24,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -50,6 +51,11 @@ func Package() error {
 	var tasks []interface{}
 	for _, target := range platforms {
 		for _, pkg := range Packages {
+
+			if mg.Verbose() {
+				log.Printf("Evaluating package %v for target %s", pkg.Spec, target)
+			}
+
 			if pkg.OS != target.GOOS() || pkg.Arch != "" && pkg.Arch != target.Arch() {
 				continue
 			}
@@ -79,6 +85,18 @@ func Package() error {
 				agentPackageArch, err := getOSArchName(target, agentPackageType)
 				if err != nil {
 					log.Printf("Skipping arch %v for package type %v: %v", target.Arch(), pkgType, err)
+					continue
+				}
+
+				// Filter out non fips-enabled beats
+				if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
+					log.Printf("Skipping creation for beat %v package type %v because beat is not listed as FIPS compliant %v", BeatName, pkgType, FIPSConfig.Beats)
+					continue
+				}
+
+				// Filter out non fips specs
+				if pkg.Spec.FIPS != FIPSBuild {
+					log.Printf("Skipping creation for package type %v because spec.FIPS = %v and FIPSBuild = %v", pkgType, pkg.Spec.FIPS, FIPSBuild)
 					continue
 				}
 
@@ -120,6 +138,11 @@ func Package() error {
 //
 // Use SNAPSHOT=true to build snapshots.
 func Ironbank() error {
+	if FIPSBuild {
+		fmt.Println(">> IronBank images are not supported for FIPS builds")
+		return nil
+	}
+
 	if runtime.GOARCH != "amd64" {
 		fmt.Printf(">> IronBank images are only supported for amd64 arch (%s is not supported)\n", runtime.GOARCH)
 		return nil
@@ -172,7 +195,6 @@ func prepareIronbankBuild() error {
 		}
 		return nil
 	})
-
 	if err != nil {
 		return fmt.Errorf("cannot create templates for the IronBank: %w", err)
 	}
@@ -206,7 +228,7 @@ func saveIronbank() error {
 
 	distributionsDir := "build/distributions"
 	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
-		err := os.MkdirAll(distributionsDir, 0750)
+		err := os.MkdirAll(distributionsDir, 0o750)
 		if err != nil {
 			return fmt.Errorf("cannot create folder for docker artifacts: %w", err)
 		}
@@ -247,11 +269,11 @@ type packageBuilder struct {
 }
 
 func (b packageBuilder) Build() error {
-	fmt.Printf(">> package: Building %v type=%v for platform=%v\n", b.Spec.Name, b.Type, b.Platform.Name)
+	fmt.Printf(">> package: Building %v type=%v for platform=%v fips=%v\n", b.Spec.Name, b.Type, b.Platform.Name, b.Spec.FIPS)
 	log.Printf("Package spec: %+v", b.Spec)
 	if err := b.Type.Build(b.Spec); err != nil {
-		return fmt.Errorf("failed building %v type=%v for platform=%v: %w",
-			b.Spec.Name, b.Type, b.Platform.Name, err)
+		return fmt.Errorf("failed building %v type=%v for platform=%v fips=%v: %w",
+			b.Spec.Name, b.Type, b.Platform.Name, b.Spec.FIPS, err)
 	}
 	return nil
 }
@@ -348,9 +370,7 @@ func TestPackages(options ...TestPackagesOption) error {
 	args = append(args, "-files", MustExpand("{{.PWD}}/build/distributions/*"))
 
 	if out, err := goTest(args...); err != nil {
-		if !mg.Verbose() {
-			fmt.Println(out)
-		}
+		fmt.Println(out)
 		return err
 	}
 

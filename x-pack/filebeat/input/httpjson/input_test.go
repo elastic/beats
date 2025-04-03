@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -1660,9 +1659,10 @@ func newChainPaginationTestServer(
 func newV2Context(id string) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
-		Logger:      logp.NewLogger("httpjson_test"),
-		ID:          id,
-		Cancelation: ctx,
+		Logger:        logp.NewLogger("httpjson_test"),
+		ID:            id,
+		IDWithoutName: id,
+		Cancelation:   ctx,
 	}, cancel
 }
 
@@ -1723,7 +1723,8 @@ func retryHandler() http.HandlerFunc {
 			_, _ = w.Write([]byte(`{"hello":"world"}`))
 			return
 		}
-		w.WriteHeader(rand.Intn(100) + 500)
+		// Any 5xx except 501 will result in a retry.
+		w.WriteHeader(500)
 		count += 1
 	}
 }

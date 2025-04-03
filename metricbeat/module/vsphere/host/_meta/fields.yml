@@ -52,6 +52,10 @@
       description: >
         Sum of disk read and write rates each second in bytes.
       format: bytes
+    - name: id
+      type: keyword
+      description: >
+        Unique host ID.
     - name: memory.free.bytes
       type: long
       description: >
@@ -146,6 +150,11 @@
       type: keyword
       description: >
         The overall health status of a host in the vSphere environment.
+    - name: triggered_alarms.*
+      type: object
+      object_type: keyword
+      description: >
+        List of all the triggered alarms.
     - name: uptime
       type: long
       description: >

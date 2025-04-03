@@ -18,6 +18,7 @@
 package monitorstate
 
 import (
+	"context"
 	"encoding/json"
 	"testing"
 
@@ -50,7 +51,9 @@ func IntegES(t *testing.T) (esc *eslegclient.Connection) {
 
 	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test

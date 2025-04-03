@@ -7,6 +7,7 @@ on:
       - main
       - 7.1*
       - 8.*
+      - 9.*
 
 permissions:
   contents: read
@@ -15,4 +16,4 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: elastic/apm-pipeline-library/.github/actions/pre-commit@current
+      - uses: elastic/oblt-actions/pre-commit@v1

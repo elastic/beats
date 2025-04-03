@@ -2022,43 +2022,6 @@ Fields from AWS CloudWatch logs.
 
 
 [float]
-=== awscloudwatch
-
-Fields from AWS CloudWatch logs. Deprecated: Use aws.cloudwatch.* instead
-
-
-
-*`awscloudwatch.log_group`*::
-+
---
-The name of the log group to which this event belongs. Deprecated: Use aws.cloudwatch.log_group instead
-
-
-type: keyword
-
---
-
-*`awscloudwatch.log_stream`*::
-+
---
-The name of the log stream to which this event belongs. Deprecated: Use aws.cloudwatch.log_stream instead
-
-
-type: keyword
-
---
-
-*`awscloudwatch.ingestion_time`*::
-+
---
-The time the event was ingested in AWS CloudWatch. Deprecated: Use aws.cloudwatch.ingestion_time instead
-
-
-type: keyword
-
---
-
-[float]
 === aws.cloudwatch
 
 Fields from AWS CloudWatch logs.

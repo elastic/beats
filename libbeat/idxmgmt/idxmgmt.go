@@ -92,25 +92,21 @@ func (m *LoadMode) Enabled() bool {
 }
 
 // DefaultSupport initializes the default index management support used by most Beats.
-func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
-	factory := MakeDefaultSupport(nil)
-	return factory(log, info, configRoot)
+func DefaultSupport(info beat.Info, configRoot *config.C) (Supporter, error) {
+	factory := MakeDefaultSupport(nil, info.Logger)
+	return factory(info.Logger, info, configRoot)
 }
 
 // MakeDefaultSupport creates some default index management support, with a
 // custom ILM support implementation.
-func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
+func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory, logger *logp.Logger) SupportFactory {
 	if ilmSupport == nil {
 		ilmSupport = lifecycle.DefaultSupport
 	}
 
 	return func(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
 		const logName = "index-management"
-		if log == nil {
-			log = logp.NewLogger(logName)
-		} else {
-			log = log.Named(logName)
-		}
+		log = log.Named(logName)
 
 		// now that we have the "correct" default, unpack the rest of the config
 		cfg := struct {
@@ -127,13 +123,9 @@ func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 
 		// consider lifecycles enabled if the user has explicitly enabled them,
 		// or if no `enabled` setting has been set by the user, thus reverting to a default of enabled.
-		enabled := false
-		if cfg.Lifecycle.DSL.Enabled() || cfg.Lifecycle.ILM.Enabled() {
-			enabled = true
-		}
-		if (cfg.Lifecycle.DSL == nil || !cfg.Lifecycle.DSL.HasField("enabled")) && (cfg.Lifecycle.ILM == nil || !cfg.Lifecycle.ILM.HasField("enabled")) {
-			enabled = true
-		}
+		enabled := cfg.Lifecycle.DSL.Enabled() || cfg.Lifecycle.ILM.Enabled() ||
+			((cfg.Lifecycle.DSL == nil || !cfg.Lifecycle.DSL.HasField("enabled")) &&
+				(cfg.Lifecycle.ILM == nil || !cfg.Lifecycle.ILM.HasField("enabled")))
 
 		if err := checkTemplateESSettings(cfg.Template, cfg.Output); err != nil {
 			return nil, err

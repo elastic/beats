@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"strings"
 
-	as "github.com/aerospike/aerospike-client-go"
+	as "github.com/aerospike/aerospike-client-go/v7"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/aerospike"
@@ -45,6 +45,7 @@ type MetricSet struct {
 	host         *as.Host
 	clientPolicy *as.ClientPolicy
 	client       *as.Client
+	infoPolicy   *as.InfoPolicy
 }
 
 // New create a new instance of the MetricSet
@@ -70,6 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		host:          host,
 		clientPolicy:  clientPolicy,
+		infoPolicy:    as.NewInfoPolicy(),
 	}, nil
 }
 
@@ -82,14 +84,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	for _, node := range m.client.GetNodes() {
-		info, err := as.RequestNodeInfo(node, "namespaces")
+		info, err := node.RequestInfo(m.infoPolicy, "namespaces")
 		if err != nil {
 			m.Logger().Error("Failed to retrieve namespaces from node %s", node.GetName())
 			continue
 		}
 
 		for _, namespace := range strings.Split(info["namespaces"], ";") {
-			info, err := as.RequestNodeInfo(node, "namespace/"+namespace)
+			info, err := node.RequestInfo(m.infoPolicy, "namespace/"+namespace)
 			if err != nil {
 				m.Logger().Error("Failed to retrieve metrics for namespace %s from node %s", namespace, node.GetName())
 				continue

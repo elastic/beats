@@ -7,7 +7,10 @@
 package sessionmd
 
 import (
+	"context"
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
@@ -18,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -336,11 +340,34 @@ var (
 	logger = logp.NewLogger("add_session_metadata_test")
 )
 
+func TestMetricsSetup(t *testing.T) {
+	// init a metrics registry multiple times with the same name, ensure we don't panic, and the names are correct
+	reg := monitoring.NewRegistry()
+	firstName := "test.metrics"
+	secondName := "other.stuff"
+	genRegistry(reg, firstName)
+	require.NotNil(t, reg.Get(firstName))
+
+	genRegistry(reg, firstName)
+	require.NotNil(t, reg.Get(fmt.Sprintf("%s.1", firstName)))
+
+	genRegistry(reg, secondName)
+	require.NotNil(t, reg.Get(secondName))
+	require.Nil(t, reg.Get(fmt.Sprintf("%s.1", secondName)))
+
+	genRegistry(reg, secondName)
+	require.NotNil(t, reg.Get(secondName))
+	require.NotNil(t, reg.Get(fmt.Sprintf("%s.1", secondName)))
+	require.Nil(t, reg.Get(fmt.Sprintf("%s.2", secondName)))
+}
+
 func TestEnrich(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*15)
+	defer cancel()
 	for _, tt := range enrichTests {
 		t.Run(tt.testName, func(t *testing.T) {
 			reader := procfs.NewMockReader()
-			db, err := processdb.NewDB(reader, *logger)
+			db, err := processdb.NewDB(ctx, monitoring.NewRegistry(), reader, logger, time.Second*30, false)
 			require.Nil(t, err)
 
 			for _, ev := range tt.mockProcesses {
@@ -361,7 +388,7 @@ func TestEnrich(t *testing.T) {
 				require.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
 				require.NotNil(t, actual, "%s: returned nil event", tt.testName)
 
-				//Validate output
+				// Validate output
 				if diff := cmp.Diff(tt.expected.Fields, actual.Fields, ignoreMissingFrom(tt.expected.Fields)); diff != "" {
 					t.Errorf("field mismatch:\n%s", diff)
 				}

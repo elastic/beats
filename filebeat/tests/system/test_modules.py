@@ -107,8 +107,11 @@ def load_fileset_test_cases():
             if not os.path.isfile(os.path.join(path, fileset, "manifest.yml")):
                 continue
 
-            test_files = glob.glob(os.path.join(modules_dir, module,
-                                                fileset, "test", os.getenv("TESTING_FILEBEAT_FILEPATTERN", "*.log")))
+            test_files_extensions = os.getenv("TESTING_FILEBEAT_FILEPATTERN", "*.log,*.journal").split(",")
+            test_files = []
+            for ext in test_files_extensions:
+                test_files.extend(glob.glob(os.path.join(modules_dir, module,
+                                                         fileset, "test", ext)))
             for test_file in test_files:
                 test_cases.append([module, fileset, test_file])
 
@@ -165,18 +168,16 @@ class Test(BaseTest):
         self.wait_until(lambda: not self.es.indices.exists(self.index_name))
 
         cmd = [
-            self.filebeat, "-systemTest",
-            "-e", "-d", "*", "-once",
+            self.filebeat, "--systemTest",
+            "-d", "*", "--once",
             "-c", cfgfile,
             "-E", "setup.ilm.enabled=false",
-            "-modules={}".format(module),
+            "--modules={}".format(module),
             "-M", "{module}.*.enabled=false".format(module=module),
             "-M", "{module}.{fileset}.enabled=true".format(
                 module=module, fileset=fileset),
             "-M", "{module}.{fileset}.var.input=file".format(
                 module=module, fileset=fileset),
-            "-M", "{module}.{fileset}.var.paths=[{test_file}]".format(
-                module=module, fileset=fileset, test_file=test_file),
             "-M", "*.*.input.close_eof=true",
         ]
         # allow connecting older versions of Elasticsearch
@@ -189,10 +190,25 @@ class Test(BaseTest):
             cmd.append("{module}.{fileset}.var.format=json".format(
                 module=module, fileset=fileset))
 
+        if ".journal" in test_file:
+            cmd.remove("--once")
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.var.use_journald=true".format(
+                module=module, fileset=fileset))
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.input.paths=[{test_file}]".format(
+                module=module, fileset=fileset, test_file=test_file))
+        else:
+            cmd.append("-M")
+            cmd.append("{module}.{fileset}.var.paths=[{test_file}]".format(
+                module=module, fileset=fileset, test_file=test_file))
+
         output_path = os.path.join(self.working_dir)
         # Runs inside a with block to ensure file is closed afterwards
         with open(os.path.join(output_path, "output.log"), "ab") as output:
-            output.write(bytes(" ".join(cmd) + "\n", "utf-8"))
+            output.write(bytes("Command run: ", "utf-8"))
+            output.write(bytes(" ".join(cmd) + "\n\n", "utf-8"))
+            output.flush()
 
             # Use a fixed timezone so results don't vary depending on the environment
             # Don't use UTC to avoid hiding that non-UTC timezones are not being converted as needed,
@@ -201,12 +217,23 @@ class Test(BaseTest):
             local_env = os.environ.copy()
             local_env["TZ"] = 'Etc/GMT+2'
 
-            subprocess.Popen(cmd,
-                             env=local_env,
-                             stdin=None,
-                             stdout=output,
-                             stderr=subprocess.STDOUT,
-                             bufsize=0).wait()
+            proc = subprocess.Popen(cmd,
+                                    env=local_env,
+                                    stdin=None,
+                                    stdout=output,
+                                    stderr=subprocess.STDOUT,
+                                    bufsize=0)
+            # The journald input (used by some modules like 'system') does not
+            # support the --once flag, hence we run Filebeat for at most
+            # 15 seconds, if it does not finish, then kill the process.
+            # If for any reason the Filebeat process gets stuck, only SIGKILL
+            # will terminate it. We use SIGKILL to avoid leaking any running
+            # process that could interfere with other tests
+            try:
+                proc.wait(15)
+            except subprocess.TimeoutExpired:
+                # Send SIGKILL
+                proc.kill()
 
         # List of errors to check in filebeat output logs
         errors = ["error loading pipeline for fileset"]

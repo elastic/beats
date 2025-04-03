@@ -142,6 +142,11 @@ metricbeat.modules:
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
 
+  # This option enables the use of performance counters to collect data for cpu/core metricset.
+  # Only effective for Windows.
+  # You should use this option if running beats on machins with more than 64 cores.
+  #use_performance_counters: false
+
 #------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
   metricsets: ['broker', 'queue', 'topic']
@@ -160,6 +165,16 @@ metricbeat.modules:
 
   # Aerospike Cluster Name
   #cluster_name: myclustername
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # Authentication modes: https://aerospike.com/docs/server/guide/security/access-control
+  # Possible values: internal (default), external, pki
+  #auth_mode: internal
 
   # Optional SSL/TLS (disabled by default)
   #ssl.enabled: true
@@ -227,6 +242,8 @@ metricbeat.modules:
   credential_profile_name: test-mb
   metricsets:
     - cloudwatch
+  include_linked_accounts: true
+  # owning_account: 111111111111
   metrics:
     - namespace: AWS/EC2
       name: ["CPUUtilization"]
@@ -392,6 +409,14 @@ metricbeat.modules:
   # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
 
+#------------------------------ Benchmark Module ------------------------------
+- module: benchmark
+  metricsets:
+    - info
+  enabled: false
+  period: 10s
+
+
 #--------------------------------- Ceph Module ---------------------------------
 # Metricsets depending on the Ceph REST API (default port: 5000)
 - module: ceph
@@ -501,6 +526,9 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
+  # podman: false
+
   # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 
   # or other configurations where virtual disks will sum metrics from other disks.
@@ -547,15 +575,6 @@ metricbeat.modules:
   #ingest_pipeline.processor_sample_rate: 0.25
   #xpack.enabled: false
   #scope: node
-
-#-------------------------- Enterprise Search Module --------------------------
-- module: enterprisesearch
-  metricsets: ["health", "stats"]
-  enabled: true
-  period: 10s
-  hosts: ["http://localhost:3002"]
-  #username: "user"
-  #password: "secret"
 
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
@@ -606,6 +625,7 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  location_label: "resource.labels.zone"
   metrics:
     - aligner: ALIGN_NONE
       service: compute
@@ -639,6 +659,7 @@ metricbeat.modules:
   period: 24h
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
+  endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
 
@@ -890,6 +911,9 @@ metricbeat.modules:
   hosts: ["localhost:5601"]
   basepath: ""
   enabled: true
+  #username: "user"
+  #password: "secret"
+  #api_key: "foo:bar"
 
   # Set to true to send data collected by module to X-Pack
   # Monitoring instead of metricbeat-* indices.
@@ -919,6 +943,8 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
   #include_labels: []
   #exclude_labels: []
   #include_annotations: []
@@ -961,6 +987,7 @@ metricbeat.modules:
     - state_persistentvolume
     - state_persistentvolumeclaim
     - state_storageclass
+    # - state_horizontalpodautoscaler
     # Uncomment this to get k8s events:
     #- event  period: 10s
   hosts: ["kube-state-metrics:8080"]
@@ -970,6 +997,8 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
   #include_labels: []
   #exclude_labels: []
   #include_annotations: []
@@ -1010,6 +1039,8 @@ metricbeat.modules:
   # If kube_config is not set, KUBECONFIG environment variable will be checked
   # and if not present it will fall back to InCluster
   #kube_config: ~/.kube/config
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
   # Set the namespace to watch for events
   #namespace: staging
   # Set the sync period of the watchers
@@ -1030,6 +1061,8 @@ metricbeat.modules:
   ssl.certificate_authorities:
     - /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
   period: 30s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes proxy server
 # (when running metricbeat locally at hosts or as a daemonset + host network)
@@ -1039,6 +1072,8 @@ metricbeat.modules:
     - proxy
   hosts: ["localhost:10249"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes controller manager
 # (URL and deployment method should be adapted to match the controller manager deployment / service / endpoint)
@@ -1048,6 +1083,8 @@ metricbeat.modules:
     - controllermanager
   hosts: ["http://localhost:10252"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 # Kubernetes scheduler
 # (URL and deployment method should be adapted to match scheduler deployment / service / endpoint)
@@ -1057,6 +1094,8 @@ metricbeat.modules:
     - scheduler
   hosts: ["localhost:10251"]
   period: 10s
+  #By default requests to kubeadm config map are made in order to enrich cluster name by requesting /api/v1/namespaces/kube-system/configmaps/kubeadm-config API endpoint.
+  use_kubeadm: true
 
 #--------------------------------- KVM Module ---------------------------------
 - module: kvm
@@ -1100,6 +1139,14 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:11211"]
   enabled: true
+
+#----------------------------- Cisco Meraki Module -----------------------------
+- module: meraki
+  metricsets: ["device_health"]
+  enabled: true
+  period: 300s
+  apiKey: "Meraki dashboard API key"
+  organizations: ["Meraki organization ID"]  
 
 #------------------------------- MongoDB Module -------------------------------
 - module: mongodb
@@ -1229,6 +1276,42 @@ metricbeat.modules:
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
 
+#-------------------------------- Openai Module --------------------------------
+- module: openai
+  metricsets: ["usage"]
+  enabled: false
+  period: 1h
+
+  # # Project API Keys - Multiple API keys can be specified for different projects
+  # api_keys:
+  # - key: "api_key1"
+  # - key: "api_key2"
+
+  # # API Configuration
+  # ## Base URL for the OpenAI usage API endpoint
+  # api_url: "https://api.openai.com/v1/usage"
+  # ## Custom headers to be included in API requests
+  # headers:
+  # - "k1: v1"
+  # - "k2: v2"
+  ## Rate Limiting Configuration
+  # rate_limit:
+  #   limit: 12 # seconds between requests
+  #   burst: 1  # max concurrent requests
+  # ## Request Timeout Duration
+  # timeout: 30s
+
+  # # Data Collection Configuration
+  # collection:
+  #   ## Number of days to look back when collecting usage data
+  #   lookback_days: 30
+  #   ## Whether to collect usage data in realtime. Defaults to false as how
+  #   # OpenAI usage data is collected will end up adding duplicate data to ES
+  #   # and also making it harder to do analytics. Best approach is to avoid
+  #   # realtime collection and collect only upto last day (in UTC). So, there's
+  #   # at most 24h delay.
+  #   realtime: false
+
 #----------------------------- Openmetrics Module -----------------------------
 - module: openmetrics
   metricsets: ['collector']
@@ -1267,6 +1350,14 @@ metricbeat.modules:
 
   # username: ""
   # password: ""
+
+#--------------------------------- Panw Module ---------------------------------
+- module: panw
+  metricsets: ["licenses"]
+  enabled: false
+  period: 10s
+  hosts: ["localhost"]
+
 
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
@@ -1325,6 +1416,9 @@ metricbeat.modules:
   #ssl.certificate_authorities:
   #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
 
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
   #use_types: true
@@ -1341,6 +1435,9 @@ metricbeat.modules:
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
   #ssl.key: "/etc/pki/server/cert.key"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
 
   # Use Elasticsearch histogram type to store histograms (beta, default: false)
   # This will change the default layout and put metric type in the field name
@@ -1393,6 +1490,9 @@ metricbeat.modules:
   #username: "user"
   #password: "secret"
 
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
   # This can be used for service account based authorization:
   #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   #ssl.certificate_authorities:
@@ -1404,6 +1504,9 @@ metricbeat.modules:
 #  metricsets: ["remote_write"]
 #  host: "localhost"
 #  port: "9201"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
 
   # Secure settings for the server using TLS/SSL:
   #ssl.certificate: "/etc/pki/server/cert.pem"
@@ -1569,7 +1672,17 @@ metricbeat.modules:
 - module: vsphere
   enabled: true
   metricsets: ["cluster", "datastore", "datastorecluster", "host", "network", "resourcepool", "virtualmachine"]
-  # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds.
+  
+  # Real-time data collection – An ESXi Server collects data for each performance counter every 20 seconds by default.
+  # Supported Periods:
+  # The Datastore and Host metricsets support performance data collection using the vSphere performance API.
+  # Since the performance API has usage restrictions based on data collection intervals,
+  # users should ensure that the period is configured optimally to receive real-time data.
+  # users can still collect summary metrics if performance metrics are not supported for the configured instance.
+  # This configuration can be determined based on the Data Collection Intervals and Data Collection Levels.
+  # Reference Links:
+  # Data Collection Intervals: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-247646EA-A04B-411A-8DD4-62A3DCFCF49B.html
+  # Data Collection Levels: https://docs.vmware.com/en/VMware-vSphere/7.0/com.vmware.vsphere.monitoring.doc/GUID-25800DE4-68E5-41CC-82D9-8811E27924BC.html
   period: 20s
   hosts: ["https://localhost/sdk"]
 
@@ -1577,7 +1690,7 @@ metricbeat.modules:
   password: "password"
   # If insecure is true, don't verify the server's certificate chain
   insecure: false
-  # Get custom fields when using virtualmachine metric set. Default false.
+  # Get custom fields when using virtualmachine metricset. Default false.
   # get_custom_fields: false
 
 #------------------------------- Windows Module -------------------------------
@@ -1600,6 +1713,30 @@ metricbeat.modules:
   metricsets: ["service"]
   enabled: true
   period: 60s
+
+- module: windows
+  metricsets: ["wmi"]
+  period: 60s
+  wmi:
+    include_null: false          # Exclude fields with null values from the output
+    include_queries: false       # Do not include the query string in the output
+    include_empty_string: false  # Exclude fields with empty string values from the output
+    warning_threshold: 30s       # Maximum time to wait for a query result before logging a warning (defaults to period)
+    # Default WMI namespace for all queries (if not specified per query)
+    # Uncomment to override the default, which is "root\\cimv2".
+    # namespace: "root\\cimv2"
+    queries:
+    - class: Win32_OperatingSystem # FROM: Class to fetch
+      fields:                      # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
+       - FreePhysicalMemory
+       - FreeSpaceInPagingFiles
+       - FreeVirtualMemory
+       - LocalDateTime
+       - NumberOfUsers
+      where: ""                   # Optional WHERE clause to filter query results
+      # Override the WMI namespace for this specific query (optional).
+      # If set, this takes precedence over the default namespace above.
+      # namespace: "root\\cimv2" # Overrides the metric
 
 #------------------------------ ZooKeeper Module ------------------------------
 - module: zookeeper
@@ -3007,7 +3144,7 @@ logging.files:
   #path: /var/log/metricbeat
 
   # The name of the files where the logs are written to.
-  #name: metricbeat-event-data
+  #name: metricbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

@@ -37,6 +37,7 @@ func TestConfig(t *testing.T) {
 			config: config.MustNewConfigFrom([]byte(`{ }`)),
 			assertion: func(t *testing.T, actual *fileOutConfig, err error) {
 				expectedConfig := &fileOutConfig{
+					Path:            &PathFormatString{},
 					NumberOfFiles:   7,
 					RotateEveryKb:   10 * 1024,
 					Permissions:     0600,

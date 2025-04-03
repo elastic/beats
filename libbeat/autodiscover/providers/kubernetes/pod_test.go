@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,16 +44,19 @@ import (
 
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
+		name   string
 		event  bus.Event
 		result bus.Event
 	}{
 		// Empty events should return empty hints
 		{
+			name:   "empty",
 			event:  bus.Event{},
 			result: bus.Event{},
 		},
 		// Only kubernetes payload must return only kubernetes as part of the hint
 		{
+			name: "only kubernetes",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"pod": mapstr.M{
@@ -71,6 +74,7 @@ func TestGenerateHints(t *testing.T) {
 		},
 		// Kubernetes payload with container info must be bubbled to top level
 		{
+			name: "kubernetes container info top level",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"container": mapstr.M{
@@ -102,6 +106,7 @@ func TestGenerateHints(t *testing.T) {
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
+			name: "multiple hints",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
@@ -163,6 +168,7 @@ func TestGenerateHints(t *testing.T) {
 		// Have one set of hints come from the pod and the other come from namespaces
 		// The resultant hints should have a combination of both
 		{
+			name: "hints from Pod and Namespace",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
@@ -227,6 +233,7 @@ func TestGenerateHints(t *testing.T) {
 		// Have one set of hints come from the pod and the same keys come from namespaces
 		// The resultant hints should honor only pods and not namespace.
 		{
+			name: "pod hints win over namespace",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"annotations": getNestedAnnotations(mapstr.M{
@@ -288,6 +295,7 @@ func TestGenerateHints(t *testing.T) {
 		// Have no hints on the pod and have namespace level defaults.
 		// The resultant hints should honor only namespace defaults.
 		{
+			name: "namespace defaults",
 			event: bus.Event{
 				"kubernetes": mapstr.M{
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -339,7 +347,10 @@ func TestGenerateHints(t *testing.T) {
 		logger: logp.NewLogger("kubernetes.pod"),
 	}
 	for _, test := range tests {
-		assert.Equal(t, p.GenerateHints(test.event), test.result)
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.result, p.GenerateHints(test.event))
+		})
 	}
 }
 

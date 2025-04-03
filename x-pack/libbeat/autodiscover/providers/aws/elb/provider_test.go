@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -52,7 +52,7 @@ func (tea *testEventAccumulator) get() []bus.Event {
 func (tea *testEventAccumulator) waitForNumEvents(t *testing.T, targetLen int, timeout time.Duration) {
 	start := time.Now()
 
-	for time.Now().Sub(start) < timeout {
+	for time.Since(start) < timeout {
 		if tea.len() >= targetLen {
 			return
 		}
@@ -100,8 +100,8 @@ func Test_internalBuilder(t *testing.T) {
 
 	// Let run twice to ensure that duplicates don't create two start events
 	// Since we're turning a list of assets into a list of changes the second once() call should be a noop
-	provider.watcher.once()
-	provider.watcher.once()
+	require.NoError(t, provider.watcher.once())
+	require.NoError(t, provider.watcher.once())
 	events.waitForNumEvents(t, 1, time.Second)
 
 	assert.Equal(t, 1, events.len())
@@ -129,8 +129,8 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher.setLbls([]*lbListener{})
 
 	// Let run twice to ensure that duplicates don't cause an issue
-	provider.watcher.once()
-	provider.watcher.once()
+	require.NoError(t, provider.watcher.once())
+	require.NoError(t, provider.watcher.once())
 	events.waitForNumEvents(t, 2, time.Second)
 
 	require.Equal(t, 2, events.len())
@@ -148,7 +148,9 @@ func Test_internalBuilder(t *testing.T) {
 	fetcher.setError(errors.New("oops"))
 
 	// Let run twice to ensure that duplicates don't cause an issue
+	//nolint:errcheck // ignore
 	provider.watcher.once()
+	//nolint:errcheck // ignore
 	provider.watcher.once()
 
 	assert.Equal(t, preErrorEventCount, events.len())

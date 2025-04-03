@@ -27,6 +27,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -216,6 +217,7 @@ func goTestIntegrationForSingleModule(ctx context.Context, module string) error 
 			return nil
 		})
 		if err != nil {
+			fmt.Printf("Error: failed to run integration tests for module %s:\n%v\n", fi.Name(), err)
 			// err will already be report to stdout, collect failed module to report at end
 			failedModules = append(failedModules, fi.Name())
 		}
@@ -273,16 +275,26 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 
 	var testArgs []string
 
-	// -race is only supported on */amd64
-	if os.Getenv("DEV_ARCH") == "amd64" {
-		if params.Race {
+	if params.Race {
+		// Enable the race detector for supported platforms.
+		// This is an intersection of the supported platforms for Beats and Go.
+		//
+		// See https://go.dev/doc/articles/race_detector#Requirements.
+		devOS := os.Getenv("DEV_OS")
+		devArch := os.Getenv("DEV_ARCH")
+		raceAmd64 := devArch == "amd64"
+		raceArm64 := devArch == "arm64" &&
+			slices.Contains([]string{"linux", "darwin"}, devOS)
+		if raceAmd64 || raceArm64 {
 			testArgs = append(testArgs, "-race")
+		} else {
+			log.Printf("Warning: skipping -race flag for unsupported platform %s/%s\n", devOS, devArch)
 		}
 	}
 	if len(params.Tags) > 0 {
-		params := strings.Join(params.Tags, " ")
+		params := strings.Join(params.Tags, ",")
 		if params != "" {
-			testArgs = append(testArgs, "-tags", params)
+			testArgs = append(testArgs, "-tags="+params)
 		}
 	}
 	if params.CoverageProfileFile != "" {

@@ -20,14 +20,13 @@ package kafka
 import (
 	"fmt"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/sarama"
 )
 
 const (
@@ -46,7 +45,7 @@ func makeKafka(
 	observer outputs.Observer,
 	cfg *config.C,
 ) (outputs.Group, error) {
-	log := logp.NewLogger(logSelector)
+	log := beat.Logger.Named(logSelector)
 	log.Debug("initialize kafka output")
 
 	kConfig, err := readConfig(cfg)
@@ -74,7 +73,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, kConfig.Key, topic, kConfig.Headers, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, kConfig.Key, topic, kConfig.Headers, codec, libCfg, beat.Logger)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -94,7 +93,7 @@ func makeKafka(
 func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
 
 	if cfg == nil {
-		return outil.Selector{}, fmt.Errorf("Kafka config cannot be nil")
+		return outil.Selector{}, fmt.Errorf("Kafka config cannot be nil") //nolint:staticcheck //Keep old behavior
 	}
 
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{

@@ -1,0 +1,9 @@
+- key: panw
+  title: "Panw"
+  description: PAN-OS module
+  release: beta
+  fields:
+    - name: panw
+      type: group
+      description: PAN-OS module
+      fields:

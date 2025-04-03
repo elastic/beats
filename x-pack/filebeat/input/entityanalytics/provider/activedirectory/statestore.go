@@ -170,6 +170,13 @@ func (s *stateStore) close(commit bool) (err error) {
 	}
 
 	for key, value := range s.users {
+		if value.State == Deleted {
+			err = s.tx.Delete(usersBucket, []byte(key))
+			if err != nil {
+				return fmt.Errorf("unable to delete user %q from state: %w", key, err)
+			}
+			continue
+		}
 		err = s.tx.Set(usersBucket, []byte(key), value)
 		if err != nil {
 			return fmt.Errorf("unable to save user %q to state: %w", key, err)

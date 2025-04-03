@@ -5,6 +5,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Clipboard changed (rule: ClipboardChange)",
       "code": "24",
       "kind": "event",
       "module": "sysmon",
@@ -19,8 +20,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Clipboard changed:\nRuleName: -\nUtcTime: 2021-02-25 15:04:48.592\nProcessGuid: {9497D8D9-AA1B-602F-A600-000000001000}\nProcessId: 0\nImage: C:\\Program Files\\VMware\\VMware Tools\\vmtoolsd.exe\nSession: 0\nClientInfo: user: DESKTOP-I9CQVAQ\\luks\nHashes: SHA256=7ADB1CF1A75973079C055F929573AE92557A8C0E5B0E38A6A5427E412FB73D59,IMPHASH=00000000000000000000000000000000\nArchived: true\nUser: %10",
     "process": {
-      "entity_id": "{9497d8d9-aa1b-602f-a600-000000001000}",
+      "entity_id": "{9497D8D9-AA1B-602F-A600-000000001000}",
       "executable": "C:\\Program Files\\VMware\\VMware Tools\\vmtoolsd.exe",
       "hash": {
         "sha256": "7adb1cf1a75973079c055f929573ae92557a8c0e5b0e38a6a5427e412fb73d59"
@@ -42,7 +44,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "DESKTOP-I9CQVAQ",
       "event_data": {
@@ -57,9 +58,10 @@
           "id": 6444
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "10757412",
+      "task": "Clipboard changed (rule: ClipboardChange)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",

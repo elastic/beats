@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"syscall"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -46,21 +47,40 @@ type WorkerProcess struct {
 }
 
 var appPoolCounters = map[string]string{
-	"process.pid":                          "\\Process(w3wp*)\\ID Process",
-	"process.cpu_usage_perc":               "\\Process(w3wp*)\\% Processor Time",
-	"process.handle_count":                 "\\Process(w3wp*)\\Handle Count",
-	"process.thread_count":                 "\\Process(w3wp*)\\Thread Count",
-	"process.working_set":                  "\\Process(w3wp*)\\Working Set",
-	"process.private_bytes":                "\\Process(w3wp*)\\Private Bytes",
-	"process.virtual_bytes":                "\\Process(w3wp*)\\Virtual Bytes",
-	"process.page_faults_per_sec":          "\\Process(w3wp*)\\Page Faults/sec",
-	"process.io_read_operations_per_sec":   "\\Process(w3wp*)\\IO Read Operations/sec",
-	"process.io_write_operations_per_sec":  "\\Process(w3wp*)\\IO Write Operations/sec",
+	"process.pid":                         "\\Process(w3wp*)\\ID Process",
+	"process.cpu_usage_perc":              "\\Process(w3wp*)\\% Processor Time",
+	"process.handle_count":                "\\Process(w3wp*)\\Handle Count",
+	"process.thread_count":                "\\Process(w3wp*)\\Thread Count",
+	"process.working_set":                 "\\Process(w3wp*)\\Working Set",
+	"process.private_bytes":               "\\Process(w3wp*)\\Private Bytes",
+	"process.virtual_bytes":               "\\Process(w3wp*)\\Virtual Bytes",
+	"process.page_faults_per_sec":         "\\Process(w3wp*)\\Page Faults/sec",
+	"process.io_read_operations_per_sec":  "\\Process(w3wp*)\\IO Read Operations/sec",
+	"process.io_write_operations_per_sec": "\\Process(w3wp*)\\IO Write Operations/sec",
+
+	// .NET CLR Memory
+	"net_clr.memory.bytes_in_all_heaps":      "\\.NET CLR Memory(w3wp*)\\# Bytes in all Heaps",
+	"net_clr.memory.gen_0_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 0 Collections",
+	"net_clr.memory.gen_1_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 1 Collections",
+	"net_clr.memory.gen_2_collections":       "\\.NET CLR Memory(w3wp*)\\# Gen 2 Collections",
+	"net_clr.memory.total_committed_bytes":   "\\.NET CLR Memory(w3wp*)\\# Total committed Bytes",
+	"net_clr.memory.allocated_bytes_per_sec": "\\.NET CLR Memory(w3wp*)\\Allocated Bytes/sec",
+	"net_clr.memory.gen_0_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 0 heap size",
+	"net_clr.memory.gen_1_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 1 heap size",
+	"net_clr.memory.gen_2_heap_size":         "\\.NET CLR Memory(w3wp*)\\Gen 2 heap size",
+	"net_clr.memory.large_object_heap_size":  "\\.NET CLR Memory(w3wp*)\\Large Object Heap size",
+	"net_clr.memory.time_in_gc_perc":         "\\.NET CLR Memory(w3wp*)\\% Time in GC",
+
+	// .NET CLR Exceptions
 	"net_clr.total_exceptions_thrown":      "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown",
 	"net_clr.exceptions_thrown_per_sec":    "\\.NET CLR Exceptions(w3wp*)\\# of Exceps Thrown / sec",
 	"net_clr.filters_per_sec":              "\\.NET CLR Exceptions(w3wp*)\\# of Filters / sec",
 	"net_clr.finallys_per_sec":             "\\.NET CLR Exceptions(w3wp*)\\# of Finallys / sec",
 	"net_clr.throw_to_catch_depth_per_sec": "\\.NET CLR Exceptions(w3wp*)\\Throw To Catch Depth / sec",
+
+	// .NET CLR LocksAndThreads
+	"net_clr.locks_and_threads.contention_rate_per_sec": "\\.NET CLR LocksAndThreads(w3wp*)\\Contention Rate / sec",
+	"net_clr.locks_and_threads.current_queue_length":    "\\.NET CLR LocksAndThreads(w3wp*)\\Current Queue Length",
 }
 
 // newReader creates a new instance of Reader.
@@ -94,6 +114,15 @@ func (r *Reader) initAppPools() error {
 		r.log.Info("no running application pools found")
 		return nil
 	}
+	// Helper function to identify known PDH errors, such as missing counters or instances.
+	// These errors are expected in certain cases (e.g. "No Managed Code" environments).
+	isPDHError := func(err error) bool {
+		return errors.Is(err, pdh.PdhErrno(syscall.ERROR_NOT_FOUND)) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTER) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTERNAME) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_INSTANCE) ||
+			errors.Is(err, pdh.PDH_CSTATUS_NO_OBJECT)
+	}
 	var newQueries []string
 	r.workerProcesses = make(map[string]string)
 	for key, value := range appPoolCounters {
@@ -101,9 +130,10 @@ func (r *Reader) initAppPools() error {
 		if err != nil {
 			if errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTER) || errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTERNAME) || errors.Is(err, pdh.PDH_CSTATUS_NO_INSTANCE) || errors.Is(err, pdh.PDH_CSTATUS_NO_OBJECT) {
 				r.log.Infow("Ignoring non existent counter", "error", err,
-					logp.Namespace("application pool"), "query", value)
+					logp.Namespace("application pool"), "query", value,
+				)
 			} else {
-				r.log.Error(err, `failed to expand counter path (query= "%v")`, value)
+				r.log.Errorf(`failed to expand counter path (query= "%v"): %w`, value, err)
 			}
 			continue
 		}
@@ -193,7 +223,6 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 					}
 				}
 			}
-
 		}
 	}
 	return events

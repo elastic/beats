@@ -26,11 +26,16 @@ import (
 func (m *NetworkMetricSet) mapEvent(net mo.Network, data *metricData) mapstr.M {
 	event := mapstr.M{}
 
+	event.Put("id", net.Self.Value)
 	event.Put("name", net.Name)
 	event.Put("status", net.OverallStatus)
 	event.Put("accessible", net.Summary.GetNetworkSummary().Accessible)
 	event.Put("config.status", net.ConfigStatus)
 	event.Put("type", net.Self.Type)
+
+	if len(data.triggeredAlarms) > 0 {
+		event.Put("triggered_alarms", data.triggeredAlarms)
+	}
 
 	if len(data.assetNames.outputHostNames) > 0 {
 		event.Put("host.names", data.assetNames.outputHostNames)

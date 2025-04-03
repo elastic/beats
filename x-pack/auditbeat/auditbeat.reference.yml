@@ -80,6 +80,9 @@ auditbeat.modules:
   - /usr/sbin
   - /etc
 
+  # Detect changes to files included in subdirectories. Disabled by default.
+  recursive: false
+  
   # List of regular expressions to filter out notifications for unwanted files.
   # Wrap in single quotes to workaround YAML escaping rules. By default no files
   # are ignored.
@@ -87,6 +90,10 @@ auditbeat.modules:
   - '(?i)\.sw[nop]$'
   - '~$'
   - '/\.git($|/)'
+
+  # If recursive is set to true, subdirectories can also be excluded here by
+  #  specifying them.
+  # - '(?i)/tmp/'
 
   # List of regular expressions used to explicitly include files. When configured,
   # Auditbeat will ignore files unless they match a pattern.
@@ -114,9 +121,6 @@ auditbeat.modules:
   # sha512, sha512_224, sha512_256, sha3_224, sha3_256, sha3_384, sha3_512, and xxh64.
   # Default is sha1.
   hash_types: [sha1]
-
-  # Detect changes to files included in subdirectories. Disabled by default.
-  recursive: false
 
   # Set to true to publish fields with null values in events.
   #keep_null: false
@@ -1637,7 +1641,7 @@ logging.files:
   #path: /var/log/auditbeat
 
   # The name of the files where the logs are written to.
-  #name: auditbeat-event-data
+  #name: auditbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

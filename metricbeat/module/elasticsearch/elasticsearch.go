@@ -288,13 +288,21 @@ func GetLicense(http *helper.HTTP, resetURI string) (*License, error) {
 }
 
 // GetClusterState returns cluster state information.
-func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (mapstr.M, error) {
+func GetClusterState(http *helper.HTTP, resetURI string, metrics []string, filterPaths []string) (mapstr.M, error) {
+	queryParams := []string{"local=true"}
 	clusterStateURI := "_cluster/state"
 	if len(metrics) > 0 {
 		clusterStateURI += "/" + strings.Join(metrics, ",")
 	}
 
-	content, err := fetchPath(http, resetURI, clusterStateURI, "local=true")
+	if len(filterPaths) > 0 {
+		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
+		queryParams = append(queryParams, filterPathQueryParam)
+	}
+
+	queryString := strings.Join(queryParams, "&")
+
+	content, err := fetchPath(http, resetURI, clusterStateURI, queryString)
 	if err != nil {
 		return nil, err
 	}
@@ -302,6 +310,28 @@ func GetClusterState(http *helper.HTTP, resetURI string, metrics []string) (maps
 	var clusterState map[string]interface{}
 	err = json.Unmarshal(content, &clusterState)
 	return clusterState, err
+}
+
+func GetIndexSettings(http *helper.HTTP, resetURI string, indexPattern string, filterPaths []string) (mapstr.M, error) {
+
+	queryParams := []string{"local=true", "expand_wildcards=hidden,all"}
+	indicesSettingsURI := indexPattern + "/_settings"
+
+	if len(filterPaths) > 0 {
+		filterPathQueryParam := "filter_path=" + strings.Join(filterPaths, ",")
+		queryParams = append(queryParams, filterPathQueryParam)
+	}
+
+	queryString := strings.Join(queryParams, "&")
+
+	content, err := fetchPath(http, resetURI, indicesSettingsURI, queryString)
+	if err != nil {
+		return nil, err
+	}
+
+	var indicesSettings map[string]interface{}
+	err = json.Unmarshal(content, &indicesSettings)
+	return indicesSettings, err
 }
 
 // GetClusterSettingsWithDefaults returns cluster settings.
@@ -558,7 +588,7 @@ func (l *License) ToMapStr() mapstr.M {
 func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 	hasSettingGroup, err := allSettings.HasKey(groupKey)
 	if err != nil {
-		return nil, fmt.Errorf("failure to determine if "+groupKey+" settings exist: %w", err)
+		return nil, fmt.Errorf("failure to determine if %s settings exist: %w", groupKey, err)
 	}
 
 	if !hasSettingGroup {
@@ -567,12 +597,12 @@ func getSettingGroup(allSettings mapstr.M, groupKey string) (mapstr.M, error) {
 
 	settings, err := allSettings.GetValue(groupKey)
 	if err != nil {
-		return nil, fmt.Errorf("failure to extract "+groupKey+" settings: %w", err)
+		return nil, fmt.Errorf("failure to extract %s settings: %w", groupKey, err)
 	}
 
 	v, ok := settings.(map[string]interface{})
 	if !ok {
-		return nil, fmt.Errorf(groupKey + " settings are not a map")
+		return nil, fmt.Errorf("%s settings are not a map", groupKey)
 	}
 
 	return mapstr.M(v), nil

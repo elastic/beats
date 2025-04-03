@@ -176,6 +176,7 @@ data:
                     - state_persistentvolume
                     - state_persistentvolumeclaim
                     - state_storageclass
+                    # - state_horizontalpodautoscaler
                   # If `https` is used to access `kube-state-metrics`, uncomment following settings:
                   # bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                   # ssl.certificate_authorities:
@@ -291,11 +292,11 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: metricbeat
-        image: docker.elastic.co/beats/metricbeat:8.16.0
+        image: docker.elastic.co/beats/metricbeat-wolfi:9.1.0
         args: [
           "-c", "/etc/metricbeat.yml",
           "-e",
-          "-system.hostfs=/hostfs",
+          "--system.hostfs=/hostfs",
         ]
         env:
         - name: ELASTICSEARCH_HOST

@@ -2,13 +2,30 @@
 
 set -euo pipefail
 
-# Secrets must be redacted
-# https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
-PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" && "$BUILDKITE_STEP_KEY" == *"system-tests"* ]]; then
-    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry -t 5 -- vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
-    export PRIVATE_CI_GCS_CREDENTIALS_SECRET
+if [[ "${BUILDKITE_LABEL:-}" == *"Pipeline upload"* || "${BUILDKITE_LABEL:-}" == *"Upload Pipeline"* ]]; then
+
+  if [[ "${GITHUB_PR_TRIGGER_COMMENT:-}" != "" ]]; then
+    buildkite-agent annotate "**No changes.** Triggered from comment: _${GITHUB_PR_TRIGGER_COMMENT}_" --style "info" --context 'ctx-info'
+  fi
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-macos-tests" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-agentbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || \
+  "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
+  echo "--- Prepare BK test analytics token :vault:"
+  BUILDKITE_ANALYTICS_TOKEN=$(vault kv get -field token kv/ci-shared/platform-ingest/buildkite_beats_analytics_token)
+  export BUILDKITE_ANALYTICS_TOKEN
 fi
 
 CPU_ARCH=$(uname -m)

@@ -52,31 +52,18 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         assert self.log_contains(
             "invalid level ('errors') for query")
 
-    def test_invalid_api(self):
-        """
-        configtest - invalid api (file)
-        """
-        self.render_config_template(
-            event_logs=[
-                {"name": "Application", "api": "file"}
-            ]
-        )
-        self.run_config_tst(exit_code=1)
-        assert self.log_contains("failed to create new event log: "
-                                 "file API is not available")
-
     def run_config_tst(self, pcap=None, exit_code=0):
         config = "winlogbeat.yml"
 
         cmd = os.path.join(self.beat_path, "winlogbeat.test")
         args = [
-            cmd, "-systemTest",
+            cmd, "--systemTest",
             "-c", os.path.join(self.working_dir, config),
         ]
 
         if os.getenv("TEST_COVERAGE") == "true":
             args += [
-                "-test.coverprofile",
+                "--test.coverprofile",
                 os.path.join(self.working_dir, "coverage.cov"),
             ]
 

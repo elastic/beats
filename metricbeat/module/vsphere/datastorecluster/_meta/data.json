@@ -15,12 +15,19 @@
     },
     "vsphere": {
         "datastorecluster": {
+            "id": "group-p1",
             "name": "datastore_cluster1",
             "capacity": {
                 "bytes": 8795019280384
             },
             "free_space": {
                 "bytes": 8788836876288
+            },
+            "datastore": {
+                "count": 1,
+                "names": [
+                    "LocalDS_0"
+                ]
             }
         }
     }

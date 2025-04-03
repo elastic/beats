@@ -18,3 +18,4 @@
 {"name": "github.com/dnaeon/go-vcr", "licenceType": "BSD-2-Clause"}
 {"name": "github.com/JohnCGriffin/overflow", "licenceType": "MIT"}
 {"name": "github.com/elastic/ebpfevents", "licenceType": "Apache-2.0"}
+{"name": "go.opentelemetry.io/collector/config/configopaque", "licenceType": "Apache-2.0"}

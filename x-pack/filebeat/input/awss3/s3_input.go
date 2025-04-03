@@ -13,11 +13,10 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
@@ -28,33 +27,28 @@ var readerLoopMaxCircuitBreaker = 10
 
 type s3PollerInput struct {
 	log             *logp.Logger
+	pipeline        beat.Pipeline
 	config          config
 	awsConfig       awssdk.Config
-	store           beater.StateStore
+	store           statestore.States
 	provider        string
 	s3              s3API
 	metrics         *inputMetrics
-	client          beat.Client
 	s3ObjectHandler s3ObjectHandlerFactory
 	states          *states
-}
-
-// s3FetchTask contains metadata for one S3 object that a worker should fetch.
-type s3FetchTask struct {
-	s3ObjectHandler s3ObjectHandler
-	objectState     state
+	filterProvider  *filterProvider
 }
 
 func newS3PollerInput(
 	config config,
 	awsConfig awssdk.Config,
-	store beater.StateStore,
+	store statestore.States,
 ) (v2.Input, error) {
-
 	return &s3PollerInput{
-		config:    config,
-		awsConfig: awsConfig,
-		store:     store,
+		config:         config,
+		awsConfig:      awsConfig,
+		store:          store,
+		filterProvider: newFilterProvider(&config),
 	}, nil
 }
 
@@ -69,33 +63,26 @@ func (in *s3PollerInput) Run(
 	pipeline beat.Pipeline,
 ) error {
 	in.log = inputContext.Logger.Named("s3")
+	in.pipeline = pipeline
 	var err error
 
 	// Load the persistent S3 polling state.
-	in.states, err = newStates(in.log, in.store)
+	in.states, err = newStates(in.log, in.store, in.config.BucketListPrefix)
 	if err != nil {
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
 	defer in.states.Close()
 
-	// Create client for publishing events and receive notification of their ACKs.
-	in.client, err = createPipelineClient(pipeline)
-	if err != nil {
-		return fmt.Errorf("failed to create pipeline client: %w", err)
-	}
-	defer in.client.Close()
-
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
-	in.s3, err = createS3API(ctx, in.config, in.awsConfig)
+	in.s3, err = in.createS3API(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to create S3 API: %w", err)
 	}
 
-	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.MaxNumberOfMessages)
+	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.NumberOfWorkers)
 	defer in.metrics.Close()
 
 	in.s3ObjectHandler = newS3ObjectProcessorFactory(
-		in.log,
 		in.metrics,
 		in.s3,
 		in.config.getFileSelectors(),
@@ -117,7 +104,7 @@ func (in *s3PollerInput) run(ctx context.Context) {
 
 func (in *s3PollerInput) runPoll(ctx context.Context) {
 	var workerWg sync.WaitGroup
-	workChan := make(chan *s3FetchTask)
+	workChan := make(chan state)
 
 	// Start the worker goroutines to listen on the work channel
 	for i := 0; i < in.config.NumberOfWorkers; i++ {
@@ -129,19 +116,52 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	}
 
 	// Start reading data and wait for its processing to be done
-	in.readerLoop(ctx, workChan)
+	ids, ok := in.readerLoop(ctx, workChan)
 	workerWg.Wait()
+
+	if !ok {
+		in.log.Warn("skipping state registry cleanup as object reading ended with a non-ok return")
+		return
+	}
+
+	// Perform state cleanup operation
+	err := in.states.CleanUp(ids)
+	if err != nil {
+		in.log.Errorf("failed to cleanup states: %v", err.Error())
+	}
 }
 
-func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan *s3FetchTask) {
+func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) {
+	acks := newAWSACKHandler()
+	// Create client for publishing events and receive notification of their ACKs.
+	client, err := createPipelineClient(in.pipeline, acks)
+	if err != nil {
+		in.log.Errorf("failed to create pipeline client: %v", err.Error())
+		return
+	}
+	defer client.Close()
+	defer acks.Close()
+
 	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 
-	for s3ObjectPayload := range workChan {
-		objHandler := s3ObjectPayload.s3ObjectHandler
-		state := s3ObjectPayload.objectState
+	for _state := range workChan {
+		state := _state
+		event := in.s3EventForState(state)
+
+		objHandler := in.s3ObjectHandler.Create(ctx, event)
+		if objHandler == nil {
+			in.log.Debugw("empty s3 processor (no matching reader configs).", "state", state)
+			continue
+		}
 
 		// Process S3 object (download, parse, create events).
-		err := objHandler.ProcessS3Object()
+		publishCount := 0
+		err := objHandler.ProcessS3Object(in.log, func(e beat.Event) {
+			in.metrics.s3EventsCreatedTotal.Inc()
+			client.Publish(e)
+			publishCount++
+		})
+		in.metrics.s3EventsPerObject.Update(int64(publishCount))
 		if errors.Is(err, errS3DownloadFailed) {
 			// Download errors are ephemeral. Add a backoff delay, then skip to the
 			// next iteration so we don't mark the object as permanently failed.
@@ -151,9 +171,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan *s3Fetc
 		// Reset the rate limit delay on results that aren't download errors.
 		rateLimitWaiter.Reset()
 
-		// Wait for downloaded objects to be ACKed.
-		objHandler.Wait()
-
+		// Update state, but don't persist it until this object is acknowledged.
 		if err != nil {
 			in.log.Errorf("failed processing S3 event for object key %q in bucket %q: %v",
 				state.Key, state.Bucket, err.Error())
@@ -164,21 +182,27 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan *s3Fetc
 			state.Stored = true
 		}
 
-		// Persist the result, report any errors
-		err = in.states.AddState(state)
-		if err != nil {
-			in.log.Errorf("saving completed object state: %v", err.Error())
-		}
+		// Add the cleanup handling to the acks helper
+		acks.Add(publishCount, func() {
+			err := in.states.AddState(state)
+			if err != nil {
+				in.log.Errorf("saving completed object state: %v", err.Error())
+			}
 
-		// Metrics
-		in.metrics.s3ObjectsAckedTotal.Inc()
+			// Metrics
+			in.metrics.s3ObjectsAckedTotal.Inc()
+		})
 	}
 }
 
-func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- *s3FetchTask) {
+// readerLoop performs the S3 object listing and emit state to work listeners if object needs to be processed.
+// Returns all tracked state IDs correlates to all tracked S3 objects iff listing is successful.
+// These IDs are intended to be used for state clean-up.
+func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- state) (knownStateIDSlice []string, ok bool) {
 	defer close(workChan)
-
 	bucketName := getBucketNameFromARN(in.config.getBucketARN())
+
+	isStateValid := in.filterProvider.getApplierFunc()
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
@@ -194,7 +218,7 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- *s3Fetc
 				circuitBreaker++
 				if circuitBreaker >= readerLoopMaxCircuitBreaker {
 					in.log.Warnw(fmt.Sprintf("%d consecutive error when paginating listing, breaking the circuit.", circuitBreaker), "error", err)
-					break
+					return nil, false
 				}
 			}
 			// add a backoff delay and try again
@@ -211,36 +235,33 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- *s3Fetc
 		in.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
+			if !isStateValid(in.log, state) {
+				continue
+			}
+
+			// add to known states only if valid for processing
+			knownStateIDSlice = append(knownStateIDSlice, state.ID())
 			if in.states.IsProcessed(state) {
-				in.log.Debugw("skipping state.", "state", state)
+				in.log.Debugw("skipping state processing as already processed.", "state", state)
 				continue
 			}
 
-			s3Processor := in.createS3ObjectProcessor(ctx, state)
-			if s3Processor == nil {
-				in.log.Debugw("empty s3 processor.", "state", state)
-				continue
-			}
-
-			workChan <- &s3FetchTask{
-				s3ObjectHandler: s3Processor,
-				objectState:     state,
-			}
+			workChan <- state
 
 			in.metrics.s3ObjectsProcessedTotal.Inc()
 		}
 	}
+
+	return knownStateIDSlice, true
 }
 
-func (in *s3PollerInput) createS3ObjectProcessor(ctx context.Context, state state) s3ObjectHandler {
+func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {
 	event := s3EventV2{}
 	event.AWSRegion = in.awsConfig.Region
 	event.Provider = in.provider
 	event.S3.Bucket.Name = state.Bucket
 	event.S3.Bucket.ARN = in.config.getBucketARN()
 	event.S3.Object.Key = state.Key
-
-	acker := awscommon.NewEventACKTracker(ctx)
-
-	return in.s3ObjectHandler.Create(ctx, in.log, in.client, acker, event)
+	event.S3.Object.LastModified = state.LastModified
+	return event
 }

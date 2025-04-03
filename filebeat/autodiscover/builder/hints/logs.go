@@ -29,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -126,26 +125,26 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				// multiline options should be under multiline parser in filestream input
 				parsersTempCfg := []mapstr.M{}
 				mlineTempCfg := mapstr.M{}
-				kubernetes.ShouldPut(mlineTempCfg, multiline, mline, l.log)
+				shouldPut(mlineTempCfg, multiline, mline, l.log)
 				parsersTempCfg = append(parsersTempCfg, mlineTempCfg)
-				kubernetes.ShouldPut(tempCfg, parsers, parsersTempCfg, l.log)
+				shouldPut(tempCfg, parsers, parsersTempCfg, l.log)
 			} else {
-				kubernetes.ShouldPut(tempCfg, multiline, mline, l.log)
+				shouldPut(tempCfg, multiline, mline, l.log)
 			}
 		}
 		if ilines := l.getIncludeLines(h); len(ilines) != 0 {
-			kubernetes.ShouldPut(tempCfg, includeLines, ilines, l.log)
+			shouldPut(tempCfg, includeLines, ilines, l.log)
 		}
 		if elines := l.getExcludeLines(h); len(elines) != 0 {
-			kubernetes.ShouldPut(tempCfg, excludeLines, elines, l.log)
+			shouldPut(tempCfg, excludeLines, elines, l.log)
 		}
 
 		if procs := l.getProcessors(h); len(procs) != 0 {
-			kubernetes.ShouldPut(tempCfg, processors, procs, l.log)
+			shouldPut(tempCfg, processors, procs, l.log)
 		}
 
 		if pip := l.getPipeline(h); len(pip) != 0 {
-			kubernetes.ShouldPut(tempCfg, pipeline, pip, l.log)
+			shouldPut(tempCfg, pipeline, pip, l.log)
 		}
 
 		if jsonOpts := l.getJSONOptions(h); len(jsonOpts) != 0 {
@@ -153,11 +152,11 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				// json options should be under ndjson parser in filestream input
 				parsersTempCfg := []mapstr.M{}
 				ndjsonTempCfg := mapstr.M{}
-				kubernetes.ShouldPut(ndjsonTempCfg, ndjson, jsonOpts, l.log)
+				shouldPut(ndjsonTempCfg, ndjson, jsonOpts, l.log)
 				parsersTempCfg = append(parsersTempCfg, ndjsonTempCfg)
-				kubernetes.ShouldPut(tempCfg, parsers, parsersTempCfg, l.log)
+				shouldPut(tempCfg, parsers, parsersTempCfg, l.log)
 			} else {
-				kubernetes.ShouldPut(tempCfg, json, jsonOpts, l.log)
+				shouldPut(tempCfg, json, jsonOpts, l.log)
 			}
 
 		}
@@ -308,4 +307,11 @@ func (l *logHints) getInputs(hints mapstr.M) []mapstr.M {
 	}
 
 	return output
+}
+
+func shouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
 }

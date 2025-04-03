@@ -48,7 +48,7 @@ import (
 type inputTestingEnvironment struct {
 	t          *testing.T
 	workingDir string
-	stateStore loginp.StateStore
+	stateStore statestore.States
 	pipeline   *mockPipelineConnector
 
 	pluginInitOnce sync.Once
@@ -194,7 +194,7 @@ func (e *inputTestingEnvironment) abspath(filename string) string {
 }
 
 func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
-	inputStore, _ := e.stateStore.Access()
+	inputStore, _ := e.stateStore.StoreFor("")
 
 	actual := 0
 	err := inputStore.Each(func(_ string, _ statestore.ValueDecoder) (bool, error) {
@@ -331,7 +331,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID str
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	inputStore, _ := e.stateStore.Access()
+	inputStore, _ := e.stateStore.StoreFor("")
 	id := getIDFromPath(filepath, inputID, fi)
 
 	var entry registryEntry
@@ -345,14 +345,14 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID str
 func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expectedOffset int) {
 	entry, err := e.getRegistryState(key)
 	if err != nil {
-		e.t.Fatalf(err.Error())
+		e.t.Fatal(err.Error())
 	}
 
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
 
 func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, error) {
-	inputStore, _ := e.stateStore.Access()
+	inputStore, _ := e.stateStore.StoreFor("")
 
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)
@@ -386,6 +386,7 @@ func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
+	e.t.Helper()
 	msg := &strings.Builder{}
 	require.Eventuallyf(e.t, func() bool {
 		msg.Reset()
@@ -415,12 +416,18 @@ func (e *inputTestingEnvironment) waitUntilEventCountCtx(ctx context.Context, co
 	select {
 	case <-ctx.Done():
 		logLines := map[string][]string{}
-		for _, e := range e.pipeline.GetAllEvents() {
-			flat := e.Fields.Flatten()
+		for _, evt := range e.pipeline.GetAllEvents() {
+			flat := evt.Fields.Flatten()
 			pathi, _ := flat.GetValue("log.file.path")
-			path := pathi.(string)
+			path, ok := pathi.(string)
+			if !ok {
+				e.t.Fatalf("waitUntilEventCountCtx: path is not a string: %v", pathi)
+			}
 			msgi, _ := flat.GetValue("message")
-			msg := msgi.(string)
+			msg, ok := msgi.(string)
+			if !ok {
+				e.t.Fatalf("waitUntilEventCountCtx: message is not a string: %v", msgi)
+			}
 			logLines[path] = append(logLines[path], msg)
 		}
 
@@ -448,9 +455,14 @@ func (e *inputTestingEnvironment) waitUntilAtLeastEventCount(count int) {
 // waitUntilHarvesterIsDone detects Harvester stop by checking if the last client has been closed
 // as when a Harvester stops the client is closed.
 func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
-	for !e.pipeline.clients[len(e.pipeline.clients)-1].closed {
-		time.Sleep(10 * time.Millisecond)
-	}
+	require.Eventually(
+		e.t,
+		func() bool {
+			return e.pipeline.clients[len(e.pipeline.clients)-1].closed
+		},
+		time.Second*10,
+		time.Millisecond*10,
+		"The last connected client has not closed it's connection")
 }
 
 // requireEventsReceived requires that the list of messages has made it into the output.
@@ -462,7 +474,10 @@ func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 			if len(events) == checkedEventCount {
 				e.t.Fatalf("not enough expected elements")
 			}
-			message := evt.Fields["message"].(string)
+			message, ok := evt.Fields["message"].(string)
+			if !ok {
+				e.t.Fatalf("message is not string %+v", evt.Fields["message"])
+			}
 			if message == events[checkedEventCount] {
 				foundEvents[checkedEventCount] = true
 			}
@@ -524,11 +539,13 @@ func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
 	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
 }
 
+var _ statestore.States = (*testInputStore)(nil)
+
 type testInputStore struct {
 	registry *statestore.Registry
 }
 
-func openTestStatestore() loginp.StateStore {
+func openTestStatestore() statestore.States {
 	return &testInputStore{
 		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
 	}
@@ -538,7 +555,7 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) Access() (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 

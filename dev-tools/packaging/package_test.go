@@ -26,7 +26,11 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
+	"context"
+	"debug/buildinfo"
+	"debug/elf"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -36,18 +40,23 @@ import (
 	"slices"
 	"strings"
 	"testing"
-
-	"errors"
+	"time"
 
 	"github.com/blakesmith/ar"
 	rpm "github.com/cavaliergopher/rpm"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/strslice"
+	"github.com/docker/docker/client"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const (
-	expectedConfigMode     = os.FileMode(0600)
-	expectedManifestMode   = os.FileMode(0644)
+	expectedConfigMode     = os.FileMode(0o600)
+	expectedManifestMode   = os.FileMode(0o644)
 	expectedModuleFileMode = expectedManifestMode
-	expectedModuleDirMode  = os.FileMode(0755)
+	expectedModuleDirMode  = os.FileMode(0o755)
 )
 
 var (
@@ -59,8 +68,8 @@ var (
 	modulesDFilePattern    = regexp.MustCompile(`modules.d/.+`)
 	monitorsDFilePattern   = regexp.MustCompile(`monitors.d/.+`)
 	systemdUnitFilePattern = regexp.MustCompile(`/lib/systemd/system/.*\.service`)
-
-	licenseFiles = []string{"LICENSE.txt", "NOTICE.txt"}
+	fipsPackagePattern     = regexp.MustCompile(`\w+-fips-\w+`)
+	licenseFiles           = []string{"LICENSE.txt", "NOTICE.txt"}
 )
 
 var (
@@ -84,15 +93,20 @@ func TestDeb(t *testing.T) {
 	debs := getFiles(t, regexp.MustCompile(`\.deb$`))
 	buf := new(bytes.Buffer)
 	for _, deb := range debs {
-		checkDeb(t, deb, buf)
+		fipsPackage := fipsPackagePattern.MatchString(deb)
+		checkDeb(t, deb, buf, fipsPackage)
 	}
 }
 
 func TestTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
-	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
-	for _, tar := range tars {
-		checkTar(t, tar)
+	tars := getFiles(t, regexp.MustCompile(`^-\w+\.tar\.gz$`))
+	for _, tarFile := range tars {
+		if strings.HasSuffix(tarFile, "docker.tar.gz") {
+			// We should skip the docker images archives , since those have their dedicated check
+			continue
+		}
+		fipsPackage := fipsPackagePattern.MatchString(tarFile)
+		checkTar(t, tarFile, fipsPackage)
 	}
 }
 
@@ -134,7 +148,7 @@ func checkRPM(t *testing.T, file string) {
 	ensureNoBuildIDLinks(t, p)
 }
 
-func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
+func checkDeb(t *testing.T, file string, buf *bytes.Buffer, fipsCheck bool) {
 	p, err := readDeb(file, buf)
 	if err != nil {
 		t.Error(err)
@@ -153,9 +167,21 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkModulesOwner(t, p, true)
 	checkModulesPermissions(t, p)
 	checkSystemdUnitPermissions(t, p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			t.Skip("FIPS check for .deb is not yet supported")
+			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err)
+			containingDir := strings.TrimSuffix(filepath.Base(file), ".tar.gz")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			checkFIPS(t, beatName, filepath.Join(extractDir, containingDir))
+		})
+	}
 }
 
-func checkTar(t *testing.T, file string) {
+func checkTar(t *testing.T, file string, fipsCheck bool) {
 	p, err := readTar(file)
 	if err != nil {
 		t.Error(err)
@@ -170,6 +196,29 @@ func checkTar(t *testing.T, file string) {
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p, true)
 	checkLicensesPresent(t, "", p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err)
+			containingDir := strings.TrimSuffix(filepath.Base(file), ".tar.gz")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			checkFIPS(t, beatName, filepath.Join(extractDir, containingDir))
+		})
+	}
+}
+
+func extractBeatNameFromTarName(t *testing.T, fileName string) string {
+	// TODO check if cutting at the first '-' is an acceptable shortcut
+	t.Logf("Extracting beat name from filename %s", fileName)
+	const sep = "-"
+	beatName, _, found := strings.Cut(fileName, sep)
+	if !found {
+		t.Logf("separator %s not found in filename %s: beatName may be incorrect", sep, fileName)
+	}
+
+	return beatName
 }
 
 func checkZip(t *testing.T, file string) {
@@ -234,15 +283,15 @@ func checkDocker(t *testing.T, file string) {
 		t.Errorf("error reading file %v: %v", file, err)
 		return
 	}
-
 	checkDockerEntryPoint(t, p, info)
 	checkDockerLabels(t, p, info, file)
 	checkDockerUser(t, p, info, *rootUserContainer)
-	checkConfigPermissionsWithMode(t, p, os.FileMode(0644))
-	checkManifestPermissionsWithMode(t, p, os.FileMode(0644))
+	checkConfigPermissionsWithMode(t, p, os.FileMode(0o644))
+	checkManifestPermissionsWithMode(t, p, os.FileMode(0o644))
 	checkModulesPresent(t, "", p)
 	checkModulesDPresent(t, "", p)
 	checkLicensesPresent(t, "licenses/", p)
+	checkDockerImageRun(t, p, file)
 }
 
 // Verify that the main configuration file is installed with a 0600 file mode.
@@ -356,7 +405,7 @@ func checkModulesOwner(t *testing.T, p *packageFile, expectRoot bool) {
 // Verify that the systemd unit file has a mode of 0644. It should not be
 // executable.
 func checkSystemdUnitPermissions(t *testing.T, p *packageFile) {
-	const expectedMode = os.FileMode(0644)
+	const expectedMode = os.FileMode(0o644)
 	t.Run(p.Name+" systemd unit file permissions", func(t *testing.T) {
 		for _, entry := range p.Contents {
 			if systemdUnitFilePattern.MatchString(entry.File) {
@@ -443,7 +492,7 @@ func checkLicensesPresent(t *testing.T, prefix string, p *packageFile) {
 }
 
 func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
-	expectedMode := os.FileMode(0755)
+	expectedMode := os.FileMode(0o755)
 
 	t.Run(fmt.Sprintf("%s entrypoint", p.Name), func(t *testing.T) {
 		if len(info.Config.Entrypoint) == 0 {
@@ -466,6 +515,10 @@ func checkDockerEntryPoint(t *testing.T, p *packageFile, info *dockerInfo) {
 	})
 }
 
+// {BeatName}-oss-{OptionalVariantSuffix}-{version}-{os}-{arch}.docker.tar.gz
+// For example, `heartbeat-oss-8.16.0-linux-arm64.docker.tar.gz`
+var ossSuffixRegexp = regexp.MustCompile(`^(\w+)-oss-.+$`)
+
 func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file string) {
 	vendor := info.Config.Labels["org.label-schema.vendor"]
 	if vendor != "Elastic" {
@@ -474,12 +527,7 @@ func checkDockerLabels(t *testing.T, p *packageFile, info *dockerInfo, file stri
 
 	t.Run(fmt.Sprintf("%s license labels", p.Name), func(t *testing.T) {
 		expectedLicense := "Elastic License"
-		ossPrefix := strings.Join([]string{
-			info.Config.Labels["org.label-schema.name"],
-			"oss",
-			info.Config.Labels["org.label-schema.version"],
-		}, "-")
-		if strings.HasPrefix(filepath.Base(file), ossPrefix) {
+		if ossSuffixRegexp.MatchString(filepath.Base(file)) {
 			expectedLicense = "ASL 2.0"
 		}
 		licenseLabels := []string{
@@ -508,6 +556,111 @@ func checkDockerUser(t *testing.T, p *packageFile, info *dockerInfo, expectRoot 
 	t.Run(fmt.Sprintf("%s user", p.Name), func(t *testing.T) {
 		if expectRoot != (info.Config.User == "root") {
 			t.Errorf("unexpected docker user: %s", info.Config.User)
+		}
+	})
+}
+
+func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
+	t.Run(fmt.Sprintf("%s check docker images runs", p.Name), func(t *testing.T) {
+		var ctx context.Context
+		dl, ok := t.Deadline()
+		if !ok {
+			ctx = context.Background()
+		} else {
+			c, cancel := context.WithDeadline(context.Background(), dl)
+			ctx = c
+			defer cancel()
+		}
+		f, err := os.Open(imagePath)
+		if err != nil {
+			t.Fatalf("failed to open docker image %q: %s", imagePath, err)
+		}
+		defer f.Close()
+
+		c, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			t.Fatalf("failed to get a Docker client: %s", err)
+		}
+
+		loadResp, err := c.ImageLoad(ctx, f, true)
+		if err != nil {
+			t.Fatalf("error loading docker image: %s", err)
+		}
+
+		loadRespBody, err := io.ReadAll(loadResp.Body)
+		if err != nil {
+			t.Fatalf("failed to read image load response: %s", err)
+		}
+		loadResp.Body.Close()
+
+		_, after, found := strings.Cut(string(loadRespBody), "Loaded image: ")
+		if !found {
+			t.Fatalf("image load response was unexpected: %s", string(loadRespBody))
+		}
+		imageId := strings.TrimRight(after, "\\n\"}\r\n")
+
+		var caps strslice.StrSlice
+		if strings.Contains(imageId, "packetbeat") {
+			caps = append(caps, "NET_ADMIN")
+		}
+
+		createResp, err := c.ContainerCreate(ctx,
+			&container.Config{
+				Image: imageId,
+			},
+			&container.HostConfig{
+				CapAdd: caps,
+			},
+			nil,
+			nil,
+			"")
+		if err != nil {
+			t.Fatalf("error creating container from image: %s", err)
+		}
+		defer func() {
+			err := c.ContainerRemove(ctx, createResp.ID, container.RemoveOptions{Force: true})
+			if err != nil {
+				t.Errorf("error removing container: %s", err)
+			}
+		}()
+
+		err = c.ContainerStart(ctx, createResp.ID, container.StartOptions{})
+		if err != nil {
+			t.Fatalf("failed to start container: %s", err)
+		}
+		defer func() {
+			err := c.ContainerStop(ctx, createResp.ID, container.StopOptions{})
+			if err != nil {
+				t.Errorf("error stopping container: %s", err)
+			}
+		}()
+
+		timer := time.NewTimer(15 * time.Second)
+		defer timer.Stop()
+		ticker := time.NewTicker(2 * time.Second)
+		defer ticker.Stop()
+
+		var logs []byte
+		sentinelLog := "Beat ID: "
+		for {
+			select {
+			case <-timer.C:
+				t.Fatalf("never saw %q within timeout\nlogs:\n%s", sentinelLog, string(logs))
+				return
+			case <-ticker.C:
+				out, err := c.ContainerLogs(ctx, createResp.ID, container.LogsOptions{ShowStdout: true, ShowStderr: true})
+				if err != nil {
+					t.Logf("could not get logs: %s", err)
+				}
+				logs, err = io.ReadAll(out)
+				out.Close()
+				if err != nil {
+					t.Logf("error reading logs: %s", err)
+				}
+				if bytes.Contains(logs, []byte(sentinelLog)) {
+					return
+				}
+			}
 		}
 	})
 }
@@ -663,6 +816,52 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 	}
 
 	return p, nil
+}
+
+func checkFIPS(t *testing.T, beatName, path string) {
+	t.Logf("Checking %s for FIPS compliance", beatName)
+	binaryPath := filepath.Join(path, beatName) // TODO eventually we'll need to support checking a .exe
+	require.FileExistsf(t, binaryPath, "Unable to find beat executable %s", binaryPath)
+
+	info, err := buildinfo.ReadFile(binaryPath)
+	require.NoError(t, err)
+
+	foundTags := false
+	foundExperiment := false
+	for _, setting := range info.Settings {
+		switch setting.Key {
+		case "-tags":
+			foundTags = true
+			require.Contains(t, setting.Value, "requirefips")
+			continue
+		case "GOEXPERIMENT":
+			foundExperiment = true
+			require.Contains(t, setting.Value, "systemcrypto")
+			continue
+		}
+	}
+
+	require.True(t, foundTags, "Did not find -tags within binary version information")
+	require.True(t, foundExperiment, "Did not find GOEXPERIMENT within binary version information")
+
+	// TODO only elf is supported at the moment, in the future we will need to use macho (darwin) and pe (windows)
+	f, err := elf.Open(binaryPath)
+	require.NoError(t, err, "unable to open ELF file")
+
+	symbols, err := f.Symbols()
+	if err != nil {
+		t.Logf("no symbols present in %q: %v", binaryPath, err)
+		return
+	}
+
+	hasOpenSSL := false
+	for _, symbol := range symbols {
+		if strings.Contains(symbol.Name, "OpenSSL_version") {
+			hasOpenSSL = true
+			break
+		}
+	}
+	require.True(t, hasOpenSSL, "unable to find OpenSSL_version symbol")
 }
 
 // inspector is a file contents inspector. It vets the contents of the file
