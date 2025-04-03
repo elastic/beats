@@ -64,7 +64,7 @@ func NewESClientHandler(client ESClient, info beat.Info, cfg lifecycle.RawConfig
 	if err != nil {
 		return nil, fmt.Errorf("error creating ES handler: %w", err)
 	}
-	loader, err := template.NewESLoader(client, esHandler)
+	loader, err := template.NewESLoader(client, esHandler, info.Logger)
 	if err != nil {
 		return nil, fmt.Errorf("error creating ES loader: %w", err)
 	}
@@ -78,5 +78,5 @@ func NewFileClientHandler(client FileClient, info beat.Info, cfg lifecycle.RawCo
 	if err != nil {
 		return nil, fmt.Errorf("error creating client handler: %w", err)
 	}
-	return NewClientHandler(mgmt, template.NewFileLoader(client, mgmt.Mode() == lifecycle.DSL)), nil
+	return NewClientHandler(mgmt, template.NewFileLoader(client, mgmt.Mode() == lifecycle.DSL, info.Logger)), nil
 }

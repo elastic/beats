@@ -3,6 +3,7 @@ filebeat.inputs:
 - paths:
     - {{input.path}}
   scan_frequency: 0.5s
+  allow_deprecated_use: true
   encoding: {{input.encoding | default("plain") }}
 {% endfor %}
 

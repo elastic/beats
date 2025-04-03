@@ -86,9 +86,9 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, userAttr
 	}
 
 	// Get users in the directory...
-	userFilter := "(objectClass=user)"
+	userFilter := "(&(objectCategory=person)(objectClass=user))"
 	if sinceFmtd != "" {
-		userFilter = "(&(objectClass=user)(whenChanged>=" + sinceFmtd + "))"
+		userFilter = "(&(objectCategory=person)(objectClass=user)(whenChanged>=" + sinceFmtd + "))"
 	}
 	usrs, err := search(conn, baseDN, userFilter, userAttrs, pagingSize)
 	if err != nil {
@@ -120,7 +120,7 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, userAttr
 				for i, u := range modGrps {
 					modGrps[i] = "(memberOf=" + u + ")"
 				}
-				query := "(&(objectClass=user)(|" + strings.Join(modGrps, "") + ")"
+				query := "(&(objectCategory=person)(objectClass=user)(|" + strings.Join(modGrps, "") + ")"
 				usrs, err := search(conn, baseDN, query, userAttrs, pagingSize)
 				if err != nil {
 					errs = append(errs, fmt.Errorf("failed to collect users of changed groups%w: %w", ErrUsers, err))
@@ -313,6 +313,11 @@ func entype(attr *ldap.EntryAttribute) any {
 			ts, err := strconv.ParseInt(v, 10, 64)
 			if err != nil {
 				return attr.Values
+			}
+			// Check for special values of accountExpires.
+			// See https://learn.microsoft.com/en-us/windows/win32/adschema/a-accountexpires.
+			if attr.Name == "accountExpires" && (ts == 0 || ts == 0x7fff_ffff_ffff_ffff) {
+				return v // Return the raw string instead of converting to time
 			}
 			if len(attr.Values) == 1 {
 				return fromWindowsNT(ts)

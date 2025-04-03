@@ -45,7 +45,7 @@ func newSyncClient(
 	observer outputs.Observer,
 	config *Config,
 ) (*syncClient, error) {
-	log := logp.NewLogger("logstash")
+	log := beat.Logger.Named("logstash")
 	c := &syncClient{
 		log:      log,
 		Client:   conn,
@@ -76,7 +76,7 @@ func newSyncClient(
 
 func (c *syncClient) Connect(ctx context.Context) error {
 	c.log.Debug("connect")
-	err := c.Client.ConnectContext(ctx)
+	err := c.ConnectContext(ctx)
 	if err != nil {
 		return err
 	}

@@ -92,8 +92,7 @@ func TestDiskQueueUnderAgent(t *testing.T) {
 			require.NotNil(t, actualGroup)
 			require.NotNil(t, actualGroup.QueueFactory)
 
-			testlogger, _ := logp.NewInMemory("test-diskqueue", zapcore.EncoderConfig{})
-
+			testlogger, _ := logp.NewInMemoryLocal("test-diskqueue", zapcore.EncoderConfig{})
 			actualQueue, err := actualGroup.QueueFactory(testlogger, nil, 1, nil)
 			require.NoError(t, err)
 			require.NotNil(t, actualQueue)

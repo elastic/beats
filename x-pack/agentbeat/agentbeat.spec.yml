@@ -1,4 +1,12 @@
 version: 2
+component_files:
+ - certs/*
+ - lenses/*
+ - module/*
+ - "osquery-extension.ext"
+ - "osquery-extension.exe"
+ - osqueryd 
+ - "osqueryd.exe"
 inputs:
   - name: audit/auditd
     description: "Auditd"
@@ -347,11 +355,6 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
-  - name: enterprisesearch/metrics
-    description: "Enterprise search metrics"
-    platforms: *platforms
-    outputs: *outputs
-    command: *metricbeat_command
   - name: kibana/metrics
     description: "Kibana metrics"
     platforms: *platforms
@@ -559,6 +562,11 @@ inputs:
     command: *metricbeat_command
   - name: zookeeper/metrics
     description: "ZooKeeper metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: aerospike/metrics
+    description: "Aerospike metrics"
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command

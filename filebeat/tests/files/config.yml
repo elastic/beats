@@ -7,6 +7,7 @@ filebeat:
         - /var/log/s*.log
       # Input: This must be either log or stdin
       input: log
+      allow_deprecated_use: true
       # Optional additional fields
       fields:
         level: debug
@@ -22,6 +23,7 @@ filebeat:
       paths:
         - /var/log/test.log
       input: log
+      allow_deprecated_use: true
     -
       fields:
       input: stdin

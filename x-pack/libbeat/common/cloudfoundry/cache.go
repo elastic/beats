@@ -42,7 +42,7 @@ func newClientCacheWrap(client cfClient, cacheName string, ttl time.Duration, er
 		name = name + "-" + sanitizeCacheName(cacheName)
 	}
 
-	cache, err := persistentcache.New(name, options)
+	cache, err := persistentcache.New(name, options, log)
 	if err != nil {
 		return nil, fmt.Errorf("creating metadata cache: %w", err)
 	}

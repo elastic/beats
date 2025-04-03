@@ -6,6 +6,7 @@ package mbreceiver
 
 import (
 	"context"
+	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 
@@ -17,10 +18,13 @@ type metricbeatReceiver struct {
 	beat   *beat.Beat
 	beater beat.Beater
 	logger *zap.Logger
+	wg     sync.WaitGroup
 }
 
 func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) error {
+	mb.wg.Add(1)
 	go func() {
+		defer mb.wg.Done()
 		mb.logger.Info("starting metricbeat receiver")
 		err := mb.beater.Run(mb.beat)
 		if err != nil {
@@ -33,5 +37,6 @@ func (mb *metricbeatReceiver) Start(ctx context.Context, host component.Host) er
 func (mb *metricbeatReceiver) Shutdown(ctx context.Context) error {
 	mb.logger.Info("stopping metricbeat receiver")
 	mb.beater.Stop()
+	mb.wg.Wait()
 	return nil
 }

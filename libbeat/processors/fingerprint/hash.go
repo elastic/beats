@@ -18,8 +18,6 @@
 package fingerprint
 
 import (
-	"crypto/md5"
-	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
 	"hash"
@@ -37,14 +35,13 @@ type hashMethod func() hash.Hash
 var hashes = map[string]namedHashMethod{}
 
 func init() {
-	for _, h := range []namedHashMethod{
-		{Name: "md5", Hash: md5.New},
-		{Name: "sha1", Hash: sha1.New},
+	fipsApprovedHashes := []namedHashMethod{
 		{Name: "sha256", Hash: sha256.New},
 		{Name: "sha384", Hash: sha512.New384},
 		{Name: "sha512", Hash: sha512.New},
 		{Name: "xxhash", Hash: newXxHash},
-	} {
+	}
+	for _, h := range fipsApprovedHashes {
 		hashes[h.Name] = h
 	}
 }

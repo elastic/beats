@@ -31,12 +31,13 @@ import (
 	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
+	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -44,8 +45,9 @@ import (
 )
 
 const (
-	recursiveGlobDepth = 8
-	harvesterErrMsg    = "Harvester could not be started on new file: %s, Err: %s"
+	recursiveGlobDepth      = 8
+	harvesterErrMsg         = "Harvester could not be started on new file: %s, Err: %s"
+	allowDeprecatedUseField = "allow_deprecated_use"
 )
 
 var (
@@ -55,7 +57,7 @@ var (
 
 	errHarvesterLimit = errors.New("harvester limit reached")
 
-	deprecatedNotificationOnce sync.Once
+	errDeprecated = errors.New("Log input is deprecated. Use Filestream input instead. Follow our migration guide https://www.elastic.co/guide/en/beats/filebeat/current/migrate-to-filestream.html")
 )
 
 func init() {
@@ -82,15 +84,23 @@ type Input struct {
 	getStatusReporter   input.GetStatusReporter
 }
 
+// AllowDeprecatedUse returns true if the configuration allows using the deprecated log input
+func AllowDeprecatedUse(cfg *conf.C) bool {
+	allow, _ := cfg.Bool(allowDeprecatedUseField, -1)
+	return allow || fleetmode.Enabled() || fileset.CheckIfModuleInput(cfg)
+}
+
 // NewInput instantiates a new Log
 func NewInput(
 	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-	deprecatedNotificationOnce.Do(func() {
-		cfgwarn.Deprecate("", "Log input. Use Filestream input instead.")
-	})
+	// we still allow the deprecated log input running under integrations and
+	// modules until they are all migrated to filestream
+	if !AllowDeprecatedUse(cfg) {
+		return nil, fmt.Errorf("Found log input configuration: %w\n%s", errDeprecated, conf.DebugString(cfg, true))
+	}
 
 	cleanupNeeded := true
 	cleanupIfNeeded := func(f func() error) {

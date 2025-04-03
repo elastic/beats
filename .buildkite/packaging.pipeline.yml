@@ -8,8 +8,10 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-standard-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
-  PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-  PLATFORMS_ARM: "linux/arm64"
+  PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
+  PLATFORMS_ARM: "+all linux/arm64 darwin/arm64"
+  PLATFORMS_AMD64_FIPS: "+all linux/amd64"
+  PLATFORMS_ARM64_FIPS: "+all linux/arm64"
 
 steps:
   # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
@@ -61,7 +63,7 @@ steps:
 
       - label: Staging dashboards
         # TODO remove OR clause below (see earlier comment)
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         depends_on: start-gate-staging
         key: dashboards-staging
         # TODO: container with go and make
@@ -73,9 +75,10 @@ steps:
         retry:
           automatic:
             - limit: 1
-        commands:
-          - make build/distributions/dependencies.csv
-          - make beats-dashboards
+        commands: |
+          source .buildkite/scripts/version_qualifier.sh
+          make build/distributions/dependencies.csv
+          make beats-dashboards
         env:
           SNAPSHOT: false
           DEV: false
@@ -120,10 +123,9 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "SNAPSHOT: {{matrix}} docker Linux/arm64"
+      - label: "SNAPSHOT: {{matrix}} Linux/arm64 and Darwin/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
-          PACKAGES: "docker"
           SNAPSHOT: true
           # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
           DEV: false
@@ -150,9 +152,11 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
+          - x-pack/osquerybeat
+          - x-pack/agentbeat
 
       ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "SNAPSHOT: x-pack/agentbeat"
+      - label: "SNAPSHOT: x-pack/agentbeat all artifacts apart from linux/arm64 and darwin/arm64"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
@@ -170,18 +174,87 @@ steps:
         artifact_paths:
           - build/distributions/**/*
 
+      - label: "SNAPSHOT: {{matrix}} Linux/amd64 FIPS"
+        env:
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
+          SNAPSHOT: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
+          FIPS: true
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - x-pack/auditbeat
+          - x-pack/filebeat
+          - x-pack/metricbeat
+
+      - label: "SNAPSHOT: {{matrix}} Linux/arm64 FIPS"
+        env:
+          PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
+          SNAPSHOT: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
+          FIPS: true
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - x-pack/auditbeat
+          - x-pack/filebeat
+          - x-pack/metricbeat
+          - x-pack/agentbeat
+
+      ## Agentbeat needs more CPUs because it builds many other beats
+      - label: "SNAPSHOT: x-pack/agentbeat Linux/amd64 FIPS"
+        env:
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
+          SNAPSHOT: true
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
+          FIPS: true
+        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+
   - group: Packaging Staging
     key: packaging-staging
     depends_on: start-gate-staging
     # TODO remove OR clause below (see earlier comment)
-    if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+    if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
     steps:
       - label: "STAGING: {{matrix}}"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -208,13 +281,14 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "STAGING: {{matrix}} docker Linux/arm64"
+      - label: "STAGING: {{matrix}} Linux/arm64 and Darwin/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
-          PACKAGES: "docker"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -237,14 +311,91 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
+          - x-pack/osquerybeat
+          - x-pack/agentbeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "STAGING: x-pack/agentbeat"
+      - label: "STAGING: x-pack/agentbeat all artifacts apart from linux/arm64 and darwin/arm64"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
           DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+
+      - label: "STAGING: {{matrix}} Linux/amd64 FIPS"
+        env:
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
+          SNAPSHOT: false
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
+          FIPS: true
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - x-pack/auditbeat
+          - x-pack/filebeat
+          - x-pack/metricbeat
+
+      - label: "STAGING: {{matrix}} Linux/arm64 FIPS"
+        env:
+          PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
+          SNAPSHOT: false
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
+          FIPS: true
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - x-pack/auditbeat
+          - x-pack/filebeat
+          - x-pack/metricbeat
+          - x-pack/agentbeat
+
+        ## Agentbeat needs more CPUs because it builds many other beats
+      - label: "STAGING: x-pack/agentbeat Linux/amd64 FIPS"
+        env:
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
+          SNAPSHOT: false
+          # packaging with `DEV=true` may cause linker issues while crosscompiling https://github.com/elastic/beats/issues/41270
+          DEV: false
+          FIPS: true
+        command: |
+          source .buildkite/scripts/version_qualifier.sh
+          .buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -280,7 +431,7 @@ steps:
 
       - label: DRA Staging
         # TODO remove OR clause below (see earlier comment)
-        if: build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null
+        if: (build.branch =~ /^[0-9]+\.[0-9x]+\$/ || build.env('VERSION_QUALIFIER') != null) || build.env('RUN_STAGING') == "true"
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
@@ -289,6 +440,7 @@ steps:
           - packaging-staging
           - dashboards-staging
         command: |
+          source .buildkite/scripts/version_qualifier.sh
           buildkite-agent artifact download "build/**" .
           .buildkite/scripts/packaging/prepare-release-manager.sh staging
           .buildkite/scripts/dra.sh

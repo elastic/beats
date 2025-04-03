@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -17,28 +16,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-type testInputStore struct {
-	registry *statestore.Registry
-}
-
-func openTestStatestore() beater.StateStore {
-	return &testInputStore{
-		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
-	}
-}
-
-func (s *testInputStore) Close() {
-	_ = s.registry.Close()
-}
-
-func (s *testInputStore) Access() (*statestore.Store, error) {
-	return s.registry.Get("filebeat")
-}
-
-func (s *testInputStore) CleanupInterval() time.Duration {
-	return 24 * time.Hour
-}
 
 func TestStatesAddStateAndIsProcessed(t *testing.T) {
 	type stateTestCase struct {
@@ -269,4 +246,28 @@ func TestStatesPrefixHandling(t *testing.T) {
 		require.False(t, st.IsProcessed(sSpace))
 	})
 
+}
+
+var _ statestore.States = (*testInputStore)(nil)
+
+type testInputStore struct {
+	registry *statestore.Registry
+}
+
+func openTestStatestore() statestore.States {
+	return &testInputStore{
+		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
+	}
+}
+
+func (s *testInputStore) Close() {
+	_ = s.registry.Close()
+}
+
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
+	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) CleanupInterval() time.Duration {
+	return 24 * time.Hour
 }

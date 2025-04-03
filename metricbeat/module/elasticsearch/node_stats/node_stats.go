@@ -35,8 +35,10 @@ func init() {
 }
 
 const (
-	nodeLocalStatsPath = "/_nodes/_local/stats"
-	nodesAllStatsPath  = "/_nodes/_all/stats"
+	statsMetrics       = "jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest"
+	indexMetrics       = "bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush"
+	nodeLocalStatsPath = "/_nodes/_local/stats/" + statsMetrics + "/" + indexMetrics
+	nodesAllStatsPath  = "/_nodes/_all/stats/" + statsMetrics + "/" + indexMetrics
 )
 
 // MetricSet type defines all fields of the MetricSet

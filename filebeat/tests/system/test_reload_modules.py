@@ -217,6 +217,7 @@ class Test(BaseTest):
         self.render_config_template(
             reload=False,
             reload_path=self.working_dir + "/configs/*.yml",
+            reload_type="modules",
             inputs=False,
         )
         os.mkdir(self.working_dir + "/configs/")
@@ -227,6 +228,7 @@ class Test(BaseTest):
   test:
     enabled: true
     wrong_field: error
+    var.paths: []
     input:
       scan_frequency: 1s
 """
@@ -235,9 +237,8 @@ class Test(BaseTest):
 
         exit_code = self.run_beat()
 
-        # Wait until offset for new line is updated
         self.wait_until(
-            lambda: self.log_contains("No paths were defined for input accessing"),
+            lambda: self.log_contains("No paths were defined for input accessing config"),
             max_timeout=10)
 
         assert exit_code == 1

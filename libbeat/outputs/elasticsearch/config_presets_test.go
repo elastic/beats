@@ -38,9 +38,9 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 		"loadbalance": true,
 	})
 	// Apply the preset and make sure no conflicts are reported.
-	conflicts, _, err := applyPreset(presetThroughput, cfg)
+	conflicts, _, err := ApplyPreset(presetThroughput, cfg)
 	require.NoError(t, err, "Valid preset must apply successfully")
-	assert.Equal(t, 0, len(conflicts), "applyPreset should report no conflicts from non-preset fields")
+	assert.Equal(t, 0, len(conflicts), "ApplyPreset should report no conflicts from non-preset fields")
 
 	// Unpack the final config into elasticsearchConfig and verify that both user
 	// and preset fields are set correctly.
@@ -49,13 +49,13 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 	require.NoError(t, err, "Config should unpack successfully")
 
 	// Check basic user params
-	assert.Equal(t, 5, esConfig.MaxRetries, "Non-preset fields should be unchanged by applyPreset")
-	assert.Equal(t, true, esConfig.LoadBalance, "Non-preset fields should be unchanged by applyPreset")
+	assert.Equal(t, 5, esConfig.MaxRetries, "Non-preset fields should be unchanged by ApplyPreset")
+	assert.Equal(t, true, esConfig.LoadBalance, "Non-preset fields should be unchanged by ApplyPreset")
 
 	// Check basic preset params
-	assert.Equal(t, 1600, esConfig.BulkMaxSize, "Preset fields should be set by applyPreset")
-	assert.Equal(t, 1, esConfig.CompressionLevel, "Preset fields should be set by applyPreset")
-	assert.Equal(t, 15*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by applyPreset")
+	assert.Equal(t, 1600, esConfig.BulkMaxSize, "Preset fields should be set by ApplyPreset")
+	assert.Equal(t, 1, esConfig.CompressionLevel, "Preset fields should be set by ApplyPreset")
+	assert.Equal(t, 15*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by ApplyPreset")
 
 	// Check preset queue params
 	var memQueueConfig struct {
@@ -63,9 +63,9 @@ func TestApplyPresetNoConflicts(t *testing.T) {
 		FlushMinEvents int           `config:"flush.min_events"`
 		FlushTimeout   time.Duration `config:"flush.timeout"`
 	}
-	require.Equal(t, "mem", esConfig.Queue.Name(), "applyPreset should configure the memory queue")
+	require.Equal(t, "mem", esConfig.Queue.Name(), "ApplyPreset should configure the memory queue")
 	err = esConfig.Queue.Config().Unpack(&memQueueConfig)
-	assert.NoError(t, err, "applyPreset should set valid memory queue config")
+	assert.NoError(t, err, "ApplyPreset should set valid memory queue config")
 
 	assert.Equal(t, 12800, memQueueConfig.Events, "Queue fields should match preset definition")
 	assert.Equal(t, 1600, memQueueConfig.FlushMinEvents, "Queue fields should match preset definition")
@@ -98,7 +98,7 @@ func TestApplyPresetWithConflicts(t *testing.T) {
 		"idle_connection_timeout":    100 * time.Second,
 	})
 	// Apply the preset and ensure all preset fields are reported as conflicts
-	conflicts, _, err := applyPreset(presetBalanced, cfg)
+	conflicts, _, err := ApplyPreset(presetBalanced, cfg)
 	require.NoError(t, err, "Valid preset must apply successfully")
 	expectedConflicts := []string{
 		"bulk_max_size",
@@ -118,9 +118,9 @@ func TestApplyPresetWithConflicts(t *testing.T) {
 	require.NoError(t, err, "Valid config tree must unpack successfully")
 
 	// Check basic preset params
-	assert.Equal(t, 1600, esConfig.BulkMaxSize, "Preset fields should be set by applyPreset")
-	assert.Equal(t, 1, esConfig.CompressionLevel, "Preset fields should be set by applyPreset")
-	assert.Equal(t, 3*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by applyPreset")
+	assert.Equal(t, 1600, esConfig.BulkMaxSize, "Preset fields should be set by ApplyPreset")
+	assert.Equal(t, 1, esConfig.CompressionLevel, "Preset fields should be set by ApplyPreset")
+	assert.Equal(t, 3*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by ApplyPreset")
 
 	// Check preset queue params
 	var memQueueConfig struct {
@@ -128,9 +128,9 @@ func TestApplyPresetWithConflicts(t *testing.T) {
 		FlushMinEvents int           `config:"flush.min_events"`
 		FlushTimeout   time.Duration `config:"flush.timeout"`
 	}
-	require.Equal(t, "mem", esConfig.Queue.Name(), "applyPreset should configure the memory queue")
+	require.Equal(t, "mem", esConfig.Queue.Name(), "ApplyPreset should configure the memory queue")
 	err = esConfig.Queue.Config().Unpack(&memQueueConfig)
-	assert.NoError(t, err, "applyPreset should set valid memory queue config")
+	assert.NoError(t, err, "ApplyPreset should set valid memory queue config")
 
 	assert.Equal(t, 3200, memQueueConfig.Events, "Queue fields should match preset definition")
 	assert.Equal(t, 1600, memQueueConfig.FlushMinEvents, "Queue fields should match preset definition")
@@ -161,9 +161,9 @@ func TestApplyPresetCustom(t *testing.T) {
 		"idle_connection_timeout":    100 * time.Second,
 	})
 	// Apply the preset and make sure no conflicts are reported.
-	conflicts, _, err := applyPreset(presetCustom, cfg)
+	conflicts, _, err := ApplyPreset(presetCustom, cfg)
 	require.NoError(t, err, "Custom preset must apply successfully")
-	assert.Equal(t, 0, len(conflicts), "applyPreset should report no conflicts when preset is 'custom'")
+	assert.Equal(t, 0, len(conflicts), "ApplyPreset should report no conflicts when preset is 'custom'")
 
 	// Unpack the final config into elasticsearchConfig and verify that both user
 	// and preset fields are set correctly.
@@ -172,9 +172,9 @@ func TestApplyPresetCustom(t *testing.T) {
 	require.NoError(t, err, "Config should unpack successfully")
 
 	// Check basic user params
-	assert.Equal(t, 100, esConfig.BulkMaxSize, "Preset fields should be set by applyPreset")
-	assert.Equal(t, 5, esConfig.CompressionLevel, "Preset fields should be set by applyPreset")
-	assert.Equal(t, 100*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by applyPreset")
+	assert.Equal(t, 100, esConfig.BulkMaxSize, "Preset fields should be set by ApplyPreset")
+	assert.Equal(t, 5, esConfig.CompressionLevel, "Preset fields should be set by ApplyPreset")
+	assert.Equal(t, 100*time.Second, esConfig.Transport.IdleConnTimeout, "Preset fields should be set by ApplyPreset")
 
 	// Check user queue params
 	var memQueueConfig struct {
@@ -182,7 +182,7 @@ func TestApplyPresetCustom(t *testing.T) {
 		FlushMinEvents int           `config:"flush.min_events"`
 		FlushTimeout   time.Duration `config:"flush.timeout"`
 	}
-	require.Equal(t, "mem", esConfig.Queue.Name(), "applyPreset with custom preset should preserve user queue settings")
+	require.Equal(t, "mem", esConfig.Queue.Name(), "ApplyPreset with custom preset should preserve user queue settings")
 	err = esConfig.Queue.Config().Unpack(&memQueueConfig)
 	assert.NoError(t, err, "Queue settings should unpack successfully")
 

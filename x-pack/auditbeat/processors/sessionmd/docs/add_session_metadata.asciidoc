@@ -70,7 +70,7 @@ auditbeat.modules:
 - module: auditd
   processors:
     - add_session_metadata:
-       backend: "auto"
+        backend: "auto"
 -------------------------------------
 +
 . Add audit rules in the modules configuration section of `auditbeat.yml` or the
@@ -96,3 +96,25 @@ auditbeat.modules:
 -------------------------------------
 sudo systemctl restart auditbeat
 -------------------------------------
+
+===== Configuring the Process Database 
+
+When using the `procfs` backend, `add_session_metadata` will use an in-memory database to store and match events as they arrive to the processor.
+This processor has a number of additional config values:
+
+[source,yaml]
+-------------------------------------
+auditbeat.modules:
+- module: auditd
+  processors:
+    - add_session_metadata:
+        backend: "procfs"
+        reap_processes: false
+        db_reaper_period: 30s
+-------------------------------------
+
+* `reap_processes` tells the database to remove orphan `execve` and `execveat` process events for which no matching `exit_group` event is found.
+  This may result in incomplete data, but will reduce memory usage under high load. The default is `false`.
+* `db_reaper_period` specifies the time interval of the reaper process that will regularly remove exited and orphaned processes from the database.
+  Setting this value lower my result in incomplete data, but will reduce memory pressure. Setting this to a higher value may help on systems with high load, but will increase memory usage. 
+  The default is `30s.`

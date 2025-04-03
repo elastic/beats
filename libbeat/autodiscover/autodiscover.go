@@ -75,8 +75,9 @@ func NewAutodiscover(
 	configurer EventConfigurer,
 	c *Config,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (*Autodiscover, error) {
-	logger := logp.NewLogger("autodiscover")
+	logger = logger.Named("autodiscover")
 
 	// Init Event bus
 	bus := bus.New(logger, name)
@@ -98,7 +99,7 @@ func NewAutodiscover(
 		factory:         factory,
 		configurer:      configurer,
 		configs:         map[string]map[uint64]*reload.ConfigWithMeta{},
-		runners:         cfgfile.NewRunnerList("autodiscover.cfgfile", factory, pipeline),
+		runners:         cfgfile.NewRunnerList("autodiscover.cfgfile", factory, pipeline, logger),
 		providers:       providers,
 		meta:            meta.NewMap(),
 		logger:          logger,
@@ -287,6 +288,11 @@ func (a *Autodiscover) handleStop(event bus.Event) bool {
 		updated = true
 	}
 
+	// Cleanup meta references for this eventID
+	for configHash := range a.configs[eventID] {
+		a.meta.Remove(configHash)
+	}
+
 	delete(a.configs, eventID)
 
 	return updated
@@ -304,7 +310,7 @@ func (a *Autodiscover) getMeta(event bus.Event) mapstr.M {
 		a.logger.Errorf("Got a wrong meta field for event %v", event)
 		return nil
 	}
-	return meta
+	return meta.Clone()
 }
 
 // getID returns the event "id" field string if present

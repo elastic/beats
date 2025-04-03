@@ -98,7 +98,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			continue
 		}
 		if p.Limit > 0 && len(keys) > int(p.Limit) {
-			m.Logger().Debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit)
+			m.Logger().Debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit, p.Pattern, keyspace)
 			keys = keys[:p.Limit]
 		}
 

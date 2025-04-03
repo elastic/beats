@@ -86,7 +86,7 @@ func TestReportErrorForMissingField(t *testing.T) {
 	r := MockReporterV2{}
 	err := ReportErrorForMissingField(field, Elasticsearch, r)
 
-	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch API response", field)
+	expectedError := fmt.Errorf("could not find field '%v' in Elasticsearch API response", field)
 	assert.Equal(t, expectedError, err)
 	assert.Equal(t, expectedError, currentErr)
 }

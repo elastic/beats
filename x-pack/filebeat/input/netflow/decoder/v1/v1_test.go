@@ -17,10 +17,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	template2 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+func init() {
+	logp.TestingSetup()
+}
+
 func TestNetflowProtocol_New(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	assert.Nil(t, proto.Start())
 	assert.Equal(t, uint16(1), proto.Version())
@@ -28,7 +33,7 @@ func TestNetflowProtocol_New(t *testing.T) {
 }
 
 func TestNetflowProtocol_OnPacket(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	rawS := "00010002000000015bf689f605946fb0" +
 		"acd910e5c0a8017b00000000000000000000000e00002cfa" +
@@ -105,7 +110,7 @@ func TestNetflowProtocol_OnPacket(t *testing.T) {
 }
 
 func TestNetflowProtocol_BadPacket(t *testing.T) {
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 
 	rawS := "00010002000000015bf689f605"
 	raw, err := hex.DecodeString(rawS)

@@ -19,7 +19,7 @@ package generator
 
 import (
 	"encoding/base64"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
 	"time"
 )

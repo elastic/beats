@@ -1352,9 +1352,11 @@ class Test(BaseTest):
         self.render_config_template(
             type='container',
             input_raw='''
+  allow_deprecated_use: true
   paths: {path}
   stream: stdout
 - type: container
+  allow_deprecated_use: true
   paths: {path}
   stream: stderr
 '''.format(path=os.path.abspath(self.working_dir) + "/log/*/*.log")

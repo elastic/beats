@@ -267,7 +267,7 @@ func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, version uint8,
 	// user data from a handle, since this information is not available
 	// from the metadata or anywhere else. It is not ideal to update the defaultEM
 	// here but there is no way around it at the moment.
-	if em.EventData.IsUserData {
+	if defaultEM != nil && em.EventData.IsUserData {
 		defaultEM.EventData.IsUserData = true
 		defaultEM.EventData.Name = em.EventData.Name
 	}

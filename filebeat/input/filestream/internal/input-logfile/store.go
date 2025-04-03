@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert"
 	"github.com/elastic/go-concert/unison"
 )
@@ -36,8 +37,14 @@ import (
 // sourceStore is a store which can access resources using the Source
 // from an input.
 type sourceStore struct {
+	// identifier is the sourceIdentifier used to generate IDs fro this store.
 	identifier *sourceIdentifier
-	store      *store
+	// identifiersToTakeOver are sourceIdentifier from previous input instances
+	// that this sourceStore will take states over.
+	identifiersToTakeOver []*sourceIdentifier
+	// store is the underlying store that encapsulates
+	// the in-memory and persistent store.
+	store *store
 }
 
 // store encapsulates the persistent store and the in memory state store, that
@@ -141,10 +148,10 @@ type (
 // hook into store close for testing purposes
 var closeStore = (*store).close
 
-func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, error) {
+func openStore(log *logp.Logger, statestore statestore.States, prefix string) (*store, error) {
 	ok := false
 
-	persistentStore, err := statestore.Access()
+	persistentStore, err := statestore.StoreFor("")
 	if err != nil {
 		return nil, err
 	}
@@ -163,10 +170,21 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}, nil
 }
 
-func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
+// newSourceStore store returns a souceStore that will operate on the provided
+// store. identifier is required and is used to generate the ID for the
+// resources stored on store. identifiersToTakeOver is used by the TakeOver
+// method when taking over states from other Filestream inputs.
+// identifiersToTakeOver is optional and can be nil.
+func newSourceStore(
+	s *store,
+	identifier *sourceIdentifier,
+	identifiersToTakeOver []*sourceIdentifier,
+) *sourceStore {
+
 	return &sourceStore{
-		store:      s,
-		identifier: identifier,
+		store:                 s,
+		identifier:            identifier,
+		identifiersToTakeOver: identifiersToTakeOver,
 	}
 }
 
@@ -214,7 +232,7 @@ func (s *sourceStore) CleanIf(pred func(v Value) bool) {
 
 // UpdateIdentifiers copies an existing resource to a new ID and marks the previous one
 // for removal.
-func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interface{})) {
+func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, any)) {
 	s.store.ephemeralStore.mu.Lock()
 	defer s.store.ephemeralStore.mu.Unlock()
 
@@ -223,14 +241,7 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 		// they're actually removed from the in-memory registry (ephemeralStore)
 		// and marked as removed in the registry operations log. So we need
 		// to skip all entries that were soft deleted.
-		//
-		//  - res.internalState.TTL == 0: entry has been deleted
-		//  - res.internalState.TTL == -1: entry will never be removed by TTL
-		//  - res.internalState.TTL > 0: entry will be removed once its TTL
-		//    is reached
-		//
-		// If the entry has been deleted, skip it
-		if res.internalState.TTL == 0 {
+		if res.isDeleted() {
 			continue
 		}
 
@@ -266,12 +277,252 @@ func (s *sourceStore) UpdateIdentifiers(getNewID func(v Value) (string, interfac
 			// We cannot use store.remove because it will
 			// acquire the same lock we hold, causing a deadlock.
 			// See store.remove for details.
+			// Fully remove the old resource from all stores.
+			//  - 1. Update the TLL, which soft-deletes it. This is the
+			//    mechanism used by store.remove. We cannot call store.remove
+			//    because it will acquire a lock we're holding.
+			//  - 2. Remove the resource from the in-memory store
+			//  - 3. Finally, synchronously remove it from the disk store.
 			s.store.UpdateTTL(res, 0)
+			delete(s.store.ephemeralStore.table, res.key)
+			s.store.persistentStore.Remove(res.key)
 			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", key, newKey, r.cursor)
 		}
 
 		res.lock.Unlock()
 	}
+}
+
+// TakeOver allows one Filestream input to take over states from other
+// Filestream inputs or the Log input. fn should return the new registry ID
+// and new CursorMeta. If fn returns an empty string, the entry is skipped.
+//
+// When fn returns a valid ID, the old resource is removed from both,
+// the in-memory and persistent store. The operations are synchronous.
+//
+// If the resource migrated was from the Log input, `TakeOver` will
+// remove it from the persistent store, however the Log input reigstrar
+// will write it back when Filebeat is shutting down. However,
+// there is a mechanism in place to detect this situation and avoid
+// migrating the same state over and over again.
+// See the comments on this method for more details.
+func (s *sourceStore) TakeOver(fn func(Value) (string, any)) {
+	matchPreviousFilestreamIDs := func(key string) bool {
+		for _, identifier := range s.identifiersToTakeOver {
+			if identifier.MatchesInput(key) {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	// Iterate through the states from any Filestream input
+	fromFilestreamInput := map[string]struct{}{}
+	for key, res := range s.store.ephemeralStore.table {
+		// Entries in the registry are soft deleted, once the gcStore runs,
+		// they're actually removed from the in-memory registry (ephemeralStore)
+		// and marked as removed in the registry operations log. So we need
+		// to skip all entries that were soft deleted.
+		if res.isDeleted() {
+			continue
+		}
+
+		if !matchPreviousFilestreamIDs(key) {
+			continue
+		}
+
+		fromFilestreamInput[key] = struct{}{}
+	}
+
+	// Iterate through the whole store, no matter input type or input ID.
+	// That's the only way to access the log input states.
+	// We only iterate through the whole store if we're not migrating from
+	// a Filestream input
+	fromLogInput := map[string]logInputState{}
+	if len(s.identifiersToTakeOver) == 0 {
+		s.store.persistentStore.Each(func(key string, value statestore.ValueDecoder) (bool, error) {
+			if strings.HasPrefix(key, "filebeat::logs::") {
+				m := mapstr.M{}
+				if err := value.Decode(&m); err != nil {
+					return true, err
+				}
+				st, err := logInputStateFromMapM(m)
+				if err != nil {
+					// Log the error and continue
+					s.store.log.Errorf("cannot read Log input state: %s", err)
+					return true, nil
+				}
+				// That is a workaround for the problems with the
+				// Log input Registrar (`filebeat/registrar`) and the way it
+				// handles states.
+				// There are two problems:
+				//  - 1. The Log input store/registrar does not have an API for
+				//       removing states
+				//  - 2. When `registrar.Registrar` starts, it copies all states
+				//       belonging to the Log input from the disk store into
+				//       memory and when the Registrar is shutting down, it
+				//       writes all states to the disk. This all happens even
+				//       if no Log input was ever started.
+				// This means that no matter what we do here, the states from
+				// the Log input are always re-written to disk.
+				// See: filebeat/registrar/registrar.go, deferred statement on
+				// `Registrar.Run`.
+				//
+				// However, there is a "reset state" code, that runs
+				// during the Registrar initialisation and sets the
+				// TTL to -2, once the Log input havesting that file starts
+				// the TTL is set to -1 (never expires) or the configured
+				// value.
+				// See: filebeat/registrar/registrar.go (readStatesFrom) and
+				// filebeat/beater/filebeat.go (registrar.Start())
+				//
+				// This means that while the Log input is running and the file
+				// has been active at any moment during the Filebeat's execution
+				// the TTL is never going to be -2 during the shutdown.
+				//
+				// So, if TTL == -2, then in the previous run of Filebeat, there
+				// was no Log input using this state, which likely means, it is
+				// a state that has already been migrated to Filestream.
+				//
+				// The worst case that can happen is that we re-ingest the file
+				// once, which is still better than copying an old state with
+				// an incorrect offset every time Filebeat starts.
+				if st.TTL == -2 {
+					return true, nil
+				}
+				st.key = key
+				fromLogInput[key] = st
+			}
+
+			return true, nil
+		})
+	}
+
+	// Lock the ephemeral store so we can migrate the states in one go
+	s.store.ephemeralStore.mu.Lock()
+	defer s.store.ephemeralStore.mu.Unlock()
+
+	// Migrate all states from the Filestream input
+	for k := range fromFilestreamInput {
+		res := s.store.ephemeralStore.unsafeFind(k, false)
+		if res == nil {
+			// The resource does not exist or has been deleted.
+			// This should never happen, but better safe than sorry
+			continue
+		}
+
+		if !res.lock.TryLock() {
+			res.Release()
+			s.store.log.Infof("cannot lock '%s', will not migrate its state", k)
+			continue
+		}
+
+		newKey, updatedMeta := fn(res)
+		if len(newKey) > 0 {
+			// If the new key already exists in the store, do nothing.
+			// Unlock the resource and return
+			if res := s.store.ephemeralStore.unsafeFind(newKey, false); res != nil {
+				res.Release()
+				res.lock.Unlock()
+				continue
+			}
+
+			r := res.copyWithNewKey(newKey)
+			r.cursorMeta = updatedMeta
+			r.stored = false
+			// writeState only writes to the log file (disk)
+			// the write is synchronous
+			s.store.writeState(r)
+
+			// Add the new resource to the ephemeralStore so the rest of the
+			// codebase can have access to the new value
+			s.store.ephemeralStore.table[newKey] = r
+
+			// Remove the old key from the store aka delete. This is also
+			// synchronously written to the disk.
+			// We cannot use store.remove because it will
+			// acquire the same lock we hold, causing a deadlock.
+			// See store.remove for details.
+			// Fully remove the old resource from all stores.
+			//  - 1. Update the TTL, which soft-deletes it.
+			//  - 2. Remove the resource from the in-memory store
+			//  - 3. Finally, synchronously remove it from the disk store.
+			s.store.UpdateTTL(res, 0)
+			delete(s.store.ephemeralStore.table, res.key)
+			s.store.persistentStore.Remove(res.key)
+			s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, r.cursor)
+		}
+
+		res.Release()
+		res.lock.Unlock()
+	}
+
+	// Migrate all states from the Log input
+	for k, v := range fromLogInput {
+		newKey, updatedMeta := fn(v)
+
+		// Find or create a resource. It should always create a new one.
+		res := s.store.ephemeralStore.unsafeFind(newKey, true)
+		res.cursorMeta = updatedMeta
+		// Convert the offset to the correct type
+		res.cursor = struct {
+			Offset int64 `json:"offset" struct:"offset"`
+		}{
+			Offset: v.Offset,
+		}
+
+		// Write to disk
+		s.store.writeState(res)
+
+		// Update in-memory store
+		s.store.ephemeralStore.table[newKey] = res
+
+		// "remove" from the disk store.
+		// It will add a remove entry in the log file for this key, however
+		// the Registrar used by the Log input will write to disk all states
+		// it read when Filebeat was starting, thus "overriding" this delete.
+		// We keep it here because when we remove the Log input we will ensure
+		// the entry is actually remove from the disk store.
+		s.store.persistentStore.Remove(k)
+		res.Release()
+		s.store.log.Infof("migrated entry in registry from '%s' to '%s'. Cursor: %v", k, newKey, res.cursor)
+	}
+}
+
+type logInputState struct {
+	ID     string        `json:"id"`
+	Offset int64         `json:"offset"`
+	TTL    time.Duration `json:"ttl" struct:"ttl"`
+	key    string        `json:"-"`
+
+	// This matches the filestream.fileMeta struct
+	// and are used by UnpackCursorMeta
+	Source         string `json:"source" struct:"source"`
+	IdentifierName string `json:"identifier_name" struct:"identifier_name"`
+}
+
+func logInputStateFromMapM(m mapstr.M) (logInputState, error) {
+	state := logInputState{}
+
+	// typeconf.Convert kept failing with an "unsupported" error because
+	// FileStateOS was present, we don't need it, so just delete it.
+	m.Delete("FileStateOS") //nolint:errcheck // The key is always there
+	if err := typeconv.Convert(&state, m); err != nil {
+		return logInputState{}, fmt.Errorf("cannot convert Log input state: %w", err)
+	}
+
+	return state, nil
+}
+
+// UnpackCursorMeta unpacks the cursor metadata's into the provided struct. TBD
+func (l logInputState) UnpackCursorMeta(to any) error {
+	return typeconv.Convert(to, l)
+}
+
+// Key returns the resource's key
+func (l logInputState) Key() string {
+	return l.key
 }
 
 func (s *store) Retain() { s.refCount.Retain() }
@@ -404,6 +655,17 @@ func (s *states) Find(key string, create bool) *resource {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	return s.unsafeFind(key, create)
+}
+
+// unsafeFind DOES NOT LOCK THE STORE!!! Only call unsafeFind if you're
+// currently holding the lock from states.mu.
+//
+// unsafeFind returns the resource for a given key. If the key is unknown and
+// create is set to false nil will be returned.
+// The resource returned by unsafeFind is marked as active. (*resource).Release
+// must be called to mark the resource as inactive again.
+func (s *states) unsafeFind(key string, create bool) *resource {
 	if resource := s.table[key]; resource != nil && !resource.isDeleted() {
 		resource.Retain()
 		return resource
@@ -419,6 +681,10 @@ func (s *states) Find(key string, create bool) *resource {
 		key:    key,
 		lock:   unison.MakeMutex(),
 	}
+	// -1 means this resource will not be cleaned up due to a timeout.
+	// The zero-value for internalState.TTL means this resource is
+	// soft-deleted.
+	resource.internalState.TTL = -1
 	s.table[key] = resource
 	resource.Retain()
 	return resource

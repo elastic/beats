@@ -97,6 +97,7 @@ type Context struct {
 
 func (c Context) UpdateStatus(status status.Status, msg string) {
 	if c.StatusReporter != nil {
+		c.Logger.Debugf("updating status, status: '%s', message: '%s'", status.String(), msg)
 		c.StatusReporter.UpdateStatus(status, msg)
 	}
 }

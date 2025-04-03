@@ -30,7 +30,6 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	logp.DevelopmentSetup()
 
 	tmp, err := os.MkdirTemp("", "pidfile_test")
 	defer os.RemoveAll(tmp)
@@ -59,10 +58,12 @@ func TestLocker(t *testing.T) {
 	// Setup two beats with same name and data path
 	const beatName = "testbeat-testlocker"
 
-	b1 := beat.Info{}
+	logger := logp.NewTestingLogger(t, "")
+
+	b1 := beat.Info{Logger: logger}
 	b1.Beat = beatName
 
-	b2 := beat.Info{}
+	b2 := beat.Info{Logger: logger}
 	b2.Beat = beatName
 
 	// Try to get a lock for the first beat. Expect it to succeed.
@@ -80,8 +81,9 @@ func TestLocker(t *testing.T) {
 
 func TestUnlock(t *testing.T) {
 	const beatName = "testbeat-testunlock"
+	logger := logp.NewTestingLogger(t, "")
 
-	b1 := beat.Info{}
+	b1 := beat.Info{Logger: logger}
 	b1.Beat = beatName
 
 	b2 := beat.Info{}
@@ -105,8 +107,9 @@ func TestUnlock(t *testing.T) {
 
 func TestUnlockWithRemainingFile(t *testing.T) {
 	const beatName = "testbeat-testunlockwithfile"
+	logger := logp.NewTestingLogger(t, "")
 
-	b1 := beat.Info{}
+	b1 := beat.Info{Logger: logger}
 	b1.Beat = beatName
 
 	b2 := beat.Info{}

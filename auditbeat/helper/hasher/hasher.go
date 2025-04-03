@@ -18,10 +18,6 @@
 package hasher
 
 import (
-	"crypto/md5"
-	"crypto/sha1"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
 	"hash"
@@ -29,11 +25,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cespare/xxhash/v2"
 	"github.com/dustin/go-humanize"
 	"github.com/joeshaw/multierror"
-	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/sha3"
 	"golang.org/x/time/rate"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -52,36 +45,6 @@ func (t *HashType) Unpack(v string) error {
 func (t *HashType) IsValid() bool {
 	_, valid := validHashes[*t]
 	return valid
-}
-
-var validHashes = map[HashType](func() hash.Hash){
-	BLAKE2B_256: func() hash.Hash {
-		h, _ := blake2b.New256(nil)
-		return h
-	},
-	BLAKE2B_384: func() hash.Hash {
-		h, _ := blake2b.New384(nil)
-		return h
-	},
-	BLAKE2B_512: func() hash.Hash {
-		h, _ := blake2b.New512(nil)
-		return h
-	},
-	MD5:        md5.New,
-	SHA1:       sha1.New,
-	SHA224:     sha256.New224,
-	SHA256:     sha256.New,
-	SHA384:     sha512.New384,
-	SHA512:     sha512.New,
-	SHA512_224: sha512.New512_224,
-	SHA512_256: sha512.New512_256,
-	SHA3_224:   sha3.New224,
-	SHA3_256:   sha3.New256,
-	SHA3_384:   sha3.New384,
-	SHA3_512:   sha3.New512,
-	XXH64: func() hash.Hash {
-		return xxhash.New()
-	},
 }
 
 // Enum of hash types.
