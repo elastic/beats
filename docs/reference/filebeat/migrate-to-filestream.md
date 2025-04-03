@@ -10,7 +10,7 @@ The [`container`](/reference/filebeat/filebeat-input-container.md) input is just
 
 After deprecation it’s possible to use `log` or `container` input type (e.g. for this migration) only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
 
-The `log` and `container` input types will be eventually removed from Filebeat. We are not fixing new issues or adding any enhancements to the `log` or `container` inputs. Our focus is on `filestream`.
+The `log` and `container` input types will be eventually removed from Filebeat. We are not fixing new issues or adding any enhancements to the `log` or `container` inputs.
 ::::
 
 The `filestream` input has been generally available since version 7.14 and it is highly recommended to migrate existing `log` input configurations to `filestream`. The `filestream` input comes with many improvements over the old `log` input, such as configurable order of parsers, better file identification, better scalability and more.
@@ -64,6 +64,8 @@ filebeat.inputs:
 
 For this example, let’s assume that the `log` input is used to collect logs from the following files:
 
+The percentage number indicates the data collection progress for each file.
+
 ```
 /var/log/java-exceptions1.log (100%)
 /var/log/java-exceptions2.log (100%)
@@ -82,8 +84,6 @@ And the `container` input collect logs from:
 /var/lib/docker/containers/24f473bc1267.log (100%)
 /var/lib/docker/containers/59f473bc1295.log (42%)
 ```
-
-The progress of data collection is shown for each file.
 
 After this migration we expect that the following files will continue to be ingested by the new `filestream` inputs from their current positions:
 
@@ -188,24 +188,24 @@ filebeat.inputs:
 
 ### Step 3: Migrate additional parameters if necessary [step_3]
 
-Some configuration options are renamed or moved in `filestream`:
+Some configuration options are renamed or moved in `filestream`, they are:
 
 | **`log` input** | **`filestream` input** |
 | --- | --- |
-| recursive_glob.enabled | [prospector.scanner.recursive_glob](/reference/filebeat/filebeat-input-filestream.md#filestream-recursive-glob) |
 | harvester_buffer_size | [buffer_size](/reference/filebeat/filebeat-input-filestream.md#_buffer_size) |
 | max_bytes | [message_max_bytes](/reference/filebeat/filebeat-input-filestream.md#_message_max_bytes) |
+| recursive_glob.enabled | [prospector.scanner.recursive_glob](/reference/filebeat/filebeat-input-filestream.md#filestream-recursive-glob) |
+| scan_frequency | [prospector.scanner.check_interval](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-scan-frequency) |
+| symlinks | [prospector.scanner.symlinks](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-prospector-scanner-symlinks) |
+| exclude_files | [prospector.scanner.exclude_files](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-exclude-files) |
 | json | [parsers.n.ndjson](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-ndjson) |
 | multiline | [parsers.n.multiline](/reference/filebeat/filebeat-input-filestream.md#_multiline_3) |
-| exclude_files | [prospector.scanner.exclude_files](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-exclude-files) |
 | close_inactive | [close.on_state_change.inactive](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-close-inactive) |
 | close_removed | [close.on_state_change.removed](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-close-removed) |
+| close_inactive | [close.on_state_change.inactive](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-close-inactive) |
 | close_eof | [close.reader.on_eof](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-close-eof) |
 | close_timeout | [close.reader.after_interval](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-close-timeout) |
-| close_inactive | [close.on_state_change.inactive](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-close-inactive) |
-| scan_frequency | [prospector.scanner.check_interval](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-scan-frequency) |
 | tail_files | [ignore_inactive.since_last_start](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-ignore-inactive) |
-| symlinks | [prospector.scanner.symlinks](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-prospector-scanner-symlinks) |
 | backoff | [backoff.init](/reference/filebeat/filebeat-input-filestream.md#_backoff_init) |
 | backoff_max | [backoff.max](/reference/filebeat/filebeat-input-filestream.md#_backoff_max) |
 
@@ -271,7 +271,14 @@ Now you finally have your configuration fully migrated to using `filestream` inp
 
 ### Step 4: Validating the migration [step_4]
 
-Double-check that steps 1-3 are correctly performed on your configuration file and start Filebeat with the new configuration and the `filestream` inputs.
+::::{important}
+Double-check that:
+
+* steps 1-3 are correctly performed on your configuration file
+* the `log` and `container` inputs you migrated are removed from the configuration
+::::
+
+Start Filebeat with the new migrated configuration.
 
 All the events produced by a `filestream` input with `take_over.enabled: true` contain the `take_over` tag. You can filter on this tag in Kibana Discover and see all the events which came from filestreams in the "take over" mode.
 
