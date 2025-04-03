@@ -949,6 +949,11 @@ The interval in which incremental updates should occur. The interval must be sho
 The time between Okta API rate limit resets. Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `1m` (1 minute).
 
 
+#### `batch_size` [_batch_size]
+
+The pagination batch size for requests. If it zero or negative, the API default is used, 200.
+
+
 #### `limit_fixed` [_limit_fixed]
 
 The number of requests to allow in each limit window, if set. This parameter should only be set in exceptional cases. When it is set, rate limit information in API responses will be ignored in favor of the fixed limit. The limit is applied separately to each endopint. Defaults to unset.

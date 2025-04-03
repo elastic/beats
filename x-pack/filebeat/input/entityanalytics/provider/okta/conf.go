@@ -64,6 +64,10 @@ type conf struct {
 	// incremental updated.
 	UpdateInterval time.Duration `config:"update_interval"`
 
+	// BatchSize is the pagination batch size for requests.
+	// If it zero or negative, the API default is used.
+	BatchSize int `config:"batch_size"`
+
 	// LimitWindow is the time between Okta
 	// API limit resets.
 	LimitWindow time.Duration `config:"limit_window"`
