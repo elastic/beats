@@ -131,7 +131,7 @@ func (state ServiceState) String() string {
 	return ""
 }
 
-func GetServiceStates(handle Handle, state ServiceEnumState, protectedServices map[string]struct{}) ([]Status, error) {
+func GetServiceStates(log *logp.Logger, handle Handle, state ServiceEnumState, protectedServices map[string]struct{}) ([]Status, error) {
 	var servicesReturned uint32
 	var servicesBuffer []byte
 
@@ -166,9 +166,9 @@ func GetServiceStates(handle Handle, state ServiceEnumState, protectedServices m
 	for i := 0; i < int(servicesReturned); i++ {
 		serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeStatusProcess]))
 
-		service, err := getServiceInformation(serviceTemp, servicesBuffer, handle, protectedServices)
+		service, err := getServiceInformation(log, serviceTemp, servicesBuffer, handle, protectedServices)
 		if err != nil {
-			logp.Err("error while getting service information: %v", err)
+			log.Error("could not get information for the service (name: %s, pid: %d): %v", service.DisplayName, service.PID, err)
 			continue
 		}
 
@@ -178,7 +178,7 @@ func GetServiceStates(handle Handle, state ServiceEnumState, protectedServices m
 	return services, nil
 }
 
-func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle Handle, protectedServices map[string]struct{}) (Status, error) {
+func getServiceInformation(log *logp.Logger, rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle Handle, protectedServices map[string]struct{}) (Status, error) {
 	service := Status{
 		PID: rawService.ServiceStatusProcess.DwProcessId,
 	}
@@ -241,7 +241,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 			}
 			if _, ok := protectedServices[service.ServiceName]; !ok {
 				protectedServices[service.ServiceName] = struct{}{}
-				logp.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
+				log.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
 			}
 		}
 		service.Uptime = processUpTime / time.Millisecond

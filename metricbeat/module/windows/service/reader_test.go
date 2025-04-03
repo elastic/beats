@@ -22,11 +22,12 @@ package service
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewReader(t *testing.T) {
-	reader, err := NewReader()
+	reader, err := NewReader(logp.L())
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
 	defer reader.Close()
