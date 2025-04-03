@@ -165,7 +165,7 @@ filebeat.autodiscover.providers:
             docker.container.labels.type: "pipeline"
         config:
           - type: filestream
-            id: container-${data.container.id}
+            id: container-${data.docker.container.id}
             prospector.scanner.symlinks: true
             parsers:
               - container: ~

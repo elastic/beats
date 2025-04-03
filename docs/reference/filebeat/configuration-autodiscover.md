@@ -116,8 +116,8 @@ filebeat.autodiscover:
                   type: filestream
                   id: container-${data.docker.container.id}
                   prospector.scanner.symlinks: true
-			      parsers:
-			        - container: ~
+                  parsers:
+                    - container: ~
                   paths:
                     - /var/lib/docker/containers/${data.docker.container.id}/*.log
 ```
@@ -154,7 +154,7 @@ autodiscover.providers:
           docker.container.image: nginx
         config:
           - type: filestream
-            id: "some-unique-id"
+            id: container-${data.docker.container.id}
             paths:
               - "/mnt/logs/${data.docker.container.id}/*.log"
 ```
@@ -342,10 +342,10 @@ filebeat.autodiscover:
               kubernetes.namespace: kube-system
           config:
             - type: filestream
-              id: container-${data.docker.container.id}
+              id: container-${data.kubernetes.container.id}
               prospector.scanner.symlinks: true
-			  parsers:
-			    - container: ~
+              parsers:
+                - container: ~
               paths:
                 - /var/log/containers/*-${data.kubernetes.container.id}.log
               exclude_lines: ["^\\s+[\\-`('.|_]"]  # drop asciiart lines
@@ -368,7 +368,7 @@ filebeat.autodiscover:
               log:
                 input:
                   type: filestream
-                  id: container-${data.docker.container.id}
+                  id: container-${data.kubernetes.container.id}
                   prospector.scanner.symlinks: true
                   parsers:
                     - container: ~
