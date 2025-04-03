@@ -72,7 +72,7 @@ func makeConsole(
 	}
 
 	index := beat.Beat
-	c, err := newConsole(index, observer, enc)
+	c, err := newConsole(index, observer, enc, beat.Logger)
 	if err != nil {
 		return outputs.Fail(fmt.Errorf("console output initialization failed with: %w", err))
 	}
@@ -88,8 +88,8 @@ func makeConsole(
 	return outputs.Success(config.Queue, config.BatchSize, 0, nil, c)
 }
 
-func newConsole(index string, observer outputs.Observer, codec codec.Codec) (*console, error) {
-	c := &console{log: logp.NewLogger("console"), out: os.Stdout, codec: codec, observer: observer, index: index}
+func newConsole(index string, observer outputs.Observer, codec codec.Codec, logger *logp.Logger) (*console, error) {
+	c := &console{log: logger.Named("console"), out: os.Stdout, codec: codec, observer: observer, index: index}
 	c.writer = bufio.NewWriterSize(c.out, 8*1024)
 	return c, nil
 }

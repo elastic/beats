@@ -130,7 +130,7 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 	}
 
 	rl.logger.Debugf("Checking module configs from: %s", rl.path)
-	gw := NewGlobWatcher(rl.path)
+	gw := NewGlobWatcher(rl.path, rl.logger)
 
 	files, _, err := gw.Scan()
 	if err != nil {
@@ -161,9 +161,9 @@ func (rl *Reloader) Check(runnerFactory RunnerFactory) error {
 
 // Run runs the reloader
 func (rl *Reloader) Run(runnerFactory RunnerFactory) {
-	logp.Info("Config reloader started")
+	rl.logger.Info("Config reloader started")
 
-	list := NewRunnerList("reload", runnerFactory, rl.pipeline)
+	list := NewRunnerList("reload", runnerFactory, rl.pipeline, rl.logger)
 
 	rl.wg.Add(1)
 	defer rl.wg.Done()
@@ -171,7 +171,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	// Stop all running modules when method finishes
 	defer list.Stop()
 
-	gw := NewGlobWatcher(rl.path)
+	gw := NewGlobWatcher(rl.path, rl.logger)
 
 	// If reloading is disable, config files should be loaded immediately
 	if !rl.config.Reload.Enabled {
@@ -187,7 +187,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 	for {
 		select {
 		case <-rl.done:
-			logp.Info("Dynamic config reloader stopped")
+			rl.logger.Info("Dynamic config reloader stopped")
 			return
 
 		case <-time.After(rl.config.Reload.Period):
@@ -198,7 +198,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 			if err != nil {
 				// In most cases of error, updated == false, so will continue
 				// to next iteration below
-				logp.Err("Error fetching new config files: %v", err)
+				rl.logger.Errorf("Error fetching new config files: %v", err)
 			}
 
 			// if there are no changes, skip this reload unless forceReload is set.
@@ -227,9 +227,9 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 		// Path loading is enabled but not reloading. Loads files only once and then stops.
 		if !rl.config.Reload.Enabled {
-			logp.Info("Loading of config files completed.")
+			rl.logger.Info("Loading of config files completed.")
 			<-rl.done
-			logp.Info("Dynamic config reloader stopped")
+			rl.logger.Info("Dynamic config reloader stopped")
 			return
 		}
 	}
@@ -237,7 +237,7 @@ func (rl *Reloader) Run(runnerFactory RunnerFactory) {
 
 // Load loads configuration files once.
 func (rl *Reloader) Load(runnerFactory RunnerFactory) {
-	list := NewRunnerList("load", runnerFactory, rl.pipeline)
+	list := NewRunnerList("load", runnerFactory, rl.pipeline, rl.logger)
 
 	rl.wg.Add(1)
 	defer rl.wg.Done()
@@ -245,12 +245,12 @@ func (rl *Reloader) Load(runnerFactory RunnerFactory) {
 	// Stop all running modules when method finishes
 	defer list.Stop()
 
-	gw := NewGlobWatcher(rl.path)
+	gw := NewGlobWatcher(rl.path, rl.logger)
 
 	rl.logger.Debug("Scan for config files")
 	files, _, err := gw.Scan()
 	if err != nil {
-		logp.Err("Error fetching new config files: %v", err)
+		rl.logger.Errorf("Error fetching new config files: %v", err)
 	}
 
 	// Load all config objects
@@ -259,11 +259,11 @@ func (rl *Reloader) Load(runnerFactory RunnerFactory) {
 	rl.logger.Debugf("Number of module configs found: %v", len(configs))
 
 	if err := list.Reload(configs); err != nil {
-		logp.Err("Error loading configuration files: %+v", err)
+		rl.logger.Errorf("Error loading configuration files: %+v", err)
 		return
 	}
 
-	logp.Info("Loading of config files completed.")
+	rl.logger.Info("Loading of config files completed.")
 }
 
 func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error) {
@@ -274,7 +274,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error
 		configs, err := LoadList(file)
 		if err != nil {
 			errs = append(errs, err)
-			logp.Err("Error loading config from file '%s', error %v", file, err)
+			rl.logger.Errorf("Error loading config from file '%s', error %v", file, err)
 			continue
 		}
 
