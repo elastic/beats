@@ -96,9 +96,10 @@ func newKafkaClient(
 	headers []header,
 	writer codec.Codec,
 	cfg *sarama.Config,
+	logger *logp.Logger,
 ) (*client, error) {
 	c := &client{
-		log:      logp.NewLogger(logSelector),
+		log:      logger.Named(logSelector),
 		observer: observer,
 		hosts:    hosts,
 		topic:    topic,
@@ -173,7 +174,7 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 
 	ref := &msgRef{
 		client: c,
-		count:  int32(len(events)),
+		count:  int32(len(events)), //nolint:gosec //keep old behavior
 		total:  len(events),
 		failed: nil,
 		batch:  batch,

@@ -88,6 +88,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Removed support for the Enterprise Search module {pull}42915[42915]
 - Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
 - Don't affect data collection for other services if single service fails  {issue}40765[40765] {pull}43409[43409]
+- Updated list of supported vSphere versions in the documentation. {pull}43642[43642]
 
 *Osquerybeat*
 
