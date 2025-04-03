@@ -151,6 +151,7 @@ require (
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
 	github.com/ugorji/go/codec v1.1.8
+<<<<<<< HEAD
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
@@ -178,6 +179,27 @@ require (
 	google.golang.org/genproto v0.0.0-20240213162025-012b6fc9bca9
 	google.golang.org/grpc v1.64.1
 	google.golang.org/protobuf v1.33.0
+=======
+	github.com/vmware/govmomi v0.39.0
+	go.elastic.co/ecszap v1.0.2
+	go.elastic.co/go-licence-detector v0.7.0
+	go.etcd.io/bbolt v1.3.10
+	go.uber.org/multierr v1.11.0
+	go.uber.org/zap v1.27.0
+	golang.org/x/crypto v0.36.0
+	golang.org/x/mod v0.21.0
+	golang.org/x/net v0.38.0
+	golang.org/x/oauth2 v0.24.0
+	golang.org/x/sync v0.12.0
+	golang.org/x/sys v0.31.0
+	golang.org/x/text v0.23.0
+	golang.org/x/time v0.8.0
+	golang.org/x/tools v0.25.0
+	google.golang.org/api v0.214.0
+	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
+	google.golang.org/grpc v1.67.3
+	google.golang.org/protobuf v1.35.2
+>>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
@@ -196,11 +218,96 @@ require (
 )
 
 require (
+<<<<<<< HEAD
 	github.com/elastic/elastic-agent-libs v0.7.2
 	github.com/elastic/elastic-agent-system-metrics v0.4.4
 	github.com/golang/protobuf v1.5.4
 	golang.org/x/tools/go/vcs v0.1.0-deprecated
 	google.golang.org/genproto/googleapis/api v0.0.0-20240318140521-94a12d6c2237
+=======
+	cloud.google.com/go v0.116.0
+	cloud.google.com/go/compute v1.29.0
+	cloud.google.com/go/redis v1.17.2
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.17.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.8.2
+	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
+	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.5.0
+	github.com/Azure/azure-storage-blob-go v0.15.0
+	github.com/aerospike/aerospike-client-go/v7 v7.7.1
+	github.com/apache/arrow/go/v17 v17.0.0
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.22
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.44
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.28.2
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.24.8
+	github.com/aws/aws-sdk-go-v2/service/health v1.29.2
+	github.com/aws/smithy-go v1.22.1
+	github.com/dgraph-io/badger/v4 v4.4.0
+	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/ebpfevents v0.6.0
+	github.com/elastic/elastic-agent-autodiscover v0.9.0
+	github.com/elastic/elastic-agent-libs v0.18.12
+	github.com/elastic/elastic-agent-system-metrics v0.11.10
+	github.com/elastic/go-elasticsearch/v8 v8.17.0
+	github.com/elastic/go-quark v0.3.0
+	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
+	github.com/elastic/mito v1.17.0
+	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
+	github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996
+	github.com/elastic/tk-btf v0.1.0
+	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
+	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
+	github.com/go-ldap/ldap/v3 v3.4.6
+	github.com/go-ole/go-ole v1.2.6
+	github.com/go-resty/resty/v2 v2.13.1
+	github.com/gofrs/uuid/v5 v5.2.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/google/cel-go v0.19.0
+	github.com/googleapis/gax-go/v2 v2.14.0
+	github.com/gorilla/handlers v1.5.1
+	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/websocket v1.5.0
+	github.com/hashicorp/golang-lru/v2 v2.0.7
+	github.com/icholy/digest v0.1.22
+	github.com/jcmturner/gokrb5/v8 v8.4.4
+	github.com/klauspost/compress v1.17.11
+	github.com/meraki/dashboard-api-go/v3 v3.0.9
+	github.com/microsoft/go-mssqldb v1.7.2
+	github.com/microsoft/wmi v0.25.1
+	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.114.0
+	github.com/otiai10/copy v1.12.0
+	github.com/pierrec/lz4/v4 v4.1.21
+	github.com/pkg/xattr v0.4.9
+	github.com/prometheus/prometheus v0.54.1
+	github.com/shirou/gopsutil/v4 v4.24.10
+	github.com/teambition/rrule-go v1.8.2
+	github.com/tklauser/go-sysconf v0.3.12
+	github.com/xdg-go/scram v1.1.2
+	github.com/zyedidia/generic v1.2.1
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
+	go.elastic.co/apm/v2 v2.6.0
+	go.mongodb.org/mongo-driver v1.14.0
+	go.opentelemetry.io/collector/component v0.114.0
+	go.opentelemetry.io/collector/config/configtls v1.20.0
+	go.opentelemetry.io/collector/confmap v1.20.0
+	go.opentelemetry.io/collector/consumer v0.114.0
+	go.opentelemetry.io/collector/consumer/consumererror v0.114.0
+	go.opentelemetry.io/collector/exporter v0.114.0
+	go.opentelemetry.io/collector/exporter/debugexporter v0.114.0
+	go.opentelemetry.io/collector/otelcol v0.114.0
+	go.opentelemetry.io/collector/pdata v1.20.0
+	go.opentelemetry.io/collector/receiver v0.114.0
+	go.uber.org/mock v0.5.0
+	golang.org/x/term v0.30.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
+	gopkg.in/yaml.v3 v3.0.1
+>>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 )
 
 require (
