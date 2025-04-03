@@ -21,6 +21,9 @@ package tlscommon
 
 import (
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,11 +35,21 @@ func TestNoFIPSCertificateAndKeys(t *testing.T) {
 	t.Run("embed encrypted PKCS#1 key", func(t *testing.T) {
 		// Create a dummy configuration and append the CA after.
 		password := "abcd1234"
-		key, cert := makeKeyCertPair(t, blockTypePKCS1Encrypted, password)
+		keyFile, err := os.Open(filepath.Join("testdata", "key.pkcs1encrypted.pem"))
+		require.NoError(t, err)
+		defer keyFile.Close()
+		rawKey, err := io.ReadAll(keyFile)
+		require.NoError(t, err)
+
+		certFile, err := os.Open(filepath.Join("testdata", "cert.pkcs1encrypted.pem"))
+		require.NoError(t, err)
+		defer certFile.Close()
+		rawCert, err := io.ReadAll(certFile)
+		require.NoError(t, err)
 		cfg, err := load(`enabled: true`)
 		require.NoError(t, err)
-		cfg.Certificate.Certificate = cert
-		cfg.Certificate.Key = key
+		cfg.Certificate.Certificate = string(rawCert)
+		cfg.Certificate.Key = string(rawKey)
 		cfg.Certificate.Passphrase = password
 
 		tlsC, err := LoadTLSConfig(cfg)

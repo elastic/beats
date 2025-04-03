@@ -21,6 +21,9 @@ package tlscommon
 
 import (
 	"errors"
+	"io"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,13 +33,24 @@ import (
 // TestFIPSCertifacteAndKeys tests that encrypted private keys fail in FIPS mode
 func TestFIPSCertificateAndKeys(t *testing.T) {
 	t.Run("embed encrypted PKCS#1 key", func(t *testing.T) {
-		// Create a dummy configuration and append the CA after.
 		password := "abcd1234"
-		key, cert := makeKeyCertPair(t, blockTypePKCS1Encrypted, password)
+
+		keyFile, err := os.Open(filepath.Join("testdata", "key.pkcs1encrypted.pem"))
+		require.NoError(t, err)
+		defer keyFile.Close()
+		rawKey, err := io.ReadAll(keyFile)
+		require.NoError(t, err)
+
+		certFile, err := os.Open(filepath.Join("testdata", "cert.pkcs1encrypted.pem"))
+		require.NoError(t, err)
+		defer certFile.Close()
+		rawCert, err := io.ReadAll(certFile)
+		require.NoError(t, err)
+
 		cfg, err := load(`enabled: true`)
 		require.NoError(t, err)
-		cfg.Certificate.Certificate = cert
-		cfg.Certificate.Key = key
+		cfg.Certificate.Certificate = string(rawCert)
+		cfg.Certificate.Key = string(rawKey)
 		cfg.Certificate.Passphrase = password
 
 		_, err = LoadTLSConfig(cfg)
@@ -46,7 +60,7 @@ func TestFIPSCertificateAndKeys(t *testing.T) {
 
 	t.Run("embed encrypted PKCS#8 key", func(t *testing.T) {
 		// Create a dummy configuration and append the CA after.
-		password := "abcd1234"
+		password := "abcdefg1234567"
 		key, cert := makeKeyCertPair(t, blockTypePKCS8Encrypted, password)
 		cfg, err := load(`enabled: true`)
 		require.NoError(t, err)

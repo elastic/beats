@@ -23,12 +23,26 @@ steps:
     artifact_paths:
       - "junit-*.xml"
 
+    # Run unit tests with requirefips tag to validate functionality
   - label: ":linux: Test Linux FIPS"
     key: test-lin-fips
     command:
       - ".buildkite/scripts/test.sh"
     env:
       FIPS: "true"
+    agents:
+      image: golang:${GO_VERSION}
+      cpu: "8"
+      memory: "4G"
+    artifact_paths:
+      - "junit-*.xml"
+
+    # Run unit tests with requirefips tag and GODEBUG=fips140=only
+    # This is a check against accidentally adding crypto that breaks FIPS compliance.
+  - label: ":linux: Test Linux fips140=only"
+    key: test-lin-fipsonly
+    command:
+      - ".buildkite/scripts/test-fipsonly.sh"
     agents:
       image: golang:${GO_VERSION}
       cpu: "8"

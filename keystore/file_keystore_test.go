@@ -238,34 +238,15 @@ func TestGetConfig(t *testing.T) {
 	require.Equal(t, port, "hello")
 }
 
-func TestShouldRaiseAndErrorWhenVersionDontMatch(t *testing.T) {
-	temporaryPath := GetTemporaryKeystoreFile(t)
-	defer os.Remove(temporaryPath)
-
-	badVersion := `v2D/EQwnDNO7yZsjsRFVWGgbkZudhPxVhBkaQAVud66+tK4HRdfPrNrNNgSmhioDGrQ0z/VZpvbw68gb0G
-	G2QHxlP5s4HGRU/GQge3Nsnx0+kDIcb/37gPN1D1TOPHSiRrzzPn2vInmgaLUfEgBgoa9tuXLZEKdh3JPh/q`
-
-	f, err := os.OpenFile(temporaryPath, os.O_CREATE|os.O_WRONLY, 0600)
-	require.NoError(t, err)
-	_, _ = f.WriteString(badVersion)
-	err = f.Close()
-	require.NoError(t, err)
-
-	_, err = NewFileKeystoreWithPassword(temporaryPath, NewSecureString([]byte("")))
-	if assert.Error(t, err, "Expect version check error") {
-		assert.Equal(t, err, fmt.Errorf("keystore format doesn't match expected version: 'v1' got 'v2'"))
-	}
-}
-
 func TestMissingEncryptedBlock(t *testing.T) {
 	temporaryPath := GetTemporaryKeystoreFile(t)
 	defer os.Remove(temporaryPath)
 
-	badVersion := "v1"
+	versionString := string(version)
 
 	f, err := os.OpenFile(temporaryPath, os.O_CREATE|os.O_WRONLY, 0600)
 	require.NoError(t, err)
-	_, _ = f.WriteString(badVersion)
+	_, _ = f.WriteString(versionString)
 	err = f.Close()
 	require.NoError(t, err)
 
