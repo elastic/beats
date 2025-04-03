@@ -26972,19 +26972,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-<<<<<<< HEAD
-Version: v0.32.0
-Licence type (autodetected): BSD-3-Clause
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.32.0/LICENSE:
-=======
 Version: v0.36.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.36.0/LICENSE:
->>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27054,19 +27046,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-<<<<<<< HEAD
-Version: v0.34.0
-Licence type (autodetected): BSD-3-Clause
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.34.0/LICENSE:
-=======
 Version: v0.38.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.38.0/LICENSE:
->>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27099,11 +27083,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/oauth2
-Version: v0.23.0
+Version: v0.24.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/oauth2@v0.23.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/oauth2@v0.24.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -27136,19 +27120,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sync
-<<<<<<< HEAD
-Version: v0.10.0
-Licence type (autodetected): BSD-3-Clause
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/golang.org/x/sync@v0.10.0/LICENSE:
-=======
 Version: v0.12.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/sync@v0.12.0/LICENSE:
->>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27181,11 +27157,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.29.0
+Version: v0.31.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.29.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.31.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -27218,19 +27194,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-<<<<<<< HEAD
-Version: v0.28.0
-Licence type (autodetected): BSD-3-Clause
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.28.0/LICENSE:
-=======
 Version: v0.30.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.30.0/LICENSE:
->>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27263,19 +27231,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/text
-<<<<<<< HEAD
-Version: v0.21.0
-Licence type (autodetected): BSD-3-Clause
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.21.0/LICENSE:
-=======
 Version: v0.23.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.23.0/LICENSE:
->>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27308,11 +27268,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/time
-Version: v0.6.0
+Version: v0.8.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/time@v0.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/time@v0.8.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -27419,11 +27379,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : google.golang.org/genproto/googleapis/api
-Version: v0.0.0-20241104194629-dd2ea8efbc28
+Version: v0.0.0-20241118233622-e639e219e697
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googleapis/api@v0.0.0-20241104194629-dd2ea8efbc28/LICENSE:
+Contents of probable licence file $GOMODCACHE/google.golang.org/genproto/googleapis/api@v0.0.0-20241118233622-e639e219e697/LICENSE:
 
 
                                  Apache License
