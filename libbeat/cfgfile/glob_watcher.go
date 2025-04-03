@@ -31,13 +31,15 @@ type GlobWatcher struct {
 	glob     string
 	lastScan time.Time
 	lastHash uint64
+	logger   *logp.Logger
 }
 
-func NewGlobWatcher(glob string) *GlobWatcher {
+func NewGlobWatcher(glob string, logger *logp.Logger) *GlobWatcher {
 	return &GlobWatcher{
 		lastScan: time.Time{},
 		lastHash: 0,
 		glob:     glob,
+		logger:   logger,
 	}
 }
 
@@ -63,7 +65,7 @@ func (gw *GlobWatcher) Scan() ([]string, bool, error) {
 
 		info, err := os.Stat(f)
 		if err != nil {
-			logp.Err("Error getting stats for file: %s", f)
+			gw.logger.Errorf("Error getting stats for file: %s", f)
 			continue
 		}
 

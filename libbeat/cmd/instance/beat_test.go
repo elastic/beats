@@ -485,7 +485,7 @@ func TestLogSystemInfo(t *testing.T) {
 		buff.Reset()
 
 		b.Manager = mockManager{enabled: tc.managed}
-		b.logSystemInfo()
+		b.logSystemInfo(log)
 
 		tc.assertFn(t, buff)
 	}
