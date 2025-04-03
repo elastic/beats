@@ -168,7 +168,7 @@ func GetServiceStates(log *logp.Logger, handle Handle, state ServiceEnumState, p
 
 		service, err := getServiceInformation(log, serviceTemp, servicesBuffer, handle, protectedServices)
 		if err != nil {
-			log.Error("could not get information for the service (name: %s, pid: %d): %v", service.DisplayName, service.PID, err)
+			log.Errorf("could not get information for the service (name: %s, pid: %d): %v", service.DisplayName, service.PID, err)
 			continue
 		}
 
@@ -241,7 +241,7 @@ func getServiceInformation(log *logp.Logger, rawService *EnumServiceStatusProces
 			}
 			if _, ok := protectedServices[service.ServiceName]; !ok {
 				protectedServices[service.ServiceName] = struct{}{}
-				log.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
+				log.Warnf("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
 			}
 		}
 		service.Uptime = processUpTime / time.Millisecond
