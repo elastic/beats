@@ -227,7 +227,7 @@ require (
 	go.opentelemetry.io/collector/receiver v0.114.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.30.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
+	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
 )
