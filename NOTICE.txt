@@ -26972,11 +26972,19 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
+<<<<<<< HEAD
 Version: v0.32.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.32.0/LICENSE:
+=======
+Version: v0.36.0
+Licence type (autodetected): BSD-3-Clause
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.36.0/LICENSE:
+>>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27046,11 +27054,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
+<<<<<<< HEAD
 Version: v0.34.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.34.0/LICENSE:
+=======
+Version: v0.38.0
+Licence type (autodetected): BSD-3-Clause
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.38.0/LICENSE:
+>>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27120,11 +27136,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sync
+<<<<<<< HEAD
 Version: v0.10.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/sync@v0.10.0/LICENSE:
+=======
+Version: v0.12.0
+Licence type (autodetected): BSD-3-Clause
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/golang.org/x/sync@v0.12.0/LICENSE:
+>>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27194,11 +27218,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
+<<<<<<< HEAD
 Version: v0.28.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.28.0/LICENSE:
+=======
+Version: v0.30.0
+Licence type (autodetected): BSD-3-Clause
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.30.0/LICENSE:
+>>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
@@ -27231,11 +27263,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/text
+<<<<<<< HEAD
 Version: v0.21.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.21.0/LICENSE:
+=======
+Version: v0.23.0
+Licence type (autodetected): BSD-3-Clause
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.23.0/LICENSE:
+>>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 
 Copyright 2009 The Go Authors.
 
