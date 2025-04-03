@@ -40,35 +40,25 @@ type StructSnapshotCollector interface {
 }
 
 type handler struct {
-	registry     *monitoring.Registry
-	inputMetrics StructSnapshotCollector
+	globalReg *monitoring.Registry
+	localReg  *monitoring.Registry
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
-// requests to /inputs. It will publish the metrics returned by the
-// StructSnapshotCollector as well as the ones registered in the global
-// 'dataset' metrics namespace. It's safe to pass a nil StructSnapshotCollector.
+// requests to /inputs. It will publish the metrics registered in the global
+// 'dataset' metrics namespace and on reg.
 func AttachHandler(
 	r *mux.Router,
-	snapCollector StructSnapshotCollector,
+	reg *monitoring.Registry,
 ) error {
-	return attachHandler(r, globalRegistry(), snapCollector)
+	return attachHandler(r, globalRegistry(), reg)
 }
 
-func attachHandler(r *mux.Router, registry *monitoring.Registry, metrics StructSnapshotCollector) error {
-	snapCollector := metrics
-	if snapCollector == nil {
-		snapCollector = &noopStructSnapshotCollector{}
-	}
-
-	h := &handler{registry: registry, inputMetrics: snapCollector}
+func attachHandler(r *mux.Router, global *monitoring.Registry, local *monitoring.Registry) error {
+	h := &handler{globalReg: global, localReg: local}
 	r = r.PathPrefix(route).Subrouter()
 	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
 }
-
-type noopStructSnapshotCollector struct{}
-
-func (n *noopStructSnapshotCollector) CollectStructSnapshot() map[string]map[string]any { return nil }
 
 func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 	requestedPretty, err := getPretty(req)
@@ -83,38 +73,42 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	filtered := filteredSnapshot(h.registry, h.inputMetrics, requestedType)
+	filtered := filteredSnapshot(h.globalReg, h.localReg, requestedType)
 
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
 
 func filteredSnapshot(
-	r *monitoring.Registry,
-	inputMetrics StructSnapshotCollector,
+	global *monitoring.Registry,
+	local *monitoring.Registry,
 	requestedType string) []map[string]any {
 
-	// 1st collect all input metrics explicitly registered by RegisterMetrics.
-	registeredInputRegistries := inputMetrics.CollectStructSnapshot()
-	filtered := make([]map[string]any, 0, len(registeredInputRegistries))
-	inputs := map[string]struct{}{}
+	selected := make([]map[string]any, 0)
 
-	for _, reg := range registeredInputRegistries {
-		if !requestedInput(reg["input"], requestedType) {
+	// 1st collect all input metrics.
+	selectedLocal := filterMetrics(local, requestedType)
+	selectedGlobal := filterMetrics(global, requestedType)
+
+	// All registries from the local registry takes priority over the global
+	// ones.
+	for _, r := range selectedLocal {
+		selected = append(selected, r)
+	}
+	for _, g := range selectedGlobal {
+		if _, ok := selectedLocal[g["id"].(string)]; ok {
+			// if the local registry has this ID, it takes precedence.
 			continue
 		}
 
-		// it should always succeed, but better safe than sorry.
-		id, ok := reg["id"].(string)
-		if !ok {
-			continue
-		}
-
-		inputs[id] = struct{}{}
-		filtered = append(filtered, reg)
+		selected = append(selected, g)
 	}
 
-	// 2nd collect the metrics from globalRegistry()
+	return selected
+}
+
+func filterMetrics(r *monitoring.Registry, requestedType string) map[string]map[string]any {
+	selected := map[string]map[string]any{}
 	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
@@ -128,19 +122,14 @@ func filteredSnapshot(
 			continue
 		}
 
-		// if a registry with this id has been already registered, skip it.
-		if _, found := inputs[id]; found {
-			continue
-		}
-
 		if !requestedInput(m["input"], requestedType) {
 			continue
 		}
 
-		filtered = append(filtered, m)
+		selected[id] = m
 	}
 
-	return filtered
+	return selected
 }
 
 func requestedInput(input any, requestedType string) bool {

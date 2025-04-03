@@ -19,10 +19,7 @@ package v2
 
 import (
 	"context"
-	"strings"
 	"time"
-
-	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -101,138 +98,15 @@ type Context struct {
 	// expected to be nil.
 	StatusReporter status.StatusReporter
 
-	// monitoringRegistry is the registry collecting metrics for the input using
+	// MetricsRegistry is the registry collecting metrics for the input using
 	// this context.
-	monitoringRegistry *monitoring.Registry
-	// monitoringRegistryCancel removes the registry from its parent and from
-	// the HTTP monitoring endpoint.
-	monitoringRegistryCancel func()
-}
-
-// NewContext creates a new context.
-func NewContext(
-	id,
-	idWithoutName,
-	inputType string,
-	agent beat.Info,
-	cancelation Canceler,
-	statusReporter status.StatusReporter,
-	reg *monitoring.Registry,
-	unreg func(),
-	log *logp.Logger) Context {
-
-	return Context{
-		ID:            id,
-		IDWithoutName: idWithoutName,
-		Name:          inputType,
-
-		Agent:          agent,
-		Cancelation:    cancelation,
-		StatusReporter: statusReporter,
-
-		Logger: log,
-
-		monitoringRegistry:       reg,
-		monitoringRegistryCancel: unreg,
-	}
-}
-
-// NewMetricsRegistry creates and registers a monitoring.Registry for an input
-// with the HTTP monitoring endpoint. It returns the metrics registry and a
-// function to unregister it.
-//
-// The metric registry is created on the metrics namespace from beatInfo with
-// name 'inputId' and populated with 'id: inputId' and 'input: inputType'.
-// An error is logged if the new registry cannot be registered with the HTTP
-// monitoring endpoint.
-//
-// The unregister function removes the registry the beatInfo monitoring
-// namespace as well as from the monitoring HTTP endpoint.
-func NewMetricsRegistry(
-	inputId string,
-	inputType string,
-	beatInfo *beat.Info,
-	log *logp.Logger) (*monitoring.Registry, func()) {
-
-	parentRegistry := beatInfo.Monitoring.NamespaceRegistry()
-	metricsID := strings.ReplaceAll(inputId, ".", "_")
-	reg := parentRegistry.GetRegistry(metricsID)
-	if reg == nil {
-		reg = parentRegistry.NewRegistry(metricsID)
-	}
-
-	// add the necessary information so the registry can be published by the
-	// HTTP monitoring endpoint.
-	monitoring.NewString(reg, "input").Set(inputType)
-	monitoring.NewString(reg, "id").Set(inputId)
-
-	// register to be published by the HTTP monitoring endpoint.
-	err := beatInfo.Monitoring.InputHTTPMetrics.RegisterMetrics(reg)
-	if err != nil {
-		log.Errorf("failed to register metrics for '%s', id: %s,: %v",
-			inputType, inputId, err)
-	}
-
-	metricsLog := logp.NewLogger("metric_registry")
-	var uid string
-	if uidv4, err := uuid.NewV4(); err != nil {
-		metricsLog.Errorf(
-			"failed to generate uuid to track input metrics register/unregister: %v",
-			err)
-	} else {
-		uid = uidv4.String()
-	}
-
-	// Log the registration to ease tracking down duplicate ID registrations.
-	// Logged at INFO rather than DEBUG since it is not in a hot path and having
-	// the information available by default can short-circuit requests for debug
-	// logs during support interactions.
-	metricsLog.Infow("registering",
-		"input_type", inputType,
-		"id", inputId,
-		"registry_name", metricsID,
-		"uuid", uid)
-
-	unreg := func() {
-		metricsLog.Infow("unregistering",
-			"input_type", inputType,
-			"id", inputId,
-			"registry_name",
-			metricsID, "uuid", uid)
-		parentRegistry.Remove(metricsID)
-		// it's safe to make this call even if registering them failed.
-		beatInfo.Monitoring.InputHTTPMetrics.UnregisterMetrics(metricsID)
-	}
-
-	return reg, unreg
+	MetricsRegistry *monitoring.Registry
 }
 
 func (c *Context) UpdateStatus(status status.Status, msg string) {
 	if c.StatusReporter != nil {
 		c.Logger.Debugf("updating status, status: '%s', message: '%s'", status.String(), msg)
 		c.StatusReporter.UpdateStatus(status, msg)
-	}
-}
-
-// MetricRegistry returns the metrics registry associated with this context.
-// This should be the metrics registry used by inputs to register their metrics.
-// It's already registered to be published by the HTTP monitoring endpoint.
-// If the context wasn't created by NewContext and its monitoring registry is
-// nil, a new registry is created and returned.
-func (c *Context) MetricRegistry() *monitoring.Registry {
-	// It's a precaution in case the context wasn't created by NewContext.
-	if c.monitoringRegistry == nil {
-		c.monitoringRegistry = monitoring.NewRegistry()
-	}
-
-	return c.monitoringRegistry
-}
-
-// UnregisterMetrics removes the metrics registry from its parent registry and
-// from the HTTP monitoring endpoint.
-func (c *Context) UnregisterMetrics() {
-	if c.monitoringRegistryCancel != nil {
-		c.monitoringRegistryCancel()
 	}
 }
 

@@ -178,7 +178,8 @@ logging.level: debug
 	errMsg := strings.Builder{}
 	defer func() {
 		if t.Failed() {
-			t.Errorf("test faild: input metrics response used for the assertions: %s", body)
+			t.Errorf("test faild: input metrics response used for the assertions:\n%s",
+				body)
 		}
 	}()
 	require.Eventuallyf(t, func() bool {

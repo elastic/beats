@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -135,27 +136,28 @@ func (r *runner) Start() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
 
-		reg, unreg := v2.NewMetricsRegistry(
-			r.id, r.input.Name(), r.agent, log)
-
-		ctx := v2.NewContext(
-			r.id,
-			r.id,
-			r.input.Name(),
-			*r.agent,
-			r.sig,
-			r.statusReporter,
-			reg,
-			unreg,
-			log)
+		reg := inputmon.NewMetricsRegistry(
+			r.id, r.input.Name(), r.agent.Monitoring.NamespaceRegistry(), log)
 		// Unregister the metrics when the input finishes running.
-		defer ctx.UnregisterMetrics()
+		defer inputmon.CancelMetricsRegistry(
+			r.id, r.input.Name(), r.agent.Monitoring.NamespaceRegistry(), log)
+
+		ctx := v2.Context{
+			ID:              r.id,
+			IDWithoutName:   r.id,
+			Name:            r.input.Name(),
+			Agent:           *r.agent,
+			Cancelation:     r.sig,
+			StatusReporter:  r.statusReporter,
+			MetricsRegistry: reg,
+			Logger:          log,
+		}
 
 		pc := pipetool.WithClientConfigEdit(r.connector,
 			func(orig beat.ClientConfig) (beat.ClientConfig, error) {
 				orig.ClientListener =
 					v2.NewPipelineClientListener(
-						ctx.MetricRegistry(), orig.ClientListener)
+						ctx.MetricsRegistry, orig.ClientListener)
 				return orig, nil
 			})
 

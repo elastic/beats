@@ -21,8 +21,6 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/gofrs/uuid/v5"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -38,7 +36,7 @@ import (
 // The returned cancel function *must* be called when the input stops to
 // unregister the metrics and prevent resource leaks.
 //
-// Deprecated. Use beat.Info.Monitoring.InputHTTPMetrics.RegisterMetrics instead.
+// Deprecated. Use input/v2.NewMetricsRegistry instead.
 func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
@@ -55,11 +53,11 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 
 	// Sanitize dots from the id because they created nested objects within
 	// the monitoring registry, and we want a consistent flat level of nesting
-	registryName := sanitizeID(inputID)
+	metricsID := sanitizeID(inputID)
 
-	reg = parentRegistry.GetRegistry(registryName)
+	reg = parentRegistry.GetRegistry(metricsID)
 	if reg == nil {
-		reg = parentRegistry.NewRegistry(registryName)
+		reg = parentRegistry.NewRegistry(metricsID)
 	}
 
 	monitoring.NewString(reg, "input").Set(inputType)
@@ -71,19 +69,17 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 	// logs during support interactions.
 	log := logp.NewLogger("metric_registry")
 
-	// Make an orthogonal ID to allow tracking register/deregister pairs.
-	var uid string
-	if rawID, err := uuid.NewV4(); err != nil {
-		log.Errorf("failed to register metrics for '%s', id: %s,: %v",
-			inputType, inputID, err)
-	} else {
-		uid = rawID.String()
-	}
-	log.Infow("registering", "input_type", inputType, "id", inputID, "key", registryName, "uuid", uid)
+	log.Infow("registering",
+		"input_type", inputType,
+		"input_id", inputID,
+		"metrics_id", metricsID)
 
+	// TODO: test adding and removing an new input to ensure the registry is removed
 	return reg, func() {
-		log.Infow("unregistering", "input_type", inputType, "id", inputID, "key", registryName, "uuid", uid)
-		parentRegistry.Remove(registryName)
+		log.Infow("unregistering", "input_type", inputType,
+			"input_id", inputID,
+			"metrics_id", metricsID)
+		parentRegistry.Remove(metricsID)
 	}
 }
 
@@ -96,14 +92,57 @@ func globalRegistry() *monitoring.Registry {
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' monitoring namespace and from the inputMetrics parameter
+// global 'dataset' monitoring namespace and from the localReg parameter
 // encoded as a JSON array (pretty formatted). It's safe to pass in a nil
-// inputMetrics.
-func MetricSnapshotJSON(inputMetrics StructSnapshotCollector) ([]byte, error) {
-	snapCollector := inputMetrics
-	if snapCollector == nil {
-		snapCollector = &noopStructSnapshotCollector{}
+// localReg.
+func MetricSnapshotJSON(reg *monitoring.Registry) ([]byte, error) {
+	return json.MarshalIndent(filteredSnapshot(globalRegistry(), reg, ""), "", "  ")
+}
+
+// NewMetricsRegistry creates a monitoring.Registry for an input.
+//
+// The metric registry is created on parent with
+// name 'inputID' ('.' are replaced by '_') and populated with 'id: inputID' and
+// 'input: inputType'.
+//
+// Call CancelMetricsRegistry to remove it from the parent registry and free up
+// the associated resources.
+func NewMetricsRegistry(
+	inputID string,
+	inputType string,
+	parent *monitoring.Registry,
+	log *logp.Logger) *monitoring.Registry {
+
+	metricsID := sanitizeID(inputID)
+	reg := parent.GetRegistry(metricsID)
+	if reg == nil {
+		reg = parent.NewRegistry(metricsID)
 	}
 
-	return json.MarshalIndent(filteredSnapshot(globalRegistry(), snapCollector, ""), "", "  ")
+	// add the necessary information so the registry can be published by the
+	// HTTP monitoring endpoint.
+	monitoring.NewString(reg, "input").Set(inputType)
+	monitoring.NewString(reg, "id").Set(inputID)
+
+	log.Named("metric_registry").Infow("registering",
+		"metrics_id", metricsID,
+		"input_id", inputID,
+		"input_type", inputType)
+
+	return reg
+}
+
+func CancelMetricsRegistry(
+	inputID string,
+	inputType string,
+	reg *monitoring.Registry,
+	log *logp.Logger) {
+
+	metricsID := sanitizeID(inputID)
+	log.Named("metric_registry").Infow("unregistering",
+		"metrics_id", metricsID,
+		"input_id", inputID,
+		"input_type", inputType)
+
+	reg.Remove(metricsID)
 }

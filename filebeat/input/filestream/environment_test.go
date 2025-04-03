@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -131,22 +132,23 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp
 		defer func() { _ = grp.Stop() }()
 
 		info := beat.Info{Monitoring: beat.Monitoring{
-			Namespace:        monitoring.GetNamespace("dataset"),
-			InputHTTPMetrics: beat.NewInputHTTPMetrics()},
+			Namespace: monitoring.GetNamespace("dataset")},
 		}
-		reg, unreg := v2.NewMetricsRegistry(
-			id, inp.Name(), &info, logp.L())
+		reg := inputmon.NewMetricsRegistry(
+			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+		defer inputmon.CancelMetricsRegistry(
+			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
 
-		inputCtx := v2.NewContext(
-			id,
-			id,
-			inp.Name(),
-			info,
-			ctx,
-			nil,
-			reg,
-			unreg,
-			logp.L())
+		inputCtx := v2.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Agent:           info,
+			Cancelation:     ctx,
+			StatusReporter:  nil,
+			MetricsRegistry: reg,
+			Logger:          logp.L(),
+		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }

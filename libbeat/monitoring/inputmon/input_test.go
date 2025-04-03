@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -87,52 +88,51 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, globalRegistry().Clear())
 	})
+	log := logp.NewLogger("TestMetricSnapshotJSON")
 
 	// ============== Input using new API and unique namespace ==============
 	// Simulates input using the metrics registry from the v2.Context.
 	// It cannot use the v2.Context directly because it creates an import cycle.
 	inputID := "input-with-pipeline-metrics-new-inputAPI"
-	parent := monitoring.GetNamespace("beat-x").GetRegistry()
-	reg := parent.
-		NewRegistry(inputID)
-	msn := &mockSnapshotCollector{
-		registries: map[string]*monitoring.Registry{inputID: reg},
-	}
+	inputType := "test"
 
+	parentLocalReg := monitoring.GetNamespace("beat-x").GetRegistry()
+	reg := NewMetricsRegistry(inputID, inputType, parentLocalReg, log)
+	monitoring.NewInt(reg, "foo_total").Set(10)
+	monitoring.NewInt(reg, "events_pipeline_total").Set(10)
+
+	// simulate a duplicated ID in the local and global namespace.
+	reg = globalRegistry().NewRegistry(inputID)
 	monitoring.NewString(reg, "id").Set(inputID)
-	monitoring.NewString(reg, "input").Set("test")
-	monitoring.NewInt(reg, "foo_total").Set(100)
-	monitoring.NewInt(reg, "events_pipeline_total").Set(100)
-	defer parent.Remove(inputID)
+	monitoring.NewString(reg, "input").Set(inputType)
+	monitoring.NewBool(reg, "should_be_overwritten").Set(true)
 
 	// =========== Input using new API and legacy, global namespace ===========
 	// Simulates input unaware of the metrics registry from the v2.Context. In
-	// that case the parent context used by the v2.Context is the legacy
+	// that case the parentLocalReg context used by the v2.Context is the legacy
 	// globalRegistry() and the input also registers its metrics directly.
 	inputID = "input-with-pipeline-metrics-globalRegistry()"
-	reg = globalRegistry().NewRegistry(inputID)
-	msn.registries[inputID] = reg
-
-	monitoring.NewString(reg, "id").Set(inputID)
-	monitoring.NewString(reg, "input").Set("test")
-	monitoring.NewInt(reg, "events_pipeline_total").Set(200)
+	inputType = "test"
+	reg = NewMetricsRegistry(inputID, inputType, globalRegistry(), log)
+	monitoring.NewInt(reg, "events_pipeline_total").Set(20)
 	defer globalRegistry().Remove(inputID)
 
 	// now the input also register its metrics with the deprecated
 	// NewInputRegistry.
 	reg, cancel := NewInputRegistry(
-		"test", inputID, nil)
+		inputType, inputID, nil)
 	defer cancel()
-	monitoring.NewInt(reg, "foo_total").Set(100)
+	monitoring.NewInt(reg, "foo_total").Set(20)
 
-	// ===== An input registering metrics, but not using the v2.Context =====
+	// ===== An input registering metrics, but not using the new API =====
 	// an input registering metrics on the global namespace. This simulates an
-	// input which does not use the metrics registry from the v2.Context.
+	// input which does not use the metrics registry from filebeat
+	// input/v2.Context.
 	inputOldAPI := "input-without-pipeline-metrics"
 	reg, cancel = NewInputRegistry(
-		"test", inputOldAPI, nil)
+		inputType, inputOldAPI, nil)
 	defer cancel()
-	monitoring.NewInt(reg, "foo_total").Set(100)
+	monitoring.NewInt(reg, "foo_total").Set(30)
 
 	// ==== registries in the global registries which aren't input metrics ===
 	// unrelated registry in the global namespace, should be ignored.
@@ -146,7 +146,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	monitoring.NewInt(reg, "foo3_total").Set(100)
 	defer globalRegistry().Remove("yet-another-registry")
 
-	jsonBytes, err := MetricSnapshotJSON(msn)
+	jsonBytes, err := MetricSnapshotJSON(parentLocalReg)
 	require.NoError(t, err)
 
 	type Resp struct {
@@ -161,21 +161,21 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	require.NoError(t, err, "failed to unmarshal response")
 	want := map[string]Resp{
 		"input-with-pipeline-metrics-new-inputAPI": {
-			EventsPipelineTotal: 100,
-			FooTotal:            100,
+			EventsPipelineTotal: 10,
+			FooTotal:            10,
 			ID:                  "input-with-pipeline-metrics-new-inputAPI",
-			Input:               "test",
+			Input:               inputType,
 		},
 		"input-with-pipeline-metrics-globalRegistry()": {
-			EventsPipelineTotal: 200,
-			FooTotal:            100,
+			EventsPipelineTotal: 20,
+			FooTotal:            20,
 			ID:                  "input-with-pipeline-metrics-globalRegistry()",
-			Input:               "test",
+			Input:               inputType,
 		},
 		"input-without-pipeline-metrics": {
-			FooTotal: 100,
+			FooTotal: 30,
 			ID:       "input-without-pipeline-metrics",
-			Input:    "test",
+			Input:    inputType,
 		},
 	}
 	found := map[string]bool{}
@@ -200,19 +200,4 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	if t.Failed() {
 		t.Logf("API reponse:\n%s\n", string(jsonBytes))
 	}
-}
-
-type mockSnapshotCollector struct {
-	registries map[string]*monitoring.Registry
-}
-
-func (i *mockSnapshotCollector) CollectStructSnapshot() map[string]map[string]any {
-	registeredInputRegistries := map[string]map[string]any{}
-
-	for id, reg := range i.registries {
-		registeredInputRegistries[id] = monitoring.CollectStructSnapshot(
-			reg, monitoring.Full, false)
-	}
-
-	return registeredInputRegistries
 }

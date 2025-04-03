@@ -101,17 +101,17 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 		}()
 
 		id := uuid.Must(uuid.NewV4()).String()
-		inputCtx := v2.NewContext(
-			id,
-			id,
-			inp.Name(),
-			beat.Info{Monitoring: beat.Monitoring{
-				InputHTTPMetrics: beat.NewInputHTTPMetrics()}},
-			ctx,
-			e.statusReporter,
-			monitoring.NewRegistry(),
-			func() {},
-			logp.L())
+		inputCtx := v2.Context{
+			ID:            id,
+			IDWithoutName: id,
+			Name:          inp.Name(),
+			Agent: beat.Info{Monitoring: beat.Monitoring{
+				Namespace: monitoring.GetNamespace("dataset")}},
+			Cancelation:     ctx,
+			StatusReporter:  e.statusReporter,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          logp.L(),
+		}
 		if err := inp.Run(inputCtx, e.pipeline); err != nil {
 			e.t.Errorf("input 'Run' method returned an error: %s", err)
 		}

@@ -195,16 +195,16 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	require.NoError(b, err)
 
 	ctx, cancel := context.WithCancel(ctx)
-	v2ctx := v2.NewContext(
-		testID,
-		testID,
-		"filestream-test",
-		beat.Info{},
-		ctx,
-		nil,
-		monitoring.NewRegistry(),
-		func() {},
-		logger)
+	v2ctx := v2.Context{
+		ID:              testID,
+		IDWithoutName:   testID,
+		Name:            "filestream-test",
+		Agent:           beat.Info{},
+		Cancelation:     ctx,
+		StatusReporter:  nil,
+		MetricsRegistry: monitoring.NewRegistry(),
+		Logger:          logger,
+	}
 
 	connector, events := newTestPipeline(eventLimit, collectEvents)
 	var out []beat.Event

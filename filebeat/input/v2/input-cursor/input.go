@@ -24,6 +24,7 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
@@ -119,7 +120,8 @@ func (inp *managedInput) Run(
 	//    - {"id": "my-cel-id", "input": "cel"}
 	//  - registry from child context:
 	//    - {"id": "my-cel-id::source-name", "input": "cel", [ ... ] }
-	ctx.UnregisterMetrics()
+	inputmon.CancelMetricsRegistry(
+		ctx.ID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), ctx.Logger)
 
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
@@ -129,27 +131,28 @@ func (inp *managedInput) Run(
 			inpCtxID := ctx.ID + "::" + source.Name()
 			log := ctx.Logger.With("input_source", source.Name())
 
-			reg, unreg := input.NewMetricsRegistry(
-				inpCtxID, ctx.Name, &ctx.Agent, log)
-
-			inpCtx := input.NewContext(
-				inpCtxID,
-				ctx.ID, // Preserve IDWithoutName, in case the context was constructed who knows how
-				ctx.Name,
-				ctx.Agent,
-				ctx.Cancelation,
-				ctx.StatusReporter,
-				reg,
-				unreg,
-				log)
+			reg := inputmon.NewMetricsRegistry(
+				inpCtxID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), log)
 			// Unregister the metrics when input finishes running
-			defer inpCtx.UnregisterMetrics()
+			defer inputmon.CancelMetricsRegistry(
+				inpCtxID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), log)
+
+			inpCtx := input.Context{
+				ID:              inpCtxID,
+				IDWithoutName:   ctx.ID, // Preserve IDWithoutName, in case the context was constructed who knows how
+				Name:            ctx.Name,
+				Agent:           ctx.Agent,
+				Cancelation:     ctx.Cancelation,
+				StatusReporter:  ctx.StatusReporter,
+				MetricsRegistry: reg,
+				Logger:          log,
+			}
 
 			pc := pipetool.WithClientConfigEdit(pipeline,
 				func(orig beat.ClientConfig) (beat.ClientConfig, error) {
 					orig.ClientListener =
 						input.NewPipelineClientListener(
-							inpCtx.MetricRegistry(), orig.ClientListener)
+							inpCtx.MetricsRegistry, orig.ClientListener)
 					return orig, nil
 				})
 
