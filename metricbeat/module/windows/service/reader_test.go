@@ -58,7 +58,7 @@ func TestGetMachineGUID(t *testing.T) {
 func TestRead(t *testing.T) {
 	t.Skip("Flaky test: https://github.com/elastic/beats/issues/22171")
 
-	reader, err := NewReader()
+	reader, err := NewReader(logp.L())
 	assert.NoError(t, err)
 	result, err := reader.Read()
 	assert.NoError(t, err)
