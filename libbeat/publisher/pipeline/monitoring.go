@@ -77,12 +77,6 @@ type metricsObserverVars struct {
 	activeEvents               *monitoring.Uint
 }
 
-type inputMetrics struct {
-	eventsTotal,
-	eventsFiltered,
-	eventsPublished *monitoring.Uint
-}
-
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 	reg := metrics.GetRegistry("pipeline")
 	if reg == nil {
