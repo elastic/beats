@@ -34,7 +34,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Pipeline implementation providint all beats publisher functionality.
@@ -115,9 +114,7 @@ func New(
 	out outputs.Group,
 	settings Settings,
 ) (*Pipeline, error) {
-	if monitors.Logger == nil {
-		monitors.Logger = logp.NewLogger("publish")
-	}
+	monitors.Logger = beat.Logger.Named("publish")
 
 	p := &Pipeline{
 		beatInfo:         beat,

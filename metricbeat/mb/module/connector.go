@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -35,6 +36,7 @@ type Connector struct {
 	processors *processors.Processors
 	eventMeta  mapstr.EventMetadata
 	keepNull   bool
+	logger     *logp.Logger
 }
 
 type connectorConfig struct {
@@ -72,6 +74,7 @@ func NewConnector(
 		processors: processors,
 		eventMeta:  config.EventMetadata,
 		keepNull:   config.KeepNull,
+		logger:     beatInfo.Logger,
 	}, nil
 }
 
@@ -87,7 +90,7 @@ func (c *Connector) UseMetricSetProcessors(r metricSetRegister, moduleName, metr
 		return nil // no processors are defined
 	}
 
-	procs := processors.NewList(nil)
+	procs := processors.NewList(c.logger)
 	procs.AddProcessors(*metricSetProcessors)
 	for _, p := range c.processors.List {
 		procs.AddProcessor(p)
@@ -99,7 +102,7 @@ func (c *Connector) UseMetricSetProcessors(r metricSetRegister, moduleName, metr
 // addProcessors appends processors to the connector properties.
 func (c *Connector) addProcessors(procs []beat.Processor) {
 	if c.processors == nil {
-		c.processors = processors.NewList(nil)
+		c.processors = processors.NewList(c.logger)
 	}
 
 	for _, p := range procs {
@@ -121,7 +124,7 @@ func (c *Connector) Connect() (beat.Client, error) {
 func processorsForConfig(
 	beatInfo beat.Info, config connectorConfig,
 ) (*processors.Processors, error) {
-	procs := processors.NewList(nil)
+	procs := processors.NewList(beatInfo.Logger)
 
 	// Processor order is important! The index processor, if present, must be
 	// added before the user processors.

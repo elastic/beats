@@ -61,7 +61,7 @@ func newModuleRegistry(modulesPath string,
 ) (*ModuleRegistry, error) {
 	reg := ModuleRegistry{
 		registry: []Module{},
-		log:      logp.NewLogger(logName),
+		log:      beatInfo.Logger.Named(logName),
 	}
 
 	for _, mcfg := range moduleConfigs {
@@ -149,7 +149,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 
 	stat, err := os.Stat(modulesPath)
 	if err != nil || !stat.IsDir() {
-		log := logp.NewLogger(logName)
+		log := beatInfo.Logger.Named(logName)
 		if !fleetmode.Enabled() {
 			// When run under agent via agentbeat there is no modules directory and this is expected.
 			log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)

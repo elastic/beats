@@ -65,7 +65,7 @@ func InitializeModule() {
 }
 
 // NewLogHints builds a log hints builder
-func NewLogHints(cfg *conf.C) (autodiscover.Builder, error) {
+func NewLogHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
@@ -76,7 +76,7 @@ func NewLogHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, err
 	}
 
-	return &logHints{&config, moduleRegistry, logp.NewLogger("hints.builder")}, nil
+	return &logHints{&config, moduleRegistry, logger.Named("hints.builder")}, nil
 }
 
 // Create config based on input hints in the bus event

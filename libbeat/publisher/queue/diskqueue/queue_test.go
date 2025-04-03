@@ -19,7 +19,6 @@ package diskqueue
 
 import (
 	"flag"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"testing"
@@ -77,13 +76,14 @@ func TestProduceConsumer(t *testing.T) {
 
 func makeTestQueue() queuetest.QueueFactory {
 	return func(t *testing.T) queue.Queue {
-		dir, err := ioutil.TempDir("", "diskqueue_test")
+		dir, err := os.MkdirTemp("", "diskqueue_test")
 		if err != nil {
 			t.Fatal(err)
 		}
 		settings := DefaultSettings()
 		settings.Path = dir
-		queue, _ := NewQueue(logp.L(), nil, settings, nil)
+		logger := logp.NewTestingLogger(t, "")
+		queue, _ := NewQueue(logger, nil, settings, nil)
 		return testQueue{
 			diskQueue: queue,
 			teardown: func() {

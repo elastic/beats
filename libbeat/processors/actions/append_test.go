@@ -26,8 +26,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-var log = logp.NewLogger("append_test")
-
 func Test_cleanEmptyValues(t *testing.T) {
 	type args struct {
 		dirtyArr []interface{}
@@ -62,6 +60,7 @@ func Test_cleanEmptyValues(t *testing.T) {
 }
 
 func Test_appendProcessor_appendValues(t *testing.T) {
+	log := logp.NewTestingLogger(t, "append_test")
 	type fields struct {
 		config appendProcessorConfig
 		logger *logp.Logger
@@ -182,6 +181,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 }
 
 func Test_appendProcessor_Run(t *testing.T) {
+	log := logp.NewTestingLogger(t, "append_test")
 	type fields struct {
 		config appendProcessorConfig
 		logger *logp.Logger

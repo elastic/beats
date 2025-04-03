@@ -38,7 +38,7 @@ type Context struct {
 }
 
 // Factory is used to register functions creating new Input instances.
-type Factory = func(config *conf.C, connector channel.Connector, context Context) (Input, error)
+type Factory = func(config *conf.C, connector channel.Connector, context Context, logger *logp.Logger) (Input, error)
 
 var registry = make(map[string]Factory)
 

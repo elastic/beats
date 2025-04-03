@@ -29,7 +29,7 @@ import (
 )
 
 func TestCopyFields(t *testing.T) {
-	log := logp.NewLogger("copy_fields_test")
+	log := logp.NewTestingLogger(t, "copy_fields_test")
 	var tests = map[string]struct {
 		FromTo   fromTo
 		Input    mapstr.M

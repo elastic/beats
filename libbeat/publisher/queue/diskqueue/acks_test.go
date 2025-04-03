@@ -19,7 +19,6 @@ package diskqueue
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -238,7 +237,7 @@ func TestAddFrames(t *testing.T) {
 }
 
 func runAddFramesTest(t *testing.T, name string, test addFramesTest) {
-	dir, err := ioutil.TempDir("", "diskqueue_acks_test")
+	dir, err := os.MkdirTemp("", "diskqueue_acks_test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -251,7 +250,8 @@ func runAddFramesTest(t *testing.T, name string, test addFramesTest) {
 	}
 	defer stateFile.Close()
 
-	dqa := newDiskQueueACKs(logp.L(), test.position, stateFile)
+	logger := logp.NewTestingLogger(t, "")
+	dqa := newDiskQueueACKs(logger, test.position, stateFile)
 	dqa.nextFrameID = test.frameID
 	for _, step := range test.steps {
 		prefix := fmt.Sprintf("[%v] %v", name, step.description)

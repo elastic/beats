@@ -35,19 +35,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func init() {
-	logp.DevelopmentSetup()
-}
-
 func TestCompliance_Default(t *testing.T) {
 	storecompliance.TestBackendCompliance(t, func(testPath string) (backend.Registry, error) {
-		return New(logp.NewLogger("test"), Settings{Root: testPath})
+		logger := logp.NewTestingLogger(t, "")
+		return New(logger.Named("test"), Settings{Root: testPath})
 	})
 }
 
 func TestCompliance_AlwaysCheckpoint(t *testing.T) {
 	storecompliance.TestBackendCompliance(t, func(testPath string) (backend.Registry, error) {
-		return New(logp.NewLogger("test"), Settings{
+		logger := logp.NewTestingLogger(t, "")
+		return New(logger.Named("test"), Settings{
 			Root: testPath,
 			Checkpoint: func(filesize uint64) bool {
 				return true
@@ -59,7 +57,7 @@ func TestCompliance_AlwaysCheckpoint(t *testing.T) {
 func TestLoadVersion1(t *testing.T) {
 	dataHome := "testdata/1"
 
-	list, err := ioutil.ReadDir(dataHome)
+	list, err := os.ReadDir(dataHome)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,8 +105,9 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 		t.Fatalf("Failed to parse expected.json: %v", err)
 	}
 
+	logger := logp.NewTestingLogger(t, "")
 	// load store:
-	store, err := openStore(logp.NewLogger("test"), path, 0660, 4096, true, func(_ uint64) bool {
+	store, err := openStore(logger.Named("test"), path, 0660, 4096, true, func(_ uint64) bool {
 		return false
 	})
 	if err != nil {

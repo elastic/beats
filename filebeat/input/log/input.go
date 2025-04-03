@@ -95,6 +95,7 @@ func NewInput(
 	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
 	// we still allow the deprecated log input running under integrations and
 	// modules until they are all migrated to filestream
@@ -106,7 +107,7 @@ func NewInput(
 	cleanupIfNeeded := func(f func() error) {
 		if cleanupNeeded {
 			if err := f(); err != nil {
-				logp.L().Named("input.log").Errorf("clean up function returned an error: %w", err)
+				logger.Named("input.log").Errorf("clean up function returned an error: %w", err)
 			}
 		}
 	}
@@ -156,7 +157,7 @@ func NewInput(
 	}
 
 	uuid, _ := uuid.NewV4()
-	logger := logp.NewLogger("input").With("input_id", uuid)
+	logger = logger.Named("input").With("input_id", uuid)
 
 	p := &Input{
 		logger:              logger,
