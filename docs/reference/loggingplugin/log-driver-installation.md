@@ -22,8 +22,8 @@ Make sure your system meets the following prerequisites:
 
     **To install from the Docker store:**
 
-    ```sh
-    docker plugin install elastic/elastic-logging-plugin:9.0.0-beta1
+    ```sh subs=true
+    docker plugin install elastic/elastic-logging-plugin:{{stack-version}}
     ```
 
     **To build and install from source:**
@@ -37,8 +37,8 @@ Make sure your system meets the following prerequisites:
 
 2. If necessary, enable the plugin:
 
-    ```sh
-    docker plugin enable elastic/elastic-logging-plugin:9.0.0-beta1
+    ```sh subs=true
+    docker plugin enable elastic/elastic-logging-plugin:{{stack-version}}
     ```
 
 3. Verify that the plugin is installed and enabled:
@@ -49,9 +49,9 @@ Make sure your system meets the following prerequisites:
 
     The output should say something like:
 
-    ```sh
+    ```sh subs=true
     ID                  NAME                                   DESCRIPTION              ENABLED
-    c2ff9d2cf090        elastic/elastic-logging-plugin:9.0.0-beta1   A beat for docker logs   true
+    c2ff9d2cf090        elastic/elastic-logging-plugin:{{stack-version}}   A beat for docker logs   true
     ```
 
 
@@ -64,8 +64,8 @@ You can set configuration options for a single container, or for all containers 
 
 Pass configuration options at run time when you start the container. For example:
 
-```sh
-docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
+```sh subs=true
+docker run --log-driver=elastic/elastic-logging-plugin:{{stack-version}} \
            --log-opt hosts="https://myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
@@ -76,9 +76,9 @@ docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
 
 Set configuration options in the Docker `daemon.json` configuration file. For example:
 
-```json
+```json subs=true
 {
-  "log-driver" : "elastic/elastic-logging-plugin:9.0.0-beta1",
+  "log-driver" : "elastic/elastic-logging-plugin:{{stack-version}}",
   "log-opts" : {
     "hosts" : "https://myhost:9200",
     "user" : "myusername",

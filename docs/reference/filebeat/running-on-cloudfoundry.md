@@ -7,7 +7,7 @@ mapped_pages:
 
 You can use Filebeat on Cloud Foundry to retrieve and ship logs.
 
-However, version 9.0.0-beta1 of Filebeat has not yet been released, no build is currently available for this version.
+% However, version {{stack-version}} of Filebeat has not yet been released, no build is currently available for this version.
 
 ## Create Cloud Foundry credentials [_create_cloud_foundry_credentials]
 
@@ -30,10 +30,10 @@ You deploy Filebeat as an application with no route.
 
 Cloud Foundry requires that 3 files exist inside of a directory to allow Filebeat to be pushed. The commands below provide the basic steps for getting it up and running.
 
-```sh
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-9.0.0-beta1-linux-x86_64.tar.gz
-tar xzvf filebeat-9.0.0-beta1-linux-x86_64.tar.gz
-cd filebeat-9.0.0-beta1-linux-x86_64
+```sh subs=true
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-linux-x86_64.tar.gz
+tar xzvf filebeat-{{stack-version}}-linux-x86_64.tar.gz
+cd filebeat-{{stack-version}}-linux-x86_64
 curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/cloudfoundry/filebeat/filebeat.yml
 curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/cloudfoundry/filebeat/manifest.yml
 ```
