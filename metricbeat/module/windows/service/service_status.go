@@ -239,7 +239,7 @@ func getServiceInformation(rawService *EnumServiceStatusProcess, servicesBuffer 
 				// if we have faced any other error, pass it to the caller
 				return service, err
 			}
-			if _, ok := protectedServices[service.ServiceName]; errors.Is(err, os.ErrPermission) && !ok {
+			if _, ok := protectedServices[service.ServiceName]; !ok {
 				protectedServices[service.ServiceName] = struct{}{}
 				logp.Warn("Uptime for service %v is not available because of insufficient rights", service.ServiceName)
 			}
