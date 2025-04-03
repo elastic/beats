@@ -201,3 +201,46 @@ func TestMetricSnapshotJSON(t *testing.T) {
 		t.Logf("API reponse:\n%s\n", string(jsonBytes))
 	}
 }
+
+func TestNewMetricsRegistry(t *testing.T) {
+	parent := monitoring.NewRegistry()
+	inputID := "input-inputID"
+	inputType := "input-type"
+	got := NewMetricsRegistry(
+		inputID,
+		inputType,
+		parent,
+		logp.NewLogger("test"))
+
+	require.NotNil(t, got, "new metrics registry should not be nil")
+	assert.Equal(t, parent.GetRegistry(inputID), got)
+
+	vals := monitoring.CollectFlatSnapshot(got, monitoring.Full, false)
+	assert.Equal(t, inputID, vals.Strings["id"])
+	assert.Equal(t, inputType, vals.Strings["input"])
+}
+
+func TestCancelMetricsRegistry(t *testing.T) {
+	parent := monitoring.NewRegistry()
+	inputID := "input-ID"
+	inputType := "input-type"
+
+	_ = parent.NewRegistry(inputID)
+	got := parent.GetRegistry(inputID)
+	require.NotNil(t, got, "metrics registry not found on parent")
+
+	CancelMetricsRegistry(inputID, inputType, parent, logp.NewLogger("test"))
+
+	got = parent.GetRegistry(inputID)
+	assert.Nil(t, got, "metrics registry was not removed from parent")
+}
+
+func TestMetricSnapshotJSON_regNil(t *testing.T) {
+	err := globalRegistry().Clear()
+	require.NoError(t, err, "could not clear global registry")
+
+	got, err := MetricSnapshotJSON(nil)
+
+	require.NoError(t, err, "MetricSnapshotJSON should not return an error")
+	assert.Equal(t, "[]", string(got))
+}
