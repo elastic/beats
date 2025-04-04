@@ -78,6 +78,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, context input.Context, l
 		config:   config,
 		cfg:      cfg,
 		registry: harvester.NewRegistry(),
+		logger:   logger,
 	}
 
 	return p, nil
@@ -94,10 +95,10 @@ func (p *Input) LoadStates(states []file.State) error {
 // by the value of the `scan_frequency` setting.
 // Also see https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-input-redis.html#redis-scan_frequency.
 func (p *Input) Run() {
-	p.logger.Debug("redis", "Run redis input with hosts: %+v", p.config.Hosts)
+	p.logger.Named("redis").Debugf("Run redis input with hosts: %+v", p.config.Hosts)
 
 	if len(p.config.Hosts) == 0 {
-		p.logger.Errorf("No redis hosts configured")
+		p.logger.Error("No redis hosts configured")
 		return
 	}
 

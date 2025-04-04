@@ -78,8 +78,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("redis input", "redis"))
-
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{
 		"network":      "tcp",
