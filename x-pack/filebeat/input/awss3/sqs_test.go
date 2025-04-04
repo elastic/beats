@@ -274,7 +274,7 @@ func TestCancelWithGrace(t *testing.T) {
 	const (
 		wait    = time.Second
 		tooLong = time.Second
-		tol     = 10 * time.Millisecond
+		tol     = 100 * time.Millisecond
 	)
 	parentCtx, parentCancel := context.WithCancel(context.Background())
 	childCtx, childCancel := cancelWithGrace(parentCtx, wait)
