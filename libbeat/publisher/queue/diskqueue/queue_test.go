@@ -20,7 +20,6 @@ package diskqueue
 import (
 	"flag"
 	"math/rand"
-	"os"
 	"testing"
 	"time"
 
@@ -33,7 +32,6 @@ var seed int64
 
 type testQueue struct {
 	*diskQueue
-	teardown func()
 }
 
 func init() {
@@ -76,25 +74,18 @@ func TestProduceConsumer(t *testing.T) {
 
 func makeTestQueue() queuetest.QueueFactory {
 	return func(t *testing.T) queue.Queue {
-		dir, err := os.MkdirTemp("", "diskqueue_test")
-		if err != nil {
-			t.Fatal(err)
-		}
+		dir := t.TempDir()
 		settings := DefaultSettings()
 		settings.Path = dir
 		logger := logp.NewTestingLogger(t, "")
 		queue, _ := NewQueue(logger, nil, settings, nil)
 		return testQueue{
 			diskQueue: queue,
-			teardown: func() {
-				os.RemoveAll(dir)
-			},
 		}
 	}
 }
 
 func (t testQueue) Close() error {
 	err := t.diskQueue.Close()
-	t.teardown()
 	return err
 }

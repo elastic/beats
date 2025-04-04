@@ -237,12 +237,7 @@ func TestAddFrames(t *testing.T) {
 }
 
 func runAddFramesTest(t *testing.T, name string, test addFramesTest) {
-	dir, err := os.MkdirTemp("", "diskqueue_acks_test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
+	dir := t.TempDir()
 	path := filepath.Join(dir, "state.dat")
 	stateFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
