@@ -30,7 +30,7 @@ import (
 )
 
 func TestTLSCommonToOTel_EncryptedPrivateKey_CipherSuites(t *testing.T) {
-	got, err := TLSCommonToOTel(&tlscommon.Config{
+	_, err := TLSCommonToOTel(&tlscommon.Config{
 		CAs: []string{
 			"testdata/certs/rootCA.crt",
 			`-----BEGIN CERTIFICATE-----
