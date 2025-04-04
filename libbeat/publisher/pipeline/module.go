@@ -81,7 +81,7 @@ func LoadWithSettings(
 	makeOutput func(outputs.Observer) (string, outputs.Group, error),
 	settings Settings,
 ) (*Pipeline, error) {
-	log := beatInfo.Logger
+	log := monitors.Logger
 
 	if publishDisabled {
 		log.Info("Dry run mode. All output types except the file based one are disabled.")
