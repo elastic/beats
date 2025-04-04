@@ -2,6 +2,8 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/8.17/release-notes.html
   - https://www.elastic.co/guide/en/beats/libbeat/current/release-notes.html
+
+navigation_title: "Beats"
 ---
 
 # {{beats}} release notes [beats-release-notes]
