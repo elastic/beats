@@ -83,6 +83,10 @@ LABEL \
   org.opencontainers.image.licenses="{{ .License }}" \
   org.opencontainers.image.title="{{ .BeatName | title }}" \
   org.opencontainers.image.vendor="{{ .BeatVendor }}" \
+  org.opencontainers.image.authors="infra@elastic.co" \
+  # The maintainer label is deprecated, but RedHat still checks for it in their preflight validation. If we don't set
+  # it here, we inherit it from the base image, and fail said validation.
+  maintainer="infra@elastic.co" \
   name="{{ .BeatName }}" \
   maintainer="infra@elastic.co" \
   vendor="{{ .BeatVendor }}" \
