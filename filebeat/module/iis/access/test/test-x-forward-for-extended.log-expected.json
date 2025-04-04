@@ -49,7 +49,7 @@
         "user_agent.os.full": "Windows 10",
         "user_agent.os.name": "Windows",
         "user_agent.os.version": "10",
-        "user_agent.version": "81.0."
+        "user_agent.version": "81.0"
     },
     {
         "@timestamp": "2020-10-05T21:40:30.000Z",
