@@ -164,9 +164,15 @@ func GetServiceStates(log *logp.Logger, handle Handle, state ServiceEnumState, p
 	var services []Status
 	var sizeStatusProcess = (int)(unsafe.Sizeof(EnumServiceStatusProcess{}))
 	for i := 0; i < int(servicesReturned); i++ {
-		serviceTemp := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeStatusProcess]))
+		rawService := (*EnumServiceStatusProcess)(unsafe.Pointer(&servicesBuffer[i*sizeStatusProcess]))
 
-		service, err := getServiceInformation(log, serviceTemp, servicesBuffer, handle, protectedServices)
+		service, err := getRawServiceStatus(rawService, servicesBuffer)
+		if err != nil {
+			log.Errorf("could not parse raw service information for PID %d: %v", rawService.ServiceStatusProcess.DwProcessId, err)
+			continue
+		}
+
+		err = getServiceHandleInformation(log, &service, rawService, handle, protectedServices)
 		if err != nil {
 			log.Errorf("could not get information for the service (name: %s, pid: %d): %v", service.DisplayName, service.PID, err)
 			continue
@@ -178,7 +184,7 @@ func GetServiceStates(log *logp.Logger, handle Handle, state ServiceEnumState, p
 	return services, nil
 }
 
-func getServiceInformation(log *logp.Logger, rawService *EnumServiceStatusProcess, servicesBuffer []byte, handle Handle, protectedServices map[string]struct{}) (Status, error) {
+func getRawServiceStatus(rawService *EnumServiceStatusProcess, servicesBuffer []byte) (Status, error) {
 	service := Status{
 		PID: rawService.ServiceStatusProcess.DwProcessId,
 	}
@@ -199,6 +205,11 @@ func getServiceInformation(log *logp.Logger, rawService *EnumServiceStatusProces
 	}
 	service.ServiceName = strBuf.String()
 
+	return service, nil
+}
+
+func getServiceHandleInformation(log *logp.Logger, service *Status, rawService *EnumServiceStatusProcess, handle Handle, protectedServices map[string]struct{}) error {
+
 	var state string
 
 	if stat, ok := serviceStates[ServiceState(rawService.ServiceStatusProcess.DwCurrentState)]; ok {
@@ -216,19 +227,19 @@ func getServiceInformation(log *logp.Logger, rawService *EnumServiceStatusProces
 
 	serviceHandle, err := openServiceHandle(handle, service.ServiceName, ServiceQueryConfig)
 	if err != nil {
-		return service, fmt.Errorf("error while opening service %s: %w", service.ServiceName, err)
+		return fmt.Errorf("error while opening service %s: %w", service.ServiceName, err)
 	}
 
 	defer closeHandle(serviceHandle)
 
 	// Get detailed information
-	if err := getAdditionalServiceInfo(serviceHandle, &service); err != nil {
-		return service, err
+	if err := getAdditionalServiceInfo(serviceHandle, service); err != nil {
+		return err
 	}
 
 	// Get optional information
-	if err := getOptionalServiceInfo(serviceHandle, &service); err != nil {
-		return service, err
+	if err := getOptionalServiceInfo(serviceHandle, service); err != nil {
+		return err
 	}
 
 	//Get uptime for service
@@ -237,7 +248,7 @@ func getServiceInformation(log *logp.Logger, rawService *EnumServiceStatusProces
 		if err != nil {
 			if !errors.Is(err, os.ErrPermission) {
 				// if we have faced any other error, pass it to the caller
-				return service, err
+				return err
 			}
 			if _, ok := protectedServices[service.ServiceName]; !ok {
 				protectedServices[service.ServiceName] = struct{}{}
@@ -247,7 +258,7 @@ func getServiceInformation(log *logp.Logger, rawService *EnumServiceStatusProces
 		service.Uptime = processUpTime / time.Millisecond
 	}
 
-	return service, nil
+	return nil
 }
 
 func openServiceHandle(handle Handle, serviceName string, desiredAccess ServiceAccessRight) (Handle, error) {
