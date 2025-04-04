@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package oteltranslate
 
 import (
@@ -27,53 +29,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-func TestTLSCommonToOTel(t *testing.T) {
-
-	t.Run("when ssl.enabled = false", func(t *testing.T) {
-		b := false
-		input := &tlscommon.Config{
-			Enabled: &b,
-		}
-		got, err := TLSCommonToOTel(input)
-		require.NoError(t, err)
-		want := map[string]any{
-			"insecure": true,
-		}
-
-		assert.Equal(t, want, got)
-	})
-
-	tests := []struct {
-		name  string
-		input *tlscommon.Config
-		want  map[string]any
-		err   bool
-	}{
-		{
-			name: "when unsupported configuration is passed",
-			input: &tlscommon.Config{
-				CATrustedFingerprint: "a3:5f:bf:93:12:8f:bc:5c:ab:14:6d:bf:e4:2a:7f:98:9d:2f:16:92:76:c4:12:ab:67:89:fc:56:4b:8e:0c:43",
-			},
-			want: nil,
-			err:  true,
-		},
-		{
-			name: "when ssl.verification_mode:none ",
-			input: &tlscommon.Config{
-				VerificationMode: tlscommon.VerifyNone,
-			},
-			want: map[string]any{
-				"insecure_skip_verify":         true,
-				"include_system_ca_certs_pool": true,
-			},
-			err: false,
-		},
-		{
-			name: "when ca, cert, key and key_passphrase, cipher_suites is provided",
-			input: &tlscommon.Config{
-				CAs: []string{
-					"testdata/certs/rootCA.crt",
-					`-----BEGIN CERTIFICATE-----
+func TestTLSCommonToOTel_EncryptedPrivateKey_CipherSuites(t *testing.T) {
+	got, err := TLSCommonToOTel(&tlscommon.Config{
+		CAs: []string{
+			"testdata/certs/rootCA.crt",
+			`-----BEGIN CERTIFICATE-----
 MIIDCjCCAfKgAwIBAgITJ706Mu2wJlKckpIvkWxEHvEyijANBgkqhkiG9w0BAQsF
 ADAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwIBcNMTkwNzIyMTkyOTA0WhgPMjExOTA2
 MjgxOTI5MDRaMBQxEjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEB
@@ -92,15 +52,16 @@ H2O8mtT0poX5AnOAhzVy7QW0D/k4WaoLyckM5hUa6RtvgvLxOwA0U+VGurCDoctu
 yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk
 sxSmbIUfc2SGJGCJD4I=
 -----END CERTIFICATE-----`},
-				Certificate: tlscommon.CertificateConfig{
-					Certificate: "testdata/certs/client.crt",
-					Key:         "testdata/certs/client.key",
-					Passphrase:  "changeme",
-				},
-				CipherSuites: []tlscommon.CipherSuite{tlscommon.CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256)},
-			},
-			want: map[string]any{
-				"ca_pem": `-----BEGIN CERTIFICATE-----
+		Certificate: tlscommon.CertificateConfig{
+			Certificate: "testdata/certs/client.crt",
+			Key:         "testdata/certs/client.key",
+			Passphrase:  "changeme",
+		},
+		CipherSuites: []tlscommon.CipherSuite{tlscommon.CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256)},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, map[string]any{
+		"ca_pem": `-----BEGIN CERTIFICATE-----
 MIIDzTCCArWgAwIBAgIURzQp9/bWT37HJX71yfGEO0xrs2wwDQYJKoZIhvcNAQEL
 BQAwdjELMAkGA1UEBhMCVVMxDzANBgNVBAgMBkFsYXNrYTETMBEGA1UEBwwKR2xl
 bm5hbGxlbjEQMA4GA1UECgwHRWxhc3RpYzEQMA4GA1UEAwwHRWxhc3RpYzEdMBsG
@@ -143,7 +104,7 @@ yvgJ38BRsFOtkRuAGSf6ZUwTO8JJRRIFnpUzXflAnGivK9M13D5GEQMmIl6U9Pvk
 sxSmbIUfc2SGJGCJD4I=
 -----END CERTIFICATE-----
 `,
-				"cert_pem": `-----BEGIN CERTIFICATE-----
+		"cert_pem": `-----BEGIN CERTIFICATE-----
 MIID2jCCAsKgAwIBAgIUXSGhi1rVH7ftDmJ6TlavLsY/74MwDQYJKoZIhvcNAQEL
 BQAwgY8xCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdGbG9yaWRhMRAwDgYDVQQHDAdP
 cmxhbmRvMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQxFzAVBgNV
@@ -167,7 +128,7 @@ qesVBabxXBCL6Y1foh5OLLHyEWw28yfK/PnVdqU0lLrBhW9VJ6mQ9XCwZxf/tlSk
 B3FafTQk4ZtU+4bVJuiAiQI7DeqpIFU6Lczds2gG
 -----END CERTIFICATE-----
 `, // the following key pem is decrypted value using key_passphrse
-				"key_pem": `-----BEGIN RSA PRIVATE KEY-----
+		"key_pem": `-----BEGIN RSA PRIVATE KEY-----
 MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDAVGPlx4U2BpWf
 QlyMNraLMjdJAo4PjO2GrDbwg2cAO4QFbMECEiNHakvuJ3zVVDO+HsBdkLWr8nO4
 iXmZDokfDrOrANJuqq16p022soC8pJQz9uIBWTnxDGd/wdofi4H+V5uaMhw961sg
@@ -196,24 +157,8 @@ m8TtceUhSOnXNrrO5agyMRmL0aYf8D425ot/uwTiSkOd4bdFeEaYs0ahHosxHq2N
 me1zqwZ6EX7XHaa6j1mx9tcX
 -----END RSA PRIVATE KEY-----
 `,
-				"insecure_skip_verify":         false,
-				"include_system_ca_certs_pool": false,
-				"cipher_suites":                []string{"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"},
-			},
-			err: false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			got, err := TLSCommonToOTel(test.input)
-			if test.err {
-				require.Error(t, err)
-			} else {
-				require.NoError(t, err)
-				assert.Equal(t, test.want, got, "beats to otel ssl mapping")
-			}
-
-		})
-	}
+		"insecure_skip_verify":         false,
+		"include_system_ca_certs_pool": false,
+		"cipher_suites":                []string{"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"},
+	}, got, "beats to otel ssl mapping")
 }

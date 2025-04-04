@@ -87,6 +87,34 @@ steps:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests FIPS"
+        key: "mandatory-linux-unit-test-fips"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "libbeat/build/*.xml"
+          - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*-unit.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "libbeat: Ubuntu x86_64 Unit Tests FIPS"
+
       - label: ":ubuntu: Libbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
@@ -111,7 +139,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Go Integration Tests"
+              context: "libbeat: Go Integration Tests FIPS"
 
       - label: ":ubuntu: Libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
