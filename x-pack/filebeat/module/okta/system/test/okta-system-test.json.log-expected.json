@@ -99,7 +99,7 @@
         "user_agent.os.full": "Mac OS X 10.15",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15",
-        "user_agent.version": "72.0."
+        "user_agent.version": "72.0"
     },
     {
         "@timestamp": "2020-02-14T20:18:57.718Z",

@@ -2649,7 +2649,7 @@
         "user_agent.os.full": "Mac OS X 10.15",
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15",
-        "user_agent.version": "85.0."
+        "user_agent.version": "85.0"
     },
     {
         "@timestamp": "2021-02-05T09:06:08.000Z",
