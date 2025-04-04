@@ -133,6 +133,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
+- Restore `maintainer` label for container images {pull}43683[43683]
 
 *Auditbeat*
 
