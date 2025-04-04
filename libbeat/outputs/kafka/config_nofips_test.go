@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestConfigAcceptValid(t *testing.T) {
+func TestConfigAcceptValidKerberos(t *testing.T) {
 	tests := map[string]mapstr.M{
 		"Kerberos with keytab": mapstr.M{
 			"topic": "foo",
