@@ -78,8 +78,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("redis input", "redis"))
-
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{
 		"network":      "tcp",
@@ -116,8 +114,9 @@ func TestInput(t *testing.T) {
 		BeatDone: make(chan struct{}),
 	}
 
+	logger := logp.NewTestingLogger(t, "")
 	// Setup the input
-	input, err := NewInput(config, connector, inputContext)
+	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 

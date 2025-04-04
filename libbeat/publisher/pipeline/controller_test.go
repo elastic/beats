@@ -70,8 +70,9 @@ func TestOutputReload(t *testing.T) {
 					return nil
 				}
 
+				logger := logp.NewTestingLogger(t, "")
 				pipeline, err := New(
-					beat.Info{},
+					beat.Info{Logger: logger},
 					Monitors{},
 					queueConfig,
 					outputs.Group{},
@@ -193,6 +194,7 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory) (queue.Queue, error) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
+	logger := logp.NewTestingLogger(t, "")
 	controller := outputController{
 		queueFactory: failedFactory,
 		consumer: &eventConsumer{
@@ -200,7 +202,7 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 			retryObserver: nilObserver,
 		},
 		monitors: Monitors{
-			Logger: logp.NewLogger("tests"),
+			Logger: logger.Named("tests"),
 		},
 	}
 	controller.Set(outputs.Group{

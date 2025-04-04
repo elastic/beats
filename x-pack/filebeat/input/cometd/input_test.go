@@ -105,7 +105,8 @@ func TestSingleInput(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logp.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -163,7 +164,8 @@ func TestInputStop_Wait(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logp.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -324,12 +326,13 @@ func TestMultiInput(t *testing.T) {
 
 	var inputContext finput.Context
 
+	logger := logp.NewTestingLogger(t, "")
 	// initialize inputs
-	input1, err := NewInput(cfg1, connector, inputContext)
+	input1, err := NewInput(cfg1, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input1)
 
-	input2, err := NewInput(cfg2, connector, inputContext)
+	input2, err := NewInput(cfg2, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input2)
 
@@ -465,7 +468,8 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logp.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -568,7 +572,8 @@ func TestNegativeCases(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logp.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 

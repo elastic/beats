@@ -84,8 +84,9 @@ func TestInput(t *testing.T) {
 		BeatDone: make(chan struct{}),
 	}
 
+	logger := logp.NewTestingLogger(t, "")
 	// Setup the input
-	input, err := NewInput(config, connector, inputContext)
+	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 

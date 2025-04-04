@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type config struct {
@@ -59,7 +58,7 @@ func RunTests(
 		return fmt.Errorf("unpacking config failed: %w", err)
 	}
 
-	log := logp.L()
+	log := info.Logger
 
 	processing, err := processing.MakeDefaultSupport(false, nil)(info, log, cfg)
 	if err != nil {
@@ -98,7 +97,7 @@ func RunTests(
 	for i := 0; i < config.Generate.Worker; i++ {
 		i := i
 		withWG(&genWG, func() {
-			err := generate(cs, pipeline, config.Generate, i, errors)
+			err := generate(cs, pipeline, config.Generate, i, errors, log)
 			if err != nil {
 				log.Errorf("Generator failed with: %v", err)
 			}

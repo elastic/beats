@@ -170,7 +170,7 @@ func newCommonConfigEditor(
 		// 1. add support for index configuration via processor
 		// 2. add processors added by the input that wants to connect
 		// 3. add locally configured processors from the 'processors' settings
-		procs := processors.NewList(nil)
+		procs := processors.NewList(beatInfo.Logger)
 		if indexProcessor != nil {
 			procs.AddProcessor(indexProcessor)
 		}

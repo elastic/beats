@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // RunnerFactory is a factory for registrars
@@ -32,14 +33,16 @@ type RunnerFactory struct {
 	outlet    channel.Factory
 	registrar *registrar.Registrar
 	beatDone  chan struct{}
+	logger    *logp.Logger
 }
 
 // NewRunnerFactory instantiates a new RunnerFactory
-func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, beatDone chan struct{}) *RunnerFactory {
+func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, beatDone chan struct{}, logger *logp.Logger) *RunnerFactory {
 	return &RunnerFactory{
 		outlet:    outlet,
 		registrar: registrar,
 		beatDone:  beatDone,
+		logger:    logger,
 	}
 }
 
@@ -49,7 +52,7 @@ func (r *RunnerFactory) Create(
 	c *conf.C,
 ) (cfgfile.Runner, error) {
 	connector := r.outlet(pipeline)
-	p, err := New(c, connector, r.beatDone, r.registrar.GetStates())
+	p, err := New(c, connector, r.beatDone, r.registrar.GetStates(), r.logger)
 	if err != nil {
 		// In case of error with loading state, input is still returned
 		return p, err

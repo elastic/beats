@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -78,7 +79,9 @@ func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Produc
 	s.Path = b.TempDir()
 
 	s.UseCompression = compress
-	q, err := NewQueue(logp.L(), nil, s, nil)
+	logger, err := logp.NewDevelopmentLogger("")
+	require.NoError(b, err)
+	q, err := NewQueue(logger, nil, s, nil)
 	if err != nil {
 		panic(err)
 	}

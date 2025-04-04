@@ -30,13 +30,13 @@ import (
 
 func TestRecoverFromCorruption(t *testing.T) {
 	path := t.TempDir()
-	logp.DevelopmentSetup()
 
 	if err := copyPath(path, "testdata/1/logfile_incomplete/"); err != nil {
 		t.Fatalf("Failed to copy test file to the temporary directory: %v", err)
 	}
 
-	store, err := openStore(logp.NewLogger("test"), path, 0660, 4096, false, func(_ uint64) bool {
+	logger := logp.NewTestingLogger(t, "")
+	store, err := openStore(logger.Named("test"), path, 0660, 4096, false, func(_ uint64) bool {
 		return false
 	})
 	require.NoError(t, err, "openStore must succeed")

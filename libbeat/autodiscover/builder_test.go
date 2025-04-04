@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -33,7 +34,7 @@ func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	return []*conf.C{conf.NewConfig()}
 }
 
-func newFakeBuilder(_ *conf.C) (Builder, error) {
+func newFakeBuilder(_ *conf.C, logger *logp.Logger) (Builder, error) {
 	return &fakeBuilder{}, nil
 }
 
