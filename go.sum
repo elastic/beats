@@ -291,6 +291,7 @@ github.com/elastic/azure-sdk-for-go v59.0.0-elastic-1+incompatible h1:jlUO91EFZu
 github.com/elastic/azure-sdk-for-go v59.0.0-elastic-1+incompatible/go.mod h1:4zuQekLQi489ShcqTmS1Zj1ta0qrcNBlSuGa+ziu2vM=
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 h1:lnDkqiRFKm0rxdljqrj3lotWinO9+jFmeDXIC4gvIQs=
 github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3/go.mod h1:aPqzac6AYkipvp4hufTyMj5PDIphF3+At8zr7r51xjY=
+<<<<<<< HEAD
 github.com/elastic/ecs v1.12.0 h1:u6WZ2AWtxv5vHvTQ4EuVZdWZ51mKHQ2UIltRePcta5U=
 github.com/elastic/ecs v1.12.0/go.mod h1:pgiLbQsijLOJvFR8OTILLu0Ni/R/foUNg0L+T6mU9b4=
 github.com/elastic/elastic-agent-client/v7 v7.8.1 h1:J9wZc/0mUvSEok0X5iR5+n60Jgb+AWooKddb3XgPWqM=
@@ -299,6 +300,20 @@ github.com/elastic/elastic-agent-libs v0.7.2 h1:yT0hF0UAxJCdQqhHh6SFpgYrcpB10oFz
 github.com/elastic/elastic-agent-libs v0.7.2/go.mod h1:pVBEElQJUO9mr4WStWNXuQGsJn54lcjAoYAHmsvBLBc=
 github.com/elastic/elastic-agent-system-metrics v0.4.4 h1:Br3S+TlBhijrLysOvbHscFhgQ00X/trDT5VEnOau0E0=
 github.com/elastic/elastic-agent-system-metrics v0.4.4/go.mod h1:tF/f9Off38nfzTZHIVQ++FkXrDm9keFhFpJ+3pQ00iI=
+=======
+github.com/elastic/ebpfevents v0.6.0 h1:BrL3m7JFK7U6h2jkbk3xAWWs//IZnugCHEDds5u2v68=
+github.com/elastic/ebpfevents v0.6.0/go.mod h1:ESG9gw7N+n5yCCMgdg1IIJENKWSmX7+X0Fi9GUs9nvU=
+github.com/elastic/elastic-agent-autodiscover v0.9.0 h1:+iWIKh0u3e8I+CJa3FfWe9h0JojNasPgYIA47gpuuns=
+github.com/elastic/elastic-agent-autodiscover v0.9.0/go.mod h1:5iUxLHhVdaGSWYTveSwfJEY4RqPXTG13LPiFoxcpFd4=
+github.com/elastic/elastic-agent-client/v7 v7.15.0 h1:nDB7v8TBoNuD6IIzC3z7Q0y+7bMgXoT2DsHfolO2CHE=
+github.com/elastic/elastic-agent-client/v7 v7.15.0/go.mod h1:6h+f9QdIr3GO2ODC0Y8+aEXRwzbA5W4eV4dd/67z7nI=
+github.com/elastic/elastic-agent-libs v0.19.0 h1:xqDkX6kjz3rBH02QQWk3kFsn8M0uv/5bKtIJOztlI8Y=
+github.com/elastic/elastic-agent-libs v0.19.0/go.mod h1:koK4coWhHibGMT3Ujni8tuLyGw8k9ttsO+AlX4ypHkI=
+github.com/elastic/elastic-agent-system-metrics v0.11.10 h1:51u6roLaI0WhX1wbU4hPaervODegOxNFLcLouDAAi8A=
+github.com/elastic/elastic-agent-system-metrics v0.11.10/go.mod h1:BlS6Fm/l/umAa9xKy7GxsSYtCfu/iqg551PULKSeCQM=
+github.com/elastic/elastic-transport-go/v8 v8.6.0 h1:Y2S/FBjx1LlCv5m6pWAF2kDJAHoSjSRSJCApolgfthA=
+github.com/elastic/elastic-transport-go/v8 v8.6.0/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
+>>>>>>> d274aa9ae (Update elastic-agent-libs to `v0.19.0` (#43620))
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdboCbArMF/nSCDUXgQuWTeoMmE/z8607X+k7ng=
 github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4 h1:ViJxdtOsHeO+SWVekzM82fYHH1xnvZ8CvGPXZj+G4YI=
