@@ -36,17 +36,22 @@ const (
 )
 
 type handler struct {
-	registry *monitoring.Registry
+	globalReg *monitoring.Registry
+	localReg  *monitoring.Registry
 }
 
 // AttachHandler attaches an HTTP handler to the given mux.Router to handle
-// requests to /inputs.
-func AttachHandler(r *mux.Router) error {
-	return attachHandler(r, globalRegistry())
+// requests to /inputs. It will publish the metrics registered in the global
+// 'dataset' metrics namespace and on reg.
+func AttachHandler(
+	r *mux.Router,
+	reg *monitoring.Registry,
+) error {
+	return attachHandler(r, globalRegistry(), reg)
 }
 
-func attachHandler(r *mux.Router, registry *monitoring.Registry) error {
-	h := &handler{registry: registry}
+func attachHandler(r *mux.Router, global *monitoring.Registry, local *monitoring.Registry) error {
+	h := &handler{globalReg: global, localReg: local}
 	r = r.PathPrefix(route).Subrouter()
 	return r.StrictSlash(true).Handle("/", validationHandler("GET", []string{"pretty", "type"}, h.allInputs)).GetError()
 }
@@ -64,16 +69,43 @@ func (h *handler) allInputs(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	filtered := filteredSnapshot(h.registry, requestedType)
+	filtered := filteredSnapshot(h.globalReg, h.localReg, requestedType)
 
 	w.Header().Set(contentType, applicationJSON)
 	serveJSON(w, filtered, requestedPretty)
 }
 
-func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string]any {
-	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
+func filteredSnapshot(
+	global *monitoring.Registry,
+	local *monitoring.Registry,
+	requestedType string) []map[string]any {
 
-	filtered := make([]map[string]any, 0, len(metrics))
+	selected := make([]map[string]any, 0)
+
+	// 1st collect all input metrics.
+	selectedLocal := filterMetrics(local, requestedType)
+	selectedGlobal := filterMetrics(global, requestedType)
+
+	// All registries from the local registry takes priority over the global
+	// ones.
+	for _, r := range selectedLocal {
+		selected = append(selected, r)
+	}
+	for _, g := range selectedGlobal {
+		if _, ok := selectedLocal[g["id"].(string)]; ok {
+			// if the local registry has this ID, it takes precedence.
+			continue
+		}
+
+		selected = append(selected, g)
+	}
+
+	return selected
+}
+
+func filterMetrics(r *monitoring.Registry, requestedType string) map[string]map[string]any {
+	selected := map[string]map[string]any{}
+	metrics := monitoring.CollectStructSnapshot(r, monitoring.Full, false)
 	for _, ifc := range metrics {
 		m, ok := ifc.(map[string]any)
 		if !ok {
@@ -81,17 +113,30 @@ func filteredSnapshot(r *monitoring.Registry, requestedType string) []map[string
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		if id, ok := m["id"].(string); !ok || id == "" {
+		id, ok := m["id"].(string)
+		if !ok || id == "" {
 			continue
 		}
 
-		if inputType, ok := m["input"].(string); !ok || (requestedType != "" && !strings.EqualFold(inputType, requestedType)) {
+		if !requestedInput(m["input"], requestedType) {
 			continue
 		}
 
-		filtered = append(filtered, m)
+		selected[id] = m
 	}
-	return filtered
+
+	return selected
+}
+
+func requestedInput(input any, requestedType string) bool {
+	inputType, ok := input.(string)
+	if !ok ||
+		(requestedType != "" &&
+			!strings.EqualFold(inputType, requestedType)) {
+		return false
+	}
+
+	return true
 }
 
 func serveJSON(w http.ResponseWriter, value any, pretty bool) {

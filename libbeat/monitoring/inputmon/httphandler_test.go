@@ -68,7 +68,7 @@ func TestHandler(t *testing.T) {
 	s := httptest.NewServer(r)
 	defer s.Close()
 
-	if err := attachHandler(r, parent); err != nil {
+	if err := attachHandler(r, parent, nil); err != nil {
 		t.Fatal(err)
 	}
 
@@ -116,7 +116,7 @@ func BenchmarkHandlers(b *testing.B) {
 		monitoring.NewInt(reg, "gauge").Set(int64(i))
 	}
 
-	h := &handler{registry: reg}
+	h := &handler{globalReg: reg}
 
 	b.Run("allInputs", func(b *testing.B) {
 		req := httptest.NewRequest(http.MethodGet, "/inputs/", nil)

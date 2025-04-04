@@ -38,10 +38,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -123,12 +125,30 @@ func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	return e.plugin.Manager
 }
 
-func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) {
+func (e *inputTestingEnvironment) startInput(ctx context.Context, id string, inp v2.Input) {
 	e.wg.Add(1)
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
-		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
+
+		info := beat.Info{Monitoring: beat.Monitoring{
+			Namespace: monitoring.GetNamespace("dataset")},
+		}
+		reg := inputmon.NewMetricsRegistry(
+			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+		defer inputmon.CancelMetricsRegistry(
+			id, inp.Name(), info.Monitoring.NamespaceRegistry(), logp.L())
+
+		inputCtx := v2.Context{
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
+			Agent:           info,
+			Cancelation:     ctx,
+			StatusReporter:  nil,
+			MetricsRegistry: reg,
+			Logger:          logp.L(),
+		}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }

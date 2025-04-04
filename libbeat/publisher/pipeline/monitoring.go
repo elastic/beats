@@ -55,8 +55,8 @@ type retryObserver interface {
 	eventsRetry(int)
 }
 
-// metricsObserver is used by many component in the publisher pipeline, to report
-// internal events. The oberserver can call registered global event handlers or
+// metricsObserver is used by many components in the publisher pipeline, to report
+// internal events. The observer can call registered global event handlers or
 // updated shared counters/metrics for reporting.
 // All events required for reporting events/metrics on the pipeline-global level
 // are defined by observer. The components are only allowed to serve localized
@@ -72,8 +72,9 @@ type metricsObserverVars struct {
 
 	// eventsTotal publish/dropped stats
 	eventsTotal, eventsFiltered, eventsPublished, eventsFailed *monitoring.Uint
-	eventsDropped, eventsRetry                                 *monitoring.Uint // (retryer) drop/retry counters
-	activeEvents                                               *monitoring.Uint
+
+	eventsDropped, eventsRetry *monitoring.Uint // (retryer) drop/retry counters
+	activeEvents               *monitoring.Uint
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {

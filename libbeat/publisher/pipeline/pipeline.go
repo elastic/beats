@@ -179,8 +179,8 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 
 // ConnectWith create a new Client for publishing events to the pipeline.
 // The client behavior on close and ACK handling can be configured by setting
-// the appropriate fields in the passed ClientConfig.
-// If not set otherwise the defaut publish mode is OutputChooses.
+// the appropriate fields in provided ClientConfig.
+// If not set otherwise the default publish mode is OutputChooses.
 //
 // It is responsibility of the caller to close the client.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
@@ -208,14 +208,20 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 		return nil, err
 	}
 
+	clientListener := cfg.ClientListener
+	if clientListener == nil {
+		clientListener = noopClientListener{}
+	}
+
 	client := &client{
 		logger:         p.monitors.Logger,
-		clientListener: cfg.ClientListener,
+		clientListener: clientListener,
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
 		observer:       p.observer,
 	}
+
 	client.isOpen.Store(true)
 
 	ackHandler := cfg.EventListener
@@ -290,3 +296,12 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.Queu
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
 }
+
+type noopClientListener struct{}
+
+func (n noopClientListener) Closing()                    {}
+func (n noopClientListener) Closed()                     {}
+func (n noopClientListener) NewEvent()                   {}
+func (n noopClientListener) Filtered()                   {}
+func (n noopClientListener) Published()                  {}
+func (n noopClientListener) DroppedOnPublish(beat.Event) {}
