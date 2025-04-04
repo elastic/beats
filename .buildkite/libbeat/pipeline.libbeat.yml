@@ -92,7 +92,7 @@ steps:
         command: |
           set -euo pipefail
           cd libbeat
-          mage build unitTest
+          mage unitTest
         retry:
           automatic:
             - limit: 1
