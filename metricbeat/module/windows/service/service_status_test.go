@@ -24,15 +24,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetServiceStates(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/22172")
-
 	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	assert.NoError(t, err)
 	assert.NotEqual(t, handle, InvalidDatabaseHandle)
-	services, err := GetServiceStates(handle, ServiceStateAll, map[string]struct{}{})
+	services, err := GetServiceStates(logp.NewTestingLogger(t, ""), handle, ServiceStateAll, map[string]struct{}{})
 	assert.NoError(t, err)
 	assert.True(t, len(services) > 0)
 	closeHandle(handle)
