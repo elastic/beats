@@ -60,7 +60,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/elastic/elastic-agent-client/v7 v7.15.0
 	github.com/elastic/go-concert v0.3.0
-	github.com/elastic/go-libaudit/v2 v2.6.1
+	github.com/elastic/go-libaudit/v2 v2.6.2
 	github.com/elastic/go-licenser v0.4.2
 	github.com/elastic/go-lookslike v1.0.1
 	github.com/elastic/go-lumber v0.1.2-0.20220819171948-335fde24ea0f
@@ -124,13 +124,13 @@ require (
 	go.etcd.io/bbolt v1.3.10
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.33.0
+	golang.org/x/crypto v0.36.0
 	golang.org/x/mod v0.21.0
-	golang.org/x/net v0.35.0
+	golang.org/x/net v0.38.0
 	golang.org/x/oauth2 v0.24.0
-	golang.org/x/sync v0.11.0
-	golang.org/x/sys v0.30.0
-	golang.org/x/text v0.22.0
+	golang.org/x/sync v0.12.0
+	golang.org/x/sys v0.31.0
+	golang.org/x/text v0.23.0
 	golang.org/x/time v0.8.0
 	golang.org/x/tools v0.25.0
 	google.golang.org/api v0.214.0
@@ -188,7 +188,7 @@ require (
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-resty/resty/v2 v2.13.1
 	github.com/gofrs/uuid/v5 v5.2.0
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/cel-go v0.19.0
 	github.com/googleapis/gax-go/v2 v2.14.0
 	github.com/gorilla/handlers v1.5.1
@@ -226,7 +226,7 @@ require (
 	go.opentelemetry.io/collector/pdata v1.20.0
 	go.opentelemetry.io/collector/receiver v0.114.0
 	go.uber.org/mock v0.5.0
-	golang.org/x/term v0.29.0
+	golang.org/x/term v0.30.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
