@@ -21,6 +21,7 @@ package oteltranslate
 
 import (
 	"crypto/tls"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -59,5 +60,5 @@ sxSmbIUfc2SGJGCJD4I=
 		CipherSuites: []tlscommon.CipherSuite{tlscommon.CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256)},
 	})
 	require.Error(t, err)
-	require.ErrorIs err, errors.ErrUnsupported)
+	require.ErrorIs(t, err, errors.ErrUnsupported)
 }
