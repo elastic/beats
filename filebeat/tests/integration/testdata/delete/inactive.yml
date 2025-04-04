@@ -1,0 +1,35 @@
+filebeat.inputs:
+  - type: filestream
+    id: delete-on-close
+    paths:
+      - {{ .logfile }}
+    delete.on_close.inactive: true
+    delete.backoff.init: 1s
+    delete.backoff.max: 1s
+    close.on_state_change.inactive: 3s
+
+    prospector:
+      scanner:
+        fingerprint:
+          enabled: true
+          length: 64
+        check_interval: 0.1s
+
+path.home: {{ .homePath }}
+queue.mem:
+  flush.timeout: 0
+
+output.elasticsearch:
+  hosts:
+    - http://{{ .esHost }}
+
+logging:
+  level: debug
+  selectors:
+    - input
+    - input.filestream
+    - input.harvester
+    - prospector
+
+metrics:
+  enabled: false
