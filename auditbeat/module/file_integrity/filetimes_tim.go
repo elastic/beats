@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
+//go:build linux || openbsd || dragonfly || aix || solaris
 
 package file_integrity
 
