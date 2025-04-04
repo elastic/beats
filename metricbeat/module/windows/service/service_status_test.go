@@ -22,15 +22,16 @@ package service
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetServiceStates(t *testing.T) {
 	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	assert.NoError(t, err)
 	assert.NotEqual(t, handle, InvalidDatabaseHandle)
-	services, err := GetServiceStates(logp.L(), handle, ServiceStateAll, map[string]struct{}{})
+	services, err := GetServiceStates(logp.NewTestingLogger(t, ""), handle, ServiceStateAll, map[string]struct{}{})
 	assert.NoError(t, err)
 	assert.True(t, len(services) > 0)
 	closeHandle(handle)
