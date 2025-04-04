@@ -29,7 +29,12 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sys/windows/registry"
 
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/common"
+=======
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+>>>>>>> 0d125fb42 ([metricbeat][windows/service] - Don't affect data collection for other services if single service fails (#43665))
 )
 
 var (
@@ -49,9 +54,10 @@ type Reader struct {
 	guid              string            // Host's MachineGuid value (a unique ID for the host).
 	ids               map[string]string // Cache of service IDs.
 	protectedServices map[string]struct{}
+	log               *logp.Logger
 }
 
-func NewReader() (*Reader, error) {
+func NewReader(log *logp.Logger) (*Reader, error) {
 	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization failed")
@@ -68,13 +74,19 @@ func NewReader() (*Reader, error) {
 		guid:              guid,
 		ids:               map[string]string{},
 		protectedServices: map[string]struct{}{},
+		log:               log,
 	}
 
 	return r, nil
 }
 
+<<<<<<< HEAD
 func (reader *Reader) Read() ([]common.MapStr, error) {
 	services, err := GetServiceStates(reader.handle, reader.state, reader.protectedServices)
+=======
+func (reader *Reader) Read() ([]mapstr.M, error) {
+	services, err := GetServiceStates(reader.log, reader.handle, reader.state, reader.protectedServices)
+>>>>>>> 0d125fb42 ([metricbeat][windows/service] - Don't affect data collection for other services if single service fails (#43665))
 	if err != nil {
 		return nil, err
 	}
