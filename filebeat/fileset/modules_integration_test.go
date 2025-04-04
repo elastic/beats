@@ -35,9 +35,11 @@ import (
 )
 
 func makeTestInfo(version string) beat.Info {
+	logger, _ := logp.NewDevelopmentLogger("")
 	return beat.Info{
 		IndexPrefix: "filebeat",
 		Version:     version,
+		Logger:      logger,
 	}
 }
 
