@@ -86,9 +86,13 @@ func (in *cometdInput) run() error {
 	in.msgCh = in.b.Channel(ctx, in.msgCh, "-1", *in.creds, in.config.ChannelName)
 	for e := range in.msgCh {
 		if e.Failed() {
-			// if err bayeux library returns recoverable error, do not close input.
-			// instead continue with connection warning
-			if !strings.Contains(e.Error(), "trying again") {
+			if strings.Contains(e.Error(), "EOF, trying again") {
+				// if err from bayeux library returns unrecoverable error, close input.
+				// start new input with new client and re-handshake
+				return fmt.Errorf("error collecting events: Unexpected EOF from server: %v", e.Err)
+			} else if !strings.Contains(e.Error(), "trying again") {
+				// if err fromcl bayeux library returns recoverable error, do not close input.
+				// instead continue with connection warning
 				return fmt.Errorf("error collecting events: %w", e.Err)
 			}
 			// log warning every 5 seconds only to avoid to many unnecessary logs
