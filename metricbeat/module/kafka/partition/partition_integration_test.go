@@ -44,7 +44,6 @@ const (
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42808")
 	service := compose.EnsureUp(t, "kafka",
 		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
@@ -61,7 +60,6 @@ func TestData(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42808")
 	service := compose.EnsureUp(t, "kafka",
 		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),

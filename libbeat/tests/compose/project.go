@@ -88,6 +88,7 @@ const (
 // Driver is the interface of docker compose implementations
 type Driver interface {
 	Up(ctx context.Context, opts UpOptions, service string) error
+	Down(ctx context.Context) error
 	Kill(ctx context.Context, signal string, service string) error
 	KillOld(ctx context.Context, except []string) error
 	Ps(ctx context.Context, filter ...string) ([]ContainerStatus, error)
@@ -95,7 +96,7 @@ type Driver interface {
 	Inspect(ctx context.Context, serviceName string) (string, error)
 
 	LockFile() string
-
+	Name() string // Name returns the docker compose project name.
 	Close() error
 }
 
@@ -126,7 +127,7 @@ func NewProject(name string, files []string) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
-	driver.Name = name
+	driver.name = name
 	driver.Files = files
 	return &Project{Driver: driver}, nil
 }
@@ -144,9 +145,6 @@ func (c *Project) Start(service string, options UpOptions) error {
 			return nil
 		}
 	}
-
-	c.Lock()
-	defer c.Unlock()
 
 	return c.Driver.Up(context.Background(), options, service)
 }
@@ -208,17 +206,11 @@ func (c *Project) HostInformation(service string) (ServiceInfo, error) {
 
 // Kill a container
 func (c *Project) Kill(service string) error {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.Driver.Kill(context.Background(), "KILL", service)
 }
 
 // Remove a container
 func (c *Project) Remove(service string, force bool) error {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.Driver.Remove(context.Background(), service, force)
 }
 
@@ -239,43 +231,60 @@ func (c *Project) KillOld(except []string) error {
 
 // Inspect a container
 func (c *Project) Inspect(service string) (string, error) {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.Driver.Inspect(context.Background(), service)
 }
 
-// Lock acquires the lock (300s) timeout
+// Lock acquires the lock (500s) timeout
 // Normally it should only be seconds that the lock is used, but in some cases it can take longer.
 // Pid is written to the lock file, and it is used to check if process holding the process is still
 // alive to avoid deadlocks on unexpected finalizations.
+// TODO: fix me
 func (c *Project) Lock() {
-	timeout := time.Now().Add(300 * time.Second)
+	timeoutDur := 500 * time.Second
+	timeout := time.Now().Add(timeoutDur)
 	infoShown := false
+	defer func() {
+		if v := recover(); v != nil {
+			panic(fmt.Errorf("[%s] timeout after %s: did not aqquire lock %s: %v",
+				c.Name(), timeout, c.LockFile(), v))
+		}
+	}()
+
 	for time.Now().Before(timeout) {
 		if acquireLock(c.LockFile()) {
 			if infoShown {
-				logp.Info("%s lock acquired", c.LockFile())
+				logp.Info("[%s] %s lock acquired",
+					c.Name(), c.LockFile())
+				fmt.Printf("[%s] acquired lock: %s\n",
+					c.Name(), c.LockFile())
 			}
 			return
 		}
 
 		if stalledLock(c.LockFile()) {
 			if err := os.Remove(c.LockFile()); err == nil {
-				logp.Info("Stalled lockfile %s removed", c.LockFile())
+				logp.Info("[%s] Stalled lockfile %s removed",
+					c.Name(), c.LockFile())
+				fmt.Printf("[%s] Stalled lockfile %s removed\n",
+					c.Name(), c.LockFile())
 				continue
 			}
 		}
 
 		if !infoShown {
-			logp.Info("%s is locked, waiting", c.LockFile())
+			logp.Info("[%s] %s is locked, waiting",
+				c.Name(), c.LockFile())
+			fmt.Printf("[%s] waiting for lock file %s to become available\n",
+				c.Name(), c.LockFile())
 			infoShown = true
 		}
+
 		time.Sleep(1 * time.Second)
 	}
 
 	// This should rarely happen as we lock for start only, less than a second
-	panic("timeout waiting for lock")
+	panic(fmt.Sprintf("[%s] timeout after %s waithing for lock %s",
+		c.Name(), timeoutDur, c.LockFile()))
 }
 
 func acquireLock(path string) bool {
@@ -317,7 +326,13 @@ func processExists(pid int) bool {
 
 // Unlock releases the project lock
 func (c *Project) Unlock() {
-	os.Remove(c.LockFile())
+	fmt.Printf("[%s] unlocking %s\n", c.Name(), c.LockFile())
+	err := os.Remove(c.LockFile())
+	if err != nil {
+		fmt.Printf("[FAIL][ERROR][%s] could not unlock %s: %v\n",
+			c.Name(), c.LockFile(), err)
+		return
+	}
 }
 
 // ServiceInfo is an interface for objects that give information about running services
@@ -326,7 +341,7 @@ type ServiceInfo interface {
 	Running() bool
 	Healthy() bool
 
-	// Has been up for too long?:
+	// Old returns if this service been up for too long
 	Old() bool
 
 	Host() string
@@ -334,9 +349,6 @@ type ServiceInfo interface {
 }
 
 func (c *Project) getServices(filter ...string) (map[string]ServiceInfo, error) {
-	c.Lock()
-	defer c.Unlock()
-
 	result := make(map[string]ServiceInfo)
 	services, err := c.Driver.Ps(context.Background(), filter...)
 	if err != nil {
