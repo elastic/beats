@@ -83,8 +83,9 @@ var azureVMMetadataFetcher = provider{
 				"service": s.Object{
 					"name": c.Str("serviceName"),
 				},
-				"region":        c.Str("location"),
-				"resourcegroup": c.Str("resourceGroupName"),
+				"region":            c.Str("location"),
+				"resourcegroup":     c.Str("resourceGroupName"),
+				"availability_zone": c.Str("zone"),
 			}.Apply(m)
 
 			return mapstr.M{"cloud": cloud}
