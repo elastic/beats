@@ -1,4 +1,4 @@
-project: 'Beats'
+project: "Beats"
 toc:
   # TO DO: Do we want these to be separate pages?
   - file: index.md
@@ -331,12 +331,6 @@ toc:
           - file: filebeat/using-environ-vars.md
           - file: filebeat/yaml-tips.md
           - file: filebeat/migrate-to-filestream.md
-            children:
-              - file: filebeat/_step_1_set_an_identifier_for_each_filestream_input.md
-              - file: filebeat/_step_2_enable_the_take_over_mode.md
-              - file: filebeat/_step_3_use_new_option_names.md
-              - file: filebeat/_step_4.md
-              - file: filebeat/_debugging_on_kibana.md
           - file: filebeat/migrate-from-deprecated-module.md
       - file: filebeat/filebeat-modules.md
         children:
