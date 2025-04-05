@@ -7,13 +7,12 @@ package oracle
 import (
 	"os"
 
-	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
 )
 
 // GetOracleConnectionDetails return a valid SID to use for testing
 func GetOracleConnectionDetails(host string) string {
-	params := godror.ConnectionParams{
+	params := dsn.ConnectionParams{
 		CommonParams: dsn.CommonParams{
 			Username: GetOracleEnvUsername(),
 			Password: dsn.NewPassword((GetOracleEnvPassword())),
