@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@b0d4fd84ae72108930c9adb83bb4beba1acbaf9f # v2.79.0
+        uses: updatecli/updatecli-action@339fdb3f3bf66d14fe5830248b4e893990415cd0 # v2.80.0
 
       - name: Run Updatecli in Apply mode
         run: updatecli --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
