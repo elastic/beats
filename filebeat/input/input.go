@@ -22,6 +22,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -36,12 +38,10 @@ var inputListMetricsOnce sync.Once
 // RegisterMonitoringInputs registers a list of inputs with the
 // monitoring system under the provided namespace.  If namespace is
 // empty, it default to "state". Registration only occurs once.
-func RegisterMonitoringInputs(namespace string) {
-	if namespace == "" {
-		namespace = "state"
-	}
+func RegisterMonitoringInputs(namespace *monitoring.Namespace) {
+	registry := common.GetOrCreateRegistry(namespace, "input")
 	inputListMetricsOnce.Do(func() {
-		monitoring.NewFunc(monitoring.GetNamespace(namespace).GetRegistry(), "input", inputList.Report, monitoring.Report)
+		monitoring.NewFunc(registry, "input", inputList.Report, monitoring.Report)
 	})
 }
 

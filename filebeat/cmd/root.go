@@ -29,6 +29,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
+	"github.com/elastic/elastic-agent-libs/monitoring"
+
 	// Import processors.
 	_ "github.com/elastic/beats/v7/libbeat/processors/cache"
 	_ "github.com/elastic/beats/v7/libbeat/processors/timestamp"
@@ -56,8 +58,10 @@ func FilebeatSettings(moduleNameSpace string) instance.Settings {
 		HasDashboards: true,
 		Initialize: []func(){
 			include.InitializeModule,
-			func() { fileset.RegisterMonitoringModules(moduleNameSpace) },
-			func() { input.RegisterMonitoringInputs("") },
+		},
+		InitializeReg: []func(*monitoring.Namespace){
+			func(namespace *monitoring.Namespace) { fileset.RegisterMonitoringModules(namespace) },
+			func(namespace *monitoring.Namespace) { input.RegisterMonitoringInputs(namespace) },
 		},
 	}
 }
