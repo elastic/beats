@@ -75,7 +75,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 		return nil, err
 	}
 
-	addr := fmt.Sprintf("%v:%v", config.ListenAddress, config.ListenPort)
+	addr := net.JoinHostPort(config.ListenAddress, config.ListenPort)
 
 	var tlsConfig *tls.Config
 	tlsConfigBuilder, err := tlscommon.LoadTLSServerConfig(config.TLS)
@@ -374,7 +374,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			zap.DebugLevel,
 		)
 		h.reqLogger = zap.New(core)
-		h.host = c.ListenAddress + ":" + c.ListenPort
+		h.host = net.JoinHostPort(c.ListenAddress, c.ListenPort)
 		if c.TLS != nil && c.TLS.IsEnabled() {
 			h.scheme = "https"
 		} else {
