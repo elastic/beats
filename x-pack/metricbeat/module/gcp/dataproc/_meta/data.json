@@ -19,7 +19,13 @@
             "resource": {
                 "bucket_name": "artifacts.elastic-apm.appspot.com",
                 "location": "us"
-            }
+            },
+            "env": "prod",
+            "goog-dataproc-cluster-uuid": "df721ba2-6107-4f54-9da7-44fcef112e78",
+            "goog-dataproc-drz-resource-uuid": "cluster-df721ba2-6107-4f54-9da7-44fcef112e78",
+            "goog-dataproc-autozone": "enabled",
+            "goog-dataproc-cluster-name": "cluster-0cd8",
+            "goog-dataproc-location": "us-central1"
         },
         "dataproc": {
             "cluster": {
