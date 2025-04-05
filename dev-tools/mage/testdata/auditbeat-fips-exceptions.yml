@@ -1,0 +1,8 @@
+packages:
+  github.com/elastic/beats/v7/auditbeat/module/file_integrity:
+    - name: TestExeObjParser
+    - name: TestExeObjParser/executableObject_elf_go
+    - name: TestExeObjParser/executableObject_elf_garble
+    - name: TestExeObjParser/executableObject_macho_go
+    - name: TestExeObjParser/executableObject_macho_garble
+    - name: TestExeObjParser/executableObject_pe_go
