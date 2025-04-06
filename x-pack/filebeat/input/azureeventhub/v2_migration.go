@@ -37,6 +37,7 @@ type checkpointer interface {
 // migrationAssistant assists the input in migrating
 // v1 checkpoint information to v2.
 type migrationAssistant struct {
+	config              azureInputConfig
 	log                 *logp.Logger
 	consumerClient      consumerClient
 	blobContainerClient containerClient
@@ -44,8 +45,9 @@ type migrationAssistant struct {
 }
 
 // newMigrationAssistant creates a new migration assistant.
-func newMigrationAssistant(log *logp.Logger, consumerClient consumerClient, blobContainerClient containerClient, checkpointStore checkpointer) *migrationAssistant {
+func newMigrationAssistant(config azureInputConfig, log *logp.Logger, consumerClient consumerClient, blobContainerClient containerClient, checkpointStore checkpointer) *migrationAssistant {
 	return &migrationAssistant{
+		config:              config,
 		log:                 log,
 		consumerClient:      consumerClient,
 		blobContainerClient: blobContainerClient,
@@ -55,7 +57,7 @@ func newMigrationAssistant(log *logp.Logger, consumerClient consumerClient, blob
 
 // checkAndMigrate checks if the v1 checkpoint information for the partitions
 // exists and migrates it to v2 if it does.
-func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnectionString, eventHubName, consumerGroup string) error {
+func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnectionString, consumerGroup string) error {
 	// Fetching event hub information
 	eventHubProperties, err := m.consumerClient.GetEventHubProperties(ctx, nil)
 	if err != nil {
@@ -69,19 +71,22 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 		"partition_ids", eventHubProperties.PartitionIDs,
 	)
 
-	// Parse the connection string to get FQDN.
-	connectionStringInfo, err := parseConnectionString(eventHubConnectionString)
-	if err != nil {
-		return fmt.Errorf("failed to parse connection string: %w", err)
-	}
-
+	// The input v1 stores the checkpoint information at the
+	// root of the container.
 	blobs, err := m.listBlobs(ctx)
 	if err != nil {
 		return err
 	}
 
 	for _, partitionID := range eventHubProperties.PartitionIDs {
-		err = m.checkAndMigratePartition(ctx, blobs, partitionID, connectionStringInfo.FullyQualifiedNamespace, eventHubName, consumerGroup)
+		err = m.checkAndMigratePartition(
+			ctx,
+			blobs,
+			partitionID,
+			m.config.ConnectionStringProperties.FullyQualifiedNamespace,
+			eventHubProperties.Name,
+			consumerGroup,
+		)
 		if err != nil {
 			return fmt.Errorf("failed to check and migrate partition: %w", err)
 		}
