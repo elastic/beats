@@ -128,7 +128,7 @@ func TestValidateConnectionStringV2(t *testing.T) {
 	t.Run("Connection string contains entity path but does not match event hub name", func(t *testing.T) {
 		config := defaultConfig()
 		config.ProcessorVersion = "v2"
-		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub"
 		config.EventHubName = "my-event-hub-2"
 		config.SAName = "teststorageaccount"
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"

@@ -124,7 +124,20 @@ func (conf *azureInputConfig) Validate() error {
 	if err != nil {
 		return fmt.Errorf("invalid connection string: %w", err)
 	}
+	// Store the connection string properties we parsed, so we can use them
+	// in the `azureeventhub` input, when needed.
 	conf.ConnectionStringProperties = connectionStringProperties
+	// If the connection string contains an entity path, we need to double
+	// check that it matches the event hub name.
+	if conf.ConnectionStringProperties.EntityPath != nil {
+		if *conf.ConnectionStringProperties.EntityPath != conf.EventHubName {
+			return fmt.Errorf(
+				"invalid connection string: entity path (%s) does not match event hub name (%s)",
+				*conf.ConnectionStringProperties.EntityPath,
+				conf.EventHubName,
+			)
+		}
+	}
 
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
@@ -180,18 +193,6 @@ func (conf *azureInputConfig) Validate() error {
 	case processorV2:
 		if conf.SAConnectionString == "" {
 			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
-		}
-
-		// If the connection string contains an entity path, we need to double
-		// check that it matches the event hub name.
-		if conf.ConnectionStringProperties.EntityPath != nil {
-			if *conf.ConnectionStringProperties.EntityPath != conf.EventHubName {
-				return fmt.Errorf(
-					"invalid connection string: entity path (%s) does not match event hub name (%s)",
-					*conf.ConnectionStringProperties.EntityPath,
-					conf.EventHubName,
-				)
-			}
 		}
 	default:
 		return fmt.Errorf(
