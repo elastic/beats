@@ -191,7 +191,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 
 	connectionString := in.config.ConnectionString
 	eventHubName := in.config.EventHubName
-	if in.config.ConnectionStringContainsEntityPath {
+	if in.config.ConnectionStringProperties.EntityPath != nil {
 		// If the connection string contains an entity path, we need to
 		// set the event hub name to an empty string.
 		eventHubName = ""

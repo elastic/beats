@@ -37,7 +37,7 @@ func TestStorageContainerValidate(t *testing.T) {
 func TestValidate(t *testing.T) {
 	t.Run("Sanitize storage account containers with underscores", func(t *testing.T) {
 		config := defaultConfig()
-		config.ConnectionString = "sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
+		config.ConnectionString = "Endpoint=sb://test-ns.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SECRET"
 		config.EventHubName = "event_hub_00"
 		config.SAName = "teststorageaccount"
 		config.SAKey = "secret"
@@ -56,13 +56,47 @@ func TestValidate(t *testing.T) {
 	})
 }
 
+func TestValidateConnectionStringV1(t *testing.T) {
+	t.Run("Connection string contains entity path", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v1"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
+		config.EventHubName = "my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAKey = "my-secret"
+		config.SAContainer = "filebeat-activitylogs-event_hub_00"
+
+		if err := config.Validate(); err != nil {
+			t.Fatalf("unexpected validation error: %v", err)
+		}
+
+		assert.NotNil(t, config.ConnectionStringProperties.EntityPath)
+		assert.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
+	})
+
+	t.Run("Connection string does not contain entity path", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v1"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;"
+		config.EventHubName = "my-event-hub"
+		config.SAName = "teststorageaccount"
+		config.SAKey = "my-secret"
+		config.SAContainer = "filebeat-activitylogs-event_hub_00"
+
+		if err := config.Validate(); err != nil {
+			t.Fatalf("unexpected validation error: %v", err)
+		}
+
+		assert.Nil(t, config.ConnectionStringProperties.EntityPath)
+	})
+}
+
 func TestValidateConnectionStringV2(t *testing.T) {
 	t.Run("Connection string contains entity path", func(t *testing.T) {
 		config := defaultConfig()
 		config.ProcessorVersion = "v2"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
 		config.EventHubName = "my-event-hub"
-		config.ConnectionStringContainsEntityPath = true
 		config.SAName = "teststorageaccount"
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
@@ -70,6 +104,9 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		if err := config.Validate(); err != nil {
 			t.Fatalf("unexpected validation error: %v", err)
 		}
+
+		assert.NotNil(t, config.ConnectionStringProperties.EntityPath)
+		assert.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
 	})
 
 	t.Run("Connection string does not contain entity path", func(t *testing.T) {
@@ -77,7 +114,6 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config.ProcessorVersion = "v2"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;"
 		config.EventHubName = "my-event-hub"
-		config.ConnectionStringContainsEntityPath = true
 		config.SAName = "teststorageaccount"
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
@@ -85,6 +121,8 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		if err := config.Validate(); err != nil {
 			t.Fatalf("unexpected validation error: %v", err)
 		}
+
+		assert.Nil(t, config.ConnectionStringProperties.EntityPath)
 	})
 
 	t.Run("Connection string contains entity path but does not match event hub name", func(t *testing.T) {
@@ -92,7 +130,6 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config.ProcessorVersion = "v2"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
 		config.EventHubName = "my-event-hub-2"
-		config.ConnectionStringContainsEntityPath = true
 		config.SAName = "teststorageaccount"
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
@@ -100,5 +137,8 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		if err := config.Validate(); err == nil {
 			t.Fatalf("expected validation error")
 		}
+
+		assert.NotNil(t, config.ConnectionStringProperties.EntityPath)
+		assert.NotEqual(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
 	})
 }

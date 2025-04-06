@@ -23,8 +23,8 @@ type azureInputConfig struct {
 	EventHubName string `config:"eventhub" validate:"required"`
 	// ConnectionString is the connection string to connect to the event hub.
 	ConnectionString string `config:"connection_string" validate:"required"`
-	// ConnectionStringContainsEntityPath is a flag to indicate if the connection string contains an entity path.
-	ConnectionStringContainsEntityPath bool `config:"connection_string_contains_entity_path"`
+	// ConnectionStringProperties contains the properties of the connection string.
+	ConnectionStringProperties ConnectionStringProperties
 	// ConsumerGroup is the name of the consumer group to use.
 	ConsumerGroup string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
@@ -124,6 +124,8 @@ func (conf *azureInputConfig) Validate() error {
 	if err != nil {
 		return fmt.Errorf("invalid connection string: %w", err)
 	}
+	conf.ConnectionStringProperties = connectionStringProperties
+
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
@@ -182,18 +184,14 @@ func (conf *azureInputConfig) Validate() error {
 
 		// If the connection string contains an entity path, we need to double
 		// check that it matches the event hub name.
-		if connectionStringProperties.EntityPath != nil {
-			if *connectionStringProperties.EntityPath != conf.EventHubName {
+		if conf.ConnectionStringProperties.EntityPath != nil {
+			if *conf.ConnectionStringProperties.EntityPath != conf.EventHubName {
 				return fmt.Errorf(
 					"invalid connection string: entity path (%s) does not match event hub name (%s)",
-					*connectionStringProperties.EntityPath,
+					*conf.ConnectionStringProperties.EntityPath,
 					conf.EventHubName,
 				)
 			}
-
-			// If the connection string contains an entity path, we need to set the flag
-			// to true, so we can set up the consumer client accordingly.
-			conf.ConnectionStringContainsEntityPath = true
 		}
 	default:
 		return fmt.Errorf(
@@ -227,20 +225,24 @@ func (c *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 }
 
 // validateConnectionStringV2 validates the connection string for processor v2.
-func (conf *azureInputConfig) validateConnectionStringV2(props ConnectionStringProperties) error {
-	// First, check if the connection string is valid. We need to parse it
-	// to get the endpoint and the entity path.
+// func (conf *azureInputConfig) validateConnectionStringV2(props ConnectionStringProperties) error {
+// First, check if the connection string is valid. We need to parse it
+// to get the endpoint and the entity path.
+// // validateConnectionStringV2 validates the connection string for processor v2.
+// func (conf *azureInputConfig) validateConnectionStringV2(props ConnectionStringProperties) error {
+// 	// First, check if the connection string is valid. We need to parse it
+// 	// to get the endpoint and the entity path.
 
-	if props.EntityPath != nil {
-		if *props.EntityPath != conf.EventHubName {
-			return fmt.Errorf("invalid connection string: entity path (%s) does not match event hub name (%s)", *props.EntityPath, conf.EventHubName)
-		}
+// 	if props.EntityPath != nil {
+// 		if *props.EntityPath != conf.EventHubName {
+// 			return fmt.Errorf("invalid connection string: entity path (%s) does not match event hub name (%s)", *props.EntityPath, conf.EventHubName)
+// 		}
 
-		conf.ConnectionStringContainsEntityPath = true
-	}
+// 		conf.ConnectionStringContainsEntityPath = true
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure
 // naming rules.
