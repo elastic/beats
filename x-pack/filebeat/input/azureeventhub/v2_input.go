@@ -151,7 +151,6 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		in.config.SAContainer,
 		&container.ClientOptions{
 			ClientOptions: azcore.ClientOptions{
-				// FIXME: check more pipelineClient creation options.
 				Cloud: cloud.AzurePublic,
 			},
 		},
@@ -189,17 +188,30 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	}
 	in.checkpointStore = checkpointStore
 
-	connectionString := in.config.ConnectionString
+	// There is a mismatch between how the azure-eventhub input and the new
+	// Event Hub SDK expect the event hub name in the connection string.
+	//
+	// The azure-eventhub input was designed to work with the old Event Hub SDK,
+	// which worked using the event hub name in the connection string.
+	//
+	// The new Event Hub SDK expects clients to pass the event hub name as a
+	// parameter, or in the connection string as the entity path.
+	//
+	// We need to handle both cases.
 	eventHubName := in.config.EventHubName
 	if in.config.ConnectionStringProperties.EntityPath != nil {
 		// If the connection string contains an entity path, we need to
 		// set the event hub name to an empty string.
+		//
+		// This is a requirement of the new Event Hub SDK.
+		//
+		// See: https://github.com/Azure/azure-sdk-for-go/blob/4ece3e50652223bba502f2b73e7f297de34a799c/sdk/messaging/azeventhubs/producer_client.go#L304-L306
 		eventHubName = ""
 	}
 
 	// Create the event hub consumerClient to receive events.
 	consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
-		connectionString,
+		in.config.ConnectionString,
 		eventHubName,
 		in.config.ConsumerGroup,
 		nil,
