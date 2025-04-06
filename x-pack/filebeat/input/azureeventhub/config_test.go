@@ -77,7 +77,7 @@ func TestValidateConnectionStringV1(t *testing.T) {
 	t.Run("Connection string does not contain entity path", func(t *testing.T) {
 		config := defaultConfig()
 		config.ProcessorVersion = "v1"
-		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret"
 		config.EventHubName = "my-event-hub"
 		config.SAName = "teststorageaccount"
 		config.SAKey = "my-secret"
@@ -95,7 +95,7 @@ func TestValidateConnectionStringV2(t *testing.T) {
 	t.Run("Connection string contains entity path", func(t *testing.T) {
 		config := defaultConfig()
 		config.ProcessorVersion = "v2"
-		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub"
 		config.EventHubName = "my-event-hub"
 		config.SAName = "teststorageaccount"
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
@@ -129,16 +129,18 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config := defaultConfig()
 		config.ProcessorVersion = "v2"
 		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub"
-		config.EventHubName = "my-event-hub-2"
+		config.EventHubName = "not-my-event-hub"
 		config.SAName = "teststorageaccount"
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		if err := config.Validate(); err == nil {
+		err := config.Validate()
+		if err == nil {
 			t.Fatalf("expected validation error")
 		}
 
 		assert.NotNil(t, config.ConnectionStringProperties.EntityPath)
-		assert.NotEqual(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
+		assert.NotEqual(t, *config.ConnectionStringProperties.EntityPath, config.EventHubName)
+		assert.ErrorContains(t, err, "invalid connection string: entity path (my-event-hub) does not match event hub name (not-my-event-hub)")
 	})
 }

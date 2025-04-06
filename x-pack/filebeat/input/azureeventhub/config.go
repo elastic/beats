@@ -23,7 +23,7 @@ type azureInputConfig struct {
 	EventHubName string `config:"eventhub" validate:"required"`
 	// ConnectionString is the connection string to connect to the event hub.
 	ConnectionString string `config:"connection_string" validate:"required"`
-	// ConnectionStringProperties contains the properties of the connection string.
+	// ConnectionStringProperties contains the parsed version of the connection string.
 	ConnectionStringProperties ConnectionStringProperties
 	// ConsumerGroup is the name of the consumer group to use.
 	ConsumerGroup string `config:"consumer_group"`
@@ -34,6 +34,7 @@ type azureInputConfig struct {
 	// SAConnectionString is used to connect to the storage account (processor v2 only)
 	SAConnectionString string `config:"storage_account_connection_string"`
 	// SAContainer is the name of the storage account container to store
+
 	// partition ownership and checkpoint information.
 	SAContainer string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
@@ -124,19 +125,17 @@ func (conf *azureInputConfig) Validate() error {
 	if err != nil {
 		return fmt.Errorf("invalid connection string: %w", err)
 	}
-	// Store the connection string properties we parsed, so we can use them
-	// in the `azureeventhub` input, when needed.
+	// Store the parsed connection string, so we can use it
+	// later in the input, when needed.
 	conf.ConnectionStringProperties = connectionStringProperties
 	// If the connection string contains an entity path, we need to double
 	// check that it matches the event hub name.
-	if conf.ConnectionStringProperties.EntityPath != nil {
-		if *conf.ConnectionStringProperties.EntityPath != conf.EventHubName {
-			return fmt.Errorf(
-				"invalid connection string: entity path (%s) does not match event hub name (%s)",
-				*conf.ConnectionStringProperties.EntityPath,
-				conf.EventHubName,
-			)
-		}
+	if conf.ConnectionStringProperties.EntityPath != nil && *conf.ConnectionStringProperties.EntityPath != conf.EventHubName {
+		return fmt.Errorf(
+			"invalid connection string: entity path (%s) does not match event hub name (%s)",
+			*conf.ConnectionStringProperties.EntityPath,
+			conf.EventHubName,
+		)
 	}
 
 	if conf.EventHubName == "" {
