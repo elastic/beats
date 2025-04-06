@@ -189,10 +189,18 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	}
 	in.checkpointStore = checkpointStore
 
+	connectionString := in.config.ConnectionString
+	eventHubName := in.config.EventHubName
+	if in.config.ConnectionStringContainsEntityPath {
+		// If the connection string contains an entity path, we need to
+		// set the event hub name to an empty string.
+		eventHubName = ""
+	}
+
 	// Create the event hub consumerClient to receive events.
 	consumerClient, err := azeventhubs.NewConsumerClientFromConnectionString(
-		in.config.ConnectionString,
-		in.config.EventHubName,
+		connectionString,
+		eventHubName,
 		in.config.ConsumerGroup,
 		nil,
 	)

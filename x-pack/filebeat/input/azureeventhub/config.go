@@ -23,6 +23,8 @@ type azureInputConfig struct {
 	EventHubName string `config:"eventhub" validate:"required"`
 	// ConnectionString is the connection string to connect to the event hub.
 	ConnectionString string `config:"connection_string" validate:"required"`
+	// ConnectionStringContainsEntityPath is a flag to indicate if the connection string contains an entity path.
+	ConnectionStringContainsEntityPath bool `config:"connection_string_contains_entity_path"`
 	// ConsumerGroup is the name of the consumer group to use.
 	ConsumerGroup string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
@@ -117,8 +119,10 @@ func defaultConfig() azureInputConfig {
 // Validate validates the config.
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
-	if conf.ConnectionString == "" {
-		return errors.New("no connection string configured")
+
+	connectionStringProperties, err := parseConnectionString(conf.SAConnectionString)
+	if err != nil {
+		return fmt.Errorf("invalid connection string: %w", err)
 	}
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
@@ -144,8 +148,7 @@ func (conf *azureInputConfig) Validate() error {
 		conf.SAContainer = strings.ReplaceAll(conf.SAContainer, "_", "-")
 		logger.Warnf("replaced underscores (_) with hyphens (-) in the storage account container name (before: %s, now: %s", originalValue, conf.SAContainer)
 	}
-	err := storageContainerValidate(conf.SAContainer)
-	if err != nil {
+	if err := storageContainerValidate(conf.SAContainer); err != nil {
 		return err
 	}
 
@@ -176,6 +179,22 @@ func (conf *azureInputConfig) Validate() error {
 		if conf.SAConnectionString == "" {
 			return errors.New("no storage account connection string configured (config: storage_account_connection_string)")
 		}
+
+		// If the connection string contains an entity path, we need to double
+		// check that it matches the event hub name.
+		if connectionStringProperties.EntityPath != nil {
+			if *connectionStringProperties.EntityPath != conf.EventHubName {
+				return fmt.Errorf(
+					"invalid connection string: entity path (%s) does not match event hub name (%s)",
+					*connectionStringProperties.EntityPath,
+					conf.EventHubName,
+				)
+			}
+
+			// If the connection string contains an entity path, we need to set the flag
+			// to true, so we can set up the consumer client accordingly.
+			conf.ConnectionStringContainsEntityPath = true
+		}
 	default:
 		return fmt.Errorf(
 			"invalid processor_version: %s (available versions: %s, %s)",
@@ -205,6 +224,22 @@ func (c *azureInputConfig) checkUnsupportedParams(logger *logp.Logger) {
 			logger.Warnf("storage_account_key is not used in processor v2, please remove it from the configuration (config: storage_account_key)")
 		}
 	}
+}
+
+// validateConnectionStringV2 validates the connection string for processor v2.
+func (conf *azureInputConfig) validateConnectionStringV2(props ConnectionStringProperties) error {
+	// First, check if the connection string is valid. We need to parse it
+	// to get the endpoint and the entity path.
+
+	if props.EntityPath != nil {
+		if *props.EntityPath != conf.EventHubName {
+			return fmt.Errorf("invalid connection string: entity path (%s) does not match event hub name (%s)", *props.EntityPath, conf.EventHubName)
+		}
+
+		conf.ConnectionStringContainsEntityPath = true
+	}
+
+	return nil
 }
 
 // storageContainerValidate validated the storage_account_container to make sure it is conforming to all the Azure
