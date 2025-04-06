@@ -120,7 +120,7 @@ func defaultConfig() azureInputConfig {
 func (conf *azureInputConfig) Validate() error {
 	logger := logp.NewLogger("azureeventhub.config")
 
-	connectionStringProperties, err := parseConnectionString(conf.SAConnectionString)
+	connectionStringProperties, err := parseConnectionString(conf.ConnectionString)
 	if err != nil {
 		return fmt.Errorf("invalid connection string: %w", err)
 	}

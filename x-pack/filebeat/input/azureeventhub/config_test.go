@@ -55,3 +55,50 @@ func TestValidate(t *testing.T) {
 		)
 	})
 }
+
+func TestValidateConnectionStringV2(t *testing.T) {
+	t.Run("Connection string contains entity path", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v2"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
+		config.EventHubName = "my-event-hub"
+		config.ConnectionStringContainsEntityPath = true
+		config.SAName = "teststorageaccount"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
+		config.SAContainer = "filebeat-activitylogs-event_hub_00"
+
+		if err := config.Validate(); err != nil {
+			t.Fatalf("unexpected validation error: %v", err)
+		}
+	})
+
+	t.Run("Connection string does not contain entity path", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v2"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;"
+		config.EventHubName = "my-event-hub"
+		config.ConnectionStringContainsEntityPath = true
+		config.SAName = "teststorageaccount"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
+		config.SAContainer = "filebeat-activitylogs-event_hub_00"
+
+		if err := config.Validate(); err != nil {
+			t.Fatalf("unexpected validation error: %v", err)
+		}
+	})
+
+	t.Run("Connection string contains entity path but does not match event hub name", func(t *testing.T) {
+		config := defaultConfig()
+		config.ProcessorVersion = "v2"
+		config.ConnectionString = "Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=my-key;SharedAccessKey=my-secret;EntityPath=my-event-hub;"
+		config.EventHubName = "my-event-hub-2"
+		config.ConnectionStringContainsEntityPath = true
+		config.SAName = "teststorageaccount"
+		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
+		config.SAContainer = "filebeat-activitylogs-event_hub_00"
+
+		if err := config.Validate(); err == nil {
+			t.Fatalf("expected validation error")
+		}
+	})
+}
