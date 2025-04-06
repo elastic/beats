@@ -19,6 +19,8 @@ package channel
 
 import (
 	"fmt"
+        "runtime"
+        "strings"
 	"testing"
 	"time"
 
@@ -235,6 +237,9 @@ service.type: "module"
 pipeline: "test"
 index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
 `
+        if runtime.GOOS == "illumos"  {
+           configYAML = strings.ReplaceAll(configYAML, "\n  - add_kubernetes_metadata: ~","")
+	}
 	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
 	require.NoError(t, err)
 

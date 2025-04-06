@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !aix
+//go:build !aix && !solaris
 
 package kubernetes
 
