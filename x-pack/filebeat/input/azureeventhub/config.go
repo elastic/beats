@@ -265,7 +265,7 @@ func storageContainerValidate(name string) error {
 		return fmt.Errorf("storage_account_container (%s) must end with a lowercase letter or number", name)
 	}
 	for i := 0; i < length; i++ {
-		if !(unicode.IsLower(runes[i]) || unicode.IsNumber(runes[i]) || runes[i] == '-') {
+		if !unicode.IsLower(runes[i]) && !unicode.IsNumber(runes[i]) && runes[i] != '-' {
 			return fmt.Errorf("rune (%d) of storage_account_container (%s) is not a lowercase letter, number or dash", i, name)
 		}
 		if runes[i] == '-' && previousRune == runes[i] {
