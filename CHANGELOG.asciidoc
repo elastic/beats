@@ -13,6 +13,8 @@ https://github.com/elastic/beats/compare/v8.17.4\...v8.18.0[View commits]
 
 - Removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
 
+*Filebeat*
+
 - The fields produced by the Journald input are updated to better match ECS. Renamed fields:
 Dropped fields: `syslog.priority` and `syslog.facility` while keeping their duplicated equivalent:
 `log.syslog.priority`,`log.syslog.facility.code`. Renamed fields: `syslog.identifier` -> `log.syslog.appname`,
