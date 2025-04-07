@@ -15,26 +15,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package asset
+package gen
 
 import (
 	"bytes"
 	"fmt"
 	"go/format"
-	"math"
 	"strings"
 	"text/template"
-)
 
-type Priority int32
-
-const (
-	Highest          Priority = 1
-	ECSFieldsPri     Priority = 5
-	LibbeatFieldsPri Priority = 10
-	BeatFieldsPri    Priority = 50
-	ModuleFieldsPri  Priority = 100
-	Lowest           Priority = math.MaxInt32
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 var Template = template.Must(template.New("normalizations").Parse(`
@@ -77,7 +67,7 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 
 	// Depending on OS or tools configuration, files can contain carriages (\r),
 	// what leads to different results, remove them before encoding.
-	encData, err := EncodeData(strings.Replace(string(data), "\r", "", -1))
+	encData, err := asset.EncodeData(strings.Replace(string(data), "\r", "", -1))
 	if err != nil {
 		return nil, fmt.Errorf("error encoding the data: %w", err)
 	}
