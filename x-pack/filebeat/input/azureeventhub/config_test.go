@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStorageContainerValidate(t *testing.T) {
@@ -43,9 +44,7 @@ func TestValidate(t *testing.T) {
 		config.SAKey = "secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		if err := config.Validate(); err != nil {
-			t.Fatalf("unexpected validation error: %v", err)
-		}
+		require.NoError(t, config.Validate())
 
 		assert.Equal(
 			t,
@@ -66,10 +65,7 @@ func TestValidateConnectionStringV1(t *testing.T) {
 		config.SAKey = "my-secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		err := config.Validate()
-		require.NoError(t, err, "unexpected validation error)
-		
-
+		require.NoError(t, config.Validate())
 		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
 		assert.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
 	})
@@ -83,11 +79,8 @@ func TestValidateConnectionStringV1(t *testing.T) {
 		config.SAKey = "my-secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		if err := config.Validate(); err != nil {
-			t.Fatalf("unexpected validation error: %v", err)
-		}
-
-		assert.Nil(t, config.ConnectionStringProperties.EntityPath)
+		require.NoError(t, config.Validate())
+		require.Nil(t, config.ConnectionStringProperties.EntityPath)
 	})
 }
 
@@ -101,12 +94,9 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		if err := config.Validate(); err != nil {
-			t.Fatalf("unexpected validation error: %v", err)
-		}
-
+		require.NoError(t, config.Validate())
 		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
-		assert.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
+		require.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
 	})
 
 	t.Run("Connection string does not contain entity path", func(t *testing.T) {
@@ -118,11 +108,8 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config.SAConnectionString = "DefaultEndpointsProtocol=https;AccountName=teststorageaccount;AccountKey=my-secret;EndpointSuffix=core.windows.net"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		if err := config.Validate(); err != nil {
-			t.Fatalf("unexpected validation error: %v", err)
-		}
-
-		assert.Nil(t, config.ConnectionStringProperties.EntityPath)
+		require.NoError(t, config.Validate())
+		require.Nil(t, config.ConnectionStringProperties.EntityPath)
 	})
 
 	t.Run("Connection string contains entity path but does not match event hub name", func(t *testing.T) {
@@ -135,12 +122,10 @@ func TestValidateConnectionStringV2(t *testing.T) {
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
 		err := config.Validate()
-		if err == nil {
-			t.Fatalf("expected validation error")
-		}
-
-		assert.NotNil(t, config.ConnectionStringProperties.EntityPath)
-		assert.NotEqual(t, *config.ConnectionStringProperties.EntityPath, config.EventHubName)
+		require.Error(t, err)
 		assert.ErrorContains(t, err, "invalid connection string: entity path (my-event-hub) does not match event hub name (not-my-event-hub)")
+
+		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
+		require.NotEqual(t, *config.ConnectionStringProperties.EntityPath, config.EventHubName)
 	})
 }
