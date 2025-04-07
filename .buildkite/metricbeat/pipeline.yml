@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -295,6 +293,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Win 2025 Unit Tests"
 
+<<<<<<< HEAD
   - group: "Extended Tests"
     key: "metricbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -348,6 +347,8 @@ steps:
           - github_commit_status:
               context: "metricbeat: macOS arm64 Unit Tests"
 
+=======
+>>>>>>> 553f71e9c (Metricbeat: GH action for macOS 13/14/15 unit tests (#43520))
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
     # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
