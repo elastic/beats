@@ -96,7 +96,6 @@ func parseConnectionString(connStr string) (ConnectionStringProperties, error) {
 			csp.SharedAccessSignature = &value
 		case strings.EqualFold(useEmulator, key):
 			v, err := strconv.ParseBool(value)
-
 			if err != nil {
 				return ConnectionStringProperties{}, err
 			}

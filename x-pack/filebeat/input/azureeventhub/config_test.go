@@ -66,11 +66,11 @@ func TestValidateConnectionStringV1(t *testing.T) {
 		config.SAKey = "my-secret"
 		config.SAContainer = "filebeat-activitylogs-event_hub_00"
 
-		if err := config.Validate(); err != nil {
-			t.Fatalf("unexpected validation error: %v", err)
-		}
+		err := config.Validate()
+		require.NoError(t, err, "unexpected validation error)
+		
 
-		assert.NotNil(t, config.ConnectionStringProperties.EntityPath)
+		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
 		assert.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
 	})
 
@@ -105,7 +105,7 @@ func TestValidateConnectionStringV2(t *testing.T) {
 			t.Fatalf("unexpected validation error: %v", err)
 		}
 
-		assert.NotNil(t, config.ConnectionStringProperties.EntityPath)
+		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
 		assert.Equal(t, config.EventHubName, *config.ConnectionStringProperties.EntityPath)
 	})
 
