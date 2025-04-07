@@ -19,6 +19,7 @@ package inputmon
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -28,16 +29,25 @@ import (
 // NewInputRegistry returns the *monitoring.Registry for metrics related to
 // an input instance, identified by ID. If a registry with the given ID
 // already exists, it is returned. Otherwise, a new registry is created.
+//
 // If a parent registry is provided, it will be used instead of the default
 // 'dataset' monitoring namespace.
-// If parent is nil, inputType and id must be non-empty. Otherwise, the metrics
-// will not be published.
+// If parent is nil, the default 'dataset' namespace is used. Therefore,
+// inputType and id should be non-empty. If either is empty, the returned
+// registry will not be registered in the global 'dataset' namespace. This will
+// cause the metrics to not be available in the HTTP monitoring endpoint.
 //
 // The returned cancel function *must* be called when the input stops to
 // unregister the metrics and prevent resource leaks.
 //
 // Deprecated. Use NewMetricsRegistry instead.
 func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
+	// Log the registration to ease tracking down duplicate ID registrations.
+	// Logged at INFO rather than DEBUG since it is not in a hot path and having
+	// the information available by default can short-circuit requests for debug
+	// logs during support interactions.
+	log := logp.NewLogger("metric_registry")
+
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
 	if parentRegistry == nil {
@@ -53,32 +63,34 @@ func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Regi
 
 	// Sanitize dots from the id because they created nested objects within
 	// the monitoring registry, and we want a consistent flat level of nesting
-	metricsID := sanitizeID(inputID)
+	registryID := sanitizeID(inputID)
 
-	reg = parentRegistry.GetRegistry(metricsID)
+	reg = parentRegistry.GetRegistry(registryID)
 	if reg == nil {
-		reg = parentRegistry.NewRegistry(metricsID)
+		reg = parentRegistry.NewRegistry(registryID)
+	} else {
+		log.Warnw(fmt.Sprintf(
+			"parent metrics registry already contains a %q registry, reusing it",
+			registryID),
+			"input_type", inputType,
+			"input_id", inputID,
+			"registry_id", registryID)
 	}
 
 	monitoring.NewString(reg, "input").Set(inputType)
 	monitoring.NewString(reg, "id").Set(inputID)
 
-	// Log the registration to ease tracking down duplicate ID registrations.
-	// Logged at INFO rather than DEBUG since it is not in a hot path and having
-	// the information available by default can short-circuit requests for debug
-	// logs during support interactions.
-	log := logp.NewLogger("metric_registry")
-
 	log.Infow("registering",
 		"input_type", inputType,
 		"input_id", inputID,
-		"metrics_id", metricsID)
+		"registry_id", registryID)
 
 	return reg, func() {
-		log.Infow("unregistering", "input_type", inputType,
+		log.Infow("unregistering",
+			"input_type", inputType,
 			"input_id", inputID,
-			"metrics_id", metricsID)
-		parentRegistry.Remove(metricsID)
+			"registry_id", registryID)
+		parentRegistry.Remove(registryID)
 	}
 }
 
@@ -112,10 +124,17 @@ func NewMetricsRegistry(
 	parent *monitoring.Registry,
 	log *logp.Logger) *monitoring.Registry {
 
-	metricsID := sanitizeID(inputID)
-	reg := parent.GetRegistry(metricsID)
+	registryID := sanitizeID(inputID)
+	reg := parent.GetRegistry(registryID)
 	if reg == nil {
-		reg = parent.NewRegistry(metricsID)
+		reg = parent.NewRegistry(registryID)
+	} else {
+		log.Warnw(fmt.Sprintf(
+			"parent metrics registry already contains a %q registry, reusing it",
+			registryID),
+			"registry_id", registryID,
+			"input_type", inputType,
+			"input_id", inputID)
 	}
 
 	// add the necessary information so the registry can be published by the
@@ -124,7 +143,7 @@ func NewMetricsRegistry(
 	monitoring.NewString(reg, "id").Set(inputID)
 
 	log.Named("metric_registry").Infow("registering",
-		"metrics_id", metricsID,
+		"registry_id", registryID,
 		"input_id", inputID,
 		"input_type", inputType)
 
@@ -140,7 +159,7 @@ func CancelMetricsRegistry(
 
 	metricsID := sanitizeID(inputID)
 	log.Named("metric_registry").Infow("unregistering",
-		"metrics_id", metricsID,
+		"registry_id", metricsID,
 		"input_id", inputID,
 		"input_type", inputType)
 
