@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v9.0.0-rc1\...v9.0.0[View commits]
 
 *Metricbeat*
 
-- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+- Add a warning log to `metricbeat.vsphere` in case vSphere connection has been configured as insecure. {pull}43104[43104]
 
 
 [[release-notes-9.0.0-rc1]]
