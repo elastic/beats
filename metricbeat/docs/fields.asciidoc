@@ -55669,7 +55669,7 @@ type: long
 Time spent reading data file blocks by backends in this database, in milliseconds.
 
 
-type: long
+type: double
 
 --
 
@@ -55679,7 +55679,7 @@ type: long
 Time spent writing data file blocks by backends in this database, in milliseconds.
 
 
-type: long
+type: double
 
 --
 
