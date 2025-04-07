@@ -3,6 +3,196 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-9.0.0]]
+=== Beats version 9.0.0
+https://github.com/elastic/beats/compare/v9.0.0-rc1\...v9.0.0[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+
+*Packetbeat*
+
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+
+*Winlogbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Libbeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+
+*Functionbeat*
+
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-9.0.0-rc1]]
 === Beats version 9.0.0-rc1
 https://github.com/elastic/beats/compare/v9.0.0-beta1\...v9.0.0-rc1[View commits]
