@@ -153,7 +153,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 			// When run under agent via agentbeat there is no modules directory and this is expected.
 			log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
 		}
-		return &ModuleRegistry{log: log}, nil //nolint:nilerr // empty registry, no error
+		return &ModuleRegistry{log: log}, nil
 	}
 
 	var modulesCLIList []string

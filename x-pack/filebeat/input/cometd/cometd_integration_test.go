@@ -55,7 +55,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 
 func TestInput(t *testing.T) {
 	t.Skip("flaky test: https://github.com/elastic/beats/issues/33423")
-	logp.TestingSetup(logp.WithSelectors("cometd input", "cometd"))
 
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{

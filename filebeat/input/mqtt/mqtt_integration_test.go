@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
+
 package mqtt
 
 import (
@@ -43,8 +45,8 @@ const (
 
 var (
 	hostPort = fmt.Sprintf("tcp://%s:%s",
-		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "localhost"),
-		getOrDefault(os.Getenv("MOSQUITTO_PORT"), "1883"))
+		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "localhost"), //nolint:misspell //required
+		getOrDefault(os.Getenv("MOSQUITTO_PORT"), "1883"))      //nolint:misspell //required
 	topic = fmt.Sprintf("topic-%d", time.Now().UnixNano())
 )
 

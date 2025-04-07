@@ -461,7 +461,7 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
 			}
 		default:
-			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder) //nolint:staticcheck //Keep olf behavior
 		}
 	case "filename":
 		switch scanOrder {
@@ -477,7 +477,7 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
 		}
 	default:
-		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort)
+		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort) //nolint:staticcheck //Keep olf behavior
 	}
 
 	sort.Slice(sortInfos, sortFunc)

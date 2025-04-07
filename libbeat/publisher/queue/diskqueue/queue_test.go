@@ -42,7 +42,7 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	r := rand.New(rand.NewPCG(uint64(seed), 0))
+	r := rand.New(rand.NewPCG(uint64(seed), 0)) //nolint:gosec //Safe to ignore in tests
 	events := r.IntN(maxEvents-minEvents) + minEvents
 	batchSize := r.IntN(events-8) + 4
 	bufferSize := r.IntN(batchSize*2) + 4
