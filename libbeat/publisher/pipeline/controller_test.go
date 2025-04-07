@@ -73,7 +73,7 @@ func TestOutputReload(t *testing.T) {
 				logger := logp.NewTestingLogger(t, "")
 				pipeline, err := New(
 					beat.Info{Logger: logger},
-					Monitors{},
+					Monitors{Logger: logger},
 					queueConfig,
 					outputs.Group{},
 					Settings{},
@@ -142,6 +142,7 @@ func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 }
 
 func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
+	logger := logp.NewTestingLogger(t, "")
 	controller := outputController{
 		// Set event limit to 1 so we can easily tell if our settings
 		// were used to create the queue.
@@ -154,6 +155,9 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 			// send configuration updates without blocking.
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	// Set to an empty output group. This should not create a queue.

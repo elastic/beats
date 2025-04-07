@@ -78,7 +78,7 @@ func generate(
 	if m := config.PublishMode; m != "" {
 		mode, exists := publishModes[m]
 		if !exists {
-			err := fmt.Errorf("Unknown publish mode '%v'", mode)
+			err := fmt.Errorf("unknown publish mode '%v'", mode)
 			if errors != nil {
 				errors(err)
 			}
