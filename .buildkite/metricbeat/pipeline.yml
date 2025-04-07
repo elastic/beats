@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -273,6 +271,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Win 2019 Unit Tests"
 
+<<<<<<< HEAD
   - group: "Extended Tests"
     key: "metricbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -325,6 +324,34 @@ steps:
         notify:
           - github_commit_status:
               context: "metricbeat: macOS arm64 Unit Tests"
+=======
+      - label: ":windows: Metricbeat: Win 2025 Unit Tests"
+        command: |
+          Set-Location -Path metricbeat
+          mage build unitTest
+        key: "extended-win-2025-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2025}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Win 2025 Unit Tests"
+>>>>>>> 553f71e9c (Metricbeat: GH action for macOS 13/14/15 unit tests (#43520))
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
