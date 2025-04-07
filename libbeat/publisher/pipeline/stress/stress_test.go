@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/stretchr/testify/require"
 )
 
 // additional flags
@@ -50,7 +51,8 @@ func TestPipeline(t *testing.T) {
 	pipelineConfigs := collectConfigs(t, "configs/pipeline/*.yml")
 	outConfigs := collectConfigs(t, "configs/out/*.yml")
 
-	logger := logp.NewTestingLogger(t, "")
+	logger, err := logp.DevelopmentLogger("")
+	require.NoError(t, err)
 	info := beat.Info{
 		Beat:     "stresser",
 		Version:  "0",
