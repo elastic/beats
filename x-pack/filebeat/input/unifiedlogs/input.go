@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -28,6 +29,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -107,7 +109,6 @@ func (input input) Test(src inputcursor.Source, _ v2.TestContext) error {
 func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor inputcursor.Cursor, pub inputcursor.Publisher) error {
 	reg, unreg := inputmon.NewInputRegistry(input.Name(), ctxt.ID, nil)
 	defer unreg()
-	input.metrics = newInputMetrics(reg)
 
 	stdCtx := ctxtool.FromCanceller(ctxt.Cancelation)
 	log := ctxt.Logger.With("source", src.Name())
@@ -120,10 +121,11 @@ func (input *input) Run(ctxt v2.Context, src inputcursor.Source, resumeCursor in
 		input.ShowConfig.Start = startFrom
 	}
 
-	return input.runWithMetrics(stdCtx, pub, log)
+	return input.runWithMetrics(stdCtx, pub, reg, log)
 }
 
-func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publisher, log *logp.Logger) error {
+func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publisher, reg *monitoring.Registry, log *logp.Logger) error {
+	input.metrics = newInputMetrics(reg)
 	// we create a wrapped publisher for the streaming go routine.
 	// It will notify the backfilling goroutine with the end date of the
 	// backfilling period and avoid updating the stored date to resume
@@ -212,7 +214,7 @@ func (input *input) runLogCmd(ctx context.Context, logCmd *exec.Cmd, pub inputcu
 }
 
 func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log *logp.Logger) error {
-	scanner := bufio.NewScanner(stdout)
+	reader := bufio.NewReader(stdout)
 
 	var (
 		event         beat.Event
@@ -222,8 +224,17 @@ func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log
 		err           error
 	)
 
-	for scanner.Scan() {
-		line = scanner.Text()
+	for {
+		line, err = reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+		if line = strings.Trim(line, " \n\t\r"); line == "" {
+			continue
+		}
 		if err = json.Unmarshal([]byte(line), &logRecordLine); err != nil {
 			log.Errorf("invalid json log: %v", err)
 			input.metrics.errs.Add(1)
@@ -248,12 +259,6 @@ func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log
 			continue
 		}
 	}
-	if err = scanner.Err(); err != nil {
-		input.metrics.errs.Add(1)
-		return fmt.Errorf("scanning stdout: %w", err)
-	}
-
-	return nil
 }
 
 // wrappedPublisher wraps a publisher and stores the first published event date.
