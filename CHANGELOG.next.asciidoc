@@ -134,6 +134,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
+- Restore `maintainer` label for container images {pull}43683[43683]
 
 *Auditbeat*
 
@@ -250,6 +251,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 
 *Osquerybeat*
 
