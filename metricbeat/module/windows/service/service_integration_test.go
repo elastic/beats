@@ -29,6 +29,11 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+<<<<<<< HEAD
+=======
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+>>>>>>> b4e461107 (fix integration test (#43727))
 )
 
 type Win32Service struct {
@@ -54,7 +59,7 @@ func TestData(t *testing.T) {
 }
 
 func TestReadService(t *testing.T) {
-	reader, err := NewReader()
+	reader, err := NewReader(logp.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
