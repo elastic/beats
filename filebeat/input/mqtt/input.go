@@ -188,7 +188,7 @@ func (mi *mqttInput) Stop() {
 
 	mi.clientDisconnected.Add(1)
 	go func() {
-		mi.client.Disconnect(uint(disconnectTimeout.Milliseconds()))
+		mi.client.Disconnect(uint(disconnectTimeout.Milliseconds())) //nolint:gosec //can ignore
 		mi.clientDisconnected.Done()
 	}()
 }

@@ -172,6 +172,7 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 }
 
 func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
+	logger := logp.NewTestingLogger(t, "")
 	// If there are queue settings provided by both the pipeline and
 	// the output, the output settings should be used.
 	controller := outputController{
@@ -181,6 +182,9 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	controller.Set(outputs.Group{
