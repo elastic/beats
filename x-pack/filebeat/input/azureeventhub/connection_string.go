@@ -96,6 +96,7 @@ func parseConnectionString(connStr string) (ConnectionStringProperties, error) {
 			csp.SharedAccessSignature = &value
 		case strings.EqualFold(useEmulator, key):
 			v, err := strconv.ParseBool(value)
+
 			if err != nil {
 				return ConnectionStringProperties{}, err
 			}
@@ -105,14 +106,13 @@ func parseConnectionString(connStr string) (ConnectionStringProperties, error) {
 	}
 
 	if csp.Emulator {
-		// check that they're only connecting to localhost
 		endpointParts := strings.SplitN(csp.Endpoint, ":", 3) // allow for a port, if it exists.
 
-		if len(endpointParts) < 2 || endpointParts[0] != "sb" || endpointParts[1] != "//localhost" {
-			// there should always be at least two parts "sb:" and "//localhost"
+		if len(endpointParts) < 2 || endpointParts[0] != "sb" {
+			// there should always be at least two parts "sb:" and "//<emulator hostname>"
 			// with an optional 3rd piece that's the port "1111".
 			// (we don't need to validate it's a valid host since it's been through url.Parse() above)
-			return ConnectionStringProperties{}, fmt.Errorf("UseDevelopmentEmulator=true can only be used with sb://localhost or sb://localhost:<port number>, not %s", csp.Endpoint)
+			return ConnectionStringProperties{}, fmt.Errorf("UseDevelopmentEmulator=true can only be used with sb://<emulator hostname> or sb://<emulator hostname>:<port number>, not %s", csp.Endpoint)
 		}
 	}
 
