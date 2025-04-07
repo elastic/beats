@@ -250,55 +250,6 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(aws).*/
 
     steps:
-<<<<<<< HEAD
-      - label: ":mac: x-pack/metricbeat: macOS x86_64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/metricbeat && mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: macOS x86_64 Unit Tests"
-
-      - label: ":mac: x-pack/metricbeat: macOS arm64 Unit Tests"
-        skip: "Skipping due to elastic/beats#33036 & elastic/beats#40496"
-        # https://github.com/elastic/beats/issues/33036 https://github.com/elastic/beats/issues/40496
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/metricbeat && mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: macOS arm64 Unit Tests"
-
-=======
->>>>>>> 90a16e5b0 (x-pack/metricbeat: GH action for macOS 13/14/15 unit tests (#43526))
       - label: ":ubuntu: x-pack/metricbeat: AWS Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
