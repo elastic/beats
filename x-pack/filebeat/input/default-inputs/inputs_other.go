@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics"
-	//"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/gcs"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/http_endpoint"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/lumberjack"
@@ -36,7 +36,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2
 		cel.Plugin(log, store),
 		cloudfoundry.Plugin(),
 		entityanalytics.Plugin(log),
-		//gcs.Plugin(log, store),
+		gcs.Plugin(log, store),
 		http_endpoint.Plugin(),
 		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
