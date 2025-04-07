@@ -40,9 +40,18 @@ type Index struct {
 	Primaries primaries `json:"primaries"`
 	Total     total     `json:"total"`
 
+<<<<<<< HEAD
 	Index  string     `json:"index"`
 	Status string     `json:"status"`
 	Shards shardStats `json:"shards"`
+=======
+	Index          string     `json:"index"`
+	Status         string     `json:"status"`
+	TierPreference string     `json:"tier_preference,omitempty"`
+	CreationDate   string     `json:"creation_date,omitempty"`
+	Version        string     `json:"version,omitempty"`
+	Shards         shardStats `json:"shards"`
+>>>>>>> 999fcb65b (Added omitempty on new elasticsearch package fields (#43637))
 }
 
 type primaries struct {
