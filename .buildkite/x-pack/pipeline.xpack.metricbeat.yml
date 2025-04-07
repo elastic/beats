@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -29,11 +27,6 @@ env:
 
   # Module tests
   BEAT_PATH: "x-pack/metricbeat"
-
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
 
   # Platforms to be used for FIPS packaging nodes
   PLATFORMS_AMD64_FIPS: "+all linux/amd64"
@@ -254,9 +247,10 @@ steps:
 
   - group: "Extended Tests"
     key: "x-pack-metricbeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|aws).*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(aws).*/
 
     steps:
+<<<<<<< HEAD
       - label: ":mac: x-pack/metricbeat: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -303,6 +297,8 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: macOS arm64 Unit Tests"
 
+=======
+>>>>>>> 90a16e5b0 (x-pack/metricbeat: GH action for macOS 13/14/15 unit tests (#43526))
       - label: ":ubuntu: x-pack/metricbeat: AWS Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
