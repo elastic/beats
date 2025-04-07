@@ -100,7 +100,7 @@ func NewInput(
 	// we still allow the deprecated log input running under integrations and
 	// modules until they are all migrated to filestream
 	if !AllowDeprecatedUse(cfg) {
-		return nil, fmt.Errorf("Found log input configuration: %w\n%s", errDeprecated, conf.DebugString(cfg, true))
+		return nil, fmt.Errorf("Found log input configuration: %w\n%s", errDeprecated, conf.DebugString(cfg, true)) //nolint:staticcheck //Keep old behavior
 	}
 
 	cleanupNeeded := true
@@ -461,7 +461,7 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return sortInfos[i].info.ModTime().After(sortInfos[j].info.ModTime())
 			}
 		default:
-			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder) //nolint:staticcheck //Keep olf behavior
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder) //nolint:staticcheck //Keep old behavior
 		}
 	case "filename":
 		switch scanOrder {
@@ -474,10 +474,10 @@ func getSortedFiles(scanOrder string, scanSort string, sortInfos []FileSortInfo)
 				return strings.Compare(sortInfos[i].info.Name(), sortInfos[j].info.Name()) > 0
 			}
 		default:
-			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder)
+			return nil, fmt.Errorf("Unexpected value for scan.order: %v", scanOrder) //nolint:staticcheck //Keep old behavior
 		}
 	default:
-		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort) //nolint:staticcheck //Keep olf behavior
+		return nil, fmt.Errorf("Unexpected value for scan.sort: %v", scanSort) //nolint:staticcheck //Keep old behavior
 	}
 
 	sort.Slice(sortInfos, sortFunc)

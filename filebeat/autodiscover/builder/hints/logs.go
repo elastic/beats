@@ -175,9 +175,10 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 			filesets := l.getFilesets(hints, module)
 			for fileset, cfg := range filesets {
 				filesetConf, _ := conf.NewConfigFrom(config)
-				if inputType == harvester.ContainerType {
+				switch inputType {
+				case harvester.ContainerType:
 					_ = filesetConf.SetString("stream", -1, cfg.Stream)
-				} else if inputType == harvester.FilestreamType {
+				case harvester.FilestreamType:
 					filestreamContainerParser := map[string]interface{}{
 						"container": map[string]interface{}{
 							"stream": cfg.Stream,
@@ -186,7 +187,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 					}
 					parserCfg, _ := conf.NewConfigFrom(filestreamContainerParser)
 					_ = filesetConf.SetChild("parsers", 0, parserCfg)
-				} else {
+				default:
 					_ = filesetConf.SetString("containers.stream", -1, cfg.Stream)
 				}
 

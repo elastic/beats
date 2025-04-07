@@ -20,7 +20,7 @@ package main
 import (
 	"flag"
 	"log"
-	_ "net/http/pprof"
+	_ "net/http/pprof" //nolint:gosec //Keep behavior
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"

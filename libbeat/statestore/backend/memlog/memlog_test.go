@@ -20,7 +20,6 @@ package memlog
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -78,11 +77,7 @@ func TestLoadVersion1(t *testing.T) {
 }
 
 func testLoadVersion1Case(t *testing.T, dataPath string) {
-	path, err := ioutil.TempDir("", "")
-	if err != nil {
-		t.Fatalf("Failed to create temporary test directory: %v", err)
-	}
-	defer os.RemoveAll(path)
+	path := t.TempDir()
 
 	t.Logf("Test tmp dir: %v", path)
 
@@ -91,7 +86,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 	}
 
 	// load expected test results
-	raw, err := ioutil.ReadFile(filepath.Join(path, "expected.json"))
+	raw, err := os.ReadFile(filepath.Join(path, "expected.json"))
 	if err != nil {
 		t.Fatalf("Failed to load expected.json: %v", err)
 	}
@@ -209,7 +204,7 @@ func copyDir(to, from string) error {
 		}
 	}
 
-	list, err := ioutil.ReadDir(from)
+	list, err := os.ReadDir(from)
 	if err != nil {
 		return err
 	}
