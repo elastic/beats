@@ -53,7 +53,11 @@ func TestData(t *testing.T) {
 }
 
 func TestReadService(t *testing.T) {
+<<<<<<< HEAD
 	reader, err := NewReader(logp.L())
+=======
+	reader, err := NewReader(logp.NewTestingLogger(t, ""))
+>>>>>>> b4e461107 (fix integration test (#43727))
 	if err != nil {
 		t.Fatal(err)
 	}
