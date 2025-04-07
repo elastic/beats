@@ -129,7 +129,7 @@ func TestNewConnectionStringProperties(t *testing.T) {
 		// in testing with multiple containers, where the hostname will not be localhost but development
 		// will still be local.
 		cs = "Endpoint=sb://myserver.com:6765;SharedAccessKeyName=" + keyName + ";SharedAccessKey=" + secret + ";UseDevelopmentEmulator=true"
-		parsed, err = parseConnectionString(cs)
+		_, err = parseConnectionString(cs)
 		require.NoError(t, err)
 
 		// there's no reason for a person to pass False, but it's allowed.
