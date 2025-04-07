@@ -21,7 +21,6 @@ on:
     paths:
       - metricbeat/
       - x-pack/metricbeat/
-      - x-pack/libbeat/common/aws
       # OSS
       - go.mod
       - dev-tools/

@@ -39,7 +39,6 @@ steps:
       - label: "x-pack/metricbeat: Run check/update"
         command: |
           set -eo pipefail
-          pip3 install wheel
           make -C x-pack/metricbeat check update
           make check-no-changes
         retry:
