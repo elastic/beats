@@ -19,7 +19,7 @@ package diskqueue
 
 import (
 	"flag"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
@@ -42,10 +42,10 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	rand.Seed(seed)
-	events := rand.Intn(maxEvents-minEvents) + minEvents
-	batchSize := rand.Intn(events-8) + 4
-	bufferSize := rand.Intn(batchSize*2) + 4
+	r := rand.New(rand.NewPCG(uint64(seed), 0))
+	events := r.IntN(maxEvents-minEvents) + minEvents
+	batchSize := r.IntN(events-8) + 4
+	bufferSize := r.IntN(batchSize*2) + 4
 
 	// events := 4
 	// batchSize := 1

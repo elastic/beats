@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -253,7 +252,7 @@ func mcfgFromConfig(cfg *conf.C) (*ModuleConfig, error) {
 
 func getCurrentModuleName(modulePath, module string) (string, bool) {
 	moduleConfigPath := filepath.Join(modulePath, module, "module.yml")
-	d, err := ioutil.ReadFile(moduleConfigPath)
+	d, err := os.ReadFile(moduleConfigPath)
 	if err != nil {
 		return module, false
 	}
@@ -271,7 +270,7 @@ func getCurrentModuleName(modulePath, module string) (string, bool) {
 
 func getModuleFilesets(modulePath, module string) ([]string, error) {
 	module, _ = getCurrentModuleName(modulePath, module)
-	fileInfos, err := ioutil.ReadDir(filepath.Join(modulePath, module))
+	fileInfos, err := os.ReadDir(filepath.Join(modulePath, module))
 	if err != nil {
 		return []string{}, err
 	}

@@ -20,7 +20,6 @@ package registrar
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -81,7 +80,7 @@ func (m *Migrator) Run() error {
 		return err
 	}
 
-	m.logger.Debugf("registrar", "Registry type '%v' found", version)
+	m.logger.Named("registrar").Debugf("Registry type '%v' found", version)
 
 	for {
 		switch version {
@@ -242,7 +241,7 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 		return fmt.Errorf("migration complete but failed to remove original data file: %v: %w", origDataFile, err)
 	}
 
-	if err := ioutil.WriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
+	if err := os.WriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
 		return fmt.Errorf("failed to update the meta.json file: %w", err)
 	}
 
@@ -263,7 +262,7 @@ func readVersion(regHome, migrateFile string) (registryVersion, error) {
 		return noRegistry, nil
 	}
 
-	tmp, err := ioutil.ReadFile(metaFile)
+	tmp, err := os.ReadFile(metaFile)
 	if err != nil {
 		return noRegistry, fmt.Errorf("failed to open meta file: %w", err)
 	}

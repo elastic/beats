@@ -129,7 +129,10 @@ func NewBuilders(
 		}
 
 		// pass rest of hints settings to the builder
-		hintsCfg.SetString("type", -1, "hints")
+		err := hintsCfg.SetString("type", -1, "hints")
+		if err != nil {
+			return Builders{}, err
+		}
 		bConfigs = append(bConfigs, hintsCfg)
 	}
 

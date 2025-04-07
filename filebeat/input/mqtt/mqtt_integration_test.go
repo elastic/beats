@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
-
 package mqtt
 
 import (
@@ -82,7 +80,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("mqtt input", "libmqtt"))
 
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{

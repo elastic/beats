@@ -118,10 +118,10 @@ func NewInput(
 		return nil, err
 	}
 	if err := inputConfig.resolveRecursiveGlobs(); err != nil {
-		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err)
+		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 	if err := inputConfig.normalizeGlobPatterns(); err != nil {
-		return nil, fmt.Errorf("Failed to normalize globs patterns: %w", err)
+		return nil, fmt.Errorf("Failed to normalize globs patterns: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 
 	if len(inputConfig.Paths) == 0 {

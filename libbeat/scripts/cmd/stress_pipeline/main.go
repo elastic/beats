@@ -19,7 +19,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	_ "net/http/pprof"
 	"time"
@@ -71,7 +70,7 @@ func run() error {
 	flag.Parse()
 
 	files := flag.Args()
-	fmt.Println("load config files:", files)
+	logger.Infof("load config files:", files)
 
 	cfg, err := common.LoadFiles(files...)
 	if err != nil {

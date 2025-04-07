@@ -208,7 +208,6 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 
 		b, err := encoder.Encode(info.Beat, event)
 		if err != nil {
-			//nolint:nilerr // encoder failure is not considered an error by this processor [why not?]
 			return event, nil
 		}
 

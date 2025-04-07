@@ -18,6 +18,8 @@
 package input
 
 import (
+	"errors"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/registrar"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -63,7 +65,7 @@ func (r *RunnerFactory) Create(
 
 func (r *RunnerFactory) CheckConfig(cfg *conf.C) error {
 	runner, err := r.Create(pipeline.NewNilPipeline(), cfg)
-	if _, ok := err.(*common.ErrInputNotFinished); ok {
+	if errors.As(err, &common.ErrInputNotFinished{}) {
 		// error is related to state, and hence config can be considered valid
 		return nil
 	}

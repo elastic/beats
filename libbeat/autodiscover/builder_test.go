@@ -41,7 +41,8 @@ func newFakeBuilder(_ *conf.C, logger *logp.Logger) (Builder, error) {
 func TestBuilderRegistry(t *testing.T) {
 	// Add a new builder
 	reg := NewRegistry()
-	reg.AddBuilder("fake", newFakeBuilder)
+	err := reg.AddBuilder("fake", newFakeBuilder)
+	assert.NoError(t, err)
 
 	// Check if that builder is available in registry
 	b := reg.GetBuilder("fake")

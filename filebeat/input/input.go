@@ -149,7 +149,7 @@ func (p *Runner) Run() {
 			p.logger.Info("input ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
-			p.logger.Debug("input", "Run input")
+			p.logger.Named("input").Debug("Run input")
 			p.input.Run()
 		}
 	}

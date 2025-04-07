@@ -122,7 +122,7 @@ func TestClient(t *testing.T) {
 					continue
 				}
 				for i := 0; i < batch.Count(); i++ {
-					e := batch.Entry(i).(publisher.Event)
+					e := batch.Entry(i).(publisher.Event) //nolint:errcheck //Safe to ignore in tests
 					received = append(received, e.Content)
 				}
 				batch.Done()
@@ -349,7 +349,7 @@ func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool) (be
 
 // Processors returns a list of config strings for the given processor, for debug purposes
 func (p testProcessorSupporter) Processors() []string {
-	return []string{p.Processor.String()}
+	return []string{p.String()}
 }
 
 // Close the processor supporter

@@ -269,7 +269,7 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 		syslog["version"] = ev.Version()
 	}
 
-	if ev.data != nil && len(ev.data) > 0 {
+	if len(ev.data) > 0 {
 		syslog["data"] = ev.data
 	}
 

@@ -138,7 +138,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 	// check store does not contain any additional keys
 	func() {
 		err = store.Each(func(key string, val statestore.ValueDecoder) (bool, error) {
-			_, exists := expected.Entries[string(key)]
+			_, exists := expected.Entries[key]
 			if !exists {
 				t.Errorf("unexpected key: %s", key)
 			}
@@ -249,9 +249,4 @@ func copyFile(to, from string) error {
 func isDir(path string) bool {
 	info, err := os.Stat(path)
 	return err == nil && info.IsDir()
-}
-
-func isFile(path string) bool {
-	info, err := os.Stat(path)
-	return err == nil && info.Mode().IsRegular()
 }
