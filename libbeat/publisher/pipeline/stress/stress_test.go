@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // additional flags
@@ -50,13 +49,11 @@ func TestPipeline(t *testing.T) {
 	pipelineConfigs := collectConfigs(t, "configs/pipeline/*.yml")
 	outConfigs := collectConfigs(t, "configs/out/*.yml")
 
-	logger := logp.NewTestingLogger(t, "")
 	info := beat.Info{
 		Beat:     "stresser",
 		Version:  "0",
 		Name:     "stresser.test",
 		Hostname: "stresser.test",
-		Logger:   logger,
 	}
 
 	if duration == 0 {
@@ -66,14 +63,14 @@ func TestPipeline(t *testing.T) {
 	configTest(t, "gen", genConfigs, func(t *testing.T, gen string) {
 		configTest(t, "pipeline", pipelineConfigs, func(t *testing.T, pipeline string) {
 			configTest(t, "out", outConfigs, func(t *testing.T, out string) {
-
-				start := time.Now()
-				fmt.Printf("%v Start stress test %v\n", start.Format(time.RFC3339), t.Name())
-				defer func() {
-					end := time.Now()
-					fmt.Printf("%v Finished stress test %v. Duration=%v\n", end.Format(time.RFC3339), t.Name(), end.Sub(start))
-				}()
-
+				if testing.Verbose() {
+					start := time.Now()
+					fmt.Printf("%v Start stress test %v\n", start.Format(time.RFC3339), t.Name())
+					defer func() {
+						end := time.Now()
+						fmt.Printf("%v Finished stress test %v. Duration=%v\n", end.Format(time.RFC3339), t.Name(), end.Sub(start))
+					}()
+				}
 				config, err := common.LoadFiles(gen, pipeline, out)
 				if err != nil {
 					t.Fatal(err)

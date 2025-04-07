@@ -212,6 +212,9 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 		monitors: Monitors{
 			Logger: logger.Named("tests"),
 		},
+		beat: beat.Info{
+			Logger: logger,
+		},
 	}
 	controller.Set(outputs.Group{
 		Clients: []outputs.Client{newMockClient(nil)},
@@ -221,11 +224,15 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 }
 
 func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
+	logger := logp.NewTestingLogger(t, "")
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	// Send producer requests from different goroutines. They should all
@@ -263,6 +270,7 @@ func TestQueueMetrics(t *testing.T) {
 	// here we just want to make sure that they appear under the right
 	// monitoring namespace.
 	reg := monitoring.NewRegistry()
+	logger := logp.NewTestingLogger(t, "")
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1000}),
 		consumer: &eventConsumer{
@@ -270,6 +278,9 @@ func TestQueueMetrics(t *testing.T) {
 			retryObserver: nilObserver,
 		},
 		monitors: Monitors{Metrics: reg},
+		beat: beat.Info{
+			Logger: logger,
+		},
 	}
 	controller.Set(outputs.Group{
 		Clients: []outputs.Client{newMockClient(nil)},

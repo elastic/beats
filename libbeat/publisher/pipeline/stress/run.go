@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type config struct {
@@ -58,7 +59,7 @@ func RunTests(
 		return fmt.Errorf("unpacking config failed: %w", err)
 	}
 
-	log := info.Logger
+	log := logp.L()
 
 	processing, err := processing.MakeDefaultSupport(false, nil)(info, log, cfg)
 	if err != nil {
