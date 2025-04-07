@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//nolint:gosec // false positive
 const googleApplicationCredentialsVar = "GOOGLE_APPLICATION_CREDENTIALS"
 
 func TestConfigValidateGoogleAppDefaultCreds(t *testing.T) {
