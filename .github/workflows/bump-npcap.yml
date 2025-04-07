@@ -1,0 +1,19 @@
+---
+name: bump-golang
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 20 * * 6"
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Updatecli in the runner
+        uses: updatecli/updatecli-action@b0d4fd84ae72108930c9adb83bb4beba1acbaf9f # v2.79.0
