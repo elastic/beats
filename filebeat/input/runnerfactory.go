@@ -65,7 +65,8 @@ func (r *RunnerFactory) Create(
 
 func (r *RunnerFactory) CheckConfig(cfg *conf.C) error {
 	runner, err := r.Create(pipeline.NewNilPipeline(), cfg)
-	if errors.As(err, &common.ErrInputNotFinished{}) {
+	var c *common.ErrInputNotFinished
+	if errors.As(err, &c) {
 		// error is related to state, and hence config can be considered valid
 		return nil
 	}

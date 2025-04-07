@@ -291,7 +291,9 @@ func TestMonitoring(t *testing.T) {
 	telemetry := monitoring.NewRegistry()
 	logger := logp.NewTestingLogger(t, "")
 	pipeline, err := Load(
-		beat.Info{},
+		beat.Info{
+			Logger: logger,
+		},
 		Monitors{
 			Metrics:   metrics,
 			Telemetry: telemetry,
