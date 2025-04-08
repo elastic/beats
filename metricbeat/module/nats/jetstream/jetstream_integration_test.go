@@ -22,9 +22,10 @@ package jetstream
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestData(t *testing.T) {
