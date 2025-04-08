@@ -32,7 +32,7 @@ else
     ARCH_SUFFIX=amd64
 fi
 
-if curl -sSLo "${KUBECTL_CMD}" "https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/${OS}/${ARCH_SUFFIX}/kubectl" ; then
+if curl -sSLo "${KUBECTL_CMD}" "https://dl.k8s.io/release/${K8S_VERSION}/bin/${OS}/${ARCH_SUFFIX}/kubectl" ; then
     chmod +x "${KUBECTL_CMD}"
 else
     echo "Something bad with the download, let's delete the corrupted binary"
