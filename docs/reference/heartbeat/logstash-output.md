@@ -12,7 +12,7 @@ The {{ls}} output sends events directly to {{ls}} by using the lumberjack protoc
 ::::{admonition} Prerequisite
 :class: important
 
-To send events to {{ls}}, you also need to create a {{ls}} configuration pipeline that listens for incoming Beats connections and indexes the received events into {{es}}. For more information, see [Getting Started with {{ls}}](logstash://reference/getting-started-with-logstash.md). Also see the documentation for the [{{beats}} input](logstash://reference/plugins-inputs-beats.md) and [{{es}} output](logstash://reference/plugins-outputs-elasticsearch.md) plugins.
+To send events to {{ls}}, you also need to create a {{ls}} configuration pipeline that listens for incoming Beats connections and indexes the received events into {{es}}. For more information, see [Getting Started with {{ls}}](logstash://reference/getting-started-with-logstash.md). Also see the documentation for the [{{beats}} input](logstash-docs-md://lsr/plugins-inputs-beats.md) and [{{es}} output](logstash-docs-md://lsr/plugins-outputs-elasticsearch.md) plugins.
 ::::
 
 
@@ -33,12 +33,12 @@ For this configuration, you must [load the index template into {{es}} manually](
 
 Every event sent to {{ls}} contains the following metadata fields that you can use in {{ls}} for indexing and filtering:
 
-```json
+```json subs=true
 {
     ...
     "@metadata": { <1>
       "beat": "heartbeat", <2>
-      "version": "9.0.0-beta1" <3>
+      "version": "{{stack-version}}" <3>
     }
 }
 ```
@@ -68,7 +68,7 @@ output {
 }
 ```
 
-1. `%{[@metadata][beat]}` sets the first part of the index name to the value of the `beat` metadata field and `%{[@metadata][version]}` sets the second part to the Beat’s version. For example: `heartbeat-9.0.0-beta1`.
+1. `%{[@metadata][beat]}` sets the first part of the index name to the value of the `beat` metadata field and `%{[@metadata][version]}` sets the second part to the Beat’s version. For example: `heartbeat-9[version]`.
 
 
 Events indexed into {{es}} with the {{ls}} configuration shown here will be similar to events directly indexed by Heartbeat into {{es}}.
@@ -178,7 +178,7 @@ The `proxy_use_local_resolver` option determines if {{ls}} hostnames are resolve
 
 ### `index` [logstash-index]
 
-The index root name to write events to. The default is the Beat name. For example `"heartbeat"` generates `"[heartbeat-]9.0.0-beta1-YYYY.MM.DD"` indices (for example, `"heartbeat-9.0.0-beta1-2017.04.26"`).
+The index root name to write events to. The default is the Beat name. For example `"heartbeat"` generates `"[heartbeat-][version]-YYYY.MM.DD"` indices (for example, `"heartbeat-9.0.0-2017.04.26"`).
 
 ::::{note}
 This parameter’s value will be assigned to the `metadata.beat` field. It can then be accessed in {{ls}}'s output section as `%{[@metadata][beat]}`.
@@ -188,7 +188,7 @@ This parameter’s value will be assigned to the `metadata.beat` field. It can t
 
 ### `ssl` [_ssl_2]
 
-Configuration options for SSL parameters like the root CA for {{ls}} connections. See [SSL](/reference/heartbeat/configuration-ssl.md) for more information. To use SSL, you must also configure the [Beats input plugin for Logstash](logstash://reference/plugins-inputs-beats.md) to use SSL/TLS.
+Configuration options for SSL parameters like the root CA for {{ls}} connections. See [SSL](/reference/heartbeat/configuration-ssl.md) for more information. To use SSL, you must also configure the [Beats input plugin for Logstash](logstash-docs-md://lsr/plugins-inputs-beats.md) to use SSL/TLS.
 
 
 ### `timeout` [_timeout_2]

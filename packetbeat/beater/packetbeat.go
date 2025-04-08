@@ -210,7 +210,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 // runManaged registers a packetbeat runner with the reload.Registry and starts
 // the runner by starting the beat's manager. It returns on the first fatal error.
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
-	runner := newReloader(management.DebugK, factory, b.Publisher)
+	runner := newReloader(management.DebugK, factory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
 

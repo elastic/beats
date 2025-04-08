@@ -16,5 +16,5 @@ You may have configured {{ls}} or Auditbeat incorrectly. To resolve the issue:
 
 * Verify that the config file for Auditbeat specifies the correct port where {{ls}} is running.
 * Make sure that the {{es}} output is commented out in the config file and the {{ls}} output is uncommented.
-* Confirm that the most recent [Beats input plugin for {{ls}}](logstash://reference/plugins-inputs-beats.md) is installed and configured. Note that Beats will not connect to the Lumberjack input plugin. To learn how to install and update plugins, see [Working with plugins](logstash://reference/working-with-plugins.md).
+* Confirm that the most recent [Beats input plugin for {{ls}}](logstash-docs-md://lsr/plugins-inputs-beats.md) is installed and configured. Note that Beats will not connect to the Lumberjack input plugin. To learn how to install and update plugins, see [Working with plugins](logstash://reference/working-with-plugins.md).
 

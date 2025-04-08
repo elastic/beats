@@ -15,12 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package logstash
-
-import (
-	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-func enableLogging(selectors []string) {
-	logp.TestingSetup(logp.WithSelectors(selectors...))
-}
+// Package replstatus is a Metricbeat module that contains MetricSets.
+package replstatus
