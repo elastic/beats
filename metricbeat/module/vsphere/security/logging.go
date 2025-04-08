@@ -15,24 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build windows
+package security
 
-package service
+import "github.com/elastic/elastic-agent-libs/logp"
 
-import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-func TestGetServiceStates(t *testing.T) {
-	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
-	assert.NoError(t, err)
-	assert.NotEqual(t, handle, InvalidDatabaseHandle)
-	services, err := GetServiceStates(logp.L(), handle, ServiceStateAll, map[string]struct{}{})
-	assert.NoError(t, err)
-	assert.True(t, len(services) > 0)
-	closeHandle(handle)
+func WarnIfInsecure(logger *logp.Logger, metricSet string, isInsecure bool) {
+	if isInsecure {
+		logger.With("metricset", metricSet).Warn("Your vSphere connection is configured as insecure. This can lead to man-in-the-middle attack.")
+	}
 }
