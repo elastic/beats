@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
+//go:build !integration && requirefips
 
 package cmd
 
@@ -76,7 +76,7 @@ func TestGenRootCmdWithSettings_TLSDefaults(t *testing.T) {
 		require.NoError(t, err)
 
 		c := tlsCfg.ToConfig()
-		assert.Equal(t, uint16(tls.VersionTLS11), c.MinVersion)
+		assert.Equal(t, uint16(tls.VersionTLS12), c.MinVersion)
 		assert.Equal(t, uint16(tls.VersionTLS13), c.MaxVersion)
 	})
 
@@ -94,11 +94,7 @@ func TestGenRootCmdWithSettings_TLSDefaults(t *testing.T) {
 		var common tlscommon.Config
 		err = sslCfg.Unpack(&common)
 		require.NoError(t, err)
-		tlsCfg, err := tlscommon.LoadTLSConfig(&common)
-		require.NoError(t, err)
-
-		c := tlsCfg.ToConfig()
-		assert.Equal(t, uint16(tls.VersionTLS10), c.MinVersion)
-		assert.Equal(t, uint16(tls.VersionTLS10), c.MaxVersion)
+		_, err = tlscommon.LoadTLSConfig(&common)
+		require.Error(t, err)
 	})
 }
