@@ -18,27 +18,12 @@ jobs:
     name: lint
     runs-on: ${{ matrix.os }}
     steps:
-<<<<<<< HEAD
-      - name: Echo details
-        env:
-          GOOS: ${{ matrix.GOOS }}
-        run: echo Go GOOS=$GOOS
-
-      - uses: actions/checkout@v3
-=======
       - uses: actions/checkout@v4
->>>>>>> a6cb1bf98 (ci(golangci): bump golangci-lint to 2.0.2 (#42026))
 
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
           go-version-file: .go-version
 
-<<<<<<< HEAD
-      - name: golangci-lint
-        env:
-          GOOS: ${{ matrix.GOOS }}
-        uses: golangci/golangci-lint-action@v3
-=======
       - name: Install Apt Package
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev
@@ -47,7 +32,6 @@ jobs:
         env:
           CGO_ENABLED: 1
         uses: golangci/golangci-lint-action@v7
->>>>>>> a6cb1bf98 (ci(golangci): bump golangci-lint to 2.0.2 (#42026))
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
           version: v2.0.2
