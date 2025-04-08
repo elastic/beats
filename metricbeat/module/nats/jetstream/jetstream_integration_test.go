@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestData(t *testing.T) {
@@ -41,7 +42,8 @@ func TestFetch(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
-	metricSet.Fetch(reporter)
+	err := metricSet.Fetch(reporter)
+	assert.NoError(t, err)
 
 	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
