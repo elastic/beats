@@ -12,6 +12,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -28,7 +29,7 @@ type InputManager struct {
 }
 
 // NewInputManager creates a new input manager.
-func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManager {
+func NewInputManager(log *logp.Logger, store statestore.States) InputManager {
 	return InputManager{
 		cursor: &inputcursor.InputManager{
 			Logger:     log,

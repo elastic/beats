@@ -22,4 +22,4 @@
 /nats bench benchsubject --kv --sub 10 --no-progress
 
 # Sleep after benchmarks are done to keep container running with lower CPU usage
-sleep 1000000
+sleep infinity

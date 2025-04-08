@@ -10,7 +10,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -32,15 +31,15 @@ func makeTestStore(data map[string]interface{}) *statestore.Store {
 	return store
 }
 
+// compile-time check if stateStore implements statestore.States
+var _ statestore.States = stateStore{}
+
 type stateStore struct{}
 
-func (stateStore) Access(_ string) (*statestore.Store, error) {
+func (stateStore) StoreFor(string) (*statestore.Store, error) {
 	return makeTestStore(map[string]interface{}{"hello": "world"}), nil
 }
 func (stateStore) CleanupInterval() time.Duration { return time.Duration(0) }
-
-// compile-time check if stateStore implements cursor.StateStore
-var _ cursor.StateStore = stateStore{}
 
 func TestInputManager(t *testing.T) {
 	inputManager := NewInputManager(logp.NewLogger("salesforce_test"), stateStore{})

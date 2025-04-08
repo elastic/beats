@@ -28,7 +28,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -147,9 +146,10 @@ func TestTakeOverTags(t *testing.T) {
 			filename := generateFile(t, t.TempDir(), 5)
 			cfg := fmt.Sprintf(`
 type: filestream
+id: foo
 prospector.scanner.check_interval: 1s
 prospector.scanner.fingerprint.enabled: false
-take_over: %t
+take_over.enabled: %t
 paths:
     - %s`, testCase.takeOver, filename)
 			runner := createFilestreamTestRunner(context.Background(), t, testCase.name, cfg, 5, true)
@@ -235,9 +235,11 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	return filename
 }
 
-func createTestStore(t testing.TB) loginp.StateStore {
+func createTestStore(t testing.TB) statestore.States {
 	return &testStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
 }
+
+var _ statestore.States = (*testStore)(nil)
 
 type testStore struct {
 	registry *statestore.Registry
@@ -247,7 +249,7 @@ func (s *testStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testStore) Access(_ string) (*statestore.Store, error) {
+func (s *testStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
 }
 
