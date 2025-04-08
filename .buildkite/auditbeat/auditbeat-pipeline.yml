@@ -8,8 +8,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_2004_X86_64: "family/platform-ingest-beats-ubuntu-2004"
   IMAGE_UBUNTU_2004_ARM64: "platform-ingest-beats-ubuntu-2004-aarch64"
@@ -105,6 +103,33 @@ steps:
           - github_commit_status:
               context: "auditbeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Unit Tests FIPS"
+        command: |
+          set -euo pipefail
+          cd auditbeat
+          mage unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "auditbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "auditbeat: Ubuntu x86_64 Unit Tests FIPS"
+
       - label: ":rhel: Auditbeat: RHEL9 Unit Tests"
         command: |
           set -euo pipefail
@@ -181,20 +206,6 @@ steps:
         notify:
           - github_commit_status:
               context: "auditbeat: Win 2022 Unit Tests"
-
-      - label: ":ubuntu: Auditbeat: Crosscompile"
-        command: |
-          make -C auditbeat crosscompile
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_2204_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        notify:
-          - github_commit_status:
-              context: "auditbeat: Crosscompile"
 
   - group: "Extended Tests"
     key: "auditbeat-extended-tests"
@@ -293,64 +304,6 @@ steps:
         notify:
           - github_commit_status:
               context: "auditbeat: Ubuntu arm64 Unit Tests"
-
-      - label: ":mac: Auditbeat: macOS x86_64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd auditbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "auditbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "auditbeat: macOS x86_64 Unit Tests"
-
-      - label: ":mac: Auditbeat: macOS arm64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd auditbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "auditbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "auditbeat: macOS arm64 Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "auditbeat-extended-tests-win"
@@ -452,7 +405,7 @@ steps:
       - label: ":ubuntu: Auditbeat: Packaging Linux"
         key: "auditbeat-package-linux-x86"
         env:
-          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
           .buildkite/scripts/packaging/packaging.sh auditbeat
         retry:
@@ -470,7 +423,7 @@ steps:
       - label: ":ubuntu: Auditbeat: Packaging Linux arm64"
         key: "auditbeat-package-linux-arm64"
         env:
-          PLATFORMS: "+all linux/arm64"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh auditbeat
         retry:

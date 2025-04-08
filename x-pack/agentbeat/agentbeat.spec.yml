@@ -565,6 +565,11 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *metricbeat_command
+  - name: aerospike/metrics
+    description: "Aerospike metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
   - name: osquery
     description: "Osquery"
     platforms: *platforms

@@ -44,7 +44,7 @@ func makeDiscard(
 	cfg *config.C,
 ) (outputs.Group, error) {
 	out := &discardOutput{
-		log:      logp.NewLogger("discard"),
+		log:      beat.Logger.Named("discard"),
 		beat:     beat,
 		observer: observer,
 	}

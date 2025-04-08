@@ -1,5 +1,0 @@
-= {Beat} Docs
-
-Welcome to the {Beat} documentation.
-
-

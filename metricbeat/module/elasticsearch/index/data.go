@@ -43,9 +43,9 @@ type Index struct {
 
 	Index          string     `json:"index"`
 	Status         string     `json:"status"`
-	TierPreference string     `json:"tier_preference"`
-	CreationDate   string     `json:"creation_date"`
-	Version        string     `json:"version"`
+	TierPreference string     `json:"tier_preference,omitempty"`
+	CreationDate   string     `json:"creation_date,omitempty"`
+	Version        string     `json:"version,omitempty"`
 	Shards         shardStats `json:"shards"`
 }
 
@@ -192,7 +192,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
 
-	indicesSettingsPattern := "*"
+	indicesSettingsPattern := "*,-.*"
 	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created"}
 	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern, indicesSettingsFilterPaths)
 	if err != nil {

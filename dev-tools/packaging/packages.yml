@@ -15,6 +15,11 @@ shared:
     url: '{{.BeatURL}}'
     description: '{{.BeatDescription}}'
 
+  - &common_fips
+    <<: *common
+    name: '{{.BeatName}}-fips'
+    fips: true
+
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
@@ -55,6 +60,10 @@ shared:
       /lib/systemd/system/{{.BeatServiceName}}.service:
         template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/linux/systemd.unit.tmpl'
         mode: 0644
+
+  - &deb_rpm_spec_fips
+    <<: *deb_rpm_spec
+    <<: *common_fips
 
   # MacOS pkg spec for community beats.
   - &macos_beat_pkg_spec
@@ -137,6 +146,14 @@ shared:
     <<: *common
     files:
       <<: *binary_files
+
+  - &binary_spec_fips
+    <<: *common_fips
+    files:
+      <<: *binary_files
+      '{{.BeatName}}{{.BinaryExt}}':
+        source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+        mode: 0755
 
   # Binary package spec (zip for windows) for community beats.
   - &windows_binary_spec
@@ -617,3 +634,20 @@ specs:
             source: data/{{.BeatName}}-{{ commit_short }}/{{.BeatName}}{{.BinaryExt}}
             symlink: true
             mode: 0755
+
+  # Elastic Beat with Elastic License and binary taken the current directory.
+  elastic_beat_xpack_fips:
+    ###
+    # Elastic Licensed Packages
+    ###
+    - os: linux
+      types: [tgz]
+      spec:
+        <<: *binary_spec_fips
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      types: [deb]
+      spec:
+        <<: *deb_rpm_spec_fips
+        <<: *elastic_license_for_deb_rpm

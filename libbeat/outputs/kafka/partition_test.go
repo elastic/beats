@@ -200,7 +200,8 @@ func TestPartitioners(t *testing.T) {
 			continue
 		}
 
-		constr, err := makePartitioner(logp.L(), pcfg.Partition)
+		logger := logp.NewTestingLogger(t, "")
+		constr, err := makePartitioner(logger, pcfg.Partition)
 		if err != nil {
 			t.Error(err)
 			continue

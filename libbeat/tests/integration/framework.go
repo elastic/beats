@@ -33,6 +33,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -63,6 +64,7 @@ type BeatProc struct {
 	stdout              *os.File
 	stderr              *os.File
 	Process             *os.Process
+	cleanUpOnce         sync.Once
 }
 
 type Meta struct {
@@ -204,26 +206,28 @@ func (b *BeatProc) Start(args ...string) {
 	}
 
 	t.Cleanup(func() {
-		b.cmdMutex.Lock()
-		// 1. Send an interrupt signal to the Beat
-		b.stopNonsynced()
+		b.cleanUpOnce.Do(func() {
+			b.cmdMutex.Lock()
+			// 1. Send an interrupt signal to the Beat
+			b.stopNonsynced()
 
-		// Make sure the goroutine restarting the Beat has exited
-		if b.RestartOnBeatOnExit {
-			// 2. Set the done flag so the goroutine loop can exit
-			done.Store(true)
-			// 3. Release the mutex, keeping it locked
-			// until now ensures a new process won't
-			// start.  Lock must be released before
-			// wg.Wait() or there is a possibility of
-			// deadlock.
-			b.cmdMutex.Unlock()
-			// 4. Wait for the goroutine to finish, this helps to ensure
-			// no other Beat process was started
-			wg.Wait()
-		} else {
-			b.cmdMutex.Unlock()
-		}
+			// Make sure the goroutine restarting the Beat has exited
+			if b.RestartOnBeatOnExit {
+				// 2. Set the done flag so the goroutine loop can exit
+				done.Store(true)
+				// 3. Release the mutex, keeping it locked
+				// until now ensures a new process won't
+				// start.  Lock must be released before
+				// wg.Wait() or there is a possibility of
+				// deadlock.
+				b.cmdMutex.Unlock()
+				// 4. Wait for the goroutine to finish, this helps to ensure
+				// no other Beat process was started
+				wg.Wait()
+			} else {
+				b.cmdMutex.Unlock()
+			}
+		})
 	})
 }
 
@@ -295,12 +299,21 @@ func (b *BeatProc) Stop() {
 // stopNonsynced is the actual stop code, but without locking so it can be reused
 // by methods that have already acquired the lock.
 func (b *BeatProc) stopNonsynced() {
-	if err := b.Process.Signal(os.Interrupt); err != nil {
-		if errors.Is(err, os.ErrProcessDone) {
-			return
+	// Windows does not support interrupt
+	if runtime.GOOS == "windows" {
+		if err := b.Process.Kill(); err != nil {
+			b.t.Logf("[WARN] could not send kill signal to process with PID: %d, err: %s",
+				b.Process.Pid, err)
 		}
-		b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
-			b.Process.Pid, err)
+	} else {
+		if err := b.Process.Signal(os.Interrupt); err != nil {
+			if errors.Is(err, os.ErrProcessDone) {
+				return
+			}
+
+			b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
+				b.Process.Pid, err)
+		}
 	}
 
 	if !b.waitingMutex.TryLock() {
@@ -310,7 +323,8 @@ func (b *BeatProc) stopNonsynced() {
 	defer b.waitingMutex.Unlock()
 	ps, err := b.Process.Wait()
 	if err != nil {
-		b.t.Logf("[WARN] got an error waiting %s to top: %v", b.beatName, err)
+		b.t.Logf("[WARN] got an error waiting %s to stop: %v", b.beatName, err)
+		return
 	}
 	if !ps.Success() {
 		b.t.Logf("[WARN] %s did not stopped successfully: %v", b.beatName, ps.String())
@@ -651,7 +665,17 @@ func createTempDir(t *testing.T) string {
 	cleanup := func() {
 		if !t.Failed() {
 			if err := os.RemoveAll(tempDir); err != nil {
-				t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
+				// Ungly workaround Windows limitations
+				// Windows does not support the Interrup signal, so it might
+				// happen that Filebeat is still running, keeping it's registry
+				// file open, thus preventing the temporary folder from being
+				// removed. So we log the error and move on without failing the
+				// test
+				if runtime.GOOS == "windows" {
+					t.Logf("[WARN] Could not remove temporatry directory '%s': %s", tempDir, err)
+				} else {
+					t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
+				}
 			}
 		} else {
 			t.Logf("Temporary directory saved: %s", tempDir)

@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestMakeClientParams(t *testing.T) {
@@ -49,7 +50,9 @@ func TestMakeReporter(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	r, err := makeReporter(beat.Info{}, report.Settings{}, c)
+	logger := logp.NewTestingLogger(t, "")
+
+	r, err := makeReporter(beat.Info{Logger: logger}, report.Settings{}, c)
 	require.NoError(t, err)
 	r.Stop()
 }
