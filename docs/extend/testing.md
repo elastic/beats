@@ -30,16 +30,22 @@ To run the integration tests use the `mage goIntegTest` target, which will start
 
 It is also possible to run module specific integration tests. For example, to run kafka only tests use `MODULE=kafka mage integTest -v`
 
-It is possible to start the `docker-compose` services manually to allow selecting which specific tests should be run. An example follows for filebeat:
+It is possible to start the `docker-compose` services manually to allow selecting which specific tests should be run. The default credential for Elasticsearch and Kibana credential are `user: admin`, `password: testing`. An example follows for filebeat:
 
 ```bash
 cd filebeat
 # Pull and build the containers. Only needs to be done once unless you change the containers.
 mage docker:composeBuild
+
 # Bring up all containers, wait until they are healthy, and put them in the background.
 mage docker:composeUp
+
+# Build the test binary
+mage buildSystemTestBinary
+
 # Run all integration tests.
 go test ./filebeat/...  -tags integration
+
 # Stop all started containers.
 mage docker:composeDown
 ```
@@ -63,7 +69,7 @@ The system tests are defined in the `tests/system` (for legacy Python test) and 
 
 To create the testing binary run `mage buildSystemTestBinary`. This will create the test binary in the beat directory. To set up the Python testing environment run `mage pythonVirtualEnv` which will create a virtual environment with all test dependencies and print its location. To activate it, the instructions depend on your operating system. See the [virtualenv documentation](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment).
 
-To run the system and integration tests use the `mage pythonIntegTest` target, which will start the required services using [docker-compose](https://docs.docker.com/compose/) and run all integration tests. Similar to Go integration tests, the individual steps can be done manually to allow selecting which tests should be run:
+To run the system and integration tests use the `mage pythonIntegTest` target, which will start the required services using [docker-compose](https://docs.docker.com/compose/) and run all integration tests. The default credential for Elasticsearch and Kibana credential are `user: admin`, `password: testing`. Similar to Go integration tests, the individual steps can be done manually to allow selecting which tests should be run:
 
 ```bash
 # Create and activate the system test virtual environment (assumes a Unix system).
@@ -75,11 +81,30 @@ mage docker:composeBuild
 # Bring up all containers, wait until they are healthy, and put them in the background.
 mage docker:composeUp
 
+# Build the test binary
+mage buildSystemTestBinary
+
 # Run all system and integration tests.
-INTEGRATION_TESTS=1 pytest ./tests/system
+INTEGRATION_TESTS=1 \
+BEAT_STRICT_PERMS=false \
+ES_PASS="testing" \
+pytest ./tests/system
 
 # Stop all started containers.
 mage docker:composeDown
+```
+
+To run a test from `x-pack/`, you need to set the `MODULES_PATH` to the full
+path to the `x-pack` modules directory:
+
+```bash
+cd x-pack/filebeat
+
+INTEGRATION_TESTS=1 \
+BEAT_STRICT_PERMS=false \
+ES_PASS="testing" \
+MODULES_PATH="/path/to/beats-repo/x-pack/filebeat/module" \
+pytest ./tests/system/test_xpack_modules.py
 ```
 
 Filebeat’s module python tests have additional documentation found in the [Filebeat module](/extend/filebeat-modules-devguide.md) guide.
