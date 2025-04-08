@@ -363,12 +363,12 @@ func unarchive(sourceFile string, destinationDir string) error {
 			return fmt.Errorf("creating output file %s: %w", path, err)
 		}
 
-		if _, err = io.Copy(writer, archiveReader); err != nil { //nolint:gosec // this is only used for dev tools
+		if _, err = io.Copy(writer, archiveReader); err != nil {
 			return fmt.Errorf("copying bytes of file %s: %w", path, err)
 		}
 
 		if arHeader.Mode != 0 {
-			if err = os.Chmod(path, os.FileMode(arHeader.Mode)); err != nil {
+			if err = os.Chmod(path, os.FileMode(arHeader.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return fmt.Errorf("changing mode for file %s: %w", path, err)
 			}
 		}
@@ -570,7 +570,7 @@ func untar(sourceFile, destinationDir string) error {
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 		case tar.TypeReg:
@@ -589,7 +589,7 @@ func untar(sourceFile, destinationDir string) error {
 				return err
 			}
 
-			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 

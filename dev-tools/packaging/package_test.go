@@ -820,7 +820,7 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 			File: header.Name,
 			UID:  header.Uid,
 			GID:  header.Gid,
-			Mode: os.FileMode(header.Mode),
+			Mode: os.FileMode(header.Mode), //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 		}
 	}
 
