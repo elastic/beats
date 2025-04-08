@@ -103,7 +103,8 @@ func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface
 	switch subData := d.(type) {
 	case map[string]interface{}, mapstr.M:
 		subEvent := mapstr.M{}
-		_, errs := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
+		convertedSubData, _ := subData.(map[string]interface{})
+		_, errs := convMap.Schema.ApplyTo(subEvent, convertedSubData)
 		for _, err := range errs {
 			var keyErr schema.KeyError
 			if errors.As(err, &keyErr) {
