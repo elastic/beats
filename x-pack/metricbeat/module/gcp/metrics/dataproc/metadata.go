@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	monitoringpb "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/dataproc/v1"
@@ -179,12 +180,15 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 
 	s.logger.Debugf("querying dataproc clusters across %d regions: %v", len(regionsToQuery), regionsToQuery)
 
+	queryCtx, cancel := context.WithTimeout(ctx, time.Minute)
+	defer cancel()
+
 	for _, region := range regionsToQuery {
 		wg.Add(1)
 		go func(region string) {
 			defer wg.Done()
 
-			listCall := clustersService.List(s.projectID, region).Fields("clusters.labels", "clusters.clusterUuid").Context(ctx)
+			listCall := clustersService.List(s.projectID, region).Fields("clusters.labels", "clusters.clusterUuid").Context(queryCtx)
 			resp, err := listCall.Do()
 			if err != nil {
 				s.logger.Errorf("dataproc ListClusters error in region %s: %v", region, err)
