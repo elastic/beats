@@ -38,6 +38,7 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 *Affecting all Beats*
 
 - Update Go version to 1.23.6. {pull}42705[42705]
+- Update Go version to 1.23.8. {pull}43780[43780]
 
 *Filebeat*
 
