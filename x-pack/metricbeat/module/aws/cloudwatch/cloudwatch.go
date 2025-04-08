@@ -5,6 +5,7 @@
 package cloudwatch
 
 import (
+	"crypto/fips140"
 	"fmt"
 	"maps"
 	"reflect"
@@ -155,6 +156,14 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	err = m.Module().UnpackConfig(&config)
 	if err != nil {
 		return err
+	}
+
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
 	}
 
 	// Create events based on listMetricDetailTotal from configuration
