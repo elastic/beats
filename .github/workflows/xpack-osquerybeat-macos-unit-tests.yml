@@ -4,6 +4,7 @@ env:
   BEAT: "x-pack/osquerybeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - x-pack/osquerybeat/**

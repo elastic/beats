@@ -4,6 +4,7 @@ env:
   BEAT: "heartbeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - heartbeat/**

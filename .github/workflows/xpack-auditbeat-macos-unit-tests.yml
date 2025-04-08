@@ -4,6 +4,7 @@ env:
   BEAT: "x-pack/auditbeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - auditbeat/**

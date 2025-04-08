@@ -5,6 +5,7 @@ env:
   NODEJS_VERSION: "18.20.3"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - heartbeat/**

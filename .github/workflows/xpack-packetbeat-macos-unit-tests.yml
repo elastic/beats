@@ -4,6 +4,7 @@ env:
   BEAT: "x-pack/packetbeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - packetbeat/**
