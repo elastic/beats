@@ -42,7 +42,7 @@ func TestBuilderRegistry(t *testing.T) {
 	// Add a new builder
 	reg := NewRegistry()
 	err := reg.AddBuilder("fake", newFakeBuilder)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Check if that builder is available in registry
 	b := reg.GetBuilder("fake")
