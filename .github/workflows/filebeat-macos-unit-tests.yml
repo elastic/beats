@@ -6,10 +6,10 @@ env:
 on:
   pull_request:
     paths:
-      - filebeat/
+      - filebeat/**
       # OSS
       - go.mod
-      - dev-tools
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/filebeat-macos-unit-tests.yml
@@ -18,10 +18,10 @@ on:
     branches:
       - main
     paths:
-      - filebeat/
+      - filebeat/**
       # OSS
       - go.mod
-      - dev-tools
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/filebeat-macos-unit-tests.yml

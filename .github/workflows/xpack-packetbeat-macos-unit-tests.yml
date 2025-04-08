@@ -6,13 +6,13 @@ env:
 on:
   pull_request:
     paths:
-      - packetbeat/
-      - x-pack/packetbeat/
-      - x-pack/libbeat/
+      - packetbeat/**
+      - x-pack/packetbeat/**
+      - x-pack/libbeat/**
       # OSS
       - go.mod
-      - dev-tools/
-      - libbeat/
+      - dev-tools/**
+      - libbeat/**
       # Workflow
       - .github/workflows/xpack-packetbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
@@ -20,13 +20,13 @@ on:
     branches:
       - main
     paths:
-      - packetbeat/
-      - x-pack/packetbeat/
-      - x-pack/libbeat/
+      - packetbeat/**
+      - x-pack/packetbeat/**
+      - x-pack/libbeat/**
       # OSS
       - go.mod
-      - dev-tools/
-      - libbeat/
+      - dev-tools/**
+      - libbeat/**
       # Workflow
       - .github/workflows/xpack-packetbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml

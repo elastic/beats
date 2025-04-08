@@ -6,10 +6,10 @@ env:
 on:
   pull_request:
     paths:
-      - heartbeat/
+      - heartbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/heartbeat-macos-unit-tests.yml
@@ -19,10 +19,10 @@ on:
     branches:
       - main
     paths:
-      - heartbeat/
+      - heartbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/heartbeat-macos-unit-tests.yml

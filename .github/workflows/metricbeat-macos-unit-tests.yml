@@ -6,10 +6,10 @@ env:
 on:
   pull_request:
     paths:
-      - metricbeat/
+      - metricbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/metricbeat-macos-unit-tests.yml
@@ -18,10 +18,10 @@ on:
     branches:
       - main
     paths:
-      - metricbeat/
+      - metricbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/metricbeat-macos-unit-tests.yml

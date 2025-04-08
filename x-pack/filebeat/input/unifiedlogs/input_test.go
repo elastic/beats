@@ -72,8 +72,8 @@ func TestInput(t *testing.T) {
 			timeUntilClose:       time.Second,
 			expectedLogStreamCmd: "/usr/bin/log stream --style ndjson",
 			assertFunc: func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
-				require.NotEmpty(collect, events)
-				require.NotEmpty(collect, cursors)
+				assert.NotEmpty(collect, events)
+				assert.NotEmpty(collect, cursors)
 				assert.Equal(collect, len(events), len(cursors))
 				lastEvent := events[len(events)-1]
 				lastCursor := cursors[len(cursors)-1]

@@ -6,10 +6,10 @@ env:
 on:
   pull_request:
     paths:
-      - auditbeat/
+      - auditbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/auditbeat-macos-unit-tests.yml
@@ -18,10 +18,10 @@ on:
     branches:
       - main
     paths:
-      - auditbeat/
+      - auditbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/auditbeat-macos-unit-tests.yml
