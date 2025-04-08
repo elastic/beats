@@ -5,6 +5,7 @@ mapped_pages:
 
 # Community {{beats}} [community-beats]
 
+
 ::::{admonition}
 **Custom Beat generator code no longer available in 8.0 and later**
 
