@@ -21,11 +21,11 @@ package process
 
 import (
 	"os"
+	"runtime"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -58,29 +58,26 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetchDegradeOnPartial(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42809")
+	if runtime.GOOS == "windows" && os.Getenv("CI") == "true" {
+		t.Skip("Skip: CI run on windows. It is run as admin, but the test requires to run as non-admin")
+	}
+	if runtime.GOOS != "windows" && os.Getuid() == 0 {
+		t.Skip("Skip: running as root on non-windows, but the test requires to run as non-root")
+	}
+
 	logp.DevelopmentSetup()
 	config := getConfig()
 	config["degrade_on_partial"] = true
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, errs := mbtest.ReportingFetchV2Error(f)
-	if len(errs) > 0 {
-		for _, err := range errs {
-			assert.NotErrorIsf(t, err, &mb.PartialMetricsError{}, "Expected non-fatal error, got %v", err)
-		}
-	} else {
-		assert.NotEmpty(t, events)
 
-		events, errs = mbtest.ReportingFetchV2Error(f)
-		for _, err := range errs {
-			assert.ErrorIsf(t, err, process.NonFatalErr{}, "Expected non-fatal error, got %v", err)
-		}
-		require.NotEmpty(t, events)
+	var errs []error
+	_, errs = mbtest.ReportingFetchV2Error(f)
+	assert.NotEmpty(t, errs, "expected at least one error, got none")
 
-		t.Logf("fetched %d events, showing events[0]:", len(events))
-		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-			events[0].BeatEvent("system", "process").Fields.StringToPrint())
+	for _, err := range errs {
+		assert.NotErrorIsf(t, err, &mb.PartialMetricsError{},
+			"Expected non-fatal error, got %v", err)
 	}
 }
 
