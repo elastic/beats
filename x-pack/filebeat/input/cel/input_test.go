@@ -2138,7 +2138,7 @@ func digestAuthHandler(user, pass, realm, nonce string, handle http.HandlerFunc)
 	chal := &digest.Challenge{
 		Realm:     realm,
 		Nonce:     nonce,
-		Algorithm: "MD5",
+		Algorithm: "SHA-256",
 		QOP:       []string{"auth"},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {

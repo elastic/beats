@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -22,6 +23,7 @@ func TestClientCacheWrap(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
 	}
+	testutils.SkipIfFIPSOnly(t, "Cache uses SHA-1")
 
 	ttl := 2 * time.Second
 	guid := mustCreateFakeGuid()

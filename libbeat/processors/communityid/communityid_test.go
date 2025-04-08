@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -172,6 +173,7 @@ func TestRun(t *testing.T) {
 
 func testProcessor(t testing.TB, seed uint16, fields mapstr.M, expectedHash interface{}) {
 	t.Helper()
+	testutils.SkipIfFIPSOnly(t, "communityid uses SHA-1")
 
 	c := defaultConfig()
 	c.Seed = seed

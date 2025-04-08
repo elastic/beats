@@ -23,6 +23,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -855,6 +856,7 @@ func TestURLEval(t *testing.T) {
 }
 
 func TestInput(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "SHA-1 is used when establishing websocket connection")
 	// tests will ignore context cancelled errors, since they are expected
 	ctxCancelledError := fmt.Errorf("context canceled")
 	logp.TestingSetup()
@@ -865,6 +867,7 @@ func TestInput(t *testing.T) {
 			}
 			if test.server != nil {
 				test.server(t, test.handler, test.config, test.response)
+				testutils.SkipIfFIPSOnly(t, "")
 			}
 			if test.proxyServer != nil {
 				test.proxyServer(t, test.handler, test.config, test.response)
