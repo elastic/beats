@@ -17,6 +17,11 @@ Learn how to perform common Filebeat configuration tasks.
 * [*Parse data using an ingest pipeline*](/reference/filebeat/configuring-ingest-node.md)
 * [*Use environment variables in the configuration*](/reference/filebeat/using-environ-vars.md)
 * [*Avoid YAML formatting problems*](/reference/filebeat/yaml-tips.md)
+<<<<<<< HEAD
 * [*Migrate `log` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md)
+=======
+* [*Migrate `log` or `container` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md)
+* [*Choose file identity for `filestream`*](/reference/filebeat/file-identity.md)
+>>>>>>> 8d256941b (Update the `log` to `filestream` migration guide (#43641))
 * [*Migrating from a Deprecated Filebeat Module*](/reference/filebeat/migrate-from-deprecated-module.md)
 

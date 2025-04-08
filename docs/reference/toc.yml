@@ -331,6 +331,7 @@ toc:
           - file: filebeat/using-environ-vars.md
           - file: filebeat/yaml-tips.md
           - file: filebeat/migrate-to-filestream.md
+<<<<<<< HEAD
             children:
               - file: filebeat/_step_1_set_an_identifier_for_each_filestream_input.md
               - file: filebeat/_step_2_enable_the_take_over_mode.md
@@ -338,6 +339,9 @@ toc:
               - file: filebeat/_step_4.md
               - file: filebeat/_if_something_went_wrong.md
               - file: filebeat/_debugging_on_kibana.md
+=======
+          - file: filebeat/file-identity.md
+>>>>>>> 8d256941b (Update the `log` to `filestream` migration guide (#43641))
           - file: filebeat/migrate-from-deprecated-module.md
       - file: filebeat/filebeat-modules.md
         children:
