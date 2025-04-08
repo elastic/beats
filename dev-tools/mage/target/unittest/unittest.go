@@ -30,6 +30,7 @@ import (
 
 func init() {
 	test.RegisterDeps(UnitTest)
+	test.RegisterDeps(GoFIPSOnlyUnitTest)
 }
 
 var (
@@ -49,6 +50,15 @@ func RegisterPythonTestDeps(deps ...interface{}) {
 // UnitTest executes the unit tests (Go and Python).
 func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
+}
+
+// GoFIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests
+func GoFIPSOnlyUnitTest() error {
+	ctx := context.Background()
+	mg.SerialCtxDeps(ctx, goTestDeps...)
+
+	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
+	return devtools.GoTest(ctx, fipsArgs)
 }
 
 // GoUnitTest executes the Go unit tests.

@@ -108,6 +108,14 @@ func testTagsFromEnv() []string {
 // all unit tests. We tag unit test files with '!integration'.
 func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 
+// DefaultGoFIPSOnlyTestArgs returns a default set of arguments for running
+// fips140=only unit tests.
+func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
+	args := makeGoTestArgs("Unit-FIPS-only")
+	args.Env["GODEBUG"] = "fips140=only"
+	return args
+}
+
 // DefaultGoTestIntegrationArgs returns a default set of arguments for running
 // all integration tests. We tag integration test files with 'integration'.
 func DefaultGoTestIntegrationArgs() GoTestArgs {
