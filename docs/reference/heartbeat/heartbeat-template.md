@@ -96,8 +96,8 @@ heartbeat setup --index-management -E output.logstash.enabled=false -E 'output.e
 
 **docker:**
 
-```sh
-docker run --rm docker.elastic.co/beats/heartbeat:9.0.0-beta1 setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
+```sh subs=true
+docker run --rm docker.elastic.co/beats/heartbeat:{{stack-version}} setup --index-management -E output.logstash.enabled=false -E 'output.elasticsearch.hosts=["localhost:9200"]'
 ```
 
 **win:**
@@ -170,59 +170,59 @@ heartbeat export template > heartbeat.template.json
 
 **win:**
 
-```sh
-PS > .\heartbeat.exe export template --es.version 9.0.0-beta1 | Out-File -Encoding UTF8 heartbeat.template.json
+```sh subs=true
+PS > .\heartbeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 heartbeat.template.json
 ```
 
 To install the template, run:
 
 **deb and rpm:**
 
-```sh
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-9.0.0-beta1 -d@heartbeat.template.json
+```sh subs=true
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{stack-version}} -d@heartbeat.template.json
 ```
 
 **mac:**
 
-```sh
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-9.0.0-beta1 -d@heartbeat.template.json
+```sh subs=true
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{stack-version}} -d@heartbeat.template.json
 ```
 
 **linux:**
 
-```sh
-curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-9.0.0-beta1 -d@heartbeat.template.json
+```sh subs=true
+curl -XPUT -H 'Content-Type: application/json' http://localhost:9200/_index_template/heartbeat-{{stack-version}} -d@heartbeat.template.json
 ```
 
 **win:**
 
-```sh
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile heartbeat.template.json -Uri http://localhost:9200/_index_template/heartbeat-9.0.0-beta1
+```sh subs=true
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile heartbeat.template.json -Uri http://localhost:9200/_index_template/heartbeat-{{stack-version}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on heartbeat-9.0.0-beta1 index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on heartbeat-{{stack-version}} index.
 
 **deb and rpm:**
 
-```sh
-curl -XPUT http://localhost:9200/_data_stream/heartbeat-9.0.0-beta1
+```sh subs=true
+curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{stack-version}}
 ```
 
 **mac:**
 
-```sh
-curl -XPUT http://localhost:9200/_data_stream/heartbeat-9.0.0-beta1
+```sh subs=true
+curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{stack-version}}
 ```
 
 **linux:**
 
-```sh
-curl -XPUT http://localhost:9200/_data_stream/heartbeat-9.0.0-beta1
+```sh subs=true
+curl -XPUT http://localhost:9200/_data_stream/heartbeat-{{stack-version}}
 ```
 
 **win:**
 
-```sh
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/heartbeat-9.0.0-beta1
+```sh subs=true
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/heartbeat-{{stack-version}}
 ```
 
