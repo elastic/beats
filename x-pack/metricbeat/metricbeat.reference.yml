@@ -671,6 +671,7 @@ metricbeat.modules:
   exclude_labels: false
   period: 1m
   collect_dataproc_user_labels: true
+
 #-------------------------------- Golang Module --------------------------------
 - module: golang
   #metricsets:
