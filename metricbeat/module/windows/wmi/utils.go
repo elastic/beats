@@ -126,7 +126,12 @@ func getPropertyType(property *ole.IDispatch) (base.WmiType, error) {
 		return base.WmiType(0), err
 	}
 
-	return base.WmiType(value.(int32)), nil
+	v, ok := value.(int32)
+	if !ok {
+		return 0, fmt.Errorf("type assertion to int32 failed")
+	}
+
+	return base.WmiType(v), nil
 }
 
 // Returns the "raw" SWbemProperty containing type information for a given property.
