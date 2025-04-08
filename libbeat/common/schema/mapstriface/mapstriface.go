@@ -210,14 +210,12 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 		return 0, schema.NewKeyNotFoundError(key)
 	}
 	switch val := emptyIface.(type) {
-	case int64:
+	case int64, uint64:
 		return val, nil
 	case int:
 		return int64(val), nil
 	case float64:
 		return int64(val), nil
-	case uint64:
-		return uint64(val), nil
 	case json.Number:
 		i64, err := val.Int64()
 		if err == nil {
