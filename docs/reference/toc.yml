@@ -331,6 +331,7 @@ toc:
           - file: filebeat/using-environ-vars.md
           - file: filebeat/yaml-tips.md
           - file: filebeat/migrate-to-filestream.md
+          - file: filebeat/file-identity.md
           - file: filebeat/migrate-from-deprecated-module.md
       - file: filebeat/filebeat-modules.md
         children:
