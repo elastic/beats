@@ -325,7 +325,7 @@ func (p *fileProspector) onFSEvent(
 	ignoreSince time.Time,
 ) {
 	switch event.Op {
-	case loginp.OpCreate, loginp.OpWrite:
+	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
 		if event.Op == loginp.OpCreate {
 			log.Debugf("A new file %s has been found", event.NewPath)
 
@@ -336,6 +336,8 @@ func (p *fileProspector) onFSEvent(
 
 		} else if event.Op == loginp.OpWrite {
 			log.Debugf("File %s has been updated", event.NewPath)
+		} else if event.Op == loginp.OpNotChanged {
+			log.Debugf("File %s has not changed, trying to start new harvester because 'delete' is enabled", event.NewPath)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
@@ -368,7 +370,7 @@ func (p *fileProspector) onFSEvent(
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unknown return value %v", event.Op)
+		log.Errorf("Unknown operation '%s'", event.Op.String())
 	}
 }
 

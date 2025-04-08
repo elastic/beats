@@ -761,7 +761,7 @@ func TestFilestreamDelete(t *testing.T) {
 				// Wait a few times for the 'not finished' logs
 				notFinishedMsg := fmt.Sprintf(
 					"not all events from '%s' have been published, "+
-						"waiting before removing the file",
+						"closing harvester",
 					msgLogFilePath)
 				for i := range 2 {
 					filebeat.WaitForLogs(

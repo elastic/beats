@@ -840,7 +840,7 @@ scanner:
 		err = ns.Unpack(cfg)
 		require.NoError(t, err)
 
-		_, err = newFileWatcher(paths, ns)
+		_, err = newFileWatcher(paths, ns, false)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
@@ -908,7 +908,7 @@ func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp
 	err = ns.Unpack(cfg)
 	require.NoError(t, err)
 
-	fw, err := newFileWatcher(paths, ns)
+	fw, err := newFileWatcher(paths, ns, false)
 	require.NoError(t, err)
 
 	return fw

@@ -31,7 +31,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -197,13 +196,13 @@ func (inp *filestream) Run(
 		deleteFile := false
 		switch {
 		case errors.Is(err, io.EOF) && inp.deleterConfig.OnClose.EOF:
-			log.Infof(
+			log.Debugf(
 				"'%s' will be removed because 'delete.on_close.eof' is set",
 				fs.newPath,
 			)
 			deleteFile = true
 		case errors.Is(err, ErrInactive) && inp.deleterConfig.OnClose.Inactive:
-			log.Infof(
+			log.Debugf(
 				"'%s' will be removed because 'delete.on_close.inactive' is set",
 				fs.newPath,
 			)
@@ -226,8 +225,6 @@ func (inp *filestream) deleteFile(
 	cursor loginp.Cursor,
 	fs fileSource,
 ) error {
-
-	bkoff := backoff.NewExpBackoff(ctx.Cancelation.Done(), time.Second, time.Minute)
 	// Wait until the resource is finished.
 	// The resource is finished when all events are acknowledged by the output.
 	// If it is not finished, this usually means one of two things:
@@ -235,25 +232,46 @@ func (inp *filestream) deleteFile(
 	//   - Filebeat is experiencing back pressure
 	// Either way, we wait until all events have been published.
 	if !cursor.Finished() {
-		logger.Infof(
-			"not all events from '%s' have been published, "+
-				"waiting before removing the file",
-			fs.newPath)
-	}
-	for !cursor.Finished() {
-		if !bkoff.Wait() {
-			// This means that context was cancelled and the backoff
-			//  returned early
-			return ctx.Cancelation.Err()
-		}
 		logger.Debugf(
 			"not all events from '%s' have been published, "+
-				"waiting before removing the file",
+				"closing harvester",
 			fs.newPath)
+		// normal operation of the harvester, the file was closed.
+		return nil
 	}
 	logger.Infof(
-		"all events from '%s' have been published, it will be removed now",
-		fs.newPath)
+		"all events from '%s' have been published, waiting for %s grace period",
+		fs.newPath, inp.deleterConfig.GracePeriod.String())
+
+	graceTicker := time.NewTimer(inp.deleterConfig.GracePeriod)
+	// Wait for the grace period or for the context to be cancelled
+	select {
+	case <-ctx.Cancelation.Done():
+		return ctx.Cancelation.Err()
+	case <-graceTicker.C:
+	}
+
+	// Check if file is still at EOF
+	// We know all events have been published because cursor.Finished is true,
+	// so we can get the offset from the cursor and compare it with the file size.
+	st := state{}
+	if err := cursor.Unpack(&st); err != nil {
+		return fmt.Errorf("cannot unpack cursor from '%s' to read offset: %w",
+			fs.newPath,
+			err)
+	}
+
+	stat, err := os.Stat(fs.newPath)
+	if err != nil {
+		return fmt.Errorf("cannot stat '%s': %w", fs.newPath, err)
+	}
+
+	// The file has been written to, close the harvester so the filewatcher
+	// can start a new one
+	if stat.Size() != st.Offset {
+		logger.Debugf("'%s' was updated, won't remove. Closing harvester", fs.newPath)
+		return nil
+	}
 
 	if err := os.Remove(fs.newPath); err != nil {
 		// The first try at removing the file failed,
@@ -275,6 +293,9 @@ func (inp *filestream) deleteFile(
 			)
 
 			select {
+			case <-ctx.Cancelation.Done():
+				return ctx.Cancelation.Err()
+
 			case <-ticker.C:
 				retries++
 				lastErr = os.Remove(fs.newPath)
@@ -282,12 +303,11 @@ func (inp *filestream) deleteFile(
 					logger.Infof("'%s' removed", fs.newPath)
 					return nil
 				}
+				// Calculate the wait using monotonic clock
 				now := time.Now()
 				maxWait -= now.Sub(lastTry)
 				lastTry = now
 
-			case <-ctx.Cancelation.Done():
-				return ctx.Cancelation.Err()
 			}
 		}
 
