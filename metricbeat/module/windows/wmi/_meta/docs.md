@@ -13,7 +13,7 @@ around the [Go-OLE](https://github.com/go-ole) library. This allows
 invoking the [Scripting API for
 WMI](https://learn.microsoft.com/en-us/windows/win32/wmisdk/scripting-api-for-wmi).
 
-**WMI Query Language (WQL) Support**
+## WMI Query Language (WQL) Support
 
 This metricset supports the execution of
 [WQL](https://learn.microsoft.com/en-us/windows/win32/wmisdk/wql-sql-for-wmi)
@@ -29,7 +29,7 @@ effects. A notorious example of a problematic WMI class is
 Win32\_Product. Read more in [Windows
 Documentation](https://support.microsoft.com/kb/974524).
 
-**WMI Arbitrator and Query Execution**
+## WMI Arbitrator and Query Execution
 
 Query execution is managed by the underlying WMI Framework, specifically
 the [WMI
@@ -50,28 +50,30 @@ results after a specified timeout. This is controlled by the
 While Metricbeat stops waiting for the result, the underlying WMI query
 may continue running until the WMI Arbitrator decides to stop execution.
 
-**Configuration**
+## Configuration
 
-    - module: windows
-      metricsets: ["wmi"]
-      period: 10m
-      wmi:
-        namespace: "root\\cimv2" # Default Namespace
-        warning_threshold: 10m
-        include_queries: true
-        include_null_properties: false
-        include_empty_strings_properties: false
-        queries:
-        - class: Win32_OperatingSystem
-          properties:
-          - FreePhysicalMemory
-          - FreeSpaceInPagingFiles
-          - NumberOfUsers
-          where: ""
-        - class: Win32_PowerPlan
-          properties: []
-          where: "IsActive = True"
-          namespace: "root\\cimv2\\power" # Overwrites the module namespace in this query
+```yml
+- module: windows
+  metricsets: ["wmi"]
+  period: 10m
+  wmi:
+    namespace: "root\\cimv2" # Default Namespace
+    warning_threshold: 10m
+    include_queries: true
+    include_null_properties: false
+    include_empty_strings_properties: false
+    queries:
+    - class: Win32_OperatingSystem
+      properties:
+      - FreePhysicalMemory
+      - FreeSpaceInPagingFiles
+      - NumberOfUsers
+      where: ""
+    - class: Win32_PowerPlan
+      properties: []
+      where: "IsActive = True"
+      namespace: "root\\cimv2\\power" # Overwrites the module namespace in this query
+```
 
 **`wmi.namespace`**  
 The default WMI namespace used for queries. This can be overridden per
@@ -101,7 +103,7 @@ that are empty string. The default value is `false`.
 The list of queries to execute. The list cannot be empty. See [Query
 Configuration](#query-configuration) for the format of the queries.
 
-**Query Configuration**
+## Query Configuration
 
 Each item in the `queries` list specifies a wmi query to perform.
 
@@ -139,7 +141,7 @@ Equivalent YAML Configuration:
       - WorkingSetSize
       where: "Name = 'lsass.exe' AND WorkingSetSize > 104857600"
 
-**Best Practices**
+## Best Practices
 
 - Test your queries in isolation using the `Get-CimInstance` PowerShell
   cmdlet or the WMI Explorer.
@@ -155,7 +157,7 @@ Equivalent YAML Configuration:
 - \[Advanced\] Collect WMI-Activity Operational Logs to correlate with
   Metricbeat WMI warnings.
 
-**Compatibility**
+## Compatibility
 
 This module has been tested on the following platform:
 
