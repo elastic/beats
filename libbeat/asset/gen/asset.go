@@ -24,9 +24,10 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/elastic/beats/v7/libbeat/asset"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
 var Template = template.Must(template.New("normalizations").Parse(`
