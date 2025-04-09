@@ -30,7 +30,6 @@ import (
 
 func init() {
 	test.RegisterDeps(UnitTest)
-	test.RegisterDeps(GoFIPSOnlyUnitTest)
 }
 
 var (

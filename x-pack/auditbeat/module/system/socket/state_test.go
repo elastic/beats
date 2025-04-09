@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -162,7 +161,6 @@ func TestDNSMemoryUsage(t *testing.T) {
 }
 
 func TestTCPConnWithProcess(t *testing.T) {
-	testutils.SkipIfFIPSOnly(t, "socket test uses communityid which uses SHA-1.")
 	const (
 		localIP            = "192.168.33.10"
 		remoteIP           = "172.19.12.13"
