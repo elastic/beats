@@ -324,24 +324,22 @@ format: bytes
 type: long
 
 
-## http [_http_5]
+### http [_http_5]
 
 The http metrics of NATS server
 
-## req_stats [_req_stats]
+#### req_stats [_req_stats]
 
 The requests statistics
 
+##### uri [_uri]
 
-## uri [_uri]
-
-The request distribution on monitoring URIS
+The request distribution on monitoring URIs
 
 **`nats.stats.http.req_stats.uri.routez`**
 :   The number of hits on routez monitoring uri
 
 type: long
-
 
 **`nats.stats.http.req_stats.uri.connz`**
 :   The number of hits on connz monitoring uri
