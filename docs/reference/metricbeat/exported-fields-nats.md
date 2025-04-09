@@ -31,11 +31,55 @@ type: date
 
 Contains nats connection related metrics
 
+**`nats.connection.id`**
+:   The id of the connection
+
+type: keyword
+
 **`nats.connection.name`**
 :   The name of the connection
 
 type: keyword
 
+**`nats.connection.kind`**
+:   The kind of the connection
+
+type: keyword
+
+**`nats.connection.type`**
+:   The type of the connection
+
+type: keyword
+
+**`nats.connection.ip`**
+:   The IP address of the connection
+
+type: ip
+
+**`nats.connection.port`**
+:   The port of the connection
+
+type: integer
+
+**`nats.connection.lang`**
+:   The language of the client connection
+
+type: keyword
+
+**`nats.connection.version`**
+:   The version of the client connection
+
+type: keyword
+
+**`nats.connection.start`**
+:   The time the connection was started
+
+type: date
+
+**`nats.connection.last_activity`**
+:   The last activity time of the connection
+
+type: date
 
 **`nats.connection.subscriptions`**
 :   The number of subscriptions in this connection
@@ -67,8 +111,7 @@ type: long
 format: duration
 
 
-
-## in [_in_2]
+### in [_in_2]
 
 The amount of incoming data
 
@@ -86,8 +129,7 @@ type: long
 format: bytes
 
 
-
-## out [_out_2]
+### out [_out_2]
 
 The amount of outgoing data
 
@@ -105,7 +147,6 @@ type: long
 format: bytes
 
 
-
 ## connections [_connections_4]
 
 Contains nats connection related metrics
@@ -114,7 +155,6 @@ Contains nats connection related metrics
 :   The number of currently active clients
 
 type: integer
-
 
 
 ## route [_route]
@@ -151,8 +191,7 @@ type: integer
 type: ip
 
 
-
-## in [_in_3]
+### in [_in_3]
 
 The amount of incoming data
 
@@ -170,8 +209,7 @@ type: long
 format: bytes
 
 
-
-## out [_out_3]
+### out [_out_3]
 
 The amount of outgoing data
 
@@ -189,7 +227,6 @@ type: long
 format: bytes
 
 
-
 ## routes [_routes]
 
 Contains nats route related metrics
@@ -198,7 +235,6 @@ Contains nats route related metrics
 :   The number of registered routes
 
 type: integer
-
 
 
 ## stats [_stats_9]
@@ -247,8 +283,7 @@ type: long
 type: integer
 
 
-
-## in [_in_4]
+### in [_in_4]
 
 The amount of incoming data
 
@@ -266,8 +301,7 @@ type: long
 format: bytes
 
 
-
-## out [_out_4]
+### out [_out_4]
 
 The amount of outgoing data
 
@@ -275,7 +309,6 @@ The amount of outgoing data
 :   The amount of outgoing messages
 
 type: long
-
 
 **`nats.stats.out.bytes`**
 :   The amount of outgoing bytes
@@ -291,11 +324,9 @@ format: bytes
 type: long
 
 
-
 ## http [_http_5]
 
 The http metrics of NATS server
-
 
 ## req_stats [_req_stats]
 
@@ -334,7 +365,6 @@ type: long
 :   The number of hits on root monitoring uri
 
 type: long
-
 
 
 ## subscriptions [_subscriptions]
