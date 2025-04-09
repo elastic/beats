@@ -28,7 +28,7 @@ Make sure your system meets the following prerequisites:
 
     **To build and install from source:**
 
-    [Set up your development environment](/extend/index.md#setting-up-dev-environment) as described in the *Beats Developer Guide* then run:
+    [Set up your development environment](/extend/index.md#setting-up-dev-environment) and then run:
 
     ```shell
     cd x-pack/dockerlogbeat

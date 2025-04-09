@@ -157,11 +157,13 @@ For more details, refer to the [Testing](/extend/testing.md) guide.
 
 ## Documentation [documentation]
 
-The main documentation for each Beat is located under `<beatname>/docs` and is based on [AsciiDoc](https://docs.asciidoctor.org/asciidoc/latest/). The Beats documentation also makes extensive use of conditionals and content reuse to ensure consistency and accuracy. Before contributing to the documentation, read the following resources:
+All of the Beats documentation is located in the `elastic/beats` repository:
 
-* [Docs HOWTO](https://github.com/elastic/docs/blob/master/README.asciidoc)
-* [Contributing to the docs](/extend/contributing-docs.md)
+* `beats/docs/extend` contains documentation about developing and contributing to the Beats code.
+* `beats/docs/reference` contains the docs for each individual Beat, as well as some content that is common to all Beats in the `beats/docs/reference/libbeat` directory.
+* `beats/docs/release-notes` contains all of the product update notes.
 
+Beginning with version 9.0.0, all Elastic documentation is sourced in Markdown format. For general information about contributing to the Elastic documentation, including versioning guidelines, a syntax reference, and more,  refer to the [Elastic Docs v3 welcome page](https://elastic.github.io/docs-builder/).
 
 ## Dependencies [dependencies]
 
