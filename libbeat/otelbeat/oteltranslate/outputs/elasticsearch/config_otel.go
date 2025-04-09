@@ -71,6 +71,7 @@ var defaultOptions = esToOTelOptions{
 
 // ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
 // Ensure cloudid is handled before calling this method
+// Note: This method may override output queue settings defined by user.
 func ToOTelConfig(output *config.C) (map[string]any, error) {
 	escfg := defaultOptions
 	// check if unsupported configuration is provided
