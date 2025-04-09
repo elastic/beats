@@ -22,12 +22,15 @@ package filestream
 import (
 	"context"
 	"testing"
+
+	"github.com/gofrs/uuid/v5"
 )
 
 func TestParsersAgentLogs(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -46,7 +49,7 @@ func TestParsersAgentLogs(t *testing.T) {
 	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
@@ -64,6 +67,7 @@ func TestParsersIncludeMessage(t *testing.T) {
 
 	testlogName := "test.log"
 	readLine := "include this"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -81,7 +85,7 @@ func TestParsersIncludeMessage(t *testing.T) {
 	env.mustWriteToFile(testlogName, logs)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(logs))
@@ -97,6 +101,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -119,7 +124,7 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(2)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
@@ -136,6 +141,7 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -155,7 +161,7 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
@@ -172,6 +178,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -195,7 +202,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testline))
@@ -213,6 +220,7 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -234,7 +242,7 @@ func TestParsersJavaElasticsearchLogs(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(20)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -248,6 +256,7 @@ func TestParsersCStyleLog(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -275,7 +284,7 @@ The total should be 4 lines covered
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(4)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -289,6 +298,7 @@ func TestParsersRabbitMQMultilineLog(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -320,7 +330,7 @@ connection <0.23893.109>, channel 3 - soft error:
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(2)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -334,6 +344,7 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -356,7 +367,7 @@ func TestParsersMultilineMaxLines(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -378,6 +389,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -403,7 +415,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -443,6 +455,7 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -465,7 +478,7 @@ func TestParsersMultilineMaxBytes(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -485,6 +498,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -509,7 +523,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
@@ -550,6 +564,7 @@ func TestParsersConsecutiveNewline(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
 		"id":                                "fake-ID",
 		"paths":                             []string{env.abspath(testlogName)},
@@ -585,7 +600,7 @@ SetAdCodeMiddleware.default_ad_code route
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(2)
 	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))

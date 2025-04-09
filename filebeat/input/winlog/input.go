@@ -87,6 +87,7 @@ func (eventlogRunner) Run(
 ) error {
 	api := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
+<<<<<<< HEAD
 
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
@@ -178,6 +179,16 @@ runLoop:
 			}
 		}
 	}
+=======
+	return eventlog.Run(
+		&ctx,
+		ctxtool.FromCanceller(ctx.Cancelation),
+		api,
+		initCheckpoint(log, cursor),
+		&publisher{cursorPub: pub},
+		log,
+	)
+>>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 }
 
 func initCheckpoint(log *logp.Logger, cursor cursor.Cursor) checkpoint.EventLogState {

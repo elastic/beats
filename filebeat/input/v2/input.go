@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/go-concert/unison"
 )
@@ -83,23 +84,85 @@ type Context struct {
 	// https://github.com/elastic/beats/blob/43d80af2aea60b0c45711475d114e118d90c4581/filebeat/input/v2/input-cursor/input.go#L118
 	IDWithoutName string
 
+	// Name is the input name, sometimes referred as input type.
+	Name string
+
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
-	// Cancelation is used by Beats to signal the input to shutdown.
+	// Cancelation is used by Beats to signal the input to shut down.
 	Cancelation Canceler
 
 	// StatusReporter provides a method to update the status of the underlying unit
 	// that maps to the config. Note: Under standalone execution of Filebeat this is
 	// expected to be nil.
 	StatusReporter status.StatusReporter
+
+	// MetricsRegistry is the registry collecting metrics for the input using
+	// this context.
+	MetricsRegistry *monitoring.Registry
 }
 
-func (c Context) UpdateStatus(status status.Status, msg string) {
+func (c *Context) UpdateStatus(status status.Status, msg string) {
 	if c.StatusReporter != nil {
 		c.StatusReporter.UpdateStatus(status, msg)
 	}
 }
+
+// NewPipelineClientListener returns a new beat.ClientListener which might be
+// the PipelineClientListener or a beat.CombinedClientListener. It's the latter
+// when clientListener is non-nil.
+// The PipelineClientListener collects pipeline metrics for an input. The
+// metrics are created on reg.
+func NewPipelineClientListener(
+	reg *monitoring.Registry,
+	clientListener beat.ClientListener) beat.ClientListener {
+
+	var pcl beat.ClientListener = &PipelineClientListener{
+		eventsTotal: monitoring.NewUint(
+			reg, "events_pipeline_total"),
+		eventsFiltered: monitoring.NewUint(
+			reg, "events_pipeline_filtered_total"),
+		eventsPublished: monitoring.NewUint(
+			reg, "events_pipeline_published_total"),
+	}
+
+	if clientListener != nil {
+		pcl = &beat.CombinedClientListener{
+			A: clientListener,
+			B: pcl,
+		}
+	}
+	return pcl
+}
+
+// PipelineClientListener implements beat.ClientListener to collect pipeline
+// metrics per-input.
+type PipelineClientListener struct {
+	eventsTotal,
+	eventsFiltered,
+	eventsPublished *monitoring.Uint
+}
+
+func (i *PipelineClientListener) Closing() {
+}
+
+func (i *PipelineClientListener) Closed() {
+}
+
+func (i *PipelineClientListener) NewEvent() {
+	i.eventsTotal.Inc()
+}
+
+func (i *PipelineClientListener) Filtered() {
+	i.eventsFiltered.Inc()
+}
+
+func (i *PipelineClientListener) Published() {
+	i.eventsPublished.Inc()
+}
+
+func (i *PipelineClientListener) DroppedOnPublish(beat.Event) {}
 
 // TestContext provides the Input Test function with common environmental
 // information and services.
@@ -111,7 +174,7 @@ type TestContext struct {
 	// Agent provides additional Beat info like instance ID or beat name.
 	Agent beat.Info
 
-	// Cancelation is used by Beats to signal the input to shutdown.
+	// Cancelation is used by Beats to signal the input to shut down.
 	Cancelation Canceler
 }
 

@@ -23,6 +23,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -32,24 +33,49 @@ func TestFilestreamMetrics(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
 	inp := env.mustCreateInput(map[string]interface{}{
+<<<<<<< HEAD
 		"id":                                   "fake-ID",
 		"paths":                                []string{env.abspath(testlogName)},
 		"prospector.scanner.check_interval":    "24h",
 		"close.on_state_change.check_interval": "100ms",
 		"close.on_state_change.inactive":       "2s",
+=======
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "24h",
+		"close.on_state_change.check_interval":   "100ms",
+		"close.on_state_change.inactive":         "2s",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+		"message_max_bytes":                      20,
+		"parsers": []map[string]interface{}{
+			{
+				"multiline": map[string]interface{}{
+					"type":      "pattern",
+					"pattern":   "^multiline",
+					"negate":    true,
+					"match":     "after",
+					"max_lines": 1,
+					"timeout":   "1s",
+				},
+			},
+		},
+>>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 	})
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
-	env.requireOffsetInRegistry(testlogName, "fake-ID", len(testlines))
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
 	env.waitUntilHarvesterIsDone()
 
+<<<<<<< HEAD
 	checkMetrics(t, "fake-ID", expectedMetrics{
 		FilesOpened:      1,
 		FilesClosed:      1,
@@ -58,6 +84,110 @@ func TestFilestreamMetrics(t *testing.T) {
 		BytesProcessed:   34,
 		EventsProcessed:  3,
 		ProcessingErrors: 0,
+=======
+	checkMetrics(t, id, expectedMetrics{
+		FilesOpened:       1,
+		FilesClosed:       1,
+		FilesActive:       0,
+		MessagesRead:      3,
+		MessagesTruncated: 2,
+		BytesProcessed:    130,
+		EventsProcessed:   3,
+		ProcessingErrors:  0,
+	})
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+func TestFilestreamMessageMaxBytesTruncatedMetric(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "24h",
+		"close.on_state_change.check_interval":   "100ms",
+		"close.on_state_change.inactive":         "2s",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+		"message_max_bytes":                      20,
+	})
+
+	testlines := []byte("first line\nsecond line\nthird line\nthis is a long line exceeding message_max_bytes\n")
+	env.mustWriteToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	env.waitUntilEventCount(4)
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
+	env.waitUntilHarvesterIsDone()
+
+	checkMetrics(t, id, expectedMetrics{
+		FilesOpened:       1,
+		FilesClosed:       1,
+		FilesActive:       0,
+		MessagesRead:      4,
+		MessagesTruncated: 1,
+		BytesProcessed:    82,
+		EventsProcessed:   4,
+		ProcessingErrors:  0,
+	})
+
+	cancelInput()
+	env.waitUntilInputStops()
+}
+
+func TestFilestreamMultilineMaxLinesTruncatedMetric(t *testing.T) {
+	env := newInputTestingEnvironment(t)
+
+	testlogName := "test.log"
+	id := uuid.Must(uuid.NewV4()).String()
+	inp := env.mustCreateInput(map[string]interface{}{
+		"id":                                     id,
+		"paths":                                  []string{env.abspath(testlogName)},
+		"prospector.scanner.check_interval":      "24h",
+		"close.on_state_change.check_interval":   "100ms",
+		"close.on_state_change.inactive":         "2s",
+		"prospector.scanner.fingerprint.enabled": false,
+		"file_identity.native":                   map[string]any{},
+		"parsers": []map[string]interface{}{
+			{
+				"multiline": map[string]interface{}{
+					"type":      "pattern",
+					"pattern":   "^multiline",
+					"negate":    true,
+					"match":     "after",
+					"max_lines": 1,
+					"timeout":   "1s",
+				},
+			},
+		},
+	})
+
+	testlines := []byte("first line\nsecond line\nmultiline first line\nmultiline second line\n")
+	env.mustWriteToFile(testlogName, testlines)
+
+	ctx, cancelInput := context.WithCancel(context.Background())
+	env.startInput(ctx, id, inp)
+
+	env.waitUntilEventCount(3)
+	env.requireOffsetInRegistry(testlogName, id, len(testlines))
+	env.waitUntilHarvesterIsDone()
+
+	checkMetrics(t, id, expectedMetrics{
+		FilesOpened:       1,
+		FilesClosed:       1,
+		FilesActive:       0,
+		MessagesRead:      3,
+		MessagesTruncated: 1,
+		BytesProcessed:    66,
+		EventsProcessed:   3,
+		ProcessingErrors:  0,
+>>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 	})
 
 	cancelInput()
