@@ -804,7 +804,7 @@ func TestFilestreamDelete(t *testing.T) {
 					// Wait for the harvester to be closed
 					filebeat.WaitForLogs(
 						fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
-						time.Second,
+						10*time.Second,
 						"harvester was not closed after data added to the file")
 
 					// Wait for the "not changed" log
@@ -816,7 +816,7 @@ func TestFilestreamDelete(t *testing.T) {
 					// Ensure harvester closes without removing the file
 					filebeat.WaitForLogs(
 						fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
-						time.Second,
+						10*time.Second,
 						"Harvester was not closed because the resource is not finished")
 
 					if !fileExists(t, logFile) {

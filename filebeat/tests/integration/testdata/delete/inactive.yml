@@ -4,10 +4,9 @@ filebeat.inputs:
     paths:
       - {{ .logfile }}
     delete.on_close.inactive: true
-    delete.backoff.init: 1s
-    delete.backoff.max: 1s
-    close.on_state_change.inactive: 3s
-
+    close.on_state_change.inactive: 1s
+    backoff.init: 0.2s
+    backoff.max: 0.2s
     prospector:
       scanner:
         fingerprint:
