@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -36,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -95,7 +97,22 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 			}
 		}()
 
+<<<<<<< HEAD
 		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx}
+=======
+		id := uuid.Must(uuid.NewV4()).String()
+		inputCtx := v2.Context{
+			ID:            id,
+			IDWithoutName: id,
+			Name:          inp.Name(),
+			Agent: beat.Info{Monitoring: beat.Monitoring{
+				Namespace: monitoring.GetNamespace("dataset")}},
+			Cancelation:     ctx,
+			StatusReporter:  e.statusReporter,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          logp.L(),
+		}
+>>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 		if err := inp.Run(inputCtx, e.pipeline); err != nil {
 			e.t.Errorf("input 'Run' method returned an error: %s", err)
 		}

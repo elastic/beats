@@ -63,7 +63,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -103,7 +103,7 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.waitUntilMetaInRegistry(testlogName, id, fileMeta{Source: env.abspath(testlogName), IdentifierName: "native"})
@@ -143,7 +143,7 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -184,7 +184,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	// first event has made it successfully
 	env.waitUntilEventCount(1)
@@ -215,7 +215,7 @@ func TestFilestreamEmptyLine(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first log line\nnext is an empty line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -254,7 +254,7 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("\n\n\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -288,7 +288,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 	env.mustWriteToFile(testlogName, lines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(7)
 
@@ -329,7 +329,7 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			env.mustWriteToFile(testlogName, buf.Bytes())
 
 			ctx, cancelInput := context.WithCancel(context.Background())
-			env.startInput(ctx, inp)
+			env.startInput(ctx, id, inp)
 
 			env.waitUntilEventCount(1)
 
@@ -359,7 +359,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -393,7 +393,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -424,7 +424,7 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -457,7 +457,7 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -492,7 +492,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -528,7 +528,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, id, len(testlines))
@@ -565,7 +565,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -600,7 +600,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -646,7 +646,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 
@@ -682,7 +682,7 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -714,7 +714,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
 	env.mustWriteToFile(testlogName, testlines)
@@ -746,7 +746,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	for env.pipeline.clientsCount() != 1 {
 		time.Sleep(10 * time.Millisecond)
@@ -801,7 +801,7 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 
@@ -838,7 +838,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	env.mustSymlink(firstTestlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 
@@ -886,7 +886,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(1)
 
@@ -929,7 +929,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCount(3)
 
@@ -971,8 +971,9 @@ func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
 			lf.path, []byte(strings.Join(lf.lines, "\n")+"\n"))
 	}
 
+	id := "TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded"
 	inp := env.mustCreateInput(map[string]interface{}{
-		"id":                  "TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded",
+		"id":                  id,
 		"harvester_limit":     1,
 		"close.reader.on_eof": true,
 		"paths": []string{
@@ -982,7 +983,7 @@ func TestFilestreamHarvestAllFilesWhenHarvesterLimitExceeded(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
 
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	env.waitUntilEventCountCtx(ctx, 4)
 
@@ -1020,7 +1021,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	time.Sleep(1 * time.Second)
 
@@ -1067,7 +1068,7 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
-	env.startInput(ctx, inp)
+	env.startInput(ctx, id, inp)
 
 	time.Sleep(1 * time.Second)
 

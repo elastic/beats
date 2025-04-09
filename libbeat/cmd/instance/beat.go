@@ -337,11 +337,17 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 		config.OverwriteConfigOpts(configOpts(store))
 	}
 
+<<<<<<< HEAD
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
 	if err != nil {
 		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
 	}
 	b.Beat.Instrumentation = instrumentation
+=======
+	b.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
+
+	b.Info.Monitoring.SetupRegistries()
+>>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 
 	b.keystore = store
 	b.Beat.Keystore = store
@@ -485,9 +491,21 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, c
 		}
 	}
 
+<<<<<<< HEAD
 	tel := reg.GetRegistry("state")
 	if tel == nil {
 		tel = reg.NewRegistry("state")
+=======
+	namespaceReg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
+	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
+	if reg == nil {
+		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
+	}
+
+	tel := namespaceReg.GetRegistry("state")
+	if tel == nil {
+		tel = namespaceReg.NewRegistry("state")
+>>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 	}
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
@@ -998,6 +1016,11 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error loading config file: %w", err)
 	}
 
+<<<<<<< HEAD
+=======
+	b.Info.Monitoring.SetupRegistries()
+
+>>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 	if err := initPaths(cfg); err != nil {
 		return err
 	}
