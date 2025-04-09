@@ -673,6 +673,7 @@ func TestFilestreamDelete(t *testing.T) {
 		configTmpl          string
 		msgs                []string
 		resourceNotFinished bool
+		dataAdded           bool
 	}{
 		"EOF": {
 			configTmpl: "eof.yml",
@@ -689,6 +690,15 @@ func TestFilestreamDelete(t *testing.T) {
 			},
 			resourceNotFinished: true,
 		},
+		"EOF resource not finished and data added": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+			resourceNotFinished: true,
+			dataAdded:           true,
+		},
 		"Inactive": {
 			configTmpl: "inactive.yml",
 			msgs: []string{
@@ -703,6 +713,15 @@ func TestFilestreamDelete(t *testing.T) {
 				"'%s' will be removed because 'delete.on_close.inactive' is set",
 			},
 			resourceNotFinished: true,
+		},
+		"Inactive resource not finished and data added": {
+			configTmpl: "inactive.yml",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
+			resourceNotFinished: true,
+			dataAdded:           true,
 		},
 	}
 
@@ -772,6 +791,39 @@ func TestFilestreamDelete(t *testing.T) {
 					)
 				}
 
+				if tc.dataAdded {
+					// Add more data to the log file
+					integration.GenerateLogFile(t, msgLogFilePath, 5, true)
+
+					// Wait for the "file update" log
+					filebeat.WaitForLogs(
+						fmt.Sprintf("File %s has been updated", msgLogFilePath),
+						time.Second,
+						"filewatcher did not detect the file as updated")
+
+					// Wait for the harvester to be closed
+					filebeat.WaitForLogs(
+						fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
+						time.Second,
+						"harvester was not closed after data added to the file")
+
+					// Wait for the "not changed" log
+					filebeat.WaitForLogs(
+						fmt.Sprintf("File %s has not changed, trying to start new harvester because 'delete' is enabled", msgLogFilePath),
+						time.Second,
+						"Filestream did not try to start a new harvester for the unchanged file")
+
+					// Ensure harvester closes without removing the file
+					filebeat.WaitForLogs(
+						fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
+						time.Second,
+						"Harvester was not closed because the resource is not finished")
+
+					if !fileExists(t, logFile) {
+						t.Fatalf("%q should not have been removed", logFile)
+					}
+				}
+
 				if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
 					t.Fatalf("cannot update mock-es odds: %s", err)
 				}
@@ -779,8 +831,24 @@ func TestFilestreamDelete(t *testing.T) {
 
 			msg := fmt.Sprintf("File %s has been removed", msgLogFilePath)
 			filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
+			if fileExists(t, logFile) {
+				t.Fatalf("%q should have been removed", logFile)
+			}
 		})
 	}
+}
+
+func fileExists(t *testing.T, path string) bool {
+	t.Helper()
+	_, err := os.Stat(path)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return false
+		}
+		t.Fatalf("cannot stat file: %s", err)
+	}
+
+	return true
 }
 
 // getConfig renders the template in testdata/<folder>/<tmplPath> using vars
