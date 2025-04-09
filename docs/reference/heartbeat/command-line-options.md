@@ -72,9 +72,9 @@ Also see [Global flags](#global-flags).
 
 **EXAMPLES**
 
-```sh
+```sh subs=true
 heartbeat export config
-heartbeat export template --es.version 9.0.0-beta1
+heartbeat export template --es.version {{stack-version}}
 ```
 
 

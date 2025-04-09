@@ -43,8 +43,8 @@ auditbeat setup --dashboards
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/auditbeat:9.0.0-beta1 setup --dashboards
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/auditbeat:{{stack-version}} setup --dashboards
 ```
 ::::::
 
@@ -118,8 +118,8 @@ auditbeat setup -e \
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/auditbeat:9.0.0-beta1 setup -e \
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/auditbeat:{{stack-version}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=auditbeat_internal \

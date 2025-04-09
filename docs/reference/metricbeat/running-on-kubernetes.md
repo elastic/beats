@@ -12,7 +12,7 @@ Running {{ecloud}} on Kubernetes? See [Run {{beats}} on ECK](docs-content://depl
 ::::
 
 
-However, version 9.0.0-beta1 of Metricbeat has not yet been released, so no Docker image is currently available for this version.
+% However, version {{stack-version}} of Metricbeat has not yet been released, so no Docker image is currently available for this version.
 
 
 ## Kubernetes deploy manifests [_kubernetes_deploy_manifests]

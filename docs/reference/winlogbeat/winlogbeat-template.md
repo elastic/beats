@@ -104,19 +104,19 @@ If the host running Winlogbeat does not have direct connectivity to {{es}}, you 
 
 To export the index template, run:
 
-```sh
-PS > .\winlogbeat.exe export template --es.version 9.0.0-beta1 | Out-File -Encoding UTF8 winlogbeat.template.json
+```sh subs=true
+PS > .\winlogbeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 winlogbeat.template.json
 ```
 
 To install the template, run:
 
-```sh
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile winlogbeat.template.json -Uri http://localhost:9200/_index_template/winlogbeat-9.0.0-beta1
+```sh subs=true
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile winlogbeat.template.json -Uri http://localhost:9200/_index_template/winlogbeat-{{stack-version}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on winlogbeat-9.0.0-beta1 index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on winlogbeat-{{stack-version}} index.
 
-```sh
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/winlogbeat-9.0.0-beta1
+```sh subs=true
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/winlogbeat-{{stack-version}}
 ```
 
