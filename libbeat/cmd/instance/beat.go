@@ -465,12 +465,8 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		}
 	}
 
-<<<<<<< HEAD
-	uniq_reg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
-
-=======
 	namespaceReg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
->>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
+
 	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
 		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")

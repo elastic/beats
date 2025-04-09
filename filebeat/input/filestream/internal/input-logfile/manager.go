@@ -164,44 +164,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
-<<<<<<< HEAD
 		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
 			"will lead to data duplication, please use a different ID. Metrics "+
 			"collection has been disabled on this input.", settings.ID)
-		metricsID = ""
-=======
-		duplicatedInput := map[string]any{}
-		unpackErr := config.Unpack(&duplicatedInput)
-		if unpackErr != nil {
-			duplicatedInput["error"] = fmt.Errorf("failed to unpack duplicated input config: %w", unpackErr).Error()
-		}
-
-		// Keep old behaviour so users can upgrade to 9.0 without
-		// having their inputs not starting.
-		if settings.AllowIDDuplication {
-			cim.Logger.Errorf("filestream input with ID '%s' already exists, "+
-				"this will lead to data duplication, please use a different "+
-				"ID. Metrics collection has been disabled on this input. The "+
-				" input will start only because "+
-				"'allow_deprecated_id_duplication' is set to true",
-				settings.ID)
-		} else {
-			cim.Logger.Errorw(
-				fmt.Sprintf(
-					"filestream input ID '%s' is duplicated: input will NOT start",
-					settings.ID,
-				),
-				"input.cfg", conf.DebugString(config, true))
-
-			cim.idsMux.Unlock()
-			return nil, &common.ErrNonReloadable{
-				Err: fmt.Errorf(
-					"filestream input with ID '%s' already exists, this "+
-						"will lead to data duplication, please use a different ID",
-					settings.ID,
-				)}
-		}
->>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 	}
 
 	// TODO: improve how inputs with empty IDs are tracked.
