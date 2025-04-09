@@ -128,7 +128,7 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 	return metadata, nil
 }
 
-// instance returns data from an instance ID using the cache or making a request
+// instance returns data from an instance ID from the cache.
 func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*dataproc.Cluster, error) {
 	s.getInstances(ctx)
 
