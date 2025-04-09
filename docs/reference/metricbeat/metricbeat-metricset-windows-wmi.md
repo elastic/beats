@@ -78,56 +78,57 @@ may continue running until the WMI Arbitrator decides to stop execution.
       namespace: "root\\cimv2\\power" # Overwrites the module namespace in this query
 ```
 
+
 **`wmi.namespace`**
-The default WMI namespace used for queries. This can be overridden per
+:   The default WMI namespace used for queries. This can be overridden per
 query. The default is `root\cimv2`.
 
 **`wmi.warning_threshold`**
-The time threshold after which Metricbeat will stop waiting for the
+:   The time threshold after which Metricbeat will stop waiting for the
 query result and return control to the main flow of the program. A
 warning is logged indicating that the query execution has exceeded the
 threshold. The default is equal to the period. See [WMI Arbitrator and
 Query Execution](#wmi-arbitrator-and-query-execution) for more details.
 
 **`wmi.include_queries`**
-If set to `true` the metricset includes the query in the output
+:   If set to `true` the metricset includes the query in the output
 document. The default value is `false`.
 
 **`wmi.include_null_properties`**
-If set to `true` the metricset includes the properties that have null
+:   If set to `true` the metricset includes the properties that have null
 value in the output document. properties that have a `null` value in the
 output document. The default value is `false`.
 
 **`wmi.include_empty_string_properties`**
-A boolean option that causes the metricset to include the properties
+:   A boolean option that causes the metricset to include the properties
 that are empty string. The default value is `false`.
 
 **`wmi.queries`**
-The list of queries to execute. The list cannot be empty. See [Query
+:   The list of queries to execute. The list cannot be empty. See [Query
 Configuration](#query-configuration) for the format of the queries.
 
-## Query Configuration
+### Query Configuration
 
 Each item in the `queries` list specifies a wmi query to perform.
 
 **`class`**
-The wmi class. In the query it specifies the `FROM` clause. Required
+:    The wmi class. In the query it specifies the `FROM` clause. Required
 
 **`properties`**
-List of properties to return. In the query it specifies the `SELECT`
+:    List of properties to return. In the query it specifies the `SELECT`
 clause. Set it to the empty list (default value) to retrieve all
 available properties.
 
 **`where`**
-The where clause. In the query it specifies the `WHERE` clause. Read
+:   The where clause. In the query it specifies the `WHERE` clause. Read
 more about the format [in the Windows
 Documentation](https://learn.microsoft.com/en-us/windows/win32/wmisdk/where-clause).
 
 **`namespace`**
-The WMI Namespace for this particular query (it overwrites the
+:   The WMI Namespace for this particular query (it overwrites the
 metricset’s `namespace` value)
 
-## Example
+### Example
 
 Example WQL Query:
 
