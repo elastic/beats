@@ -241,6 +241,16 @@ type: integer
 
 Contains nats var related metrics
 
+**`nats.stats.server_name`**
+:   The name of the NATS server
+
+type: keyword
+
+**`nats.stats.version`**
+:   The version of the NATS server
+
+type: keyword
+
 **`nats.stats.uptime`**
 :   The period the server is up (sec)
 
@@ -282,6 +292,11 @@ type: long
 
 type: integer
 
+**`nats.stats.slow_consumers`**
+:   The number of slow consumers currently on NATS
+
+type: long
+
 
 ### in [_in_4]
 
@@ -316,12 +331,6 @@ type: long
 type: long
 
 format: bytes
-
-
-**`nats.stats.slow_consumers`**
-:   The number of slow consumers currently on NATS
-
-type: long
 
 
 ### http [_http_5]
@@ -364,6 +373,35 @@ type: long
 
 type: long
 
+**`nats.stats.http.req_stats.uri.jsz`**
+:   The number of hits on jsz monitoring uri
+
+type: long
+
+**`nats.stats.http.req_stats.uri.accountz`**
+:   The number of hits on accountz monitoring uri
+
+type: long
+
+**`nats.stats.http.req_stats.uri.accstatz`**
+:   The number of hits on accstatz monitoring uri
+
+type: long
+
+**`nats.stats.http.req_stats.uri.gatewayz`**
+:   The number of hits on gatewayz monitoring uri
+
+type: long
+
+**`nats.stats.http.req_stats.uri.healthz`**
+:   The number of hits on healthz monitoring uri
+
+type: long
+
+**`nats.stats.http.req_stats.uri.leafz`**
+:   The number of hits on leafz monitoring uri
+
+type: long
 
 ## subscriptions [_subscriptions]
 
