@@ -100,6 +100,10 @@ func (in winlogInput) Run(
 	api, _ := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 	return eventlog.Run(
+<<<<<<< HEAD
+=======
+		&ctx,
+>>>>>>> 87512a888 (input metrics refactor and add per-input metrics to libbeat pipeline client (#42618))
 		ctxtool.FromCanceller(ctx.Cancelation),
 		api,
 		initCheckpoint(log, cursor),
