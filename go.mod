@@ -132,16 +132,6 @@ require (
 	go.etcd.io/bbolt v1.3.10
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-<<<<<<< HEAD
-	golang.org/x/crypto v0.32.0
-	golang.org/x/mod v0.21.0
-	golang.org/x/net v0.34.0
-	golang.org/x/oauth2 v0.22.0
-	golang.org/x/sync v0.10.0
-	golang.org/x/sys v0.29.0
-	golang.org/x/text v0.21.0
-	golang.org/x/time v0.6.0
-=======
 	golang.org/x/crypto v0.36.0
 	golang.org/x/mod v0.21.0
 	golang.org/x/net v0.38.0
@@ -150,7 +140,6 @@ require (
 	golang.org/x/sys v0.31.0
 	golang.org/x/text v0.23.0
 	golang.org/x/time v0.8.0
->>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 	golang.org/x/tools v0.25.0
 	google.golang.org/api v0.191.0
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
@@ -231,28 +220,12 @@ require (
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/apm/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.14.0
-<<<<<<< HEAD
 	go.opentelemetry.io/collector/component v0.109.0
 	go.opentelemetry.io/collector/consumer v0.109.0
 	go.opentelemetry.io/collector/pdata v1.15.0
 	go.opentelemetry.io/collector/receiver v0.109.0
 	golang.org/x/term v0.28.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240725223205-93522f1f2a9f
-=======
-	go.opentelemetry.io/collector/component v0.114.0
-	go.opentelemetry.io/collector/config/configtls v1.20.0
-	go.opentelemetry.io/collector/confmap v1.20.0
-	go.opentelemetry.io/collector/consumer v0.114.0
-	go.opentelemetry.io/collector/consumer/consumererror v0.114.0
-	go.opentelemetry.io/collector/exporter v0.114.0
-	go.opentelemetry.io/collector/exporter/debugexporter v0.114.0
-	go.opentelemetry.io/collector/otelcol v0.114.0
-	go.opentelemetry.io/collector/pdata v1.20.0
-	go.opentelemetry.io/collector/receiver v0.114.0
-	go.uber.org/mock v0.5.0
-	golang.org/x/term v0.30.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697
->>>>>>> 10858f98c (chore: bump golang.org/x/net to v0.38.0 (#43653))
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
