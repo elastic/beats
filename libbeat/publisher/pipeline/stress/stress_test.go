@@ -65,6 +65,7 @@ func TestPipeline(t *testing.T) {
 	configTest(t, "gen", genConfigs, func(t *testing.T, gen string) {
 		configTest(t, "pipeline", pipelineConfigs, func(t *testing.T, pipeline string) {
 			configTest(t, "out", outConfigs, func(t *testing.T, out string) {
+
 				if testing.Verbose() {
 					start := time.Now()
 					fmt.Printf("%v Start stress test %v\n", start.Format(time.RFC3339), t.Name())
@@ -73,6 +74,7 @@ func TestPipeline(t *testing.T) {
 						fmt.Printf("%v Finished stress test %v. Duration=%v\n", end.Format(time.RFC3339), t.Name(), end.Sub(start))
 					}()
 				}
+
 				config, err := common.LoadFiles(gen, pipeline, out)
 				if err != nil {
 					t.Fatal(err)
