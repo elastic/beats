@@ -127,6 +127,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - All standard queue metrics are now included in metrics monitoring, including: `added.{events, bytes}`, `consumed.{events, bytes}`, `removed.{events, bytes}`, and `filled.{events, bytes, pct}`. {pull}42439[42439]
 - The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
 - Restored event Meta fields in the Elasticsearch output's error logs. {pull}42559[42559]
+- Restore `maintainer` label for container images {pull}43683[43683]
 
 *Auditbeat*
 
@@ -244,6 +245,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
 - Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 
 *Osquerybeat*
 
