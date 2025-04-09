@@ -328,7 +328,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		return nil, fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-	logpConfig := logp.Config{}
+	logpConfig := logp.DefaultConfig(configure.GetEnvironment())
 	logpConfig.Beat = b.Info.Name
 	logpConfig.Files.MaxSize = 1
 
