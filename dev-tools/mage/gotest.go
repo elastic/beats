@@ -76,13 +76,13 @@ func makeGoTestArgs(name string) GoTestArgs {
 	return params
 }
 
-func makeGoTestArgsForModule(name, module string) GoTestArgs {
+func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 	fileName := fmt.Sprintf("build/TEST-go-%s-%s", strings.Replace(strings.ToLower(name), " ", "_", -1),
-		strings.Replace(strings.ToLower(module), " ", "_", -1))
+		strings.Replace(strings.ToLower(pkg), " ", "_", -1))
 	params := GoTestArgs{
-		TestName:        fmt.Sprintf("%s-%s", name, module),
+		TestName:        fmt.Sprintf("%s-%s", name, pkg),
 		Race:            RaceDetector,
-		Packages:        []string{fmt.Sprintf("./module/%s/...", module)},
+		Packages:        []string{fmt.Sprintf("./module/%s", pkg)},
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -91,6 +91,32 @@ func makeGoTestArgsForModule(name, module string) GoTestArgs {
 		params.CoverageProfileFile = fileName + ".cov"
 	}
 	return params
+}
+
+// fetchGoPackages uses "go list ./module/..." to get all Go packages for a
+// module.
+// It returns a list of packages that are relative to the module path.
+// Example: for module "kafka" it'll return:
+//
+//	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
+func fetchGoPackages(module string) ([]string, error) {
+	cmd := exec.Command("go", "list", fmt.Sprintf("./%s/...", module))
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	rawPackages := strings.Split(strings.TrimSpace(string(output)), "\n")
+	var pkgs []string
+	for _, pkg := range rawPackages {
+		tmp := strings.Split(pkg, "/module/")
+		if len(tmp) != 2 {
+			continue
+		}
+
+		pkgs = append(pkgs, tmp[1])
+	}
+	return pkgs, nil
 }
 
 // testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
@@ -149,7 +175,7 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 // GoTestIntegrationArgsForModule returns a default set of arguments for running
 // module integration tests. We tag integration test files with 'integration'.
 func GoTestIntegrationArgsForModule(module string) GoTestArgs {
-	args := makeGoTestArgsForModule("Integration", module)
+	args := makeGoTestArgsForPackage("Integration", module)
 
 	args.Tags = append(args.Tags, "integration")
 	return args
@@ -163,7 +189,8 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 	}
 }
 
-// GoTestIntegrationForModule executes the Go integration tests sequentially.
+// GoTestIntegrationForModule executes the Go integration tests for each Go
+// package within a module sequentially.
 // Currently, all test cases must be present under "./module" directory.
 //
 // Motivation: previous implementation executed all integration tests at once,
@@ -189,6 +216,8 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 	return nil
 }
 
+// goTestIntegrationForSingleModule sequentially executes the tests every Go
+// packages within a module.
 func goTestIntegrationForSingleModule(ctx context.Context, module string) error {
 	modulesFileInfo, err := os.ReadDir("./module")
 	if err != nil {
@@ -215,11 +244,20 @@ func goTestIntegrationForSingleModule(ctx context.Context, module string) error 
 			return fmt.Errorf("test setup failed for module %s: %w", fi.Name(), err)
 		}
 		err = runners.Test("goIntegTest", func() error {
-			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
+			pkgs, err := fetchGoPackages("module/" + fi.Name())
 			if err != nil {
-				return err
+				return fmt.Errorf("could not list packages for module %s: %w",
+					fi.Name(), err)
 			}
-			return nil
+
+			var errs []error
+			for _, pkg := range pkgs {
+				err := GoTest(ctx, GoTestIntegrationArgsForModule(pkg))
+				if err != nil {
+					errs = append(errs, err)
+				}
+			}
+			return errors.Join(errs...)
 		})
 		if err != nil {
 			fmt.Printf("Error: failed to run integration tests for module %s:\n%v\n", fi.Name(), err)
