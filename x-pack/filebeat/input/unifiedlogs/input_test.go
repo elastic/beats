@@ -46,7 +46,7 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	p.events = append(p.events, e)
 	var c *time.Time
 	if cursor != nil {
-		cv := cursor.(time.Time)
+		cv, _ := cursor.(time.Time)
 		c = &cv
 	}
 	p.cursors = append(p.cursors, c)
@@ -224,7 +224,7 @@ func TestInput(t *testing.T) {
 				return
 			}
 			_, cursorInput := newCursorInput(tc.cfg)
-			input := cursorInput.(*input)
+			input, _ := cursorInput.(*input)
 
 			ctx, cancel := context.WithCancel(context.Background())
 
@@ -395,7 +395,7 @@ func extractTarGz(tarGzPath string) (string, error) {
 	// Create a temporary directory
 	tempDir, err := os.MkdirTemp("", "extracted-*")
 	if err != nil {
-		return "", fmt.Errorf("failed to create temporary directory: %v", err)
+		return "", fmt.Errorf("failed to create temporary directory: %w", err)
 	}
 
 	// Use the 'tar' command to extract the .tar.gz file
@@ -403,7 +403,7 @@ func extractTarGz(tarGzPath string) (string, error) {
 
 	// Run the command
 	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("failed to extract .tar.gz: %v", err)
+		return "", fmt.Errorf("failed to extract .tar.gz: %w", err)
 	}
 
 	return path.Join(tempDir, "test.logarchive"), nil

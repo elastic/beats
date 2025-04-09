@@ -10,6 +10,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os/exec"
@@ -174,7 +175,7 @@ func (input *input) runWithMetrics(ctx context.Context, pub inputcursor.Publishe
 // mustStream returns true in case a stream command is needed.
 // This is the default case and the only exceptions are when an archive file or an end date are set.
 func (input *input) mustStream() bool {
-	return !(input.ShowConfig.ArchiveFile != "" || input.ShowConfig.TraceFile != "" || input.ShowConfig.End != "")
+	return input.ShowConfig.ArchiveFile == "" && input.ShowConfig.TraceFile == "" && input.ShowConfig.End == ""
 }
 
 // mustBackfill returns true in case a show command is needed.
@@ -227,9 +228,10 @@ func (input *input) processLogs(stdout io.Reader, pub inputcursor.Publisher, log
 	for {
 		line, err = reader.ReadString('\n')
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return nil
 			}
+			input.metrics.errs.Add(1)
 			return err
 		}
 		if line = strings.Trim(line, " \n\t\r"); line == "" {
@@ -285,7 +287,7 @@ func newWrappedPublisher(updateCursor bool, inner inputcursor.Publisher) *wrappe
 
 func (pub *wrappedPublisher) Publish(event beat.Event, cursor interface{}) error {
 	pub.firstTimeOnce.Do(func() {
-		pub.firstProcessedTime = cursor.(time.Time)
+		pub.firstProcessedTime, _ = cursor.(time.Time)
 		close(pub.firstTimeC)
 	})
 	if !pub.updateCursor.Load() {
