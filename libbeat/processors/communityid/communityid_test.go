@@ -36,6 +36,7 @@ func TestNewDefaults(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "communityid uses SHA-1")
 	// From flowhash package testdata.
 	// 1:LQU9qZlK+B5F3KDmev6m5PMibrg= | 128.232.110.120 66.35.250.204 6 34855 80
 	evt := func() mapstr.M {
@@ -173,7 +174,6 @@ func TestRun(t *testing.T) {
 
 func testProcessor(t testing.TB, seed uint16, fields mapstr.M, expectedHash interface{}) {
 	t.Helper()
-	testutils.SkipIfFIPSOnly(t, "communityid uses SHA-1")
 
 	c := defaultConfig()
 	c.Seed = seed
