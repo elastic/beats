@@ -29,13 +29,13 @@ packetbeat.flows:
 
 Here’s an example of a flow information sent by Packetbeat. See [*Flow Event fields*](/reference/packetbeat/exported-fields-flows_event.md) for a description of each field.
 
-```json
+```json subs=true
 {
   "@timestamp": "2018-11-15T14:41:24.000Z",
   "agent": {
     "hostname": "host.example.com",
     "name": "host.example.com",
-    "version": "9.0.0-beta1"
+    "version": "{{stack-version}}"
   },
   "destination": {
     "bytes": 460,

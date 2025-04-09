@@ -5,7 +5,7 @@ mapped_pages:
 
 # Change the index name [change-index-name]
 
-Filebeat uses data streams named `filebeat-9.0.0-beta1`. To use a different name, set the [`index`](/reference/filebeat/elasticsearch-output.md#index-option-es) option in the {{es}} output. You also need to configure the `setup.template.name` and `setup.template.pattern` options to match the new name. For example:
+Filebeat uses data streams named `filebeat-[version]`. To use a different name, set the [`index`](/reference/filebeat/elasticsearch-output.md#index-option-es) option in the {{es}} output. You also need to configure the `setup.template.name` and `setup.template.pattern` options to match the new name. For example:
 
 ```sh
 output.elasticsearch.index: "customname-%{[agent.version]}"
