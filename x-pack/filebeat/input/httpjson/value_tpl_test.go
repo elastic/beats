@@ -466,7 +466,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hmac Hex",
-			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 usage is not allowed") },
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hmac "sha1" "secret" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -491,7 +491,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hash Hex empty",
-			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 usage is not allowed") },
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hash "sha1"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -499,7 +499,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hash Hex",
-			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 usage is not allowed") },
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hash "sha1" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -614,7 +614,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hmac Base64",
-			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 usage is not allowed") },
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hmacBase64 "sha1" "secret" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -639,7 +639,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 empty",
-			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 usage is not allowed") },
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hashBase64 "sha1"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -647,7 +647,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hash Base64",
-			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 usage is not allowed") },
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hashBase64 "sha1" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},

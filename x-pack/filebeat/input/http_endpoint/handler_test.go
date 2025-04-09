@@ -259,7 +259,7 @@ func Test_apiResponse(t *testing.T) {
 		},
 		{
 			name:  "hmac_hex",
-			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 is not allowed") },
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -285,7 +285,7 @@ func Test_apiResponse(t *testing.T) {
 		},
 		{
 			name:  "hmac_base64",
-			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 is not allowed") },
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -311,7 +311,7 @@ func Test_apiResponse(t *testing.T) {
 		},
 		{
 			name:  "hmac_raw_base64",
-			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "SHA-1 is not allowed") },
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."

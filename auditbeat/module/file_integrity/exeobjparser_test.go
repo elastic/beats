@@ -54,7 +54,7 @@ func TestExeObjParser(t *testing.T) {
 					}
 				}
 
-				testutils.SkipIfFIPSOnly(t, "file parser uses MD5 which is not allowed in fips140=only mode.")
+				testutils.SkipIfFIPSOnly(t, "file parser uses MD5.")
 
 				got := make(mapstr.M)
 				err := exeObjParser(nil).Parse(got, target)

@@ -856,7 +856,7 @@ func TestURLEval(t *testing.T) {
 }
 
 func TestInput(t *testing.T) {
-	testutils.SkipIfFIPSOnly(t, "SHA-1 is used when establishing websocket connection")
+	testutils.SkipIfFIPSOnly(t, "websocket setup requires SHA-1.")
 	// tests will ignore context cancelled errors, since they are expected
 	ctxCancelledError := fmt.Errorf("context canceled")
 	logp.TestingSetup()
@@ -867,7 +867,6 @@ func TestInput(t *testing.T) {
 			}
 			if test.server != nil {
 				test.server(t, test.handler, test.config, test.response)
-				testutils.SkipIfFIPSOnly(t, "")
 			}
 			if test.proxyServer != nil {
 				test.proxyServer(t, test.handler, test.config, test.response)

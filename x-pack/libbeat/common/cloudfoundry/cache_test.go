@@ -23,7 +23,7 @@ func TestClientCacheWrap(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
 	}
-	testutils.SkipIfFIPSOnly(t, "Cache uses SHA-1")
+	testutils.SkipIfFIPSOnly(t, "cache uses SHA-1.")
 
 	ttl := 2 * time.Second
 	guid := mustCreateFakeGuid()

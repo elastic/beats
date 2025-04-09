@@ -178,7 +178,7 @@ var testCases = []testCase{
 
 func TestFilebeatSyslogCisco(t *testing.T) {
 	logp.TestingSetup()
-	testutils.SkipIfFIPSOnly(t, "javascript processor uses SHA-1")
+	testutils.SkipIfFIPSOnly(t, "javascript processor uses SHA-1.")
 
 	p, err := javascript.NewFromConfig(
 		javascript.Config{File: "config/pipeline.js"},
