@@ -103,17 +103,17 @@ func globalRegistry() *monitoring.Registry {
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' monitoring namespace and from the localReg parameter
+// global 'dataset' monitoring namespace and from the reg parameter
 // encoded as a JSON array (pretty formatted). It's safe to pass in a nil
-// localReg.
+// reg.
 func MetricSnapshotJSON(reg *monitoring.Registry) ([]byte, error) {
 	return json.MarshalIndent(filteredSnapshot(globalRegistry(), reg, ""), "", "  ")
 }
 
 // NewMetricsRegistry creates a monitoring.Registry for an input.
 //
-// The metric registry is created on parent with
-// name 'inputID' (all '.' are replaced by '_') and populated with
+// The metric registry is created on parent using inputID as the name,
+// any '.' is replaced by '_'. The new registry is initialized with
 // 'id: inputID' and 'input: inputType'.
 //
 // Call CancelMetricsRegistry to remove it from the parent registry and free up
