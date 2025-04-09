@@ -24,6 +24,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/mitchellh/hashstructure"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -37,9 +39,10 @@ var moduleList = monitoring.NewUniqueList()
 var moduleListMetricsOnce sync.Once
 
 // RegisterMonitoringModules registers the modules list with the monitoring system.
-func RegisterMonitoringModules(namespace string) {
+func RegisterMonitoringModules(namespace *monitoring.Namespace) {
+	registry := common.GetOrCreateRegistry(namespace, "state")
 	moduleListMetricsOnce.Do(func() {
-		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), namespace, moduleList.Report, monitoring.Report)
+		monitoring.NewFunc(registry, "modules", moduleList.Report, monitoring.Report)
 	})
 }
 
