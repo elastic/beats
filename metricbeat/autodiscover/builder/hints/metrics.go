@@ -70,7 +70,7 @@ func InitializeModule() {
 }
 
 // NewMetricHints builds a new metrics builder based on hints
-func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
+func NewMetricHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
@@ -78,7 +78,7 @@ func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &metricHints{config.Key, config.Registry, logp.NewLogger("hints.builder")}, nil
+	return &metricHints{config.Key, config.Registry, logger.Named("hints.builder")}, nil
 }
 
 // Create configs based on hints passed from providers

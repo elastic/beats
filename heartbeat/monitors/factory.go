@@ -247,7 +247,7 @@ func newCommonPublishConfigs(info beat.Info, beatLocation *config.LocationWithID
 			_, _ = meta.Put("pipeline", settings.Pipeline)
 		}
 
-		procs := processors.NewList(nil)
+		procs := processors.NewList(info.Logger)
 
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
@@ -272,7 +272,7 @@ var geoErrOnce = &sync.Once{}
 
 // preProcessors sets up the required geo, event.dataset, data_stream.*, and write index processors for future event publishes.
 func preProcessors(info beat.Info, location *config.LocationWithID, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
-	procs = processors.NewList(nil)
+	procs = processors.NewList(info.Logger)
 
 	var dataset string
 	if settings.DataStream != nil && settings.DataStream.Dataset != "" {

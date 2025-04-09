@@ -21,9 +21,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-ucfg"
 )
 
@@ -33,14 +35,15 @@ func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 	return []*conf.C{conf.NewConfig()}
 }
 
-func newFakeBuilder(_ *conf.C) (Builder, error) {
+func newFakeBuilder(_ *conf.C, logger *logp.Logger) (Builder, error) {
 	return &fakeBuilder{}, nil
 }
 
 func TestBuilderRegistry(t *testing.T) {
 	// Add a new builder
 	reg := NewRegistry()
-	reg.AddBuilder("fake", newFakeBuilder)
+	err := reg.AddBuilder("fake", newFakeBuilder)
+	require.NoError(t, err)
 
 	// Check if that builder is available in registry
 	b := reg.GetBuilder("fake")

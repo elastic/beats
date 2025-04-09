@@ -98,7 +98,7 @@ func RunTests(
 	for i := 0; i < config.Generate.Worker; i++ {
 		i := i
 		withWG(&genWG, func() {
-			err := generate(cs, pipeline, config.Generate, i, errors)
+			err := generate(cs, pipeline, config.Generate, i, errors, log)
 			if err != nil {
 				log.Errorf("Generator failed with: %v", err)
 			}

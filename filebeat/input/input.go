@@ -61,6 +61,7 @@ type Runner struct {
 	Once           bool
 	beatDone       chan struct{}
 	statusReporter status.StatusReporter
+	logger         *logp.Logger
 }
 
 // New instantiates a new Runner
@@ -69,6 +70,7 @@ func New(
 	connector channel.Connector,
 	beatDone chan struct{},
 	states []file.State,
+	logger *logp.Logger,
 ) (*Runner, error) {
 	input := &Runner{
 		config:   defaultConfig,
@@ -76,6 +78,7 @@ func New(
 		done:     make(chan struct{}),
 		Once:     false,
 		beatDone: beatDone,
+		logger:   logger,
 	}
 
 	var err error
@@ -97,7 +100,7 @@ func New(
 		GetStatusReporter: input.GetStatusReporter,
 	}
 	var ipt Input
-	ipt, err = f(conf, connector, context)
+	ipt, err = f(conf, connector, context, logger)
 	if err != nil {
 		return input, err
 	}
@@ -143,10 +146,10 @@ func (p *Runner) Run() {
 	for {
 		select {
 		case <-p.done:
-			logp.Info("input ticker stopped")
+			p.logger.Info("input ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
-			logp.Debug("input", "Run input")
+			p.logger.Named("input").Debug("Run input")
 			p.input.Run()
 		}
 	}

@@ -35,9 +35,11 @@ import (
 )
 
 func makeTestInfo(version string) beat.Info {
+	logger, _ := logp.NewDevelopmentLogger("")
 	return beat.Info{
 		IndexPrefix: "filebeat",
 		Version:     version,
+		Logger:      logger,
 	}
 }
 
@@ -89,7 +91,7 @@ func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expecte
 	var res map[string]interface{}
 	err = json.Unmarshal(response, &res)
 	if assert.NoError(t, err) {
-		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response))
+		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response)) //nolint:errcheck // Safe to ignore
 	}
 }
 

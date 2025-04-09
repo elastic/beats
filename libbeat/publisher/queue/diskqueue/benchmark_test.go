@@ -34,6 +34,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -78,7 +80,9 @@ func setup(b *testing.B, compress bool, protobuf bool) (*diskQueue, queue.Produc
 	s.Path = b.TempDir()
 
 	s.UseCompression = compress
-	q, err := NewQueue(logp.L(), nil, s, nil)
+	logger, err := logp.NewDevelopmentLogger("")
+	require.NoError(b, err)
+	q, err := NewQueue(logger, nil, s, nil)
 	if err != nil {
 		panic(err)
 	}

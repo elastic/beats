@@ -111,7 +111,7 @@ func (f *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 		pipelineLoaderFactory: f.pipelineLoaderFactory,
 		pipelineCallbackID:    f.pipelineCallbackID,
 		overwritePipelines:    f.overwritePipelines,
-		log:                   logp.NewLogger(logName),
+		log:                   f.beatInfo.Logger.Named(logName),
 	}, nil
 }
 

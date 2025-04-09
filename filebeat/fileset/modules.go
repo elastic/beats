@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -61,7 +60,7 @@ func newModuleRegistry(modulesPath string,
 ) (*ModuleRegistry, error) {
 	reg := ModuleRegistry{
 		registry: []Module{},
-		log:      logp.NewLogger(logName),
+		log:      beatInfo.Logger.Named(logName),
 	}
 
 	for _, mcfg := range moduleConfigs {
@@ -149,12 +148,12 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, f
 
 	stat, err := os.Stat(modulesPath)
 	if err != nil || !stat.IsDir() {
-		log := logp.NewLogger(logName)
+		log := beatInfo.Logger.Named(logName)
 		if !fleetmode.Enabled() {
 			// When run under agent via agentbeat there is no modules directory and this is expected.
 			log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
 		}
-		return &ModuleRegistry{log: log}, nil //nolint:nilerr // empty registry, no error
+		return &ModuleRegistry{log: log}, nil
 	}
 
 	var modulesCLIList []string
@@ -253,7 +252,7 @@ func mcfgFromConfig(cfg *conf.C) (*ModuleConfig, error) {
 
 func getCurrentModuleName(modulePath, module string) (string, bool) {
 	moduleConfigPath := filepath.Join(modulePath, module, "module.yml")
-	d, err := ioutil.ReadFile(moduleConfigPath)
+	d, err := os.ReadFile(moduleConfigPath)
 	if err != nil {
 		return module, false
 	}
@@ -271,7 +270,7 @@ func getCurrentModuleName(modulePath, module string) (string, bool) {
 
 func getModuleFilesets(modulePath, module string) ([]string, error) {
 	module, _ = getCurrentModuleName(modulePath, module)
-	fileInfos, err := ioutil.ReadDir(filepath.Join(modulePath, module))
+	fileInfos, err := os.ReadDir(filepath.Join(modulePath, module))
 	if err != nil {
 		return []string{}, err
 	}

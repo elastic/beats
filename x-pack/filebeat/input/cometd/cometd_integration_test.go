@@ -55,7 +55,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 
 func TestInput(t *testing.T) {
 	t.Skip("flaky test: https://github.com/elastic/beats/issues/33423")
-	logp.TestingSetup(logp.WithSelectors("cometd input", "cometd"))
 
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{
@@ -84,8 +83,9 @@ func TestInput(t *testing.T) {
 		BeatDone: make(chan struct{}),
 	}
 
+	logger := logp.NewTestingLogger(t, "")
 	// Setup the input
-	input, err := NewInput(config, connector, inputContext)
+	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
