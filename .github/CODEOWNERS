@@ -29,7 +29,7 @@ CHANGELOG*
 /deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
 /dev-tools/ @elastic/elastic-agent-data-plane
 /dev-tools/kubernetes @elastic/elastic-agent-data-plane @elastic/elastic-agent-control-plane
-/docs/ @elastic/elastic-agent-data-plane
+/docs/ @elastic/ingest-docs
 /filebeat @elastic/elastic-agent-data-plane
 /filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /filebeat/input/syslog/ @elastic/sec-deployment-and-devices
