@@ -467,7 +467,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		}
 	}
 
-	namespaceReg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
+	namespaceReg := b.Info.Monitoring.Namespace.GetRegistry()
 	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
 		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
