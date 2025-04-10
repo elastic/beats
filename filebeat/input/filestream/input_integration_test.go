@@ -1194,7 +1194,7 @@ func TestFilestreamDelete(t *testing.T) {
 			env.mustWriteToFile(logfile, testlines.Bytes())
 
 			ctx, cancelInput := context.WithCancel(context.Background())
-			env.startInput(ctx, inp)
+			env.startInput(ctx, t.Name(), inp)
 			defer cancelInput()
 
 			env.waitUntilEventCount(10)
