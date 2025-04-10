@@ -23,10 +23,6 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Release date:** March 25, 2025
 
 ### Features and enhancements [beats-900-features-enhancements]
-<<<<<<< HEAD
-
-### Fixes [beats-900-fixes]
-=======
 * Improves logging in system/socket in Auditbeat. [#41571]({{beats-pull}}41571)
 * Adds out of the box support for Amazon EventBridge notifications over SQS to S3 input in Filebeat. [#40006]({{beats-pull}}40006)
 * Update CEL mito extensions to v1.16.0 in Filebeat. [#41727]({{beats-pull}}41727)
@@ -84,4 +80,3 @@ To check for security updates, go to [Security announcements for the Elastic sta
 * Reset EventLog if error EOF is encountered in Winlogbeat. [#42826]({{beats-pull}}42826)
 * Implement backoff on error retrial in Winlogbeat. [#42826]({{beats-pull}}42826)
 * Fix boolean key in security pipelines and sync pipelines with integration in Winlogbeat. [#43027]({{beats-pull}}43027)
->>>>>>> e6f4fd6dc (Add Beats Release Notes for 9.0.0 (#43771))
