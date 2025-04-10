@@ -100,7 +100,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 //
 //	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
 func fetchGoPackages(module string) ([]string, error) {
-	cmd := exec.Command("go", "list", fmt.Sprintf("./%s/...", module))
+	cmd := exec.Command("go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module))
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
