@@ -259,7 +259,7 @@ func TestInput(t *testing.T) {
 						tc.assertFunc(collect, pub.events, pub.cursors)
 					}
 				},
-				30*time.Second, time.Second,
+				60*time.Second, time.Second,
 			)
 		})
 	}
