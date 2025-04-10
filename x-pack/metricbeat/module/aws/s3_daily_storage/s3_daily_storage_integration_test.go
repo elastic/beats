@@ -9,7 +9,7 @@ package s3_daily_storage
 import (
 	"testing"
 
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions/init"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )

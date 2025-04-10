@@ -22,9 +22,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -44,14 +41,6 @@ type renameFieldsConfig struct {
 type fromTo struct {
 	From string `config:"from"`
 	To   string `config:"to"`
-}
-
-func init() {
-	processors.RegisterPlugin("rename",
-		checks.ConfigChecked(NewRenameFields,
-			checks.RequireFields("fields")))
-
-	jsprocessor.RegisterPlugin("Rename", NewRenameFields)
 }
 
 // NewRenameFields returns a new rename processor.

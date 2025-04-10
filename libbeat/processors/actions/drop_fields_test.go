@@ -59,7 +59,7 @@ func TestDropFieldRun(t *testing.T) {
 			},
 		)
 
-		p, err := newDropFields(c)
+		p, err := NewDropFields(c)
 		require.NoError(t, err)
 		process, ok := p.(*dropFields)
 		assert.True(t, ok)
@@ -117,7 +117,7 @@ func TestNewDropFields(t *testing.T) {
 			"fields": []string{"/field_.*1/", "/second/", "third"},
 		})
 
-		procInt, err := newDropFields(c)
+		procInt, err := NewDropFields(c)
 		assert.NoError(t, err)
 
 		processor, ok := procInt.(*dropFields)
@@ -132,7 +132,7 @@ func TestNewDropFields(t *testing.T) {
 			"fields": []string{"/[//"},
 		})
 
-		_, err := newDropFields(c)
+		_, err := NewDropFields(c)
 
 		assert.Equal(t, "wrong configuration in drop_fields[0]=/[//. error parsing regexp: missing closing ]: `[/`", err.Error())
 	})

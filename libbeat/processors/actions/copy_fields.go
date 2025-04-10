@@ -22,9 +22,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -39,15 +36,6 @@ type copyFieldsConfig struct {
 	Fields        []fromTo `config:"fields"`
 	IgnoreMissing bool     `config:"ignore_missing"`
 	FailOnError   bool     `config:"fail_on_error"`
-}
-
-func init() {
-	processors.RegisterPlugin("copy_fields",
-		checks.ConfigChecked(NewCopyFields,
-			checks.RequireFields("fields"),
-		),
-	)
-	jsprocessor.RegisterPlugin("CopyFields", NewCopyFields)
 }
 
 // NewCopyFields returns a new copy_fields processor.

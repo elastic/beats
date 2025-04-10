@@ -24,7 +24,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -33,14 +32,7 @@ type includeFields struct {
 	Fields []string
 }
 
-func init() {
-	processors.RegisterPlugin("include_fields",
-		checks.ConfigChecked(newIncludeFields,
-			checks.RequireFields("fields"),
-			checks.AllowedFields("fields", "when")))
-}
-
-func newIncludeFields(c *conf.C) (beat.Processor, error) {
+func NewIncludeFields(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Fields []string `config:"fields"`
 	}{}

@@ -21,8 +21,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -30,14 +28,7 @@ import (
 // LabelsKey is the default target key for the add_labels processor.
 const LabelsKey = "labels"
 
-func init() {
-	processors.RegisterPlugin("add_labels",
-		checks.ConfigChecked(createAddLabels,
-			checks.RequireFields(LabelsKey),
-			checks.AllowedFields(LabelsKey, "when")))
-}
-
-func createAddLabels(c *conf.C) (beat.Processor, error) {
+func CreateAddLabels(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Labels mapstr.M `config:"labels" validate:"required"`
 	}{}
