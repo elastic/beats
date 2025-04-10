@@ -1,0 +1,3 @@
+server:
+  remoteWrite:
+    - url: http://metricbeat.kube-system:9201/write
