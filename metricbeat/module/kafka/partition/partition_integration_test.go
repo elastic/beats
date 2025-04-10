@@ -21,7 +21,7 @@ package partition
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 	"testing"
 	"time"
@@ -66,8 +66,7 @@ func TestTopic(t *testing.T) {
 	)
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
-
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64())).Int())
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 	// Create initial topic
