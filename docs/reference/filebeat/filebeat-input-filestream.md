@@ -580,42 +580,44 @@ file_identity.inode_marker.path: /logs/.filebeat-marker
 ```
 
 ## Removing fully ingested files [filebeat-input-filestream-delete-options]
-Filebeat can delete files after they reach EOF or become inactive and
-all events from the file have been published.
+Filebeat can delete files after the reader is closed.
+Regardless of the reader close configuration, a file can only be
+deleted if EOF has been reached and all events from the file have
+been published.
 
-If there is an issue while deleting the file, the operation is retried
-with an exponential backoff until the maximum wait is reached.
+If there are events pending publishing or there is an issue while
+deleting the file, the harvester is closed and it will be re-opened at
+the next scan, then the remove operation is retried. The scan for
+changes in files can be configured by setting
+[`prospector.scanner.check_interval`](#filebeat-input-filestream-scan-frequency).
+
+If you enabled removing files, it is recommended to keep
+`clean_removed` enabled.
 
 Removing files is disabled by default.
 
 ### `delete.on_close.eof` [filebeat-input-filestream-delete-eof]
 When set to `true`, files will be removed after EOF is reached and the
-reader is closed. If you set `delete.on_close.eof: ture`, you must
-also set `close.reader.on_eof: true`. The default is `false`.
+reader is closed. If you set `delete.on_close.eof: ture`, then
+`close.reader.on_eof: true` is automatically set. This option is
+disabled by default.
 
 ### `delete.on_close.inactive` [filebeat-input-filestream-delete-inactive]
-When set to `true`, files will be removed after they are inactive and
-the reader is closed. If you enable `delete.on_close.inactive` you
-must also enable
-[`close.on_state_change.inactive`](#filebeat-input-filestream-close-inactive). The
-default is `false`.
+When set to `true`, files will be removed after the reader is closed
+due to inactivity. If you enable `delete.on_close.inactive`, then
+`close.on_state_change.inactive: true` is automatically set. This
+option is disabled by default.
 
-When `delete.on_close.inactive` is true, if
-`close.on_state_change.inactive` is not set, it defaults to 30m (30
-minutes).
+When `delete.on_close.inactive` is true,
+`close.on_state_change.inactive` defaults to 30 minutes.
 
-### `delete.backoff.init` [filebeat-input-filestream-delete-backoff-init]
-The `delete.backoff.init` option defines how long Filebeat waits
-before retrying removing the file. The backoff intervals increase
-exponentially. The default is 1s. Thus, removing the file is retried
-after 1 second, then 2 seconds, then 4 seconds and so on until it
-reaches the limit defined in `delete.backoff.max`.
-
-### `delete.backoff.max` [filebeat-input-filestream-delete-backoff-max]
-The maximum time Filebeat will wait until giving up on removing the
-file. After the maximum wait is reached Filebeat stops trying to
-remove the file. For Filebeat to try removing the file again either
-the input or Filebeat need to be restarted. The default is 10s.
+### `delete.grace_period` [filebeat-input-filestream-delete-grace-period]
+An interval to wait after the reader is closed and all events have
+been published before trying to remove the file. The harvester for the
+file will stay open while waiting for the grace period. Once the grace
+period expires, Filestream checks if the file is at EOF, if is not,
+then the harvester is closed, otherwise the file is removed. The
+default is 30 minutes.
 
 ## Log rotation [filestream-log-rotation-support]
 

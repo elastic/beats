@@ -64,7 +64,6 @@ type takeOverConfig struct {
 
 type deleterConfig struct {
 	OnClose     deleterReasonConfig `config:"on_close"`
-	Backoff     backoffConfig       `config:"backoff"`
 	GracePeriod time.Duration       `config:"grace_period"`
 }
 
@@ -166,10 +165,7 @@ func defaultReaderConfig() readerConfig {
 
 func defaultDeleterConfig() deleterConfig {
 	return deleterConfig{
-		Backoff: backoffConfig{
-			Init: 1 * time.Second,
-			Max:  10 * time.Second,
-		},
+		GracePeriod: 30 * time.Minute,
 	}
 }
 

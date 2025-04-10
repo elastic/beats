@@ -86,44 +86,66 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
-	config := defaultConfig()
-	defaultInactive := config.Close.OnStateChange.Inactive
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, nil, err
-	}
-
-	if config.Delete.OnClose.Inactive {
+func updateDefaults(cfg config, inactiveSet bool) config {
+	defaultInactive := defaultCloserConfig().OnStateChange.Inactive
+	if cfg.Delete.OnClose.Inactive && !inactiveSet {
 		// This means the `close.on_state_change.inactive` is either not set or
 		// it is set to the default value, in either case, overwrite it to
 		// 30min
-		if config.Close.OnStateChange.Inactive == defaultInactive {
+		if cfg.Close.OnStateChange.Inactive == defaultInactive {
 			logp.
 				L().
 				Named("filestream").
 				Info("setting 'close.on_state_change.inactive' to 30min" +
 					" because 'delete.on_close.inactive' is true.")
-			config.Close.OnStateChange.Inactive = 30 * time.Minute
+			cfg.Close.OnStateChange.Inactive = 30 * time.Minute
 		}
 	}
 
-	prospector, err := newProspector(config)
+	if cfg.Delete.OnClose.EOF {
+		if !cfg.Close.Reader.OnEOF {
+			logp.
+				L().
+				Named("filestream").
+				Info("setting 'close.reader.on_eof: true'" +
+					" because 'delete.on_close.eof' is true.")
+		}
+		cfg.Close.Reader.OnEOF = true
+	}
+
+	return cfg
+}
+
+func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
+	c := defaultConfig()
+	if err := cfg.Unpack(&c); err != nil {
+		return nil, nil, err
+	}
+
+	inactiveSet, err := cfg.Has("close.on_state_change.inactive", -1)
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot read 'close.on_state_change.inactive': %w", err)
+	}
+
+	c = updateDefaults(c, inactiveSet)
+
+	prospector, err := newProspector(c)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
 
-	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)
+	encodingFactory, ok := encoding.FindEncoding(c.Reader.Encoding)
 	if !ok || encodingFactory == nil {
-		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
+		return nil, nil, fmt.Errorf("unknown encoding('%v')", c.Reader.Encoding)
 	}
 
 	filestream := &filestream{
-		readerConfig:    config.Reader,
+		readerConfig:    c.Reader,
 		encodingFactory: encodingFactory,
-		closerConfig:    config.Close,
-		parsers:         config.Reader.Parsers,
-		takeOver:        config.TakeOver,
-		deleterConfig:   config.Delete,
+		closerConfig:    c.Close,
+		parsers:         c.Reader.Parsers,
+		takeOver:        c.TakeOver,
+		deleterConfig:   c.Delete,
 	}
 
 	return prospector, filestream, nil
