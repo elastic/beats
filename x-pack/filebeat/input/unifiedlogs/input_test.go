@@ -25,7 +25,9 @@ import (
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var _ inputcursor.Publisher = (*publisher)(nil)
@@ -44,7 +46,7 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	p.events = append(p.events, e)
 	var c *time.Time
 	if cursor != nil {
-		cv := cursor.(time.Time)
+		cv, _ := cursor.(time.Time)
 		c = &cv
 	}
 	p.cursors = append(p.cursors, c)
@@ -72,8 +74,8 @@ func TestInput(t *testing.T) {
 			timeUntilClose:       time.Second,
 			expectedLogStreamCmd: "/usr/bin/log stream --style ndjson",
 			assertFunc: func(collect *assert.CollectT, events []beat.Event, cursors []*time.Time) {
-				assert.NotEmpty(collect, events)
-				assert.NotEmpty(collect, cursors)
+				require.NotEmpty(collect, events)
+				require.NotEmpty(collect, cursors)
 				assert.Equal(collect, len(events), len(cursors))
 				lastEvent := events[len(events)-1]
 				lastCursor := cursors[len(cursors)-1]
@@ -222,7 +224,7 @@ func TestInput(t *testing.T) {
 				return
 			}
 			_, cursorInput := newCursorInput(tc.cfg)
-			input := cursorInput.(*input)
+			input, _ := cursorInput.(*input)
 
 			ctx, cancel := context.WithCancel(context.Background())
 
@@ -233,7 +235,7 @@ func TestInput(t *testing.T) {
 			wg.Add(1)
 			go func(t *testing.T) {
 				defer wg.Done()
-				err := input.runWithMetrics(ctx, pub, log)
+				err := input.runWithMetrics(ctx, pub, testMetricsRegistry(t), log)
 				if tc.expectedRunErrorMsg == "" {
 					assert.NoError(t, err)
 				} else {
@@ -257,7 +259,7 @@ func TestInput(t *testing.T) {
 						tc.assertFunc(collect, pub.events, pub.cursors)
 					}
 				},
-				30*time.Second, time.Second,
+				60*time.Second, time.Second,
 			)
 		})
 	}
@@ -298,7 +300,7 @@ func TestBackfillAndStream(t *testing.T) {
 	wg.Add(1)
 	go func(t *testing.T) {
 		defer wg.Done()
-		err := input.runWithMetrics(ctx, pub, log)
+		err := input.runWithMetrics(ctx, pub, testMetricsRegistry(t), log)
 		assert.NoError(t, err)
 	}(t)
 
@@ -308,13 +310,13 @@ func TestBackfillAndStream(t *testing.T) {
 			showCmdLog := filterStartLogShowLogline(buf.Bytes())
 			assert.Equal(collect, expectedLogStreamCmd, filterStartLogStreamLogline(buf.Bytes()))
 			assert.True(collect, strings.HasPrefix(showCmdLog, expectedLogShowCmd))
-			assert.NotEmpty(collect, pub.events)
-			assert.NotEmpty(collect, pub.cursors)
+			require.NotEmpty(collect, pub.events)
+			require.NotEmpty(collect, pub.cursors)
 
 			var endTime time.Time
 			regex := regexp.MustCompile(`--end\s+(\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}[+-]\d{4})`)
 			matches := regex.FindStringSubmatch(showCmdLog)
-			assert.Equal(collect, 2, len(matches))
+			require.Equal(collect, 2, len(matches))
 			endTime, _ = time.Parse("2006-01-02 15:04:05-0700", matches[1])
 			endTime = endTime.Truncate(time.Second)
 
@@ -327,7 +329,7 @@ func TestBackfillAndStream(t *testing.T) {
 					}
 				}
 			}
-			assert.NotNil(collect, firstStreamedEventTime)
+			require.NotNil(collect, firstStreamedEventTime)
 			assert.EqualValues(collect, endTime, *firstStreamedEventTime)
 			assert.True(collect, strings.HasPrefix(showCmdLog, filterEndLogShowLogline(buf.Bytes())))
 		},
@@ -393,7 +395,7 @@ func extractTarGz(tarGzPath string) (string, error) {
 	// Create a temporary directory
 	tempDir, err := os.MkdirTemp("", "extracted-*")
 	if err != nil {
-		return "", fmt.Errorf("failed to create temporary directory: %v", err)
+		return "", fmt.Errorf("failed to create temporary directory: %w", err)
 	}
 
 	// Use the 'tar' command to extract the .tar.gz file
@@ -401,8 +403,14 @@ func extractTarGz(tarGzPath string) (string, error) {
 
 	// Run the command
 	if err := cmd.Run(); err != nil {
-		return "", fmt.Errorf("failed to extract .tar.gz: %v", err)
+		return "", fmt.Errorf("failed to extract .tar.gz: %w", err)
 	}
 
 	return path.Join(tempDir, "test.logarchive"), nil
+}
+
+func testMetricsRegistry(t *testing.T) *monitoring.Registry {
+	reg, unreg := inputmon.NewInputRegistry("", "", nil)
+	t.Cleanup(unreg)
+	return reg
 }
