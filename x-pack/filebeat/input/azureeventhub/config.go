@@ -132,7 +132,7 @@ func (conf *azureInputConfig) Validate() error {
 	// check that it matches the event hub name.
 	if conf.ConnectionStringProperties.EntityPath != nil && *conf.ConnectionStringProperties.EntityPath != conf.EventHubName {
 		return fmt.Errorf(
-			"invalid connection string: entity path (%s) does not match event hub name (%s)",
+			"invalid config: the entity path (%s) in the connection string does not match event hub name (%s)",
 			*conf.ConnectionStringProperties.EntityPath,
 			conf.EventHubName,
 		)

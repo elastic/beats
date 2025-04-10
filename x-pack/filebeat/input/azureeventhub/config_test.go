@@ -123,7 +123,7 @@ func TestValidateConnectionStringV2(t *testing.T) {
 
 		err := config.Validate()
 		require.Error(t, err)
-		assert.ErrorContains(t, err, "invalid connection string: entity path (my-event-hub) does not match event hub name (not-my-event-hub)")
+		assert.ErrorContains(t, err, "invalid config: the entity path (my-event-hub) in the connection string does not match event hub name (not-my-event-hub)")
 
 		require.NotNil(t, config.ConnectionStringProperties.EntityPath)
 		require.NotEqual(t, *config.ConnectionStringProperties.EntityPath, config.EventHubName)
