@@ -203,9 +203,8 @@ func TestMultipleReceivers(t *testing.T) {
 			},
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
-			require.Conditionf(t, func() bool {
-				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
-			}, "expected receivers to have logs, got logs: %v", logs)
+			assert.Len(t, logs["r1"], 1, "receive r1 does not have ny logs")
+			assert.Len(t, logs["r2"], 1, "receive r2 does not have ny logs")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
