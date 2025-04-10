@@ -97,8 +97,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 		factory := RunnerFactory(
 			log,
 			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")}},
 			loader.Loader)
 
 		inputID := "filestream-kubernetes-pod-aee2af1c6365ecdd72416f44aab49cd8bdc7522ab008c39784b7fd9d46f794a4"
@@ -143,8 +142,7 @@ type: test
 		factory := RunnerFactory(
 			log,
 			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")}},
 			loader.Loader)
 
 		// run
@@ -172,8 +170,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		factory := RunnerFactory(
 			log,
 			beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")},
-				Logger: log},
+				Namespace: monitoring.GetNamespace("TestRunnerFactory_CheckConfig")}},
 			loader.Loader)
 
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
