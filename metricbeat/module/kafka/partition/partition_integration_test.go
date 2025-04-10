@@ -106,13 +106,13 @@ func TestTopic(t *testing.T) {
 
 	// Its possible that other topics exists -> select the right data
 	for _, data := range dataBefore {
-		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic {
+		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
 			offsetBefore, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
 		}
 	}
 
 	for _, data := range dataAfter {
-		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic {
+		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
 			offsetAfter, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
 		}
 	}

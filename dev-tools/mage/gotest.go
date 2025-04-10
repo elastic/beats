@@ -60,7 +60,7 @@ type TestBinaryArgs struct {
 }
 
 func makeGoTestArgs(name string) GoTestArgs {
-	fileName := fmt.Sprintf("build/TEST-go-%s", strings.Replace(strings.ToLower(name), " ", "_", -1))
+	fileName := fmt.Sprintf("build/TEST-go-%s", strings.ReplaceAll(strings.ToLower(name), " ", "_"))
 	params := GoTestArgs{
 		TestName:        name,
 		Race:            RaceDetector,
@@ -102,7 +102,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 //
 //	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
 func fetchGoPackages(module string) ([]string, error) {
-	cmd := exec.Command("go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module)) // nolint:gosec // used only to run tests
+	cmd := exec.Command("go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module)) //nolint:gosec // used only to run tests
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
