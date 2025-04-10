@@ -41,7 +41,7 @@ type Config struct {
 	WithFields map[string]any `config:"with_fields" yaml:"with_fields"`
 
 	environment Environment
-	addCaller   bool // Adds package and line number info to messages.
+	AddCaller   bool // Adds package and line number info to messages.
 	development bool // Controls how DPanic behaves.
 }
 
@@ -98,7 +98,7 @@ func DefaultConfig(environment Environment) Config {
 			Period:  30 * time.Second,
 		},
 		environment: environment,
-		addCaller:   true,
+		AddCaller:   true,
 	}
 }
 
@@ -122,7 +122,7 @@ func DefaultEventConfig(environment Environment) Config {
 			Enabled: false,
 		},
 		environment: environment,
-		addCaller:   true,
+		AddCaller:   true,
 	}
 }
 

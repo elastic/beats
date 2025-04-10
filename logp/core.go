@@ -394,7 +394,7 @@ func DevelopmentSetup(options ...Option) error {
 		Level:       DebugLevel,
 		ToStderr:    true,
 		development: true,
-		addCaller:   true,
+		AddCaller:   true,
 	}
 	for _, apply := range options {
 		apply(&cfg)
@@ -429,7 +429,7 @@ func Sync() error {
 
 func makeOptions(cfg Config) []zap.Option {
 	var options []zap.Option
-	if cfg.addCaller {
+	if cfg.AddCaller {
 		options = append(options, zap.AddCaller())
 	}
 	if cfg.development {
