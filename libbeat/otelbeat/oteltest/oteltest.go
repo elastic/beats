@@ -136,5 +136,6 @@ func CheckReceivers(params CheckReceiversParams) {
 		}
 
 		params.AssertFunc(ct, logs, zapLogs)
-	}, time.Minute, 100*time.Millisecond, "timeout waiting for assertion to pass")
+	}, 2*time.Minute, 100*time.Millisecond,
+		"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 }

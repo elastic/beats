@@ -39,4 +39,4 @@ Want to get up and running quickly with infrastructure metrics monitoring and ce
 
 ## Need to capture other kinds of data? [_need_to_capture_other_kinds_of_data]
 
-If you have a specific use case to solve, we encourage you to create a [community Beat](/reference/libbeat/community-beats.md). We’ve created an infrastructure to simplify the process. The *libbeat* library, written entirely in Go, offers the API that all Beats use to ship data to Elasticsearch, configure the input options, implement logging, and more. To learn how to create a new Beat, see the [Beats Developer Guide](http://www.elastic.co/guide/en/beats/devguide/master/index.md).
+If you have a specific use case to solve, we encourage you to create a [community Beat](/reference/libbeat/community-beats.md). We’ve created an infrastructure to simplify the process. The *libbeat* library, written entirely in Go, offers the API that all Beats use to ship data to Elasticsearch, configure the input options, implement logging, and more. To learn how to create a new Beat, see [Contribute to Beats](../extend/index.md).
