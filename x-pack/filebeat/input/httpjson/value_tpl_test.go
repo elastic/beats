@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/useragent"
@@ -29,7 +30,7 @@ func TestValueTpl(t *testing.T) {
 		paramDefVal   string
 		expectedVal   string
 		expectedError string
-		setup         func()
+		setup         func(t *testing.T)
 		teardown      func()
 	}{
 		{
@@ -105,7 +106,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func now",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[ now ]]`,
 			paramCtx:    emptyTransformContext(),
@@ -114,7 +115,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func now with duration",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[ now (parseDuration "-1h") ]]`,
 			paramCtx:    emptyTransformContext(),
@@ -179,7 +180,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func formatDate",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[ formatDate (now) "UnixDate" "America/New_York" ]]`,
 			paramCtx:    emptyTransformContext(),
@@ -188,7 +189,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func formatDate defaults to UTC",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[ formatDate (now) "UnixDate" ]]`,
 			paramCtx:    emptyTransformContext(),
@@ -197,7 +198,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func formatDate falls back to UTC",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[ formatDate (now) "UnixDate" "wrong/tz"]]`,
 			paramCtx:    emptyTransformContext(),
@@ -358,7 +359,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "can execute functions pipeline",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[ (parseDuration "-1h") | now | formatDate ]]`,
 			paramCtx:    emptyTransformContext(),
@@ -465,6 +466,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hmac Hex",
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hmac "sha1" "secret" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -472,12 +474,12 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha256 hmac Hex",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
-			value:       `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`,
+			value:       `[[hmac "sha256" "superlongsecret" "string1" "string2" (formatDate (now) "RFC1123")]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: "adc61cd206e146f2d1337504e760ea70f3d2e34bedf28d07802e0e776568a06b",
+			expectedVal: "531c01c163a976b73bd2d8eb7e4f0f8ee7eb381f56457580d3be95a09b91a9c4",
 		},
 		{
 			name:          "func invalid hmac Hex",
@@ -489,6 +491,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hash Hex empty",
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hash "sha1"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -496,6 +499,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hash Hex",
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hash "sha1" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -503,7 +507,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha256 hash Hex",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[hash "sha256" "string1" "string2" (formatDate (now) "RFC1123")]]`,
 			paramCtx:    emptyTransformContext(),
@@ -610,6 +614,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hmac Base64",
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hmacBase64 "sha1" "secret" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -617,12 +622,12 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha256 hmac Base64",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
-			value:       `[[hmacBase64 "sha256" "secret" "string1" "string2"]]`,
+			value:       `[[hmacBase64 "sha256" "superlongsecret" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
-			expectedVal: "HlglO6yRZs0Ts3MjmgnRKtTJk3fr9nt8LmeliVKZyAA=",
+			expectedVal: "++mWjiSNsREpOxXjbi0pBmBaQad/+Gt+MQtRP7CoKD0=",
 		},
 		{
 			name:          "func invalid hmac Base64",
@@ -634,6 +639,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 empty",
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hashBase64 "sha1"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -641,6 +647,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha1 hash Base64",
+			setup:       func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			value:       `[[hashBase64 "sha1" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
@@ -648,7 +655,7 @@ func TestValueTpl(t *testing.T) {
 		},
 		{
 			name:        "func sha256 hash Base64",
-			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			setup:       func(t *testing.T) { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[hashBase64 "sha256" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
@@ -787,7 +794,7 @@ func TestValueTpl(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.setup != nil {
-				tc.setup()
+				tc.setup(t)
 			}
 			if tc.teardown != nil {
 				t.Cleanup(tc.teardown)

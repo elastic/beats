@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -35,6 +36,7 @@ func TestNewDefaults(t *testing.T) {
 }
 
 func TestRun(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "communityid uses SHA-1.")
 	// From flowhash package testdata.
 	// 1:LQU9qZlK+B5F3KDmev6m5PMibrg= | 128.232.110.120 66.35.250.204 6 34855 80
 	evt := func() mapstr.M {

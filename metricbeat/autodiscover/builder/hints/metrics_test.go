@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-libs/keystore"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -752,6 +753,7 @@ func NewMockPrometheus(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // `PASSWORD` with the value of `secret` variable.
 func createAnExistingKeystore(t *testing.T, path string, secret string) keystore.Keystore {
 	t.Helper()
+	testutils.SkipIfFIPSOnly(t, "keystore implementation does not use NewGCMWithRandomNonce.")
 	keyStore, err := keystore.NewFileKeystore(path)
 	// Fail fast in the test suite
 	if err != nil {
