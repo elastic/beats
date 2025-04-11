@@ -17,7 +17,7 @@
 
 //go:build integration
 
-package connection
+package jetstream
 
 import (
 	"testing"
@@ -46,16 +46,28 @@ func TestFetch(t *testing.T) {
 	err := metricSet.Fetch(reporter)
 	assert.NoError(t, err)
 
-	events := reporter.GetEvents()
-
-	e := mbtest.StandardizeEvent(metricSet, events[0])
+	e := mbtest.StandardizeEvent(metricSet, reporter.GetEvents()[0])
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 }
 
 func getConfig(host string) map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "nats",
-		"metricsets": []string{"connection"},
+		"metricsets": []string{"jetstream"},
 		"hosts":      []string{host},
+		"jetstream": map[string]interface{}{
+			"stats": map[string]interface{}{
+				"enabled": true,
+			},
+			"account": map[string]interface{}{
+				"enabled": true,
+			},
+			"stream": map[string]interface{}{
+				"enabled": true,
+			},
+			"consumer": map[string]interface{}{
+				"enabled": true,
+			},
+		},
 	}
 }
