@@ -20,8 +20,8 @@ env:
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
   # Integration Tests
-  K8S_VERSION: "v1.31.0"
-  ASDF_KIND_VERSION: "0.24.0"
+  K8S_VERSION: "v1.32.0"
+  ASDF_KIND_VERSION: "0.27.0"
 
   # Module Tests
   BEAT_PATH: "metricbeat"

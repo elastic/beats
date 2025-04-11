@@ -1,0 +1,24 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"capacity": {
+				"bytes": 1048576
+			},
+			"name": "pvc-bdf9afc1-c19e-44db-b169-fdcb423338d2",
+			"phase": "Bound",
+			"storage_class": "standard"
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.persistentvolume",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

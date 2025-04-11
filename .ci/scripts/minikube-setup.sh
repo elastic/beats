@@ -13,7 +13,7 @@ export CHANGE_MINIKUBE_NONE_USER=true
 
 mkdir -p "${HOME}/bin"
 
-curl -sSLo "${KBC_CMD}" "https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
+curl -sSLo "${KBC_CMD}" "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
 chmod +x "${KBC_CMD}"
 
 curl -sSLo "${MKB_CMD}" "https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-linux-amd64"
