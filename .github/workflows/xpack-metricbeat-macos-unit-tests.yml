@@ -4,13 +4,14 @@ env:
   BEAT: "x-pack/metricbeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
-      - metricbeat/
-      - x-pack/metricbeat/
+      - metricbeat/**
+      - x-pack/metricbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/xpack-metricbeat-macos-unit-tests.yml
@@ -19,11 +20,11 @@ on:
     branches:
       - main
     paths:
-      - metricbeat/
-      - x-pack/metricbeat/
+      - metricbeat/**
+      - x-pack/metricbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/xpack-metricbeat-macos-unit-tests.yml
