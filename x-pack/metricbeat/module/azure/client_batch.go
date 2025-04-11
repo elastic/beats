@@ -173,41 +173,52 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 
 			// Slice the metrics to form the batch request
 			batchMetrics := metricsDefinitions[i:end]
-			// Make the batch API call (adjust parameters as needed)
-			response, err := client.AzureMonitorService.QueryResources(
-				getResourceIDs(batchMetrics), // Get the resource IDs from the batch
-				criteria.SubscriptionID,
-				criteria.Namespace,
-				criteria.TimeGrain,
-				startTime.Format("2006-01-02T15:04:05.000Z07:00"),
-				endTime.Format("2006-01-02T15:04:05.000Z07:00"),
-				strings.Split(criteria.Names, ","),
-				strings.ToLower(batchMetrics[0].Aggregations),
-				filter,
-				criteria.Location,
-			)
-			if err != nil {
-				err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metricsDefinitions[0].ResourceSubId, metricsDefinitions[0].Namespace, err)
-				client.Log.Error(err)
-				reporter.Error(err)
-				continue
-			}
 
-			// Process the response as needed
-			for i, v := range response {
-				client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
-					timeGrain: *response[i].Interval,
-					timestamp: referenceTime,
-				})
-				values := mapBatchMetricValues(client, v)
-				metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
-				if metricsDefinitions[i].TimeGrain == "" {
-					metricsDefinitions[i].TimeGrain = *response[i].Interval
+			// Slice the Metric Names by batches of 20 due to batch api limitation
+			names := strings.Split(criteria.Names, ",")
+			for j := 0; j < len(names); j += BatchApiMetricNamesLimit {
+				endMetric := j + BatchApiMetricNamesLimit
+				if endMetric > len(names) {
+					endMetric = len(names)
 				}
 
-			}
+				// Make the batch API call (adjust parameters as needed)
+				response, err := client.AzureMonitorService.QueryResources(
+					getResourceIDs(batchMetrics), // Get the resource IDs from the batch
+					criteria.SubscriptionID,
+					criteria.Namespace,
+					criteria.TimeGrain,
+					startTime.Format("2006-01-02T15:04:05.000Z07:00"),
+					endTime.Format("2006-01-02T15:04:05.000Z07:00"),
+					names[j:endMetric],
+					strings.ToLower(batchMetrics[0].Aggregations),
+					filter,
+					criteria.Location,
+				)
+				if err != nil {
+					err = fmt.Errorf("error while listing metric values by resource ID %s and namespace  %s: %w", metricsDefinitions[0].ResourceSubId, metricsDefinitions[0].Namespace, err)
+					client.Log.Error(err)
+					reporter.Error(err)
+					continue
+				}
 
-			result = append(result, metricsDefinitions...)
+				// Process the response as needed
+				for i, v := range response {
+					client.MetricRegistry.Update(metricsDefinitions[i], MetricCollectionInfo{
+						timeGrain: *response[i].Interval,
+						timestamp: referenceTime,
+					})
+					values := mapBatchMetricValues(client, v)
+					metricsDefinitions[i].Values = append(metricsDefinitions[i].Values, values...)
+					if metricsDefinitions[i].TimeGrain == "" {
+						metricsDefinitions[i].TimeGrain = *response[i].Interval
+					}
+
+				}
+
+				result = append(result, metricsDefinitions...)
+
+			}
 		}
 	}
 
