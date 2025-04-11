@@ -150,7 +150,7 @@ queue.mem:
 		"--dashboards",
 		"-E", "setup.dashboards.file="+filepath.Join("./testdata", "testbeat-dashboards.zip"),
 		"-E", "setup.dashboards.beat=testbeat",
-		"-E", "setup.dashboards.only_index=true",
+		"-E", "setup.dashboards.only_index=false",
 		"-E", "setup.kibana.protocol=http",
 		"-E", "setup.kibana.host="+kURL.Hostname(),
 		"-E", "setup.kibana.port="+kURL.Port(),
@@ -177,7 +177,7 @@ queue.mem:
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
-	dbPath := filepath.Join(mockbeat.TempDir(), "system-overview", "_meta", "kibana", "8", "dashboard", "Metricbeat-system-overview.json")
+	dbPath := filepath.Join(mockbeat.TempDir(), "system-overview", "_meta", "kibana", "9", "dashboard", "Metricbeat-system-overview.json")
 	require.FileExists(t, dbPath, "dashboard file not exported")
 	b, err := os.ReadFile(dbPath)
 	require.NoError(t, err)
