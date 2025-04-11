@@ -17,6 +17,7 @@ import (
 
 	"golang.org/x/oauth2/clientcredentials"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -43,13 +44,13 @@ type falconHoseStream struct {
 // NewFalconHoseFollower performs environment construction including CEL
 // program and regexp compilation, and input metrics set-up for a Crowdstrike
 // FalconHose stream follower.
-func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+func NewFalconHoseFollower(ctx context.Context, env v2.Context, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
 	if stat == nil {
 		stat = noopReporter{}
 	}
 	stat.UpdateStatus(status.Configuring, "")
 	s := falconHoseStream{
-		id:     id,
+		id:     env.ID,
 		cfg:    cfg,
 		cursor: cursor,
 		status: stat,
@@ -58,7 +59,7 @@ func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor ma
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id, nil),
+			metrics: newInputMetrics(env),
 		},
 		creds: &clientcredentials.Config{
 			ClientID:       cfg.Auth.OAuth2.ClientID,
@@ -305,7 +306,6 @@ func (s *falconHoseStream) now() time.Time {
 }
 
 func (s *falconHoseStream) Close() error {
-	s.metrics.Close()
 	return nil
 }
 

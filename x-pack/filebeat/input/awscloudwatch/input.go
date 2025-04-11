@@ -114,8 +114,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	}
 
 	log := inputContext.Logger
-	in.metrics = newInputMetrics(inputContext.ID, nil)
-	defer in.metrics.Close()
+	in.metrics = newInputMetrics(inputContext)
 	cwPoller := newCloudwatchPoller(
 		log.Named("cloudwatch_poller"),
 		in.metrics,

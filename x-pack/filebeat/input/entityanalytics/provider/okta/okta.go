@@ -99,8 +99,7 @@ func (*oktaInput) Test(v2.TestContext) error { return nil }
 // Run will start data collection on this provider.
 func (p *oktaInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
 	p.logger = inputCtx.Logger.With("provider", Name, "domain", p.cfg.OktaDomain)
-	p.metrics = newMetrics(inputCtx.ID, nil)
-	defer p.metrics.Close()
+	p.metrics = newMetrics(inputCtx)
 
 	lastSyncTime, _ := getLastSync(store)
 	syncWaitTime := time.Until(lastSyncTime.Add(p.cfg.SyncInterval))
