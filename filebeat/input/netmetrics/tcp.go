@@ -28,7 +28,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -36,8 +36,7 @@ import (
 
 // TCP handles the TCP metric reporting.
 type TCP struct {
-	unregister func()
-	done       chan struct{}
+	done chan struct{}
 
 	monitorRegistry *monitoring.Registry
 
@@ -52,13 +51,13 @@ type TCP struct {
 }
 
 // NewTCP returns a new TCP input metricset. Note that if the id is empty then a nil TCP metricset is returned.
-func NewTCP(inputName string, id string, device string, poll time.Duration, log *logp.Logger) *TCP {
-	if id == "" {
+func NewTCP(ctx v2.Context, device string, poll time.Duration, log *logp.Logger) *TCP {
+	if ctx.ID == "" {
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+
+	reg := ctx.MetricsRegistry
 	out := &TCP{
-		unregister:      unreg,
 		monitorRegistry: reg,
 		device:          monitoring.NewString(reg, "device"),
 		packets:         monitoring.NewUint(reg, "received_events_total"),
@@ -240,11 +239,6 @@ func (m *TCP) Close() {
 	if m.done != nil {
 		// Shut down poller and wait until done before unregistering metrics.
 		m.done <- struct{}{}
-	}
-
-	if m.unregister != nil {
-		m.unregister()
-		m.unregister = nil
 	}
 
 	m.monitorRegistry = nil

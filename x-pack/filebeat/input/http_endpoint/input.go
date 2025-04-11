@@ -33,7 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -108,8 +107,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	ctx.UpdateStatus(status.Starting, "")
 	ctx.UpdateStatus(status.Configuring, "")
 
-	metrics := newInputMetrics(ctx.ID)
-	defer metrics.Close()
+	metrics := newInputMetrics(ctx)
 
 	if e.config.Tracer != nil {
 		id := sanitizeFileName(ctx.IDWithoutName)
@@ -452,8 +450,6 @@ func newID() string {
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	bindAddr            *monitoring.String // bind address of input
 	route               *monitoring.String // request route
 	isTLS               *monitoring.Bool   // whether the input is listening on a TLS connection
@@ -468,10 +464,9 @@ type inputMetrics struct {
 	batchACKTime        metrics.Sample     // histogram of the elapsed successful batch acking times in nanoseconds (time of handler start to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(id string) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+func newInputMetrics(ctx v2.Context) *inputMetrics {
+	reg := ctx.MetricsRegistry
 	out := &inputMetrics{
-		unregister:          unreg,
 		bindAddr:            monitoring.NewString(reg, "bind_address"),
 		route:               monitoring.NewString(reg, "route"),
 		isTLS:               monitoring.NewBool(reg, "is_tls_connection"),
@@ -495,8 +490,4 @@ func newInputMetrics(id string) *inputMetrics {
 		Register("histogram", metrics.NewHistogram(out.batchACKTime))
 
 	return out
-}
-
-func (m *inputMetrics) Close() {
-	m.unregister()
 }

@@ -24,6 +24,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -117,13 +118,13 @@ func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start t
 // NewWebsocketFollower performs environment construction including CEL
 // program and regexp compilation, and input metrics set-up for a websocket
 // stream follower.
-func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+func NewWebsocketFollower(ctx context.Context, env v2.Context, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
 	if stat == nil {
 		stat = noopReporter{}
 	}
 	stat.UpdateStatus(status.Configuring, "")
 	s := websocketStream{
-		id:     id,
+		id:     env.ID,
 		cfg:    cfg,
 		cursor: cursor,
 		status: stat,
@@ -132,7 +133,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id, nil),
+			metrics: newInputMetrics(env),
 		},
 		// the token expiry handler will never trigger unless a valid expiry time is assigned
 		tokenExpiry: nil,
@@ -530,7 +531,6 @@ func (s *websocketStream) now() time.Time {
 }
 
 func (s *websocketStream) Close() error {
-	s.metrics.Close()
 	return nil
 }
 

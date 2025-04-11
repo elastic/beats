@@ -14,7 +14,6 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -150,23 +149,14 @@ func publishEvt(publisher stateless.Publisher, msg string, line uint64, filename
 }
 
 type inputMetrics struct {
-	unregister func()
-
 	eventsPublished *monitoring.Uint // number of events published
 	publishingTime  metrics.Sample   // histogram of the elapsed times in nanoseconds (time of publisher.Publish)
 }
 
 // newInputMetrics returns an input metric for the benchmark processor.
 func newInputMetrics(ctx v2.Context) *inputMetrics {
-	var globalRegistry *monitoring.Registry
-	// When running under Elastic-Agent Namespace can be nil.
-	// Passing a nil registry to inputmon.NewInputRegistry is not a problem.
-	if ctx.Agent.Monitoring.Namespace != nil {
-		globalRegistry = ctx.Agent.Monitoring.Namespace.GetRegistry()
-	}
-	reg, unreg := inputmon.NewInputRegistry(inputName, ctx.ID, globalRegistry)
+	reg := ctx.MetricsRegistry
 	out := &inputMetrics{
-		unregister:      unreg,
 		eventsPublished: monitoring.NewUint(reg, "events_published_total"),
 		publishingTime:  metrics.NewUniformSample(1024),
 	}
@@ -175,8 +165,4 @@ func newInputMetrics(ctx v2.Context) *inputMetrics {
 		Register("histogram", metrics.NewHistogram(out.publishingTime))
 
 	return out
-}
-
-func (m *inputMetrics) Close() {
-	m.unregister()
 }

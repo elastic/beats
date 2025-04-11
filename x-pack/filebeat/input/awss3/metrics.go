@@ -14,7 +14,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/go-concert/timed"
@@ -41,10 +41,9 @@ func currentTime() time.Time {
 }
 
 type inputMetrics struct {
-	registry   *monitoring.Registry
-	unregister func()
-	ctx        context.Context    // ctx signals when to stop the sqs worker utilization goroutine.
-	cancel     context.CancelFunc // cancel cancels the ctx context.
+	registry *monitoring.Registry
+	ctx      context.Context    // ctx signals when to stop the sqs worker utilization goroutine.
+	cancel   context.CancelFunc // cancel cancels the ctx context.
 
 	sqsMaxMessagesInflight            int                  // Maximum number of SQS workers allowed.
 	sqsWorkerUtilizationMutex         sync.Mutex           // Guards the sqs worker utilization fields.
@@ -78,7 +77,6 @@ type inputMetrics struct {
 // Close cancels the context and removes the metrics from the registry.
 func (m *inputMetrics) Close() {
 	m.cancel()
-	m.unregister()
 }
 
 // beginSQSWorker tracks the start of a new SQS worker. The returned ID
@@ -147,13 +145,12 @@ func (m *inputMetrics) updateSqsWorkerUtilization() {
 	m.sqsWorkerUtilizationLastUpdate = now
 }
 
-func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers int) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+func newInputMetrics(v2ctx v2.Context, maxWorkers int) *inputMetrics {
+	reg := v2ctx.MetricsRegistry
 	ctx, cancel := context.WithCancel(context.Background())
 
 	out := &inputMetrics{
 		registry:                            reg,
-		unregister:                          unreg,
 		ctx:                                 ctx,
 		cancel:                              cancel,
 		sqsMaxMessagesInflight:              maxWorkers,

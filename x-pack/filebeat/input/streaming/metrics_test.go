@@ -9,6 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -17,10 +20,15 @@ import (
 // the same ID could be re-registered, and that ID cannot exist in the
 // monitoring registry.
 func TestInputMetricsClose(t *testing.T) {
-	reg := monitoring.NewRegistry()
+	reg := inputmon.NewMetricsRegistry(
+		"", "", monitoring.NewRegistry(), logp.NewLogger("test"))
+	env := v2.Context{
+		ID:              "streaming-8b312b5f-9f99-492c-b035-3dff354a1f01",
+		MetricsRegistry: monitoring.NewRegistry(),
+	}
 
-	metrics := newInputMetrics("streaming-8b312b5f-9f99-492c-b035-3dff354a1f01", reg)
-	metrics.Close()
+	// TODO:(AndersonQ): what is actually tested here?
+	_ = newInputMetrics(env)
 
 	reg.Do(monitoring.Full, func(s string, _ interface{}) {
 		t.Errorf("registry should be empty, but found %v", s)
@@ -32,7 +40,11 @@ func TestInputMetricsClose(t *testing.T) {
 // a getter is invoked on any uninitialized metric.
 func TestNewInputMetricsInstance(t *testing.T) {
 	reg := monitoring.NewRegistry()
-	metrics := newInputMetrics("streaming-metric-test", reg)
+	env := v2.Context{
+		ID:              "streaming-metric-test",
+		MetricsRegistry: reg,
+	}
+	metrics := newInputMetrics(env)
 
 	assert.NotNil(t,
 		metrics.errorsTotal,

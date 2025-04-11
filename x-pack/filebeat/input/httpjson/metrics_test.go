@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -125,8 +126,17 @@ func TestMetrics(t *testing.T) {
 			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
 
-			reg, unreg := inputmon.NewInputRegistry("httpjson-test", ctx.ID, nil)
-			t.Cleanup(unreg)
+			parent := monitoring.NewRegistry()
+			logger := logp.NewTestingLogger(t, "httpjson")
+			reg := inputmon.NewMetricsRegistry(
+				ctx.ID, "httpjson-test", parent, logger)
+			t.Cleanup(func() {
+				inputmon.CancelMetricsRegistry(
+					ctx.ID,
+					"httpjson-test",
+					parent,
+					logger)
+			})
 
 			var g errgroup.Group
 			g.Go(func() error {
