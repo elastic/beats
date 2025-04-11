@@ -28,7 +28,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -36,8 +36,7 @@ import (
 
 // UDP captures UDP related metrics.
 type UDP struct {
-	unregister func()
-	done       chan struct{}
+	done chan struct{}
 
 	monitorRegistry *monitoring.Registry
 
@@ -54,13 +53,13 @@ type UDP struct {
 }
 
 // NewUDP returns a new UDP input metricset. Note that if the id is empty then a nil UDP metricset is returned.
-func NewUDP(inputName string, id string, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
-	if id == "" {
+func NewUDP(ctx v2.Context, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
+	if ctx.ID == "" {
 		return nil
 	}
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+
+	reg := ctx.MetricsRegistry
 	out := &UDP{
-		unregister:      unreg,
 		monitorRegistry: reg,
 		bufferLen:       monitoring.NewUint(reg, "udp_read_buffer_length_gauge"),
 		device:          monitoring.NewString(reg, "device"),
@@ -256,11 +255,6 @@ func (m *UDP) Close() {
 	if m.done != nil {
 		// Shut down poller and wait until done before unregistering metrics.
 		m.done <- struct{}{}
-	}
-
-	if m.unregister != nil {
-		m.unregister()
-		m.unregister = nil
 	}
 
 	m.monitorRegistry = nil

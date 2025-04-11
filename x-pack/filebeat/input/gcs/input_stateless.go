@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"cloud.google.com/go/storage"
-	gax "github.com/googleapis/gax-go/v2"
+	"github.com/googleapis/gax-go/v2"
 	"golang.org/x/sync/errgroup"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -16,6 +16,7 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type statelessInput struct {
@@ -77,8 +78,9 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		st := newState()
 		currentSource := source.(*Source)
 		log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
-		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
-		defer metrics.Close()
+		// use a new metrics registry associated to no parent. No metrics will
+		// be published.
+		metrics := newInputMetrics(monitoring.NewRegistry())
 		metrics.url.Set("gs://" + currentSource.BucketName)
 
 		ctx, cancel := context.WithCancel(context.Background())

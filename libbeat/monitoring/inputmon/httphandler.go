@@ -92,7 +92,7 @@ func filteredSnapshot(
 		selected = append(selected, r)
 	}
 	for _, g := range selectedGlobal {
-		if _, ok := selectedLocal[g["id"].(string)]; ok {
+		if _, ok := selectedLocal[g[MetricNameID].(string)]; ok {
 			// if the local registry has this ID, it takes precedence.
 			continue
 		}
@@ -113,12 +113,12 @@ func filterMetrics(r *monitoring.Registry, requestedType string) map[string]map[
 		}
 
 		// Require all entries to have an 'input' and 'id' to be accessed through this API.
-		id, ok := m["id"].(string)
+		id, ok := m[MetricNameID].(string)
 		if !ok || id == "" {
 			continue
 		}
 
-		if !requestedInput(m["input"], requestedType) {
+		if !requestedInput(m[MetricNameInput], requestedType) {
 			continue
 		}
 

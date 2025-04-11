@@ -159,7 +159,7 @@ func newInputMetrics(id, device string, ports map[uint16]protos.Protocol) *input
 		return nil
 	}
 	devID := fmt.Sprintf("%s-udp%s::%s", id, portList(ports), device)
-	reg, unreg := inputmon.NewInputRegistry("udp", devID, nil)
+	reg, unreg := inputmon.NewDeprecatedMetricsRegistry("udp", devID, nil)
 	out := &inputMetrics{
 		unregister:     unreg,
 		device:         monitoring.NewString(reg, "device"),

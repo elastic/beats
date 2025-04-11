@@ -235,7 +235,7 @@ func TestInput(t *testing.T) {
 			wg.Add(1)
 			go func(t *testing.T) {
 				defer wg.Done()
-				err := input.runWithMetrics(ctx, pub, testMetricsRegistry(t), log)
+				err := input.runWithMetrics(ctx, pub, testMetricsRegistry(), log)
 				if tc.expectedRunErrorMsg == "" {
 					assert.NoError(t, err)
 				} else {
@@ -300,7 +300,7 @@ func TestBackfillAndStream(t *testing.T) {
 	wg.Add(1)
 	go func(t *testing.T) {
 		defer wg.Done()
-		err := input.runWithMetrics(ctx, pub, testMetricsRegistry(t), log)
+		err := input.runWithMetrics(ctx, pub, testMetricsRegistry(), log)
 		assert.NoError(t, err)
 	}(t)
 
@@ -409,8 +409,8 @@ func extractTarGz(tarGzPath string) (string, error) {
 	return path.Join(tempDir, "test.logarchive"), nil
 }
 
-func testMetricsRegistry(t *testing.T) *monitoring.Registry {
-	reg, unreg := inputmon.NewInputRegistry("", "", nil)
-	t.Cleanup(unreg)
+func testMetricsRegistry() *monitoring.Registry {
+	reg := inputmon.NewMetricsRegistry(
+		"", "", monitoring.NewRegistry(), logp.NewLogger("test"))
 	return reg
 }

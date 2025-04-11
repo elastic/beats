@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	gax "github.com/googleapis/gax-go/v2"
+	"github.com/googleapis/gax-go/v2"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -152,9 +152,8 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
 	// create a new inputMetrics instance
-	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
+	metrics := newInputMetrics(inputCtx.MetricsRegistry)
 	metrics.url.Set("gs://" + currentSource.BucketName)
-	defer metrics.Close()
 
 	var cp *Checkpoint
 	if !cursor.IsNew() {
