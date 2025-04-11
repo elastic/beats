@@ -4,7 +4,7 @@ filebeat.inputs:
     paths:
       - {{ .logfile }}
     delete.on_close.eof: true
-    delete.grace_period: 0
+    delete.grace_period: {{ .gracePeriod }}
     close.reader.on_eof: true
 
     prospector:

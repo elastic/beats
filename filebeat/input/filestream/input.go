@@ -265,12 +265,12 @@ func (inp *filestream) deleteFile(
 		"all events from '%s' have been published, waiting for %s grace period",
 		fs.newPath, inp.deleterConfig.GracePeriod.String())
 
-	graceTicker := time.NewTimer(inp.deleterConfig.GracePeriod)
+	graceTimer := time.NewTimer(inp.deleterConfig.GracePeriod)
 	// Wait for the grace period or for the context to be cancelled
 	select {
 	case <-ctx.Cancelation.Done():
 		return ctx.Cancelation.Err()
-	case <-graceTicker.C:
+	case <-graceTimer.C:
 	}
 
 	// Check if file is still at EOF

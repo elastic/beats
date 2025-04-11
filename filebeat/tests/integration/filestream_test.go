@@ -674,6 +674,7 @@ func TestFilestreamDelete(t *testing.T) {
 		msgs                []string
 		resourceNotFinished bool
 		dataAdded           bool
+		gracePeriod         time.Duration
 	}{
 		"EOF": {
 			configTmpl: "eof.yml",
@@ -698,6 +699,16 @@ func TestFilestreamDelete(t *testing.T) {
 			},
 			resourceNotFinished: true,
 			dataAdded:           true,
+		},
+		"EOF resource not finished data added and grace priod": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+			resourceNotFinished: true,
+			dataAdded:           true,
+			gracePeriod:         2 * time.Second,
 		},
 		"Inactive": {
 			configTmpl: "inactive.yml",
@@ -757,10 +768,11 @@ func TestFilestreamDelete(t *testing.T) {
 			integration.GenerateLogFile(t, logFile, 100, false)
 
 			vars := map[string]any{
-				"homePath": workDir,
-				"logfile":  logFile,
-				"testdata": testDataPath,
-				"esHost":   esAddr,
+				"homePath":    workDir,
+				"logfile":     logFile,
+				"testdata":    testDataPath,
+				"esHost":      esAddr,
+				"gracePeriod": tc.gracePeriod.String(),
 			}
 			cfgYAML := getConfig(t, vars, "delete", tc.configTmpl)
 			filebeat.WriteConfigFile(cfgYAML)
@@ -829,13 +841,54 @@ func TestFilestreamDelete(t *testing.T) {
 				}
 			}
 
-			msg := fmt.Sprintf("File %s has been removed", msgLogFilePath)
+			msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
 			filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
+			removedMsg := filebeat.GetLastLogLine(msg)
+
+			gracePeriodMsg := fmt.Sprintf("all events from '%s' have been published, waiting for %s grace period", msgLogFilePath, tc.gracePeriod)
+			beforeWait := filebeat.GetLastLogLine(gracePeriodMsg)
+
+			delta := timeBetweenLogEntries(t, beforeWait, removedMsg)
+			if delta < tc.gracePeriod {
+				t.Errorf("grace period of %s was not respected", tc.gracePeriod)
+				t.Log("grace period waiting calculated based on the following log entries:")
+				t.Log("First :", beforeWait)
+				t.Log("Second:", removedMsg)
+			}
+
 			if fileExists(t, logFile) {
 				t.Fatalf("%q should have been removed", logFile)
 			}
 		})
 	}
+}
+
+func timeBetweenLogEntries(t *testing.T, l1, l2 string) time.Duration {
+	type entry struct {
+		TS string `json:"@timestamp"`
+	}
+
+	e1 := entry{}
+	if err := json.Unmarshal([]byte(l1), &e1); err != nil {
+		t.Fatalf("cannot parse log entry. Err: %s. Entry: %s", err, l1)
+	}
+
+	e2 := entry{}
+	if err := json.Unmarshal([]byte(l2), &e2); err != nil {
+		t.Fatalf("cannot parse log entry. Err: %s. Entry: %s", err, l1)
+	}
+
+	t1, err := time.Parse("2006-01-02T15:04:05-0700", e1.TS)
+	if err != nil {
+		t.Fatalf("cannot parse time from first log entry: %s", err)
+	}
+
+	t2, err := time.Parse("2006-01-02T15:04:05-0700", e2.TS)
+	if err != nil {
+		t.Fatalf("cannot parse time from second log entry: %s", err)
+	}
+
+	return t2.Sub(t1)
 }
 
 func fileExists(t *testing.T, path string) bool {
