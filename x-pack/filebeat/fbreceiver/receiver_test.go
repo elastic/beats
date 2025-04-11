@@ -7,6 +7,7 @@ package fbreceiver
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -203,8 +204,11 @@ func TestMultipleReceivers(t *testing.T) {
 			},
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
-			assert.Greater(t, len(logs["r1"]), 0, "receive r1 does not have ny logs")
-			assert.Greater(t, len(logs["r2"]), 0, "receive r2 does not have ny logs")
+			assert.Greater(t, len(logs["r1"]), 0, "receive r1 does not have any logs")
+			assert.Greater(t, len(logs["r2"]), 0, "receive r2 does not have any logs")
+			// logs for debug if it fails again
+			fmt.Printf("len(logs[\"r1\"]): %d\n", len(logs["r1"]))
+			fmt.Printf("len(logs[\"r2\"]): %d\n", len(logs["r2"]))
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
