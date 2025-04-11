@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package gcppubsub
 
 import (
@@ -312,7 +314,7 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 
 	if in.AlternativeHost != "" {
 		// This will be typically set because we want to point the input to a testing pubsub emulator.
-		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(in.AlternativeHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			return nil, fmt.Errorf("cannot connect to alternative host %q: %w", in.AlternativeHost, err)
 		}
