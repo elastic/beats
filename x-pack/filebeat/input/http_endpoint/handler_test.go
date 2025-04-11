@@ -24,9 +24,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"gopkg.in/natefinch/lumberjack.v2"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var withTraces = flag.Bool("log-traces", false, "specify logging request traces during tests")
@@ -542,8 +544,7 @@ func Test_apiResponse(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
 			pub := new(publisher)
-			metrics := newInputMetrics("")
-			defer metrics.Close()
+			metrics := newInputMetrics(v2.Context{MetricsRegistry: monitoring.NewRegistry()})
 			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
