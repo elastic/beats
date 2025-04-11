@@ -1,6 +1,9 @@
 CHANGELOG.next.asciidoc  merge=union
 CHANGELOG-developer.next.asciidoc  merge=union
 
+# use lf for go files
+*.go text eol=lf
+
 # Keep these file types as CRLF (Windows).
 *.bat    text eol=crlf
 *.cmd    text eol=crlf
