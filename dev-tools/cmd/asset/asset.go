@@ -27,7 +27,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset/gen"
 	"github.com/elastic/beats/v7/licenses"
 )
 
@@ -91,7 +91,7 @@ func main() {
 		name = file
 	}
 
-	bs, err := asset.CreateAsset(licenseHeader, beatName, name, pkg, data, priority, file)
+	bs, err := gen.CreateAsset(licenseHeader, beatName, name, pkg, data, priority, file)
 	if err != nil {
 		panic(err)
 	}
