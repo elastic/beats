@@ -1,7 +1,6 @@
 ---
 navigation_title: "Beats"
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/libbeat/8.17/release-notes.html
   - https://www.elastic.co/guide/en/beats/libbeat/current/release-notes.html
 ---
 
