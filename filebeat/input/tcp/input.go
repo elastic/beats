@@ -99,7 +99,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	defer log.Info("tcp input stopped")
 
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.config.Host, pollInterval, log)
+	metrics := netmetrics.NewTCP(ctx, s.config.Host, pollInterval, log)
 	defer metrics.Close()
 
 	split, err := streaming.SplitFunc(s.config.Framing, []byte(s.config.LineDelimiter))
