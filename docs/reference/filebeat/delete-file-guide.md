@@ -67,6 +67,7 @@ configuration is:
     paths:
       - /var/log/cronjobs/*.log
     delete.on_close.eof: true
+    delete.grace_period: 0s
 ```
 
 ### Log files from long running tasks
@@ -85,6 +86,7 @@ period of inactivity, the simplest configuration is:
     paths:
       - /var/log/long-tasks/*.log
     delete.on_close.inactive: true
+    delete.grace_period: 0s
 ```
 
 Because `delete.on_close.inactive: true` the time to consider a file
@@ -98,6 +100,7 @@ can be overwritten to a short or longer time, e.g: 5 minutes.
       - /var/log/long-tasks/*.log
     delete.on_close.inactive: true
     close.on_state_change.inactive: 5m
+    delete.grace_period: 0s
 ```
 
 ### Waiting before removing log files

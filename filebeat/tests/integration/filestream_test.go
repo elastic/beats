@@ -878,12 +878,12 @@ func timeBetweenLogEntries(t *testing.T, l1, l2 string) time.Duration {
 		t.Fatalf("cannot parse log entry. Err: %s. Entry: %s", err, l1)
 	}
 
-	t1, err := time.Parse("2006-01-02T15:04:05-0700", e1.TS)
+	t1, err := time.Parse("2006-01-02T15:04:05Z0700", e1.TS)
 	if err != nil {
 		t.Fatalf("cannot parse time from first log entry: %s", err)
 	}
 
-	t2, err := time.Parse("2006-01-02T15:04:05-0700", e2.TS)
+	t2, err := time.Parse("2006-01-02T15:04:05Z0700", e2.TS)
 	if err != nil {
 		t.Fatalf("cannot parse time from second log entry: %s", err)
 	}
