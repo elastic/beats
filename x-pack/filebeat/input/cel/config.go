@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/mito/lib"
 )
 
 const defaultMaxExecutions = 1000
@@ -114,7 +115,7 @@ func (c config) Validate() error {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
 	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
-	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, lib.HTTPOptions{}, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -233,10 +234,12 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 
 type ResourceConfig struct {
 	URL                    *urlConfig       `config:"url" validate:"required"`
+	Headers                http.Header      `config:"headers"`
 	Retry                  retryConfig      `config:"retry"`
 	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
 	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
 	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
+	MaxBodySize            int64            `config:"max_body_size"`
 	RateLimit              *rateLimitConfig `config:"rate_limit"`
 	KeepAlive              keepAlive        `config:"keep_alive"`
 

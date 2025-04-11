@@ -419,6 +419,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+- Update CEL mito extensions to v1.18.0. {pull}43855[43855]
 
 *Auditbeat*
 
