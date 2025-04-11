@@ -5,6 +5,7 @@
 package azure
 
 import (
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 )
@@ -27,4 +28,16 @@ type Service interface {
 		aggregations string, // aggregations is the comma-separated list of aggregations to use for the metric query (e.g. "Average,Maximum,Minimum")
 		filter string, // filter is the filter to query for dimensions (e.g. "ActivityType eq '*' AND ActivityName eq '*' AND StatusCode eq '*' AND StatusCodeClass eq '*'")
 	) ([]armmonitor.Metric, string, error)
+	QueryResources(
+		resourceIDs []string,
+		subscriptionID string,
+		namespace string,
+		timegrain string,
+		//timespan string,
+		startTime string,
+		endTime string,
+		metricNames []string,
+		aggregations string,
+		filter string,
+		location string) ([]azmetrics.MetricData, error)
 }
