@@ -2,6 +2,8 @@
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/8.17/release-notes.html
   - https://www.elastic.co/guide/en/beats/libbeat/current/release-notes.html
+
+navigation_title: "Beats"
 ---
 
 # {{beats}} release notes [beats-release-notes]
@@ -58,17 +60,17 @@ To check for security updates, go to [Security announcements for the Elastic sta
 * Add a warning log to `metricbeat.vsphere` in Metricbeat in case vSphere connection has been configured as insecure. [#43104]({{beats-pull}}43104)
 
 ### Fixes [beats-900-fixes]
-* hasher: Add a cached hasher for upcoming backend in Auditbeat. [#41952]({{beats-pull}}41952)
-* Split common tty definitions in Auditbeat. [#42004]({{beats-pull}}42004)
-* Redact authorization headers in HTTPJSON debug logs in Filebeat. [#41920]({{beats-pull}}41920)
-* Further rate limiting fix in the Okta provider of the Entity Analytics input in Filebeat. [#40106]({{beats-issue}}40106) and [#41977]({{beats-pull}}41977)
-* The `_id` generation process for S3 events has been updated to incorporate the LastModified field. This enhancement ensures that the `_id` is unique in Filebeat. [#42078]({{beats-pull}}42078)
-* Fixes truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size in Filebeat. [#42327]({{beats-pull}}42327)
-* [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines in Filebeat. [#41331]({{beats-issue}}41331) and [#42595]({{beats-pull}}42595)
-* Fixwa bug where Metricbeat unintentionally triggers Windows ASR in Metricbeat. [#42177]({{beats-pull}}42177)
-* Removes `hostname` field from ZooKeeper's `mntr` data stream in Metricbeat. [41887]({{beats-pull}}41887)
-* Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names in Packetbeat. [42116]({{beats-pull}}42116)
-* Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly in Filebeat. [42966]({{beats-pull}}42966)
+* hasher: Add a cached hasher for upcoming backend in Auditbeat {pull}41952[41952]
+* Split common tty definitions in Auditbeat {pull}42004[42004]
+* Redact authorization headers in HTTPJSON debug logs in Filebeat {pull}41920[41920]
+* Further rate limiting fix in the Okta provider of the Entity Analytics input in Filebeat {issue}40106[40106] and {pull}41977[41977]
+* The `_id` generation process for S3 events has been updated to incorporate the LastModified field. This enhancement ensures that the `_id` is unique in Filebeat {pull}42078[42078]
+* Fixes truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size in Filebeat {pull}42327[42327]
+* [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines in Filebeat {issue}41331[41331] and {pull}42595[42595]
+* Fixwa bug where Metricbeat unintentionally triggers Windows ASR in Metricbeat {pull}42177[42177]
+* Removes `hostname` field from ZooKeeper's `mntr` data stream in Metricbeat {pull}41887[41887]
+* Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names in Packetbeat {pull}42116[42116]
+* * Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly in Filebeat. [42966]({{beats-pull}}42966)
 * Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider in Filebeat. [#11818]({{beats-issue}}11818) and [#42796]({{beats-pull}}42796)
 * Handle unexpected EOF error in aws-s3 input and enforce retrying using download failed error in Filebeat. [#42420]({{beats-pull}}42420)
 * Prevent azureblobstorage input from logging key details during blob fetch operations in Filebeat. [#43169]({{beats-pull}}43169)
