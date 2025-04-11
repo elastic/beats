@@ -1,6 +1,8 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-benchmark.html
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-benchmark.html
+  # That link will 404 until 8.18 is current
+  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/metricbeat-module-benchmark.html)
 ---
 
 # Benchmark module [metricbeat-module-benchmark]
