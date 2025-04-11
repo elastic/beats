@@ -64,6 +64,7 @@ steps:
       - label: ":ubuntu: x-pack/dockerlogbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
+          source .buildkite/scripts/qemu.sh
           cd x-pack/dockerlogbeat
           mage build unitTest
         retry:
