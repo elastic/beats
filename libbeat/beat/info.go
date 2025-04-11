@@ -41,6 +41,7 @@ type Info struct {
 	FirstStart      time.Time // The time of the first start of the Beat.
 	StartTime       time.Time // The time of last start of the Beat. Updated when the Beat is started or restarted.
 	UserAgent       string    // A string of the user-agent that can be passed to any outputs or network connections
+	FIPS            bool      // If the beat is a FIPS variant.
 
 	// Monitoring-related fields
 	Monitoring           Monitoring

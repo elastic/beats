@@ -252,6 +252,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 			FirstStart:      time.Now(),
 			StartTime:       time.Now(),
 			EphemeralID:     metricreport.EphemeralID(),
+			FIPS:            version.FIPSEnabled,
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),
@@ -553,7 +554,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	log := b.Info.Logger.Named("beat")
-	log.Infof("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+	log.Infof("Setup Beat: %s; Version: %s (FIPS: %v)", b.Info.Beat, b.Info.Version, b.Info.FIPS)
 	b.logSystemInfo(log)
 
 	err = b.registerESVersionCheckCallback()
