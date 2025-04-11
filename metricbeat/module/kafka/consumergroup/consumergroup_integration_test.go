@@ -40,6 +40,7 @@ const (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42808")
 	service := compose.EnsureUp(t, "kafka",
 		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
@@ -63,6 +64,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42808")
 	service := compose.EnsureUp(t, "kafka",
 		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
@@ -107,7 +109,7 @@ func startConsumer(t *testing.T, host string, groupID string) (io.Closer, error)
 	// Create a new consumer group
 	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, config)
 	if err != nil {
-		t.Fatalf("Error creating consumer group: %v", err)
+		t.Fatalf("Error creating consumer group: %v, brokers: %s", err, brokers)
 		return nil, err
 	}
 

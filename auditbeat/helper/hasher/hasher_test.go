@@ -35,7 +35,7 @@ func TestHasher(t *testing.T) {
 	}
 
 	config := Config{
-		HashTypes:           []HashType{SHA1, MD5},
+		HashTypes:           []HashType{SHA256, SHA512},
 		MaxFileSize:         "100 MiB",
 		MaxFileSizeBytes:    100 * 1024 * 1024,
 		ScanRatePerSec:      "50 MiB",
@@ -52,8 +52,8 @@ func TestHasher(t *testing.T) {
 	}
 
 	assert.Len(t, hashes, 2)
-	assert.Equal(t, "44a36f2cd27e56794cd405ad8d44e82dba4c54fa", hashes["sha1"].String())
-	assert.Equal(t, "1d7572082f6b0d18a393d618285d7100", hashes["md5"].String())
+	assert.Equal(t, "c2bf6d47d4b367498fba613e6b7b33798b713f4909dfdf4f2b8a919c5440d36e", hashes["sha256"].String())
+	assert.Equal(t, "6908dddec81668e11b7c1d65f27f5b26e85bd02847980e476e951cf9d740dd154f328e76f471854c2cb21a0e87a9b9f65c90b51a23baa988a45d1f91d57f88ce", hashes["sha512"].String())
 }
 
 func TestHasherLimits(t *testing.T) {
@@ -65,7 +65,7 @@ func TestHasherLimits(t *testing.T) {
 	}
 
 	configZeroSize := Config{
-		HashTypes:           []HashType{SHA1},
+		HashTypes:           []HashType{SHA256},
 		MaxFileSize:         "0 MiB",
 		MaxFileSizeBytes:    0,
 		ScanRatePerSec:      "0 MiB",

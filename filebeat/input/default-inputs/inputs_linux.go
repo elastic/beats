@@ -20,18 +20,14 @@ package inputs
 import (
 	"github.com/elastic/beats/v7/filebeat/input/journald"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // inputs that are only supported on linux
 
-type osComponents interface {
-	cursor.StateStore
-}
-
-func osInputs(info beat.Info, log *logp.Logger, components osComponents) []v2.Plugin {
+func osInputs(info beat.Info, log *logp.Logger, components statestore.States) []v2.Plugin {
 	var plugins []v2.Plugin
 
 	zeroPlugin := v2.Plugin{}

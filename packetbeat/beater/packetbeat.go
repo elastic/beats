@@ -145,7 +145,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	}()
 
 	if b.API != nil {
-		err := inputmon.AttachHandler(b.API.Router())
+		err := inputmon.AttachHandler(b.API.Router(), nil)
 		if err != nil {
 			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
@@ -154,7 +154,7 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON()
+				data, err := inputmon.MetricSnapshotJSON(nil)
 				if err != nil {
 					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
@@ -210,7 +210,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 // runManaged registers a packetbeat runner with the reload.Registry and starts
 // the runner by starting the beat's manager. It returns on the first fatal error.
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
-	runner := newReloader(management.DebugK, factory, b.Publisher)
+	runner := newReloader(management.DebugK, factory, b.Publisher, b.Info.Logger)
 	b.Registry.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
 

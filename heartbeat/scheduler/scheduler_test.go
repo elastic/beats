@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
+	"github.com/elastic/beats/v7/heartbeat/monitors/maintwin"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -83,10 +84,13 @@ func TestSchedulerRun(t *testing.T) {
 	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
 	defer s.Stop()
 
+	mainWin := maintwin.ParsedMaintWin{}
+	mainWins := []maintwin.ParsedMaintWin{mainWin}
+
 	executed := make(chan string)
 
 	initialEvents := uint32(10)
-	_, err := s.Add(testSchedule{0}, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{0}, mainWins, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
 		executed <- "initial"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "initialCont"
@@ -109,13 +113,13 @@ func TestSchedulerRun(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err = s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http")
+	remove, err = s.Add(testSchedule{}, mainWins, "removed", testTaskTimes(removedEvents+1, testFn), "http")
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
 
 	postRemoveEvents := uint32(10)
-	_, err = s.Add(testSchedule{}, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
+	_, err = s.Add(testSchedule{}, mainWins, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
 		executed <- "postRemove"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "postRemoveCont"
@@ -159,9 +163,12 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 
 	defer s.Stop()
 
+	mainWin := maintwin.ParsedMaintWin{}
+	mainWins := []maintwin.ParsedMaintWin{mainWin}
+
 	executed := new(uint32)
 
-	_, err := s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{0}, mainWins, "runOnce", func(_ context.Context) []TaskFunc {
 		cont := func(_ context.Context) []TaskFunc {
 			// Make sure we actually wait for the task!
 			time.Sleep(time.Millisecond * 250)
@@ -180,10 +187,12 @@ func TestScheduler_Stop(t *testing.T) {
 	s := Create(10, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 	executed := make(chan struct{})
+	mainWin := maintwin.ParsedMaintWin{}
+	mainWins := []maintwin.ParsedMaintWin{mainWin}
 
 	s.Stop()
 
-	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{}, mainWins, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
 		return nil
 	}), "http")
@@ -279,10 +288,12 @@ func BenchmarkScheduler(b *testing.B) {
 	s := Create(0, monitoring.NewRegistry(), tarawaTime(), nil, false)
 
 	sched := testSchedule{0}
+	mainWin := maintwin.ParsedMaintWin{}
+	mainWins := []maintwin.ParsedMaintWin{mainWin}
 
 	executed := make(chan struct{})
 	for i := 0; i < 1024; i++ {
-		_, err := s.Add(sched, "testPostStop", func(_ context.Context) []TaskFunc {
+		_, err := s.Add(sched, mainWins, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil
 		}, "http")

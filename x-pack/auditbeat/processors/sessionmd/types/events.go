@@ -56,9 +56,10 @@ type ProcessForkEvent struct {
 }
 
 type ProcessExecEvent struct {
-	PIDs  PIDInfo
-	Creds CredInfo
-	CTTY  tty.TTYDev
+	PIDs             PIDInfo
+	Creds            CredInfo
+	CTTY             tty.TTYDev
+	ProcfsLookupFail bool
 
 	// varlen fields
 	CWD      string

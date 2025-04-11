@@ -75,12 +75,14 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 					eventMap[eventKey].Error = fmt.Errorf("failed on query=%v: %w", counterPath, val.Err.Error)
 				}
 				if val.Instance != "" {
-					// will ignore instance index
-					if ok, match := matchesParentProcess(val.Instance); ok {
-						eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, match)
-					} else {
-						eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, val.Instance)
+					instanceName := val.Instance
+					if re.config.ShouldMatchByParentInstance() {
+						if ok, match := matchesParentProcess(val.Instance); ok {
+							// will ignore instance index
+							instanceName = match
+						}
 					}
+					eventMap[eventKey].MetricSetFields.Put(counter.InstanceField, instanceName)
 				}
 			}
 
@@ -126,13 +128,13 @@ func (re *Reader) groupToSingleEvent(counters map[string][]pdh.CounterValue) mb.
 					continue
 				}
 				var counterVal float64
-				switch val.Measurement.(type) {
+				switch m := val.Measurement.(type) {
 				case int64:
-					counterVal = float64(val.Measurement.(int64))
+					counterVal = float64(m)
 				case int:
-					counterVal = float64(val.Measurement.(int))
+					counterVal = float64(m)
 				default:
-					counterVal = val.Measurement.(float64)
+					counterVal, _ = val.Measurement.(float64)
 				}
 				if _, ok := measurements[readerCounter.QueryField]; !ok {
 					measurements[readerCounter.QueryField] = counterVal
