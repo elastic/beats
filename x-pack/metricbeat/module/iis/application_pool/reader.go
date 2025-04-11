@@ -9,6 +9,7 @@ package application_pool
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"syscall"
 
@@ -36,6 +37,7 @@ type Reader struct {
 type ApplicationPool struct {
 	name             string
 	workerProcessIds []int
+	status           string
 }
 
 // WorkerProcess struct contains the worker process details
@@ -126,8 +128,7 @@ func (r *Reader) initAppPools() error {
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
-			// Handle known PDH errors as informational (e.g. missing counters).
-			if isPDHError(err) {
+			if errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTER) || errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTERNAME) || errors.Is(err, pdh.PDH_CSTATUS_NO_INSTANCE) || errors.Is(err, pdh.PDH_CSTATUS_NO_OBJECT) {
 				r.log.Infow("Ignoring non existent counter", "error", err,
 					logp.Namespace("application pool"), "query", value,
 				)
@@ -232,20 +233,75 @@ func (r *Reader) close() error {
 	return r.query.Close()
 }
 
+func getAllAppPool() (map[string]string, error) {
+
+	commands := "Import-Module WebAdministration\r\n\tGet-IISAppPool"
+	stdout, stderr, err := Run(commands)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving App Pool %w", err)
+	}
+	if *stderr != "" {
+		return nil, fmt.Errorf("error retrieving App Pool %v", *stderr)
+	}
+
+	allPooldata := parseApplicationPool(*stdout)
+	return allPooldata, nil
+}
+
+func parseApplicationPool(data string) map[string]string {
+	lines := strings.Split(data, "\n")
+	// Skip the header lines
+	lines = lines[2:]
+	var applicationPools = make(map[string]string)
+	if len(lines) == 0 {
+		return applicationPools
+	}
+	// Regular expression to match the name and status
+	re := regexp.MustCompile(`^(.+?)\s{2,}(\S+)`)
+
+	for _, line := range lines {
+		matches := re.FindStringSubmatch(line)
+		if len(matches) == 3 {
+			name := strings.TrimSpace(matches[1])
+			if name == "----" {
+				continue
+			}
+			status := matches[2]
+			applicationPools[name] = status
+		}
+	}
+	return applicationPools
+}
+
 // getApplicationPools method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
 func getApplicationPools(names []string) ([]ApplicationPool, error) {
 	processes, err := getw3wpProceses()
 	if err != nil {
 		return nil, err
 	}
-	appPools := make(map[string][]int)
+	applicationPoolWithStatus, err := getAllAppPool()
+	if err != nil {
+		return nil, err
+	}
+	var appPools = make(map[string][]int)
 	for key, value := range processes {
 		appPools[value] = append(appPools[value], key)
 	}
 	var applicationPools []ApplicationPool
 	for key, value := range appPools {
-		applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value})
+		if status, ok := applicationPoolWithStatus[key]; ok {
+			applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value, status: status})
+		} else {
+			applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value})
+		}
 	}
+
+	for key, status := range applicationPoolWithStatus {
+		if _, ok := appPools[key]; !ok { // adding only those values which are not present in appPools
+			applicationPools = append(applicationPools, ApplicationPool{name: key, status: status})
+		}
+	}
+
 	if len(names) == 0 {
 		return applicationPools, nil
 	}
@@ -279,7 +335,6 @@ func getw3wpProceses() (map[int]string, error) {
 				for i, ar := range info.Args {
 					if ar == "-ap" && len(info.Args) > i+1 {
 						wps[info.PID] = info.Args[i+1]
-						break
 					}
 				}
 			}
