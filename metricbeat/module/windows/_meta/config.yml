@@ -19,13 +19,13 @@
 #  - module: windows
 #   metricsets:
 #   - wmi
-#   period: 60s
+#   period: 10m
 #   wmi:
-#     warning_threshold: 30s
+#     warning_threshold: 10m
 #     # namespace: "root\\cimv2"
 #     queries:
 #     - class: Win32_OperatingSystem  # FROM: Class to fetch
-#       fields:                       # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
+#       properties:                   # SELECT: Properties to retrieve for this WMI class. Omit the setting to fetch all properties
 #        - FreePhysicalMemory
 #        - FreeSpaceInPagingFiles
 #        - FreeVirtualMemory
