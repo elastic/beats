@@ -36,7 +36,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Processor in the light module
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions/init"
 
 	// Input used in the light module
 	_ "github.com/elastic/beats/v7/metricbeat/module/http/json"

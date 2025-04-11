@@ -22,9 +22,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -37,15 +34,6 @@ type addFields struct {
 
 // FieldsKey is the default target key for the add_fields processor.
 const FieldsKey = "fields"
-
-func init() {
-	processors.RegisterPlugin("add_fields",
-		checks.ConfigChecked(CreateAddFields,
-			checks.RequireFields(FieldsKey),
-			checks.AllowedFields(FieldsKey, "target", "when")))
-
-	jsprocessor.RegisterPlugin("AddFields", CreateAddFields)
-}
 
 // CreateAddFields constructs an add_fields processor from config.
 func CreateAddFields(c *conf.C) (beat.Processor, error) {
