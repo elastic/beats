@@ -619,6 +619,9 @@ period expires, Filestream checks if the file is at EOF, if is not,
 then the harvester is closed, otherwise the file is removed. The
 default is 30 minutes.
 
+For examples on how to use this feature read our [Removing files after
+ingestion](/reference/filebeat/delete-file-guide.md) guide.
+
 ## Log rotation [filestream-log-rotation-support]
 
 As log files are constantly written, they must be rotated and purged to prevent the logger application from filling up the disk. Rotation is done by an external application, thus, Filebeat needs information how to cooperate with it.

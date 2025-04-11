@@ -6,8 +6,7 @@ filebeat.inputs:
     delete.on_close.inactive: true
     close.on_state_change.inactive: 1s
     delete.grace_period: 0
-    backoff.init: 0.2s
-    backoff.max: 0.2s
+
     prospector:
       scanner:
         fingerprint:
