@@ -1,8 +1,3 @@
----
-mapped_pages:
-  - https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-metricset-windows-wmi.html
----
-
 # Windows wmi metricset [metricbeat-metricset-windows-wmi]
 
 ::::{warning}

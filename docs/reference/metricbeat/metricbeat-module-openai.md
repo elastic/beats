@@ -1,6 +1,8 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-openai.html
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-openai.html
+  # That link will 404 until 8.18 is current
+  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/metricbeat-module-openai.html)
 ---
 
 # openai module [metricbeat-module-openai]
