@@ -944,14 +944,14 @@ The interval in which full synchronizations should occur. The interval must be l
 The interval in which incremental updates should occur. The interval must be shorter than the full synchronization interval (`sync_interval`). Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
 
-#### `limit_window` [_limit_window]
-
-The time between Okta API rate limit resets. Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `1m` (1 minute).
-
-
 #### `batch_size` [_batch_size]
 
 The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
+
+
+#### `limit_window` [_limit_window]
+
+The time between Okta API rate limit resets. Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `1m` (1 minute).
 
 
 #### `limit_fixed` [_limit_fixed]
