@@ -1015,6 +1015,11 @@ shorter than the full synchronization interval (`sync_interval`). Expressed as a
 duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
 [float]
+==== `batch_size`
+
+The pagination batch size for requests. If it is zero or negative, the API default is used. The default is 200.
+
+[float]
 ==== `tracer.enabled`
 
 It is possible to log HTTP requests and responses to the Okta API to a local file-system for debugging configurations.
