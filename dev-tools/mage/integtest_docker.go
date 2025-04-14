@@ -111,7 +111,7 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 		"-e", "GOCACHE=" + dockerGoCache,
 		// Use the host machine's pkg cache to minimize external downloads.
 		"-v", goPkgCache + ":" + dockerGoPkgCache + ":ro",
-		"-e", "GOPROXY=file://" + dockerGoPkgCache + ",direct",
+		"-e", "GOPROXY=file://" + dockerGoPkgCache + ",https://proxy.golang.org/,direct",
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {
