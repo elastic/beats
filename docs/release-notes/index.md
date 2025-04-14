@@ -1,5 +1,9 @@
 ---
+<<<<<<< HEAD
 navigation_title: "Beats"
+=======
+navigation_title: Beats
+>>>>>>> a194fe0db (Set navigation title for release notes (#43907))
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/8.17/release-notes.html
   - https://www.elastic.co/guide/en/beats/libbeat/current/release-notes.html
