@@ -43,10 +43,9 @@ type MonitorService struct {
 }
 
 const (
-	metricNameLimit          = 20
-	ApiVersion               = "2021-04-01"
-	BatchApiResourcesLimit   = 50
-	BatchApiMetricNamesLimit = 20
+	metricNameLimit        = 20
+	ApiVersion             = "2021-04-01"
+	BatchApiResourcesLimit = 50
 )
 
 // NewService instantiates the Azure monitoring service

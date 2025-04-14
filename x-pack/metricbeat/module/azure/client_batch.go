@@ -176,8 +176,8 @@ func (client *BatchClient) GetMetricsInBatch(groupedMetrics map[ResDefGroupingCr
 
 			// Slice the Metric Names by batches of 20 due to batch api limitation
 			names := strings.Split(criteria.Names, ",")
-			for j := 0; j < len(names); j += BatchApiMetricNamesLimit {
-				endMetric := j + BatchApiMetricNamesLimit
+			for j := 0; j < len(names); j += metricNameLimit {
+				endMetric := j + metricNameLimit
 				if endMetric > len(names) {
 					endMetric = len(names)
 				}
