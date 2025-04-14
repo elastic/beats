@@ -39,7 +39,7 @@ func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) erro
 func (fb *filebeatReceiver) Shutdown(ctx context.Context) error {
 	fb.logger.Info("stopping filebeat receiver")
 	fb.Beater.Stop()
-	if err := fb.BaseReceiver.Stop(); err != nil {
+	if err := fb.BaseReceiver.Shutdown(); err != nil {
 		return fmt.Errorf("error stopping base server: %w", err)
 	}
 	fb.wg.Wait()

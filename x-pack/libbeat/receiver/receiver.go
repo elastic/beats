@@ -30,7 +30,7 @@ func (b *BaseReceiver) Start() error {
 	return nil
 }
 
-func (b *BaseReceiver) Stop() error {
+func (b *BaseReceiver) Shutdown() error {
 	if err := b.stopMonitoring(); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
