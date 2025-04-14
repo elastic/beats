@@ -1,4 +1,4 @@
-ARG NATS_VERSION=2.10.26
+ARG NATS_VERSION=2.11.1
 FROM nats:$NATS_VERSION
 
 # create an enhanced container with nc command available since nats is based
@@ -6,9 +6,11 @@ FROM nats:$NATS_VERSION
 FROM alpine:latest
 COPY --from=0 / /opt/nats
 COPY ./run.sh /run.sh
-COPY ./bench.sh /bench.sh
+COPY ./setup.sh /setup.sh
+RUN chmod +x /run.sh
+RUN chmod +x /setup.sh
 RUN apk update && apk add --no-cache curl
-RUN curl -sf https://binaries.nats.dev/nats-io/natscli/nats@latest | sh
+RUN curl -sf https://binaries.nats.dev/nats-io/natscli/nats@v0.2.1 | sh
 
 # Expose client, management, and cluster ports
 EXPOSE 4222 8222 6222

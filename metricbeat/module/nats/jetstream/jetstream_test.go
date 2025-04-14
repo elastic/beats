@@ -59,7 +59,7 @@ func TestEventMappingForErrors(t *testing.T) {
 func TestFetchEventContentForStats(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
 		Type:      "http",
-		URL:       "/jsz?config=true",
+		URL:       "/jsz?config=true&consumers=true",
 		Suffix:    "stats.json",
 		Path:      "_meta/testdata/input",
 		WritePath: "_meta/testdata/expected",
@@ -80,7 +80,7 @@ func TestFetchEventContentForStats(t *testing.T) {
 func TestFetchEventContentForAccount(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
 		Type:      "http",
-		URL:       "/jsz?accounts=true&config=true",
+		URL:       "/jsz?config=true&consumers=true",
 		Suffix:    "accounts.json",
 		Path:      "_meta/testdata/input",
 		WritePath: "_meta/testdata/expected",
@@ -101,7 +101,7 @@ func TestFetchEventContentForAccount(t *testing.T) {
 func TestFetchEventContentForStreams(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
 		Type:      "http",
-		URL:       "/jsz?config=true&streams=true",
+		URL:       "/jsz?config=true&consumers=true",
 		Suffix:    "streams.json",
 		Path:      "_meta/testdata/input",
 		WritePath: "_meta/testdata/expected",
@@ -173,7 +173,7 @@ func TestFetchEventContentForAll(t *testing.T) {
 func TestFetchEventContentForAllWithNothingEnabled(t *testing.T) {
 	dataConfig := mbtest.DataConfig{
 		Type:      "http",
-		URL:       "/jsz?config=true",
+		URL:       "/jsz?config=true&consumers=true",
 		Suffix:    "all.disabled.json",
 		Path:      "_meta/testdata/input",
 		WritePath: "_meta/testdata/expected",

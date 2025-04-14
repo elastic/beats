@@ -2,9 +2,10 @@ import metricbeat
 import os
 import sys
 import unittest
+from pkg_resources import packaging
+from parameterized import parameterized
 
 NATS_FIELDS = metricbeat.COMMON_FIELDS + ["nats"]
-
 
 @metricbeat.parameterized_with_supported_versions
 class TestNats(metricbeat.BaseTest):
@@ -28,7 +29,7 @@ class TestNats(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+        self.assertEqual(len(output), 2)
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
@@ -53,7 +54,7 @@ class TestNats(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+        self.assertEqual(len(output), 2)
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
@@ -78,7 +79,7 @@ class TestNats(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+        self.assertEqual(len(output), 2)
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
@@ -103,7 +104,7 @@ class TestNats(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+        self.assertEqual(len(output), 2)
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
@@ -128,7 +129,16 @@ class TestNats(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+
+        nats_version = self.COMPOSE_ENV["NATS_VERSION"]
+
+        # There is a difference in the number of route events reported from versions older
+        # than 2.10.
+        if packaging.version.parse(nats_version) < packaging.version.parse("2.10.0"):
+            self.assertEqual(len(output), 2)
+        else:
+            self.assertEqual(len(output), 8)
+
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
@@ -153,7 +163,7 @@ class TestNats(metricbeat.BaseTest):
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
+        self.assertEqual(len(output), 2)
         evt = output[0]
 
         self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
@@ -161,7 +171,13 @@ class TestNats(metricbeat.BaseTest):
         self.assert_fields_are_documented(evt)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
-    def test_jetstream(self):
+    @parameterized.expand([
+        "stats",
+        "account",
+        "stream",
+        "consumer"
+    ])
+    def test_jetstream(self, category):
         """
         nats jetstream test
         """
@@ -170,23 +186,33 @@ class TestNats(metricbeat.BaseTest):
             "metricsets": ["jetstream"],
             "hosts": self.get_hosts(),
             "period": "5s",
-            "jetstream.stats.enabled": True,
-            "jetstream.account.enabled": True,
-            "jetstream.stream.enabled": True,
-            "jetstream.consumer.enabled": True,
+            "extras": {
+                "jetstream": {
+                    "stats": {
+                        "enabled": category == "stats"
+                    },
+                    "account": {
+                        "enabled": category == "account"
+                    },
+                    "stream": {
+                        "enabled": category == "stream"
+                    },
+                    "consumer": {
+                        "enabled": category == "consumer"
+                    },
+                },
+            }
         }])
         proc = self.start_beat()
-        self.wait_until(lambda: self.output_lines() > 0)
+        self.wait_until(lambda: self.output_lines() > 0, max_timeout=20)
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
 
         output = self.read_output_json()
-        self.assertEqual(len(output), 1)
-        evt = output[0]
-
-        self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
-
-        self.assert_fields_are_documented(evt)
+        for evt in output:
+            self.assertEqual(evt["nats"]["jetstream"]["category"], category)
+            self.assertCountEqual(self.de_dot(NATS_FIELDS), evt.keys(), evt)
+            self.assert_fields_are_documented(evt)
 
     def get_hosts(self):
-        return [self.compose_host("nats")]
+        return [self.compose_host("nats"), self.compose_host("nats-routes")]

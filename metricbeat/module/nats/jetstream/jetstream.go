@@ -41,6 +41,7 @@ var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
+		QueryParams:   "config=true&consumers=true",
 	}.Build()
 )
 
@@ -78,29 +79,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
-	}
-
-	// Default detail will just get us stats about JetStream
-	detailLevel := ""
-
-	// Enables gathering the top-most layer of data, which is about accounts
-	if config.Jetstream.Account.Enabled {
-		detailLevel = "accounts"
-	}
-
-	// Enables gathering the second layer of data, which is about accounts + streams
-	if config.Jetstream.Stream.Enabled {
-		detailLevel = "streams"
-	}
-
-	// Enables gathering the lowest layer of data, which is about accounts + streams + consumers
-	if config.Jetstream.Consumer.Enabled {
-		detailLevel = "consumers"
-	}
-
-	http.SetURI(fmt.Sprintf("%s?config=true", http.GetURI()))
-	if detailLevel != "" {
-		http.SetURI(fmt.Sprintf("%s&%s=true", http.GetURI(), detailLevel))
 	}
 
 	return &MetricSet{

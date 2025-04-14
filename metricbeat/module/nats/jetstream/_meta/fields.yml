@@ -250,7 +250,7 @@
               type: long
               description: >
                 Limits maximum number of messages in the stream to retain per subject.	
-            - name: max_msgs_size
+            - name: max_msg_size
               type: long
               format: bytes
               description: >
@@ -336,10 +336,6 @@
           type: long
           description: >
             The number of pull requests currently waiting for messages to be delivered.
-        - name: num_pending
-          type: long
-          description: >
-            The number of messages remaining in the stream that the consumer has not yet delivered to any client.
         - name: num_pending
           type: long
           description: >

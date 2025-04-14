@@ -758,7 +758,7 @@ type: long
 
 type: long
 
-**`nats.jetstream.stream.config.max_msgs_size`**
+**`nats.jetstream.stream.config.max_msg_size`**
 :   The largest message (bytes) that will be accepted by the stream. The size of a message is a sum of payload and headers.
 
 type: long
@@ -852,11 +852,6 @@ type: long
 
 **`nats.jetstream.consumer.num_waiting`**
 :   The number of pull requests currently waiting for messages to be delivered.
-
-type: long
-
-**`nats.jetstream.consumer.num_pending`**
-:   The number of messages remaining in the stream that the consumer has not yet delivered to any client.
 
 type: long
 

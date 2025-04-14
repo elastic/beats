@@ -390,7 +390,9 @@ func statsMapping(r mb.ReporterV2, response JetstreamResponse) error {
 		Timestamp:       timestamp,
 	}
 
-	r.Event(event)
+	if !r.Event(event) {
+		return nil
+	}
 
 	return nil
 }
