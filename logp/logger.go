@@ -21,17 +21,14 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"testing"
 
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"go.uber.org/zap/zaptest"
 )
 
 // LogOption configures a Logger.
 type LogOption = zap.Option
-type LogTestOption = zaptest.LoggerOption
 
 // Logger logs messages to the configured output.
 type Logger struct {
@@ -74,13 +71,6 @@ func NewDevelopmentLogger(selector string, options ...LogOption) (*Logger, error
 		return nil, err
 	}
 	return &Logger{log, log.Sugar()}, nil
-}
-
-// NewTestingLogger returns a testing suitable logp.Logger.
-func NewTestingLogger(t *testing.T, selector string, options ...LogTestOption) *Logger {
-	log := zaptest.NewLogger(t, options...)
-	log = log.Named(selector)
-	return &Logger{log, log.Sugar()}
 }
 
 // NewInMemory returns a new in-memory logger along with the buffer to which it

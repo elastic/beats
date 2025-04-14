@@ -405,7 +405,7 @@ func DevelopmentSetup(options ...Option) error {
 // TestingSetup configures logging by calling DevelopmentSetup if and only if
 // verbose testing is enabled (as in 'go test -v').
 //
-// Deprecated: Prefer using localized loggers. Use logp.NewTestingLogger.
+// Deprecated: Prefer using localized loggers. Use logptest.NewTestingLogger.
 func TestingSetup(options ...Option) error {
 	// Use the flag to avoid a dependency on the testing package.
 	f := flag.Lookup("test.v")
