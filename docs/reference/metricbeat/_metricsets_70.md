@@ -1,6 +1,8 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/metricbeat/master/_metricsets_70.html
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/_metricsets_70.html
+  # That link will 404 until 8.18 is current
+  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/_metricsets_70.html)
 ---
 
 # Metricsets [_metricsets_70]
