@@ -126,44 +126,33 @@ func NewPipelineClientListener(
 	reg *monitoring.Registry,
 	clientListener beat.ClientListener) beat.ClientListener {
 
-	pcl := &PipelineClientListener{}
-
-	if monVar := reg.Get(metricEventsPipelineTotal); monVar == nil {
-		pcl.eventsTotal = monitoring.NewUint(
-			reg, metricEventsPipelineTotal)
-	} else {
-		if monUInt, ok := monVar.(*monitoring.Uint); ok {
-			pcl.eventsTotal = monUInt
-		}
+	var pcl beat.ClientListener = &PipelineClientListener{
+		eventsTotal:     getMonitoringUint(reg, metricEventsPipelineTotal),
+		eventsFiltered:  getMonitoringUint(reg, metricEventsPipelineFiltered),
+		eventsPublished: getMonitoringUint(reg, metricEventsPipelinePublished),
 	}
 
-	if monVar := reg.Get(metricEventsPipelineFiltered); monVar == nil {
-		pcl.eventsFiltered = monitoring.NewUint(
-			reg, metricEventsPipelineFiltered)
-	} else {
-		if monUInt, ok := monVar.(*monitoring.Uint); ok {
-			pcl.eventsFiltered = monUInt
-		}
-	}
-
-	if monVar := reg.Get(metricEventsPipelinePublished); monVar == nil {
-		pcl.eventsPublished = monitoring.NewUint(
-			reg, metricEventsPipelinePublished)
-	} else {
-		if monUInt, ok := monVar.(*monitoring.Uint); ok {
-			pcl.eventsPublished = monUInt
-		}
-	}
-
-	var cl beat.ClientListener = pcl
 	if clientListener != nil {
-		cl = &beat.CombinedClientListener{
+		pcl = &beat.CombinedClientListener{
 			A: clientListener,
 			B: pcl,
 		}
 	}
 
-	return cl
+	return pcl
+}
+
+// getMonitoringUint returns a *monitoring.Uint metric with the given name.
+// If the metric does not exist, it will be created and registered in the
+// registry. If the metric already exists, it will be returned.
+func getMonitoringUint(reg *monitoring.Registry, name string) *monitoring.Uint {
+	monVar := reg.Get(name)
+	if monVar == nil {
+		return monitoring.NewUint(
+			reg, name)
+	}
+
+	return monVar.(*monitoring.Uint)
 }
 
 // PipelineClientListener implements beat.ClientListener to collect pipeline
