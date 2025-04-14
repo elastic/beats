@@ -126,6 +126,9 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+          - "x-pack/heartbeat/build/integration-tests/*"
+          - "x-pack/heartbeat/build/integration-tests/Test*/*"
+          - "x-pack/heartbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/heartbeat/build/TEST-*.xml"
