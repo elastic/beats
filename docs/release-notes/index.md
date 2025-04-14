@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/release-notes.html
 ---
 
-# {{beats}} release notes [beats-release-notes]
+# {{beats}} [beats-release-notes]
 Review the changes, fixes, and more in each version of {{beats}}.
 
 To check for security updates, go to [Security announcements for the Elastic stack](https://discuss.elastic.co/c/announcements/security-announcements/31).
