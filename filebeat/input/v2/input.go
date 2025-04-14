@@ -30,6 +30,12 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+const (
+	metricEventsPipelineTotal     = "events_pipeline_total"
+	metricEventsPipelineFiltered  = "events_pipeline_filtered_total"
+	metricEventsPipelinePublished = "events_pipeline_published_total"
+)
+
 // InputManager creates and maintains actions and background processes for an
 // input type.
 // The InputManager is used to create inputs. The InputManager can provide
@@ -114,27 +120,50 @@ func (c *Context) UpdateStatus(status status.Status, msg string) {
 // the PipelineClientListener or a beat.CombinedClientListener. It's the latter
 // when clientListener is non-nil.
 // The PipelineClientListener collects pipeline metrics for an input. The
-// metrics are created on reg.
+// metrics are created on reg. If there is already a metric with the same name
+// on reg, the existing metric will be used.
 func NewPipelineClientListener(
 	reg *monitoring.Registry,
 	clientListener beat.ClientListener) beat.ClientListener {
 
-	var pcl beat.ClientListener = &PipelineClientListener{
-		eventsTotal: monitoring.NewUint(
-			reg, "events_pipeline_total"),
-		eventsFiltered: monitoring.NewUint(
-			reg, "events_pipeline_filtered_total"),
-		eventsPublished: monitoring.NewUint(
-			reg, "events_pipeline_published_total"),
+	pcl := &PipelineClientListener{}
+
+	if monVar := reg.Get(metricEventsPipelineTotal); monVar == nil {
+		pcl.eventsTotal = monitoring.NewUint(
+			reg, metricEventsPipelineTotal)
+	} else {
+		if monUInt, ok := monVar.(*monitoring.Uint); ok {
+			pcl.eventsTotal = monUInt
+		}
 	}
 
+	if monVar := reg.Get(metricEventsPipelineFiltered); monVar == nil {
+		pcl.eventsFiltered = monitoring.NewUint(
+			reg, metricEventsPipelineFiltered)
+	} else {
+		if monUInt, ok := monVar.(*monitoring.Uint); ok {
+			pcl.eventsFiltered = monUInt
+		}
+	}
+
+	if monVar := reg.Get(metricEventsPipelinePublished); monVar == nil {
+		pcl.eventsPublished = monitoring.NewUint(
+			reg, metricEventsPipelinePublished)
+	} else {
+		if monUInt, ok := monVar.(*monitoring.Uint); ok {
+			pcl.eventsPublished = monUInt
+		}
+	}
+
+	var cl beat.ClientListener = pcl
 	if clientListener != nil {
-		pcl = &beat.CombinedClientListener{
+		cl = &beat.CombinedClientListener{
 			A: clientListener,
 			B: pcl,
 		}
 	}
-	return pcl
+
+	return cl
 }
 
 // PipelineClientListener implements beat.ClientListener to collect pipeline
