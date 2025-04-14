@@ -174,12 +174,12 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
-	github.com/elastic/elastic-agent-libs v0.19.0
+	github.com/elastic/elastic-agent-libs v0.19.1
 	github.com/elastic/elastic-agent-system-metrics v0.11.10
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
-	github.com/elastic/mito v1.17.0
+	github.com/elastic/mito v1.18.0
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
 	github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996
 	github.com/elastic/tk-btf v0.1.0
