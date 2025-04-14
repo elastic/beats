@@ -7,6 +7,7 @@ from parameterized import parameterized
 
 NATS_FIELDS = metricbeat.COMMON_FIELDS + ["nats"]
 
+
 @metricbeat.parameterized_with_supported_versions
 class TestNats(metricbeat.BaseTest):
     COMPOSE_SERVICES = ['nats', 'nats-routes']
