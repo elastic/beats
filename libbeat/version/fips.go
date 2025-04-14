@@ -19,5 +19,5 @@
 
 package version
 
-// Set FIPSEnabled to true for FIPS builds.
-const FIPSEnabled bool = true
+// Set FIPSDistribution to true for FIPS builds.
+const FIPSDistribution bool = true

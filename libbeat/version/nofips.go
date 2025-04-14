@@ -19,5 +19,5 @@
 
 package version
 
-// Set FIPSEnabled to false for non-FIPS builds.
-const FIPSEnabled bool = false
+// Set FIPSDistribution to false for non-FIPS builds.
+const FIPSDistribution bool = false
