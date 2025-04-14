@@ -66,7 +66,7 @@ func TestTopic(t *testing.T) {
 	)
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
-	id := strconv.Itoa(rand.New(rand.NewPCG(rand.Uint64(), rand.Uint64())).Int())
+	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 	// Create initial topic

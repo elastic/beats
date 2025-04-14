@@ -33,6 +33,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"golang.org/x/sys/execabs"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -95,14 +96,14 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 	return params
 }
 
-// fetchGoPackages uses "go list ./module/..." to get all Go packages for a
-// module.
-// It returns a list of packages that are relative to the module path.
-// Example: for module "kafka" it'll return:
+// fetchGoPackages retrieves all Go packages for a beats module. It uses
+// "go list -tags integration" to obtain the list of packages.
+// Example: for the "kafka" module inside "metricbeat/module", it'll return:
 //
 //	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
 func fetchGoPackages(module string) ([]string, error) {
-	cmd := exec.Command("go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module)) //nolint:gosec // used only to run tests
+	cmd := execabs.Command(
+		"go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module))
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
@@ -174,10 +175,10 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 	return args
 }
 
-// GoTestIntegrationArgsForModule returns a default set of arguments for running
+// GoTestIntegrationArgsForPackage returns a default set of arguments for running
 // module integration tests. We tag integration test files with 'integration'.
-func GoTestIntegrationArgsForModule(module string) GoTestArgs {
-	args := makeGoTestArgsForPackage("Integration", module)
+func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
+	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
 	return args
@@ -254,7 +255,7 @@ func goTestIntegrationForSingleModule(ctx context.Context, module string) error 
 
 			var errs []error
 			for _, pkg := range pkgs {
-				err := GoTest(ctx, GoTestIntegrationArgsForModule(pkg))
+				err := GoTest(ctx, GoTestIntegrationArgsForPackage(pkg))
 				if err != nil {
 					errs = append(errs, err)
 				}
