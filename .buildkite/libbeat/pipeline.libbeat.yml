@@ -159,6 +159,9 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+          - "libbeat/build/integration-tests/*"
+          - "libbeat/build/integration-tests/Test*/*"
+          - "libbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "libbeat/build/TEST-*.xml"
@@ -185,6 +188,9 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+          - "libbeat/build/integration-tests/*"
+          - "libbeat/build/integration-tests/Test*/*"
+          - "libbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "libbeat/build/TEST-*.xml"

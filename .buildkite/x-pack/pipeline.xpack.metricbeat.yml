@@ -170,6 +170,9 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+          - "x-pack/metricbeat/build/integration-tests/*"
+          - "x-pack/metricbeat/build/integration-tests/Test*/*"
+          - "x-pack/metricbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
@@ -197,6 +200,9 @@ steps:
         artifact_paths:
           - "x-pack/metricbeat/build/*.xml"
           - "x-pack/metricbeat/build/*.json"
+          - "x-pack/metricbeat/build/integration-tests/*"
+          - "x-pack/metricbeat/build/integration-tests/Test*/*"
+          - "x-pack/metricbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/metricbeat/build/TEST-*.xml"
