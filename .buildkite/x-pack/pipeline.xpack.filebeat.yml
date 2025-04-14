@@ -145,6 +145,9 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"
@@ -170,6 +173,9 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"
