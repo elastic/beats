@@ -32,10 +32,6 @@ func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue)
 				if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
 					continue
 				}
-				//// remove metric values that are not part of the timeline selected
-				//if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
-				//	continue
-				//}
 				// define the new metric value and match aggregations values
 				var val MetricValue
 				val.name = *v.Name.Value
@@ -260,10 +256,6 @@ func mapBatchMetricValues(client *BatchClient, metricValues azmetrics.MetricData
 				if batchMetricIsEmpty(mv) {
 					continue
 				}
-				//// remove metric values that are not part of the timeline selected
-				//if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
-				//	continue
-				//}
 				// define the new metric value and match aggregations values
 				var val MetricValue
 				val.name = *v.Name.Value
