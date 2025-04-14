@@ -14,8 +14,8 @@ The following examples show common configurations for the Elastic Logging Plugin
 
 **Docker run command:**
 
-```sh
-docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
+```sh subs=true
+docker run --log-driver=elastic/elastic-logging-plugin:{{stack-version}} \
            --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
@@ -24,9 +24,9 @@ docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
 
 **Daemon configuration:**
 
-```json
+```json subs=true
 {
-  "log-driver" : "elastic/elastic-logging-plugin:9.0.0-beta1",
+  "log-driver" : "elastic/elastic-logging-plugin:{{stack-version}}",
   "log-opts" : {
     "hosts" : "myhost:9200",
     "user" : "myusername",
@@ -40,8 +40,8 @@ docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
 
 **Docker run command:**
 
-```sh
-docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
+```sh subs=true
+docker run --log-driver=elastic/elastic-logging-plugin:{{stack-version}} \
            --log-opt cloud_id="MyElasticStack:daMbY2VudHJhbDekZ2NwLmN4b3VkLmVzLmliJDVkYmQwtGJiYjs0NTRiN4Q5ODJmNGUwm1IxZmFkNjM5JDFiNjdkMDE4MTgxMTQzNTM5ZGFiYWJjZmY0OWIyYWE5" \
            --log-opt cloud_auth="myusername:mypassword" \
            -it debian:jessie /bin/bash
@@ -49,9 +49,9 @@ docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
 
 **Daemon configuration:**
 
-```json
+```json subs=true
 {
-  "log-driver" : "elastic/elastic-logging-plugin:9.0.0-beta1",
+  "log-driver" : "elastic/elastic-logging-plugin:{{stack-version}}",
   "log-opts" : {
     "cloud_id" : "MyElasticStack:daMbY2VudHJhbDekZ2NwLmN4b3VkLmVzLmliJDVkYmQwtGJiYjs0NTRiN4Q5ODJmNGUwm1IxZmFkNjM5JDFiNjdkMDE4MTgxMTQzNTM5ZGFiYWJjZmY0OWIyYWE5",
     "cloud_auth" : "myusername:mypassword",
@@ -65,8 +65,8 @@ docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
 
 **Docker run command:**
 
-```sh
-docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
+```sh subs=true
+docker run --log-driver=elastic/elastic-logging-plugin:{{stack-version}} \
            --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
@@ -76,9 +76,9 @@ docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
 
 **Daemon configuration:**
 
-```json
+```json subs=true
 {
-  "log-driver" : "elastic/elastic-logging-plugin:9.0.0-beta1",
+  "log-driver" : "elastic/elastic-logging-plugin:{{stack-version}}",
   "log-opts" : {
     "hosts" : "myhost:9200",
     "user" : "myusername",

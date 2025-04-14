@@ -17,8 +17,8 @@ Use the following options to configure the Elastic Logging Plugin for Docker. Yo
 
 To set configuration options when you start a container:
 
-```sh
-docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
+```sh subs=true
+docker run --log-driver=elastic/elastic-logging-plugin:{{stack-version}} \
            --log-opt hosts="https://myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
@@ -27,9 +27,9 @@ docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
 
 To set configuration options for all containers in the `daemon.json` file:
 
-```json
+```json subs=true
 {
-  "log-driver" : "elastic/elastic-logging-plugin:9.0.0-beta1",
+  "log-driver" : "elastic/elastic-logging-plugin:{{stack-version}}",
   "log-opts" : {
     "hosts" : "https://myhost:9200",
     "user" : "myusername",
@@ -73,27 +73,27 @@ This plugin fully supports `docker logs`, and it maintains a local copy of logs 
 
 1. Disable the plugin:
 
-    ```sh
-    docker plugin disable elastic/elastic-logging-plugin:9.0.0-beta1
+    ```sh subs=true
+    docker plugin disable elastic/elastic-logging-plugin:{{stack-version}}
     ```
 
 2. Set the bindmount directory:
 
-    ```sh
-    docker plugin set elastic/elastic-logging-plugin:9.0.0-beta1 LOG_DIR.source=NEW_LOG_LOCATION
+    ```sh subs=true
+    docker plugin set elastic/elastic-logging-plugin:{{stack-version}} LOG_DIR.source=NEW_LOG_LOCATION
     ```
 
 3. Enable the plugin:
 
-    ```sh
-    docker plugin enable elastic/elastic-logging-plugin:9.0.0-beta1
+    ```sh subs=true
+    docker plugin enable elastic/elastic-logging-plugin:{{stack-version}}
     ```
 
 
 The local log also supports the `max-file`, `max-size` and `compress` options that are [a part of the Docker default file logger](https://docs.docker.com/config/containers/logging/json-file/#options). For example:
 
-```sh
-docker run --log-driver=elastic/elastic-logging-plugin:9.0.0-beta1 \
+```sh subs=true
+docker run --log-driver=elastic/elastic-logging-plugin:{{stack-version}} \
            --log-opt hosts="myhost:9200" \
            --log-opt user="myusername" \
            --log-opt password="mypassword" \
@@ -107,20 +107,20 @@ In situations where logs can’t be easily managed, for example, you can also co
 
 1. Disable the plugin:
 
-    ```sh
-    docker plugin disable elastic/elastic-logging-plugin:9.0.0-beta1
+    ```sh subs=true
+    docker plugin disable elastic/elastic-logging-plugin:{{stack-version}}
     ```
 
 2. Enable log removal:
 
-    ```sh
-    docker plugin set elastic/elastic-logging-plugin:9.0.0-beta1 DESTROY_LOGS_ON_STOP=true
+    ```sh subs=true
+    docker plugin set elastic/elastic-logging-plugin:{{stack-version}} DESTROY_LOGS_ON_STOP=true
     ```
 
 3. Enable the plugin:
 
-    ```sh
-    docker plugin enable elastic/elastic-logging-plugin:9.0.0-beta1
+    ```sh subs=true
+    docker plugin enable elastic/elastic-logging-plugin:{{stack-version}}
     ```
 
 
