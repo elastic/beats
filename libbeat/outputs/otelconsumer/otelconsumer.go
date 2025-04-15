@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/consumer/consumererror"
@@ -113,6 +114,9 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 
 		beatEvent := event.Content.Fields
+		if beatEvent == nil {
+			beatEvent = mapstr.M{}
+		}
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
 		otelmap.ConvertNonPrimitive(beatEvent)
@@ -132,7 +136,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 
 		}
-		logRecord.Body().FromRaw(beatEvent)
+		logRecord.Body().SetEmptyMap().FromRaw(beatEvent)
 	}
 
 	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
