@@ -49,6 +49,7 @@ func init() {
 					"execve",
 					"exit",
 					"exit_group",
+					"faccessat",
 					"faccessat2",
 					"fchdir",
 					"fchmod",

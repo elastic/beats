@@ -12,3 +12,6 @@ source .buildkite/scripts/qemu.sh
 
 cd $BEAT_DIR
 mage package
+
+echo "Generated packages in ${BEAT_DIR}/build/distributions:"
+ls -lah "build/distributions"

@@ -319,13 +319,13 @@ func TestMatchByParentInstance(t *testing.T) {
 		`\Processor Information(processor)\% Processor Time`: {
 			{
 				Instance:    "processor",
-				Measurement: 23,
+				Measurement: 1,
 			},
 		},
 		`\Processor Information(processor#1)\% Processor Time`: {
 			{
 				Instance:    "processor#1",
-				Measurement: 21,
+				Measurement: 2,
 			},
 		},
 	}
@@ -353,6 +353,15 @@ func TestMatchByParentInstance(t *testing.T) {
 		events := reader.groupToEvents(counters)
 		assert.NotNil(t, events)
 		assert.Equal(t, 2, len(events))
+		pt, _ := events[0].MetricSetFields.GetValue("%_processor_time")
+		var exp1, exp2 string
+		// since counters is a map we use the value to determine order
+		// of expected values
+		if pt == 1 {
+			exp1, exp2 = "processor", "processor#1"
+		} else {
+			exp1, exp2 = "processor#1", "processor"
+		}
 		ok, err := events[0].MetricSetFields.HasKey("instance")
 		assert.NoError(t, err)
 		assert.True(t, ok)
@@ -361,10 +370,10 @@ func TestMatchByParentInstance(t *testing.T) {
 		assert.True(t, ok)
 		val1, err := events[0].MetricSetFields.GetValue("instance")
 		assert.NoError(t, err)
-		assert.Equal(t, val1, "processor")
+		assert.Equal(t, val1, exp1)
 		val2, err := events[1].MetricSetFields.GetValue("instance")
 		assert.NoError(t, err)
-		assert.Equal(t, val2, "processor#1")
+		assert.Equal(t, val2, exp2)
 	}
 }
 

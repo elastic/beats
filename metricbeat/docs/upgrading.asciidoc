@@ -1,7 +1,0 @@
-[[upgrading-metricbeat]]
-== Upgrade Metricbeat
-
-For information about upgrading to a new version, see:
-
-* {beats-ref}/breaking-changes.html[Breaking Changes]
-* {beats-ref}/upgrading.html[Upgrade]

@@ -346,6 +346,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			hmacKey:      c.HMACKey,
 			hmacType:     c.HMACType,
 			hmacPrefix:   c.HMACPrefix,
+			maxBodySize:  -1,
 		},
 		maxInFlight:           c.MaxInFlight,
 		retryAfter:            c.RetryAfter,
@@ -356,6 +357,9 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
+	}
+	if c.MaxBodySize != nil {
+		h.validator.maxBodySize = *c.MaxBodySize
 	}
 	if c.Tracer.enabled() {
 		w := zapcore.AddSync(c.Tracer)

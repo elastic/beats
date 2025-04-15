@@ -33,6 +33,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 	ms.MapMetrics = mapMetrics
+	ms.ConcMapMetrics = concurrentMapMetrics
 	return &MetricSet{
 		MetricSet: ms,
 	}, nil

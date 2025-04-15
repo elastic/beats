@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -22,6 +23,7 @@ func TestClientCacheWrap(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping in short mode")
 	}
+	testutils.SkipIfFIPSOnly(t, "cache uses SHA-1.")
 
 	ttl := 2 * time.Second
 	guid := mustCreateFakeGuid()
@@ -30,7 +32,8 @@ func TestClientCacheWrap(t *testing.T) {
 		Name: "Foo", // use this field to track if from cache or from client
 	}
 	fakeClient := &fakeCFClient{app, 0}
-	cache, err := newClientCacheWrap(fakeClient, "test", ttl, ttl, logp.NewLogger("cloudfoundry"))
+	logger := logp.NewTestingLogger(t, "")
+	cache, err := newClientCacheWrap(fakeClient, "test", ttl, ttl, logger.Named("cloudfoundry"))
 	require.NoError(t, err)
 
 	missingAppGuid := mustCreateFakeGuid()
