@@ -131,7 +131,7 @@ func NewBuilders(
 		// pass rest of hints settings to the builder
 		err := hintsCfg.SetString("type", -1, "hints")
 		if err != nil {
-			return Builders{}, err
+			return Builders{}, fmt.Errorf("autodiscover NewBuilder: could not set 'type' to 'hinsts' on hints config: %w")
 		}
 		bConfigs = append(bConfigs, hintsCfg)
 	}
