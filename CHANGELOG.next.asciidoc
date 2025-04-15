@@ -485,6 +485,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
 - Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
+- Collect OS CPU stats from ES node/stats metrics {pull}43924[43924]
 
 *Metricbeat*
 - Add benchmark module {pull}41801[41801]
