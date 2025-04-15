@@ -171,13 +171,13 @@ class TestNats(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @parameterized.expand([
         "stats",
         "account",
         "stream",
         "consumer"
     ])
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_jetstream(self, category):
         """
         nats jetstream test
