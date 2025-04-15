@@ -19,6 +19,7 @@
 package otelmap
 
 import (
+	"reflect"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,11 +32,26 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 	return m.AsRaw()
 }
 
+// ConvertNonPrimitive handles the conversion of non-primitive data types to pcommon-primitive types.
+// The conversion is performed in place.
+// Notes:
+//  1. Slices require special handling when converting a map[string]any to pcommon.Map.
+//     The pcommon.Map expects all slices to be of type []any.
+//     If you attempt to use other slice types (e.g., []string or []int),
+//     pcommon.Map.FromRaw(...) will return an "invalid type" error.
+//     To overcome this, we use "reflect" to transform []T into []any.
 func ConvertNonPrimitive(m mapstr.M) {
 	for key, val := range m {
 		switch x := val.(type) {
 		case mapstr.M:
 			ConvertNonPrimitive(x)
+		case []mapstr.M:
+			s := make([]any, len(x))
+			for i, val := range x {
+				ConvertNonPrimitive(val)
+				s[i] = val
+			}
+			m[key] = s
 		case time.Time:
 			m[key] = x.UTC().Format("2006-01-02T15:04:05.000Z")
 		case []time.Time:
@@ -44,46 +60,16 @@ func ConvertNonPrimitive(m mapstr.M) {
 				s = append(s, i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
 			m[key] = s
-		case []mapstr.M:
-			s := make([]any, len(x))
-			for i, val := range x {
-				ConvertNonPrimitive(val)
-				s[i] = val
+		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
+			[]uint, []uint8, []uint16, []uint32, []uint64:
+			ref := reflect.ValueOf(x)
+			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
+				slice := make([]any, ref.Len())
+				for i := 0; i < ref.Len(); i++ {
+					slice[i] = ref.Index(i).Interface()
+				}
+				m[key] = slice
 			}
-			m[key] = s
-		case []bool:
-			m[key] = convertSlice(x)
-		case []string:
-			m[key] = convertSlice(x)
-		case []float32:
-			m[key] = convertSlice(x)
-		case []float64:
-			m[key] = convertSlice(x)
-		case []int:
-			m[key] = convertSlice(x)
-		case []int16:
-			m[key] = convertSlice(x)
-		case []int32:
-			m[key] = convertSlice(x)
-		case []int64:
-			m[key] = convertSlice(x)
-		case []uint:
-			m[key] = convertSlice(x)
-		case []uint16:
-			m[key] = convertSlice(x)
-		case []uint32:
-			m[key] = convertSlice(x)
-		case []uint64:
-			m[key] = convertSlice(x)
 		}
-
 	}
-}
-
-func convertSlice[T any](slice []T) []any {
-	s := make([]any, len(slice))
-	for i, val := range slice {
-		s[i] = val
-	}
-	return s
 }
