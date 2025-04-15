@@ -258,12 +258,10 @@ func (r *Reader) Close() error {
 	return nil
 }
 
-// Next returns the next journal entry. If there is no entry available
-// next will block until there is an entry or cancel is cancelled.
-//
-// If cancel is cancelled, Next returns a zero value JournalEntry
-// and ErrCancelled.
-func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
+// next reads the next entry from journalctl. It handles any errors from
+// journalctl restarting it as necessary with a backoff strategy. It either
+// returns a valid journald entry or ErrCancelled when the input is cancelled.
+func (r *Reader) next(cancel input.Canceler) ([]byte, error) {
 	msg, finished, err := r.jctl.Next(cancel)
 
 	// Check if the input has been cancelled
@@ -273,7 +271,7 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 		// journalctl. Cancelling this canceller only means this Next call was
 		// cancelled. Because the input has been cancelled, we ignore the message
 		// and any error it might have returned.
-		return JournalEntry{}, ErrCancelled
+		return nil, ErrCancelled
 	default:
 		// Three options:
 		//   - Journalctl finished reading messages from previous boots
@@ -343,15 +341,42 @@ func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
 		if restart {
 			if err := r.newJctl(extraArgs...); err != nil {
 				// If we cannot restart journalct, there is nothing we can do.
-				return JournalEntry{}, fmt.Errorf("cannot restart journalctl: %w", err)
+				return nil, fmt.Errorf("cannot restart journalctl: %w", err)
 			}
 
-			// Return an empty message and wait for the input to call us again
-			return JournalEntry{}, ErrRestarting
+			// Return an empty message and wait for the caller to call us again
+			return nil, ErrRestarting
 		}
 	}
 
-	return r.handleMessage(msg)
+	return msg, nil
+}
+
+// Next returns the next journal entry. If there is no entry available
+// next will block until there is an entry or cancel is cancelled.
+//
+// If cancel is cancelled, Next returns a zero value JournalEntry
+// and ErrCancelled.
+func (r *Reader) Next(cancel input.Canceler) (JournalEntry, error) {
+	// r.next returns ErrRestarting when journalctl is restarting,
+	// this happens in two situations:
+	//  - When the reader first starts, it runs journalctl without the follow
+	//    flat to read messages from all previous boots, journalctl exits once
+	//    all messages are read.
+	//  - journalctl exited unexpectedly and was restarted.
+	// On both cases Readr.Next must block until we have a valid journal entry
+	// or the input is cancelled.
+	for {
+		msg, err := r.next(cancel)
+		if err != nil {
+			if errors.Is(err, ErrRestarting) {
+				continue
+			}
+			return JournalEntry{}, err
+		}
+
+		return r.handleMessage(msg)
+	}
 }
 
 func (r *Reader) handleMessage(msg []byte) (JournalEntry, error) {

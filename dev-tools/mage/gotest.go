@@ -292,9 +292,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		}
 	}
 	if len(params.Tags) > 0 {
-		params := strings.Join(params.Tags, " ")
+		params := strings.Join(params.Tags, ",")
 		if params != "" {
-			testArgs = append(testArgs, "-tags", params)
+			testArgs = append(testArgs, "-tags="+params)
 		}
 	}
 	if params.CoverageProfileFile != "" {

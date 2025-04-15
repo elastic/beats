@@ -1,8 +1,0 @@
-[role="exclude",id="monitor-browser-options"]
-== Browser options
-
-*{heartbeat} browser checks are in beta and will not be made generally available.*
-
-If you want to set up browser checks, we highly recommend using Synthetics via {observability-guide}/synthetics-get-started-project.html[Projects] or the {observability-guide}/synthetics-get-started-ui.html[Synthetics app in {kib}] to create and manage browser monitors.
-
-If you need to refer to how beta {heartbeat} browser checks were set up previously, refer to the {beats-ref-root}/heartbeat/8.7/monitor-browser-options.html[Browser options documentation for 8.7].

@@ -35,11 +35,6 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-type testStateStore struct {
-	Store    *statestore.Store
-	GCPeriod time.Duration
-}
-
 func TestResource_CopyInto(t *testing.T) {
 	src := resource{lock: unison.MakeMutex()}
 	dst := resource{lock: unison.MakeMutex()}
@@ -476,7 +471,7 @@ func closeStoreWith(fn func(s *store)) func() {
 }
 
 //nolint:unparam // It's a test helper
-func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *store {
+func testOpenStore(t *testing.T, prefix string, persistentStore statestore.States) *store {
 	if persistentStore == nil {
 		persistentStore = createSampleStore(t, nil)
 	}
@@ -506,9 +501,16 @@ func createSampleStore(t *testing.T, data map[string]state) testStateStore {
 	}
 }
 
+var _ statestore.States = testStateStore{}
+
+type testStateStore struct {
+	Store    *statestore.Store
+	GCPeriod time.Duration
+}
+
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) Access(string) (*statestore.Store, error) {
+func (ts testStateStore) StoreFor(string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}

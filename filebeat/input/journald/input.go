@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -70,10 +71,10 @@ const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 const pluginName = "journald"
 
 // Plugin creates a new journald input plugin for creating a stateful input.
-func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "journald input",
 		Doc:        "The journald input collects logs from the local journald service",

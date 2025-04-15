@@ -127,11 +127,11 @@ type (
 // hook into store close for testing purposes
 var closeStore = (*store).close
 
-func openStore(log *logp.Logger, statestore StateStore, prefix string, inputID string, fullInit bool) (*store, error) {
+func openStore(log *logp.Logger, statestore statestore.States, prefix string, inputID string, fullInit bool) (*store, error) {
 	ok := false
 
 	log.Debugf("input-cursor::openStore: prefix: %v inputID: %s", prefix, inputID)
-	persistentStore, err := statestore.Access(prefix)
+	persistentStore, err := statestore.StoreFor(prefix)
 	if err != nil {
 		return nil, err
 	}

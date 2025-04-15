@@ -341,10 +341,9 @@ steps:
       - label: ":ubuntu: Heartbeat: Packaging Linux"
         key: "heartbeat-package-linux"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
-          cd heartbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh heartbeat
         retry:
           automatic:
             - limit: 1
@@ -360,11 +359,9 @@ steps:
       - label: ":ubuntu: Heartbeat: Packaging Linux arm64"
         key: "heartbeat-package-linux-arm"
         env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
-          cd heartbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh heartbeat
         retry:
           automatic:
             - limit: 1
