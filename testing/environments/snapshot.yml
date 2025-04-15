@@ -3,11 +3,21 @@
 version: '2.3'
 services:
   elasticsearch:
+<<<<<<< HEAD
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.26-97f99b87-SNAPSHOT
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
       interval: 1s
+=======
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.0-e0282968-SNAPSHOT
+    # When extend is used it merges healthcheck.tests, see:
+    # https://github.com/docker/compose/issues/8962
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+    #   retries: 300
+    #   interval: 1s
+>>>>>>> 76a264664 (fix filebeat module golden files and update elastic stack version for testing (#43711))
     environment:
     - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
     - "network.host="
@@ -22,7 +32,11 @@ services:
     - "ingest.geoip.downloader.enabled=false"
 
   logstash:
+<<<<<<< HEAD
     image: docker.elastic.co/logstash/logstash:7.17.26-97f99b87-SNAPSHOT
+=======
+    image: docker.elastic.co/logstash/logstash:9.1.0-e0282968-SNAPSHOT
+>>>>>>> 76a264664 (fix filebeat module golden files and update elastic stack version for testing (#43711))
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
@@ -32,8 +46,27 @@ services:
       - ./docker/logstash/pki:/etc/pki:ro
 
   kibana:
+<<<<<<< HEAD
     image: docker.elastic.co/kibana/kibana:7.17.26-97f99b87-SNAPSHOT
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600
       interval: 1s
+=======
+    image: docker.elastic.co/kibana/kibana:9.1.0-e0282968-SNAPSHOT
+    environment:
+    - "ELASTICSEARCH_USERNAME=kibana_system_user"
+    - "ELASTICSEARCH_PASSWORD=testing"
+    - "XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=gwaXhuYzE6l3r1wh5ZdSkJvtK6uSw11d"
+    - "XPACK_SECURITY_ENCRYPTIONKEY=wZSVeczkXAmebqNgfcKEzNMmQCBZKkSH"
+    - "XPACK_REPORTING_ENCRYPTIONKEY=xCyqJUFqrUJJKxjZVGfnhrRkyqqaKeAG"
+    - "LOGGING_ROOT_LEVEL=all"
+    ports:
+      - 5601:5601
+    # When extend is used it merges healthcheck.tests, see:
+    # https://github.com/docker/compose/issues/8962
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
+    #   retries: 600
+
+>>>>>>> 76a264664 (fix filebeat module golden files and update elastic stack version for testing (#43711))
