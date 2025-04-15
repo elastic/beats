@@ -9,14 +9,14 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/receiver"
+	"github.com/elastic/beats/v7/libbeat/otelbeat"
 
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 )
 
 type filebeatReceiver struct {
-	receiver.BaseReceiver
+	otelbeat.BaseReceiver
 	logger *zap.Logger
 	wg     sync.WaitGroup
 }
