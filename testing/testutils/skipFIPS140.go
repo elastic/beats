@@ -15,12 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package logstash
+package testutils
 
 import (
-	"github.com/elastic/elastic-agent-libs/logp"
+	"os"
+	"strings"
+	"testing"
 )
 
-func enableLogging(selectors []string) {
-	logp.TestingSetup(logp.WithSelectors(selectors...))
+// SkipIfFIPSOnly will mark the passed test as skipped if GODEBUG=fips140=only is detected.
+// If GODEBUG=fips140=on, go may call non-compliant algorithms and the test does not need to be skipped.
+func SkipIfFIPSOnly(t *testing.T, msg string) {
+	// NOTE: This only checks env var; at the time of writing fips140 can only be set via env
+	// other GODEBUG settings can be set via embedded comments or in go.mod, we may need to account for this in the future.
+	s := os.Getenv("GODEBUG")
+	if strings.Contains(s, "fips140=only") {
+		t.Skip("GODEBUG=fips140=only detected, skipping test:", msg)
+	}
 }
