@@ -328,22 +328,20 @@ func TestGroup_Go(t *testing.T) {
 
 func TestGroup_Stop(t *testing.T) {
 	t.Run("timeout", func(t *testing.T) {
-		g := NewGroup(50, time.Millisecond, noopLogger{}, "")
+
+		g := NewGroup(1, time.Nanosecond, noopLogger{}, "")
 
 		done := make(chan struct{})
-		wg := sync.WaitGroup{}
-		wg.Add(1)
 		defer func() { close(done) }()
 		err := g.Go(func(_ context.Context) error {
-			wg.Done() // signal that the goroutine is running
 			<-done
 			return nil
 		})
 		require.NoError(t, err, "could not launch goroutine")
-		wg.Wait() // wait for the goroutine to start
+
+		time.Sleep(time.Nanosecond)
 
 		err = g.Stop()
-		require.NotNil(t, err, "Stop should return a timeout error")
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
 
