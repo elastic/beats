@@ -344,7 +344,6 @@ func TestMonitoring(t *testing.T) {
 }
 
 func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig) {
-	require.NoError(t, logp.TestingSetup(), "could not setup logger")
 
 	var config Config
 	err := conf.MustNewConfigFrom(map[string]interface{}{
