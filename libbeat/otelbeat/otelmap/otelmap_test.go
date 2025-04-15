@@ -101,12 +101,9 @@ func TestFromMapstrSliceAny(t *testing.T) {
 	inputMap := mapstr.M{
 		"slice": inputSlice,
 	}
-	want := mapstr.M{}
-	slice := make([]any, 0)
-	for _, i := range inputSlice {
-		slice = append(slice, i)
+	want := mapstr.M{
+		"slice": inputSlice,
 	}
-	want["slice"] = slice
 
 	ConvertNonPrimitive(inputMap)
 	assert.Equal(t, want, inputMap)

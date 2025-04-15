@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
@@ -33,8 +34,6 @@ import (
 
 func makeTestOtelConsumer(t testing.TB, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 	t.Helper()
-
-	assert.NoError(t, logp.TestingSetup(logp.WithSelectors("otelconsumer")))
 
 	logConsumer, err := consumer.NewLogs(consumeFn)
 	assert.NoError(t, err)
