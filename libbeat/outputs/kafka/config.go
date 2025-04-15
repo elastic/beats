@@ -25,8 +25,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
@@ -38,6 +36,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/sarama"
 )
 
 type backoffConfig struct {
@@ -306,11 +305,14 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 	k.Version = version
 
 	k.Producer.Partitioner = partitioner
+
 	k.MetricRegistry = adapter.GetGoMetrics(
 		monitoring.Default,
-		"libbeat.outputs.kafka",
-		adapter.Rename("incoming-byte-rate", "bytes_read"),
-		adapter.Rename("outgoing-byte-rate", "bytes_write"),
+		"libbeat.outputs",
+		adapter.Rename("incoming-byte-rate", "read.bytes"),
+		adapter.Rename("outgoing-byte-rate", "write.bytes"),
+		adapter.Rename("request-latency-in-ms", "write.latency"),
+		adapter.Rename("requests-in-flight", "kafka.requests-in-flight"),
 		adapter.GoMetricsNilify,
 	)
 

@@ -86,9 +86,9 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, userAttr
 	}
 
 	// Get users in the directory...
-	userFilter := "(objectClass=user)"
+	userFilter := "(&(objectCategory=person)(objectClass=user))"
 	if sinceFmtd != "" {
-		userFilter = "(&(objectClass=user)(whenChanged>=" + sinceFmtd + "))"
+		userFilter = "(&(objectCategory=person)(objectClass=user)(whenChanged>=" + sinceFmtd + "))"
 	}
 	usrs, err := search(conn, baseDN, userFilter, userAttrs, pagingSize)
 	if err != nil {
@@ -120,7 +120,7 @@ func GetDetails(url, user, pass string, base *ldap.DN, since time.Time, userAttr
 				for i, u := range modGrps {
 					modGrps[i] = "(memberOf=" + u + ")"
 				}
-				query := "(&(objectClass=user)(|" + strings.Join(modGrps, "") + ")"
+				query := "(&(objectCategory=person)(objectClass=user)(|" + strings.Join(modGrps, "") + ")"
 				usrs, err := search(conn, baseDN, query, userAttrs, pagingSize)
 				if err != nil {
 					errs = append(errs, fmt.Errorf("failed to collect users of changed groups%w: %w", ErrUsers, err))

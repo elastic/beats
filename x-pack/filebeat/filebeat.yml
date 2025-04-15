@@ -55,11 +55,11 @@ filebeat.inputs:
   #  review: 1
 
 # journald is an input for collecting logs from Journald
-- type: journald
+#- type: journald
 
   # Unique ID among all inputs, if the ID changes, all entries
   # will be re-ingested
-  id: my-journald-id
+  #id: my-journald-id
 
   # The position to start reading from the journal, valid options are:
   #  - head: Starts reading at the beginning of the journal.

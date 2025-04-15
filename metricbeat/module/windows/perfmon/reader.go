@@ -96,13 +96,8 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := re.query.CollectData(); err != nil {
-		// users can encounter the case no counters are found (services/processes stopped), this should not generate an event with the error message,
-		//could be the case the specific services are started after and picked up by the next RefreshCounterPaths func
-		if err == pdh.PDH_NO_COUNTERS { //nolint:errorlint // Bad linter! This is always errno or nil.
-			re.log.Warnf("%s %v", collectFailedMsg, err)
-		} else {
-			return nil, fmt.Errorf("%v: %w", collectFailedMsg, err)
-		}
+		err = re.handleCollectDataError(err)
+		return nil, err
 	}
 
 	// Get the values.
@@ -119,6 +114,19 @@ func (re *Reader) Read() ([]mb.Event, error) {
 		events = re.groupToEvents(values)
 	}
 	return events, nil
+}
+
+func (re *Reader) handleCollectDataError(err error) error {
+	// users can encounter the case no counters are found (services/processes stopped), this should not generate an event with the error message,
+	//could be the case the specific services are started after and picked up by the next RefreshCounterPaths func
+	if err == pdh.PDH_NO_COUNTERS || err == pdh.PDH_NO_DATA { //nolint:errorlint // linter complains about comparing error using '==' operator but here error is always of type pdh.PdhErrno (or nil) so `errors.Is` is redundant here
+		re.log.Warnf("%s %v", collectFailedMsg, err)
+
+		// Ensure the returned error is nil to prevent the Elastic Agent from transitioning to an UNHEALTHY state.
+		return nil
+	}
+
+	return fmt.Errorf("%v: %w", collectFailedMsg, err)
 }
 
 func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {

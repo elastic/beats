@@ -17,8 +17,10 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "sshd",
         "log.syslog.facility.code": 4,
         "log.syslog.priority": 6,
+        "log.syslog.procid": 26538,
         "message": "Accepted publickey for vagrant from 10.0.2.2 port 48274 ssh2: ED25519 SHA256:k1kjhwoH/H3w31MbGOIGd7qxrkSQJnoAN0eYJVHDmmI",
         "process.args": [
             "\"sshd: vagrant [priv]\""
@@ -65,8 +67,10 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "sshd",
         "log.syslog.facility.code": 4,
         "log.syslog.priority": 6,
+        "log.syslog.procid": 1710,
         "message": "Accepted password for vagrant from 192.168.42.119 port 55310 ssh2",
         "process.args": [
             "\"sshd: vagrant [priv]\""
@@ -111,8 +115,10 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "sshd",
         "log.syslog.facility.code": 4,
         "log.syslog.priority": 6,
+        "log.syslog.procid": 1721,
         "message": "Invalid user test from 192.168.42.119 port 48890",
         "process.args": [
             "\"sshd: unknown [priv]\""
@@ -155,8 +161,10 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "sshd",
         "log.syslog.facility.code": 4,
         "log.syslog.priority": 6,
+        "log.syslog.procid": 1723,
         "message": "Failed password for root from 192.168.42.119 port 46632 ssh2",
         "process.args": [
             "\"sshd: root [priv]\""
@@ -201,8 +209,10 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "sshd",
         "log.syslog.facility.code": 4,
         "log.syslog.priority": 6,
+        "log.syslog.procid": 1723,
         "message": "Failed password for root from 192.168.42.119 port 46632 ssh2",
         "process.args": [
             "\"sshd: root [priv]\""
@@ -247,8 +257,10 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "sshd",
         "log.syslog.facility.code": 4,
         "log.syslog.priority": 6,
+        "log.syslog.procid": 1723,
         "message": "Failed password for root from 192.168.42.119 port 46632 ssh2",
         "process.args": [
             "\"sshd: root [priv]\""
@@ -285,6 +297,7 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "sudo",
         "log.syslog.facility.code": 10,
         "log.syslog.priority": 5,
         "message": " vagrant : TTY=pts/2 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/emacs /etc/ssh/sshd_config",
@@ -333,8 +346,10 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "groupadd",
         "log.syslog.facility.code": 10,
         "log.syslog.priority": 6,
+        "log.syslog.procid": 1743,
         "message": "new group: name=test, GID=1001",
         "process.args": [
             "/sbin/groupadd",
@@ -363,6 +378,7 @@
         "host.hostname": "vagrant-debian-12",
         "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
         "input.type": "journald",
+        "log.syslog.appname": "systemd-logind",
         "log.syslog.facility.code": 4,
         "log.syslog.priority": 6,
         "message": "Session 8 logged out. Waiting for processes to exit.",
