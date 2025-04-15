@@ -1,3 +1,15 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: azure
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/azure/_meta/docs.asciidoc
+
+
+[[metricbeat-module-azure]]
+[role="xpack"]
+== Azure module
+
 //override value inherited for modulename
 :modulename: azure_metrics
 
@@ -166,3 +178,180 @@ This metricset concentrate on the most relevant application insights metrics and
 Costs: Metric queries are charged based on the number of standard API calls. More information on pricing here https://azure.microsoft.com/id-id/pricing/details/monitor/.
 
 Authentication: we are handling authentication on our side (creating/renewing the authentication token), so we advise users to use dedicated credentials for metricbeat only.
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Azure module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: azure
+  metricsets:
+  - monitor
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+  resources:
+    - resource_query: "resourceType eq 'Microsoft.DocumentDb/databaseAccounts'"
+      metrics:
+      - name: ["DataUsage", "DocumentCount", "DocumentQuota"]
+        namespace: "Microsoft.DocumentDb/databaseAccounts"
+
+- module: azure
+  metricsets:
+  - compute_vm
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - compute_vm_scaleset
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - storage
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_instance
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_service
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - container_registry
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+  - database_account
+  enabled: true
+  period: 300s
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+    - billing
+  enabled: true
+  period: 24h
+  client_id: '${AZURE_CLIENT_ID:""}'
+  client_secret: '${AZURE_CLIENT_SECRET:""}'
+  tenant_id: '${AZURE_TENANT_ID:""}'
+  subscription_id: '${AZURE_SUBSCRIPTION_ID:""}'
+
+- module: azure
+  metricsets:
+    - app_insights
+  enabled: true
+  period: 300s
+  application_id: ''
+  api_key: ''
+  metrics:
+    - id: ["requests/count", "requests/duration"]
+
+- module: azure
+  metricsets:
+    - app_state
+  enabled: true
+  period: 300s
+  application_id: ''
+  api_key: ''
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-azure-app_insights,app_insights>>
+
+* <<metricbeat-metricset-azure-app_state,app_state>>
+
+* <<metricbeat-metricset-azure-billing,billing>>
+
+* <<metricbeat-metricset-azure-compute_vm,compute_vm>>
+
+* <<metricbeat-metricset-azure-compute_vm_scaleset,compute_vm_scaleset>>
+
+* <<metricbeat-metricset-azure-container_instance,container_instance>>
+
+* <<metricbeat-metricset-azure-container_registry,container_registry>>
+
+* <<metricbeat-metricset-azure-container_service,container_service>>
+
+* <<metricbeat-metricset-azure-database_account,database_account>>
+
+* <<metricbeat-metricset-azure-monitor,monitor>>
+
+* <<metricbeat-metricset-azure-storage,storage>>
+
+include::azure/app_insights.asciidoc[]
+
+include::azure/app_state.asciidoc[]
+
+include::azure/billing.asciidoc[]
+
+include::azure/compute_vm.asciidoc[]
+
+include::azure/compute_vm_scaleset.asciidoc[]
+
+include::azure/container_instance.asciidoc[]
+
+include::azure/container_registry.asciidoc[]
+
+include::azure/container_service.asciidoc[]
+
+include::azure/database_account.asciidoc[]
+
+include::azure/monitor.asciidoc[]
+
+include::azure/storage.asciidoc[]
+
+:edit_url!:

@@ -20,23 +20,32 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azidentity"
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 )
 
+type queryResourceClientConfig struct {
+	endpoint   string
+	credential azcore.TokenCredential
+	options    *azmetrics.ClientOptions
+}
+
 // MonitorService service wrapper to the azure sdk for go
 type MonitorService struct {
-	metricsClient          *armmonitor.MetricsClient
-	metricDefinitionClient *armmonitor.MetricDefinitionsClient
-	metricNamespaceClient  *armmonitor.MetricNamespacesClient
-	resourceClient         *armresources.Client
-	context                context.Context
-	log                    *logp.Logger
+	metricsClient             *armmonitor.MetricsClient
+	metricDefinitionClient    *armmonitor.MetricDefinitionsClient
+	metricNamespaceClient     *armmonitor.MetricNamespacesClient
+	resourceClient            *armresources.Client
+	queryResourceClientConfig queryResourceClientConfig
+	context                   context.Context
+	log                       *logp.Logger
 }
 
 const (
-	metricNameLimit = 20
-	ApiVersion      = "2021-04-01"
+	metricNameLimit        = 20
+	ApiVersion             = "2021-04-01"
+	BatchApiResourcesLimit = 50
 )
 
 // NewService instantiates the Azure monitoring service
@@ -96,13 +105,21 @@ func NewService(config Config) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create metric namespaces client: %w", err)
 	}
 
+	queryResourceClientConfig := queryResourceClientConfig{
+		credential: credential,
+		options: &azmetrics.ClientOptions{
+			ClientOptions: clientOptions,
+		},
+	}
+
 	service := &MonitorService{
-		metricDefinitionClient: metricsDefinitionClient,
-		metricsClient:          metricsClient,
-		metricNamespaceClient:  metricNamespaceClient,
-		resourceClient:         resourceClient,
-		context:                context.Background(),
-		log:                    logp.NewLogger("azure monitor service"),
+		metricDefinitionClient:    metricsDefinitionClient,
+		metricsClient:             metricsClient,
+		metricNamespaceClient:     metricNamespaceClient,
+		resourceClient:            resourceClient,
+		queryResourceClientConfig: queryResourceClientConfig,
+		context:                   context.Background(),
+		log:                       logp.NewLogger("azure monitor service"),
 	}
 
 	return service, nil
@@ -260,6 +277,85 @@ func (service *MonitorService) GetMetricDefinitionsWithRetry(resourceId string, 
 	}
 
 	return metricDefinitionCollection, nil
+}
+
+func (service *MonitorService) QueryResources(
+	resourceIDs []string,
+	subscriptionID string,
+	namespace string,
+	timegrain string,
+	startTime string,
+	endTime string,
+	metricNames []string,
+	aggregations string,
+	filter string,
+	location string) ([]azmetrics.MetricData, error) {
+
+	var tg *string
+	var top int32
+	//var interval string
+
+	if timegrain != "" {
+		tg = &timegrain
+	}
+
+	// API fails with bad request if filter value is sent empty.
+	var metricsFilter *string
+
+	if filter != "" {
+		metricsFilter = &filter
+		// set top as a high value, otherwise default is only 10
+		top = int32(1000)
+	}
+
+	opts := azmetrics.QueryResourcesOptions{
+		Aggregation: &aggregations,
+		Filter:      metricsFilter,
+		Interval:    tg,
+		StartTime:   &startTime,
+		EndTime:     &endTime,
+		Top:         &top,
+	}
+
+	resp := []azmetrics.MetricData{}
+
+	service.queryResourceClientConfig.endpoint = fmt.Sprintf("https://%s.metrics.monitor.azure.com", location)
+	queryResourceClient, err := azmetrics.NewClient(
+		service.queryResourceClientConfig.endpoint,
+		service.queryResourceClientConfig.credential,
+		service.queryResourceClientConfig.options,
+	)
+	if err != nil {
+		return nil, err
+	}
+	service.log.Infof("QueryResources to be called. length of resources is %d", len(resourceIDs))
+	// call the query resources client passing 50 resourceIDs at a time
+	for i := 0; i < len(resourceIDs); i += BatchApiResourcesLimit {
+		end := i + BatchApiResourcesLimit
+
+		if end > len(resourceIDs) {
+			end = len(resourceIDs)
+		}
+		r, err := queryResourceClient.QueryResources(
+			service.context,
+			subscriptionID,
+			namespace,
+			metricNames,
+			azmetrics.ResourceIDList{
+				ResourceIDs: resourceIDs[i:end],
+			},
+			&opts,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		resp = append(resp, r.MetricResults.Values...)
+	}
+
+	return resp, nil
+
 }
 
 // GetMetricValues will return the metric values based on the resource and metric details
