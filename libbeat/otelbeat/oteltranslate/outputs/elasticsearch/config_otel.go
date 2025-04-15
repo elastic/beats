@@ -71,6 +71,7 @@ var defaultOptions = esToOTelOptions{
 
 // ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
 // Ensure cloudid is handled before calling this method
+// Note: This method may override output queue settings defined by user.
 func ToOTelConfig(output *config.C) (map[string]any, error) {
 	escfg := defaultOptions
 	// check if unsupported configuration is provided
@@ -147,8 +148,13 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 
 		// Batcher is experimental
 		"batcher": map[string]any{
-			"enabled":        true,
-			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
+			"enabled":  true,
+			"max_size": escfg.BulkMaxSize, // bulk_max_size
+			"min_size": 0,                 // 0 means immediately trigger a flush
+		},
+
+		"mapping": map[string]any{
+			"mode": "bodymap",
 		},
 	}
 

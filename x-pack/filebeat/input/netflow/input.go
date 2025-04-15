@@ -129,10 +129,9 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 
 	n.metrics = newInputMetrics(n.udpMetrics.Registry())
 	var err error
-	n.decoder, err = decoder.NewDecoder(decoder.NewConfig().
+	n.decoder, err = decoder.NewDecoder(decoder.NewConfig(n.logger).
 		WithProtocols(n.cfg.Protocols...).
 		WithExpiration(n.cfg.ExpirationTimeout).
-		WithLogOutput(&logDebugWrapper{Logger: n.logger}).
 		WithCustomFields(n.customFields...).
 		WithSequenceResetEnabled(n.cfg.DetectSequenceReset).
 		WithSharedTemplates(n.cfg.ShareTemplates).
@@ -234,26 +233,6 @@ func (n *netflowInput) Run(env v2.Context, connector beat.PipelineConnector) err
 	n.stop()
 
 	return nil
-}
-
-// An adapter so that logp.Logger can be used as a log.Logger.
-type logDebugWrapper struct {
-	sync.Mutex
-	Logger *logp.Logger
-	buf    []byte
-}
-
-// Write writes messages to the log.
-func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
-	w.Lock()
-	defer w.Unlock()
-	n = len(p)
-	w.buf = append(w.buf, p...)
-	for endl := bytes.IndexByte(w.buf, '\n'); endl != -1; endl = bytes.IndexByte(w.buf, '\n') {
-		w.Logger.Debug(string(w.buf[:endl]))
-		w.buf = w.buf[endl+1:]
-	}
-	return n, nil
 }
 
 // stop stops the netflow input

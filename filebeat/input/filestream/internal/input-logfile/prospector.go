@@ -25,8 +25,12 @@ import (
 // based on the retrieved information about the configured paths.
 // It also updates the statestore with the meta data of the running harvesters.
 type Prospector interface {
-	// Init runs the cleanup processes before starting the prospector.
-	Init(c, g ProspectorCleaner, newID func(Source) string) error
+	// Init updates the store before starting the prospector.
+	// It cleans up the store, migrates file identities and takes over
+	// states from log or other filestream inputs.
+	// It receives two StoreUpdater: one global and another local
+	// to this prospector instance.
+	Init(local, global StoreUpdater, newID func(Source) string) error
 	// Run starts the event loop and handles the incoming events
 	// either by starting/stopping a harvester, or updating the statestore.
 	Run(input.Context, StateMetadataUpdater, HarvesterGroup)
@@ -48,14 +52,18 @@ type StateMetadataUpdater interface {
 	ResetCursor(s Source, cur interface{}) error
 }
 
-// ProspectorCleaner cleans the state store before it starts running.
-type ProspectorCleaner interface {
+// StoreUpdater allows manipulation of the state store
+type StoreUpdater interface {
 	// CleanIf removes an entry if the function returns true
 	CleanIf(func(v Value) bool)
 	// UpdateIdentifiers updates ID in the registry.
 	// The function passed to UpdateIdentifiers must return an empty string if the key
 	// remains the same.
-	UpdateIdentifiers(func(v Value) (string, interface{}))
+	UpdateIdentifiers(func(v Value) (string, any))
+	// TakeOver takes over states from other inputs. This allows a Filestream
+	// input to take over states from the Log input or other Filestream
+	// inputs with different IDs.
+	TakeOver(func(v Value) (string, any))
 }
 
 // Value contains the cursor metadata.

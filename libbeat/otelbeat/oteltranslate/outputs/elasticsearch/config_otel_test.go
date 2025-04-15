@@ -75,7 +75,10 @@ headers:
   X-Bar-Header: bar
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size: 1600
+  min_size: 0
+mapping:
+  mode: bodymap  
  `
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
@@ -111,6 +114,8 @@ logs_index: some-index
 password: changeme
 user: elastic
 timeout: 1m30s
+mapping:
+  mode: bodymap 
 `
 
 		tests := []struct {
@@ -124,7 +129,8 @@ idle_conn_timeout: 3s
 num_workers: 1
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size: 1600
+  min_size: 0
  `,
 			},
 			{
@@ -134,7 +140,8 @@ idle_conn_timeout: 15s
 num_workers: 4
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size: 1600
+  min_size: 0
  `,
 			},
 			{
@@ -156,7 +163,10 @@ idle_conn_timeout: 1s
 num_workers: 1
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size: 1600
+  min_size: 0
+mapping:
+  mode: bodymap    
  `,
 			},
 			{
@@ -166,7 +176,8 @@ idle_conn_timeout: 1m0s
 num_workers: 1
 batcher:
   enabled: true
-  max_size_items: 50
+  max_size: 50
+  min_size: 0
  `,
 			},
 			{
@@ -176,7 +187,8 @@ idle_conn_timeout: 3s
 num_workers: 0
 batcher:
   enabled: true
-  max_size_items: 1600
+  max_size: 1600
+  min_size: 0
  `,
 			},
 		}

@@ -1,0 +1,31 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.horizontalpodautoscaler",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "horizontalpodautoscaler": {
+            "name": "cpu",
+            "replicas": {
+                "current": 1,
+                "desired": 1,
+                "max": 5,
+                "min": 1
+            },
+            "status": {
+                "condition": "scalinglimited"
+            }
+        },
+        "namespace": "default"
+    },
+    "metricset": {
+        "name": "state_horizontalpodautoscaler",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
+    }
+}

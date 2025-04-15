@@ -24,7 +24,6 @@ package tools
 
 import (
 	_ "github.com/magefile/mage"
-	_ "github.com/pierrre/gotestcover"
 	_ "github.com/stretchr/testify/assert"
 	_ "golang.org/x/tools/cmd/goimports"
 	_ "golang.org/x/tools/cmd/stringer"

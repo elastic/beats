@@ -49,6 +49,10 @@ const (
 	datSourceIP = "192.0.2.1"
 )
 
+func init() {
+	logp.TestingSetup()
+}
+
 // DatTests specifies the .dat files associated with test cases.
 type DatTests struct {
 	Tests map[string]TestCase `yaml:"tests"`
@@ -131,6 +135,8 @@ func TestNetFlow(t *testing.T) {
 			require.NoError(t, err)
 
 			goldenData := readGoldenFile(t, filepath.Join(goldenDir, testName+".pcap.golden.json"))
+
+			stripCommunityID(&goldenData)
 
 			// Process packets in PCAP and get flow records.
 			var totalBytes, totalPackets int
@@ -224,6 +230,7 @@ func TestPCAPFiles(t *testing.T) {
 			}
 
 			goldenData := readGoldenFile(t, goldenName)
+			stripCommunityID(&goldenData)
 			assert.EqualValues(t, goldenData, normalize(t, result))
 		})
 	}
@@ -256,6 +263,7 @@ func TestDatFiles(t *testing.T) {
 			}
 
 			goldenData := readGoldenFile(t, goldenName)
+			stripCommunityID(&goldenData)
 			jsonGolden, err := json.Marshal(goldenData)
 			if !assert.NoError(t, err) {
 				t.Fatal(err)
@@ -289,11 +297,10 @@ func readDatTests(t testing.TB) *DatTests {
 func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 	t.Helper()
 
-	config := decoder.NewConfig().
+	config := decoder.NewConfig(logp.NewLogger("netflow_test")).
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
-		WithExpiration(0).
-		WithLogOutput(test.TestLogWriter{TB: t})
+		WithExpiration(0)
 
 	for _, fieldFile := range testCase.Fields {
 		fields, err := LoadFieldDefinitionsFromFile(filepath.Join(fieldsDir, fieldFile))
@@ -351,12 +358,11 @@ func getFlowsFromPCAP(t testing.TB, name, pcapFile string) TestResult {
 	r, err := pcapgo.NewReader(f)
 	require.NoError(t, err)
 
-	config := decoder.NewConfig().
+	config := decoder.NewConfig(logp.NewLogger("netflow_test")).
 		WithProtocols(protocol.Registry.All()...).
 		WithSequenceResetEnabled(false).
 		WithExpiration(0).
-		WithCache(strings.HasSuffix(pcapFile, ".reversed.pcap")).
-		WithLogOutput(test.TestLogWriter{TB: t})
+		WithCache(strings.HasSuffix(pcapFile, ".reversed.pcap"))
 
 	decoder, err := decoder.NewDecoder(config)
 	if !assert.NoError(t, err) {
@@ -415,7 +421,7 @@ func readGoldenFile(t testing.TB, file string) TestResult {
 }
 
 // This test converts a flow and its reverse flow to a Beat event
-// to check that they have the same flow.id, locality and community-id.
+// to check that they have the same flow.id, locality and community-id (non-fips only).
 func TestReverseFlows(t *testing.T) {
 	parseMAC := func(s string) net.HardwareAddr {
 		addr, err := net.ParseMAC(s)
@@ -484,7 +490,7 @@ func TestReverseFlows(t *testing.T) {
 	if !assert.Len(t, evs, 2) {
 		t.Fatal()
 	}
-	for _, key := range []string{"flow.id", "flow.locality", "network.community_id"} {
+	for _, key := range reverseFlowsTestKeys {
 		var keys [2]interface{}
 		for i := range keys {
 			var err error

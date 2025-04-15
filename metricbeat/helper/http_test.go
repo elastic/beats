@@ -38,51 +38,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
-func TestGetAuthHeaderFromToken(t *testing.T) {
-	tests := []struct {
-		Name, Content, Expected string
-	}{
-		{
-			"Test a token is read",
-			"testtoken",
-			"Bearer testtoken",
-		},
-		{
-			"Test a token is trimmed",
-			"testtoken\n",
-			"Bearer testtoken",
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(test.Name, func(t *testing.T) {
-			content := []byte(test.Content)
-			tmpfile, err := os.CreateTemp("", "token")
-			if err != nil {
-				t.Fatal(err)
-			}
-			defer os.Remove(tmpfile.Name())
-
-			if _, err := tmpfile.Write(content); err != nil {
-				t.Fatal(err)
-			}
-			if err := tmpfile.Close(); err != nil {
-				t.Fatal(err)
-			}
-
-			header, err := getAuthHeaderFromToken(tmpfile.Name())
-			assert.NoError(t, err)
-			assert.Equal(t, test.Expected, header)
-		})
-	}
-}
-
-func TestGetAuthHeaderFromTokenNoFile(t *testing.T) {
-	header, err := getAuthHeaderFromToken("nonexistingfile")
-	assert.Equal(t, "", header)
-	assert.Error(t, err)
-}
-
 func TestTimeout(t *testing.T) {
 	c := make(chan struct{})
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -301,35 +256,34 @@ func TestRefreshAuthorizationHeader(t *testing.T) {
 	bearerFileName := "token"
 	bearerFilePath := filepath.Join(path, bearerFileName)
 
-	getAuth := func(helper *HTTP) string {
-		for k, v := range helper.headers {
-			if k == "Authorization" {
-				return v[0]
-			}
-		}
-		return ""
-	}
+	var authToken string
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authToken = r.Header.Get("Authorization")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
 
 	firstToken := "token-1"
 	err := os.WriteFile(bearerFilePath, []byte(firstToken), 0644)
 	assert.NoError(t, err)
 
-	helper := &HTTP{bearerFile: bearerFilePath, headers: make(http.Header)}
-	updated, err := helper.RefreshAuthorizationHeader()
-	assert.NoError(t, err)
-	assert.True(t, updated)
-	expected := fmt.Sprintf("Bearer %s", firstToken)
-	assert.Equal(t, expected, getAuth(helper))
+	cfg := defaultConfig()
+	cfg.BearerTokenFile = bearerFilePath
+	hostData := mb.HostData{
+		URI:          ts.URL,
+		SanitizedURI: ts.URL,
+	}
 
-	secondToken := "token-2"
-	err = os.WriteFile(bearerFilePath, []byte(secondToken), 0644)
-	assert.NoError(t, err)
+	h, err := NewHTTPFromConfig(cfg, hostData)
+	require.NoError(t, err)
 
-	updated, err = helper.RefreshAuthorizationHeader()
-	assert.NoError(t, err)
-	assert.True(t, updated)
-	expected = fmt.Sprintf("Bearer %s", secondToken)
-	assert.Equal(t, expected, getAuth(helper))
+	res, err := h.FetchResponse()
+	require.NoError(t, err)
+	res.Body.Close()
+
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+	assert.Contains(t, authToken, firstToken)
 }
 
 func checkTimeout(t *testing.T, h *HTTP) {

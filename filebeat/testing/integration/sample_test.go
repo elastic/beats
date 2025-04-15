@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
+
 package integration
 
 import (
@@ -37,7 +39,8 @@ func TestFilebeat(t *testing.T) {
 	lineCount := 128
 
 	reportOptions := integration.ReportOptions{
-		PrintLinesOnFail: 10,
+		PrintLinesOnFail:  10,
+		PrintConfigOnFail: true,
 	}
 
 	t.Run("Filebeat starts and ingests files", func(t *testing.T) {
@@ -113,6 +116,8 @@ output.console:
 	})
 
 	t.Run("Filebeat crashes due to incorrect config", func(t *testing.T) {
+		t.Skip("Flaky test: https://github.com/elastic/beats/issues/42778")
+
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
