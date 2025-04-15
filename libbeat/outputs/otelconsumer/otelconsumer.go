@@ -112,29 +112,27 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 		}
 
-		beatEvent := event.Content.Fields.Clone()
+		beatEvent := event.Content.Fields
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
+		otelmap.ConvertNonPrimitive(beatEvent)
 
-		pcommonEvent := otelmap.FromMapstr(beatEvent)
-		// pcommonEvent := pcommon.NewMap()
-		// fmt.Println("okok", pcommonEvent.FromRaw(otelmap.GetRaw(beatEvent)))
-		// if data_stream field is set on beats.Event. Add it to logrecord.Attributes to support dynamic indexing
-		if data, ok := pcommonEvent.Get("data_stream"); ok {
+		// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing
+		if val, _ := beatEvent.GetValue("data_stream"); val != nil {
 			// If the below sub fields do not exist, it will return empty string.
 			var subFields = []string{"dataset", "namespace", "type"}
 
 			for _, subField := range subFields {
-				value, ok := data.Map().Get(subField)
-				if ok && value.Str() != "" {
+				// value, ok := data.Map().Get(subField)
+				value, err := beatEvent.GetValue("data_stream." + subField)
+				if vStr, ok := value.(string); ok && err == nil {
 					// set log record attribute only if value is non empty
-					logRecord.Attributes().PutStr("data_stream."+subField, value.Str())
+					logRecord.Attributes().PutStr("data_stream."+subField, vStr)
 				}
 			}
 
 		}
-		pcommonEvent.CopyTo(logRecord.Body().SetEmptyMap())
-		// logRecord.Body().FromRaw(pcommonEvent.AsRaw())
+		logRecord.Body().FromRaw(beatEvent)
 	}
 
 	err := out.logsConsumer.ConsumeLogs(ctx, pLogs)
