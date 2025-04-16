@@ -105,7 +105,7 @@ func TestSocket(t *testing.T) {
 
 		c := client(sockFile)
 
-		r, err := c.Get("http://unix/echo-hello")
+		r, err := c.Get("http://unix/echo-hello") //nolint:noctx //Safe to not use ctx in test
 		require.NoError(t, err)
 		defer r.Body.Close()
 
@@ -148,7 +148,7 @@ func TestSocket(t *testing.T) {
 
 		c := client(sockFile)
 
-		r, err := c.Get("http://unix/echo-hello")
+		r, err := c.Get("http://unix/echo-hello") //nolint:noctx //Safe to not use ctx in test
 		require.NoError(t, err)
 		defer r.Body.Close()
 
@@ -179,7 +179,7 @@ func TestHTTP(t *testing.T) {
 		require.NoError(t, s.Stop())
 	}()
 
-	r, err := http.Get("http://" + s.l.Addr().String() + "/echo-hello")
+	r, err := http.Get("http://" + s.l.Addr().String() + "/echo-hello") //nolint:noctx //Safe to not use ctx in test
 	require.NoError(t, err)
 	defer r.Body.Close()
 

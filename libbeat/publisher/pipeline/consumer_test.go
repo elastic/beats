@@ -20,8 +20,9 @@ package pipeline
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNoBatchAssemblyOnNilTarget(t *testing.T) {
