@@ -66,10 +66,7 @@ func TestTopic(t *testing.T) {
 	)
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
-<<<<<<< HEAD
 
-=======
->>>>>>> 4730fcbc0 (execute Go integration tests sequentially within a beat module (#43073))
 	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
@@ -108,7 +105,7 @@ func TestTopic(t *testing.T) {
 	var offsetBefore int64 = 0
 	var offsetAfter int64 = 0
 
-	// Its possible that other topics exists -> select the right data
+	// It's possible that other topics exists -> select the right data
 	for _, data := range dataBefore {
 		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
 			offsetBefore, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
