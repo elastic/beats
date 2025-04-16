@@ -119,6 +119,10 @@ func (s *Stats) NewBatch(evs []publisher.Event) {
 	s.eventsBatches.Inc()
 	s.eventsTotal.Add(uint64(len(evs)))
 	s.eventsActive.Add(uint64(len(evs)))
+
+	for _, e := range evs {
+		e.OutputListener.NewEvent()
+	}
 }
 
 func (s *Stats) ReportLatency(time time.Duration) {
@@ -137,6 +141,7 @@ func (s *Stats) AckedEvent(e publisher.Event) {
 
 	s.eventsACKed.Add(uint64(1))
 	s.eventsActive.Sub(uint64(1))
+	e.OutputListener.Acked()
 }
 
 // AckedEvents updates active and acked event metrics.
@@ -147,6 +152,9 @@ func (s *Stats) AckedEvents(evs []publisher.Event) {
 
 	s.eventsACKed.Add(uint64(len(evs)))
 	s.eventsActive.Sub(uint64(len(evs)))
+	for _, e := range evs {
+		e.OutputListener.Acked()
+	}
 }
 
 func (s *Stats) DeadLetterEvents(evs []publisher.Event) {
@@ -157,6 +165,9 @@ func (s *Stats) DeadLetterEvents(evs []publisher.Event) {
 	n := uint64(len(evs))
 	s.eventsDeadLetter.Add(n)
 	s.eventsActive.Sub(n)
+	for _, e := range evs {
+		e.OutputListener.DeadLetter()
+	}
 }
 
 // RetryableErrors updates active and failed event metrics.
@@ -191,6 +202,7 @@ func (s *Stats) PermanentError(e publisher.Event) {
 	// number of dropped events (e.g. encoding failures)
 	s.eventsActive.Sub(uint64(1))
 	s.eventsDropped.Add(uint64(1))
+	e.OutputListener.Dropped()
 }
 
 func (s *Stats) PermanentErrors(evs []publisher.Event) {
@@ -201,6 +213,9 @@ func (s *Stats) PermanentErrors(evs []publisher.Event) {
 	// number of dropped events (e.g. encoding failures)
 	s.eventsActive.Sub(uint64(len(evs)))
 	s.eventsDropped.Add(uint64(len(evs)))
+	for _, e := range evs {
+		e.OutputListener.Dropped()
+	}
 }
 
 func (s *Stats) BatchSplit() {
