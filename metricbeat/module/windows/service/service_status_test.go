@@ -22,8 +22,9 @@ package service
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestGetServiceStates(t *testing.T) {
@@ -33,5 +34,5 @@ func TestGetServiceStates(t *testing.T) {
 	services, err := GetServiceStates(logptest.NewTestingLogger(t, ""), handle, ServiceStateAll, map[string]struct{}{})
 	assert.NoError(t, err)
 	assert.True(t, len(services) > 0)
-	closeHandle(handle)
+	closeHandle(handle) //nolint:errcheck //safe to ignore
 }
