@@ -210,6 +210,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 
 *Auditbeat*
 
