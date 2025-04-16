@@ -24,7 +24,7 @@ This module fetches metrics from [Docker](https://www.docker.com/) containers. T
 
 The Docker module is currently tested on Linux and Mac with the community edition engine, versions 1.11 and 17.09.0-ce. It is not tested on Windows, but it should also work there.
 
-The Docker module supports collection of metrics from Podman’s Docker-compatible API. It has been tested on Linux and Mac with Podman Rest API v2.0.0 and above.
+The Docker module supports collection of metrics from Podman’s Docker-compatible API on Metricbeat 8.16.2 and 8.17.1, and higher versions. It has been tested on Linux and Mac with Podman Rest API v2.0.0 and above.
 
 
 ## Module-specific configuration notes [_module_specific_configuration_notes_6]
