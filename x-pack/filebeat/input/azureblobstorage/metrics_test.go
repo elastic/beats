@@ -36,7 +36,6 @@ func TestNewInputMetricsInstance(t *testing.T) {
 
 	assert.NotNil(t, metrics.errorsTotal,
 		metrics.decodeErrorsTotal,
-		metrics.absBlobsTracked,
 		metrics.absBlobsRequestedTotal,
 		metrics.absBlobsPublishedTotal,
 		metrics.absBlobsListedTotal,
@@ -52,7 +51,6 @@ func TestNewInputMetricsInstance(t *testing.T) {
 
 	assert.Equal(t, uint64(0x0), metrics.errorsTotal.Get())
 	assert.Equal(t, uint64(0x0), metrics.decodeErrorsTotal.Get())
-	assert.Equal(t, uint64(0x0), metrics.absBlobsTracked.Get())
 	assert.Equal(t, uint64(0x0), metrics.absBlobsRequestedTotal.Get())
 	assert.Equal(t, uint64(0x0), metrics.absBlobsPublishedTotal.Get())
 	assert.Equal(t, uint64(0x0), metrics.absBlobsListedTotal.Get())

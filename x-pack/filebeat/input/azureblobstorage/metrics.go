@@ -19,7 +19,6 @@ type inputMetrics struct {
 	errorsTotal       *monitoring.Uint   // Number of errors encountered.
 	decodeErrorsTotal *monitoring.Uint   // Number of decode errors encountered.
 
-	absBlobsTracked                 *monitoring.Uint // Number of blobs currently tracked in the state registry (gauge).
 	absBlobsRequestedTotal          *monitoring.Uint // Number of ABS blobs downloaded.
 	absBlobsPublishedTotal          *monitoring.Uint // Number of ABS blobs processed that were published.
 	absBlobsListedTotal             *monitoring.Uint // Number of ABS blobs returned by list operations.
@@ -41,7 +40,6 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetri
 		errorsTotal:       monitoring.NewUint(reg, "errors_total"),
 		decodeErrorsTotal: monitoring.NewUint(reg, "decode_errors_total"),
 
-		absBlobsTracked:                 monitoring.NewUint(reg, "abs_blobs_tracked_gauge"),
 		absBlobsRequestedTotal:          monitoring.NewUint(reg, "abs_blobs_requested_total"),
 		absBlobsPublishedTotal:          monitoring.NewUint(reg, "abs_blobs_published_total"),
 		absBlobsListedTotal:             monitoring.NewUint(reg, "abs_blobs_listed_total"),
