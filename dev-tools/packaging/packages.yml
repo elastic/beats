@@ -170,7 +170,11 @@ shared:
   - &docker_spec
     <<: *binary_spec
     extra_vars:
+<<<<<<< HEAD
       from: '--platform=linux/amd64 ubuntu:24.04'
+=======
+      from: '--platform=linux/amd64 redhat/ubi9-minimal'
+>>>>>>> afa6ac640 (docker: use the official Red Hat images (#43839))
       buildFrom: '--platform=linux/amd64 cgr.dev/chainguard/wolfi-base'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
@@ -183,18 +187,22 @@ shared:
   - &docker_arm_spec
     <<: *docker_spec
     extra_vars:
+<<<<<<< HEAD
       from: '--platform=linux/arm64 ubuntu:24.04'
+=======
+      from: '--platform=linux/arm64 redhat/ubi9-minimal'
+>>>>>>> afa6ac640 (docker: use the official Red Hat images (#43839))
       buildFrom: '--platform=linux/arm64 cgr.dev/chainguard/wolfi-base'
 
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi'
-      from: '--platform=linux/amd64 docker.elastic.co/ubi9/ubi-minimal'
+      from: '--platform=linux/amd64 redhat/ubi9-minimal'
 
   - &docker_arm_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi'
-      from: '--platform=linux/arm64 docker.elastic.co/ubi9/ubi-minimal'
+      from: '--platform=linux/arm64 redhat/ubi9-minimal'
 
   - &docker_wolfi_spec
     extra_vars:
