@@ -24,6 +24,7 @@ subs:
   agents:   "Elastic Agents"
   fleet:   "Fleet"
   stack:   "Elastic Stack"
+  xpack:   "X-Pack"
   es:   "Elasticsearch"
   kib:   "Kibana"
   ls:   "Logstash"
