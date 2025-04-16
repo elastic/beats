@@ -32,6 +32,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -185,7 +186,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	require.NoError(t, err)
 
 	lst := clientCfg.Processing.Processor
-	assert.Equal(t, 2, len(lst.(*processors.Processors).List))
+	assert.Equal(t, 2, len(lst.(*processors.Processors).List)) //nolint:errcheck //Safe to ignore in tests
 }
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a
@@ -209,7 +210,8 @@ func (p *setRawIndex) String() string {
 
 // makeProcessors wraps one or more bare Processor objects in Processors.
 func makeProcessors(procs ...beat.Processor) *processors.Processors {
-	procList := processors.NewList(nil)
+	logger, _ := logp.NewDevelopmentLogger("")
+	procList := processors.NewList(logger)
 	procList.List = procs
 	return procList
 }

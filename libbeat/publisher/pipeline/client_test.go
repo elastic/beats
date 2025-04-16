@@ -43,7 +43,8 @@ import (
 )
 
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
-	p, err := New(beat.Info{},
+	logger := logp.NewTestingLogger(t, "")
+	p, err := New(beat.Info{Logger: logger},
 		Monitors{},
 		conf.Namespace{},
 		outputs.Group{},
@@ -61,7 +62,6 @@ func TestClient(t *testing.T) {
 		// Note: no asserts. If closing fails we have a deadlock, because Publish
 		// would block forever
 
-		logp.TestingSetup()
 		routinesChecker := resources.NewGoroutinesChecker()
 		defer routinesChecker.Check(t)
 
@@ -85,8 +85,7 @@ func TestClient(t *testing.T) {
 	})
 
 	t.Run("no infinite loop when processing fails", func(t *testing.T) {
-		logp.TestingSetup()
-		l := logp.L()
+		l := logp.NewTestingLogger(t, "")
 
 		// a small in-memory queue with a very short flush interval
 		q := memqueue.NewQueue(l, nil, memqueue.Settings{
@@ -193,8 +192,9 @@ func TestClient(t *testing.T) {
 }
 
 func TestClientWaitClose(t *testing.T) {
+	logger := logp.NewTestingLogger(t, "")
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
-		p, err := New(beat.Info{},
+		p, err := New(beat.Info{Logger: logger},
 			Monitors{},
 			conf.Namespace{},
 			outputs.Group{},
@@ -208,9 +208,8 @@ func TestClientWaitClose(t *testing.T) {
 
 		return p
 	}
-	logp.TestingSetup()
 
-	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1}, 0, nil)
+	q := memqueue.NewQueue(logger, nil, memqueue.Settings{Events: 1}, 0, nil)
 	pipeline := makePipeline(Settings{}, q)
 	defer pipeline.Close()
 
@@ -300,8 +299,7 @@ func TestMonitoring(t *testing.T) {
 
 		metrics := monitoring.NewRegistry()
 		telemetry := monitoring.NewRegistry()
-
-		beatInfo := beat.Info{}
+		beatInfo := beat.Info{Logger: logp.NewTestingLogger(t, "")}
 		pipeline, err := Load(
 			beatInfo,
 			Monitors{
@@ -346,7 +344,6 @@ func TestMonitoring(t *testing.T) {
 }
 
 func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientConfig) {
-	require.NoError(t, logp.TestingSetup(), "could not setup logger")
 
 	var config Config
 	err := conf.MustNewConfigFrom(map[string]interface{}{
@@ -360,12 +357,15 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 
 	metrics := monitoring.NewRegistry()
 	telemetry := monitoring.NewRegistry()
-
+	logger := logp.NewTestingLogger(t, "")
 	pipeline, err := Load(
-		beatInfo,
+		beat.Info{
+			Logger: logger,
+		},
 		Monitors{
 			Metrics:   metrics,
 			Telemetry: telemetry,
+			Logger:    logger,
 		},
 		config,
 		testProcessorSupporter{
@@ -479,7 +479,7 @@ func (p testProcessorSupporter) Create(cfg beat.ProcessingConfig, drop bool) (be
 
 // Processors returns a list of config strings for the given processor, for debug purposes
 func (p testProcessorSupporter) Processors() []string {
-	return []string{p.Processor.String()}
+	return []string{p.String()}
 }
 
 // Close the processor supporter
