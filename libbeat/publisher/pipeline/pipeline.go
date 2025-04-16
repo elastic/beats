@@ -210,12 +210,17 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	clientListener := cfg.ClientListener
 	if clientListener == nil {
-		clientListener = noopClientListener{}
+		clientListener = beat.NoopClientListener{}
+	}
+	outputListener := cfg.OutputListener
+	if outputListener == nil {
+		outputListener = beat.NoopOutputListener{}
 	}
 
 	client := &client{
 		logger:         p.monitors.Logger,
 		clientListener: clientListener,
+		outputListener: outputListener,
 		processors:     processors,
 		eventFlags:     eventFlags,
 		canDrop:        canDrop,
@@ -296,12 +301,3 @@ func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.Queu
 		return nil, fmt.Errorf("unrecognized queue type '%v'", queueType)
 	}
 }
-
-type noopClientListener struct{}
-
-func (n noopClientListener) Closing()                    {}
-func (n noopClientListener) Closed()                     {}
-func (n noopClientListener) NewEvent()                   {}
-func (n noopClientListener) Filtered()                   {}
-func (n noopClientListener) Published()                  {}
-func (n noopClientListener) DroppedOnPublish(beat.Event) {}

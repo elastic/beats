@@ -158,6 +158,7 @@ func (r *runner) Start() {
 				orig.ClientListener =
 					v2.NewPipelineClientListener(
 						ctx.MetricsRegistry, orig.ClientListener)
+				orig.OutputListener = v2.NewPipelineOutputListener(reg)
 				return orig, nil
 			})
 
