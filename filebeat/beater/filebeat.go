@@ -123,7 +123,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if b.API != nil {
-		if err = inputmon.AttachHandler(b.API.Router()); err != nil {
+		if err = inputmon.AttachHandler(b.API.Router(), b.Info.Monitoring.NamespaceRegistry()); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
@@ -131,7 +131,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON()
+				data, err := inputmon.MetricSnapshotJSON(b.Info.Monitoring.NamespaceRegistry())
 				if err != nil {
 					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
@@ -288,7 +288,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
-	registryMigrator := registrar.NewMigrator(config.Registry)
+	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
 		return err
@@ -386,7 +386,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
 		compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader),
-		input.NewRunnerFactory(pipelineConnector, registrar, fb.done),
+		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
 	))
 
 	// Create a ES connection factory for dynamic modules pipeline loading
