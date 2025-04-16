@@ -8,10 +8,8 @@ import (
 	"context"
 	"encoding/binary"
 	"io"
-	"io/ioutil"
 	"syscall"
 
-	"github.com/containerd/fifo"
 	"github.com/docker/docker/api/types/plugins/logdriver"
 	"github.com/gogo/protobuf/proto"
 	"github.com/pkg/errors"
@@ -28,7 +26,7 @@ type PipeReader struct {
 
 // NewReaderFromPath creates a new FIFO pipe reader from a docker log pipe location
 func NewReaderFromPath(file string) (*PipeReader, error) {
-	inputFile, err := fifo.OpenFifo(context.Background(), file, syscall.O_RDONLY, 0700)
+	inputFile, err := openFifo(context.Background(), file, syscall.O_RDONLY, 0700)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error opening logger fifo: %q", file)
 	}
@@ -61,7 +59,7 @@ func (reader *PipeReader) ReadMessage(log *logdriver.LogEntry) error {
 		}
 
 		// 2) we have a too-large message. Disregard length bytes
-		_, err = io.CopyBuffer(ioutil.Discard, io.LimitReader(reader.fifoPipe, int64(lenFrame)), reader.bodyBuf)
+		_, err = io.CopyBuffer(io.Discard, io.LimitReader(reader.fifoPipe, int64(lenFrame)), reader.bodyBuf)
 		if err != nil {
 			return errors.Wrap(err, "error emptying buffer")
 		}
