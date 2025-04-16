@@ -47,8 +47,8 @@ exporters:
     timeout: 1m30s
     batcher:
       enabled: true
-      max_size_items: 1600
-      min_size_items: 0
+      max_size: 1600
+      min_size: 0
     mapping:
       mode: bodymap       
 `
@@ -190,8 +190,8 @@ exporters:
     timeout: 1m30s
     batcher:
       enabled: true
-      max_size_items: 1600
-      min_size_items: 0
+      max_size: 1600
+      min_size: 0
     mapping:
       mode: bodymap       
 receivers:
