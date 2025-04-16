@@ -5,15 +5,16 @@ env:
   NODEJS_VERSION: "18.20.3"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
-      - heartbeat/
-      - x-pack/heartbeat/
+      - heartbeat/**
+      - x-pack/heartbeat/**
       # OSS
       - go.mod
-      - dev-tools/
-      - libbeat/
-      - x-pack/libbeat/
+      - dev-tools/**
+      - libbeat/**
+      - x-pack/libbeat/**
       # Workflow
       - .github/workflows/xpack-heartbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
@@ -21,13 +22,13 @@ on:
     branches:
       - main
     paths:
-      - heartbeat/
-      - x-pack/heartbeat/
+      - heartbeat/**
+      - x-pack/heartbeat/**
       # OSS
       - go.mod
-      - dev-tools/
-      - libbeat/
-      - x-pack/libbeat/
+      - dev-tools/**
+      - libbeat/**
+      - x-pack/libbeat/**
       # Workflow
       - .github/workflows/xpack-heartbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
