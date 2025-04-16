@@ -177,7 +177,7 @@ queue.mem:
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
-	dbPath := filepath.Join(mockbeat.TempDir(), "system-overview", "_meta", "kibana", "9", "dashboard", "Metricbeat-system-overview.json")
+	dbPath := filepath.Join(mockbeat.TempDir(), "system-overview", "_meta", "kibana", "8", "dashboard", "Metricbeat-system-overview.json")
 	require.FileExists(t, dbPath, "dashboard file not exported")
 	b, err := os.ReadFile(dbPath)
 	require.NoError(t, err)
