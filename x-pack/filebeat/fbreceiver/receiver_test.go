@@ -7,6 +7,7 @@ package fbreceiver
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -200,11 +201,6 @@ func TestMultipleReceivers(t *testing.T) {
 			},
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
-<<<<<<< HEAD
-			_ = zapLogs
-			require.Len(t, logs["r1"], 1)
-			require.Len(t, logs["r2"], 1)
-=======
 			r1ok := assert.Greater(t, len(logs["r1"]), 0, "receive r1 does not have any logs")
 			r2ok := assert.Greater(t, len(logs["r2"]), 0, "receive r2 does not have any logs")
 			// logs for debug if it fails again
@@ -224,7 +220,6 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Equal(t, 1, r1StartLogs.Len(), "r1 should have a single start log")
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
 			require.Equal(t, 1, r2StartLogs.Len(), "r2 should have a single start log")
->>>>>>> d9f378dae ([BeatReceivers] Update Otel version and batcher configuration (#43796))
 		},
 	})
 }
