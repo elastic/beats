@@ -40,19 +40,23 @@ const (
 )
 
 func TestData(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42808")
 	service := compose.EnsureUp(t, "kafka",
 		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
 	)
+	host := service.HostForPort(9092)
 
+<<<<<<< HEAD
 	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
+=======
+	c, err := startConsumer(t, host, "test-group")
+>>>>>>> 4730fcbc0 (execute Go integration tests sequentially within a beat module (#43073))
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
 	defer c.Close()
 
-	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.HostForPort(9092)))
+	ms := mbtest.NewReportingMetricSetV2Error(t, getConfig(host))
 	for retries := 0; retries < 3; retries++ {
 		err = mbtest.WriteEventsReporterV2Error(ms, t, "")
 		if err == nil {
@@ -64,7 +68,6 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/42808")
 	service := compose.EnsureUp(t, "kafka",
 		compose.UpWithTimeout(600*time.Second),
 		compose.UpWithAdvertisedHostEnvFileForPort(9092),
