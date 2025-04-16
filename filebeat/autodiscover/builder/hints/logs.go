@@ -65,18 +65,18 @@ func InitializeModule() {
 }
 
 // NewLogHints builds a log hints builder
-func NewLogHints(cfg *conf.C) (autodiscover.Builder, error) {
+func NewLogHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false, fileset.FilesetOverrides{})
+	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{Logger: logger}, false, fileset.FilesetOverrides{})
 	if err != nil {
 		return nil, err
 	}
 
-	return &logHints{&config, moduleRegistry, logp.NewLogger("hints.builder")}, nil
+	return &logHints{&config, moduleRegistry, logger.Named("hints.builder")}, nil
 }
 
 // Create config based on input hints in the bus event
@@ -175,9 +175,10 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 			filesets := l.getFilesets(hints, module)
 			for fileset, cfg := range filesets {
 				filesetConf, _ := conf.NewConfigFrom(config)
-				if inputType == harvester.ContainerType {
+				switch inputType {
+				case harvester.ContainerType:
 					_ = filesetConf.SetString("stream", -1, cfg.Stream)
-				} else if inputType == harvester.FilestreamType {
+				case harvester.FilestreamType:
 					filestreamContainerParser := map[string]interface{}{
 						"container": map[string]interface{}{
 							"stream": cfg.Stream,
@@ -186,7 +187,7 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 					}
 					parserCfg, _ := conf.NewConfigFrom(filestreamContainerParser)
 					_ = filesetConf.SetChild("parsers", 0, parserCfg)
-				} else {
+				default:
 					_ = filesetConf.SetString("containers.stream", -1, cfg.Stream)
 				}
 
