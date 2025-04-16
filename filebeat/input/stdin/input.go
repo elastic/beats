@@ -43,11 +43,12 @@ type Input struct {
 	cfg       *conf.C
 	outlet    channel.Outleter
 	registry  *harvester.Registry
+	logger    *logp.Logger
 }
 
 // NewInput creates a new stdin input
 // This input contains one harvester which is reading from stdin
-func NewInput(cfg *conf.C, outlet channel.Connector, context input.Context) (input.Input, error) {
+func NewInput(cfg *conf.C, outlet channel.Connector, context input.Context, logger *logp.Logger) (input.Input, error) {
 	out, err := outlet.Connect(cfg)
 	if err != nil {
 		return nil, err
@@ -58,11 +59,12 @@ func NewInput(cfg *conf.C, outlet channel.Connector, context input.Context) (inp
 		cfg:      cfg,
 		outlet:   out,
 		registry: harvester.NewRegistry(),
+		logger:   logger,
 	}
 
 	p.harvester, err = p.createHarvester(file.State{Source: "-"})
 	if err != nil {
-		return nil, fmt.Errorf("Error initializing stdin harvester: %v", err)
+		return nil, fmt.Errorf("Error initializing stdin harvester: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 
 	return p, nil
@@ -74,11 +76,11 @@ func (p *Input) Run() {
 	if !p.started {
 		err := p.harvester.Setup()
 		if err != nil {
-			logp.Err("Error setting up stdin harvester: %s", err)
+			p.logger.Errorf("Error setting up stdin harvester: %s", err)
 			return
 		}
 		if err = p.registry.Start(p.harvester); err != nil {
-			logp.Err("Error starting the harvester: %s", err)
+			p.logger.Errorf("Error starting the harvester: %s", err)
 		}
 		p.started = true
 	}
@@ -88,7 +90,7 @@ func (p *Input) Run() {
 func (p *Input) createHarvester(state file.State) (*log.Harvester, error) {
 	// Each harvester gets its own copy of the outlet
 	h, err := log.NewHarvester(
-		logp.NewLogger("stdin"),
+		p.logger.Named("stdin"),
 		p.cfg,
 		state, nil, nil,
 		func() channel.Outleter {
