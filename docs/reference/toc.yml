@@ -1,4 +1,4 @@
-project: 'Beats'
+project: "Beats"
 toc:
   # TO DO: Do we want these to be separate pages?
   - file: index.md

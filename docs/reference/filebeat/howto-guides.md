@@ -20,4 +20,3 @@ Learn how to perform common Filebeat configuration tasks.
 * [*Migrate `log` or `container` input configurations to `filestream`*](/reference/filebeat/migrate-to-filestream.md)
 * [*Choose file identity for `filestream`*](/reference/filebeat/file-identity.md)
 * [*Migrating from a Deprecated Filebeat Module*](/reference/filebeat/migrate-from-deprecated-module.md)
-
