@@ -44,7 +44,7 @@ func GenVersionCmd(settings instance.Settings) *cobra.Command {
 				if bt := version.BuildTime(); !bt.IsZero() {
 					buildTime = bt.String()
 				}
-				fmt.Printf("%s version %s (%s), libbeat %s [%s built %s] (FIPS: %v)\n",
+				fmt.Printf("%s version %s (%s), libbeat %s [%s built %s] (FIPS-distribution: %v)\n",
 					beat.Info.Beat, beat.Info.Version, runtime.GOARCH, version.GetDefaultVersion(),
 					version.Commit(), buildTime, version.FIPSDistribution)
 				return nil

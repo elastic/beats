@@ -555,7 +555,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	log := b.Info.Logger.Named("beat")
-	log.Infof("Setup Beat: %s; Version: %s (FIPS: %v)", b.Info.Beat, b.Info.Version, b.Info.FIPSDistribution)
+	log.Infof("Setup Beat: %s; Version: %s (FIPS-distribution: %v)", b.Info.Beat, b.Info.Version, b.Info.FIPSDistribution)
 	b.logSystemInfo(log)
 
 	err = b.registerESVersionCheckCallback()
