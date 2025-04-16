@@ -83,7 +83,7 @@ func (in *cometdInput) run() error {
 	defer cancel()
 	// Ticker with 5 seconds to avoid log too many warnings
 	ticker := time.NewTicker(5 * time.Second)
-	in.msgCh = in.b.Channel(ctx, in.msgCh, "-1", *in.creds, in.config.ChannelName)
+	in.msgCh = in.b.Channel(ctx, in.msgCh, "-1", *in.creds, in.ChannelName)
 	for e := range in.msgCh {
 		if e.Failed() {
 			// if err bayeux library returns recoverable error, do not close input.
@@ -148,6 +148,7 @@ func NewInput(
 	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
+	logger *logp.Logger,
 ) (inp input.Input, err error) {
 	// Extract and validate the input's configuration.
 	conf := defaultConfig()
@@ -162,7 +163,7 @@ func NewInput(
 	authParams.Password = conf.Auth.OAuth2.Password
 	authParams.TokenURL = conf.Auth.OAuth2.TokenURL
 
-	logger := logp.NewLogger(inputName).With(
+	logger = logger.Named(inputName).With(
 		"pubsub_channel", conf.ChannelName)
 
 	// Wrap input.Context's Done channel with a context.Context. This goroutine

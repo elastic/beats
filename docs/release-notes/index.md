@@ -1,4 +1,5 @@
 ---
+navigation_title: Beats
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/libbeat/current/release-notes.html
 ---
