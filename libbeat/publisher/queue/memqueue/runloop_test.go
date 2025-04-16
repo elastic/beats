@@ -19,6 +19,7 @@ package memqueue
 
 import (
 	"context"
+	"io"
 	"testing"
 	"time"
 
@@ -116,6 +117,38 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since adding an event should unblock the previous one")
 	assert.Equal(t, 101, rl.consumedCount, "Queue should have a consumedCount of 101 after adding an event unblocked the pending get request")
+}
+
+func TestClosedEmptyQueueDoesNotBlockGet(t *testing.T) {
+	broker := newQueue(
+		logp.NewLogger("testing"),
+		nil,
+		Settings{
+			Events:        1000,
+			MaxGetRequest: 500,
+			FlushTimeout:  10 * time.Second,
+		},
+		10, nil)
+	rl := broker.runLoop
+
+	// Signal close, and execute the run loop to make sure it's processed
+	go broker.Close()
+	rl.runIteration()
+
+	// Calling Get on the queue now should immediately return io.EOF, since
+	// a closed empty queue should cancel its context and terminate its
+	// run loop.
+	resultChan := make(chan error)
+	go func() {
+		_, err := broker.Get(1)
+		resultChan <- err
+	}()
+	select {
+	case err := <-resultChan:
+		assert.Equal(t, err, io.EOF, "Closed empty queue should return io.EOF on Get requests")
+	case <-time.After(10 * time.Second):
+		require.Fail(t, "Get requests to a closed empty queue should not block")
+	}
 }
 
 func TestObserverAddEvent(t *testing.T) {
