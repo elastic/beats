@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/otelbeat"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/basereceiver"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
@@ -71,7 +71,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("error starting API :%w", err)
 	}
 
-	base := otelbeat.BaseReceiver{
+	base := basereceiver.BaseReceiver{
 		HttpConf: httpConf.HTTP,
 		Beat:     b,
 		Beater:   fbBeater,

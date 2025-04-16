@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package otelbeat
+package basereceiver
 
 import (
 	"fmt"
