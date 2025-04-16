@@ -89,7 +89,7 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	logFilePath := filepath.Join(tempDir, "log.log")
 	msgLogFilePath := logFilePath
 	if runtime.GOOS == "windows" {
-		msgLogFilePath = strings.Replace(logFilePath, `\`, `\\`, -1)
+		msgLogFilePath = strings.ReplaceAll(logFilePath, `\`, `\\`)
 	}
 
 	// 2. Write configuration file ans start Filebeat
@@ -372,7 +372,7 @@ logging:
 			logFilepath := filepath.Join(workDir, "log.log")
 			msgLogFilepath := logFilepath
 			if runtime.GOOS == "windows" {
-				msgLogFilepath = strings.Replace(logFilepath, `\`, `\\`, -1)
+				msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
 			}
 			integration.GenerateLogFile(t, logFilepath, 25, false)
 
@@ -763,7 +763,7 @@ func TestFilestreamDelete(t *testing.T) {
 			// Escape filepaths for Windows
 			msgLogFilePath := logFile
 			if runtime.GOOS == "windows" {
-				msgLogFilePath = strings.Replace(logFile, `\`, `\\`, -1)
+				msgLogFilePath = strings.ReplaceAll(logFile, `\`, `\\`)
 			}
 			integration.GenerateLogFile(t, logFile, 100, false)
 

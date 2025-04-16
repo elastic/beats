@@ -571,6 +571,7 @@ func (inp *filestream) readFromSource(
 			continue
 		}
 
+		//nolint:gosec // message.Bytes is always positive
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 
 		// add "take_over" tag if `take_over` is set to true

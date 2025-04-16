@@ -79,7 +79,7 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 		"did not find two tries to reconnect")
 
 	// 4. Restart mock-es on the same port
-	s, esIPPort, _, mr = StartMockES(t, ":4242", 0, 0, 0, 0, 0)
+	s, _, _, mr = StartMockES(t, ":4242", 0, 0, 0, 0, 0)
 
 	// 5. Wait for reconnection logs
 	mockbeat.WaitForLogs(
@@ -112,15 +112,15 @@ func waitForEventToBePublished(t *testing.T, rdr *sdkmetric.ManualReader) {
 			for _, m := range sm.Metrics {
 				if m.Name == "bulk.create.total" {
 					total := int64(0)
+					//nolint: errcheck // It's a test
 					for _, dp := range m.Data.(metricdata.Sum[int64]).DataPoints {
 						total += dp.Value
 					}
 					return total >= 1
 				}
 			}
-
-			return false
 		}
+
 		return false
 	},
 		10*time.Second,

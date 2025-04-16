@@ -268,6 +268,7 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
+		//nolint:staticcheck // It's a test
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -379,6 +380,7 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
+		//nolint:staticcheck // It's a test
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -814,6 +816,7 @@ scanner:
     offset: 0
     length: 1024
 `
+		//nolint:staticcheck // It's a test
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		// this file is 128 bytes long

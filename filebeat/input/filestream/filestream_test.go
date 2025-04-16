@@ -20,7 +20,6 @@ package filestream
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -110,7 +109,7 @@ func TestLogFileTruncated(t *testing.T) {
 }
 
 func createTestLogFile() *os.File {
-	f, err := ioutil.TempFile("", "filestream_reader_test")
+	f, err := os.CreateTemp("", "filestream_reader_test")
 	if err != nil {
 		panic(err)
 	}

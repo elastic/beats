@@ -1078,7 +1078,7 @@ func StartMockES(
 	addr = l.Addr().String()
 	s := http.Server{Handler: es, ReadHeaderTimeout: time.Second}
 	go func() {
-		if err := s.Serve(l); !errors.Is(http.ErrServerClosed, err) {
+		if err := s.Serve(l); !errors.Is(err, http.ErrServerClosed) {
 			t.Errorf("could not start mock-es server: %s", err)
 		}
 	}()
