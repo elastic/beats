@@ -58,7 +58,8 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	}
 
 	once.Do(func() {
-		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
+
+    // Disable HTTP keep-alives to ensure no extra goroutines hang around.
 		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
 
 		// Sanity check the emulator.
@@ -242,7 +243,8 @@ func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(
 		return eventOutlet, nil
 	})
 
-	in, err := NewInput(cfg, connector, inputCtx)
+	logger := logp.NewTestingLogger(t, "")
+	in, err := NewInput(cfg, connector, inputCtx, logger)
 	if err != nil {
 		t.Fatal(err)
 	}

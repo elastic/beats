@@ -20,7 +20,6 @@ package registrar
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -47,9 +46,10 @@ type Migrator struct {
 	dataPath    string
 	migrateFile string
 	permissions os.FileMode
+	logger      *logp.Logger
 }
 
-func NewMigrator(cfg config.Registry) *Migrator {
+func NewMigrator(cfg config.Registry, logger *logp.Logger) *Migrator {
 	path := paths.Resolve(paths.Data, cfg.Path)
 	migrateFile := cfg.MigrateFile
 	if migrateFile != "" {
@@ -60,6 +60,7 @@ func NewMigrator(cfg config.Registry) *Migrator {
 		dataPath:    path,
 		migrateFile: migrateFile,
 		permissions: cfg.Permissions,
+		logger:      logger,
 	}
 }
 
@@ -79,7 +80,7 @@ func (m *Migrator) Run() error {
 		return err
 	}
 
-	logp.Debug("registrar", "Registry type '%v' found", version)
+	m.logger.Named("registrar").Debugf("Registry type '%v' found", version)
 
 	for {
 		switch version {
@@ -124,29 +125,29 @@ func (m *Migrator) Run() error {
 // NOTE: The oldest known filebeat registry file format this was tested with is from Filebeat 6.3.
 // Support for older Filebeat versions is best effort.
 func (m *Migrator) updateToVersion0(regHome, migrateFile string) error {
-	logp.Info("Migrate registry file to registry directory")
+	m.logger.Info("Migrate registry file to registry directory")
 
 	if m.dataPath == migrateFile {
 		backupFile := migrateFile + ".bak"
 		if isFile(migrateFile) {
-			logp.Info("Move registry file to backup file: %v", backupFile)
+			m.logger.Infof("Move registry file to backup file: %v", backupFile)
 			if err := helper.SafeFileRotate(backupFile, migrateFile); err != nil {
 				return err
 			}
 			migrateFile = backupFile
 		} else if isFile(backupFile) {
-			logp.Info("Old registry backup file found, continue migration")
+			m.logger.Info("Old registry backup file found, continue migration")
 			migrateFile = backupFile
 		}
 	}
 
-	if err := initVersion0Registry(regHome, m.permissions); err != nil {
+	if err := initVersion0Registry(regHome, m.permissions, m.logger); err != nil {
 		return err
 	}
 
 	dataFile := filepath.Join(regHome, "data.json")
 	if !isFile(dataFile) && isFile(migrateFile) {
-		logp.Info("Migrate old registry file to new data file")
+		m.logger.Info("Migrate old registry file to new data file")
 		err := helper.SafeFileRotate(dataFile, migrateFile)
 		if err != nil {
 			return err
@@ -156,9 +157,9 @@ func (m *Migrator) updateToVersion0(regHome, migrateFile string) error {
 	return nil
 }
 
-func initVersion0Registry(regHome string, perm os.FileMode) error {
+func initVersion0Registry(regHome string, perm os.FileMode, logger *logp.Logger) error {
 	if !isDir(regHome) {
-		logp.Info("No registry home found. Create: %v", regHome)
+		logger.Infof("No registry home found. Create: %v", regHome)
 		if err := os.MkdirAll(regHome, 0o750); err != nil {
 			return fmt.Errorf("failed to create registry dir '%v': %w", regHome, err)
 		}
@@ -166,7 +167,7 @@ func initVersion0Registry(regHome string, perm os.FileMode) error {
 
 	metaFile := filepath.Join(regHome, "meta.json")
 	if !isFile(metaFile) {
-		logp.Info("Initialize registry meta file")
+		logger.Info("Initialize registry meta file")
 		err := safeWriteFile(metaFile, []byte(`{"version": "0"}`), perm)
 		if err != nil {
 			return fmt.Errorf("failed writing registry meta.json: %w", err)
@@ -180,7 +181,7 @@ func initVersion0Registry(regHome string, perm os.FileMode) error {
 // only. Version 1 is based on the implementation of version 1 in
 // libbeat/statestore/backend/memlog.
 func (m *Migrator) updateToVersion1(regHome string) error {
-	logp.Info("Migrate registry version 0 to version 1")
+	m.logger.Info("Migrate registry version 0 to version 1")
 
 	origDataFile := filepath.Join(regHome, "data.json")
 	if !isFile(origDataFile) {
@@ -208,7 +209,7 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 
 	states = resetStates(fixStates(states))
 
-	registryBackend, err := memlog.New(logp.NewLogger("migration"), memlog.Settings{
+	registryBackend, err := memlog.New(m.logger.Named("migration"), memlog.Settings{
 		Root:               m.dataPath,
 		FileMode:           m.permissions,
 		Checkpoint:         func(sz uint64) bool { return false },
@@ -240,7 +241,7 @@ func (m *Migrator) updateToVersion1(regHome string) error {
 		return fmt.Errorf("migration complete but failed to remove original data file: %v: %w", origDataFile, err)
 	}
 
-	if err := ioutil.WriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
+	if err := os.WriteFile(filepath.Join(regHome, "meta.json"), []byte(`{"version": "1"}`), m.permissions); err != nil {
 		return fmt.Errorf("failed to update the meta.json file: %w", err)
 	}
 
@@ -261,7 +262,7 @@ func readVersion(regHome, migrateFile string) (registryVersion, error) {
 		return noRegistry, nil
 	}
 
-	tmp, err := ioutil.ReadFile(metaFile)
+	tmp, err := os.ReadFile(metaFile)
 	if err != nil {
 		return noRegistry, fmt.Errorf("failed to open meta file: %w", err)
 	}
