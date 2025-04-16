@@ -105,24 +105,14 @@ func TestTopic(t *testing.T) {
 
 	// Its possible that other topics exists -> select the right data
 	for _, data := range dataBefore {
-<<<<<<< HEAD
-		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic {
-			offsetBefore = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
-=======
 		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
 			offsetBefore, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
->>>>>>> 4730fcbc0 (execute Go integration tests sequentially within a beat module (#43073))
 		}
 	}
 
 	for _, data := range dataAfter {
-<<<<<<< HEAD
-		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic {
-			offsetAfter = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
-=======
 		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
 			offsetAfter, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
->>>>>>> 4730fcbc0 (execute Go integration tests sequentially within a beat module (#43073))
 		}
 	}
 

@@ -46,11 +46,7 @@ func TestData(t *testing.T) {
 	)
 	host := service.HostForPort(9092)
 
-<<<<<<< HEAD
-	c, err := startConsumer(t, service.HostForPort(9092), "metricbeat-test")
-=======
 	c, err := startConsumer(t, host, "test-group")
->>>>>>> 4730fcbc0 (execute Go integration tests sequentially within a beat module (#43073))
 	if err != nil {
 		t.Fatal(fmt.Errorf("starting kafka consumer: %w", err))
 	}
