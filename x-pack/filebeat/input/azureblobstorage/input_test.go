@@ -670,7 +670,7 @@ func newV2Context(t *testing.T) (v2.Context, func()) {
 		t.Fatalf("failed to generate random id: %v", err)
 	}
 	return v2.Context{
-		Logger:      logp.NewLogger("gcs_test"),
+		Logger:      logp.NewLogger("abs_test"),
 		ID:          "abs_test-" + id,
 		Cancelation: ctx,
 	}, cancel
