@@ -4,15 +4,16 @@ env:
   BEAT: "x-pack/filebeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
-      - filebeat/
-      - x-pack/filebeat/
-      - x-pack/libbeat/
+      - filebeat/**
+      - x-pack/filebeat/**
+      - x-pack/libbeat/**
       # OSS
       - go.mod
       - pytest.ini
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/xpack-filebeat-macos-unit-tests.yml
@@ -21,13 +22,13 @@ on:
     branches:
       - main
     paths:
-      - filebeat/
-      - x-pack/filebeat/
-      - x-pack/libbeat/
+      - filebeat/**
+      - x-pack/filebeat/**
+      - x-pack/libbeat/**
       # OSS
       - go.mod
       - pytest.ini
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/xpack-filebeat-macos-unit-tests.yml

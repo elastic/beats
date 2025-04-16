@@ -88,6 +88,17 @@ func GoUnitTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, args)
 }
 
+// GoFIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests
+func GoFIPSOnlyUnitTest() error {
+	ctx := context.Background()
+
+	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
+	if isWindows32bitRunner() {
+		fipsArgs.ExtraFlags = append(fipsArgs.ExtraFlags, "-ldflags=-w")
+	}
+	return devtools.GoTest(ctx, fipsArgs)
+}
+
 // PythonUnitTest executes the python system tests.
 func PythonUnitTest() error {
 	mg.SerialDeps(Fields)
