@@ -1,31 +1,31 @@
-name: auditbeat-macos-unit-tests
+name: metricbeat-macos-unit-tests
 
 env:
-  BEAT: "auditbeat"
+  BEAT: "metricbeat"
 
 on:
   workflow_dispatch:
   pull_request:
     paths:
-      - auditbeat/**
+      - metricbeat/**
       # OSS
       - go.mod
       - dev-tools/**
       - libbeat/**
       # Workflow
-      - .github/workflows/auditbeat-macos-unit-tests.yml
+      - .github/workflows/metricbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
   push:
     branches:
       - main
     paths:
-      - auditbeat/**
+      - metricbeat/**
       # OSS
       - go.mod
       - dev-tools/**
       - libbeat/**
       # Workflow
-      - .github/workflows/auditbeat-macos-unit-tests.yml
+      - .github/workflows/metricbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
 
 permissions:
@@ -38,13 +38,13 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  unit-tests-branch:
+  unit-tests-push:
     name: Unit tests ${{ matrix.os }}
     if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
-        # Disabled due to: https://github.com/elastic/beats/issues/43482
+        # Disabled due to: https://github.com/elastic/beats/issues/43658
         # TODO uncomment for testing or once solved
         os: [macos-13] #, macos-14]
     runs-on: ${{ matrix.os }}
@@ -58,10 +58,10 @@ jobs:
 
   unit-tests-pr:
     name: Unit tests macos-15
-    # Disabled due to: https://github.com/elastic/beats/issues/43482
+    # Disabled due to: https://github.com/elastic/beats/issues/43658
     # TODO: remove the `if: false` and uncomment `if: github.event_name == 'pull_request'`for testing or once solved
     if: false
-#    if: github.event_name == 'pull_request'
+    # if: github.event_name == 'pull_request'
     runs-on: [macos-15]
     timeout-minutes: 60
     steps:

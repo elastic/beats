@@ -77,6 +77,7 @@ processors:
 `
 
 func TestTranslateGUIDWithLDAP(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/42616")
 	startOpenldapContainer(t)
 
 	var entryUUID string
