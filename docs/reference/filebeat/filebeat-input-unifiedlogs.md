@@ -1,7 +1,9 @@
 ---
 navigation_title: "Unified Logs"
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-input-unifiedlogs.html
+  - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-unifiedlogs.html
+  # That link will 404 until 8.18 is current
+  # (see https://www.elastic.co/guide/en/beats/filebeat/8.18/filebeat-input-unifiedlogs.html)
 ---
 
 # Unified Logs input [filebeat-input-unifiedlogs]

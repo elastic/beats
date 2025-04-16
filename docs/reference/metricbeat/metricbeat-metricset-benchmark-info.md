@@ -1,6 +1,8 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-metricset-benchmark-info.html
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-benchmark-info.html
+  # That link will 404 until 8.18 is current
+  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/metricbeat-metricset-benchmark-info.html)
 ---
 
 # Benchmark info metricset [metricbeat-metricset-benchmark-info]
