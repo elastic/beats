@@ -46,6 +46,7 @@ type client struct {
 	observer       observer
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
+	outputListener beat.OutputListener
 }
 
 type clientCloseWaiter struct {
@@ -111,9 +112,11 @@ func (c *client) publish(e beat.Event) {
 
 	e = *event
 	pubEvent := publisher.Event{
-		// ?
 		Content: e,
 		Flags:   c.eventFlags,
+
+		OutputListener: publisher.OutputListener{
+			Listener: c.outputListener},
 	}
 
 	var published bool
