@@ -428,13 +428,21 @@ func (r *msgRef) dec() {
 
 		stats.RetryableErrors(failed)
 		if success > 0 {
-			stats.AckedEvent(success)
+			// TODO(Anderson): fix it: find a solution for that
+			// does it ever happens? a mix of failures and successes where the
+			// success won't be reported to successWorker?
+			// If success > 0 and also every of the success is also reported to
+			// client.successWorker(ch <-chan *sarama.ProducerMessage), it means
+			// the successes are being counted twice.
+			// Also if it's been reported to successWorker, no need to count it
+			// here.
+			stats.AckedEvents(make([]publisher.Event, success))
 		}
 
 		r.client.log.Debugf("Kafka publish failed with: %+v", err)
 	} else {
 		r.batch.ACK()
-		stats.AckedEvent(r.total)
+		stats.AckedEvents(r.batch.Events())
 	}
 }
 
