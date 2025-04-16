@@ -60,11 +60,49 @@ type Event struct {
 	Flags   EventFlags
 	Cache   EventCache
 
+	// OutputListener is used by the output to report the final status of the
+	// event.
+	OutputListener OutputListener
+
 	// If the output provides an early encoder for incoming events,
 	// it should store the encoded form in EncodedEvent and clear Content
 	// to free the unencoded data. The updated event will be provided to
 	// output workers when calling Publish.
 	EncodedEvent interface{}
+}
+
+// OutputListener is a helper around a beat.OutputListener to make it safe to
+// call methods on Event.OutputListener without requiring a nil check.
+type OutputListener struct {
+	Listener beat.OutputListener
+}
+
+func (o OutputListener) NewEvent() {
+	if o.Listener == nil {
+		return
+	}
+	o.Listener.NewEvent()
+}
+
+func (o OutputListener) Acked() {
+	if o.Listener == nil {
+		return
+	}
+	o.Listener.Acked()
+}
+
+func (o OutputListener) Dropped() {
+	if o.Listener == nil {
+		return
+	}
+	o.Listener.Dropped()
+}
+
+func (o OutputListener) DeadLetter() {
+	if o.Listener == nil {
+		return
+	}
+	o.Listener.DeadLetter()
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.
