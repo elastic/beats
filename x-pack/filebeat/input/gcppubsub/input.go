@@ -95,14 +95,10 @@ type pubsubInput struct {
 
 // NewInput creates a new Google Cloud Pub/Sub input that consumes events from
 // a topic subscription.
-<<<<<<< HEAD
-func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context) (inp input.Input, err error) {
+func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context, logger *logp.Logger) (inp input.Input, err error) {
 	stat := getStatusReporter(inputContext)
 	stat.UpdateStatus(status.Starting, "")
 
-=======
-func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context, logger *logp.Logger) (inp input.Input, err error) {
->>>>>>> e2264dc60 ([Chore] Replace global logger with local logger instance #3 (#43657))
 	// Extract and validate the input's configuration.
 	stat.UpdateStatus(status.Configuring, "")
 	conf := defaultConfig()
