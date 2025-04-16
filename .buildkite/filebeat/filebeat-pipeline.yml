@@ -127,6 +127,32 @@ steps:
           - github_commit_status:
               context: "filebeat: Ubuntu x86_64 Unit Tests FIPS"
 
+      - label: ":ubuntu: Filebeat: Ubuntu x86_64 fips140=only Unit Tests"
+        command: |
+          cd filebeat
+          mage goFIPSOnlyUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "filebeat: Ubuntu x86_64 fips140=only Unit Tests"
+
       - label: ":ubuntu: Filebeat: Go Integration Tests"
         command: |
           cd filebeat
@@ -168,6 +194,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
+          - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"
@@ -195,6 +224,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+          - "filebeat/build/integration-tests/*"
+          - "filebeat/build/integration-tests/Test*/*"
+          - "filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "filebeat/build/TEST-*.xml"

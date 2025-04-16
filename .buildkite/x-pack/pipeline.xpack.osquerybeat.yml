@@ -107,6 +107,9 @@ steps:
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
           - "x-pack/osquerybeat/build/*.json"
+          - "x-pack/osquerybeat/build/integration-tests/*"
+          - "x-pack/osquerybeat/build/integration-tests/Test*/*"
+          - "x-pack/osquerybeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Go Integration Tests"

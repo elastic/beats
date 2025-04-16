@@ -203,7 +203,7 @@ func TestDecodeBase64Run(t *testing.T) {
 			t.Parallel()
 
 			f := &decodeBase64Field{
-				log:    logp.NewLogger(processorName),
+				log:    logp.NewTestingLogger(t, processorName),
 				config: test.config,
 			}
 
@@ -238,7 +238,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		}
 
 		f := &decodeBase64Field{
-			log:    logp.NewLogger(processorName),
+			log:    logp.NewTestingLogger(t, processorName),
 			config: config,
 		}
 
