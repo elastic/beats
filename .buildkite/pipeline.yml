@@ -24,8 +24,8 @@ steps:
       - "junit-*.xml"
 
     # Run unit tests with requirefips tag to validate functionality
-  - label: ":linux: Test Linux FIPS"
-    key: test-lin-fips
+  - label: ":linux: Test Linux with requirefips build tag"
+    key: test-lin-fips-tag
     command:
       - ".buildkite/scripts/test.sh"
     env:
@@ -80,7 +80,9 @@ steps:
     depends_on:
       - step: "test-lin"
         allow_failure: true
-      - step: "test-lin-fips"
+      - step: "test-lin-fips-tag"
+        allow_failure: true
+      - step: "test-lin-fipsonly"
         allow_failure: true
       - step: "test-win"
         allow_failure: true
