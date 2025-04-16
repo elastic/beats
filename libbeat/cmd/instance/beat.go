@@ -466,12 +466,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		}
 	}
 
-<<<<<<< HEAD
-	namespaceReg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
-
-=======
 	namespaceReg := b.Info.Monitoring.Namespace.GetRegistry()
->>>>>>> 9ecf8c484 ([mbreceiver][fbreceiver] - use logp.DefaultConfig (#43800))
 	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
 		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
