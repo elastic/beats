@@ -35,12 +35,12 @@ Want to use [Filebeat modules](/reference/filebeat/filebeat-modules.md) with {{l
 
 Every event sent to {{ls}} contains the following metadata fields that you can use in {{ls}} for indexing and filtering:
 
-```json
+```json subs=true
 {
     ...
     "@metadata": { <1>
       "beat": "filebeat", <2>
-      "version": "9.0.0-beta1" <3>
+      "version": "{{stack-version}}" <3>
     }
 }
 ```
@@ -70,7 +70,7 @@ output {
 }
 ```
 
-1. `%{[@metadata][beat]}` sets the first part of the index name to the value of the `beat` metadata field and `%{[@metadata][version]}` sets the second part to the Beat’s version. For example: `filebeat-9.0.0-beta1`.
+1. `%{[@metadata][beat]}` sets the first part of the index name to the value of the `beat` metadata field and `%{[@metadata][version]}` sets the second part to the Beat’s version. For example: `filebeat-9[version]`.
 
 
 Events indexed into {{es}} with the {{ls}} configuration shown here will be similar to events directly indexed by Filebeat into {{es}}.
@@ -180,7 +180,7 @@ The `proxy_use_local_resolver` option determines if {{ls}} hostnames are resolve
 
 ### `index` [logstash-index]
 
-The index root name to write events to. The default is the Beat name. For example `"filebeat"` generates `"[filebeat-]9.0.0-beta1-YYYY.MM.DD"` indices (for example, `"filebeat-9.0.0-beta1-2017.04.26"`).
+The index root name to write events to. The default is the Beat name. For example `"filebeat"` generates `"[filebeat-][version]-YYYY.MM.DD"` indices (for example, `"filebeat-9.0.0-2017.04.26"`).
 
 ::::{note}
 This parameter’s value will be assigned to the `metadata.beat` field. It can then be accessed in {{ls}}'s output section as `%{[@metadata][beat]}`.

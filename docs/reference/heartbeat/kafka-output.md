@@ -144,7 +144,7 @@ output.kafka:
         message: "ERR"
 ```
 
-This configuration results in topics named `critical-9.0.0-beta1`, `error-9.0.0-beta1`, and `logs-9.0.0-beta1`.
+This configuration results in topics named `critical-[version]`, `error-[version]`, and `logs-[version]`.
 
 
 ### `key` [_key]

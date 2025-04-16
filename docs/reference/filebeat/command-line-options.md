@@ -90,9 +90,9 @@ Also see [Global flags](#global-flags).
 
 **EXAMPLES**
 
-```sh
+```sh subs=true
 filebeat export config
-filebeat export template --es.version 9.0.0-beta1
+filebeat export template --es.version {{stack-version}}
 filebeat export dashboard --id="a7b35890-8baa-11e8-9676-ef67484126fb" > dashboard.json
 ```
 
@@ -297,7 +297,7 @@ filebeat setup [FLAGS]
 **FLAGS**
 
 **`--dashboards`**
-:   Sets up the {{kib}} dashboards (when available). This option loads the dashboards from the Filebeat package. For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](http://www.elastic.co/guide/en/beats/devguide/master/import-dashboards.md) in the *Beats Developer Guide*.
+:   Sets up the {{kib}} dashboards (when available). This option loads the dashboards from the Filebeat package. For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](http://www.elastic.co/guide/en/beats/devguide/master/import-dashboards.md) in [Contribute to Beats](../../extend/index.md).
 
 **`-h, --help`**
 :   Shows help for the `setup` command.
