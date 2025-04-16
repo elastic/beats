@@ -1,8 +1,22 @@
+commands_restrictions:
+  backport:
+    conditions:
+      - or:
+        - sender-permission>=write
+        - sender=github-actions[bot]
 queue_rules:
   - name: default
     merge_method: squash
     conditions:
       - check-success=buildkite/beats
+defaults:
+  actions:
+    backport:
+      title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+      assignees:
+        - "{{ author }}"
+      labels:
+        - "backport"
 pull_request_rules:
   - name: self-assign PRs
     conditions:
