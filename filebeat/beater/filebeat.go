@@ -287,7 +287,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 	finishedLogger := newFinishedLogger(wgEvents)
 
-	registryMigrator := registrar.NewMigrator(config.Registry)
+	registryMigrator := registrar.NewMigrator(config.Registry, fb.logger)
 	if err := registryMigrator.Run(); err != nil {
 		fb.logger.Errorf("Failed to migrate registry file: %+v", err)
 		return err
@@ -379,7 +379,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
 		compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader),
-		input.NewRunnerFactory(pipelineConnector, registrar, fb.done),
+		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
 	))
 
 	// Create a ES connection factory for dynamic modules pipeline loading

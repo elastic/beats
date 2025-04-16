@@ -24,9 +24,17 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+<<<<<<< HEAD
+=======
+var (
+	errDeprecated = errors.New("Container input is deprecated. Use Filestream input with its container parser instead. https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-filestream.html#_container") //nolint:staticcheck //Keep old behavior
+)
+
+>>>>>>> e2264dc60 ([Chore] Replace global logger with local logger instance #3 (#43657))
 func init() {
 	err := input.Register("container", NewInput)
 	if err != nil {
@@ -39,7 +47,17 @@ func NewInput(
 	cfg *conf.C,
 	outletFactory channel.Connector,
 	context input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
+<<<<<<< HEAD
+=======
+	// we still allow the deprecated log input running under integrations and
+	// modules until they are all migrated to filestream
+	if !log.AllowDeprecatedUse(cfg) {
+		return nil, fmt.Errorf("Found container input configuration: %w\n%s", errDeprecated, conf.DebugString(cfg, true)) //nolint:staticcheck //Keep old behavior
+	}
+
+>>>>>>> e2264dc60 ([Chore] Replace global logger with local logger instance #3 (#43657))
 	// Wrap log input with custom docker settings
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
@@ -71,5 +89,5 @@ func NewInput(
 		context.Meta["stream"] = config.Stream
 	}
 
-	return log.NewInput(cfg, outletFactory, context)
+	return log.NewInput(cfg, outletFactory, context, logger)
 }

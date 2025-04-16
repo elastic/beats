@@ -83,8 +83,6 @@ func (ec *eventCaptor) Done() <-chan struct{} {
 }
 
 func TestInput(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("redis input", "redis"))
-
 	// Setup the input config.
 	config := conf.MustNewConfigFrom(mapstr.M{
 		"network":      "tcp",
@@ -116,8 +114,9 @@ func TestInput(t *testing.T) {
 		BeatDone: make(chan struct{}),
 	}
 
+	logger := logp.NewTestingLogger(t, "")
 	// Setup the input
-	input, err := NewInput(config, connector, inputContext)
+	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -148,7 +147,7 @@ func TestInput(t *testing.T) {
 		require.Equal(t, message, val)
 		val, err = event.GetValue("redis")
 		require.NoError(t, err)
-		role := val.(mapstr.M)["slowlog"].(mapstr.M)["role"]
+		role := val.(mapstr.M)["slowlog"].(mapstr.M)["role"] //nolint:errcheck //Safe to ignore in tests
 		require.Equal(t, "master", role)
 	case <-time.After(30 * time.Second):
 		t.Fatal("Timeout waiting for event")

@@ -105,7 +105,8 @@ func TestSingleInput(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logp.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -163,7 +164,8 @@ func TestInputStop_Wait(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logp.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -289,7 +291,8 @@ func TestMultiInput(t *testing.T) {
 			_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 			return
 		case "/meta/connect":
-			if called < uint64(expectedHTTPEventCount) {
+			if called < uint64(expectedHTTPEventCount) { //nolint:gosec //Safe to ignore in tests
+				//nolint:staticcheck //Safe to ignore in tests
 				if called == 0 {
 					atomic.AddUint64(&called, 1)
 					_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
@@ -303,6 +306,7 @@ func TestMultiInput(t *testing.T) {
 			_, _ = w.Write([]byte(`{}`))
 			return
 		case "/meta/subscribe":
+			//nolint:staticcheck //Safe to ignore in tests
 			if called == 0 {
 				_, _ = w.Write([]byte(`[{"clientId": "client_id", "channel": "/meta/subscribe", "subscription": "channel_name", "successful":true}]`))
 			} else if called == 1 {
@@ -324,12 +328,13 @@ func TestMultiInput(t *testing.T) {
 
 	var inputContext finput.Context
 
+	logger := logp.NewTestingLogger(t, "")
 	// initialize inputs
-	input1, err := NewInput(cfg1, connector, inputContext)
+	input1, err := NewInput(cfg1, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input1)
 
-	input2, err := NewInput(cfg2, connector, inputContext)
+	input2, err := NewInput(cfg2, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input2)
 
@@ -372,7 +377,7 @@ func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`[{"ext":{"replay":true,"payload.format":true},"minimumVersion":"1.0","clientId":"client_id","supportedConnectionTypes":["long-polling"],"channel":"/meta/handshake","version":"1.0","successful":true}]`))
 		return
 	case "/meta/connect":
-		if called < uint64(expectedHTTPEventCount) {
+		if called < uint64(expectedHTTPEventCount) { //nolint:gosec //Safe to ignore in tests
 			atomic.AddUint64(&called, 1)
 			_, _ = w.Write([]byte(`[{"data": {"payload": {"CountryIso": "IN"}, "event": {"replayId":1234}}, "channel": "channel_name"}]`))
 			return
@@ -465,7 +470,8 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logp.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
@@ -568,7 +574,8 @@ func TestNegativeCases(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	input, err := NewInput(cfg, connector, inputContext)
+	logger := logp.NewTestingLogger(t, "")
+	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
 
