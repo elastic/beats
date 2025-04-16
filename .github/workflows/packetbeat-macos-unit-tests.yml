@@ -4,13 +4,14 @@ env:
   BEAT: "packetbeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
-      - packetbeat/
+      - packetbeat/**
       # OSS
       - go.mod
-      - dev-tools/
-      - libbeat/
+      - dev-tools/**
+      - libbeat/**
       # Workflow
       - .github/workflows/packetbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
@@ -18,11 +19,11 @@ on:
     branches:
       - main
     paths:
-      - packetbeat/
+      - packetbeat/**
       # OSS
       - go.mod
-      - dev-tools/
-      - libbeat/
+      - dev-tools/**
+      - libbeat/**
       # Workflow
       - .github/workflows/packetbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml

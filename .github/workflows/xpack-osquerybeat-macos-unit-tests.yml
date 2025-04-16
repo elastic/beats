@@ -4,13 +4,14 @@ env:
   BEAT: "x-pack/osquerybeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
-      - x-pack/osquerybeat
+      - x-pack/osquerybeat/**
       - x-pack/libbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/xpack-osquerybeat-macos-unit-tests.yml
@@ -19,11 +20,11 @@ on:
     branches:
       - main
     paths:
-      - x-pack/osquerybeat
+      - x-pack/osquerybeat/**
       - x-pack/libbeat/**
       # OSS
       - go.mod
-      - dev-tools/
+      - dev-tools/**
       - libbeat/**
       # Workflow
       - .github/workflows/xpack-osquerybeat-macos-unit-tests.yml
