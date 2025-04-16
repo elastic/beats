@@ -44,7 +44,7 @@ Each file found by the glob must contain a list of one or more module definition
 ```
 
 ::::{note}
-On systems with POSIX file permissions, all Beats configuration files are subject to ownership and file permission checks. If you encounter config loading errors related to file ownership, see {{beats-ref}}/config-file-permissions.html.
+On systems with POSIX file permissions, all Beats configuration files are subject to ownership and file permission checks. If you encounter config loading errors related to file ownership, see [Config file ownership and permissions](/reference/libbeat/config-file-permissions).
 ::::
 
 

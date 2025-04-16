@@ -31,9 +31,7 @@ The STAN module is tested with STAN 0.15.1.
 
 Dashboards for topic message count and queue depth are included:
 
-:::{image} images/metricbeat-stan-overview.png
-:alt: metricbeat stan overview
-:::
+![metricbeat stan overview](images/metricbeat-stan-overview.png)
 
 
 ### Example configuration [_example_configuration_60]
