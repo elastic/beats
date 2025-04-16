@@ -128,7 +128,7 @@ func (r *Reader) initAppPools() error {
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
-			if errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTER) || errors.Is(err, pdh.PDH_CSTATUS_NO_COUNTERNAME) || errors.Is(err, pdh.PDH_CSTATUS_NO_INSTANCE) || errors.Is(err, pdh.PDH_CSTATUS_NO_OBJECT) {
+			if isPDHError(err) {
 				r.log.Infow("Ignoring non existent counter", "error", err,
 					logp.Namespace("application pool"), "query", value,
 				)
