@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
+	"go.uber.org/zap"
 )
 
 // BaseReceiver holds common configurations for beatreceivers.
@@ -34,6 +35,7 @@ type BaseReceiver struct {
 	HttpConf *config.C
 	Beat     *instance.Beat
 	Beater   beat.Beater
+	Logger   *zap.Logger
 }
 
 func (b *BaseReceiver) Start() error {

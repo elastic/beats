@@ -75,9 +75,10 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		HttpConf: httpConf.HTTP,
 		Beat:     b,
 		Beater:   fbBeater,
+		Logger:   set.Logger,
 	}
 
-	return &filebeatReceiver{BaseReceiver: base, logger: set.Logger}, nil
+	return &filebeatReceiver{BaseReceiver: base}, nil
 }
 
 func defaultProcessors() []mapstr.M {
