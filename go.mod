@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.23.6
+go 1.24.6
 
 toolchain go1.23.8
 
