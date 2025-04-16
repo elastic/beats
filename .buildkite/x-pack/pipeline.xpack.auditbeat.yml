@@ -101,8 +101,8 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: Build Tests (Module)"
 
-      - label: ":ubuntu: x-pack/auditbeat: Ubuntu Unit Tests FIPS"
-        key: "mandatory-linux-unit-test-fips"
+      - label: ":ubuntu: x-pack/auditbeat: Ubuntu Unit Tests with requirefips build tag"
+        key: "mandatory-linux-unit-test-fips-tag"
         command: |
           cd x-pack/auditbeat
           mage unitTest
@@ -126,7 +126,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/auditbeat: Ubuntu Unit Tests FIPS"
+              context: "x-pack/auditbeat: Ubuntu Unit Tests with requirefips build tag"
 
       - label: ":rhel: x-pack/auditbeat: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"

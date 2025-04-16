@@ -97,8 +97,8 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/filebeat: Ubuntu x86_64 Unit Tests FIPS"
-        key: "x-pack-filebeat-mandatory-linux-unit-test-FIPS"
+      - label: ":ubuntu: x-pack/filebeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "x-pack-filebeat-mandatory-linux-unit-test-FIPS-tag"
         command: |
           cd x-pack/filebeat
           mage unitTest
@@ -122,7 +122,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests FIPS"
+              context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
 
       - label: ":ubuntu: x-pack/filebeat: Go Integration Tests"
         key: "x-pack-filebeat-mandatory-int-test"
