@@ -28,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -137,7 +136,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	clients := outGrp.Clients
 	c.workers = make([]outputWorker, len(clients))
 	for i, client := range clients {
-		logger := logp.NewLogger("publisher_pipeline_output")
+		logger := c.beat.Logger.Named("publisher_pipeline_output")
 		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer)
 	}
 
