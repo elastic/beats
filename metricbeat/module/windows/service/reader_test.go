@@ -22,13 +22,12 @@ package service
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestNewReader(t *testing.T) {
-	reader, err := NewReader(logp.NewTestingLogger(t, ""))
+	reader, err := NewReader(logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
 	defer reader.Close()
@@ -59,7 +58,7 @@ func TestGetMachineGUID(t *testing.T) {
 func TestRead(t *testing.T) {
 	t.Skip("Flaky test: https://github.com/elastic/beats/issues/22171")
 
-	reader, err := NewReader(logp.NewTestingLogger(t, ""))
+	reader, err := NewReader(logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	result, err := reader.Read()
 	assert.NoError(t, err)

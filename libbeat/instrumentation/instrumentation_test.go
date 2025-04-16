@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestInstrumentationConfig(t *testing.T) {
@@ -34,7 +34,7 @@ func TestInstrumentationConfig(t *testing.T) {
 			"enabled": "true",
 		},
 	})
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	instrumentation, err := New(cfg, "my-beat", version.GetDefaultVersion(), logger)
 	require.NoError(t, err)
 
@@ -52,7 +52,7 @@ func TestInstrumentationConfigExplicitHosts(t *testing.T) {
 		},
 	},
 	)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	instrumentation, err := New(cfg, "my-beat", version.GetDefaultVersion(), logger)
 	require.NoError(t, err)
 	tracer := instrumentation.Tracer()
@@ -67,7 +67,7 @@ func TestInstrumentationConfigListener(t *testing.T) {
 			"enabled": "true",
 		},
 	})
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	instrumentation, err := New(cfg, "apm-server", version.GetDefaultVersion(), logger)
 	require.NoError(t, err)
@@ -79,7 +79,7 @@ func TestInstrumentationConfigListener(t *testing.T) {
 }
 
 func TestAPMTracerDisabledByDefault(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	instrumentation, err := New(config.NewConfig(), "beat", "8.0", logger)
 	require.NoError(t, err)
@@ -94,7 +94,7 @@ func TestInstrumentationDisabled(t *testing.T) {
 			"enabled": "false",
 		},
 	})
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	instrumentation, err := New(cfg, "filebeat", version.GetDefaultVersion(), logger)
 	require.NoError(t, err)

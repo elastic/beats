@@ -22,9 +22,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGlobWatcher(t *testing.T) {
@@ -32,7 +31,7 @@ func TestGlobWatcher(t *testing.T) {
 	dir := t.TempDir()
 	glob := dir + "/*.yml"
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	gcd := NewGlobWatcher(glob, logger)
 
 	content := []byte("test\n")
