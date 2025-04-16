@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -442,6 +443,14 @@ func (p *oktaInput) doFetchUsers(ctx context.Context, state *stateStore, fullSyn
 		// users; a nil query is more efficient, but excludes these users.
 		query = url.Values{"search": []string{"status pr"}}
 	}
+	if p.cfg.BatchSize > 0 {
+		// If limit is not specified, the API default is used in the case
+		// that we are using, this is 200.
+		//
+		// See:
+		//  https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/listUsers!in=query&path=limit&t=request
+		query.Set("limit", strconv.Itoa(p.cfg.BatchSize))
+	}
 
 	const omit = okta.OmitCredentials | okta.OmitCredentialsLinks | okta.OmitTransitioningToStatus
 
@@ -568,6 +577,14 @@ func (p *oktaInput) doFetchDevices(ctx context.Context, state *stateStore, fullS
 		// There is no equivalent documentation for devices, so we assume the
 		// behaviour is the same.
 		deviceQuery = url.Values{"search": []string{"status pr"}}
+	}
+	if p.cfg.BatchSize > 0 {
+		// If limit is not specified, the API default is used in the case
+		// that we are using, this is 200.
+		//
+		// See:
+		//  https://developer.okta.com/docs/api/openapi/okta-management/management/tag/User/#tag/User/operation/listUsers!in=query&path=limit&t=request
+		deviceQuery.Set("limit", strconv.Itoa(p.cfg.BatchSize))
 	}
 	// Start user queries from the same time point. This must not
 	// be mutated since we may perform multiple batched gets over
