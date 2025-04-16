@@ -58,6 +58,9 @@ type ClientConfig struct {
 	// Callbacks for when events are added / acknowledged
 	EventListener EventListener
 
+	// OutputListener configures callbacks for monitoring the output
+	OutputListener OutputListener
+
 	// ClientListener configures callbacks for monitoring pipeline clients
 	ClientListener ClientListener
 }
@@ -138,6 +141,14 @@ type ClientListener interface {
 	DroppedOnPublish(Event) // event has been dropped, while waiting for the queue
 }
 
+// OutputListener provides an interface to track status of events in the output.
+type OutputListener interface {
+	NewEvent()   // report number of events that arrived in the output
+	Acked()      // report number of events acked
+	Dropped()    // report number of events dropped
+	DeadLetter() // report number of events sent to dead letter index
+}
+
 type ProcessorList interface {
 	Processor
 	Close() error
@@ -204,3 +215,21 @@ func (c *CombinedClientListener) DroppedOnPublish(event Event) {
 	c.A.DroppedOnPublish(event)
 	c.B.DroppedOnPublish(event)
 }
+
+// NoopOutputListener is a no-op OutputListener.
+type NoopOutputListener struct{}
+
+func (n NoopOutputListener) NewEvent()   {}
+func (n NoopOutputListener) Acked()      {}
+func (n NoopOutputListener) Dropped()    {}
+func (n NoopOutputListener) DeadLetter() {}
+
+// NoopClientListener is a no-op ClientListener.
+type NoopClientListener struct{}
+
+func (n NoopClientListener) Closing()               {}
+func (n NoopClientListener) Closed()                {}
+func (n NoopClientListener) NewEvent()              {}
+func (n NoopClientListener) Filtered()              {}
+func (n NoopClientListener) Published()             {}
+func (n NoopClientListener) DroppedOnPublish(Event) {}
