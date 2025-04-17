@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestDeadlockListener(t *testing.T) {
@@ -32,7 +32,7 @@ func TestDeadlockListener(t *testing.T) {
 	var currentTime time.Time
 	getTime := func() time.Time { return currentTime }
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	dl := idleDeadlockListener(logger, timeout, getTime)
 
 	// Channels get a buffer so we can trigger them deterministically in

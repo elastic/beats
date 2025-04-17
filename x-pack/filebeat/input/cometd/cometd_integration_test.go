@@ -18,7 +18,7 @@ import (
 
 	bay "github.com/elastic/bayeux"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -83,7 +83,7 @@ func TestInput(t *testing.T) {
 		BeatDone: make(chan struct{}),
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// Setup the input
 	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
