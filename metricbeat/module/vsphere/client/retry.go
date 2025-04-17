@@ -31,7 +31,7 @@ const maxInterval = 1 * time.Minute
 // Retry attempts to execute the provided function `fn` with a retry mechanism.
 // It uses an exponential backoff strategy and retries up to a maximum number of attempts.
 func Retry(ctx context.Context, fn func() error) (err error) {
-	backoff := backoff.NewExpBackoff(ctx.Done(), initialInterval, maxInterval)
+	expBackoff := backoff.NewExpBackoff(ctx.Done(), initialInterval, maxInterval)
 
 	for numTries := 0; ; numTries++ {
 		err = fn()
@@ -40,12 +40,12 @@ func Retry(ctx context.Context, fn func() error) (err error) {
 			break
 		}
 
-		if maxRetries > 0 && numTries >= maxRetries {
+		if numTries >= maxRetries-1 {
 			// maxRetries hit
 			break
 		}
 
-		if !backoff.Wait() {
+		if !expBackoff.Wait() {
 			// context cancelled
 			break
 		}
