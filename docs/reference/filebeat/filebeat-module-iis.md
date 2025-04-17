@@ -96,10 +96,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/kibana-iis.png
-:alt: kibana iis
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana iis](images/kibana-iis.png)
 
 
 ## Fields [_fields_23]

@@ -11,14 +11,11 @@ This guide describes how to get started quickly with log collection. You’ll le
 
 * install Filebeat on each system you want to monitor
 * specify the location of your log files
-* parse log data into fields and send it to {es}
-* visualize the log data in {kib}
+* parse log data into fields and send it to {{es}}
+* visualize the log data in {{kib}}
 
-:::{image} images/kibana-system.png
-:alt: Filebeat System dashboard
-:class: screenshot
-:::
-
+% TO DO: Use `:class: screenshot`
+![Filebeat System dashboard](images/kibana-system.png)
 
 ## Before you begin [_before_you_begin]
 
@@ -119,7 +116,7 @@ Specify the [cloud.id](/reference/filebeat/configure-cloud-id.md) of your {{ess}
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "filebeat_setup:{pwd}" <1>
+cloud.auth: "filebeat_setup:YOUR_PASSWORD" <1>
 ```
 
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/filebeat/keystore.md).
@@ -132,7 +129,7 @@ cloud.auth: "filebeat_setup:{pwd}" <1>
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "filebeat_internal"
-      password: "{pwd}" <1>
+      password: "YOUR_PASSWORD" <1>
       ssl:
         enabled: true
         ca_trusted_fingerprint: "b9a10bbe64ee9826abeda6546fc988c8bf798b41957c33d05db736716513dc9c" <2>
@@ -147,7 +144,7 @@ cloud.auth: "filebeat_setup:{pwd}" <1>
       setup.kibana:
         host: "mykibanahost:5601" <1>
         username: "my_kibana_user" <2> <3>
-        password: "{pwd}"
+        password: "YOUR_PASSWORD"
     ```
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
@@ -179,153 +176,153 @@ There are several ways to collect log data with Filebeat:
 
     :::::::{tab-set}
 
-::::::{tab-item} DEB
-```sh
+    ::::::{tab-item} DEB
+    ```sh
     filebeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     filebeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./filebeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./filebeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\filebeat.exe modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} DEB
-```sh
+    ::::::{tab-item} DEB
+    ```sh
     filebeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     filebeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./filebeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./filebeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\filebeat.exe modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} DEB
-```sh
+    ::::::{tab-item} DEB
+    ```sh
     filebeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     filebeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./filebeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./filebeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\filebeat.exe setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} DEB
-```sh
-sudo service filebeat start
-```
+    ::::::{tab-item} DEB
+    ```sh
+    sudo service filebeat start
+    ```
 
-::::{note}
-If you use an `init.d` script to start Filebeat, you can’t specify command line flags (see [Command reference](/reference/filebeat/command-line-options.md)). To specify flags, start Filebeat in the foreground.
-::::
-
-
-Also see [Filebeat and systemd](/reference/filebeat/running-with-systemd.md).
-::::::
-
-::::::{tab-item} RPM
-```sh
-sudo service filebeat start
-```
-
-::::{note}
-If you use an `init.d` script to start Filebeat, you can’t specify command line flags (see [Command reference](/reference/filebeat/command-line-options.md)). To specify flags, start Filebeat in the foreground.
-::::
+    ::::{note}
+    If you use an `init.d` script to start Filebeat, you can’t specify command line flags (see [Command reference](/reference/filebeat/command-line-options.md)). To specify flags, start Filebeat in the foreground.
+    ::::
 
 
-Also see [Filebeat and systemd](/reference/filebeat/running-with-systemd.md).
-::::::
+    Also see [Filebeat and systemd](/reference/filebeat/running-with-systemd.md).
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
-sudo chown root filebeat.yml <1>
-sudo chown root modules.d/nginx.yml <1>
-sudo ./filebeat -e
-```
+    ::::::{tab-item} RPM
+    ```sh
+    sudo service filebeat start
+    ```
 
-1. You’ll be running Filebeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Filebeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-::::::
+    ::::{note}
+    If you use an `init.d` script to start Filebeat, you can’t specify command line flags (see [Command reference](/reference/filebeat/command-line-options.md)). To specify flags, start Filebeat in the foreground.
+    ::::
 
-::::::{tab-item} Linux
-```sh
-sudo chown root filebeat.yml <1>
-sudo chown root modules.d/nginx.yml <1>
-sudo ./filebeat -e
-```
 
-1. You’ll be running Filebeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Filebeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-::::::
+    Also see [Filebeat and systemd](/reference/filebeat/running-with-systemd.md).
+    ::::::
 
-::::::{tab-item} Windows
-```sh
-PS C:\Program Files\filebeat> Start-Service filebeat
-```
+    ::::::{tab-item} MacOS
+    ```sh
+    sudo chown root filebeat.yml <1>
+    sudo chown root modules.d/nginx.yml <1>
+    sudo ./filebeat -e
+    ```
 
-By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
-::::::
+    1. You’ll be running Filebeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Filebeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+    ::::::
 
-:::::::
+    ::::::{tab-item} Linux
+    ```sh
+    sudo chown root filebeat.yml <1>
+    sudo chown root modules.d/nginx.yml <1>
+    sudo ./filebeat -e
+    ```
+
+    1. You’ll be running Filebeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Filebeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+    ::::::
+
+    ::::::{tab-item} Windows
+    ```sh
+    PS C:\Program Files\filebeat> Start-Service filebeat
+    ```
+
+    By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
+    ::::::
+
+    :::::::
+
 Filebeat should begin streaming events to {{es}}.
-
 
 ## Step 6: View your data in {{kib}} [view-data]
 
@@ -335,39 +332,14 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    <div class="tabs" data-tab-group="host">
-      <div role="tablist" aria-label="Open Kibana">
-        <button role="tab"
-                aria-selected="true"
-                aria-controls="cloud-tab-open-kibana"
-                id="cloud-open-kibana">
-          Elasticsearch Service
-        </button>
-        <button role="tab"
-                aria-selected="false"
-                aria-controls="self-managed-tab-open-kibana"
-                id="self-managed-open-kibana"
-                tabindex="-1">
-          Self-managed
-        </button>
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="cloud-tab-open-kibana"
-           aria-labelledby="cloud-open-kibana">
+    :::::::{tab-set}
+    ::::::{tab-item} Elasticsearch Service
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
-
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="self-managed-tab-open-kibana"
-           aria-labelledby="self-managed-open-kibana"
-           hidden="">
+    ::::::{tab-item} Self-managed
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
-
-      </div>
-    </div>
+    ::::::
+    :::::::
 
 2. In the side navigation, click **Discover**. To see Filebeat data, make sure the predefined `filebeat-*` data view is selected.
 

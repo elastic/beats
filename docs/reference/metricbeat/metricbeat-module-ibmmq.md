@@ -28,17 +28,11 @@ The image provides an option to easily enable metrics exporter using an environm
 
 The ibmmq module includes predefined dashboards with overview information of the monitored Queue Manager, including subscriptions, calls and messages.
 
-:::{image} images/metricbeat-ibmmq-calls.png
-:alt: metricbeat ibmmq calls
-:::
+![metricbeat ibmmq calls](images/metricbeat-ibmmq-calls.png)
 
-:::{image} images/metricbeat-ibmmq-messages.png
-:alt: metricbeat ibmmq messages
-:::
+![metricbeat ibmmq messages](images/metricbeat-ibmmq-messages.png)
 
-:::{image} images/metricbeat-ibmmq-subscriptions.png
-:alt: metricbeat ibmmq subscriptions
-:::
+![metricbeat ibmmq subscriptions](images/metricbeat-ibmmq-subscriptions.png)
 
 
 ## Example configuration [_example_configuration_31]
