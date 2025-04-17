@@ -189,12 +189,12 @@ shared:
   - &docker_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi'
-      from: '--platform=linux/amd64 docker.elastic.co/ubi9/ubi-minimal'
+      from: '--platform=linux/amd64 redhat/ubi9-minimal'
 
   - &docker_arm_ubi_spec
     extra_vars:
       image_name: '{{.BeatName}}-ubi'
-      from: '--platform=linux/arm64 docker.elastic.co/ubi9/ubi-minimal'
+      from: '--platform=linux/arm64 redhat/ubi9-minimal'
 
   - &docker_wolfi_spec
     extra_vars:
