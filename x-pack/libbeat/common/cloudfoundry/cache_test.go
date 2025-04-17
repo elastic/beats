@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/testing/testutils"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestClientCacheWrap(t *testing.T) {
@@ -32,7 +32,7 @@ func TestClientCacheWrap(t *testing.T) {
 		Name: "Foo", // use this field to track if from cache or from client
 	}
 	fakeClient := &fakeCFClient{app, 0}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	cache, err := newClientCacheWrap(fakeClient, "test", ttl, ttl, logger.Named("cloudfoundry"))
 	require.NoError(t, err)
 

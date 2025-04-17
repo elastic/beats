@@ -23,6 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -72,7 +73,7 @@ func TestBulkReadToItems(t *testing.T) {
 
 func TestBulkReadItemStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	reader := newJSONReader(response)
 	code, _, err := bulkReadItemStatus(logger, reader)
@@ -82,7 +83,7 @@ func TestBulkReadItemStatus(t *testing.T) {
 
 func TestESNoErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 200}}`)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	code, msg, err := readStatusItem(response, logger)
 
@@ -93,7 +94,7 @@ func TestESNoErrorStatus(t *testing.T) {
 
 func TestES1StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": "test error"}}`)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	code, msg, err := readStatusItem(response, logger)
 
@@ -104,7 +105,7 @@ func TestES1StyleErrorStatus(t *testing.T) {
 
 func TestES2StyleErrorStatus(t *testing.T) {
 	response := []byte(`{"create": {"status": 400, "error": {"reason": "test_error"}}}`)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	code, msg, err := readStatusItem(response, logger)
 
@@ -125,7 +126,7 @@ func TestES2StyleExtendedErrorStatus(t *testing.T) {
         }
       }
     }`)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	code, _, err := readStatusItem(response, logger)
 
 	assert.NoError(t, err)
