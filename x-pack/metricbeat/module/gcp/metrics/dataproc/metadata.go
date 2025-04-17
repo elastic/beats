@@ -11,8 +11,11 @@ import (
 	"sync"
 	"time"
 
+	compute "cloud.google.com/go/compute/apiv1"
+	"cloud.google.com/go/compute/apiv1/computepb"
 	monitoringpb "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/dataproc/v1"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -80,7 +83,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	if s.collectUserLabels {
 		metadata, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceRegion(resp))
 		if err != nil {
-			return gcp.MetadataCollectorData{}, err
+			return metadataCollectorData, err
 		}
 
 		if metadata.machineType != "" {
@@ -168,7 +171,12 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 
 	regionsToQuery := s.regions
 	if len(regionsToQuery) == 0 {
-		regionsToQuery = []string{"africa-south1", "asia-east1", "asia-east2", "asia-northeast1", "asia-northeast2", "asia-northeast3", "asia-south1", "asia-south2", "asia-southeast1", "asia-southeast2", "australia-southeast1", "australia-southeast2", "europe-central2", "europe-north1", "europe-north2", "europe-southwest1", "europe-west1", "europe-west10", "europe-west12", "europe-west2", "europe-west3", "europe-west4", "europe-west6", "europe-west8", "europe-west9", "me-central1", "me-central2", "me-west1", "northamerica-northeast1", "northamerica-northeast2", "northamerica-south1", "southamerica-east1", "southamerica-west1", "us-central1", "us-east1", "us-east4", "us-east5", "us-south1", "us-west1", "us-west2", "us-west3", "us-west4"}
+		regions, err := s.fetchAvailableRegions(ctx)
+		if err != nil {
+			s.logger.Errorf("error fetching available regions: %v", err)
+			return
+		}
+		regionsToQuery = regions
 	}
 
 	dataprocService, err := dataproc.NewService(ctx, s.opt...)
@@ -205,4 +213,36 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 
 	wg.Wait()
 	s.logger.Debugf("completed fetching dataproc clusters, found %d clusters", len(s.clusters))
+}
+
+// fetchAvailableRegions gets all available GCP regions
+func (s *metadataCollector) fetchAvailableRegions(ctx context.Context) ([]string, error) {
+	restClient, err := compute.NewRegionsRESTClient(ctx, s.opt...)
+	if err != nil {
+		return nil, fmt.Errorf("error getting client from compute regions service: %v", err)
+	}
+	defer restClient.Close()
+
+	regionsIt := restClient.List(ctx, &computepb.ListRegionsRequest{
+		Project: s.projectID,
+	})
+
+	var regions []string
+	for {
+		region, err := regionsIt.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil, fmt.Errorf("error getting next region from regions iterator: %v", err)
+		}
+
+		// Only include regions that are UP
+		if region.GetStatus() == "UP" {
+			regions = append(regions, region.GetName())
+		}
+	}
+
+	s.logger.Debugf("found %d available regions: %v", len(regions), regions)
+	return regions, nil
 }
