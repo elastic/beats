@@ -150,7 +150,7 @@ func (p *fileProspector) Init(
 			//  - The old identifier is neither native nor path
 			oldIdentifierName := fm.IdentifierName
 			if oldIdentifierName == identifierName ||
-				!(oldIdentifierName == nativeName || oldIdentifierName == pathName) {
+				(oldIdentifierName != nativeName && oldIdentifierName != pathName) {
 				return "", nil
 			}
 
@@ -325,8 +325,9 @@ func (p *fileProspector) onFSEvent(
 	ignoreSince time.Time,
 ) {
 	switch event.Op {
-	case loginp.OpCreate, loginp.OpWrite:
-		if event.Op == loginp.OpCreate {
+	case loginp.OpCreate, loginp.OpWrite, loginp.OpNotChanged:
+		switch event.Op {
+		case loginp.OpCreate:
 			log.Debugf("A new file %s has been found", event.NewPath)
 
 			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
@@ -334,8 +335,11 @@ func (p *fileProspector) onFSEvent(
 				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
 			}
 
-		} else if event.Op == loginp.OpWrite {
+		case loginp.OpWrite:
 			log.Debugf("File %s has been updated", event.NewPath)
+
+		case loginp.OpNotChanged:
+			log.Debugf("File %s has not changed, trying to start new harvester because 'delete' is enabled", event.NewPath)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
@@ -368,7 +372,7 @@ func (p *fileProspector) onFSEvent(
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unknown return value %v", event.Op)
+		log.Errorf("Unknown operation '%s'", event.Op.String())
 	}
 }
 

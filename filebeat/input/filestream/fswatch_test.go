@@ -268,6 +268,7 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
+		//nolint:staticcheck // It's a test
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -379,6 +380,7 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
+		//nolint:staticcheck // It's a test
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		fw := createWatcherWithConfig(t, paths, cfgStr)
@@ -814,6 +816,7 @@ scanner:
     offset: 0
     length: 1024
 `
+		//nolint:staticcheck // It's a test
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		// this file is 128 bytes long
@@ -840,7 +843,7 @@ scanner:
 		err = ns.Unpack(cfg)
 		require.NoError(t, err)
 
-		_, err = newFileWatcher(paths, ns)
+		_, err = newFileWatcher(paths, ns, false)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "fingerprint size 1 bytes cannot be smaller than 64 bytes")
 	})
@@ -908,7 +911,7 @@ func createWatcherWithConfig(t *testing.T, paths []string, cfgStr string) loginp
 	err = ns.Unpack(cfg)
 	require.NoError(t, err)
 
-	fw, err := newFileWatcher(paths, ns)
+	fw, err := newFileWatcher(paths, ns, false)
 	require.NoError(t, err)
 
 	return fw
