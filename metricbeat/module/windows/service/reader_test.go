@@ -22,8 +22,9 @@ package service
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestNewReader(t *testing.T) {
@@ -46,7 +47,7 @@ func TestOpenSCManager(t *testing.T) {
 	handle, err = openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	assert.NoError(t, err)
 	assert.NotEqual(t, handle, InvalidDatabaseHandle)
-	closeHandle(handle)
+	closeHandle(handle) //nolint:errcheck //safe to ignore
 }
 
 func TestGetMachineGUID(t *testing.T) {
