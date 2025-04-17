@@ -24,6 +24,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
@@ -61,9 +62,9 @@ func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 // NewWebsocketFollower performs environment construction including CEL
 // program and regexp compilation, and input metrics set-up for a websocket
 // stream follower.
-func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+func NewWebsocketFollower(ctx context.Context, env v2.Context, cfg config, cursor map[string]any, pub inputcursor.Publisher, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
 	s := websocketStream{
-		id:     id,
+		id:     env.ID,
 		cfg:    cfg,
 		cursor: cursor,
 		processor: processor{
@@ -71,7 +72,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id),
+			metrics: newInputMetrics(env),
 		},
 		// the token expiry handler will never trigger unless a valid expiry time is assigned
 		tokenExpiry: nil,
@@ -377,7 +378,6 @@ func (s *websocketStream) now() time.Time {
 }
 
 func (s *websocketStream) Close() error {
-	s.metrics.Close()
 	return nil
 }
 

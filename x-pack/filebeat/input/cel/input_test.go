@@ -31,6 +31,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
@@ -1989,10 +1990,11 @@ func TestInput(t *testing.T) {
 
 			id := "test_id:" + test.name
 			v2Ctx := v2.Context{
-				Logger:        logp.NewLogger("cel_test"),
-				ID:            id,
-				IDWithoutName: id,
-				Cancelation:   ctx,
+				Logger:          logp.NewLogger("cel_test"),
+				ID:              id,
+				IDWithoutName:   id,
+				Cancelation:     ctx,
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
 			client.done = func() {
