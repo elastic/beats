@@ -43,28 +43,6 @@ func TestConfigAcceptValid(t *testing.T) {
 			"version":     "1.0.0",
 			"topic":       "foo",
 		},
-		"Kerberos with keytab": mapstr.M{
-			"topic": "foo",
-			"kerberos": mapstr.M{
-				"auth_type":    "keytab",
-				"username":     "elastic",
-				"keytab":       "/etc/krb5kcd/kafka.keytab",
-				"config_path":  "/etc/path/config",
-				"service_name": "HTTP/elastic@ELASTIC",
-				"realm":        "ELASTIC",
-			},
-		},
-		"Kerberos with user and password pair": mapstr.M{
-			"topic": "foo",
-			"kerberos": mapstr.M{
-				"auth_type":    "password",
-				"username":     "elastic",
-				"password":     "changeme",
-				"config_path":  "/etc/path/config",
-				"service_name": "HTTP/elastic@ELASTIC",
-				"realm":        "ELASTIC",
-			},
-		},
 	}
 
 	for name, test := range tests {

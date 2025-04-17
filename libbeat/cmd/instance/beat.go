@@ -337,6 +337,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	}
 
 	logpConfig := logp.Config{}
+	logpConfig.AddCaller = true
 	logpConfig.Beat = b.Info.Name
 	logpConfig.Files.MaxSize = 1
 
@@ -465,8 +466,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		}
 	}
 
-	namespaceReg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
-
+	namespaceReg := b.Info.Monitoring.Namespace.GetRegistry()
 	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
 		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
