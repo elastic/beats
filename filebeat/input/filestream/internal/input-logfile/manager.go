@@ -162,13 +162,11 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 			" duplication, please add an ID and restart Filebeat")
 	}
 
-	metricsID := settings.ID
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
 		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
 			"will lead to data duplication, please use a different ID. Metrics "+
 			"collection has been disabled on this input.", settings.ID)
-		metricsID = ""
 	}
 
 	// TODO: improve how inputs with empty IDs are tracked.
@@ -211,7 +209,6 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		manager:          cim,
 		ackCH:            cim.ackCH,
 		userID:           settings.ID,
-		metricsID:        metricsID,
 		prospector:       prospector,
 		harvester:        harvester,
 		sourceIdentifier: sourceIdentifier,

@@ -47,7 +47,7 @@ const (
 	packageStagingDir = "build/package"
 
 	// defaultBinaryName specifies the output file for zip and tar.gz.
-	defaultBinaryName = "{{.Name}}{{if .FIPS}}-fips{{end}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
+	defaultBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 )
 
 // PackageType defines the file format of the package (e.g. zip, rpm, etc).
@@ -529,7 +529,7 @@ func (s PackageSpec) rootDir() string {
 
 	// NOTE: This uses .BeatName instead of .Name because we wanted the internal
 	// directory to not include "-oss".
-	return s.MustExpand("{{.BeatName}}{{if .FIPS}}-fips{{end}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}")
+	return s.MustExpand("{{.BeatName}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}")
 }
 
 // PackageZip packages a zip file.
@@ -728,7 +728,7 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 	}
 	defer os.Remove(inputTar)
 
-	outputFile, err := spec.Expand("{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.Arch}}{{if .FIPS}}-fips{{end}}")
+	outputFile, err := spec.Expand("{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}-{{.Arch}}")
 	if err != nil {
 		return err
 	}

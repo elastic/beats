@@ -66,6 +66,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
 - Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
+- Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
+- Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
 
 *Osquerybeat*
 
@@ -125,6 +127,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - All standard queue metrics are now included in metrics monitoring, including: `added.{events, bytes}`, `consumed.{events, bytes}`, `removed.{events, bytes}`, and `filled.{events, bytes, pct}`. {pull}42439[42439]
 - The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
 - Restored event Meta fields in the Elasticsearch output's error logs. {pull}42559[42559]
+- Restore `maintainer` label for container images {pull}43683[43683]
 
 *Auditbeat*
 
@@ -204,6 +207,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 
 *Heartbeat*
 
@@ -241,6 +245,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
 - Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
+- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 
 *Osquerybeat*
 
@@ -371,6 +376,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update CEL mito extensions to v1.17.0. {pull}42851[42851]
 - Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
 - Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+- Update CEL mito extensions to v1.18.0. {pull}43855[43855]
 
 *Auditbeat*
 
@@ -383,6 +391,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
+- Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
 
 *Metricbeat*
 
@@ -431,6 +440,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
 - Log every 401 response from Kubernetes API Server {pull}42714[42714]
 - Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
+- Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 
 *Metricbeat*
@@ -442,7 +453,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Increase maximum query timeout to 24 hours {pull}42356[42356]
 
 *Packetbeat*
-
+- Add `tls.server.ja3s` tls fingerprint {pull}43284[43284]
 
 *Winlogbeat*
 
