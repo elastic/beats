@@ -180,9 +180,10 @@ func openQueue(t *testing.T, be backend) *quark.Queue {
 	attr := quark.DefaultQueueAttr()
 	attr.HoldTime = 25
 	attr.Flags &= ^quark.QQ_ALL_BACKENDS
-	if be == Ebpf {
+	switch be {
+	case Ebpf:
 		attr.Flags |= quark.QQ_EBPF
-	} else if be == Kprobe {
+	case Kprobe:
 		attr.Flags |= quark.QQ_KPROBE
 	}
 	qq, err := quark.OpenQueue(attr, 1)
@@ -240,7 +241,7 @@ func drainFirstOfPid(t *testing.T, qq *quark.Queue, pid int) quark.Event {
 			if !wantedEvent(qev) {
 				continue
 			}
-			if qev.Process.Pid == uint32(pid) {
+			if int(qev.Process.Pid) == pid {
 				return qev
 			}
 		}
@@ -264,7 +265,9 @@ func firstEventOfPid(t *testing.T, events []mb.Event, pid int) mb.Event {
 	for _, event := range events {
 		pid2, err := event.RootFields.GetValue("process.pid")
 		require.NoError(t, err)
-		if pid2.(uint32) == uint32(pid) {
+		x, ok := pid2.(uint32)
+		require.True(t, ok)
+		if x == uint32(pid) { //nolint:gosec // pid in kernel is 32bit
 			return event
 		}
 	}
@@ -299,10 +302,10 @@ func makeSelfEvent(t *testing.T, qp quark.Process, be backend) mb.Event {
 			"process.name":                          qp.Comm,
 			"process.args":                          qp.Cmdline,
 			"process.args_count":                    len(qp.Cmdline),
-			"process.pid":                           uint32(os.Getpid()),
+			"process.pid":                           uint32(os.Getpid()), //nolint:gosec // pid in kernel is 32bit
 			"process.executable":                    exe,
-			"process.parent.pid":                    uint32(os.Getppid()),
-			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)),
+			"process.parent.pid":                    uint32(os.Getppid()),                  //nolint:gosec // pid in kernel is 32bit
+			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)), //nolint:gosec // 292 billion years is enough
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
 			"user.effective.id":                     uint32(0),
@@ -362,10 +365,10 @@ func makeEventOfCmd(t *testing.T, cmd *exec.Cmd, qev quark.Event, be backend) mb
 			"process.name":                          "true",
 			"process.args":                          []string{"/bin/true"},
 			"process.args_count":                    1,
-			"process.pid":                           uint32(cmd.Process.Pid),
+			"process.pid":                           uint32(cmd.Process.Pid), //nolint:gosec // pid in kernel is 32bit
 			"process.executable":                    "/bin/true",
-			"process.parent.pid":                    uint32(os.Getpid()),
-			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)),
+			"process.parent.pid":                    uint32(os.Getpid()),                   //nolint:gosec // pid in kernel is 32bit
+			"process.start":                         time.Unix(0, int64(qp.Proc.TimeBoot)), //nolint:gosec // 292 billion years is enough
 			"user.id":                               uint32(0),
 			"user.group.id":                         uint32(0),
 			"user.effective.id":                     uint32(0),

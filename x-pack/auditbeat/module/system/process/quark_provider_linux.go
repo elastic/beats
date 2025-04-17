@@ -48,7 +48,7 @@ func init() {
 type QuarkMetricSet struct {
 	MetricSet
 	queue        *quark.Queue // Quark runtime state
-	selfMntNsIno uint32       // Mnt inode from current process
+	selfMntNsIno uint64       // Mnt inode from current process
 	cachedHasher *hasher.CachedHasher
 }
 
@@ -65,7 +65,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch self mount inode: %w", err)
 	}
-	qm.selfMntNsIno = uint32(ino64)
+	qm.selfMntNsIno = ino64
 	qm.cachedHasher, err = hasher.NewFileHasherWithCache(qm.config.HasherConfig, 4096)
 	if err != nil {
 		return nil, fmt.Errorf("can't create hash cache: %w", err)
@@ -82,11 +82,12 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("can't open quark queue: %w", err)
 	}
 	stats := qm.queue.Stats()
-	if stats.Backend == quark.QQ_EBPF {
+	switch stats.Backend {
+	case quark.QQ_EBPF:
 		qm.log.Info("quark using EBPF")
-	} else if stats.Backend == quark.QQ_KPROBE {
+	case quark.QQ_KPROBE:
 		qm.log.Info("quark using KPROBES")
-	} else {
+	default:
 		qm.queue.Close()
 		qm.cachedHasher.Close()
 		return nil, fmt.Errorf("quark has an invalid backend")
@@ -192,7 +193,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 
 	// Ids
 	event.RootFields.Put("process.parent.pid", process.Proc.Ppid)
-	startTime := time.Unix(0, int64(process.Proc.TimeBoot))
+	startTime := time.Unix(0, int64(process.Proc.TimeBoot)) //nolint:gosec // 292 billion years is enough
 	if ms.HostID() != "" {
 		// TODO unify with sessionview and guarantee loss of precision
 		event.RootFields.Put("process.entity_id",
@@ -235,7 +236,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 	// the file. When quark is running on kprobes, there are
 	// limitations concerning the full path of the filename, in
 	// those cases, the path won't start with a slash.
-	if process.Proc.MntInonum == ms.selfMntNsIno && len(process.Filename) > 0 && process.Filename[0] == '/' {
+	if uint64(process.Proc.MntInonum) == ms.selfMntNsIno && len(process.Filename) > 0 && process.Filename[0] == '/' {
 		hashes, err := ms.cachedHasher.HashFile(process.Filename)
 		if err != nil {
 			processErr = fmt.Errorf("failed to hash executable %v for PID %v: %w",
@@ -325,11 +326,12 @@ func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
 	quarkMetrics.aggregations.Set(stats.Aggregations)
 	quarkMetrics.nonAggregations.Set(stats.NonAggregations)
 	quarkMetrics.lost.Set(stats.Lost)
-	if stats.Backend == quark.QQ_EBPF {
+	switch stats.Backend {
+	case quark.QQ_EBPF:
 		quarkMetrics.backend.Set("ebpf")
-	} else if stats.Backend == quark.QQ_KPROBE {
+	case quark.QQ_KPROBE:
 		quarkMetrics.backend.Set("kprobe")
-	} else {
+	default:
 		quarkMetrics.backend.Set("invalid")
 	}
 
