@@ -38,6 +38,8 @@ type BaseReceiver struct {
 	Logger   *zap.Logger
 }
 
+// For now, BaseReceiver.Start() only kicks of monitoring server.
+// We will include internal telemetry and instrumentations related info in future.
 func (b *BaseReceiver) Start() error {
 	if err := b.startMonitoring(); err != nil {
 		return fmt.Errorf("could not start the HTTP server for the monitoring API: %w", err)
