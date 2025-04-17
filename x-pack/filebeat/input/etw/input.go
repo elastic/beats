@@ -7,6 +7,7 @@
 package etw
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -124,20 +125,26 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 	// Handle realtime session creation or attachment
 	if e.etwSession.Realtime {
-		if !e.etwSession.NewSession {
+		switch e.etwSession.NewSession {
+		case true:
+			// Create a new realtime session
+			// If it fails with ERROR_ALREADY_EXISTS we try to attach to it
+			createErr := e.operator.createRealtimeSession(e.etwSession)
+			if createErr == nil {
+				e.log.Debug("created new session")
+				break
+			}
+			if !errors.Is(createErr, etw.ERROR_ALREADY_EXISTS) {
+				return fmt.Errorf("realtime session could not be created: %w", createErr)
+			}
+			e.log.Debug("session already exists, trying to attach to it")
+			fallthrough
+		case false:
 			// Attach to an existing session
-			err = e.operator.attachToExistingSession(e.etwSession)
-			if err != nil {
+			if err := e.operator.attachToExistingSession(e.etwSession); err != nil {
 				return fmt.Errorf("unable to retrieve handler: %w", err)
 			}
 			e.log.Debug("attached to existing session")
-		} else {
-			// Create a new realtime session
-			err = e.operator.createRealtimeSession(e.etwSession)
-			if err != nil {
-				return fmt.Errorf("realtime session could not be created: %w", err)
-			}
-			e.log.Debug("created new session")
 		}
 	}
 

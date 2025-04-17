@@ -23,10 +23,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestNewReader(t *testing.T) {
-	reader, err := NewReader()
+	reader, err := NewReader(logp.L())
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
 	defer reader.Close()
@@ -57,7 +59,7 @@ func TestGetMachineGUID(t *testing.T) {
 func TestRead(t *testing.T) {
 	t.Skip("Flaky test: https://github.com/elastic/beats/issues/22171")
 
-	reader, err := NewReader()
+	reader, err := NewReader(logp.L())
 	assert.NoError(t, err)
 	result, err := reader.Read()
 	assert.NoError(t, err)
