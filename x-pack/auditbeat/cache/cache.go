@@ -4,10 +4,6 @@
 
 package cache
 
-import (
-	"maps"
-)
-
 // Cache is just a map being used as a cache.
 type Cache[V Cacheable] struct {
 	hashMap map[uint64]V
