@@ -6,6 +6,7 @@ package dataproc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -219,7 +220,7 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 func (s *metadataCollector) fetchAvailableRegions(ctx context.Context) ([]string, error) {
 	restClient, err := compute.NewRegionsRESTClient(ctx, s.opt...)
 	if err != nil {
-		return nil, fmt.Errorf("error getting client from compute regions service: %v", err)
+		return nil, fmt.Errorf("error getting client from compute regions service: %w", err)
 	}
 	defer restClient.Close()
 
@@ -230,11 +231,11 @@ func (s *metadataCollector) fetchAvailableRegions(ctx context.Context) ([]string
 	var regions []string
 	for {
 		region, err := regionsIt.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
-			return nil, fmt.Errorf("error getting next region from regions iterator: %v", err)
+			return nil, fmt.Errorf("error getting next region from regions iterator: %w", err)
 		}
 
 		// Only include regions that are UP
