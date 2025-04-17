@@ -12287,19 +12287,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-<<<<<<< HEAD
-Version: v0.18.9
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.18.9/LICENSE:
-=======
 Version: v0.19.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.19.1/LICENSE:
->>>>>>> 9ecf8c484 ([mbreceiver][fbreceiver] - use logp.DefaultConfig (#43800))
 
                                  Apache License
                            Version 2.0, January 2004
