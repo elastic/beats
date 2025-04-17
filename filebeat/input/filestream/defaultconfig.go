@@ -25,7 +25,7 @@ func defaultCloserConfig() closerConfig {
 	return closerConfig{
 		OnStateChange: stateChangeCloserConfig{
 			CheckInterval: 5 * time.Second,
-			Removed:       false, // States are only cleaned if the harvester is closed
+			Removed:       false, // It's ok to leave clean_removed: true
 			Inactive:      5 * time.Minute,
 			Renamed:       false,
 		},
