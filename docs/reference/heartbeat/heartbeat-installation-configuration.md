@@ -31,7 +31,7 @@ To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www
 ::::::
 
 ::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/deploy-cluster.md).
+To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
 :::::::
