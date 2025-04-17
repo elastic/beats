@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -107,7 +107,7 @@ func TestMakeRedis(t *testing.T) {
 	beatInfo := beat.Info{Beat: "libbeat", Version: "1.2.3"}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 			beatInfo.Logger = logger
 			cfg, err := config.NewConfigFrom(test.config)
 			assert.NoError(t, err)

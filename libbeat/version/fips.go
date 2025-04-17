@@ -15,24 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build windows
+//go:build requirefips
 
-package service
+package version
 
-import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-)
-
-func TestGetServiceStates(t *testing.T) {
-	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
-	assert.NoError(t, err)
-	assert.NotEqual(t, handle, InvalidDatabaseHandle)
-	services, err := GetServiceStates(logptest.NewTestingLogger(t, ""), handle, ServiceStateAll, map[string]struct{}{})
-	assert.NoError(t, err)
-	assert.True(t, len(services) > 0)
-	closeHandle(handle) //nolint:errcheck //safe to ignore
-}
+// Set FIPSDistribution to true for FIPS builds.
+const FIPSDistribution bool = true
