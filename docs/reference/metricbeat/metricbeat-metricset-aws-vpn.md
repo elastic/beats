@@ -31,9 +31,7 @@ iam:ListAccountAliases
 
 The aws vpn metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-vpn-overview.png
-:alt: metricbeat aws vpn overview
-:::
+![metricbeat aws vpn overview](images/metricbeat-aws-vpn-overview.png)
 
 
 ## Configuration example [_configuration_example_17]

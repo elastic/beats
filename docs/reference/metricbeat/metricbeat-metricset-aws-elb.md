@@ -26,9 +26,7 @@ iam:ListAccountAliases
 
 The aws elb metricset comes with a predefined dashboard for classic ELB. For example:
 
-:::{image} images/metricbeat-aws-elb-overview.png
-:alt: metricbeat aws elb overview
-:::
+![metricbeat aws elb overview](images/metricbeat-aws-elb-overview.png)
 
 
 ## Configuration example [_configuration_example_6]

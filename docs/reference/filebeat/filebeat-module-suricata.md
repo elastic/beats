@@ -81,15 +81,11 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with sample dashboards. For example:
 
-:::{image} images/filebeat-suricata-events.png
-:alt: filebeat suricata events
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat suricata events](images/filebeat-suricata-events.png)
 
-:::{image} images/filebeat-suricata-alerts.png
-:alt: filebeat suricata alerts
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat suricata alerts](images/filebeat-suricata-alerts.png)
 
 
 ## Fields [_fields_51]

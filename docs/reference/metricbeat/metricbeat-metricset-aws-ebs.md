@@ -26,9 +26,7 @@ iam:ListAccountAliases
 
 The aws ebs metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-ebs-overview.png
-:alt: metricbeat aws ebs overview
-:::
+![metricbeat aws ebs overview](images/metricbeat-aws-ebs-overview.png)
 
 
 ## Configuration example [_configuration_example_4]

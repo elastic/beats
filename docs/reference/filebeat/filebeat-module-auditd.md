@@ -88,10 +88,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with a sample dashboard showing an overview of the audit log data. You can build more specific dashboards that are tailored to the audit rules that you use on your systems.
 
-:::{image} images/kibana-audit-auditd.png
-:alt: kibana audit auditd
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana audit auditd](images/kibana-audit-auditd.png)
 
 
 ## Fields [_fields_5]
