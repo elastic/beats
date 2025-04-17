@@ -7,12 +7,14 @@
 package cloudfoundry
 
 import (
-	"crypto/sha256"
 	"encoding/base64"
+	"strconv"
+
+	"github.com/cespare/xxhash/v2"
 )
 
 // sanitizeCacheName returns a unique string that can be used safely as part of a file name
 func sanitizeCacheName(name string) string {
-	hash := sha256.Sum224([]byte(name))
-	return base64.RawURLEncoding.EncodeToString(hash[:])
+	h := xxhash.Sum64([]byte(name))
+	return base64.RawURLEncoding.EncodeToString([]byte(strconv.FormatUint(h, 10)))
 }
