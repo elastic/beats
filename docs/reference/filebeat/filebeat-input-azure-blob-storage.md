@@ -390,34 +390,27 @@ filebeat.inputs:
 
 **Explanation :** In this configuration even though we have specified `max_workers = 10`, `poll = true` and `poll_interval = 15s` at the root level, both the containers will override these values with their own respective values which are defined as part of their sub attibutes.
 
-[float]
-=== Metrics
-
-This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+## Metrics [_metrics]
+This input exposes metrics under the [HTTP monitoring endpoint](/reference/filebeat/http-endpoint.md).
 These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.
 
-[options="header"]
-|=======
-| Metric                                      | Description
-| `url`                                       | URL of the input resource.
-| `errors_total`                              | Total number of errors encountered by the input.
-| `decode_errors_total`                       | Total number of decode errors encountered by the input.
-| `abs_blobs_requested_total`                 | Total number of ABS blobs downloaded.
-| `abs_blobs_published_total`                 | Total number of ABS blobs processed that were published.
-| `abs_blobs_listed_total`                    | Total number of ABS blobs returned by list operations.
-| `abs_bytes_processed_total`                 | Total number of ABS bytes processed.
-| `abs_events_created_total`                  | Total number of events created from processing ABS data.
-| `abs_blobs_inflight_gauge`                  | Number of ABS blobs inflight (gauge).
-| `abs_jobs_scheduled_after_validation`       | Histogram of the number of jobs scheduled after validation.
-| `abs_blob_processing_time`                  | Histogram of the elapsed ABS blob processing times in nanoseconds (start of download to completion of parsing).
-| `abs_blob_size_in_bytes`                    | Histogram of processed ABS blob size in bytes.
-| `abs_events_per_blob`                       | Histogram of event count per ABS blob.
-| `source_lag_time`                           | Histogram of the time between the source (Updated) timestamp and the time the blob was read, in nanoseconds.
-|=======
-
-## Common input options [_common_input_options]
-
+| Metric | Description |
+| --- | --- |
+| `url`                                 | URL of the input resource.
+| `errors_total`                        | Total number of errors encountered by the input.
+| `decode_errors_total`                 | Total number of decode errors encountered by the input.
+| `abs_blobs_requested_total`           | Total number of ABS blobs downloaded.
+| `abs_blobs_published_total`           | Total number of ABS blobs processed that were published.
+| `abs_blobs_listed_total`              | Total number of ABS blobs returned by list operations.
+| `abs_bytes_processed_total`           | Total number of ABS bytes processed.
+| `abs_events_created_total`            | Total number of events created from processing ABS data.
+| `abs_blobs_inflight_gauge`            | Number of ABS blobs inflight (gauge).
+| `abs_jobs_scheduled_after_validation` | Histogram of the number of jobs scheduled after validation.
+| `abs_blob_processing_time`            | Histogram of the elapsed ABS blob processing times in nanoseconds (start of download to completion of parsing).
+| `abs_blob_size_in_bytes`              | Histogram of processed ABS blob size in bytes.
+| `abs_events_per_blob`                 | Histogram of event count per ABS blob.
+| `source_lag_time`                     | Histogram of the time between the source (Updated) timestamp and the time the blob was read, in nanoseconds.
 
 
 ## Common options [filebeat-input-abs-common-options]
