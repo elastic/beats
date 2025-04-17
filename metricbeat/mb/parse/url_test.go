@@ -63,7 +63,7 @@ func TestParseURL(t *testing.T) {
 
 	t.Run("http+unix at root", func(t *testing.T) {
 		rawURL := "http+unix:///var/lib/docker.sock"
-		hostData, err := ParseURL(rawURL, "http", "", "", "", "","")
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
 			assert.True(t, ok)
@@ -78,7 +78,7 @@ func TestParseURL(t *testing.T) {
 
 	t.Run("http+unix with path", func(t *testing.T) {
 		rawURL := "http+unix:///var/lib/docker.sock"
-		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "","")
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.UnixDialerBuilder)
 			assert.True(t, ok)
@@ -93,7 +93,7 @@ func TestParseURL(t *testing.T) {
 
 	t.Run("http+npipe at root", func(t *testing.T) {
 		rawURL := "http+npipe://./pipe/custom"
-		hostData, err := ParseURL(rawURL, "http", "", "", "", "","")
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
@@ -108,7 +108,7 @@ func TestParseURL(t *testing.T) {
 
 	t.Run("http+npipe with path", func(t *testing.T) {
 		rawURL := "http+npipe://./pipe/custom"
-		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "","")
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
@@ -123,7 +123,7 @@ func TestParseURL(t *testing.T) {
 
 	t.Run("http+npipe short with", func(t *testing.T) {
 		rawURL := "http+npipe:///custom"
-		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "","")
+		hostData, err := ParseURL(rawURL, "http", "", "", "apath", "", "")
 		if assert.NoError(t, err) {
 			transport, ok := hostData.Transport.(*dialer.NpipeDialerBuilder)
 			assert.True(t, ok)
@@ -138,7 +138,7 @@ func TestParseURL(t *testing.T) {
 
 	t.Run("npipe", func(t *testing.T) {
 		rawURL := "npipe://./pipe/docker_engine"
-		hostData, err := ParseURL(rawURL, "tcp", "", "", "", "","")
+		hostData, err := ParseURL(rawURL, "tcp", "", "", "", "", "")
 		if assert.NoError(t, err) {
 			assert.Equal(t, "npipe://./pipe/docker_engine", hostData.URI)
 			assert.Equal(t, "npipe://./pipe/docker_engine", hostData.SanitizedURI)
@@ -150,7 +150,7 @@ func TestParseURL(t *testing.T) {
 
 	t.Run("set default user", func(t *testing.T) {
 		rawURL := "http://:secret@localhost"
-		h, err := ParseURL(rawURL, "https", "root", "passwd", "", "","")
+		h, err := ParseURL(rawURL, "https", "root", "passwd", "", "", "")
 		if assert.NoError(t, err) {
 			assert.Equal(t, "http://root:secret@localhost", h.URI)
 			assert.Equal(t, "root", h.User)
@@ -160,49 +160,47 @@ func TestParseURL(t *testing.T) {
 
 	t.Run("set default password", func(t *testing.T) {
 		rawURL := "http://admin@localhost"
-		h, err := ParseURL(rawURL, "https", "root", "passwd", "", "","")
+		h, err := ParseURL(rawURL, "https", "root", "passwd", "", "", "")
 		if assert.NoError(t, err) {
 			assert.Equal(t, "http://admin:passwd@localhost", h.URI)
 			assert.Equal(t, "admin", h.User)
 			assert.Equal(t, "passwd", h.Password)
 		}
 	})
-	
-    t.Run("default port set", func(t *testing.T) {
-        rawURL := "localhost"
-        hostData, err := ParseURL(rawURL, "http", "", "", "", "9090", "")
-        if assert.NoError(t, err) {
-            assert.Equal(t, "http://localhost:9090", hostData.URI)
-            assert.Equal(t, "http://localhost:9090", hostData.SanitizedURI)
-            assert.Equal(t, "localhost:9090", hostData.Host)
-        }
-    })
 
+	t.Run("default port set", func(t *testing.T) {
+		rawURL := "localhost"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "9090", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, "http://localhost:9090", hostData.URI)
+			assert.Equal(t, "http://localhost:9090", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:9090", hostData.Host)
+		}
+	})
 
-    t.Run("default port set with explicit port", func(t *testing.T) {
-        rawURL := "localhost:8080"
-        hostData, err := ParseURL(rawURL, "http", "", "", "", "9090", "")
-        if assert.NoError(t, err) {
-            assert.Equal(t, "http://localhost:8080", hostData.URI)
-            assert.Equal(t, "http://localhost:8080", hostData.SanitizedURI)
-            assert.Equal(t, "localhost:8080", hostData.Host)
-        }
-    })
+	t.Run("default port set with explicit port", func(t *testing.T) {
+		rawURL := "localhost:8080"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "9090", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, "http://localhost:8080", hostData.URI)
+			assert.Equal(t, "http://localhost:8080", hostData.SanitizedURI)
+			assert.Equal(t, "localhost:8080", hostData.Host)
+		}
+	})
 
-    t.Run("default port not set", func(t *testing.T) {
-        rawURL := "localhost"
-        hostData, err := ParseURL(rawURL, "http", "", "", "", "", "")
-        if assert.NoError(t, err) {
-            assert.Equal(t, "http://localhost", hostData.URI)
-            assert.Equal(t, "http://localhost", hostData.SanitizedURI)
-            assert.Equal(t, "localhost", hostData.Host)
-        }
-    })
-
+	t.Run("default port not set", func(t *testing.T) {
+		rawURL := "localhost"
+		hostData, err := ParseURL(rawURL, "http", "", "", "", "", "")
+		if assert.NoError(t, err) {
+			assert.Equal(t, "http://localhost", hostData.URI)
+			assert.Equal(t, "http://localhost", hostData.SanitizedURI)
+			assert.Equal(t, "localhost", hostData.Host)
+		}
+	})
 
 	t.Run("don't overwrite empty password", func(t *testing.T) {
 		rawURL := "http://admin:@localhost"
-		h, err := ParseURL(rawURL, "https", "root", "passwd", "", "","")
+		h, err := ParseURL(rawURL, "https", "root", "passwd", "", "", "")
 		if assert.NoError(t, err) {
 			assert.Equal(t, "http://admin:@localhost", h.URI)
 			assert.Equal(t, "admin", h.User)

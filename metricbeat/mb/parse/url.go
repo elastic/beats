@@ -117,7 +117,7 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	return NewHostDataFromURLWithTransport(dialer.NewDefaultDialerBuilder(), u)
 }
 
-// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjonction of the
+// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjunction of the
 // url, this is useful if you use a combined scheme like "http+unix://" or "http+npipe".
 func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.HostData {
 	var user, pass string
@@ -199,7 +199,7 @@ func getURL(
 
 	u, err := url.Parse(rawURL)
 	if err != nil {
-		return nil, t, fmt.Errorf("error parsing URL: %v", err)
+		return nil, t, fmt.Errorf("error parsing URL: %w", err)
 	}
 
 	// discover the transport to use to communicate with the host if we have a combined scheme.
@@ -232,7 +232,7 @@ func getURL(
 			u.Path = "/" + segs[1]
 		}
 
-		p = `\\.\pipe\` + strings.Replace(p, "/", "\\", -1)
+		p = `\\.\pipe\` + strings.ReplaceAll(p, "/", "\\")
 		t = dialer.NewNpipeDialerBuilder(p)
 	default:
 		t = dialer.NewDefaultDialerBuilder()
@@ -251,7 +251,7 @@ func getURL(
 			if strings.Contains(err.Error(), "missing port") {
 				host = u.Host
 			} else {
-				return nil, t, fmt.Errorf("error parsing URL: %v", err)
+				return nil, t, fmt.Errorf("error parsing URL: %w", err)
 			}
 		}
 		if host == "" {
