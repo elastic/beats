@@ -86,7 +86,9 @@ func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 			data := buff.Bytes()
 			t.Logf("Debug Logs:%s\n", string(data))
 			t.Logf("Logs written to %s", f.Name())
-			f.Write(data)
+			if _, err := f.Write(data); err != nil {
+				t.Logf("could not write log file for debugging: %s", err)
+			}
 
 			return
 		}
@@ -530,6 +532,7 @@ func (e *inputTestingEnvironment) getOutputMessages() []string {
 	messages := make([]string, 0)
 	for _, c := range e.pipeline.clients {
 		for _, evt := range c.GetEvents() {
+			//nolint:errcheck // It's a test, we can force the type cast
 			messages = append(messages, evt.Fields["message"].(string))
 		}
 	}
