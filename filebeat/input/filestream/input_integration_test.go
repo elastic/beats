@@ -1107,7 +1107,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 		}
 		n := 0
 		for n <= iterations {
-			_, _ = f.Write([]byte(fmt.Sprintf("hello world %d\n", r*iterations+n)))
+			fmt.Fprintf(f, "hello world %d\n", r*iterations+n)
 			n += 1
 			time.Sleep(100 * time.Millisecond)
 		}

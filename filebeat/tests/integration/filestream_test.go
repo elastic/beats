@@ -972,7 +972,7 @@ func createFileAndWaitIngestion(
 	integration.GenerateLogFile(t, logFilepath, n, false)
 	msgLogFilepath := logFilepath
 	if runtime.GOOS == "windows" {
-		msgLogFilepath = strings.Replace(logFilepath, `\`, `\\`, -1)
+		msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
 	}
 
 	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
@@ -983,7 +983,7 @@ func createFileAndWaitIngestion(
 func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
 	for _, path := range files {
 		if runtime.GOOS == "windows" {
-			path = strings.Replace(path, `\`, `\\`, -1)
+			path = strings.ReplaceAll(path, `\`, `\\`)
 		}
 		eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", path)
 
