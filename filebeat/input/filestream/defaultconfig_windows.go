@@ -17,7 +17,7 @@
 
 //go:build windows
 
-package config
+package filestream
 
 import "time"
 
