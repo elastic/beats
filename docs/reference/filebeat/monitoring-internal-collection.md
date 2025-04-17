@@ -30,7 +30,7 @@ Use internal collectors to send {{beats}} monitoring data directly to your monit
     monitoring:
       enabled: true
       cloud.id: 'staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=='
-      cloud.auth: 'elastic:{pwd}'
+      cloud.auth: 'elastic:YOUR_PASSWORD'
     ```
 
     If you configured a different output, such as {{ls}} or you want to send Filebeat monitoring events to a separate {{es}} cluster (referred to as the *monitoring cluster*), you must specify additional configuration options. For example:
