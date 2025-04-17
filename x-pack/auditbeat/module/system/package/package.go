@@ -13,7 +13,6 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"hash/maphash"
 	"io"
 	"io/fs"
 	"os"
