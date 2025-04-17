@@ -15826,11 +15826,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/tk-btf@v0.1.0/L
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/toutoumomoma
-Version: v0.0.0-20240626215117-76e39db18dfb
+Version: v0.0.0-20250415211611-be287c9c0d0e
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/toutoumomoma@v0.0.0-20240626215117-76e39db18dfb/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/toutoumomoma@v0.0.0-20250415211611-be287c9c0d0e/LICENSE:
 
 Copyright ©2022 Elastic N.V. All rights reserved.
 Copyright ©2021 Dan Kortschak. All rights reserved.
