@@ -53,35 +53,37 @@ func (b *BaseReceiver) Shutdown() error {
 }
 
 func (b *BaseReceiver) startMonitoring() error {
-	if b.HttpConf.Enabled() {
-		var err error
-
-		b.Beat.RegisterMetrics()
-
-		statsReg := b.Beat.Info.Monitoring.StatsRegistry
-
-		// stats.beat
-		processReg := statsReg.GetRegistry("beat")
-		if processReg == nil {
-			processReg = statsReg.NewRegistry("beat")
-		}
-
-		// stats.system
-		systemReg := statsReg.GetRegistry("system")
-		if systemReg == nil {
-			systemReg = statsReg.NewRegistry("system")
-		}
-
-		err = metricreport.SetupMetrics(logp.NewLogger("metrics"), b.Beat.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
-		if err != nil {
-			return err
-		}
-		b.Beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), b.HttpConf, api.RegistryLookupFunc(b.Beat.Info.Monitoring.Namespace))
-		if err != nil {
-			return err
-		}
-		b.Beat.API.Start()
+	if !b.HttpConf.Enabled() {
+		return nil
 	}
+	var err error
+
+	b.Beat.RegisterMetrics()
+
+	statsReg := b.Beat.Info.Monitoring.StatsRegistry
+
+	// stats.beat
+	processReg := statsReg.GetRegistry("beat")
+	if processReg == nil {
+		processReg = statsReg.NewRegistry("beat")
+	}
+
+	// stats.system
+	systemReg := statsReg.GetRegistry("system")
+	if systemReg == nil {
+		systemReg = statsReg.NewRegistry("system")
+	}
+
+	err = metricreport.SetupMetrics(logp.NewLogger("metrics"), b.Beat.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
+	if err != nil {
+		return err
+	}
+	b.Beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), b.HttpConf, api.RegistryLookupFunc(b.Beat.Info.Monitoring.Namespace))
+	if err != nil {
+		return err
+	}
+	b.Beat.API.Start()
+
 	return nil
 }
 
