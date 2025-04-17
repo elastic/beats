@@ -45,6 +45,7 @@ steps:
           set -eo pipefail
           make -C auditbeat check update
           make check-no-changes
+          #test change
         retry:
           automatic:
             - limit: 1
