@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -60,7 +60,7 @@ func AssertNotStartedInputCanBeDone(t *testing.T, factory input.Factory, configM
 		Done: make(chan struct{}),
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	_, err = factory(config, Connector, context, logger)
 	assert.NoError(t, err)
 
