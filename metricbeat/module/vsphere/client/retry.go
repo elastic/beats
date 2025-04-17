@@ -40,7 +40,7 @@ func Retry(ctx context.Context, fn func() error) (err error) {
 			break
 		}
 
-		if numTries >= maxRetries-1 {
+		if numTries >= maxRetries {
 			// maxRetries hit
 			break
 		}

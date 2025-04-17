@@ -54,12 +54,12 @@ func TestLogout(t *testing.T) {
 			expectedErrorMessage: "",
 		},
 		{
-			name: "Logout fails 3 times",
+			name: "Logout fails 4 times (original try + 3 retries)",
 			mockClient: func(clientMock *MockLogouter) {
 				clientMock.EXPECT().
 					Logout(gomock.Any()).
 					Return(errors.New("logout failed")).
-					Times(3)
+					Times(4)
 			},
 			expectedErrorMessage: "logout failed",
 		},
