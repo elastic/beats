@@ -246,6 +246,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
 
 *Auditbeat*
 
