@@ -37,7 +37,11 @@ func GetTestTcpServer(host string, port int) (server.Server, error) {
 		return nil, err
 	}
 
-	logp.Info("Started listening for TCP on: %s:%d", host, port)
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		return nil, err
+	}
+	logger.Infof("Started listening for TCP on: %s:%d", host, port)
 	return &TcpServer{
 		tcpAddr:           addr,
 		receiveBufferSize: 1024,
