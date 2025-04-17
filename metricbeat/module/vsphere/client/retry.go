@@ -19,22 +19,37 @@ package client
 
 import (
 	"context"
+	"time"
 
-	"github.com/cenkalti/backoff/v5"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
 const maxRetries = 3
+const initialInterval = 500 * time.Millisecond
+const maxInterval = 1 * time.Minute
 
 // Retry attempts to execute the provided function `fn` with a retry mechanism.
 // It uses an exponential backoff strategy and retries up to a maximum number of attempts.
-func Retry(ctx context.Context, fn func() error) error {
-	_, err := backoff.Retry(ctx, func() (bool, error) {
-		err := fn()
-		return err == nil, err
-	},
-		backoff.WithBackOff(backoff.NewExponentialBackOff()),
-		backoff.WithMaxTries(maxRetries),
-	)
+func Retry(ctx context.Context, fn func() error) (err error) {
+	backoff := backoff.NewExpBackoff(ctx.Done(), initialInterval, maxInterval)
+
+	for numTries := 0; ; numTries++ {
+		err = fn()
+		if err == nil {
+			// function succeeded
+			break
+		}
+
+		if maxRetries > 0 && numTries >= maxRetries {
+			// maxRetries hit
+			break
+		}
+
+		if !backoff.Wait() {
+			// context cancelled
+			break
+		}
+	}
 
 	return err
 }
