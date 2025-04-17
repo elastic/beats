@@ -77,17 +77,13 @@ var:
 
 The best way to view CrowdStrike events and alert data is in the SIEM.
 
-:::{image} images/siem-alerts-cs.jpg
-:alt: siem alerts cs
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![siem alerts cs](images/siem-alerts-cs.jpg)
 
 For alerts, go to Detections → External alerts.
 
-:::{image} images/siem-events-cs.jpg
-:alt: siem events cs
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![siem events cs](images/siem-events-cs.jpg)
 
 And for all over event CrowdStrike Falcon event types, go to Host → Events.
 

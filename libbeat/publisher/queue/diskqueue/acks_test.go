@@ -23,7 +23,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type addFramesTestStep struct {
@@ -245,7 +245,7 @@ func runAddFramesTest(t *testing.T, name string, test addFramesTest) {
 	}
 	defer stateFile.Close()
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	dqa := newDiskQueueACKs(logger, test.position, stateFile)
 	dqa.nextFrameID = test.frameID
 	for _, step := range test.steps {

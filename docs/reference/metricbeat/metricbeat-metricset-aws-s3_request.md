@@ -27,9 +27,7 @@ iam:ListAccountAliases
 
 The aws s3_request metricset and s3_daily_storage metricset shares one predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-s3-overview.png
-:alt: metricbeat aws s3 overview
-:::
+![metricbeat aws s3 overview](images/metricbeat-aws-s3-overview.png)
 
 Note: If s3 request metrics are not enabled for the specific S3 bucket, some visualizations in this dashboard will be empty.
 

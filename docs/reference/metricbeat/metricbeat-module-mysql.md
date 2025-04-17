@@ -50,9 +50,7 @@ The mysql MetricSets were tested with MySQL and Percona 5.7 and 8.0 and are expe
 
 The mysql module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-mysql.png
-:alt: metricbeat mysql
-:::
+![metricbeat mysql](images/metricbeat-mysql.png)
 
 
 ## Example configuration [_example_configuration_46]
