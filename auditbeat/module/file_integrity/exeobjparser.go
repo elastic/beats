@@ -172,11 +172,8 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 		"file.pe.imphash",
 		"file.macho.symhash",
 		"file."+typ+".import_hash",
-		"file."+typ+".imports",
-		"file."+typ+".imports_names_entropy",
-		"file."+typ+".imports_names_var_entropy",
 	) {
-		h, symbols, err := f.ImportHash()
+		h, _, err := f.ImportHash()
 		if err != nil {
 			return err
 		}
@@ -193,6 +190,17 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 			if wantFields(fields, "file.macho.symhash") {
 				details["symhash"] = imphash
 			}
+		}
+	}
+
+	if wantFields(fields,
+		"file."+typ+".imports",
+		"file."+typ+".imports_names_entropy",
+		"file."+typ+".imports_names_var_entropy",
+	) {
+		symbols, err := f.Imports()
+		if err != nil {
+			return err
 		}
 		if len(symbols) != 0 {
 			if wantFields(fields, "file."+typ+".imports") {
@@ -214,19 +222,27 @@ func (fields exeObjParser) Parse(dst mapstr.M, path string) (err error) {
 
 	if wantFields(fields,
 		"file."+typ+".go_import_hash",
-		"file."+typ+".go_imports",
-		"file."+typ+".go_imports_names_entropy",
-		"file."+typ+".go_imports_names_var_entropy",
 	) {
-		h, symbols, err := f.GoSymbolHash(false)
+		h, _, err := f.GoSymbolHash(false)
 		if err != nil {
 			if err == toutoumomoma.ErrNotGoExecutable {
 				return nil
 			}
 			return err
 		}
-		if wantFields(fields, "file."+typ+".go_import_hash") {
-			details["go_import_hash"] = Digest(h)
+		details["go_import_hash"] = Digest(h)
+	}
+	if wantFields(fields,
+		"file."+typ+".go_imports",
+		"file."+typ+".go_imports_names_entropy",
+		"file."+typ+".go_imports_names_var_entropy",
+	) {
+		symbols, err := f.GoSymbols(false)
+		if err != nil {
+			if err == toutoumomoma.ErrNotGoExecutable {
+				return nil
+			}
+			return err
 		}
 		if len(symbols) != 0 {
 			if wantFields(fields, "file."+typ+".go_imports") {

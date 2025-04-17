@@ -184,7 +184,7 @@ require (
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
 	github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996
 	github.com/elastic/tk-btf v0.1.0
-	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
+	github.com/elastic/toutoumomoma v0.0.0-20250415211611-be287c9c0d0e
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/go-ole/go-ole v1.2.6
