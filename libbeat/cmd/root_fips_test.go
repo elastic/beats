@@ -93,8 +93,7 @@ func TestGenRootCmdWithSettings_TLSDefaults(t *testing.T) {
 		require.NoError(t, err)
 		var common tlscommon.Config
 		err = sslCfg.Unpack(&common)
-		require.NoError(t, err)
-		_, err = tlscommon.LoadTLSConfig(&common)
 		require.Error(t, err)
+		require.ErrorContains(t, err, "unsupported tls version")
 	})
 }
