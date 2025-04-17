@@ -182,6 +182,11 @@ class TestNats(metricbeat.BaseTest):
         """
         nats jetstream test
         """
+        # There were no consumer stats available prior to 2.9, so this test won't pass.
+        nats_version = self.COMPOSE_ENV["NATS_VERSION"]
+        if category == "consumer" and packaging.version.parse(nats_version) < packaging.version.parse("2.9.25"):
+            return
+
         self.render_config_template(modules=[{
             "name": "nats",
             "metricsets": ["jetstream"],

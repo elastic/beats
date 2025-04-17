@@ -299,3 +299,5 @@ Example:
     }
 }
 ```
+
+Note: `consumer` data is only available in JetStream versions 2.9+.
