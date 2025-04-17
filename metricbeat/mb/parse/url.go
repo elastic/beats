@@ -36,6 +36,7 @@ type URLHostParserBuilder struct {
 	DefaultUsername string
 	DefaultPassword string
 	DefaultScheme   string
+	DefaultPort     string
 	QueryParams     string
 }
 
@@ -104,7 +105,7 @@ func (b URLHostParserBuilder) Build() mb.HostParser {
 		// Combine paths and normalize
 		fullPath := strings.Trim(p.Join(basePath, path), "/")
 
-		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.QueryParams)
+		return ParseURL(host, b.DefaultScheme, user, pass, fullPath, b.DefaultPort, b.QueryParams)
 	}
 }
 
@@ -143,8 +144,8 @@ func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.Ho
 // ParseURL returns HostData object from a raw 'host' value and a series of
 // defaults that are added to the URL if not present in the rawHost value.
 // Values from the rawHost take precedence over the defaults.
-func ParseURL(rawHost, scheme, user, pass, path, query string) (mb.HostData, error) {
-	u, transport, err := getURL(rawHost, scheme, user, pass, path, query)
+func ParseURL(rawHost, scheme, user, pass, path, defaultport, query string) (mb.HostData, error) {
+	u, transport, err := getURL(rawHost, scheme, user, pass, path, defaultport, query)
 
 	if err != nil {
 		return mb.HostData{}, err
@@ -186,7 +187,7 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 // getURL constructs a URL from the rawHost value and adds the provided user,
 // password, path, and query params if one was not set in the rawURL value.
 func getURL(
-	rawURL, scheme, username, password, path, query string,
+	rawURL, scheme, username, password, path, defaultport, query string,
 ) (*url.URL, dialer.Builder, error) {
 
 	if parts := strings.SplitN(rawURL, "://", 2); len(parts) != 2 {
@@ -244,8 +245,8 @@ func getURL(
 			return nil, t, fmt.Errorf("error parsing URL: empty host")
 		}
 
-		// Validate the host. The port is optional.
-		host, _, err := net.SplitHostPort(u.Host)
+		// Validate the host.
+		host, port, err := net.SplitHostPort(u.Host)
 		if err != nil {
 			if strings.Contains(err.Error(), "missing port") {
 				host = u.Host
@@ -255,6 +256,10 @@ func getURL(
 		}
 		if host == "" {
 			return nil, t, fmt.Errorf("error parsing URL: empty host")
+		}
+		// Add default port to host if port is empty and defaultport is set
+		if port == "" && defaultport != "" {
+			u.Host = net.JoinHostPort(host, defaultport)
 		}
 	}
 
