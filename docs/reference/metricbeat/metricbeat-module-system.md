@@ -38,9 +38,7 @@ Note that in some cases a field like this may be missing from the System module 
 
 The System module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat_system_dashboard.png
-:alt: metricbeat system dashboard
-:::
+![metricbeat system dashboard](images/metricbeat_system_dashboard.png)
 
 
 ## Required permissions [_required_permissions]
