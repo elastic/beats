@@ -20,8 +20,8 @@
 package filestream
 
 import (
+	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -46,10 +46,12 @@ import (
 )
 
 type inputTestingEnvironment struct {
-	t          *testing.T
-	workingDir string
-	stateStore statestore.States
-	pipeline   *mockPipelineConnector
+	logger       *logp.Logger
+	loggerBuffer *bytes.Buffer
+	t            *testing.T
+	workingDir   string
+	stateStore   statestore.States
+	pipeline     *mockPipelineConnector
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -62,35 +64,43 @@ type registryEntry struct {
 	Cursor struct {
 		Offset int `json:"offset"`
 	} `json:"cursor"`
-	Meta interface{} `json:"meta,omitempty"`
+	Meta any `json:"meta,omitempty"`
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
-	logp.DevelopmentSetup(logp.ToObserverOutput())
+	// logp.NewInMemoryLocal will always use a console encoder, passing a
+	// JSONEncoderConfig will only change the keys, not the final encoding.
+	logger, buff := logp.NewInMemoryLocal("", logp.ConsoleEncoderConfig())
 
 	t.Cleanup(func() {
 		if t.Failed() {
-			t.Logf("Debug Logs:\n")
-			for _, log := range logp.ObserverLogs().TakeAll() {
-				data, err := json.Marshal(log)
-				if err != nil {
-					t.Errorf("failed encoding log as JSON: %s", err)
-				}
-				t.Logf("%s", string(data))
+			f, err := os.CreateTemp("", t.Name()+"-*")
+			if err != nil {
+				t.Errorf("cannot create temp file for logs: %s", err)
 			}
+
+			defer f.Close()
+
+			data := buff.Bytes()
+			t.Logf("Debug Logs:%s\n", string(data))
+			t.Logf("Logs written to %s", f.Name())
+			f.Write(data)
+
 			return
 		}
 	})
 
 	return &inputTestingEnvironment{
-		t:          t,
-		workingDir: t.TempDir(),
-		stateStore: openTestStatestore(),
-		pipeline:   &mockPipelineConnector{},
+		logger:       logger,
+		loggerBuffer: buff,
+		t:            t,
+		workingDir:   t.TempDir(),
+		stateStore:   openTestStatestore(),
+		pipeline:     &mockPipelineConnector{},
 	}
 }
 
-func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{}) v2.Input {
+func (e *inputTestingEnvironment) mustCreateInput(config map[string]any) v2.Input {
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
@@ -103,7 +113,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	return inp
 }
 
-func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2.Input, error) {
+func (e *inputTestingEnvironment) createInput(config map[string]any) (v2.Input, error) {
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
 	_ = manager.Init(&e.grp)
@@ -118,7 +128,7 @@ func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2
 
 func (e *inputTestingEnvironment) getManager() v2.InputManager {
 	e.pluginInitOnce.Do(func() {
-		e.plugin = Plugin(logp.L(), e.stateStore)
+		e.plugin = Plugin(e.logger, e.stateStore)
 	})
 	return e.plugin.Manager
 }
@@ -128,7 +138,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer func() { _ = grp.Stop() }()
-		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
+		inputCtx := v2.Context{Logger: e.logger, Cancelation: ctx, ID: "fake-ID"}
 		_ = inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }
@@ -677,7 +687,7 @@ func newMockACKHandler(starter context.Context, blocking bool, config beat.Clien
 }
 
 func blockingACKer(starter context.Context) beat.EventListener {
-	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+	return acker.EventPrivateReporter(func(acked int, private []any) {
 		for starter.Err() == nil {
 		}
 	})
