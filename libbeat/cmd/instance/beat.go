@@ -242,16 +242,17 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 
 	b := beat.Beat{
 		Info: beat.Info{
-			Beat:            name,
-			ElasticLicensed: elasticLicensed,
-			IndexPrefix:     indexPrefix,
-			Version:         v,
-			Name:            hostname,
-			Hostname:        hostname,
-			ID:              id,
-			FirstStart:      time.Now(),
-			StartTime:       time.Now(),
-			EphemeralID:     metricreport.EphemeralID(),
+			Beat:             name,
+			ElasticLicensed:  elasticLicensed,
+			IndexPrefix:      indexPrefix,
+			Version:          v,
+			Name:             hostname,
+			Hostname:         hostname,
+			ID:               id,
+			FirstStart:       time.Now(),
+			StartTime:        time.Now(),
+			EphemeralID:      metricreport.EphemeralID(),
+			FIPSDistribution: version.FIPSDistribution,
 		},
 		Fields:   fields,
 		Registry: reload.NewRegistry(),
@@ -329,6 +330,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	}
 
 	logpConfig := logp.Config{}
+	logpConfig.AddCaller = true
 	logpConfig.Beat = b.Info.Name
 	logpConfig.Files.MaxSize = 1
 
@@ -466,7 +468,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 		}
 	}
 
-	namespaceReg := b.Beat.Info.Monitoring.Namespace.GetRegistry()
+	namespaceReg := b.Info.Monitoring.Namespace.GetRegistry()
 	reg := b.Info.Monitoring.StatsRegistry.GetRegistry("libbeat")
 	if reg == nil {
 		reg = b.Info.Monitoring.StatsRegistry.NewRegistry("libbeat")
@@ -553,7 +555,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	log := b.Info.Logger.Named("beat")
-	log.Infof("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
+	log.Infof("Setup Beat: %s; Version: %s (FIPS-distribution: %v)", b.Info.Beat, b.Info.Version, b.Info.FIPSDistribution)
 	b.logSystemInfo(log)
 
 	err = b.registerESVersionCheckCallback()
