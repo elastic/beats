@@ -92,10 +92,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/kibana-mysql.png
-:alt: kibana mysql
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana mysql](images/kibana-mysql.png)
 
 
 ## Fields [_fields_33]

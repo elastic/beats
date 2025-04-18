@@ -22,9 +22,7 @@ The module is being tested with 1.4.2 and 1.9.3 versions of Consul.
 
 The Consul module comes with a predefined dashboard:
 
-:::{image} images/metricbeat-consul.png
-:alt: metricbeat consul
-:::
+![metricbeat consul](images/metricbeat-consul.png)
 
 
 ## Example configuration [_example_configuration_13]

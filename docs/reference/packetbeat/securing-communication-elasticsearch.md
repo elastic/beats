@@ -19,7 +19,7 @@ Authentication is specified in the Packetbeat configuration file:
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "packetbeat_writer" <1>
-      password: "{pwd}" <2>
+      password: "YOUR_PASSWORD" <2>
     ```
 
     1. This user needs the privileges required to publish events to {{es}}. To create a user like this, see [Create a *publishing* user](/reference/packetbeat/privileges-to-publish-events.md).
@@ -86,7 +86,7 @@ For example, specify a unique username and password to connect to Kibana like th
 setup.kibana:
   host: "mykibanahost:5601"
   username: "packetbeat_kib_setup" <1>
-  password: "{pwd}" <2>
+  password: "YOUR_PASSWORD" <2>
 ```
 
 1. This user needs privileges required to set up dashboards. To create a user like this, see [Create a *setup* user](/reference/packetbeat/privileges-to-setup-beats.md).
