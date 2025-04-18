@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/beats/v7/libbeat/processors/timeseries"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -342,7 +342,10 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	tags = append(tags, b.tags...)
 	tags = append(tags, cfg.EventMetadata.Tags...)
 	if len(tags) > 0 {
-		processors.add(actions.NewAddTags("tags", tags))
+		processors.add(newProcessor("add_tags", func(event *beat.Event) (*beat.Event, error) {
+			_ = mapstr.AddTagsWithKey(event.Fields, "tags", tags)
+			return event, nil
+		}))
 	}
 
 	// setup 3, 4, 5: client config fields + pipeline fields + client fields + dyn metadata
@@ -360,7 +363,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 		// With dynamic fields potentially changing at any time, we need to copy,
 		// so we do not change shared structures be accident.
 		fieldsNeedsCopy := needsCopy || cfg.DynamicFields != nil || hasKeyAnyOf(fields, builtin)
-		processors.add(actions.NewAddFields(fields, fieldsNeedsCopy, true))
+		processors.add(addfields.NewAddFields(fields, fieldsNeedsCopy, true))
 	}
 
 	if cfg.DynamicFields != nil {
@@ -375,7 +378,7 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 
 	// setup 6: add beats and host metadata
 	if meta := builtin; len(meta) > 0 {
-		processors.add(actions.NewAddFields(meta, needsCopy, false))
+		processors.add(addfields.NewAddFields(meta, needsCopy, false))
 	}
 
 	// setup 8: pipeline processors list
