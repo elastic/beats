@@ -56,7 +56,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		observer:     observer,
 		logsConsumer: beat.LogConsumer,
 		beatInfo:     beat,
-		log:          logp.NewLogger("otelconsumer"),
+		log:          beat.Logger.Named("otelconsumer"),
 	}
 
 	ocConfig := defaultConfig()

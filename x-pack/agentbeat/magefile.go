@@ -128,8 +128,14 @@ func Package() error {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 	fmt.Printf(">> Packaging agentbeat that includes %v\n", getIncludedBeats())
-	// specific packaging just for agentbeat
-	devtools.MustUsePackaging("agentbeat", "x-pack/agentbeat/dev-tools/packaging/packages.yml")
+
+	if devtools.FIPSBuild {
+		// FIPS specific packaging spec
+		devtools.MustUsePackaging("agentbeat_fips", "x-pack/agentbeat/dev-tools/packaging/packages.yml")
+	} else {
+		// specific packaging just for agentbeat
+		devtools.MustUsePackaging("agentbeat", "x-pack/agentbeat/dev-tools/packaging/packages.yml")
+	}
 
 	// Add metricbeat lightweight modules.
 	if err := metricbeat.CustomizeLightModulesPackaging(); err != nil {

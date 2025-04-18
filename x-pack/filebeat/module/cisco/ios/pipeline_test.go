@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
@@ -177,6 +178,7 @@ var testCases = []testCase{
 
 func TestFilebeatSyslogCisco(t *testing.T) {
 	logp.TestingSetup()
+	testutils.SkipIfFIPSOnly(t, "javascript processor uses SHA-1.")
 
 	p, err := javascript.NewFromConfig(
 		javascript.Config{File: "config/pipeline.js"},
