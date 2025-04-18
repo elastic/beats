@@ -132,7 +132,7 @@ func (s *Store) Get(key string, into interface{}) error {
 // Set returns an error if the store has been closed, the value can not be
 // encoded by the store, or the storage backend did failed.
 func (s *Store) Set(key string, from interface{}) error {
-	const operation = "store/get"
+	const operation = "store/set"
 	if err := s.active.Add(1); err != nil {
 		return &ErrorClosed{operation: operation, name: s.shared.name}
 	}
