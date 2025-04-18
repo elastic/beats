@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -211,7 +211,7 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 
 func TestPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promMetrics}, logp.NewLogger("test")}
+	p := &prometheus{mockFetcher{response: promMetrics}, logptest.NewTestingLogger(t, "test")}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -543,7 +543,7 @@ func TestPrometheus(t *testing.T) {
 // correctly processed
 func TestInfoMetricPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promInfoMetrics}, logp.NewLogger("test")}
+	p := &prometheus{mockFetcher{response: promInfoMetrics}, logptest.NewTestingLogger(t, "test")}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -1042,7 +1042,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
-		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logp.NewLogger("test")}
+		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logptest.NewTestingLogger(t, "test")}
 		_ = p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {

@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -51,7 +52,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err := mb.NewModule(c, mb.Registry)
+	module, metricsets, err := mb.NewModule(c, mb.Registry, logptest.NewTestingLogger(t, ""))
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)
 	assert.NoError(t, err)
@@ -64,7 +65,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err = mb.NewModule(c, mb.Registry)
+	module, metricsets, err = mb.NewModule(c, mb.Registry, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)

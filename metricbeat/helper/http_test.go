@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestTimeout(t *testing.T) {
@@ -321,3 +322,4 @@ func (*dummyModule) UnpackConfig(interface{}) error {
 }
 func (dummyModule) UpdateStatus(_ status.Status, _ string)    {}
 func (dummyModule) SetStatusReporter(_ status.StatusReporter) {}
+func (dummyModule) Logger() *logp.Logger                      { return nil }

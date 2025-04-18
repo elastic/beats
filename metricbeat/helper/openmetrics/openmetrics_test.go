@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -201,7 +201,7 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 
 func TestOpenMetrics(t *testing.T) {
 
-	p := &openmetrics{mockFetcher{response: openMetricsTestSamples}, logp.NewLogger("test")}
+	p := &openmetrics{mockFetcher{response: openMetricsTestSamples}, logptest.NewTestingLogger(t, "test")}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -1057,7 +1057,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
-		p := &openmetrics{mockFetcher{response: tc.openmetricsResponse}, logp.NewLogger("test")}
+		p := &openmetrics{mockFetcher{response: tc.openmetricsResponse}, logptest.NewTestingLogger(t, "test")}
 		_ = p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {

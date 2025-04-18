@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -84,7 +85,7 @@ func TestConfigValidation(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		_, _, err = mb.NewModule(c, mb.Registry)
+		_, _, err = mb.NewModule(c, mb.Registry, logptest.NewTestingLogger(t, ""))
 		if err != nil && test.err == "" {
 			t.Errorf("unexpected error in testcase %d: %v", i, err)
 			continue

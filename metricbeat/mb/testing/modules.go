@@ -66,6 +66,8 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type TestModule struct {
@@ -79,6 +81,7 @@ func (m *TestModule) Config() mb.ModuleConfig                   { return m.ModCo
 func (m *TestModule) UnpackConfig(to interface{}) error         { return m.RawConfig.Unpack(to) }
 func (m *TestModule) UpdateStatus(_ status.Status, _ string)    {}
 func (m *TestModule) SetStatusReporter(_ status.StatusReporter) {}
+func (m *TestModule) Logger() *logp.Logger                      { return nil }
 
 func NewTestModule(t testing.TB, config interface{}) *TestModule {
 	c, err := conf.NewConfigFrom(config)
@@ -125,7 +128,7 @@ func NewMetricSetsWithRegistry(t testing.TB, config interface{}, registry *mb.Re
 	if err != nil {
 		t.Fatal(err)
 	}
-	m, metricsets, err := mb.NewModule(c, registry)
+	m, metricsets, err := mb.NewModule(c, registry, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal("failed to create new MetricSet", err)
 	}

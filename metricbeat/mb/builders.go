@@ -47,12 +47,12 @@ var (
 // will be unpacked into ModuleConfig structs). r is the Register where the
 // ModuleFactory's and MetricSetFactory's will be obtained from. This method
 // returns a Module and its configured MetricSets or an error.
-func NewModule(config *conf.C, r *Register) (Module, []MetricSet, error) {
+func NewModule(config *conf.C, r *Register, logger *logp.Logger) (Module, []MetricSet, error) {
 	if !config.Enabled() {
 		return nil, nil, ErrModuleDisabled
 	}
 
-	bm, err := newBaseModuleFromConfig(config)
+	bm, err := newBaseModuleFromConfig(config, logger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -72,10 +72,11 @@ func NewModule(config *conf.C, r *Register) (Module, []MetricSet, error) {
 
 // newBaseModuleFromConfig creates a new BaseModule from config. The returned
 // BaseModule's name will always be lower case.
-func newBaseModuleFromConfig(rawConfig *conf.C) (BaseModule, error) {
+func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger) (BaseModule, error) {
 	baseModule := BaseModule{
 		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
+		logger:    logger,
 	}
 	err := rawConfig.Unpack(&baseModule.config)
 	if err != nil {
@@ -198,7 +199,7 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 				monitoring.NewString(metrics, "id").Set(msID)
 			}
 
-			logger := logp.NewLogger(m.Name() + "." + name)
+			logger := m.Logger().Named(m.Name() + "." + name)
 			if m.Config().ID != "" {
 				logger = logger.With("id", m.Config().ID)
 			}
