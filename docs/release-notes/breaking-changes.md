@@ -12,6 +12,20 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+::::{dropdown} The default data and logs path for the Windows service installation.
+The base folder has changed from `C:\ProgramData\` to `C:\Program
+Files\` because the latter has more strict permissions.
+
+When the installation script runs, it looks for the previous default
+data path, if it is found, then the new service is installed using the
+old default. The script also accepts parameters (`UseLegacyPath` and
+`ForceNewDataPath`) to control this behaviour.
+
+In a PowerShell prompt you can use `Get-Help install-service.ps1
+-detailed` to get detailed help.
+
+::::
+
 ## 9.0.0 [beats-900-breaking-changes]
 
 % Description and impact of the breaking change.
