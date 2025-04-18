@@ -22,12 +22,13 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/mock/gomock"
 )
 
 // Run 'go generate' to create mocks that are used in tests.
-//go:generate go run go.uber.org/mock/mockgen -source=logout.go -destination=mock_logout.go -package client -mock_names=Logouter=MockLogouter
+//go:generate go install github.com/golang/mock/mockgen@v1.6.0
+//go:generate mockgen -source=logout.go -destination=mock_logout.go -package client -mock_names=Logouter=MockLogouter
 
 func TestLogout(t *testing.T) {
 	tests := []struct {
