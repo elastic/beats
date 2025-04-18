@@ -28,7 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -87,7 +87,7 @@ func TestProcessorsForConfig(t *testing.T) {
 		"Set field in ClientConfig": {
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+					Processor: makeProcessors(addfields.NewAddFields(mapstr.M{
 						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
@@ -100,7 +100,7 @@ func TestProcessorsForConfig(t *testing.T) {
 			configStr: `processors: [add_fields: {fields: {testField: inputConfig}}]`,
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+					Processor: makeProcessors(addfields.NewAddFields(mapstr.M{
 						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},

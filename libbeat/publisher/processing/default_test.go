@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -189,7 +190,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
 					g := newGroup("test", logp.L())
-					g.add(actions.NewAddFields(mapstr.M{"custom": "value"}, true, true))
+					g.add(addfields.NewAddFields(mapstr.M{"custom": "value"}, true, true))
 					return g
 				}(),
 			},
