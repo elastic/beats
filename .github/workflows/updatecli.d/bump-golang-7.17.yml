@@ -13,6 +13,7 @@ scms:
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: "7.17"
       commitusingapi: true
+      force: false
 
 actions:
   beats:
