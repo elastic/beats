@@ -29,7 +29,7 @@ func TestData(t *testing.T) {
 	// Set lastState and add test process to cache so it will be reported as stopped.
 	f.(*SysInfoMetricSet).lastState = time.Now()
 	p := testProcess()
-	f.(*SysInfoMetricSet).cache.DiffAndUpdateCache(convertToCacheable([]*Process{p}))
+	f.(*SysInfoMetricSet).cache.DiffAndUpdateCache([]*Process{p})
 
 	events, errs := mbtest.ReportingFetchV2(f)
 	if len(errs) > 0 {
