@@ -21,7 +21,7 @@ package partition
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 	"testing"
 	"time"
@@ -66,8 +66,7 @@ func TestTopic(t *testing.T) {
 	)
 
 	logp.TestingSetup(logp.WithSelectors("kafka"))
-
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-metricbeat-%s", id)
 
 	// Create initial topic
@@ -107,13 +106,13 @@ func TestTopic(t *testing.T) {
 
 	// Its possible that other topics exists -> select the right data
 	for _, data := range dataBefore {
-		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic {
+		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
 			offsetBefore, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
 		}
 	}
 
 	for _, data := range dataAfter {
-		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic {
+		if data.ModuleFields["topic"].(mapstr.M)["name"] == testTopic { //nolint:errcheck // it's fine for a test
 			offsetAfter, _ = data.MetricSetFields["offset"].(mapstr.M)["newest"].(int64)
 		}
 	}

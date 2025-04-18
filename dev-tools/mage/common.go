@@ -511,6 +511,12 @@ func untar(sourceFile, destinationDir string) error {
 				return err
 			}
 		case tar.TypeReg:
+			// create containing folder if it doesn't exist yet
+			targetContainingDir := filepath.Dir(filepath.FromSlash(path))
+			if mkDirErr := os.MkdirAll(targetContainingDir, 0755); mkDirErr != nil {
+				return fmt.Errorf("creating container directory for file %s: %w", header.Name, mkDirErr)
+			}
+
 			writer, err := os.Create(path)
 			if err != nil {
 				return err

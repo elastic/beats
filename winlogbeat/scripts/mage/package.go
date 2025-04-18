@@ -19,6 +19,7 @@ package mage
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -45,7 +46,7 @@ func init() {
 // Use VERSION_QUALIFIER to control the version qualifier.
 func Package() {
 	start := time.Now()
-	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+	defer func() { log.Println("package ran for", time.Since(start)) }()
 
 	switch SelectLogic {
 	case devtools.OSSProject:
@@ -57,7 +58,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update.All)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.Deps(build.CrossBuild)
 	mg.SerialDeps(devtools.Package, pkg.PackageTest)
 }
 

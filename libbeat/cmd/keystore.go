@@ -44,26 +44,6 @@ func getKeystore(settings instance.Settings) (keystore.Keystore, error) {
 	return b.Keystore(), nil
 }
 
-// genKeystoreCmd initialize the Keystore command to manage the Keystore
-// with the following subcommands:
-//   - create
-//   - add
-//   - remove
-//   - list
-func genKeystoreCmd(settings instance.Settings) *cobra.Command {
-	keystoreCmd := cobra.Command{
-		Use:   "keystore",
-		Short: "Manage secrets keystore",
-	}
-
-	keystoreCmd.AddCommand(genCreateKeystoreCmd(settings))
-	keystoreCmd.AddCommand(genAddKeystoreCmd(settings))
-	keystoreCmd.AddCommand(genRemoveKeystoreCmd(settings))
-	keystoreCmd.AddCommand(genListKeystoreCmd(settings))
-
-	return &keystoreCmd
-}
-
 func genCreateKeystoreCmd(settings instance.Settings) *cobra.Command {
 	var flagForce bool
 	command := &cobra.Command{

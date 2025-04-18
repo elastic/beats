@@ -7,15 +7,6 @@
 
 Metricbeat will call the following Kibana API endpoints corresponding to each metricset.
 
-### settings
-
-- `/api/settings`
-- [mb exported fields](https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-kibana.html#_settings_2)
-
-This endpoint provides some basic information about the Kibana instance and how it's configured (uuids, local settings, status).
-
-The endpoint was removed from kibana in 8.0.0-beta1 ([changelog](https://www.elastic.co/guide/en/kibana/master/release-notes-8.0.0-beta1.html#rest-api-breaking-changes-8.0.0-beta1)) but the metricset can still be used on older kibana versions.
-
 ### stats [xpack]
 
 - `/api/stats`

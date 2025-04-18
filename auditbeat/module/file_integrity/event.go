@@ -22,6 +22,7 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha3"
 	"crypto/sha512"
 	"encoding/binary"
 	"encoding/hex"
@@ -39,7 +40,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"golang.org/x/crypto/blake2b"
-	"golang.org/x/crypto/sha3"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/metricbeat/mb"

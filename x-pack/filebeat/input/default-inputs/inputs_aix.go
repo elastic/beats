@@ -5,9 +5,9 @@
 package inputs
 
 import (
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/http_endpoint"
@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2.Plugin {
+func xpackInputs(info beat.Info, log *logp.Logger, store statestore.States) []v2.Plugin {
 	return []v2.Plugin{
 		entityanalytics.Plugin(log),
 		http_endpoint.Plugin(),

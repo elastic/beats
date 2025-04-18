@@ -72,10 +72,13 @@ var (
 					"bytes":  c.Int("bytes"),
 					"errors": c.Int("errors"),
 					"latency": c.Dict("latency", s.Schema{
-						"count":  c.Int("count"),
-						"max":    c.Int("max"),
-						"median": c.Float("median"),
-						"p99":    c.Float("p99"),
+						"histogram": c.Dict("histogram", s.Schema{
+							"count":  c.Int("count"),
+							"max":    c.Int("max"),
+							"median": c.Float("median"),
+							"p95":    c.Float("p95"),
+							"p99":    c.Float("p99"),
+						}),
 					}),
 				}),
 			}),
