@@ -80,9 +80,10 @@ func TestLeaseConfigurableFields(t *testing.T) {
 	le, err := NewLeaderElectionManager(uuid, &cfg, client, startLeadingFunc, stopLeadingFunc, logger)
 	require.NoError(t, err)
 
-	leaseDuration = le.(*leaderElectionManager).leaderElection.LeaseDuration
-	retryPeriod = le.(*leaderElectionManager).leaderElection.RetryPeriod
-	renewDeadline = le.(*leaderElectionManager).leaderElection.RenewDeadline
+	lem, _ := le.(*leaderElectionManager)
+	leaseDuration = lem.leaderElection.LeaseDuration
+	retryPeriod = lem.leaderElection.RetryPeriod
+	renewDeadline = lem.leaderElection.RenewDeadline
 
 	require.Equalf(t, cfg.LeaseDuration, leaseDuration, "lease duration should be the same as the one provided in the configuration.")
 	require.Equalf(t, cfg.RetryPeriod, retryPeriod, "retry period should be the same as the one provided in the configuration.")
@@ -136,9 +137,9 @@ func TestNewLeaderElectionManager(t *testing.T) {
 
 		le, err := NewLeaderElectionManager(uuid, &cfg, client, startLeadingFunc, stopLeadingFunc, logger)
 		require.NoError(t, err)
-
-		leaseDuration = le.(*leaderElectionManager).leaderElection.LeaseDuration
-		retryPeriod = le.(*leaderElectionManager).leaderElection.RetryPeriod
+		lem, _ := le.(*leaderElectionManager)
+		leaseDuration = lem.leaderElection.LeaseDuration
+		retryPeriod = lem.leaderElection.RetryPeriod
 
 		les[i] = &le
 	}
