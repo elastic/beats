@@ -5,8 +5,6 @@
 package cloudfoundry
 
 import (
-	"crypto/sha1"
-	"encoding/base64"
 	"fmt"
 	"time"
 
@@ -138,10 +136,4 @@ func (c *clientCacheWrap) Close() error {
 		return fmt.Errorf("closing cache: %w", err)
 	}
 	return nil
-}
-
-// sanitizeCacheName returns a unique string that can be used safely as part of a file name
-func sanitizeCacheName(name string) string {
-	hash := sha1.Sum([]byte(name))
-	return base64.RawURLEncoding.EncodeToString(hash[:])
 }
