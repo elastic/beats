@@ -63,6 +63,10 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		st := newState()
 		currentSource := source.(*Source)
 		log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
+		// create a new inputMetrics instance
+		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+		metrics.url.Set(in.serviceURL + currentSource.ContainerName)
+		defer metrics.Close()
 
 		ctx, cancel := context.WithCancel(context.Background())
 		go func() {
@@ -79,7 +83,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			return err
 		}
 
-		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, log)
+		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, metrics, log)
 		// allows multiple containers to be scheduled concurrently while testing
 		// the stateless input is triggered only while testing and till now it did not mimic
 		// the real world concurrent execution of multiple containers. This fix allows it to do so.
