@@ -258,15 +258,15 @@ func getIncludedBeats() []string {
 	}
 
 	if devtools.FIPSBuild {
-		// If a FIPS-compliant version of agentbeat is being built, restrict the list of beats to the fips-compliant ones.
-		// This helps producing a FIPS-compliant agentbeat by excluding code from beats that are not required to be FIPS compliant.
-		fipsCompliantBeats := make([]string, 0, len(includedBeats))
+		// If a FIPS-capable version of agentbeat is being built, restrict the list of beats to the fips-capable ones.
+		// This helps producing a FIPS-capable agentbeat by excluding code from beats that are not required to be FIPS-capable.
+		fipsCapableBeats := make([]string, 0, len(includedBeats))
 		for _, beat := range includedBeats {
 			if slices.Contains(devtools.FIPSConfig.Beats, beat) {
-				fipsCompliantBeats = append(fipsCompliantBeats, beat)
+				fipsCapableBeats = append(fipsCapableBeats, beat)
 			}
 		}
-		return fipsCompliantBeats
+		return fipsCapableBeats
 	}
 
 	return includedBeats
