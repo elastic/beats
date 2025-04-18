@@ -19,14 +19,13 @@ package wineventlog
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
-
-	"github.com/joeshaw/multierror"
 )
 
 const (
@@ -102,7 +101,7 @@ type queryParams struct {
 }
 
 func newQueryParams(q Query) (*queryParams, error) {
-	var errs multierror.Errors
+	var errs []error
 	if q.Log == "" {
 		errs = append(errs, fmt.Errorf("empty log name"))
 	}
@@ -118,7 +117,7 @@ func newQueryParams(q Query) (*queryParams, error) {
 		errs = append(errs, err)
 	}
 	qp.buildSelects()
-	return qp, errs.Err()
+	return qp, errors.Join(errs...)
 }
 
 func (qp *queryParams) withIgnoreOlder(q Query) {
