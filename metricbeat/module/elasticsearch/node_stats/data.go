@@ -249,6 +249,7 @@ var (
 		}),
 		"os": c.Dict("os", s.Schema{
 			"cpu": c.Dict("cpu", s.Schema{
+				"pct": c.Int("percent"),
 				"load_avg": c.Dict("load_average", s.Schema{
 					"1m": c.Float("1m", s.Optional),
 				}, c.DictOptional), // No load average reported by ES on Windows

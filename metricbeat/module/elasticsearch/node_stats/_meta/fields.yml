@@ -330,6 +330,9 @@
         - name: cpu
           type: group
           fields:
+            - name: pct
+              type: double
+              format: percent
             - name: load_avg.1m
               type: half_float
         - name: cgroup
