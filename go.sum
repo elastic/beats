@@ -408,8 +408,8 @@ github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996 h1:bgsq8RD7lg4Jc
 github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996/go.mod h1:EEdpKWvuZ46X7OEOENvSH5jEJXosi4fn7xjIeTajf+M=
 github.com/elastic/tk-btf v0.1.0 h1:T4rbsnfaRH/MZKSLwZFd3sndt/NexsQb0IXWtMQ9PAA=
 github.com/elastic/tk-btf v0.1.0/go.mod h1:caLQPEcMbyKmPUQb2AsbX3ZAj1yCz06lOxfhn0esLR8=
-github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb h1:8SvKmGOYyxKi6jB0nvV1lpxEHfIS6tQ40x1BXBhKMsE=
-github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb/go.mod h1:5hdJb3ERm3hyHBfHFL39pyWvGgkW7ZCoFlaEemNNHIw=
+github.com/elastic/toutoumomoma v0.0.0-20250415211611-be287c9c0d0e h1:mkHcHfYL/cmJR3fzal3NDXCYFoT3rZKtB0EDxEVeoFc=
+github.com/elastic/toutoumomoma v0.0.0-20250415211611-be287c9c0d0e/go.mod h1:5hdJb3ERm3hyHBfHFL39pyWvGgkW7ZCoFlaEemNNHIw=
 github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 h1:g7YUigN4dW2+zpdusdTTghZ+5Py3BaUMAStvL8Nk+FY=
 github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1/go.mod h1:thX175TtLTzLj3p7N/Q9IiKZ7NF+p72cvL91emV0hzo=
 github.com/elazarl/goproxy/ext v0.0.0-20240909085733-6741dbfc16a1 h1:XgXwWTQglBILwCpfm8I9xUjPXKOi1EzRzuYzyczU5Z0=
