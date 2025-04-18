@@ -1065,6 +1065,7 @@ toc:
             children:
               - file: metricbeat/metricbeat-metricset-nats-connection.md
               - file: metricbeat/metricbeat-metricset-nats-connections.md
+              - file: metricbeat/metricbeat-metricset-nats-jetstream.md
               - file: metricbeat/metricbeat-metricset-nats-route.md
               - file: metricbeat/metricbeat-metricset-nats-routes.md
               - file: metricbeat/metricbeat-metricset-nats-stats.md

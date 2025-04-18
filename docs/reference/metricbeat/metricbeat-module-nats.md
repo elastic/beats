@@ -17,14 +17,13 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/n
 :::::
 
 
-The Nats module uses [Nats monitoring server APIs](https://nats.io/documentation/managing_the_server/monitoring/) to collect metrics.
+The Nats module uses [Nats monitoring server APIs](https://docs.nats.io/running-a-nats-service/nats_admin/monitoring) to collect metrics.
 
-The default metricsets are `stats`, `connections`, `routes` and `subscriptions` while `connection` and `route` metricsets can be enabled to collect detailed metrics per connection/route.
-
+The default metricsets are `stats`, `connections`, `routes` and `subscriptions`. The `connection`, `route`, and `jetstream` metricsets can be enabled to collect additional metrics.
 
 ## Compatibility [_compatibility_39]
 
-The Nats module is tested with Nats 1.3.0, 2.0.4 and 2.1.4
+The NATS module is tested with NATS 2.2.6 and 2.11.x. Versions in between are expected to be compatible as well.
 
 
 ## Dashboard [_dashboard_34]
@@ -48,6 +47,7 @@ metricbeat.modules:
     - "subscriptions"
     #- "connection"
     #- "route"
+    #- "jetstream"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
@@ -56,6 +56,24 @@ metricbeat.modules:
   #subscriptions.metrics_path: "/subsz"
   #connection.metrics_path: "/connz"
   #route.metrics_path: "/routez"
+  #jetstream:
+  #  stats:
+  #    enabled: true
+  #  account:
+  #    enabled: true
+  #    names:
+  #      - default
+  #  stream:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1
+  #      - another-stream
+  #  consumer:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1-consumer-1
+  #      - my-stream-1-consumer-2
+  #      - another-stream-consumer-1
 ```
 
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
@@ -67,6 +85,7 @@ The following metricsets are available:
 
 * [connection](/reference/metricbeat/metricbeat-metricset-nats-connection.md)
 * [connections](/reference/metricbeat/metricbeat-metricset-nats-connections.md)
+* [jetstream](/reference/metricbeat/metricbeat-metricset-nats-jetstream.md)
 * [route](/reference/metricbeat/metricbeat-metricset-nats-route.md)
 * [routes](/reference/metricbeat/metricbeat-metricset-nats-routes.md)
 * [stats](/reference/metricbeat/metricbeat-metricset-nats-stats.md)

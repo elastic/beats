@@ -1,4 +1,4 @@
 variants:
-  - NATS_VERSION: 2.1.4
-  - NATS_VERSION: 2.0.4
-  - NATS_VERSION: 1.3.0
+  - NATS_VERSION: 2.11.1 # Latest
+  - NATS_VERSION: 2.9.25 # Oldest version supporting consumer details
+  - NATS_VERSION: 2.2.6  # Oldest supported version, but without consumer details

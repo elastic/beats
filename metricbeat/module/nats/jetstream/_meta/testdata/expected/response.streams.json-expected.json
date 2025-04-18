@@ -1,0 +1,124 @@
+[
+    {
+        "event": {
+            "dataset": "nats.jetstream",
+            "duration": 115000,
+            "module": "nats"
+        },
+        "metricset": {
+            "name": "jetstream",
+            "period": 10000
+        },
+        "nats": {
+            "jetstream": {
+                "category": "stream",
+                "stream": {
+                    "account": {
+                        "id": "default",
+                        "name": "default"
+                    },
+                    "cluster": {
+                        "leader": "us-south-nats-demo"
+                    },
+                    "config": {
+                        "description": "",
+                        "max_age": 0,
+                        "max_bytes": -1,
+                        "max_consumers": -1,
+                        "max_msg_size": -1,
+                        "max_msgs": -1,
+                        "max_msgs_per_subject": 10,
+                        "num_replicas": 1,
+                        "retention": "limits",
+                        "storage": "file",
+                        "subjects": [
+                            "$KV.credibil-wallet-24a57423-1be9-44be-8ad5-d51a299ad003.\u003e"
+                        ]
+                    },
+                    "created": "2024-07-17T00:23:08.152Z",
+                    "name": "KV_credibil-wallet-24a57423-1be9-44be-8ad5-d51a299ad003",
+                    "state": {
+                        "bytes": 3353,
+                        "consumer_count": 0,
+                        "first_seq": 1,
+                        "first_ts": "2024-07-17T00:23:08.349Z",
+                        "last_seq": 2,
+                        "last_ts": "2024-07-17T00:23:09.091Z",
+                        "messages": 2,
+                        "num_deleted": 0,
+                        "num_subjects": 1
+                    }
+                }
+            },
+            "server": {
+                "id": "NAGGEW65XCMGPSNNQQF6FGKDGQCCXZFMHDI264FXBLT5MURRVDAAKII3",
+                "time": "2025-03-15T11:54:13.510Z"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "nats"
+        }
+    },
+    {
+        "event": {
+            "dataset": "nats.jetstream",
+            "duration": 115000,
+            "module": "nats"
+        },
+        "metricset": {
+            "name": "jetstream",
+            "period": 10000
+        },
+        "nats": {
+            "jetstream": {
+                "category": "stream",
+                "stream": {
+                    "account": {
+                        "id": "default",
+                        "name": "default"
+                    },
+                    "cluster": {
+                        "leader": "us-south-nats-demo"
+                    },
+                    "config": {
+                        "description": "",
+                        "max_age": 0,
+                        "max_bytes": -1,
+                        "max_consumers": -1,
+                        "max_msg_size": -1,
+                        "max_msgs": -1,
+                        "max_msgs_per_subject": 10,
+                        "num_replicas": 1,
+                        "retention": "limits",
+                        "storage": "file",
+                        "subjects": [
+                            "$KV.credibil-wallet-8f580625-2ccf-494e-a5e7-44f9335c801f.\u003e"
+                        ]
+                    },
+                    "created": "2024-07-17T23:54:45.971Z",
+                    "name": "KV_credibil-wallet-8f580625-2ccf-494e-a5e7-44f9335c801f",
+                    "state": {
+                        "bytes": 3353,
+                        "consumer_count": 0,
+                        "first_seq": 1,
+                        "first_ts": "2024-07-17T23:54:46.152Z",
+                        "last_seq": 2,
+                        "last_ts": "2024-07-17T23:54:46.870Z",
+                        "messages": 2,
+                        "num_deleted": 0,
+                        "num_subjects": 1
+                    }
+                }
+            },
+            "server": {
+                "id": "NAGGEW65XCMGPSNNQQF6FGKDGQCCXZFMHDI264FXBLT5MURRVDAAKII3",
+                "time": "2025-03-15T11:54:13.510Z"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "nats"
+        }
+    }
+]
