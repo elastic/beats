@@ -102,13 +102,9 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 The ActiveMQ module comes with several predefined dashboards for application and audit logs. For example:
 
-:::{image} images/filebeat-activemq-application-events.png
-:alt: filebeat activemq application events
-:::
+![filebeat activemq application events](images/filebeat-activemq-application-events.png)
 
-:::{image} images/filebeat-activemq-audit-events.png
-:alt: filebeat activemq audit events
-:::
+![filebeat activemq audit events](images/filebeat-activemq-audit-events.png)
 
 
 ## Fields [_fields_3]
