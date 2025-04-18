@@ -59,7 +59,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 
 	once.Do(func() {
 
-    // Disable HTTP keep-alives to ensure no extra goroutines hang around.
+		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
 		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
 
 		// Sanity check the emulator.
