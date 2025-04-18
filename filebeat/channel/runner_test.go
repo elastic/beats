@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
