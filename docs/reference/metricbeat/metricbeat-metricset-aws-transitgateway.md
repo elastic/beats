@@ -31,9 +31,7 @@ iam:ListAccountAliases
 
 The aws transitgateway metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-transitgateway-overview.png
-:alt: metricbeat aws transitgateway overview
-:::
+![metricbeat aws transitgateway overview](images/metricbeat-aws-transitgateway-overview.png)
 
 
 ## Configuration example [_configuration_example_15]

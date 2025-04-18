@@ -193,9 +193,7 @@ This metricset fetches billing metrics from [GCP BigQuery](https://cloud.google.
 
 The `billing` metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-gcp-billing-overview.png
-:alt: metricbeat gcp billing overview
-:::
+![metricbeat gcp billing overview](images/metricbeat-gcp-billing-overview.png)
 
 
 ### `compute` [_compute]
@@ -204,9 +202,7 @@ This metricset fetches metrics from [Compute Engine](https://cloud.google.com/co
 
 The `compute` metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-gcp-compute-overview.png
-:alt: metricbeat gcp compute overview
-:::
+![metricbeat gcp compute overview](images/metricbeat-gcp-compute-overview.png)
 
 
 ### `gke` [_gke]
@@ -219,9 +215,7 @@ Extra labels and metadata are also extracted using the [Compute API](https://clo
 
 The `gke` metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-gcp-gke-overview.png
-:alt: metricbeat gcp gke overview
-:::
+![metricbeat gcp gke overview](images/metricbeat-gcp-gke-overview.png)
 
 
 ### `loadbalancing` [_loadbalancing]
@@ -252,9 +246,7 @@ This metricset fetches metrics from [Pub/Sub](https://cloud.google.com/pubsub/) 
 
 The `pubsub` metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-gcp-pubsub-overview.png
-:alt: metricbeat gcp pubsub overview
-:::
+![metricbeat gcp pubsub overview](images/metricbeat-gcp-pubsub-overview.png)
 
 
 ### `metrics` [_metrics_7]
@@ -270,9 +262,7 @@ We recommend users to define `period: 5m` for this metricset because in Google C
 
 The `storage` metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-gcp-storage-overview.png
-:alt: metricbeat gcp storage overview
-:::
+![metricbeat gcp storage overview](images/metricbeat-gcp-storage-overview.png)
 
 
 ### Example configuration [_example_configuration_25]

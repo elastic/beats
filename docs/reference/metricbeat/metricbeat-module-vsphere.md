@@ -77,13 +77,9 @@ If you need to configure multiple metricsets with different periods, you can ach
 
 The vSphere module includes a predefined dashboard. For example:
 
-:::{image} images/metricbeat_vsphere_dashboard.png
-:alt: metricbeat vsphere dashboard
-:::
+![metricbeat vsphere dashboard](images/metricbeat_vsphere_dashboard.png)
 
-:::{image} images/metricbeat_vsphere_vm_dashboard.png
-:alt: metricbeat vsphere vm dashboard
-:::
+![metricbeat vsphere vm dashboard](images/metricbeat_vsphere_vm_dashboard.png)
 
 
 ## Example configuration [_example_configuration_67]
