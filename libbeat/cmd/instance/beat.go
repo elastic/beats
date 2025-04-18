@@ -337,6 +337,7 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	}
 
 	logpConfig := logp.Config{}
+	logpConfig.AddCaller = true
 	logpConfig.Beat = b.Info.Name
 	logpConfig.Files.MaxSize = 1
 
