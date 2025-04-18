@@ -12,6 +12,13 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+::::{dropdown} 'close.on_state_change.removed' defaults to false on Linux and MacOS.
+To keep the previous behaviour, add `close.on_state_change.removed:
+true` on every Filestream input.
+
+For more information, check [#38523](https://github.com/elastic/beats/issues/38523)
+::::
+
 ## 9.0.0 [beats-900-breaking-changes]
 
 % Description and impact of the breaking change.
