@@ -27,6 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -62,6 +65,15 @@ var (
 	}
 	errProcessingSkipped = errors.New("processing skipped")
 )
+
+func init() {
+	processors.RegisterPlugin("decode_json_fields",
+		checks.ConfigChecked(NewDecodeJSONFields,
+			checks.RequireFields("fields"),
+			checks.AllowedFields("fields", "max_depth", "overwrite_keys", "add_error_key", "process_array", "target", "when", "document_id", "expand_keys")))
+
+	jsprocessor.RegisterPlugin("DecodeJSONFields", NewDecodeJSONFields)
+}
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.
 func NewDecodeJSONFields(c *cfg.C) (beat.Processor, error) {

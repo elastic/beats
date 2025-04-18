@@ -21,7 +21,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/autodiscover/appenders/config" // Register autodiscover appenders
 	_ "github.com/elastic/beats/v7/libbeat/autodiscover/providers/jolokia"
 	_ "github.com/elastic/beats/v7/libbeat/monitoring/report/elasticsearch" // Register default monitoring reporting
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions/init"         // Register default processors.
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"              // Register default processors.
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"

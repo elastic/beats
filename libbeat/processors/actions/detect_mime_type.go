@@ -22,8 +22,17 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/mime"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
+
+func init() {
+	processors.RegisterPlugin("detect_mime_type",
+		checks.ConfigChecked(NewDetectMimeType,
+			checks.RequireFields("field", "target"),
+			checks.AllowedFields("field", "target")))
+}
 
 type mimeTypeProcessor struct {
 	Field  string `config:"field"`

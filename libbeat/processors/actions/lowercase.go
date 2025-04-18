@@ -21,8 +21,21 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
+
+func init() {
+	processors.RegisterPlugin(
+		"lowercase",
+		checks.ConfigChecked(
+			NewLowerCaseProcessor,
+			checks.RequireFields("fields"),
+			checks.AllowedFields("fields", "ignore_missing", "fail_on_error", "alter_full_field", "values"),
+		),
+	)
+}
 
 // NewLowerCaseProcessor converts event keys matching the provided fields to lowercase
 func NewLowerCaseProcessor(c *conf.C) (beat.Processor, error) {

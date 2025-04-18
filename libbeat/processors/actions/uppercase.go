@@ -21,8 +21,21 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
+
+func init() {
+	processors.RegisterPlugin(
+		"uppercase",
+		checks.ConfigChecked(
+			NewUpperCaseProcessor,
+			checks.RequireFields("fields"),
+			checks.AllowedFields("fields", "ignore_missing", "fail_on_error", "alter_full_field", "values"),
+		),
+	)
+}
 
 // NewUpperCaseProcessor converts event keys matching the provided fields to uppercase
 func NewUpperCaseProcessor(c *conf.C) (beat.Processor, error) {

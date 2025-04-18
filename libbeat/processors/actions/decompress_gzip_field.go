@@ -25,6 +25,8 @@ import (
 	"io"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -39,6 +41,13 @@ type decompressGzipFieldConfig struct {
 	Field         fromTo `config:"field"`
 	IgnoreMissing bool   `config:"ignore_missing"`
 	FailOnError   bool   `config:"fail_on_error"`
+}
+
+func init() {
+	processors.RegisterPlugin("decompress_gzip_field",
+		checks.ConfigChecked(NewDecompressGzipFields,
+			checks.RequireFields("field"),
+			checks.AllowedFields("field", "ignore_missing", "overwrite_keys", "overwrite_keys", "fail_on_error")))
 }
 
 // NewDecompressGzipFields construct a new decompress_gzip_fields processor.

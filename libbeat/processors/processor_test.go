@@ -27,7 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions/init"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_process_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/convert"

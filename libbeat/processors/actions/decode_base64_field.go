@@ -24,6 +24,9 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -42,6 +45,14 @@ type base64Config struct {
 	Field         fromTo `config:"field"`
 	IgnoreMissing bool   `config:"ignore_missing"`
 	FailOnError   bool   `config:"fail_on_error"`
+}
+
+func init() {
+	processors.RegisterPlugin(processorName,
+		checks.ConfigChecked(NewDecodeBase64Field,
+			checks.RequireFields("field"),
+			checks.AllowedFields("field", "when", "ignore_missing", "fail_on_error")))
+	jsprocessor.RegisterPlugin("DecodeBase64Field", NewDecodeBase64Field)
 }
 
 // NewDecodeBase64Field construct a new decode_base64_field processor.

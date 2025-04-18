@@ -23,8 +23,19 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
+
+func init() {
+	processors.RegisterPlugin("add_network_direction",
+		checks.ConfigChecked(NewAddNetworkDirection,
+			checks.RequireFields("source", "destination", "target", "internal_networks"),
+			checks.AllowedFields("source", "destination", "target", "internal_networks")))
+	jsprocessor.RegisterPlugin("AddNetworkDirection", NewAddNetworkDirection)
+}
 
 const (
 	directionInternal = "internal"

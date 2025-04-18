@@ -21,6 +21,9 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -38,6 +41,15 @@ type appendProcessorConfig struct {
 	IgnoreEmptyValues bool          `config:"ignore_empty_values"`
 	FailOnError       bool          `config:"fail_on_error"`
 	AllowDuplicate    bool          `config:"allow_duplicate"`
+}
+
+func init() {
+	processors.RegisterPlugin("append",
+		checks.ConfigChecked(NewAppendProcessor,
+			checks.RequireFields("target_field"),
+		),
+	)
+	jsprocessor.RegisterPlugin("AppendProcessor", NewAppendProcessor)
 }
 
 // NewAppendProcessor returns a new append processor.

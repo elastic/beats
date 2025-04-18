@@ -19,14 +19,21 @@ package actions
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type dropEvent struct{}
 
+func init() {
+	processors.RegisterPlugin("drop_event",
+		checks.ConfigChecked(newDropEvent, checks.AllowedFields("when")))
+}
+
 var dropEventsSingleton = (*dropEvent)(nil)
 
-func NewDropEvent(c *conf.C) (beat.Processor, error) {
+func newDropEvent(c *conf.C) (beat.Processor, error) {
 	return dropEventsSingleton, nil
 }
 
