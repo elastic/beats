@@ -9,14 +9,14 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/basereceiver"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
 
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 )
 
 type filebeatReceiver struct {
-	basereceiver.BaseReceiver
+	beatreceiver.BeatReceiver
 	wg sync.WaitGroup
 }
 
@@ -25,7 +25,7 @@ func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) erro
 	go func() {
 		defer fb.wg.Done()
 		fb.Logger.Info("starting filebeat receiver")
-		if err := fb.BaseReceiver.Start(); err != nil {
+		if err := fb.BeatReceiver.Start(); err != nil {
 			fb.Logger.Error("error starting base receiver", zap.Error(err))
 		}
 		if err := fb.Beater.Run(&fb.Beat.Beat); err != nil {
@@ -38,7 +38,7 @@ func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) erro
 func (fb *filebeatReceiver) Shutdown(ctx context.Context) error {
 	fb.Logger.Info("stopping filebeat receiver")
 	fb.Beater.Stop()
-	if err := fb.BaseReceiver.Shutdown(); err != nil {
+	if err := fb.BeatReceiver.Shutdown(); err != nil {
 		return fmt.Errorf("error stopping base receiver: %w", err)
 	}
 	fb.wg.Wait()

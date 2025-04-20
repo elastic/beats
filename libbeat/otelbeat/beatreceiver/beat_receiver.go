@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package basereceiver
+package beatreceiver
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ import (
 )
 
 // BaseReceiver holds common configurations for beatreceivers.
-type BaseReceiver struct {
+type BeatReceiver struct {
 	HttpConf *config.C
 	Beat     *instance.Beat
 	Beater   beat.Beater
@@ -40,21 +40,23 @@ type BaseReceiver struct {
 
 // For now, BaseReceiver.Start() only kicks of monitoring server.
 // We will include internal telemetry and instrumentations related info in future.
-func (b *BaseReceiver) Start() error {
+func (b *BeatReceiver) Start() error {
 	if err := b.startMonitoring(); err != nil {
 		return fmt.Errorf("could not start the HTTP server for the monitoring API: %w", err)
 	}
 	return nil
 }
 
-func (b *BaseReceiver) Shutdown() error {
+// For now, BaseReceiver.Stop() only stops the monitoring server.
+// We will include internal telemetry and instrumentations related info in future.
+func (b *BeatReceiver) Shutdown() error {
 	if err := b.stopMonitoring(); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
 	return nil
 }
 
-func (b *BaseReceiver) startMonitoring() error {
+func (b *BeatReceiver) startMonitoring() error {
 	if !b.HttpConf.Enabled() {
 		return nil
 	}
@@ -89,7 +91,7 @@ func (b *BaseReceiver) startMonitoring() error {
 	return nil
 }
 
-func (b *BaseReceiver) stopMonitoring() error {
+func (b *BeatReceiver) stopMonitoring() error {
 	if b.Beat.API != nil {
 		return b.Beat.API.Stop()
 	}
