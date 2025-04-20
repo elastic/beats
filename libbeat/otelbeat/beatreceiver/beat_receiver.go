@@ -38,18 +38,20 @@ type BeatReceiver struct {
 	Logger   *zap.Logger
 }
 
-// For now, BaseReceiver.Start() only kicks of monitoring server.
-// We will include internal telemetry and instrumentations related info in future.
+// BeatReceiver.Stop() starts the beat receiver.
 func (b *BeatReceiver) Start() error {
 	if err := b.startMonitoring(); err != nil {
 		return fmt.Errorf("could not start the HTTP server for the monitoring API: %w", err)
 	}
+	if err := b.Beater.Run(&b.Beat.Beat); err != nil {
+		return fmt.Errorf("beat receiver run error: %w", err)
+	}
 	return nil
 }
 
-// For now, BaseReceiver.Stop() only stops the monitoring server.
-// We will include internal telemetry and instrumentations related info in future.
+// BeatReceiver.Stop() stops beat receiver.
 func (b *BeatReceiver) Shutdown() error {
+	b.Beater.Stop()
 	if err := b.stopMonitoring(); err != nil {
 		return fmt.Errorf("error stopping monitoring server: %w", err)
 	}
@@ -57,7 +59,7 @@ func (b *BeatReceiver) Shutdown() error {
 }
 
 func (b *BeatReceiver) startMonitoring() error {
-	if !b.HttpConf.Enabled() {
+	if b.HttpConf == nil || !b.HttpConf.Enabled() {
 		return nil
 	}
 	var err error

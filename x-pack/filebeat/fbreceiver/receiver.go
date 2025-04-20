@@ -26,10 +26,7 @@ func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) erro
 		defer fb.wg.Done()
 		fb.Logger.Info("starting filebeat receiver")
 		if err := fb.BeatReceiver.Start(); err != nil {
-			fb.Logger.Error("error starting base receiver", zap.Error(err))
-		}
-		if err := fb.Beater.Run(&fb.Beat.Beat); err != nil {
-			fb.Logger.Error("filebeat receiver run error", zap.Error(err))
+			fb.Logger.Error("error starting filebeat receiver", zap.Error(err))
 		}
 	}()
 	return nil
@@ -37,9 +34,8 @@ func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) erro
 
 func (fb *filebeatReceiver) Shutdown(ctx context.Context) error {
 	fb.Logger.Info("stopping filebeat receiver")
-	fb.Beater.Stop()
 	if err := fb.BeatReceiver.Shutdown(); err != nil {
-		return fmt.Errorf("error stopping base receiver: %w", err)
+		return fmt.Errorf("error stopping filebeat receiver: %w", err)
 	}
 	fb.wg.Wait()
 	return nil
