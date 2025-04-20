@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
+
 	"go.uber.org/zap"
 )
 
