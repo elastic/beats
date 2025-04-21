@@ -91,10 +91,8 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This module comes with a sample dashboard showing geolocation, distribution of requests between backends and frontends, and status codes over time. For example:
 
-:::{image} images/kibana-haproxy-overview.png
-:alt: kibana haproxy overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana haproxy overview](images/kibana-haproxy-overview.png)
 
 
 ## Fields [_fields_20]

@@ -13,9 +13,7 @@ To collect data, the module communicates with a Jolokia HTTP/REST endpoint that 
 
 The broker metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-activemq-broker-overview.png
-:alt: metricbeat activemq broker overview
-:::
+![metricbeat activemq broker overview](images/metricbeat-activemq-broker-overview.png)
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
