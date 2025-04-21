@@ -15,17 +15,41 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build freebsd || openbsd || netbsd || darwin
-
-package file_integrity
+package client
 
 import (
-	"syscall"
+	"context"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 )
 
-func fileTimes(stat *syscall.Stat_t) (atime, mtime, ctime time.Time) {
-	return time.Unix(0, stat.Atimespec.Nano()).UTC(),
-		time.Unix(0, stat.Mtimespec.Nano()).UTC(),
-		time.Unix(0, stat.Mtimespec.Nano()).UTC()
+const maxRetries = 3
+const initialInterval = 500 * time.Millisecond
+const maxInterval = 1 * time.Minute
+
+// Retry attempts to execute the provided function `fn` with a retry mechanism.
+// It uses an exponential backoff strategy and retries up to a maximum number of attempts.
+func Retry(ctx context.Context, fn func() error) (err error) {
+	expBackoff := backoff.NewExpBackoff(ctx.Done(), initialInterval, maxInterval)
+
+	for numTries := 0; ; numTries++ {
+		err = fn()
+		if err == nil {
+			// function succeeded
+			break
+		}
+
+		if numTries >= maxRetries {
+			// maxRetries hit
+			break
+		}
+
+		if !expBackoff.Wait() {
+			// context cancelled
+			break
+		}
+	}
+
+	return err
 }

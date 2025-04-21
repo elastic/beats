@@ -31,7 +31,7 @@ When sending data to a secured cluster through the `elasticsearch` output, Audit
 output.elasticsearch:
   hosts: ["https://myEShost:9200"]
   username: "auditbeat_writer"
-  password: "{pwd}"
+  password: "YOUR_PASSWORD"
 ```
 
 **API key authentication:**
