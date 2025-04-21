@@ -402,6 +402,7 @@ func (r *msgRef) fail(msg *message, err error) {
 		r.failed = append(r.failed, msg.data)
 
 	default:
+		r.client.log.Errorf("Unknown kafka failure (topic=%v, message='%v'): %v", msg.topic, msg.data, err.Error())
 		r.failed = append(r.failed, msg.data)
 		if r.err == nil {
 			// Don't overwrite an existing error. This way at tne end of the batch
