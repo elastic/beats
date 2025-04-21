@@ -31,9 +31,7 @@ The Nats module is tested with Nats 1.3.0, 2.0.4 and 2.1.4
 
 The Nats module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat_nats_dashboard.png
-:alt: metricbeat nats dashboard
-:::
+![metricbeat nats dashboard](images/metricbeat_nats_dashboard.png)
 
 
 ## Example configuration [_example_configuration_47]
