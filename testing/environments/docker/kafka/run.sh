@@ -22,7 +22,6 @@ wait_for_port 2181
 echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
-    --override auto.create.topics.enable=true \
     --override delete.topic.enable=true \
     --override listener.security.protocol.map=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,SASL_SSL:SASL_SSL \
     --override listeners=INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094,SASL_SSL://0.0.0.0:9093 \
