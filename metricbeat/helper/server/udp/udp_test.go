@@ -47,6 +47,7 @@ func GetTestUdpServer(host string, port int) (server.Server, error) {
 		receiveBufferSize: 1024,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
+		logger:            logger,
 	}, nil
 }
 

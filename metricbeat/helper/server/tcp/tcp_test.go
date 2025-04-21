@@ -48,6 +48,7 @@ func GetTestTcpServer(host string, port int) (server.Server, error) {
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
 		delimiter:         '\n',
+		logger:            logger,
 	}, nil
 }
 
