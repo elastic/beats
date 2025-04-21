@@ -45,11 +45,12 @@ func ConvertNonPrimitive(m mapstr.M) {
 		switch x := val.(type) {
 		case mapstr.M:
 			ConvertNonPrimitive(x)
+			m[key] = map[string]any(x)
 		case []mapstr.M:
 			s := make([]any, len(x))
 			for i, val := range x {
 				ConvertNonPrimitive(val)
-				s[i] = val
+				s[i] = map[string]any(val)
 			}
 			m[key] = s
 		case time.Time:

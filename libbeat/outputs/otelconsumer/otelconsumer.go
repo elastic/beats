@@ -136,7 +136,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			}
 
 		}
-		if err := logRecord.Body().SetEmptyMap().FromRaw(beatEvent); err != nil {
+		if err := logRecord.Body().SetEmptyMap().FromRaw(map[string]any(beatEvent)); err != nil {
 			out.log.Errorf("received an error while converting map to plog.Log, some fields might be missing: %v", err)
 		}
 	}
