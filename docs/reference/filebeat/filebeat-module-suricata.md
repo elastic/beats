@@ -6,7 +6,7 @@ mapped_pages:
 # Suricata module [filebeat-module-suricata]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/suricata.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/suricata/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -81,15 +81,11 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with sample dashboards. For example:
 
-:::{image} images/filebeat-suricata-events.png
-:alt: filebeat suricata events
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat suricata events](images/filebeat-suricata-events.png)
 
-:::{image} images/filebeat-suricata-alerts.png
-:alt: filebeat suricata alerts
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat suricata alerts](images/filebeat-suricata-alerts.png)
 
 
 ## Fields [_fields_51]

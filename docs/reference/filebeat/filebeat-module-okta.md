@@ -6,7 +6,7 @@ mapped_pages:
 # Okta module [filebeat-module-okta]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/okta.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/okta/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -103,10 +103,8 @@ This is an example configuration for the module.
 
 This module comes with a sample dashboard:
 
-:::{image} images/filebeat-okta-dashboard.png
-:alt: filebeat okta dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat okta dashboard](images/filebeat-okta-dashboard.png)
 
 
 ## Fields [_fields_39]

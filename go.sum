@@ -340,11 +340,10 @@ github.com/elastic/elastic-agent-autodiscover v0.9.0 h1:+iWIKh0u3e8I+CJa3FfWe9h0
 github.com/elastic/elastic-agent-autodiscover v0.9.0/go.mod h1:5iUxLHhVdaGSWYTveSwfJEY4RqPXTG13LPiFoxcpFd4=
 github.com/elastic/elastic-agent-client/v7 v7.15.0 h1:nDB7v8TBoNuD6IIzC3z7Q0y+7bMgXoT2DsHfolO2CHE=
 github.com/elastic/elastic-agent-client/v7 v7.15.0/go.mod h1:6h+f9QdIr3GO2ODC0Y8+aEXRwzbA5W4eV4dd/67z7nI=
-<<<<<<< HEAD
-github.com/elastic/elastic-agent-libs v0.18.9 h1:NQbBK6uMd/t4S0Fe7iOpT5mE7RXMWVaOLBSEXHRBzWI=
-github.com/elastic/elastic-agent-libs v0.18.9/go.mod h1:Repx7BMzE1v/gTipPogNIQeEnSGwOWGBC63h7h9c5aM=
-github.com/elastic/elastic-agent-system-metrics v0.11.9 h1:UDgT4ygXKGRwyNyUDzBKbDW7bYphZNg1GOLtDFqZ4Wg=
-github.com/elastic/elastic-agent-system-metrics v0.11.9/go.mod h1:FgtshyeVEAxNqRoFkdL0MpCW0rHxQGFNEKjIsxfcrag=
+github.com/elastic/elastic-agent-libs v0.19.0 h1:xqDkX6kjz3rBH02QQWk3kFsn8M0uv/5bKtIJOztlI8Y=
+github.com/elastic/elastic-agent-libs v0.19.0/go.mod h1:koK4coWhHibGMT3Ujni8tuLyGw8k9ttsO+AlX4ypHkI=
+github.com/elastic/elastic-agent-system-metrics v0.11.10 h1:51u6roLaI0WhX1wbU4hPaervODegOxNFLcLouDAAi8A=
+github.com/elastic/elastic-agent-system-metrics v0.11.10/go.mod h1:BlS6Fm/l/umAa9xKy7GxsSYtCfu/iqg551PULKSeCQM=
 github.com/elastic/elastic-transport-go/v8 v8.6.0 h1:Y2S/FBjx1LlCv5m6pWAF2kDJAHoSjSRSJCApolgfthA=
 github.com/elastic/elastic-transport-go/v8 v8.6.0/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
 =======
@@ -361,16 +360,6 @@ github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3 h1:UyNbxdkQiSfy
 github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3/go.mod h1:DAsKqylc/16NDcfdk8dN5axVtSOsQwgP2kV+NV5xPDE=
 github.com/elastic/go-concert v0.3.0 h1:Y66JFn3ENndpHErOhTASu8/Fz1SSsLZicPufCmvQD60=
 github.com/elastic/go-concert v0.3.0/go.mod h1:UWt1MB5HxxZ85hKynLaYl/AaLIKFx0WiBP2uJSRfduA=
-<<<<<<< HEAD
-github.com/elastic/go-docappender/v2 v2.3.0 h1:Vr+l36jM+sE/LHp0JFxSIbHlWTSk8CpBblYWZZ/I1KA=
-github.com/elastic/go-docappender/v2 v2.3.0/go.mod h1:VNWgXUE9HX1G6W6ON8dOs/KdH8aCxXir/fxxcfrnov4=
-github.com/elastic/go-elasticsearch/v7 v7.17.10 h1:TCQ8i4PmIJuBunvBS6bwT2ybzVFxxUhhltAs3Gyu1yo=
-github.com/elastic/go-elasticsearch/v7 v7.17.10/go.mod h1:OJ4wdbtDNk5g503kvlHLyErCgQwwzmDtaFC4XyOxXA4=
-github.com/elastic/go-elasticsearch/v8 v8.17.0 h1:e9cWksE/Fr7urDRmGPGp47Nsp4/mvNOrU8As1l2HQQ0=
-github.com/elastic/go-elasticsearch/v8 v8.17.0/go.mod h1:lGMlgKIbYoRvay3xWBeKahAiJOgmFDsjZC39nmO3H64=
-github.com/elastic/go-libaudit/v2 v2.6.1 h1:eN7tobGizmB+OJpCuG7gvPX7Nxni//H47uvMDXlMrI0=
-github.com/elastic/go-libaudit/v2 v2.6.1/go.mod h1:8205nkf2oSrXFlO4H5j8/cyVMoSF3Y7jt+FjgS4ubQU=
-=======
 github.com/elastic/go-docappender/v2 v2.6.0 h1:VxFla3ctXsbv612aMYg0GH8KE/dONs/rNHmt6ExpWM0=
 github.com/elastic/go-docappender/v2 v2.6.0/go.mod h1:ymIoSDEiGm8fG/Vdfk4ytsX+qG20cLFtQkX6fZ7NfTs=
 github.com/elastic/go-elasticsearch/v8 v8.17.1 h1:bOXChDoCMB4TIwwGqKd031U8OXssmWLT3UrAr9EGs3Q=
@@ -379,7 +368,6 @@ github.com/elastic/go-freelru v0.16.0 h1:gG2HJ1WXN2tNl5/p40JS/l59HjvjRhjyAa+oFTR
 github.com/elastic/go-freelru v0.16.0/go.mod h1:bSdWT4M0lW79K8QbX6XY2heQYSCqD7THoYf82pT/H3I=
 github.com/elastic/go-libaudit/v2 v2.6.2 h1:1PM6wVBTJHJQYsKl8jfA9/Aw9pFty5uUezPiUfKtOI4=
 github.com/elastic/go-libaudit/v2 v2.6.2/go.mod h1:8205nkf2oSrXFlO4H5j8/cyVMoSF3Y7jt+FjgS4ubQU=
->>>>>>> d9f378dae ([BeatReceivers] Update Otel version and batcher configuration (#43796))
 github.com/elastic/go-licenser v0.4.2 h1:bPbGm8bUd8rxzSswFOqvQh1dAkKGkgAmrPxbUi+Y9+A=
 github.com/elastic/go-licenser v0.4.2/go.mod h1:W8eH6FaZDR8fQGm+7FnVa7MxI1b/6dAqxz+zPB8nm5c=
 github.com/elastic/go-lookslike v1.0.1 h1:qVieyn6i/kx4xntar1cEB0qrGHVGNCX5KC8czAaTW/0=
@@ -408,8 +396,8 @@ github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6 h1:VgOx6omXIMK
 github.com/elastic/gopacket v1.1.20-0.20241002174017-e8c5fda595e6/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
 github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/uo=
 github.com/elastic/gosigar v0.14.3/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
-github.com/elastic/mito v1.17.0 h1:UEEFfQy5WhS6vVvMPMwHvdn5rH24eBJMb2ZOlGBkI5s=
-github.com/elastic/mito v1.17.0/go.mod h1:nG5MoOsgJwVlglhlANiBFmHWqoIjrpbR5vy612wE8yE=
+github.com/elastic/mito v1.18.0 h1:WlNIQMJDlw0fbqh20n97YBCzvXA0MO1gntMAjGWbepI=
+github.com/elastic/mito v1.18.0/go.mod h1:fAVRjgTSaheI4qjWprqxYjFBkqSxCbNo1XQ99LlMOFw=
 github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015 h1:z8cC8GASpPo8yKlbnXI36HQ/BM9wYjhBPNbDjAWm0VU=
 github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015/go.mod h1:qH9DX/Dmflz6EAtaks/+2SsdQzecVAKE174Zl66hk7E=
 github.com/elastic/pkcs8 v1.0.0 h1:HhitlUKxhN288kcNcYkjW6/ouvuwJWd9ioxpjnD9jVA=
@@ -840,15 +828,8 @@ github.com/otiai10/mint v1.5.1/go.mod h1:MJm72SBthJjz8qhefc4z1PYEieWmy8Bku7CjcAq
 github.com/oxtoacart/bpool v0.0.0-20150712133111-4e1c5567d7c2 h1:CXwSGu/LYmbjEab5aMCs5usQRVBGThelUKBNnoSOuso=
 github.com/oxtoacart/bpool v0.0.0-20150712133111-4e1c5567d7c2/go.mod h1:L3UMQOThbttwfYRNFOWLLVXMhk5Lkio4GGOtw5UrxS0=
 github.com/pborman/getopt v0.0.0-20170112200414-7148bc3a4c30/go.mod h1:85jBQOZwpVEaDAr341tbn15RS4fCAsIst0qp7i8ex1o=
-<<<<<<< HEAD
-github.com/pierrec/lz4/v4 v4.1.21 h1:yOVMLb6qSIDP67pl/5F7RepeKYu/VmTyEXvuMI5d9mQ=
-github.com/pierrec/lz4/v4 v4.1.21/go.mod h1:gZWDp/Ze/IJXGXf23ltt2EXimqmTUXEy0GFuRQyBid4=
-github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0 h1:i5VIxp6QB8oWZ8IkK8zrDgeT6ORGIUeiN+61iETwJbI=
-github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0/go.mod h1:4xpMLz7RBWyB+ElzHu8Llua96TRCB3YwX+l5EP1wmHk=
-=======
 github.com/pierrec/lz4/v4 v4.1.22 h1:cKFw6uJDK+/gfw5BcDL0JL5aBsAFdsIT18eRtLj7VIU=
 github.com/pierrec/lz4/v4 v4.1.22/go.mod h1:gZWDp/Ze/IJXGXf23ltt2EXimqmTUXEy0GFuRQyBid4=
->>>>>>> d9f378dae ([BeatReceivers] Update Otel version and batcher configuration (#43796))
 github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c h1:+mdjkGKdHQG3305AYmdv1U2eRNDiU2ErMBj1gwrq8eQ=
 github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c/go.mod h1:7rwL4CYBLnjLxUqIJNnCWiEdr3bn6IUYi15bNlnbCCU=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

@@ -163,7 +163,6 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
-	github.com/Azure/go-autorest/autorest/adal v0.9.24
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
 	github.com/apache/arrow/go/v17 v17.0.0
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.22
@@ -176,19 +175,16 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
-<<<<<<< HEAD
-	github.com/elastic/elastic-agent-libs v0.18.9
-	github.com/elastic/elastic-agent-system-metrics v0.11.9
+	github.com/elastic/elastic-agent-libs v0.19.0
+	github.com/elastic/elastic-agent-system-metrics v0.11.10
 	github.com/elastic/go-elasticsearch/v8 v8.17.0
 	github.com/elastic/go-quark v0.2.0
-=======
 	github.com/elastic/elastic-agent-libs v0.19.1
 	github.com/elastic/elastic-agent-system-metrics v0.11.10
 	github.com/elastic/go-elasticsearch/v8 v8.17.1
 	github.com/elastic/go-quark v0.3.0
->>>>>>> d9f378dae ([BeatReceivers] Update Otel version and batcher configuration (#43796))
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
-	github.com/elastic/mito v1.17.0
+	github.com/elastic/mito v1.18.0
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
 	github.com/elastic/sarama v1.19.1-0.20241120141909-c7eabfcee7e5
 	github.com/elastic/tk-btf v0.1.0
@@ -209,22 +205,14 @@ require (
 	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/microsoft/go-mssqldb v1.7.2
-<<<<<<< HEAD
-	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.114.0
-=======
 	github.com/microsoft/wmi v0.25.1
 	github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.121.0
->>>>>>> d9f378dae ([BeatReceivers] Update Otel version and batcher configuration (#43796))
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/prometheus v0.54.1
-<<<<<<< HEAD
-	github.com/shirou/gopsutil/v4 v4.24.10
-=======
 	github.com/shirou/gopsutil/v4 v4.25.1
 	github.com/teambition/rrule-go v1.8.2
->>>>>>> d9f378dae ([BeatReceivers] Update Otel version and batcher configuration (#43796))
 	github.com/tklauser/go-sysconf v0.3.12
 	github.com/xdg-go/scram v1.1.2
 	github.com/zyedidia/generic v1.2.1
@@ -262,6 +250,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.10.0 // indirect
 	github.com/Azure/go-amqp v1.0.5 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
+	github.com/Azure/go-autorest/autorest/adal v0.9.24 // indirect
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
 	github.com/Azure/go-autorest/autorest/validation v0.3.1 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect

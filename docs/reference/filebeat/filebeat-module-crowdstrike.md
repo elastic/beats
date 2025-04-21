@@ -6,7 +6,7 @@ mapped_pages:
 # CrowdStrike module [filebeat-module-crowdstrike]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/crowdstrike.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/crowdstrike/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -77,17 +77,13 @@ var:
 
 The best way to view CrowdStrike events and alert data is in the SIEM.
 
-:::{image} images/siem-alerts-cs.jpg
-:alt: siem alerts cs
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![siem alerts cs](images/siem-alerts-cs.jpg)
 
 For alerts, go to Detections → External alerts.
 
-:::{image} images/siem-events-cs.jpg
-:alt: siem events cs
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![siem events cs](images/siem-events-cs.jpg)
 
 And for all over event CrowdStrike Falcon event types, go to Host → Events.
 
