@@ -138,6 +138,7 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	newBM := &BaseModule{
 		name:      m.name,
 		rawConfig: &config,
+		logger:    m.logger,
 	}
 
 	if err := config.Unpack(&newBM.config); err != nil {
