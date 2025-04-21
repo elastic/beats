@@ -346,14 +346,12 @@ github.com/elastic/elastic-agent-system-metrics v0.11.10 h1:51u6roLaI0WhX1wbU4hP
 github.com/elastic/elastic-agent-system-metrics v0.11.10/go.mod h1:BlS6Fm/l/umAa9xKy7GxsSYtCfu/iqg551PULKSeCQM=
 github.com/elastic/elastic-transport-go/v8 v8.6.0 h1:Y2S/FBjx1LlCv5m6pWAF2kDJAHoSjSRSJCApolgfthA=
 github.com/elastic/elastic-transport-go/v8 v8.6.0/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
-=======
 github.com/elastic/elastic-agent-libs v0.19.1 h1:6jiH0SPB5RzoF3W8Ipk+mI/Xl6zXqVPZkKADuzeChw0=
 github.com/elastic/elastic-agent-libs v0.19.1/go.mod h1:1HNxREH8C27kGrJCtKZh/ot8pV8joH8VREP21+FrH5s=
 github.com/elastic/elastic-agent-system-metrics v0.11.10 h1:51u6roLaI0WhX1wbU4hPaervODegOxNFLcLouDAAi8A=
 github.com/elastic/elastic-agent-system-metrics v0.11.10/go.mod h1:BlS6Fm/l/umAa9xKy7GxsSYtCfu/iqg551PULKSeCQM=
 github.com/elastic/elastic-transport-go/v8 v8.6.1 h1:h2jQRqH6eLGiBSN4eZbQnJLtL4bC5b4lfVFRjw2R4e4=
 github.com/elastic/elastic-transport-go/v8 v8.6.1/go.mod h1:YLHer5cj0csTzNFXoNQ8qhtGY1GTvSqPnKWKaqQE3Hk=
->>>>>>> d9f378dae ([BeatReceivers] Update Otel version and batcher configuration (#43796))
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270 h1:cWPqxlPtir4RoQVCpGSRXmLqjEHpJKbR60rxh1nQZY4=
 github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdboCbArMF/nSCDUXgQuWTeoMmE/z8607X+k7ng=
 github.com/elastic/fsnotify v1.6.1-0.20240920222514-49f82bdbc9e3 h1:UyNbxdkQiSfyipwsOCWAlO+ju3xXC61Z4prx/HBTtFk=
