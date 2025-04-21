@@ -31,9 +31,7 @@ iam:ListAccountAliases
 
 The `aws sns` metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-sns-overview.png
-:alt: metricbeat aws sns overview
-:::
+![metricbeat aws sns overview](images/metricbeat-aws-sns-overview.png)
 
 
 ## Configuration example [_configuration_example_13]

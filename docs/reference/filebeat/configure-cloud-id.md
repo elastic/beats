@@ -13,7 +13,7 @@ Example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "elastic:{pwd}"
+cloud.auth: "elastic:YOUR_PASSWORD"
 ```
 
 These settings can be also specified at the command line, like this:
@@ -24,7 +24,7 @@ filebeat -e -E cloud.id="<cloud-id>" -E cloud.auth="<cloud.auth>"
 
 ## `cloud.id` [_cloud_id]
 
-The Cloud ID, which can be found in the {{ess}} web console, is used by Filebeat to resolve the {{es}} and {{kib}} URLs. This setting overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings. For more on locating and configuring the Cloud ID, see [Configure Beats and Logstash with Cloud ID](docs-content://deploy-manage/deploy/cloud-enterprise/find-cloud-id.md).
+The Cloud ID, which can be found in the {{ess}} web console, is used by Filebeat to resolve the {{es}} and {{kib}} URLs. This setting overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings. For more on locating and configuring the Cloud ID, see [Configure Beats and Logstash with Cloud ID](docs-content://deploy-manage/deploy/cloud-enterprise/connect-elasticsearch.md).
 
 
 ## `cloud.auth` [_cloud_auth]

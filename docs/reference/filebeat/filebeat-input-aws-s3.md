@@ -71,7 +71,7 @@ This aws-s3 input feature prevents the duplication of events in Elasticsearch by
 
 The custom `_id` is based on several pieces of information from the S3 object: the Last-Modified timestamp, the bucket ARN, the object key, and the byte offset of the data in the event.
 
-Duplicate prevention is particularly useful in scenarios where Filebeat needs to retry an operation. Filebeat guarantees at-least-once delivery, meaning it will retry any failed or incomplete operations. These retries may be triggered by issues with the host, `{{beatname_uc}}`, network connectivity, or services such as Elasticsearch, SQS, or S3.
+Duplicate prevention is particularly useful in scenarios where Filebeat needs to retry an operation. Filebeat guarantees at-least-once delivery, meaning it will retry any failed or incomplete operations. These retries may be triggered by issues with the host, `Filebeat`, network connectivity, or services such as Elasticsearch, SQS, or S3.
 
 
 ### Limitations of `_id`-Based Deduplication [_limitations_of_id_based_deduplication]
@@ -419,6 +419,11 @@ This sets the maximum number of JavaScript VM sessions that will be cached to av
 ### `sqs.wait_time` [_sqs_wait_time]
 
 The maximum duration that an SQS `ReceiveMessage` call should wait for a message to arrive in the queue before returning. The default value is `20s`. The maximum value is `20s`.
+
+
+### `sqs.shutdown_grace_time` [_shutdown_grace_time]
+
+The duration that an SQS message processor will wait for a messages to arrive in the queue and be processed before allowing the input to terminate when a cancelation has been received. The default value is `20s`. It must not be negative.
 
 
 ### `bucket_arn` [_bucket_arn]

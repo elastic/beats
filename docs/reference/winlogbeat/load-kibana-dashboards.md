@@ -43,8 +43,8 @@ winlogbeat setup --dashboards
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/winlogbeat:9.0.0-beta1 setup --dashboards
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/winlogbeat:{{stack-version}} setup --dashboards
 ```
 ::::::
 
@@ -79,7 +79,7 @@ winlogbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=winlogbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -90,7 +90,7 @@ winlogbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=winlogbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -101,7 +101,7 @@ winlogbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=winlogbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -112,18 +112,18 @@ winlogbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=winlogbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/winlogbeat:9.0.0-beta1 setup -e \
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/winlogbeat:{{stack-version}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=winlogbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -138,7 +138,7 @@ PS > .\winlogbeat.exe setup -e `
   -E output.logstash.enabled=false `
   -E output.elasticsearch.hosts=['localhost:9200'] `
   -E output.elasticsearch.username=winlogbeat_internal `
-  -E output.elasticsearch.password={pwd} `
+  -E output.elasticsearch.password=YOUR_PASSWORD `
   -E setup.kibana.host=localhost:5601
 ```
 ::::::

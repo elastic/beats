@@ -6,7 +6,7 @@ mapped_pages:
 # ZooKeeper module [metricbeat-module-zookeeper]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/zookeeper.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/zookeeper/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -31,9 +31,7 @@ Note that from ZooKeeper 3.6.0, `mntr`, `stat`, `ruok`, `conf`, `isro`, `cons` c
 
 The Zookeeper module comes with a predefined dashboard:
 
-:::{image} images/metricbeat-zookeeper.png
-:alt: metricbeat zookeeper
-:::
+![metricbeat zookeeper](images/metricbeat-zookeeper.png)
 
 
 ## Example configuration [_example_configuration_69]

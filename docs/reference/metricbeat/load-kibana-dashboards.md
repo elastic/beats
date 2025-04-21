@@ -48,8 +48,8 @@ metricbeat setup --dashboards
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/metricbeat:9.0.0-beta1 setup --dashboards
+```sh  subs=true
+docker run --rm --net="host" docker.elastic.co/beats/metricbeat:{{stack-version}} setup --dashboards
 ```
 ::::::
 
@@ -84,7 +84,7 @@ metricbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=metricbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -95,7 +95,7 @@ metricbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=metricbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -106,7 +106,7 @@ metricbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=metricbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -117,18 +117,18 @@ metricbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=metricbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/metricbeat:9.0.0-beta1 setup -e \
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/metricbeat:{{stack-version}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=metricbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -143,7 +143,7 @@ PS > .\metricbeat.exe setup -e `
   -E output.logstash.enabled=false `
   -E output.elasticsearch.hosts=['localhost:9200'] `
   -E output.elasticsearch.username=metricbeat_internal `
-  -E output.elasticsearch.password={pwd} `
+  -E output.elasticsearch.password=YOUR_PASSWORD `
   -E setup.kibana.host=localhost:5601
 ```
 ::::::

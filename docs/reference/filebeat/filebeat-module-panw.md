@@ -6,7 +6,7 @@ mapped_pages:
 # Palo Alto Networks module [filebeat-module-panw]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/panw.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/panw/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -190,15 +190,11 @@ These are the PAN-OS to ECS field mappings as well as those fields still not in 
 
 This module comes with two sample dashboards:
 
-:::{image} images/filebeat-panw-traffic.png
-:alt: filebeat panw traffic
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat panw traffic](images/filebeat-panw-traffic.png)
 
-:::{image} images/filebeat-panw-threat.png
-:alt: filebeat panw threat
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat panw threat](images/filebeat-panw-threat.png)
 
 
 ## Fields [_fields_42]
