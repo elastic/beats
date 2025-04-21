@@ -273,7 +273,7 @@ func TestKafkaPublish(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
-			logger := logptest.NewTestingLogger(t, "noop-change-2")
+			logger := logptest.NewTestingLogger(t, "noop-change-3")
 			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
 			if err != nil {
 				t.Fatal(err)
