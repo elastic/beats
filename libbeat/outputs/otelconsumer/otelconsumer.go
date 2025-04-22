@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -116,7 +117,20 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		beatEvent := event.Content.Fields.Clone()
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
-		logRecord.SetObservedTimestamp(pcommon.NewTimestampFromTime(time.Now().UTC()))
+
+		// Set the timestamp for when the event was first seen by the pipeline.
+		observedTimestamp := logRecord.Timestamp()
+		if created, err := beatEvent.GetValue("event.created"); err == nil {
+			fmt.Printf("created %T", created)
+			switch created := created.(type) {
+			case time.Time:
+				observedTimestamp = pcommon.NewTimestampFromTime(created)
+			case common.Time:
+				observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+			}
+		}
+		logRecord.SetObservedTimestamp(observedTimestamp)
+
 		pcommonEvent := otelmap.FromMapstr(beatEvent)
 		// if data_stream field is set on beats.Event. Add it to logrecord.Attributes to support dynamic indexing
 		if data, ok := pcommonEvent.Get("data_stream"); ok {
