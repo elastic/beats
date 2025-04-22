@@ -219,6 +219,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add CEL input program evaluation coverage collection support. {pull}41884[41884]
 - Fix test framework and python tests saving config file with wrong permission. {issue}42779[42779]
 - Tests reading testdata config file now set flag `strict.perms=false`. They use the new `testflag` package helper function MustSetStrictPermsFalse. {issue}42779[42779]
+- Added exponential backoff retry logic for vSphere client logout operation in metricbeat. {issue}43449[43449]
 
 ==== Deprecated
 
