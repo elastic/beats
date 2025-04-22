@@ -302,3 +302,18 @@ func TestToMapstr(t *testing.T) {
 	got := ToMapstr(pm)
 	assert.Equal(t, want, got)
 }
+
+type unknown int
+
+func TestUnknownType(t *testing.T) {
+	inputMap := mapstr.M{
+		"slice": []unknown{42, 43, 44},
+	}
+
+	expected := mapstr.M{
+		"slice": "unknown type: []otelmap.unknown",
+	}
+
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, expected, inputMap)
+}

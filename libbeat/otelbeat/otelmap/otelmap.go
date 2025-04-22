@@ -19,6 +19,7 @@
 package otelmap
 
 import (
+	"fmt"
 	"reflect"
 	"time"
 
@@ -80,6 +81,9 @@ func ConvertNonPrimitive(m mapstr.M) {
 				}
 				m[key] = slice
 			}
+		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool, []any, map[string]any:
+		default:
+			m[key] = fmt.Sprintf("unknown type: %T", x)
 		}
 	}
 }
