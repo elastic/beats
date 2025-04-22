@@ -260,7 +260,7 @@ func getURL(
 		// Add default port to host if port is empty and defaultport is set
 		if port == "" && defaultport != "" {
 			u.Host = net.JoinHostPort(host, defaultport)
-			// log.Debugf("No port specified, defaulting to port %s: %s", defaultport, u.Host)
+			log.Debugf("No port specified, defaulting to port %s: %s", defaultport, u.Host)
 }
 		}
 	}
