@@ -15,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -50,7 +51,14 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
 	}
 
-	return &metricbeatReceiver{beat: &b.Beat, beater: mbBeater, logger: set.Logger}, nil
+	httpConf := struct {
+		HTTP *config.C `config:"http"`
+	}{}
+	if err := b.RawConfig.Unpack(&httpConf); err != nil {
+		return nil, fmt.Errorf("error starting API :%w", err)
+	}
+
+	return &metricbeatReceiver{beat: b, beater: mbBeater, logger: set.Logger, httpConf: httpConf.HTTP}, nil
 }
 
 func NewFactory() receiver.Factory {

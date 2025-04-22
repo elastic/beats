@@ -5,6 +5,17 @@
 package mbreceiver
 
 import (
+	"context"
+	"encoding/base64"
+	"fmt"
+	"io"
+	"math/rand/v2"
+	"net"
+	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -16,10 +27,12 @@ import (
 )
 
 func TestNewReceiver(t *testing.T) {
+	monitorSocket := genSocketPath()
+	monitorHost := "unix://" + monitorSocket
 	config := Config{
-		Beatconfig: map[string]interface{}{
-			"metricbeat": map[string]interface{}{
-				"modules": []map[string]interface{}{
+		Beatconfig: map[string]any{
+			"metricbeat": map[string]any{
+				"modules": []map[string]any{
 					{
 						"module":     "system",
 						"enabled":    true,
@@ -29,16 +42,18 @@ func TestNewReceiver(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
 			},
-			"logging": map[string]interface{}{
+			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
 				},
 			},
-			"path.home": t.TempDir(),
+			"path.home":    t.TempDir(),
+			"http.enabled": true,
+			"http.host":    monitorHost,
 		},
 	}
 
@@ -56,15 +71,48 @@ func TestNewReceiver(t *testing.T) {
 			assert.Conditionf(t, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
+			var lastError strings.Builder
+			assert.Condition(t, func() bool {
+				// skip windows for now
+				if runtime.GOOS == "windows" {
+					return true
+				}
+				client := http.Client{
+					Transport: &http.Transport{
+						DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+							return net.Dial("unix", monitorSocket)
+						},
+					},
+				}
+				r, err := client.Get("http://unix/stats")
+				if err != nil {
+					lastError.Reset()
+					lastError.WriteString(fmt.Sprintf("client.Get failed: %s", err))
+					return false
+				}
+				defer r.Body.Close()
+				body, err := io.ReadAll(r.Body)
+				if err != nil {
+					lastError.Reset()
+					lastError.WriteString(fmt.Sprintf("io.ReadAll of body failed: %s", err))
+					return false
+				}
+				if len(body) <= 0 {
+					lastError.Reset()
+					lastError.WriteString("body too short")
+					return false
+				}
+				return true
+			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
 		},
 	})
 }
 
 func TestMultipleReceivers(t *testing.T) {
 	config := Config{
-		Beatconfig: map[string]interface{}{
-			"metricbeat": map[string]interface{}{
-				"modules": []map[string]interface{}{
+		Beatconfig: map[string]any{
+			"metricbeat": map[string]any{
+				"modules": []map[string]any{
 					{
 						"module":     "system",
 						"enabled":    true,
@@ -74,10 +122,10 @@ func TestMultipleReceivers(t *testing.T) {
 					},
 				},
 			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
 			},
-			"logging": map[string]interface{}{
+			"logging": map[string]any{
 				"level": "debug",
 				"selectors": []string{
 					"*",
@@ -109,4 +157,14 @@ func TestMultipleReceivers(t *testing.T) {
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
 		},
 	})
+}
+
+func genSocketPath() string {
+	randData := make([]byte, 16)
+	for i := range len(randData) {
+		randData[i] = uint8(rand.UintN(255))
+	}
+	socketName := base64.URLEncoding.EncodeToString(randData) + ".sock"
+	socketDir := os.TempDir()
+	return filepath.Join(socketDir, socketName)
 }
