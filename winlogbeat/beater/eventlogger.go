@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -143,7 +144,7 @@ func (e *eventLogger) run(
 		client:     client,
 		eventACKer: eventACKer,
 	}
-	if err := eventlog.Run(ctx, api, state, publisher, e.log); err != nil {
+	if err := eventlog.Run(noopReporter{}, ctx, api, state, publisher, e.log); err != nil {
 		e.log.Error(err)
 	}
 }
@@ -152,7 +153,7 @@ func (e *eventLogger) run(
 func processorsForConfig(
 	beatInfo beat.Info, config eventLoggerConfig,
 ) (*processors.Processors, error) {
-	procs := processors.NewList(nil)
+	procs := processors.NewList(beatInfo.Logger)
 
 	// Processor order is important! The index processor, if present, must be
 	// added before the user processors.
@@ -174,3 +175,7 @@ func processorsForConfig(
 
 	return procs, nil
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}

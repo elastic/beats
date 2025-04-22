@@ -112,8 +112,9 @@ func NewInput(
 	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
-	log := logp.NewLogger("syslog")
+	log := logger.Named("syslog")
 
 	deprecatedNotificationOnce.Do(func() {
 		cfgwarn.Deprecate("", "Syslog input. Use Syslog processor instead.")
@@ -268,7 +269,7 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 		syslog["version"] = ev.Version()
 	}
 
-	if ev.data != nil && len(ev.data) > 0 {
+	if len(ev.data) > 0 {
 		syslog["data"] = ev.data
 	}
 

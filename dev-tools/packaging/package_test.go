@@ -27,6 +27,8 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"debug/buildinfo"
+	"debug/elf"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -45,6 +47,9 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/strslice"
 	"github.com/docker/docker/client"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
 const (
@@ -63,8 +68,8 @@ var (
 	modulesDFilePattern    = regexp.MustCompile(`modules.d/.+`)
 	monitorsDFilePattern   = regexp.MustCompile(`monitors.d/.+`)
 	systemdUnitFilePattern = regexp.MustCompile(`/lib/systemd/system/.*\.service`)
-
-	licenseFiles = []string{"LICENSE.txt", "NOTICE.txt"}
+	fipsPackagePattern     = regexp.MustCompile(`\w+-fips-\w+`)
+	licenseFiles           = []string{"LICENSE.txt", "NOTICE.txt"}
 )
 
 var (
@@ -88,15 +93,20 @@ func TestDeb(t *testing.T) {
 	debs := getFiles(t, regexp.MustCompile(`\.deb$`))
 	buf := new(bytes.Buffer)
 	for _, deb := range debs {
-		checkDeb(t, deb, buf)
+		fipsPackage := fipsPackagePattern.MatchString(deb)
+		checkDeb(t, deb, buf, fipsPackage)
 	}
 }
 
 func TestTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
-	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
-	for _, tar := range tars {
-		checkTar(t, tar)
+	tars := getFiles(t, regexp.MustCompile(`^-\w+\.tar\.gz$`))
+	for _, tarFile := range tars {
+		if strings.HasSuffix(tarFile, "docker.tar.gz") {
+			// We should skip the docker images archives , since those have their dedicated check
+			continue
+		}
+		fipsPackage := fipsPackagePattern.MatchString(tarFile)
+		checkTar(t, tarFile, fipsPackage)
 	}
 }
 
@@ -138,7 +148,7 @@ func checkRPM(t *testing.T, file string) {
 	ensureNoBuildIDLinks(t, p)
 }
 
-func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
+func checkDeb(t *testing.T, file string, buf *bytes.Buffer, fipsCheck bool) {
 	p, err := readDeb(file, buf)
 	if err != nil {
 		t.Error(err)
@@ -157,9 +167,30 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkModulesOwner(t, p, true)
 	checkModulesPermissions(t, p)
 	checkSystemdUnitPermissions(t, p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err, "Error extracting file %s", file)
+
+			require.FileExists(t, filepath.Join(extractDir, "debian-binary"))
+			require.FileExists(t, filepath.Join(extractDir, "control.tar.gz"))
+			dataTarFile := filepath.Join(extractDir, "data.tar.gz")
+			require.FileExists(t, dataTarFile)
+
+			dataExtractionDir := filepath.Join(extractDir, "data")
+			err = mage.Extract(dataTarFile, dataExtractionDir)
+			require.NoError(t, err, "Error extracting data tarball")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			// the expected location for the binary is under /usr/share/<beatName>/bin
+			containingDir := filepath.Join(dataExtractionDir, "usr", "share", beatName, "bin")
+			checkFIPS(t, beatName, containingDir)
+		})
+	}
 }
 
-func checkTar(t *testing.T, file string) {
+func checkTar(t *testing.T, file string, fipsCheck bool) {
 	p, err := readTar(file)
 	if err != nil {
 		t.Error(err)
@@ -174,6 +205,29 @@ func checkTar(t *testing.T, file string) {
 	checkModulesPermissions(t, p)
 	checkModulesOwner(t, p, true)
 	checkLicensesPresent(t, "", p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err)
+			containingDir := strings.TrimSuffix(filepath.Base(file), ".tar.gz")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			checkFIPS(t, beatName, filepath.Join(extractDir, containingDir))
+		})
+	}
+}
+
+func extractBeatNameFromTarName(t *testing.T, fileName string) string {
+	// TODO check if cutting at the first '-' is an acceptable shortcut
+	t.Logf("Extracting beat name from filename %s", fileName)
+	const sep = "-"
+	beatName, _, found := strings.Cut(fileName, sep)
+	if !found {
+		t.Logf("separator %s not found in filename %s: beatName may be incorrect", sep, fileName)
+	}
+
+	return beatName
 }
 
 func checkZip(t *testing.T, file string) {
@@ -766,11 +820,57 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 			File: header.Name,
 			UID:  header.Uid,
 			GID:  header.Gid,
-			Mode: os.FileMode(header.Mode),
+			Mode: os.FileMode(header.Mode), //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 		}
 	}
 
 	return p, nil
+}
+
+func checkFIPS(t *testing.T, beatName, path string) {
+	t.Logf("Checking %s for FIPS compliance", beatName)
+	binaryPath := filepath.Join(path, beatName) // TODO eventually we'll need to support checking a .exe
+	require.FileExistsf(t, binaryPath, "Unable to find beat executable %s", binaryPath)
+
+	info, err := buildinfo.ReadFile(binaryPath)
+	require.NoError(t, err)
+
+	foundTags := false
+	foundExperiment := false
+	for _, setting := range info.Settings {
+		switch setting.Key {
+		case "-tags":
+			foundTags = true
+			require.Contains(t, setting.Value, "requirefips")
+			continue
+		case "GOEXPERIMENT":
+			foundExperiment = true
+			require.Contains(t, setting.Value, "systemcrypto")
+			continue
+		}
+	}
+
+	require.True(t, foundTags, "Did not find -tags within binary version information")
+	require.True(t, foundExperiment, "Did not find GOEXPERIMENT within binary version information")
+
+	// TODO only elf is supported at the moment, in the future we will need to use macho (darwin) and pe (windows)
+	f, err := elf.Open(binaryPath)
+	require.NoError(t, err, "unable to open ELF file")
+
+	symbols, err := f.Symbols()
+	if err != nil {
+		t.Logf("no symbols present in %q: %v", binaryPath, err)
+		return
+	}
+
+	hasOpenSSL := false
+	for _, symbol := range symbols {
+		if strings.Contains(symbol.Name, "OpenSSL_version") {
+			hasOpenSSL = true
+			break
+		}
+	}
+	require.True(t, hasOpenSSL, "unable to find OpenSSL_version symbol")
 }
 
 // inspector is a file contents inspector. It vets the contents of the file

@@ -21,6 +21,7 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -56,7 +57,7 @@ func NewTcpServer(base mb.BaseMetricSet) (server.Server, error) {
 		return nil, err
 	}
 
-	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", config.Host, config.Port))
+	addr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(config.Host, strconv.Itoa(config.Port)))
 
 	if err != nil {
 		return nil, err
@@ -67,7 +68,7 @@ func NewTcpServer(base mb.BaseMetricSet) (server.Server, error) {
 		receiveBufferSize: config.ReceiveBufferSize,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
-		delimiter:         byte(config.Delimiter[0]),
+		delimiter:         config.Delimiter[0],
 	}, nil
 }
 

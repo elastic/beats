@@ -246,15 +246,20 @@ class Test(BaseTest):
         assert r.json()[
             'message'] == 'wrong Content-Type header, expecting application/json'
 
-    @unittest.skipIf(os.getenv("CI") is not None and platform.system() == 'Darwin', 'Flaky test: https://github.com/elastic/beats/issues/30028')
     def test_http_endpoint_missing_auth_value(self):
         """
         Test http_endpoint input with missing basic auth values.
         """
+        # Include a benchmark input to keep the beat alive, otherwise it might
+        # shut down before logging the error we're looking for
         options = """
   basic_auth: true
   username: testuser
   password:
+- type: benchmark
+  enabled: true
+  message: "placeholder"
+  eps: 1
 """
         self.get_config(options)
         filebeat = self.start_beat()

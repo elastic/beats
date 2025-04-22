@@ -6,37 +6,37 @@ package fbreceiver
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
 
 	"go.opentelemetry.io/collector/component"
 	"go.uber.org/zap"
 )
 
 type filebeatReceiver struct {
-	beat   *beat.Beat
-	beater beat.Beater
-	logger *zap.Logger
-	wg     sync.WaitGroup
+	beatreceiver.BeatReceiver
+	wg sync.WaitGroup
 }
 
 func (fb *filebeatReceiver) Start(ctx context.Context, host component.Host) error {
 	fb.wg.Add(1)
 	go func() {
 		defer fb.wg.Done()
-		fb.logger.Info("starting filebeat receiver")
-		err := fb.beater.Run(fb.beat)
-		if err != nil {
-			fb.logger.Error("filebeat receiver run error", zap.Error(err))
+		fb.Logger.Info("starting filebeat receiver")
+		if err := fb.BeatReceiver.Start(); err != nil {
+			fb.Logger.Error("error starting filebeat receiver", zap.Error(err))
 		}
 	}()
 	return nil
 }
 
 func (fb *filebeatReceiver) Shutdown(ctx context.Context) error {
-	fb.logger.Info("stopping filebeat receiver")
-	fb.beater.Stop()
+	fb.Logger.Info("stopping filebeat receiver")
+	if err := fb.BeatReceiver.Shutdown(); err != nil {
+		return fmt.Errorf("error stopping filebeat receiver: %w", err)
+	}
 	fb.wg.Wait()
 	return nil
 }

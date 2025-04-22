@@ -23,6 +23,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 
@@ -52,7 +53,7 @@ func (pub *publisher) Publish(records []eventlog.Record) error {
 type winlogInput struct{}
 
 // Plugin create a stateful input Plugin collecting logs from Windows Event Logs.
-func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Beta,
@@ -100,6 +101,7 @@ func (in winlogInput) Run(
 	api, _ := source.(eventlog.EventLog)
 	log := ctx.Logger.With("eventlog", source.Name(), "channel", api.Channel())
 	return eventlog.Run(
+		&ctx,
 		ctxtool.FromCanceller(ctx.Cancelation),
 		api,
 		initCheckpoint(log, cursor),

@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
+
 package integration
 
 import (
@@ -37,7 +39,8 @@ func TestFilebeat(t *testing.T) {
 	lineCount := 128
 
 	reportOptions := integration.ReportOptions{
-		PrintLinesOnFail: 10,
+		PrintLinesOnFail:  10,
+		PrintConfigOnFail: true,
 	}
 
 	t.Run("Filebeat starts and ingests files", func(t *testing.T) {
