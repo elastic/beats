@@ -22,6 +22,7 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -55,10 +56,18 @@ func ConvertNonPrimitive(m mapstr.M) {
 			m[key] = s
 		case time.Time:
 			m[key] = x.UTC().Format("2006-01-02T15:04:05.000Z")
+		case common.Time:
+			m[key] = time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z")
 		case []time.Time:
 			s := make([]any, 0, len(x))
 			for _, i := range x {
 				s = append(s, i.UTC().Format("2006-01-02T15:04:05.000Z"))
+			}
+			m[key] = s
+		case []common.Time:
+			s := make([]any, 0, len(x))
+			for _, i := range x {
+				s = append(s, time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
 			m[key] = s
 		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,

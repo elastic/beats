@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
@@ -39,6 +40,25 @@ func TestFromMapstrTime(t *testing.T) {
 		origTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
 		assert.NoError(t, err, "Error parsing time")
 		a := mapstr.M{"test": origTime}
+		want := mapstr.M{}
+		want["test"] = tc.pcommon_val
+		ConvertNonPrimitive(a)
+		assert.Equal(t, want, a)
+	}
+}
+
+func TestFromMapstrCommongTime(t *testing.T) {
+	tests := []struct {
+		mapstr_val  string
+		pcommon_val string
+	}{
+		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: "2006-01-02T08:04:05.000Z"},
+		{mapstr_val: "1970-01-01T00:00:00+00:00", pcommon_val: "1970-01-01T00:00:00.000Z"},
+	}
+	for _, tc := range tests {
+		origTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
+		assert.NoError(t, err, "Error parsing time")
+		a := mapstr.M{"test": common.Time(origTime)}
 		want := mapstr.M{}
 		want["test"] = tc.pcommon_val
 		ConvertNonPrimitive(a)
@@ -213,6 +233,33 @@ func TestFromMapstrSliceTime(t *testing.T) {
 		targetTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
 		assert.NoError(t, err, "Error parsing time")
 		sliceTimes = append(sliceTimes, targetTime)
+		sliceTimesStr = append(sliceTimesStr, tc.pcommon_val)
+	}
+	inputMap := mapstr.M{
+		"slice": sliceTimes,
+	}
+	want := mapstr.M{
+		"slice": sliceTimesStr,
+	}
+
+	ConvertNonPrimitive(inputMap)
+	assert.Equal(t, want, inputMap)
+}
+
+func TestFromMapstrSliceCommonTime(t *testing.T) {
+	times := []struct {
+		mapstr_val  string
+		pcommon_val string
+	}{
+		{mapstr_val: "2006-01-02T15:04:05+07:00", pcommon_val: "2006-01-02T08:04:05.000Z"},
+		{mapstr_val: "1970-01-01T00:00:00+00:00", pcommon_val: "1970-01-01T00:00:00.000Z"},
+	}
+	var sliceTimes []common.Time
+	var sliceTimesStr []any
+	for _, tc := range times {
+		targetTime, err := time.Parse(time.RFC3339, tc.mapstr_val)
+		assert.NoError(t, err, "Error parsing time")
+		sliceTimes = append(sliceTimes, common.Time(targetTime))
 		sliceTimesStr = append(sliceTimesStr, tc.pcommon_val)
 	}
 	inputMap := mapstr.M{
