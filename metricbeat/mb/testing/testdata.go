@@ -291,12 +291,12 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 
 	// Overwrites the golden files if run with -generate
 	if *flags.DataFlag {
-		outputIndented, errMarshal := json.MarshalIndent(&data, "", "    ")
-		if errMarshal != nil {
-			t.Fatal(errMarshal)
+		outputIndented, err := json.MarshalIndent(&data, "", "    ")
+		if err != nil {
+			t.Fatal(err)
 		}
-		if errWrite := os.WriteFile(expectedFile, outputIndented, 0644); errWrite != nil {
-			t.Fatal(errWrite)
+		if err := os.WriteFile(expectedFile, outputIndented, 0644); err != nil {
+			t.Fatal(err)
 		}
 	}
 
@@ -362,12 +362,12 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 func writeDataJSON(t *testing.T, data mapstr.M, path string) {
 	// Add hardcoded timestamp
 	data.Put("@timestamp", "2019-03-01T08:05:34.853Z")
-	output, errMarshal := json.MarshalIndent(&data, "", "    ")
-	if errMarshal != nil {
-		t.Fatal(errMarshal)
+	output, err := json.MarshalIndent(&data, "", "    ")
+	if err != nil {
+		t.Fatal(err)
 	}
-	if errWrite := os.WriteFile(path, output, 0644); errWrite != nil {
-		t.Fatal(errWrite)
+	if err := os.WriteFile(path, output, 0644); err != nil {
+		t.Fatal(err)
 	}
 }
 
