@@ -31,7 +31,7 @@ To add the Beats repository for APT:
     sudo apt-get install apt-transport-https
     ```
 
-3. Save the repository definition to `/etc/apt/sources.list.d/elastic-{{major-version}}.list`:
+3. Save the repository definition to _/etc/apt/sources.list.d/elastic-{{major-version}}.list_:
 
     ```shell subs=true
     echo "deb https://artifacts.elastic.co/packages/{{major-version}}/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-{{major-version}}.list

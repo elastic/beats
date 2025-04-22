@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -203,7 +203,7 @@ func TestDecodeBase64Run(t *testing.T) {
 			t.Parallel()
 
 			f := &decodeBase64Field{
-				log:    logp.NewLogger(processorName),
+				log:    logptest.NewTestingLogger(t, processorName),
 				config: test.config,
 			}
 
@@ -238,7 +238,7 @@ func TestDecodeBase64Run(t *testing.T) {
 		}
 
 		f := &decodeBase64Field{
-			log:    logp.NewLogger(processorName),
+			log:    logptest.NewTestingLogger(t, processorName),
 			config: config,
 		}
 

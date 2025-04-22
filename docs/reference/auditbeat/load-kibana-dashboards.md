@@ -79,7 +79,7 @@ auditbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=auditbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -90,7 +90,7 @@ auditbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=auditbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -101,7 +101,7 @@ auditbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=auditbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -112,7 +112,7 @@ auditbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=auditbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -123,7 +123,7 @@ docker run --rm --net="host" docker.elastic.co/beats/auditbeat:{{stack-version}}
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=auditbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -138,7 +138,7 @@ PS > .\auditbeat.exe setup -e `
   -E output.logstash.enabled=false `
   -E output.elasticsearch.hosts=['localhost:9200'] `
   -E output.elasticsearch.username=auditbeat_internal `
-  -E output.elasticsearch.password={pwd} `
+  -E output.elasticsearch.password=YOUR_PASSWORD `
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
