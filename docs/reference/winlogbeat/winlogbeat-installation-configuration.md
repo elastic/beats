@@ -11,13 +11,11 @@ This guide describes how to get started quickly with Windows log monitoring. You
 
 * install Winlogbeat on each system you want to monitor
 * specify the location of your log files
-* parse log data into fields and send it to {es}
-* visualize the log data in {kib}
+* parse log data into fields and send it to {{es}}
+* visualize the log data in {{kib}}
 
-:::{image} images/winlogbeat-dashboard.png
-:alt: Winlogbeat dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Winlogbeat dashboard](images/winlogbeat-dashboard.png)
 
 
 ## Before you begin [_before_you_begin]
@@ -31,7 +29,7 @@ To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www
 ::::::
 
 ::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/deploy-cluster.md).
+To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
 :::::::
@@ -84,7 +82,7 @@ Specify the [cloud.id](/reference/winlogbeat/configure-cloud-id.md) of your {{es
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "winlogbeat_setup:{pwd}" <1>
+cloud.auth: "winlogbeat_setup:YOUR_PASSWORD" <1>
 ```
 
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/winlogbeat/keystore.md).
@@ -97,7 +95,7 @@ cloud.auth: "winlogbeat_setup:{pwd}" <1>
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "winlogbeat_internal"
-      password: "{pwd}" <1>
+      password: "YOUR_PASSWORD" <1>
       ssl:
         enabled: true
         ca_trusted_fingerprint: "b9a10bbe64ee9826abeda6546fc988c8bf798b41957c33d05db736716513dc9c" <2>
@@ -112,7 +110,7 @@ cloud.auth: "winlogbeat_setup:{pwd}" <1>
       setup.kibana:
         host: "mykibanahost:5601" <1>
         username: "my_kibana_user" <2> <3>
-        password: "{pwd}"
+        password: "YOUR_PASSWORD"
     ```
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
@@ -223,39 +221,16 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    <div class="tabs" data-tab-group="host">
-      <div role="tablist" aria-label="Open Kibana">
-        <button role="tab"
-                aria-selected="true"
-                aria-controls="cloud-tab-open-kibana"
-                id="cloud-open-kibana">
-          Elasticsearch Service
-        </button>
-        <button role="tab"
-                aria-selected="false"
-                aria-controls="self-managed-tab-open-kibana"
-                id="self-managed-open-kibana"
-                tabindex="-1">
-          Self-managed
-        </button>
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="cloud-tab-open-kibana"
-           aria-labelledby="cloud-open-kibana">
+    :::::::{tab-set}
+    ::::::{tab-item} Elasticsearch Service
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
-
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="self-managed-tab-open-kibana"
-           aria-labelledby="self-managed-open-kibana"
-           hidden="">
+    ::::::
+    ::::::{tab-item} Self-managed
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
+    ::::::
+    :::::::
 
-      </div>
-    </div>
 
 2. In the side navigation, click **Discover**. To see Winlogbeat data, make sure the predefined `winlogbeat-*` data view is selected.
 

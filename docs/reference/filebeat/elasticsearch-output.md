@@ -31,7 +31,7 @@ When sending data to a secured cluster through the `elasticsearch` output, Fileb
 output.elasticsearch:
   hosts: ["https://myEShost:9200"]
   username: "filebeat_writer"
-  password: "{pwd}"
+  password: "YOUR_PASSWORD"
 ```
 
 **API key authentication:**

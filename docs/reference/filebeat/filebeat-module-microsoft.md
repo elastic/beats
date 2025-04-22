@@ -6,7 +6,7 @@ mapped_pages:
 # Microsoft module [filebeat-module-microsoft]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/m365_defender.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/m365_defender/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -204,24 +204,18 @@ This is a list of Defender ATP fields that are mapped to ECS.
 
 This module comes with a sample dashboard for Defender ATP.
 
-:::{image} images/filebeat-defender-atp-overview.png
-:alt: filebeat defender atp overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat defender atp overview](images/filebeat-defender-atp-overview.png)
 
 The best way to view Defender ATP events and alert data is in the SIEM.
 
-:::{image} images/siem-alerts-cs.jpg
-:alt: siem alerts cs
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![siem alerts cs](images/siem-alerts-cs.jpg)
 
 For alerts, go to Detections → External alerts.
 
-:::{image} images/siem-events-cs.jpg
-:alt: siem events cs
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![siem events cs](images/siem-events-cs.jpg)
 
 And for all other Defender ATP event types, go to Host → Events.
 
