@@ -121,7 +121,6 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		// Set the timestamp for when the event was first seen by the pipeline.
 		observedTimestamp := logRecord.Timestamp()
 		if created, err := beatEvent.GetValue("event.created"); err == nil {
-			fmt.Printf("created %T", created)
 			switch created := created.(type) {
 			case time.Time:
 				observedTimestamp = pcommon.NewTimestampFromTime(created)
