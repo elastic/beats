@@ -144,8 +144,8 @@ func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.Ho
 // ParseURL returns HostData object from a raw 'host' value and a series of
 // defaults that are added to the URL if not present in the rawHost value.
 // Values from the rawHost take precedence over the defaults.
-func ParseURL(rawHost, scheme, user, pass, path, defaultport, query string) (mb.HostData, error) {
-	u, transport, err := getURL(rawHost, scheme, user, pass, path, defaultport, query)
+func ParseURL(rawHost, scheme, user, pass, path, defaultPort, query string) (mb.HostData, error) {
+	u, transport, err := getURL(rawHost, scheme, user, pass, path, defaultPort, query)
 
 	if err != nil {
 		return mb.HostData{}, err
@@ -187,7 +187,7 @@ func SetURLUser(u *url.URL, defaultUser, defaultPass string) {
 // getURL constructs a URL from the rawHost value and adds the provided user,
 // password, path, and query params if one was not set in the rawURL value.
 func getURL(
-	rawURL, scheme, username, password, path, defaultport, query string,
+	rawURL, scheme, username, password, path, defaultPort, query string,
 ) (*url.URL, dialer.Builder, error) {
 
 	if parts := strings.SplitN(rawURL, "://", 2); len(parts) != 2 {
@@ -258,8 +258,8 @@ func getURL(
 			return nil, t, fmt.Errorf("error parsing URL: empty host")
 		}
 		// Add default port to host if port is empty and defaultport is set
-		if port == "" && defaultport != "" {
-			u.Host = net.JoinHostPort(host, defaultport)
+		if port == "" && defaultPort != "" {
+			u.Host = net.JoinHostPort(host, defaultPort)
 		}
 	}
 
