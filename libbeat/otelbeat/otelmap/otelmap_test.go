@@ -47,7 +47,7 @@ func TestFromMapstrTime(t *testing.T) {
 	}
 }
 
-func TestFromMapstrCommongTime(t *testing.T) {
+func TestFromMapstrCommonTime(t *testing.T) {
 	tests := []struct {
 		mapstr_val  string
 		pcommon_val string
