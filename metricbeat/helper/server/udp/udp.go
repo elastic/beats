@@ -20,6 +20,7 @@ package udp
 import (
 	"fmt"
 	"net"
+	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -55,7 +56,7 @@ func NewUdpServer(base mb.BaseMetricSet) (server.Server, error) {
 		return nil, err
 	}
 
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", config.Host, config.Port))
+	addr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(config.Host, strconv.Itoa(config.Port)))
 
 	if err != nil {
 		return nil, err
