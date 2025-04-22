@@ -34,9 +34,7 @@ organizations:ListAccounts
 
 The aws billing metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-billing-overview.png
-:alt: metricbeat aws billing overview
-:::
+![metricbeat aws billing overview](images/metricbeat-aws-billing-overview.png)
 
 
 ## Configuration example [_configuration_example_2]

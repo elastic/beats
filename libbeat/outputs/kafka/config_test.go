@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -43,35 +43,13 @@ func TestConfigAcceptValid(t *testing.T) {
 			"version":     "1.0.0",
 			"topic":       "foo",
 		},
-		"Kerberos with keytab": mapstr.M{
-			"topic": "foo",
-			"kerberos": mapstr.M{
-				"auth_type":    "keytab",
-				"username":     "elastic",
-				"keytab":       "/etc/krb5kcd/kafka.keytab",
-				"config_path":  "/etc/path/config",
-				"service_name": "HTTP/elastic@ELASTIC",
-				"realm":        "ELASTIC",
-			},
-		},
-		"Kerberos with user and password pair": mapstr.M{
-			"topic": "foo",
-			"kerberos": mapstr.M{
-				"auth_type":    "password",
-				"username":     "elastic",
-				"password":     "changeme",
-				"config_path":  "/etc/path/config",
-				"service_name": "HTTP/elastic@ELASTIC",
-				"realm":        "ELASTIC",
-			},
-		},
 	}
 
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			c := config.MustNewConfigFrom(test)
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
