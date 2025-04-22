@@ -19,6 +19,7 @@ package sys
 
 import (
 	"sync"
+	"bytes"
 
 	"golang.org/x/sys/windows"
 	"golang.org/x/text/encoding"
@@ -48,6 +49,8 @@ func initANSIDecoder() *encoding.Decoder {
 }
 
 func ANSIBytesToString(enc []byte) (string, error) {
-	out, err := getCachedANSIDecoder().Bytes(enc)
+	// Trim to the null terminator
+	prefix, _, _ := bytes.Cut(enc, []byte("\x00"))
+	out, err := getCachedANSIDecoder().Bytes(prefix)
 	return string(out), err
 }
