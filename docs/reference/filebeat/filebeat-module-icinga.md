@@ -89,10 +89,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with sample dashboards. For example:
 
-:::{image} images/kibana-icinga-main.png
-:alt: kibana icinga main
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana icinga main](images/kibana-icinga-main.png)
 
 
 ## Fields [_fields_22]

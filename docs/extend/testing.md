@@ -115,4 +115,11 @@ If the tests were run to create a test coverage, the coverage report files can b
 
 All tests can be run with the Go race detector enabled by setting the environment variable `RACE_DETECTOR=1`. This applies to tests in Go and Python. For Python the test binary has to be recompile when the flag is changed. Having the race detection enabled will slow down the tests.
 
+## Stress testing [_stress_testing]
 
+Stress testing can be useful to reproduce CI flaky runs or check for flakiness in tests.
+
+```bash
+./script/stresstest.sh --help
+./script/stresstest.sh ./libbeat/common/backoff ^TestBackoff$ -p 32
+```

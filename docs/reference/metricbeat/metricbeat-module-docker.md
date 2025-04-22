@@ -6,7 +6,7 @@ mapped_pages:
 # Docker module [metricbeat-module-docker]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/docker.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/docker/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -24,7 +24,7 @@ This module fetches metrics from [Docker](https://www.docker.com/) containers. T
 
 The Docker module is currently tested on Linux and Mac with the community edition engine, versions 1.11 and 17.09.0-ce. It is not tested on Windows, but it should also work there.
 
-The Docker module supports collection of metrics from Podman’s Docker-compatible API. It has been tested on Linux and Mac with Podman Rest API v2.0.0 and above.
+The Docker module supports collection of metrics from Podman’s Docker-compatible API on Metricbeat 8.16.2 and 8.17.1, and higher versions. It has been tested on Linux and Mac with Podman Rest API v2.0.0 and above.
 
 
 ## Module-specific configuration notes [_module_specific_configuration_notes_6]

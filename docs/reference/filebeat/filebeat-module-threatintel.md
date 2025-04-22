@@ -6,7 +6,7 @@ mapped_pages:
 # Threat Intel module [filebeat-module-threatintel]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/ti_abusech.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/ti_abusech/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -426,45 +426,33 @@ $$$a$$$
 
 This module comes with dashboards for the threat information feeds.
 
-:::{image} images/filebeat-threatintel-overview.png
-:alt: filebeat threatintel overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel overview](images/filebeat-threatintel-overview.png)
 
 Overview of the information provided, and the health of, the Threat Intel module.
 
-:::{image} images/filebeat-threatintel-abuse-malware.png
-:alt: filebeat threatintel abuse malware
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel abuse malware](images/filebeat-threatintel-abuse-malware.png)
 
 Overview of the information provided by the Abuse.ch Malware feed.
 
-:::{image} images/filebeat-threatintel-abuse-url.png
-:alt: filebeat threatintel abuse url
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel abuse url](images/filebeat-threatintel-abuse-url.png)
 
 Overview of the information provided by the Abuse.ch URL feed.
 
-:::{image} images/filebeat-threatintel-alienvault-otx.png
-:alt: filebeat threatintel alienvault otx
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel alienvault otx](images/filebeat-threatintel-alienvault-otx.png)
 
 Overview of the information provided by the AlienVault OTX feed.
 
-:::{image} images/filebeat-threatintel-anomali.png
-:alt: filebeat threatintel anomali
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel anomali](images/filebeat-threatintel-anomali.png)
 
 Overview of the information provided by the Anomali Limo and Anomali ThreatStream feeds.
 
-:::{image} images/filebeat-threatintel-misp.png
-:alt: filebeat threatintel misp
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel misp](images/filebeat-threatintel-misp.png)
 
 Overview of the information provided by the MISP feed.
 
@@ -523,52 +511,38 @@ ThreatQ fields are mapped to the following ECS fields:
 
 This module comes with dashboards for the threat information feeds.
 
-:::{image} images/filebeat-threatintel-overview.png
-:alt: filebeat threatintel overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel overview](images/filebeat-threatintel-overview.png)
 
 Overview of the information provided, and the health of, the Threat Intel module.
 
-:::{image} images/filebeat-threatintel-abuse-malware.png
-:alt: filebeat threatintel abuse malware
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel abuse malware](images/filebeat-threatintel-abuse-malware.png)
 
 Overview of the information provided by the Abuse.ch Malware feed.
 
-:::{image} images/filebeat-threatintel-abuse-url.png
-:alt: filebeat threatintel abuse url
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel abuse url](images/filebeat-threatintel-abuse-url.png)
 
 Overview of the information provided by the Abuse.ch URL feed.
 
-:::{image} images/filebeat-threatintel-alienvault-otx.png
-:alt: filebeat threatintel alienvault otx
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel alienvault otx](images/filebeat-threatintel-alienvault-otx.png)
 
 Overview of the information provided by the AlienVault OTX feed.
 
-:::{image} images/filebeat-threatintel-anomali.png
-:alt: filebeat threatintel anomali
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel anomali](images/filebeat-threatintel-anomali.png)
 
 Overview of the information provided by the Anomali Limo and Anomali ThreatStream feeds.
 
-:::{image} images/filebeat-threatintel-misp.png
-:alt: filebeat threatintel misp
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel misp](images/filebeat-threatintel-misp.png)
 
 Overview of the information provided by the MISP feed.
 
-:::{image} images/filebeat-threatintel-threatq.png
-:alt: filebeat threatintel threatq
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel threatq](images/filebeat-threatintel-threatq.png)
 
 Overview of the information provided by the ThreatQuotient feed.
 

@@ -6,7 +6,7 @@ mapped_pages:
 # ActiveMQ module [filebeat-module-activemq]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/activemq.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/activemq/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -102,13 +102,9 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 The ActiveMQ module comes with several predefined dashboards for application and audit logs. For example:
 
-:::{image} images/filebeat-activemq-application-events.png
-:alt: filebeat activemq application events
-:::
+![filebeat activemq application events](images/filebeat-activemq-application-events.png)
 
-:::{image} images/filebeat-activemq-audit-events.png
-:alt: filebeat activemq audit events
-:::
+![filebeat activemq audit events](images/filebeat-activemq-audit-events.png)
 
 
 ## Fields [_fields_3]

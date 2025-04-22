@@ -6,7 +6,7 @@ mapped_pages:
 # Kubernetes module [metricbeat-module-kubernetes]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/kubernetes.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/kubernetes/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -179,29 +179,21 @@ processors:
 
 Kubernetes cluster overview example:
 
-:::{image} images/metricbeat-kubernetes-clusteroverview.png
-:alt: metricbeat kubernetes clusteroverview
-:::
+![metricbeat kubernetes clusteroverview](images/metricbeat-kubernetes-clusteroverview.png)
 
 If you are setting collection period to a value bigger than `2m` you will need to increase the Interval (in Panel Options) for "Desired Pods", "Available Pods" and "Unavailable Pods" visualisations.
 
 Kubernetes controller manager example:
 
-:::{image} images/metricbeat-kubernetes-controllermanager.png
-:alt: metricbeat kubernetes controllermanager
-:::
+![metricbeat kubernetes controllermanager](images/metricbeat-kubernetes-controllermanager.png)
 
 Kubernetes scheduler example:
 
-:::{image} images/metricbeat_kubernetes_scheduler.png
-:alt: metricbeat kubernetes scheduler
-:::
+![metricbeat kubernetes scheduler](images/metricbeat_kubernetes_scheduler.png)
 
 Kubernetes proxy example:
 
-:::{image} images/metricbeat-kubernetes-proxy.png
-:alt: metricbeat kubernetes proxy
-:::
+![metricbeat kubernetes proxy](images/metricbeat-kubernetes-proxy.png)
 
 
 ## Example configuration [_example_configuration_37]
