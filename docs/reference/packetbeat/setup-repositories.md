@@ -85,7 +85,7 @@ To add the Beats repository for YUM:
     ```shell subs=true
     [elastic-{{major-version}}]
     name=Elastic repository for {{major-version}} packages
-    baseurl=https://artifacts.elastic.co/packages/{{major-version}}/yum
+    baseurl=https://artifacts.elastic.co/packages/9.x/yum
     gpgcheck=1
     gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
     enabled=1
@@ -97,7 +97,7 @@ To add the Beats repository for YUM:
     The package is free to use under the Elastic license. An alternative package which contains only features that are available under the Apache 2.0 license is also available. To install it, use the following `baseurl` in your `.repo` file:
 
     ```shell subs=true
-    baseurl=https://artifacts.elastic.co/packages/oss-{{major-version}}/yum
+    baseurl=https://artifacts.elastic.co/packages/oss-9.x/yum
     ```
     :::
 
