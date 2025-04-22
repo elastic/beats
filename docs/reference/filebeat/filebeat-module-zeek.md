@@ -503,10 +503,8 @@ Zeek requires a Unix-like platform, and it currently supports Linux, FreeBSD, an
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/kibana-zeek.png
-:alt: kibana zeek
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana zeek](images/kibana-zeek.png)
 
 
 ## Fields [_fields_55]

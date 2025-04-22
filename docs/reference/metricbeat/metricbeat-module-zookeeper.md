@@ -31,9 +31,7 @@ Note that from ZooKeeper 3.6.0, `mntr`, `stat`, `ruok`, `conf`, `isro`, `cons` c
 
 The Zookeeper module comes with a predefined dashboard:
 
-:::{image} images/metricbeat-zookeeper.png
-:alt: metricbeat zookeeper
-:::
+![metricbeat zookeeper](images/metricbeat-zookeeper.png)
 
 
 ## Example configuration [_example_configuration_69]

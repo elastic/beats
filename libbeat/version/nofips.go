@@ -15,17 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build freebsd || openbsd || netbsd || darwin
+//go:build !requirefips
 
-package file_integrity
+package version
 
-import (
-	"syscall"
-	"time"
-)
-
-func fileTimes(stat *syscall.Stat_t) (atime, mtime, ctime time.Time) {
-	return time.Unix(0, stat.Atimespec.Nano()).UTC(),
-		time.Unix(0, stat.Mtimespec.Nano()).UTC(),
-		time.Unix(0, stat.Mtimespec.Nano()).UTC()
-}
+// Set FIPSDistribution to false for non-FIPS builds.
+const FIPSDistribution bool = false
