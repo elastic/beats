@@ -168,7 +168,7 @@ func TestFromMapstrMapstr(t *testing.T) {
 		},
 	}
 	want := mapstr.M{}
-	want["inner"] = mapstr.M{
+	want["inner"] = map[string]any{
 		"inner_int":          42,
 		"inner_string_slice": []any{"string"},
 	}
@@ -184,13 +184,13 @@ func TestFromMapstrSliceMapstr(t *testing.T) {
 	}
 	want := mapstr.M{}
 	want["slice"] = []any{
-		mapstr.M{
+		map[string]any{
 			"item": 1,
 		},
-		mapstr.M{
+		map[string]any{
 			"item": 1,
 		},
-		mapstr.M{
+		map[string]any{
 			"item": 1,
 		},
 	}
