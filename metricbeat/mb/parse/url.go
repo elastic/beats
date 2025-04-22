@@ -117,7 +117,7 @@ func NewHostDataFromURL(u *url.URL) mb.HostData {
 	return NewHostDataFromURLWithTransport(dialer.NewDefaultDialerBuilder(), u)
 }
 
-// NewHostDataFromURLWithTransport Allow to specify what kind of transport to in conjunction of the
+// NewHostDataFromURLWithTransport allows to specify the type of transport to use in conjunction with the
 // url, this is useful if you use a combined scheme like "http+unix://" or "http+npipe".
 func NewHostDataFromURLWithTransport(transport dialer.Builder, u *url.URL) mb.HostData {
 	var user, pass string
