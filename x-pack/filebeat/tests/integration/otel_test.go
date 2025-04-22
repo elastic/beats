@@ -176,15 +176,15 @@ func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 }
 
 func assertMonitoring(t *testing.T) {
-	r, err := http.Get("http://localhost:5066") //nolint:noctx // fine for tests
+	r, err := http.Get("http://localhost:5066") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	r, err = http.Get("http://localhost:5066/stats") //nolint:noctx // fine for tests
+	r, err = http.Get("http://localhost:5066/stats") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	r, err = http.Get("http://localhost:5066/not-exist") //nolint:noctx // fine for tests
+	r, err = http.Get("http://localhost:5066/not-exist") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }
