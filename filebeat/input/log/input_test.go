@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -214,7 +215,8 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 		return channel.SubOutlet(capturer), nil
 	})
 
-	input, err := NewInput(config, connector, context)
+	logger := logptest.NewTestingLogger(t, "")
+	input, err := NewInput(config, connector, context, logger)
 	if err != nil {
 		t.Error(err)
 		return
@@ -263,7 +265,8 @@ func TestNewInputError(t *testing.T) {
 
 	context := input.Context{}
 
-	_, err := NewInput(config, connector, context)
+	logger := logptest.NewTestingLogger(t, "")
+	_, err := NewInput(config, connector, context, logger)
 	assert.Error(t, err)
 }
 

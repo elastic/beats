@@ -30,6 +30,12 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+const (
+	metricEventsPipelineTotal     = "events_pipeline_total"
+	metricEventsPipelineFiltered  = "events_pipeline_filtered_total"
+	metricEventsPipelinePublished = "events_pipeline_published_total"
+)
+
 // InputManager creates and maintains actions and background processes for an
 // input type.
 // The InputManager is used to create inputs. The InputManager can provide
@@ -114,18 +120,16 @@ func (c *Context) UpdateStatus(status status.Status, msg string) {
 // the PipelineClientListener or a beat.CombinedClientListener. It's the latter
 // when clientListener is non-nil.
 // The PipelineClientListener collects pipeline metrics for an input. The
-// metrics are created on reg.
+// metrics are created on reg. If there is already a metric with the same name
+// on reg, the existing metric will be used.
 func NewPipelineClientListener(
 	reg *monitoring.Registry,
 	clientListener beat.ClientListener) beat.ClientListener {
 
 	var pcl beat.ClientListener = &PipelineClientListener{
-		eventsTotal: monitoring.NewUint(
-			reg, "events_pipeline_total"),
-		eventsFiltered: monitoring.NewUint(
-			reg, "events_pipeline_filtered_total"),
-		eventsPublished: monitoring.NewUint(
-			reg, "events_pipeline_published_total"),
+		eventsTotal:     getMonitoringUint(reg, metricEventsPipelineTotal),
+		eventsFiltered:  getMonitoringUint(reg, metricEventsPipelineFiltered),
+		eventsPublished: getMonitoringUint(reg, metricEventsPipelinePublished),
 	}
 
 	if clientListener != nil {
@@ -134,7 +138,21 @@ func NewPipelineClientListener(
 			B: pcl,
 		}
 	}
+
 	return pcl
+}
+
+// getMonitoringUint returns a *monitoring.Uint metric with the given name.
+// If the metric does not exist, it will be created and registered in the
+// registry. If the metric already exists, it will be returned.
+func getMonitoringUint(reg *monitoring.Registry, name string) *monitoring.Uint {
+	monVar := reg.Get(name)
+	if monVar == nil {
+		return monitoring.NewUint(
+			reg, name)
+	}
+
+	return monVar.(*monitoring.Uint)
 }
 
 // PipelineClientListener implements beat.ClientListener to collect pipeline
