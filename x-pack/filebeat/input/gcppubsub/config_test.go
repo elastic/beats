@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package gcppubsub
 
 import (
@@ -12,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+//nolint:gosec // false positive
 const googleApplicationCredentialsVar = "GOOGLE_APPLICATION_CREDENTIALS"
 
 func TestConfigValidateGoogleAppDefaultCreds(t *testing.T) {

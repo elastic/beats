@@ -7,6 +7,7 @@ package fbreceiver
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -203,17 +204,24 @@ func TestMultipleReceivers(t *testing.T) {
 			},
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
-			require.Conditionf(t, func() bool {
-				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
-			}, "expected receivers to have logs, got logs: %v", logs)
+			r1ok := assert.Greater(t, len(logs["r1"]), 0, "receive r1 does not have any logs")
+			r2ok := assert.Greater(t, len(logs["r2"]), 0, "receive r2 does not have any logs")
+			// logs for debug if it fails again
+			fmt.Printf("len(logs[\"r1\"]): %d\n", len(logs["r1"]))
+			fmt.Printf("len(logs[\"r2\"]): %d\n", len(logs["r2"]))
+			if !r1ok || !r2ok {
+				fmt.Printf("logs[\"r1\"]: %v\n", logs["r1"])
+				fmt.Printf("logs[\"r2\"]: %v\n", logs["r2"])
+				fmt.Printf("all logs: %v\n", logs)
+			}
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
 			// logger in Beats was global, causing logger fields to be
 			// overwritten when multiple receivers started in the same process.
-			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("name", "r1"))
+			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r1"))
 			assert.Equal(t, 1, r1StartLogs.Len(), "r1 should have a single start log")
-			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("name", "r2"))
+			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
 			require.Equal(t, 1, r2StartLogs.Len(), "r2 should have a single start log")
 		},
 	})
