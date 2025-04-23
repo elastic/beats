@@ -21,7 +21,7 @@ data path, if it is found, then the new service is installed using the
 old default. The script also accepts parameters (`UseLegacyPath` and
 `ForceNewDataPath`) to control this behaviour.
 
-In a PowerShell prompt you can use `Get-Help install-service.ps1
+In a PowerShell prompt you can use `Get-Help install-service-<Beat Name>.ps1
 -detailed` to get detailed help.
 
 ::::
