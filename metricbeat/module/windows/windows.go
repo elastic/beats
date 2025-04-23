@@ -48,7 +48,7 @@ type Module struct {
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
 	once.Do(func() {
-		initModule(base.Logger())
+		initModule(base.Logger)
 	})
 
 	return &Module{BaseModule: base}, nil
