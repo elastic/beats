@@ -49,17 +49,12 @@ $LegacyDataPath = "$env:PROGRAMDATA\{{.BeatName}}"
 If ($ForceNewDataPath -eq $False){
   If (($UseLegacyPath -eq $True) -or (Test-Path $LegacyDataPath)) {
     $BasePath = $env:PROGRAMDATA
-    Write-Debug "`$UseLegacyPath=$UseLegacyPath, Previous Installation: $(Test-Path $LegacyDataPath)"
   }
 }
 
 $HomePath = "$BasePath\{{.BeatName}}"
 $LogsPath = "$HomePath\log"
 $KeystorePath = "$workdir\data\{{.BeatName}}.keystore"
-
-Write-Debug "Base folder: $BasePath"
-Write-Debug "Logs folder: $HomePath"
-Write-Debug "Data folder: $LogsPath"
 
 $FullCmd = "`"$workdir\{{.BeatName}}.exe`" " +
            "--environment=windows_service " +
