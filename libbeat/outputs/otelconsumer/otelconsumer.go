@@ -130,6 +130,8 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 				observedTimestamp = pcommon.NewTimestampFromTime(created)
 			case common.Time:
 				observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+			default:
+				out.log.Warnf("Invalid type for 'event.created': expected time.Time or common.Time, got %T. Using log record timestamp instead.", created)
 			}
 		}
 		logRecord.SetObservedTimestamp(observedTimestamp)

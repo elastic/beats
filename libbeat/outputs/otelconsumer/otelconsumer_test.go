@@ -208,14 +208,16 @@ func TestPublish(t *testing.T) {
 		eventCreatedTime := eventTime.Add(-time.Minute)
 
 		eventWithTime := beat.Event{Fields: mapstr.M{"event": mapstr.M{"created": eventCreatedTime}}}
-		batch := outest.NewBatch(event1, eventWithTime)
+		eventWithInvalidTime := beat.Event{Fields: mapstr.M{"event": mapstr.M{"created": 42}}}
+		events := []beat.Event{event1, eventWithTime, eventWithInvalidTime}
+		batch := outest.NewBatch(events...)
 		for _, ev := range batch.Events() {
 			ev.Content.Timestamp = eventTime
 		}
 
 		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
 			logRecords := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords()
-			assert.Equal(t, 2, logRecords.Len(), "log records should be equal to events in the batch")
+			assert.Equal(t, len(events), logRecords.Len(), "log records should be equal to events in the batch")
 
 			// no event.created, observed timestamp should be the same as the event timestamp
 			record := logRecords.At(0)
@@ -226,8 +228,14 @@ func TestPublish(t *testing.T) {
 			// has event.created, observed timestamp should be the same as event.created
 			record = logRecords.At(1)
 			observedTimestamp = record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
-			wantTimestamp := eventCreatedTime.UTC().Format("2006-01-02T15:04:05.000Z")
-			assert.Equal(t, wantTimestamp, observedTimestamp, "observed timestamp should match event.created")
+			eventCreatedTimestamp := eventCreatedTime.UTC().Format("2006-01-02T15:04:05.000Z")
+			assert.Equal(t, eventCreatedTimestamp, observedTimestamp, "observed timestamp should match event.created")
+
+			// has event.created with invalid type, observed timestamp should fall back to the event timestamp
+			record = logRecords.At(2)
+			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			observedTimestamp = record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			assert.Equal(t, recordTimestamp, observedTimestamp, "observed timestamp should match event.created")
 			return nil
 		})
 
