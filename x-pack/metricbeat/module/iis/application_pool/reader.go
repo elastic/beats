@@ -234,7 +234,7 @@ func (r *Reader) close() error {
 }
 
 func (r *Reader) getAllAppPool() (map[string]string, error) {
-	commands := "Import-Module WebAdministration\r\n\tGet-IISAppPool"
+	commands := "Get-IISAppPool"
 	stdout, stderr, err := Run(commands)
 
 	if err != nil {
