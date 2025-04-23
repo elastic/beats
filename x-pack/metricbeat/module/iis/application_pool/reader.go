@@ -351,7 +351,12 @@ func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess 
 	var workers []WorkerProcess
 	for key, values := range counterValues {
 		if strings.Contains(key, "\\ID Process") && values[0].Measurement != nil {
-			workers = append(workers, WorkerProcess{instanceName: values[0].Instance, processId: int(values[0].Measurement.(float64))})
+			if pidFloat, ok := values[0].Measurement.(float64); ok {
+				workers = append(workers, WorkerProcess{
+					instanceName: values[0].Instance,
+					processId:    int(pidFloat),
+				})
+			}
 		}
 	}
 	return workers

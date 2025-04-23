@@ -11,17 +11,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"time"
 
-	"math/rand"
+	"math/rand/v2"
 )
 
-func RandomInt() int {
-	return rand.New(rand.NewSource(time.Now().UnixNano())).Int()
-}
-
 func Run(commands string) (*string, *string, error) {
-	rInt := RandomInt()
+	rInt := rand.Int()
 	filename := fmt.Sprintf("command-%d.ps1", rInt)
 	err := os.WriteFile(filename, []byte(commands), os.FileMode(0700))
 	if err != nil {
