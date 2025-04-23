@@ -37,7 +37,7 @@ func init() {
 
 // NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"node", "node_stats"}, []string{}, base.Logger().Named(ModuleName))
+	return elastic.NewModule(&base, []string{"node", "node_stats"}, []string{}, base.Logger.Named(ModuleName))
 }
 
 // ModuleName is the name of this module.

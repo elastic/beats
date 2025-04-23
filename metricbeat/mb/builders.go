@@ -62,7 +62,7 @@ func NewModule(config *conf.C, r *Register, logger *logp.Logger) (Module, []Metr
 		return nil, nil, err
 	}
 
-	metricsets, err := initMetricSets(r, module)
+	metricsets, err := initMetricSets(r, module, logger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -76,7 +76,7 @@ func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger) (BaseModule
 	baseModule := BaseModule{
 		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
-		logger:    logger,
+		Logger:    logger,
 	}
 	err := rawConfig.Unpack(&baseModule.config)
 	if err != nil {
@@ -107,12 +107,12 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 	return f(bm)
 }
 
-func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
+func initMetricSets(r *Register, m Module, logger *logp.Logger) ([]MetricSet, error) {
 	var (
 		errs multierror.Errors
 	)
 
-	bms, err := newBaseMetricSets(r, m)
+	bms, err := newBaseMetricSets(r, m, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func initMetricSets(r *Register, m Module) ([]MetricSet, error) {
 // newBaseMetricSets creates a new BaseMetricSet for all MetricSets defined
 // in the module's config. An error is returned if no MetricSets are specified
 // in the module's config and no default MetricSet is defined.
-func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
+func newBaseMetricSets(r *Register, m Module, logger *logp.Logger) ([]BaseMetricSet, error) {
 	hosts := []string{""}
 	if l := m.Config().Hosts; len(l) > 0 {
 		hosts = l
@@ -199,7 +199,7 @@ func newBaseMetricSets(r *Register, m Module) ([]BaseMetricSet, error) {
 				monitoring.NewString(metrics, "id").Set(msID)
 			}
 
-			logger := m.Logger().Named(m.Name() + "." + name)
+			logger := logger.Named(m.Name() + "." + name)
 			if m.Config().ID != "" {
 				logger = logger.With("id", m.Config().ID)
 			}

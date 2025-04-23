@@ -68,7 +68,6 @@ type Module interface {
 	UnpackConfig(to interface{}) error                      // UnpackConfig unpacks the raw module config to the given object.
 	UpdateStatus(status status.Status, msg string)          // UpdateStatus updates the status of the module. Reflected on elastic-agent.
 	SetStatusReporter(statusReporter status.StatusReporter) // SetStatusReporter updates the status reporter for the given module.
-	Logger() *logp.Logger                                   // Module specific logger
 }
 
 // BaseModule implements the Module interface.
@@ -81,7 +80,7 @@ type BaseModule struct {
 	config         ModuleConfig
 	rawConfig      *conf.C
 	statusReporter status.StatusReporter
-	logger         *logp.Logger
+	Logger         *logp.Logger
 }
 
 func (m *BaseModule) String() string {
@@ -138,7 +137,7 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	newBM := &BaseModule{
 		name:      m.name,
 		rawConfig: &config,
-		logger:    m.logger,
+		Logger:    m.Logger,
 	}
 
 	if err := config.Unpack(&newBM.config); err != nil {
@@ -146,11 +145,6 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	}
 
 	return newBM, nil
-}
-
-// Logger returns the logger
-func (m *BaseModule) Logger() *logp.Logger {
-	return m.logger
 }
 
 // MetricSet interfaces

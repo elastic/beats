@@ -86,7 +86,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 	xpackEnabledMetricSets := []string{
 		"stats", "cluster_rules", "node_rules", "cluster_actions", "node_actions",
 	}
-	return elastic.NewModule(&base, xpackEnabledMetricSets, []string{}, base.Logger().Named(ModuleName))
+	return elastic.NewModule(&base, xpackEnabledMetricSets, []string{}, base.Logger.Named(ModuleName))
 }
 
 // GetVersion returns the version of the Kibana instance
