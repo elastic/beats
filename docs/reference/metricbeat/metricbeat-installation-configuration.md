@@ -170,156 +170,157 @@ Metricbeat uses modules to collect metrics. Each module defines the basic logic 
 
 1. Identify the modules you need to enable. To see the list of available [modules](/reference/metricbeat/metricbeat-modules.md), run:
 
-    :::::::{tab-set}
+:::::::{tab-set}
 
-    ::::::{tab-item} DEB
-    ```sh
-    metricbeat modules list
-    ```
-    ::::::
+::::::{tab-item} DEB
+```sh
+metricbeat modules list
+```
+::::::
 
-    ::::::{tab-item} RPM
-    ```sh
-    metricbeat modules list
-    ```
-    ::::::
+::::::{tab-item} RPM
+```sh
+metricbeat modules list
+```
+::::::
 
-    ::::::{tab-item} MacOS
-    ```sh
-    ./metricbeat modules list
-    ```
-    ::::::
+::::::{tab-item} MacOS
+```sh
+./metricbeat modules list
+```
+::::::
 
-    ::::::{tab-item} Linux
-    ```sh
-    ./metricbeat modules list
-    ```
-    ::::::
+::::::{tab-item} Linux
+```sh
+./metricbeat modules list
+```
+::::::
 
-    ::::::{tab-item} Windows
-    ```sh
-    PS > .\metricbeat.exe modules list
-    ```
-    ::::::
+::::::{tab-item} Windows
+```sh
+PS > .\metricbeat.exe modules list
+```
+::::::
 
-    ::::::{tab-item} DEB
-    ```sh
-    metricbeat modules enable nginx
-    ```
-    ::::::
+::::::{tab-item} DEB
+```sh
+metricbeat modules enable nginx
+```
+::::::
 
-    ::::::{tab-item} RPM
-    ```sh
-    metricbeat modules enable nginx
-    ```
-    ::::::
+::::::{tab-item} RPM
+```sh
+metricbeat modules enable nginx
+```
+::::::
 
-    ::::::{tab-item} MacOS
-    ```sh
-    ./metricbeat modules enable nginx
-    ```
-    ::::::
+::::::{tab-item} MacOS
+```sh
+./metricbeat modules enable nginx
+```
+::::::
 
-    ::::::{tab-item} Linux
-    ```sh
-    ./metricbeat modules enable nginx
-    ```
-    ::::::
+::::::{tab-item} Linux
+```sh
+./metricbeat modules enable nginx
+```
+::::::
 
-    ::::::{tab-item} Windows
-    ```sh
-    PS > .\metricbeat.exe modules enable nginx
-    ```
-    ::::::
+::::::{tab-item} Windows
+```sh
+PS > .\metricbeat.exe modules enable nginx
+```
+::::::
 
-    ::::::{tab-item} DEB
-    ```sh
-    metricbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} DEB
+```sh
+metricbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} RPM
-    ```sh
-    metricbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} RPM
+```sh
+metricbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} MacOS
-    ```sh
-    ./metricbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} MacOS
+```sh
+./metricbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} Linux
-    ```sh
-    ./metricbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} Linux
+```sh
+./metricbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} Windows
-    ```sh
-    PS > .\metricbeat.exe setup -e
-    ```
-    ::::::
+::::::{tab-item} Windows
+```sh
+PS > .\metricbeat.exe setup -e
+```
+::::::
 
-    ::::::{tab-item} DEB
-    ```sh
-    sudo service metricbeat start
-    ```
+::::::{tab-item} DEB
+```sh
+sudo service metricbeat start
+```
 
-    ::::{note}
-    If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
-    ::::
-
-
-    Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} RPM
-    ```sh
-    sudo service metricbeat start
-    ```
-
-    ::::{note}
-    If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
-    ::::
+::::{note}
+If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
+::::
 
 
-    Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
-    ::::::
+Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
+::::::
 
-    ::::::{tab-item} MacOS
-    ```sh
-    sudo chown root metricbeat.yml <1>
-    sudo chown root modules.d/nginx.yml <1>
-    sudo ./metricbeat -e
-    ```
+::::::{tab-item} RPM
+```sh
+sudo service metricbeat start
+```
 
-    1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
+::::{note}
+If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
+::::
 
-    ::::::{tab-item} Linux
-    ```sh
-    sudo chown root metricbeat.yml <1>
-    sudo chown root modules.d/nginx.yml <1>
-    sudo ./metricbeat -e
-    ```
 
-    1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
+Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
+::::::
 
-    ::::::{tab-item} Windows
-    ```sh
-    PS C:\Program Files\metricbeat> Start-Service metricbeat
-    ```
+::::::{tab-item} MacOS
+```sh
+sudo chown root metricbeat.yml <1>
+sudo chown root modules.d/nginx.yml <1>
+sudo ./metricbeat -e
+```
 
-    By default, Windows log files are stored in `C:\ProgramData\metricbeat\Logs`.
+1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
 
-    ::::{note}
-    On Windows, statistics about system load and swap usage are currently not captured
-    ::::
-    ::::::
-    :::::::
+::::::{tab-item} Linux
+```sh
+sudo chown root metricbeat.yml <1>
+sudo chown root modules.d/nginx.yml <1>
+sudo ./metricbeat -e
+```
+
+1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Windows
+```sh
+PS C:\Program Files\metricbeat> Start-Service metricbeat
+```
+
+By default, Windows log files are stored in `C:\ProgramData\metricbeat\Logs`.
+
+::::{note}
+On Windows, statistics about system load and swap usage are currently not captured
+::::
+::::::
+
+:::::::
 
 Metricbeat should begin streaming metrics to {{es}}.
 
