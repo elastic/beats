@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -105,7 +106,7 @@ func TestSingleInput(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
@@ -164,7 +165,7 @@ func TestInputStop_Wait(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
@@ -328,7 +329,7 @@ func TestMultiInput(t *testing.T) {
 
 	var inputContext finput.Context
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// initialize inputs
 	input1, err := NewInput(cfg1, connector, inputContext, logger)
 	require.NoError(t, err)
@@ -470,7 +471,7 @@ func TestMultiEventForEOFRetryHandlerInput(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
@@ -574,7 +575,7 @@ func TestNegativeCases(t *testing.T) {
 
 	cfg := conf.MustNewConfigFrom(config)
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input, err := NewInput(cfg, connector, inputContext, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)

@@ -81,10 +81,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with one sample dashboard including error and regular logs.
 
-:::{image} images/filebeat-mongodb-overview.png
-:alt: filebeat mongodb overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat mongodb overview](images/filebeat-mongodb-overview.png)
 
 
 ## Fields [_fields_31]

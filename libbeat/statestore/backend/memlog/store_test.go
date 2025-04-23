@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -35,7 +35,7 @@ func TestRecoverFromCorruption(t *testing.T) {
 		t.Fatalf("Failed to copy test file to the temporary directory: %v", err)
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	store, err := openStore(logger.Named("test"), path, 0660, 4096, false, func(_ uint64) bool {
 		return false
 	})
