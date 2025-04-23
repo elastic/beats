@@ -12,7 +12,7 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
-::::{dropdown} 'close.on_state_change.removed' defaults to false on Linux and MacOS.
+::::{dropdown} 'close.on_state_change.removed' defaults to `true` on Windows and `false` on the rest of the platforms.
 To keep the previous behaviour, add `close.on_state_change.removed:
 true` on every Filestream input.
 
