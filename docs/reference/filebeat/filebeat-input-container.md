@@ -6,8 +6,6 @@ mapped_pages:
 
 # Container input [filebeat-input-container]
 
-[7.16.0]
-
 ::::{warning}
 The container input is just a preset for the [`log`](/reference/filebeat/filebeat-input-log.md) input. The `log` input is deprecated in version 7.16 and disabled in version 9.0.
 
