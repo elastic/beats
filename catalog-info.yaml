@@ -747,7 +747,7 @@ spec:
         everyone:
           access_level: BUILD_AND_READ
       schedules:
-        Daily main:
+        Daily 7.17:
           branch: "7.17"
           cronline: "@daily"
           message: Builds daily `7.17` dra
@@ -1084,7 +1084,7 @@ spec:
         everyone:
           access_level: BUILD_AND_READ
       schedules:
-        Daily main:
+        Daily 7.17:
           branch: "7.17"
           cronline: "@daily"
           message: Builds daily `7.17` dra
