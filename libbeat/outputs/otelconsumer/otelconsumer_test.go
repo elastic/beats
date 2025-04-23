@@ -235,7 +235,7 @@ func TestPublish(t *testing.T) {
 			record = logRecords.At(2)
 			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
 			observedTimestamp = record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
-			assert.Equal(t, recordTimestamp, observedTimestamp, "observed timestamp should match event.created")
+			assert.Equal(t, recordTimestamp, observedTimestamp, "observed timestamp should match log record timestamp")
 			return nil
 		})
 
