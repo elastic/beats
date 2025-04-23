@@ -28,7 +28,12 @@ import (
 
 func TestNewReceiver(t *testing.T) {
 	monitorSocket := genSocketPath()
-	monitorHost := "unix://" + monitorSocket
+	monitorHost := ""
+	if runtime.GOOS == "windows" {
+		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
+	} else {
+		monitorHost = "unix://" + monitorSocket
+	}
 	config := Config{
 		Beatconfig: map[string]any{
 			"metricbeat": map[string]any{
