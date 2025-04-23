@@ -317,7 +317,8 @@ There are several ways to collect log data with Filebeat:
     PS C:\Program Files\filebeat> Start-Service filebeat
     ```
 
-    By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
+    By default, Windows log files are stored in `C:\Program Files\filebeat-Data\logs`.
+    For versions < 9.1.0, logs are stored by default in `C:\ProgramData\filebeat\Logs`.
     ::::::
 
     :::::::

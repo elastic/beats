@@ -328,7 +328,9 @@ Heartbeat comes with predefined assets for parsing, indexing, and visualizing yo
     PS C:\Program Files\heartbeat> Start-Service heartbeat
     ```
 
-    By default, Windows log files are stored in `C:\ProgramData\heartbeat\Logs`.
+    By default, Windows log files are stored in `C:\Program Files\heartbeat-Data\logs`.
+    For versions < 9.1.0, logs are stored by default in `C:\ProgramData\heartbeat\Logs`.
+
     ::::::
     :::::::
 

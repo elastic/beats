@@ -271,7 +271,8 @@ Auditbeat comes with predefined assets for parsing, indexing, and visualizing yo
     PS C:\Program Files\auditbeat> Start-Service auditbeat
     ```
 
-    By default, Windows log files are stored in `C:\ProgramData\auditbeat\Logs`.
+    By default, Windows log files are stored in `C:\Program Files\auditbeat-Data\logs`.
+    For versions < 9.1.0, logs are stored by default in `C:\ProgramData\auditbeat\Logs`.
     ::::::
 
     :::::::
