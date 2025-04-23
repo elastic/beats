@@ -25,8 +25,8 @@ ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override auto.create.topics.enable=true \
     --override delete.topic.enable=true \
     --override listener.security.protocol.map=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,SASL_SSL:SASL_SSL \
-    --override listeners=INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094,SASL_SSL://0.0.0.0:9093 \
-    --override advertised.listeners=INSIDE://${KAFKA_ADVERTISED_HOST}:9092,OUTSIDE://localhost:9094,SASL_SSL://localhost:9093 \
+    --override listeners=INSIDE://0.0.0.0:9192,OUTSIDE://0.0.0.0:9194,SASL_SSL://0.0.0.0:9193 \
+    --override advertised.listeners=INSIDE://${KAFKA_ADVERTISED_HOST}:9192,OUTSIDE://localhost:9194,SASL_SSL://localhost:9193 \
     --override inter.broker.listener.name=INSIDE \
     --override sasl.enabled.mechanisms=SCRAM-SHA-512 \
     --override listener.name.sasl_ssl.scram-sha-512.sasl.jaas.config="org.apache.kafka.common.security.scram.ScramLoginModule required;" \
