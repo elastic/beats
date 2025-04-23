@@ -84,14 +84,20 @@ func TestNewReceiver(t *testing.T) {
 						},
 					},
 				}
-				r, err := client.Get("http://unix/stats")
+				req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://unix/stats", nil)
+				if err != nil {
+					lastError.Reset()
+					lastError.WriteString(fmt.Sprintf("error creating request: %s", err))
+					return false
+				}
+				resp, err := client.Do(req)
 				if err != nil {
 					lastError.Reset()
 					lastError.WriteString(fmt.Sprintf("client.Get failed: %s", err))
 					return false
 				}
-				defer r.Body.Close()
-				body, err := io.ReadAll(r.Body)
+				defer resp.Body.Close()
+				body, err := io.ReadAll(resp.Body)
 				if err != nil {
 					lastError.Reset()
 					lastError.WriteString(fmt.Sprintf("io.ReadAll of body failed: %s", err))
@@ -162,7 +168,7 @@ func TestMultipleReceivers(t *testing.T) {
 func genSocketPath() string {
 	randData := make([]byte, 16)
 	for i := range len(randData) {
-		randData[i] = uint8(rand.UintN(255))
+		randData[i] = uint8(rand.UintN(255)) //nolint:gosec // 0-255 fits in a unint8
 	}
 	socketName := base64.URLEncoding.EncodeToString(randData) + ".sock"
 	socketDir := os.TempDir()
