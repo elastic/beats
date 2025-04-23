@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestStats(t *testing.T) {
@@ -60,10 +59,6 @@ func (m mockModule) Config() mb.ModuleConfig {
 }
 
 func (m mockModule) UnpackConfig(to interface{}) error {
-	return nil
-}
-
-func (m mockModule) Logger() *logp.Logger {
 	return nil
 }
 

@@ -47,7 +47,7 @@ type MetricbeatHostFSConfig struct {
 // InitSystemModule initializes either either the system or linux module. This will produce different modules depending on if we're running under agent or not.
 func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 	// common code for the base use case of `hostfs` being set at the module-level
-	logger := base.Logger()
+	logger := base.Logger
 	hostfs, userSet, err := findConfigValue(base)
 	if err != nil {
 		return nil, fmt.Errorf("error fetching config value: %w", err)
@@ -61,13 +61,13 @@ func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 
 func fleetInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module, error) {
 	once.Do(func() {
-		InitModule(modulepath, base.Logger())
+		InitModule(modulepath, base.Logger)
 	})
 
 	// The multiple invocations here might seem buggy, but we're dealing with a case were agent's config schemea (local, per-datastream) must mesh with the global HostFS scheme used by some libraries
 	// Strictly speaking, we can't guarantee that agent will send consistent HostFS config values across all datastreams, as it treats a global value as per-datastream.
 	if moduleSet {
-		InitModule(modulepath, base.Logger())
+		InitModule(modulepath, base.Logger)
 	}
 
 	return &Module{BaseModule: base, HostFS: modulepath, UserSetHostFS: moduleSet}, nil
@@ -84,7 +84,7 @@ func metricbeatInit(base mb.BaseModule, modulePath string) (mb.Module, error) {
 	}
 
 	once.Do(func() {
-		InitModule(hostfs, base.Logger())
+		InitModule(hostfs, base.Logger)
 	})
 	return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
 
