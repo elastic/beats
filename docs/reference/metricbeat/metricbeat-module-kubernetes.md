@@ -179,29 +179,21 @@ processors:
 
 Kubernetes cluster overview example:
 
-:::{image} images/metricbeat-kubernetes-clusteroverview.png
-:alt: metricbeat kubernetes clusteroverview
-:::
+![metricbeat kubernetes clusteroverview](images/metricbeat-kubernetes-clusteroverview.png)
 
 If you are setting collection period to a value bigger than `2m` you will need to increase the Interval (in Panel Options) for "Desired Pods", "Available Pods" and "Unavailable Pods" visualisations.
 
 Kubernetes controller manager example:
 
-:::{image} images/metricbeat-kubernetes-controllermanager.png
-:alt: metricbeat kubernetes controllermanager
-:::
+![metricbeat kubernetes controllermanager](images/metricbeat-kubernetes-controllermanager.png)
 
 Kubernetes scheduler example:
 
-:::{image} images/metricbeat_kubernetes_scheduler.png
-:alt: metricbeat kubernetes scheduler
-:::
+![metricbeat kubernetes scheduler](images/metricbeat_kubernetes_scheduler.png)
 
 Kubernetes proxy example:
 
-:::{image} images/metricbeat-kubernetes-proxy.png
-:alt: metricbeat kubernetes proxy
-:::
+![metricbeat kubernetes proxy](images/metricbeat-kubernetes-proxy.png)
 
 
 ## Example configuration [_example_configuration_37]

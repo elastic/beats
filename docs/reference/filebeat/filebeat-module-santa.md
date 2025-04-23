@@ -78,10 +78,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with a sample dashboard showing and overview of the processes that are executing.
 
-:::{image} images/kibana-santa-log-overview.png
-:alt: kibana santa log overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana santa log overview](images/kibana-santa-log-overview.png)
 
 
 ## Fields [_fields_48]

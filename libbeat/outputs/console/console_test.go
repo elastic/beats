@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -114,7 +115,7 @@ func TestConsoleOutput(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.title, func(t *testing.T) {
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 			batch := outest.NewBatch(test.events...)
 			lines, err := run(test.codec, logger, batch)
 			assert.NoError(t, err)

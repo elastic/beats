@@ -28,6 +28,8 @@ import (
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
+
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -95,7 +97,9 @@ func (m *ResourcePoolMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV
 	}
 
 	defer func() {
-		if err := client.Logout(ctx); err != nil {
+		err := vSphereClientUtil.Logout(ctx, client)
+
+		if err != nil {
 			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()

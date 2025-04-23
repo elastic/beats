@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
 
@@ -58,7 +58,7 @@ func TestLocker(t *testing.T) {
 	// Setup two beats with same name and data path
 	const beatName = "testbeat-testlocker"
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	b1 := beat.Info{Logger: logger}
 	b1.Beat = beatName
@@ -81,7 +81,7 @@ func TestLocker(t *testing.T) {
 
 func TestUnlock(t *testing.T) {
 	const beatName = "testbeat-testunlock"
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	b1 := beat.Info{Logger: logger}
 	b1.Beat = beatName
@@ -107,7 +107,7 @@ func TestUnlock(t *testing.T) {
 
 func TestUnlockWithRemainingFile(t *testing.T) {
 	const beatName = "testbeat-testunlockwithfile"
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	b1 := beat.Info{Logger: logger}
 	b1.Beat = beatName

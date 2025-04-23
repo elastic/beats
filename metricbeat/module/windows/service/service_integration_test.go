@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -53,7 +53,7 @@ func TestData(t *testing.T) {
 }
 
 func TestReadService(t *testing.T) {
-	reader, err := NewReader(logp.NewTestingLogger(t, ""))
+	reader, err := NewReader(logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

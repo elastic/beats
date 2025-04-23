@@ -17,11 +17,6 @@ To learn how to upgrade, check out [Upgrade](docs-content://deploy-manage/upgrad
 % **Action**<br> Steps for mitigating deprecation impact.
 % ::::
 
-% ## 9.0.0 [beats-900-deprecations]
+## 9.0.0 [beats-900-deprecations]
 
-% ::::{dropdown} Deprecation title
-% Description of the deprecation.
-% For more information, check [PR #](PR link).
-% **Impact**<br> Impact of deprecation. 
-% **Action**<br> Steps for mitigating deprecation impact.
-% ::::
+_No deprecations_

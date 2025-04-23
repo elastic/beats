@@ -86,6 +86,48 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "mandatory-linux-unit-test-fips-tag"
+        command: |
+          cd x-pack/libbeat
+          mage unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "x-pack/libbeat/build/*.xml"
+          - "x-pack/libbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+
+      - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 fips140=only Unit Tests"
+        key: "mandatory-linux-unit-test-fips-only"
+        command: |
+          cd x-pack/libbeat
+          mage goFIPSOnlyUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "x-pack/libbeat/build/*.xml"
+          - "x-pack/libbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/libbeat: Ubuntu x86_64 fips140=only Unit Tests"
+
       - label: ":ubuntu: x-pack/libbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
@@ -101,6 +143,9 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+          - "x-pack/libbeat/build/integration-tests/*"
+          - "x-pack/libbeat/build/integration-tests/Test*/*"
+          - "x-pack/libbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Go Integration Tests"
@@ -120,6 +165,9 @@ steps:
         artifact_paths:
           - "x-pack/libbeat/build/*.xml"
           - "x-pack/libbeat/build/*.json"
+          - "x-pack/libbeat/build/integration-tests/*"
+          - "x-pack/libbeat/build/integration-tests/Test*/*"
+          - "x-pack/libbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Python Integration Tests"

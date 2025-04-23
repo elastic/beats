@@ -29,9 +29,7 @@ The `dynamodb` metricset of aws module allows you to monitor your AWS DynamoDB d
 
 The aws dynamodb metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-dynamodb-overview.png
-:alt: metricbeat aws dynamodb overview
-:::
+![metricbeat aws dynamodb overview](images/metricbeat-aws-dynamodb-overview.png)
 
 
 ## Metrics [_metrics_2]
