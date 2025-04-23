@@ -41,7 +41,7 @@ if (Get-Service {{.BeatName}} -ErrorAction SilentlyContinue) {
 # We need to support a new default path for the data folder, ideally
 # automatically detecting if the old one is used and keeping it
 
-$workdir = Split-Path $MyInvocation.MyCommand.Path
+$WorkDir = Split-Path $MyInvocation.MyCommand.Path
 $BasePath = "$env:ProgramFiles\{{.BeatName}}-Data"
 $LegacyDataPath = "$env:PROGRAMDATA\{{.BeatName}}"
 
@@ -54,12 +54,12 @@ If ($ForceNewDataPath -eq $False){
 
 $HomePath = "$BasePath\{{.BeatName}}"
 $LogsPath = "$HomePath\log"
-$KeystorePath = "$workdir\data\{{.BeatName}}.keystore"
+$KeystorePath = "$WorkDir\data\{{.BeatName}}.keystore"
 
-$FullCmd = "`"$workdir\{{.BeatName}}.exe`" " +
+$FullCmd = "`"$WorkDir\{{.BeatName}}.exe`" " +
            "--environment=windows_service " +
-           "-c `"$workdir\{{.BeatName}}.yml`" " +
-           "--path.home `"$workdir`" " +
+           "-c `"$WorkDir\{{.BeatName}}.yml`" " +
+           "--path.home `"$WorkDir`" " +
            "--path.data `"$HomePath`" " +
            "--path.logs `"$LogsPath`" " +
            "-E keystore.path=`"$KeyStorePath`" " +
