@@ -31,9 +31,7 @@ iam:ListAccountAliases
 
 The aws natgateway metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-natgateway-overview.png
-:alt: metricbeat aws natgateway overview
-:::
+![metricbeat aws natgateway overview](images/metricbeat-aws-natgateway-overview.png)
 
 
 ## Configuration example [_configuration_example_9]

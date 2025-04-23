@@ -65,9 +65,7 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 The `nats` module comes with a predefined dashboard. For example:
 
-:::{image} images/filebeat_nats_dashboard.png
-:alt: filebeat nats dashboard
-:::
+![filebeat nats dashboard](images/filebeat_nats_dashboard.png)
 
 
 ## Fields [_fields_35]

@@ -37,7 +37,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
@@ -409,7 +409,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		t.Fatal(err)
 	}
 
-	logger := logp.NewTestingLogger(t, "elasticsearch")
+	logger := logptest.NewTestingLogger(t, "elasticsearch")
 	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
 	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))

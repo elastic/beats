@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package gcppubsub
 
 import (
@@ -27,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const (
@@ -57,7 +59,6 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	}
 
 	once.Do(func() {
-		logp.TestingSetup()
 
 		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
 		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
@@ -243,7 +244,8 @@ func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(
 		return eventOutlet, nil
 	})
 
-	in, err := NewInput(cfg, connector, inputCtx)
+	logger := logptest.NewTestingLogger(t, "")
+	in, err := NewInput(cfg, connector, inputCtx, logger)
 	if err != nil {
 		t.Fatal(err)
 	}

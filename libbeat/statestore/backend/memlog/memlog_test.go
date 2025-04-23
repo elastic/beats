@@ -20,7 +20,6 @@ package memlog
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -32,22 +31,20 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/internal/storecompliance"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
-
-func init() {
-	logp.DevelopmentSetup()
-}
 
 func TestCompliance_Default(t *testing.T) {
 	storecompliance.TestBackendCompliance(t, func(testPath string) (backend.Registry, error) {
-		return New(logp.NewLogger("test"), Settings{Root: testPath})
+		logger := logptest.NewTestingLogger(t, "")
+		return New(logger.Named("test"), Settings{Root: testPath})
 	})
 }
 
 func TestCompliance_AlwaysCheckpoint(t *testing.T) {
 	storecompliance.TestBackendCompliance(t, func(testPath string) (backend.Registry, error) {
-		return New(logp.NewLogger("test"), Settings{
+		logger := logptest.NewTestingLogger(t, "")
+		return New(logger.Named("test"), Settings{
 			Root: testPath,
 			Checkpoint: func(filesize uint64) bool {
 				return true
@@ -59,7 +56,7 @@ func TestCompliance_AlwaysCheckpoint(t *testing.T) {
 func TestLoadVersion1(t *testing.T) {
 	dataHome := "testdata/1"
 
-	list, err := ioutil.ReadDir(dataHome)
+	list, err := os.ReadDir(dataHome)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,11 +77,7 @@ func TestLoadVersion1(t *testing.T) {
 }
 
 func testLoadVersion1Case(t *testing.T, dataPath string) {
-	path, err := ioutil.TempDir("", "")
-	if err != nil {
-		t.Fatalf("Failed to create temporary test directory: %v", err)
-	}
-	defer os.RemoveAll(path)
+	path := t.TempDir()
 
 	t.Logf("Test tmp dir: %v", path)
 
@@ -93,7 +86,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 	}
 
 	// load expected test results
-	raw, err := ioutil.ReadFile(filepath.Join(path, "expected.json"))
+	raw, err := os.ReadFile(filepath.Join(path, "expected.json"))
 	if err != nil {
 		t.Fatalf("Failed to load expected.json: %v", err)
 	}
@@ -107,8 +100,9 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 		t.Fatalf("Failed to parse expected.json: %v", err)
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	// load store:
-	store, err := openStore(logp.NewLogger("test"), path, 0660, 4096, true, func(_ uint64) bool {
+	store, err := openStore(logger.Named("test"), path, 0660, 4096, true, func(_ uint64) bool {
 		return false
 	})
 	if err != nil {
@@ -139,7 +133,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 	// check store does not contain any additional keys
 	func() {
 		err = store.Each(func(key string, val statestore.ValueDecoder) (bool, error) {
-			_, exists := expected.Entries[string(key)]
+			_, exists := expected.Entries[key]
 			if !exists {
 				t.Errorf("unexpected key: %s", key)
 			}
@@ -210,7 +204,7 @@ func copyDir(to, from string) error {
 		}
 	}
 
-	list, err := ioutil.ReadDir(from)
+	list, err := os.ReadDir(from)
 	if err != nil {
 		return err
 	}
@@ -250,9 +244,4 @@ func copyFile(to, from string) error {
 func isDir(path string) bool {
 	info, err := os.Stat(path)
 	return err == nil && info.IsDir()
-}
-
-func isFile(path string) bool {
-	info, err := os.Stat(path)
-	return err == nil && info.Mode().IsRegular()
 }

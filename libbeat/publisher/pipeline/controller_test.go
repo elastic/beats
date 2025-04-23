@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	//"github.com/elastic/beats/v7/libbeat/tests/resources"
@@ -70,9 +71,10 @@ func TestOutputReload(t *testing.T) {
 					return nil
 				}
 
+				logger := logptest.NewTestingLogger(t, "")
 				pipeline, err := New(
-					beat.Info{},
-					Monitors{},
+					beat.Info{Logger: logger},
+					Monitors{Logger: logger},
 					queueConfig,
 					outputs.Group{},
 					Settings{},
@@ -141,6 +143,7 @@ func TestSetEmptyOutputsSendsNilChannel(t *testing.T) {
 }
 
 func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	controller := outputController{
 		// Set event limit to 1 so we can easily tell if our settings
 		// were used to create the queue.
@@ -153,6 +156,9 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 			// send configuration updates without blocking.
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	// Set to an empty output group. This should not create a queue.
@@ -167,6 +173,7 @@ func TestQueueCreatedOnlyAfterOutputExists(t *testing.T) {
 }
 
 func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	// If there are queue settings provided by both the pipeline and
 	// the output, the output settings should be used.
 	controller := outputController{
@@ -176,6 +183,9 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	controller.Set(outputs.Group{
@@ -193,6 +203,7 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	failedFactory := func(_ *logp.Logger, _ queue.Observer, _ int, _ queue.EncoderFactory) (queue.Queue, error) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
+	logger := logptest.NewTestingLogger(t, "")
 	controller := outputController{
 		queueFactory: failedFactory,
 		consumer: &eventConsumer{
@@ -200,7 +211,10 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 			retryObserver: nilObserver,
 		},
 		monitors: Monitors{
-			Logger: logp.NewLogger("tests"),
+			Logger: logger.Named("tests"),
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	controller.Set(outputs.Group{
@@ -211,11 +225,15 @@ func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 }
 
 func TestQueueProducerBlocksUntilOutputIsSet(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1}),
 		consumer: &eventConsumer{
 			targetChan:    make(chan consumerTarget, 4),
 			retryObserver: nilObserver,
+		},
+		beat: beat.Info{
+			Logger: logger,
 		},
 	}
 	// Send producer requests from different goroutines. They should all
@@ -253,6 +271,7 @@ func TestQueueMetrics(t *testing.T) {
 	// here we just want to make sure that they appear under the right
 	// monitoring namespace.
 	reg := monitoring.NewRegistry()
+	logger := logptest.NewTestingLogger(t, "")
 	controller := outputController{
 		queueFactory: memqueue.FactoryForSettings(memqueue.Settings{Events: 1000}),
 		consumer: &eventConsumer{
@@ -260,6 +279,9 @@ func TestQueueMetrics(t *testing.T) {
 			retryObserver: nilObserver,
 		},
 		monitors: Monitors{Metrics: reg},
+		beat: beat.Info{
+			Logger: logger,
+		},
 	}
 	controller.Set(outputs.Group{
 		Clients: []outputs.Client{newMockClient(nil)},
