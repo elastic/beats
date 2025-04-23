@@ -13,6 +13,7 @@ import (
 	"go.opentelemetry.io/collector/receiver"
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -58,7 +59,13 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("error starting API :%w", err)
 	}
 
-	return &metricbeatReceiver{beat: b, beater: mbBeater, logger: set.Logger, httpConf: httpConf.HTTP}, nil
+	beatReceiver := beatreceiver.BeatReceiver{
+		Beat:     b,
+		Beater:   mbBeater,
+		Logger:   set.Logger,
+		HttpConf: httpConf.HTTP,
+	}
+	return &metricbeatReceiver{BeatReceiver: beatReceiver}, nil
 }
 
 func NewFactory() receiver.Factory {
