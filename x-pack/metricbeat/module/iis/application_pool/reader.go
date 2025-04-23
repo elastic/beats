@@ -105,7 +105,7 @@ func newReader(config Config) (*Reader, error) {
 
 // initAppPools will check for any new instances and add them to the counter list
 func (r *Reader) initAppPools() error {
-	apps, err := getApplicationPools(r.config.Names)
+	apps, err := r.getApplicationPools(r.config.Names)
 	if err != nil {
 		return fmt.Errorf("failed retrieving running worker processes: %w", err)
 	}
@@ -233,15 +233,18 @@ func (r *Reader) close() error {
 	return r.query.Close()
 }
 
-func getAllAppPool() (map[string]string, error) {
-
+func (r *Reader) getAllAppPool() (map[string]string, error) {
 	commands := "Import-Module WebAdministration\r\n\tGet-IISAppPool"
 	stdout, stderr, err := Run(commands)
+
 	if err != nil {
-		return nil, fmt.Errorf("error retrieving App Pool %w", err)
+		// Log the error, but continue gracefully
+		r.log.Infow("warning: failed to get IIS App Pools: %v\n", err)
+		return map[string]string{}, nil
 	}
 	if *stderr != "" {
-		return nil, fmt.Errorf("error retrieving App Pool %v", *stderr)
+		r.log.Infow("warning: stderr from Get-IISAppPool: %v\n", *stderr)
+		return map[string]string{}, nil
 	}
 
 	allPooldata := parseApplicationPool(*stdout)
@@ -274,12 +277,12 @@ func parseApplicationPool(data string) map[string]string {
 }
 
 // getApplicationPools method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
-func getApplicationPools(names []string) ([]ApplicationPool, error) {
+func (r *Reader) getApplicationPools(names []string) ([]ApplicationPool, error) {
 	processes, err := getw3wpProceses()
 	if err != nil {
 		return nil, err
 	}
-	applicationPoolWithStatus, err := getAllAppPool()
+	applicationPoolWithStatus, err := r.getAllAppPool()
 	if err != nil {
 		return nil, err
 	}
