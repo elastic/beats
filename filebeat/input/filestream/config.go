@@ -119,6 +119,21 @@ func defaultConfig() config {
 	}
 }
 
+func defaultCloserConfig() closerConfig {
+	return closerConfig{
+		OnStateChange: stateChangeCloserConfig{
+			CheckInterval: 5 * time.Second,
+			Removed:       defaultCloserOnStateChangeRemoved(), // It's ok to leave clean_removed: true
+			Inactive:      5 * time.Minute,
+			Renamed:       false,
+		},
+		Reader: readerCloserConfig{
+			OnEOF:         false,
+			AfterInterval: 0 * time.Second,
+		},
+	}
+}
+
 func defaultReaderConfig() readerConfig {
 	return readerConfig{
 		Backoff: backoffConfig{

@@ -414,9 +414,10 @@ removed from disk too early, disable this option.
 This option is disabled by default on Linux and MacOS, on Windows it
 is enabled by default.
 
+::::{warning}
 WINDOWS: If your Windows log rotation system shows errors because it
 can’t rotate files, make sure this option is enabled.
-
+::::
 
 #### `close.reader.on_eof` [filebeat-input-filestream-close-eof]
 

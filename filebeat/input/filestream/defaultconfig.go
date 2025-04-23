@@ -19,21 +19,8 @@
 
 package filestream
 
-import (
-	"time"
-)
-
-func defaultCloserConfig() closerConfig {
-	return closerConfig{
-		OnStateChange: stateChangeCloserConfig{
-			CheckInterval: 5 * time.Second,
-			Removed:       false, // It's ok to leave clean_removed: true
-			Inactive:      5 * time.Minute,
-			Renamed:       false,
-		},
-		Reader: readerCloserConfig{
-			OnEOF:         false,
-			AfterInterval: 0 * time.Second,
-		},
-	}
+// defaultCloserOnStateChangeRemoved returns the default configuration value for
+// close.on_state_change.removed
+func defaultCloserOnStateChangeRemoved() bool {
+	return false
 }
