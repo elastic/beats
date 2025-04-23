@@ -11,6 +11,7 @@ toc:
   - toc: release-notes
   - toc: extend
 subs:
+  version: "9.0.0"
   beats-ref:   "https://www.elastic.co/guide/en/beats/libbeat/current"
   ecloud:   "Elastic Cloud"
   ess:   "Elasticsearch Service"

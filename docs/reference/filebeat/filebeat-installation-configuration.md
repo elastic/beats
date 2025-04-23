@@ -336,6 +336,7 @@ To open the dashboards:
     ::::::{tab-item} Elasticsearch Service
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
+    ::::::
     ::::::{tab-item} Self-managed
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
