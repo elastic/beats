@@ -202,6 +202,14 @@ Metricbeat uses modules to collect metrics. Each module defines the basic logic 
     ```
     ::::::
 
+    :::::::
+
+2. From the installation directory, enable one or more modules. If you accept the default configuration without enabling additional modules, Metricbeat collects system metrics only.
+
+    The following command enables the nginx config in the `modules.d` directory:
+
+    :::::::{tab-set}
+
     ::::::{tab-item} DEB
     ```sh
     metricbeat modules enable nginx
@@ -231,6 +239,31 @@ Metricbeat uses modules to collect metrics. Each module defines the basic logic 
     PS > .\metricbeat.exe modules enable nginx
     ```
     ::::::
+
+    :::::::
+
+    See the [`modules` command](/reference/metricbeat/command-line-options.md#modules-command) to learn more about this command. If you are using a Docker image, see [Run Metricbeat on Docker](/reference/metricbeat/running-on-docker.md).
+
+3. In the module config under `modules.d`, change the module settings to match your environment. See [Standard config options](/reference/metricbeat/configuration-metricbeat.md#module-config-options) for more about available settings.
+
+:::{tip}
+To test your configuration file, change to the directory where the Metricbeat binary is installed, and run Metricbeat in the foreground with the following options specified: `./metricbeat test config -e`. Make sure your config files are in the path expected by Metricbeat (see [Directory layout](/reference/metricbeat/directory-layout.md)), or use the `-c` flag to specify the path to the config file.
+:::
+
+For more information about configuring Metricbeat, also see:
+
+* [Configure Metricbeat](/reference/metricbeat/configuring-howto-metricbeat.md)
+* [Config file format](/reference/libbeat/config-file-format.md)
+* [`metricbeat.reference.yml`](/reference/metricbeat/metricbeat-reference-yml.md): This reference configuration file shows all non-deprecated options. You’ll find it in the same location as `metricbeat.yml`.
+
+## Step 4: Set up assets
+
+Metricbeat comes with predefined assets for parsing, indexing, and visualizing your data. To load these assets:
+
+1. Make sure the user specified in `metricbeat.yml` is [authorized to set up Metricbeat](/reference/metricbeat/privileges-to-setup-beats.md).
+2. From the installation directory, run:
+
+    :::::::{tab-set}
 
     ::::::{tab-item} DEB
     ```sh
@@ -262,64 +295,83 @@ Metricbeat uses modules to collect metrics. Each module defines the basic logic 
     ```
     ::::::
 
-    ::::::{tab-item} DEB
-    ```sh
-    sudo service metricbeat start
-    ```
-
-    ::::{note}
-    If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
-    ::::
-
-
-    Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} RPM
-    ```sh
-    sudo service metricbeat start
-    ```
-
-    ::::{note}
-    If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
-    ::::
-
-
-    Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} MacOS
-    ```sh
-    sudo chown root metricbeat.yml <1>
-    sudo chown root modules.d/nginx.yml <1>
-    sudo ./metricbeat -e
-    ```
-
-    1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Linux
-    ```sh
-    sudo chown root metricbeat.yml <1>
-    sudo chown root modules.d/nginx.yml <1>
-    sudo ./metricbeat -e
-    ```
-
-    1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Windows
-    ```sh
-    PS C:\Program Files\metricbeat> Start-Service metricbeat
-    ```
-
-    By default, Windows log files are stored in `C:\ProgramData\metricbeat\Logs`.
-
-    ::::{note}
-    On Windows, statistics about system load and swap usage are currently not captured
-    ::::
-    ::::::
     :::::::
+
+    `-e` is optional and sends output to standard error instead of the configured log output.
+
+This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
+
+:::{tip}
+A connection to Elasticsearch (or Elasticsearch Service) is required to set up the initial environment. If you’re using a different output, such as Logstash, see [Load the index template manually](/reference/metricbeat/metricbeat-template.md#load-template-manually) and [Load Kibana dashboards](/reference/metricbeat/load-kibana-dashboards.md).
+:::
+
+## Step 5: Start Metricbeat
+
+Before starting Metricbeat, modify the user credentials in metricbeat.yml and specify a user who is [authorized to publish events](/reference/metricbeat/privileges-to-publish-events.md).
+
+To start Metricbeat, run:
+
+:::::::{tab-set}
+
+::::::{tab-item} DEB
+```sh
+sudo service metricbeat start
+```
+
+::::{note}
+If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
+::::
+
+
+Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} RPM
+```sh
+sudo service metricbeat start
+```
+
+::::{note}
+If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
+::::
+
+
+Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} MacOS
+```sh
+sudo chown root metricbeat.yml <1>
+sudo chown root modules.d/nginx.yml <1>
+sudo ./metricbeat -e
+```
+
+1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Linux
+```sh
+sudo chown root metricbeat.yml <1>
+sudo chown root modules.d/nginx.yml <1>
+sudo ./metricbeat -e
+```
+
+1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Windows
+```sh
+PS C:\Program Files\metricbeat> Start-Service metricbeat
+```
+
+By default, Windows log files are stored in `C:\ProgramData\metricbeat\Logs`.
+
+::::{note}
+On Windows, statistics about system load and swap usage are currently not captured
+::::
+::::::
+
+:::::::
 
 Metricbeat should begin streaming metrics to {{es}}.
 
