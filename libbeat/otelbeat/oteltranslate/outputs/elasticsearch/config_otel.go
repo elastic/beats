@@ -126,17 +126,14 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	// get number of workers
-	var worker int // Default value is 1
-	if escfg.NumWorkers() < 1 {
-		worker = 1
-	} else {
-		worker = escfg.NumWorkers()
+	workers := 1 // Default value is 1
+	if escfg.NumWorkers() > 1 {
+		workers = escfg.NumWorkers()
 	}
-
 	otelYAMLCfg := map[string]any{
 		"logs_index":  escfg.Index, // index
 		"endpoints":   hosts,       // hosts, protocol, path, port
-		"num_workers": worker,      // worker/workers
+		"num_workers": workers,     // worker/workers
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
