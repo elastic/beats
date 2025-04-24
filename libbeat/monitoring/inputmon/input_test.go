@@ -25,7 +25,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/logp"
+=======
+>>>>>>> 5dda76dc5 ([Chore]: Replace global logger with local logger instances #4 (#43973))
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -90,7 +93,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	t.Cleanup(func() {
 		require.NoError(t, globalRegistry().Clear())
 	})
-	log := logp.NewLogger("TestMetricSnapshotJSON")
+	log := logptest.NewTestingLogger(t, "TestMetricSnapshotJSON")
 
 	// ============== Input using new API and unique namespace ==============
 	// Simulates input using the metrics registry from the v2.Context.
@@ -200,7 +203,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 
 	// It's easier to understand the failure with the full output.
 	if t.Failed() {
-		t.Logf("API reponse:\n%s\n", string(jsonBytes))
+		t.Logf("API response:\n%s\n", string(jsonBytes))
 	}
 }
 
@@ -212,7 +215,7 @@ func TestNewMetricsRegistry(t *testing.T) {
 		inputID,
 		inputType,
 		parent,
-		logp.NewLogger("test"))
+		logptest.NewTestingLogger(t, "test"))
 
 	require.NotNil(t, got, "new metrics registry should not be nil")
 	assert.Equal(t, parent.GetRegistry(inputID), got)
@@ -267,7 +270,7 @@ func TestCancelMetricsRegistry(t *testing.T) {
 	got := parent.GetRegistry(inputID)
 	require.NotNil(t, got, "metrics registry not found on parent")
 
-	CancelMetricsRegistry(inputID, inputType, parent, logp.NewLogger("test"))
+	CancelMetricsRegistry(inputID, inputType, parent, logptest.NewTestingLogger(t, "test"))
 
 	got = parent.GetRegistry(inputID)
 	assert.Nil(t, got, "metrics registry was not removed from parent")

@@ -38,6 +38,7 @@ type HttpServer struct {
 	stop       context.CancelFunc
 	done       chan struct{}
 	eventQueue chan server.Event
+	logger     *logp.Logger
 }
 
 type HttpEvent struct {
@@ -71,6 +72,7 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 		eventQueue: make(chan server.Event),
 		ctx:        ctx,
 		stop:       cancel,
+		logger:     mb.Logger(),
 	}
 
 	httpServer := &http.Server{
@@ -107,17 +109,17 @@ func NewHttpServerWithHandler(mb mb.BaseMetricSet, handlerFunc http.HandlerFunc)
 func (h *HttpServer) Start() error {
 	go func() {
 		if h.server.TLSConfig != nil {
-			logp.Info("Starting HTTPS server on %s", h.server.Addr)
+			h.logger.Infof("Starting HTTPS server on %s", h.server.Addr)
 			//certificate is already loaded. That's why the parameters are empty
 			err := h.server.ListenAndServeTLS("", "")
 			if err != nil && err != http.ErrServerClosed {
-				logp.Critical("Unable to start HTTPS server due to error: %v", err)
+				h.logger.Errorf("Unable to start HTTPS server due to error: %v", err)
 			}
 		} else {
-			logp.Info("Starting HTTP server on %s", h.server.Addr)
+			h.logger.Infof("Starting HTTP server on %s", h.server.Addr)
 			err := h.server.ListenAndServe()
 			if err != nil && err != http.ErrServerClosed {
-				logp.Critical("Unable to start HTTP server due to error: %v", err)
+				h.logger.Errorf("Unable to start HTTP server due to error: %v", err)
 			}
 		}
 	}()
@@ -151,7 +153,7 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
-			logp.Err("Error reading body: %v", err)
+			h.logger.Errorf("Error reading body: %v", err)
 			http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
 			return
 		}
