@@ -25,10 +25,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-<<<<<<< HEAD
-	"github.com/elastic/elastic-agent-libs/logp"
-=======
->>>>>>> 5dda76dc5 ([Chore]: Replace global logger with local logger instances #4 (#43973))
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
