@@ -158,13 +158,17 @@ See the Kafka documentation for the implications of a particular choice of key; 
 
 Kafka output broker event partitioning strategy. Must be one of `random`, `round_robin`, or `hash`. By default the `hash` partitioner is used.
 
-**`random.group_events`**: Sets the number of events to be published to the same partition, before the partitioner selects a new partition by random. The default value is 1 meaning after each event a new partition is picked randomly.
+**`random.group_events`**
+:   Sets the number of events to be published to the same partition, before the partitioner selects a new partition by random. The default value is 1 meaning after each event a new partition is picked randomly.
 
-**`round_robin.group_events`**: Sets the number of events to be published to the same partition, before the partitioner selects the next partition. The default value is 1 meaning after each event the next partition will be selected.
+**`round_robin.group_events`**
+:   Sets the number of events to be published to the same partition, before the partitioner selects the next partition. The default value is 1 meaning after each event the next partition will be selected.
 
-**`hash.hash`**: List of fields used to compute the partitioning hash value from. If no field is configured, the events `key` value will be used.
+**`hash.hash`**
+:   List of fields used to compute the partitioning hash value from. If no field is configured, the events `key` value will be used.
 
-**`hash.random`**: Randomly distribute events if no hash or key value can be computed.
+**`hash.random`**
+:   Randomly distribute events if no hash or key value can be computed.
 
 All partitioners will try to publish events to all partitions by default. If a partition’s leader becomes unreachable for the beat, the output might block. All partitioners support setting `reachable_only` to overwrite this behavior. If `reachable_only` is set to `true`, events will be published to available partitions only.
 

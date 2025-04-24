@@ -49,7 +49,7 @@ filebeat.inputs:
 
 
 ::::{note}
-*/var/log/containers/**.log* is normally a symlink to */var/log/pods/**/*/.log*, so above path can be edited accordingly
+*/var/log/containers/\*\*.log* is normally a symlink to */var/log/pods/\*\*/\*/.log*, so above path can be edited accordingly
 ::::
 
 

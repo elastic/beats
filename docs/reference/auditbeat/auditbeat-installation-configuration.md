@@ -231,50 +231,74 @@ Auditbeat comes with predefined assets for parsing, indexing, and visualizing yo
     PS > .\auditbeat.exe setup -e
     ```
     ::::::
-
-    ::::::{tab-item} DEB
-    ```sh
-    sudo service auditbeat start
-    ```
-
-    Also see [Auditbeat and systemd](/reference/auditbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} RPM
-    ```sh
-    sudo service auditbeat start
-    ```
-
-    Also see [Auditbeat and systemd](/reference/auditbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} MacOS
-    ```sh
-    sudo chown root auditbeat.yml <1>
-    sudo ./auditbeat -e
-    ```
-
-    1. You’ll be running Auditbeat as root, so you need to change ownership of the configuration file, or run Auditbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Linux
-    ```sh
-    sudo chown root auditbeat.yml <1>
-    sudo ./auditbeat -e
-    ```
-
-    1. You’ll be running Auditbeat as root, so you need to change ownership of the configuration file, or run Auditbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Windows
-    ```sh
-    PS C:\Program Files\auditbeat> Start-Service auditbeat
-    ```
-
-    By default, Windows log files are stored in `C:\ProgramData\auditbeat\Logs`.
-    ::::::
-
     :::::::
+
+    `-e` is optional and sends output to standard error instead of the configured log output.
+
+This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
+
+:::{tip}
+A connection to {{es}} (or {{ess}}) is required to set up the initial environment. If you're using a different output, such as {{ls}}, see [](/reference/auditbeat/auditbeat-template.md#load-template-manually) and [](/reference/auditbeat/load-kibana-dashboards.md).
+:::
+
+## Step 5: Start Auditbeat [start]
+
+Before starting Auditbeat, modify the user credentials in `auditbeat.yml` and specify a user who is [authorized to publish events](/reference/auditbeat/privileges-to-publish-events.md).
+
+To start Auditbeat, run:
+
+:::::::{tab-set}
+::::::{tab-item} DEB
+```sh
+sudo service auditbeat start
+```
+
+:::{note}
+If you use an `init.d` script to start Auditbeat, you can’t specify command line flags (see [Command reference](/reference/filebeat/command-line-options.md)). To specify flags, start Auditbeat in the foreground.
+:::
+
+Also see [Auditbeat and systemd](/reference/auditbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} RPM
+```sh
+sudo service auditbeat start
+```
+
+:::{note}
+If you use an `init.d` script to start Auditbeat, you can’t specify command line flags (see [Command reference](/reference/filebeat/command-line-options.md)). To specify flags, start Auditbeat in the foreground.
+:::
+
+Also see [Auditbeat and systemd](/reference/auditbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} MacOS
+```sh
+sudo chown root auditbeat.yml <1>
+sudo ./auditbeat -e
+```
+
+1. You’ll be running Auditbeat as root, so you need to change ownership of the configuration file, or run Auditbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Linux
+```sh
+sudo chown root auditbeat.yml <1>
+sudo ./auditbeat -e
+```
+
+1. You’ll be running Auditbeat as root, so you need to change ownership of the configuration file, or run Auditbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Windows
+```sh
+PS C:\Program Files\auditbeat> Start-Service auditbeat
+```
+
+By default, Windows log files are stored in `C:\ProgramData\auditbeat\Logs`.
+::::::
+
+:::::::
 
 Auditbeat should begin streaming events to {{es}}.
 
@@ -322,7 +346,7 @@ Now that you have audit data streaming into {{es}}, learn how to unify your logs
     | Elastic {{beats}} | To capture |
     | --- | --- |
     | [{{metricbeat}}](/reference/metricbeat/metricbeat-installation-configuration.md) | Infrastructure metrics |
-    | [{{filebeat}}](/reference/filebeat/filebeat-installation-configuration.md) | Logs |
+    | [{{auditbeat}}](/reference/auditbeat/auditbeat-installation-configuration.md) | Logs |
     | [{{winlogbeat}}](/reference/winlogbeat/winlogbeat-installation-configuration.md) | Windows event logs |
     | [{{heartbeat}}](/reference/heartbeat/heartbeat-installation-configuration.md) | Uptime information |
     | [APM](docs-content://solutions/observability/apm/index.md) | Application performance metrics |
