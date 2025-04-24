@@ -170,97 +170,148 @@ Metricbeat uses modules to collect metrics. Each module defines the basic logic 
 
 1. Identify the modules you need to enable. To see the list of available [modules](/reference/metricbeat/metricbeat-modules.md), run:
 
+    :::::::{tab-set}
+
+    ::::::{tab-item} DEB
+    ```sh
+    metricbeat modules list
+    ```
+    ::::::
+
+    ::::::{tab-item} RPM
+    ```sh
+    metricbeat modules list
+    ```
+    ::::::
+
+    ::::::{tab-item} MacOS
+    ```sh
+    ./metricbeat modules list
+    ```
+    ::::::
+
+    ::::::{tab-item} Linux
+    ```sh
+    ./metricbeat modules list
+    ```
+    ::::::
+
+    ::::::{tab-item} Windows
+    ```sh
+    PS > .\metricbeat.exe modules list
+    ```
+    ::::::
+
+    :::::::
+
+2. From the installation directory, enable one or more modules. If you accept the default configuration without enabling additional modules, Metricbeat collects system metrics only.
+
+    The following command enables the nginx config in the `modules.d` directory:
+
+    :::::::{tab-set}
+
+    ::::::{tab-item} DEB
+    ```sh
+    metricbeat modules enable nginx
+    ```
+    ::::::
+
+    ::::::{tab-item} RPM
+    ```sh
+    metricbeat modules enable nginx
+    ```
+    ::::::
+
+    ::::::{tab-item} MacOS
+    ```sh
+    ./metricbeat modules enable nginx
+    ```
+    ::::::
+
+    ::::::{tab-item} Linux
+    ```sh
+    ./metricbeat modules enable nginx
+    ```
+    ::::::
+
+    ::::::{tab-item} Windows
+    ```sh
+    PS > .\metricbeat.exe modules enable nginx
+    ```
+    ::::::
+
+    :::::::
+
+    See the [`modules` command](/reference/metricbeat/command-line-options.md#modules-command) to learn more about this command. If you are using a Docker image, see [Run Metricbeat on Docker](/reference/metricbeat/running-on-docker.md).
+
+3. In the module config under `modules.d`, change the module settings to match your environment. See [Standard config options](/reference/metricbeat/configuration-metricbeat.md#module-config-options) for more about available settings.
+
+:::{tip}
+To test your configuration file, change to the directory where the Metricbeat binary is installed, and run Metricbeat in the foreground with the following options specified: `./metricbeat test config -e`. Make sure your config files are in the path expected by Metricbeat (see [Directory layout](/reference/metricbeat/directory-layout.md)), or use the `-c` flag to specify the path to the config file.
+:::
+
+For more information about configuring Metricbeat, also see:
+
+* [Configure Metricbeat](/reference/metricbeat/configuring-howto-metricbeat.md)
+* [Config file format](/reference/libbeat/config-file-format.md)
+* [`metricbeat.reference.yml`](/reference/metricbeat/metricbeat-reference-yml.md): This reference configuration file shows all non-deprecated options. You’ll find it in the same location as `metricbeat.yml`.
+
+## Step 4: Set up assets
+
+Metricbeat comes with predefined assets for parsing, indexing, and visualizing your data. To load these assets:
+
+1. Make sure the user specified in `metricbeat.yml` is [authorized to set up Metricbeat](/reference/metricbeat/privileges-to-setup-beats.md).
+2. From the installation directory, run:
+
+    :::::::{tab-set}
+
+    ::::::{tab-item} DEB
+    ```sh
+    metricbeat setup -e
+    ```
+    ::::::
+
+    ::::::{tab-item} RPM
+    ```sh
+    metricbeat setup -e
+    ```
+    ::::::
+
+    ::::::{tab-item} MacOS
+    ```sh
+    ./metricbeat setup -e
+    ```
+    ::::::
+
+    ::::::{tab-item} Linux
+    ```sh
+    ./metricbeat setup -e
+    ```
+    ::::::
+
+    ::::::{tab-item} Windows
+    ```sh
+    PS > .\metricbeat.exe setup -e
+    ```
+    ::::::
+
+    :::::::
+
+    `-e` is optional and sends output to standard error instead of the configured log output.
+
+This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
+
+:::{tip}
+A connection to Elasticsearch (or Elasticsearch Service) is required to set up the initial environment. If you’re using a different output, such as Logstash, see [Load the index template manually](/reference/metricbeat/metricbeat-template.md#load-template-manually) and [Load Kibana dashboards](/reference/metricbeat/load-kibana-dashboards.md).
+:::
+
+## Step 5: Start Metricbeat
+
+Before starting Metricbeat, modify the user credentials in metricbeat.yml and specify a user who is [authorized to publish events](/reference/metricbeat/privileges-to-publish-events.md).
+
+To start Metricbeat, run:
+
 :::::::{tab-set}
-
-::::::{tab-item} DEB
-```sh
-metricbeat modules list
-```
-::::::
-
-::::::{tab-item} RPM
-```sh
-metricbeat modules list
-```
-::::::
-
-::::::{tab-item} MacOS
-```sh
-./metricbeat modules list
-```
-::::::
-
-::::::{tab-item} Linux
-```sh
-./metricbeat modules list
-```
-::::::
-
-::::::{tab-item} Windows
-```sh
-PS > .\metricbeat.exe modules list
-```
-::::::
-
-::::::{tab-item} DEB
-```sh
-metricbeat modules enable nginx
-```
-::::::
-
-::::::{tab-item} RPM
-```sh
-metricbeat modules enable nginx
-```
-::::::
-
-::::::{tab-item} MacOS
-```sh
-./metricbeat modules enable nginx
-```
-::::::
-
-::::::{tab-item} Linux
-```sh
-./metricbeat modules enable nginx
-```
-::::::
-
-::::::{tab-item} Windows
-```sh
-PS > .\metricbeat.exe modules enable nginx
-```
-::::::
-
-::::::{tab-item} DEB
-```sh
-metricbeat setup -e
-```
-::::::
-
-::::::{tab-item} RPM
-```sh
-metricbeat setup -e
-```
-::::::
-
-::::::{tab-item} MacOS
-```sh
-./metricbeat setup -e
-```
-::::::
-
-::::::{tab-item} Linux
-```sh
-./metricbeat setup -e
-```
-::::::
-
-::::::{tab-item} Windows
-```sh
-PS > .\metricbeat.exe setup -e
-```
-::::::
 
 ::::::{tab-item} DEB
 ```sh
