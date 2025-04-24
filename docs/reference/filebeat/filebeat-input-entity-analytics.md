@@ -674,7 +674,7 @@ The interval in which full synchronizations should occur. The interval must be l
 
 The interval in which incremental updates should occur. The interval must be shorter than the full synchronization interval (`sync_interval`). Expressed as a duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
-+==== `tracer.enabled`
+### `tracer.enabled` [_tracer_enabled_1]
 
 It is possible to log HTTP requests and responses to the Jamf API to a local file-system for debugging configurations. This option is enabled by setting `tracer.enabled` to true and setting the `tracer.filename` value. Additional options are available to tune log rotation behavior. To delete existing logs, set `tracer.enabled` to false without unsetting the filename option.
 
