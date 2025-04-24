@@ -77,50 +77,29 @@ func TestNewReceiver(t *testing.T) {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
 			var lastError strings.Builder
-			assert.Condition(t, func() bool {
-				// skip windows for now
-				if runtime.GOOS == "windows" {
-					return true
-				}
-				client := http.Client{
-					Transport: &http.Transport{
-						DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
-							return net.Dial("unix", monitorSocket)
-						},
-					},
-				}
-				req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://unix/stats", nil)
-				if err != nil {
-					lastError.Reset()
-					lastError.WriteString(fmt.Sprintf("error creating request: %s", err))
-					return false
-				}
-				resp, err := client.Do(req)
-				if err != nil {
-					lastError.Reset()
-					lastError.WriteString(fmt.Sprintf("client.Get failed: %s", err))
-					return false
-				}
-				defer resp.Body.Close()
-				body, err := io.ReadAll(resp.Body)
-				if err != nil {
-					lastError.Reset()
-					lastError.WriteString(fmt.Sprintf("io.ReadAll of body failed: %s", err))
-					return false
-				}
-				if len(body) <= 0 {
-					lastError.Reset()
-					lastError.WriteString("body too short")
-					return false
-				}
-				return true
+			assert.Conditionf(t, func() bool {
+				return getFromSocket(&lastError, monitorSocket)
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
 		},
 	})
 }
 
 func TestMultipleReceivers(t *testing.T) {
-	config := Config{
+	monitorSocket1 := genSocketPath()
+	monitorHost1 := ""
+	if runtime.GOOS == "windows" {
+		monitorHost1 = "npipe:///" + filepath.Base(monitorSocket1)
+	} else {
+		monitorHost1 = "unix://" + monitorSocket1
+	}
+	monitorSocket2 := genSocketPath()
+	monitorHost2 := ""
+	if runtime.GOOS == "windows" {
+		monitorHost2 = "npipe:///" + filepath.Base(monitorSocket2)
+	} else {
+		monitorHost2 = "unix://" + monitorSocket2
+	}
+	config1 := Config{
 		Beatconfig: map[string]any{
 			"metricbeat": map[string]any{
 				"modules": []map[string]any{
@@ -142,7 +121,37 @@ func TestMultipleReceivers(t *testing.T) {
 					"*",
 				},
 			},
-			"path.home": t.TempDir(),
+			"path.home":    t.TempDir(),
+			"http.enabled": true,
+			"http.host":    monitorHost1,
+		},
+	}
+
+	config2 := Config{
+		Beatconfig: map[string]any{
+			"metricbeat": map[string]any{
+				"modules": []map[string]any{
+					{
+						"module":     "system",
+						"enabled":    true,
+						"period":     "1s",
+						"processes":  []string{".*"},
+						"metricsets": []string{"cpu"},
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"logging": map[string]any{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home":    t.TempDir(),
+			"http.enabled": true,
+			"http.host":    monitorHost2,
 		},
 	}
 
@@ -152,12 +161,12 @@ func TestMultipleReceivers(t *testing.T) {
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
-				Config:  &config,
+				Config:  &config1,
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
-				Config:  &config,
+				Config:  &config2,
 				Factory: factory,
 			},
 		},
@@ -166,6 +175,16 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Conditionf(t, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
+			var lastError strings.Builder
+			assert.Conditionf(t, func() bool {
+				tests := []string{monitorSocket1, monitorSocket2}
+				for _, tc := range tests {
+					if ret := getFromSocket(&lastError, tc); ret == false {
+						return false
+					}
+				}
+				return true
+			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
 		},
 	})
 }
@@ -173,9 +192,48 @@ func TestMultipleReceivers(t *testing.T) {
 func genSocketPath() string {
 	randData := make([]byte, 16)
 	for i := range len(randData) {
-		randData[i] = uint8(rand.UintN(255)) //nolint:gosec // 0-255 fits in a unint8
+		randData[i] = uint8(rand.UintN(255)) //nolint:gosec // 0-255 fits in a uint8
 	}
 	socketName := base64.URLEncoding.EncodeToString(randData) + ".sock"
 	socketDir := os.TempDir()
 	return filepath.Join(socketDir, socketName)
+}
+
+func getFromSocket(sb *strings.Builder, socketPath string) bool {
+	// skip windows for now
+	if runtime.GOOS == "windows" {
+		return true
+	}
+	client := http.Client{
+		Transport: &http.Transport{
+			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
+				return net.Dial("unix", socketPath)
+			},
+		},
+	}
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://unix/stats", nil)
+	if err != nil {
+		sb.Reset()
+		sb.WriteString(fmt.Sprintf("error creating request: %s", err))
+		return false
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		sb.Reset()
+		sb.WriteString(fmt.Sprintf("client.Get failed: %s", err))
+		return false
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		sb.Reset()
+		sb.WriteString(fmt.Sprintf("io.ReadAll of body failed: %s", err))
+		return false
+	}
+	if len(body) <= 0 {
+		sb.Reset()
+		sb.WriteString("body too short")
+		return false
+	}
+	return true
 }
