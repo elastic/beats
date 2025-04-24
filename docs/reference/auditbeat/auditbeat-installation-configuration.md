@@ -346,7 +346,7 @@ Now that you have audit data streaming into {{es}}, learn how to unify your logs
     | Elastic {{beats}} | To capture |
     | --- | --- |
     | [{{metricbeat}}](/reference/metricbeat/metricbeat-installation-configuration.md) | Infrastructure metrics |
-    | [{{auditbeat}}](/reference/auditbeat/auditbeat-installation-configuration.md) | Logs |
+    | [{{filebeat}}](/reference/filebeat/filebeat-installation-configuration.md) | Logs |
     | [{{winlogbeat}}](/reference/winlogbeat/winlogbeat-installation-configuration.md) | Windows event logs |
     | [{{heartbeat}}](/reference/heartbeat/heartbeat-installation-configuration.md) | Uptime information |
     | [APM](docs-content://solutions/observability/apm/index.md) | Application performance metrics |
