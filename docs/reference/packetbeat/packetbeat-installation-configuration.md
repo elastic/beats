@@ -24,45 +24,51 @@ This guide describes how to get started quickly with network packets analytics. 
 
 * You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
-:::::::{tab-set}
+    :::::::{tab-set}
 
-::::::{tab-item} Elasticsearch Service
-To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
-::::::
+    ::::::{tab-item} Elasticsearch Service
+    To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+    ::::::
 
-::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
-::::::
+    ::::::{tab-item} Self-managed
+    To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
+    ::::::
 
-::::::{tab-item} DEB
-```sh
-sudo apt-get install libpcap0.8
-```
-::::::
+    :::::::
 
-::::::{tab-item} RPM
-```sh
-sudo yum install libpcap
-```
-::::::
+* On most platforms, Packetbeat requires the libpcap packet capture library. Depending on your OS, you might need to install it:
 
-::::::{tab-item} MacOS
-You probably do not need to install libpcap.
-::::::
+    :::::::{tab-set}
 
-::::::{tab-item} Linux
-You probably do not need to install libpcap.
-::::::
+    ::::::{tab-item} DEB
+    ```sh
+    sudo apt-get install libpcap0.8
+    ```
+    ::::::
 
-::::::{tab-item} Windows
-You probably do not need to install libpcap. The default distribution of {{packetbeat}} for Windows comes bundled with the Npcap library.
+    ::::::{tab-item} RPM
+    ```sh
+    sudo yum install libpcap
+    ```
+    ::::::
 
-    For the OSS-only distribution, you must download and install a packet sniffing library, such as [Npcap](https://nmap.org/npcap/), that implements the [libpcap](https://github.com/the-tcpdump-group/libpcap) interfaces.
+    ::::::{tab-item} MacOS
+    You probably do not need to install libpcap.
+    ::::::
 
-    If you use Npcap, make sure you install it in WinPcap API-compatible mode. If you plan to capture traffic from the loopback device (127.0.0.1 traffic), also select the option to support loopback traffic.
-::::::
+    ::::::{tab-item} Linux
+    You probably do not need to install libpcap.
+    ::::::
 
-:::::::
+    ::::::{tab-item} Windows
+    You probably do not need to install libpcap. The default distribution of {{packetbeat}} for Windows comes bundled with the Npcap library.
+
+        For the OSS-only distribution, you must download and install a packet sniffing library, such as [Npcap](https://nmap.org/npcap/), that implements the [libpcap](https://github.com/the-tcpdump-group/libpcap) interfaces.
+
+        If you use Npcap, make sure you install it in WinPcap API-compatible mode. If you plan to capture traffic from the loopback device (127.0.0.1 traffic), also select the option to support loopback traffic.
+    ::::::
+
+    :::::::
 
 
 ## Step 1: Install Packetbeat [install]
@@ -254,7 +260,67 @@ In `packetbeat.yml`, configure the network devices and protocols to capture traf
     packetbeat.interfaces.device: 0
     ```
     ::::::
+    :::::::
 
+    For more information about these settings, see Traffic sniffing.
+
+3. In the `protocols` section, configure the ports where Packetbeat can find each protocol. If you use any non-standard ports, add them here. Otherwise, use the default values.
+
+    ```yaml
+    packetbeat.protocols:
+
+    - type: dhcpv4
+      ports: [67, 68]
+
+    - type: dns
+      ports: [53]
+
+    - type: http
+      ports: [80, 8080, 8081, 5000, 8002]
+
+    - type: memcache
+      ports: [11211]
+
+    - type: mysql
+      ports: [3306,3307]
+
+    - type: pgsql
+      ports: [5432]
+
+    - type: redis
+      ports: [6379]
+
+    - type: thrift
+      ports: [9090]
+
+    - type: mongodb
+      ports: [27017]
+
+    - type: cassandra
+      ports: [9042]
+
+    - type: tls
+      ports: [443, 993, 995, 5223, 8443, 8883, 9243]
+    ```
+
+:::{tip}
+To test your configuration file, change to the directory where the Packetbeat binary is installed, and run Packetbeat in the foreground with the following options specified: `sudo ./packetbeat test config -e`. Make sure your config files are in the path expected by Packetbeat (see [Directory layout](/reference/packetbeat/directory-layout.md)), or use the `-c` flag to specify the path to the config file. Depending on your OS, you might run into file ownership issues when you run this test. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md) for more information.
+:::
+
+For more information about configuring Packetbeat, also see:
+
+* [Configure Packetbeat](/reference/packetbeat/configuring-howto-packetbeat.md)
+* [Config file format](/reference/libbeat/config-file-format.md)
+* [`packetbeat.reference.yml`](/reference/packetbeat/packetbeat-reference-yml.md): This reference configuration file shows all non-deprecated options. You’ll find it in the same location as `packetbeat.yml`.
+
+## Step 4: Set up assets
+
+Packetbeat comes with predefined assets for parsing, indexing, and visualizing your data. To load these assets:
+
+1. Make sure the user specified in packetbeat.yml is [authorized to set up Packetbeat](/reference/packetbeat/privileges-to-setup-beats.md).
+2. From the installation directory, run:
+
+    :::::::{tab-set}
     ::::::{tab-item} DEB
     ```sh
     packetbeat setup -e
@@ -285,62 +351,79 @@ In `packetbeat.yml`, configure the network devices and protocols to capture traf
     ```
     ::::::
 
-    ::::::{tab-item} DEB
-    ```sh
-    sudo service packetbeat start
-    ```
-
-    ::::{note}
-    If you use an `init.d` script to start Packetbeat, you can’t specify command line flags (see [Command reference](/reference/packetbeat/command-line-options.md)). To specify flags, start Packetbeat in the foreground.
-    ::::
-
-
-    Also see [Packetbeat and systemd](/reference/packetbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} RPM
-    ```sh
-    sudo service packetbeat start
-    ```
-
-    ::::{note}
-    If you use an `init.d` script to start Packetbeat, you can’t specify command line flags (see [Command reference](/reference/packetbeat/command-line-options.md)). To specify flags, start Packetbeat in the foreground.
-    ::::
-
-
-    Also see [Packetbeat and systemd](/reference/packetbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} MacOS
-    ```sh
-    sudo chown root packetbeat.yml <1>
-    sudo ./packetbeat -e
-    ```
-
-    1. You’ll be running Packetbeat as root, so you need to change ownership of the configuration file, or run Packetbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Linux
-    ```sh
-    sudo chown root packetbeat.yml <1>
-    sudo ./packetbeat -e
-    ```
-
-    1. You’ll be running Packetbeat as root, so you need to change ownership of the configuration file, or run Packetbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Windows
-    ```sh
-    PS C:\Program Files\packetbeat> Start-Service packetbeat
-    ```
-
-    By default, Windows log files are stored in `C:\ProgramData\packetbeat\Logs`.
-    ::::::
-
     :::::::
 
-Packetbeat should begin streaming data to {{es}}.
+    `-e` is optional and sends output to standard error instead of the configured log output.
 
+This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
+
+:::{tip}
+A connection to Elasticsearch (or Elasticsearch Service) is required to set up the initial environment. If you’re using a different output, such as Logstash, see [Load the index template manually](/reference/packetbeat/packetbeat-template.md#load-template-manually) and [Load Kibana dashboards](/reference/packetbeat/load-kibana-dashboards.md).
+:::
+
+## Step 5: Start Packetbeat
+
+Before starting Packetbeat, modify the user credentials in `packetbeat.yml` and specify a user who is [authorized to publish events](/reference/packetbeat/privileges-to-publish-events.md).
+
+To start Packetbeat, run:
+
+:::::::{tab-set}
+
+::::::{tab-item} DEB
+```sh
+sudo service packetbeat start
+```
+
+::::{note}
+If you use an `init.d` script to start Packetbeat, you can’t specify command line flags (see [Command reference](/reference/packetbeat/command-line-options.md)). To specify flags, start Packetbeat in the foreground.
+::::
+
+
+Also see [Packetbeat and systemd](/reference/packetbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} RPM
+```sh
+sudo service packetbeat start
+```
+
+::::{note}
+If you use an `init.d` script to start Packetbeat, you can’t specify command line flags (see [Command reference](/reference/packetbeat/command-line-options.md)). To specify flags, start Packetbeat in the foreground.
+::::
+
+
+Also see [Packetbeat and systemd](/reference/packetbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} MacOS
+```sh
+sudo chown root packetbeat.yml <1>
+sudo ./packetbeat -e
+```
+
+1. You’ll be running Packetbeat as root, so you need to change ownership of the configuration file, or run Packetbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Linux
+```sh
+sudo chown root packetbeat.yml <1>
+sudo ./packetbeat -e
+```
+
+1. You’ll be running Packetbeat as root, so you need to change ownership of the configuration file, or run Packetbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Windows
+```sh
+PS C:\Program Files\packetbeat> Start-Service packetbeat
+```
+
+By default, Windows log files are stored in `C:\ProgramData\packetbeat\Logs`.
+::::::
+
+:::::::
+
+Packetbeat should begin streaming data to {{es}}.
 
 ## Step 6: View your data in {{kib}} [view-data]
 

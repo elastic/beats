@@ -247,93 +247,100 @@ Heartbeat comes with predefined assets for parsing, indexing, and visualizing yo
 1. Make sure the user specified in `heartbeat.yml` is [authorized to set up Heartbeat](/reference/heartbeat/privileges-to-setup-beats.md).
 2. From the installation directory, run:
 
-    :::::::{tab-set}
+:::::::{tab-set}
 
-    ::::::{tab-item} DEB
-    ```sh
-    heartbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} DEB
+```sh
+heartbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} RPM
-    ```sh
-    heartbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} RPM
+```sh
+heartbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} MacOS
-    ```sh
-    ./heartbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} MacOS
+```sh
+./heartbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} Linux
-    ```sh
-    ./heartbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} Linux
+```sh
+./heartbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} Windows
-    ```sh
-    PS > .\heartbeat.exe setup -e
-    ```
-    ::::::
+::::::{tab-item} Windows
+```sh
+PS > .\heartbeat.exe setup -e
+```
+::::::
+:::::::
 
-    ::::::{tab-item} DEB
-    ```sh
-    sudo service heartbeat-elastic start
-    ```
+## Step 6: Start Heartbeat [start]
 
-    ::::{note}
-    If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
-    ::::
+Before starting Heartbeat, modify the user credentials in heartbeat.yml and specify a user who is [authorized to publish events](/reference/heartbeat/privileges-to-publish-events.md).
+
+To start Heartbeat, run:
+
+:::::::{tab-set}
+
+::::::{tab-item} DEB
+```sh
+sudo service heartbeat-elastic start
+```
+
+::::{note}
+If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
+::::
+
+Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} RPM
+```sh
+sudo service heartbeat-elastic start
+```
+
+::::{note}
+If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
+::::
 
 
-    Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
-    ::::::
+Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
+::::::
 
-    ::::::{tab-item} RPM
-    ```sh
-    sudo service heartbeat-elastic start
-    ```
+::::::{tab-item} MacOS
+```sh
+sudo chown root heartbeat.yml <1>
+sudo ./heartbeat -e
+```
 
-    ::::{note}
-    If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
-    ::::
+1. You’ll be running Heartbeat as root, so you need to change ownership of the configuration file, or run Heartbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
 
+::::::{tab-item} Linux
+```sh
+sudo chown root heartbeat.yml <1>
+sudo ./heartbeat -e
+```
 
-    Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
-    ::::::
+1. You’ll be running Heartbeat as root, so you need to change ownership of the configuration file, or run Heartbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
 
-    ::::::{tab-item} MacOS
-    ```sh
-    sudo chown root heartbeat.yml <1>
-    sudo ./heartbeat -e
-    ```
+::::::{tab-item} Windows
+```sh
+PS C:\Program Files\heartbeat> Start-Service heartbeat
+```
 
-    1. You’ll be running Heartbeat as root, so you need to change ownership of the configuration file, or run Heartbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Linux
-    ```sh
-    sudo chown root heartbeat.yml <1>
-    sudo ./heartbeat -e
-    ```
-
-    1. You’ll be running Heartbeat as root, so you need to change ownership of the configuration file, or run Heartbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Windows
-    ```sh
-    PS C:\Program Files\heartbeat> Start-Service heartbeat
-    ```
-
-    By default, Windows log files are stored in `C:\ProgramData\heartbeat\Logs`.
-    ::::::
-    :::::::
+By default, Windows log files are stored in `C:\ProgramData\heartbeat\Logs`.
+::::::
+:::::::
 
 Heartbeat is now ready to check the status of your services and send events to your defined output.
-
 
 ## Step 7: View your data in {{kib}} [view-data]
 

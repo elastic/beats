@@ -31,10 +31,8 @@ It is implemented for Linux, macOS (Darwin), and Windows.
 
 The dataset comes with a sample dashboard:
 
-:::{image} images/auditbeat-system-process-dashboard.png
-:alt: Auditbeat System Process Dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Auditbeat System Process Dashboard](images/auditbeat-system-process-dashboard.png)
 
 ## Fields [_fields_6]
 

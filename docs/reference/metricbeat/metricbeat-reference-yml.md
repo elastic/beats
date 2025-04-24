@@ -2504,7 +2504,7 @@ logging.files:
   #permissions: 0600
 
   # Enable log file rotation on time intervals in addition to the size-based rotation.
-  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
@@ -2552,7 +2552,7 @@ logging.files:
   #permissions: 0600
 
   # Enable log file rotation on time intervals in addition to the size-based rotation.
-  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
+  # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
