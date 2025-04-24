@@ -21,9 +21,7 @@ Metricsets with the `mgr_` prefix are compatible with Ceph releases using the Ce
 
 The Ceph module comes with a predefined dashboard showing Ceph cluster related metrics. For example:
 
-:::{image} images/ceph-overview-dashboard.png
-:alt: ceph overview dashboard
-:::
+![ceph overview dashboard](images/ceph-overview-dashboard.png)
 
 
 ## Example configuration [_example_configuration_10]

@@ -24,12 +24,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestGlobManagerInit(t *testing.T) {
 	// Wrong settings return error
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	manager, err := NewGlobManager("dir/*.yml", ".noyml", ".disabled", logger)
 	assert.Error(t, err)
 	assert.Nil(t, manager)
@@ -52,7 +52,7 @@ func TestGlobManager(t *testing.T) {
 
 	// Init Glob Manager
 	glob := dir + "/*.yml"
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	manager, err := NewGlobManager(glob, ".yml", ".disabled", logger)
 	if err != nil {
 		t.Fatal(err)

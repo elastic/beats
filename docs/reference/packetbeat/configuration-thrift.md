@@ -17,9 +17,7 @@ Packetbeat also indexes the `event.duration` field so you can get performance an
 
 Here is an example performance dashboard:
 
-:::{image} images/thrift-dashboard.png
-:alt: Thrift-RPC dashboard
-:::
+![Thrift-RPC dashboard](images/thrift-dashboard.png)
 
 Thrift supports multiple [transport and protocol types](http://en.wikipedia.org/wiki/Apache_Thrift). Currently Packetbeat supports the default `TSocket` transport as well as the `TFramed` transport. From the protocol point of view, Packetbeat currently supports only the default `TBinary` protocol.
 

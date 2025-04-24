@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package gcppubsub
 
 import (
@@ -91,7 +93,7 @@ type pubsubInput struct {
 
 // NewInput creates a new Google Cloud Pub/Sub input that consumes events from
 // a topic subscription.
-func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context) (inp input.Input, err error) {
+func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context, logger *logp.Logger) (inp input.Input, err error) {
 	// Extract and validate the input's configuration.
 	conf := defaultConfig()
 	if err = cfg.Unpack(&conf); err != nil {
@@ -103,7 +105,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 		return nil, err
 	}
 
-	logger := logp.NewLogger("gcp.pubsub").With(
+	logger = logger.Named("gcp.pubsub").With(
 		"pubsub_project", conf.ProjectID,
 		"pubsub_topic", conf.Topic,
 		"pubsub_subscription", conf.Subscription)
@@ -312,7 +314,7 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 
 	if in.AlternativeHost != "" {
 		// This will be typically set because we want to point the input to a testing pubsub emulator.
-		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(in.AlternativeHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			return nil, fmt.Errorf("cannot connect to alternative host %q: %w", in.AlternativeHost, err)
 		}

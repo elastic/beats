@@ -31,9 +31,7 @@ iam:ListAccountAliases
 
 The aws usage metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-usage-overview.png
-:alt: metricbeat aws usage overview
-:::
+![metricbeat aws usage overview](images/metricbeat-aws-usage-overview.png)
 
 
 ## Configuration example [_configuration_example_16]

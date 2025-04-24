@@ -19,6 +19,7 @@ package memqueue
 
 import (
 	"context"
+	"io"
 	"testing"
 	"time"
 
@@ -28,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -38,8 +40,9 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 	// available. This test verifies that Get requests that can be completely
 	// filled do not wait for the flush timer.
 
+	logger := logptest.NewTestingLogger(t, "")
 	broker := newQueue(
-		logp.NewLogger("testing"),
+		logger.Named("testing"),
 		nil,
 		Settings{
 			Events:        1000,
@@ -76,9 +79,9 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	// The previous test confirms that Get requests are handled immediately if
 	// there are enough events. This one uses the same setup to confirm that
 	// Get requests are delayed if there aren't enough events.
-
+	logger := logptest.NewTestingLogger(t, "")
 	broker := newQueue(
-		logp.NewLogger("testing"),
+		logger.Named("testing"),
 		nil,
 		Settings{
 			Events:        1000,
@@ -115,6 +118,38 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since adding an event should unblock the previous one")
 	assert.Equal(t, 101, rl.consumedCount, "Queue should have a consumedCount of 101 after adding an event unblocked the pending get request")
+}
+
+func TestClosedEmptyQueueDoesNotBlockGet(t *testing.T) {
+	broker := newQueue(
+		logp.NewLogger("testing"),
+		nil,
+		Settings{
+			Events:        1000,
+			MaxGetRequest: 500,
+			FlushTimeout:  10 * time.Second,
+		},
+		10, nil)
+	rl := broker.runLoop
+
+	// Signal close, and execute the run loop to make sure it's processed
+	go broker.Close()
+	rl.runIteration()
+
+	// Calling Get on the queue now should immediately return io.EOF, since
+	// a closed empty queue should cancel its context and terminate its
+	// run loop.
+	resultChan := make(chan error)
+	go func() {
+		_, err := broker.Get(1)
+		resultChan <- err
+	}()
+	select {
+	case err := <-resultChan:
+		assert.Equal(t, err, io.EOF, "Closed empty queue should return io.EOF on Get requests")
+	case <-time.After(10 * time.Second):
+		require.Fail(t, "Get requests to a closed empty queue should not block")
+	}
 }
 
 func TestObserverAddEvent(t *testing.T) {
