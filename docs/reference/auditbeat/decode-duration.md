@@ -11,10 +11,10 @@ The `decode_duration` processor decodes a Go-style duration string into a specif
 
 For more information about the Go `time.Duration` string style, refer to the [Go documentation](https://pkg.go.dev/time#Duration).
 
-| Name | Required | Default | Description |  |
-| --- | --- | --- | --- | --- |
-| `field` | yes |  | Which field of event needs to be decoded as `time.Duration` |  |
-| `format` | yes | `milliseconds` | Supported formats: `milliseconds`/`seconds`/`minutes`/`hours` |  |
+| Name | Required | Default | Description |
+| --- | --- | --- | --- |
+| `field` | yes |  | Which field of event needs to be decoded as `time.Duration` |
+| `format` | yes | `milliseconds` | Supported formats: `milliseconds`/`seconds`/`minutes`/`hours` |
 
 ```yaml
 processors:

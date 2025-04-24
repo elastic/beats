@@ -50,16 +50,14 @@ The aws usage metricset comes with a predefined dashboard. For example:
 
 Metrics:
 
-|     |     |     |
-| --- | --- | --- |
 | Metric Name | Statistic Method | Description |
+| --- | --- | --- |
 | CallCount | Sum | The number of specified operations performed in your account. |
 
 Dimensions:
 
-|     |     |
-| --- | --- |
 | Dimension Name | Description |
+| --- | --- |
 | Resource | The name of the API operation. |
 | Service | The name of the AWS service containing the resource. |
 | Type | The type of resource being tracked. Currently, the only valid value is API. |
