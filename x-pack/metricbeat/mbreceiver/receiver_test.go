@@ -28,7 +28,7 @@ import (
 
 func TestNewReceiver(t *testing.T) {
 	monitorSocket := genSocketPath()
-	monitorHost := ""
+	var monitorHost string
 	if runtime.GOOS == "windows" {
 		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
 	} else {
@@ -71,14 +71,14 @@ func TestNewReceiver(t *testing.T) {
 				Factory: NewFactory(),
 			},
 		},
-		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Conditionf(t, func() bool {
+			assert.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
 			var lastError strings.Builder
-			assert.Conditionf(t, func() bool {
-				return getFromSocket(&lastError, monitorSocket)
+			assert.Conditionf(c, func() bool {
+				return getFromSocket(t, &lastError, monitorSocket)
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
 		},
 	})
@@ -86,14 +86,14 @@ func TestNewReceiver(t *testing.T) {
 
 func TestMultipleReceivers(t *testing.T) {
 	monitorSocket1 := genSocketPath()
-	monitorHost1 := ""
+	var monitorHost1 string
 	if runtime.GOOS == "windows" {
 		monitorHost1 = "npipe:///" + filepath.Base(monitorSocket1)
 	} else {
 		monitorHost1 = "unix://" + monitorSocket1
 	}
 	monitorSocket2 := genSocketPath()
-	monitorHost2 := ""
+	var monitorHost2 string
 	if runtime.GOOS == "windows" {
 		monitorHost2 = "npipe:///" + filepath.Base(monitorSocket2)
 	} else {
@@ -170,16 +170,16 @@ func TestMultipleReceivers(t *testing.T) {
 				Factory: factory,
 			},
 		},
-		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Conditionf(t, func() bool {
+			assert.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
 			var lastError strings.Builder
-			assert.Conditionf(t, func() bool {
+			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
 				for _, tc := range tests {
-					if ret := getFromSocket(&lastError, tc); ret == false {
+					if ret := getFromSocket(t, &lastError, tc); ret == false {
 						return false
 					}
 				}
@@ -199,7 +199,7 @@ func genSocketPath() string {
 	return filepath.Join(socketDir, socketName)
 }
 
-func getFromSocket(sb *strings.Builder, socketPath string) bool {
+func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 	// skip windows for now
 	if runtime.GOOS == "windows" {
 		return true
@@ -211,23 +211,23 @@ func getFromSocket(sb *strings.Builder, socketPath string) bool {
 			},
 		},
 	}
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://unix/stats", nil)
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/stats", nil)
 	if err != nil {
 		sb.Reset()
-		sb.WriteString(fmt.Sprintf("error creating request: %s", err))
+		fmt.Fprintf(sb, "error creating request: %s", err)
 		return false
 	}
 	resp, err := client.Do(req)
 	if err != nil {
 		sb.Reset()
-		sb.WriteString(fmt.Sprintf("client.Get failed: %s", err))
+		fmt.Fprintf(sb, "client.Get failed: %s", err)
 		return false
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		sb.Reset()
-		sb.WriteString(fmt.Sprintf("io.ReadAll of body failed: %s", err))
+		fmt.Fprintf(sb, "io.ReadAll of body failed: %s", err)
 		return false
 	}
 	if len(body) <= 0 {
