@@ -30,7 +30,7 @@ The Cloud ID, which can be found in the {{ess}} web console, is used by Auditbea
 ## `cloud.auth` [_cloud_auth]
 
 ::::{important}
-`cloud.auth` should not be confused with API keys generated in the cloud stack management. Although these values look similar, they are unrelated.
+`cloud.auth` should not be confused with API keys generated in {{ecloud}} stack management. Although these values look similar, they are unrelated.
 ::::
 
 When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` and `output.elasticsearch.password` settings. Because the Kibana settings inherit the username and password from the {{es}} output, this can also be used to set the `setup.kibana.username` and `setup.kibana.password` options.
