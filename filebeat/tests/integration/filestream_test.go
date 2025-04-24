@@ -578,7 +578,7 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	cfgYAML = getConfig(t, vars, "take-over", "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
-	removeOldLogFiles(t, workDir)
+	filebeat.RemoveLogFiles()
 
 	// Start Filebeat again.
 	// This time the states must be migrated and no new data ingested
@@ -640,7 +640,7 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 	cfgYAML = getConfig(t, vars, "take-over", "happy-path-log-input.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
-	removeOldLogFiles(t, workDir)
+	filebeat.RemoveLogFiles()
 
 	// Start Filebeat again.
 	// This time the states must be migrated and no new data ingested
@@ -863,6 +863,102 @@ func TestFilestreamDelete(t *testing.T) {
 	}
 }
 
+func TestFilestreamDeleteRestart(t *testing.T) {
+	testCases := map[string]struct {
+		configTmpl          string
+		msgs                []string
+		resourceNotFinished bool
+		dataAdded           bool
+		gracePeriod         time.Duration
+	}{
+		"EOF and grace priod": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+			gracePeriod: 5 * time.Second,
+		},
+		"Inactive and grace period": {
+			configTmpl: "inactive.yml",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
+			gracePeriod: 5 * time.Second,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			s, esAddr, _, _ := integration.StartMockES(t, "", 0, 0, 0, 0, 0)
+			defer s.Close()
+
+			testDataPath, err := filepath.Abs("./testdata")
+			if err != nil {
+				t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+			}
+
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+			workDir := filebeat.TempDir()
+
+			logFile := filepath.Join(workDir, "log.log")
+			// Escape filepaths for Windows
+			msgLogFilePath := logFile
+			if runtime.GOOS == "windows" {
+				msgLogFilePath = strings.ReplaceAll(logFile, `\`, `\\`)
+			}
+			integration.GenerateLogFile(t, logFile, 100, false)
+
+			vars := map[string]any{
+				"homePath":    workDir,
+				"logfile":     logFile,
+				"testdata":    testDataPath,
+				"esHost":      esAddr,
+				"gracePeriod": tc.gracePeriod.String(),
+			}
+			cfgYAML := getConfig(t, vars, "delete", tc.configTmpl)
+			filebeat.WriteConfigFile(cfgYAML)
+			filebeat.Start()
+
+			for _, msgFmt := range tc.msgs {
+				msg := fmt.Sprintf(msgFmt, msgLogFilePath)
+				filebeat.WaitForLogs(
+					msg,
+					10*time.Second,
+					"did not find '%s' in the logs",
+					msg,
+				)
+			}
+
+			gracePeriodMsg := fmt.Sprintf("all events from '%s' have been published, waiting for %s grace period", msgLogFilePath, tc.gracePeriod)
+			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
+
+			filebeat.Stop()
+			filebeat.WaitForLogs("filebeat stopped.", 2*time.Second, "Filebeat did not stop successfully")
+			filebeat.RemoveLogFiles()
+
+			if !fileExists(t, logFile) {
+				t.Fatalf("%q should not have been removed", logFile)
+			}
+
+			filebeat.Start()
+			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
+
+			msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
+			filebeat.WaitForLogs(msg, 10*time.Second, "file removed log entry not found")
+
+			if fileExists(t, logFile) {
+				t.Fatalf("%q should have been removed", logFile)
+			}
+		})
+	}
+}
+
 func timeBetweenLogEntries(t *testing.T, l1, l2 string) time.Duration {
 	type entry struct {
 		TS string `json:"@timestamp"`
@@ -1012,21 +1108,6 @@ func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []s
 			100*time.Millisecond,
 			"'File didn't change' log not found for %q", path,
 		)
-	}
-}
-
-func removeOldLogFiles(t *testing.T, workDir string) {
-	// Remove old log file so we can correctly search stuff
-	glob := filepath.Join(workDir, "filebeat-*.ndjson")
-	files, err := filepath.Glob(glob)
-	if err != nil {
-		t.Fatalf("cannot list log files: %s", err)
-	}
-
-	for _, f := range files {
-		if err := os.Remove(f); err != nil {
-			t.Fatalf("cannot remove old log file: %s", err)
-		}
 	}
 }
 

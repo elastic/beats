@@ -4,8 +4,8 @@ filebeat.inputs:
     paths:
       - {{ .logfile }}
     delete.on_close.inactive: true
+    delete.grace_period: {{ .gracePeriod }}
     close.on_state_change.inactive: 1s
-    delete.grace_period: 0
 
     prospector:
       scanner:
