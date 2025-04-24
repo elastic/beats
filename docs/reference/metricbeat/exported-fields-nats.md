@@ -19,7 +19,9 @@ type: keyword
 
 
 **`nats.server.time`**
-:   [8.0.0]
+:   :::{admonition} Deprecated in 8.0.0
+    The `nats.server.time` field was deprecated in 8.0.0.
+    :::
 
 Server time of metric creation
 

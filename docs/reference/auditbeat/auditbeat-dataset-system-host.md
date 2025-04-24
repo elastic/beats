@@ -19,10 +19,8 @@ It is implemented for Linux, macOS (Darwin), and Windows.
 
 This dataset comes with a sample dashboard:
 
-:::{image} images/auditbeat-system-host-dashboard.png
-:alt: Auditbeat System Host Dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Auditbeat System Host Dashboard](images/auditbeat-system-host-dashboard.png)
 
 ## Fields [_fields_3]
 
