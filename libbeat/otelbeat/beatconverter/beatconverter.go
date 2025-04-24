@@ -67,7 +67,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		if len(output.ToStringMap()) > 1 {
 			return fmt.Errorf("multiple outputs are not supported")
 		}
-
+		workers := 0
 		for key, output := range output.ToStringMap() {
 			switch key {
 			case "elasticsearch":
@@ -82,6 +82,10 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 					if err := promoteOutputQueueSettings(beatreceiver, esConfig, conf); err != nil {
 						return err
 					}
+				}
+
+				if w, ok := esOTelConfig["num_workers"]; ok {
+					workers, _ = w.(int)
 				}
 
 				out = map[string]any{
@@ -108,7 +112,9 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			return err
 		}
 		out = map[string]any{
-			beatReceiverConfigKey + "::output::otelconsumer": nil,
+			beatReceiverConfigKey + "::output::otelconsumer": map[string]any{
+				"workers": workers,
+			},
 		}
 
 		// inject log level

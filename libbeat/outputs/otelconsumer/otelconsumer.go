@@ -51,19 +51,36 @@ type otelConsumer struct {
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
-
-	out := &otelConsumer{
-		observer:     observer,
-		logsConsumer: beat.LogConsumer,
-		beatInfo:     beat,
-		log:          beat.Logger.Named("otelconsumer"),
-	}
-
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
 	}
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, out)
+
+	workersCfg := struct {
+		Workers int `config:"workers"`
+	}{}
+
+	if err := cfg.Unpack(&workersCfg); err != nil {
+		beat.Logger.Warnf("failed to unpack workers: %v; setting workers to 1", err)
+		workersCfg.Workers = 1
+	}
+
+	// Default to one worker
+	if workersCfg.Workers < 1 {
+		workersCfg.Workers = 1
+	}
+
+	clients := make([]outputs.Client, 0)
+	for i := 0; i < workersCfg.Workers; i++ {
+		clients = append(clients, &otelConsumer{
+			observer:     observer,
+			logsConsumer: beat.LogConsumer,
+			beatInfo:     beat,
+			log:          beat.Logger.Named("otelconsumer"),
+		})
+	}
+
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, clients...)
 }
 
 // Close is a noop for otelconsumer
