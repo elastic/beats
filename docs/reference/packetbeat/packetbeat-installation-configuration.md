@@ -334,7 +334,8 @@ In `packetbeat.yml`, configure the network devices and protocols to capture traf
     PS C:\Program Files\packetbeat> Start-Service packetbeat
     ```
 
-    By default, Windows log files are stored in `C:\ProgramData\packetbeat\Logs`.
+    By default, Windows log files are stored in `C:\Program Files\packetbeat-Data\logs`.
+    For versions < 9.1.0, logs are stored by default in `C:\ProgramData\packetbeat\Logs`.
     ::::::
 
     :::::::
