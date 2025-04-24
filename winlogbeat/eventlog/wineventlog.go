@@ -383,6 +383,9 @@ func (l *winEventLog) close() error {
 // forwarded events. This is a workaround to skip the query filters for
 // Windows Server 2025 in such scenarios.
 func (l *winEventLog) skipQueryFilters() bool {
+	if l.config.Bypass2025Workaround {
+		return false
+	}
 	osinfo, err := wininfo.OperatingSystem()
 	if err != nil {
 		l.log.Warnf("failed to get OS info: %v", err)
