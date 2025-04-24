@@ -30,9 +30,10 @@ import (
 func NewTestingLogger(t testing.TB, selector string, options ...logp.LogOption) *logp.Logger {
 	log := zaptest.NewLogger(t)
 	log = log.Named(selector)
-	options = append(options, zap.WrapCore(func(zapcore.Core) zapcore.Core {
+	wrapCore := zap.WrapCore(func(zapcore.Core) zapcore.Core {
 		return log.Core()
-	}))
+	})
+	options = append([]logp.LogOption{wrapCore}, options...)
 	logger, err := logp.NewDevelopmentLogger(selector, options...)
 	if err != nil {
 		t.Fatal(err)
