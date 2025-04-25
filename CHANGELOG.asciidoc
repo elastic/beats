@@ -323,7 +323,6 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 *Osquerybeat*
 
 - Increase maximum query timeout to 24 hours. {pull}42356[42356]
->>>>>>> 396898e59 (docs: Prepare Changelog for 8.18.0 (#43740) (#43928))
 
 
 [[release-notes-8.17.3]]
