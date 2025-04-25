@@ -30,9 +30,9 @@ The `translate_sid` processor has the following configuration settings:
 | `field` | yes |  | Source field containing a Windows security identifier (SID). |
 | `account_name_target` | yes* |  | Target field for the account name value. |
 | `account_type_target` | yes* |  | Target field for the account type value. |
-| `domain_target` | yes* |  | Target field for the domain value. |
+| `domain_target` | yes\* |  | Target field for the domain value. |
 | `ignore_missing` | no | false | Ignore errors when the source field is missing. |
 | `ignore_failure` | no | false | Ignore all errors produced by the processor. |
 
-* At least one of `account_name_target`, `account_type_target`, and `domain_target` is required to be configured.
+\* At least one of `account_name_target`, `account_type_target`, and `domain_target` is required to be configured.
 

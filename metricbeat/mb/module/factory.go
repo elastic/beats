@@ -51,7 +51,7 @@ func NewFactory(beatInfo beat.Info, registry *mb.Register, options ...Option) *F
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-	module, metricSets, err := mb.NewModule(c, r.registry)
+	module, metricSets, err := mb.NewModule(c, r.registry, r.beatInfo.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 
 // CheckConfig checks if a config is valid or not
 func (r *Factory) CheckConfig(config *conf.C) error {
-	_, err := NewWrapper(config, r.registry, r.options...)
+	_, err := NewWrapper(config, r.registry, r.beatInfo.Logger, r.options...)
 	if err != nil {
 		return err
 	}
