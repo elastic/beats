@@ -155,12 +155,13 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		registry: registry,
 		logger:   b.Info.Logger,
 	}
+
 	for _, applyOption := range options {
 		applyOption(metricbeat)
 	}
 
 	// List all registered modules and metricsets.
-	logp.Debug("modules", "Available modules and metricsets: %s", registry.String())
+	b.Info.Logger.Named("modules").Debugf("Available modules and metricsets: %s", registry.String())
 
 	if b.InSetupCmd {
 		// Return without instantiating the metricsets.
@@ -168,7 +169,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	if b.API != nil {
-		if err := inputmon.AttachHandler(b.API.Router()); err != nil {
+		if err := inputmon.AttachHandler(b.API.Router(), nil); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
@@ -176,9 +177,9 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON()
+				data, err := inputmon.MetricSnapshotJSON(nil)
 				if err != nil {
-					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
 				}
 				return data

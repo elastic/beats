@@ -11,14 +11,11 @@ This guide describes how to get started quickly with log collection. You’ll le
 
 * install Filebeat on each system you want to monitor
 * specify the location of your log files
-* parse log data into fields and send it to {es}
-* visualize the log data in {kib}
+* parse log data into fields and send it to {{es}}
+* visualize the log data in {{kib}}
 
-:::{image} images/kibana-system.png
-:alt: Filebeat System dashboard
-:class: screenshot
-:::
-
+% TO DO: Use `:class: screenshot`
+![Filebeat System dashboard](images/kibana-system.png)
 
 ## Before you begin [_before_you_begin]
 
@@ -119,7 +116,7 @@ Specify the [cloud.id](/reference/filebeat/configure-cloud-id.md) of your {{ess}
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "filebeat_setup:{pwd}" <1>
+cloud.auth: "filebeat_setup:YOUR_PASSWORD" <1>
 ```
 
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/filebeat/keystore.md).
@@ -132,7 +129,7 @@ cloud.auth: "filebeat_setup:{pwd}" <1>
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "filebeat_internal"
-      password: "{pwd}" <1>
+      password: "YOUR_PASSWORD" <1>
       ssl:
         enabled: true
         ca_trusted_fingerprint: "b9a10bbe64ee9826abeda6546fc988c8bf798b41957c33d05db736716513dc9c" <2>
@@ -147,7 +144,7 @@ cloud.auth: "filebeat_setup:{pwd}" <1>
       setup.kibana:
         host: "mykibanahost:5601" <1>
         username: "my_kibana_user" <2> <3>
-        password: "{pwd}"
+        password: "YOUR_PASSWORD"
     ```
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
@@ -179,96 +176,178 @@ There are several ways to collect log data with Filebeat:
 
     :::::::{tab-set}
 
-::::::{tab-item} DEB
-```sh
+    ::::::{tab-item} DEB
+    ```sh
     filebeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     filebeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./filebeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./filebeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\filebeat.exe modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} DEB
-```sh
+    :::::::
+
+2. From the installation directory, enable one or more modules. For example, the following command enables the `nginx` module config:
+
+    :::::::{tab-set}
+
+    ::::::{tab-item} DEB
+    ```sh
     filebeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     filebeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./filebeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./filebeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\filebeat.exe modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} DEB
-```sh
+3. In the module config under modules.d, change the module settings to match your environment. You must enable at least one fileset in the module. Filesets are disabled by default.
+
+    For example, log locations are set based on the OS. If your logs aren’t in default locations, set the paths variable:
+
+    ```yaml
+    - module: nginx
+      access:
+        enabled: true
+        var.paths: ["/var/log/nginx/access.log*"]
+    ```
+
+To see the full list of variables for a module, see the documentation under [](/reference/filebeat/filebeat-modules.md).
+
+:::{tip}
+To test your configuration file, change to the directory where the Filebeat binary is installed, and run Filebeat in the foreground with the following options specified: `./filebeat test config -e`. Make sure your config files are in the path expected by Filebeat (see [](/reference/filebeat/directory-layout.md)), or use the `-c` flag to specify the path to the config file.
+:::
+
+For more information about configuring Filebeat, also see:
+
+* [Configure Filebeat](/reference/filebeat/configuring-howto-filebeat.md)
+* [Config file format](/reference/libbeat/config-file-format.md)
+* [`filebeat.reference.yml`](/reference/filebeat/filebeat-reference-yml.md): This reference configuration file shows all non-deprecated options. You'll find it in the same location as `filebeat.yml`.
+
+### Enable and configure ECS loggers for application log collection [collect-application-logs]
+
+While Filebeat can be used to ingest raw, plain-text application logs,
+we recommend structuring your logs at ingest time. This lets you extract fields,
+like log level and exception stack traces.
+
+Elastic simplifies this process by providing application log formatters in a variety
+of popular programming languages. These plugins format your logs into ECS-compatible JSON,
+which removes the need to manually parse logs.
+
+See [ECS loggers](ecs-logging://reference/intro.md) to get started.
+
+### Configure Filebeat manually [manual-configuration]
+
+If you're unable to find a module for your file type, or can't change your application's
+log output, see [configure the input](/reference/filebeat/configuration-filebeat-options.md) manually.
+
+## Step 4: Set up assets [setup-assets]
+
+Filebeat comes with predefined assets for parsing, indexing, and
+visualizing your data. To load these assets:
+
+1. Make sure the user specified in `filebeat.yml` is [authorized to set up Filebeat](/reference/filebeat/privileges-to-setup-beats.md).
+
+1. From the installation directory, run:
+
+    :::::::{tab-set}
+    ::::::{tab-item} DEB
+    ```sh
     filebeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     filebeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./filebeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./filebeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\filebeat.exe setup -e
     ```
-::::::
+    ::::::
+    :::::::
 
+    `-e` is optional and sends output to standard error instead of the configured log output.
+
+This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
+
+This step does not load the ingest pipelines used to parse log lines. By default, ingest pipelines are set up automatically the first time you run the module and connect to {{es}}.
+
+:::{tip}
+A connection to {{es}} (or {{ess}}) is required to set up the initial environment. If you're using a different output, such as {{ls}}, see:
+
+* [](/reference/filebeat/filebeat-template.md#load-template-manually)
+* [](/reference/filebeat/load-kibana-dashboards.md)
+* [](/reference/filebeat/load-ingest-pipelines.md)
+:::
+
+:::{note}
+Filebeat should not be used to ingest its own log as this may lead to an infinite loop.
+:::
+
+## Step 5: Start Filebeat [start]
+
+Before starting Filebeat, modify the user credentials in `filebeat.yml` and specify a user who is [authorized to publish events](/reference/filebeat/privileges-to-publish-events.md).
+
+To start Filebeat, run:
+
+:::::::{tab-set}
 ::::::{tab-item} DEB
 ```sh
 sudo service filebeat start
@@ -324,8 +403,8 @@ By default, Windows log files are stored in `C:\ProgramData\filebeat\Logs`.
 ::::::
 
 :::::::
-Filebeat should begin streaming events to {{es}}.
 
+Filebeat should begin streaming events to {{es}}.
 
 ## Step 6: View your data in {{kib}} [view-data]
 
@@ -335,39 +414,15 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    <div class="tabs" data-tab-group="host">
-      <div role="tablist" aria-label="Open Kibana">
-        <button role="tab"
-                aria-selected="true"
-                aria-controls="cloud-tab-open-kibana"
-                id="cloud-open-kibana">
-          Elasticsearch Service
-        </button>
-        <button role="tab"
-                aria-selected="false"
-                aria-controls="self-managed-tab-open-kibana"
-                id="self-managed-open-kibana"
-                tabindex="-1">
-          Self-managed
-        </button>
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="cloud-tab-open-kibana"
-           aria-labelledby="cloud-open-kibana">
+    :::::::{tab-set}
+    ::::::{tab-item} Elasticsearch Service
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
-
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="self-managed-tab-open-kibana"
-           aria-labelledby="self-managed-open-kibana"
-           hidden="">
+    ::::::
+    ::::::{tab-item} Self-managed
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
-
-      </div>
-    </div>
+    ::::::
+    :::::::
 
 2. In the side navigation, click **Discover**. To see Filebeat data, make sure the predefined `filebeat-*` data view is selected.
 
@@ -391,7 +446,7 @@ Now that you have your logs streaming into {{es}}, learn how to unify your logs,
     | [{{metricbeat}}](/reference/metricbeat/metricbeat-installation-configuration.md) | Infrastructure metrics |
     | [{{winlogbeat}}](/reference/winlogbeat/winlogbeat-installation-configuration.md) | Windows event logs |
     | [{{heartbeat}}](/reference/heartbeat/heartbeat-installation-configuration.md) | Uptime information |
-    | [APM](docs-content://solutions/observability/apps/application-performance-monitoring-apm.md) | Application performance metrics |
+    | [APM](docs-content://solutions/observability/apm/index.md) | Application performance metrics |
     | [{{auditbeat}}](/reference/auditbeat/auditbeat-installation-configuration.md) | Audit events |
 
 2. Use the Observability apps in {{kib}} to search across all your data:
@@ -400,8 +455,8 @@ Now that you have your logs streaming into {{es}}, learn how to unify your logs,
     | --- | --- |
     | [{{metrics-app}}](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) | Explore metrics about systems and services across your ecosystem |
     | [{{logs-app}}](docs-content://solutions/observability/logs/explore-logs.md) | Tail related log data in real time |
-    | [{{uptime-app}}](docs-content://solutions/observability/apps/synthetic-monitoring.md#monitoring-uptime) | Monitor availability issues across your apps and services |
-    | [APM app](docs-content://solutions/observability/apps/overviews.md) | Monitor application performance |
+    | [{{uptime-app}}](docs-content://solutions/observability/synthetics/index.md#monitoring-uptime) | Monitor availability issues across your apps and services |
+    | [APM app](docs-content://solutions/observability/apm/overviews.md) | Monitor application performance |
     | [{{siem-app}}](docs-content://solutions/security.md) | Analyze security events |
 
 

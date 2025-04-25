@@ -13,13 +13,11 @@ This guide describes how to get started quickly with metrics collection. You’l
 
 * install Metricbeat on each system you want to monitor
 * specify the metrics you want to collect
-* send the metrics to {es}
-* visualize the metrics data in {kib}
+* send the metrics to {{es}}
+* visualize the metrics data in {{kib}}
 
-:::{image} images/metricbeat-system-dashboard.png
-:alt: Metricbeat System dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Metricbeat System dashboard](images/metricbeat-system-dashboard.png)
 
 
 ## Before you begin [_before_you_begin]
@@ -121,7 +119,7 @@ Specify the [cloud.id](/reference/metricbeat/configure-cloud-id.md) of your {{es
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "metricbeat_setup:{pwd}" <1>
+cloud.auth: "metricbeat_setup:YOUR_PASSWORD" <1>
 ```
 
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/metricbeat/keystore.md).
@@ -134,7 +132,7 @@ cloud.auth: "metricbeat_setup:{pwd}" <1>
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "metricbeat_internal"
-      password: "{pwd}" <1>
+      password: "YOUR_PASSWORD" <1>
       ssl:
         enabled: true
         ca_trusted_fingerprint: "b9a10bbe64ee9826abeda6546fc988c8bf798b41957c33d05db736716513dc9c" <2>
@@ -149,7 +147,7 @@ cloud.auth: "metricbeat_setup:{pwd}" <1>
       setup.kibana:
         host: "mykibanahost:5601" <1>
         username: "my_kibana_user" <2> <3>
-        password: "{pwd}"
+        password: "YOUR_PASSWORD"
     ```
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
@@ -174,95 +172,146 @@ Metricbeat uses modules to collect metrics. Each module defines the basic logic 
 
     :::::::{tab-set}
 
-::::::{tab-item} DEB
-```sh
+    ::::::{tab-item} DEB
+    ```sh
     metricbeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     metricbeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./metricbeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./metricbeat modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\metricbeat.exe modules list
     ```
-::::::
+    ::::::
 
-::::::{tab-item} DEB
-```sh
+    :::::::
+
+2. From the installation directory, enable one or more modules. If you accept the default configuration without enabling additional modules, Metricbeat collects system metrics only.
+
+    The following command enables the nginx config in the `modules.d` directory:
+
+    :::::::{tab-set}
+
+    ::::::{tab-item} DEB
+    ```sh
     metricbeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     metricbeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./metricbeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./metricbeat modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\metricbeat.exe modules enable nginx
     ```
-::::::
+    ::::::
 
-::::::{tab-item} DEB
-```sh
+    :::::::
+
+    See the [`modules` command](/reference/metricbeat/command-line-options.md#modules-command) to learn more about this command. If you are using a Docker image, see [Run Metricbeat on Docker](/reference/metricbeat/running-on-docker.md).
+
+3. In the module config under `modules.d`, change the module settings to match your environment. See [Standard config options](/reference/metricbeat/configuration-metricbeat.md#module-config-options) for more about available settings.
+
+:::{tip}
+To test your configuration file, change to the directory where the Metricbeat binary is installed, and run Metricbeat in the foreground with the following options specified: `./metricbeat test config -e`. Make sure your config files are in the path expected by Metricbeat (see [Directory layout](/reference/metricbeat/directory-layout.md)), or use the `-c` flag to specify the path to the config file.
+:::
+
+For more information about configuring Metricbeat, also see:
+
+* [Configure Metricbeat](/reference/metricbeat/configuring-howto-metricbeat.md)
+* [Config file format](/reference/libbeat/config-file-format.md)
+* [`metricbeat.reference.yml`](/reference/metricbeat/metricbeat-reference-yml.md): This reference configuration file shows all non-deprecated options. You’ll find it in the same location as `metricbeat.yml`.
+
+## Step 4: Set up assets
+
+Metricbeat comes with predefined assets for parsing, indexing, and visualizing your data. To load these assets:
+
+1. Make sure the user specified in `metricbeat.yml` is [authorized to set up Metricbeat](/reference/metricbeat/privileges-to-setup-beats.md).
+2. From the installation directory, run:
+
+    :::::::{tab-set}
+
+    ::::::{tab-item} DEB
+    ```sh
     metricbeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     metricbeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./metricbeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./metricbeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\metricbeat.exe setup -e
     ```
-::::::
+    ::::::
+
+    :::::::
+
+    `-e` is optional and sends output to standard error instead of the configured log output.
+
+This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
+
+:::{tip}
+A connection to Elasticsearch (or Elasticsearch Service) is required to set up the initial environment. If you’re using a different output, such as Logstash, see [Load the index template manually](/reference/metricbeat/metricbeat-template.md#load-template-manually) and [Load Kibana dashboards](/reference/metricbeat/load-kibana-dashboards.md).
+:::
+
+## Step 5: Start Metricbeat
+
+Before starting Metricbeat, modify the user credentials in metricbeat.yml and specify a user who is [authorized to publish events](/reference/metricbeat/privileges-to-publish-events.md).
+
+To start Metricbeat, run:
+
+:::::::{tab-set}
 
 ::::::{tab-item} DEB
 ```sh
@@ -323,6 +372,7 @@ On Windows, statistics about system load and swap usage are currently not captur
 ::::::
 
 :::::::
+
 Metricbeat should begin streaming metrics to {{es}}.
 
 
@@ -334,39 +384,15 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    <div class="tabs" data-tab-group="host">
-      <div role="tablist" aria-label="Open Kibana">
-        <button role="tab"
-                aria-selected="true"
-                aria-controls="cloud-tab-open-kibana"
-                id="cloud-open-kibana">
-          Elasticsearch Service
-        </button>
-        <button role="tab"
-                aria-selected="false"
-                aria-controls="self-managed-tab-open-kibana"
-                id="self-managed-open-kibana"
-                tabindex="-1">
-          Self-managed
-        </button>
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="cloud-tab-open-kibana"
-           aria-labelledby="cloud-open-kibana">
+    :::::::{tab-set}
+    ::::::{tab-item} Elasticsearch Service
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
-
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="self-managed-tab-open-kibana"
-           aria-labelledby="self-managed-open-kibana"
-           hidden="">
+    ::::::
+    ::::::{tab-item} Self-managed
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
-
-      </div>
-    </div>
+    ::::::
+    :::::::
 
 2. In the side navigation, click **Discover**. To see Metricbeat data, make sure the predefined `metricbeat-*` data view is selected.
 
@@ -390,7 +416,7 @@ Now that you have your infrastructure metrics streaming into {{es}}, learn how t
     | [{{filebeat}}](/reference/filebeat/filebeat-installation-configuration.md) | Logs |
     | [{{winlogbeat}}](/reference/winlogbeat/winlogbeat-installation-configuration.md) | Windows event logs |
     | [{{heartbeat}}](/reference/heartbeat/heartbeat-installation-configuration.md) | Uptime information |
-    | [APM](docs-content://solutions/observability/apps/application-performance-monitoring-apm.md) | Application performance metrics |
+    | [APM](docs-content://solutions/observability/apm/index.md) | Application performance metrics |
     | [{{auditbeat}}](/reference/auditbeat/auditbeat-installation-configuration.md) | Audit events |
 
 2. Use the Observability apps in {{kib}} to search across all your data:
@@ -399,8 +425,8 @@ Now that you have your infrastructure metrics streaming into {{es}}, learn how t
     | --- | --- |
     | [{{metrics-app}}](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) | Explore metrics about systems and services across your ecosystem |
     | [{{logs-app}}](docs-content://solutions/observability/logs/explore-logs.md) | Tail related log data in real time |
-    | [{{uptime-app}}](docs-content://solutions/observability/apps/synthetic-monitoring.md#monitoring-uptime) | Monitor availability issues across your apps and services |
-    | [APM app](docs-content://solutions/observability/apps/overviews.md) | Monitor application performance |
+    | [{{uptime-app}}](docs-content://solutions/observability/synthetics/index.md#monitoring-uptime) | Monitor availability issues across your apps and services |
+    | [APM app](docs-content://solutions/observability/apm/overviews.md) | Monitor application performance |
     | [{{siem-app}}](docs-content://solutions/security.md) | Analyze security events |
 
 

@@ -6,6 +6,8 @@ package azureblobstorage
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -492,7 +494,7 @@ func Test_StorageClient(t *testing.T) {
 			chanClient := beattest.NewChanClient(len(tt.expected))
 			t.Cleanup(func() { _ = chanClient.Close() })
 
-			ctx, cancel := newV2Context()
+			ctx, cancel := newV2Context(t)
 			t.Cleanup(cancel)
 			ctx.ID += tt.name
 
@@ -597,7 +599,7 @@ func Test_Concurrency(t *testing.T) {
 					PollInterval:  *container.PollInterval,
 				}
 			}
-			v2Ctx, cancel := newV2Context()
+			v2Ctx, cancel := newV2Context(t)
 			t.Cleanup(cancel)
 			v2Ctx.ID += t.Name()
 			client := publisher{
@@ -661,11 +663,23 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	return nil
 }
 
-func newV2Context() (v2.Context, func()) {
+func newV2Context(t *testing.T) (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
+	id, err := generateRandomID(8)
+	if err != nil {
+		t.Fatalf("failed to generate random id: %v", err)
+	}
 	return v2.Context{
-		Logger:      logp.NewLogger("azure-blob-storage_test"),
-		ID:          "test_id:",
+		Logger:      logp.NewLogger("abs_test"),
+		ID:          "abs_test-" + id,
 		Cancelation: ctx,
 	}, cancel
+}
+
+func generateRandomID(length int) (string, error) {
+	bytes := make([]byte, length)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(bytes), nil
 }

@@ -44,6 +44,8 @@ type Config struct {
 	// specific to billing
 	BillingScopeDepartment string `config:"billing_scope_department"` // retrieve usage details from department scope
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
+	// Use BatchApi for metric values collection
+	EnableBatchApi bool `config:"enable_batch_api"` // defaults to false
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
@@ -88,7 +90,7 @@ func (conf *Config) Validate() error {
 			if err != nil {
 				return fmt.Errorf("no active directory endpoint found for the resource manager endpoint selected: %w", err)
 			}
-			conf.ActiveDirectoryEndpoint = add.(string)
+			conf.ActiveDirectoryEndpoint, _ = add.(string)
 		}
 		if conf.ActiveDirectoryEndpoint == "" {
 			return fmt.Errorf("no active directory endpoint has been configured")
