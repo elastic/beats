@@ -56,7 +56,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		HTTP *config.C `config:"http"`
 	}{}
 	if err := b.RawConfig.Unpack(&httpConf); err != nil {
-		return nil, fmt.Errorf("error starting API: %w", err)
+		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
 	}
 
 	beatReceiver := beatreceiver.BeatReceiver{
