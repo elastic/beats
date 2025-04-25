@@ -54,11 +54,69 @@ headers:
 
 		OTelCfg := `
 endpoints:
-  - http://localhost:9200/foo/bar
-  - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
+ - http://localhost:9200/foo/bar
+ - http://localhost:9300/foo/bar
 idle_conn_timeout: 3s
 logs_index: some-index
-num_workers: 30
+num_workers: 60
 password: changeme
 pipeline: some-ingest-pipeline
 proxy_url: https://proxy.url
@@ -138,8 +196,6 @@ preset: %s
 `
 
 		commonOTelCfg := `
-endpoints:
-  - http://localhost:9200
 retry:
   enabled: true
   initial_interval: 1s
@@ -160,6 +216,8 @@ mapping:
 			{
 				presetName: "balanced",
 				output: commonOTelCfg + `
+endpoints:
+  - http://localhost:9200
 idle_conn_timeout: 3s
 num_workers: 1
 batcher:
@@ -171,6 +229,11 @@ batcher:
 			{
 				presetName: "throughput",
 				output: commonOTelCfg + `
+endpoints:
+  - http://localhost:9200
+  - http://localhost:9200
+  - http://localhost:9200
+  - http://localhost:9200
 idle_conn_timeout: 15s
 num_workers: 4
 batcher:
@@ -206,6 +269,8 @@ mapping:
 			{
 				presetName: "latency",
 				output: commonOTelCfg + `
+endpoints:
+  - http://localhost:9200
 idle_conn_timeout: 1m0s
 num_workers: 1
 batcher:
@@ -217,6 +282,8 @@ batcher:
 			{
 				presetName: "custom",
 				output: commonOTelCfg + `
+endpoints:
+  - http://localhost:9200
 idle_conn_timeout: 3s
 num_workers: 1
 batcher:
