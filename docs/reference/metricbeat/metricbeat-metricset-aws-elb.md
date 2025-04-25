@@ -51,9 +51,8 @@ elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.am
 
 ### Metrics for Classic ELB [_metrics_for_classic_elb]
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | BackendConnectionErrors | Sum |
 | HealthyHostCount | Maximum |
 | HTTPCode_Backend_2XX | Sum |
@@ -75,9 +74,8 @@ elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.am
 
 ### Metrics for Application ELB [_metrics_for_application_elb]
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | ActiveConnectionCount | Sum |
 | ClientTLSNegotiationErrorCount | Sum |
 | ConsumedLCUs | Average |
@@ -102,9 +100,8 @@ elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.am
 
 ### Metrics for Network ELB [_metrics_for_network_elb]
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | ActiveFlowCount | Average |
 | ActiveFlowCount_TLS | Average |
 | ActiveFlowCount_TCP | Average |

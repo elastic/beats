@@ -22,6 +22,8 @@ package perfmon
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,7 +41,7 @@ func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	reader, err := NewReader(config)
+	reader, err := NewReader(config, logptest.NewTestingLogger(t, ""))
 	assert.Error(t, err)
 	assert.Nil(t, reader)
 	assert.EqualValues(t, err.Error(), `failed to expand counter (query="\Invalid(*)\% Processor Time"): The specified object was not found on the computer.`)
@@ -47,7 +49,6 @@ func TestNewReaderWhenQueryPathNotProvided(t *testing.T) {
 
 // TestNewReaderWithValidQueryPath should successfully instantiate the reader.
 func TestNewReaderWithValidQueryPath(t *testing.T) {
-
 	config := Config{
 		IgnoreNECounters:  false,
 		GroupMeasurements: false,
@@ -60,15 +61,14 @@ func TestNewReaderWithValidQueryPath(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	reader, err := NewReader(config)
-	defer reader.Close()
+	reader, err := NewReader(config, logptest.NewTestingLogger(t, ""))
 	assert.NoError(t, err)
+	defer reader.Close()
 	assert.NotNil(t, reader)
 	assert.NotNil(t, reader.query)
 	assert.NotNil(t, reader.query.Handle)
 	assert.NotNil(t, reader.query.Counters)
 	assert.NotZero(t, len(reader.query.Counters))
-
 }
 
 // TestReadSuccessfully will test the func read when it first retrieves no events (and ignored) and then starts retrieving events.
@@ -85,11 +85,11 @@ func TestReadSuccessfully(t *testing.T) {
 			Name: "% Processor Time",
 		},
 	}
-	reader, err := NewReader(config)
+	reader, err := NewReader(config, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
-	//Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we call reader.Read() twice.
+	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we call reader.Read() twice.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	events, err := reader.Read()
 	assert.NoError(t, err)

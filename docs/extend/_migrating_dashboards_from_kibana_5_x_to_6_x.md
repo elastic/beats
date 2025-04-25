@@ -13,12 +13,19 @@ Starting with Kibana 6.0, the dashboards are loaded by default via the Kibana AP
 
 As the format of the dashboards and index-pattern for Kibana 5.x is different than the ones for Kibana 6.x, they are placed in different directories. Depending on the Kibana version, the 5.x or 6.x dashboards are loaded.
 
-The Kibana 5.x dashboards are placed under the 5.x directory that contains the following directories: - search - visualization - dashboard - index-pattern
+The Kibana 5.x dashboards are placed under the 5.x directory that contains the following directories:
+- search
+- visualization
+- dashboard
+- index-pattern
 
-The Kibana 6.x dashboards and later are placed under the default directory that contains the following directories: - dashboard - index-pattern
+The Kibana 6.x dashboards and later are placed under the default directory that contains the following directories:
+- dashboard
+- index-pattern
 
-NOTE
-:   Please make sure the 5.x and default directories are created before running the following commands.
+:::{note}
+Please make sure the 5.x and default directories are created before running the following commands.
+:::
 
 To migrate your Kibana 5.x dashboards to Kibana 6.0 and above, you can import the dashboards into Kibana 5.6 and then export them using Beats 6.0 version.
 
@@ -53,7 +60,9 @@ module/rabbitmq/_meta/kibana/default/Metricbeat-Rabbitmq.json <1>
 1. `Metricbeat-Rabbitmq` is the ID of the dashboard that you want to export.
 
 
-Note: You can get the dashboard ID from the URL of the dashboard in Kibana. Depending on the Kibana version the dashboard was created, the ID consists of a name or random characters that can be separated by `-`.
+:::{note}
+You can get the dashboard ID from the URL of the dashboard in Kibana. Depending on the Kibana version the dashboard was created, the ID consists of a name or random characters that can be separated by `-`.
+:::
 
 This command creates a single JSON file (Metricbeat-Rabbitmq.JSON) that contains the dashboard and all the dependencies like searches, visualizations. The name of the output file has the format: <Beat name>-<module name>.json.
 
