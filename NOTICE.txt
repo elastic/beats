@@ -41279,11 +41279,11 @@ Contents of probable licence file $GOMODCACHE/github.com/godror/knownpb@v0.1.0/L
 
 --------------------------------------------------------------------------------
 Dependency : github.com/golang-jwt/jwt/v4
-Version: v4.5.0
+Version: v4.5.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/golang-jwt/jwt/v4@v4.5.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/golang-jwt/jwt/v4@v4.5.2/LICENSE:
 
 Copyright (c) 2012 Dave Grijalva
 Copyright (c) 2021 golang-jwt maintainers
