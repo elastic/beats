@@ -86,7 +86,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 
 				// extract the number of workers from OTEL config and delete from exporter config
 				// because num_workers has no effect if batcher is enabled.
-				// We will use thi setting to create multiple clients later
+				// We will use the setting to create multiple clients later
 				workers = esOTelConfig["num_workers"]
 				delete(esOTelConfig, "num_workers")
 
