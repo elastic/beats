@@ -99,8 +99,8 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 Unit Tests FIPS"
-        key: "mandatory-linux-unit-test-fips"
+      - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "mandatory-linux-unit-test-fips-tag"
         command: |
           cd x-pack/metricbeat
           mage unitTest
@@ -124,7 +124,34 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests FIPS"
+              context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+
+      - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 fips140=only Unit Tests"
+        key: "mandatory-linux-unit-test-fips-only"
+        command: |
+          cd x-pack/metricbeat
+          mage goFIPSOnlyUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: Ubuntu x86_64 fips140=only Unit Tests"
 
       - label: ":ubuntu: x-pack/metricbeat: Go Integration Tests (Module)"
         key: "mandatory-int-test"

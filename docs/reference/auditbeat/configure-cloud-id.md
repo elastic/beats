@@ -13,7 +13,7 @@ Example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "elastic:{pwd}"
+cloud.auth: "elastic:YOUR_PASSWORD"
 ```
 
 These settings can be also specified at the command line, like this:
@@ -29,6 +29,8 @@ The Cloud ID, which can be found in the {{ess}} web console, is used by Auditbea
 
 ## `cloud.auth` [_cloud_auth]
 
+::::{important}
+`cloud.auth` should not be confused with API keys generated in {{ecloud}} stack management. Although these values look similar, they are unrelated.
+::::
+
 When specified, the `cloud.auth` overwrites the `output.elasticsearch.username` and `output.elasticsearch.password` settings. Because the Kibana settings inherit the username and password from the {{es}} output, this can also be used to set the `setup.kibana.username` and `setup.kibana.password` options.
-
-

@@ -115,10 +115,8 @@ See customlog documentation  [https://httpd.apache.org/docs/2.4/en/mod/mod_log_c
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/kibana-apache.png
-:alt: kibana apache
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana apache](images/kibana-apache.png)
 
 
 ## Fields [_fields_4]

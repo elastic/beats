@@ -103,10 +103,8 @@ This is an example configuration for the module.
 
 This module comes with a sample dashboard:
 
-:::{image} images/filebeat-okta-dashboard.png
-:alt: filebeat okta dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat okta dashboard](images/filebeat-okta-dashboard.png)
 
 
 ## Fields [_fields_39]

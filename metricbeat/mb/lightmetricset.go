@@ -67,7 +67,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 	registration.Factory = func(base BaseMetricSet) (MetricSet, error) {
 		// Override default config on base module and metricset
 		base.name = m.Name
-		baseModule, err := m.baseModule(base.module)
+		baseModule, err := m.baseModule(base)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create base module for light module '%s', using base module '%s': %w", m.Module, base.module.Name(), err)
 		}
@@ -101,7 +101,8 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 
 // baseModule does the configuration overrides in the base module configuration
 // taking into account the light metric set default configurations
-func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
+func (m *LightMetricSet) baseModule(base BaseMetricSet) (*BaseModule, error) {
+	from := base.module
 	// Initialize config using input defaults as raw config
 	rawConfig, err := conf.NewConfigFrom(m.Input.Defaults)
 	if err != nil {
@@ -114,11 +115,11 @@ func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
 	}
 
 	// Create the base module
-	baseModule, err := newBaseModuleFromConfig(rawConfig)
+	baseModule, err := newBaseModuleFromConfig(rawConfig, base.Logger())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create base module: %w", err)
 	}
 	baseModule.name = m.Module
-
 	return &baseModule, nil
+
 }

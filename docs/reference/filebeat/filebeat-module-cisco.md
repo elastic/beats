@@ -394,10 +394,8 @@ When starting up the Filebeat module for the first time, you are able to configu
 
 This module comes with a sample dashboard for ASA:
 
-:::{image} images/kibana-cisco-asa.png
-:alt: kibana cisco asa
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana cisco asa](images/kibana-cisco-asa.png)
 
 
 ## Fields [_fields_11]

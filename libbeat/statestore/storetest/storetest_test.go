@@ -24,12 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/internal/storecompliance"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-func init() {
-	logp.DevelopmentSetup()
-}
 
 func TestCompliance(t *testing.T) {
 	storecompliance.TestBackendCompliance(t, func(testPath string) (backend.Registry, error) {

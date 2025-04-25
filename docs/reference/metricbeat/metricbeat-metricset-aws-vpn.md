@@ -31,9 +31,7 @@ iam:ListAccountAliases
 
 The aws vpn metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-vpn-overview.png
-:alt: metricbeat aws vpn overview
-:::
+![metricbeat aws vpn overview](images/metricbeat-aws-vpn-overview.png)
 
 
 ## Configuration example [_configuration_example_17]
@@ -52,18 +50,16 @@ The aws vpn metricset comes with a predefined dashboard. For example:
 
 Metrics:
 
-|     |     |     |
-| --- | --- | --- |
 | Metric Name | Statistic Method | Description |
+| --- | --- | --- |
 | TunnelState | Max | The state of the tunnel. For static VPNs, 0 indicates DOWN and 1 indicates UP. For BGP VPNs, 1 indicates ESTABLISHED and 0 is used for all other states. |
 | TunnelDataIn | Sum | The bytes received through the VPN tunnel. |
 | TunnelDataOut | Sum | The bytes sent through the VPN tunnel. |
 
 Dimensions:
 
-|     |     |
-| --- | --- |
 | Dimension Name | Description |
+| --- | --- |
 | VpnId | Filters the metric data by the Site-to-Site VPN connection ID. |
 | TunnelIpAddress | Filters the metric data by the IP address of the tunnel for the virtual private gateway. |
 

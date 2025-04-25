@@ -26,9 +26,7 @@ iam:ListAccountAliases
 
 The aws elb metricset comes with a predefined dashboard for classic ELB. For example:
 
-:::{image} images/metricbeat-aws-elb-overview.png
-:alt: metricbeat aws elb overview
-:::
+![metricbeat aws elb overview](images/metricbeat-aws-elb-overview.png)
 
 
 ## Configuration example [_configuration_example_6]
@@ -53,9 +51,8 @@ elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.am
 
 ### Metrics for Classic ELB [_metrics_for_classic_elb]
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | BackendConnectionErrors | Sum |
 | HealthyHostCount | Maximum |
 | HTTPCode_Backend_2XX | Sum |
@@ -77,9 +74,8 @@ elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.am
 
 ### Metrics for Application ELB [_metrics_for_application_elb]
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | ActiveConnectionCount | Sum |
 | ClientTLSNegotiationErrorCount | Sum |
 | ConsumedLCUs | Average |
@@ -104,9 +100,8 @@ elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.am
 
 ### Metrics for Network ELB [_metrics_for_network_elb]
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | ActiveFlowCount | Average |
 | ActiveFlowCount_TLS | Average |
 | ActiveFlowCount_TCP | Average |
