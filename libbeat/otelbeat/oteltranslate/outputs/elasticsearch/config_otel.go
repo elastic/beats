@@ -118,7 +118,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		workers = escfg.NumWorkers()
 	}
 
-	// duplicate host entries config.NumWorkers() times
+	// duplicate host entries workers times
 	for _ = range workers {
 		for _, h := range escfg.Hosts {
 			esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
