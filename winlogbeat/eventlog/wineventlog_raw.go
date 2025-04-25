@@ -24,14 +24,17 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
 const (
@@ -73,10 +76,9 @@ type winEventLogRaw struct {
 // newWinEventLogRaw creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLogRaw(options *conf.C) (EventLog, error) {
-	var xmlQuery string
 	var err error
-	var isFile bool
-	var log *logp.Logger
+
+	cfgwarn.Experimental("The %s event log reader is experimental.", winEventLogExpAPIName)
 
 	c := winEventLogConfig{BatchReadSize: 512}
 	if err := readConfig(options, &c); err != nil {
@@ -88,42 +90,51 @@ func newWinEventLogRaw(options *conf.C) (EventLog, error) {
 		id = c.Name
 	}
 
+	l := &winEventLogRaw{
+		config:      c,
+		id:          id,
+		channelName: c.Name,
+		maxRead:     c.BatchReadSize,
+		log:         logp.NewLogger("wineventlog").With("id", id),
+	}
+
 	if c.XMLQuery != "" {
-		xmlQuery = c.XMLQuery
-		log = logp.NewLogger("wineventlog").With("id", id)
+		if l.skipQueryFilters() {
+			l.log.Warn("you are using a custom XML query with Windows Server 2025 and forwarded events, " +
+				"this is not recommended due to a known issue with that can crash the Event Log service if using" +
+				" query filters. Please use a custom query without filters or use the default query")
+		}
+		l.query = c.XMLQuery
 	} else {
+		l.log = l.log.With("channel", c.Name)
 		queryLog := c.Name
 		if info, err := os.Stat(c.Name); err == nil && info.Mode().IsRegular() {
 			path, err := filepath.Abs(c.Name)
 			if err != nil {
 				return nil, err
 			}
-			isFile = true
+			l.file = true
 			queryLog = "file://" + path
 		}
 
-		xmlQuery, err = win.Query{
-			Log:         queryLog,
-			IgnoreOlder: c.SimpleQuery.IgnoreOlder,
-			Level:       c.SimpleQuery.Level,
-			EventID:     c.SimpleQuery.EventID,
-			Provider:    c.SimpleQuery.Provider,
-		}.Build()
+		winQuery := win.Query{
+			Log: queryLog,
+		}
+
+		if !l.skipQueryFilters() {
+			winQuery.IgnoreOlder = c.SimpleQuery.IgnoreOlder
+			winQuery.Level = c.SimpleQuery.Level
+			winQuery.EventID = c.SimpleQuery.EventID
+			winQuery.Provider = c.SimpleQuery.Provider
+		} else {
+			l.log.Warn("skipping query filters for Windows Server 2025 due to known issue" +
+				" with Event Log API and forwarded events")
+		}
+
+		l.query, err = winQuery.Build()
 		if err != nil {
 			return nil, err
 		}
-
-		log = logp.NewLogger("wineventlog").With("id", id).With("channel", c.Name)
-	}
-
-	l := &winEventLogRaw{
-		config:      c,
-		query:       xmlQuery,
-		id:          id,
-		channelName: c.Name,
-		file:        isFile,
-		maxRead:     c.BatchReadSize,
-		log:         log,
 	}
 
 	switch c.IncludeXML {
@@ -133,14 +144,14 @@ func newWinEventLogRaw(options *conf.C) (EventLog, error) {
 				IsForwarded: l.isForwarded(),
 				Locale:      c.EventLanguage,
 			},
-			win.NilHandle, log)
+			win.NilHandle, l.log)
 	case false:
 		l.renderer, err = win.NewRenderer(
 			win.RenderConfig{
 				IsForwarded: l.isForwarded(),
 				Locale:      c.EventLanguage,
 			},
-			win.NilHandle, log)
+			win.NilHandle, l.log)
 		if err != nil {
 			return nil, err
 		}
@@ -387,4 +398,19 @@ func (l *winEventLogRaw) close() error {
 		l.iterator.Close(),
 		l.renderer.Close(),
 	)
+}
+
+// FIXME: Windows Server 2025 has a bug in the Windows Event Log API that causes
+// the Event Log Service to crash when using some combinations of filters with
+// forwarded events. This is a workaround to skip the query filters for
+// Windows Server 2025 in such scenarios.
+func (l *winEventLogRaw) skipQueryFilters() bool {
+	if l.config.Bypass2025Workaround {
+		return false
+	}
+	osinfo, err := wininfo.OperatingSystem()
+	if err != nil {
+		return false
+	}
+	return l.isForwarded() && strings.Contains(osinfo.Name, "2025")
 }
