@@ -179,11 +179,7 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
 
-*Functionbeat*
 
-<<<<<<< HEAD
-- Remove Functionbeat binaries from CI pipelines. {issue}40745[40745] {pull}41506[41506]
-=======
 [[release-notes-8.18.0]]
 === Beats version 8.18.0
 https://github.com/elastic/beats/compare/v8.17.4\...v8.18.0[View commits]
