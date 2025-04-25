@@ -411,11 +411,11 @@ the file open to make sure the harvester has completed. If this
 setting results in files that are not completely read because they are
 removed from disk too early, disable this option.
 
-This option is disabled by default on Linux and MacOS, on Windows it
-is enabled by default.
+This option is enabled by default on Windows and disabled by default
+on all other OSes.
 
 ::::{warning}
-WINDOWS: If your Windows log rotation system shows errors because it
+If your Windows log rotation system shows errors because it
 can’t rotate files, make sure this option is enabled.
 ::::
 
