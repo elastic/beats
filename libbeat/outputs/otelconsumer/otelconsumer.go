@@ -74,7 +74,7 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 	}
 
 	clients := make([]outputs.Client, 0)
-	for _ = range workersCfg.Workers {
+	for range workersCfg.Workers {
 		clients = append(clients, &otelConsumer{
 			observer:     observer,
 			logsConsumer: beat.LogConsumer,
