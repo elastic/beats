@@ -11,11 +11,8 @@ upgrade.
 * <<release-notes-9.0.0>>
 * <<release-notes-9.0.0-rc1>>
 * <<release-notes-9.0.0-beta1>>
-<<<<<<< HEAD
-=======
 * <<release-notes-8.18.0>>
 * <<release-notes-8.17.4>>
->>>>>>> 396898e59 (docs: Prepare Changelog for 8.18.0 (#43740) (#43928))
 * <<release-notes-8.17.3>>
 * <<release-notes-8.17.2>>
 * <<release-notes-8.17.1>>
