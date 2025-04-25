@@ -106,8 +106,8 @@ The Docker image provides several methods for configuring Metricbeat. The conven
 
 Download this example configuration file as a starting point:
 
-```sh
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/docker/metricbeat.docker.yml
+```sh subs=true
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/docker/metricbeat.docker.yml
 ```
 
 
