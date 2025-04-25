@@ -121,6 +121,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Journald input now works on Docker containers {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 
 
 *Heartbeat*
