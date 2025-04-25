@@ -35,7 +35,6 @@ exporters:
       - https://localhost:9200
     idle_conn_timeout: 3s
     logs_index: form-otel-exporter
-    num_workers: 1
     password: changeme
     retry:
       enabled: true
@@ -97,7 +96,8 @@ receivers:
           paths:
             - /var/log/*.log		  
     output:
-      otelconsumer: null
+      otelconsumer:
+        workers: 1
 service:
   pipelines:
     logs:
@@ -177,7 +177,6 @@ exporters:
       - https://es-hostname.elastic.co:443
     idle_conn_timeout: 3s
     logs_index: form-otel-exporter
-    num_workers: 1
     password: password
     retry:
       enabled: true
@@ -202,7 +201,8 @@ receivers:
             - /tmp/flog.log
           type: filestream  
     output:
-      otelconsumer: null
+      otelconsumer:
+        workers: 1
     cloud: null
     setup:
       kibana:
@@ -259,7 +259,8 @@ receivers:
           min_events: 1600
           timeout: 10s    	  
     output:
-      otelconsumer: null
+      otelconsumer:
+        workers: 1
 service:
   pipelines:
     logs:
