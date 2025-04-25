@@ -111,8 +111,15 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 
 	// Create url using host name, protocol and path
 	hosts := []string{}
-	// duplicate entries config.NumWorkers() times
-	for i := 0; i < escfg.NumWorkers(); i++ {
+
+	// get number of workers
+	workers := 1 // Default value is 1
+	if escfg.NumWorkers() > 1 {
+		workers = escfg.NumWorkers()
+	}
+
+	// duplicate host entries config.NumWorkers() times
+	for i := range workers {
 		for _, h := range escfg.Hosts {
 			esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
 			if err != nil {
@@ -128,15 +135,10 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
 
-	// get number of workers
-	workers := 1 // Default value is 1
-	if escfg.NumWorkers() > 1 {
-		workers = escfg.NumWorkers()
-	}
 	otelYAMLCfg := map[string]any{
 		"logs_index":  escfg.Index, // index
 		"endpoints":   hosts,       // hosts, protocol, path, port
-		"num_workers": workers,     // worker/workers
+		"num_workers": len(hosts),  // number of workers (or clients) will be escfg.NumWorkers() * escfg.Hosts
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
