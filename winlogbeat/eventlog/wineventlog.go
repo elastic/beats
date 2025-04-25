@@ -46,6 +46,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	wininfo "github.com/elastic/go-sysinfo/providers/windows"
 )
 
 var (
@@ -92,6 +93,10 @@ type winEventLogConfig struct {
 	SimpleQuery   query              `config:",inline"`
 	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
 	EventLanguage uint32             `config:"language"`
+
+	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
+	// and will be removed in the future.
+	Bypass2025Workaround bool `config:"bypass_2025_workaround"`
 }
 
 // query contains parameters used to customize the event log data that is
@@ -209,7 +214,6 @@ func newEventLogging(options *conf.C) (EventLog, error) {
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(options *conf.C) (EventLog, error) {
-	var xmlQuery string
 	var err error
 
 	c := defaultWinEventLogConfig
@@ -220,21 +224,6 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	id := c.ID
 	if id == "" {
 		id = c.Name
-	}
-
-	if c.XMLQuery != "" {
-		xmlQuery = c.XMLQuery
-	} else {
-		xmlQuery, err = win.Query{
-			Log:         c.Name,
-			IgnoreOlder: c.SimpleQuery.IgnoreOlder,
-			Level:       c.SimpleQuery.Level,
-			EventID:     c.SimpleQuery.EventID,
-			Provider:    c.SimpleQuery.Provider,
-		}.Build()
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	eventMetadataHandle := func(providerName, sourceName string) sys.MessageFiles {
@@ -260,7 +249,6 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 	l := &winEventLog{
 		id:           id,
 		config:       c,
-		query:        xmlQuery,
 		channelName:  c.Name,
 		file:         filepath.IsAbs(c.Name),
 		maxRead:      c.BatchReadSize,
@@ -285,6 +273,32 @@ func newWinEventLog(options *conf.C) (EventLog, error) {
 		}
 		l.message = func(event win.EvtHandle) (string, error) {
 			return win.Message(event, l.renderBuf, l.cache.get)
+		}
+	}
+
+	if c.XMLQuery != "" {
+		if l.skipQueryFilters() {
+			logp.Warn("%s you are using a custom XML query with Windows Server 2025 and forwarded events, "+
+				"this is not recommended due to a known issue with that can crash the Event Log service if using"+
+				" query filters. Please use a custom query without filters or use the default query", l.logPrefix)
+		}
+		l.query = c.XMLQuery
+	} else {
+		winQuery := win.Query{
+			Log: c.Name,
+		}
+		if !l.skipQueryFilters() {
+			winQuery.IgnoreOlder = c.SimpleQuery.IgnoreOlder
+			winQuery.Level = c.SimpleQuery.Level
+			winQuery.EventID = c.SimpleQuery.EventID
+			winQuery.Provider = c.SimpleQuery.Provider
+		} else {
+			logp.Warn("%s skipping query filters for Windows Server 2025 due to known issue"+
+				" with Event Log API and forwarded events", l.logPrefix)
+		}
+		l.query, err = winQuery.Build()
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -743,4 +757,19 @@ func (m *inputMetrics) close() {
 		return
 	}
 	m.unregister()
+}
+
+// FIXME: Windows Server 2025 has a bug in the Windows Event Log API that causes
+// the Event Log Service to crash when using some combinations of filters with
+// forwarded events. This is a workaround to skip the query filters for
+// Windows Server 2025 in such scenarios.
+func (l *winEventLog) skipQueryFilters() bool {
+	if l.config.Bypass2025Workaround {
+		return false
+	}
+	osinfo, err := wininfo.OperatingSystem()
+	if err != nil {
+		return false
+	}
+	return l.isForwarded() && strings.Contains(osinfo.Name, "2025")
 }
