@@ -16,6 +16,11 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 To keep the previous behaviour, add `close.on_state_change.removed:
 true` on every Filestream input.
 
+Even after the file is removed, the file handles will stay open until
+it is closed due to
+inactivity. See [`close.on_state_change.inactive`](https://www.elastic.co/docs/reference/beats/filebeat/filebeat-input-filestream#filebeat-input-filestream-close-inactive)
+for more details.
+
 For more information, check [#38523](https://github.com/elastic/beats/issues/38523)
 ::::
 
