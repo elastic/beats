@@ -11,9 +11,10 @@ mapped_pages:
 :::{important}
 When using the Journald input from a Docker container, make sure the
 `journalctl` binary in the container is compatible with your
-Systemd/journal version, to get the version of the `journalctl` binary
-in Filebeat's image run (adjust the image name/tag accordingly to the
-version you are running):
+Systemd/journal version. To get the version of the `journalctl` binary
+in Filebeat's image run the following, adjusting the image name/tag 
+according to the version that you are running:
+
 
 ```sh
 docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat-wolfi:<VERSION> --version
