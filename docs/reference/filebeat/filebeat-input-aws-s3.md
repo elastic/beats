@@ -460,9 +460,8 @@ Number of workers that will process the S3 or SQS objects listed. Required when 
 
 Name of the third-party S3 bucket provider like backblaze or GCP. The following endpoints/providers will be detected automatically:
 
-|     |     |
-| --- | --- |
 | Domain | Provider |
+| --- | --- |
 | amazonaws.com, amazonaws.com.cn, c2s.sgov.gov, c2s.ic.gov | aws |
 | backblazeb2.com | backblaze |
 | wasabisys.com | wasabi |

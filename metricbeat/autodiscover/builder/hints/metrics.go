@@ -111,7 +111,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 				configs = append(configs, config)
 			}
 		}
-		logp.Debug("hints.builder", "generated config %+v", configs)
+		m.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
 		return template.ApplyConfigTemplate(event, configs, options...)
 
@@ -176,14 +176,14 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 				mod := moduleConfig.Clone()
 				mod["hosts"] = []string{h}
 
-				logp.Debug("hints.builder", "generated config: %v", mod)
+				m.logger.Debugf("generated config: %v", mod)
 
 				// Create config object
 				cfg := m.generateConfig(mod)
 				configs = append(configs, cfg)
 			}
 		} else {
-			logp.Debug("hints.builder", "generated config: %v", moduleConfig)
+			m.logger.Debugf("generated config: %v", moduleConfig)
 
 			// Create config object
 			cfg := m.generateConfig(moduleConfig)
@@ -201,9 +201,9 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 func (m *metricHints) generateConfig(mod mapstr.M) *conf.C {
 	cfg, err := conf.NewConfigFrom(mod)
 	if err != nil {
-		logp.Debug("hints.builder", "config merge failed with error: %v", err)
+		m.logger.Debugf("config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: %+v", conf.DebugString(cfg, true))
+	m.logger.Debugf("generated config: %+v", conf.DebugString(cfg, true))
 	return cfg
 }
 

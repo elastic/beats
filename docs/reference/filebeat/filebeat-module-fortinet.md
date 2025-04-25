@@ -97,98 +97,98 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This is a list of FortiOS fields that are mapped to ECS.
 
-| Fortinet Fields | ECS Fields |  |
-| --- | --- | --- |
-| action | event.action |  |
-| agent | user_agent.original |  |
-| app | network.application |  |
-| appcat | rule.category |  |
-| applist | rule.ruleset |  |
-| catdesc | rule.category |  |
-| ccertissuer | tls.client_issuer |  |
-| collectedemail | source.user.email |  |
-| comment | rule.description |  |
-| daddr | destination.address |  |
-| devid | observer.serial_number |  |
-| dir | network.direction |  |
-| direction | network.direction |  |
-| dst_host | destination.address |  |
-| dstcollectedemail | destination.user.email |  |
-| dst_int | observer.egress.interface.name |  |
-| dstintf | observer.egress.interface.name |  |
-| dstip | destination.ip |  |
-| dstmac | destination.mac |  |
-| dstname | destination.address |  |
-| dst_port | destination.port |  |
-| dstport | destination.port |  |
-| dstunauthuser | destination.user.name |  |
-| dtype | vulnerability.category |  |
-| duration | event.duration |  |
-| errorcode | error.code |  |
-| event_id | event.id |  |
-| eventid | event.id |  |
-| eventtime | event.start |  |
-| eventtype | event.action |  |
-| file | file.name |  |
-| filename | file.name |  |
-| filesize | file.size |  |
-| filetype | file.extension |  |
-| filehash | file.hash.crc32 |  |
-| from | source.user.email |  |
-| group | source.user.group |  |
-| hostname | url.domain |  |
-| infectedfilename | file.name |  |
-| infectedfilesize | file.size |  |
-| infectedfiletype | file.extension |  |
-| ipaddr | dns.resolved_ip |  |
-| level | log.level |  |
-| locip | source.ip |  |
-| locport | source.port |  |
-| logdesc | rule.description |  |
-| logid | event.code |  |
-| matchfilename | file.name |  |
-| matchfiletype | file.extension |  |
-| msg | message |  |
-| error_num | error.code |  |
-| policyid | rule.id |  |
-| policy_id | rule.id |  |
-| policyname | rule.name |  |
-| policytype | rule.ruleset |  |
-| poluuid | rule.uuid |  |
-| profile | rule.ruleset |  |
-| proto | network.iana_number |  |
-| qclass | dns.question.class |  |
-| qname | dns.question.name |  |
-| qtype | dns.question.type |  |
-| rcvdbyte | source.bytes |  |
-| rcvdpkt | source.packets |  |
-| recipient | destination.user.email |  |
-| ref | event.reference |  |
-| remip | destination.ip |  |
-| remport | destination.port |  |
-| saddr | source.address |  |
-| scertcname | tls.client.server_name |  |
-| scertissuer | tls.server.issuer |  |
-| sender | source.user.email |  |
-| sentbyte | source.bytes |  |
-| sentpkt | source.packets |  |
-| service | network.protocol |  |
-| sess_duration | event.duration |  |
-| srcdomain | source.domain |  |
-| srcintf | observer.ingress.interface.name |  |
-| srcip | source.ip |  |
-| source_mac | source.mac |  |
-| srcmac | source.mac |  |
-| srcport | source.port |  |
-| tranip | destination.nat.ip |  |
-| tranport | destination.nat.port |  |
-| transip | source.nat.ip |  |
-| transport | source.nat.port |  |
-| tz | event.timezone |  |
-| unauthuser | source.user.name |  |
-| url | url.path |  |
-| user | source.user.name |  |
-| xid | dns.id |  |
+| Fortinet Fields | ECS Fields |
+| --- | --- |
+| action | event.action |
+| agent | user_agent.original |
+| app | network.application |
+| appcat | rule.category |
+| applist | rule.ruleset |
+| catdesc | rule.category |
+| ccertissuer | tls.client_issuer |
+| collectedemail | source.user.email |
+| comment | rule.description |
+| daddr | destination.address |
+| devid | observer.serial_number |
+| dir | network.direction |
+| direction | network.direction |
+| dst_host | destination.address |
+| dstcollectedemail | destination.user.email |
+| dst_int | observer.egress.interface.name |
+| dstintf | observer.egress.interface.name |
+| dstip | destination.ip |
+| dstmac | destination.mac |
+| dstname | destination.address |
+| dst_port | destination.port |
+| dstport | destination.port |
+| dstunauthuser | destination.user.name |
+| dtype | vulnerability.category |
+| duration | event.duration |
+| errorcode | error.code |
+| event_id | event.id |
+| eventid | event.id |
+| eventtime | event.start |
+| eventtype | event.action |
+| file | file.name |
+| filename | file.name |
+| filesize | file.size |
+| filetype | file.extension |
+| filehash | file.hash.crc32 |
+| from | source.user.email |
+| group | source.user.group |
+| hostname | url.domain |
+| infectedfilename | file.name |
+| infectedfilesize | file.size |
+| infectedfiletype | file.extension |
+| ipaddr | dns.resolved_ip |
+| level | log.level |
+| locip | source.ip |
+| locport | source.port |
+| logdesc | rule.description |
+| logid | event.code |
+| matchfilename | file.name |
+| matchfiletype | file.extension |
+| msg | message |
+| error_num | error.code |
+| policyid | rule.id |
+| policy_id | rule.id |
+| policyname | rule.name |
+| policytype | rule.ruleset |
+| poluuid | rule.uuid |
+| profile | rule.ruleset |
+| proto | network.iana_number |
+| qclass | dns.question.class |
+| qname | dns.question.name |
+| qtype | dns.question.type |
+| rcvdbyte | source.bytes |
+| rcvdpkt | source.packets |
+| recipient | destination.user.email |
+| ref | event.reference |
+| remip | destination.ip |
+| remport | destination.port |
+| saddr | source.address |
+| scertcname | tls.client.server_name |
+| scertissuer | tls.server.issuer |
+| sender | source.user.email |
+| sentbyte | source.bytes |
+| sentpkt | source.packets |
+| service | network.protocol |
+| sess_duration | event.duration |
+| srcdomain | source.domain |
+| srcintf | observer.ingress.interface.name |
+| srcip | source.ip |
+| source_mac | source.mac |
+| srcmac | source.mac |
+| srcport | source.port |
+| tranip | destination.nat.ip |
+| tranport | destination.nat.port |
+| transip | source.nat.ip |
+| transport | source.nat.port |
+| tz | event.timezone |
+| unauthuser | source.user.name |
+| url | url.path |
+| user | source.user.name |
+| xid | dns.id |
 
 
 ## Fields [_fields_17]

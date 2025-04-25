@@ -31,7 +31,7 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 	var modules []*Wrapper //nolint:prealloc //can't be preallocated
 
 	for _, moduleCfg := range modulesData {
-		module, err := NewWrapper(moduleCfg, registry, moduleOptions...)
+		module, err := NewWrapper(moduleCfg, registry, logger, moduleOptions...)
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +56,7 @@ func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModul
 				return nil, fmt.Errorf("error loading config files: %w", err)
 			}
 			for _, conf := range confs {
-				m, err := NewWrapper(conf, registry, moduleOptions...)
+				m, err := NewWrapper(conf, registry, logger, moduleOptions...)
 				if err != nil {
 					return nil, fmt.Errorf("module initialization error: %w", err)
 				}
