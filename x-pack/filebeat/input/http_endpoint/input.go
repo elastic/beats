@@ -7,6 +7,7 @@ package http_endpoint
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"encoding/base32"
 	"encoding/binary"
@@ -414,10 +415,14 @@ func htmlEscape(s string) string {
 	return buf.String()
 }
 
-// newID returns an ID derived from the current time.
+// newID returns an ID derived from the current time combined with cryptographic randomness.
+// The first 8 bytes are the nanosecond timestamp (little-endian), and the next 8 bytes are random.
+// It returns the base32 hex encoded string.
 func newID() string {
-	var data [8]byte
-	binary.LittleEndian.PutUint64(data[:], uint64(time.Now().UnixNano()))
+	var data [16]byte
+	binary.LittleEndian.PutUint64(data[:8], uint64(time.Now().UnixNano()))
+	// rand.Read never returns an error as per its documentation
+	_, _ = rand.Read(data[8:])
 	return base32.HexEncoding.WithPadding(base32.NoPadding).EncodeToString(data[:])
 }
 
