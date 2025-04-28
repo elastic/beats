@@ -50,9 +50,7 @@ The Broker, Producer, Consumer metricsets require [Jolokia](/reference/metricbea
 
 The Kafka module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat_kafka_dashboard.png
-:alt: metricbeat kafka dashboard
-:::
+![metricbeat kafka dashboard](images/metricbeat_kafka_dashboard.png)
 
 
 ## Example configuration [_example_configuration_35]

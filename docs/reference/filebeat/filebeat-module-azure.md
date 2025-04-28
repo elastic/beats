@@ -119,9 +119,7 @@ Read the [quick start](/reference/filebeat/filebeat-installation-configuration.m
 
 The azure module comes with several predefined dashboards for general cloud overview, user activity and alerts. For example:
 
-:::{image} images/filebeat-azure-overview.png
-:alt: filebeat azure overview
-:::
+![filebeat azure overview](images/filebeat-azure-overview.png)
 
 
 ## Fields [_fields_8]

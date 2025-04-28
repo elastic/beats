@@ -20,9 +20,7 @@ The uWSGI module has these additional config options:
 
 The uwsgi module comes with a predefined dashboard. For example:
 
-:::{image} images/uwsgi_dashboard.png
-:alt: uwsgi dashboard
-:::
+![uwsgi dashboard](images/uwsgi_dashboard.png)
 
 
 ## Example configuration [_example_configuration_66]

@@ -480,7 +480,7 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 }
 
 func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
-	parser, err := textparse.New(b, contentType, false, labels.NewSymbolTable())
+	parser, err := textparse.New(b, contentType, ContentTypeTextFormat, false, false, labels.NewSymbolTable()) // Fallback protocol set to ContentTypeTextFormat
 	if err != nil {
 		return nil, err
 	}
@@ -588,11 +588,12 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *log
 				continue
 			}
 
-			if l.Name == model.QuantileLabel {
+			switch l.Name {
+			case model.QuantileLabel:
 				qv = lset.Get(model.QuantileLabel)
-			} else if l.Name == labels.BucketLabel {
+			case labels.BucketLabel:
 				qv = lset.Get(labels.BucketLabel)
-			} else {
+			default:
 				lbls.WriteString(l.Name)
 				lbls.WriteString(l.Value)
 			}

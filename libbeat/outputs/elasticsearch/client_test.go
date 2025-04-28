@@ -49,6 +49,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	libversion "github.com/elastic/elastic-agent-libs/version"
@@ -86,7 +87,7 @@ func (bm *batchMock) RetryEvents(events []publisher.Event) {
 
 func TestPublish(t *testing.T) {
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	makePublishTestClient := func(t *testing.T, url string) (*Client, *monitoring.Registry) {
 		reg := monitoring.NewRegistry()
 		client, err := NewClient(
@@ -289,7 +290,7 @@ func assertRegistryUint(t *testing.T, reg *monitoring.Registry, key string, expe
 }
 
 func TestCollectPublishFailsNone(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
@@ -318,7 +319,7 @@ func TestCollectPublishFailsNone(t *testing.T) {
 }
 
 func TestCollectPublishFailMiddle(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
@@ -355,7 +356,7 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 
 func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
 	const deadLetterIndex = "test_index"
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer:        outputs.NewNilObserver(),
@@ -389,7 +390,7 @@ func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
 	// Test that a fatal error sending to the dead letter index is reported as
 	// a dropped event, and is not retried forever
 	const deadLetterIndex = "test_index"
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer:        outputs.NewNilObserver(),
@@ -420,7 +421,7 @@ func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
 }
 
 func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{observer: outputs.NewNilObserver()},
 		nil,
@@ -451,7 +452,7 @@ func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
 }
 
 func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	const deadLetterIndex = "test_index"
 	client, err := NewClient(
 		clientSettings{
@@ -501,7 +502,7 @@ func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
 }
 
 func TestCollectPublishFailDrop(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer:        outputs.NewNilObserver(),
@@ -551,7 +552,7 @@ func TestCollectPublishFailDrop(t *testing.T) {
 }
 
 func TestCollectPublishFailAll(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(
 		clientSettings{
 			observer: outputs.NewNilObserver(),
@@ -583,7 +584,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	client, err := NewClient(
 		clientSettings{
@@ -844,7 +845,7 @@ func TestClientWithHeaders(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	client, err := NewClient(clientSettings{
 		observer: outputs.NewNilObserver(),
 		connection: eslegclient.ConnectionSettings{
@@ -902,7 +903,7 @@ func TestBulkEncodeEvents(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 			cfg := c.MustNewConfigFrom(test.config)
 			info := beat.Info{
 				IndexPrefix: "test",
@@ -974,7 +975,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 	}
 
 	cfg := c.MustNewConfigFrom(mapstr.M{})
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	info := beat.Info{
 		IndexPrefix: "test",
 		Version:     version.GetDefaultVersion(),
@@ -1052,7 +1053,7 @@ func TestClientWithAPIKey(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	client, err := NewClient(clientSettings{
 		observer: outputs.NewNilObserver(),
@@ -1074,7 +1075,7 @@ func TestClientWithAPIKey(t *testing.T) {
 }
 
 func TestBulkRequestHasFilterPath(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	makePublishTestClient := func(t *testing.T, url string, configParams map[string]string) *Client {
 		client, err := NewClient(

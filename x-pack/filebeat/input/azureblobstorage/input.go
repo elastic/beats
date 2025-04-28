@@ -157,6 +157,10 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
+	// create a new inputMetrics instance
+	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+	metrics.url.Set(input.serviceURL + currentSource.ContainerName)
+	defer metrics.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
@@ -166,18 +170,15 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 
 	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
 	if err != nil {
+		metrics.errorsTotal.Inc()
 		return err
 	}
 	containerClient, err := fetchContainerClient(serviceClient, currentSource.ContainerName, log)
 	if err != nil {
+		metrics.errorsTotal.Inc()
 		return err
 	}
 
-	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
-	err = scheduler.schedule(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, metrics, log)
+	return scheduler.schedule(ctx)
 }

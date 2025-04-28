@@ -37,7 +37,7 @@ Features used by the `socket` dataset require a minimum Linux kernel version of 
 
 | Distribution | kernel version | Works? |
 | --- | --- | --- |
-| CentOS 6.5 | 2.6.32-431.el6 | NO[[1]](#anchor-1) |
+| CentOS 6.5 | 2.6.32-431.el6 | NO[^1^](#footnote-1) |
 | CentOS 6.9 | 2.6.32-696.30.1.el6 | ✓ |
 | CentOS 7.6 | 3.10.0-957.1.3.el7 | ✓ |
 | RHEL 8 | 4.18.0-80.rhel8 | ✓ |
@@ -45,13 +45,13 @@ Features used by the `socket` dataset require a minimum Linux kernel version of 
 | Debian 9 | 4.9.0-8 | ✓ |
 | Debian 10 | 4.19.0-5 | ✓ |
 | SLES 12 | 4.4.73-5 | ✓ |
-| Ubuntu 12.04 | 3.2.0-126 | NO[[1]](#anchor-1) |
+| Ubuntu 12.04 | 3.2.0-126 | NO[^1^](#footnote-1) |
 | Ubuntu 14.04.6 | 3.13.0-170 | ✓ |
 | Ubuntu 16.04.3 | 4.4.0-97 | ✓ |
 | AWS Linux 2 | 4.14.138-114.102 | ✓ |
 
-$$$anchor-1$$$
-[[1]](#anchor-1): These systems lack [PERF_EVENT_IOC_ID ioctl.](https://lore.kernel.org/patchwork/patch/399251/) Support might be added in a future release.
+
+^1^ $$$footnote-1$$$ These systems lack [PERF_EVENT_IOC_ID ioctl.](https://lore.kernel.org/patchwork/patch/399251/) Support might be added in a future release.
 
 The dataset needs CAP_SYS_ADMIN and CAP_NET_ADMIN in order to work.
 

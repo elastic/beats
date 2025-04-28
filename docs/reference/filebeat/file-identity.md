@@ -157,7 +157,7 @@ This file identity is using file fingerprints produced by the scanner component 
 
 In the context of the filestream input, fingerprint is a hash string computed from a part of the file content.
 
-![Fingerprint File Identity](/reference/filebeat/img/fingerprint-file-identity.png)
+![Fingerprint File Identity](images/fingerprint-file-identity.png)
 
 By default, the hashed part of the file is the first 1024 bytes (`offset: 0`, `length: 1024`). Most of the log files have timestamps and other unique segments on each line that make sure that the first 1024 bytes combined together constitute a unique set of characters. This makes sure that a produced fingerprint is a stable unique identifier for each file.
 

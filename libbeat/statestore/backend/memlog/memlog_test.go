@@ -31,19 +31,19 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/internal/storecompliance"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestCompliance_Default(t *testing.T) {
 	storecompliance.TestBackendCompliance(t, func(testPath string) (backend.Registry, error) {
-		logger := logp.NewTestingLogger(t, "")
+		logger := logptest.NewTestingLogger(t, "")
 		return New(logger.Named("test"), Settings{Root: testPath})
 	})
 }
 
 func TestCompliance_AlwaysCheckpoint(t *testing.T) {
 	storecompliance.TestBackendCompliance(t, func(testPath string) (backend.Registry, error) {
-		logger := logp.NewTestingLogger(t, "")
+		logger := logptest.NewTestingLogger(t, "")
 		return New(logger.Named("test"), Settings{
 			Root: testPath,
 			Checkpoint: func(filesize uint64) bool {
@@ -100,7 +100,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 		t.Fatalf("Failed to parse expected.json: %v", err)
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// load store:
 	store, err := openStore(logger.Named("test"), path, 0660, 4096, true, func(_ uint64) bool {
 		return false

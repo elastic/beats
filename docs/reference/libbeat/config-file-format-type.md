@@ -30,7 +30,7 @@ float: 5.4
 
 ## String [_string]
 
-In YAML[[http://www.yaml.org](http://www.yaml.org)], multiple styles of string definitions are supported: double-quoted, single-quoted, unquoted.
+In [YAML](http://www.yaml.org), multiple styles of string definitions are supported: double-quoted, single-quoted, unquoted.
 
 The double-quoted style is specified by surrounding the string with `"`. This style provides support for escaping unprintable characters using `\`, but comes at the cost of having to escape `\` and `"` characters.
 

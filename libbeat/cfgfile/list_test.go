@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -116,7 +116,7 @@ func (r *testDiagHandler) Register(_ string, _ string, _ string, _ string, callb
 
 func TestDiagnostics(t *testing.T) {
 	factory := &runnerFactory{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	list := NewRunnerList("", factory, nil, logger)
 	cfg := createConfig(1)
 	callback := &testDiagHandler{}
@@ -131,7 +131,7 @@ func TestDiagnostics(t *testing.T) {
 
 func TestNewConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
@@ -146,7 +146,7 @@ func TestNewConfigs(t *testing.T) {
 
 func TestReloadSameConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	list := NewRunnerList("", factory, nil, logger)
 
@@ -173,7 +173,7 @@ func TestReloadSameConfigs(t *testing.T) {
 
 func TestReloadDuplicateConfig(t *testing.T) {
 	factory := &runnerFactory{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
@@ -198,7 +198,7 @@ func TestReloadDuplicateConfig(t *testing.T) {
 
 func TestReloadStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
@@ -221,7 +221,7 @@ func TestReloadStopConfigs(t *testing.T) {
 
 func TestReloadStartStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	list := NewRunnerList("", factory, nil, logger)
 
@@ -248,7 +248,7 @@ func TestReloadStartStopConfigs(t *testing.T) {
 
 func TestStopAll(t *testing.T) {
 	factory := &runnerFactory{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	list := NewRunnerList("", factory, nil, logger)
 
@@ -270,7 +270,7 @@ func TestStopAll(t *testing.T) {
 
 func TestHas(t *testing.T) {
 	factory := &runnerFactory{}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	list := NewRunnerList("", factory, nil, logger)
 	config := createConfig(1)

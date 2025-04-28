@@ -62,10 +62,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/filebeat-ibmmq.png
-:alt: filebeat ibmmq
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat ibmmq](images/filebeat-ibmmq.png)
 
 
 ## Fields [_fields_21]

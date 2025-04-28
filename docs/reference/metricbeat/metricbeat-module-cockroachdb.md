@@ -29,9 +29,7 @@ The CockroachDB `status` metricset is compatible with any CockroachDB version ex
 
 The CockroachDB module includes a predefined dashboard with overview information of the monitored servers.
 
-:::{image} images/metricbeat-cockroachdb-overview.png
-:alt: metricbeat cockroachdb overview
-:::
+![metricbeat cockroachdb overview](images/metricbeat-cockroachdb-overview.png)
 
 
 ## Example configuration [_example_configuration_12]

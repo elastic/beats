@@ -86,10 +86,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with a sample dashboard for visualizing the data collected by the "compliance" pack. To collect this data, enable the `it-compliance` pack in the osquery configuration file.
 
-:::{image} images/kibana-osquery-compatibility.png
-:alt: kibana osquery compatibility
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana osquery compatibility](images/kibana-osquery-compatibility.png)
 
 
 ## Fields [_fields_41]

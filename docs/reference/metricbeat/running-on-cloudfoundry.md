@@ -34,8 +34,8 @@ Cloud Foundry requires that 3 files exist inside of a directory to allow Metricb
 curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-linux-x86_64.tar.gz
 tar xzvf metricbeat-{{stack-version}}-linux-x86_64.tar.gz
 cd metricbeat-{{stack-version}}-linux-x86_64
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/cloudfoundry/metricbeat/metricbeat.yml
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/cloudfoundry/metricbeat/manifest.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/cloudfoundry/metricbeat/metricbeat.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/cloudfoundry/metricbeat/manifest.yml
 ```
 
 You need to modify the `metricbeat.yml` file to set the `api_address`, `client_id` and `client_secret`.

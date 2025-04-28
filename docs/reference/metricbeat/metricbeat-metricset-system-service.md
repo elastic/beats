@@ -31,9 +31,7 @@ If systemd resource accounting is enabled, this metricset will report any resour
 
 The system service metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-services-host.png
-:alt: metricbeat services host
-:::
+![metricbeat services host](images/metricbeat-services-host.png)
 
 ## Fields [_fields_245]
 

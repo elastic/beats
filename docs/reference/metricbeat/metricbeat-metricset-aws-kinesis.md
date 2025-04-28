@@ -34,9 +34,7 @@ iam:ListAccountAliases
 
 The kinesis metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-kinesis-overview.png
-:alt: metricbeat aws kinesis overview
-:::
+![metricbeat aws kinesis overview](images/metricbeat-aws-kinesis-overview.png)
 
 
 ## Configuration example [_configuration_example_7]

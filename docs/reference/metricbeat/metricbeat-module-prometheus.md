@@ -25,9 +25,7 @@ This module periodically scrapes metrics from [Prometheus exporters](https://pro
 
 The Prometheus module comes with a predefined dashboard for Prometheus specific stats. For example:
 
-:::{image} images/metricbeat-prometheus-overview.png
-:alt: metricbeat prometheus overview
-:::
+![metricbeat prometheus overview](images/metricbeat-prometheus-overview.png)
 
 
 ## Example configuration [_example_configuration_55]

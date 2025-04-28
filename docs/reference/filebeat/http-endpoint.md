@@ -48,7 +48,7 @@ This is the list of paths you can access. For pretty JSON output append `?pretty
 You can query a unix socket using the `cURL` command and the `--unix-socket` flag.
 
 ```js
-curl -XGET --unix-socket '/var/run/{beatname_lc}.sock' 'http:/stats/?pretty'
+curl -XGET --unix-socket '/var/run/filebeat.sock' 'http:/stats/?pretty'
 ```
 
 

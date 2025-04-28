@@ -24,7 +24,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/elastic/beats/v7/libbeat/asset"
+	"github.com/elastic/beats/v7/libbeat/asset/gen"
 	"github.com/elastic/beats/v7/libbeat/generator/fields"
 	"github.com/elastic/beats/v7/licenses"
 )
@@ -98,7 +98,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		bs, err := asset.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri", filepath.ToSlash(p))
+		bs, err := gen.CreateAsset(license, beatName, module, module, data, "asset.ModuleFieldsPri", filepath.ToSlash(p))
 		if err != nil {
 			log.Fatalf("Error creating golang file from template: %v", err)
 		}

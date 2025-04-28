@@ -110,10 +110,8 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This module comes with a sample dashboard to see Kafka logs and stack traces.
 
-:::{image} images/filebeat-kafka-logs-overview.png
-:alt: filebeat kafka logs overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat kafka logs overview](images/filebeat-kafka-logs-overview.png)
 
 
 ## Fields [_fields_26]

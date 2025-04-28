@@ -33,16 +33,16 @@ To define your own layout, rewrite the reference time in a format that matches t
 
 If a layout does not contain a year then the current year in the specified `timezone` is added to the time value.
 
-| Name | Required | Default | Description |  |
-| --- | --- | --- | --- | --- |
-| `field` | yes |  | Source field containing the time to be parsed. |  |
-| `target_field` | no | @timestamp | Target field for the parsed time value. The target value is always written as UTC. |  |
-| `layouts` | yes |  | Timestamp layouts that define the expected time value format. In addition layouts, `UNIX` and `UNIX_MS` are accepted. |  |
-| `timezone` | no | UTC | IANA time zone name (e.g. `America/New_York`) or fixed time offset (e.g. `+0200`) to use when parsing times that do not contain a time zone. `Local` may be specified to use the machine’s local time zone. |  |
-| `ignore_missing` | no | false | Ignore errors when the source field is missing. |  |
-| `ignore_failure` | no | false | Ignore all errors produced by the processor. |  |
-| `test` | no |  | A list of timestamps that must parse successfully when loading the processor. |  |
-| `id` | no |  | An identifier for this processor instance. Useful for debugging. |  |
+| Name | Required | Default | Description |
+| --- | --- | --- | --- |
+| `field` | yes |  | Source field containing the time to be parsed. |
+| `target_field` | no | @timestamp | Target field for the parsed time value. The target value is always written as UTC. |
+| `layouts` | yes |  | Timestamp layouts that define the expected time value format. In addition layouts, `UNIX` and `UNIX_MS` are accepted. |
+| `timezone` | no | UTC | IANA time zone name (e.g. `America/New_York`) or fixed time offset (e.g. `+0200`) to use when parsing times that do not contain a time zone. `Local` may be specified to use the machine’s local time zone. |
+| `ignore_missing` | no | false | Ignore errors when the source field is missing. |
+| `ignore_failure` | no | false | Ignore all errors produced by the processor. |
+| `test` | no |  | A list of timestamps that must parse successfully when loading the processor. |
+| `id` | no |  | An identifier for this processor instance. Useful for debugging. |
 
 Here is an example that parses the `start_time` field and writes the result to the `@timestamp` field then deletes the `start_time` field. When the processor is loaded, it will immediately validate that the two `test` timestamps parse with this configuration.
 

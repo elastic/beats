@@ -100,98 +100,98 @@ This module will parse Check Point Syslog data as documented in: [Checkpoint Log
 
 Check Point Syslog extensions are mapped as follows to ECS:
 
-| Check Point Fields | ECS Fields |  |
-| --- | --- | --- |
-| action | event.action |  |
-| appi_name | network.application |  |
-| app_risk | event.risk_score |  |
-| app_rule_id | rule.id |  |
-| app_rule_name | rule.name |  |
-| bytes | network.bytes |  |
-| categories | rule.category |  |
-| client_inbound_interface | observer.ingress.interface.name |  |
-| client_outbound_bytes | source.bytes |  |
-| client_outbound_interface | observer.egress.interface.name |  |
-| client_outbound_packets | source.packets |  |
-| destination_dns_hostname | destination.domain |  |
-| dlp_file_name | file.name |  |
-| dns_message_type | dns.type |  |
-| dns_type | dns.question.type |  |
-| domain_name | dns.question.name |  |
-| dst | destination.ip |  |
-| dst_machine_name | destination.domain |  |
-| dlp_rule_name | rule.name |  |
-| dlp_rule_uid | rule.uuid |  |
-| endpoint_ip | observer.ip |  |
-| file_id | file.inode |  |
-| file_type | file.type |  |
-| file_name | file.name |  |
-| file_size | file.size |  |
-| file_md5 | file.hash.md5 |  |
-| file_sha1 | file.hash.sha1 |  |
-| file_sha256 | file.hash.sha256 |  |
-| first_detection | event.start |  |
-| from | source.user.email |  |
-| ifdir | network.direction |  |
-| industry_reference | vulnerability.id |  |
-| inzone | observer.ingress.zone |  |
-| last_detection | event.end |  |
-| loguid | event.id |  |
-| mac_destination_address | destination.mac |  |
-| mac_source_address | source.mac |  |
-| malware_action | rule.description |  |
-| matched_category | rule.category |  |
-| malware_rule_id | rule.rule.id |  |
-| message | message |  |
-| method | http.request.method |  |
-| origin | observer.name |  |
-| origin_ip | observer.ip |  |
-| os_name | host.os.name |  |
-| os_version | host.os.version |  |
-| outzone | observer.egress.zone |  |
-| packet_capture | event.url |  |
-| packets | network.packets |  |
-| parent_process_md5 | process.parent.hash.md5 |  |
-| parent_process_name | process.parent.name |  |
-| process_md5 | process.hash.md5 |  |
-| process_name | process.name |  |
-| product | observer.product |  |
-| proto | network.iana_number |  |
-| reason | message |  |
-| received_bytes | destination.bytes |  |
-| referrer | http.request.referrer |  |
-| rule_name | rule.name |  |
-| resource | url.original |  |
-| s_port | source.port |  |
-| security_inzone | observer.ingress.zone |  |
-| security_outzone | observer.egress.zone |  |
-| sent_bytes | source.bytes |  |
-| sequencenum | event.sequence |  |
-| service | destination.port |  |
-| service_id | network.application |  |
-| service_name | destination.service.name |  |
-| server_outbound_packets | destination.packets |  |
-| server_outbound_bytes | destination.bytes |  |
-| severity | event.severity |  |
-| smartdefense_profile | rule.ruleset |  |
-| src | source.ip |  |
-| src_machine_name | source.domain |  |
-| src_user_group | source.user.group.name |  |
-| start_time | event.start |  |
-| status | http.response.status_code |  |
-| tid | dns.id |  |
-| time | @timestamp |  |
-| to | destination.user.email |  |
-| type | observer.type |  |
-| update_version | observer.version |  |
-| url | url.original |  |
-| user_group | group.name |  |
-| usercheck_incident_uid | destination.user.id |  |
-| web_client_type | user_agent.name |  |
-| xlatesrc | source.nat.ip |  |
-| xlatedst | destination.nat.ip |  |
-| xlatesport | source.nat.port |  |
-| xlatedport | destination.nat.port |  |
+| Check Point Fields | ECS Fields |
+| --- | --- |
+| action | event.action |
+| appi_name | network.application |
+| app_risk | event.risk_score |
+| app_rule_id | rule.id |
+| app_rule_name | rule.name |
+| bytes | network.bytes |
+| categories | rule.category |
+| client_inbound_interface | observer.ingress.interface.name |
+| client_outbound_bytes | source.bytes |
+| client_outbound_interface | observer.egress.interface.name |
+| client_outbound_packets | source.packets |
+| destination_dns_hostname | destination.domain |
+| dlp_file_name | file.name |
+| dns_message_type | dns.type |
+| dns_type | dns.question.type |
+| domain_name | dns.question.name |
+| dst | destination.ip |
+| dst_machine_name | destination.domain |
+| dlp_rule_name | rule.name |
+| dlp_rule_uid | rule.uuid |
+| endpoint_ip | observer.ip |
+| file_id | file.inode |
+| file_type | file.type |
+| file_name | file.name |
+| file_size | file.size |
+| file_md5 | file.hash.md5 |
+| file_sha1 | file.hash.sha1 |
+| file_sha256 | file.hash.sha256 |
+| first_detection | event.start |
+| from | source.user.email |
+| ifdir | network.direction |
+| industry_reference | vulnerability.id |
+| inzone | observer.ingress.zone |
+| last_detection | event.end |
+| loguid | event.id |
+| mac_destination_address | destination.mac |
+| mac_source_address | source.mac |
+| malware_action | rule.description |
+| matched_category | rule.category |
+| malware_rule_id | rule.rule.id |
+| message | message |
+| method | http.request.method |
+| origin | observer.name |
+| origin_ip | observer.ip |
+| os_name | host.os.name |
+| os_version | host.os.version |
+| outzone | observer.egress.zone |
+| packet_capture | event.url |
+| packets | network.packets |
+| parent_process_md5 | process.parent.hash.md5 |
+| parent_process_name | process.parent.name |
+| process_md5 | process.hash.md5 |
+| process_name | process.name |
+| product | observer.product |
+| proto | network.iana_number |
+| reason | message |
+| received_bytes | destination.bytes |
+| referrer | http.request.referrer |
+| rule_name | rule.name |
+| resource | url.original |
+| s_port | source.port |
+| security_inzone | observer.ingress.zone |
+| security_outzone | observer.egress.zone |
+| sent_bytes | source.bytes |
+| sequencenum | event.sequence |
+| service | destination.port |
+| service_id | network.application |
+| service_name | destination.service.name |
+| server_outbound_packets | destination.packets |
+| server_outbound_bytes | destination.bytes |
+| severity | event.severity |
+| smartdefense_profile | rule.ruleset |
+| src | source.ip |
+| src_machine_name | source.domain |
+| src_user_group | source.user.group.name |
+| start_time | event.start |
+| status | http.response.status_code |
+| tid | dns.id |
+| time | @timestamp |
+| to | destination.user.email |
+| type | observer.type |
+| update_version | observer.version |
+| url | url.original |
+| user_group | group.name |
+| usercheck_incident_uid | destination.user.id |
+| web_client_type | user_agent.name |
+| xlatesrc | source.nat.ip |
+| xlatedst | destination.nat.ip |
+| xlatesport | source.nat.port |
+| xlatedport | destination.nat.port |
 
 
 ## Fields [_fields_10]

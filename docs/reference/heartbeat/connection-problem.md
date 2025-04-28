@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/connection-problem.html
 ---
 
-# Logstash connection doesn���t work [connection-problem]
+# Logstash connection doesn't work [connection-problem]
 
 You may have configured {{ls}} or Heartbeat incorrectly. To resolve the issue:
 

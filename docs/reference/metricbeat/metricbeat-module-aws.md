@@ -130,9 +130,7 @@ This configuration works together with AWS/APIGateway namespace. It defines the 
 
 The aws module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-overview.png
-:alt: metricbeat aws overview
-:::
+![metricbeat aws overview](images/metricbeat-aws-overview.png)
 
 
 ## Metricsets [_metricsets_6]
@@ -146,9 +144,7 @@ Billing metric data includes the estimated charges for every service in the AWS 
 
 The billing metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-billing-overview.png
-:alt: metricbeat aws billing overview
-:::
+![metricbeat aws billing overview](images/metricbeat-aws-billing-overview.png)
 
 
 ### `cloudwatch` [_cloudwatch]
@@ -162,9 +158,7 @@ DynamoDB sends metrics to CloudWatch periodically for better monitoring how web 
 
 The dynamodb metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-dynamodb-overview.png
-:alt: metricbeat aws dynamodb overview
-:::
+![metricbeat aws dynamodb overview](images/metricbeat-aws-dynamodb-overview.png)
 
 
 ### `ebs` [_ebs]
@@ -173,9 +167,7 @@ For basic monitoring in AWS EBS volumes, data is available automatically in 5-mi
 
 The ebs metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-ebs-overview.png
-:alt: metricbeat aws ebs overview
-:::
+![metricbeat aws ebs overview](images/metricbeat-aws-ebs-overview.png)
 
 
 ### `ec2` [_ec2]
@@ -184,9 +176,7 @@ By default, Amazon EC2 sends metric data to CloudWatch every 5 minutes. With thi
 
 The ec2 metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-ec2-overview.png
-:alt: metricbeat aws ec2 overview
-:::
+![metricbeat aws ec2 overview](images/metricbeat-aws-ec2-overview.png)
 
 
 ### `elb` [_elb]
@@ -197,18 +187,14 @@ All three kinds of elastic load balancing reports metrics to Cloudwatch only whe
 
 The elb metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-elb-overview.png
-:alt: metricbeat aws elb overview
-:::
+![metricbeat aws elb overview](images/metricbeat-aws-elb-overview.png)
 
 
 ### `lambda` [_lambda]
 
 When an invocation completes, Lambda sends a set of metrics to CloudWatch for that invocation. Default period in aws module configuration is set to `5m` for lambda metricset. The lambda metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-lambda-overview.png
-:alt: metricbeat aws lambda overview
-:::
+![metricbeat aws lambda overview](images/metricbeat-aws-lambda-overview.png)
 
 
 ### `natgateway` [_natgateway]
@@ -222,9 +208,7 @@ CloudWatch collects information from NAT gateways and creates readable, near rea
 
 The rds metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-rds-overview.png
-:alt: metricbeat aws rds overview
-:::
+![metricbeat aws rds overview](images/metricbeat-aws-rds-overview.png)
 
 
 ### `s3_daily_storage` [_s3_daily_storage]
@@ -238,9 +222,7 @@ Request metrics are available at 1-minute intervals with additional charges. The
 
 The s3_daily_storage and s3_request metricset comes with a predefined combined dashboard:
 
-:::{image} images/metricbeat-aws-s3-overview.png
-:alt: metricbeat aws s3 overview
-:::
+![metricbeat aws s3 overview](images/metricbeat-aws-s3-overview.png)
 
 
 ### `sqs` [_sqs]
@@ -249,9 +231,7 @@ CloudWatch metrics for Amazon SQS queues are automatically collected and pushed 
 
 The sqs metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-sqs-overview.png
-:alt: metricbeat aws sqs overview
-:::
+![metricbeat aws sqs overview](images/metricbeat-aws-sqs-overview.png)
 
 
 ### `transitgateway` [_transitgateway]
@@ -265,9 +245,7 @@ CloudWatch collects metrics that track the usage of some AWS resources. These me
 
 The usage metricset comes with a predefined dashboard:
 
-:::{image} images/metricbeat-aws-usage-overview.png
-:alt: metricbeat aws usage overview
-:::
+![metricbeat aws usage overview](images/metricbeat-aws-usage-overview.png)
 
 
 ### `vpn` [_vpn]
@@ -285,9 +263,8 @@ ListMetrics max page size: 500, based on [AWS API ListMetrics](https://docs.aws.
 
 GetMetricData max page size: 100, based on [AWS API GetMetricData](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html)
 
-|     |     |     |
-| --- | --- | --- |
 | AWS API Name | AWS API Count | Frequency |
+| --- | --- | --- |
 | IAM ListAccountAliases | 1 | Once on startup |
 | STS GetCallerIdentity | 1 | Once on startup |
 | EC2 DescribeRegions | 1 | Once on startup |

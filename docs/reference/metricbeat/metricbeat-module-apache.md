@@ -29,9 +29,7 @@ The Apache metricsets were tested with Apache 2.4.12 and 2.4.54 and are expected
 
 The Apache module comes with a predefined dashboard. For example:
 
-:::{image} images/apache_httpd_server_status.png
-:alt: apache httpd server status
-:::
+![apache httpd server status](images/apache_httpd_server_status.png)
 
 
 ## Example configuration [_example_configuration_4]

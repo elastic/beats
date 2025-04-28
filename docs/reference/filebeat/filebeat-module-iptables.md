@@ -95,17 +95,13 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This module comes with sample dashboards showing geolocation and network protocols used. One for all iptables logs:
 
-:::{image} images/kibana-iptables.png
-:alt: kibana iptables
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana iptables](images/kibana-iptables.png)
 
 and one specific for Ubiquiti Firewall logs:
 
-:::{image} images/kibana-iptables-ubiquiti.png
-:alt: kibana iptables ubiquiti
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana iptables ubiquiti](images/kibana-iptables-ubiquiti.png)
 
 
 ## Fields [_fields_24]

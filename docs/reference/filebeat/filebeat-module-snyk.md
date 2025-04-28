@@ -112,12 +112,12 @@ There is also multiple optional configuration options that can be used to filter
 
 This is a list of Snyk Audit Log fields that are mapped to ECS.
 
-| Snyk Audit log fields | ECS Fields |  |
-| --- | --- | --- |
-| groupId | user.group.id |  |
-| userId | user.id |  |
-| event | event.action |  |
-| created | @timestamp |  |
+| Snyk Audit log fields | ECS Fields |
+| --- | --- |
+| groupId | user.group.id |
+| userId | user.id |
+| event | event.action |
+| created | @timestamp |
 
 
 ### `vulnerabilities` fileset settings [_vulnerabilities_fileset_settings]
@@ -216,8 +216,14 @@ There is also multiple optional configuration options that can be used to filter
 
 This is a list of Snyk Vulnerability fields that are mapped to ECS.
 
-|============================================================| | Snyk Fields                   | ECS Fields                 | | issue.description             | vulnerability.description  | | issue.identifiers.CVE         | vulnerability.id           | | issue.identifiers.ALTERNATIVE | vulnerability.id           | | issue.cvssScore               | vulnerability.score.base   | | issue.severity                | vulnerability.severity     | | issue.url                     | vulnerability.reference    | |============================================================|
-
+| Snyk Fields | ECS Fields |
+| --- | --- |
+| issue.description | vulnerability.description |
+| issue.identifiers.CVE | vulnerability.id |
+| issue.identifiers.ALTERNATIVE | vulnerability.id |
+| issue.cvssScore | vulnerability.score.base |
+| issue.severity | vulnerability.severity     |
+| issue.url | vulnerability.reference |
 
 ## Fields [_fields_49]
 

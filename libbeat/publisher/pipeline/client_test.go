@@ -37,13 +37,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func makePipeline(t *testing.T, settings Settings, qu queue.Queue) *Pipeline {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	p, err := New(beat.Info{Logger: logger},
 		Monitors{},
 		conf.Namespace{},
@@ -85,7 +85,7 @@ func TestClient(t *testing.T) {
 	})
 
 	t.Run("no infinite loop when processing fails", func(t *testing.T) {
-		l := logp.NewTestingLogger(t, "")
+		l := logptest.NewTestingLogger(t, "")
 
 		// a small in-memory queue with a very short flush interval
 		q := memqueue.NewQueue(l, nil, memqueue.Settings{
@@ -192,7 +192,7 @@ func TestClient(t *testing.T) {
 }
 
 func TestClientWaitClose(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{Logger: logger},
 			Monitors{},
@@ -299,7 +299,7 @@ func TestMonitoring(t *testing.T) {
 
 		metrics := monitoring.NewRegistry()
 		telemetry := monitoring.NewRegistry()
-		beatInfo := beat.Info{Logger: logp.NewTestingLogger(t, "")}
+		beatInfo := beat.Info{Logger: logptest.NewTestingLogger(t, "")}
 		pipeline, err := Load(
 			beatInfo,
 			Monitors{
@@ -357,7 +357,7 @@ func testInputMetrics(t *testing.T, beatInfo beat.Info, clientCfg beat.ClientCon
 
 	metrics := monitoring.NewRegistry()
 	telemetry := monitoring.NewRegistry()
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	pipeline, err := Load(
 		beat.Info{
 			Logger: logger,

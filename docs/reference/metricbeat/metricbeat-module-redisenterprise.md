@@ -32,9 +32,7 @@ The metricsets `node` and `proxy` are compatible with Redis Enterprise Software 
 
 The `redisenterprise` module includes a predefined dashboard with overview information of the monitored servers.
 
-:::{image} images/metricbeat-redisenterprise-overview.png
-:alt: metricbeat redisenterprise overview
-:::
+![metricbeat redisenterprise overview](images/metricbeat-redisenterprise-overview.png)
 
 
 ## Example configuration [_example_configuration_58]

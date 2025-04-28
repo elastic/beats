@@ -64,10 +64,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/filebeat-pensando-dfw.png
-:alt: filebeat pensando dfw
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat pensando dfw](images/filebeat-pensando-dfw.png)
 
 
 ## Fields [_fields_43]

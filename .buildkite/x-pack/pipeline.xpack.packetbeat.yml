@@ -16,6 +16,7 @@ env:
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_WIN_2025: "family/platform-ingest-beats-windows-2025"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -230,6 +231,61 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2022 System Tests"
+
+      - label: ":windows: x-pack/packetbeat: Win 2025 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/packetbeat
+          mage build unitTest
+        key: "mandatory-win-2025-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2025}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Win 2025 Unit Tests"
+
+      - label: ":windows: x-pack/packetbeat: Win 2025 System Tests"
+        key: "mandatory-win-2025-system-tests"
+        command: |
+          .buildkite/scripts/gcp_auth.ps1
+          Set-Location -Path x-pack/packetbeat
+          mage systemTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2025}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Win 2025 System Tests"
 
   - group: "Extended Windows Tests"
     key: "x-pack-packetbeat-extended-win-tests"

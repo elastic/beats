@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/libbeat/template"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -80,7 +80,7 @@ func TestDefaultSupport_Enabled(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 			info := beat.Info{Beat: "test", Version: "9.9.9"}
 			factory := MakeDefaultSupport(makeMockILMSupport(test.ilmCalls...), logger)
 			im, err := factory(logger, info, config.MustNewConfigFrom(test.cfg))
@@ -179,7 +179,7 @@ func TestDefaultSupport_BuildSelector(t *testing.T) {
 	}
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 
 			ts := time.Now()
 			info := beat.Info{Beat: "test", Version: "9.9.9"}
@@ -261,7 +261,7 @@ func TestIndexManager_VerifySetup(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 			cfg, err := config.NewConfigFrom(mapstr.M{
 				"setup.ilm.enabled":      setup.ilmEnabled,
 				"setup.ilm.overwrite":    setup.ilmOverwrite,
@@ -447,7 +447,7 @@ func TestIndexManager_Setup(t *testing.T) {
 	}
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 			factory := MakeDefaultSupport(lifecycle.StdSupport, logger)
 			im, err := factory(logger, info, config.MustNewConfigFrom(test.cfg))
 			require.NoError(t, err)

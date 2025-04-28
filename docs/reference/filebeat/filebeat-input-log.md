@@ -6,8 +6,6 @@ mapped_pages:
 
 # Log input [filebeat-input-log]
 
-[7.16.0]
-
 ::::{warning}
 The `log` input is deprecated in version 7.16 and disabled in version 9.0.
 

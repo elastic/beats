@@ -34,9 +34,7 @@ The module has been tested with Tomcat 7.0.24 and 9.0.24. Other versions are exp
 
 An overview dashboard for Kibana is already included:
 
-:::{image} images/metricbeat-tomcat-overview.png
-:alt: metricbeat tomcat overview
-:::
+![metricbeat tomcat overview](images/metricbeat-tomcat-overview.png)
 
 
 ### Usage [_usage_9]

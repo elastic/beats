@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/go-sysinfo/providers/windows"
 )
 
 const (
@@ -307,6 +308,42 @@ func testWindowsEventLog(t *testing.T, includeXML bool) {
 
 		assert.Len(t, records, 21)
 	})
+}
+
+func TestWindows2025IgnoresFilters(t *testing.T) {
+	os, err := windows.OperatingSystem()
+	if err != nil {
+		t.Fatalf("failed to get operating system info: %v", err)
+	}
+	t.Logf("running tests on %s", os.Name)
+
+	path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	log := openLog(t, nil, map[string]interface{}{
+		"name":           path,
+		"no_more_events": "stop",
+		"event_id":       "3, 5",
+		"include_xml":    false,
+		"forwarded":      true,
+	})
+	defer log.Close()
+
+	records, err := log.Read()
+
+	if assert.Error(t, err, "no_more_events=stop requires io.EOF to be returned") {
+		assert.Equal(t, io.EOF, err)
+	}
+
+	if !strings.Contains(os.Name, "2025") {
+		assert.Len(t, records, 21)
+	} else {
+		// we get all events on 2025
+		// because the event log is not filtered by event id
+		assert.Len(t, records, 32)
+	}
 }
 
 // ---- Utility Functions -----

@@ -34,8 +34,8 @@ Cloud Foundry requires that 3 files exist inside of a directory to allow Filebea
 curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{stack-version}}-linux-x86_64.tar.gz
 tar xzvf filebeat-{{stack-version}}-linux-x86_64.tar.gz
 cd filebeat-{{stack-version}}-linux-x86_64
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/cloudfoundry/filebeat/filebeat.yml
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/cloudfoundry/filebeat/manifest.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/cloudfoundry/filebeat/filebeat.yml
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/cloudfoundry/filebeat/manifest.yml
 ```
 
 You need to modify the `filebeat.yml` file to set the `api_address`, `client_id` and `client_secret`.

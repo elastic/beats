@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-loopback-interface.html
 ---
 
-# Packetbeat can���t capture traffic from Windows loopback interface [packetbeat-loopback-interface]
+# Packetbeat Can't capture traffic from Windows loopback interface [packetbeat-loopback-interface]
 
 The Windows TCP/IP stack does not implement a network loopback interface, making it difficult for Windows packet capture drivers to capture traffic from the loopback device (127.0.0.1 traffic). To resolve this issue, install [Npcap](https://nmap.org/npcap/) in WinPcap API-compatible mode and select the option to support loopback traffic. When you restart Windows, Npcap creates an Npcap Loopback Adapter that you can select to capture loopback traffic.
 

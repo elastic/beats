@@ -31,13 +31,9 @@ The Istio module includes predefined dashboards:
 
 These dashboards are only compatible with versions of Istio after `1.5` which should be monitored with `istiod` and `proxy` metricsets.
 
-:::{image} images/metricbeat-istio-overview.png
-:alt: metricbeat istio overview
-:::
+![metricbeat istio overview](images/metricbeat-istio-overview.png)
 
-:::{image} images/metricbeat-istio-traffic.png
-:alt: metricbeat istio traffic
-:::
+![metricbeat istio traffic](images/metricbeat-istio-traffic.png)
 
 
 ## Example configuration [_example_configuration_33]

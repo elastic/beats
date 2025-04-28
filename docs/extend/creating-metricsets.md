@@ -264,7 +264,8 @@ func eventMapping(input map[string]interface{}) common.MapStr {
 2. If a field has no schema option set, it is equivalent to `Required`.
 3. Marks the field as optional.
 4. Ignore any value conversion error
-5. By default, `Apply` will fail and return an error if any required field is missing. Using the optional second argument, you can specify how `Apply` handles different fields of the  schema. The possible values are:* `AllRequired` is the default behavior. Returns an error if any required field is missing, including fields that are required because no schema option is set.
+5. By default, `Apply` will fail and return an error if any required field is missing. Using the optional second argument, you can specify how `Apply` handles different fields of the  schema. The possible values are:
+* `AllRequired` is the default behavior. Returns an error if any required field is missing, including fields that are required because no schema option is set.
 * `FailOnRequired`  will fail if a field explicitly marked as `required` is missing.
 * `NotFoundKeys(cb func([]string))` takes a callback function that will be called with a list of missing keys, allowing for finer-grained error handling.
 

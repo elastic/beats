@@ -366,7 +366,7 @@ func (inp *filestream) readFromSource(
 			if errors.Is(err, ErrFileTruncate) {
 				log.Infof("File was truncated, nothing to read. Path='%s'", path)
 			} else if errors.Is(err, ErrClosed) {
-				log.Infof("Reader was closed. Closing. Path='%s'", path)
+				log.Debugf("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
 			} else {

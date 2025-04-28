@@ -10,9 +10,7 @@ Filebeat is a lightweight shipper for forwarding and centralizing log data. Inst
 
 Here’s how Filebeat works: When you start Filebeat, it starts one or more inputs that look in the locations you’ve specified for log data. For each log that Filebeat locates, Filebeat starts a harvester. Each harvester reads a single log for new content and sends the new log data to libbeat, which aggregates the events and sends the aggregated data to the output that you’ve configured for Filebeat.
 
-:::{image} images/filebeat.png
-:alt: Beats design
-:::
+![Beats design](images/filebeat.png)
 
 For more information about inputs and harvesters, see [*How Filebeat works*](/reference/filebeat/how-filebeat-works.md).
 

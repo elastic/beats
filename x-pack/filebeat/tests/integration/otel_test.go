@@ -51,7 +51,7 @@ processors:
     - add_kubernetes_metadata: ~
 http.enabled: true
 http.host: localhost
-http.port: 5066
+http.port: %d
 `
 
 func TestFilebeatOTelE2E(t *testing.T) {
@@ -67,7 +67,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 
 	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default"))
+	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
 	writeEventsToLogFile(t, logFilePath, numEvents)
 	filebeatOTel.Start()
 
@@ -79,7 +79,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default")
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
 	s = s + `
 setup.template.name: logs-filebeat-default
 setup.template.pattern: logs-filebeat-default
@@ -176,15 +176,15 @@ func assertMapsEqual(t *testing.T, m1, m2 mapstr.M, ignoredFields []string, msg 
 }
 
 func assertMonitoring(t *testing.T) {
-	r, err := http.Get("http://localhost:5066") //nolint:noctx // fine for tests
+	r, err := http.Get("http://localhost:5066") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	r, err = http.Get("http://localhost:5066/stats") //nolint:noctx // fine for tests
+	r, err = http.Get("http://localhost:5066/stats") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, r.StatusCode, "incorrect status code")
 
-	r, err = http.Get("http://localhost:5066/not-exist") //nolint:noctx // fine for tests
+	r, err = http.Get("http://localhost:5066/not-exist") //nolint:noctx,bodyclose // fine for tests
 	require.NoError(t, err)
 	require.Equal(t, http.StatusNotFound, r.StatusCode, "incorrect status code")
 }

@@ -19,9 +19,7 @@ The CoreDNS module is tested with CoreDNS 1.5.0
 
 The CoreDNS module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat_coredns_dashboard.png
-:alt: metricbeat coredns dashboard
-:::
+![metricbeat coredns dashboard](images/metricbeat_coredns_dashboard.png)
 
 
 ## Example configuration [_example_configuration_15]

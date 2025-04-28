@@ -18,7 +18,7 @@ mapped_pages:
 
 {{beats}} can send data to {{es}} directly or through {{ls}}, where you can further process and enhance the data before visualizing it in {{kib}}.
 
-::::{admonition} Authenticating with {es}
+::::{admonition} Authenticating with {{es}}
 :class: note
 
 When you use {{beats}} to export data to an {{es-serverless}} project, the {{beats}} require an API key to authenticate with {{es}}. Refer to [Create API key](docs-content://solutions/search/search-connection-details.md#create-an-api-key-serverless) for the steps to set up your API key, and to [Grant access using API keys](https://www.elastic.co/guide/en/beats/filebeat/current/beats-api-keys.md) in the Filebeat documentation for an example of how to configure your {{beats}} to use the key.

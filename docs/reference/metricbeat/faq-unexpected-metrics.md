@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/faq-unexpected-metrics.html
 ---
 
-# Metricbeat collects system metrics for interfaces you didn���t configure [faq-unexpected-metrics]
+# Metricbeat collects system metrics for interfaces you didn't configure [faq-unexpected-metrics]
 
 The [System](/reference/metricbeat/metricbeat-module-system.md) module specifies several metricsets that are enabled by default unless you explicitly disable them. To disable a default metricset, comment it out in the `modules.d/system.yml` configuration file. If *all* metricsets are commented out and the System module is enabled, Metricbeat uses the default metricsets.
 

@@ -28,10 +28,8 @@ utmp files are binary, but you can display their contents using the `utmpdump` u
 
 The dataset comes with a sample dashboard:
 
-:::{image} images/auditbeat-system-login-dashboard.png
-:alt: Auditbeat System Login Dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Auditbeat System Login Dashboard](images/auditbeat-system-login-dashboard.png)
 
 ## Fields [_fields_4]
 

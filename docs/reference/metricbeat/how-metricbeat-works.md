@@ -9,9 +9,7 @@ Metricbeat consists of modules and metricsets. A Metricbeat *module* defines the
 
 Each module has one or more metricsets. A *metricset* is the part of the module that fetches and structures the data. Rather than collecting each metric as a separate event, metricsets retrieve a list of multiple related metrics in a single request to the remote system. So, for example, the Redis module provides an `info` metricset that collects information and statistics from Redis by running the [`INFO`](http://redis.io/commands/INFO) command and parsing the returned result.
 
-:::{image} images/module-overview.png
-:alt: Modules and metricsets
-:::
+![Modules and metricsets](images/module-overview.png)
 
 Likewise, the MySQL module provides a `status` metricset that collects data from MySQL by running a [`SHOW GLOBAL STATUS`](http://dev.mysql.com/doc/refman/5.7/en/show-status.md) SQL query. Metricsets make it easier for you by grouping sets of related metrics together in a single request returned by the remote server. Most modules have default metricsets that are enabled if there are no user-enabled metricsets.
 

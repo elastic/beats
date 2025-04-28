@@ -60,14 +60,14 @@ type PerfCounter struct {
 }
 
 // NewReader creates a new instance of Reader.
-func NewReader(config Config) (*Reader, error) {
+func NewReader(config Config, logger *logp.Logger) (*Reader, error) {
 	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
 	r := &Reader{
 		query:  query,
-		log:    logp.NewLogger("perfmon"),
+		log:    logger.Named("perfmon"),
 		config: config,
 	}
 	r.mapCounters(config)

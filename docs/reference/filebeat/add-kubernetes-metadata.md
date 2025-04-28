@@ -97,28 +97,26 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 
 `add_resource_metadata`
 :   (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
-
     * `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output. Note: wildcards are not supported for those settings. The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
     * `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
     * `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
 
-        Example:
+    Example:
 
-
-```yaml
-      add_resource_metadata:
-        namespace:
-          include_labels: ["namespacelabel1"]
-          #labels.dedot: true
-          #annotations.dedot: true
-        node:
-          include_labels: ["nodelabel2"]
-          include_annotations: ["nodeannotation1"]
-          #labels.dedot: true
-          #annotations.dedot: true
-        deployment: false
-        cronjob: false
-```
+    ```yaml
+          add_resource_metadata:
+            namespace:
+              include_labels: ["namespacelabel1"]
+              #labels.dedot: true
+              #annotations.dedot: true
+            node:
+              include_labels: ["nodelabel2"]
+              include_annotations: ["nodeannotation1"]
+              #labels.dedot: true
+              #annotations.dedot: true
+            deployment: false
+            cronjob: false
+    ```
 
 `kube_config`
 :   (Optional) Use given config file as configuration for Kubernetes client. It defaults to `KUBECONFIG` environment variable if present.
@@ -249,12 +247,9 @@ This matcher has the following configuration settings:
 
 `resource_type`
 :   (Optional) Type of the resource to obtain the ID of. Valid `resource_type`:
-
     * `pod`: to make the lookup based on the pod UID. When `resource_type` is set to `pod`, `logs_path` must be set as well, supported path in this case:
-
-        * `/var/lib/kubelet/pods/` used to read logs from mounted into the pod volumes, those logs end up under `/var/lib/kubelet/pods/<pod UID>/volumes/<volume name>/...` To use `/var/lib/kubelet/pods/` as a `log_path`, `/var/lib/kubelet/pods` must be mounted into the filebeat Pods.
-        * `/var/log/pods/` Note: when using `resource_type: 'pod'` logs will be enriched only with pod metadata: pod id, pod name, etc., not container metadata.
-
+      * `/var/lib/kubelet/pods/` used to read logs from mounted into the pod volumes, those logs end up under `/var/lib/kubelet/pods/<pod UID>/volumes/<volume name>/...` To use `/var/lib/kubelet/pods/` as a `log_path`, `/var/lib/kubelet/pods` must be mounted into the filebeat Pods.
+      * `/var/log/pods/` Note: when using `resource_type: 'pod'` logs will be enriched only with pod metadata: pod id, pod name, etc., not container metadata.
     * `container`: to make the lookup based on the container ID, `logs_path` must be set to `/var/log/containers/`. It defaults to `container`.
 
 

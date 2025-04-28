@@ -140,17 +140,13 @@ This module comes with two sample dashboards.
 
 The first dashboard is for regular logs.
 
-:::{image} images/filebeat-postgresql-overview.png
-:alt: filebeat postgresql overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat postgresql overview](images/filebeat-postgresql-overview.png)
 
 The second one shows the slowlogs of PostgreSQL. If `log_min_duration_statement` is not used, this dashboard will show incomplete or no data.
 
-:::{image} images/filebeat-postgresql-slowlog-overview.png
-:alt: filebeat postgresql slowlog overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat postgresql slowlog overview](images/filebeat-postgresql-slowlog-overview.png)
 
 
 ## Fields [_fields_44]

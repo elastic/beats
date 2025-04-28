@@ -22,9 +22,7 @@ The Couchdb module is tested in CI with Couchdb 1.7 and 2.3. Because of the diff
 
 The CouchDB module comes with a predefined dashboard for CouchDB database specific stats. For example:
 
-:::{image} images/metricbeat-couchdb-overview.png
-:alt: metricbeat couchdb overview
-:::
+![metricbeat couchdb overview](images/metricbeat-couchdb-overview.png)
 
 
 ## Example configuration [_example_configuration_17]

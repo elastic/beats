@@ -31,7 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -42,7 +42,7 @@ func TestNewInput_MissingConfigField(t *testing.T) {
 	connector := new(mockedConnector)
 	var inputContext finput.Context
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input, err := NewInput(config, connector, inputContext, logger)
 
 	require.Error(t, err)
@@ -60,7 +60,7 @@ func TestNewInput_ConnectWithFailed(t *testing.T) {
 	}
 	var inputContext finput.Context
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input, err := NewInput(config, connector, inputContext, logger)
 
 	require.Equal(t, connectWithError, err)
@@ -117,7 +117,7 @@ func TestNewInput_Run(t *testing.T) {
 		return client
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input, err := newInput(config, connector, inputContext, newMqttClient, backoff.NewEqualJitterBackoff, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
@@ -191,7 +191,7 @@ func TestNewInput_Run_Wait(t *testing.T) {
 		return client
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input, err := newInput(config, connector, inputContext, newMqttClient, backoff.NewEqualJitterBackoff, logger)
 	require.NoError(t, err)
 	require.NotNil(t, input)
@@ -210,7 +210,7 @@ func TestNewInput_Run_Wait(t *testing.T) {
 
 func TestRun_Once(t *testing.T) {
 	client := new(mockedClient)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input := &mqttInput{
 		client: client,
 		logger: logger,
@@ -223,7 +223,7 @@ func TestRun_Once(t *testing.T) {
 
 func TestRun_Twice(t *testing.T) {
 	client := new(mockedClient)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input := &mqttInput{
 		client: client,
 		logger: logger,
@@ -239,7 +239,7 @@ func TestWait(t *testing.T) {
 	clientDisconnected := new(sync.WaitGroup)
 	inflightMessages := new(sync.WaitGroup)
 	client := new(mockedClient)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input := &mqttInput{
 		client:             client,
 		clientDisconnected: clientDisconnected,
@@ -255,7 +255,7 @@ func TestWait(t *testing.T) {
 func TestStop(t *testing.T) {
 	client := new(mockedClient)
 	clientDisconnected := new(sync.WaitGroup)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	input := &mqttInput{
 		client:             client,
 		clientDisconnected: clientDisconnected,
@@ -272,7 +272,7 @@ func TestOnCreateHandler_SubscribeMultiple_Succeeded(t *testing.T) {
 	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
 		return backoff.NewEqualJitterBackoff(inputContext.Done, time.Nanosecond, 2*time.Nanosecond)
 	}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions, newBackoff)
 
 	client := &mockedClient{
@@ -292,7 +292,7 @@ func TestOnCreateHandler_SubscribeMultiple_BackoffSucceeded(t *testing.T) {
 	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
 		return backoff.NewEqualJitterBackoff(inputContext.Done, time.Nanosecond, 2*time.Nanosecond)
 	}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions, newBackoff)
 
 	client := &mockedClient{
@@ -317,7 +317,7 @@ func TestOnCreateHandler_SubscribeMultiple_BackoffSignalDone(t *testing.T) {
 	newBackoff := func(done <-chan struct{}, init, max time.Duration) backoff.Backoff {
 		return mockedBackoff
 	}
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	handler := createOnConnectHandler(logger, inputContext, onMessageHandler, clientSubscriptions, newBackoff)
 
 	client := &mockedClient{

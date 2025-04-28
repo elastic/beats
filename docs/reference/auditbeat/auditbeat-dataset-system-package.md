@@ -14,10 +14,8 @@ It is implemented for Linux distributions using dpkg or rpm as their package man
 
 The dataset comes with a sample dashboard:
 
-:::{image} images/auditbeat-system-package-dashboard.png
-:alt: Auditbeat System Package Dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Auditbeat System Package Dashboard](images/auditbeat-system-package-dashboard.png)
 
 ## Fields [_fields_5]
 

@@ -90,7 +90,7 @@ func Package() error {
 
 				// Filter out non fips-enabled beats
 				if FIPSBuild && !slices.Contains(FIPSConfig.Beats, BeatName) {
-					log.Printf("Skipping creation for beat %v package type %v because beat is not listed as FIPS compliant %v", BeatName, pkgType, FIPSConfig.Beats)
+					log.Printf("Skipping creation for beat %v package type %v because beat is not listed as FIPS-capable %v", BeatName, pkgType, FIPSConfig.Beats)
 					continue
 				}
 

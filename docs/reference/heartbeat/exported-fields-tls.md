@@ -13,17 +13,21 @@ None
 TLS layer related fields.
 
 **`tls.certificate_not_valid_before`**
-:   [7.8.0]
+:   :::{admonition} Deprecated in 7.8.0
+    Deprecated in favor of `tls.server.x509.not_before`.
+    :::
 
-Deprecated in favor of `tls.server.x509.not_before`. Earliest time at which the connection’s certificates are valid.
+Earliest time at which the connection’s certificates are valid.
 
 type: date
 
 
 **`tls.certificate_not_valid_after`**
-:   [7.8.0]
+:   :::{admonition} Deprecated in 7.8.0
+    Deprecated in favor of `tls.server.x509.not_after`.
+    :::
 
-Deprecated in favor of `tls.server.x509.not_after`. Latest time at which the connection’s certificates are valid.
+Latest time at which the connection’s certificates are valid.
 
 type: date
 

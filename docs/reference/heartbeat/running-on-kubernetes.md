@@ -23,8 +23,8 @@ Everything is deployed under `kube-system` namespace, you can change that by upd
 
 To get the manifests just run:
 
-```sh
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/kubernetes/heartbeat-kubernetes.yaml
+```sh subs=true
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/kubernetes/heartbeat-kubernetes.yaml
 ```
 
 ::::{warning}

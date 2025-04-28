@@ -40,11 +40,11 @@ The `translate_ldap_attribute` processor has the following configuration setting
 | `ldap_search_attribute` | yes | `objectGUID` | LDAP attribute to search by. |
 | `ldap_mapped_attribute` | yes | `cn` | LDAP attribute to map to. |
 | `ldap_search_time_limit` | no | 30 | LDAP search time limit in seconds. |
-| `ldap_ssl`* | no | 30 | LDAP TLS/SSL connection settings. |
+| `ldap_ssl`\* | no | 30 | LDAP TLS/SSL connection settings. |
 | `ignore_missing` | no | false | Ignore errors when the source field is missing. |
 | `ignore_failure` | no | false | Ignore all errors produced by the processor. |
 
-* Also see [SSL](/reference/filebeat/configuration-ssl.md) for a full description of the `ldap_ssl` options.
+\* Also see [SSL](/reference/filebeat/configuration-ssl.md) for a full description of the `ldap_ssl` options.
 
 If the searches are slow or you expect a high amount of different key attributes to be found, consider using a cache processor to speed processing:
 

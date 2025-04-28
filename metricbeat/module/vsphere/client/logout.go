@@ -15,17 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
-
-package file_integrity
+package client
 
 import (
-	"syscall"
-	"time"
+	"context"
 )
 
-func fileTimes(stat *syscall.Stat_t) (atime, mtime, ctime time.Time) {
-	return time.Unix(0, stat.Atim.Nano()).UTC(),
-		time.Unix(0, stat.Mtim.Nano()).UTC(),
-		time.Unix(0, stat.Ctim.Nano()).UTC()
+type Logouter interface {
+	Logout(ctx context.Context) error
+}
+
+// Logout performs log out on vSphere API client with backoff retry.
+func Logout(ctx context.Context, client Logouter) error {
+	return Retry(ctx, func() error {
+		return client.Logout(ctx)
+	})
 }

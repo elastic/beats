@@ -164,10 +164,8 @@ This setting is only applicable when `file` input is configured.
 
 This module comes with a sample dashboard:
 
-:::{image} images/filebeat-cyberarkpas-overview.png
-:alt: filebeat cyberarkpas overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat cyberarkpas overview](images/filebeat-cyberarkpas-overview.png)
 
 
 ## Fields [_fields_14]

@@ -26,9 +26,7 @@ iam:ListAccountAliases
 
 The aws lambda metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-lambda-overview.png
-:alt: metricbeat aws lambda overview
-:::
+![metricbeat aws lambda overview](images/metricbeat-aws-lambda-overview.png)
 
 
 ## Configuration example [_configuration_example_8]
@@ -47,9 +45,8 @@ The aws lambda metricset comes with a predefined dashboard. For example:
 
 Please see more details for each metric in [lambda-cloudwatch-metric](https://docs.aws.amazon.com/lambda/latest/dg/monitoring-functions-metrics.html).
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | Invocations | Average |
 | Errors | Average |
 | DeadLetterErrors | Average |

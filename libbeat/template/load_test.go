@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
 
@@ -227,7 +227,7 @@ func TestFileLoader_Load(t *testing.T) {
 	} {
 		t.Run(name, func(t *testing.T) {
 			fc := newFileClient(ver)
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 			fl := NewFileLoader(fc, test.isServerless, logger)
 
 			cfg := DefaultConfig(info)

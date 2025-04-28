@@ -14,10 +14,8 @@ In Kibana, you can filter transactions either by entering a search query or by c
 
 The search field on the **Discover** page provides a way to query a specific subset of transactions from the selected time frame. It allows boolean operators, wildcards, and field filtering. For example, if you want to find the HTTP redirects, you can search for `http.response.status_code: 302`.
 
-:::{image} images/kibana-query-filtering.png
-:alt: Kibana query
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Kibana query](images/kibana-query-filtering.png)
 
 
 ### String queries [_string_queries]
@@ -133,15 +131,11 @@ To search for either INSERT or UPDATE queries with a response time greater than 
 
 In Kibana, you can also filter transactions by clicking on elements within a visualization. For example, to filter for all the HTTP redirects that are coming from a specific IP and port, click the **Filter for value** ![filterforval icon](images/filterforval_icon.png "") icon next to the `client.ip` and `client.port` fields in the transaction detail table. To exclude the HTTP redirects coming from the IP and port, click the **Filter out value** ![filteroutval icon](images/filteroutval_icon.png "") icon instead.
 
-:::{image} images/filter_from_context.png
-:alt: Filter from context
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Filter from context](images/filter_from_context.png)
 
 The selected filters appear under the search box.
 
-:::{image} images/kibana-filters.png
-:alt: Kibana filters
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Kibana filters](images/kibana-filters.png)
 

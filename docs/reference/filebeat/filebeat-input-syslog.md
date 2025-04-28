@@ -6,10 +6,9 @@ mapped_pages:
 
 # Syslog input [filebeat-input-syslog]
 
-[8.14.0]
-
+:::{admonition} Deprecated in 8.14.0
 The syslog input is deprecated. Please use the [`syslog`](/reference/filebeat/syslog.md) processor for processing syslog messages.
-
+:::
 
 The `syslog` input reads Syslog events as specified by RFC 3164 and RFC 5424, over TCP, UDP, or a Unix stream socket.
 

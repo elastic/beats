@@ -52,10 +52,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 ### `audit` fileset settings [_audit_fileset_settings_2]
 
-:::{image} images/filebeat-gcp-audit.png
-:alt: filebeat gcp audit
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat gcp audit](images/filebeat-gcp-audit.png)
 
 Example config:
 

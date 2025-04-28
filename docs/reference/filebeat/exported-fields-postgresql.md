@@ -18,13 +18,17 @@ Fields from PostgreSQL logs.
 Fields from the PostgreSQL log files.
 
 **`postgresql.log.timestamp`**
-:   [7.3.0]
+:   :::{admonition} Deprecated in 7.3.0
+    The `postgresql.log.timestamp` field was deprecated in 7.3.0.
+    :::
 
 The timestamp from the log line.
 
 
 **`postgresql.log.core_id`**
-:   [8.0.0]
+:   :::{admonition} Deprecated in 8.0.0
+    The `postgresql.log.core_id` field was deprecated in 8.0.0.
+    :::
 
 Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
 
@@ -152,7 +156,9 @@ example: client backend
 
 
 **`postgresql.log.error.code`**
-:   [8.0.0]
+:   :::{admonition} Deprecated in 8.0.0
+    The `postgresql.log.error.code` field was deprecated in 8.0.0.
+    :::
 
 Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
 

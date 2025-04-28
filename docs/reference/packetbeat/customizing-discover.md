@@ -9,22 +9,16 @@ To make it easier for you to search and discover Packetbeat data in Kibana, the 
 
 Type `Packetbeat` in the Search field to filter the list of searches.
 
-:::{image} images/saved-packetbeat-searches.png
-:alt: Saved Packetbeat Searches
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Saved Packetbeat Searches](images/saved-packetbeat-searches.png)
 
 You can use the predefined searches to customize the columns in the Discover table. For example, select the **Packetbeat Search** to customize the columns in the Discover table:
 
-:::{image} images/discovery-packetbeat-transactions.png
-:alt: Packetbeat Search
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Packetbeat Search](images/discovery-packetbeat-transactions.png)
 
 Select the **Packetbeat Flows Search** to display the most important information for Packetbeat flows:
 
-:::{image} images/discovery-packetbeat-flows.png
-:alt: Packetbeat Flows Search
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Packetbeat Flows Search](images/discovery-packetbeat-flows.png)
 

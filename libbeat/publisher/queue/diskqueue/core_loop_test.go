@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -127,7 +127,7 @@ func TestHandleProducerWriteRequest(t *testing.T) {
 	settings := DefaultSettings()
 	settings.MaxSegmentSize = 1000 + segmentHeaderSize
 	settings.MaxBufferSize = 10000
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	for description, test := range testCases {
 		dq := &diskQueue{
 			logger:   logger,
@@ -438,7 +438,7 @@ func TestHandleReaderLoopResponse(t *testing.T) {
 		},
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	for description, test := range testCases {
 		dq := &diskQueue{
 			logger:   logger,
@@ -981,7 +981,7 @@ func TestObserverDeleteSegment(t *testing.T) {
 	// Check that the results of segment deletions are reported to the
 	// metrics observer.
 	reg := monitoring.NewRegistry()
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	dq := diskQueue{
 		logger:   logger.Named("testing"),
 		observer: queue.NewQueueObserver(reg),

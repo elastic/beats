@@ -9,9 +9,7 @@ This is the database_account metricset of the module azure.
 
 This metricset allows users to retrieve relevant metrics from specified database accounts and comes with a predefined dashboard:
 
-:::{image} images/metricbeat-azure-database-account-overview.png
-:alt: metricbeat azure database account overview
-:::
+![metricbeat azure database account overview](images/metricbeat-azure-database-account-overview.png)
 
 
 ## Metricset-specific configuration notes [_metricset_specific_configuration_notes_9]

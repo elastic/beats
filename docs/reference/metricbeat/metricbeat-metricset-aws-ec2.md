@@ -54,9 +54,7 @@ iam:ListAccountAliases
 
 The aws ec2 metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-ec2-overview.png
-:alt: metricbeat aws ec2 overview
-:::
+![metricbeat aws ec2 overview](images/metricbeat-aws-ec2-overview.png)
 
 
 ## Configuration example [_configuration_example_5]

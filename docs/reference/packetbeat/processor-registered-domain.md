@@ -24,13 +24,13 @@ processors:
 
 The `registered_domain` processor has the following configuration settings:
 
-| Name | Required | Default | Description |  |
-| --- | --- | --- | --- | --- |
-| `field` | yes |  | Source field containing a fully qualified domain name (FQDN). |  |
-| `target_field` | yes |  | Target field for the registered domain value. |  |
-| `target_etld_field` | no |  | Target field for the effective top-level domain value. |  |
-| `target_subdomain_field` | no |  | Target subdomain field for the subdomain value. |  |
-| `ignore_missing` | no | false | Ignore errors when the source field is missing. |  |
-| `ignore_failure` | no | false | Ignore all errors produced by the processor. |  |
-| `id` | no |  | An identifier for this processor instance. Useful for debugging. |  |
+| Name | Required | Default | Description |
+| --- | --- | --- | --- |
+| `field` | yes |  | Source field containing a fully qualified domain name (FQDN). |
+| `target_field` | yes |  | Target field for the registered domain value. |
+| `target_etld_field` | no |  | Target field for the effective top-level domain value. |
+| `target_subdomain_field` | no |  | Target subdomain field for the subdomain value. |
+| `ignore_missing` | no | false | Ignore errors when the source field is missing. |
+| `ignore_failure` | no | false | Ignore all errors produced by the processor. |
+| `id` | no |  | An identifier for this processor instance. Useful for debugging. |
 

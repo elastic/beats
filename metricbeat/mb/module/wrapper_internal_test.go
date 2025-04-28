@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 const mockModuleName = "MockModule"
@@ -304,7 +305,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				})
 				require.NoError(t, err)
 
-				aModule, metricSets, err := mb.NewModule(tc.config, r)
+				aModule, metricSets, err := mb.NewModule(tc.config, r, logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
 
 				// Set the mock status reporter
@@ -532,7 +533,7 @@ func TestWrapperHandleFetchErrorSync(t *testing.T) {
 				})
 				require.NoError(t, err)
 
-				aModule, metricSets, err := mb.NewModule(tc.config, r)
+				aModule, metricSets, err := mb.NewModule(tc.config, r, logptest.NewTestingLogger(t, ""))
 				require.NoError(t, err)
 
 				// Set the mock status reporter

@@ -12,9 +12,7 @@ The `service` metricset of the Windows module reads the status of Windows servic
 
 The service metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-windows-service.png
-:alt: metricbeat windows service
-:::
+![metricbeat windows service](images/metricbeat-windows-service.png)
 
 
 ## Configuration [_configuration_20]

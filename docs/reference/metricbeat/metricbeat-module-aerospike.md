@@ -17,9 +17,7 @@ The Aerospike metricsets were tested with Aerospike Enterprise Edition 7.2.0.1 a
 
 The Aerospike module comes with a predefined dashboard for Aerospike namespace, node specific stats. For example:
 
-:::{image} images/metricbeat-aerospike-overview.png
-:alt: metricbeat aerospike overview
-:::
+![metricbeat aerospike overview](images/metricbeat-aerospike-overview.png)
 
 
 ## Example configuration [_example_configuration_2]

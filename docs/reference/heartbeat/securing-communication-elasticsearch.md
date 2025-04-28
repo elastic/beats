@@ -19,7 +19,7 @@ Authentication is specified in the Heartbeat configuration file:
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "heartbeat_writer" <1>
-      password: "{pwd}" <2>
+      password: "YOUR_PASSWORD" <2>
     ```
 
     1. This user needs the privileges required to publish events to {{es}}. To create a user like this, see [Create a *publishing* user](/reference/heartbeat/privileges-to-publish-events.md).

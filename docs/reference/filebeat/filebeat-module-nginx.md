@@ -122,10 +122,8 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This module comes with sample dashboards. For example:
 
-:::{image} images/kibana-nginx.png
-:alt: kibana nginx
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana nginx](images/kibana-nginx.png)
 
 
 ## Fields [_fields_37]

@@ -59,32 +59,32 @@ To configure a remote syslog destination, please reference the [SRX Getting Star
 
 The following processes and tags are supported:
 
-| JunOS processes | JunOS tags |  |
-| --- | --- | --- |
-| RT_FLOW | RT_FLOW_SESSION_CREATE |  |
-|  | RT_FLOW_SESSION_CLOSE |  |
-|  | RT_FLOW_SESSION_DENY |  |
-|  | APPTRACK_SESSION_CREATE |  |
-|  | APPTRACK_SESSION_CLOSE |  |
-|  | APPTRACK_SESSION_VOL_UPDATE |  |
-| RT_IDS | RT_SCREEN_TCP |  |
-|  | RT_SCREEN_UDP |  |
-|  | RT_SCREEN_ICMP |  |
-|  | RT_SCREEN_IP |  |
-|  | RT_SCREEN_TCP_DST_IP |  |
-|  | RT_SCREEN_TCP_SRC_IP |  |
-| RT_UTM | WEBFILTER_URL_PERMITTED |  |
-|  | WEBFILTER_URL_BLOCKED |  |
-|  | AV_VIRUS_DETECTED_MT |  |
-|  | CONTENT_FILTERING_BLOCKED_MT |  |
-|  | ANTISPAM_SPAM_DETECTED_MT |  |
-| RT_IDP | IDP_ATTACK_LOG_EVENT |  |
-|  | IDP_APPDDOS_APP_STATE_EVENT |  |
-| RT_AAMW | SRX_AAMW_ACTION_LOG |  |
-|  | AAMW_MALWARE_EVENT_LOG |  |
-|  | AAMW_HOST_INFECTED_EVENT_LOG |  |
-|  | AAMW_ACTION_LOG |  |
-| RT_SECINTEL | SECINTEL_ACTION_LOG |  |
+| JunOS processes | JunOS tags |
+| --- | --- |
+| RT_FLOW | RT_FLOW_SESSION_CREATE |
+|  | RT_FLOW_SESSION_CLOSE |
+|  | RT_FLOW_SESSION_DENY |
+|  | APPTRACK_SESSION_CREATE |
+|  | APPTRACK_SESSION_CLOSE |
+|  | APPTRACK_SESSION_VOL_UPDATE |
+| RT_IDS | RT_SCREEN_TCP |
+|  | RT_SCREEN_UDP |
+|  | RT_SCREEN_ICMP |
+|  | RT_SCREEN_IP |
+|  | RT_SCREEN_TCP_DST_IP |
+|  | RT_SCREEN_TCP_SRC_IP |
+| RT_UTM | WEBFILTER_URL_PERMITTED |
+|  | WEBFILTER_URL_BLOCKED |
+|  | AV_VIRUS_DETECTED_MT |
+|  | CONTENT_FILTERING_BLOCKED_MT |
+|  | ANTISPAM_SPAM_DETECTED_MT |
+| RT_IDP | IDP_ATTACK_LOG_EVENT |
+|  | IDP_APPDDOS_APP_STATE_EVENT |
+| RT_AAMW | SRX_AAMW_ACTION_LOG |
+|  | AAMW_MALWARE_EVENT_LOG |
+|  | AAMW_HOST_INFECTED_EVENT_LOG |
+|  | AAMW_ACTION_LOG |
+| RT_SECINTEL | SECINTEL_ACTION_LOG |
 
 The syslog format choosen should be `Default`.
 
@@ -119,33 +119,33 @@ This module has been tested against JunOS version 19.x and 20.x. Versions above 
 
 This is a list of JunOS fields that are mapped to ECS.
 
-| Juniper SRX Fields | ECS Fields |  |
-| --- | --- | --- |
-| application-risk | event.risk_score |  |
-| bytes-from-client | source.bytes |  |
-| bytes-from-server | destination.bytes |  |
-| destination-interface-name | observer.egress.interface.name |  |
-| destination-zone-name | observer.egress.zone |  |
-| destination-address | destination.ip |  |
-| destination-port | destination.port |  |
-| dst_domainname | url.domain |  |
-| elapsed-time | event.duration |  |
-| filename | file.name |  |
-| nat-destination-address | destination.nat.ip |  |
-| nat-destination-port | destination.nat.port |  |
-| nat-source-address | source.nat.ip |  |
-| nat-source-port | source.nat.port |  |
-| message | message |  |
-| obj | url.path |  |
-| packets-from-client | source.packets |  |
-| packets-from-server | destination.packets |  |
-| policy-name | rule.name |  |
-| protocol | network.transport |  |
-| source-address | source.ip |  |
-| source-interface-name | observer.ingress.interface.name |  |
-| source-port | source.port |  |
-| source-zone-name | observer.ingress.zone |  |
-| url | url.domain |  |
+| Juniper SRX Fields | ECS Fields |
+| --- | --- |
+| application-risk | event.risk_score |
+| bytes-from-client | source.bytes |
+| bytes-from-server | destination.bytes |
+| destination-interface-name | observer.egress.interface.name |
+| destination-zone-name | observer.egress.zone |
+| destination-address | destination.ip |
+| destination-port | destination.port |
+| dst_domainname | url.domain |
+| elapsed-time | event.duration |
+| filename | file.name |
+| nat-destination-address | destination.nat.ip |
+| nat-destination-port | destination.nat.port |
+| nat-source-address | source.nat.ip |
+| nat-source-port | source.nat.port |
+| message | message |
+| obj | url.path |
+| packets-from-client | source.packets |
+| packets-from-server | destination.packets |
+| policy-name | rule.name |
+| protocol | network.transport |
+| source-address | source.ip |
+| source-interface-name | observer.ingress.interface.name |
+| source-port | source.port |
+| source-zone-name | observer.ingress.zone |
+| url | url.domain |
 
 
 ## Fields [_fields_25]

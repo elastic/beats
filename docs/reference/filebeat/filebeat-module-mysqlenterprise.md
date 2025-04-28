@@ -66,16 +66,16 @@ Example config:
 
 MySQL Enterprise Audit fields are mapped to ECS in the following way:
 
-| MySQL Enterprise Fields | ECS Fields |  |
-| --- | --- | --- |
-| account.user | server.user.name |  |
-| account.host | client.domain |  |
-| login.os | client.user.name |  |
-| login.ip | client.ip |  |
-| startup_data.os_version | host.os.full |  |
-| startup_data.args | process.args |  |
-| connection_attributes._pid | process.pid |  |
-| timestamp | @timestamp |  |
+| MySQL Enterprise Fields | ECS Fields |
+| --- | --- |
+| account.user | server.user.name |
+| account.host | client.domain |
+| login.os | client.user.name |
+| login.ip | client.ip |
+| startup_data.os_version | host.os.full |
+| startup_data.args | process.args |
+| connection_attributes._pid | process.pid |
+| timestamp | @timestamp |
 
 
 ## Fields [_fields_34]

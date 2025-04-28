@@ -13,58 +13,62 @@ This guide describes how to get started quickly with network packets analytics. 
 
 * install Packetbeat on each system you want to monitor
 * specify the network devices and protocols to sniff
-* parse the packet data into fields and send it to {es}
-* visualize the packet data in {kib}
+* parse the packet data into fields and send it to {{es}}
+* visualize the packet data in {{kib}}
 
-:::{image} images/packetbeat-overview-dashboard.png
-:alt: Packetbeat Overview dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Packetbeat Overview dashboard](images/packetbeat-overview-dashboard.png)
 
 
 ## Before you begin [_before_you_begin]
 
 * You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
-:::::::{tab-set}
+    :::::::{tab-set}
 
-::::::{tab-item} Elasticsearch Service
-To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
-::::::
+    ::::::{tab-item} Elasticsearch Service
+    To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+    ::::::
 
-::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
-::::::
+    ::::::{tab-item} Self-managed
+    To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
+    ::::::
 
-::::::{tab-item} DEB
-```sh
-sudo apt-get install libpcap0.8
-```
-::::::
+    :::::::
 
-::::::{tab-item} RPM
-```sh
-sudo yum install libpcap
-```
-::::::
+* On most platforms, Packetbeat requires the libpcap packet capture library. Depending on your OS, you might need to install it:
 
-::::::{tab-item} MacOS
-You probably do not need to install libpcap.
-::::::
+    :::::::{tab-set}
 
-::::::{tab-item} Linux
-You probably do not need to install libpcap.
-::::::
+    ::::::{tab-item} DEB
+    ```sh
+    sudo apt-get install libpcap0.8
+    ```
+    ::::::
 
-::::::{tab-item} Windows
-You probably do not need to install libpcap. The default distribution of {{packetbeat}} for Windows comes bundled with the Npcap library.
+    ::::::{tab-item} RPM
+    ```sh
+    sudo yum install libpcap
+    ```
+    ::::::
 
-    For the OSS-only distribution, you must download and install a packet sniffing library, such as [Npcap](https://nmap.org/npcap/), that implements the [libpcap](https://github.com/the-tcpdump-group/libpcap) interfaces.
+    ::::::{tab-item} MacOS
+    You probably do not need to install libpcap.
+    ::::::
 
-    If you use Npcap, make sure you install it in WinPcap API-compatible mode. If you plan to capture traffic from the loopback device (127.0.0.1 traffic), also select the option to support loopback traffic.
-::::::
+    ::::::{tab-item} Linux
+    You probably do not need to install libpcap.
+    ::::::
 
-:::::::
+    ::::::{tab-item} Windows
+    You probably do not need to install libpcap. The default distribution of {{packetbeat}} for Windows comes bundled with the Npcap library.
+
+        For the OSS-only distribution, you must download and install a packet sniffing library, such as [Npcap](https://nmap.org/npcap/), that implements the [libpcap](https://github.com/the-tcpdump-group/libpcap) interfaces.
+
+        If you use Npcap, make sure you install it in WinPcap API-compatible mode. If you plan to capture traffic from the loopback device (127.0.0.1 traffic), also select the option to support loopback traffic.
+    ::::::
+
+    :::::::
 
 
 ## Step 1: Install Packetbeat [install]
@@ -144,7 +148,7 @@ Specify the [cloud.id](/reference/packetbeat/configure-cloud-id.md) of your {{es
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "packetbeat_setup:{pwd}" <1>
+cloud.auth: "packetbeat_setup:YOUR_PASSWORD" <1>
 ```
 
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/packetbeat/keystore.md).
@@ -157,7 +161,7 @@ cloud.auth: "packetbeat_setup:{pwd}" <1>
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "packetbeat_internal"
-      password: "{pwd}" <1>
+      password: "YOUR_PASSWORD" <1>
       ssl:
         enabled: true
         ca_trusted_fingerprint: "b9a10bbe64ee9826abeda6546fc988c8bf798b41957c33d05db736716513dc9c" <2>
@@ -172,7 +176,7 @@ cloud.auth: "packetbeat_setup:{pwd}" <1>
       setup.kibana:
         host: "mykibanahost:5601" <1>
         username: "my_kibana_user" <2> <3>
-        password: "{pwd}"
+        password: "YOUR_PASSWORD"
     ```
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
@@ -217,32 +221,32 @@ In `packetbeat.yml`, configure the network devices and protocols to capture traf
 
     :::::::{tab-set}
 
-::::::{tab-item} DEB
-```shell
+    ::::::{tab-item} DEB
+    ```shell
     packetbeat devices
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```shell
+    ::::::{tab-item} RPM
+    ```shell
     packetbeat devices
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```shell
+    ::::::{tab-item} MacOS
+    ```shell
     ./packetbeat devices
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```shell
+    ::::::{tab-item} Linux
+    ```shell
     ./packetbeat devices
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```shell
+    ::::::{tab-item} Windows
+    ```shell
     PS C:\Program Files\Packetbeat> .\packetbeat.exe devices
 
     0: \Device\NPF_{113535AD-934A-452E-8D5F-3004797DE286} (Intel(R) PRO/1000 MT Desktop Adapter)
@@ -255,37 +259,115 @@ In `packetbeat.yml`, configure the network devices and protocols to capture traf
     ```shell
     packetbeat.interfaces.device: 0
     ```
-::::::
+    ::::::
+    :::::::
 
-::::::{tab-item} DEB
-```sh
+    For more information about these settings, see Traffic sniffing.
+
+3. In the `protocols` section, configure the ports where Packetbeat can find each protocol. If you use any non-standard ports, add them here. Otherwise, use the default values.
+
+    ```yaml
+    packetbeat.protocols:
+
+    - type: dhcpv4
+      ports: [67, 68]
+
+    - type: dns
+      ports: [53]
+
+    - type: http
+      ports: [80, 8080, 8081, 5000, 8002]
+
+    - type: memcache
+      ports: [11211]
+
+    - type: mysql
+      ports: [3306,3307]
+
+    - type: pgsql
+      ports: [5432]
+
+    - type: redis
+      ports: [6379]
+
+    - type: thrift
+      ports: [9090]
+
+    - type: mongodb
+      ports: [27017]
+
+    - type: cassandra
+      ports: [9042]
+
+    - type: tls
+      ports: [443, 993, 995, 5223, 8443, 8883, 9243]
+    ```
+
+:::{tip}
+To test your configuration file, change to the directory where the Packetbeat binary is installed, and run Packetbeat in the foreground with the following options specified: `sudo ./packetbeat test config -e`. Make sure your config files are in the path expected by Packetbeat (see [Directory layout](/reference/packetbeat/directory-layout.md)), or use the `-c` flag to specify the path to the config file. Depending on your OS, you might run into file ownership issues when you run this test. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md) for more information.
+:::
+
+For more information about configuring Packetbeat, also see:
+
+* [Configure Packetbeat](/reference/packetbeat/configuring-howto-packetbeat.md)
+* [Config file format](/reference/libbeat/config-file-format.md)
+* [`packetbeat.reference.yml`](/reference/packetbeat/packetbeat-reference-yml.md): This reference configuration file shows all non-deprecated options. You’ll find it in the same location as `packetbeat.yml`.
+
+## Step 4: Set up assets
+
+Packetbeat comes with predefined assets for parsing, indexing, and visualizing your data. To load these assets:
+
+1. Make sure the user specified in packetbeat.yml is [authorized to set up Packetbeat](/reference/packetbeat/privileges-to-setup-beats.md).
+2. From the installation directory, run:
+
+    :::::::{tab-set}
+    ::::::{tab-item} DEB
+    ```sh
     packetbeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} RPM
-```sh
+    ::::::{tab-item} RPM
+    ```sh
     packetbeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} MacOS
-```sh
+    ::::::{tab-item} MacOS
+    ```sh
     ./packetbeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Linux
-```sh
+    ::::::{tab-item} Linux
+    ```sh
     ./packetbeat setup -e
     ```
-::::::
+    ::::::
 
-::::::{tab-item} Windows
-```sh
+    ::::::{tab-item} Windows
+    ```sh
     PS > .\packetbeat.exe setup -e
     ```
-::::::
+    ::::::
+
+    :::::::
+
+    `-e` is optional and sends output to standard error instead of the configured log output.
+
+This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
+
+:::{tip}
+A connection to Elasticsearch (or Elasticsearch Service) is required to set up the initial environment. If you’re using a different output, such as Logstash, see [Load the index template manually](/reference/packetbeat/packetbeat-template.md#load-template-manually) and [Load Kibana dashboards](/reference/packetbeat/load-kibana-dashboards.md).
+:::
+
+## Step 5: Start Packetbeat
+
+Before starting Packetbeat, modify the user credentials in `packetbeat.yml` and specify a user who is [authorized to publish events](/reference/packetbeat/privileges-to-publish-events.md).
+
+To start Packetbeat, run:
+
+:::::::{tab-set}
 
 ::::::{tab-item} DEB
 ```sh
@@ -340,8 +422,8 @@ By default, Windows log files are stored in `C:\ProgramData\packetbeat\Logs`.
 ::::::
 
 :::::::
-Packetbeat should begin streaming data to {{es}}.
 
+Packetbeat should begin streaming data to {{es}}.
 
 ## Step 6: View your data in {{kib}} [view-data]
 
@@ -351,39 +433,15 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    <div class="tabs" data-tab-group="host">
-      <div role="tablist" aria-label="Open Kibana">
-        <button role="tab"
-                aria-selected="true"
-                aria-controls="cloud-tab-open-kibana"
-                id="cloud-open-kibana">
-          Elasticsearch Service
-        </button>
-        <button role="tab"
-                aria-selected="false"
-                aria-controls="self-managed-tab-open-kibana"
-                id="self-managed-open-kibana"
-                tabindex="-1">
-          Self-managed
-        </button>
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="cloud-tab-open-kibana"
-           aria-labelledby="cloud-open-kibana">
+    :::::::{tab-set}
+    ::::::{tab-item} Elasticsearch Service
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
-
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="self-managed-tab-open-kibana"
-           aria-labelledby="self-managed-open-kibana"
-           hidden="">
+    ::::::
+    ::::::{tab-item} Self-managed
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
-
-      </div>
-    </div>
+    ::::::
+    :::::::
 
 2. In the side navigation, click **Discover**. To see Packetbeat data, make sure the predefined `packetbeat-*` data view is selected.
 

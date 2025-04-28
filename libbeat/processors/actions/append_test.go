@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -60,7 +61,7 @@ func Test_cleanEmptyValues(t *testing.T) {
 }
 
 func Test_appendProcessor_appendValues(t *testing.T) {
-	log := logp.NewTestingLogger(t, "append_test")
+	log := logptest.NewTestingLogger(t, "append_test")
 	type fields struct {
 		config appendProcessorConfig
 		logger *logp.Logger
@@ -181,7 +182,7 @@ func Test_appendProcessor_appendValues(t *testing.T) {
 }
 
 func Test_appendProcessor_Run(t *testing.T) {
-	log := logp.NewTestingLogger(t, "append_test")
+	log := logptest.NewTestingLogger(t, "append_test")
 	type fields struct {
 		config appendProcessorConfig
 		logger *logp.Logger

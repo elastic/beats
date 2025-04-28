@@ -21,7 +21,8 @@ processors:
       fail_on_error: true
 ```
 
-In the example above: - field1 is decoded in field2
+In the example above:
+- field1 is decoded in field2
 
 The `decompress_gzip_field` processor has the following configuration settings:
 

@@ -27,7 +27,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/paths"
 )
@@ -1109,7 +1109,7 @@ func TestGenerateHints(t *testing.T) {
 			Home: abs,
 		}))
 
-		logger := logp.NewTestingLogger(t, "")
+		logger := logptest.NewTestingLogger(t, "")
 		l, err := NewLogHints(test.config, logger)
 		if err != nil {
 			t.Fatal(err)
@@ -1344,7 +1344,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		require.NoError(t, paths.InitPaths(&paths.Path{
 			Home: abs,
 		}))
-		logger := logp.NewTestingLogger(t, "")
+		logger := logptest.NewTestingLogger(t, "")
 		l, err := NewLogHints(cfg, logger)
 		if err != nil {
 			t.Fatal(err)

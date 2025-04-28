@@ -53,7 +53,6 @@ headers:
   X-Bar-Header: bar`
 
 		OTelCfg := `
-api_key: ""
 endpoints:
   - http://localhost:9200/foo/bar
   - http://localhost:9300/foo/bar
@@ -83,14 +82,51 @@ mapping:
 		input := newFromYamlString(t, beatCfg)
 		cfg := config.MustNewConfigFrom(input.ToStringMap())
 		got, err := ToOTelConfig(cfg)
-		require.NoError(t, err, "error translating elasticsearch output to OTel ES exporter type")
+		require.NoError(t, err, "error translating elasticsearch output to ES exporter config")
+		expOutput := newFromYamlString(t, OTelCfg)
+		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
+
+	})
+
+	t.Run("test api key is encoded before mapping to es-exporter", func(t *testing.T) {
+		beatCfg := `
+hosts:
+  - localhost:9200
+index: "some-index"
+api_key: "TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA"
+`
+
+		OTelCfg := `
+endpoints:
+  - http://localhost:9200
+idle_conn_timeout: 3s
+logs_index: some-index
+num_workers: 1
+retry:
+  enabled: true
+  initial_interval: 1s
+  max_interval: 1m0s
+  max_retries: 3
+timeout: 1m30s
+batcher:
+  enabled: true
+  max_size: 1600
+  min_size: 0
+mapping:
+  mode: bodymap  
+api_key: VGlOQUdHNEJhYU1kYUgxdFJmdVU6S25SNnlFNDFSclNvd2Iwa1EwSFdvQQ==
+ `
+		input := newFromYamlString(t, beatCfg)
+		cfg := config.MustNewConfigFrom(input.ToStringMap())
+		got, err := ToOTelConfig(cfg)
+		require.NoError(t, err, "error translating elasticsearch output to ES exporter config ")
 		expOutput := newFromYamlString(t, OTelCfg)
 		compareAndAssert(t, expOutput, confmap.NewFromStringMap(got))
 
 	})
 
 	// when preset is configured, we only test worker, bulk_max_size, idle_connection_timeout here
-	// TODO: Check for compression_level when we add support upstream
+	// es-exporter sets compression level to 1 by default
 	t.Run("check preset config translation", func(t *testing.T) {
 		commonBeatCfg := `
 hosts:
@@ -102,7 +138,6 @@ preset: %s
 `
 
 		commonOTelCfg := `
-api_key: ""
 endpoints:
   - http://localhost:9200
 retry:
@@ -147,7 +182,6 @@ batcher:
 			{
 				presetName: "scale",
 				output: `
-api_key: ""
 endpoints:
   - http://localhost:9200
 retry:
@@ -184,7 +218,7 @@ batcher:
 				presetName: "custom",
 				output: commonOTelCfg + `
 idle_conn_timeout: 3s
-num_workers: 0
+num_workers: 1
 batcher:
   enabled: true
   max_size: 1600

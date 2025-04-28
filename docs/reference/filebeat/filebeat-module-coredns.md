@@ -60,10 +60,8 @@ Example config:
 
 This module comes with a sample dashboard.
 
-:::{image} images/kibana-coredns.jpg
-:alt: kibana coredns
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana coredns](images/kibana-coredns.jpg)
 
 
 ## Fields [_fields_12]

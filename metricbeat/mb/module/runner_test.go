@@ -31,6 +31,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/system"
 	_ "github.com/elastic/beats/v7/metricbeat/module/system/cpu"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -48,7 +49,7 @@ func TestRunner(t *testing.T) {
 	}
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,7 +77,7 @@ func TestCPUDiagnostics(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create a new Wrapper based on the configuration.
-	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, mb.Registry, logptest.NewTestingLogger(t, ""), module.WithMetricSetInfo())
 	if err != nil {
 		t.Fatal(err)
 	}

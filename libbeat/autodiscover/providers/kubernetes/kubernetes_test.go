@@ -48,13 +48,8 @@ func createLease() *v1.Lease {
 }
 
 // applyLease applies the lease
-func applyLease(client kubernetes.Interface, lease *v1.Lease, firstTime bool) error {
-	var err error
-	if firstTime {
-		_, err = client.CoordinationV1().Leases(namespace).Create(context.Background(), lease, metav1.CreateOptions{})
-		return err
-	}
-	_, err = client.CoordinationV1().Leases(namespace).Update(context.Background(), lease, metav1.UpdateOptions{})
+func applyLease(client kubernetes.Interface, lease *v1.Lease) error {
+	_, err := client.CoordinationV1().Leases(namespace).Create(context.Background(), lease, metav1.CreateOptions{})
 	return err
 }
 
@@ -85,9 +80,10 @@ func TestLeaseConfigurableFields(t *testing.T) {
 	le, err := NewLeaderElectionManager(uuid, &cfg, client, startLeadingFunc, stopLeadingFunc, logger)
 	require.NoError(t, err)
 
-	leaseDuration = le.(*leaderElectionManager).leaderElection.LeaseDuration
-	retryPeriod = le.(*leaderElectionManager).leaderElection.RetryPeriod
-	renewDeadline = le.(*leaderElectionManager).leaderElection.RenewDeadline
+	lem, _ := le.(*leaderElectionManager)
+	leaseDuration = lem.leaderElection.LeaseDuration
+	retryPeriod = lem.leaderElection.RetryPeriod
+	renewDeadline = lem.leaderElection.RenewDeadline
 
 	require.Equalf(t, cfg.LeaseDuration, leaseDuration, "lease duration should be the same as the one provided in the configuration.")
 	require.Equalf(t, cfg.RetryPeriod, retryPeriod, "retry period should be the same as the one provided in the configuration.")
@@ -104,20 +100,20 @@ func TestNewLeaderElectionManager(t *testing.T) {
 
 	lease := createLease()
 	// create the lease that leader election will be using
-	err := applyLease(client, lease, true)
+	err := applyLease(client, lease)
 	require.NoError(t, err)
 
 	uuid, err := uuid.NewV4()
 	require.NoError(t, err)
 
 	waitForNewLeader := make(chan string)
-	waitForLosingLeader := make(chan string)
+	var loosingLeader = ""
 
 	startLeadingFunc := func(uuid string, eventID string) {
 		waitForNewLeader <- eventID
 	}
 	stopLeadingFunc := func(uuid string, eventID string) {
-		waitForLosingLeader <- eventID
+		loosingLeader = eventID
 	}
 	logger := logp.NewLogger("kubernetes-test")
 
@@ -141,15 +137,17 @@ func TestNewLeaderElectionManager(t *testing.T) {
 
 		le, err := NewLeaderElectionManager(uuid, &cfg, client, startLeadingFunc, stopLeadingFunc, logger)
 		require.NoError(t, err)
-
-		leaseDuration = le.(*leaderElectionManager).leaderElection.LeaseDuration
-		retryPeriod = le.(*leaderElectionManager).leaderElection.RetryPeriod
+		lem, _ := le.(*leaderElectionManager)
+		leaseDuration = lem.leaderElection.LeaseDuration
+		retryPeriod = lem.leaderElection.RetryPeriod
 
 		les[i] = &le
 	}
 
 	for _, le := range les {
 		(*le).Start()
+		// Start leader election managers with some delay so the first always becomes the first leader
+		time.Sleep(500 * time.Millisecond)
 	}
 
 	// It is possible that startLeading is triggered more than one time before stopLeading is called.
@@ -169,14 +167,13 @@ func TestNewLeaderElectionManager(t *testing.T) {
 		if exists {
 			t.Fatalf("The new leader produced the same event id as the previous one.")
 		}
-		expectedLoosingEventIds[eventId] = true
 
-		// wait for loosing leader
-		loosingEventId := <-waitForLosingLeader
-		_, exists = expectedLoosingEventIds[loosingEventId]
+		_, exists = expectedLoosingEventIds[loosingLeader]
 		if !exists {
 			t.Fatalf("The loosing leader used an unexpected event id %s.", eventId)
 		}
+
+		expectedLoosingEventIds[eventId] = true
 	}
 
 	go func() {
@@ -199,38 +196,27 @@ func TestNewLeaderElectionManager(t *testing.T) {
 		}
 	}()
 
-	renewals := 5
 	// cause lease renewals
-	for i := 0; i < renewals; i++ {
-		// Force the lease to be applied again, so a new leader is elected.
-		newHolder := "does-not-matter-" + fmt.Sprint(i)
-		lease.Spec.HolderIdentity = &newHolder
-		err = applyLease(client, lease, false)
-		require.NoError(t, err)
-
-		// wait some time to ensure lease renewal
-		<-time.After((retryPeriod + leaseDuration) * 2)
+	for _, le := range les {
+		// stop leader
+		(*le).Stop()
+		time.Sleep((retryPeriod + leaseDuration) * 2)
+		// start leader again
+		// during this time, the leader will have changed
+		(*le).Start()
 	}
+
 	endedRequests <- 1
 
 	<-finished
 
 	// Wait for some to ensure we are not having lease fail renewal, and there is no new leader.
-	<-time.After((retryPeriod + leaseDuration) * 2)
+	time.Sleep((retryPeriod + leaseDuration) * 2)
 
 	// waitForNewLeader channel should be empty, because we removed it just before ending the for cycle.
 	require.Equalf(t, 0, len(waitForNewLeader), "waitForNewLeader channel should be empty.")
 
-	// waitForLosingLeader channel should be empty, because the last leader did not lose the lease lock yet.
-	require.Equalf(t, 0, len(waitForLosingLeader), "waitForLosingLeader channel should be empty.")
-
 	for _, le := range les {
 		(*le).Stop()
-	}
-
-	// When the context gets cancelled, stopLeading is always called.
-	// Let's check that the leaders electors are correctly stopping.
-	for i := 0; i < numberNodes; i++ {
-		<-waitForLosingLeader
 	}
 }

@@ -79,7 +79,9 @@ The registry will be migrated to the new location only if a registry using the d
 
 ### `config_dir` [_config_dir]
 
-[6.0.0]
+:::{admonition} Deprecated in 6.0.0.
+Use [Input config](/reference/filebeat/filebeat-configuration-reloading.md#load-input-config) instead.
+:::
 
 The full path to the directory that contains additional input configuration files. Each configuration file must end with `.yml`. Each config file must also specify the full Filebeat config hierarchy even though only the `inputs` part of each file is processed. All global options, such as `registry_file`, are ignored.
 

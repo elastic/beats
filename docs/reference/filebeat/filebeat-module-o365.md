@@ -97,10 +97,8 @@ Finally you need to add permissions in the *API permissions* section and grant i
 * ActivityFeed.ReadDlp
 * ServiceHealth.Read
 
-:::{image} images/filebeat-o365-azure-permissions.png
-:alt: filebeat o365 azure permissions
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat o365 azure permissions](images/filebeat-o365-azure-permissions.png)
 
 Once the required permissions are added, click the *Grant admin consent* button. Note that it can take a while for the required permissions to be in effect, so it’s possible that you observe some permission errors when running Filebeat right away.
 
@@ -186,10 +184,8 @@ The following configuration options are only recomended in case of problems. The
 
 This module comes with a sample dashboard:
 
-:::{image} images/filebeat-o365-audit.png
-:alt: filebeat o365 audit
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat o365 audit](images/filebeat-o365-audit.png)
 
 
 ## Fields [_fields_38]

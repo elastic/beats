@@ -225,9 +225,7 @@ This is useful when two Packetbeat instances publish the same transactions. Beca
 
 For example, in the following scenario, you see a 3-server architecture where a Beat is installed on each server. t1 is the transaction exchanged between Server1 and Server2, and t2 is the transaction between Server2 and Server3.
 
-:::{image} images/option_ignore_outgoing.png
-:alt: Beats Architecture
-:::
+![Beats Architecture](images/option_ignore_outgoing.png)
 
 By default, each transaction is indexed twice because Beat2 sees both transactions. So you would see the following published transactions (when `ignore_outgoing` is false):
 

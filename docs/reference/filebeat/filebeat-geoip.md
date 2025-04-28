@@ -199,8 +199,6 @@ If you add a field that’s not already defined as a `geo_point` in the index te
 
 To visualize the location of IP addresses, you can create a new [coordinate map](docs-content://explore-analyze/visualize/maps.md) in {{kib}} and select the location field, for example `client.geo.location` or `host.geo.location`, as the Geohash.
 
-:::{image} images/coordinate-map.png
-:alt: Coordinate map in {kib}
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Coordinate map in {{kib}}](images/coordinate-map.png)
 

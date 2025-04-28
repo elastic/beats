@@ -101,7 +101,7 @@ steps:
           - github_commit_status:
               context: "filebeat: Ubuntu x86_64 Unit Tests"
 
-      - label: ":ubuntu: Filebeat: Ubuntu x86_64 Unit Tests FIPS"
+      - label: ":ubuntu: Filebeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
         command: |
           cd filebeat
           mage unitTest
@@ -125,7 +125,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "filebeat: Ubuntu x86_64 Unit Tests FIPS"
+              context: "filebeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
 
       - label: ":ubuntu: Filebeat: Ubuntu x86_64 fips140=only Unit Tests"
         command: |

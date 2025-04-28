@@ -31,9 +31,7 @@ If none of the options are entered then all virtual machine inside the subscript
 
 To populate the VM Guest Metrics Overview dashboard, users will have to enable the Virtual Machine Guest namespace for the monitored resources. More on sending guest OS metrics to Azure Monitor here [https://docs.microsoft.com/en-us/azure/azure-monitor/platform/collect-custom-metrics-guestos-resource-manager-vm](https://docs.microsoft.com/en-us/azure/azure-monitor/platform/collect-custom-metrics-guestos-resource-manager-vm).
 
-:::{image} images/metricbeat-azure-vm-guestmetrics-overview.png
-:alt: metricbeat azure vm guestmetrics overview
-:::
+![metricbeat azure vm guestmetrics overview](images/metricbeat-azure-vm-guestmetrics-overview.png)
 
 ## Fields [_fields_32]
 
