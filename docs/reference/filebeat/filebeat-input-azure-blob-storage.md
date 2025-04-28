@@ -102,7 +102,7 @@ The scheduler is responsible for scheduling jobs, and uses the `maximum availabl
 
 As we can see from the response above, the `message` field contains the original stringified data.
 
-**Some of the key attributes are as follows :-**
+**Some of the key attributes are as follows:**
 
 1. **message** : Original stringified blob data.
 2. **log.file.path** : Path of the blob in azure cloud.

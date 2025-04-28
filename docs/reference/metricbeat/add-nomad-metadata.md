@@ -82,7 +82,13 @@ Indexers and matchers are used to correlate fields in events with actual metadat
 
 Indexers use allocation metadata to create unique identifiers for each one of the pods.
 
-Avaliable indexers are: `allocation_name`:: Identifies allocations by its name and namespace (as `<namespace>/<name>`) `allocation_uuid`:: Identifies allocations by its unique identifier.
+Avaliable indexers are:
+
+`allocation_name`
+:   Identifies allocations by its name and namespace (as `<namespace>/<name>`)
+
+`allocation_uuid`
+:   Identifies allocations by its unique identifier.
 
 
 ### Matchers [_matchers_2]

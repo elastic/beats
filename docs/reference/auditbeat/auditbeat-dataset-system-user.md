@@ -19,10 +19,8 @@ It is implemented for Linux only.
 
 The dataset comes with a sample dashboard:
 
-:::{image} images/auditbeat-system-user-dashboard.png
-:alt: Auditbeat System User Dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Auditbeat System User Dashboard](images/auditbeat-system-user-dashboard.png)
 
 ## Fields [_fields_8]
 

@@ -36,9 +36,8 @@ The aws dynamodb metricset comes with a predefined dashboard. For example:
 
 Please see more details for each metric in [Amazon DynamoDB Metrics](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html).
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | SuccessfulRequestLatency | Average |
 | OnlineIndexPercentageProgress | Average |
 | ProvisionedWriteCapacityUnits | Average |
