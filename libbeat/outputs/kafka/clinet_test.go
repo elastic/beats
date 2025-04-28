@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/sarama/mocks"
 )
 
-func TestClientOutputListener(t *testing.T) {
+func TestClientOutputListener_customMock(t *testing.T) {
 	logger := logp.NewTestingLogger(t, "")
 	cfg, err := config.NewConfigFrom(map[string]interface{}{
 		"hosts":   []string{"localhost:9094"},
@@ -123,101 +123,7 @@ func TestClientOutputListener(t *testing.T) {
 	assert.Equal(t, int64(1), counter.dropped.Load())
 }
 
-type mockProducer struct {
-	wg   sync.WaitGroup
-	once sync.Once
-
-	inCh         chan *sarama.ProducerMessage
-	successCh    chan *sarama.ProducerMessage
-	errCh        chan *sarama.ProducerError
-	processInput func(*sarama.ProducerMessage) error
-}
-
-func (m *mockProducer) run() error {
-	m.wg.Add(1)
-	defer m.wg.Done()
-
-	msg, ok := <-m.inCh
-	if !ok {
-		return errors.New("producer already closed")
-	}
-	err := m.processInput(msg)
-	if err != nil {
-		m.errCh <- &sarama.ProducerError{
-			Err: err,
-			Msg: msg,
-		}
-	} else {
-		m.successCh <- msg
-	}
-
-	return nil
-}
-
-func (m *mockProducer) AsyncClose() {
-	_ = m.Close()
-}
-
-func (m *mockProducer) Close() error {
-	m.once.Do(func() {
-		close(m.inCh)
-		close(m.successCh)
-		close(m.errCh)
-	})
-
-	m.wg.Wait()
-
-	return nil
-}
-
-func (m *mockProducer) Input() chan<- *sarama.ProducerMessage {
-	return m.inCh
-}
-
-func (m *mockProducer) Successes() <-chan *sarama.ProducerMessage {
-	return m.successCh
-}
-
-func (m *mockProducer) Errors() <-chan *sarama.ProducerError {
-	return m.errCh
-}
-
-func (m *mockProducer) IsTransactional() bool {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (m *mockProducer) TxnStatus() sarama.ProducerTxnStatusFlag {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (m *mockProducer) BeginTxn() error {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (m *mockProducer) CommitTxn() error {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (m *mockProducer) AbortTxn() error {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (m *mockProducer) AddOffsetsToTxn(offsets map[string][]*sarama.PartitionOffsetMetadata, groupId string) error {
-	// TODO implement me
-	panic("implement me")
-}
-
-func (m *mockProducer) AddMessageToTxn(msg *sarama.ConsumerMessage, groupId string, metadata *string) error {
-	// TODO implement me
-	panic("implement me")
-}
-
-func TestBasic(t *testing.T) {
+func TestClientOutputListener_saramaMock(t *testing.T) {
 	logger := logp.NewTestingLogger(t, "")
 
 	cfgSarama := sarama.NewConfig()
@@ -321,4 +227,98 @@ func (c *countListener) DeadLetter() {
 func (c *countListener) String() string {
 	return fmt.Sprintf("New: %d, Acked: %d, Dropped: %d, DeadLetter: %d",
 		c.new.Load(), c.acked.Load(), c.dropped.Load(), c.deadLetter.Load())
+}
+
+type mockProducer struct {
+	wg   sync.WaitGroup
+	once sync.Once
+
+	inCh         chan *sarama.ProducerMessage
+	successCh    chan *sarama.ProducerMessage
+	errCh        chan *sarama.ProducerError
+	processInput func(*sarama.ProducerMessage) error
+}
+
+func (m *mockProducer) run() error {
+	m.wg.Add(1)
+	defer m.wg.Done()
+
+	msg, ok := <-m.inCh
+	if !ok {
+		return errors.New("producer already closed")
+	}
+	err := m.processInput(msg)
+	if err != nil {
+		m.errCh <- &sarama.ProducerError{
+			Err: err,
+			Msg: msg,
+		}
+	} else {
+		m.successCh <- msg
+	}
+
+	return nil
+}
+
+func (m *mockProducer) AsyncClose() {
+	_ = m.Close()
+}
+
+func (m *mockProducer) Close() error {
+	m.once.Do(func() {
+		close(m.inCh)
+		close(m.successCh)
+		close(m.errCh)
+	})
+
+	m.wg.Wait()
+
+	return nil
+}
+
+func (m *mockProducer) Input() chan<- *sarama.ProducerMessage {
+	return m.inCh
+}
+
+func (m *mockProducer) Successes() <-chan *sarama.ProducerMessage {
+	return m.successCh
+}
+
+func (m *mockProducer) Errors() <-chan *sarama.ProducerError {
+	return m.errCh
+}
+
+func (m *mockProducer) IsTransactional() bool {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (m *mockProducer) TxnStatus() sarama.ProducerTxnStatusFlag {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (m *mockProducer) BeginTxn() error {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (m *mockProducer) CommitTxn() error {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (m *mockProducer) AbortTxn() error {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (m *mockProducer) AddOffsetsToTxn(offsets map[string][]*sarama.PartitionOffsetMetadata, groupId string) error {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (m *mockProducer) AddMessageToTxn(msg *sarama.ConsumerMessage, groupId string, metadata *string) error {
+	// TODO implement me
+	panic("implement me")
 }
