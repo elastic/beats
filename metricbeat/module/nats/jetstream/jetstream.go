@@ -82,10 +82,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		base,
-		http,
-		logp.NewLogger("nats"),
-		config.Jetstream,
+		BaseMetricSet: base,
+		http: http,
+		Log: logp.NewLogger("nats"),
+		Config: config.Jetstream,
 	}, nil
 }
 
