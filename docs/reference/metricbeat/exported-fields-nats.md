@@ -34,7 +34,7 @@ type: date
 Contains nats connection related metrics
 
 **`nats.connection.id`**
-:   The id of the connection
+:   The ID of the connection
 
 type: keyword
 
@@ -170,7 +170,7 @@ type: integer
 
 
 **`nats.route.remote_id`**
-:   The remote id on which the route is connected to
+:   The remote ID on which the route is connected
 
 type: keyword
 

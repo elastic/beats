@@ -7,7 +7,7 @@
     - name: id
       type: keyword
       description: >
-        The id of the connection
+        The ID of the connection
     - name: name
       type: keyword
       description: >
