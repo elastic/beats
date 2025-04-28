@@ -30,18 +30,19 @@ import (
 const (
 	defaultScheme = "http"
 	// Ref: https://docs.nats.io/running-a-nats-service/nats_admin/monitoring#jetstream-information-jsz
-	defaultPath      = "/jsz"
-	statsCategory    = "stats"
-	accountCategory  = "account"
-	streamCategory   = "stream"
-	consumerCategory = "consumer"
+	defaultPath        = "/jsz"
+	statsCategory      = "stats"
+	accountCategory    = "account"
+	streamCategory     = "stream"
+	consumerCategory   = "consumer"
+	defaultQueryParams = "config=true&consumers=true"
 )
 
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
-		QueryParams:   "config=true&consumers=true",
+		QueryParams:   defaultQueryParams,
 	}.Build()
 )
 
@@ -83,9 +84,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		http: http,
-		Log: logp.NewLogger("nats"),
-		Config: config.Jetstream,
+		http:          http,
+		Log:           logp.NewLogger("nats"),
+		Config:        config.Jetstream,
 	}, nil
 }
 
