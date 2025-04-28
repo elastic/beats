@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -37,6 +38,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -278,10 +280,19 @@ func TestManager_InputsRun(t *testing.T) {
 		defer cancel()
 
 		var clientCounters pubtest.ClientCounter
-		err = inp.Run(input.Context{
-			Logger:      manager.Logger,
-			Cancelation: cancelCtx,
-		}, clientCounters.BuildConnector())
+		id := uuid.Must(uuid.NewV4()).String()
+		ctx := input.Context{
+			ID:            id,
+			IDWithoutName: id,
+			Name:          inp.Name(),
+			Agent: beat.Info{Monitoring: beat.Monitoring{
+				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			Cancelation:     cancelCtx,
+			StatusReporter:  nil,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          manager.Logger,
+		}
+		err = inp.Run(ctx, clientCounters.BuildConnector())
 		require.Error(t, err)
 		require.Equal(t, 0, clientCounters.Active())
 	})
@@ -302,10 +313,19 @@ func TestManager_InputsRun(t *testing.T) {
 		defer cancel()
 
 		var clientCounters pubtest.ClientCounter
-		err = inp.Run(input.Context{
-			Logger:      manager.Logger,
-			Cancelation: cancelCtx,
-		}, clientCounters.BuildConnector())
+		id := uuid.Must(uuid.NewV4()).String()
+		ctx := input.Context{
+			ID:            id,
+			IDWithoutName: id,
+			Name:          inp.Name(),
+			Agent: beat.Info{Monitoring: beat.Monitoring{
+				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			Cancelation:     cancelCtx,
+			StatusReporter:  nil,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          manager.Logger,
+		}
+		err = inp.Run(ctx, clientCounters.BuildConnector())
 		require.Error(t, err)
 		require.Equal(t, 0, clientCounters.Active())
 	})
@@ -331,10 +351,19 @@ func TestManager_InputsRun(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err = inp.Run(input.Context{
-				Logger:      manager.Logger,
-				Cancelation: cancelCtx,
-			}, clientCounters.BuildConnector())
+			id := uuid.Must(uuid.NewV4()).String()
+			ctx := input.Context{
+				ID:            id,
+				IDWithoutName: id,
+				Name:          inp.Name(),
+				Agent: beat.Info{Monitoring: beat.Monitoring{
+					Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+				Cancelation:     cancelCtx,
+				StatusReporter:  nil,
+				MetricsRegistry: monitoring.NewRegistry(),
+				Logger:          manager.Logger,
+			}
+			err = inp.Run(ctx, clientCounters.BuildConnector())
 		}()
 
 		cancel()
@@ -389,18 +418,36 @@ func TestManager_InputsRun(t *testing.T) {
 		// create and run first instance
 		inp, err := manager.Create(conf.MustNewConfigFrom(runConfig{Max: 3}))
 		require.NoError(t, err)
-		require.NoError(t, inp.Run(input.Context{
-			Logger:      log,
-			Cancelation: context.Background(),
-		}, pipeline))
+		id := uuid.Must(uuid.NewV4()).String()
+		ctx := input.Context{
+			ID:            id,
+			IDWithoutName: id,
+			Name:          inp.Name(),
+			Agent: beat.Info{Monitoring: beat.Monitoring{
+				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			Cancelation:     context.Background(),
+			StatusReporter:  nil,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          log,
+		}
+		require.NoError(t, inp.Run(ctx, pipeline))
 
-		// create and run second instance instance
+		// create and run second instance
 		inp, err = manager.Create(conf.MustNewConfigFrom(runConfig{Max: 3}))
 		require.NoError(t, err)
-		_ = inp.Run(input.Context{
-			Logger:      log,
-			Cancelation: context.Background(),
-		}, pipeline)
+		id = uuid.Must(uuid.NewV4()).String()
+		ctx = input.Context{
+			ID:            id,
+			IDWithoutName: id,
+			Name:          inp.Name(),
+			Agent: beat.Info{Monitoring: beat.Monitoring{
+				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			Cancelation:     context.Background(),
+			StatusReporter:  nil,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          log,
+		}
+		_ = inp.Run(ctx, pipeline)
 
 		// verify
 		assert.Equal(t, []int{0, 1, 2, 3, 4, 5}, ids)
@@ -455,15 +502,24 @@ func TestManager_InputsRun(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err = inp.Run(input.Context{
-				Logger:      manager.Logger,
-				Cancelation: cancelCtx,
-			}, pipeline)
+			id := uuid.Must(uuid.NewV4()).String()
+			ctx := input.Context{
+				ID:            id,
+				IDWithoutName: id,
+				Name:          inp.Name(),
+				Agent: beat.Info{Monitoring: beat.Monitoring{
+					Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+				Cancelation:     cancelCtx,
+				StatusReporter:  nil,
+				MetricsRegistry: monitoring.NewRegistry(),
+				Logger:          manager.Logger,
+			}
+			err = inp.Run(ctx, pipeline)
 		}()
-		// wait for test setup to shutdown
+		// wait for test setup to shut down
 		defer wg.Wait()
 
-		// wait for setup complete and events being send (pending operations in the pipeline)
+		// wait for setup complete and events being sent (pending operations in the pipeline)
 		wgACKer.Wait()
 		wgSend.Wait()
 

@@ -150,7 +150,7 @@ queue.mem:
 		"--dashboards",
 		"-E", "setup.dashboards.file="+filepath.Join("./testdata", "testbeat-dashboards.zip"),
 		"-E", "setup.dashboards.beat=testbeat",
-		"-E", "setup.dashboards.only_index=true",
+		"-E", "setup.dashboards.only_index=false",
 		"-E", "setup.kibana.protocol=http",
 		"-E", "setup.kibana.host="+kURL.Hostname(),
 		"-E", "setup.kibana.port="+kURL.Port(),
