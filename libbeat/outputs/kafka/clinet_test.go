@@ -18,14 +18,14 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/sarama"
 	"github.com/elastic/sarama/mocks"
 )
 
 func TestClientOutputListener_customMock(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	cfg, err := config.NewConfigFrom(map[string]interface{}{
 		"hosts":   []string{"localhost:9094"},
 		"topic":   "testTopic",
@@ -118,13 +118,28 @@ func TestClientOutputListener_customMock(t *testing.T) {
 	err = c.Close()
 	require.NoError(t, err, "could not kafka client")
 
+	assertOutputMetrics(t, counter, reg)
+}
+
+func assertOutputMetrics(t *testing.T, counter *countListener, reg *monitoring.Registry) {
 	assert.Equal(t, int64(2), counter.new.Load())
 	assert.Equal(t, int64(2), counter.acked.Load())
 	assert.Equal(t, int64(1), counter.dropped.Load())
+
+	metrics := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
+	evs, ok := metrics["events"]
+	require.True(t, ok, "could not find 'events' in metrics")
+	parsedEvs, ok := evs.(map[string]any)
+	require.True(t, ok, "could not parse 'events' isn't map[string]int64, it's %T", evs)
+
+	assert.Equal(t, int64(2), parsedEvs["total"].(int64))
+	assert.Equal(t, int64(2), parsedEvs["acked"].(int64))
+	assert.Equal(t, int64(1), parsedEvs["dropped"].(int64))
+	assert.Equal(t, int64(1), parsedEvs["batches"].(int64))
 }
 
 func TestClientOutputListener_saramaMock(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	cfgSarama := sarama.NewConfig()
 	cfgSarama.Producer.Return.Successes = true
@@ -142,13 +157,14 @@ func TestClientOutputListener_saramaMock(t *testing.T) {
 	})
 	require.NoError(t, err, "could not create config from map")
 
+	reg := monitoring.NewRegistry()
 	outGrup, err := makeKafka(
 		nil,
 		beat.Info{
 			Beat:        "libbeat",
 			IndexPrefix: "testbeat",
 			Logger:      logger},
-		outputs.NewStats(monitoring.NewRegistry()), cfg)
+		outputs.NewStats(reg), cfg)
 	require.NoError(t, err, "could not create kafka output")
 
 	c, ok := outGrup.Clients[0].(*client)
@@ -196,9 +212,7 @@ func TestClientOutputListener_saramaMock(t *testing.T) {
 
 	require.NoError(t, c.Close(), "failed closing kafka client")
 
-	assert.Equal(t, int64(2), counter.new.Load())
-	assert.Equal(t, int64(2), counter.acked.Load())
-	assert.Equal(t, int64(1), counter.dropped.Load())
+	assertOutputMetrics(t, counter, reg)
 }
 
 type countListener struct {
