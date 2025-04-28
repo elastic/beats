@@ -206,6 +206,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
 - Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 - Journald input now works on Docker containers {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
 
 *Heartbeat*
 
