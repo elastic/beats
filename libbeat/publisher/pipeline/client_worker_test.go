@@ -124,7 +124,7 @@ func TestReplaceClientWorker(t *testing.T) {
 					batch := randomBatch(
 						minEventsInBatch, maxEventsInBatch,
 					).withRetryer(retryer)
-					batch.events[0].Content.Private = i
+					batch.EventList[0].Content.Private = i
 					numEvents += batch.Len()
 					batches = append(batches, batch)
 				}
@@ -134,7 +134,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				go func() {
 					defer wg.Done()
 					for _, batch := range batches {
-						t.Logf("publish batch: %v", batch.(*mockBatch).events[0].Content.Private)
+						t.Logf("publish batch: %v", batch.(*MockBatch).EventList[0].Content.Private)
 						workQueue <- batch
 					}
 				}()
@@ -153,7 +153,7 @@ func TestReplaceClientWorker(t *testing.T) {
 
 					count := len(batch.Events())
 					publishedFirst.Add(uint64(count))
-					t.Logf("#1 processed batch: %v (%v)", batch.(*mockBatch).events[0].Content.Private, count)
+					t.Logf("#1 processed batch: %v (%v)", batch.(*MockBatch).EventList[0].Content.Private, count)
 					return nil
 				}
 
@@ -180,7 +180,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				countingPublishFn := func(batch publisher.Batch) error {
 					count := len(batch.Events())
 					publishedLater.Add(uint64(count))
-					t.Logf("#2 processed batch: %v (%v)", batch.(*mockBatch).events[0].Content.Private, count)
+					t.Logf("#2 processed batch: %v (%v)", batch.(*MockBatch).EventList[0].Content.Private, count)
 					return nil
 				}
 
