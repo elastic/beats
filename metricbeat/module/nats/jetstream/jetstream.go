@@ -96,11 +96,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return fmt.Errorf("error in fetch: %w", err)
+		return fmt.Errorf("failed to fetch content for NATS JetStream: %w", err)
 	}
 	err = eventMapping(m, report, content)
 	if err != nil {
-		return fmt.Errorf("error in mapping: %w", err)
+		return fmt.Errorf("error in mapping NATS JetStream response: %w", err)
 	}
 
 	return nil
