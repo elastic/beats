@@ -50,9 +50,8 @@ The `aws sns` metricset comes with a predefined dashboard. For example:
 
 Please see more details for each metric in [CloudWatch SNS Metrics](https://docs.aws.amazon.com/sns/latest/dg/sns-monitoring-using-cloudwatch.html#SNS_ViewMetrics).
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | NumberOfMessagesPublished | Sum |
 | NumberOfNotificationsDelivered | Sum |
 | NumberOfNotificationsFailed | Sum |

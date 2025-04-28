@@ -49,10 +49,8 @@ Under CentOS 6.x, it’s possible that none of the files above exist. In that ca
 
 The module comes with a sample dashboard:
 
-:::{image} images/auditbeat-system-overview-dashboard.png
-:alt: Auditbeat System Overview Dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Auditbeat System Overview Dashboard](images/auditbeat-system-overview-dashboard.png)
 
 
 ## Configuration options [_configuration_options_19]
