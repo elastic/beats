@@ -318,11 +318,16 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				if err == nil {
 					return conn, response, nil
 				}
-				//nolint:errorlint // it will never be a wrapped error at this point
-				if err == websocket.ErrBadHandshake {
-					log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				// in case of sudden network errors or server crashes the response will be nil and logging should be done gracefully
+				if response != nil {
+					//nolint:errorlint // it will never be a wrapped error at this point
+					if err == websocket.ErrBadHandshake {
+						log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+					} else {
+						log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+					}
 				} else {
-					log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 				time.Sleep(waitTime)
@@ -334,11 +339,16 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				if err == nil {
 					return conn, response, nil
 				}
-				//nolint:errorlint // it will never be a wrapped error at this point
-				if err == websocket.ErrBadHandshake {
-					log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				// in case of sudden network errors or server crashes the response will be nil and logging should be done gracefully
+				if response != nil {
+					//nolint:errorlint // it will never be a wrapped error at this point
+					if err == websocket.ErrBadHandshake {
+						log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+					} else {
+						log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+					}
 				} else {
-					log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 				time.Sleep(waitTime)
