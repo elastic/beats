@@ -118,9 +118,9 @@ func TestClient(t *testing.T) {
 	err = c.Close()
 	require.NoError(t, err, "could not kafka client")
 
-	assert.Equal(t, 2, counter.new.Load())
-	assert.Equal(t, 2, counter.acked.Load())
-	assert.Equal(t, 1, counter.dropped.Load())
+	assert.Equal(t, int64(2), counter.new.Load())
+	assert.Equal(t, int64(2), counter.acked.Load())
+	assert.Equal(t, int64(1), counter.dropped.Load())
 }
 
 type mockProducer struct {
@@ -218,116 +218,85 @@ func (m *mockProducer) AddMessageToTxn(msg *sarama.ConsumerMessage, groupId stri
 }
 
 func TestBasic(t *testing.T) {
-	wg := sync.WaitGroup{}
+	logger := logp.NewTestingLogger(t, "")
 
-	cfg := sarama.NewConfig()
-	cfg.Producer.Return.Successes = true
-	cfg.Producer.Return.Errors = true
+	cfgSarama := sarama.NewConfig()
+	cfgSarama.Producer.Return.Successes = true
+	cfgSarama.Producer.Return.Errors = true
 
-	producer := mocks.NewAsyncProducer(t, cfg)
+	producer := mocks.NewAsyncProducer(t, cfgSarama)
 	producer.ExpectInputAndSucceed()
-	producer.ExpectInputAndFail(errors.New("a error: ExpectInputAndFail"))
-	// producer.ExpectInputWithMessageCheckerFunctionAndSucceed(func(m *sarama.ProducerMessage) error {
-	// 	defer wg.Done()
-	// 	fmt.Println("ExpectInputWithMessageCheckerFunctionAndSucceed")
-	// 	bs, err := m.Value.Encode()
-	// 	assert.NoError(t, err, "could not encode message")
-	//
-	// 	dic := map[string]any{}
-	// 	err = json.Unmarshal(bs, &dic)
-	// 	if err != nil {
-	// 		return fmt.Errorf("could not decode message: %w", err)
-	// 	}
-	//
-	// 	fmt.Println("data received: ", dic)
-	//
-	// 	// if dic["to_drop"].(string) == "true" {
-	// 	// 	return fmt.Errorf("to_drop == true, returning an error")
-	// 	// }
-	// 	return nil
-	// })
-	// producer.ExpectInputWithMessageCheckerFunctionAndFail(func(m *sarama.ProducerMessage) error {
-	// 	defer wg.Done()
-	// 	fmt.Println("ExpectInputWithMessageCheckerFunctionAndFail")
-	// 	bs, err := m.Value.Encode()
-	// 	assert.NoError(t, err, "could not encode message")
-	//
-	// 	dic := map[string]any{}
-	// 	err = json.Unmarshal(bs, &dic)
-	// 	if err != nil {
-	// 		return fmt.Errorf("could not decode message: %w", err)
-	// 	}
-	//
-	// 	fmt.Println("data received: ", dic)
-	//
-	// 	// if dic["to_drop"].(string) == "true" {
-	// 	// 	return fmt.Errorf("anfail to_drop == true, returning an error")
-	// 	// }
-	// 	return nil
-	// }, fmt.Errorf("to_drop == true, returning an error"))
+	producer.ExpectInputAndFail(
+		fmt.Errorf("test permanent error: %w", sarama.ErrInvalidMessage))
 
-	// counter := &countListener{}
-	// observer := publisher.OutputListener{Listener: counter}
-	// b := pipeline.MockBatch{
-	// 	Mu: sync.Mutex{},
-	// 	EventList: []publisher.Event{
-	// 		{
-	// 			OutputListener: observer,
-	// 			Content: beat.Event{
-	// 				Timestamp: time.Time{},
-	// 				Meta:      nil,
-	// 				Fields: map[string]interface{}{
-	// 					"msg":     "a message 1",
-	// 					"to_drop": "false"},
-	// 				Private:    nil,
-	// 				TimeSeries: false,
-	// 			},
-	// 		},
-	// 		{
-	// 			OutputListener: observer,
-	// 			Content: beat.Event{
-	// 				Timestamp: time.Time{},
-	// 				Meta:      nil,
-	// 				Fields: map[string]interface{}{
-	// 					"msg":     "a message 2",
-	// 					"to_drop": "true"},
-	// 				Private:    nil,
-	// 				TimeSeries: false,
-	// 			},
-	// 		},
-	// 	},
-	// }
-	//
-	// wg.Add(len(b.EventList))
-	fmt.Println("before 1st message")
-	producer.Input() <- &sarama.ProducerMessage{Topic: "topic", Partition: 0, Offset: 0}
-	fmt.Println("before 2nd message")
-	producer.Input() <- &sarama.ProducerMessage{Topic: "topic", Partition: 0, Offset: 0}
-	fmt.Println("after both messages")
+	cfg, err := config.NewConfigFrom(map[string]interface{}{
+		"hosts":   []string{"localhost:9094"},
+		"topic":   "testTopic",
+		"timeout": "1s",
+	})
+	require.NoError(t, err, "could not create config from map")
 
-	wg.Add(2)
-	go func() {
-		fmt.Println("waiting success")
-		fmt.Println("success received:", <-producer.Successes())
-		wg.Done()
-	}()
-	go func() {
-		fmt.Println("waiting error")
-		fmt.Println("error received:", <-producer.Errors())
-		wg.Done()
-	}()
+	outGrup, err := makeKafka(
+		nil,
+		beat.Info{
+			Beat:        "libbeat",
+			IndexPrefix: "testbeat",
+			Logger:      logger},
+		outputs.NewStats(monitoring.NewRegistry()), cfg)
+	require.NoError(t, err, "could not create kafka output")
 
-	fmt.Println("waiting success and error to be processes")
-	wg.Wait()
-	fmt.Println("consumed both reports")
+	c, ok := outGrup.Clients[0].(*client)
+	require.Truef(t, ok, "Expected output to be of type %T", &client{})
 
-	require.NoError(t, producer.Close())
-	// wg.Wait()
-	// fmt.Println(*counter)
+	c.producer = producer
+	c.wg.Add(2)
+	go c.successWorker(c.producer.Successes())
+	go c.errorWorker(c.producer.Errors())
+
+	counter := &countListener{}
+	observer := publisher.OutputListener{Listener: counter}
+	b := pipeline.MockBatch{
+		Mu: sync.Mutex{},
+		EventList: []publisher.Event{
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg":     "a message 1",
+						"to_drop": "false"},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg":     "a message 2",
+						"to_drop": "true"},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+		},
+	}
+
+	err = c.Publish(context.Background(), &b)
+	require.NoError(t, err, "could not publish batch")
+
+	require.NoError(t, c.Close(), "failed closing kafka client")
+
+	assert.Equal(t, int64(2), counter.new.Load())
+	assert.Equal(t, int64(2), counter.acked.Load())
+	assert.Equal(t, int64(1), counter.dropped.Load())
 }
 
 type countListener struct {
-	new        atomic.Uint64
+	new        atomic.Int64
 	acked      atomic.Int64
 	dropped    atomic.Int64
 	deadLetter atomic.Int64
