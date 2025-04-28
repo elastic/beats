@@ -6,7 +6,7 @@ mapped_pages:
 # AWS module [filebeat-module-aws]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/aws.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/aws/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -229,10 +229,8 @@ Setting `enabled: false` in the unused fileset will silence the warning and it i
 
 CloudTrail monitors events for the account. If user creates a trail, it delivers those events as log files to a specific Amazon S3 bucket. The `cloudtrail` fileset does not read the CloudTrail Digest files that are delivered to the S3 bucket when Log File Integrity is turned on, it only reads the CloudTrail logs.
 
-:::{image} images/filebeat-aws-cloudtrail.png
-:alt: filebeat aws cloudtrail
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat aws cloudtrail](images/filebeat-aws-cloudtrail.png)
 
 
 ## cloudwatch fileset [_cloudwatch_fileset]
@@ -253,10 +251,8 @@ Please follow [enable access logs for classic load balancer](https://docs.aws.am
 
 This fileset comes with a predefined dashboard:
 
-:::{image} images/filebeat-aws-elb-overview.png
-:alt: filebeat aws elb overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat aws elb overview](images/filebeat-aws-elb-overview.png)
 
 
 ## s3access fileset [_s3access_fileset]
@@ -267,10 +263,8 @@ Please follow [how to enable server access logging](https://docs.aws.amazon.com/
 
 This fileset comes with a predefined dashboard:
 
-:::{image} images/filebeat-aws-s3access-overview.png
-:alt: filebeat aws s3access overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat aws s3access overview](images/filebeat-aws-s3access-overview.png)
 
 
 ## vpcflow fileset [_vpcflow_fileset]
@@ -279,10 +273,8 @@ VPC Flow Logs is a feature in AWS that enables users to capture information abou
 
 This fileset comes with a predefined dashboard:
 
-:::{image} images/filebeat-aws-vpcflow-overview.png
-:alt: filebeat aws vpcflow overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat aws vpcflow overview](images/filebeat-aws-vpcflow-overview.png)
 
 
 ## AWS Credentials Configuration [aws-credentials-options]

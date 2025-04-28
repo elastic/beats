@@ -6,7 +6,7 @@ mapped_pages:
 # PostgreSQL module [filebeat-module-postgresql]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/postgresql.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/postgresql/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -140,17 +140,13 @@ This module comes with two sample dashboards.
 
 The first dashboard is for regular logs.
 
-:::{image} images/filebeat-postgresql-overview.png
-:alt: filebeat postgresql overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat postgresql overview](images/filebeat-postgresql-overview.png)
 
 The second one shows the slowlogs of PostgreSQL. If `log_min_duration_statement` is not used, this dashboard will show incomplete or no data.
 
-:::{image} images/filebeat-postgresql-slowlog-overview.png
-:alt: filebeat postgresql slowlog overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat postgresql slowlog overview](images/filebeat-postgresql-slowlog-overview.png)
 
 
 ## Fields [_fields_44]

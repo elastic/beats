@@ -6,7 +6,7 @@ mapped_pages:
 # Google Workspace module [filebeat-module-google_workspace]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/google_workspace.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/google_workspace/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -29,14 +29,14 @@ Read the [quick start](/reference/filebeat/filebeat-installation-configuration.m
 
 It is compatible with a subset of applications under the [Google Reports API v1](https://developers.google.com/admin-sdk/reports/v1/get-start/getting-started). As of today it supports:
 
-| Google Workspace Service | Description |  |
+| Google Workspace Service | Description |
 | --- | --- | --- |
-| SAML [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml) [help](https://support.google.com/a/answer/7007375?hl=en&ref_topic=9027054) | View users’ successful and failed sign-ins to SAML applications. |  |
-| User Accounts [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/user-accounts) [help](https://support.google.com/a/answer/9022875?hl=en&ref_topic=9027054) | Audit actions carried out by users on their own accounts including password changes, account recovery details and 2-Step Verification enrollment. |  |
-| Login [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login) [help](https://support.google.com/a/answer/4580120?hl=en&ref_topic=9027054) | Track user sign-in activity to your domain. |  |
-| Admin [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings) [help](https://support.google.com/a/answer/4579579?hl=en&ref_topic=9027054) | View administrator activity performed within the Google Admin console. |  |
-| Drive [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive) [help](https://support.google.com/a/answer/4579696?hl=en&ref_topic=9027054) | Record user activity within Google Drive including content creation in such as Google Docs, as well as content created elsewhere that your users upload to Drive such as PDFs and Microsoft Word files. |  |
-| Groups [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups) [help](https://support.google.com/a/answer/6270454?hl=en&ref_topic=9027054) | Track changes to groups, group memberships and group messages. |  |
+| SAML [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml) [help](https://support.google.com/a/answer/7007375?hl=en&ref_topic=9027054) | View users’ successful and failed sign-ins to SAML applications. |
+| User Accounts [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/user-accounts) [help](https://support.google.com/a/answer/9022875?hl=en&ref_topic=9027054) | Audit actions carried out by users on their own accounts including password changes, account recovery details and 2-Step Verification enrollment. |
+| Login [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login) [help](https://support.google.com/a/answer/4580120?hl=en&ref_topic=9027054) | Track user sign-in activity to your domain. |
+| Admin [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings) [help](https://support.google.com/a/answer/4579579?hl=en&ref_topic=9027054) | View administrator activity performed within the Google Admin console. |
+| Drive [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive) [help](https://support.google.com/a/answer/4579696?hl=en&ref_topic=9027054) | Record user activity within Google Drive including content creation in such as Google Docs, as well as content created elsewhere that your users upload to Drive such as PDFs and Microsoft Word files. |
+| Groups [api docs](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups) [help](https://support.google.com/a/answer/6270454?hl=en&ref_topic=9027054) | Track changes to groups, group memberships and group messages. |
 
 
 ## Configure the module [_configure_the_module]
@@ -115,16 +115,16 @@ Google Workspace defaults to a 2 hour polling interval because Google reports ca
 
 This is a list of Google Workspace Reports fields that are mapped to ECS.
 
-| Google Workspace Reports | ECS Fields |  |
+| Google Workspace Reports | ECS Fields |
 | --- | --- | --- |
-| `items[].id.time` | `@timestamp` |  |
-| `items[].id.uniqueQualifier` | `event.id` |  |
-| `items[].id.applicationName` | `event.provider` |  |
-| `items[].events[].name` | `event.action` |  |
-| `items[].customerId` | `organization.id` |  |
-| `items[].ipAddress` | `source.ip`, related.ip`, `source.as.*`, `source.geo.*` |  |
-| `items[].actor.email` | `source.user.email`, `source.user.name`, `source.user.domain` |  |
-| `items[].actor.profileId` | `source.user.id` |  |
+| `items[].id.time` | `@timestamp` |
+| `items[].id.uniqueQualifier` | `event.id` |
+| `items[].id.applicationName` | `event.provider` |
+| `items[].events[].name` | `event.action` |
+| `items[].customerId` | `organization.id` |
+| `items[].ipAddress` | `source.ip`, `related.ip`, `source.as.*`, `source.geo.*` |
+| `items[].actor.email` | `source.user.email`, `source.user.name`, `source.user.domain` |
+| `items[].actor.profileId` | `source.user.id` |
 
 These are the common ones to all filesets.
 

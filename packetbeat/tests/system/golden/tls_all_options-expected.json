@@ -190,6 +190,7 @@
         "tls.server.hash.sha1": "7BB698386970363D2919CC5772846984FFD4A889",
         "tls.server.hash.sha256": "9250711C54DE546F4370E0C3D3A3EC45BC96092A25A4A71A1AFA396AF7047EB8",
         "tls.server.issuer": "CN=DigiCert SHA2 Secure Server CA,O=DigiCert Inc,C=US",
+        "tls.server.ja3s": "1f0e0e89ed879e47f04963f4c1ba1f17",
         "tls.server.not_after": "2020-12-02T12:00:00.000Z",
         "tls.server.not_before": "2018-11-28T00:00:00.000Z",
         "tls.server.subject": "CN=www.example.org,OU=Technology,O=Internet Corporation for Assigned Names and Numbers,L=Los Angeles,ST=California,C=US",
