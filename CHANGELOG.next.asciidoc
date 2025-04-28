@@ -123,6 +123,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
 - Journald input now works on Docker containers {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+
 
 *Heartbeat*
 
