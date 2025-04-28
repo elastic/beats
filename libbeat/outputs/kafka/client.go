@@ -60,11 +60,12 @@ type client struct {
 }
 
 type msgRef struct {
-	client *client
-	count  int32
-	total  int
-	failed []publisher.Event
-	batch  publisher.Batch
+	client    *client
+	count     int32
+	total     int
+	failed    []publisher.Event
+	succeeded []publisher.Event
+	batch     publisher.Batch
 
 	err error
 }
@@ -174,7 +175,7 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 
 	ref := &msgRef{
 		client: c,
-		count:  int32(len(events)), //nolint:gosec //keep old behavior
+		count:  int32(len(events)), //nolint:gosec // keep old behavior
 		total:  len(events),
 		failed: nil,
 		batch:  batch,
@@ -268,8 +269,10 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 }
 
 func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
-	defer c.wg.Done()
-	defer c.log.Debug("Stop kafka ack worker")
+	defer func() {
+		c.log.Debug("Stop kafka ack worker")
+		c.wg.Done()
+	}()
 
 	for libMsg := range ch {
 		msg, ok := libMsg.Metadata.(*message)
@@ -277,14 +280,16 @@ func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 			c.log.Debug("Failed to assert libMsg.Metadata to *message")
 			return
 		}
-		msg.ref.done()
+		msg.ref.success(msg)
 	}
 }
 
 func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	breakerOpen := false
-	defer c.wg.Done()
-	defer c.log.Debug("Stop kafka error handler")
+	defer func() {
+		c.log.Debug("Stop kafka error handler")
+		c.wg.Done()
+	}()
 
 	for errMsg := range ch {
 		msg, ok := errMsg.Msg.Metadata.(*message)
@@ -379,6 +384,11 @@ func (r *msgRef) done() {
 	r.dec()
 }
 
+func (r *msgRef) success(msg *message) {
+	r.succeeded = append(r.succeeded, msg.data)
+	r.dec()
+}
+
 func (r *msgRef) fail(msg *message, err error) {
 	switch {
 	case errors.Is(err, sarama.ErrInvalidMessage):
@@ -428,15 +438,8 @@ func (r *msgRef) dec() {
 
 		stats.RetryableErrors(failed)
 		if success > 0 {
-			// TODO(Anderson): fix it: find a solution for that
-			// does it ever happens? a mix of failures and successes where the
-			// success won't be reported to successWorker?
-			// If success > 0 and also every of the success is also reported to
-			// client.successWorker(ch <-chan *sarama.ProducerMessage), it means
-			// the successes are being counted twice.
-			// Also if it's been reported to successWorker, no need to count it
-			// here.
-			stats.AckedEvents(make([]publisher.Event, success))
+			stats.AckedEvents(r.succeeded)
+			r.succeeded = nil
 		}
 
 		r.client.log.Debugf("Kafka publish failed with: %+v", err)
