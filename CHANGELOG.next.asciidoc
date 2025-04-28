@@ -113,7 +113,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
-
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
 
 *Heartbeat*
 
