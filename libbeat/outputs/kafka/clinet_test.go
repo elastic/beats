@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/sarama/mocks"
 )
 
-func TestClient(t *testing.T) {
+func TestClientOutputListener(t *testing.T) {
 	logger := logp.NewTestingLogger(t, "")
 	cfg, err := config.NewConfigFrom(map[string]interface{}{
 		"hosts":   []string{"localhost:9094"},
@@ -264,7 +264,7 @@ func TestBasic(t *testing.T) {
 					Timestamp: time.Time{},
 					Meta:      nil,
 					Fields: map[string]interface{}{
-						"msg":     "a message 1",
+						"msg":     "message 1",
 						"to_drop": "false"},
 					Private:    nil,
 					TimeSeries: false,
@@ -276,7 +276,7 @@ func TestBasic(t *testing.T) {
 					Timestamp: time.Time{},
 					Meta:      nil,
 					Fields: map[string]interface{}{
-						"msg":     "a message 2",
+						"msg":     "message 2",
 						"to_drop": "true"},
 					Private:    nil,
 					TimeSeries: false,
