@@ -47,44 +47,6 @@ func TestClient(t *testing.T) {
 	c, ok := outGrup.Clients[0].(*client)
 	require.Truef(t, ok, "Expected output to be of type %T", &client{})
 
-	// producer := mocks.NewAsyncProducer(t, nil)
-	// producer.ExpectInputWithMessageCheckerFunctionAndSucceed(func(m *sarama.ProducerMessage) error {
-	// 	defer wg.Done()
-	// 	bs, err := m.Value.Encode()
-	// 	assert.NoError(t, err, "could not encode message")
-	//
-	// 	dic := map[string]any{}
-	// 	err = json.Unmarshal(bs, &dic)
-	// 	if err != nil {
-	// 		return fmt.Errorf("could not decode message: %w", err)
-	// 	}
-	//
-	// 	fmt.Println("data received: ", dic)
-	//
-	// 	// if dic["to_drop"].(string) == "true" {
-	// 	// 	return fmt.Errorf("to_drop == true, returning an error")
-	// 	// }
-	// 	return nil
-	// })
-	// producer.ExpectInputWithMessageCheckerFunctionAndFail(func(m *sarama.ProducerMessage) error {
-	// 	defer wg.Done()
-	// 	bs, err := m.Value.Encode()
-	// 	assert.NoError(t, err, "could not encode message")
-	//
-	// 	dic := map[string]any{}
-	// 	err = json.Unmarshal(bs, &dic)
-	// 	if err != nil {
-	// 		return fmt.Errorf("could not decode message: %w", err)
-	// 	}
-	//
-	// 	fmt.Println("data received: ", dic)
-	//
-	// 	// if dic["to_drop"].(string) == "true" {
-	// 	// 	return fmt.Errorf("anfail to_drop == true, returning an error")
-	// 	// }
-	// 	return nil
-	// }, fmt.Errorf("to_drop == true, returning an error"))
-
 	producer := &mockProducer{
 		inCh:      make(chan *sarama.ProducerMessage, 2),
 		successCh: make(chan *sarama.ProducerMessage, 1),
@@ -153,8 +115,12 @@ func TestClient(t *testing.T) {
 	require.NoError(t, producer.run())
 	require.NoError(t, producer.run())
 
-	require.NoError(t, c.Close())
-	fmt.Println(counter)
+	err = c.Close()
+	require.NoError(t, err, "could not kafka client")
+
+	assert.Equal(t, 2, counter.new.Load())
+	assert.Equal(t, 2, counter.acked.Load())
+	assert.Equal(t, 1, counter.dropped.Load())
 }
 
 type mockProducer struct {
@@ -189,7 +155,7 @@ func (m *mockProducer) run() error {
 }
 
 func (m *mockProducer) AsyncClose() {
-	m.Close()
+	_ = m.Close()
 }
 
 func (m *mockProducer) Close() error {
@@ -253,9 +219,14 @@ func (m *mockProducer) AddMessageToTxn(msg *sarama.ConsumerMessage, groupId stri
 
 func TestBasic(t *testing.T) {
 	wg := sync.WaitGroup{}
-	producer := mocks.NewAsyncProducer(t, nil)
+
+	cfg := sarama.NewConfig()
+	cfg.Producer.Return.Successes = true
+	cfg.Producer.Return.Errors = true
+
+	producer := mocks.NewAsyncProducer(t, cfg)
 	producer.ExpectInputAndSucceed()
-	producer.ExpectInputAndFail(errors.New("a error"))
+	producer.ExpectInputAndFail(errors.New("a error: ExpectInputAndFail"))
 	// producer.ExpectInputWithMessageCheckerFunctionAndSucceed(func(m *sarama.ProducerMessage) error {
 	// 	defer wg.Done()
 	// 	fmt.Println("ExpectInputWithMessageCheckerFunctionAndSucceed")
@@ -334,20 +305,19 @@ func TestBasic(t *testing.T) {
 	producer.Input() <- &sarama.ProducerMessage{Topic: "topic", Partition: 0, Offset: 0}
 	fmt.Println("after both messages")
 
-	producer.Input()
-
 	wg.Add(2)
 	go func() {
 		fmt.Println("waiting success")
-		fmt.Println("success:", <-producer.Successes())
+		fmt.Println("success received:", <-producer.Successes())
 		wg.Done()
 	}()
 	go func() {
 		fmt.Println("waiting error")
-		fmt.Println("error:", <-producer.Errors())
+		fmt.Println("error received:", <-producer.Errors())
 		wg.Done()
 	}()
 
+	fmt.Println("waiting success and error to be processes")
 	wg.Wait()
 	fmt.Println("consumed both reports")
 
