@@ -23,6 +23,7 @@ import (
 
 	"errors"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -144,7 +145,7 @@ func TestFindMatchingAddress(t *testing.T) {
 		},
 	}
 
-	finder := brokerFinder{Net: &dummyNet{}}
+	finder := brokerFinder{Net: &dummyNet{}, logger: logptest.NewTestingLogger(t, "")}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
 			i, found := finder.findAddress(c.address, c.brokers)
