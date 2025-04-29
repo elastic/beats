@@ -228,6 +228,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 
 
 *Heartbeat*
