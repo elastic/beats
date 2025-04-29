@@ -11,8 +11,9 @@ scms:
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      branch: main
+      branch: '{{ .scm.branch }}'
       commitusingapi: true
+      force: false
 
 actions:
   beats:
