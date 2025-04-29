@@ -230,7 +230,6 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		args[0] = dest
 
 		okEvents, args := c.serializeEvents(args, 1, data)
-		// c.observer.PermanentErrors(len(data) - len(okEvents))
 		if (len(args) - 1) == 0 {
 			return nil, nil
 		}
@@ -245,9 +244,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 			return okEvents, err
 		}
 
-		for _, e := range okEvents {
-			c.observer.AckedEvent(e)
-		}
+		c.observer.AckedEvents(okEvents)
 		return nil, nil
 	}
 }
@@ -306,7 +303,11 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 	}
 }
 
-func (c *client) serializeEvents(to []interface{}, i int, data []publisher.Event) ([]publisher.Event, []interface{}) {
+func (c *client) serializeEvents(
+	to []interface{},
+	i int,
+	data []publisher.Event,
+) ([]publisher.Event, []interface{}) {
 
 	succeeded := data
 	for _, d := range data {
