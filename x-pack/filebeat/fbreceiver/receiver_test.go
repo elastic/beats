@@ -58,58 +58,18 @@ func TestNewReceiver(t *testing.T) {
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Len(t, logs["r1"], 1)
-		},
-	})
-}
-
-func TestReceiverDefaultProcessors(t *testing.T) {
-	config := Config{
-		Beatconfig: map[string]interface{}{
-			"filebeat": map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{
-						"type":    "benchmark",
-						"enabled": true,
-						"message": "test",
-						"count":   1,
-					},
-				},
-			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
-			},
-			"logging": map[string]interface{}{
-				"level": "debug",
-				"selectors": []string{
-					"*",
-				},
-			},
-			"path.home": t.TempDir(),
-		},
-	}
-
-	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T: t,
-		Receivers: []oteltest.ReceiverConfig{
-			{
-				Name:    "r1",
-				Config:  &config,
-				Factory: NewFactory(),
-			},
-		},
-		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
-			require.Len(t, logs["r1"], 1)
-
-			processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
-				FilterMessageSnippet("add_host_metadata").
-				FilterMessageSnippet("add_cloud_metadata").
-				FilterMessageSnippet("add_docker_metadata").
-				FilterMessageSnippet("add_kubernetes_metadata").
-				Len() == 1
-			require.True(t, processorsLoaded, "processors not loaded")
-			// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
-			require.Contains(t, logs["r1"][0].Flatten(), "host.architecture")
+			require.Lenf(t, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
+			assert.Condition(t, func() bool {
+				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
+					FilterMessageSnippet("add_host_metadata").
+					FilterMessageSnippet("add_cloud_metadata").
+					FilterMessageSnippet("add_docker_metadata").
+					FilterMessageSnippet("add_kubernetes_metadata").
+					Len() == 1
+				assert.True(t, processorsLoaded, "processors not loaded")
+				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
+				return assert.Contains(t, logs["r1"][0].Flatten(), "host.architecture")
+			}, "failed to check processors loaded")
 		},
 	})
 }

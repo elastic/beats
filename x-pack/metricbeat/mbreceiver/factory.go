@@ -14,9 +14,13 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
+	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
+	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -33,9 +37,15 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("could not convert otel config to metricbeat config")
 	}
 	settings := cmd.MetricbeatSettings(Name)
+	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
+	if err != nil {
+		return nil, fmt.Errorf("error making global processors: %w", err)
+	}
+	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
+	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
-	b, err := instance.NewBeatReceiver(settings, cfg.Beatconfig, false, consumer, set.Logger.Core())
+	b, err := instance.NewBeatReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
@@ -66,6 +76,26 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		HttpConf: httpConf.HTTP,
 	}
 	return &metricbeatReceiver{BeatReceiver: beatReceiver}, nil
+}
+
+func defaultProcessors() []mapstr.M {
+	// processors:
+	// - add_host_metadata:
+	// 	when.not.contains.tags: forwarded
+	// - add_cloud_metadata: ~
+	// - add_docker_metadata: ~
+	// - add_kubernetes_metadata: ~
+
+	return []mapstr.M{
+		{
+			"add_host_metadata": mapstr.M{
+				"when.not.contains.tags": "forwarded",
+			},
+		},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{"add_kubernetes_metadata": nil},
+	}
 }
 
 func NewFactory() receiver.Factory {
