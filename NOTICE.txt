@@ -41602,7 +41602,6 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
-<<<<<<< HEAD
 Dependency : github.com/evanphx/json-patch
 Version: v5.6.0+incompatible
 Licence type (autodetected): BSD-3-Clause
@@ -41635,7 +41634,6 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-=======
 Dependency : github.com/envoyproxy/go-control-plane
 Version: v0.13.4
 Licence type (autodetected): Apache-2.0
@@ -42478,7 +42476,6 @@ Contents of probable licence file $GOMODCACHE/github.com/envoyproxy/protoc-gen-v
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
->>>>>>> 6fd122401 (Update Prometheus library to v 0.300.1 (#43540))
 
 
 --------------------------------------------------------------------------------
