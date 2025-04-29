@@ -106,8 +106,8 @@ The Docker image provides several methods for configuring Filebeat. The conventi
 
 Download this example configuration file as a starting point:
 
-```sh
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/docker/filebeat.docker.yml
+```sh subs=true
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/docker/filebeat.docker.yml
 ```
 
 

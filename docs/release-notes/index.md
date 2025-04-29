@@ -16,6 +16,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 % ### Features and enhancements [beats-versionext-features-enhancements]
 
 % ### Fixes [beats-versionext-fixes]
+* Filebeat Journald input now works on Docker containers (except Wolfi) [#41278]({{beats-issue}}41278) [#44040]({{beats-issue}}44040) [#44056]({{beats-pull}}44056)
 
 ## 9.0.0 [beats-900-release-notes]
 

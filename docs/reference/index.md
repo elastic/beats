@@ -30,9 +30,7 @@ Windows event logs
 
 {{beats}} can send data directly to {{es}} or via [{{ls}}](https://www.elastic.co/products/logstash), where you can further process and enhance the data, before visualizing it in [{{kib}}](https://www.elastic.co/products/logstash).
 
-:::{image} libbeat/images/beats-platform.png
-:alt: Beats Platform
-:::
+![Beats Platform](libbeat/images/beats-platform.png)
 
 Want to get up and running quickly with infrastructure metrics monitoring and centralized log analytics? Try out the {{metrics-app}} and the {{logs-app}} in {{kib}}. For more details, see [Analyze metrics](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) and [Monitor logs](docs-content://solutions/observability/logs/explore-logs.md).
 

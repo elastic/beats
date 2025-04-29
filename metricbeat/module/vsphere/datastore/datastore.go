@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/vmware/govmomi"
@@ -99,7 +100,9 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 		return fmt.Errorf("error in NewClient: %w", err)
 	}
 	defer func() {
-		if err := client.Logout(ctx); err != nil {
+		err := vSphereClientUtil.Logout(ctx, client)
+
+		if err != nil {
 			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()

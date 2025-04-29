@@ -29,18 +29,15 @@ The `dynamodb` metricset of aws module allows you to monitor your AWS DynamoDB d
 
 The aws dynamodb metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-dynamodb-overview.png
-:alt: metricbeat aws dynamodb overview
-:::
+![metricbeat aws dynamodb overview](images/metricbeat-aws-dynamodb-overview.png)
 
 
 ## Metrics [_metrics_2]
 
 Please see more details for each metric in [Amazon DynamoDB Metrics](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/metrics-dimensions.html).
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | SuccessfulRequestLatency | Average |
 | OnlineIndexPercentageProgress | Average |
 | ProvisionedWriteCapacityUnits | Average |

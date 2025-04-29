@@ -183,8 +183,7 @@ The following tables explain the meaning of the most important fields under `.mo
 | `.output.events.acked` | Integer | Number of events acknowledged by the output destination. | Generally, we want this number to be the same as `.output.events.total` as this indicates that the output destination has reliably received all the events sent to it. |
 | `.output.events.failed` | Integer | Number of events that Auditbeat tried to send to the output destination, but the destination failed to receive them. | Generally, we want this field to be absent or its value to be zero. When the value is greater than zero, it’s useful to check Auditbeat’s logs right before this log entry’s `@timestamp` to see if there are any connectivity issues with the output destination. Note that failed events are not lost or dropped; they will be sent back to the publisher pipeline for retrying later. |
 | `.output.events.dropped` | Integer | Number of events that Auditbeat gave up sending to the output destination because of a permanent (non-retryable) error. |
-|`.output.events.dead_letter` |
-| Integer | Number of events that Auditbeat successfully sent to a configured dead letter index after they failed to ingest in the primary index. |
+| `.output.events.dead_letter` | Integer | Number of events that Auditbeat successfully sent to a configured dead letter index after they failed to ingest in the primary index. |
 | `.output.write.latency` | Object | Reports statistics on the time to send an event to the connected output, in milliseconds. This can be used to diagnose delays and performance issues caused by I/O or output configuration. This metric is available for the Elasticsearch, file, redis, and logstash outputs. |
 
 | Field path (relative to `.monitoring.metrics.libbeat.pipeline`) | Type | Meaning | Troubleshooting hints |
