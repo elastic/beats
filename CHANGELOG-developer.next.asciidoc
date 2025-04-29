@@ -75,6 +75,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Bugfixes
 
+- Fix collecting multiple times the same unchanged alerts in filebeat - microsoft module - m365_defender fileset.{pull}44109[44109]
 - Handle the starting of namespace and node watchers for metadata enrichment according to `add_resource_metadata` configuration.{pull}38762[38762]
 - Fix multiple metricbeat instances reporting same metrics when using autodiscover with provider kubernetes, and ensure leader elector is always running in autodiscover mode.{pull}38471[38471]
 - Fix how Prometheus histograms are calculated when percentiles are provide.{pull}36537[36537]
