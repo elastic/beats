@@ -32,7 +32,7 @@ response.split:
       keep_parent: true
 cursor:
   lastUpdateTime:
-    value: "[[.last_event.lastUpdateTime]]"
+    value: "[[.first_event.lastUpdateTime]]" # alerts are returned in ascending order
     ignore_empty_value: true
 
 {{ else if eq .input "file" }}
