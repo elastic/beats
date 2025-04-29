@@ -10,6 +10,14 @@ queue_rules:
     conditions:
       - check-success=buildkite/beats
       - check-success=CLA
+defaults:
+  actions:
+    backport:
+      title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+      assignees:
+        - "{{ author }}"
+      labels:
+        - "backport"
 pull_request_rules:
   - name: self-assign PRs
     conditions:
