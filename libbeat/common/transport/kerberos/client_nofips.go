@@ -46,7 +46,7 @@ func NewClient(config *Config, httpClient *http.Client, esurl string) (Client, e
 	case authPassword:
 		krbClient = krbclient.NewWithPassword(config.Username, config.Realm, config.Password, krbConf)
 	default:
-		return nil, InvalidAuthType
+		return nil, ErrInvalidAuthType
 	}
 
 	return spnego.NewClient(krbClient, httpClient, ""), nil

@@ -1,6 +1,21 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
+
+  - label: "Validate catalog-info"
+    if: build.pull_request.id != null
+    plugins:
+      monorepo-diff#v1.3.0:
+        diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+        wait: true
+        watch:
+          # if our catalog-info.yaml is changed, make sure it's well-formed according to our internal standards as well as Backstage's validation
+          - path: "catalog-info.yaml"
+            config:
+              command: "/agent/check-catalog-info.sh"
+              agents:
+                image: "docker.elastic.co/ci-agent-images/pipelib:0.13.0@sha256:190464950de81cb3390bd5e07bb1cc171dd4a765c1ce5de58ebca476f9a6839f"
+
   - label: "Trigger Auditbeat"
     if: build.pull_request.id != null
     plugins:
@@ -657,3 +672,10 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
+
+  # Triggers Serverless Beats tests in the elastic-agent repo for main/release branches
+  - label: "Serverless beats tests(elastic-agent)"
+    if: build.pull_request.id == null
+    trigger: "beats-agent-serverless-tests"
+    build:
+      branch: "main"

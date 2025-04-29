@@ -7,6 +7,7 @@ package cel
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -734,6 +735,72 @@ var inputTests = []struct {
 							},
 						},
 					},
+				},
+			},
+		},
+	},
+	{
+		name:   "GET_headers",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval":         1,
+			"resource.headers": http.Header{"foo": {"bar"}},
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			enc := json.NewEncoder(w)
+			enc.Encode(map[string][]any{"events": {r.Header.Get("foo")}})
+		},
+		want: []map[string]interface{}{
+			{
+				"events": []any{"bar"},
+			},
+		},
+	},
+	{
+		name:   "GET_max_body_size_ok",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval":               1,
+			"resource.max_body_size": int64(6),
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [{"message": string(body)}]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("hello"))
+		},
+		want: []map[string]interface{}{
+			{
+				"message": "hello",
+			},
+		},
+	},
+	{
+		name:   "GET_max_body_size_too_big",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval":               1,
+			"resource.max_body_size": int64(4),
+			"program": `
+	get(state.url).Body.as(body, {
+		"events": [string(body)]
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("hello"))
+		},
+		want: []map[string]interface{}{
+			{
+				"error": map[string]any{
+					"message": string("failed eval: ERROR: <input>:2:16: response body too big\n |  get(state.url).Body.as(body, {\n | ...............^"),
 				},
 			},
 		},
@@ -1977,7 +2044,7 @@ func TestInput(t *testing.T) {
 				t.Errorf("unexpected number of cursors events: got:%d want at least:%d", len(client.cursors), len(test.wantCursor))
 				test.wantCursor = test.wantCursor[:len(client.published)]
 			}
-			client.published = client.published[:len(test.want)]
+			client.cursors = client.cursors[:len(test.wantCursor)]
 			for i, got := range client.cursors {
 				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
 					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
@@ -2138,7 +2205,7 @@ func digestAuthHandler(user, pass, realm, nonce string, handle http.HandlerFunc)
 	chal := &digest.Challenge{
 		Realm:     realm,
 		Nonce:     nonce,
-		Algorithm: "MD5",
+		Algorithm: "SHA-256",
 		QOP:       []string{"auth"},
 	}
 	return func(w http.ResponseWriter, r *http.Request) {

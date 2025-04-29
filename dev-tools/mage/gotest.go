@@ -33,6 +33,7 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"golang.org/x/sys/execabs"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -60,7 +61,7 @@ type TestBinaryArgs struct {
 }
 
 func makeGoTestArgs(name string) GoTestArgs {
-	fileName := fmt.Sprintf("build/TEST-go-%s", strings.Replace(strings.ToLower(name), " ", "_", -1))
+	fileName := fmt.Sprintf("build/TEST-go-%s", strings.ReplaceAll(strings.ToLower(name), " ", "_"))
 	params := GoTestArgs{
 		TestName:        name,
 		Race:            RaceDetector,
@@ -76,13 +77,15 @@ func makeGoTestArgs(name string) GoTestArgs {
 	return params
 }
 
-func makeGoTestArgsForModule(name, module string) GoTestArgs {
-	fileName := fmt.Sprintf("build/TEST-go-%s-%s", strings.Replace(strings.ToLower(name), " ", "_", -1),
-		strings.Replace(strings.ToLower(module), " ", "_", -1))
+func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
+	fileName := fmt.Sprintf(
+		"build/TEST-go-%s-%s",
+		strings.ReplaceAll(strings.ToLower(name), " ", "_"),
+		strings.ReplaceAll(strings.ToLower(pkg), " ", "_"))
 	params := GoTestArgs{
-		TestName:        fmt.Sprintf("%s-%s", name, module),
+		TestName:        fmt.Sprintf("%s-%s", name, pkg),
 		Race:            RaceDetector,
-		Packages:        []string{fmt.Sprintf("./module/%s/...", module)},
+		Packages:        []string{fmt.Sprintf("./module/%s", pkg)},
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -93,15 +96,54 @@ func makeGoTestArgsForModule(name, module string) GoTestArgs {
 	return params
 }
 
+// fetchGoPackages retrieves all Go packages for a beats module. It uses
+// "go list -tags integration" to obtain the list of packages.
+// Example: for the "kafka" module inside "metricbeat/module", it'll return:
+//
+//	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
+func fetchGoPackages(module string) ([]string, error) {
+	cmd := execabs.Command(
+		"go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module))
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	rawPackages := strings.Split(strings.TrimSpace(string(output)), "\n")
+	var pkgs []string
+	for _, pkg := range rawPackages {
+		tmp := strings.Split(pkg, "/module/")
+		if len(tmp) != 2 {
+			continue
+		}
+
+		pkgs = append(pkgs, tmp[1])
+	}
+	return pkgs, nil
+}
+
 // testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
 // environment variables, e.g: TEST_TAGS=aws,azure.
+// If the FIPS env var is set to true, the requirefips tag is injected.
 func testTagsFromEnv() []string {
-	return strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
+	tags := strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
+	if FIPSBuild {
+		tags = append(tags, "requirefips")
+	}
+	return tags
 }
 
 // DefaultGoTestUnitArgs returns a default set of arguments for running
 // all unit tests. We tag unit test files with '!integration'.
 func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
+
+// DefaultGoFIPSOnlyTestArgs returns a default set of arguments for running
+// fips140=only unit tests.
+func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
+	args := makeGoTestArgs("Unit-FIPS-only")
+	args.Env["GODEBUG"] = "fips140=only"
+	return args
+}
 
 // DefaultGoTestIntegrationArgs returns a default set of arguments for running
 // all integration tests. We tag integration test files with 'integration'.
@@ -141,10 +183,10 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 	return args
 }
 
-// GoTestIntegrationArgsForModule returns a default set of arguments for running
+// GoTestIntegrationArgsForPackage returns a default set of arguments for running
 // module integration tests. We tag integration test files with 'integration'.
-func GoTestIntegrationArgsForModule(module string) GoTestArgs {
-	args := makeGoTestArgsForModule("Integration", module)
+func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
+	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
 	return args
@@ -158,7 +200,8 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 	}
 }
 
-// GoTestIntegrationForModule executes the Go integration tests sequentially.
+// GoTestIntegrationForModule executes the Go integration tests for each Go
+// package within a module sequentially.
 // Currently, all test cases must be present under "./module" directory.
 //
 // Motivation: previous implementation executed all integration tests at once,
@@ -184,6 +227,8 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 	return nil
 }
 
+// goTestIntegrationForSingleModule sequentially executes the tests every Go
+// packages within a module.
 func goTestIntegrationForSingleModule(ctx context.Context, module string) error {
 	modulesFileInfo, err := os.ReadDir("./module")
 	if err != nil {
@@ -210,11 +255,20 @@ func goTestIntegrationForSingleModule(ctx context.Context, module string) error 
 			return fmt.Errorf("test setup failed for module %s: %w", fi.Name(), err)
 		}
 		err = runners.Test("goIntegTest", func() error {
-			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
+			pkgs, err := fetchGoPackages("module/" + fi.Name())
 			if err != nil {
-				return err
+				return fmt.Errorf("could not list packages for module %s: %w",
+					fi.Name(), err)
 			}
-			return nil
+
+			var errs []error
+			for _, pkg := range pkgs {
+				err := GoTest(ctx, GoTestIntegrationArgsForPackage(pkg))
+				if err != nil {
+					errs = append(errs, err)
+				}
+			}
+			return errors.Join(errs...)
 		})
 		if err != nil {
 			fmt.Printf("Error: failed to run integration tests for module %s:\n%v\n", fi.Name(), err)
@@ -292,9 +346,9 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 		}
 	}
 	if len(params.Tags) > 0 {
-		params := strings.Join(params.Tags, " ")
+		params := strings.Join(params.Tags, ",")
 		if params != "" {
-			testArgs = append(testArgs, "-tags", params)
+			testArgs = append(testArgs, "-tags="+params)
 		}
 	}
 	if params.CoverageProfileFile != "" {

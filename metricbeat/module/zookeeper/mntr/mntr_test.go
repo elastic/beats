@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -88,7 +88,7 @@ func TestEventMapping(t *testing.T) {
 		},
 	}
 
-	logger := logp.NewLogger("mntr_test")
+	logger := logptest.NewTestingLogger(t, "mntr_test")
 
 	for i, sample := range mntrSamples {
 		t.Run(sample.Version, func(t *testing.T) {

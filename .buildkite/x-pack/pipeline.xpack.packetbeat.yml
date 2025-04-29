@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
@@ -18,6 +16,7 @@ env:
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_WIN_2025: "family/platform-ingest-beats-windows-2025"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -233,6 +232,61 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 2022 System Tests"
 
+      - label: ":windows: x-pack/packetbeat: Win 2025 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/packetbeat
+          mage build unitTest
+        key: "mandatory-win-2025-unit-tests"
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2025}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Win 2025 Unit Tests"
+
+      - label: ":windows: x-pack/packetbeat: Win 2025 System Tests"
+        key: "mandatory-win-2025-system-tests"
+        command: |
+          .buildkite/scripts/gcp_auth.ps1
+          Set-Location -Path x-pack/packetbeat
+          mage systemTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2025}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Win 2025 System Tests"
+
   - group: "Extended Windows Tests"
     key: "x-pack-packetbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
@@ -349,7 +403,7 @@ steps:
 
   - group: "Extended Tests"
     key: "x-pack-packetbeat-extended-linux-arm-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(arm).*/
 
     steps:
       - label: ":ubuntu: x-pack/packetbeat: Ubuntu arm64 Unit Tests"
@@ -378,66 +432,6 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":mac: x-pack/packetbeat: macOS x86_64 Unit Tests"
-        key: "extended-macos-unit-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/packetbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "x-pack/packetbeat/build/*.xml"
-          - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/packetbeat: macOS x86_64 Unit Tests"
-
-      - label: ":mac: x-pack/packetbeat: macOS arm64 Unit Tests"
-        key: "macos-arm64-unit-tests-extended"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/packetbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "x-pack/packetbeat/build/*.xml"
-          - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/packetbeat: macOS arm64 Unit Tests"
-
   - group: "Packaging"
     key: "x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
@@ -449,7 +443,7 @@ steps:
       - label: ":ubuntu: x-pack/packetbeat: Packaging Linux"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/packetbeat
         retry:
@@ -469,8 +463,7 @@ steps:
       - label: ":ubuntu: x-pack/packetbeat: Packaging arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/packetbeat
         retry:

@@ -19,10 +19,26 @@ package statestore
 
 import (
 	"sync/atomic"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/go-concert/unison"
 )
+
+// States is a collection of states backed by one or more persistent stores
+// that may be differentiated by input type.
+type States interface {
+	// StoreFor returns the storage registry for the given type.
+	// The value of typ is expected to have been obtained from
+	// cursor.InputManager.Type and represents the input type.
+	// Whether the receiver considers the value of typ is
+	// implementation dependent.
+	StoreFor(typ string) (*Store, error)
+
+	// CleanupInterval returns the time between garbage collection
+	// runs for the stores owned by the States.
+	CleanupInterval() time.Duration
+}
 
 type sharedStore struct {
 	reg      *Registry
@@ -116,7 +132,7 @@ func (s *Store) Get(key string, into interface{}) error {
 // Set returns an error if the store has been closed, the value can not be
 // encoded by the store, or the storage backend did failed.
 func (s *Store) Set(key string, from interface{}) error {
-	const operation = "store/get"
+	const operation = "store/set"
 	if err := s.active.Add(1); err != nil {
 		return &ErrorClosed{operation: operation, name: s.shared.name}
 	}

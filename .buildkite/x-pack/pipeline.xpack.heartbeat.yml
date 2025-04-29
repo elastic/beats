@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
@@ -128,6 +126,9 @@ steps:
         artifact_paths:
           - "x-pack/heartbeat/build/*.xml"
           - "x-pack/heartbeat/build/*.json"
+          - "x-pack/heartbeat/build/integration-tests/*"
+          - "x-pack/heartbeat/build/integration-tests/Test*/*"
+          - "x-pack/heartbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/heartbeat/build/TEST-*.xml"
@@ -278,71 +279,6 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Win 2019 Unit Tests"
 
-  - group: "Extended Tests"
-    key: "x-pack-heartbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-
-    steps:
-      - label: ":mac: x-pack/heartbeat: macOS x86_64 Unit Tests"
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          withNodeJSEnv $ASDF_NODEJS_VERSION
-          installNodeJsDependencies
-          cd x-pack/heartbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "x-pack/heartbeat/build/*.xml"
-          - "x-pack/heartbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/heartbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/heartbeat: macOS x86_64 Extended Tests"
-
-      - label: ":mac: x-pack/heartbeat: macOS arm64 Unit Tests"
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          withNodeJSEnv $ASDF_NODEJS_VERSION
-          installNodeJsDependencies
-          cd x-pack/heartbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "x-pack/heartbeat/build/*.xml"
-          - "x-pack/heartbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/heartbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/heartbeat: macOS arm64 Extended Tests"
-
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
     # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
@@ -359,7 +295,7 @@ steps:
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux"
         key: "packaging-linux"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:
@@ -379,8 +315,7 @@ steps:
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux arm64"
         key: "packaging-arm"
         env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
           .buildkite/scripts/packaging/packaging.sh x-pack/heartbeat
         retry:

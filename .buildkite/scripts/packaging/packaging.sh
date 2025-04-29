@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
 #
 # Centralise the mage package for a given beat in Buildkite.
-# It enables multi-arch builds to avoid the exec format errors when 
-# attempting to build arm64 inside arm64 workers.
-# For further details, see https://github.com/elastic/elastic-agent/pull/6948
-# and https://github.com/elastic/golang-crossbuild/pull/507
 #
 
 set -ueo pipefail
 
-
 BEAT_DIR=${1:?-"Error: Beat directory must be specified."}
 
-#Use newer multiarch support for packaging
-docker run --privileged --rm tonistiigi/binfmt:master --install all
+# shellcheck source=/dev/null
+source .buildkite/scripts/qemu.sh
 
 cd $BEAT_DIR
 mage package
+
+echo "Generated packages in ${BEAT_DIR}/build/distributions:"
+ls -lah "build/distributions"

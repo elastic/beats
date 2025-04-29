@@ -28,7 +28,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -36,6 +35,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func BenchmarkFilestream(b *testing.B) {
@@ -147,9 +147,10 @@ func TestTakeOverTags(t *testing.T) {
 			filename := generateFile(t, t.TempDir(), 5)
 			cfg := fmt.Sprintf(`
 type: filestream
+id: foo
 prospector.scanner.check_interval: 1s
 prospector.scanner.fingerprint.enabled: false
-take_over: %t
+take_over.enabled: %t
 paths:
     - %s`, testCase.takeOver, filename)
 			runner := createFilestreamTestRunner(context.Background(), t, testCase.name, cfg, 5, true)
@@ -179,7 +180,7 @@ func runFilestreamBenchmark(b *testing.B, testID string, cfg string, expEventCou
 // with the given configuration and event limit.
 // `testID` must be unique for each test run
 // `cfg` must be a valid YAML string containing valid filestream configuration
-// `eventLimit` is an amount of produced events after which the filestream will shutdown
+// `eventLimit` is an amount of produced events after which the filestream will shut down
 // `collectEvents` if `true` the runner will return a list of all events produced by the filestream input.
 // Events should not be collected in benchmarks due to high extra costs of using the channel.
 //
@@ -194,10 +195,15 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	require.NoError(b, err)
 
 	ctx, cancel := context.WithCancel(ctx)
-	context := v2.Context{
-		Logger:      logger,
-		ID:          testID,
-		Cancelation: ctx,
+	v2ctx := v2.Context{
+		ID:              testID,
+		IDWithoutName:   testID,
+		Name:            "filestream-test",
+		Agent:           beat.Info{},
+		Cancelation:     ctx,
+		StatusReporter:  nil,
+		MetricsRegistry: monitoring.NewRegistry(),
+		Logger:          logger,
 	}
 
 	connector, events := newTestPipeline(eventLimit, collectEvents)
@@ -215,7 +221,7 @@ func createFilestreamTestRunner(ctx context.Context, b testing.TB, testID string
 	}()
 
 	return func(t testing.TB) []beat.Event {
-		err := input.Run(context, connector)
+		err := input.Run(v2ctx, connector)
 		require.NoError(b, err)
 
 		return out
@@ -235,9 +241,11 @@ func generateFile(t testing.TB, dir string, lineCount int) string {
 	return filename
 }
 
-func createTestStore(t testing.TB) loginp.StateStore {
+func createTestStore(t testing.TB) statestore.States {
 	return &testStore{registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend())}
 }
+
+var _ statestore.States = (*testStore)(nil)
 
 type testStore struct {
 	registry *statestore.Registry
@@ -247,7 +255,7 @@ func (s *testStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testStore) Access(_ string) (*statestore.Store, error) {
+func (s *testStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filestream-benchmark")
 }
 
