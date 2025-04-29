@@ -20,6 +20,7 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -64,13 +65,13 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 	}{}
 
 	if err := cfg.Unpack(&workersCfg); err != nil {
-		beat.Logger.Warnf("failed to unpack workers: %v; setting workers to 1", err)
-		workersCfg.Workers = 1
+		beat.Logger.Warnf("failed to unpack workers: %v; setting workers equal to number of logical CPUs (%d)", err, runtime.NumCPU())
+		workersCfg.Workers = runtime.NumCPU()
 	}
 
-	// Default to one worker
+	// Default to runtime.NumCPU() worker
 	if workersCfg.Workers < 1 {
-		workersCfg.Workers = 1
+		workersCfg.Workers = runtime.NumCPU()
 	}
 
 	clients := make([]outputs.Client, 0)
