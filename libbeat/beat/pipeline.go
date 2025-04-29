@@ -143,10 +143,10 @@ type ClientListener interface {
 
 // OutputListener provides an interface to track status of events in the output.
 type OutputListener interface {
-	NewEvent()   // report number of events that arrived in the output
-	Acked()      // report number of events acked
-	Dropped()    // report number of events dropped
-	DeadLetter() // report number of events sent to dead letter index
+	NewEvent()   // event has arrived in the output
+	Acked()      // event has been acked
+	Dropped()    // event has been events dropped
+	DeadLetter() // event has been sent to dead letter index
 }
 
 type ProcessorList interface {
