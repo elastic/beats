@@ -78,20 +78,15 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	return &metricbeatReceiver{BeatReceiver: beatReceiver}, nil
 }
 
+// copied from metricbeat cmd.
 func defaultProcessors() []mapstr.M {
 	// processors:
-	// - add_host_metadata:
-	// 	when.not.contains.tags: forwarded
-	// - add_cloud_metadata: ~
-	// - add_docker_metadata: ~
-	// - add_kubernetes_metadata: ~
-
+	//   - add_host_metadata: ~
+	//   - add_cloud_metadata: ~
+	//   - add_docker_metadata: ~
+	//   - add_kubernetes_metadata: ~
 	return []mapstr.M{
-		{
-			"add_host_metadata": mapstr.M{
-				"when.not.contains.tags": "forwarded",
-			},
-		},
+		{"add_host_metadata": nil},
 		{"add_cloud_metadata": nil},
 		{"add_docker_metadata": nil},
 		{"add_kubernetes_metadata": nil},
