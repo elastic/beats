@@ -290,7 +290,6 @@ func (client *Client) doBulkRequest(
 	// events slice
 	resultEvents, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), rawEvents)
 	result.events = resultEvents
-	// client.observer.PermanentError(len(rawEvents) - len(resultEvents))
 
 	// If we encoded any events, send the network request.
 	if len(result.events) > 0 {
@@ -345,6 +344,8 @@ func (client *Client) handleBulkResultError(
 
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to the list of bulk items and the list of bulk items.
+// It also calls the observer to report any permanent errors encountered while
+// encoding.
 func (client *Client) bulkEncodePublishRequest(version version.V, data []publisher.Event) ([]publisher.Event, []interface{}) {
 	okEvents := data[:0]
 	var bulkItems []interface{}
