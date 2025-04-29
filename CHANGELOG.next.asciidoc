@@ -205,7 +205,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
 - Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
 - Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
-- Journald input now works on Docker containers {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Journald input now works on Docker containers (except Wolfi) {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 
