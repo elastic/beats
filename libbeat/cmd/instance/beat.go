@@ -553,13 +553,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
 	log := logp.NewLogger("beat")
-	log.Infof("Setup Beat: %s; Version: %s", b.Info.Beat, b.Info.Version)
-=======
-	log := b.Info.Logger.Named("beat")
 	log.Infof("Setup Beat: %s; Version: %s (FIPS-distribution: %v)", b.Info.Beat, b.Info.Version, b.Info.FIPSDistribution)
->>>>>>> 868cf6248 (Add FIPS indicator to startup and version command (#43840))
 	b.logSystemInfo(log)
 
 	err = b.registerESVersionCheckCallback()
