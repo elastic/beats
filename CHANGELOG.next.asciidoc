@@ -208,6 +208,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Journald input now works on Docker containers (except Wolfi) {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 
 
 *Heartbeat*
@@ -371,6 +372,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
 - Update CEL mito extensions to v1.18.0. {pull}43855[43855]
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
 
 *Auditbeat*
 
