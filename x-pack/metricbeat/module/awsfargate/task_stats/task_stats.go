@@ -8,7 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -165,7 +165,7 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 }
 
 func getTaskStats(taskStatsResp *http.Response) (map[string]types.StatsJSON, error) {
-	taskStatsBody, err := ioutil.ReadAll(taskStatsResp.Body)
+	taskStatsBody, err := io.ReadAll(taskStatsResp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
@@ -179,7 +179,7 @@ func getTaskStats(taskStatsResp *http.Response) (map[string]types.StatsJSON, err
 }
 
 func getTask(taskResp *http.Response) (TaskMetadata, error) {
-	taskBody, err := ioutil.ReadAll(taskResp.Body)
+	taskBody, err := io.ReadAll(taskResp.Body)
 	if err != nil {
 		return TaskMetadata{}, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
