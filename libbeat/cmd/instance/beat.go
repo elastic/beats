@@ -1769,7 +1769,6 @@ func promoteOutputQueueSettings(b *Beat) error {
 			return fmt.Errorf("error unpacking output queue settings: %w", err)
 		}
 		if pc.Queue.IsSet() {
-			panic("Hello")
 			b.Info.Logger.Info("global queue settings replaced with output queue settings")
 			b.Config.Pipeline.Queue = pc.Queue
 		}
