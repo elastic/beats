@@ -71,6 +71,8 @@ type Event struct {
 	EncodedEvent interface{}
 }
 
+var _ beat.OutputListener = (*OutputListener)(nil)
+
 // OutputListener is a helper around a beat.OutputListener to make it safe to
 // call methods on Event.OutputListener without requiring a nil check.
 type OutputListener struct {
@@ -103,6 +105,27 @@ func (o OutputListener) DeadLetter() {
 		return
 	}
 	o.Listener.DeadLetter()
+}
+
+func (o OutputListener) DuplicateEvents() {
+	if o.Listener == nil {
+		return
+	}
+	o.Listener.DuplicateEvents()
+}
+
+func (o OutputListener) ErrTooMany() {
+	if o.Listener == nil {
+		return
+	}
+	o.Listener.ErrTooMany()
+}
+
+func (o OutputListener) RetryableError() {
+	if o.Listener == nil {
+		return
+	}
+	o.Listener.RetryableError()
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.

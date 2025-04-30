@@ -75,7 +75,6 @@ func (*testOutput) Close() error { return nil }
 func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	config := &t.config
 
-	n := len(batch.Events())
 	t.observer.NewBatch(batch.Events())
 
 	minWait := int64(config.MinWait)
@@ -93,7 +92,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 		if config.Fail.EveryBatch == t.batchCount {
 			t.batchCount = 0
-			t.observer.RetryableErrors(n)
+			t.observer.RetryableErrors(batch.Events())
 			batch.Retry()
 			return nil
 		}

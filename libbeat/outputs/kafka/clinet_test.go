@@ -215,27 +215,44 @@ func TestClientOutputListener_saramaMock(t *testing.T) {
 	assertOutputMetrics(t, counter, reg)
 }
 
-type countListener struct {
-	new        atomic.Int64
-	acked      atomic.Int64
-	dropped    atomic.Int64
-	deadLetter atomic.Int64
-}
+var _ beat.OutputListener = (*countListener)(nil)
 
-func (c *countListener) NewEvent() {
-	c.new.Add(1)
+type countListener struct {
+	acked,
+	deadLetter,
+	dropped,
+	duplicateEvents,
+	errTooMany,
+	new,
+	retryableErrors atomic.Int64
 }
 
 func (c *countListener) Acked() {
 	c.acked.Add(1)
 }
 
+func (c *countListener) DeadLetter() {
+	c.deadLetter.Add(1)
+}
+
 func (c *countListener) Dropped() {
 	c.dropped.Add(1)
 }
 
-func (c *countListener) DeadLetter() {
-	c.deadLetter.Add(1)
+func (c *countListener) DuplicateEvents() {
+	c.duplicateEvents.Add(1)
+}
+
+func (c *countListener) ErrTooMany() {
+	c.errTooMany.Add(1)
+}
+
+func (c *countListener) NewEvent() {
+	c.new.Add(1)
+}
+
+func (c *countListener) RetryableError() {
+	c.retryableErrors.Add(1)
 }
 
 func (c *countListener) String() string {
