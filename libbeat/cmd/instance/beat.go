@@ -987,19 +987,6 @@ func (b *Beat) configure(settings Settings) error {
 		return err
 	}
 
-	b.RawConfig = cfg
-	err = cfg.Unpack(&b.Config)
-	if err != nil {
-		return fmt.Errorf("error unpacking config data: %w", err)
-	}
-
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
-	if err != nil {
-		return fmt.Errorf("error initializing logging: %w", err)
-	}
-	// extracting here for ease of use
-	logger := b.Info.Logger
-
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
 	store, err := LoadKeystore(cfg, b.Info.Beat)
@@ -1021,6 +1008,20 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return err
 	}
+
+	b.RawConfig = cfg
+	err = cfg.Unpack(&b.Config)
+	if err != nil {
+		return fmt.Errorf("error unpacking config data: %w", err)
+	}
+
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	if err != nil {
+		return fmt.Errorf("error initializing logging: %w", err)
+	}
+
+	// extracting here for ease of use
+	logger := b.Info.Logger
 
 	if err := promoteOutputQueueSettings(b); err != nil {
 		return fmt.Errorf("could not promote output queue settings: %w", err)
