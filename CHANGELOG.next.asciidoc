@@ -131,7 +131,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- Restore `maintainer` label for container images {pull}43683[43683]
 
 *Auditbeat*
 
@@ -229,6 +228,9 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+
 
 *Heartbeat*
 
@@ -254,7 +256,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
-- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 
 *Osquerybeat*
 
@@ -415,6 +416,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
 - Update CEL mito extensions to v1.18.0. {pull}43855[43855]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
 
 *Auditbeat*
 
@@ -483,6 +485,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
+- Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
 
 *Metricbeat*
 
