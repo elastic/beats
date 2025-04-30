@@ -487,6 +487,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
+- Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
 
 *Metricbeat*
 
