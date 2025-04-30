@@ -337,9 +337,9 @@ func TestCollectPublishFailMiddle(t *testing.T) {
     ]}
   `)
 
-	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}})
-	event2 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}})
-	eventFail := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 3}}})
+	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": "success 1"}}})
+	event2 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": "success 2"}}})
+	eventFail := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": "fail: tooMany"}}})
 	events := []publisher.Event{event1, eventFail, event2}
 
 	res, stats := client.bulkCollectPublishFails(bulkResult{
@@ -351,7 +351,12 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
 	}
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, tooMany: 1}, stats)
+	assert.Equal(t, bulkResultStats{
+		acked:   []publisher.Event{event1, event2},
+		fails:   []publisher.Event{eventFail},
+		tooMany: []publisher.Event{eventFail},
+	},
+		stats)
 }
 
 func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
@@ -382,7 +387,7 @@ func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 0, deadLetter: 1}, stats)
+	assert.Equal(t, bulkResultStats{deadLetter: events}, stats)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -416,7 +421,7 @@ func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 0, nonIndexable: 1}, stats)
+	assert.Equal(t, bulkResultStats{nonIndexable: events}, stats)
 	assert.Equal(t, 0, len(res))
 }
 
@@ -444,7 +449,7 @@ func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
 	})
 	// The event should be returned for retry, and should appear in aggregated
 	// stats as failed (retryable error)
-	assert.Equal(t, bulkResultStats{acked: 0, fails: 1}, stats)
+	assert.Equal(t, bulkResultStats{fails: events}, stats)
 	assert.Equal(t, 1, len(res))
 	if len(res) > 0 {
 		assert.Equal(t, event1, res[0])
@@ -489,7 +494,7 @@ func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
 		status:   200,
 		response: response,
 	})
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, nonIndexable: 0}, stats)
+	assert.Equal(t, bulkResultStats{acked: []publisher.Event{event1, event2}, fails: []publisher.Event{eventFail}}, stats)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equalf(t, eventFail, res[0], "bulkCollectPublishFails should return failed event")
@@ -548,7 +553,11 @@ func TestCollectPublishFailDrop(t *testing.T) {
 		response: response,
 	})
 	assert.Equal(t, 0, len(res))
-	assert.Equal(t, bulkResultStats{acked: 2, fails: 0, nonIndexable: 1}, stats)
+	assert.Equal(t, bulkResultStats{
+		acked:        encodeEvents(client, []publisher.Event{event, event}),
+		nonIndexable: encodeEvents(client, []publisher.Event{eventFail}),
+	},
+		stats)
 }
 
 func TestCollectPublishFailAll(t *testing.T) {
@@ -580,7 +589,10 @@ func TestCollectPublishFailAll(t *testing.T) {
 	})
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
-	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
+	assert.Equal(t, stats, bulkResultStats{
+		fails:   events,
+		tooMany: events,
+	})
 }
 
 func TestCollectPipelinePublishFail(t *testing.T) {

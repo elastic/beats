@@ -458,8 +458,8 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 		itemStatus, itemMessage, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
 			// The response json is invalid, mark the remaining events for retry.
-			stats.fails = append(stats.fails, events[:i]...)
 			eventsToRetry = append(eventsToRetry, events[i:]...)
+			stats.fails = append(stats.fails, eventsToRetry...)
 			break
 		}
 
