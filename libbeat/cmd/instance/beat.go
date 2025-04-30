@@ -974,6 +974,14 @@ func (b *Beat) handleFlags() error {
 func (b *Beat) configure(settings Settings) error {
 	var err error
 
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	if err != nil {
+		return fmt.Errorf("error initializing logging: %w", err)
+	}
+
+	// extracting here for ease of use
+	logger := b.Info.Logger
+
 	b.InputQueueSize = settings.InputQueueSize
 
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
@@ -1033,14 +1041,6 @@ func (b *Beat) configure(settings Settings) error {
 	if err := common.SetTimestampPrecision(b.Config.TimestampPrecision); err != nil {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
 	}
-
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
-	if err != nil {
-		return fmt.Errorf("error initializing logging: %w", err)
-	}
-
-	// extracting here for ease of use
-	logger := b.Info.Logger
 
 	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, b.Info.Logger)
 	if err != nil {
@@ -1769,6 +1769,7 @@ func promoteOutputQueueSettings(b *Beat) error {
 			return fmt.Errorf("error unpacking output queue settings: %w", err)
 		}
 		if pc.Queue.IsSet() {
+			panic("Hello")
 			b.Info.Logger.Info("global queue settings replaced with output queue settings")
 			b.Config.Pipeline.Queue = pc.Queue
 		}
