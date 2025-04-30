@@ -69,13 +69,9 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		workersCfg.Workers = runtime.NumCPU()
 	}
 
-	// Default to runtime.NumCPU() worker
-	if workersCfg.Workers < 1 {
-		workersCfg.Workers = runtime.NumCPU()
-	}
-
-	clients := make([]outputs.Client, 0)
-	for range workersCfg.Workers {
+	// Default to runtime.NumCPU() workers
+	clients := make([]outputs.Client, 0, runtime.NumCPU())
+	for range runtime.NumCPU() {
 		clients = append(clients, &otelConsumer{
 			observer:     observer,
 			logsConsumer: beat.LogConsumer,

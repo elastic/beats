@@ -112,21 +112,12 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	// Create url using host name, protocol and path
 	hosts := []string{}
 
-	// get number of workers
-	workers := 1 // Default value is 1
-	if escfg.NumWorkers() > 1 {
-		workers = escfg.NumWorkers()
-	}
-
-	// duplicate host entries workers times
-	for range workers {
-		for _, h := range escfg.Hosts {
-			esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
-			if err != nil {
-				return nil, fmt.Errorf("cannot generate ES URL from host %w", err)
-			}
-			hosts = append(hosts, esURL)
+	for _, h := range escfg.Hosts {
+		esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
+		if err != nil {
+			return nil, fmt.Errorf("cannot generate ES URL from host %w", err)
 		}
+		hosts = append(hosts, esURL)
 	}
 
 	// convert ssl configuration
@@ -136,9 +127,8 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	otelYAMLCfg := map[string]any{
-		"logs_index":  escfg.Index, // index
-		"endpoints":   hosts,       // hosts, protocol, path, port
-		"num_workers": len(hosts),  // number of workers (or clients) will be escfg.NumWorkers() * escfg.Hosts
+		"logs_index": escfg.Index, // index
+		"endpoints":  hosts,       // hosts, protocol, path, port
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout

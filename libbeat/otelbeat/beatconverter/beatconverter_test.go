@@ -96,8 +96,7 @@ receivers:
           paths:
             - /var/log/*.log		  
     output:
-      otelconsumer:
-        workers: 1
+      otelconsumer: null
 service:
   pipelines:
     logs:
@@ -201,8 +200,7 @@ receivers:
             - /tmp/flog.log
           type: filestream  
     output:
-      otelconsumer:
-        workers: 1
+      otelconsumer: null
     cloud: null
     setup:
       kibana:
@@ -259,8 +257,7 @@ receivers:
           min_events: 1600
           timeout: 10s    	  
     output:
-      otelconsumer:
-        workers: 1
+      otelconsumer: null
 service:
   pipelines:
     logs:

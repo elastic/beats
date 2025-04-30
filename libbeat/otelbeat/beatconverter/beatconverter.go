@@ -67,7 +67,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		if len(output.ToStringMap()) > 1 {
 			return fmt.Errorf("multiple outputs are not supported")
 		}
-		var workers any
+
 		for key, output := range output.ToStringMap() {
 			switch key {
 			case "elasticsearch":
@@ -83,12 +83,6 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 						return err
 					}
 				}
-
-				// extract the number of workers from OTEL config and delete from exporter config
-				// because num_workers has no effect if batcher is enabled.
-				// We will use the setting to create multiple clients later
-				workers = esOTelConfig["num_workers"]
-				delete(esOTelConfig, "num_workers")
 
 				out = map[string]any{
 					"service::pipelines::logs::exporters": []string{"elasticsearch"},
@@ -114,9 +108,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 			return err
 		}
 		out = map[string]any{
-			beatReceiverConfigKey + "::output::otelconsumer": map[string]any{
-				"workers": workers,
-			},
+			beatReceiverConfigKey + "::output::otelconsumer": nil,
 		}
 
 		// inject log level
