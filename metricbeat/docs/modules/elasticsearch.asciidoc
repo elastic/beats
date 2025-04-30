@@ -1,0 +1,153 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: elasticsearch
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/elasticsearch/_meta/docs.asciidoc
+
+
+[[metricbeat-module-elasticsearch]]
+== Elasticsearch module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+The `elasticsearch` module collects metrics about {es}.
+
+[float]
+=== Compatibility
+
+The `elasticsearch` module works with {es} 6.7.0 and later.
+
+[float]
+=== Usage for {stack} Monitoring
+
+The `elasticsearch` module can be used to collect metrics shown in our {stack-monitor-app}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+from the module's configuration. Alternatively, run `metricbeat modules disable elasticsearch` and
+`metricbeat modules enable elasticsearch-xpack`.
+
+When xpack mode is enabled, all the legacy metricsets are automatically enabled by default.
+This means that you do not need to manually enable them, and there will be no conflicts or issues because Metricbeat merges the user-defined metricsets with the ones that xpack mode forces to enable.
+As a result, you can seamlessly collect comprehensive metrics without worrying about dataset overlap or duplication.
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: elasticsearch
+  xpack.enabled: true
+  metricsets:
+    - ingest_pipeline
+  period: 10s
+----
+
+NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
+monitoring index instead of the default index typically used by {metricbeat}.
+For more details about the monitoring index, see
+{ref}/config-monitoring-indices.html[Configuring indices for monitoring].
+
+[float]
+=== Module-specific configuration notes
+
+Like other {beatname_uc} modules, the `elasticsearch` module accepts a `hosts` configuration setting.
+This setting can contain a list of entries. The related `scope` setting determines how each entry in
+the `hosts` list is interpreted by the module.
+
+* If `scope` is set to `node` (default), each entry in the `hosts` list indicates a distinct node in an
+  {es} cluster.
+* If `scope` is set to `cluster`, each entry in the `hosts` list indicates a single endpoint for a distinct
+  {es} cluster (for example, a load-balancing proxy fronting the cluster).
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Elasticsearch module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: elasticsearch
+  metricsets:
+    - node
+    - node_stats
+    #- index
+    #- index_recovery
+    #- index_summary
+    #- ingest_pipeline
+    #- shard
+    #- ml_job
+  period: 10s
+  hosts: ["http://localhost:9200"]
+  #username: "elastic"
+  #password: "changeme"
+  #api_key: "foo:bar"
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  #index_recovery.active_only: true
+  #ingest_pipeline.processor_sample_rate: 0.25
+  #xpack.enabled: false
+  #scope: node
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-elasticsearch-ccr,ccr>>
+
+* <<metricbeat-metricset-elasticsearch-cluster_stats,cluster_stats>>
+
+* <<metricbeat-metricset-elasticsearch-enrich,enrich>>
+
+* <<metricbeat-metricset-elasticsearch-index,index>>
+
+* <<metricbeat-metricset-elasticsearch-index_recovery,index_recovery>>
+
+* <<metricbeat-metricset-elasticsearch-index_summary,index_summary>>
+
+* <<metricbeat-metricset-elasticsearch-ingest_pipeline,ingest_pipeline>>
+
+* <<metricbeat-metricset-elasticsearch-ml_job,ml_job>>
+
+* <<metricbeat-metricset-elasticsearch-node,node>>
+
+* <<metricbeat-metricset-elasticsearch-node_stats,node_stats>>
+
+* <<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>
+
+* <<metricbeat-metricset-elasticsearch-shard,shard>>
+
+include::elasticsearch/ccr.asciidoc[]
+
+include::elasticsearch/cluster_stats.asciidoc[]
+
+include::elasticsearch/enrich.asciidoc[]
+
+include::elasticsearch/index.asciidoc[]
+
+include::elasticsearch/index_recovery.asciidoc[]
+
+include::elasticsearch/index_summary.asciidoc[]
+
+include::elasticsearch/ingest_pipeline.asciidoc[]
+
+include::elasticsearch/ml_job.asciidoc[]
+
+include::elasticsearch/node.asciidoc[]
+
+include::elasticsearch/node_stats.asciidoc[]
+
+include::elasticsearch/pending_tasks.asciidoc[]
+
+include::elasticsearch/shard.asciidoc[]
+
+:edit_url!:

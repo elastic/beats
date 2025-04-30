@@ -1,0 +1,14 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+  * <<{beatname_lc}-module-auditd,Auditd>>
+  * <<{beatname_lc}-module-file_integrity,File Integrity>>
+  * <<{beatname_lc}-module-system,System>>
+
+
+--
+
+include::./modules/auditd.asciidoc[]
+include::./modules/file_integrity.asciidoc[]
+include::../../x-pack/auditbeat/docs/modules/system.asciidoc[]

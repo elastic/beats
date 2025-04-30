@@ -1,0 +1,61 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: consul
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/consul/_meta/docs.asciidoc
+
+
+[[metricbeat-module-consul]]
+== Consul module
+
+beta[]
+
+This is the https://www.consul.io[Hashicorp's Consul] Metricbeat module. It is still in beta and under active development to add new Metricsets and introduce enhancements.
+
+[float]
+=== Compatibility
+
+The module is being tested with 1.4.2 and 1.9.3 versions of Consul.
+
+[float]
+=== Dashboard
+
+The Consul module comes with a predefined dashboard:
+
+image::./images/metricbeat-consul.png[]
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Consul module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: consul
+  metricsets:
+  - agent
+  enabled: true
+  period: 10s
+  hosts: ["localhost:8500"]
+
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-consul-agent,agent>>
+
+include::consul/agent.asciidoc[]
+
+:edit_url!:
