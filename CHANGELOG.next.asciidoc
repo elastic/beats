@@ -495,7 +495,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Winlogbeat*
 
 - Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}41418[41418]
-
+- Render data values in xml renderer. {pull}44132[44132]
 
 *Functionbeat*
 
