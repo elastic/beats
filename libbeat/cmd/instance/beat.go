@@ -974,11 +974,6 @@ func (b *Beat) handleFlags() error {
 func (b *Beat) configure(settings Settings) error {
 	var err error
 
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
-	if err != nil {
-		return fmt.Errorf("error initializing logging: %w", err)
-	}
-
 	// extracting here for ease of use
 	logger := b.Info.Logger
 
@@ -993,6 +988,17 @@ func (b *Beat) configure(settings Settings) error {
 
 	if err := initPaths(cfg); err != nil {
 		return err
+	}
+
+	b.RawConfig = cfg
+	err = cfg.Unpack(&b.Config)
+	if err != nil {
+		return fmt.Errorf("error unpacking config data: %w", err)
+	}
+
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	if err != nil {
+		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
 	// We have to initialize the keystore before any unpack or merging the cloud
@@ -1015,12 +1021,6 @@ func (b *Beat) configure(settings Settings) error {
 	err = cloudid.OverwriteSettings(cfg)
 	if err != nil {
 		return err
-	}
-
-	b.RawConfig = cfg
-	err = cfg.Unpack(&b.Config)
-	if err != nil {
-		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
 	if err := promoteOutputQueueSettings(b); err != nil {
