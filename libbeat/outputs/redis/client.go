@@ -149,7 +149,7 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 	c.observer.NewBatch(events)
 	rest, err := c.publish(c.key, events)
 	if rest != nil {
-		c.observer.RetryableErrors(len(rest))
+		c.observer.RetryableErrors(rest)
 		batch.RetryEvents(rest)
 		return err
 	}

@@ -143,10 +143,13 @@ type ClientListener interface {
 
 // OutputListener provides an interface to track status of events in the output.
 type OutputListener interface {
-	NewEvent()   // event has arrived in the output
-	Acked()      // event has been acked
-	Dropped()    // event has been events dropped
-	DeadLetter() // event has been sent to dead letter index
+	NewEvent()        // event has arrived in the output
+	Acked()           // event has been acked
+	DeadLetter()      // event has been sent to dead letter index
+	Dropped()         // event has been events dropped
+	DuplicateEvents() // event has been detected as duplicate
+	ErrTooMany()      // output replied with too many requests
+	RetryableError()  // event has a retryable error
 }
 
 type ProcessorList interface {
@@ -216,13 +219,18 @@ func (c *CombinedClientListener) DroppedOnPublish(event Event) {
 	c.B.DroppedOnPublish(event)
 }
 
+var _ OutputListener = (*NoopOutputListener)(nil)
+
 // NoopOutputListener is a no-op OutputListener.
 type NoopOutputListener struct{}
 
-func (n NoopOutputListener) NewEvent()   {}
-func (n NoopOutputListener) Acked()      {}
-func (n NoopOutputListener) Dropped()    {}
-func (n NoopOutputListener) DeadLetter() {}
+func (n NoopOutputListener) DuplicateEvents() {}
+func (n NoopOutputListener) ErrTooMany()      {}
+func (n NoopOutputListener) RetryableError()  {}
+func (n NoopOutputListener) NewEvent()        {}
+func (n NoopOutputListener) Acked()           {}
+func (n NoopOutputListener) Dropped()         {}
+func (n NoopOutputListener) DeadLetter()      {}
 
 // NoopClientListener is a no-op ClientListener.
 type NoopClientListener struct{}
