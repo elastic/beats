@@ -503,3 +503,5 @@ replace (
 )
 
 replace github.com/elastic/sarama => github.com/AndersonQ/elastic-sarama v0.0.0-20250429162615-fdeb5fa8a25d
+
+replace github.com/elastic/mock-es => ../mock-es
