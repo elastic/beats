@@ -119,7 +119,6 @@ func (s *Stats) NewBatch(evs []publisher.Event) {
 	s.eventsBatches.Inc()
 	s.eventsTotal.Add(uint64(len(evs)))
 	s.eventsActive.Add(uint64(len(evs)))
-
 	for _, e := range evs {
 		e.OutputListener.NewEvent()
 	}
@@ -171,23 +170,31 @@ func (s *Stats) DeadLetterEvents(evs []publisher.Event) {
 }
 
 // RetryableErrors updates active and failed event metrics.
-func (s *Stats) RetryableErrors(n int) {
+func (s *Stats) RetryableErrors(evs []publisher.Event) {
 	if s == nil {
 		return
 	}
 
-	s.eventsFailed.Add(uint64(n))
-	s.eventsActive.Sub(uint64(n))
+	n := uint64(len(evs))
+	s.eventsFailed.Add(n)
+	s.eventsActive.Sub(n)
+	for _, e := range evs {
+		e.OutputListener.RetryableError()
+	}
 }
 
 // DuplicateEvents updates the active and duplicate event metrics.
-func (s *Stats) DuplicateEvents(n int) {
+func (s *Stats) DuplicateEvents(evs []publisher.Event) {
 	if s == nil {
 		return
 	}
 
-	s.eventsDuplicates.Add(uint64(n))
-	s.eventsActive.Sub(uint64(n))
+	n := uint64(len(evs))
+	s.eventsDuplicates.Add(n)
+	s.eventsActive.Sub(n)
+	for _, e := range evs {
+		e.OutputListener.DuplicateEvents()
+	}
 }
 
 // PermanentError updates total number of event drops as reported by the output.
@@ -227,12 +234,15 @@ func (s *Stats) BatchSplit() {
 }
 
 // ErrTooMany updates the number of Too Many Requests responses reported by the output.
-func (s *Stats) ErrTooMany(n int) {
+func (s *Stats) ErrTooMany(evs []publisher.Event) {
 	if s == nil {
 		return
 	}
 
-	s.eventsTooMany.Add(uint64(n))
+	s.eventsTooMany.Add(uint64(len(evs)))
+	for _, e := range evs {
+		e.OutputListener.ErrTooMany()
+	}
 }
 
 // WriteError increases the write I/O error metrics.

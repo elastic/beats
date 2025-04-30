@@ -315,7 +315,7 @@ func (client *Client) handleBulkResultError(
 		if batch.SplitRetry() {
 			// Report that we split a batch
 			client.observer.BatchSplit()
-			client.observer.RetryableErrors(len(bulkResult.events))
+			client.observer.RetryableErrors(bulkResult.events)
 		} else {
 			// If the batch could not be split, there is no option left but
 			// to drop it and log the error state.
@@ -338,7 +338,7 @@ func (client *Client) handleBulkResultError(
 		// All events were sent successfully
 		batch.ACK()
 	}
-	client.observer.RetryableErrors(len(bulkResult.events))
+	client.observer.RetryableErrors(bulkResult.events)
 	return bulkResult.connErr
 }
 
@@ -555,10 +555,10 @@ func (client *Client) Test(d testing.Driver) {
 
 func (stats bulkResultStats) reportToObserver(ob outputs.Observer) {
 	ob.AckedEvents(stats.acked)
-	ob.RetryableErrors(len(stats.fails))
+	ob.RetryableErrors(stats.fails)
 	ob.PermanentErrors(stats.nonIndexable)
-	ob.DuplicateEvents(len(stats.duplicates))
+	ob.DuplicateEvents(stats.duplicates)
 	ob.DeadLetterEvents(stats.deadLetter)
 
-	ob.ErrTooMany(len(stats.tooMany))
+	ob.ErrTooMany(stats.tooMany)
 }

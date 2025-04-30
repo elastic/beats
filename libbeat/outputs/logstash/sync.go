@@ -150,19 +150,18 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 		c.log.Debugf("%v events out of %v events sent to logstash host %s. Continue sending",
 			n, len(events), c.Host())
 
-		events = events[n:]
+		toRetry := events[n:]
 		st.AckedEvents(events[:n])
 		deadlockListener.ack(n)
 		if err != nil {
 			// return batch to pipeline before reporting/counting error
-			batch.RetryEvents(events)
+			batch.RetryEvents(toRetry)
 
 			_ = c.Close()
 
 			c.log.Errorf("Failed to publish events caused by: %+v", err)
 
-			rest := len(events)
-			st.RetryableErrors(rest)
+			st.RetryableErrors(toRetry)
 
 			return err
 		}

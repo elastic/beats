@@ -171,27 +171,43 @@ func getMonitoringUint(reg *monitoring.Registry, name string) *monitoring.Uint {
 	return monVar.(*monitoring.Uint)
 }
 
-type OutputListener struct {
-	eventsTotal,
-	eventsAcked,
-	eventsDropped,
-	eventsDeadLetter *monitoring.Uint
-}
+var _ beat.OutputListener = (*OutputListener)(nil)
 
-func (o *OutputListener) NewEvent() {
-	o.eventsTotal.Inc()
+type OutputListener struct {
+	eventsAcked,
+	eventsDeadLetter,
+	eventsDropped,
+	eventsDuplicateEvents,
+	eventsErrTooMany,
+	eventsRetryableErrors,
+	eventsTotal *monitoring.Uint
 }
 
 func (o *OutputListener) Acked() {
 	o.eventsAcked.Inc()
 }
 
+func (o *OutputListener) DeadLetter() {
+	o.eventsDeadLetter.Inc()
+}
 func (o *OutputListener) Dropped() {
 	o.eventsDropped.Inc()
 }
 
-func (o *OutputListener) DeadLetter() {
-	o.eventsDeadLetter.Inc()
+func (o *OutputListener) DuplicateEvents() {
+	o.eventsDuplicateEvents.Inc()
+}
+
+func (o *OutputListener) ErrTooMany() {
+	o.eventsErrTooMany.Inc()
+}
+
+func (o *OutputListener) RetryableError() {
+	o.eventsRetryableErrors.Inc()
+}
+
+func (o *OutputListener) NewEvent() {
+	o.eventsTotal.Inc()
 }
 
 // PipelineClientListener implements beat.ClientListener to collect pipeline
@@ -200,12 +216,6 @@ type PipelineClientListener struct {
 	eventsTotal,
 	eventsFiltered,
 	eventsPublished *monitoring.Uint
-}
-
-func (i *PipelineClientListener) Closing() {
-}
-
-func (i *PipelineClientListener) Closed() {
 }
 
 func (i *PipelineClientListener) NewEvent() {
@@ -220,6 +230,8 @@ func (i *PipelineClientListener) Published() {
 	i.eventsPublished.Inc()
 }
 
+func (i *PipelineClientListener) Closing()                    {}
+func (i *PipelineClientListener) Closed()                     {}
 func (i *PipelineClientListener) DroppedOnPublish(beat.Event) {}
 
 // TestContext provides the Input Test function with common environmental
