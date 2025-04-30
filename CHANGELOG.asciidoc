@@ -103,8 +103,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
 
 
-<<<<<<< HEAD
-=======
 [[release-notes-8.17.5]]
 === Beats version 8.17.5
 https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
@@ -190,7 +188,6 @@ https://github.com/elastic/beats/compare/v8.17.3\...v8.17.4[View commits]
 - Increase maximum query timeout to 24 hours. {pull}42356[42356]
 
 
->>>>>>> 4edf4dd91 (docs: Prepare Changelog for 8.17.5 (#43876) (#43909))
 [[release-notes-8.17.3]]
 === Beats version 8.17.3
 https://github.com/elastic/beats/compare/v8.17.2\...v8.17.3[View commits]
