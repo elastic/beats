@@ -16,7 +16,8 @@ processors:
       target: http.request.mime_type
 ```
 
-In the example above: - http.request.body.content is used as the source and http.request.mime_type is set to the detected mime type
+In the example above:
+- http.request.body.content is used as the source and http.request.mime_type is set to the detected mime type
 
 See [Conditions](/reference/winlogbeat/defining-processors.md#conditions) for a list of supported conditions.
 

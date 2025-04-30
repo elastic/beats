@@ -400,26 +400,25 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 | ThreatStream fields | ECS Fields |
 | --- | --- |
 | asn | threat.indicator.as.number |
-| classification[[1]](#a) | threat.indicator.marking.tlp |
-| confidence[[1]](#a) | threat.indicator.confidence |
+| classification[^1^](#footnote-1) | threat.indicator.marking.tlp |
+| confidence[^1^](#footnote-1) | threat.indicator.confidence |
 | country | threat.indicator.geo.country_iso_code |
 | date_first | threat.indicator.first_seen |
 | date_last | threat.indicator.last_seen |
 | detail | tags |
 | domain | threat.indicator.url.domain |
 | email | threat.indicator.email.address |
-| itype[[1]](#a) | threat.indicator.type |
+| itype[^1^](#footnote-1) | threat.indicator.type |
 | lat | threat.indicator.geo.location.lat |
 | lon | threat.indicator.geo.location.lon |
 | md5 | threat.indicator.file.hash |
 | org | threat.indicator.as.organization.name |
-| severity[[1]](#a) | event.severity |
+| severity[^1^](#footnote-1) | event.severity |
 | source | threat.indicator.provider |
 | srcip | threat.indicator.ip |
 | url | threat.indicator.url.original |
 
-$$$a$$$
-[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.
+^1^ $$$footnote-1$$$ Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.
 
 
 ## Dashboards [_dashboards_5]
