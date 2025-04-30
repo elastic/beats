@@ -155,3 +155,26 @@ func TestRegistryIter(t *testing.T) {
 
 	assert.Equal(t, vars, collected)
 }
+
+func TestGetOrCreateRegistry(t *testing.T) {
+	root := &Registry{
+		name:    "root",
+		entries: map[string]entry{},
+		opts:    &defaultOptions,
+	}
+
+	require.Nil(t, root.GetRegistry("a.b.c"), "GetRegistry on empty registry always returns nil")
+
+	c := root.GetOrCreateRegistry("a.b.c")
+	require.NotNil(t, c, "GetOrCreateRegistry must be successful on an empty registry")
+	assert.Equal(t, c, root.GetRegistry("a.b.c"), "GetRegistry after GetOrCreateRegistry should return the same value")
+	assert.Equal(t, "root.a.b.c", c.name, "Registries created with GetOrCreateRegistry should contain the parent name followed by the path to the registry")
+
+	y := c.GetOrCreateRegistry("z.y")
+	require.NotNil(t, y, "GetOrCreateRegistry must be successful on an empty registry")
+	assert.Equal(t, y, c.GetOrCreateRegistry("z.y"), "GetOrCreateRegistry on the same input should return the same result")
+	assert.Equal(t, c.GetOrCreateRegistry("z.y"), root.GetOrCreateRegistry("a.b.c.z.y"), "GetOrCreateRegistry with equivalent paths from different starting points should return the same result")
+
+	c.Add("scalar", &Int{}, Full)
+	assert.Nil(t, root.GetOrCreateRegistry("a.b.c.scalar.w.x"), "GetOrCreateRegistry should return nil if part of the path is a non-registry type")
+}

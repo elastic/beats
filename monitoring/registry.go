@@ -106,22 +106,52 @@ func (r *Registry) Get(name string) Var {
 
 // GetRegistry tries to find a sub-registry by name.
 func (r *Registry) GetRegistry(name string) *Registry {
-	e, err := r.find(name)
-	if err != nil {
-		return nil
+	if v := r.Get(name); v != nil {
+		if reg, ok := v.(*Registry); ok {
+			return reg
+		}
 	}
+	return nil
+}
 
-	v := e.Var
-	if v == nil {
-		return nil
+// Creates new recursive registries under the given sequence of names,
+// returning the final leaf node.
+// r.mu must be held by the caller.
+func (r *Registry) newRegistryChainWithLock(names []string, opts *options) *Registry {
+	cur := r
+	for _, name := range names {
+		sub := &Registry{
+			name:    fullName(cur, name),
+			opts:    opts,
+			entries: map[string]entry{},
+		}
+		cur.entries[name] = entry{sub, sub.opts.mode}
+		cur = sub
 	}
+	return cur
+}
 
-	reg, ok := v.(*Registry)
-	if !ok {
-		return nil
+func (r *Registry) GetOrCreateRegistry(name string, opts ...Option) *Registry {
+	names := strings.Split(name, ".")
+	return r.getOrCreateRegistry(names, opts...)
+}
+
+func (r *Registry) getOrCreateRegistry(names []string, opts ...Option) *Registry {
+	if len(names) == 0 {
+		return r
 	}
+	name := names[0]
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-	return reg
+	if entry, found := r.entries[name]; found {
+		reg, ok := entry.Var.(*Registry)
+		if !ok {
+			return nil
+		}
+		return reg.getOrCreateRegistry(names[1:], opts...)
+	}
+	return r.newRegistryChainWithLock(names, applyOpts(r.opts, opts))
 }
 
 // Remove removes a variable or a sub-registry by name
