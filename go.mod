@@ -513,4 +513,4 @@ replace (
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250514220331-e52c94766b6f
 )
 
-replace github.com/elastic/sarama => github.com/AndersonQ/elastic-sarama v0.0.0-20250429133819-24a2ab3ae613
+replace github.com/elastic/sarama => github.com/AndersonQ/elastic-sarama v0.0.0-20250429162615-fdeb5fa8a25d
