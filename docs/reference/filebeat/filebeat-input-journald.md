@@ -8,11 +8,15 @@ mapped_pages:
 
 [`journald`](https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html) is a system service that collects and stores logging data. The `journald` input reads this log data and the metadata associated with it. To read this log data Filebeat calls `journalctl` to read from the journal, therefore Filebeat needs permission to execute `journalctl`.
 
+:::{warning}
+The Wolfi-based Docker image does not contain the `journalctl` binary and the `journald` input type cannot be used with it.
+:::
+
 :::{important}
 When using the Journald input from a Docker container, make sure the
 `journalctl` binary in the container is compatible with your
 Systemd/journal version. To get the version of the `journalctl` binary
-in Filebeat's image run the following, adjusting the image name/tag 
+in Filebeat's image run the following, adjusting the image name/tag
 according to the version that you are running:
 
 
