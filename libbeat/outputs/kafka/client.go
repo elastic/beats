@@ -432,11 +432,10 @@ func (r *msgRef) dec() {
 
 	err := r.err
 	if err != nil {
-		failed := len(r.failed)
-		success := r.total - failed
+		success := r.total - len(r.failed)
 		r.batch.RetryEvents(r.failed)
 
-		stats.RetryableErrors(failed)
+		stats.RetryableErrors(r.failed)
 		if success > 0 {
 			stats.AckedEvents(r.succeeded)
 			r.succeeded = nil
