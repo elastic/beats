@@ -28,12 +28,16 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	e "github.com/elastic/beats/v7/libbeat/beat/events"
@@ -53,6 +57,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	libversion "github.com/elastic/elastic-agent-libs/version"
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 type batchMock struct {
@@ -279,6 +284,130 @@ func TestPublish(t *testing.T) {
 		assertRegistryUint(t, reg, "events.dropped", 1, "One event should be dropped")
 		assertRegistryUint(t, reg, "events.failed", 3, "Split batches should retry 3 events before dropping them")
 		assertRegistryUint(t, reg, "events.active", 0, "Active events should be zero when Publish returns")
+	})
+
+	t.Run("metrics", func(t *testing.T) {
+		rdr := sdkmetric.NewManualReader()
+		provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(rdr))
+		mockESHandler := api.NewDeterministicAPIHandler(
+			uuid.Must(uuid.NewV4()),
+			"",
+			provider,
+			time.Now().Add(24*time.Hour),
+			0,
+			100,
+			func(action api.Action, event []byte) int {
+				ev := map[string]string{}
+				err := json.Unmarshal(event, &ev)
+				if err != nil {
+					t.Errorf("failed to unmarshal event: %v", err)
+					return http.StatusInternalServerError
+				}
+
+				t.Logf("\naction: %v\n\tmeta: %s\n\tevent: %s", action.Action, action.Meta, string(event))
+
+				httpStatus, err := strconv.Atoi(ev["http_status"])
+				if err != nil {
+					t.Errorf("failed to parse %s to int: %v", ev["http_status"], err)
+					return http.StatusInternalServerError
+				}
+				return httpStatus
+			})
+
+		esMock := httptest.NewServer(mockESHandler)
+		client, reg := makePublishTestClient(t, esMock.URL)
+
+		counter := &countListener{}
+		observer := publisher.OutputListener{Listener: counter}
+		evs := []publisher.Event{
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg":         "message 1",
+						"http_status": strconv.Itoa(http.StatusOK)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 2",
+						// dropped
+						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 3",
+						// toomany
+						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 4",
+						// duplicated
+						"http_status": strconv.Itoa(http.StatusConflict)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+		}
+
+		// Try publishing a batch that can be split
+		batch := encodeBatch(client, &batchMock{
+			events: evs,
+		})
+		err := client.Publish(context.Background(), batch)
+		require.NoError(t, err, "could not publish events")
+
+		snapshot := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
+		events := snapshot["events"].(map[string]any)
+
+		evAcked := events["acked"].(int64)
+		evNew := events["total"].(int64)
+		evDropped := events["dropped"].(int64)
+		evDeadLetter := events["dead_letter"].(int64)
+		evDuplicated := events["duplicates"].(int64)
+		evTooMany := events["toomany"].(int64)
+		evRetrieable := events["failed"].(int64)
+
+		assert.Equal(t, evNew, counter.NewLoad())
+		assert.Equal(t, evAcked, counter.AckedLoad())
+		assert.Equal(t, evDropped, counter.DroppedLoad())
+		assert.Equal(t, evDeadLetter, counter.DeadLetterLoad())
+		assert.Equal(t, evDuplicated, counter.DuplicateEventsLoad())
+		assert.Equal(t, evTooMany, counter.ErrTooManyLoad())
+		assert.Equal(t, evRetrieable, counter.RetryableErrorsLoad())
+
+		if t.Failed() {
+			t.Log("OutputListener metrics: ", counter)
+
+			snapshotJson, err := json.Marshal(snapshot)
+			require.NoErrorf(t, err,
+				"could not marshal metrics snapshot. Raw metrics snapshot: %v",
+				snapshot)
+			t.Logf("metrics registry snapshot: %s", snapshotJson)
+		}
 	})
 }
 
@@ -1186,4 +1315,80 @@ func TestSetDeadLetter(t *testing.T) {
 	require.NoError(t, err, "json decoding of encoded event should succeed")
 	assert.Equal(t, errType, errFields.ErrType, "encoded error.type should match value in setDeadLetter")
 	assert.Equal(t, errStr, errFields.ErrMessage, "encoded error.message should match value in setDeadLetter")
+}
+
+var _ beat.OutputListener = (*countListener)(nil)
+
+// TODO(Anderson): move to a generic place
+type countListener struct {
+	acked,
+	deadLetter,
+	dropped,
+	duplicateEvents,
+	errTooMany,
+	new,
+	retryableErrors atomic.Int64
+}
+
+func (c *countListener) Acked() {
+	c.acked.Add(1)
+}
+
+func (c *countListener) DeadLetter() {
+	c.deadLetter.Add(1)
+}
+
+func (c *countListener) Dropped() {
+	c.dropped.Add(1)
+}
+
+func (c *countListener) DuplicateEvents() {
+	c.duplicateEvents.Add(1)
+}
+
+func (c *countListener) ErrTooMany() {
+	c.errTooMany.Add(1)
+}
+
+func (c *countListener) NewEvent() {
+	c.new.Add(1)
+}
+
+func (c *countListener) RetryableError() {
+	c.retryableErrors.Add(1)
+}
+
+func (c *countListener) AckedLoad() int64 {
+	return c.acked.Load()
+}
+
+func (c *countListener) DeadLetterLoad() int64 {
+	return c.deadLetter.Load()
+}
+
+func (c *countListener) DroppedLoad() int64 {
+	return c.dropped.Load()
+}
+
+func (c *countListener) DuplicateEventsLoad() int64 {
+	return c.duplicateEvents.Load()
+}
+
+func (c *countListener) ErrTooManyLoad() int64 {
+	return c.errTooMany.Load()
+}
+
+func (c *countListener) NewLoad() int64 {
+	return c.new.Load()
+}
+
+func (c *countListener) RetryableErrorsLoad() int64 {
+	return c.retryableErrors.Load()
+}
+
+func (c *countListener) String() string {
+	return fmt.Sprintf(
+		"New: %d, Acked: %d, Dropped: %d, DeadLetter: %d, DuplicateEvents: %d, ErrTooMany: %d, RetryableErrors: %d",
+		c.new.Load(), c.acked.Load(), c.dropped.Load(), c.deadLetter.Load(),
+		c.duplicateEvents.Load(), c.errTooMany.Load(), c.retryableErrors.Load())
 }
