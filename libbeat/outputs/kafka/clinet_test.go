@@ -12,6 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -139,7 +141,9 @@ func assertOutputMetrics(t *testing.T, counter *countListener, reg *monitoring.R
 }
 
 func TestClientOutputListener_saramaMock(t *testing.T) {
-	logger := logptest.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "",
+		// only print stacktrace for errors above ErrorLevel.
+		zap.AddStacktrace(zapcore.ErrorLevel+1))
 
 	cfgSarama := sarama.NewConfig()
 	cfgSarama.Producer.Return.Successes = true
