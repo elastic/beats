@@ -974,9 +974,6 @@ func (b *Beat) handleFlags() error {
 func (b *Beat) configure(settings Settings) error {
 	var err error
 
-	// extracting here for ease of use
-	logger := b.Info.Logger
-
 	b.InputQueueSize = settings.InputQueueSize
 
 	cfg, err := cfgfile.Load("", settings.ConfigOverrides)
@@ -1000,6 +997,8 @@ func (b *Beat) configure(settings Settings) error {
 	if err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
+	// extracting here for ease of use
+	logger := b.Info.Logger
 
 	// We have to initialize the keystore before any unpack or merging the cloud
 	// options.
