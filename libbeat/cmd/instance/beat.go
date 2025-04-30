@@ -795,7 +795,19 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+<<<<<<< HEAD
 	if err := PromoteOutputQueueSettings(&b.Config); err != nil {
+=======
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	if err != nil {
+		return fmt.Errorf("error initializing logging: %w", err)
+	}
+
+	// extracting here for ease of use
+	logger := b.Info.Logger
+
+	if err := promoteOutputQueueSettings(b); err != nil {
+>>>>>>> 3604ffadd ([libbeat/logging] fix a breaking bug (#44131))
 		return fmt.Errorf("could not promote output queue settings: %w", err)
 	}
 
@@ -814,9 +826,17 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
 	}
 
+<<<<<<< HEAD
 	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
+=======
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, b.Info.Logger)
+	if err != nil {
+		return err
+	}
+	b.Instrumentation = instrumentation
+>>>>>>> 3604ffadd ([libbeat/logging] fix a breaking bug (#44131))
 
 	// log paths values to help with troubleshooting
 	logp.Info("%s", paths.Paths.String())
