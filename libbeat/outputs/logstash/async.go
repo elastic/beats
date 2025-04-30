@@ -271,8 +271,8 @@ func (r *msgRef) dec() {
 
 	r.deadlockListener.close()
 
-	if L := len(r.slice); L > 0 {
-		r.client.observer.RetryableErrors(L)
+	if l := len(r.slice); l > 0 {
+		r.client.observer.RetryableErrors(r.slice)
 	}
 
 	err := r.err

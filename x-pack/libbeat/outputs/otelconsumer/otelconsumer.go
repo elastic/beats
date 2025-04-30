@@ -162,7 +162,7 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 			st.PermanentErrors(events)
 			batch.Drop()
 		} else {
-			st.RetryableErrors(len(events))
+			st.RetryableErrors(events)
 			batch.Retry()
 		}
 
