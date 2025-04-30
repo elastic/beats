@@ -43,9 +43,10 @@ import (
 // factory implements the cfgfile.RunnerFactory interface and wraps the
 // v2.Loader to create cfgfile.Runner instances based on available v2 inputs.
 type factory struct {
-	log    *logp.Logger
-	info   beat.Info
-	loader *v2.Loader
+	log        *logp.Logger
+	info       beat.Info
+	monitoring beat.Monitoring
+	loader     *v2.Loader
 }
 
 // runner wraps a v2.Input, starting a go-routine
@@ -70,9 +71,10 @@ type runner struct {
 func RunnerFactory(
 	log *logp.Logger,
 	info beat.Info,
+	monitoring beat.Monitoring,
 	loader *v2.Loader,
 ) cfgfile.RunnerFactory {
-	return &factory{log: log, info: info, loader: loader}
+	return &factory{log: log, info: info, monitoring: monitoring, loader: loader}
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {

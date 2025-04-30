@@ -437,11 +437,9 @@ func TestManager_InputsRun(t *testing.T) {
 		require.NoError(t, err)
 		id = uuid.Must(uuid.NewV4()).String()
 		ctx = input.Context{
-			ID:            id,
-			IDWithoutName: id,
-			Name:          inp.Name(),
-			Agent: beat.Info{Monitoring: beat.Monitoring{
-				Namespace: monitoring.GetNamespace("TestManager_InputsRun")}},
+			ID:              id,
+			IDWithoutName:   id,
+			Name:            inp.Name(),
 			Cancelation:     context.Background(),
 			StatusReporter:  nil,
 			MetricsRegistry: monitoring.NewRegistry(),

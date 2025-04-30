@@ -123,7 +123,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	}
 
 	if b.API != nil {
-		if err = inputmon.AttachHandler(b.API.Router(), b.Info.Monitoring.NamespaceRegistry()); err != nil {
+		if err = inputmon.AttachHandler(b.API.Router(), b.Monitoring.NamespaceRegistry()); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
@@ -131,7 +131,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *conf.C) (beat.Bea
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON(b.Info.Monitoring.NamespaceRegistry())
+				data, err := inputmon.MetricSnapshotJSON(b.Monitoring.NamespaceRegistry())
 				if err != nil {
 					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
@@ -273,14 +273,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	waitEvents := newSignalWait()
 
 	// count active events for waiting on shutdown
-	var reg *monitoring.Registry
-
-	if b.Info.Monitoring.Namespace != nil {
-		reg = b.Info.Monitoring.Namespace.GetRegistry().GetRegistry("stats")
-		if reg == nil {
-			reg = b.Info.Monitoring.Namespace.GetRegistry().NewRegistry("stats")
-		}
-	}
+	reg := b.Monitoring.StatsRegistry
 	wgEvents := &eventCounter{
 		count: monitoring.NewInt(reg, "filebeat.events.active"), // Gauge
 		added: monitoring.NewUint(reg, "filebeat.events.added"),
@@ -385,7 +378,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	inputLoader := channel.RunnerFactoryWithCommonInputSettings(b.Info, compat.Combine(
-		compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader),
+		compat.RunnerFactory(inputsLogger, b.Info, b.Monitoring, v2InputLoader),
 		input.NewRunnerFactory(pipelineConnector, registrar, fb.done, fb.logger),
 	))
 

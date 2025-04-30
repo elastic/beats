@@ -30,10 +30,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// RegistryLookupFunc is used for looking up specfic registry inside a namespace
-func RegistryLookupFunc(rootNamespace *monitoring.Namespace) LookupFunc {
+// RegistryLookupFunc is used to look up a registry by its path inside a
+// containing registry.
+func RegistryLookupFunc(root *monitoring.Registry) LookupFunc {
 	return func(s string) *monitoring.Registry {
-		return rootNamespace.GetRegistry().GetRegistry(s)
+		return root.GetRegistry(s)
 	}
 }
 

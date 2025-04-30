@@ -67,25 +67,19 @@ func (b *BeatReceiver) startMonitoring() error {
 
 	b.Beat.RegisterMetrics()
 
-	statsReg := b.Beat.Info.Monitoring.StatsRegistry
+	statsReg := b.Beat.Monitoring.StatsRegistry
 
 	// stats.beat
-	processReg := statsReg.GetRegistry("beat")
-	if processReg == nil {
-		processReg = statsReg.NewRegistry("beat")
-	}
+	processReg := statsReg.GetOrCreateRegistry("beat")
 
 	// stats.system
-	systemReg := statsReg.GetRegistry("system")
-	if systemReg == nil {
-		systemReg = statsReg.NewRegistry("system")
-	}
+	systemReg := statsReg.GetOrCreateRegistry("system")
 
 	err = metricreport.SetupMetrics(logp.NewLogger("metrics"), b.Beat.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
 	if err != nil {
 		return err
 	}
-	b.Beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), b.HttpConf, api.RegistryLookupFunc(b.Beat.Info.Monitoring.Namespace))
+	b.Beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), b.HttpConf, api.RegistryLookupFunc(b.Beat.Monitoring.Namespace))
 	if err != nil {
 		return err
 	}
