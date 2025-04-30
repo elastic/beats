@@ -238,6 +238,7 @@ func TestClientOutputListener_saramaMock(t *testing.T) {
 
 var _ beat.OutputListener = (*countListener)(nil)
 
+// TODO(Anderson): move to a generic place
 type countListener struct {
 	acked,
 	deadLetter,
