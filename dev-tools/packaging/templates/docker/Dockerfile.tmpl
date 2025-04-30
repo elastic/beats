@@ -233,15 +233,6 @@ done; \
 # Journald input
 {{- if (eq .BeatName "filebeat") }}
 
-    {{- if (contains .from "wolfi") }}
-    RUN for iter in {1..10}; do \
-            apk update && \
-            apk add --no-interactive --no-progress --no-cache systemd && \
-            exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
-        done; \
-        (exit $exit_code)
-    {{- end}}
-
     {{- if (contains .from "ubi") }}
     RUN for iter in {1..10}; do \
             microdnf -y update && \
