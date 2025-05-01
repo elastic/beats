@@ -20,13 +20,12 @@ package dashboards
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
@@ -131,7 +130,7 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 		return fmt.Errorf("kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
 	}
 
-	var errs multierror.Errors
+	var errs []error
 
 	params := url.Values{}
 	params.Set("overwrite", "true")
@@ -144,7 +143,7 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error loading index pattern: %w", err))
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // ImportDashboard imports the dashboard file
