@@ -170,7 +170,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Go Integration Tests FIPS"
+              context: "libbeat: Go Integration Tests"
 
       - label: ":ubuntu: Libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
