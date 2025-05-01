@@ -1,5 +1,5 @@
 #!/bin/bash
-junitfile=$1 # filename for jnit annotation plugin
+junitfile=$1 # filename for junit annotation plugin
 
 set -euo pipefail
 
@@ -11,10 +11,14 @@ with_go_junit_report
 
 echo "--- Go Test fips140=only"
 set +e
-GODEBUG=fips140=only go test -tags=integration,requirefips -json -race -v ./... > test-fips-report.json
+GODEBUG=fips140=only go test -tags=integration,requirefips -race -v ./... > test-fips-report.txt
 exit_code=$?
 set -e
 
+# Buildkite collapse logs under --- symbols
+# need to change --- to anything else or switch off collapsing (note: not available at the moment of this commit)
+awk '{gsub("---", "----"); print }' test-fips-report.txt
+
 # Create Junit report for junit annotation plugin
-go-junit-report -parser gojson > "${junitfile:-junit-report-fips-linux.xml}" < test-fips-report.json
+go-junit-report > "${junitfile:-junit-report-fips-linux.xml}" < test-fips-report.txt
 exit $exit_code
