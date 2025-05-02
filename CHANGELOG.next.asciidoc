@@ -120,10 +120,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
-- Journald input now works on Docker containers (except Wolfi) {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
-- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
-- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
-- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 
 
 *Heartbeat*
@@ -150,18 +146,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
 - Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
-- Log Cisco Meraki `getDevicePerformanceScores` errors without stopping metrics collection. {pull}41622[41622]
 - Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
 - [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
-- Fixed `creation_date` scientific notation output in the `elasticsearch.index` metricset. {pull}42053[42053]
-- Fix bug where metricbeat unintentionally triggers Windows ASR. {pull}42177[42177]
 - Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
-- Continue collecting metrics even if the Cisco Meraki `getDeviceLicenses` operation fails. {pull}42397[42397]
-- Fixed errors in the `elasticsearch.index` metricset when index settings are missing. {issue}42424[42424] {pull}42426[42426]
-- Fixed panic caused by uninitialized meraki device wifi0 and wifi1 struct pointers in the device WiFi data fetching. {issue}42745[42745] {pull}42746[42746]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
-- Fixed an issue in Metricbeat's Windows module where data collection would fail if the data was unavailable. {issue}42802[42802] {pull}42803[42803]
-- Fix logging argument number mismatch in Metricbeat(Redis). {pull}43072[43072]
 - Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 
 *Osquerybeat*
@@ -249,8 +237,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
-- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
-- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
 
 *Auditbeat*
 
@@ -347,6 +333,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
