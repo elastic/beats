@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"go.uber.org/zap/zaptest/observer"
 )
@@ -73,13 +74,24 @@ func TestNewReceiver(t *testing.T) {
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Conditionf(c, func() bool {
+			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket)
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+			assert.Condition(c, func() bool {
+				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
+					FilterMessageSnippet("add_host_metadata").
+					FilterMessageSnippet("add_cloud_metadata").
+					FilterMessageSnippet("add_docker_metadata").
+					FilterMessageSnippet("add_kubernetes_metadata").
+					Len() == 1
+				assert.True(c, processorsLoaded, "processors not loaded")
+				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
+				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
+			}, "failed to check processors loaded")
 		},
 	})
 }
