@@ -77,6 +77,15 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+<<<<<<< HEAD
+=======
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+>>>>>>> 4d4ea93c5 (Fix failing libbeat unit test pipeline (#44173))
         notify:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
@@ -101,7 +110,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
@@ -129,7 +138,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
