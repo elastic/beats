@@ -121,21 +121,6 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-<<<<<<< HEAD
-	config := Config{
-		Beatconfig: map[string]interface{}{
-			"filebeat": map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{
-						"type":    "benchmark",
-						"enabled": true,
-						"message": "test",
-						"count":   1,
-=======
-	// This test verifies that multiple receivers can be instantiated
-	// in isolation, started, and can ingest logs without interfering
-	// with each other.
-
 	// Receivers need distinct home directories so wrap the config in a function.
 	config := func() *Config {
 		return &Config{
@@ -148,7 +133,6 @@ func TestMultipleReceivers(t *testing.T) {
 							"message": "test",
 							"count":   1,
 						},
->>>>>>> d0520260a (Give test receivers distinct home directories (#44188))
 					},
 				},
 				"output": map[string]interface{}{
