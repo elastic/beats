@@ -79,7 +79,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
@@ -87,6 +87,65 @@ steps:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
 
+<<<<<<< HEAD
+=======
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "mandatory-linux-unit-test-fips-tag"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          mage unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "libbeat/build/*.xml"
+          - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 fips140=only Unit Tests"
+        key: "mandatory-linux-unit-test-fips-only"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          mage goFIPSOnlyUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "libbeat/build/*.xml"
+          - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "libbeat: Ubuntu x86_64 fips140=only Unit Tests"
+
+>>>>>>> 4d4ea93c5 (Fix failing libbeat unit test pipeline (#44173))
       - label: ":ubuntu: Libbeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
