@@ -7,7 +7,6 @@ package fbreceiver
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -58,58 +57,18 @@ func TestNewReceiver(t *testing.T) {
 		},
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Len(t, logs["r1"], 1)
-		},
-	})
-}
-
-func TestReceiverDefaultProcessors(t *testing.T) {
-	config := Config{
-		Beatconfig: map[string]interface{}{
-			"filebeat": map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{
-						"type":    "benchmark",
-						"enabled": true,
-						"message": "test",
-						"count":   1,
-					},
-				},
-			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
-			},
-			"logging": map[string]interface{}{
-				"level": "debug",
-				"selectors": []string{
-					"*",
-				},
-			},
-			"path.home": t.TempDir(),
-		},
-	}
-
-	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T: t,
-		Receivers: []oteltest.ReceiverConfig{
-			{
-				Name:    "r1",
-				Config:  &config,
-				Factory: NewFactory(),
-			},
-		},
-		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
-			require.Len(t, logs["r1"], 1)
-
-			processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
-				FilterMessageSnippet("add_host_metadata").
-				FilterMessageSnippet("add_cloud_metadata").
-				FilterMessageSnippet("add_docker_metadata").
-				FilterMessageSnippet("add_kubernetes_metadata").
-				Len() == 1
-			require.True(t, processorsLoaded, "processors not loaded")
-			// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
-			require.Contains(t, logs["r1"][0].Flatten(), "host.architecture")
+			require.Lenf(t, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
+			assert.Condition(t, func() bool {
+				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
+					FilterMessageSnippet("add_host_metadata").
+					FilterMessageSnippet("add_cloud_metadata").
+					FilterMessageSnippet("add_docker_metadata").
+					FilterMessageSnippet("add_kubernetes_metadata").
+					Len() == 1
+				assert.True(t, processorsLoaded, "processors not loaded")
+				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
+				return assert.Contains(t, logs["r1"][0].Flatten(), "host.architecture")
+			}, "failed to check processors loaded")
 		},
 	})
 }
@@ -200,6 +159,7 @@ func TestMultipleReceivers(t *testing.T) {
 				Factory: factory,
 			},
 		},
+<<<<<<< HEAD
 		AssertFunc: func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
 			require.Len(t, logs["r1"], 1)
@@ -214,15 +174,20 @@ func TestMultipleReceivers(t *testing.T) {
 				fmt.Printf("logs[\"r2\"]: %v\n", logs["r2"])
 				fmt.Printf("all logs: %v\n", logs)
 			}
+=======
+		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
+			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
+			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
+>>>>>>> 049bbcd05 (fix(otel): register default processors for mbreceiver (#44110))
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
 			// logger in Beats was global, causing logger fields to be
 			// overwritten when multiple receivers started in the same process.
 			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r1"))
-			assert.Equal(t, 1, r1StartLogs.Len(), "r1 should have a single start log")
+			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
-			require.Equal(t, 1, r2StartLogs.Len(), "r2 should have a single start log")
+			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 		},
 	})
 }
