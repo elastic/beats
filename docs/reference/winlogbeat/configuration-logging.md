@@ -157,7 +157,7 @@ Examples:
 
 ### `logging.files.interval` [_logging_files_interval]
 
-Enable log file rotation on time intervals in addition to size-based rotation. Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h are boundary-aligned with minutes, hours, days, weeks, months, and years as reported by the local system clock. All other intervals are calculated from the unix epoch. Defaults to disabled.
+Enable log file rotation on time intervals in addition to size-based rotation. Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h are boundary-aligned with minutes, hours, days, weeks, months, and years as reported by the local system clock. All other intervals are calculated from the unix epoch. Defaults to disabled.
 
 
 ### `logging.files.rotateonstartup` [_logging_files_rotateonstartup]
@@ -240,7 +240,7 @@ Examples:
 
 ### `logging.event_data.files.interval` [_logging_event_data_files_interval]
 
-Enable log file rotation on time intervals in addition to size-based rotation. Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h are boundary-aligned with minutes, hours, days, weeks, months, and years as reported by the local system clock. All other intervals are calculated from the unix epoch. Defaults to disabled.
+Enable log file rotation on time intervals in addition to size-based rotation. Intervals must be at least 1s. Values of 1m, 1h, 24h, 7\*24h, 30\*24h, and 365\*24h are boundary-aligned with minutes, hours, days, weeks, months, and years as reported by the local system clock. All other intervals are calculated from the unix epoch. Defaults to disabled.
 
 
 ### `logging.event_data.files.rotateonstartup` [_logging_event_data_files_rotateonstartup]
