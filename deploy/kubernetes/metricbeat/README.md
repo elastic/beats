@@ -20,7 +20,7 @@ This file uses a set of environment variables to configure Elasticsearch output.
     | ELASTICSEARCH_USERNAME | elastic       | Elasticsearch username for HTTP auth |
     | ELASTICSEARCH_PASSWORD | changeme      | Elasticsearch password               |
 
-  * [Elastic Cloud Hosted](https://www.elastic.co/docs/reference/beats/metricbeat/configure-cloud-id):
+  * Elasticsearch service on [Elastic Cloud](https://www.elastic.co/guide/en/beats/metricbeat/current/configure-cloud-id.html):
 
       | Variable           | Default | Description        |
       |--------------------|---------|--------------------|
