@@ -60,15 +60,6 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		return outputs.Fail(err)
 	}
 
-	workersCfg := struct {
-		Workers int `config:"workers"`
-	}{}
-
-	if err := cfg.Unpack(&workersCfg); err != nil {
-		beat.Logger.Warnf("failed to unpack workers: %v; setting workers equal to number of logical CPUs (%d)", err, runtime.NumCPU())
-		workersCfg.Workers = runtime.NumCPU()
-	}
-
 	// Default to runtime.NumCPU() workers
 	clients := make([]outputs.Client, 0, runtime.NumCPU())
 	for range runtime.NumCPU() {

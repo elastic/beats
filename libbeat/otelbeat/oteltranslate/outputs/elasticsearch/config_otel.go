@@ -111,7 +111,6 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 
 	// Create url using host name, protocol and path
 	hosts := []string{}
-
 	for _, h := range escfg.Hosts {
 		esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
 		if err != nil {
