@@ -23,8 +23,8 @@ You need {{es}} for storing and searching your data, and {{kib}} for visualizing
 
 :::::::{tab-set}
 
-::::::{tab-item} Elasticsearch Service
-To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+::::::{tab-item} {{ech}}
+To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
 ::::::{tab-item} Self-managed
@@ -111,8 +111,8 @@ Set the connection information in `filebeat.yml`. To locate this configuration f
 
 :::::::{tab-set}
 
-::::::{tab-item} Elasticsearch Service
-Specify the [cloud.id](/reference/filebeat/configure-cloud-id.md) of your {{ess}}, and set [cloud.auth](/reference/filebeat/configure-cloud-id.md) to a user who is authorized to set up Filebeat. For example:
+::::::{tab-item} {{ech}}
+Specify the [cloud.id](/reference/filebeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/filebeat/configure-cloud-id.md) to a user who is authorized to set up Filebeat. For example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
@@ -330,7 +330,7 @@ This step loads the recommended [index template](docs-content://manage-data/data
 This step does not load the ingest pipelines used to parse log lines. By default, ingest pipelines are set up automatically the first time you run the module and connect to {{es}}.
 
 :::{tip}
-A connection to {{es}} (or {{ess}}) is required to set up the initial environment. If you're using a different output, such as {{ls}}, see:
+A connection to {{es}} (or {{ech}}) is required to set up the initial environment. If you're using a different output, such as {{ls}}, see:
 
 * [](/reference/filebeat/filebeat-template.md#load-template-manually)
 * [](/reference/filebeat/load-kibana-dashboards.md)
@@ -415,7 +415,7 @@ To open the dashboards:
 1. Launch {{kib}}:
 
     :::::::{tab-set}
-    ::::::{tab-item} Elasticsearch Service
+    ::::::{tab-item} {{ech}}
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::

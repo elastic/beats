@@ -24,8 +24,8 @@ You need {{es}} for storing and searching your data, and {{kib}} for visualizing
 
 :::::::{tab-set}
 
-::::::{tab-item} Elasticsearch Service
-To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+::::::{tab-item} {{ech}}
+To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
 ::::::{tab-item} Self-managed
@@ -110,8 +110,8 @@ Set the connection information in `heartbeat.yml`. To locate this configuration 
 
 :::::::{tab-set}
 
-::::::{tab-item} Elasticsearch Service
-Specify the [cloud.id](/reference/heartbeat/configure-cloud-id.md) of your {{ess}}, and set [cloud.auth](/reference/heartbeat/configure-cloud-id.md) to a user who is authorized to set up Heartbeat. For example:
+::::::{tab-item} {{ech}}
+Specify the [cloud.id](/reference/heartbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/heartbeat/configure-cloud-id.md) to a user who is authorized to set up Heartbeat. For example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
@@ -353,7 +353,7 @@ To open the dashboards:
 1. Launch {{kib}}:
 
     :::::::{tab-set}
-    ::::::{tab-item} Elasticsearch Service
+    ::::::{tab-item} {{ech}}
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
