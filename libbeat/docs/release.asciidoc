@@ -9,6 +9,7 @@ This section summarizes the changes in each release. Also read
 upgrade.
 
 * <<release-notes-8.18.0>>
+* <<release-notes-8.17.5>>
 * <<release-notes-8.17.4>>
 * <<release-notes-8.17.3>>
 * <<release-notes-8.17.2>>
