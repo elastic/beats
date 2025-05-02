@@ -121,6 +121,7 @@ func BenchmarkFactory(b *testing.B) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
+<<<<<<< HEAD
 	config := Config{
 		Beatconfig: map[string]interface{}{
 			"filebeat": map[string]interface{}{
@@ -130,20 +131,38 @@ func TestMultipleReceivers(t *testing.T) {
 						"enabled": true,
 						"message": "test",
 						"count":   1,
+=======
+	// This test verifies that multiple receivers can be instantiated
+	// in isolation, started, and can ingest logs without interfering
+	// with each other.
+
+	// Receivers need distinct home directories so wrap the config in a function.
+	config := func() *Config {
+		return &Config{
+			Beatconfig: map[string]interface{}{
+				"filebeat": map[string]interface{}{
+					"inputs": []map[string]interface{}{
+						{
+							"type":    "benchmark",
+							"enabled": true,
+							"message": "test",
+							"count":   1,
+						},
+>>>>>>> d0520260a (Give test receivers distinct home directories (#44188))
 					},
 				},
-			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
-			},
-			"logging": map[string]interface{}{
-				"level": "info",
-				"selectors": []string{
-					"*",
+				"output": map[string]interface{}{
+					"otelconsumer": map[string]interface{}{},
 				},
+				"logging": map[string]interface{}{
+					"level": "info",
+					"selectors": []string{
+						"*",
+					},
+				},
+				"path.home": t.TempDir(),
 			},
-			"path.home": t.TempDir(),
-		},
+		}
 	}
 
 	factory := NewFactory()
@@ -152,12 +171,12 @@ func TestMultipleReceivers(t *testing.T) {
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
-				Config:  &config,
+				Config:  config(),
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
-				Config:  &config,
+				Config:  config(),
 				Factory: factory,
 			},
 		},
