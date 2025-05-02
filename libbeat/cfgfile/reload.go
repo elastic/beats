@@ -18,12 +18,11 @@
 package cfgfile
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"sync"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -269,7 +268,7 @@ func (rl *Reloader) Load(runnerFactory RunnerFactory) {
 func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error) {
 	// Load all config objects
 	result := []*reload.ConfigWithMeta{}
-	var errs multierror.Errors
+	var errs []error
 	for _, file := range files {
 		configs, err := LoadList(file)
 		if err != nil {
@@ -283,7 +282,7 @@ func (rl *Reloader) loadConfigs(files []string) ([]*reload.ConfigWithMeta, error
 		}
 	}
 
-	return result, errs.Err()
+	return result, errors.Join(errs...)
 }
 
 // Stop stops the reloader and waits for all modules to properly stop
