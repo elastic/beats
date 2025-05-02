@@ -28,7 +28,6 @@ import (
 	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -189,8 +188,9 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 		}()
 	}
 
-	var responses []result
+	var response *result
 
+outerLoop:
 	for ctx.Err() == nil {
 		select {
 		case result := <-results:
@@ -198,45 +198,29 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 				result.provider, time.Since(start), result)
 
 			if result.err == nil && result.metadata != nil {
-				responses = append(responses, result)
+				if slices.Contains(priorityProviders, result.provider) {
+					// We got a valid response from a priority provider, we don't need
+					// to wait for the rest.
+					response = &result
+					break outerLoop
+				}
+				// For non-priority providers, only set the response if it's currently
+				// empty.
+				if response == nil {
+					response = &result
+				}
 			}
 
 			if result.err != nil {
 				p.logger.Debugf("add_cloud_metadata: received error for provider %s: %v", result.provider, result.err)
 			}
 		case <-ctx.Done():
-			p.logger.Debugf("add_cloud_metadata: timed-out waiting for responses")
+			if response == nil {
+				p.logger.Debugf("add_cloud_metadata: timed-out waiting for responses")
+			}
 		}
 	}
 
-	return priorityResult(responses, p.logger)
-}
-
-// priorityResult is a helper to extract correct result (if multiple exist) based on priorityProviders
-func priorityResult(responses []result, logger *logp.Logger) *result {
-	if len(responses) == 0 {
-		return nil
-	}
-
-	if len(responses) == 1 {
-		return &responses[0]
-	}
-
-	logger.Debugf("add_cloud_metadata: multiple responses were received, filtering based on priority")
-	var prioritizedResponses []result
-	for _, r := range responses {
-		if slices.Contains(priorityProviders, r.provider) {
-			prioritizedResponses = append(prioritizedResponses, r)
-		}
-	}
-
-	// simply send the first entry of prioritized response
-	if len(prioritizedResponses) != 0 {
-		pr := prioritizedResponses[0]
-		logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", pr.provider)
-		return &pr
-	}
-
-	// else send the first from bulk of response
-	return &responses[0]
+	p.logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", response.provider)
+	return response
 }
