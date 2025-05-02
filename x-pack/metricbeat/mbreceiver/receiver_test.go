@@ -5,6 +5,7 @@
 package mbreceiver
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -22,7 +23,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+<<<<<<< HEAD
+=======
+	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/receiver"
+>>>>>>> ef4bf7d20 (otel(tests): fix BenchmarkFactory for beats receivers (#44127))
 
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 )
 
@@ -236,4 +245,52 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 		return false
 	}
 	return true
+}
+
+func BenchmarkFactory(b *testing.B) {
+	tmpDir := b.TempDir()
+
+	cfg := &Config{
+		Beatconfig: map[string]interface{}{
+			"metricbeat": map[string]any{
+				"modules": []map[string]any{
+					{
+						"module":     "system",
+						"enabled":    true,
+						"period":     "1s",
+						"processes":  []string{".*"},
+						"metricsets": []string{"cpu"},
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"logging": map[string]any{
+				"level": "info",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": tmpDir,
+		},
+	}
+
+	var zapLogs bytes.Buffer
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.Lock(zapcore.AddSync(&zapLogs)),
+		zapcore.InfoLevel)
+
+	factory := NewFactory()
+
+	receiverSettings := receiver.Settings{}
+	receiverSettings.Logger = zap.New(core)
+	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+	}
 }

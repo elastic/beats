@@ -6,8 +6,11 @@ package fbreceiver
 
 import (
 	"bytes"
+<<<<<<< HEAD
 	"context"
 	"fmt"
+=======
+>>>>>>> ef4bf7d20 (otel(tests): fix BenchmarkFactory for beats receivers (#44127))
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -15,6 +18,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -133,7 +137,7 @@ func BenchmarkFactory(b *testing.B) {
 				"otelconsumer": map[string]interface{}{},
 			},
 			"logging": map[string]interface{}{
-				"level": "debug",
+				"level": "info",
 				"selectors": []string{
 					"*",
 				},
@@ -146,15 +150,17 @@ func BenchmarkFactory(b *testing.B) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
-		zapcore.DebugLevel)
+		zapcore.InfoLevel)
+
+	factory := NewFactory()
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
+	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
 
-	factory := NewFactory()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := factory.CreateLogs(context.Background(), receiverSettings, cfg, nil)
+		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
 }
@@ -176,7 +182,7 @@ func TestMultipleReceivers(t *testing.T) {
 				"otelconsumer": map[string]interface{}{},
 			},
 			"logging": map[string]interface{}{
-				"level": "debug",
+				"level": "info",
 				"selectors": []string{
 					"*",
 				},
