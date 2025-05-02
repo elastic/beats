@@ -3,6 +3,194 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.17.6]]
+=== Beats version 8.17.6
+https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Journald input now works on Docker containers (except Wolfi) {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+
+*Auditbeat*
+
+
+*Libbeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+
+*Functionbeat*
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-8.17.5]]
 === Beats version 8.17.5
 https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
