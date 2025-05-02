@@ -12,6 +12,10 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+## 9.0.1 [beats-9.0.1-breaking-changes]
+
+_No breaking changes_
+
 ## 9.0.0 [beats-900-breaking-changes]
 
 % Description and impact of the breaking change.
