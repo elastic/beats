@@ -42,6 +42,9 @@ and metadata information from metricsets and fetch metrics only. At the moment,
 
 * *endpoint*: A custom endpoint to use for the GCP API calls. If not specified, the default endpoint will be used.
 
+* *collect_dataproc_user_labels*: (`true`/`false` default `false`) Retrieve additional
+user-defined labels from Dataproc clusters.
+
 [float]
 == Example configuration
 * `compute` metricset is enabled to collect metrics from `us-central1-a` zone
