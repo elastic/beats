@@ -28,6 +28,7 @@ import (
 	"time"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -188,14 +189,23 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 		}()
 	}
 
+	return acceptFirstPriorityResult(ctx, p.logger, start, results)
+}
+
+func acceptFirstPriorityResult(
+	ctx context.Context,
+	logger *logp.Logger,
+	startTime time.Time,
+	results chan result,
+) *result {
 	var response *result
 
 outerLoop:
 	for ctx.Err() == nil {
 		select {
 		case result := <-results:
-			p.logger.Debugf("add_cloud_metadata: received disposition for %v after %v. %v",
-				result.provider, time.Since(start), result)
+			logger.Debugf("add_cloud_metadata: received disposition for %v after %v. %v",
+				result.provider, time.Since(startTime), result)
 
 			if result.err == nil && result.metadata != nil {
 				if slices.Contains(priorityProviders, result.provider) {
@@ -212,15 +222,16 @@ outerLoop:
 			}
 
 			if result.err != nil {
-				p.logger.Debugf("add_cloud_metadata: received error for provider %s: %v", result.provider, result.err)
+				logger.Debugf("add_cloud_metadata: received error for provider %s: %v", result.provider, result.err)
 			}
 		case <-ctx.Done():
-			if response == nil {
-				p.logger.Debugf("add_cloud_metadata: timed-out waiting for responses")
-			}
 		}
 	}
 
-	p.logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", response.provider)
+	if response != nil {
+		logger.Debugf("add_cloud_metadata: using provider %s metadata based on priority", response.provider)
+	} else {
+		logger.Debugf("add_cloud_metadata: timed-out waiting for responses")
+	}
 	return response
 }

@@ -18,13 +18,17 @@
 package add_cloud_metadata
 
 import (
+	"context"
+	"errors"
 	"os"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -116,6 +120,94 @@ func TestProvidersFilter(t *testing.T) {
 
 			sort.Strings(actual)
 			assert.Equal(t, expected, actual)
+		})
+	}
+}
+
+func Test_priorityResult(t *testing.T) {
+	tLogger := logp.NewLogger("add_cloud_metadata testing")
+	awsRsp := result{
+		provider: "aws",
+		metadata: map[string]interface{}{
+			"id": "a-1",
+		},
+	}
+
+	openStackRsp := result{
+		provider: "openstack",
+		metadata: map[string]interface{}{
+			"id": "o-1",
+		},
+	}
+
+	digitaloceanRsp := result{
+		provider: "digitalocean",
+		metadata: map[string]interface{}{
+			"id": "d-1",
+		},
+	}
+
+	tests := []struct {
+		name      string
+		collected []result
+		want      *result
+	}{
+		{
+			name:      "Empty results returns nil",
+			collected: []result{},
+			want:      nil,
+		},
+		{
+			name: "Error result returns nil",
+			collected: []result{
+				{
+					provider: "aws",
+					err:      errors.New("some error"),
+				},
+			},
+			want: nil,
+		},
+		{
+			name:      "Single result returns the same",
+			collected: []result{awsRsp},
+			want:      &awsRsp,
+		},
+		{
+			name:      "Priority result wins",
+			collected: []result{openStackRsp, awsRsp},
+			want:      &awsRsp,
+		},
+		{
+			name:      "For non-priority result, response order wins",
+			collected: []result{openStackRsp, digitaloceanRsp},
+			want:      &openStackRsp,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a buffered result channel with the test results preloaded
+			resultChan := make(chan result)
+			ctx, cancel := context.WithCancel(context.Background())
+
+			responseChan := make(chan *result)
+			go func() {
+				response := acceptFirstPriorityResult(ctx, tLogger, time.Now(), resultChan)
+				cancel()
+				responseChan <- response
+			}()
+
+			for _, result := range tt.collected {
+				select {
+				case resultChan <- result:
+				case <-ctx.Done():
+				}
+			}
+			// Cancel the context for cases that haven't returned yet and
+			// fetch the final response.
+			cancel()
+			response := <-responseChan
+
+			assert.Equal(t, tt.want, response)
 		})
 	}
 }
