@@ -76,8 +76,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/joeshaw/multierror"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/schema"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -92,13 +90,13 @@ type ConvMap struct {
 }
 
 // Map drills down in the data dictionary by using the key
-func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface{}) multierror.Errors {
+func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface{}) []error {
 	d, err := mapstr.M(data).GetValue(convMap.Key)
 	if err != nil {
 		err := schema.NewKeyNotFoundError(convMap.Key)
 		err.Optional = convMap.Optional
 		err.Required = convMap.Required
-		return multierror.Errors{err}
+		return []error{err}
 	}
 	switch subData := d.(type) {
 	case map[string]interface{}, mapstr.M:
@@ -117,7 +115,7 @@ func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface
 		msg := fmt.Sprintf("expected dictionary, found %T", subData)
 		err := schema.NewWrongFormatError(convMap.Key, msg)
 		logp.Err("%s", err.Error())
-		return multierror.Errors{err}
+		return []error{err}
 	}
 }
 
