@@ -190,6 +190,10 @@ func getDeviceLicenses(client *meraki.Client, organizationID string, devices map
 			return nil
 		}
 
+		if strings.Contains(err.Error(), "does not support per-device licensing") {
+			return nil
+		}
+
 		if res != nil {
 			return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
 		}
