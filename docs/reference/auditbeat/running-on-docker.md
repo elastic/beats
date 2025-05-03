@@ -108,8 +108,8 @@ The Docker image provides several methods for configuring Auditbeat. The convent
 
 Download this example configuration file as a starting point:
 
-```sh
-curl -L -O https://raw.githubusercontent.com/elastic/beats/master/deploy/docker/auditbeat.docker.yml
+```sh subs=true
+curl -L -O https://raw.githubusercontent.com/elastic/beats/{{major-version}}/deploy/docker/auditbeat.docker.yml
 ```
 
 

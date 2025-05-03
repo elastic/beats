@@ -21,11 +21,10 @@ package eventlog
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -58,6 +57,10 @@ type config struct {
 	SimpleQuery   query              `config:",inline"`
 	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
 	EventLanguage uint32             `config:"language"`
+
+	// FIXME: This is for a WS2025 known issue so we can bypass the workaround
+	// and will be removed in the future.
+	Bypass2025Workaround bool `config:"bypass_2025_workaround"`
 }
 
 // query contains parameters used to customize the event log data that is
@@ -103,7 +106,7 @@ func (a NoMoreEventsAction) String() string { return noMoreEventsActionNames[a] 
 // Validate validates the winEventLogConfig data and returns an error describing
 // any problems or nil.
 func (c *config) Validate() error {
-	var errs multierror.Errors
+	var errs []error
 
 	if c.XMLQuery != "" {
 		if c.ID == "" {
@@ -131,5 +134,5 @@ func (c *config) Validate() error {
 		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
