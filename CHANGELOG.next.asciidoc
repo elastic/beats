@@ -113,6 +113,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 - Journald input now works on Docker containers (except Wolfi) {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
+
 
 *Heartbeat*
 
