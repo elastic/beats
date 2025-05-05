@@ -25,9 +25,9 @@ You need {{es}} for storing and searching your data, and {{kib}} for visualizing
 :::::::{tab-set}
 :group: deployment
 
-::::::{tab-item} Elasticsearch Service
+::::::{tab-item} {{ech}}
 :sync: hosted
-To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
 ::::::{tab-item} Self-managed
@@ -81,9 +81,9 @@ Set the connection information in `winlogbeat.yml`. To locate this configuration
 :::::::{tab-set}
 :group: deployment
 
-::::::{tab-item} Elasticsearch Service
+::::::{tab-item} {{ech}}
 :sync: hosted
-Specify the [cloud.id](/reference/winlogbeat/configure-cloud-id.md) of your {{ess}}, and set [cloud.auth](/reference/winlogbeat/configure-cloud-id.md) to a user who is authorized to set up Winlogbeat. For example:
+Specify the [cloud.id](/reference/winlogbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/winlogbeat/configure-cloud-id.md) to a user who is authorized to set up Winlogbeat. For example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
@@ -181,7 +181,7 @@ Winlogbeat comes with predefined assets for parsing, indexing, and visualizing y
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} , loads the ingest pipelines to parse the events (x-pack only), and deploys the sample dashboards for visualizing the data in {{kib}}.
 
 ::::{tip}
-A connection to {{es}} (or {{ess}}) is required to set up the initial environment. If you’re using a different output, such as {{ls}}, see:
+A connection to {{es}} (or {{ech}}) is required to set up the initial environment. If you’re using a different output, such as {{ls}}, see:
 
 * [Load the index template manually](/reference/winlogbeat/winlogbeat-template.md#load-template-manually)
 * [*Load {{kib}} dashboards*](/reference/winlogbeat/load-kibana-dashboards.md)
@@ -229,7 +229,7 @@ To open the dashboards:
 
     :::::::{tab-set}
     :group: deployment
-    ::::::{tab-item} Elasticsearch Service
+    ::::::{tab-item} {{ech}}
     :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
