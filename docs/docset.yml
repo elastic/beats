@@ -16,6 +16,7 @@ subs:
   beats-ref:   "https://www.elastic.co/guide/en/beats/libbeat/current"
   ecloud:   "Elastic Cloud"
   ess:   "Elasticsearch Service"
+  ech: "Elastic Cloud Hosted"
   es-serverless:   "Elasticsearch Serverless"
   uptime-app:   "Uptime app"
   logs-app:   "Logs app"

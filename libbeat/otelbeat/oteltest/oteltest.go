@@ -122,12 +122,19 @@ func CheckReceivers(params CheckReceiversParams) {
 		}()
 	}
 
+	t.Cleanup(func() {
+		if t.Failed() {
+			logsMu.Lock()
+			defer logsMu.Unlock()
+			t.Logf("Ingested Logs: %v", logs)
+		}
+	})
+
 	require.EventuallyWithT(t, func(ct *assert.CollectT) {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
 		// Ensure the logger fields from the otel collector are present in the logs.
-
 		for _, zl := range zapLogs.All() {
 			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
 			require.Equal(t, zl.ContextMap()["otelcol.component.kind"], "Receiver")
