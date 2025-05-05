@@ -413,6 +413,8 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
+          - elastic/oblt-aws-auth#v0.1.0:
+              duration: 3600 # seconds
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: AWS Tests"
