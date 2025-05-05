@@ -6,7 +6,7 @@ mapped_pages:
 # PostgreSQL module [metricbeat-module-postgresql]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/postgresql.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/postgresql/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -26,9 +26,7 @@ Default metricsets are `activity`, `bgwriter` and `database`.
 
 The PostgreSQL module comes with a predefined dashboard showing databse related metrics. For example:
 
-:::{image} images/metricbeat-postgresql-overview.png
-:alt: metricbeat postgresql overview
-:::
+![metricbeat postgresql overview](images/metricbeat-postgresql-overview.png)
 
 
 ## Module-specific configuration notes [_module_specific_configuration_notes_17]

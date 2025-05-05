@@ -6,7 +6,7 @@ mapped_pages:
 # System module [metricbeat-module-system]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/system.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/system/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -38,9 +38,7 @@ Note that in some cases a field like this may be missing from the System module 
 
 The System module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat_system_dashboard.png
-:alt: metricbeat system dashboard
-:::
+![metricbeat system dashboard](images/metricbeat_system_dashboard.png)
 
 
 ## Required permissions [_required_permissions]

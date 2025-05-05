@@ -31,12 +31,11 @@ import (
 var esCommonOutput = `
 exporters:
   elasticsearch:
-    api_key: ""
     endpoints:
       - https://localhost:9200
     idle_conn_timeout: 3s
     logs_index: form-otel-exporter
-    num_workers: 0
+    num_workers: 1
     password: changeme
     retry:
       enabled: true
@@ -47,8 +46,8 @@ exporters:
     timeout: 1m30s
     batcher:
       enabled: true
-      max_size_items: 1600
-      min_size_items: 0
+      max_size: 1600
+      min_size: 0
     mapping:
       mode: bodymap       
 `
@@ -174,12 +173,11 @@ service:
 		var expectedOutput = `
 exporters:
   elasticsearch:
-    api_key: ""
     endpoints:
       - https://es-hostname.elastic.co:443
     idle_conn_timeout: 3s
     logs_index: form-otel-exporter
-    num_workers: 0
+    num_workers: 1
     password: password
     retry:
       enabled: true
@@ -190,8 +188,8 @@ exporters:
     timeout: 1m30s
     batcher:
       enabled: true
-      max_size_items: 1600
-      min_size_items: 0
+      max_size: 1600
+      min_size: 0
     mapping:
       mode: bodymap       
 receivers:

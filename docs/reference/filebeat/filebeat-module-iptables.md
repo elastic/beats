@@ -6,7 +6,7 @@ mapped_pages:
 # Iptables module [filebeat-module-iptables]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/iptables.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/iptables/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -95,17 +95,13 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This module comes with sample dashboards showing geolocation and network protocols used. One for all iptables logs:
 
-:::{image} images/kibana-iptables.png
-:alt: kibana iptables
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana iptables](images/kibana-iptables.png)
 
 and one specific for Ubiquiti Firewall logs:
 
-:::{image} images/kibana-iptables-ubiquiti.png
-:alt: kibana iptables ubiquiti
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana iptables ubiquiti](images/kibana-iptables-ubiquiti.png)
 
 
 ## Fields [_fields_24]

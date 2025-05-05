@@ -6,7 +6,7 @@ mapped_pages:
 # Azure module [metricbeat-module-azure]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/azure_metrics.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/azure_metrics/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -35,39 +35,27 @@ The azure module comes with several predefined dashboards for virtual machines, 
 
 The VM overview dashboard shows information about CPU, memory, disk usage as well as operations per second. The two available filters help narrowing down the dashbord to specific regions and/or resource groups. For example:
 
-:::{image} images/metricbeat-azure-vm-overview.png
-:alt: metricbeat azure vm overview
-:::
+![metricbeat azure vm overview](images/metricbeat-azure-vm-overview.png)
 
 If VM guest metrics are enabled then the guest metrics overview dashboard can help with monitoring ASP.NET applications and SQL Server metrics. For example:
 
-:::{image} images/metricbeat-azure-vm-guestmetrics-overview.png
-:alt: metricbeat azure vm guestmetrics overview
-:::
+![metricbeat azure vm guestmetrics overview](images/metricbeat-azure-vm-guestmetrics-overview.png)
 
 The virtual machine scale sets dashboard is similar to the VM dashboard and shows relevant health information about running vm scale sets. For example:
 
-:::{image} images/metricbeat-azure-vmss-overview.png
-:alt: metricbeat azure vmss overview
-:::
+![metricbeat azure vmss overview](images/metricbeat-azure-vmss-overview.png)
 
 The Azure storage dashboards show all relevant metrics for the blob, file, table and queue storage services:
 
-:::{image} images/metricbeat-azure-storage-overview.png
-:alt: metricbeat azure storage overview
-:::
+![metricbeat azure storage overview](images/metricbeat-azure-storage-overview.png)
 
 The Azure billing dashboards show relevant usage and forecast information:
 
-:::{image} images/metricbeat-azure-billing-overview.png
-:alt: metricbeat azure billing overview
-:::
+![metricbeat azure billing overview](images/metricbeat-azure-billing-overview.png)
 
 The Azure app_state dashboard shows relevant application insights information:
 
-:::{image} images/metricbeat-azure-app-state-overview.png
-:alt: metricbeat azure app state overview
-:::
+![metricbeat azure app state overview](images/metricbeat-azure-app-state-overview.png)
 
 
 ### Module-specific configuration notes [_module_specific_configuration_notes_2]

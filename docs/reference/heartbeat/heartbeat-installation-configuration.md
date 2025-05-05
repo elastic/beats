@@ -11,13 +11,11 @@ This guide describes how to get started quickly collecting uptime data about you
 
 * install Heartbeat
 * specify the protocols to monitor
-* send uptime data to {es}
-* visualize the uptime data in {kib}
+* send uptime data to {{es}}
+* visualize the uptime data in {{kib}}
 
-:::{image} images/heartbeat-statistics.png
-:alt: Heartbeat HTTP monitoring dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Heartbeat HTTP monitoring dashboard](images/heartbeat-statistics.png)
 
 
 ## Before you begin [_before_you_begin]
@@ -31,7 +29,7 @@ To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www
 ::::::
 
 ::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/deploy-cluster.md).
+To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
 :::::::
@@ -92,8 +90,8 @@ tar xzvf heartbeat-{{stack-version}}-linux-x86_64.tar.gz
 If script execution is disabled on your system, you need to set the execution policy for the current session to allow the script to run. For example: `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-heartbeat.ps1`.
 :::
 ::::::
-
 :::::::
+
 The commands shown are for AMD platforms, but ARM packages are also available. Refer to the [download page](https://www.elastic.co/downloads/beats/heartbeat) for the full list of available packages.
 
 
@@ -117,7 +115,7 @@ Specify the [cloud.id](/reference/heartbeat/configure-cloud-id.md) of your {{ess
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "heartbeat_setup:{pwd}" <1>
+cloud.auth: "heartbeat_setup:YOUR_PASSWORD" <1>
 ```
 
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/heartbeat/keystore.md).
@@ -130,7 +128,7 @@ cloud.auth: "heartbeat_setup:{pwd}" <1>
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "heartbeat_internal"
-      password: "{pwd}" <1>
+      password: "YOUR_PASSWORD" <1>
       ssl:
         enabled: true
         ca_trusted_fingerprint: "b9a10bbe64ee9826abeda6546fc988c8bf798b41957c33d05db736716513dc9c" <2>
@@ -145,7 +143,7 @@ cloud.auth: "heartbeat_setup:{pwd}" <1>
       setup.kibana:
         host: "mykibanahost:5601" <1>
         username: "my_kibana_user" <2> <3>
-        password: "{pwd}"
+        password: "YOUR_PASSWORD"
     ```
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
@@ -249,37 +247,46 @@ Heartbeat comes with predefined assets for parsing, indexing, and visualizing yo
 1. Make sure the user specified in `heartbeat.yml` is [authorized to set up Heartbeat](/reference/heartbeat/privileges-to-setup-beats.md).
 2. From the installation directory, run:
 
-    :::::::{tab-set}
+:::::::{tab-set}
 
 ::::::{tab-item} DEB
 ```sh
-    heartbeat setup -e
-    ```
+heartbeat setup -e
+```
 ::::::
 
 ::::::{tab-item} RPM
 ```sh
-    heartbeat setup -e
-    ```
+heartbeat setup -e
+```
 ::::::
 
 ::::::{tab-item} MacOS
 ```sh
-    ./heartbeat setup -e
-    ```
+./heartbeat setup -e
+```
 ::::::
 
 ::::::{tab-item} Linux
 ```sh
-    ./heartbeat setup -e
-    ```
+./heartbeat setup -e
+```
 ::::::
 
 ::::::{tab-item} Windows
 ```sh
-    PS > .\heartbeat.exe setup -e
-    ```
+PS > .\heartbeat.exe setup -e
+```
 ::::::
+:::::::
+
+## Step 6: Start Heartbeat [start]
+
+Before starting Heartbeat, modify the user credentials in heartbeat.yml and specify a user who is [authorized to publish events](/reference/heartbeat/privileges-to-publish-events.md).
+
+To start Heartbeat, run:
+
+:::::::{tab-set}
 
 ::::::{tab-item} DEB
 ```sh
@@ -289,7 +296,6 @@ sudo service heartbeat-elastic start
 ::::{note}
 If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
 ::::
-
 
 Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
 ::::::
@@ -332,10 +338,9 @@ PS C:\Program Files\heartbeat> Start-Service heartbeat
 
 By default, Windows log files are stored in `C:\ProgramData\heartbeat\Logs`.
 ::::::
-
 :::::::
-Heartbeat is now ready to check the status of your services and send events to your defined output.
 
+Heartbeat is now ready to check the status of your services and send events to your defined output.
 
 ## Step 7: View your data in {{kib}} [view-data]
 
@@ -347,39 +352,15 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    <div class="tabs" data-tab-group="host">
-      <div role="tablist" aria-label="Open Kibana">
-        <button role="tab"
-                aria-selected="true"
-                aria-controls="cloud-tab-open-kibana"
-                id="cloud-open-kibana">
-          Elasticsearch Service
-        </button>
-        <button role="tab"
-                aria-selected="false"
-                aria-controls="self-managed-tab-open-kibana"
-                id="self-managed-open-kibana"
-                tabindex="-1">
-          Self-managed
-        </button>
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="cloud-tab-open-kibana"
-           aria-labelledby="cloud-open-kibana">
+    :::::::{tab-set}
+    ::::::{tab-item} Elasticsearch Service
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
-
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="self-managed-tab-open-kibana"
-           aria-labelledby="self-managed-open-kibana"
-           hidden="">
+    ::::::
+    ::::::{tab-item} Self-managed
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
-
-      </div>
-    </div>
+    ::::::
+    :::::::
 
 2. In the side navigation, click **Discover**. To see Heartbeat data, make sure the predefined `heartbeat-*` data view is selected.
 

@@ -12,7 +12,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
 - Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
-- Allow faccessat(2) in seccomp. {pull}43322[43322]
 
 *Auditbeat*
 
@@ -39,6 +38,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
 - Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
+- Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
 
 *Osquerybeat*
 
@@ -79,7 +79,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- Restore `maintainer` label for container images {pull}43683[43683]
 
 *Auditbeat*
 
@@ -113,6 +112,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
+
 
 *Heartbeat*
 
@@ -167,6 +171,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
+- Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
+
 
 *Auditbeat*
 
@@ -214,6 +220,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 - Disable event normalization for netflow input {pull}40635[40635]
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
+- Update CEL mito extensions to v1.18.0. {pull}43855[43855]
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
 
 *Auditbeat*
 
@@ -226,6 +236,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Added status to monitor run log report.
 - Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
+- Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
 
 *Metricbeat*
 
@@ -241,7 +252,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
-- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+- Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
 
 *Metricbeat*
 
@@ -251,9 +262,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
-
 *Winlogbeat*
-
 
 
 *Functionbeat*
@@ -294,6 +303,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 

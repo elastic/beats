@@ -6,7 +6,7 @@ mapped_pages:
 # Threat Intel module [filebeat-module-threatintel]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/ti_abusech.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/ti_abusech/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -400,71 +400,58 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 | ThreatStream fields | ECS Fields |
 | --- | --- |
 | asn | threat.indicator.as.number |
-| classification[[1]](#a) | threat.indicator.marking.tlp |
-| confidence[[1]](#a) | threat.indicator.confidence |
+| classification[^1^](#footnote-1) | threat.indicator.marking.tlp |
+| confidence[^1^](#footnote-1) | threat.indicator.confidence |
 | country | threat.indicator.geo.country_iso_code |
 | date_first | threat.indicator.first_seen |
 | date_last | threat.indicator.last_seen |
 | detail | tags |
 | domain | threat.indicator.url.domain |
 | email | threat.indicator.email.address |
-| itype[[1]](#a) | threat.indicator.type |
+| itype[^1^](#footnote-1) | threat.indicator.type |
 | lat | threat.indicator.geo.location.lat |
 | lon | threat.indicator.geo.location.lon |
 | md5 | threat.indicator.file.hash |
 | org | threat.indicator.as.organization.name |
-| severity[[1]](#a) | event.severity |
+| severity[^1^](#footnote-1) | event.severity |
 | source | threat.indicator.provider |
 | srcip | threat.indicator.ip |
 | url | threat.indicator.url.original |
 
-$$$a$$$
-[1]: Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.
+^1^ $$$footnote-1$$$ Field is used to derive a value for the ECS field but its original value is kept under `threatintel.anomalithreatstream`.
 
 
 ## Dashboards [_dashboards_5]
 
 This module comes with dashboards for the threat information feeds.
 
-:::{image} images/filebeat-threatintel-overview.png
-:alt: filebeat threatintel overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel overview](images/filebeat-threatintel-overview.png)
 
 Overview of the information provided, and the health of, the Threat Intel module.
 
-:::{image} images/filebeat-threatintel-abuse-malware.png
-:alt: filebeat threatintel abuse malware
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel abuse malware](images/filebeat-threatintel-abuse-malware.png)
 
 Overview of the information provided by the Abuse.ch Malware feed.
 
-:::{image} images/filebeat-threatintel-abuse-url.png
-:alt: filebeat threatintel abuse url
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel abuse url](images/filebeat-threatintel-abuse-url.png)
 
 Overview of the information provided by the Abuse.ch URL feed.
 
-:::{image} images/filebeat-threatintel-alienvault-otx.png
-:alt: filebeat threatintel alienvault otx
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel alienvault otx](images/filebeat-threatintel-alienvault-otx.png)
 
 Overview of the information provided by the AlienVault OTX feed.
 
-:::{image} images/filebeat-threatintel-anomali.png
-:alt: filebeat threatintel anomali
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel anomali](images/filebeat-threatintel-anomali.png)
 
 Overview of the information provided by the Anomali Limo and Anomali ThreatStream feeds.
 
-:::{image} images/filebeat-threatintel-misp.png
-:alt: filebeat threatintel misp
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel misp](images/filebeat-threatintel-misp.png)
 
 Overview of the information provided by the MISP feed.
 
@@ -523,52 +510,38 @@ ThreatQ fields are mapped to the following ECS fields:
 
 This module comes with dashboards for the threat information feeds.
 
-:::{image} images/filebeat-threatintel-overview.png
-:alt: filebeat threatintel overview
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel overview](images/filebeat-threatintel-overview.png)
 
 Overview of the information provided, and the health of, the Threat Intel module.
 
-:::{image} images/filebeat-threatintel-abuse-malware.png
-:alt: filebeat threatintel abuse malware
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel abuse malware](images/filebeat-threatintel-abuse-malware.png)
 
 Overview of the information provided by the Abuse.ch Malware feed.
 
-:::{image} images/filebeat-threatintel-abuse-url.png
-:alt: filebeat threatintel abuse url
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel abuse url](images/filebeat-threatintel-abuse-url.png)
 
 Overview of the information provided by the Abuse.ch URL feed.
 
-:::{image} images/filebeat-threatintel-alienvault-otx.png
-:alt: filebeat threatintel alienvault otx
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel alienvault otx](images/filebeat-threatintel-alienvault-otx.png)
 
 Overview of the information provided by the AlienVault OTX feed.
 
-:::{image} images/filebeat-threatintel-anomali.png
-:alt: filebeat threatintel anomali
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel anomali](images/filebeat-threatintel-anomali.png)
 
 Overview of the information provided by the Anomali Limo and Anomali ThreatStream feeds.
 
-:::{image} images/filebeat-threatintel-misp.png
-:alt: filebeat threatintel misp
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel misp](images/filebeat-threatintel-misp.png)
 
 Overview of the information provided by the MISP feed.
 
-:::{image} images/filebeat-threatintel-threatq.png
-:alt: filebeat threatintel threatq
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat threatintel threatq](images/filebeat-threatintel-threatq.png)
 
 Overview of the information provided by the ThreatQuotient feed.
 
