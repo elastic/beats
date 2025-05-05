@@ -123,7 +123,7 @@ func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	}()
 	s.log.Infof("Attempting to attach %q to server.", route)
 	s.mux.Handle(route, h)
-	return //nolint:nakedret // returning from recover
+	return // returning from recover
 }
 
 func parse(host string, port int) (string, string, error) {

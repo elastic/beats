@@ -47,10 +47,8 @@ func makeListener(cfg Config) (net.Listener, error) {
 	}
 
 	if network == unixNetwork {
-		if _, err := os.Stat(path); !os.IsNotExist(err) {
-			if err := os.Remove(path); err != nil {
-				return nil, fmt.Errorf("cannot remove existing unix socket file at location %s: %w", path, err)
-			}
+		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+			return nil, fmt.Errorf("cannot remove existing unix socket file at location %s: %w", path, err)
 		}
 	}
 
