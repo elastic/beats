@@ -20,6 +20,7 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"runtime"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -54,6 +55,7 @@ type otelConsumer struct {
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
+<<<<<<< HEAD
 
 	out := &otelConsumer{
 		observer:     observer,
@@ -62,11 +64,25 @@ func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.O
 		log:          logp.NewLogger("otelconsumer"),
 	}
 
+=======
+>>>>>>> 8cee5f57d ([otelconsumer] Create multiple otelconsumer clients (#44009))
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
 	}
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, out)
+
+	// Default to runtime.NumCPU() workers
+	clients := make([]outputs.Client, 0, runtime.NumCPU())
+	for range runtime.NumCPU() {
+		clients = append(clients, &otelConsumer{
+			observer:     observer,
+			logsConsumer: beat.LogConsumer,
+			beatInfo:     beat,
+			log:          beat.Logger.Named("otelconsumer"),
+		})
+	}
+
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, clients...)
 }
 
 // Close is a noop for otelconsumer
