@@ -26,6 +26,7 @@ scms:
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: '{{ requiredEnv "BRANCH" }}'
       commitusingapi: true
+      force: false
 
 sources:
   latestVersion:

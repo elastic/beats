@@ -93,7 +93,6 @@ require (
 	github.com/hashicorp/nomad/api v0.0.0-20240717122358-3d93bd3778f3
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
 	github.com/insomniacslk/dhcp v0.0.0-20220119180841-3c283ff8b7dd
-	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
@@ -128,7 +127,7 @@ require (
 	golang.org/x/crypto v0.36.0
 	golang.org/x/mod v0.21.0
 	golang.org/x/net v0.38.0
-	golang.org/x/oauth2 v0.25.0
+	golang.org/x/oauth2 v0.27.0
 	golang.org/x/sync v0.12.0
 	golang.org/x/sys v0.31.0
 	golang.org/x/text v0.23.0
@@ -180,7 +179,7 @@ require (
 	github.com/elastic/go-elasticsearch/v8 v8.17.1
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
-	github.com/elastic/mito v1.18.0
+	github.com/elastic/mito v1.19.0
 	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
 	github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996
 	github.com/elastic/tk-btf v0.1.0
