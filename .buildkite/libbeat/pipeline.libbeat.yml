@@ -79,7 +79,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
@@ -107,7 +107,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
@@ -135,7 +135,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
