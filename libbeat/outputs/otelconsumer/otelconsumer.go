@@ -55,17 +55,6 @@ type otelConsumer struct {
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
-<<<<<<< HEAD
-
-	out := &otelConsumer{
-		observer:     observer,
-		logsConsumer: beat.LogConsumer,
-		beatInfo:     beat,
-		log:          logp.NewLogger("otelconsumer"),
-	}
-
-=======
->>>>>>> 8cee5f57d ([otelconsumer] Create multiple otelconsumer clients (#44009))
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
