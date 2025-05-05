@@ -97,8 +97,7 @@ func fetchRawProviderMetadata(
 
 	// generate AWS specific client with overriding requirements
 	var awsHTTPClient awshttp.BuildableClient
-	awsHTTPClient = *awsHTTPClient.WithTimeout(client.Timeout)
-	awsHTTPClient = *awsHTTPClient.WithTransportOptions(func(tr *http.Transport) {
+	awsHTTPClient = *awsHTTPClient.WithTimeout(client.Timeout).WithTransportOptions(func(tr *http.Transport) {
 		transport, ok := client.Transport.(*http.Transport)
 		if ok {
 			tr.TLSClientConfig = transport.TLSClientConfig
