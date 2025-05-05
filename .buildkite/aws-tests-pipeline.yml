@@ -37,6 +37,7 @@ steps:
       - "x-pack/filebeat/build/*.xml"
       - "x-pack/filebeat/build/*.json"
     plugins:
+      # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-aws-buildkite-oidc.tf
       - elastic/oblt-aws-auth#v0.1.0:
           duration: 3600 # seconds
     notify:
@@ -61,6 +62,7 @@ steps:
       - "x-pack/metricbeat/build/*.xml"
       - "x-pack/metricbeat/build/*.json"
     plugins:
+      # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-aws-buildkite-oidc.tf
       - elastic/oblt-aws-auth#v0.1.0:
           duration: 3600 # seconds
     notify:
