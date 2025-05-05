@@ -79,7 +79,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
@@ -107,7 +107,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
@@ -135,7 +135,7 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
@@ -170,7 +170,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Go Integration Tests FIPS"
+              context: "libbeat: Go Integration Tests"
 
       - label: ":ubuntu: Libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"
