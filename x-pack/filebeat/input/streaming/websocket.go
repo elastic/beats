@@ -68,9 +68,9 @@ func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 // heartBeat sends a ping message to the websocket server at regular intervals
 func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start time.Time) context.CancelFunc {
 	ctx, cancel := context.WithCancel(ctx)
-	// Set initial read deadline
+	// set initial read deadline
 	conn.SetReadDeadline(time.Now().Add(k.cfg.KeepAlive.readControlDeadline))
-	// Set pong handler to update read deadline
+	// set pong handler to update read deadline
 	conn.SetPongHandler(func(string) error {
 		k.log.Debugw("received pong message from websocket server")
 		k.metrics.pongMessageReceivedTime.Update(time.Since(start).Nanoseconds())
