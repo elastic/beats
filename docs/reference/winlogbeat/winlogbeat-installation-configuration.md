@@ -23,12 +23,15 @@ This guide describes how to get started quickly with Windows log monitoring. You
 You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
 :::::::{tab-set}
+:group: deployment
 
 ::::::{tab-item} Elasticsearch Service
+:sync: hosted
 To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
 ::::::{tab-item} Self-managed
+:sync: self
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
@@ -76,8 +79,10 @@ Connections to {{es}} and {{kib}} are required to set up Winlogbeat.
 Set the connection information in `winlogbeat.yml`. To locate this configuration file, see [Directory layout](/reference/winlogbeat/directory-layout.md).
 
 :::::::{tab-set}
+:group: deployment
 
 ::::::{tab-item} Elasticsearch Service
+:sync: hosted
 Specify the [cloud.id](/reference/winlogbeat/configure-cloud-id.md) of your {{ess}}, and set [cloud.auth](/reference/winlogbeat/configure-cloud-id.md) to a user who is authorized to set up Winlogbeat. For example:
 
 ```yaml
@@ -89,6 +94,7 @@ cloud.auth: "winlogbeat_setup:YOUR_PASSWORD" <1>
 ::::::
 
 ::::::{tab-item} Self-managed
+:sync: self
 1. Set the host and port where Winlogbeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Winlogbeat. For example:
 
     ```yaml
@@ -222,11 +228,14 @@ To open the dashboards:
 1. Launch {{kib}}:
 
     :::::::{tab-set}
+    :group: deployment
     ::::::{tab-item} Elasticsearch Service
+    :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
     ::::::{tab-item} Self-managed
+    :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
     :::::::
