@@ -30,7 +30,6 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -317,7 +316,7 @@ func TestPublish(t *testing.T) {
 		esMock := httptest.NewServer(mockESHandler)
 		client, reg := makePublishTestClient(t, esMock.URL)
 
-		counter := &countListener{}
+		counter := &beat.CountOutputListener{}
 		observer := publisher.OutputListener{Listener: counter}
 		evs := []publisher.Event{
 			{
@@ -1317,78 +1316,4 @@ func TestSetDeadLetter(t *testing.T) {
 	assert.Equal(t, errStr, errFields.ErrMessage, "encoded error.message should match value in setDeadLetter")
 }
 
-var _ beat.OutputListener = (*countListener)(nil)
-
-// TODO(Anderson): move to a generic place
-type countListener struct {
-	acked,
-	deadLetter,
-	dropped,
-	duplicateEvents,
-	errTooMany,
-	new,
-	retryableErrors atomic.Int64
-}
-
-func (c *countListener) Acked() {
-	c.acked.Add(1)
-}
-
-func (c *countListener) DeadLetter() {
-	c.deadLetter.Add(1)
-}
-
-func (c *countListener) Dropped() {
-	c.dropped.Add(1)
-}
-
-func (c *countListener) DuplicateEvents() {
-	c.duplicateEvents.Add(1)
-}
-
-func (c *countListener) ErrTooMany() {
-	c.errTooMany.Add(1)
-}
-
-func (c *countListener) NewEvent() {
-	c.new.Add(1)
-}
-
-func (c *countListener) RetryableError() {
-	c.retryableErrors.Add(1)
-}
-
-func (c *countListener) AckedLoad() int64 {
-	return c.acked.Load()
-}
-
-func (c *countListener) DeadLetterLoad() int64 {
-	return c.deadLetter.Load()
-}
-
-func (c *countListener) DroppedLoad() int64 {
-	return c.dropped.Load()
-}
-
-func (c *countListener) DuplicateEventsLoad() int64 {
-	return c.duplicateEvents.Load()
-}
-
-func (c *countListener) ErrTooManyLoad() int64 {
-	return c.errTooMany.Load()
-}
-
-func (c *countListener) NewLoad() int64 {
-	return c.new.Load()
-}
-
-func (c *countListener) RetryableErrorsLoad() int64 {
-	return c.retryableErrors.Load()
-}
-
-func (c *countListener) String() string {
-	return fmt.Sprintf(
-		"New: %d, Acked: %d, Dropped: %d, DeadLetter: %d, DuplicateEvents: %d, ErrTooMany: %d, RetryableErrors: %d",
-		c.new.Load(), c.acked.Load(), c.dropped.Load(), c.deadLetter.Load(),
-		c.duplicateEvents.Load(), c.errTooMany.Load(), c.retryableErrors.Load())
-}
+var _ beat.OutputListener = (*beat.CountOutputListener)(nil)

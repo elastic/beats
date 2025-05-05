@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -95,7 +94,7 @@ func TestClientOutputListener_customMock(t *testing.T) {
 	go c.successWorker(c.producer.Successes())
 	go c.errorWorker(c.producer.Errors())
 
-	counter := &countListener{}
+	counter := &beat.CountOutputListener{}
 	observer := publisher.OutputListener{Listener: counter}
 	b := pipeline.MockBatch{
 		Mu: sync.Mutex{},
@@ -140,23 +139,6 @@ func TestClientOutputListener_customMock(t *testing.T) {
 	assertOutputMetrics(t, counter, reg)
 }
 
-func assertOutputMetrics(t *testing.T, counter *countListener, reg *monitoring.Registry) {
-	assert.Equal(t, int64(2), counter.new.Load())
-	assert.Equal(t, int64(2), counter.acked.Load())
-	assert.Equal(t, int64(1), counter.dropped.Load())
-
-	metrics := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
-	evs, ok := metrics["events"]
-	require.True(t, ok, "could not find 'events' in metrics")
-	parsedEvs, ok := evs.(map[string]any)
-	require.True(t, ok, "could not parse 'events' isn't map[string]int64, it's %T", evs)
-
-	assert.Equal(t, int64(2), parsedEvs["total"].(int64))
-	assert.Equal(t, int64(2), parsedEvs["acked"].(int64))
-	assert.Equal(t, int64(1), parsedEvs["dropped"].(int64))
-	assert.Equal(t, int64(1), parsedEvs["batches"].(int64))
-}
-
 func TestClientOutputListener_saramaMock(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "",
 		// only print stacktrace for errors above ErrorLevel.
@@ -196,7 +178,7 @@ func TestClientOutputListener_saramaMock(t *testing.T) {
 	go c.successWorker(c.producer.Successes())
 	go c.errorWorker(c.producer.Errors())
 
-	counter := &countListener{}
+	counter := &beat.CountOutputListener{}
 	observer := publisher.OutputListener{Listener: counter}
 	b := pipeline.MockBatch{
 		Mu: sync.Mutex{},
@@ -236,50 +218,21 @@ func TestClientOutputListener_saramaMock(t *testing.T) {
 	assertOutputMetrics(t, counter, reg)
 }
 
-var _ beat.OutputListener = (*countListener)(nil)
+func assertOutputMetrics(t *testing.T, counter *beat.CountOutputListener, reg *monitoring.Registry) {
+	assert.Equal(t, int64(2), counter.NewLoad())
+	assert.Equal(t, int64(2), counter.AckedLoad())
+	assert.Equal(t, int64(1), counter.DroppedLoad())
 
-// TODO(Anderson): move to a generic place
-type countListener struct {
-	acked,
-	deadLetter,
-	dropped,
-	duplicateEvents,
-	errTooMany,
-	new,
-	retryableErrors atomic.Int64
-}
+	metrics := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
+	evs, ok := metrics["events"]
+	require.True(t, ok, "could not find 'events' in metrics")
+	parsedEvs, ok := evs.(map[string]any)
+	require.True(t, ok, "could not parse 'events' isn't map[string]int64, it's %T", evs)
 
-func (c *countListener) Acked() {
-	c.acked.Add(1)
-}
-
-func (c *countListener) DeadLetter() {
-	c.deadLetter.Add(1)
-}
-
-func (c *countListener) Dropped() {
-	c.dropped.Add(1)
-}
-
-func (c *countListener) DuplicateEvents() {
-	c.duplicateEvents.Add(1)
-}
-
-func (c *countListener) ErrTooMany() {
-	c.errTooMany.Add(1)
-}
-
-func (c *countListener) NewEvent() {
-	c.new.Add(1)
-}
-
-func (c *countListener) RetryableError() {
-	c.retryableErrors.Add(1)
-}
-
-func (c *countListener) String() string {
-	return fmt.Sprintf("New: %d, Acked: %d, Dropped: %d, DeadLetter: %d",
-		c.new.Load(), c.acked.Load(), c.dropped.Load(), c.deadLetter.Load())
+	assert.Equal(t, int64(2), parsedEvs["total"].(int64))
+	assert.Equal(t, int64(2), parsedEvs["acked"].(int64))
+	assert.Equal(t, int64(1), parsedEvs["dropped"].(int64))
+	assert.Equal(t, int64(1), parsedEvs["batches"].(int64))
 }
 
 type mockProducer struct {
