@@ -21,11 +21,10 @@ package eventlog
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
@@ -107,7 +106,7 @@ func (a NoMoreEventsAction) String() string { return noMoreEventsActionNames[a] 
 // Validate validates the winEventLogConfig data and returns an error describing
 // any problems or nil.
 func (c *config) Validate() error {
-	var errs multierror.Errors
+	var errs []error
 
 	if c.XMLQuery != "" {
 		if c.ID == "" {
@@ -135,5 +134,5 @@ func (c *config) Validate() error {
 		errs = append(errs, fmt.Errorf("event log is missing a 'name'"))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

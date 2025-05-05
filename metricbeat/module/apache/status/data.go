@@ -19,6 +19,7 @@ package status
 
 import (
 	"bufio"
+	"errors"
 	"regexp"
 	"strings"
 
@@ -29,10 +30,10 @@ import (
 )
 
 var (
-	scoreboardRegexp = regexp.MustCompile("(Scoreboard):\\s+((_|S|R|W|K|D|C|L|G|I|\\.)+)")
+	scoreboardRegexp = regexp.MustCompile(`(Scoreboard):\s+((_|S|R|W|K|D|C|L|G|I|\.)+)`)
 
 	// This should match: "CPUSystem: .01"
-	matchNumber = regexp.MustCompile("(^[0-9a-zA-Z ]+):\\s+(\\d*\\.?\\d+)")
+	matchNumber = regexp.MustCompile(`(^[0-9a-zA-Z ]+):\s+(\d*\.?\d+)`)
 
 	schema = s.Schema{
 		"total_accesses":    c.Int("Total Accesses"),
@@ -103,8 +104,8 @@ func applySchema(event mapstr.M, fullEvent map[string]interface{}) error {
 	if _, found := fullEvent["ServerUptimeSeconds"]; !found {
 		applicableSchema = schemaOld
 	}
-	_, err := applicableSchema.ApplyTo(event, fullEvent)
-	return err.Err()
+	_, errs := applicableSchema.ApplyTo(event, fullEvent)
+	return errors.Join(errs...)
 }
 
 // Map body to MapStr
