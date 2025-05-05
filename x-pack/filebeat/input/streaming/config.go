@@ -78,7 +78,7 @@ type retry struct {
 // KeepAlive is the configuration for keep-alive settings.
 type KeepAlive struct {
 	// Enable indicates whether keep-alive is enabled.
-	Enabled bool `config:"enabled"`
+	Enable bool `config:"enable"`
 	// Interval is the interval between keep-alive messages.
 	// by default, this is set to 30 seconds.
 	Interval time.Duration `config:"interval"`

@@ -157,7 +157,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 	}
 
 	// set and assign KeepAlive if enabled
-	if cfg.KeepAlive.Enabled {
+	if cfg.KeepAlive.Enable {
 		// create a new keepAlive instance
 		k := &keepAlive{
 			cfg:     cfg,

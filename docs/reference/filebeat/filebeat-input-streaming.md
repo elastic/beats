@@ -207,6 +207,21 @@ filebeat.inputs:
   url: wss://localhost:443/_stream
 ```
 
+## Keep Alive Configuration
+
+The `streaming` input currently supports keep-alive configuration options for streams of `type: websocket`. Using these configuration options we can further optimize the stability
+of our websocket connections and prevent them from idling out. 
+
+The `keep_alive` setting has the following configuration options:
+
+* `enable`: This indicates whether keep-alive is enabled. By default, this is set to `false`.
+* `interval`: This is the interval between keep-alive messages. This is a time duration value and by default, this is set to `30s`.
+* `write_control_deadline`: This is the deadline for writing control frames (like `PING`, `PONG`, or `CLOSE`) on a websocket connection. This timeout helps prevent indefinite blocking when the server or client is not responding to control frame requests. This is a time duration value and by default, this is set to `10s`.
+   
+::::{note}
+It is recommended to not use `blanket_retries` and `infinite_retries` configuration options together with the `keep_alive` settings. The purpose of `keep_alive` is to keep the connection open so we do not need to `retry` and reconnect all the time. In some scenarios `keep_alive` might not work if the host websocket server is not configured to handle 
+`ping` frames.
+::::
 
 ## Input state [input-state-streaming]
 
