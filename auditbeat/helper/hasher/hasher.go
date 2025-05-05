@@ -19,6 +19,7 @@ package hasher
 
 import (
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -26,7 +27,6 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
-	"github.com/joeshaw/multierror"
 	"golang.org/x/time/rate"
 
 	"github.com/elastic/beats/v7/libbeat/common/file"
@@ -100,7 +100,7 @@ type Config struct {
 
 // Validate validates the config.
 func (c *Config) Validate() error {
-	var errs multierror.Errors
+	var errs []error
 
 	for _, ht := range c.HashTypes {
 		if !ht.IsValid() {
@@ -122,7 +122,7 @@ func (c *Config) Validate() error {
 		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // FileHasher hashes the contents of files.
