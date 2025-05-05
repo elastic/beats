@@ -47,4 +47,4 @@ subs:
   major-version: "9.0"
   major-release: "9.x"
   beats-pull: "https://github.com/elastic/beats/pull/"
-  beats-issue: "https://github.com/elastic/beats/issue/"
+  beats-issue: "https://github.com/elastic/beats/issues/"
