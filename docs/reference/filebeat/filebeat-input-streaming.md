@@ -219,8 +219,7 @@ The `keep_alive` setting has the following configuration options:
 * `write_control_deadline`: This is the deadline for writing control frames (like `PING`, `PONG`, or `CLOSE`) on a websocket connection. This timeout helps prevent indefinite blocking when the server or client is not responding to control frame requests. This is a time duration value and by default, this is set to `10s`.
    
 ::::{note}
-It is recommended to not use `blanket_retries` and `infinite_retries` configuration options together with the `keep_alive` settings. The purpose of `keep_alive` is to keep the connection open so we do not need to `retry` and reconnect all the time. In some scenarios `keep_alive` might not work if the host websocket server is not configured to handle 
-`ping` frames.
+It is recommended to not use `blanket_retries` and `infinite_retries` configuration options together with the `keep_alive` settings. The purpose of `keep_alive` is to keep the connection open so we do not need to `retry` and reconnect all the time. In some scenarios `keep_alive` might not work if the host websocket server is not configured to handle `ping` frames.
 ::::
 
 ## Input state [input-state-streaming]
