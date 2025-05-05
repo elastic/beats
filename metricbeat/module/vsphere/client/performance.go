@@ -22,9 +22,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/vim25/types"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type PerformanceDataFetcher struct {
