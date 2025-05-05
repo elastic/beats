@@ -78,6 +78,27 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	if len(data.triggeredAlarms) > 0 {
 		event.Put("triggered_alarms", data.triggeredAlarms)
 	}
+	if val, ok := data.PerformanceData["cpu.usage.average"]; ok {
+		event.Put("cpu.perc", val.(int64))
+	}
+	if val, ok := data.PerformanceData["disk.usage.average"]; ok {
+		event.Put("disk.average", val.(int64))
+	}
+	if val, ok := data.PerformanceData["disk.read.average"]; ok {
+		event.Put("disk.read.average", val.(int64))
+	}
+	if val, ok := data.PerformanceData["disk.write.average"]; ok {
+		event.Put("disk.write.average", val.(int64))
+	}
+	if val, ok := data.PerformanceData["disk.numberRead.summation"]; ok {
+		event.Put("disk.numberRead", val.(int64))
+	}
+	if val, ok := data.PerformanceData["disk.numberWrite.summation"]; ok {
+		event.Put("disk.numberWrite", val.(int64))
+	}
+	if val, ok := data.PerformanceData["mem.usage.average"]; ok {
+		event.Put("memory.perc", val.(int64))
+	}
 
 	return event
 }
