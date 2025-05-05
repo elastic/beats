@@ -47,6 +47,10 @@ processor_update_interval: {{ .processor_update_interval }}
 processor_start_position: {{ .processor_start_position }}
 {{ end }}
 
+{{ if .processor_log_events }}
+processor_log_events: {{ .processor_log_events }}
+{{ end }}
+
 {{ if .partition_receive_timeout }}
 partition_receive_timeout: {{ .partition_receive_timeout }}
 {{ end }}
