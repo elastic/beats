@@ -546,7 +546,7 @@ func TestErrorPerUnit(t *testing.T) {
 	r.MustRegisterOutput(output)
 	inputs := &mockReloadable{
 		ReloadFn: func(configs []*reload.ConfigWithMeta) error {
-			errs := []error{}
+			var errs []error
 			for _, input := range configs {
 				errs = append(errs, cfgfile.UnitError{
 					UnitID: input.InputUnitID,

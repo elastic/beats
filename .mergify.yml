@@ -9,6 +9,7 @@ queue_rules:
     merge_method: squash
     conditions:
       - check-success=buildkite/beats
+      - check-success=CLA
 defaults:
   actions:
     backport:
@@ -45,7 +46,7 @@ pull_request_rules:
       - -merged
       - -closed
       - conflict
-      - -author=apmmachine
+      - -author=github-actions[bot]
     actions:
         comment:
           message: |
@@ -62,7 +63,7 @@ pull_request_rules:
       - -merged
       - -closed
       - conflict
-      - author=apmmachine
+      - author=github-actions[bot]
       - label=automation
     actions:
       close:
@@ -71,7 +72,7 @@ pull_request_rules:
           There are some other up-to-date pull requests.
   - name: automatic approval for automated pull requests with bump updates
     conditions:
-      - author=apmmachine
+      - author=github-actions[bot]
       - check-success=buildkite/beats
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
@@ -95,7 +96,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-        - head~=^updatecli_bump-elastic-stack
+        - head~=^updatecli_
         - files~=^testing/environments/snapshot.*\.yml$
     actions:
       delete_head_branch:
@@ -106,7 +107,7 @@ pull_request_rules:
         - closed
       - and:
         - label=automation
-        - head~=^updatecli_bump-golang-version
+        - head~=^updatecli_
         - files~=^\.go-version$
     actions:
       delete_head_branch:
@@ -124,20 +125,29 @@ pull_request_rules:
   - name: automatic squash and merge with success checks and the files matching the regex ^.mergify.yml is modified.
     conditions:
       - check-success=buildkite/beats
-      - label=automation
+      - author=elastic-vault-github-plugin-prod[bot]
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
       - "#approved-reviews-by>=1"
     actions:
       queue:
         name: default
+  - name: delete upstream branch for mergify backports
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - head~=^mergify/bp/.*
+    actions:
+      delete_head_branch:
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
       - or:
         - merged
         - closed
       - and:
-        - label=automation
+        - author=elastic-vault-github-plugin-prod[bot]
         - head~=^add-backport-next.*
         - files~=^\.mergify\.yml$
     actions:
