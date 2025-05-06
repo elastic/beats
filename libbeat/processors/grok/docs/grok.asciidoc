@@ -1,0 +1,99 @@
+[[grok]]
+=== grok
+
+++++
+<titleabbrev>grok</titleabbrev>
+++++
+
+The `grok` processor parses a given string the same way as it is used in Logstash or Elasticsearch.
+
+For example, given the following event:
+
+[source,json]
+----
+{
+  "someotherfield": "foo",
+  "message": "1.2.3.4:5678 [30/Apr/2025:14:05:13.969] my_frontend~ my_service_1443/srv002 0/0/3/1/4 200 73 - - ---- 67/65/0/0/0 0/0 \"POST /some/path/here HTTP/1.0\"",
+}
+----
+
+Giving the following grok configuration
+
+[source,yaml]
+----
+processors:
+  - grok:
+      field: "message"
+      pattern: '%{IP:source.address}:%{NUMBER:source.port} \[%{HAPROXYDATE:haproxy.request_date}\] %{NOTSPACE:haproxy.frontend_name} %{USERNAME:haproxy.backend_name}/%{NOTSPACE:haproxy.server_name} %{NUMBER:haproxy.http.request.time_wait_ms:long}/%{NUMBER:haproxy.total_waiting_time_ms:long}/%{NUMBER:haproxy.connection_wait_time_ms:long}/%{NUMBER:haproxy.http.request.time_wait_without_data_ms:long}/%{NUMBER:temp.duration:long} %{NUMBER:http.response.status_code:long} %{NUMBER:haproxy.bytes_read:long} %{NOTSPACE:haproxy.http.request.captured_cookie} %{NOTSPACE:haproxy.http.response.captured_cookie} %{NOTSPACE:haproxy.termination_state} %{NUMBER:haproxy.connections.active:long}/%{NUMBER:haproxy.connections.frontend:long}/%{NUMBER:haproxy.connections.backend:long}/%{NUMBER:haproxy.connections.server:long}/%{NUMBER:haproxy.connections.retries:long} %{NUMBER:haproxy.server_queue:long}/%{NUMBER:haproxy.backend_queue:long} "%{GREEDYDATA:haproxy.http.request.raw_request_line}"'
+      customPatterns:
+        HAPROXYDATE: '%{MONTHDAY}/%{MONTH}/%{YEAR}:%{HOUR}:%{MINUTE}:%{SECOND}.%{INT}'
+----
+
+Your final event will be:
+
+[source,json]
+----
+{
+  "someotherfield": "foo",
+  "message": "1.2.3.4:5678 [30/Apr/2025:14:05:13.969] my_frontend~ my_service_1443/srv002 0/0/3/1/4 200 73 - - ---- 67/65/0/0/0 0/0 \"POST /some/path/here HTTP/1.0\"",
+  "haproxy": {
+    "connections": {
+      "frontend": 65,
+      "backend": 0,
+      "server": 0,
+      "retries": 0,
+      "active": 67
+    },
+    "request_date": "30/Apr/2025:14:05:13.969",
+    "server_name": "srv002",
+    "termination_state": "----",
+    "http": {
+      "request": {
+        "time_wait_without_data_ms": 1,
+        "raw_request_line": "POST /some/path/here HTTP/1.0",
+        "time_wait_ms": 0,
+        "captured_cookie": "-"
+      },
+      "response": {
+        "captured_cookie": "-"
+      }
+    },
+    "frontend_name": "my_frontend~",
+    "backend_queue": 0,
+    "bytes_read": 73,
+    "backend_name": "my_service_1443",
+    "connection_wait_time_ms": 3,
+    "server_queue": 0,
+    "total_waiting_time_ms": 0
+  },
+  "source": {
+    "address": "1.2.3.4",
+    "port": "5678"
+  },
+  "http": {
+    "response": {
+      "status_code": 200
+    }
+  }
+  ...
+}
+----
+
+.grok options
+[options="header"]
+|======
+| Name                    | Required | Default                  | Description                                                                                           |
+| `field`                 | yes      |                          | The name of the field with the event you want to parse         |
+| `pattern`               | yes      |                          | The pattern that should be used to parse.                   |
+| `customPatterns`        | no       |                          | Additional custom patterns can be given (besides all the default patterns, that already exist)|
+|======
+
+[source,yaml]
+----
+processors:
+  - grok:
+      from: "message"
+      pattern: '%{HAPROXYDATE:haproxy.request_data}'
+      customPatterns:
+        HAPROXYDATE: '%{MONTHDAY}/%{MONTH}/%{YEAR}:%{HOUR}:%{MINUTE}:%{SECOND}.%{INT}'
+----

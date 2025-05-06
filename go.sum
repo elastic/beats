@@ -372,6 +372,8 @@ github.com/elastic/go-elasticsearch/v8 v8.17.1 h1:bOXChDoCMB4TIwwGqKd031U8OXssmW
 github.com/elastic/go-elasticsearch/v8 v8.17.1/go.mod h1:MVJCtL+gJJ7x5jFeUmA20O7rvipX8GcQmo5iBcmaJn4=
 github.com/elastic/go-freelru v0.16.0 h1:gG2HJ1WXN2tNl5/p40JS/l59HjvjRhjyAa+oFTRArYs=
 github.com/elastic/go-freelru v0.16.0/go.mod h1:bSdWT4M0lW79K8QbX6XY2heQYSCqD7THoYf82pT/H3I=
+github.com/elastic/go-grok v0.3.1 h1:WEhUxe2KrwycMnlvMimJXvzRa7DoByJB4PVUIE1ZD/U=
+github.com/elastic/go-grok v0.3.1/go.mod h1:n38ls8ZgOboZRgKcjMY8eFeZFMmcL9n2lP0iHhIDk64=
 github.com/elastic/go-libaudit/v2 v2.6.2 h1:1PM6wVBTJHJQYsKl8jfA9/Aw9pFty5uUezPiUfKtOI4=
 github.com/elastic/go-libaudit/v2 v2.6.2/go.mod h1:8205nkf2oSrXFlO4H5j8/cyVMoSF3Y7jt+FjgS4ubQU=
 github.com/elastic/go-licenser v0.4.2 h1:bPbGm8bUd8rxzSswFOqvQh1dAkKGkgAmrPxbUi+Y9+A=

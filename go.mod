@@ -178,6 +178,7 @@ require (
 	github.com/elastic/elastic-agent-libs v0.19.2
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.17.1
+	github.com/elastic/go-grok v0.3.1
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.19.0
