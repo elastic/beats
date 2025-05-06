@@ -15,6 +15,10 @@ To learn how to upgrade, check out <uprade docs>.
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+## 9.0.1 [beats-9.0.1-breaking-changes]
+
+_No breaking changes_
+
 ## 9.0.0 [beats-900-breaking-changes]
 **Release date:** March 25, 2025
 
