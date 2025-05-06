@@ -9,10 +9,6 @@ https://github.com/elastic/beats/compare/v9.0.0\...v9.0.1[View commits]
 
 ==== Breaking changes
 
-*Metricbeat*
-
-- Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services. {issue}40765[40765] {pull}43665[43665]
-
 ==== Bugfixes
 
 *Filebeat*
@@ -20,6 +16,10 @@ https://github.com/elastic/beats/compare/v9.0.0\...v9.0.1[View commits]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+
+*Metricbeat*
+
+- Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services. {issue}40765[40765] {pull}43665[43665]
 
 ==== Added
 
