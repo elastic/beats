@@ -12,7 +12,6 @@ env:
 
 steps:
   - group: "Deploy/K8S"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
     - label: "Deploy/K8S: Run pre-commit"
