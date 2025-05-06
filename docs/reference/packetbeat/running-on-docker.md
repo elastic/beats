@@ -76,11 +76,11 @@ setup -E setup.kibana.host=kibana:5601 \
 ```
 
 1. Substitute your Kibana and Elasticsearch hosts and ports.
-2. If you are using the hosted {{ess}} in {{ecloud}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using this syntax:
+2. If you are using the {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using this syntax:
 
 
 ```shell
--E cloud.id=<Cloud ID from Elasticsearch Service> \
+-E cloud.id=<Cloud ID from Elastic Cloud Hosted> \
 -E cloud.auth=elastic:<elastic password>
 ```
 
@@ -130,7 +130,7 @@ docker run -d \
 ```
 
 1. Substitute your Elasticsearch hosts and ports.
-2. If you are using the hosted {{ess}} in {{ecloud}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using the syntax shown earlier.
+2. If you are using the {{ech}}, replace the `-E output.elasticsearch.hosts` line with the Cloud ID and elastic password using the syntax shown earlier.
 
 
 
