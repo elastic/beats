@@ -52,15 +52,14 @@ import (
 	"github.com/elastic/mock-es/pkg/api"
 )
 
-const (
-	kafkaDefaultHost = "localhost"
-	kafkaDefaultPort = "9094"
-
-	logstashDefaultHost     = "localhost"
-	logstashTestDefaultPort = "5044"
-)
-
 func TestOutputsMetrics(t *testing.T) {
+	defaultEvFields := []map[string]any{
+		{"msg": "message 1"},
+		{"msg": "message 2"},
+		{"msg": "message 3"},
+		{"msg": "message 4"},
+	}
+
 	t.Run("elasticsearch", func(t *testing.T) {
 		rdr := sdkmetric.NewManualReader()
 		provider := sdkmetric.NewMeterProvider(sdkmetric.WithReader(rdr))
@@ -92,60 +91,37 @@ func TestOutputsMetrics(t *testing.T) {
 		esMock := httptest.NewServer(mockESHandler)
 		rawCfg := map[string]any{"hosts": []string{esMock.URL}}
 
-		evs := []publisher.Event{
+		evFields := []map[string]any{
 			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg":         "message 1",
-						"http_status": strconv.Itoa(http.StatusOK)},
-					Private:    nil,
-					TimeSeries: false,
-				},
+				"msg":         "message 1",
+				"http_status": strconv.Itoa(http.StatusOK),
 			},
 			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 2",
-						// dropped
-						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
-					Private:    nil,
-					TimeSeries: false,
-				},
+				"msg": "message 2",
+				// dropped
+				"http_status": strconv.Itoa(http.StatusNotAcceptable),
 			},
 			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 3",
-						// toomany
-						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
-					Private:    nil,
-					TimeSeries: false,
-				},
+				"msg": "message 3",
+				// toomany
+				"http_status": strconv.Itoa(http.StatusTooManyRequests),
 			},
 			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 4",
-						// duplicated
-						"http_status": strconv.Itoa(http.StatusConflict)},
-					Private:    nil,
-					TimeSeries: false,
-				},
+				"msg": "message 4",
+				// duplicated
+				"http_status": strconv.Itoa(http.StatusConflict),
 			},
 		}
 
-		testOutputMetrics(t, "elasticsearch", rawCfg, evs)
+		testOutputMetrics(t, "elasticsearch", rawCfg, evFields)
 	})
 
 	t.Run("kafka", func(t *testing.T) {
+		const (
+			kafkaDefaultHost = "localhost"
+			kafkaDefaultPort = "9094"
+		)
+
 		kafkaHost := fmt.Sprintf("%v:%v",
 			getenv("KAFKA_HOST", kafkaDefaultHost),
 			getenv("KAFKA_PORT", kafkaDefaultPort),
@@ -159,60 +135,15 @@ func TestOutputsMetrics(t *testing.T) {
 			"timeout": "1s",
 		}
 
-		evs := []publisher.Event{
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg":         "message 1",
-						"http_status": strconv.Itoa(http.StatusOK)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 2",
-						// dropped
-						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 3",
-						// toomany
-						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 4",
-						// duplicated
-						"http_status": strconv.Itoa(http.StatusConflict)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-		}
-
-		testOutputMetrics(t, "kafka", rawCfg, evs)
+		testOutputMetrics(t, "kafka", rawCfg, defaultEvFields)
 	})
 
 	t.Run("logstash", func(t *testing.T) {
+		const (
+			logstashDefaultHost     = "localhost"
+			logstashTestDefaultPort = "5044"
+		)
+		
 		rawCfg := map[string]interface{}{
 			"hosts": []string{fmt.Sprintf("%v:%v",
 				getenv("LS_HOST", logstashDefaultHost),
@@ -222,57 +153,7 @@ func TestOutputsMetrics(t *testing.T) {
 			"pipelining": 0,
 		}
 
-		evs := []publisher.Event{
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg":         "message 1",
-						"http_status": strconv.Itoa(http.StatusOK)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 2",
-						// dropped
-						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 3",
-						// toomany
-						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 4",
-						// duplicated
-						"http_status": strconv.Itoa(http.StatusConflict)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-		}
-
-		testOutputMetrics(t, "logstash", rawCfg, evs)
+		testOutputMetrics(t, "logstash", rawCfg, defaultEvFields)
 	})
 
 	t.Run("redis", func(t *testing.T) {
@@ -291,118 +172,18 @@ func TestOutputsMetrics(t *testing.T) {
 			"timeout":  "5s",
 		}
 
-		evs := []publisher.Event{
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg":         "message 1",
-						"http_status": strconv.Itoa(http.StatusOK)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 2",
-						// dropped
-						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 3",
-						// toomany
-						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 4",
-						// duplicated
-						"http_status": strconv.Itoa(http.StatusConflict)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-		}
-
-		testOutputMetrics(t, "redis", rawCfg, evs)
+		testOutputMetrics(t, "redis", rawCfg, defaultEvFields)
 	})
 
 	t.Run("otelconsumer", func(t *testing.T) {
-		evs := []publisher.Event{
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg":         "message 1",
-						"http_status": strconv.Itoa(http.StatusOK)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 2",
-						// dropped
-						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 3",
-						// toomany
-						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-			{
-				Content: beat.Event{
-					Timestamp: time.Time{},
-					Meta:      nil,
-					Fields: map[string]interface{}{
-						"msg": "message 4",
-						// duplicated
-						"http_status": strconv.Itoa(http.StatusConflict)},
-					Private:    nil,
-					TimeSeries: false,
-				},
-			},
-		}
-
-		testOutputMetrics(t, "otelconsumer", nil, evs)
+		testOutputMetrics(t, "otelconsumer", nil, defaultEvFields)
 	})
 }
 
 func testOutputMetrics(t *testing.T,
 	output string,
 	configuration any,
-	evs []publisher.Event) {
+	evFields []map[string]any) {
 
 	counter := &beat.CountOutputListener{}
 	observer := publisher.OutputListener{Listener: counter}
@@ -434,14 +215,25 @@ func testOutputMetrics(t *testing.T,
 		cfg)
 	require.NoError(t, err, "could not create output group")
 
-	for i := 0; i < len(evs); i++ {
-		evs[i].OutputListener = observer
+	var evs []publisher.Event
+	for _, fields := range evFields {
+		ev := publisher.Event{
+			Content: beat.Event{
+				Timestamp:  time.Time{},
+				Meta:       nil,
+				Fields:     fields,
+				Private:    nil,
+				TimeSeries: false,
+			},
+			OutputListener: observer,
+		}
 
 		if og.EncoderFactory != nil {
 			encoderFactory := og.EncoderFactory()
-			e, _ := encoderFactory.EncodeEntry(evs[i])
-			evs[i] = e.(publisher.Event)
+			e, _ := encoderFactory.EncodeEntry(ev)
+			ev = e.(publisher.Event)
 		}
+		evs = append(evs, ev)
 	}
 
 	client := og.Clients[0]
