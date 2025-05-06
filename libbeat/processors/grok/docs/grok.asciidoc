@@ -92,7 +92,7 @@ Your final event will be:
 ----
 processors:
   - grok:
-      from: "message"
+      field: "message"
       pattern: '%{HAPROXYDATE:haproxy.request_data}'
       customPatterns:
         HAPROXYDATE: '%{MONTHDAY}/%{MONTH}/%{YEAR}:%{HOUR}:%{MINUTE}:%{SECOND}.%{INT}'
