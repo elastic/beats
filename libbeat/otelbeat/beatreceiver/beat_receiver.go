@@ -39,11 +39,26 @@ type BeatReceiver struct {
 	Logger   *zap.Logger
 }
 
+// NewBeatReceiver creates a new BeatReceiver instance.
+func NewBeatReceiver(
+	beat *instance.Beat,
+	beater beat.Beater,
+	httpConf *config.C,
+	logger *zap.Logger,
+) (BeatReceiver, error) {
+	b := BeatReceiver{
+		Beat:     beat,
+		Beater:   beater,
+		HttpConf: httpConf,
+		Logger:   logger,
+	}
+
+	err := b.startMonitoring()
+	return b, err
+}
+
 // BeatReceiver.Stop() starts the beat receiver.
 func (b *BeatReceiver) Start() error {
-	if err := b.startMonitoring(); err != nil {
-		return fmt.Errorf("could not start the HTTP server for the monitoring API: %w", err)
-	}
 	if err := b.Beater.Run(&b.Beat.Beat); err != nil {
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}

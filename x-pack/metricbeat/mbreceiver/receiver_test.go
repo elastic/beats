@@ -32,6 +32,66 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 )
 
+func TestFactory(t *testing.T) {
+	monitorSocket := genSocketPath()
+	var monitorHost string
+	if runtime.GOOS == "windows" {
+		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
+	} else {
+		monitorHost = "unix://" + monitorSocket
+	}
+
+	cfg := &Config{
+		Beatconfig: map[string]interface{}{
+			"metricbeat": map[string]any{
+				"modules": []map[string]any{
+					{
+						"module":     "system",
+						"enabled":    true,
+						"period":     "1s",
+						"processes":  []string{".*"},
+						"metricsets": []string{"cpu"},
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"logging": map[string]any{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home":    t.TempDir(),
+			"http.enabled": true,
+			"http.host":    monitorHost,
+		},
+	}
+
+	var zapLogs bytes.Buffer
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.Lock(zapcore.AddSync(&zapLogs)),
+		zapcore.InfoLevel)
+
+	factory := NewFactory()
+
+	receiverSettings := receiver.Settings{}
+	receiverSettings.Logger = zap.New(core)
+	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
+
+	rc, err := factory.CreateLogs(t.Context(), receiverSettings, cfg, nil)
+	require.NotEmpty(t, rc, "receiver should not be nil")
+	require.NoError(t, err)
+
+	// Ensure http metrics endpoint is reachable on receiver creation
+	var lastError strings.Builder
+	assert.Conditionf(t, func() bool {
+		return getFromSocket(t, &lastError, monitorSocket)
+	}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+}
+
 func TestNewReceiver(t *testing.T) {
 	monitorSocket := genSocketPath()
 	var monitorHost string

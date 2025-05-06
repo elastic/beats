@@ -69,13 +69,11 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
 	}
 
-	beatReceiver := beatreceiver.BeatReceiver{
-		Beat:     b,
-		Beater:   mbBeater,
-		Logger:   set.Logger,
-		HttpConf: httpConf.HTTP,
+	base, err := beatreceiver.NewBeatReceiver(b, mbBeater, httpConf.HTTP, set.Logger)
+	if err != nil {
+		return nil, fmt.Errorf("error creating base receiver: %w", err)
 	}
-	return &metricbeatReceiver{BeatReceiver: beatReceiver}, nil
+	return &metricbeatReceiver{BeatReceiver: base}, nil
 }
 
 // copied from metricbeat cmd.
