@@ -489,6 +489,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
 - Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
+- Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
 
 *Metricbeat*
 
