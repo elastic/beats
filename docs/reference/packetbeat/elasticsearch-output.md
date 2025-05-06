@@ -430,7 +430,9 @@ Configuration options for internal queue.
 
 See [Internal queue](/reference/packetbeat/configuring-internal-queue.md) for more information.
 
-Note:`queue` options can be set under `packetbeat.yml` or the `output` section but not both. ===== `non_indexable_policy`
+Note:`queue` options can be set under `packetbeat.yml` or the `output` section but not both.
+
+### `non_indexable_policy`[_non_indexable_policy]
 
 Specifies the behavior when the elasticsearch cluster explicitly rejects documents, for example on mapping conflicts.
 
@@ -485,7 +487,12 @@ output.elasticsearch:
   preset: balanced
 ```
 
-Performance presets apply a set of configuration overrides based on a desired performance goal. If set, a performance preset will override other configuration flags to match the recommended settings for that preset. If a preset doesn’t set a value for a particular field, the user-specified value will be used if present, otherwise the default. Valid options are: * `balanced`: good starting point for general efficiency * `throughput`: good for high data volumes, may increase cpu and memory requirements * `scale`: reduces ambient resource use in large low-throughput deployments * `latency`: minimize the time for fresh data to become visible in Elasticsearch * `custom`: apply user configuration directly with no overrides
+Performance presets apply a set of configuration overrides based on a desired performance goal. If set, a performance preset will override other configuration flags to match the recommended settings for that preset. If a preset doesn’t set a value for a particular field, the user-specified value will be used if present, otherwise the default. Valid options are:
+* `balanced`: good starting point for general efficiency
+* `throughput`: good for high data volumes, may increase cpu and memory requirements
+* `scale`: reduces ambient resource use in large low-throughput deployments
+* `latency`: minimize the time for fresh data to become visible in Elasticsearch
+* `custom`: apply user configuration directly with no overrides
 
 The default if unspecified is `custom`.
 

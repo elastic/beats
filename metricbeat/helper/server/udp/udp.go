@@ -34,6 +34,7 @@ type UdpServer struct {
 	receiveBufferSize int
 	done              chan struct{}
 	eventQueue        chan server.Event
+	logger            *logp.Logger
 }
 
 type UdpEvent struct {
@@ -67,6 +68,7 @@ func NewUdpServer(base mb.BaseMetricSet) (server.Server, error) {
 		receiveBufferSize: config.ReceiveBufferSize,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
+		logger:            base.Logger(),
 	}, nil
 }
 
@@ -80,7 +82,7 @@ func (g *UdpServer) Start() error {
 		return fmt.Errorf("failed to start UDP server: %w", err)
 	}
 
-	logp.Info("Started listening for UDP on: %s", g.udpaddr.String())
+	g.logger.Infof("Started listening for UDP on: %s", g.udpaddr.String())
 	g.listener = listener
 
 	go g.watchMetrics()
@@ -98,7 +100,7 @@ func (g *UdpServer) watchMetrics() {
 
 		length, addr, err := g.listener.ReadFromUDP(buffer)
 		if err != nil {
-			logp.Err("Error reading from buffer: %v", err.Error())
+			g.logger.Errorf("Error reading from buffer: %v", err.Error())
 			continue
 		}
 

@@ -102,31 +102,31 @@ Example config:
 
 This is a list of 365 Defender fields that are mapped to ECS.
 
-| 365 Defender Fields | ECS Fields |  |
-| --- | --- | --- |
-| lastUpdateTime | @timestamp |  |
-| severity | event.severity |  |
-| createdTime | event.created |  |
-| alerts.category | threat.technique.name |  |
-| alerts.description | rule.description |  |
-| alerts.serviceSource | event.provider |  |
-| alerts.alertId | event.id |  |
-| alerts.firstActivity | event.start |  |
-| alerts.lastActivity | event.end |  |
-| alerts.title | message |  |
-| entities.processId | process.pid |  |
-| entities.processCommandLine | process.command_line |  |
-| entities.processCreationTime | process.start |  |
-| entities.parentProcessId | process.parent.pid |  |
-| entities.parentProcessCreationTime | process.parent.start |  |
-| entities.sha1 | file.hash.sha1 |  |
-| entities.sha256 | file.hash.sha256 |  |
-| entities.url | url.full |  |
-| entities.filePath | file.path |  |
-| entities.fileName | file.name |  |
-| entities.userPrincipalName | host.user.name |  |
-| entities.domainName | host.user.domain |  |
-| entities.aadUserId | host.user.id |  |
+| 365 Defender Fields | ECS Fields |
+| --- | --- |
+| lastUpdateTime | @timestamp |
+| severity | event.severity |
+| createdTime | event.created |
+| alerts.category | threat.technique.name |
+| alerts.description | rule.description |
+| alerts.serviceSource | event.provider |
+| alerts.alertId | event.id |
+| alerts.firstActivity | event.start |
+| alerts.lastActivity | event.end |
+| alerts.title | message |
+| entities.processId | process.pid |
+| entities.processCommandLine | process.command_line |
+| entities.processCreationTime | process.start |
+| entities.parentProcessId | process.parent.pid |
+| entities.parentProcessCreationTime | process.parent.start |
+| entities.sha1 | file.hash.sha1 |
+| entities.sha256 | file.hash.sha256 |
+| entities.url | url.full |
+| entities.filePath | file.path |
+| entities.fileName | file.name |
+| entities.userPrincipalName | host.user.name |
+| entities.domainName | host.user.domain |
+| entities.aadUserId | host.user.id |
 
 
 ### `defender_atp` fileset settings [_defender_atp_fileset_settings]
@@ -172,32 +172,32 @@ Example config:
 
 This is a list of Defender ATP fields that are mapped to ECS.
 
-| Defender ATP Fields | ECS Fields |  |
-| --- | --- | --- |
-| alertCreationTime | @timestamp |  |
-| aadTenantId | cloud.account.id |  |
-| category | threat.technique.name |  |
-| computerDnsName | host.hostname |  |
-| description | rule.description |  |
-| detectionSource | observer.name |  |
-| evidence.fileName | file.name |  |
-| evidence.filePath | file.path |  |
-| evidence.processId | process.pid |  |
-| evidence.processCommandLine | process.command_line |  |
-| evidence.processCreationTime | process.start |  |
-| evidence.parentProcessId | process.parent.pid |  |
-| evidence.parentProcessCreationTime | process.parent.start |  |
-| evidence.sha1 | file.hash.sha1 |  |
-| evidence.sha256 | file.hash.sha256 |  |
-| evidence.url | url.full |  |
-| firstEventTime | event.start |  |
-| id | event.id |  |
-| lastEventTime | event.end |  |
-| machineId | cloud.instance.id |  |
-| relatedUser.userName | host.user.name |  |
-| relatedUser.domainName | host.user.domain |  |
-| title | message |  |
-| severity | event.severity |  |
+| Defender ATP Fields | ECS Fields |
+| --- | --- |
+| alertCreationTime | @timestamp |
+| aadTenantId | cloud.account.id |
+| category | threat.technique.name |
+| computerDnsName | host.hostname |
+| description | rule.description |
+| detectionSource | observer.name |
+| evidence.fileName | file.name |
+| evidence.filePath | file.path |
+| evidence.processId | process.pid |
+| evidence.processCommandLine | process.command_line |
+| evidence.processCreationTime | process.start |
+| evidence.parentProcessId | process.parent.pid |
+| evidence.parentProcessCreationTime | process.parent.start |
+| evidence.sha1 | file.hash.sha1 |
+| evidence.sha256 | file.hash.sha256 |
+| evidence.url | url.full |
+| firstEventTime | event.start |
+| id | event.id |
+| lastEventTime | event.end |
+| machineId | cloud.instance.id |
+| relatedUser.userName | host.user.name |
+| relatedUser.domainName | host.user.domain |
+| title | message |
+| severity | event.severity |
 
 
 ## Dashboards [_dashboards_4]

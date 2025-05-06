@@ -31,12 +31,10 @@ import (
 var esCommonOutput = `
 exporters:
   elasticsearch:
-    api_key: ""
     endpoints:
       - https://localhost:9200
     idle_conn_timeout: 3s
     logs_index: form-otel-exporter
-    num_workers: 0
     password: changeme
     retry:
       enabled: true
@@ -174,12 +172,10 @@ service:
 		var expectedOutput = `
 exporters:
   elasticsearch:
-    api_key: ""
     endpoints:
       - https://es-hostname.elastic.co:443
     idle_conn_timeout: 3s
     logs_index: form-otel-exporter
-    num_workers: 0
     password: password
     retry:
       enabled: true
