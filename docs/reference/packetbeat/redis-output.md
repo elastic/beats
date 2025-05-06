@@ -131,7 +131,9 @@ See [Change the output codec](/reference/packetbeat/configuration-output-codec.m
 
 ### `worker` or `workers` [_worker_or_workers_2]
 
-The number of workers to use for each host configured to publish events to Redis. Use this setting along with the `loadbalance` option. For example, if you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
+`worker` or `workers` specifies the number of connections created per host for publishing events. It is best used with `loadbalance:true` which publishes events to Redis parallely. Example: If you have 2 hosts and 3 workers, in total 6 connections are started (3 for each host).
+
+The default value is `1`.
 
 
 ### `loadbalance` [_loadbalance_2]

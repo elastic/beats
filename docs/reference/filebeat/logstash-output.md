@@ -122,7 +122,9 @@ The default value is `false`.
 
 ### `worker` or `workers` [_worker_or_workers]
 
-The number of workers per configured host publishing events to {{ls}}. This is best used with load balancing mode enabled. Example: If you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
+`worker` or `workers` specifies the number of connections created per host for publishing events. It is best used with `loadbalance:true` which publishes events to {{ls}} parallely. Example: If you have 2 hosts and 3 workers, in total 6 connections are started (3 for each host).
+
+The default value is `1`.
 
 
 ### `loadbalance` [loadbalance]
