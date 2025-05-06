@@ -1,13 +1,13 @@
 ---
-navigation_title: "{{ess}}"
+navigation_title: "{{ech}}"
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/configure-cloud-id.html
 ---
 
-# Configure the output for {{ess}} on {{ecloud}} [configure-cloud-id]
+# Configure the output for {{ech}} [configure-cloud-id]
 
 
-Winlogbeat comes with two settings that simplify the output configuration when used together with [{{ess}}](https://www.elastic.co/cloud/elasticsearch-service?page=docs&placement=docs-body). When defined, these setting overwrite settings from other parts in the configuration.
+Winlogbeat comes with two settings that simplify the output configuration when used together with [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body). When defined, these setting overwrite settings from other parts in the configuration.
 
 Example:
 
@@ -24,7 +24,7 @@ winlogbeat -e -E cloud.id="<cloud-id>" -E cloud.auth="<cloud.auth>"
 
 ## `cloud.id` [_cloud_id]
 
-The Cloud ID, which can be found in the {{ess}} web console, is used by Winlogbeat to resolve the {{es}} and {{kib}} URLs. This setting overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings. For more on locating and configuring the Cloud ID, see [Configure Beats and Logstash with Cloud ID](docs-content://deploy-manage/deploy/cloud-enterprise/connect-elasticsearch.md).
+The Cloud ID, which can be found in the [{{ecloud}} console](https://cloud.elastic.co/?page=docs&placement=docs-body), is used by Winlogbeat to resolve the {{es}} and {{kib}} URLs. This setting overwrites the `output.elasticsearch.hosts` and `setup.kibana.host` settings. For more on locating and configuring the Cloud ID, see [Find your Cloud ID](docs-content://deploy-manage/deploy/elastic-cloud/find-cloud-id.md).
 
 
 ## `cloud.auth` [_cloud_auth]

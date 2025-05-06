@@ -1,0 +1,408 @@
+- name: jetstream
+  type: group
+  release: beta
+  description: >
+    Information pertaining to a NATS JetStream server
+  fields:
+    - name: category
+      type: keyword
+      description: >
+        The category of metrics represented in this event (stats, account, stream, or consumer).
+    - name: stats
+      type: group
+      description: >
+        General stats about the NATS JetStream server.
+      fields:
+        - name: streams
+          type: long
+          description: >
+            The total number of streams on the JetStream server.
+        - name: consumers
+          type: long
+          description: >
+            The total number of consumers on the JetStream server.
+        - name: messages
+          type: long
+          description: >
+            The total number of messages on the JetStream server.
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            The total number of message bytes on the JetStream server.
+        - name: memory
+          type: long
+          format: bytes
+          description: >
+            The total amount of memory (bytes) used by the JetStream server.
+        - name: reserved_memory
+          type: long
+          format: bytes
+          description: >
+            The of memory (bytes) reserved by the JetStream server.
+        - name: storage
+          type: long
+          format: bytes
+          description: >
+            The total amount of storage (bytes) used by the JetStream server.
+        - name: reserved_storage
+          type: long
+          format: bytes
+          description: >
+            The total amount of storage (bytes) reserved by the JetStream server.
+        - name: accounts
+          type: long
+          description: >
+            The total number of accounts on the JetStream server.
+        - name: config
+          type: group
+          description: >
+            Configuration of the JetStream server.
+          fields:
+            - name: max_memory
+              type: long
+              format: bytes
+              description: >
+                The maximum amount of memory (bytes) the JetStream server can use.
+            - name: max_storage
+              type: long
+              format: bytes
+              description: >
+                The maximum amount of storage (bytes) the JetStream server can use.
+            - name: store_dir
+              type: keyword
+              description: >
+                The path on disk where the JetStream storage lives.
+            - name: sync_interval
+              type: long
+              description: >
+                The fsync/sync interval for page cache in the filestore.
+    - name: account
+      type: group
+      description: >
+        Information about a NATS JetStream account.
+      fields:
+        - name: id
+          type: keyword
+          description: >
+            The ID of the JetStream account.
+        - name: name
+          type: keyword
+          description: >
+            The name of the JetStream account.
+        - name: accounts
+          type: integer
+          description: >
+            The number of accounts using JetStream on the server.
+        - name: high_availability_assets
+          type: integer
+          description: >
+            Indicates the number of JetStream high-availability (HA) assets allocated for an account.
+        - name: memory
+          type: long
+          format: bytes
+          description: >
+            The amount of memory in bytes currently used by JetStream for this account.
+        - name: storage
+          type: long
+          format: bytes
+          description: >
+            The amount of storage in bytes currently used by JetStream for this account.
+        - name: reserved_memory
+          type: long
+          format: bytes
+          description: >
+            The maximum memory quota reserved for this account (in bytes).
+        - name: reserved_storage
+          type: long
+          format: bytes
+          description: >
+            The maximum disk storage quota reserved for this account (in bytes).
+        - name: api
+          type: group
+          description: >
+            API stats pertaining to this account.
+          fields:
+            - name: total
+              type: long
+              description: >
+                The total number of JetStream API calls made by this account.
+            - name: errors
+              type: long
+              description: >
+                The total number of JetStream API errors encountered by this account.
+    - name: stream
+      type: group
+      description: >
+        Information about a NATS JetStream stream.
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            The name of the JetStream stream.
+        - name: created
+          type: date
+          description: >
+            The date/time the stream was created.
+        - name: cluster
+          type: group
+          description: >
+            Cluster information for the stream.
+          fields:
+            - name: leader
+              type: keyword
+              description: >
+                The ID of the leader in the cluster.
+        - name: state
+          type: group
+          description: >
+            The state of the stream.
+          fields:
+            - name: messages
+              type: long
+              description: >
+                The number of messages on the stream.
+            - name: bytes
+              type: long
+              format: bytes
+              description: >
+                The number of bytes of messages on the stream.
+            - name: consumer_count
+              type: long
+              description: >
+                The number of consumers on the stream.
+            - name: num_subjects
+              type: long
+              description: >
+                The number of subjects on the stream.
+            - name: num_deleted
+              type: long
+              description: >
+                The number of messages deleted from the stream.
+            - name: first_seq
+              type: long
+              description: >
+                The first sequence number on the stream.
+            - name: first_ts
+              type: date
+              description: >
+                The date/time corresponding to first_seq.
+            - name: last_seq
+              type: long
+              description: >
+                The last sequence number on the stream.
+            - name: last_ts
+              type: date
+              description: >
+                The date/time corresponding to last_seq.
+        - name: account
+          type: group
+          description: >
+            Information about the account for this stream.
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                The ID of the account.
+            - name: name
+              type: keyword
+              description: >
+                The name of the account.
+        - name: config
+          type: group
+          description: >
+            Information regarding how the stream is configured.
+          fields:
+            - name: description
+              type: text
+              description: >
+                The description of the stream.
+            - name: retention
+              type: keyword
+              description: >
+                The retention policy for the stream.
+            - name: num_replicas
+              type: integer
+              description: >
+                How many replicas to keep for each message in a clustered JetStream.
+            - name: storage
+              type: keyword
+              description: >
+                The storage type for stream data.
+            - name: max_consumers
+              type: long
+              description: >
+                The maximum number of consumers allowed for this stream.
+            - name: max_msgs
+              type: long
+              description: >
+                Maximum number of messages stored in the stream. Adheres to Discard Policy, removing oldest or refusing new messages if the Stream exceeds this number of messages.
+            - name: max_bytes
+              type: long
+              format: bytes
+              description: >
+                Maximum number of bytes stored in the stream. Adheres to Discard Policy, removing oldest or refusing new messages if the Stream exceeds this size.
+            - name: max_age
+              type: long
+              description: >
+                Maximum age of any message in the stream, expressed in nanoseconds.	
+            - name: max_msgs_per_subject
+              type: long
+              description: >
+                Limits maximum number of messages in the stream to retain per subject.	
+            - name: max_msg_size
+              type: long
+              format: bytes
+              description: >
+                The largest message (bytes) that will be accepted by the stream. The size of a message is a sum of payload and headers.
+            - name: subjects
+              type: keyword
+              description: >
+                The list of subjects bound to the stream.
+    - name: consumer
+      type: group
+      description: >
+        Information about a NATS JetStream consumer.
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            The name of the consumer.
+        - name: created
+          type: date
+          description: >
+            The date/time the consumer was created.
+        - name: stream
+          type: group
+          description: >
+            Information about the stream for this consumer.
+          fields:
+            - name: name
+              type: keyword
+              description: >
+                The name of the stream.
+        - name: cluster
+          type: group
+          description: >
+            Cluster information for the consumer.
+          fields:
+            - name: leader
+              type: keyword
+              description: >
+                The ID of the leader in the cluster.
+        - name: ack_floor
+          type: group
+          description: >
+            Information about message acknowledgements pertaining to AckFloor, which indicates the highest contiguous sequence number that has been fully acknowledged.
+          fields:
+            - name: consumer_seq
+              type: long
+              description: >
+                The lowest contiguous consumer sequence number that has been acknowledged.
+            - name: stream_seq
+              type: long
+              description: >
+                The lowest contiguous stream sequence number that has been acknowledged by the consumer.
+            - name: last_active
+              type: date
+              description: >
+                The timestamp of the last acknowledged message.
+        - name: delivered
+          type: group
+          description: >
+            Information about delivered messages.
+          fields:
+            - name: consumer_seq
+              type: long
+              description: >
+                The number of messages delivered to this consumer, starting from 1 when the consumer was created.
+            - name: stream_seq
+              type: long
+              description: >
+                The last stream sequence number of a message delivered to the consumer. Corresponds to the global sequence of messages in the stream.
+            - name: last_active
+              type: date
+              description: >
+                The timestamp of the last message delivered to the consumer.
+        - name: num_ack_pending
+          type: long
+          description: >
+            The number of messages that have been delivered to the consumer but not yet acknowledged.
+        - name: num_redelivered
+          type: long
+          description: >
+            The number of messages that had to be resent because they were previously delivered but not acknowledged within the Ack Wait time.
+        - name: num_waiting
+          type: long
+          description: >
+            The number of pull requests currently waiting for messages to be delivered.
+        - name: num_pending
+          type: long
+          description: >
+            The number of messages remaining in the stream that the consumer has not yet delivered to any client.
+        - name: last_active_time
+          type: date
+          description: >
+            Represents the last activity time of the consumer.
+        - name: account
+          type: group
+          description: >
+            Information about the account for this consumer.
+          fields:
+            - name: id
+              type: keyword
+              description: >
+                The ID of the account.
+            - name: name
+              type: keyword
+              description: >
+                The name of the account.
+        - name: config
+          type: group
+          description: >
+            Information about the configuration for this consumer.
+          fields:
+            - name: name
+              type: keyword
+              description: >
+                The name of the consumer.
+            - name: durable_name
+              type: keyword
+              description: >
+                The durable name of the consumer. If set, clients can have subscriptions bind to the consumer and resume until the consumer is explicitly deleted.
+            - name: deliver_policy
+              type: keyword
+              description: >
+                The point in the stream from which to receive messages.
+            - name: filter_subject
+              type: keyword
+              description: >
+                A subject that overlaps with the subjects bound to the stream to filter delivery to subscribers.
+            - name: replay_policy
+              type: keyword
+              description: >
+                The configured replay policy for the consumer.
+            - name: ack_policy
+              type: keyword
+              description: >
+                The configured ack policy for the consumer.
+            - name: ack_wait
+              type: long
+              description: >
+                The duration (in nanoseconds) that the server will wait for an acknowledgment for any individual message once it has been delivered to a consumer. If an acknowledgment is not received in time, the message will be redelivered.
+            - name: max_deliver
+              type: long
+              description: >
+                The maximum number of times a message will be redelivered if not acknowledged.
+            - name: max_waiting
+              type: long
+              description: >
+                The maximum number of pull requests a consumer can have waiting for messages.
+            - name: max_ack_pending
+              type: long
+              description: >
+                The maximum number of messages the consumer can have in-flight (delivered but unacknowledged) at any time.
+            - name: num_replicas
+              type: long
+              description: >
+                The number of replicas for the consumer's state in a JetStream cluster.
