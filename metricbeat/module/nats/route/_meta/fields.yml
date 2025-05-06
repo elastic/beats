@@ -11,7 +11,7 @@
     - name: remote_id
       type: keyword
       description: >
-        The remote id on which the route is connected to
+        The remote ID on which the route is connected
     - name: pending_size
       type: long
       description: >

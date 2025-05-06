@@ -25,12 +25,15 @@ This guide describes how to get started quickly with network packets analytics. 
 * You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
     :::::::{tab-set}
+    :group: deployment
 
-    ::::::{tab-item} Elasticsearch Service
-    To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+    ::::::{tab-item} {{ech}}
+    :sync: hosted
+    To get started quickly, spin up a deployment of [{{ech}}](https://www.elastic.co/cloud). The {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
     ::::::
 
     ::::::{tab-item} Self-managed
+    :sync: self
     To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
     ::::::
 
@@ -39,28 +42,34 @@ This guide describes how to get started quickly with network packets analytics. 
 * On most platforms, Packetbeat requires the libpcap packet capture library. Depending on your OS, you might need to install it:
 
     :::::::{tab-set}
+    :group: platform
 
     ::::::{tab-item} DEB
+    :sync: deb
     ```sh
     sudo apt-get install libpcap0.8
     ```
     ::::::
 
     ::::::{tab-item} RPM
+    :sync: rpm
     ```sh
     sudo yum install libpcap
     ```
     ::::::
 
     ::::::{tab-item} MacOS
+    :sync: macos
     You probably do not need to install libpcap.
     ::::::
 
     ::::::{tab-item} Linux
+    :sync: linux
     You probably do not need to install libpcap.
     ::::::
 
     ::::::{tab-item} Windows
+    :sync: windows
     You probably do not need to install libpcap. The default distribution of {{packetbeat}} for Windows comes bundled with the Npcap library.
 
         For the OSS-only distribution, you must download and install a packet sniffing library, such as [Npcap](https://nmap.org/npcap/), that implements the [libpcap](https://github.com/the-tcpdump-group/libpcap) interfaces.
@@ -74,8 +83,10 @@ This guide describes how to get started quickly with network packets analytics. 
 ## Step 1: Install Packetbeat [install]
 
 :::::::{tab-set}
+:group: platform
 
 ::::::{tab-item} DEB
+:sync: deb
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-amd64.deb
 sudo dpkg -i packetbeat-{{stack-version}}-amd64.deb
@@ -83,6 +94,7 @@ sudo dpkg -i packetbeat-{{stack-version}}-amd64.deb
 ::::::
 
 ::::::{tab-item} RPM
+:sync: rpm
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-x86_64.rpm
 sudo rpm -vi packetbeat-{{stack-version}}-x86_64.rpm
@@ -90,6 +102,7 @@ sudo rpm -vi packetbeat-{{stack-version}}-x86_64.rpm
 ::::::
 
 ::::::{tab-item} MacOS
+:sync: macos
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
 tar xzvf packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
@@ -97,6 +110,7 @@ tar xzvf packetbeat-{{stack-version}}-darwin-x86_64.tar.gz
 ::::::
 
 ::::::{tab-item} Linux
+:sync: linux
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-linux-x86_64.tar.gz
 tar xzvf packetbeat-{{stack-version}}-linux-x86_64.tar.gz
@@ -104,6 +118,7 @@ tar xzvf packetbeat-{{stack-version}}-linux-x86_64.tar.gz
 ::::::
 
 ::::::{tab-item} Windows
+:sync: windows
 1. Download the [Packetbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{stack-version}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
@@ -142,9 +157,11 @@ Connections to {{es}} and {{kib}} are required to set up Packetbeat.
 Set the connection information in `packetbeat.yml`. To locate this configuration file, see [Directory layout](/reference/packetbeat/directory-layout.md).
 
 :::::::{tab-set}
+:group: deployment
 
-::::::{tab-item} Elasticsearch Service
-Specify the [cloud.id](/reference/packetbeat/configure-cloud-id.md) of your {{ess}}, and set [cloud.auth](/reference/packetbeat/configure-cloud-id.md) to a user who is authorized to set up Packetbeat. For example:
+::::::{tab-item} {{ech}}
+:sync: hosted
+Specify the [cloud.id](/reference/packetbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/packetbeat/configure-cloud-id.md) to a user who is authorized to set up Packetbeat. For example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
@@ -155,6 +172,7 @@ cloud.auth: "packetbeat_setup:YOUR_PASSWORD" <1>
 ::::::
 
 ::::::{tab-item} Self-managed
+:sync: self
 1. Set the host and port where Packetbeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Packetbeat. For example:
 
     ```yaml
@@ -220,32 +238,38 @@ In `packetbeat.yml`, configure the network devices and protocols to capture traf
     To see a list of available devices, run:
 
     :::::::{tab-set}
+    :group: platform
 
     ::::::{tab-item} DEB
+    :sync: deb
     ```shell
     packetbeat devices
     ```
     ::::::
 
     ::::::{tab-item} RPM
+    :sync: rpm
     ```shell
     packetbeat devices
     ```
     ::::::
 
     ::::::{tab-item} MacOS
+    :sync: macos
     ```shell
     ./packetbeat devices
     ```
     ::::::
 
     ::::::{tab-item} Linux
+    :sync: linux
     ```shell
     ./packetbeat devices
     ```
     ::::::
 
     ::::::{tab-item} Windows
+    :sync: windows
     ```shell
     PS C:\Program Files\Packetbeat> .\packetbeat.exe devices
 
@@ -321,31 +345,37 @@ Packetbeat comes with predefined assets for parsing, indexing, and visualizing y
 2. From the installation directory, run:
 
     :::::::{tab-set}
+    :group: platform
     ::::::{tab-item} DEB
+    :sync: deb
     ```sh
     packetbeat setup -e
     ```
     ::::::
 
     ::::::{tab-item} RPM
+    :sync: rpm
     ```sh
     packetbeat setup -e
     ```
     ::::::
 
     ::::::{tab-item} MacOS
+    :sync: macos
     ```sh
     ./packetbeat setup -e
     ```
     ::::::
 
     ::::::{tab-item} Linux
+    :sync: linux
     ```sh
     ./packetbeat setup -e
     ```
     ::::::
 
     ::::::{tab-item} Windows
+    :sync: windows
     ```sh
     PS > .\packetbeat.exe setup -e
     ```
@@ -358,7 +388,7 @@ Packetbeat comes with predefined assets for parsing, indexing, and visualizing y
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
 
 :::{tip}
-A connection to Elasticsearch (or Elasticsearch Service) is required to set up the initial environment. If you’re using a different output, such as Logstash, see [Load the index template manually](/reference/packetbeat/packetbeat-template.md#load-template-manually) and [Load Kibana dashboards](/reference/packetbeat/load-kibana-dashboards.md).
+A connection to Elasticsearch (or {{ech}}) is required to set up the initial environment. If you’re using a different output, such as Logstash, see [Load the index template manually](/reference/packetbeat/packetbeat-template.md#load-template-manually) and [Load Kibana dashboards](/reference/packetbeat/load-kibana-dashboards.md).
 :::
 
 ## Step 5: Start Packetbeat
@@ -368,8 +398,10 @@ Before starting Packetbeat, modify the user credentials in `packetbeat.yml` and 
 To start Packetbeat, run:
 
 :::::::{tab-set}
+:group: platform
 
 ::::::{tab-item} DEB
+:sync: deb
 ```sh
 sudo service packetbeat start
 ```
@@ -383,6 +415,7 @@ Also see [Packetbeat and systemd](/reference/packetbeat/running-with-systemd.md)
 ::::::
 
 ::::::{tab-item} RPM
+:sync: rpm
 ```sh
 sudo service packetbeat start
 ```
@@ -396,6 +429,7 @@ Also see [Packetbeat and systemd](/reference/packetbeat/running-with-systemd.md)
 ::::::
 
 ::::::{tab-item} MacOS
+:sync: macos
 ```sh
 sudo chown root packetbeat.yml <1>
 sudo ./packetbeat -e
@@ -405,6 +439,7 @@ sudo ./packetbeat -e
 ::::::
 
 ::::::{tab-item} Linux
+:sync: linux
 ```sh
 sudo chown root packetbeat.yml <1>
 sudo ./packetbeat -e
@@ -414,6 +449,7 @@ sudo ./packetbeat -e
 ::::::
 
 ::::::{tab-item} Windows
+:sync: windows
 ```sh
 PS C:\Program Files\packetbeat> Start-Service packetbeat
 ```
@@ -434,11 +470,14 @@ To open the dashboards:
 1. Launch {{kib}}:
 
     :::::::{tab-set}
-    ::::::{tab-item} Elasticsearch Service
+    :group: deployment
+    ::::::{tab-item} {{ech}}
+    :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
     ::::::{tab-item} Self-managed
+    :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
     :::::::
