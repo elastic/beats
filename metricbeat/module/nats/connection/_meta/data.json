@@ -1,35 +1,43 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "nats.connection",
+        "duration": 115000,
+        "module": "nats"
     },
-    "metricset":{
-        "host":"localhost",
-        "module":"nats",
-        "name":"connections",
-        "rtt":44269
+    "metricset": {
+        "name": "connection",
+        "period": 10000
     },
     "nats": {
-        "server": {
-            "id": "bUAdpRFtMWddIBWw80Yd9D",
-            "time": "2018-12-28T12:33:53.026865597Z"
-        },
         "connection": {
-            "idle_time": 0,
+            "id": 18,
+            "idle_time": 416,
             "in": {
-                "bytes": 678867264,
-                "messages": 42429204
+                "bytes": 0,
+                "messages": 0
             },
-            "name": "NATS Benchmark",
+            "ip": "127.0.0.1",
+            "lang": "go",
+            "last_activity": "2025-03-16T13:38:16.992424387Z",
+            "name": "NATS CLI Version development",
             "out": {
                 "bytes": 0,
                 "messages": 0
             },
             "pending_bytes": 0,
-            "subscriptions": 0,
-            "uptime": 29
+            "port": 44042,
+            "start": "2025-03-16T13:38:16.99188926Z",
+            "subscriptions": 1,
+            "uptime": 416,
+            "version": "1.38.0"
+        },
+        "server": {
+            "id": "NCLTOCCWWFT55ANXSNIMXTP2Q4CEL42V2K2BNDXGM5YNMTBMULQO5V7L"
         }
     },
-    "type":"metricsets"
+    "service": {
+        "address": "localhost:60207",
+        "type": "nats"
+    }
 }
