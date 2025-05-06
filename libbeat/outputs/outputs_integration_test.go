@@ -86,7 +86,7 @@ func TestOutputsMetrics(t *testing.T) {
 			})
 
 		esMock := httptest.NewServer(mockESHandler)
-		rawCfg := fmt.Sprintf(`{"hosts": ["%s"]}`, esMock.URL)
+		rawCfg := map[string]any{"hosts": []string{esMock.URL}}
 
 		evs := []publisher.Event{
 			{
@@ -291,7 +291,6 @@ func testOutputMetrics(t *testing.T,
 
 	cfg, err := config.NewConfigFrom(configuration)
 	require.NoError(t, err, "could not parse config")
-
 	factory := outputs.FindFactory(output)
 	og, err := factory(
 		mockIndexManager("mock-index"),
@@ -302,9 +301,15 @@ func testOutputMetrics(t *testing.T,
 
 	for i := 0; i < len(evs); i++ {
 		evs[i].OutputListener = observer
-	}
-	client := og.Clients[0]
 
+		if og.EncoderFactory != nil {
+			encoderFactory := og.EncoderFactory()
+			e, _ := encoderFactory.EncodeEntry(evs[i])
+			evs[i] = e.(publisher.Event)
+		}
+	}
+
+	client := og.Clients[0]
 	if connectable, ok := client.(outputs.Connectable); ok {
 		require.NoError(t, connectable.Connect(context.Background()),
 			"could not connect %s", client.String())
