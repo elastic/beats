@@ -109,7 +109,11 @@ func (p *PerformanceDataFetcher) GetPerfMetrics(ctx context.Context,
 			if objectType == "virtualMachine" {
 				p.logger.Infof("METRIC RESULT: %+v", result)
 			}
-			metricMap[result.Name] = result.Value[0]
+			value := result.Value[0]
+			if result.Unit == string(types.PerformanceManagerUnitPercent) {
+				value = value / 100
+			}
+			metricMap[result.Name] = value
 			continue
 		}
 		p.logger.Debugf("For %s %s, Metric %s: No result found", objectType, objectName, result.Name)
