@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 
 *Filebeat*
 
-- Journald input now works on Docker containers (except Wolfi). {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Journald input is again usable in the Filebeat Docker container (except Wolfi) by including journalctl by default. The included version of journalctl must be compatible with the one on that wrote the journal files being ingested. The Wolfi container remains distroless and does not contain journalctl or any part of systemd. {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
 - Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
 
 ==== Added
