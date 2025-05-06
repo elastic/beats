@@ -128,7 +128,7 @@ func fetchGoPackages(module string) ([]string, error) {
 func testTagsFromEnv() []string {
 	tags := strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
 	if FIPSBuild {
-		tags = append(tags, "requirefips")
+		tags = append(tags, "requirefips", "ms_tls13kdf")
 	}
 	return tags
 }
