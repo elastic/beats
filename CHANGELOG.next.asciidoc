@@ -68,7 +68,7 @@ already present as `container.id` and `container.log.tag` is dropped because it 
 `log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
-- Fixed Redis input in Filebeat to support username and password authentication. {pull}44137[44137]
+- Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
 
 
 *Heartbeat*
