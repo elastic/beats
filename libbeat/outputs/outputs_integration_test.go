@@ -33,6 +33,8 @@ import (
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/consumer"
+	"go.opentelemetry.io/collector/pdata/plog"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -41,6 +43,8 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/kafka"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/otelconsumer"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/redis"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -270,6 +274,129 @@ func TestOutputsMetrics(t *testing.T) {
 
 		testOutputMetrics(t, "logstash", rawCfg, evs)
 	})
+
+	t.Run("redis", func(t *testing.T) {
+		const (
+			RedisDefaultHost = "localhost"
+			RedisDefaultPort = "6379"
+		)
+
+		rawCfg := map[string]interface{}{
+			"hosts": []string{fmt.Sprintf("%v:%v",
+				getenv("REDIS_HOST", RedisDefaultHost),
+				getenv("REDIS_PORT", RedisDefaultPort))},
+			"key":      "test_publish_tcp",
+			"db":       0,
+			"datatype": "list",
+			"timeout":  "5s",
+		}
+
+		evs := []publisher.Event{
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg":         "message 1",
+						"http_status": strconv.Itoa(http.StatusOK)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 2",
+						// dropped
+						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 3",
+						// toomany
+						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 4",
+						// duplicated
+						"http_status": strconv.Itoa(http.StatusConflict)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+		}
+
+		testOutputMetrics(t, "redis", rawCfg, evs)
+	})
+
+	t.Run("otelconsumer", func(t *testing.T) {
+		evs := []publisher.Event{
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg":         "message 1",
+						"http_status": strconv.Itoa(http.StatusOK)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 2",
+						// dropped
+						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 3",
+						// toomany
+						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 4",
+						// duplicated
+						"http_status": strconv.Itoa(http.StatusConflict)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+		}
+
+		testOutputMetrics(t, "otelconsumer", nil, evs)
+	})
 }
 
 func testOutputMetrics(t *testing.T,
@@ -286,7 +413,15 @@ func testOutputMetrics(t *testing.T,
 			t.Logf("\n%s", logBuff.String())
 		}
 	}()
-	beatInfo := beat.Info{Logger: log}
+
+	lconsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
+		return nil
+	})
+	require.NoError(t, err)
+	beatInfo := beat.Info{
+		Logger:      log,
+		LogConsumer: lconsumer,
+	}
 	reg := monitoring.NewRegistry()
 
 	cfg, err := config.NewConfigFrom(configuration)
