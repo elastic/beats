@@ -93,7 +93,6 @@ require (
 	github.com/hashicorp/nomad/api v0.0.0-20240717122358-3d93bd3778f3
 	github.com/hectane/go-acl v0.0.0-20190604041725-da78bae5fc95
 	github.com/insomniacslk/dhcp v0.0.0-20220119180841-3c283ff8b7dd
-	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901
 	github.com/jonboulle/clockwork v0.2.2
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
