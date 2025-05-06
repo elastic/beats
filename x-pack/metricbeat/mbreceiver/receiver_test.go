@@ -5,6 +5,7 @@
 package mbreceiver
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"fmt"
@@ -22,7 +23,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/receiver"
 
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
 )
 
@@ -73,13 +79,24 @@ func TestNewReceiver(t *testing.T) {
 		},
 		AssertFunc: func(c *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			_ = zapLogs
-			assert.Conditionf(c, func() bool {
+			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket)
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+			assert.Condition(c, func() bool {
+				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
+					FilterMessageSnippet("add_host_metadata").
+					FilterMessageSnippet("add_cloud_metadata").
+					FilterMessageSnippet("add_docker_metadata").
+					FilterMessageSnippet("add_kubernetes_metadata").
+					Len() == 1
+				assert.True(c, processorsLoaded, "processors not loaded")
+				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
+				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
+			}, "failed to check processors loaded")
 		},
 	})
 }
@@ -236,4 +253,52 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 		return false
 	}
 	return true
+}
+
+func BenchmarkFactory(b *testing.B) {
+	tmpDir := b.TempDir()
+
+	cfg := &Config{
+		Beatconfig: map[string]interface{}{
+			"metricbeat": map[string]any{
+				"modules": []map[string]any{
+					{
+						"module":     "system",
+						"enabled":    true,
+						"period":     "1s",
+						"processes":  []string{".*"},
+						"metricsets": []string{"cpu"},
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"logging": map[string]any{
+				"level": "info",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": tmpDir,
+		},
+	}
+
+	var zapLogs bytes.Buffer
+	core := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.Lock(zapcore.AddSync(&zapLogs)),
+		zapcore.InfoLevel)
+
+	factory := NewFactory()
+
+	receiverSettings := receiver.Settings{}
+	receiverSettings.Logger = zap.New(core)
+	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
+		require.NoError(b, err)
+	}
 }
