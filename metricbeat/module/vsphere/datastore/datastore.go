@@ -150,7 +150,9 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 			m.Logger().Errorf("Failed to retrieve object from datastore %s: %v", dst[i].Name, err)
 		}
 
-		metricMap, err := m.getPerfMetrics(ctx, perfManager, dst[i], metrics)
+		perfFetcher := vSphereClientUtil.NewPerformanceDataFetcher(m.Logger(), perfManager)
+		metricMap, err := perfFetcher.GetPerfMetrics(ctx, int32(m.Module().Config().Period.Seconds()), "datastore", dst[i].Name, dst[i].Reference(), metrics, metricSet)
+
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve performance metrics from datastore %s: %v", dst[i].Name, err)
 		}
