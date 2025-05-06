@@ -11,7 +11,7 @@ You configure Auditbeat to write to a specific output by setting options in the 
 
 The following topics describe how to configure each supported output. If you’ve secured the {{stack}}, also read [Secure](/reference/auditbeat/securing-auditbeat.md) for more about security-related configuration options.
 
-* [{{ess}}](/reference/auditbeat/configure-cloud-id.md)
+* [{{ech}}](/reference/auditbeat/configure-cloud-id.md)
 * [Elasticsearch](/reference/auditbeat/elasticsearch-output.md)
 * [Logstash](/reference/auditbeat/logstash-output.md)
 * [Kafka](/reference/auditbeat/kafka-output.md)
