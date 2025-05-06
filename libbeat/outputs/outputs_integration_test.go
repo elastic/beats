@@ -40,6 +40,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/kafka"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -50,6 +51,9 @@ import (
 const (
 	kafkaDefaultHost = "localhost"
 	kafkaDefaultPort = "9094"
+
+	logstashDefaultHost     = "localhost"
+	logstashTestDefaultPort = "5044"
 )
 
 func TestOutputsMetrics(t *testing.T) {
@@ -203,6 +207,69 @@ func TestOutputsMetrics(t *testing.T) {
 
 		testOutputMetrics(t, "kafka", rawCfg, evs)
 	})
+
+	t.Run("logstash", func(t *testing.T) {
+		rawCfg := map[string]interface{}{
+			"hosts": []string{fmt.Sprintf("%v:%v",
+				getenv("LS_HOST", logstashDefaultHost),
+				getenv("LS_TCP_PORT", logstashTestDefaultPort),
+			)},
+			"index":      "logstash-test",
+			"pipelining": 0,
+		}
+
+		evs := []publisher.Event{
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg":         "message 1",
+						"http_status": strconv.Itoa(http.StatusOK)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 2",
+						// dropped
+						"http_status": strconv.Itoa(http.StatusNotAcceptable)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 3",
+						// toomany
+						"http_status": strconv.Itoa(http.StatusTooManyRequests)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+			{
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg": "message 4",
+						// duplicated
+						"http_status": strconv.Itoa(http.StatusConflict)},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
+		}
+
+		testOutputMetrics(t, "logstash", rawCfg, evs)
+	})
 }
 
 func testOutputMetrics(t *testing.T,
@@ -246,6 +313,7 @@ func testOutputMetrics(t *testing.T,
 	// Try publishing a batch that can be split
 	err = client.Publish(context.Background(), &mockBatch{evs: evs})
 	require.NoError(t, err, "could not publish events")
+	require.NoError(t, og.Clients[0].Close(), "failed to close output client")
 
 	snapshot := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
 	events := snapshot["events"].(map[string]any)
@@ -266,7 +334,7 @@ func testOutputMetrics(t *testing.T,
 	assert.Equal(t, evTooMany, counter.ErrTooManyLoad())
 	assert.Equal(t, evRetrieable, counter.RetryableErrorsLoad())
 
-	t.Fail()
+	t.Logf("output metrics: %s", counter)
 	if t.Failed() {
 		t.Log("OutputListener metrics: ", counter)
 
