@@ -6,7 +6,6 @@ package fbreceiver
 
 import (
 	"bytes"
-	"context"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -92,7 +92,7 @@ func BenchmarkFactory(b *testing.B) {
 				"otelconsumer": map[string]interface{}{},
 			},
 			"logging": map[string]interface{}{
-				"level": "debug",
+				"level": "info",
 				"selectors": []string{
 					"*",
 				},
@@ -105,43 +105,48 @@ func BenchmarkFactory(b *testing.B) {
 	core := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 		zapcore.Lock(zapcore.AddSync(&zapLogs)),
-		zapcore.DebugLevel)
+		zapcore.InfoLevel)
+
+	factory := NewFactory()
 
 	receiverSettings := receiver.Settings{}
 	receiverSettings.Logger = zap.New(core)
+	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
 
-	factory := NewFactory()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_, err := factory.CreateLogs(context.Background(), receiverSettings, cfg, nil)
+		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
 	}
 }
 
 func TestMultipleReceivers(t *testing.T) {
-	config := Config{
-		Beatconfig: map[string]interface{}{
-			"filebeat": map[string]interface{}{
-				"inputs": []map[string]interface{}{
-					{
-						"type":    "benchmark",
-						"enabled": true,
-						"message": "test",
-						"count":   1,
+	// Receivers need distinct home directories so wrap the config in a function.
+	config := func() *Config {
+		return &Config{
+			Beatconfig: map[string]interface{}{
+				"filebeat": map[string]interface{}{
+					"inputs": []map[string]interface{}{
+						{
+							"type":    "benchmark",
+							"enabled": true,
+							"message": "test",
+							"count":   1,
+						},
 					},
 				},
-			},
-			"output": map[string]interface{}{
-				"otelconsumer": map[string]interface{}{},
-			},
-			"logging": map[string]interface{}{
-				"level": "debug",
-				"selectors": []string{
-					"*",
+				"output": map[string]interface{}{
+					"otelconsumer": map[string]interface{}{},
 				},
+				"logging": map[string]interface{}{
+					"level": "info",
+					"selectors": []string{
+						"*",
+					},
+				},
+				"path.home": t.TempDir(),
 			},
-			"path.home": t.TempDir(),
-		},
+		}
 	}
 
 	factory := NewFactory()
@@ -150,12 +155,12 @@ func TestMultipleReceivers(t *testing.T) {
 		Receivers: []oteltest.ReceiverConfig{
 			{
 				Name:    "r1",
-				Config:  &config,
+				Config:  config(),
 				Factory: factory,
 			},
 			{
 				Name:    "r2",
-				Config:  &config,
+				Config:  config(),
 				Factory: factory,
 			},
 		},

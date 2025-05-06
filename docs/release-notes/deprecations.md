@@ -13,16 +13,17 @@ To learn how to upgrade, check out <uprade docs>.
 % ::::{dropdown} Deprecation title
 % Description of the deprecation.
 % For more information, check [PR #](PR link).
-% **Impact**<br> Impact of deprecation. 
+% **Impact**<br> Impact of deprecation.
 % **Action**<br> Steps for mitigating deprecation impact.
 % ::::
 
-% ## 9.0.0 [beats-900-deprecations]
-% **Release date:** March 25, 2025
+% ## Going forward, please use this format for the ID: 9.0.x [beats-9.0.x-deprecations]
+
+## 9.0.0 [beats-900-deprecations]
 
 % ::::{dropdown} Deprecation title
 % Description of the deprecation.
 % For more information, check [PR #](PR link).
-% **Impact**<br> Impact of deprecation. 
+% **Impact**<br> Impact of deprecation.
 % **Action**<br> Steps for mitigating deprecation impact.
 % ::::
