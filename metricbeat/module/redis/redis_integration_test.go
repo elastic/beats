@@ -211,7 +211,7 @@ func TestFetchKeyInfo(t *testing.T) {
 				conn.Do("EXPIRE", c.Key, c.Expire)
 			}
 
-			info, err := FetchKeyInfo(conn, c.Key)
+			info, err := FetchKeyInfo(conn, c.Key, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			require.Equal(t, c.Expected, info)
 		})
