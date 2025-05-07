@@ -129,8 +129,9 @@ func NewMetricsRegistry(
 	if reg == nil {
 		reg = parent.NewRegistry(registryID)
 	} else {
+		reg = monitoring.NewRegistry()
 		log.Warnw(fmt.Sprintf(
-			"parent metrics registry already contains a %q registry, reusing it",
+			"parent metrics registry already contains a %q registry, returning an unregistered registry. Metrics won't be available for this input instance",
 			registryID),
 			"registry_id", registryID,
 			"input_type", inputType,
