@@ -291,6 +291,18 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
+<<<<<<< HEAD
+=======
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-aws-buildkite-oidc.tf
+          - elastic/oblt-aws-auth#v0.1.0:
+              duration: 3600 # seconds
+>>>>>>> 20a009464 (bk: use OIDC to create AWS cloud resources (#44202))
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: AWS Tests"
