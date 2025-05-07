@@ -84,7 +84,7 @@ func GetNpcapInstallerFn(dir string) func() error {
 		ciBucketName := getBucketName()
 
 		fmt.Printf("getting %s from private cache to %q\n", installer, dstPath) //nolint:forbidigo // fmt.Println is ok here
-		return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
+		return sh.RunV("gcloud", "storage", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
 	}
 }
 
