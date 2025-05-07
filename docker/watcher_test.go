@@ -27,7 +27,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/stretchr/testify/assert"
@@ -38,20 +37,20 @@ import (
 
 type MockClient struct {
 	// containers to return on ContainerList call
-	containers [][]types.Container
+	containers [][]container.Summary
 	// event list to send on Events call
 	events []interface{}
 	// done channel is closed when the client has sent all events
 	done chan interface{}
 }
 
-func (m *MockClient) ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error) {
+func (m *MockClient) ContainerList(ctx context.Context, options container.ListOptions) ([]container.Summary, error) {
 	res := m.containers[0]
 	m.containers = m.containers[1:]
 	return res, nil
 }
 
-func (m *MockClient) Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error) {
+func (m *MockClient) Events(ctx context.Context, options events.ListOptions) (<-chan events.Message, <-chan error) {
 	eventsC := make(chan events.Message)
 	errorsC := make(chan error)
 
@@ -70,27 +69,27 @@ func (m *MockClient) Events(ctx context.Context, options types.EventsOptions) (<
 	return eventsC, errorsC
 }
 
-func (m *MockClient) ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error) {
-	return types.ContainerJSON{}, errors.New("unimplemented")
+func (m *MockClient) ContainerInspect(ctx context.Context, containerID string) (container.InspectResponse, error) {
+	return container.InspectResponse{}, errors.New("unimplemented")
 }
 
 func TestWatcherInitialization(t *testing.T) {
 	watcher := runAndWait(testWatcher(t,
-		[][]types.Container{
-			[]types.Container{
-				types.Container{
+		[][]container.Summary{
+			{
+				container.Summary{
 					ID:              "0332dbd79e20",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"foo": "bar"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
-				types.Container{
+				container.Summary{
 					ID:              "6ac6ee8df5d4",
 					Names:           []string{"/other"},
 					Image:           "nginx",
 					Labels:          map[string]string{},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
 		},
@@ -98,13 +97,13 @@ func TestWatcherInitialization(t *testing.T) {
 	))
 
 	assert.Equal(t, map[string]*Container{
-		"0332dbd79e20": &Container{
+		"0332dbd79e20": {
 			ID:     "0332dbd79e20",
 			Name:   "containername",
 			Image:  "busybox",
 			Labels: map[string]string{"foo": "bar"},
 		},
-		"6ac6ee8df5d4": &Container{
+		"6ac6ee8df5d4": {
 			ID:     "6ac6ee8df5d4",
 			Name:   "other",
 			Image:  "nginx",
@@ -115,21 +114,21 @@ func TestWatcherInitialization(t *testing.T) {
 
 func TestWatcherInitializationShortID(t *testing.T) {
 	watcher := runAndWait(testWatcherShortID(t,
-		[][]types.Container{
-			[]types.Container{
-				types.Container{
+		[][]container.Summary{
+			{
+				container.Summary{
 					ID:              "1234567890123",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"foo": "bar"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
-				types.Container{
+				container.Summary{
 					ID:              "2345678901234",
 					Names:           []string{"/other"},
 					Image:           "nginx",
 					Labels:          map[string]string{},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
 		},
@@ -138,13 +137,13 @@ func TestWatcherInitializationShortID(t *testing.T) {
 	))
 
 	assert.Equal(t, map[string]*Container{
-		"1234567890123": &Container{
+		"1234567890123": {
 			ID:     "1234567890123",
 			Name:   "containername",
 			Image:  "busybox",
 			Labels: map[string]string{"foo": "bar"},
 		},
-		"2345678901234": &Container{
+		"2345678901234": {
 			ID:     "2345678901234",
 			Name:   "other",
 			Image:  "nginx",
@@ -162,23 +161,23 @@ func TestWatcherInitializationShortID(t *testing.T) {
 
 func TestWatcherAddEvents(t *testing.T) {
 	watcher := runAndWait(testWatcher(t,
-		[][]types.Container{
-			[]types.Container{
-				types.Container{
+		[][]container.Summary{
+			{
+				container.Summary{
 					ID:              "0332dbd79e20",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"foo": "bar"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
-			[]types.Container{
-				types.Container{
+			{
+				container.Summary{
 					ID:              "6ac6ee8df5d4",
 					Names:           []string{"/other"},
 					Image:           "nginx",
 					Labels:          map[string]string{"label": "value"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
 		},
@@ -198,13 +197,13 @@ func TestWatcherAddEvents(t *testing.T) {
 	))
 
 	assert.Equal(t, map[string]*Container{
-		"0332dbd79e20": &Container{
+		"0332dbd79e20": {
 			ID:     "0332dbd79e20",
 			Name:   "containername",
 			Image:  "busybox",
 			Labels: map[string]string{"foo": "bar"},
 		},
-		"6ac6ee8df5d4": &Container{
+		"6ac6ee8df5d4": {
 			ID:     "6ac6ee8df5d4",
 			Name:   "other",
 			Image:  "nginx",
@@ -215,23 +214,23 @@ func TestWatcherAddEvents(t *testing.T) {
 
 func TestWatcherAddEventsShortID(t *testing.T) {
 	watcher := runAndWait(testWatcherShortID(t,
-		[][]types.Container{
-			[]types.Container{
-				types.Container{
+		[][]container.Summary{
+			{
+				container.Summary{
 					ID:              "1234567890123",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"foo": "bar"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
-			[]types.Container{
-				types.Container{
+			{
+				container.Summary{
 					ID:              "2345678901234",
 					Names:           []string{"/other"},
 					Image:           "nginx",
 					Labels:          map[string]string{"label": "value"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
 		},
@@ -252,13 +251,13 @@ func TestWatcherAddEventsShortID(t *testing.T) {
 	))
 
 	assert.Equal(t, map[string]*Container{
-		"1234567890123": &Container{
+		"1234567890123": {
 			ID:     "1234567890123",
 			Name:   "containername",
 			Image:  "busybox",
 			Labels: map[string]string{"foo": "bar"},
 		},
-		"2345678901234": &Container{
+		"2345678901234": {
 			ID:     "2345678901234",
 			Name:   "other",
 			Image:  "nginx",
@@ -269,23 +268,23 @@ func TestWatcherAddEventsShortID(t *testing.T) {
 
 func TestWatcherUpdateEvent(t *testing.T) {
 	watcher := runAndWait(testWatcher(t,
-		[][]types.Container{
-			[]types.Container{
-				types.Container{
+		[][]container.Summary{
+			{
+				{
 					ID:              "0332dbd79e20",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"label": "foo"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
-			[]types.Container{
-				types.Container{
+			{
+				container.Summary{
 					ID:              "0332dbd79e20",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"label": "bar"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
 		},
@@ -305,7 +304,7 @@ func TestWatcherUpdateEvent(t *testing.T) {
 	))
 
 	assert.Equal(t, map[string]*Container{
-		"0332dbd79e20": &Container{
+		"0332dbd79e20": {
 			ID:     "0332dbd79e20",
 			Name:   "containername",
 			Image:  "busybox",
@@ -317,23 +316,23 @@ func TestWatcherUpdateEvent(t *testing.T) {
 
 func TestWatcherUpdateEventShortID(t *testing.T) {
 	watcher := runAndWait(testWatcherShortID(t,
-		[][]types.Container{
-			[]types.Container{
-				types.Container{
+		[][]container.Summary{
+			{
+				container.Summary{
 					ID:              "1234567890123",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"label": "foo"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
-			[]types.Container{
-				types.Container{
+			{
+				container.Summary{
 					ID:              "1234567890123",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"label": "bar"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
 		},
@@ -354,7 +353,7 @@ func TestWatcherUpdateEventShortID(t *testing.T) {
 	))
 
 	assert.Equal(t, map[string]*Container{
-		"1234567890123": &Container{
+		"1234567890123": {
 			ID:     "1234567890123",
 			Name:   "containername",
 			Image:  "busybox",
@@ -366,14 +365,14 @@ func TestWatcherUpdateEventShortID(t *testing.T) {
 
 func TestWatcherDie(t *testing.T) {
 	watcher, clientDone := testWatcher(t,
-		[][]types.Container{
-			[]types.Container{
-				types.Container{
+		[][]container.Summary{
+			{
+				container.Summary{
 					ID:              "0332dbd79e20",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"label": "foo"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
 		},
@@ -418,14 +417,14 @@ func TestWatcherDie(t *testing.T) {
 
 func TestWatcherDieShortID(t *testing.T) {
 	watcher, clientDone := testWatcherShortID(t,
-		[][]types.Container{
-			[]types.Container{
-				types.Container{
+		[][]container.Summary{
+			{
+				container.Summary{
 					ID:              "0332dbd79e20aaa",
 					Names:           []string{"/containername", "othername"},
 					Image:           "busybox",
 					Labels:          map[string]string{"label": "foo"},
-					NetworkSettings: &types.SummaryNetworkSettings{},
+					NetworkSettings: &container.NetworkSettingsSummary{},
 				},
 			},
 		},
@@ -469,11 +468,11 @@ func TestWatcherDieShortID(t *testing.T) {
 	assert.Equal(t, 0, len(watcher.Containers()))
 }
 
-func testWatcher(t *testing.T, containers [][]types.Container, events []interface{}) (*watcher, chan interface{}) {
+func testWatcher(t *testing.T, containers [][]container.Summary, events []interface{}) (*watcher, chan interface{}) {
 	return testWatcherShortID(t, containers, events, false)
 }
 
-func testWatcherShortID(t *testing.T, containers [][]types.Container, events []interface{}, enable bool) (*watcher, chan interface{}) {
+func testWatcherShortID(t *testing.T, containers [][]container.Summary, events []interface{}, enable bool) (*watcher, chan interface{}) {
 	err := logp.TestingSetup()
 	require.NoError(t, err)
 

@@ -28,7 +28,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/api/types/filters"
@@ -107,14 +106,14 @@ type Container struct {
 	Image       string
 	Labels      map[string]string
 	IPAddresses []string
-	Ports       []types.Port
+	Ports       []container.Port
 }
 
 // Client for docker interface
 type Client interface {
-	ContainerList(ctx context.Context, options container.ListOptions) ([]types.Container, error)
-	ContainerInspect(ctx context.Context, container string) (types.ContainerJSON, error)
-	Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error)
+	ContainerList(ctx context.Context, options container.ListOptions) ([]container.Summary, error)
+	ContainerInspect(ctx context.Context, container string) (container.InspectResponse, error)
+	Events(ctx context.Context, options events.ListOptions) (<-chan events.Message, <-chan error)
 }
 
 // WatcherConstructor represent a function that creates a new Watcher from giving parameters
@@ -266,7 +265,7 @@ func (w *watcher) watch() {
 
 		w.log.Debugf("Fetching events since %s", lastValidTimestamp)
 
-		options := types.EventsOptions{
+		options := events.ListOptions{
 			Since:   lastValidTimestamp.Format(time.RFC3339Nano),
 			Filters: filter,
 		}
