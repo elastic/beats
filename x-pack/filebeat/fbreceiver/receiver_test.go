@@ -180,7 +180,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 		},
 	}
 
-	for _, endpoint := range []string{"inputs", "stats"} {
+	for _, endpoint := range []string{"inputs/", "stats/"} {
 		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/"+endpoint, nil)
 		if err != nil {
 			sb.Reset()
@@ -194,6 +194,13 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 			return false
 		}
 		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			sb.Reset()
+			fmt.Fprintf(sb, "%s: unexpected status code: %d", endpoint, resp.StatusCode)
+			return false
+		}
+
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			sb.Reset()

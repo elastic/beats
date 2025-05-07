@@ -286,31 +286,36 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 		},
 	}
 
-	for _, endpoint := range []string{"inputs", "stats"} {
-		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/"+endpoint, nil)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: error creating request: %s", endpoint, err)
-			return false
-		}
-		resp, err := client.Do(req)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: client.Get failed: %s", endpoint, err)
-			return false
-		}
-		defer resp.Body.Close()
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: io.ReadAll of body failed: %s", endpoint, err)
-			return false
-		}
-		if len(body) <= 0 {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: body too short", endpoint)
-			return false
-		}
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/stats/", nil)
+	if err != nil {
+		sb.Reset()
+		fmt.Fprintf(sb, "error creating request: %s", err)
+		return false
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		sb.Reset()
+		fmt.Fprintf(sb, "client.Get failed: %s", err)
+		return false
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		sb.Reset()
+		fmt.Fprintf(sb, "unexpected status code: %d", resp.StatusCode)
+		return false
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		sb.Reset()
+		fmt.Fprintf(sb, "io.ReadAll of body failed: %s", err)
+		return false
+	}
+	if len(body) <= 0 {
+		sb.Reset()
+		fmt.Fprintf(sb, "body too short")
+		return false
 	}
 	return true
 }
