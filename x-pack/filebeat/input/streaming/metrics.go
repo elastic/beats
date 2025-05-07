@@ -23,6 +23,7 @@ type inputMetrics struct {
 	eventsReceived          *monitoring.Uint   // number of events received
 	batchesPublished        *monitoring.Uint   // number of event arrays published
 	eventsPublished         *monitoring.Uint   // number of events published
+	writeControlErrors      *monitoring.Uint   // number of errors encountered while sending write control messages like ping
 	celProcessingTime       metrics.Sample     // histogram of the elapsed successful cel program processing times in nanoseconds
 	batchProcessingTime     metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 	pingMessageSendTime     metrics.Sample     // histogram of the elapsed successful ping message send times in nanoseconds
@@ -41,6 +42,7 @@ func newInputMetrics(id string) *inputMetrics {
 		eventsReceived:          monitoring.NewUint(reg, "events_received_total"),
 		batchesPublished:        monitoring.NewUint(reg, "batches_published_total"),
 		eventsPublished:         monitoring.NewUint(reg, "events_published_total"),
+		writeControlErrors:      monitoring.NewUint(reg, "write_control_errors"),
 		celProcessingTime:       metrics.NewUniformSample(1024),
 		batchProcessingTime:     metrics.NewUniformSample(1024),
 		pingMessageSendTime:     metrics.NewUniformSample(1024),

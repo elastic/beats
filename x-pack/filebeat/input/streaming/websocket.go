@@ -84,14 +84,15 @@ func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start t
 
 		for {
 			select {
-			case <-ticker.C:
+			case now := <-ticker.C:
 				if conn != nil {
-					err := conn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(k.cfg.KeepAlive.WriteControlDeadline))
+					err := conn.WriteControl(websocket.PingMessage, nil, now.Add(k.cfg.KeepAlive.WriteControlDeadline))
 					if err != nil {
-						k.log.Debugw("error sending ping message to websocket server:", err)
-						return
+						k.log.Debugw("error sending ping control frame to websocket server:", err)
+						k.metrics.writeControlErrors.Inc()
+						k.metrics.errorsTotal.Inc()
 					}
-					k.log.Debugw("sent ping message to websocket server")
+					k.log.Debugw("sent ping control frame to websocket server")
 					k.metrics.pingMessageSendTime.Update(time.Since(start).Nanoseconds())
 				} else {
 					k.log.Debugw("websocket connection is nil but heartbeat routine is still running!")
