@@ -259,6 +259,13 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Fix Kubernetes metadata sometimes not being present after startup {pull}41216[41216]
+- Do not report non-existant 0 values for RSS metrics in docker/memory {pull}41449[41449]
+- Don't skip first bucket value in GCP metrics metricset for distribution type metrics {pull}41822[41822]
+- [K8s Integration] Enhance HTTP authentication in case of token updates for Apiserver, Controllermanager and Scheduler metricsets  {issue}41910[41910] {pull}42016[42016]
+- Remove `hostname` field from zookeeper's `mntr` data stream. {pull}41887[41887]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 
 *Osquerybeat*
 
