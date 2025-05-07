@@ -314,7 +314,7 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 	}
 	if len(body) <= 0 {
 		sb.Reset()
-		fmt.Fprintf(sb, "body too short")
+		sb.WriteString("body too short")
 		return false
 	}
 	return true
