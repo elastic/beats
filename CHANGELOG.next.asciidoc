@@ -119,10 +119,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 
-- Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
-- Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
-- Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
-
 *Heartbeat*
 
 
@@ -229,12 +225,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 - Update CEL mito extensions to v1.18.0. {pull}43855[43855]
 - Update CEL mito extensions to v1.19.0. {pull}44098[44098]
-- Add `use_kubeadm` config option for filebeat (both filbeat.input and autodiscovery) in order to toggle kubeadm-config api requests {pull}40301[40301]
-- Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
-- Add CSV decoding capacity to gcs input {pull}40979[40979]
-- Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
-- Jounrald input now supports filtering by facilities {pull}41061[41061]
-- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 
 *Auditbeat*
 
@@ -314,26 +304,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
