@@ -38,38 +38,6 @@ steps:
 
     steps:
 
-      - label: ":windows: x-pack/packetbeat: Win 2022 System Tests"
-        key: "mandatory-win-2022-system-tests"
-        command: |
-          Set-Location -Path x-pack/packetbeat
-          mage systemTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/packetbeat/build/*.xml"
-          - "x-pack/packetbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/packetbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
-          # This plugin authenticates to Google Cloud using the OIDC token.
-          - elastic/oblt-google-auth#v1.2.0:
-              lifetime: 10800 # seconds
-              project-id: "elastic-observability-ci"
-              project-number: "911195782929"
-        notify:
-          - github_commit_status:
-              context: "x-pack/packetbeat: Win 2022 System Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 2025 System Tests"
         key: "mandatory-win-2025-system-tests"
@@ -96,7 +64,53 @@ steps:
               debug: true
           # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
           # This plugin authenticates to Google Cloud using the OIDC token.
-          - elastic/oblt-google-auth#v1.2.0:
+          - elastic/oblt-google-auth#test/feature-use-oidc-gcp:
+              lifetime: 10800 # seconds
+              project-id: "elastic-observability-ci"
+              project-number: "911195782929"
+
+      - label: ":windows: x-pack/packetbeat: Linux"
+        command: gcloud storage cp -r gs://golang-crossbuild-ci-internal/private .
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        plugins:
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
+          # This plugin authenticates to Google Cloud using the OIDC token.
+          - elastic/oblt-google-auth#test/feature-use-oidc-gcp:
+              lifetime: 10800 # seconds
+              project-id: "elastic-observability-ci"
+              project-number: "911195782929"
+
+      - label: ":windows: x-pack/packetbeat: Win 2025 System Tests"
+        key: "mandatory-win-2025-system-tests"
+        command: |
+          Set-Location -Path x-pack/packetbeat
+          mage systemTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2025}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/packetbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
+          # This plugin authenticates to Google Cloud using the OIDC token.
+          - elastic/oblt-google-auth#test/feature-use-oidc-gcp:
               lifetime: 10800 # seconds
               project-id: "elastic-observability-ci"
               project-number: "911195782929"
@@ -129,7 +143,7 @@ steps:
               debug: true
           # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
           # This plugin authenticates to Google Cloud using the OIDC token.
-          - elastic/oblt-google-auth#v1.2.0:
+          - elastic/oblt-google-auth#test/feature-use-oidc-gcp:
               lifetime: 10800 # seconds
               project-id: "elastic-observability-ci"
               project-number: "911195782929"
