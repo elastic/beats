@@ -119,7 +119,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 
-
 *Heartbeat*
 
 
@@ -317,23 +316,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
