@@ -37,10 +37,13 @@ func init() {
 			supportedCipherSuites[i] = cipherName
 		}
 	}
-	// only allow P256, P384.
+	// Elliptic curves approved for use in ECDSA are specified in SP 800-186,
+	// as implemented in FIPS 186-5.
+	// Based on NIST SP 800-186 section 3 and SP 800-56A Rev.3
+	// only allows P-256, P-384, P-521
 	for name, curveType := range tlsCurveTypes {
 		switch tls.CurveID(curveType) {
-		case tls.CurveP256, tls.CurveP384:
+		case tls.CurveP256, tls.CurveP384, tls.CurveP521:
 			supportedCurveTypes[curveType] = name
 		}
 	}
