@@ -138,7 +138,7 @@ func TestFactory(t *testing.T) {
 	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
 
 	rc, err := factory.CreateLogs(t.Context(), receiverSettings, cfg, nil)
-	require.NotEmpty(t, rc, "receiver should not be nil")
+	require.NotEmpty(t, rc, "receiver should not be empty")
 	require.NoError(t, err)
 
 	// Ensure http metrics endpoint is reachable on receiver creation
@@ -179,29 +179,32 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 			},
 		},
 	}
-	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/stats", nil)
-	if err != nil {
-		sb.Reset()
-		fmt.Fprintf(sb, "error creating request: %s", err)
-		return false
-	}
-	resp, err := client.Do(req)
-	if err != nil {
-		sb.Reset()
-		fmt.Fprintf(sb, "client.Get failed: %s", err)
-		return false
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		sb.Reset()
-		fmt.Fprintf(sb, "io.ReadAll of body failed: %s", err)
-		return false
-	}
-	if len(body) <= 0 {
-		sb.Reset()
-		sb.WriteString("body too short")
-		return false
+
+	for _, endpoint := range []string{"inputs", "stats"} {
+		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/"+endpoint, nil)
+		if err != nil {
+			sb.Reset()
+			fmt.Fprintf(sb, "%s: error creating request: %s", endpoint, err)
+			return false
+		}
+		resp, err := client.Do(req)
+		if err != nil {
+			sb.Reset()
+			fmt.Fprintf(sb, "%s: client.Get failed: %s", endpoint, err)
+			return false
+		}
+		defer resp.Body.Close()
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			sb.Reset()
+			fmt.Fprintf(sb, "%s: io.ReadAll of body failed: %s", endpoint, err)
+			return false
+		}
+		if len(body) <= 0 {
+			sb.Reset()
+			fmt.Fprintf(sb, "%s: body too short", endpoint)
+			return false
+		}
 	}
 	return true
 }
@@ -344,6 +347,19 @@ func TestMultipleReceivers(t *testing.T) {
 				}
 				return true
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+
+			assert.Condition(c, func() bool {
+				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
+					FilterMessageSnippet("add_host_metadata").
+					FilterMessageSnippet("add_cloud_metadata").
+					FilterMessageSnippet("add_docker_metadata").
+					FilterMessageSnippet("add_kubernetes_metadata").
+					Len() == 2
+				assert.True(c, processorsLoaded, "processors not loaded")
+				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
+				assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
+				return assert.Contains(c, logs["r2"][0].Flatten(), "host.architecture")
+			}, "failed to check processors loaded")
 
 			// Make sure that each receiver has a separate logger
 			// instance and does not interfere with others. Previously, the
