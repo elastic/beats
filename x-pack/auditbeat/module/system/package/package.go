@@ -25,7 +25,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid/v5"
-	"github.com/joeshaw/multierror"
 	"go.etcd.io/bbolt"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
@@ -255,7 +254,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Close cleans up the MetricSet when it finishes.
 func (ms *MetricSet) Close() error {
-	var errs multierror.Errors
+	var errs []error
 
 	errs = append(errs, closeDataset())
 
@@ -263,7 +262,7 @@ func (ms *MetricSet) Close() error {
 		errs = append(errs, ms.bucket.Close())
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Fetch collects data about the host. It is invoked periodically.

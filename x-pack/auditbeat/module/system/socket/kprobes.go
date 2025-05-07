@@ -12,8 +12,6 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/joeshaw/multierror"
-
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -59,19 +57,19 @@ func (p *probeInstaller) Install(pdef helper.ProbeDef) (format tracing.ProbeForm
 	if decoder, err = pdef.Decoder(format); err != nil {
 		return format, decoder, fmt.Errorf("failed to create decoder: %w", err)
 	}
-	return
+	return format, decoder, nil
 }
 
 // UninstallInstalled uninstalls the probes installed by Install.
 func (p *probeInstaller) UninstallInstalled() error {
-	var errs multierror.Errors
+	var errs []error
 	for _, probe := range p.installed {
 		if err := p.traceFS.RemoveKProbe(probe); err != nil {
 			errs = append(errs, err)
 		}
 	}
 	p.installed = nil
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // UninstallIf uninstalls all probes in the system that met the condition.
@@ -80,7 +78,7 @@ func (p *probeInstaller) UninstallIf(condition helper.ProbeCondition) error {
 	if err != nil {
 		return fmt.Errorf("failed to list installed kprobes: %w", err)
 	}
-	var errs multierror.Errors
+	var errs []error
 	for _, probe := range kprobes {
 		if condition(probe) {
 			if err := p.traceFS.RemoveKProbe(probe); err != nil {
@@ -88,7 +86,7 @@ func (p *probeInstaller) UninstallIf(condition helper.ProbeCondition) error {
 			}
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // WithGroup sets a custom group to probes before they are installed.

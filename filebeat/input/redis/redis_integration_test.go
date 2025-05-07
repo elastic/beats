@@ -34,7 +34,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -114,7 +114,7 @@ func TestInput(t *testing.T) {
 		BeatDone: make(chan struct{}),
 	}
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	// Setup the input
 	input, err := NewInput(config, connector, inputContext, logger)
 	require.NoError(t, err)
@@ -229,4 +229,78 @@ func getOrDefault(s, defaultString string) string {
 		return defaultString
 	}
 	return s
+}
+
+func TestAuthenticate(t *testing.T) {
+	var redisConfig config
+	var pool *rd.Pool
+	var conn rd.Conn
+	var err error
+
+	redisConfig = createRedisConfig("", "password")
+	require.NotEmpty(t, redisConfig, "redisConfig should not be empty")
+	pool = CreatePool(hostPort, redisConfig)
+	conn, err = pool.Dial()
+	require.NoError(t, err)
+	_, err = conn.Do("PING")
+	require.NoError(t, err)
+
+	redisConfig = createRedisConfig("", "password1")
+	require.NotEmpty(t, redisConfig, "redisConfig should not be empty")
+	pool = CreatePool(hostPort, redisConfig)
+	_, err = pool.Dial()
+	require.Error(t, err)
+	require.Equal(t, rd.Error("WRONGPASS invalid username-password pair or user is disabled."), err)
+
+	redisConfig = createRedisConfig("testuser", "testpass")
+	require.NotEmpty(t, redisConfig, "redisConfig should not be empty")
+	pool = CreatePool(hostPort, redisConfig)
+	conn, err = pool.Dial()
+	require.NoError(t, err)
+	_, err = conn.Do("PING")
+	require.NoError(t, err)
+
+	redisConfig = createRedisConfig("testuser", "testpass1")
+	require.NotEmpty(t, redisConfig, "redisConfig should not be empty")
+	pool = CreatePool(hostPort, redisConfig)
+	_, err = pool.Dial()
+	require.Error(t, err)
+	require.Equal(t, rd.Error("WRONGPASS invalid username-password pair or user is disabled."), err)
+}
+
+func createRedisConfig(username string, password string) config {
+	cfg := conf.MustNewConfigFrom(mapstr.M{
+		"network":      "tcp",
+		"type":         "redis",
+		"hosts":        []string{hostPort},
+		"maxconn":      10,
+		"idle_timeout": 60 * time.Second,
+		"ssl": mapstr.M{
+			"enabled":                 true,
+			"certificate_authorities": []string{"_meta/certs/root-ca.pem"},
+			"certificate":             "_meta/certs/server-cert.pem",
+			"key":                     "_meta/certs/server-key.pem",
+		},
+	})
+
+	redisConfig := defaultConfig()
+	err := cfg.Unpack(&redisConfig)
+	if err != nil {
+		return config{}
+	}
+
+	if username != "" {
+		redisConfig.Username = username
+	}
+
+	if password != "" {
+		redisConfig.Password = password
+	}
+
+	if redisConfig.TLS.IsEnabled() {
+		tlsConfig, _ := tlscommon.LoadTLSConfig(redisConfig.TLS)
+		redisConfig.tlsConfig = tlsConfig.ToConfig()
+	}
+
+	return redisConfig
 }

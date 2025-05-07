@@ -214,7 +214,9 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.reads`**
-:   [6.4]
+:   :::{admonition} Deprecated in 6.4
+    The `awsfargate.task_stats.diskio.reads` field was deprecated in 6.4.
+    :::
 
 Number of current reads per second
 
@@ -265,7 +267,9 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.writes`**
-:   [6.4]
+:   :::{admonition} Deprecated in 6.4
+    The `awsfargate.task_stats.diskio.writes` field was deprecated in 6.4.
+    :::
 
 Number of current writes per second
 
@@ -316,7 +320,9 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.total`**
-:   [6.4]
+:   :::{admonition} Deprecated in 6.4
+    The `aawsfargate.task_stats.diskio.total` field was deprecated in 6.4.
+    :::
 
 Number of reads and writes per second
 

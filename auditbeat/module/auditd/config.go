@@ -22,6 +22,7 @@ package auditd
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -29,8 +30,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-libaudit/v2/rule"
@@ -93,7 +92,7 @@ var defaultConfig = Config{
 
 // Validate validates the rules specified in the config.
 func (c *Config) Validate() error {
-	var errs multierror.Errors
+	var errs []error
 	err := c.loadRules()
 	if err != nil {
 		errs = append(errs, err)
@@ -115,7 +114,7 @@ func (c *Config) Validate() error {
 			"'%v' (use unicast, multicast, or don't set a value)", c.SocketType))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Rules returns a list of rules specified in the config.
@@ -191,7 +190,7 @@ func (c Config) failureMode() (uint32, error) {
 // errors will be logged as warnings and any successfully parsed rules will be
 // returned.
 func readRules(reader io.Reader, source string, knownRules ruleSet, log *logp.Logger) (rules []auditRule, err error) {
-	var errs multierror.Errors
+	var errs []error
 
 	s := bufio.NewScanner(reader)
 	for lineNum := 1; s.Scan(); lineNum++ {
@@ -229,9 +228,9 @@ func readRules(reader io.Reader, source string, knownRules ruleSet, log *logp.Lo
 
 	if len(errs) != 0 {
 		if log == nil {
-			return nil, fmt.Errorf("failed loading rules: %w", errs.Err())
+			return nil, fmt.Errorf("failed loading rules: %w", errors.Join(errs...))
 		}
-		log.Warnf("errors loading rules: %v", errs.Err())
+		log.Warnf("errors loading rules: %v", errors.Join(errs...))
 	}
 	return rules, nil
 }

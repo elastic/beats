@@ -12,7 +12,7 @@ mapped_pages:
 ::::{admonition} Important note for {{ecloud}} users
 :class: important
 
-Built-in users are not available when running our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service) on {{ecloud}}. To send monitoring data securely, create a monitoring user and grant it the roles described in the following sections.
+Built-in users are not available when running [{{ech}}](https://www.elastic.co/cloud). To send monitoring data securely, create a monitoring user and grant it the roles described in the following sections.
 
 ::::
 

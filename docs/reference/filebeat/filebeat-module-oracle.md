@@ -73,12 +73,12 @@ Example config:
 
 Oracle Database fields are mapped to the current ECS Fields:
 
-| Oracle Fields | ECS Fields |  |
-| --- | --- | --- |
-| privilege | host.user.roles |  |
-| client_user | client.user.name |  |
-| userhost | client.ip/domain |  |
-| database_user | server.user.name |  |
+| Oracle Fields | ECS Fields |
+| --- | --- |
+| privilege | host.user.roles |
+| client_user | client.user.name |
+| userhost | client.ip/domain |
+| database_user | server.user.name |
 
 
 ## Fields [_fields_40]
