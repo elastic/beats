@@ -256,6 +256,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
 - Update CEL mito extensions to v1.19.0. {pull}44098[44098]
+- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 
 *Auditbeat*
 
@@ -352,6 +353,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
+
+
 
 
 
