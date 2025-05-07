@@ -143,7 +143,7 @@ func TestOutputsMetrics(t *testing.T) {
 			logstashDefaultHost     = "localhost"
 			logstashTestDefaultPort = "5044"
 		)
-		
+
 		rawCfg := map[string]interface{}{
 			"hosts": []string{fmt.Sprintf("%v:%v",
 				getenv("LS_HOST", logstashDefaultHost),
