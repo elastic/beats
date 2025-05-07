@@ -34,6 +34,7 @@ type config struct {
 	BucketListInterval time.Duration        `config:"bucket_list_interval"`
 	BucketListPrefix   string               `config:"bucket_list_prefix"`
 	FileSelectors      []fileSelectorConfig `config:"file_selectors"`
+	IpfixPaths         []string `config:"ipfix_paths"`
 	IgnoreOlder        time.Duration        `config:"ignore_older"`
 	NonAWSBucketName   string               `config:"non_aws_bucket_name"`
 	NumberOfWorkers    int                  `config:"number_of_workers"`
