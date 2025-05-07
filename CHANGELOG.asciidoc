@@ -3,6 +3,7 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-9.0.0]]
 === Beats version 9.0.0
 https://github.com/elastic/beats/compare/v9.0.0-rc1\...v9.0.0[View commits]
@@ -34,11 +35,17 @@ https://github.com/elastic/beats/compare/v9.0.0-beta1\...v9.0.0-rc1[View commits
 
 - Remove kibana.settings metricset since the API was removed in 8.0. {issue}30592[30592] {pull}42937[42937]
 - Removed support for the Enterprise Search module. {pull}42915[42915]
+=======
+[[release-notes-8.18.1]]
+=== Beats version 8.18.1
+https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
+>>>>>>> 4fa89b1cf (docs: Prepare Changelog for 8.18.1 (#44166))
 
 ==== Bugfixes
 
 *Filebeat*
 
+<<<<<<< HEAD
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly. {pull}42966[42966]
 - Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
 - Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error. {pull}42420[42756]
@@ -178,6 +185,19 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 - Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
+=======
+- Journald input now works on Docker containers (except Wolfi). {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+
+==== Added
+
+*Filebeat*
+
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
+>>>>>>> 4fa89b1cf (docs: Prepare Changelog for 8.18.1 (#44166))
 
 
 [[release-notes-8.18.0]]
