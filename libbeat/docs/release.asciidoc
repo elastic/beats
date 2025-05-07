@@ -18,6 +18,7 @@ upgrade.
 * <<release-notes-8.18.1>>
 >>>>>>> 4fa89b1cf (docs: Prepare Changelog for 8.18.1 (#44166))
 * <<release-notes-8.18.0>>
+* <<release-notes-8.17.6>>
 * <<release-notes-8.17.5>>
 * <<release-notes-8.17.4>>
 * <<release-notes-8.17.3>>
