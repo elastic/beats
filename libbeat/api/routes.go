@@ -55,6 +55,7 @@ func NewWithDefaultRoutes(log *logp.Logger, config *config.C, reg LookupFunc) (*
 
 	err = multierr.Combine(
 		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(reg("info")))),
+		api.AttachHandler("/inputs", makeAPIHandler(reg("inputs"))),
 		api.AttachHandler("/state", makeAPIHandler(reg("state"))),
 		api.AttachHandler("/stats", makeAPIHandler(reg("stats"))),
 		api.AttachHandler("/dataset", makeAPIHandler(reg("dataset"))),
