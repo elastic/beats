@@ -28,12 +28,18 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+type PerfManager interface {
+	AvailableMetric(ctx context.Context, entity types.ManagedObjectReference, interval int32) (performance.MetricList, error)
+	Query(ctx context.Context, spec []types.PerfQuerySpec) ([]types.BasePerfEntityMetricBase, error)
+	ToMetricSeries(ctx context.Context, series []types.BasePerfEntityMetricBase) ([]performance.EntityMetric, error)
+}
+
 type PerformanceDataFetcher struct {
-	perfManager *performance.Manager
+	perfManager PerfManager
 	logger      *logp.Logger
 }
 
-func NewPerformanceDataFetcher(logger *logp.Logger, perfManager *performance.Manager) *PerformanceDataFetcher {
+func NewPerformanceDataFetcher(logger *logp.Logger, perfManager PerfManager) *PerformanceDataFetcher {
 	return &PerformanceDataFetcher{
 		logger:      logger,
 		perfManager: perfManager,
