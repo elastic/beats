@@ -39,8 +39,8 @@ type BeatReceiver struct {
 	Logger   *zap.Logger
 }
 
-// NewBeatReceiver creates a new BeatReceiver instance.
-func NewBeatReceiver(
+// New creates a new BeatReceiver instance.
+func New(
 	beat *instance.Beat,
 	beater beat.Beater,
 	httpConf *config.C,
