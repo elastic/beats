@@ -1,0 +1,6 @@
+- name: wmi
+  type: group
+  release: beta
+  description: >
+    wmi
+  fields: []

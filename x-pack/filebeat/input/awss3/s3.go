@@ -43,6 +43,12 @@ func createPipelineClient(pipeline beat.Pipeline, acks *awsACKHandler) (beat.Cli
 }
 
 func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {
+	// Skip region fetching if it's an Access Point ARN
+	if isValidAccessPointARN(bucketName) {
+		// Extract the region from the ARN (e.g., arn:aws:s3:us-west-2:123456789012:accesspoint/my-access-point)
+		return getRegionFromAccessPointARN(bucketName), nil
+	}
+
 	getBucketLocationOutput, err := s3Client.GetBucketLocation(ctx, &s3.GetBucketLocationInput{
 		Bucket: awssdk.String(bucketName),
 	})
@@ -59,7 +65,19 @@ func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName str
 	return string(getBucketLocationOutput.LocationConstraint), nil
 }
 
+// Helper function to extract region from Access Point ARN
+func getRegionFromAccessPointARN(arn string) string {
+	arnParts := strings.Split(arn, ":")
+	if len(arnParts) > 3 {
+		return arnParts[3] // The fourth part of ARN is region
+	}
+	return ""
+}
+
 func getBucketNameFromARN(bucketARN string) string {
+	if isValidAccessPointARN(bucketARN) {
+		return bucketARN // Return full ARN for Access Points
+	}
 	bucketMetadata := strings.Split(bucketARN, ":")
 	bucketName := bucketMetadata[len(bucketMetadata)-1]
 	return bucketName

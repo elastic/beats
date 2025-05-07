@@ -18,7 +18,6 @@ import (
 	"testing"
 	"time"
 
-	"golang.org/x/time/rate"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/okta/internal/okta"
@@ -177,6 +176,7 @@ func TestOktaDoFetch(t *testing.T) {
 			if err != nil {
 				t.Errorf("failed to parse server URL: %v", err)
 			}
+			rateLimiter := okta.NewRateLimiter(window, nil)
 			a := oktaInput{
 				cfg: conf{
 					OktaDomain: u.Host,
@@ -185,7 +185,7 @@ func TestOktaDoFetch(t *testing.T) {
 					EnrichWith: test.enrichWith,
 				},
 				client: ts.Client(),
-				lim:    rate.NewLimiter(1, 1),
+				lim:    rateLimiter,
 				logger: logp.L(),
 			}
 			if *trace {
@@ -211,14 +211,22 @@ func TestOktaDoFetch(t *testing.T) {
 
 			t.Run("users", func(t *testing.T) {
 				n = 0
+				var got []*User
+				published := make(map[string]struct{})
 
-				got, err := a.doFetchUsers(ctx, ss, false)
+				err := a.doFetchUsers(ctx, ss, false, func(u *User) {
+					got = append(got, u)
+					published[u.ID] = struct{}{}
+				})
 				if err != nil {
 					t.Fatalf("unexpected error from doFetch: %v", err)
 				}
 
 				if len(got) != wantCount(repeats, test.wantUsers) {
 					t.Errorf("unexpected number of results: got:%d want:%d", len(got), wantCount(repeats, test.wantUsers))
+				}
+				if len(published) != len(got) {
+					t.Errorf("unexpected number of distinct users published: got:%d want:%d", len(published), len(got))
 				}
 				for i, g := range got {
 					wantID := fmt.Sprintf("userid%d", i+1)
@@ -244,14 +252,22 @@ func TestOktaDoFetch(t *testing.T) {
 
 			t.Run("devices", func(t *testing.T) {
 				n = 0
+				var got []*Device
+				published := make(map[string]struct{})
 
-				got, err := a.doFetchDevices(ctx, ss, false)
+				err := a.doFetchDevices(ctx, ss, false, func(d *Device) {
+					got = append(got, d)
+					published[d.ID] = struct{}{}
+				})
 				if err != nil {
 					t.Fatalf("unexpected error from doFetch: %v", err)
 				}
 
 				if len(got) != wantCount(repeats, test.wantDevices) {
 					t.Errorf("unexpected number of results: got:%d want:%d", len(got), wantCount(repeats, test.wantDevices))
+				}
+				if len(published) != len(got) {
+					t.Errorf("unexpected number of distinct devices published: got:%d want:%d", len(published), len(got))
 				}
 				for i, g := range got {
 					if wantID := fmt.Sprintf("deviceid%d", i+1); g.ID != wantID {

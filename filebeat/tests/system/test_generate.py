@@ -11,7 +11,7 @@ class Test(filebeat.BaseTest):
 
         self._create_clean_test_modules()
         exit_code = self.run_beat(
-            extra_args=["generate", "module", "my_module", "-modules-path", "test_modules", "-es-beats", self.beat_path])
+            extra_args=["generate", "module", "my_module", "--modules-path", "test_modules", "--es-beats", self.beat_path])
         assert exit_code == 0
 
         module_root = os.path.join("test_modules", "module", "my_module")
@@ -47,11 +47,11 @@ class Test(filebeat.BaseTest):
 
         self._create_clean_test_modules()
         exit_code = self.run_beat(
-            extra_args=["generate", "module", "my_module", "-modules-path", "test_modules", "-es-beats", self.beat_path])
+            extra_args=["generate", "module", "my_module", "--modules-path", "test_modules", "--es-beats", self.beat_path])
         assert exit_code == 0
 
         exit_code = self.run_beat(
-            extra_args=["generate", "fileset", "my_module", "my_fileset", "-modules-path", "test_modules", "-es-beats", self.beat_path])
+            extra_args=["generate", "fileset", "my_module", "my_fileset", "--modules-path", "test_modules", "--es-beats", self.beat_path])
         assert exit_code == 0
 
         fileset_root = os.path.join("test_modules", "module", "my_module", "my_fileset")
@@ -88,11 +88,11 @@ class Test(filebeat.BaseTest):
 
         self._create_clean_test_modules()
         exit_code = self.run_beat(
-            extra_args=["generate", "module", "my_module", "-modules-path", "test_modules", "-es-beats", self.beat_path])
+            extra_args=["generate", "module", "my_module", "--modules-path", "test_modules", "--es-beats", self.beat_path])
         assert exit_code == 0
 
         exit_code = self.run_beat(
-            extra_args=["generate", "fileset", "my_module", "my_fileset", "-modules-path", "test_modules", "-es-beats", self.beat_path])
+            extra_args=["generate", "fileset", "my_module", "my_fileset", "--modules-path", "test_modules", "--es-beats", self.beat_path])
         assert exit_code == 0
 
         test_pipeline_path = os.path.join(self.beat_path, "tests", "system", "input", "my-module-pipeline.json")
@@ -102,7 +102,7 @@ class Test(filebeat.BaseTest):
         shutil.copyfile(test_pipeline_path, fileset_pipeline)
 
         exit_code = self.run_beat(
-            extra_args=["generate", "fields", "my_module", "my_fileset", "-es-beats", "test_modules", "-without-documentation"])
+            extra_args=["generate", "fields", "my_module", "my_fileset", "--es-beats", "test_modules", "--without-documentation"])
         assert exit_code == 0
 
         fields_yml_path = os.path.join("test_modules", "module", "my_module", "my_fileset", "_meta", "fields.yml")

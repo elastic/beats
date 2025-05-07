@@ -98,3 +98,43 @@ func GCSFileServer() http.Handler {
 		w.Write([]byte("resource not found"))
 	})
 }
+
+//nolint:errcheck // We can ignore errors here, as this is just for testing
+func GCSRetryServer() http.Handler {
+	retries := 0
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		retries++
+		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
+		if r.Method == http.MethodGet && retries >= 3 {
+			switch len(path) {
+			case 2:
+				if path[0] == "b" {
+					if buckets[path[1]] {
+						w.Write([]byte(fetchBucket[path[1]]))
+						return
+					}
+				} else if buckets[path[0]] && availableObjects[path[0]][path[1]] {
+					w.Write([]byte(objects[path[0]][path[1]]))
+					return
+				}
+			case 3:
+				if path[0] == "b" && path[2] == "o" {
+					if buckets[path[1]] {
+						w.Write([]byte(objectList[path[1]]))
+						return
+					}
+				} else if buckets[path[0]] {
+					objName := strings.Join(path[1:], "/")
+					if availableObjects[path[0]][objName] {
+						w.Write([]byte(objects[path[0]][objName]))
+						return
+					}
+				}
+			default:
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+}

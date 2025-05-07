@@ -21,6 +21,10 @@ jobs:
     - uses: actions/setup-go@v5
       with:
         go-version-file: .go-version
+    - uses: actions/setup-python@v5
+      with:
+        cache: "pip"
+        python-version-file: .python-version
     - name: Run check/update
       run: |
         go install github.com/magefile/mage

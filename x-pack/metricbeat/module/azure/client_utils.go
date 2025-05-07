@@ -10,8 +10,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 )
 
@@ -30,10 +32,6 @@ func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue)
 				if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
 					continue
 				}
-				//// remove metric values that are not part of the timeline selected
-				//if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
-				//	continue
-				//}
 				// define the new metric value and match aggregations values
 				var val MetricValue
 				val.name = *v.Name.Value
@@ -92,7 +90,7 @@ func metricIsEmpty(metric armmonitor.MetricValue) bool {
 // matchMetrics will compare current metrics
 func matchMetrics(prevMet Metric, met Metric) bool {
 	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.ResourceId == met.ResourceId &&
-		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain {
+		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain && reflect.DeepEqual(prevMet.Dimensions, met.Dimensions) {
 		return true
 	}
 	return false
@@ -221,4 +219,92 @@ func getVM(vmName string, vms []VmResource) (VmResource, bool) {
 		}
 	}
 	return VmResource{}, false
+}
+
+// Helper function to generate a string key for the dimensions
+func getDimensionKey(dimensions []Dimension) string {
+	var dimensionKey string
+	for _, dimension := range dimensions {
+		dimensionKey += dimension.Name + ","
+	}
+	return dimensionKey
+}
+
+// Function to get the resource IDs from the batch of metrics
+func getResourceIDs(metrics []Metric) []string {
+	var resourceIDs []string
+	for _, metric := range metrics {
+		resourceIDs = append(resourceIDs, metric.ResourceSubId)
+	}
+	return resourceIDs
+}
+
+// batchMetricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
+func batchMetricIsEmpty(metric azmetrics.MetricValue) bool {
+	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
+		return true
+	}
+	return false
+}
+
+func mapBatchMetricValues(client *BatchClient, metricValues azmetrics.MetricData) []MetricValue {
+	var currentMetrics []MetricValue
+	// compare with the previously returned values and filter out any double records
+	for _, v := range metricValues.Values {
+		for _, t := range v.TimeSeries {
+			for _, mv := range t.Data {
+				if batchMetricIsEmpty(mv) {
+					continue
+				}
+				// define the new metric value and match aggregations values
+				var val MetricValue
+				val.name = *v.Name.Value
+				val.timestamp = *mv.TimeStamp
+				if mv.Minimum != nil {
+					val.min = mv.Minimum
+				}
+				if mv.Maximum != nil {
+					val.max = mv.Maximum
+				}
+				if mv.Average != nil {
+					val.avg = mv.Average
+				}
+				if mv.Total != nil {
+					val.total = mv.Total
+				}
+				if mv.Count != nil {
+					val.count = mv.Count
+				}
+				if t.MetadataValues != nil {
+					for _, dim := range t.MetadataValues {
+						val.dimensions = append(val.dimensions, Dimension{Name: *dim.Name.Value, Value: *dim.Value})
+					}
+				}
+				currentMetrics = append(currentMetrics, val)
+			}
+		}
+	}
+
+	return currentMetrics
+}
+
+// processStore collects and return the metric values of the store using the batchAPI. After the metric values are collected, the store gets cleared.
+func processStore(client *BatchClient, criteria ResDefGroupingCriteria, store *MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
+	groupedMetrics := map[ResDefGroupingCriteria][]Metric{
+		criteria: store.GetMetrics(),
+	}
+	metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
+	store.ClearMetrics()
+	return metricValues
+}
+
+// processAllStores collects and return the metrics of all the stores using the batchAPI
+func processAllStores(client *BatchClient, stores map[ResDefGroupingCriteria]*MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
+	var metricValues []Metric
+	for criteria, store := range stores {
+		if store.Size() > 0 {
+			metricValues = append(metricValues, processStore(client, criteria, store, referenceTime, report)...)
+		}
+	}
+	return metricValues
 }

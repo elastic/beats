@@ -24,7 +24,6 @@ import (
 	"regexp/syntax"
 	"testing"
 
-	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -34,7 +33,7 @@ import (
 func TestConfig(t *testing.T) {
 	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"paths":             []string{"/usr/bin"},
-		"hash_types":        []string{"md5", "sha256"},
+		"hash_types":        []string{"sha256", "sha512"},
 		"max_file_size":     "1 GiB",
 		"scan_rate_per_sec": "10MiB",
 		"exclude_files":     []string{`\.DS_Store$`, `\.swp$`},
@@ -50,7 +49,7 @@ func TestConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, []HashType{MD5, SHA256}, c.HashTypes)
+	assert.Equal(t, []HashType{SHA256, SHA512}, c.HashTypes)
 	assert.EqualValues(t, 1024*1024*1024, c.MaxFileSizeBytes)
 	assert.EqualValues(t, 1024*1024*10, c.ScanRateBytesPerSec)
 	assert.Len(t, c.ExcludeFiles, 2)
@@ -85,11 +84,13 @@ func TestConfigInvalid(t *testing.T) {
 		t.Fatal("expected ucfg.Error")
 	}
 
-	merr, ok := ucfgErr.Reason().(*multierror.MultiError)
+	merr, ok := ucfgErr.Reason().(interface {
+		Unwrap() []error
+	})
 	if !ok {
-		t.Fatal("expected MultiError")
+		t.Fatal("expected slice error unwrapper")
 	}
-	assert.Len(t, merr.Errors, 4)
+	assert.Len(t, merr.Unwrap(), 4)
 
 	config, err = conf.NewConfigFrom(map[string]interface{}{
 		"paths":         []string{"/usr/bin"},

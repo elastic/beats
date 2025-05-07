@@ -29,7 +29,6 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/common/terminal"
@@ -45,26 +44,6 @@ func getKeystore(settings instance.Settings) (keystore.Keystore, error) {
 	return b.Keystore(), nil
 }
 
-// genKeystoreCmd initialize the Keystore command to manage the Keystore
-// with the following subcommands:
-//   - create
-//   - add
-//   - remove
-//   - list
-func genKeystoreCmd(settings instance.Settings) *cobra.Command {
-	keystoreCmd := cobra.Command{
-		Use:   "keystore",
-		Short: "Manage secrets keystore",
-	}
-
-	keystoreCmd.AddCommand(genCreateKeystoreCmd(settings))
-	keystoreCmd.AddCommand(genAddKeystoreCmd(settings))
-	keystoreCmd.AddCommand(genRemoveKeystoreCmd(settings))
-	keystoreCmd.AddCommand(genListKeystoreCmd(settings))
-
-	return &keystoreCmd
-}
-
 func genCreateKeystoreCmd(settings instance.Settings) *cobra.Command {
 	var flagForce bool
 	command := &cobra.Command{
@@ -75,7 +54,6 @@ func genCreateKeystoreCmd(settings instance.Settings) *cobra.Command {
 		}),
 	}
 	command.Flags().BoolVar(&flagForce, "force", false, "override the existing keystore")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("force")
 	return command
 }
 
@@ -94,9 +72,7 @@ func genAddKeystoreCmd(settings instance.Settings) *cobra.Command {
 		}),
 	}
 	command.Flags().BoolVar(&flagStdin, "stdin", false, "Use the stdin as the source of the secret")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("stdin")
 	command.Flags().BoolVar(&flagForce, "force", false, "Override the existing key")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("force")
 	return command
 }
 

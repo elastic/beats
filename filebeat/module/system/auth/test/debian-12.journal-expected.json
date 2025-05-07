@@ -1,0 +1,399 @@
+[
+    {
+        "event.action": "ssh_login",
+        "event.category": [
+            "authentication",
+            "session"
+        ],
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "sshd",
+        "log.syslog.facility.code": 4,
+        "log.syslog.priority": 6,
+        "log.syslog.procid": 26538,
+        "message": "Accepted publickey for vagrant from 10.0.2.2 port 48274 ssh2: ED25519 SHA256:k1kjhwoH/H3w31MbGOIGd7qxrkSQJnoAN0eYJVHDmmI",
+        "process.args": [
+            "\"sshd: vagrant [priv]\""
+        ],
+        "process.args_count": 1,
+        "process.command_line": "\"sshd: vagrant [priv]\"",
+        "process.name": "sshd",
+        "process.pid": 26538,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "related.ip": [
+            "10.0.2.2"
+        ],
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "source.address": "10.0.2.2",
+        "source.ip": "10.0.2.2",
+        "source.port": 48274,
+        "system.auth.ssh.event": "Accepted",
+        "system.auth.ssh.method": "publickey",
+        "system.auth.ssh.signature": "ED25519 SHA256:k1kjhwoH/H3w31MbGOIGd7qxrkSQJnoAN0eYJVHDmmI",
+        "user.group.id": "0",
+        "user.id": "0",
+        "user.name": "vagrant"
+    },
+    {
+        "event.action": "ssh_login",
+        "event.category": [
+            "authentication",
+            "session"
+        ],
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "sshd",
+        "log.syslog.facility.code": 4,
+        "log.syslog.priority": 6,
+        "log.syslog.procid": 1710,
+        "message": "Accepted password for vagrant from 192.168.42.119 port 55310 ssh2",
+        "process.args": [
+            "\"sshd: vagrant [priv]\""
+        ],
+        "process.args_count": 1,
+        "process.command_line": "\"sshd: vagrant [priv]\"",
+        "process.name": "sshd",
+        "process.pid": 1710,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "related.ip": [
+            "192.168.42.119"
+        ],
+        "related.user": [
+            "vagrant"
+        ],
+        "service.type": "system",
+        "source.address": "192.168.42.119",
+        "source.ip": "192.168.42.119",
+        "source.port": 55310,
+        "system.auth.ssh.event": "Accepted",
+        "system.auth.ssh.method": "password",
+        "user.group.id": "0",
+        "user.id": "0",
+        "user.name": "vagrant"
+    },
+    {
+        "event.action": "ssh_login",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "sshd",
+        "log.syslog.facility.code": 4,
+        "log.syslog.priority": 6,
+        "log.syslog.procid": 1721,
+        "message": "Invalid user test from 192.168.42.119 port 48890",
+        "process.args": [
+            "\"sshd: unknown [priv]\""
+        ],
+        "process.args_count": 1,
+        "process.command_line": "\"sshd: unknown [priv]\"",
+        "process.name": "sshd",
+        "process.pid": 1721,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "related.ip": [
+            "192.168.42.119"
+        ],
+        "related.user": [
+            "test"
+        ],
+        "service.type": "system",
+        "source.address": "192.168.42.119",
+        "source.ip": "192.168.42.119",
+        "system.auth.ssh.event": "Invalid",
+        "user.group.id": "0",
+        "user.id": "0",
+        "user.name": "test"
+    },
+    {
+        "event.action": "ssh_login",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "sshd",
+        "log.syslog.facility.code": 4,
+        "log.syslog.priority": 6,
+        "log.syslog.procid": 1723,
+        "message": "Failed password for root from 192.168.42.119 port 46632 ssh2",
+        "process.args": [
+            "\"sshd: root [priv]\""
+        ],
+        "process.args_count": 1,
+        "process.command_line": "\"sshd: root [priv]\"",
+        "process.name": "sshd",
+        "process.pid": 1723,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "related.ip": [
+            "192.168.42.119"
+        ],
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "source.address": "192.168.42.119",
+        "source.ip": "192.168.42.119",
+        "source.port": 46632,
+        "system.auth.ssh.event": "Failed",
+        "system.auth.ssh.method": "password",
+        "user.group.id": "0",
+        "user.id": "0",
+        "user.name": "root"
+    },
+    {
+        "event.action": "ssh_login",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "sshd",
+        "log.syslog.facility.code": 4,
+        "log.syslog.priority": 6,
+        "log.syslog.procid": 1723,
+        "message": "Failed password for root from 192.168.42.119 port 46632 ssh2",
+        "process.args": [
+            "\"sshd: root [priv]\""
+        ],
+        "process.args_count": 1,
+        "process.command_line": "\"sshd: root [priv]\"",
+        "process.name": "sshd",
+        "process.pid": 1723,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "related.ip": [
+            "192.168.42.119"
+        ],
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "source.address": "192.168.42.119",
+        "source.ip": "192.168.42.119",
+        "source.port": 46632,
+        "system.auth.ssh.event": "Failed",
+        "system.auth.ssh.method": "password",
+        "user.group.id": "0",
+        "user.id": "0",
+        "user.name": "root"
+    },
+    {
+        "event.action": "ssh_login",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "sshd",
+        "log.syslog.facility.code": 4,
+        "log.syslog.priority": 6,
+        "log.syslog.procid": 1723,
+        "message": "Failed password for root from 192.168.42.119 port 46632 ssh2",
+        "process.args": [
+            "\"sshd: root [priv]\""
+        ],
+        "process.args_count": 1,
+        "process.command_line": "\"sshd: root [priv]\"",
+        "process.name": "sshd",
+        "process.pid": 1723,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "related.ip": [
+            "192.168.42.119"
+        ],
+        "related.user": [
+            "root"
+        ],
+        "service.type": "system",
+        "source.address": "192.168.42.119",
+        "source.ip": "192.168.42.119",
+        "source.port": 46632,
+        "system.auth.ssh.event": "Failed",
+        "system.auth.ssh.method": "password",
+        "user.group.id": "0",
+        "user.id": "0",
+        "user.name": "root"
+    },
+    {
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "sudo",
+        "log.syslog.facility.code": 10,
+        "log.syslog.priority": 5,
+        "message": " vagrant : TTY=pts/2 ; PWD=/home/vagrant ; USER=root ; COMMAND=/usr/bin/emacs /etc/ssh/sshd_config",
+        "process.args": [
+            "sudo",
+            "emacs",
+            "/etc/ssh/sshd_config"
+        ],
+        "process.args_count": 3,
+        "process.command_line": "sudo emacs /etc/ssh/sshd_config",
+        "process.name": "sudo",
+        "process.pid": 1582,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "related.user": [
+            " vagrant",
+            "root"
+        ],
+        "service.type": "system",
+        "system.auth.sudo.command": "/usr/bin/emacs /etc/ssh/sshd_config",
+        "system.auth.sudo.pwd": "/home/vagrant",
+        "system.auth.sudo.tty": "pts/2",
+        "system.auth.sudo.user": "root",
+        "user.effective.name": "root",
+        "user.group.id": "1000",
+        "user.id": "1000",
+        "user.name": " vagrant"
+    },
+    {
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "creation",
+            "group"
+        ],
+        "fileset.name": "auth",
+        "group.id": "1001",
+        "group.name": "test",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "groupadd",
+        "log.syslog.facility.code": 10,
+        "log.syslog.priority": 6,
+        "log.syslog.procid": 1743,
+        "message": "new group: name=test, GID=1001",
+        "process.args": [
+            "/sbin/groupadd",
+            "-g",
+            "1001",
+            "test"
+        ],
+        "process.args_count": 4,
+        "process.command_line": "/sbin/groupadd -g 1001 test",
+        "process.name": "groupadd",
+        "process.pid": 1743,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "service.type": "system",
+        "user.effective.group.id": "0",
+        "user.effective.id": "0",
+        "user.id": "1000"
+    },
+    {
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "auth",
+        "host.hostname": "vagrant-debian-12",
+        "host.id": "5e6dc8fe417f4ea383e2afaa731f5d8a",
+        "input.type": "journald",
+        "log.syslog.appname": "systemd-logind",
+        "log.syslog.facility.code": 4,
+        "log.syslog.priority": 6,
+        "message": "Session 8 logged out. Waiting for processes to exit.",
+        "process.args": [
+            "/lib/systemd/systemd-logind"
+        ],
+        "process.args_count": 1,
+        "process.command_line": "/lib/systemd/systemd-logind",
+        "process.name": "systemd-logind",
+        "process.pid": 316,
+        "related.hosts": [
+            "vagrant-debian-12"
+        ],
+        "service.type": "system",
+        "user.group.id": "0",
+        "user.id": "0"
+    }
+]

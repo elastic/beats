@@ -21,7 +21,6 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/tests/system/template"
 )
 
@@ -32,14 +31,11 @@ func init() {
 	systemTest = flag.Bool("systemTest", false, "Set to true when running system tests")
 
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("systemTest"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("systemTest")
 	RootCmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("test.coverprofile"))
-	cfgfile.AddAllowedBackwardsCompatibleFlag("test.coverprofile")
 }
 
 // Test started when the test binary is started
 func TestSystem(t *testing.T) {
-	cfgfile.ConvertFlagsForBackwardsCompatibility()
 	if *systemTest {
 		main()
 	}

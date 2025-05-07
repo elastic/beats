@@ -1,0 +1,26 @@
+{
+    "@timestamp": "2024-12-12T15:46:39.622Z",
+    "event": {
+        "dataset": "windows.wmi",
+        "duration": 58982500,
+        "module": "windows"
+    },
+    "metricset": {
+        "name": "wmi",
+        "period": 10000
+    },
+    "service": {
+        "type": "windows"
+    },
+    "windows": {
+        "wmi": {
+            "FreePhysicalMemory": 7537796,
+            "FreeSpaceInPagingFiles": 2257908,
+            "FreeVirtualMemory": 9694064,
+            "LocalDateTime": "2024-12-12T15:46:39.62Z",
+            "NumberOfUsers": 1,
+            "class": "Win32_OperatingSystem",
+            "namespace": "root\\cimv2"
+        }
+    }
+}

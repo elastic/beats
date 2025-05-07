@@ -34,8 +34,9 @@ var expectedMBStreams = &proto.UnitExpectedConfig{
 }
 
 func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
-	tests.InitBeatsForTest(t, cmd.RootCmd)
-	var mbStreams = []*proto.Stream{
+	mbCmd := cmd.Initialize()
+	tests.InitBeatsForTest(t, mbCmd)
+	mbStreams := []*proto.Stream{
 		{
 			Id: "system/metrics-system.cpu-default-system",
 			DataStream: &proto.DataStream{
@@ -79,7 +80,7 @@ func TestSingleMetricbeatMetricsetWithProcessors(t *testing.T) {
 
 	go func() {
 		t.Logf("Running beats...")
-		err := cmd.RootCmd.Execute()
+		err := mbCmd.Execute()
 		require.NoError(t, err)
 	}()
 

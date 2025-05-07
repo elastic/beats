@@ -28,17 +28,74 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/file"
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestDeprecatedUse(t *testing.T) {
+	cases := []struct {
+		name     string
+		yaml     string
+		expected bool
+	}{
+		{
+			name: "allow when the input configuration has the flag",
+			yaml: `
+type: "log"
+allow_deprecated_use: true
+`,
+			expected: true,
+		},
+		{
+			name: "ignore a non-boolean value",
+			yaml: `
+type: "log"
+allow_deprecated_use: "string"
+`,
+			expected: false,
+		},
+		{
+			name: "allow if the input is created by a module",
+			yaml: `
+type: "log"
+_module_name: "module"
+`,
+			expected: true,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg, err := conf.NewConfigFrom(tc.yaml)
+			require.NoError(t, err)
+			require.Equal(t, AllowDeprecatedUse(cfg), tc.expected)
+		})
+	}
+
+	t.Run("allowed under the agent", func(t *testing.T) {
+		currentMode := fleetmode.Enabled()
+		t.Cleanup(func() {
+			fleetmode.SetAgentMode(currentMode)
+		})
+		yaml := `type: "log"`
+		cfg, err := conf.NewConfigFrom(yaml)
+		require.NoError(t, err)
+		require.False(t, AllowDeprecatedUse(cfg), "Not in Fleet mode")
+		fleetmode.SetAgentMode(true)
+		require.True(t, AllowDeprecatedUse(cfg), "Should be allowed in Fleet mode")
+	})
+}
 
 func TestInputFileExclude(t *testing.T) {
 	p := Input{
@@ -145,8 +202,9 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 
 	// Setup the input
 	config, _ := conf.NewConfigFrom(mapstr.M{
-		"paths":     path.Join(tmpdir, "*.log"),
-		"close_eof": true,
+		allowDeprecatedUseField: true,
+		"paths":                 path.Join(tmpdir, "*.log"),
+		"close_eof":             true,
 	})
 
 	events := make(chan beat.Event, 100)
@@ -157,7 +215,8 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 		return channel.SubOutlet(capturer), nil
 	})
 
-	input, err := NewInput(config, connector, context)
+	logger := logptest.NewTestingLogger(t, "")
+	input, err := NewInput(config, connector, context, logger)
 	if err != nil {
 		t.Error(err)
 		return
@@ -188,7 +247,8 @@ func testInputLifecycle(t *testing.T, context input.Context, closer func(input.C
 
 func TestNewInputDone(t *testing.T) {
 	config := mapstr.M{
-		"paths": path.Join(os.TempDir(), "logs", "*.log"),
+		allowDeprecatedUseField: true,
+		"paths":                 path.Join(os.TempDir(), "logs", "*.log"),
 	}
 	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
@@ -205,7 +265,8 @@ func TestNewInputError(t *testing.T) {
 
 	context := input.Context{}
 
-	_, err := NewInput(config, connector, context)
+	logger := logptest.NewTestingLogger(t, "")
+	_, err := NewInput(config, connector, context, logger)
 	assert.Error(t, err)
 }
 

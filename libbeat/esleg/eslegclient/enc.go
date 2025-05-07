@@ -19,10 +19,12 @@ package eslegclient
 
 import (
 	"bytes"
-	"compress/gzip"
+
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/klauspost/compress/gzip"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"

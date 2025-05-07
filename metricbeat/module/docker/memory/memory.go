@@ -43,6 +43,7 @@ type MetricSet struct {
 	memoryService *MemoryService
 	dockerClient  *client.Client
 	dedot         bool
+	podman        bool
 	logger        *logp.Logger
 }
 
@@ -64,13 +65,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		memoryService: &MemoryService{},
 		dockerClient:  dockerClient,
 		dedot:         config.DeDot,
+		podman:        config.Podman,
 		logger:        logger,
 	}, nil
 }
 
 // Fetch creates a list of memory events for each container.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
+	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout, m.podman, m.Logger())
 	if err != nil {
 		return fmt.Errorf("failed to get docker stats: %w", err)
 	}

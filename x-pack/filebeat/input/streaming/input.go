@@ -20,6 +20,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/mito/lib"
@@ -42,7 +43,7 @@ const (
 	root      string = "state"
 )
 
-func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Experimental,
@@ -53,7 +54,7 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
-func PluginWebsocketAlias(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func PluginWebsocketAlias(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       "websocket",
 		Stability:  feature.Experimental,
@@ -378,12 +379,14 @@ func errorMessage(msg string) map[string]interface{} {
 func formHeader(cfg config) map[string][]string {
 	header := make(map[string][]string)
 	switch {
-	case cfg.Auth.CustomAuth != nil:
-		header[cfg.Auth.CustomAuth.Header] = []string{cfg.Auth.CustomAuth.Value}
+	case cfg.Auth.OAuth2.accessToken != "":
+		header["Authorization"] = []string{"Bearer " + cfg.Auth.OAuth2.accessToken}
 	case cfg.Auth.BearerToken != "":
 		header["Authorization"] = []string{"Bearer " + cfg.Auth.BearerToken}
 	case cfg.Auth.BasicToken != "":
 		header["Authorization"] = []string{"Basic " + cfg.Auth.BasicToken}
+	case cfg.Auth.CustomAuth != nil:
+		header[cfg.Auth.CustomAuth.Header] = []string{cfg.Auth.CustomAuth.Value}
 	}
 	return header
 }

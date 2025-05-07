@@ -25,6 +25,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -192,6 +193,9 @@ type publisher struct {
 func (p *publisher) Publish(e beat.Event) {
 	p.mu.Lock()
 	p.events = append(p.events, e)
+	if ack, ok := e.Private.(*batchACKTracker); ok {
+		ack.ACK()
+	}
 	p.mu.Unlock()
 }
 
@@ -207,12 +211,13 @@ func Test_apiResponse(t *testing.T) {
 		}
 	}
 	testCases := []struct {
-		name         string        // Sub-test name.
-		conf         config        // Load configuration.
-		request      *http.Request // Input request.
-		events       []mapstr.M    // Expected output events.
-		wantStatus   int           // Expected response code.
-		wantResponse string        // Expected response message.
+		name         string             // Sub-test name.
+		setup        func(t *testing.T) // setup function
+		conf         config             // Load configuration.
+		request      *http.Request      // Input request.
+		events       []mapstr.M         // Expected output events.
+		wantStatus   int                // Expected response code.
+		wantResponse string             // Expected response message.
 	}{
 		{
 			name: "single_event",
@@ -253,7 +258,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_hex",
+			name:  "hmac_hex",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -278,7 +284,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_base64",
+			name:  "hmac_base64",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -303,7 +310,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_raw_base64",
+			name:  "hmac_raw_base64",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -326,6 +334,81 @@ func Test_apiResponse(t *testing.T) {
 			},
 			wantStatus:   http.StatusOK,
 			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "hmac_header_not_present",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"missing HMAC header"}`,
+		},
+		{
+			name: "hmac_header_value_is_empty",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: unexpected empty header value"}`,
+		},
+		{
+			name: "hmac_header_value_only_contains_prefix",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "HMAC-SHA256 ")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: unexpected empty header value"}`,
+		},
+		{
+			name: "hmac_header_value_bad_encoding",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "HMAC-SHA256 not-hex-or-base64")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: encoding/hex: invalid byte: U+006E 'n'\nillegal base64 data at input byte 3\nillegal base64 data at input byte 3"}`,
 		},
 		{
 			name: "single_event_gzip",
@@ -463,6 +546,9 @@ func Test_apiResponse(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
+			if tc.setup != nil {
+				tc.setup(t)
+			}
 			pub := new(publisher)
 			metrics := newInputMetrics("")
 			defer metrics.Close()

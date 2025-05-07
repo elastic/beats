@@ -31,11 +31,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type testStateStore struct {
-	Store    *statestore.Store
-	GCPeriod time.Duration
-}
-
 func TestStore_OpenClose(t *testing.T) {
 	t.Run("releasing store closes", func(t *testing.T) {
 		var closed bool
@@ -52,7 +47,7 @@ func TestStore_OpenClose(t *testing.T) {
 	})
 
 	t.Run("fail if persistent store can not be accessed", func(t *testing.T) {
-		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test")
+		_, err := openStore(logp.NewLogger("test"), testStateStore{}, "test", "", true)
 		require.Error(t, err)
 	})
 
@@ -235,12 +230,12 @@ func closeStoreWith(fn func(s *store)) func() {
 	}
 }
 
-func testOpenStore(t *testing.T, prefix string, persistentStore StateStore) *store {
+func testOpenStore(t *testing.T, prefix string, persistentStore statestore.States) *store {
 	if persistentStore == nil {
 		persistentStore = createSampleStore(t, nil)
 	}
 
-	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix)
+	store, err := openStore(logp.NewLogger("test"), persistentStore, prefix, "", true)
 	if err != nil {
 		t.Fatalf("failed to open the store")
 	}
@@ -265,9 +260,16 @@ func createSampleStore(t *testing.T, data map[string]state) testStateStore {
 	}
 }
 
+var _ statestore.States = testStateStore{}
+
+type testStateStore struct {
+	Store    *statestore.Store
+	GCPeriod time.Duration
+}
+
 func (ts testStateStore) WithGCPeriod(d time.Duration) testStateStore { ts.GCPeriod = d; return ts }
 func (ts testStateStore) CleanupInterval() time.Duration              { return ts.GCPeriod }
-func (ts testStateStore) Access() (*statestore.Store, error) {
+func (ts testStateStore) StoreFor(string) (*statestore.Store, error) {
 	if ts.Store == nil {
 		return nil, errors.New("no store configured")
 	}

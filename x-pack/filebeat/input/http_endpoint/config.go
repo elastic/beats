@@ -37,6 +37,9 @@ type config struct {
 	URL                   string                  `config:"url" validate:"required"`
 	Prefix                string                  `config:"prefix"`
 	ContentType           string                  `config:"content_type"`
+	MaxBodySize           *int64                  `config:"max_body_bytes"`
+	MaxInFlight           int64                   `config:"max_in_flight_bytes"`
+	RetryAfter            int                     `config:"retry_after"`
 	Program               string                  `config:"program"`
 	SecretHeader          string                  `config:"secret.header"`
 	SecretValue           string                  `config:"secret.value"`
@@ -66,6 +69,7 @@ func defaultConfig() config {
 		BasicAuth:     false,
 		ResponseCode:  200,
 		ResponseBody:  `{"message": "success"}`,
+		RetryAfter:    10,
 		ListenAddress: "127.0.0.1",
 		ListenPort:    "8000",
 		URL:           "/",
@@ -111,6 +115,10 @@ func (c *config) Validate() error {
 		}
 	} else if c.CRCSecret != "" {
 		return errors.New("crc.provider is required when crc.secret is defined")
+	}
+
+	if c.MaxBodySize != nil && *c.MaxBodySize < 0 {
+		return fmt.Errorf("max_body_bytes is negative: %d", *c.MaxBodySize)
 	}
 
 	return nil

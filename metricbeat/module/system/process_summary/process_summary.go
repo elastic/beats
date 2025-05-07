@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -50,17 +51,28 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	sys resolve.Resolver
+	sys              resolve.Resolver
+	degradeOnPartial bool
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("resolver cannot be cast from the module")
+	}
+	degradedConf := struct {
+		DegradeOnPartial bool `config:"degrade_on_partial"`
+	}{}
+	if err := base.Module().UnpackConfig(&degradedConf); err != nil {
+		logp.L().Warnf("Failed to unpack config; degraded mode will be disabled for partial metrics: %v", err)
+	}
 	return &MetricSet{
-		BaseMetricSet: base,
-		sys:           sys,
+		BaseMetricSet:    base,
+		sys:              sys,
+		degradeOnPartial: degradedConf.DegradeOnPartial,
 	}, nil
 }
 
@@ -74,6 +86,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		// return only if the error is fatal in nature
 		return fmt.Errorf("error fetching process list: %w", degradeErr)
 	} else if (degradeErr != nil && errors.Is(degradeErr, process.NonFatalErr{})) {
+		if m.degradeOnPartial {
+			return fmt.Errorf("error fetching process list: %w", degradeErr)
+		}
 		degradeErr = mb.PartialMetricsError{Err: degradeErr}
 	}
 

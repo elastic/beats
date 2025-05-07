@@ -31,9 +31,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestConfiguration(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
 	if runtime.GOOS != "windows" {
 		t.Skip("Check for User and Security Descriptor")
 		return
@@ -44,7 +46,7 @@ func TestConfiguration(t *testing.T) {
 			"user": "admin",
 		})
 
-		_, err := New(nil, cfg)
+		_, err := New(logger, cfg)
 		require.Error(t, err)
 	})
 
@@ -54,12 +56,14 @@ func TestConfiguration(t *testing.T) {
 			"security_descriptor": "D:P(A;;GA;;;1234)",
 		})
 
-		_, err := New(nil, cfg)
+		_, err := New(logger, cfg)
 		require.Error(t, err)
 	})
 }
 
 func TestSocket(t *testing.T) {
+	logger := logptest.NewTestingLogger(t, "")
+
 	if runtime.GOOS == "windows" {
 		t.Skip("Unix Sockets don't work under windows")
 		return
@@ -87,7 +91,7 @@ func TestSocket(t *testing.T) {
 			"host": "unix://" + sockFile,
 		})
 
-		s, err := New(nil, cfg)
+		s, err := New(logger, cfg)
 		require.NoError(t, err)
 		attachEchoHelloHandler(t, s)
 		go s.Start()
@@ -101,7 +105,7 @@ func TestSocket(t *testing.T) {
 
 		c := client(sockFile)
 
-		r, err := c.Get("http://unix/echo-hello")
+		r, err := c.Get("http://unix/echo-hello") //nolint:noctx //Safe to not use ctx in test
 		require.NoError(t, err)
 		defer r.Body.Close()
 
@@ -130,7 +134,7 @@ func TestSocket(t *testing.T) {
 			"host": "unix://" + sockFile,
 		})
 
-		s, err := New(nil, cfg)
+		s, err := New(logger, cfg)
 		require.NoError(t, err)
 		attachEchoHelloHandler(t, s)
 		go s.Start()
@@ -144,7 +148,7 @@ func TestSocket(t *testing.T) {
 
 		c := client(sockFile)
 
-		r, err := c.Get("http://unix/echo-hello")
+		r, err := c.Get("http://unix/echo-hello") //nolint:noctx //Safe to not use ctx in test
 		require.NoError(t, err)
 		defer r.Body.Close()
 
@@ -166,8 +170,8 @@ func TestHTTP(t *testing.T) {
 	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"host": url,
 	})
-
-	s, err := New(nil, cfg)
+	logger := logptest.NewTestingLogger(t, "")
+	s, err := New(logger, cfg)
 	require.NoError(t, err)
 	attachEchoHelloHandler(t, s)
 	go s.Start()
@@ -175,7 +179,7 @@ func TestHTTP(t *testing.T) {
 		require.NoError(t, s.Stop())
 	}()
 
-	r, err := http.Get("http://" + s.l.Addr().String() + "/echo-hello")
+	r, err := http.Get("http://" + s.l.Addr().String() + "/echo-hello") //nolint:noctx //Safe to not use ctx in test
 	require.NoError(t, err)
 	defer r.Body.Close()
 
@@ -198,7 +202,8 @@ func TestAttachHandler(t *testing.T) {
 		"host": "http://localhost:0",
 	})
 
-	s, err := New(nil, cfg)
+	logger := logptest.NewTestingLogger(t, "")
+	s, err := New(logger, cfg)
 	require.NoError(t, err)
 
 	req := httptest.NewRequest(http.MethodGet, "http://"+s.l.Addr().String()+"/test", nil)

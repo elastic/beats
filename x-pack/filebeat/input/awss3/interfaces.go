@@ -27,11 +27,10 @@ import (
 )
 
 // Run 'go generate' to create mocks that are used in tests.
-//go:generate go install github.com/golang/mock/mockgen@v1.6.0
-//go:generate mockgen -source=interfaces.go -destination=mock_interfaces_test.go -package awss3 -mock_names=sqsAPI=MockSQSAPI,sqsProcessor=MockSQSProcessor,s3API=MockS3API,s3Pager=MockS3Pager,s3ObjectHandlerFactory=MockS3ObjectHandlerFactory,s3ObjectHandler=MockS3ObjectHandler
-//go:generate mockgen -destination=mock_publisher_test.go -package=awss3 -mock_names=Client=MockBeatClient,Pipeline=MockBeatPipeline github.com/elastic/beats/v7/libbeat/beat Client,Pipeline
-//go:generate go-licenser -license Elastic .
-//go:generate goimports -w -local github.com/elastic .
+//go:generate go run go.uber.org/mock/mockgen -source=interfaces.go -destination=mock_interfaces_test.go -package awss3 -mock_names=sqsAPI=MockSQSAPI,sqsProcessor=MockSQSProcessor,s3API=MockS3API,s3Pager=MockS3Pager,s3ObjectHandlerFactory=MockS3ObjectHandlerFactory,s3ObjectHandler=MockS3ObjectHandler
+//go:generate go run go.uber.org/mock/mockgen -destination=mock_publisher_test.go -package=awss3 -mock_names=Client=MockBeatClient,Pipeline=MockBeatPipeline github.com/elastic/beats/v7/libbeat/beat Client,Pipeline
+//go:generate go run github.com/elastic/go-licenser -license Elastic .
+//go:generate go run golang.org/x/tools/cmd/goimports -w -local github.com/elastic .
 
 // ------
 // SQS interfaces

@@ -1,0 +1,40 @@
+[
+    {
+        "event": {
+            "dataset": "nats.jetstream",
+            "duration": 115000,
+            "module": "nats"
+        },
+        "metricset": {
+            "name": "jetstream",
+            "period": 10000
+        },
+        "nats": {
+            "jetstream": {
+                "account": {
+                    "accounts": 0,
+                    "api": {
+                        "errors": 22596,
+                        "total": 1436563
+                    },
+                    "high_availability_assets": 0,
+                    "id": "default",
+                    "memory": 2408,
+                    "name": "default",
+                    "reserved_memory": 8589934592,
+                    "reserved_storage": 429496729600,
+                    "storage": 1474866157
+                },
+                "category": "account"
+            },
+            "server": {
+                "id": "NAGGEW65XCMGPSNNQQF6FGKDGQCCXZFMHDI264FXBLT5MURRVDAAKII3",
+                "time": "2025-03-15T01:22:56.617Z"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "nats"
+        }
+    }
+]

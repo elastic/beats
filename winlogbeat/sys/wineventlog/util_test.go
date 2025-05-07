@@ -38,7 +38,7 @@ const (
 	winlogbeatTestLogName = "WinEventLogTestGo"
 
 	security4752File      = "testdata/4752.evtx"
-	sysmon9File           = "testdata/sysmon-9.01.evtx"
+	security4738File      = "testdata/4738.evtx"
 	winErrorReportingFile = "testdata/application-windows-error-reporting.evtx"
 )
 

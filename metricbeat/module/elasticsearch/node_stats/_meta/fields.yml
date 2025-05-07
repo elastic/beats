@@ -74,9 +74,25 @@
         - name: fielddata
           type: group
           fields:
+            - name: evictions.count
+              type: long
             - name: memory.bytes
               type: long
               format: bytes
+        - name: flush
+          type: group
+          fields:
+            - name: total_time.ms
+              type: long
+            - name: total.count
+              type: long
+        - name: get
+          type: group
+          fields:
+            - name: time.ms
+              type: long
+            - name: total.count
+              type: long
         - name: indexing
           type: group
           fields:
@@ -86,12 +102,26 @@
               type: long
             - name: throttle_time.ms
               type: long
+        - name: merges
+          type: group
+          fields:
+            - name: total_time.ms
+              type: long
+            - name: total.count
+              type: long
         - name: query_cache
           type: group
           fields:
             - name: memory.bytes
               type: long
               format: bytes
+        - name: refresh
+          type: group
+          fields:
+            - name: total_time.ms
+              type: long
+            - name: total.count
+              type: long
         - name: request_cache
           type: group
           fields:
@@ -104,6 +134,10 @@
             - name: query_time.ms
               type: long
             - name: query_total.count
+              type: long
+            - name: fetch_time.ms
+              type: long
+            - name: fetch_total.count
               type: long
         - name: shard_stats
           type: group
@@ -140,6 +174,13 @@
             - name: version_map.memory.bytes
               type: long
               format: bytes
+        - name: translog
+          type: group
+          fields:
+            - name: size.bytes
+              type: long
+            - name: operations.count
+              type: long
     - name: jvm.mem.heap
       type: group
       fields:
@@ -155,6 +196,8 @@
             - name: pct
               type: double
               format: percent
+    - name: jvm.threads.count
+      type: long
     - name: jvm.mem.pools
       type: group
       fields:
@@ -320,12 +363,44 @@
     - name: process.cpu.pct
       type: double
       format: percent
+    - name: process.mem.total_virtual.bytes
+      type: long
+    - name: process.open_file_descriptors
+      type: long
+    - name: transport
+      type: group
+      fields:
+        - name: rx
+          type: group
+          fields:
+            - name: count
+              type: long
+            - name: size.bytes
+              type: long
+        - name: tx
+          type: group
+          fields:
+            - name: count
+              type: long
+            - name: size.bytes
+              type: long
     - name: thread_pool
       type: group
       fields:
         - name: bulk
           type: group
           fields:
+            - name: active.count
+              type: long
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: esql_worker
+          type: group
+          fields:
+            - name: active.count
+              type: long
             - name: queue.count
               type: long
             - name: rejected.count
@@ -333,6 +408,17 @@
         - name: force_merge
           type: group
           fields:
+            - name: active.count
+              type: long
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: flush
+          type: group
+          fields:
+            - name: active.count
+              type: long
             - name: queue.count
               type: long
             - name: rejected.count
@@ -340,6 +426,8 @@
         - name: get
           type: group
           fields:
+            - name: active.count
+              type: long
             - name: queue.count
               type: long
             - name: rejected.count
@@ -347,6 +435,8 @@
         - name: index
           type: group
           fields:
+            - name: active.count
+              type: long
             - name: queue.count
               type: long
             - name: rejected.count
@@ -354,6 +444,44 @@
         - name: search
           type: group
           fields:
+            - name: active.count
+              type: long
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: search_worker
+          type: group
+          fields:
+            - name: active.count
+              type: long
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: snapshot
+          type: group
+          fields:
+            - name: active.count
+              type: long
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: system_read
+          type: group
+          fields:
+            - name: active.count
+              type: long
+            - name: queue.count
+              type: long
+            - name: rejected.count
+              type: long
+        - name: system_write
+          type: group
+          fields:
+            - name: active.count
+              type: long
             - name: queue.count
               type: long
             - name: rejected.count
@@ -361,6 +489,8 @@
         - name: write
           type: group
           fields:
+            - name: active.count
+              type: long
             - name: queue.count
               type: long
             - name: rejected.count

@@ -27,23 +27,27 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/unison"
 )
 
 type inputTestingEnvironment struct {
-	t          *testing.T
-	workingDir string
-	stateStore *testInputStore
-	pipeline   *mockPipelineConnector
+	t              *testing.T
+	workingDir     string
+	stateStore     *testInputStore
+	pipeline       *mockPipelineConnector
+	statusReporter *mockStatusReporter
 
 	pluginInitOnce sync.Once
 	plugin         v2.Plugin
@@ -54,10 +58,11 @@ type inputTestingEnvironment struct {
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
 	return &inputTestingEnvironment{
-		t:          t,
-		workingDir: t.TempDir(),
-		stateStore: openTestStatestore(),
-		pipeline:   &mockPipelineConnector{},
+		t:              t,
+		workingDir:     t.TempDir(),
+		stateStore:     openTestStatestore(),
+		pipeline:       &mockPipelineConnector{},
+		statusReporter: &mockStatusReporter{},
 	}
 }
 
@@ -95,7 +100,18 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 			}
 		}()
 
-		inputCtx := v2.Context{Logger: logp.L(), Cancelation: ctx}
+		id := uuid.Must(uuid.NewV4()).String()
+		inputCtx := v2.Context{
+			ID:            id,
+			IDWithoutName: id,
+			Name:          inp.Name(),
+			Agent: beat.Info{Monitoring: beat.Monitoring{
+				Namespace: monitoring.GetNamespace("dataset")}},
+			Cancelation:     ctx,
+			StatusReporter:  e.statusReporter,
+			MetricsRegistry: monitoring.NewRegistry(),
+			Logger:          logp.L(),
+		}
 		if err := inp.Run(inputCtx, e.pipeline); err != nil {
 			e.t.Errorf("input 'Run' method returned an error: %s", err)
 		}
@@ -125,6 +141,27 @@ func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	}, 5*time.Second, 10*time.Millisecond, &msg)
 }
 
+func (e *inputTestingEnvironment) RequireStatuses(expected []statusUpdate) {
+	t := e.t
+	t.Helper()
+	got := e.statusReporter.GetUpdates()
+	if len(got) != len(expected) {
+		t.Fatalf("expecting %d updates, got %d", len(expected), len(got))
+	}
+
+	for i := range expected {
+		g, e := got[i], expected[i]
+		if g != e {
+			t.Errorf(
+				"expecting [%d] status update to be {state:%s, msg:%s}, got  {state:%s, msg:%s}",
+				i, e.state.String(), e.msg, g.state.String(), g.msg,
+			)
+		}
+	}
+}
+
+var _ statestore.States = (*testInputStore)(nil)
+
 type testInputStore struct {
 	registry *statestore.Registry
 }
@@ -139,7 +176,7 @@ func (s *testInputStore) Close() {
 	s.registry.Close()
 }
 
-func (s *testInputStore) Access() (*statestore.Store, error) {
+func (s *testInputStore) StoreFor(string) (*statestore.Store, error) {
 	return s.registry.Get("filebeat")
 }
 
@@ -250,4 +287,26 @@ func blockingACKer(starter context.Context) beat.EventListener {
 		for starter.Err() == nil {
 		}
 	})
+}
+
+type statusUpdate struct {
+	state status.Status
+	msg   string
+}
+
+type mockStatusReporter struct {
+	mutex   sync.RWMutex
+	updates []statusUpdate
+}
+
+func (m *mockStatusReporter) UpdateStatus(status status.Status, msg string) {
+	m.mutex.Lock()
+	m.updates = append(m.updates, statusUpdate{status, msg})
+	m.mutex.Unlock()
+}
+
+func (m *mockStatusReporter) GetUpdates() []statusUpdate {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	return append([]statusUpdate{}, m.updates...)
 }

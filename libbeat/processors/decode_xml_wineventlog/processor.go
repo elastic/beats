@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -83,7 +83,7 @@ func newProcessor(config config) (beat.Processor, error) {
 
 	return &processor{
 		config:  config,
-		decoder: newDecoder(),
+		decoder: newDecoder(config.Language),
 		log:     logp.NewLogger(logName),
 	}, nil
 }

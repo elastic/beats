@@ -102,6 +102,9 @@
   # Bucket ARN used for polling AWS S3 buckets
   #bucket_arn: arn:aws:s3:::test-s3-bucket
 
+  # Access Point ARN used for polling AWS S3 buckets
+  #access_point_arn: arn:aws:s3:us-east-1:123456789:accesspoint/my-accesspoint
+
   # Bucket Name used for polling non-AWS S3 buckets
   #non_aws_bucket_name: test-s3-bucket
 
@@ -120,6 +123,16 @@
 
   # Controls deletion of objects after backing them up
   #delete_after_backup: false
+
+  # Ignore bucket entries older than the given timespan.
+  # Timespan is calculated from current time to processing object's last modified timestamp.
+  # This is disabled by default(value 0) and can be configured to a time duration like "48h" or "2h30m".
+  #ignore_older: 0
+
+  # Accept bucket entries with last modified timestamp newer than the given timestamp.
+  # Accepts a timestamp in YYYY-MM-DDTHH:MM:SSZ format and default is empty.
+  # For example, "2024-11-20T20:00:00Z" (UTC) or "2024-11-20T22:30:00+02:30" (with zone offset).
+  #start_timestamp:
 
 #------------------------------ AWS CloudWatch input --------------------------------
 # Beta: Config options for AWS CloudWatch input

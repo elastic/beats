@@ -24,11 +24,13 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// register kubernetes runner
@@ -86,7 +88,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.Deps(build.CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -254,4 +256,27 @@ func PythonIntegTest(ctx context.Context) error {
 		args.ForceCreateVenv = true
 		return devtools.PythonTestForModule(args)
 	})
+}
+
+// FIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests
+// Will also filter out packages that fail to run with the GODEBUG=fips140=only var set
+func FIPSOnlyUnitTest() error {
+	ctx := context.Background()
+
+	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
+	packages, err := gotool.ListProjectPackages()
+	if err != nil {
+		return err
+	}
+	filteredPackages := make([]string, 0, len(packages))
+	for _, pkg := range packages {
+		// Filter out tests from metricbeat/module/vsphere as the github.com/vmware/govmomi simulator uses SHA-1.
+		// This causes tests to panic on load before TestMain is ran.
+		if !strings.Contains(pkg, "github.com/elastic/beats/v7/metricbeat/module/vsphere") {
+			filteredPackages = append(filteredPackages, pkg)
+		}
+	}
+	fipsArgs.Packages = filteredPackages
+
+	return devtools.GoTest(ctx, fipsArgs)
 }

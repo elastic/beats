@@ -45,6 +45,8 @@ services under "Google Cloud metrics", but does not work for other services
 (`kubernetes` aka GKE for example).
 This option allow to override the default and specify an arbitrary metric prefix.
 
+* *location_label*: Use this option to specify the resource label that identifies the location (such as zone or region) for a Google Cloud service when filtering metrics. For example, labels like `resource.label.location` or `resource.label.zone` are used by Google Cloud to represent the region or zone of a resource. This is an optional configuration for the user. 
+
 [float]
 === Example Configuration
 * `metrics` metricset is enabled to collect metrics from all zones under
@@ -133,4 +135,29 @@ metric prefix, as for GKE metrics the required prefix is `kubernetes.io/`
       service_metric_prefix: kubernetes.io/
       metric_types:
         - "container/cpu/core_usage_time"
+----
+
+* `metrics` metricset is enabled to collect metrics from region
+`us-east4` in `elastic-observability` project. The metric, number of replicas of the prediction model is
+collected from a new GCP service `aiplatform`. Since its a new service which is not supported by 
+default in this metricset, the user provides the servicelabel (resource.label.location), for which 
+user wants to filter the incoming data
+
++
+[source,yaml]
+----
+- module: gcp
+  metricsets:
+    - metrics
+  project_id: "elastic-observability"
+  credentials_json: "your JSON credentials"
+  exclude_labels: false
+  period: 1m
+  location_label: "resource.label.location" # This is an optional configuration
+  regions:
+  - us-east4
+  metrics:
+    - service: aiplatform
+      metric_types:
+          - "prediction/online/replicas"
 ----

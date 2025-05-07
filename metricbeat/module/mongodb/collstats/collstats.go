@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 package collstats
 
 import (
@@ -22,10 +24,13 @@ import (
 	"errors"
 	"fmt"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func init() {
@@ -59,7 +64,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
-	client, err := mongodb.NewClient(m.Metricset.Config, m.HostData().URI, m.Module().Config().Timeout, 0)
+	client, err := mongodb.NewClient(m.Config, m.HostData().URI, m.Module().Config().Timeout, 0)
 	if err != nil {
 		return fmt.Errorf("could not create mongodb client: %w", err)
 	}
@@ -69,10 +74,6 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			m.Logger().Warn("client disconnection did not happen gracefully")
 		}
 	}()
-
-	if err != nil {
-		return fmt.Errorf("could not get a list of databases: %w", err)
-	}
 
 	// This info is only stored in 'admin' database
 	db := client.Database("admin")
@@ -92,10 +93,19 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 
 	totals, ok := result["totals"].(map[string]interface{})
 	if !ok {
-		return errors.New("collection 'totals' are not a map")
+		return errors.New("collection 'totals' is not a map")
 	}
 
+	if err = res.Err(); err != nil {
+		return fmt.Errorf("'top' command failed: %w", err)
+	}
+
+	collStatsErrGroup := &errgroup.Group{}
+	collStatsErrGroup.SetLimit(10) // limit number of goroutines running at the same time
+
 	for group, info := range totals {
+		group := group // make sure it works properly on older Go versions
+
 		if group == "note" {
 			continue
 		}
@@ -106,16 +116,60 @@ func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
 			continue
 		}
 
-		event, err := eventMapping(group, infoMap)
-		if err != nil {
-			reporter.Error(fmt.Errorf("mapping of the event data filed: %w", err))
-			continue
-		}
+		collStatsErrGroup.Go(func() error {
+			names, err := splitKey(group)
+			if err != nil {
+				reporter.Error(fmt.Errorf("splitting a collection key failed: %w", err))
 
-		reporter.Event(mb.Event{
-			MetricSetFields: event,
+				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
+				return nil
+			}
+
+			database, collection := names[0], names[1]
+
+			collStats, err := fetchCollStats(client, database, collection)
+			if err != nil {
+				reporter.Error(fmt.Errorf("fetching collStats failed: %w", err))
+
+				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
+				return nil
+			}
+
+			infoMap["stats"] = collStats
+
+			event, err := eventMapping(group, infoMap)
+			if err != nil {
+				reporter.Error(fmt.Errorf("mapping of the event data failed: %w", err))
+
+				// the error is captured by reporter. no need to return it (to avoid double reporting of the same error)
+				return nil
+			}
+
+			reporter.Event(mb.Event{
+				MetricSetFields: event,
+			})
+
+			return nil
 		})
 	}
 
+	if err := collStatsErrGroup.Wait(); err != nil {
+		return fmt.Errorf("error processing mongodb collstats: %w", err)
+	}
+
 	return nil
+}
+
+func fetchCollStats(client *mongo.Client, dbName, collectionName string) (map[string]interface{}, error) {
+	db := client.Database(dbName)
+	collStats := db.RunCommand(context.Background(), bson.M{"collStats": collectionName})
+	if err := collStats.Err(); err != nil {
+		return nil, fmt.Errorf("collStats command failed: %w", err)
+	}
+	var statsRes map[string]interface{}
+	if err := collStats.Decode(&statsRes); err != nil {
+		return nil, fmt.Errorf("could not decode mongo response for database=%s, collection=%s: %w", dbName, collectionName, err)
+	}
+
+	return statsRes, nil
 }

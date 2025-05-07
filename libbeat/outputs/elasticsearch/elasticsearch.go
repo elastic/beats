@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -39,24 +38,18 @@ func makeES(
 	observer outputs.Observer,
 	cfg *config.C,
 ) (outputs.Group, error) {
-	log := logp.NewLogger(logSelector)
-	if !cfg.HasField("bulk_max_size") {
-		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {
-			return outputs.Fail(err)
-		}
-	}
-
+	log := beatInfo.Logger.Named(logSelector)
+	esConfig := defaultConfig
 	indexSelector, pipelineSelector, err := buildSelectors(im, beatInfo, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	esConfig := defaultConfig
 	preset, err := cfg.String("preset", -1)
 	if err == nil && preset != "" {
 		// Performance preset is present, apply it and log any fields that
 		// were overridden
-		overriddenFields, presetConfig, err := applyPreset(preset, cfg)
+		overriddenFields, presetConfig, err := ApplyPreset(preset, cfg)
 		if err != nil {
 			return outputs.Fail(err)
 		}
@@ -127,7 +120,7 @@ func makeES(
 			pipelineSelector: pipelineSelector,
 			observer:         observer,
 			deadLetterIndex:  deadLetterIndex,
-		}, &connectCallbackRegistry)
+		}, &connectCallbackRegistry, log)
 		if err != nil {
 			return outputs.Fail(err)
 		}

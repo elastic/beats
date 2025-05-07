@@ -114,9 +114,11 @@ func MakeDefaultSupport(
 		// don't try to "merge" the two lists somehow, if the supportFactory caller requests its own processors, use those
 		// also makes it easier to disable global processors if needed, since they're otherwise hardcoded
 		var rawProcessors processors.PluginConfig
+		shouldLoadDefaultProcessors := info.UseDefaultProcessors || fleetmode.Enabled()
+
 		// don't check the array directly, use HasField, that way processors can easily be bypassed with -E processors=[]
-		if fleetmode.Enabled() && !beatCfg.HasField("processors") {
-			log.Debugf("In fleet mode with no processors specified, defaulting to global processors")
+		if shouldLoadDefaultProcessors && !beatCfg.HasField("processors") {
+			log.Debugf("In fleet/otel mode with no processors specified, defaulting to global processors")
 			rawProcessors = fleetDefaultProcessors
 
 		} else {
@@ -324,10 +326,10 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	// setup 1: generalize/normalize output (P)
 	if cfg.EventNormalization != nil {
 		if *cfg.EventNormalization {
-			processors.add(newGeneralizeProcessor(cfg.KeepNull))
+			processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
 		}
 	} else if !b.skipNormalize {
-		processors.add(newGeneralizeProcessor(cfg.KeepNull))
+		processors.add(newGeneralizeProcessor(cfg.KeepNull, b.log))
 	}
 
 	// setup 2: add Meta from client config (C)

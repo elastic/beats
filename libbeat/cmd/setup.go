@@ -24,7 +24,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 )
 
@@ -112,16 +111,11 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 	}
 
 	setup.Flags().Bool(DashboardKey, false, "Setup dashboards")
-	cfgfile.AddAllowedBackwardsCompatibleFlag(DashboardKey)
 	setup.Flags().Bool(PipelineKey, false, "Setup Ingest pipelines")
-	cfgfile.AddAllowedBackwardsCompatibleFlag(PipelineKey)
 	setup.Flags().Bool(IndexManagementKey, false,
 		"Setup all components related to Elasticsearch index management, including template, ilm policy and rollover alias")
-	cfgfile.AddAllowedBackwardsCompatibleFlag(IndexManagementKey)
 	setup.Flags().Bool("enable-all-filesets", false, "Behave as if all modules and filesets had been enabled")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("enable-all-filesets")
 	setup.Flags().Bool("force-enable-module-filesets", false, "Behave as if all filesets, within enabled modules, are enabled")
-	cfgfile.AddAllowedBackwardsCompatibleFlag("force-enable-module-filesets")
 
 	return &setup
 }

@@ -1,0 +1,1670 @@
+project: "Beats"
+toc:
+  # TO DO: Do we want these to be separate pages?
+  - file: index.md
+  - file: serverless/beats.md
+  - file: libbeat/config-file-format.md
+    children:
+      - file: libbeat/config-file-format-namespacing.md
+      - file: libbeat/config-file-format-type.md
+      - file: libbeat/config-file-format-env-vars.md
+      - file: libbeat/config-gile-format-refs.md
+      - file: libbeat/config-file-permissions.md
+      - file: libbeat/config-file-format-cli.md
+      - file: libbeat/config-file-format-tips.md
+  - file: auditbeat/index.md
+    children:
+      - file: auditbeat/auditbeat-installation-configuration.md
+      - file: auditbeat/setting-up-running.md
+        children:
+          - file: auditbeat/directory-layout.md
+          - file: auditbeat/keystore.md
+          - file: auditbeat/command-line-options.md
+          - file: auditbeat/setup-repositories.md
+          - file: auditbeat/running-on-docker.md
+          - file: auditbeat/running-on-kubernetes.md
+          - file: auditbeat/running-with-systemd.md
+          - file: auditbeat/auditbeat-starting.md
+          - file: auditbeat/shutdown.md
+      - file: auditbeat/upgrading-auditbeat.md
+      - file: auditbeat/configuring-howto-auditbeat.md
+        children:
+          - file: auditbeat/configuration-auditbeat.md
+          - file: auditbeat/configuration-general-options.md
+          - file: auditbeat/configuration-path.md
+          - file: auditbeat/auditbeat-configuration-reloading.md
+          - file: auditbeat/configuring-output.md
+            children:
+              - file: auditbeat/configure-cloud-id.md
+              - file: auditbeat/elasticsearch-output.md
+              - file: auditbeat/logstash-output.md
+              - file: auditbeat/kafka-output.md
+              - file: auditbeat/redis-output.md
+              - file: auditbeat/file-output.md
+              - file: auditbeat/console-output.md
+              - file: auditbeat/discard-output.md
+              - file: auditbeat/configuration-output-codec.md
+          - file: auditbeat/configuration-kerberos.md
+          - file: auditbeat/configuration-ssl.md
+          - file: auditbeat/ilm.md
+          - file: auditbeat/configuration-template.md
+          - file: auditbeat/setup-kibana-endpoint.md
+          - file: auditbeat/configuration-dashboards.md
+          - file: auditbeat/filtering-enhancing-data.md
+            children:
+              - file: auditbeat/defining-processors.md
+              - file: auditbeat/add-cloud-metadata.md
+              - file: auditbeat/add-cloudfoundry-metadata.md
+              - file: auditbeat/add-docker-metadata.md
+              - file: auditbeat/add-fields.md
+              - file: auditbeat/add-host-metadata.md
+              - file: auditbeat/add-id.md
+              - file: auditbeat/add-kubernetes-metadata.md
+              - file: auditbeat/add-labels.md
+              - file: auditbeat/add-locale.md
+              - file: auditbeat/add-network-direction.md
+              - file: auditbeat/add-nomad-metadata.md
+              - file: auditbeat/add-observer-metadata.md
+              - file: auditbeat/add-process-metadata.md
+              - file: auditbeat/add-session-metadata.md
+              - file: auditbeat/add-tags.md
+              - file: auditbeat/append.md
+              - file: auditbeat/community-id.md
+              - file: auditbeat/convert.md
+              - file: auditbeat/copy-fields.md
+              - file: auditbeat/decode-base64-field.md
+              - file: auditbeat/decode-duration.md
+              - file: auditbeat/decode-json-fields.md
+              - file: auditbeat/decode-xml.md
+              - file: auditbeat/decode-xml-wineventlog.md
+              - file: auditbeat/decompress-gzip-field.md
+              - file: auditbeat/detect-mime-type.md
+              - file: auditbeat/dissect.md
+              - file: auditbeat/processor-dns.md
+              - file: auditbeat/drop-event.md
+              - file: auditbeat/drop-fields.md
+              - file: auditbeat/extract-array.md
+              - file: auditbeat/fingerprint.md
+              - file: auditbeat/include-fields.md
+              - file: auditbeat/move-fields.md
+              - file: auditbeat/rate-limit.md
+              - file: auditbeat/processor-registered-domain.md
+              - file: auditbeat/rename-fields.md
+              - file: auditbeat/replace-fields.md
+              - file: auditbeat/syslog.md
+              - file: auditbeat/processor-translate-guid.md
+              - file: auditbeat/processor-translate-sid.md
+              - file: auditbeat/truncate-fields.md
+              - file: auditbeat/urldecode.md
+          - file: auditbeat/configuring-internal-queue.md
+          - file: auditbeat/configuration-logging.md
+          - file: auditbeat/http-endpoint.md
+          - file: auditbeat/regexp-support.md
+          - file: auditbeat/configuration-instrumentation.md
+          - file: auditbeat/configuration-feature-flags.md
+          - file: auditbeat/auditbeat-reference-yml.md
+      - file: auditbeat/howto-guides.md
+        children:
+          - file: auditbeat/auditbeat-template.md
+          - file: auditbeat/change-index-name.md
+          - file: auditbeat/load-kibana-dashboards.md
+          - file: auditbeat/auditbeat-geoip.md
+          - file: auditbeat/configuring-ingest-node.md
+          - file: auditbeat/using-environ-vars.md
+          - file: auditbeat/yaml-tips.md
+      - file: auditbeat/auditbeat-modules.md
+        children:
+          - file: auditbeat/auditbeat-module-auditd.md
+          - file: auditbeat/auditbeat-module-file_integrity.md
+          - file: auditbeat/auditbeat-module-system.md
+            children:
+              - file: auditbeat/auditbeat-dataset-system-host.md
+              - file: auditbeat/auditbeat-dataset-system-login.md
+              - file: auditbeat/auditbeat-dataset-system-package.md
+              - file: auditbeat/auditbeat-dataset-system-process.md
+              - file: auditbeat/auditbeat-dataset-system-socket.md
+              - file: auditbeat/auditbeat-dataset-system-user.md
+      - file: auditbeat/exported-fields.md
+        children:
+          - file: auditbeat/exported-fields-auditd.md
+          - file: auditbeat/exported-fields-beat-common.md
+          - file: auditbeat/exported-fields-cloud.md
+          - file: auditbeat/exported-fields-common.md
+          - file: auditbeat/exported-fields-docker-processor.md
+          - file: auditbeat/exported-fields-ecs.md
+          - file: auditbeat/exported-fields-file_integrity.md
+          - file: auditbeat/exported-fields-host-processor.md
+          - file: auditbeat/exported-fields-jolokia-autodiscover.md
+          - file: auditbeat/exported-fields-kubernetes-processor.md
+          - file: auditbeat/exported-fields-process.md
+          - file: auditbeat/exported-fields-system.md
+      - file: auditbeat/monitoring.md
+        children:
+          - file: auditbeat/monitoring-internal-collection.md
+            children:
+              - file: auditbeat/configuration-monitor.md
+          - file: auditbeat/monitoring-metricbeat-collection.md
+      - file: auditbeat/securing-auditbeat.md
+        children:
+          - file: auditbeat/feature-roles.md
+            children:
+              - file: auditbeat/privileges-to-setup-beats.md
+              - file: auditbeat/privileges-to-publish-monitoring.md
+              - file: auditbeat/privileges-to-publish-events.md
+              - file: auditbeat/kibana-user-privileges.md
+              - file: auditbeat/learn-more-security.md
+          - file: auditbeat/beats-api-keys.md
+          - file: auditbeat/securing-communication-elasticsearch.md
+          - file: auditbeat/configuring-ssl-logstash.md
+          - file: auditbeat/linux-seccomp.md
+      - file: auditbeat/troubleshooting.md
+        children:
+          - file: auditbeat/getting-help.md
+          - file: auditbeat/enable-auditbeat-debugging.md
+          - file: auditbeat/understand-auditbeat-logs.md
+          - file: auditbeat/faq.md
+            children:
+              - file: auditbeat/ulimit.md
+              - file: auditbeat/bandwidth-throttling.md
+              - file: auditbeat/error-loading-config.md
+              - file: auditbeat/error-found-unexpected-character.md
+              - file: auditbeat/connection-problem.md
+              - file: auditbeat/publishing-ls-fails-connection-reset-by-peer.md
+              - file: auditbeat/metadata-missing.md
+              - file: auditbeat/diff-logstash-beats.md
+              - file: auditbeat/ssl-client-fails.md
+              - file: auditbeat/monitoring-shows-fewer-than-expected-beats.md
+              - file: auditbeat/could-not-locate-index-pattern.md
+              - file: auditbeat/madvdontneed-rss.md
+      - file: auditbeat/contributing-to-beats.md
+  - file: filebeat/index.md
+    children:
+      - file: filebeat/filebeat-installation-configuration.md
+      - file: filebeat/setting-up-running.md
+        children:
+          - file: filebeat/directory-layout.md
+          - file: filebeat/keystore.md
+          - file: filebeat/command-line-options.md
+          - file: filebeat/setup-repositories.md
+          - file: filebeat/running-on-docker.md
+          - file: filebeat/running-on-kubernetes.md
+          - file: filebeat/running-on-cloudfoundry.md
+          - file: filebeat/running-with-systemd.md
+          - file: filebeat/filebeat-starting.md
+          - file: filebeat/shutdown.md
+      - file: filebeat/upgrading-filebeat.md
+      - file: filebeat/how-filebeat-works.md
+      - file: filebeat/configuring-howto-filebeat.md
+        children:
+          - file: filebeat/configuration-filebeat-options.md
+            children:
+              - file: filebeat/multiline-examples.md
+              - file: filebeat/filebeat-input-aws-cloudwatch.md
+              - file: filebeat/filebeat-input-aws-s3.md
+              - file: filebeat/filebeat-input-azure-eventhub.md
+              - file: filebeat/filebeat-input-azure-blob-storage.md
+              - file: filebeat/filebeat-input-benchmark.md
+              - file: filebeat/filebeat-input-cel.md
+              - file: filebeat/filebeat-input-cloudfoundry.md
+              - file: filebeat/filebeat-input-cometd.md
+              - file: filebeat/filebeat-input-container.md
+              - file: filebeat/filebeat-input-entity-analytics.md
+              - file: filebeat/filebeat-input-etw.md
+              - file: filebeat/filebeat-input-filestream.md
+              - file: filebeat/filebeat-input-gcp-pubsub.md
+              - file: filebeat/filebeat-input-gcs.md
+              - file: filebeat/filebeat-input-http_endpoint.md
+              - file: filebeat/filebeat-input-httpjson.md
+              - file: filebeat/filebeat-input-journald.md
+              - file: filebeat/filebeat-input-kafka.md
+              - file: filebeat/filebeat-input-log.md
+              - file: filebeat/filebeat-input-mqtt.md
+              - file: filebeat/filebeat-input-netflow.md
+              - file: filebeat/filebeat-input-o365audit.md
+              - file: filebeat/filebeat-input-redis.md
+              - file: filebeat/filebeat-input-salesforce.md
+              - file: filebeat/filebeat-input-stdin.md
+              - file: filebeat/filebeat-input-streaming.md
+              - file: filebeat/filebeat-input-syslog.md
+              - file: filebeat/filebeat-input-tcp.md
+              - file: filebeat/filebeat-input-udp.md
+              - file: filebeat/filebeat-input-unifiedlogs.md
+              - file: filebeat/filebeat-input-unix.md
+              - file: filebeat/filebeat-input-winlog.md
+          - file: filebeat/configuration-filebeat-modules.md
+            children:
+              - file: filebeat/advanced-settings.md
+          - file: filebeat/configuration-general-options.md
+          - file: filebeat/configuration-path.md
+          - file: filebeat/filebeat-configuration-reloading.md
+            children:
+              - file: filebeat/_live_reloading.md
+          - file: filebeat/configuring-output.md
+            children:
+              - file: filebeat/configure-cloud-id.md
+              - file: filebeat/elasticsearch-output.md
+              - file: filebeat/logstash-output.md
+              - file: filebeat/kafka-output.md
+              - file: filebeat/redis-output.md
+              - file: filebeat/file-output.md
+              - file: filebeat/console-output.md
+              - file: filebeat/discard-output.md
+              - file: filebeat/configuration-output-codec.md
+          - file: filebeat/configuration-kerberos.md
+          - file: filebeat/configuration-ssl.md
+          - file: filebeat/ilm.md
+          - file: filebeat/configuration-template.md
+          - file: filebeat/setup-kibana-endpoint.md
+          - file: filebeat/configuration-dashboards.md
+          - file: filebeat/filtering-enhancing-data.md
+            children:
+              - file: filebeat/defining-processors.md
+              - file: filebeat/add-cloud-metadata.md
+              - file: filebeat/add-cloudfoundry-metadata.md
+              - file: filebeat/add-docker-metadata.md
+              - file: filebeat/add-fields.md
+              - file: filebeat/add-host-metadata.md
+              - file: filebeat/add-id.md
+              - file: filebeat/add-kubernetes-metadata.md
+              - file: filebeat/add-labels.md
+              - file: filebeat/add-locale.md
+              - file: filebeat/add-network-direction.md
+              - file: filebeat/add-nomad-metadata.md
+              - file: filebeat/add-observer-metadata.md
+              - file: filebeat/add-process-metadata.md
+              - file: filebeat/add-tags.md
+              - file: filebeat/append.md
+              - file: filebeat/add-cached-metadata.md
+              - file: filebeat/community-id.md
+              - file: filebeat/convert.md
+              - file: filebeat/copy-fields.md
+              - file: filebeat/decode-base64-field.md
+              - file: filebeat/processor-decode-cef.md
+              - file: filebeat/decode-csv-fields.md
+              - file: filebeat/decode-duration.md
+              - file: filebeat/decode-json-fields.md
+              - file: filebeat/decode-xml.md
+              - file: filebeat/decode-xml-wineventlog.md
+              - file: filebeat/decompress-gzip-field.md
+              - file: filebeat/detect-mime-type.md
+              - file: filebeat/dissect.md
+              - file: filebeat/processor-dns.md
+              - file: filebeat/drop-event.md
+              - file: filebeat/drop-fields.md
+              - file: filebeat/extract-array.md
+              - file: filebeat/fingerprint.md
+              - file: filebeat/include-fields.md
+              - file: filebeat/move-fields.md
+              - file: filebeat/processor-parse-aws-vpc-flow-log.md
+              - file: filebeat/rate-limit.md
+              - file: filebeat/processor-registered-domain.md
+              - file: filebeat/rename-fields.md
+              - file: filebeat/replace-fields.md
+              - file: filebeat/processor-script.md
+              - file: filebeat/syslog.md
+              - file: filebeat/processor-timestamp.md
+              - file: filebeat/processor-translate-guid.md
+              - file: filebeat/processor-translate-sid.md
+              - file: filebeat/truncate-fields.md
+              - file: filebeat/urldecode.md
+          - file: filebeat/configuration-autodiscover.md
+            children:
+              - file: filebeat/configuration-autodiscover-hints.md
+              - file: filebeat/configuration-autodiscover-advanced.md
+          - file: filebeat/configuring-internal-queue.md
+          - file: filebeat/configuration-logging.md
+          - file: filebeat/http-endpoint.md
+          - file: filebeat/regexp-support.md
+          - file: filebeat/configuration-instrumentation.md
+          - file: filebeat/configuration-feature-flags.md
+          - file: filebeat/filebeat-reference-yml.md
+      - file: filebeat/howto-guides.md
+        children:
+          - file: filebeat/override-filebeat-config-settings.md
+          - file: filebeat/filebeat-template.md
+          - file: filebeat/change-index-name.md
+          - file: filebeat/load-kibana-dashboards.md
+          - file: filebeat/load-ingest-pipelines.md
+          - file: filebeat/filebeat-geoip.md
+          - file: filebeat/filebeat-deduplication.md
+          - file: filebeat/configuring-ingest-node.md
+          - file: filebeat/using-environ-vars.md
+          - file: filebeat/yaml-tips.md
+          - file: filebeat/migrate-to-filestream.md
+          - file: filebeat/file-identity.md
+          - file: filebeat/migrate-from-deprecated-module.md
+      - file: filebeat/filebeat-modules.md
+        children:
+          - file: filebeat/filebeat-modules-overview.md
+          - file: filebeat/filebeat-module-activemq.md
+          - file: filebeat/filebeat-module-apache.md
+          - file: filebeat/filebeat-module-auditd.md
+          - file: filebeat/filebeat-module-aws.md
+          - file: filebeat/filebeat-module-awsfargate.md
+          - file: filebeat/filebeat-module-azure.md
+          - file: filebeat/filebeat-module-cef.md
+          - file: filebeat/filebeat-module-checkpoint.md
+          - file: filebeat/filebeat-module-cisco.md
+          - file: filebeat/filebeat-module-coredns.md
+          - file: filebeat/filebeat-module-crowdstrike.md
+          - file: filebeat/filebeat-module-cyberarkpas.md
+          - file: filebeat/filebeat-module-elasticsearch.md
+          - file: filebeat/filebeat-module-envoyproxy.md
+          - file: filebeat/filebeat-module-fortinet.md
+          - file: filebeat/filebeat-module-gcp.md
+          - file: filebeat/filebeat-module-google_workspace.md
+          - file: filebeat/filebeat-module-haproxy.md
+          - file: filebeat/filebeat-module-ibmmq.md
+          - file: filebeat/filebeat-module-icinga.md
+          - file: filebeat/filebeat-module-iis.md
+          - file: filebeat/filebeat-module-iptables.md
+          - file: filebeat/filebeat-module-juniper.md
+          - file: filebeat/filebeat-module-kafka.md
+          - file: filebeat/filebeat-module-kibana.md
+          - file: filebeat/filebeat-module-logstash.md
+          - file: filebeat/filebeat-module-microsoft.md
+          - file: filebeat/filebeat-module-misp.md
+          - file: filebeat/filebeat-module-mongodb.md
+          - file: filebeat/filebeat-module-mssql.md
+          - file: filebeat/filebeat-module-mysql.md
+          - file: filebeat/filebeat-module-mysqlenterprise.md
+          - file: filebeat/filebeat-module-nats.md
+          - file: filebeat/filebeat-module-netflow.md
+          - file: filebeat/filebeat-module-nginx.md
+          - file: filebeat/filebeat-module-o365.md
+          - file: filebeat/filebeat-module-okta.md
+          - file: filebeat/filebeat-module-oracle.md
+          - file: filebeat/filebeat-module-osquery.md
+          - file: filebeat/filebeat-module-panw.md
+          - file: filebeat/filebeat-module-pensando.md
+          - file: filebeat/filebeat-module-postgresql.md
+          - file: filebeat/filebeat-module-rabbitmq.md
+          - file: filebeat/filebeat-module-redis.md
+          - file: filebeat/filebeat-module-salesforce.md
+            children:
+              - file: filebeat/_set_up_the_oauth_app_in_the_salesforce_2.md
+          - file: filebeat/filebeat-module-santa.md
+          - file: filebeat/filebeat-module-snyk.md
+          - file: filebeat/filebeat-module-sophos.md
+          - file: filebeat/filebeat-module-suricata.md
+          - file: filebeat/filebeat-module-system.md
+          - file: filebeat/filebeat-module-threatintel.md
+          - file: filebeat/filebeat-module-traefik.md
+          - file: filebeat/filebeat-module-zeek.md
+          - file: filebeat/filebeat-module-zookeeper.md
+          - file: filebeat/filebeat-module-zoom.md
+      - file: filebeat/exported-fields.md
+        children:
+          - file: filebeat/exported-fields-activemq.md
+          - file: filebeat/exported-fields-apache.md
+          - file: filebeat/exported-fields-auditd.md
+          - file: filebeat/exported-fields-aws.md
+          - file: filebeat/exported-fields-aws-cloudwatch.md
+          - file: filebeat/exported-fields-awsfargate.md
+          - file: filebeat/exported-fields-azure.md
+          - file: filebeat/exported-fields-beat-common.md
+          - file: filebeat/exported-fields-cef.md
+          - file: filebeat/exported-fields-cef-module.md
+          - file: filebeat/exported-fields-checkpoint.md
+          - file: filebeat/exported-fields-cisco.md
+          - file: filebeat/exported-fields-cloud.md
+          - file: filebeat/exported-fields-coredns.md
+          - file: filebeat/exported-fields-crowdstrike.md
+          - file: filebeat/exported-fields-cyberarkpas.md
+          - file: filebeat/exported-fields-docker-processor.md
+          - file: filebeat/exported-fields-ecs.md
+          - file: filebeat/exported-fields-elasticsearch.md
+          - file: filebeat/exported-fields-envoyproxy.md
+          - file: filebeat/exported-fields-fortinet.md
+          - file: filebeat/exported-fields-gcp.md
+          - file: filebeat/exported-fields-google_workspace.md
+          - file: filebeat/exported-fields-haproxy.md
+          - file: filebeat/exported-fields-host-processor.md
+          - file: filebeat/exported-fields-ibmmq.md
+          - file: filebeat/exported-fields-icinga.md
+          - file: filebeat/exported-fields-iis.md
+          - file: filebeat/exported-fields-iptables.md
+          - file: filebeat/exported-fields-jolokia-autodiscover.md
+          - file: filebeat/exported-fields-juniper.md
+          - file: filebeat/exported-fields-kafka.md
+          - file: filebeat/exported-fields-kibana.md
+          - file: filebeat/exported-fields-kubernetes-processor.md
+          - file: filebeat/exported-fields-log.md
+          - file: filebeat/exported-fields-logstash.md
+          - file: filebeat/exported-fields-lumberjack.md
+          - file: filebeat/exported-fields-microsoft.md
+          - file: filebeat/exported-fields-misp.md
+          - file: filebeat/exported-fields-mongodb.md
+          - file: filebeat/exported-fields-mssql.md
+          - file: filebeat/exported-fields-mysql.md
+          - file: filebeat/exported-fields-mysqlenterprise.md
+          - file: filebeat/exported-fields-nats.md
+          - file: filebeat/exported-fields-netflow.md
+          - file: filebeat/exported-fields-nginx.md
+          - file: filebeat/exported-fields-o365.md
+          - file: filebeat/exported-fields-okta.md
+          - file: filebeat/exported-fields-oracle.md
+          - file: filebeat/exported-fields-osquery.md
+          - file: filebeat/exported-fields-panw.md
+          - file: filebeat/exported-fields-pensando.md
+          - file: filebeat/exported-fields-postgresql.md
+          - file: filebeat/exported-fields-process.md
+          - file: filebeat/exported-fields-rabbitmq.md
+          - file: filebeat/exported-fields-redis.md
+          - file: filebeat/exported-fields-s3.md
+          - file: filebeat/exported-fields-salesforce.md
+          - file: filebeat/exported-fields-santa.md
+          - file: filebeat/exported-fields-snyk.md
+          - file: filebeat/exported-fields-sophos.md
+          - file: filebeat/exported-fields-suricata.md
+          - file: filebeat/exported-fields-system.md
+          - file: filebeat/exported-fields-threatintel.md
+          - file: filebeat/exported-fields-traefik.md
+          - file: filebeat/exported-fields-winlog.md
+          - file: filebeat/exported-fields-zeek.md
+          - file: filebeat/exported-fields-zookeeper.md
+          - file: filebeat/exported-fields-zoom.md
+      - file: filebeat/monitoring.md
+        children:
+          - file: filebeat/monitoring-internal-collection.md
+            children:
+              - file: filebeat/configuration-monitor.md
+          - file: filebeat/monitoring-metricbeat-collection.md
+      - file: filebeat/securing-filebeat.md
+        children:
+          - file: filebeat/feature-roles.md
+            children:
+              - file: filebeat/privileges-to-setup-beats.md
+              - file: filebeat/privileges-to-publish-monitoring.md
+              - file: filebeat/privileges-to-publish-events.md
+              - file: filebeat/kibana-user-privileges.md
+              - file: filebeat/learn-more-security.md
+          - file: filebeat/beats-api-keys.md
+          - file: filebeat/securing-communication-elasticsearch.md
+          - file: filebeat/configuring-ssl-logstash.md
+          - file: filebeat/linux-seccomp.md
+      - file: filebeat/troubleshooting.md
+        children:
+          - file: filebeat/getting-help.md
+          - file: filebeat/enable-filebeat-debugging.md
+          - file: filebeat/understand-filebeat-logs.md
+          - file: filebeat/faq.md
+            children:
+              - file: filebeat/filebeat-kubernetes-metadata-error-extracting-container-id.md
+              - file: filebeat/filebeat-network-volumes.md
+              - file: filebeat/filebeat-not-collecting-lines.md
+              - file: filebeat/open-file-handlers.md
+              - file: filebeat/reduce-registry-size.md
+              - file: filebeat/inode-reuse-issue.md
+              - file: filebeat/file-log-rotation.md
+              - file: filebeat/windows-file-rotation.md
+              - file: filebeat/filebeat-cpu.md
+              - file: filebeat/dashboard-fields-incorrect-filebeat.md
+              - file: filebeat/fields-not-indexed.md
+              - file: filebeat/newline-character-required-eof.md
+              - file: filebeat/faq-deleted-files-are-not-freed.md
+              - file: filebeat/bandwidth-throttling.md
+              - file: filebeat/error-loading-config.md
+              - file: filebeat/error-found-unexpected-character.md
+              - file: filebeat/connection-problem.md
+              - file: filebeat/publishing-ls-fails-connection-reset-by-peer.md
+              - file: filebeat/metadata-missing.md
+              - file: filebeat/diff-logstash-beats.md
+              - file: filebeat/ssl-client-fails.md
+              - file: filebeat/monitoring-shows-fewer-than-expected-beats.md
+              - file: filebeat/could-not-locate-index-pattern.md
+              - file: filebeat/madvdontneed-rss.md
+      - file: filebeat/contributing-to-beats.md
+  - file: heartbeat/index.md
+    children:
+      - file: heartbeat/heartbeat-installation-configuration.md
+      - file: heartbeat/setting-up-running.md
+        children:
+          - file: heartbeat/directory-layout.md
+          - file: heartbeat/keystore.md
+          - file: heartbeat/command-line-options.md
+          - file: heartbeat/setup-repositories.md
+          - file: heartbeat/running-on-docker.md
+          - file: heartbeat/running-on-kubernetes.md
+          - file: heartbeat/running-with-systemd.md
+          - file: heartbeat/shutdown.md
+      - file: heartbeat/configuring-howto-heartbeat.md
+        children:
+          - file: heartbeat/configuration-heartbeat-options.md
+            children:
+              - file: heartbeat/monitor-options.md
+              - file: heartbeat/monitor-icmp-options.md
+              - file: heartbeat/monitor-tcp-options.md
+              - file: heartbeat/monitor-http-options.md
+          - file: heartbeat/monitors-scheduler.md
+          - file: heartbeat/configuration-general-options.md
+          - file: heartbeat/configuration-path.md
+          - file: heartbeat/configuring-output.md
+            children:
+              - file: heartbeat/configure-cloud-id.md
+              - file: heartbeat/elasticsearch-output.md
+              - file: heartbeat/logstash-output.md
+              - file: heartbeat/kafka-output.md
+              - file: heartbeat/redis-output.md
+              - file: heartbeat/file-output.md
+              - file: heartbeat/console-output.md
+              - file: heartbeat/discard-output.md
+              - file: heartbeat/configuration-output-codec.md
+          - file: heartbeat/configuration-kerberos.md
+          - file: heartbeat/configuration-ssl.md
+          - file: heartbeat/ilm.md
+          - file: heartbeat/configuration-template.md
+          - file: heartbeat/filtering-enhancing-data.md
+            children:
+              - file: heartbeat/defining-processors.md
+              - file: heartbeat/add-cloud-metadata.md
+              - file: heartbeat/add-cloudfoundry-metadata.md
+              - file: heartbeat/add-docker-metadata.md
+              - file: heartbeat/add-fields.md
+              - file: heartbeat/add-host-metadata.md
+              - file: heartbeat/add-id.md
+              - file: heartbeat/add-kubernetes-metadata.md
+              - file: heartbeat/add-labels.md
+              - file: heartbeat/add-locale.md
+              - file: heartbeat/add-network-direction.md
+              - file: heartbeat/add-nomad-metadata.md
+              - file: heartbeat/add-observer-metadata.md
+              - file: heartbeat/add-process-metadata.md
+              - file: heartbeat/add-tags.md
+              - file: heartbeat/append.md
+              - file: heartbeat/community-id.md
+              - file: heartbeat/convert.md
+              - file: heartbeat/copy-fields.md
+              - file: heartbeat/decode-base64-field.md
+              - file: heartbeat/decode-duration.md
+              - file: heartbeat/decode-json-fields.md
+              - file: heartbeat/decode-xml.md
+              - file: heartbeat/decode-xml-wineventlog.md
+              - file: heartbeat/decompress-gzip-field.md
+              - file: heartbeat/detect-mime-type.md
+              - file: heartbeat/dissect.md
+              - file: heartbeat/processor-dns.md
+              - file: heartbeat/drop-event.md
+              - file: heartbeat/drop-fields.md
+              - file: heartbeat/extract-array.md
+              - file: heartbeat/fingerprint.md
+              - file: heartbeat/include-fields.md
+              - file: heartbeat/move-fields.md
+              - file: heartbeat/rate-limit.md
+              - file: heartbeat/processor-registered-domain.md
+              - file: heartbeat/rename-fields.md
+              - file: heartbeat/replace-fields.md
+              - file: heartbeat/processor-script.md
+              - file: heartbeat/syslog.md
+              - file: heartbeat/processor-translate-guid.md
+              - file: heartbeat/processor-translate-sid.md
+              - file: heartbeat/truncate-fields.md
+              - file: heartbeat/urldecode.md
+          - file: heartbeat/configuration-autodiscover.md
+            children:
+              - file: heartbeat/configuration-autodiscover-hints.md
+              - file: heartbeat/configuration-autodiscover-advanced.md
+          - file: heartbeat/configuring-internal-queue.md
+          - file: heartbeat/configuration-logging.md
+          - file: heartbeat/http-endpoint.md
+          - file: heartbeat/regexp-support.md
+          - file: heartbeat/configuration-instrumentation.md
+          - file: heartbeat/configuration-feature-flags.md
+          - file: heartbeat/heartbeat-reference-yml.md
+      - file: heartbeat/howto-guides.md
+        children:
+          - file: heartbeat/configuration-observer-options.md
+          - file: heartbeat/heartbeat-template.md
+          - file: heartbeat/change-index-name.md
+          - file: heartbeat/heartbeat-geoip.md
+          - file: heartbeat/using-environ-vars.md
+          - file: heartbeat/configuring-ingest-node.md
+          - file: heartbeat/yaml-tips.md
+      - file: heartbeat/exported-fields.md
+        children:
+          - file: heartbeat/exported-fields-beat-common.md
+          - file: heartbeat/exported-fields-browser.md
+          - file: heartbeat/exported-fields-cloud.md
+          - file: heartbeat/exported-fields-common.md
+          - file: heartbeat/exported-fields-docker-processor.md
+          - file: heartbeat/exported-fields-ecs.md
+          - file: heartbeat/exported-fields-host-processor.md
+          - file: heartbeat/exported-fields-http.md
+          - file: heartbeat/exported-fields-icmp.md
+          - file: heartbeat/exported-fields-jolokia-autodiscover.md
+          - file: heartbeat/exported-fields-kubernetes-processor.md
+          - file: heartbeat/exported-fields-process.md
+          - file: heartbeat/exported-fields-resolve.md
+          - file: heartbeat/exported-fields-service.md
+          - file: heartbeat/exported-fields-socks5.md
+          - file: heartbeat/exported-fields-state.md
+          - file: heartbeat/exported-fields-summary.md
+          - file: heartbeat/exported-fields-synthetics.md
+          - file: heartbeat/exported-fields-tcp.md
+          - file: heartbeat/exported-fields-tls.md
+      - file: heartbeat/monitoring.md
+        children:
+          - file: heartbeat/monitoring-internal-collection.md
+            children:
+              - file: heartbeat/configuration-monitor.md
+          - file: heartbeat/monitoring-metricbeat-collection.md
+      - file: heartbeat/securing-heartbeat.md
+        children:
+          - file: heartbeat/feature-roles.md
+            children:
+              - file: heartbeat/privileges-to-setup-beats.md
+              - file: heartbeat/privileges-to-publish-monitoring.md
+              - file: heartbeat/privileges-to-publish-events.md
+              - file: heartbeat/kibana-user-privileges.md
+              - file: heartbeat/learn-more-security.md
+          - file: heartbeat/beats-api-keys.md
+          - file: heartbeat/securing-communication-elasticsearch.md
+          - file: heartbeat/configuring-ssl-logstash.md
+          - file: heartbeat/linux-seccomp.md
+      - file: heartbeat/troubleshooting.md
+        children:
+          - file: heartbeat/getting-help.md
+          - file: heartbeat/enable-heartbeat-debugging.md
+          - file: heartbeat/understand-heartbeat-logs.md
+          - file: heartbeat/faq.md
+            children:
+              - file: heartbeat/bandwidth-throttling.md
+              - file: heartbeat/error-loading-config.md
+              - file: heartbeat/error-found-unexpected-character.md
+              - file: heartbeat/connection-problem.md
+              - file: heartbeat/publishing-ls-fails-connection-reset-by-peer.md
+              - file: heartbeat/metadata-missing.md
+              - file: heartbeat/diff-logstash-beats.md
+              - file: heartbeat/ssl-client-fails.md
+              - file: heartbeat/monitoring-shows-fewer-than-expected-beats.md
+              - file: heartbeat/madvdontneed-rss.md
+      - file: heartbeat/contributing-to-beats.md
+  - file: metricbeat/index.md
+    children:
+      - file: metricbeat/metricbeat-installation-configuration.md
+      - file: metricbeat/setting-up-running.md
+        children:
+          - file: metricbeat/directory-layout.md
+          - file: metricbeat/keystore.md
+          - file: metricbeat/command-line-options.md
+          - file: metricbeat/setup-repositories.md
+          - file: metricbeat/running-on-docker.md
+          - file: metricbeat/running-on-kubernetes.md
+          - file: metricbeat/running-on-cloudfoundry.md
+          - file: metricbeat/running-with-systemd.md
+          - file: metricbeat/metricbeat-starting.md
+          - file: metricbeat/shutdown.md
+      - file: metricbeat/upgrading-metricbeat.md
+      - file: metricbeat/how-metricbeat-works.md
+        children:
+          - file: metricbeat/metricbeat-event-structure.md
+          - file: metricbeat/error-event-structure.md
+          - file: metricbeat/key-features.md
+      - file: metricbeat/configuring-howto-metricbeat.md
+        children:
+          - file: metricbeat/configuration-metricbeat.md
+          - file: metricbeat/configuration-general-options.md
+          - file: metricbeat/configuration-path.md
+          - file: metricbeat/metricbeat-configuration-reloading.md
+            children:
+              - file: metricbeat/_live_reloading.md
+          - file: metricbeat/configuring-output.md
+            children:
+              - file: metricbeat/configure-cloud-id.md
+              - file: metricbeat/elasticsearch-output.md
+              - file: metricbeat/logstash-output.md
+              - file: metricbeat/kafka-output.md
+              - file: metricbeat/redis-output.md
+              - file: metricbeat/file-output.md
+              - file: metricbeat/console-output.md
+              - file: metricbeat/discard-output.md
+              - file: metricbeat/configuration-output-codec.md
+          - file: metricbeat/configuration-kerberos.md
+          - file: metricbeat/configuration-ssl.md
+          - file: metricbeat/ilm.md
+          - file: metricbeat/configuration-template.md
+          - file: metricbeat/setup-kibana-endpoint.md
+          - file: metricbeat/configuration-dashboards.md
+          - file: metricbeat/filtering-enhancing-data.md
+            children:
+              - file: metricbeat/defining-processors.md
+              - file: metricbeat/add-cloud-metadata.md
+              - file: metricbeat/add-cloudfoundry-metadata.md
+              - file: metricbeat/add-docker-metadata.md
+              - file: metricbeat/add-fields.md
+              - file: metricbeat/add-host-metadata.md
+              - file: metricbeat/add-id.md
+              - file: metricbeat/add-kubernetes-metadata.md
+              - file: metricbeat/add-labels.md
+              - file: metricbeat/add-locale.md
+              - file: metricbeat/add-network-direction.md
+              - file: metricbeat/add-nomad-metadata.md
+              - file: metricbeat/add-observer-metadata.md
+              - file: metricbeat/add-process-metadata.md
+              - file: metricbeat/add-tags.md
+              - file: metricbeat/append.md
+              - file: metricbeat/community-id.md
+              - file: metricbeat/convert.md
+              - file: metricbeat/copy-fields.md
+              - file: metricbeat/decode-base64-field.md
+              - file: metricbeat/decode-duration.md
+              - file: metricbeat/decode-json-fields.md
+              - file: metricbeat/decode-xml.md
+              - file: metricbeat/decode-xml-wineventlog.md
+              - file: metricbeat/decompress-gzip-field.md
+              - file: metricbeat/detect-mime-type.md
+              - file: metricbeat/dissect.md
+              - file: metricbeat/processor-dns.md
+              - file: metricbeat/drop-event.md
+              - file: metricbeat/drop-fields.md
+              - file: metricbeat/extract-array.md
+              - file: metricbeat/fingerprint.md
+              - file: metricbeat/include-fields.md
+              - file: metricbeat/move-fields.md
+              - file: metricbeat/rate-limit.md
+              - file: metricbeat/processor-registered-domain.md
+              - file: metricbeat/rename-fields.md
+              - file: metricbeat/replace-fields.md
+              - file: metricbeat/processor-script.md
+              - file: metricbeat/syslog.md
+              - file: metricbeat/processor-translate-guid.md
+              - file: metricbeat/processor-translate-sid.md
+              - file: metricbeat/truncate-fields.md
+              - file: metricbeat/urldecode.md
+          - file: metricbeat/configuration-autodiscover.md
+            children:
+              - file: metricbeat/configuration-autodiscover-hints.md
+              - file: metricbeat/configuration-autodiscover-advanced.md
+          - file: metricbeat/configuring-internal-queue.md
+          - file: metricbeat/configuration-logging.md
+          - file: metricbeat/http-endpoint.md
+          - file: metricbeat/regexp-support.md
+          - file: metricbeat/configuration-instrumentation.md
+          - file: metricbeat/configuration-feature-flags.md
+          - file: metricbeat/metricbeat-reference-yml.md
+      - file: metricbeat/howto-guides.md
+        children:
+          - file: metricbeat/metricbeat-template.md
+          - file: metricbeat/change-index-name.md
+          - file: metricbeat/load-kibana-dashboards.md
+          - file: metricbeat/metricbeat-geoip.md
+          - file: metricbeat/using-environ-vars.md
+          - file: metricbeat/configuring-ingest-node.md
+          - file: metricbeat/yaml-tips.md
+      - file: metricbeat/metricbeat-modules.md
+        children:
+          - file: metricbeat/metricbeat-module-activemq.md
+            children:
+              - file: metricbeat/metricbeat-metricset-activemq-broker.md
+              - file: metricbeat/metricbeat-metricset-activemq-queue.md
+              - file: metricbeat/metricbeat-metricset-activemq-topic.md
+          - file: metricbeat/metricbeat-module-aerospike.md
+            children:
+              - file: metricbeat/metricbeat-metricset-aerospike-namespace.md
+          - file: metricbeat/metricbeat-module-airflow.md
+            children:
+              - file: metricbeat/metricbeat-metricset-airflow-statsd.md
+          - file: metricbeat/metricbeat-module-apache.md
+            children:
+              - file: metricbeat/metricbeat-metricset-apache-status.md
+          - file: metricbeat/metricbeat-module-aws.md
+            children:
+              - file: metricbeat/metricbeat-metricset-aws-awshealth.md
+              - file: metricbeat/metricbeat-metricset-aws-billing.md
+              - file: metricbeat/metricbeat-metricset-aws-cloudwatch.md
+              - file: metricbeat/metricbeat-metricset-aws-dynamodb.md
+              - file: metricbeat/metricbeat-metricset-aws-ebs.md
+              - file: metricbeat/metricbeat-metricset-aws-ec2.md
+              - file: metricbeat/metricbeat-metricset-aws-elb.md
+              - file: metricbeat/metricbeat-metricset-aws-kinesis.md
+              - file: metricbeat/metricbeat-metricset-aws-lambda.md
+              - file: metricbeat/metricbeat-metricset-aws-natgateway.md
+              - file: metricbeat/metricbeat-metricset-aws-rds.md
+              - file: metricbeat/metricbeat-metricset-aws-s3_daily_storage.md
+              - file: metricbeat/metricbeat-metricset-aws-s3_request.md
+              - file: metricbeat/metricbeat-metricset-aws-sns.md
+              - file: metricbeat/metricbeat-metricset-aws-sqs.md
+              - file: metricbeat/metricbeat-metricset-aws-transitgateway.md
+              - file: metricbeat/metricbeat-metricset-aws-usage.md
+              - file: metricbeat/metricbeat-metricset-aws-vpn.md
+          - file: metricbeat/metricbeat-module-awsfargate.md
+            children:
+              - file: metricbeat/metricbeat-metricset-awsfargate-task_stats.md
+          - file: metricbeat/metricbeat-module-azure.md
+            children:
+              - file: metricbeat/metricbeat-metricset-azure-app_insights.md
+              - file: metricbeat/metricbeat-metricset-azure-app_state.md
+              - file: metricbeat/metricbeat-metricset-azure-billing.md
+              - file: metricbeat/metricbeat-metricset-azure-compute_vm.md
+              - file: metricbeat/metricbeat-metricset-azure-compute_vm_scaleset.md
+              - file: metricbeat/metricbeat-metricset-azure-container_instance.md
+              - file: metricbeat/metricbeat-metricset-azure-container_registry.md
+              - file: metricbeat/metricbeat-metricset-azure-container_service.md
+              - file: metricbeat/metricbeat-metricset-azure-database_account.md
+              - file: metricbeat/metricbeat-metricset-azure-monitor.md
+              - file: metricbeat/metricbeat-metricset-azure-storage.md
+          - file: metricbeat/metricbeat-module-beat.md
+            children:
+              - file: metricbeat/metricbeat-metricset-beat-state.md
+              - file: metricbeat/metricbeat-metricset-beat-stats.md
+          - file: metricbeat/metricbeat-module-benchmark.md
+            children:
+              - file: metricbeat/metricbeat-metricset-benchmark-info.md
+          - file: metricbeat/metricbeat-module-ceph.md
+            children:
+              - file: metricbeat/metricbeat-metricset-ceph-cluster_disk.md
+              - file: metricbeat/metricbeat-metricset-ceph-cluster_health.md
+              - file: metricbeat/metricbeat-metricset-ceph-cluster_status.md
+              - file: metricbeat/metricbeat-metricset-ceph-mgr_cluster_disk.md
+              - file: metricbeat/metricbeat-metricset-ceph-mgr_cluster_health.md
+              - file: metricbeat/metricbeat-metricset-ceph-mgr_osd_perf.md
+              - file: metricbeat/metricbeat-metricset-ceph-mgr_osd_pool_stats.md
+              - file: metricbeat/metricbeat-metricset-ceph-mgr_osd_tree.md
+              - file: metricbeat/metricbeat-metricset-ceph-mgr_pool_disk.md
+              - file: metricbeat/metricbeat-metricset-ceph-monitor_health.md
+              - file: metricbeat/metricbeat-metricset-ceph-osd_df.md
+              - file: metricbeat/metricbeat-metricset-ceph-osd_tree.md
+              - file: metricbeat/metricbeat-metricset-ceph-pool_disk.md
+          - file: metricbeat/metricbeat-module-cloudfoundry.md
+            children:
+              - file: metricbeat/metricbeat-metricset-cloudfoundry-container.md
+              - file: metricbeat/metricbeat-metricset-cloudfoundry-counter.md
+              - file: metricbeat/metricbeat-metricset-cloudfoundry-value.md
+          - file: metricbeat/metricbeat-module-cockroachdb.md
+            children:
+              - file: metricbeat/metricbeat-metricset-cockroachdb-status.md
+          - file: metricbeat/metricbeat-module-consul.md
+            children:
+              - file: metricbeat/metricbeat-metricset-consul-agent.md
+          - file: metricbeat/metricbeat-module-containerd.md
+            children:
+              - file: metricbeat/metricbeat-metricset-containerd-blkio.md
+              - file: metricbeat/metricbeat-metricset-containerd-cpu.md
+              - file: metricbeat/metricbeat-metricset-containerd-memory.md
+          - file: metricbeat/metricbeat-module-coredns.md
+            children:
+              - file: metricbeat/metricbeat-metricset-coredns-stats.md
+          - file: metricbeat/metricbeat-module-couchbase.md
+            children:
+              - file: metricbeat/metricbeat-metricset-couchbase-bucket.md
+              - file: metricbeat/metricbeat-metricset-couchbase-cluster.md
+              - file: metricbeat/metricbeat-metricset-couchbase-node.md
+          - file: metricbeat/metricbeat-module-couchdb.md
+            children:
+              - file: metricbeat/metricbeat-metricset-couchdb-server.md
+          - file: metricbeat/metricbeat-module-docker.md
+            children:
+              - file: metricbeat/metricbeat-metricset-docker-container.md
+              - file: metricbeat/metricbeat-metricset-docker-cpu.md
+              - file: metricbeat/metricbeat-metricset-docker-diskio.md
+              - file: metricbeat/metricbeat-metricset-docker-event.md
+              - file: metricbeat/metricbeat-metricset-docker-healthcheck.md
+              - file: metricbeat/metricbeat-metricset-docker-image.md
+              - file: metricbeat/metricbeat-metricset-docker-info.md
+              - file: metricbeat/metricbeat-metricset-docker-memory.md
+              - file: metricbeat/metricbeat-metricset-docker-network.md
+              - file: metricbeat/metricbeat-metricset-docker-network_summary.md
+          - file: metricbeat/metricbeat-module-dropwizard.md
+            children:
+              - file: metricbeat/metricbeat-metricset-dropwizard-collector.md
+          - file: metricbeat/metricbeat-module-elasticsearch.md
+            children:
+              - file: metricbeat/metricbeat-metricset-elasticsearch-ccr.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-cluster_stats.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-enrich.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-index.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-index_recovery.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-index_summary.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-ingest_pipeline.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-ml_job.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-node.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-node_stats.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-pending_tasks.md
+              - file: metricbeat/metricbeat-metricset-elasticsearch-shard.md
+          - file: metricbeat/metricbeat-module-envoyproxy.md
+            children:
+              - file: metricbeat/metricbeat-metricset-envoyproxy-server.md
+          - file: metricbeat/metricbeat-module-etcd.md
+            children:
+              - file: metricbeat/metricbeat-metricset-etcd-leader.md
+              - file: metricbeat/metricbeat-metricset-etcd-metrics.md
+              - file: metricbeat/metricbeat-metricset-etcd-self.md
+              - file: metricbeat/metricbeat-metricset-etcd-store.md
+          - file: metricbeat/metricbeat-module-gcp.md
+            children:
+              - file: metricbeat/metricbeat-metricset-gcp-billing.md
+              - file: metricbeat/metricbeat-metricset-gcp-carbon.md
+              - file: metricbeat/metricbeat-metricset-gcp-compute.md
+              - file: metricbeat/metricbeat-metricset-gcp-dataproc.md
+              - file: metricbeat/metricbeat-metricset-gcp-firestore.md
+              - file: metricbeat/metricbeat-metricset-gcp-gke.md
+              - file: metricbeat/metricbeat-metricset-gcp-loadbalancing.md
+              - file: metricbeat/metricbeat-metricset-gcp-metrics.md
+              - file: metricbeat/metricbeat-metricset-gcp-pubsub.md
+              - file: metricbeat/metricbeat-metricset-gcp-storage.md
+          - file: metricbeat/metricbeat-module-golang.md
+            children:
+              - file: metricbeat/metricbeat-metricset-golang-expvar.md
+              - file: metricbeat/metricbeat-metricset-golang-heap.md
+          - file: metricbeat/metricbeat-module-graphite.md
+            children:
+              - file: metricbeat/metricbeat-metricset-graphite-server.md
+          - file: metricbeat/metricbeat-module-haproxy.md
+            children:
+              - file: metricbeat/metricbeat-metricset-haproxy-info.md
+              - file: metricbeat/metricbeat-metricset-haproxy-stat.md
+          - file: metricbeat/metricbeat-module-http.md
+            children:
+              - file: metricbeat/metricbeat-metricset-http-json.md
+              - file: metricbeat/metricbeat-metricset-http-server.md
+          - file: metricbeat/metricbeat-module-ibmmq.md
+            children:
+              - file: metricbeat/metricbeat-metricset-ibmmq-qmgr.md
+          - file: metricbeat/metricbeat-module-iis.md
+            children:
+              - file: metricbeat/metricbeat-metricset-iis-application_pool.md
+              - file: metricbeat/metricbeat-metricset-iis-webserver.md
+              - file: metricbeat/metricbeat-metricset-iis-website.md
+          - file: metricbeat/metricbeat-module-istio.md
+            children:
+              - file: metricbeat/metricbeat-metricset-istio-citadel.md
+              - file: metricbeat/metricbeat-metricset-istio-galley.md
+              - file: metricbeat/metricbeat-metricset-istio-istiod.md
+              - file: metricbeat/metricbeat-metricset-istio-mesh.md
+              - file: metricbeat/metricbeat-metricset-istio-mixer.md
+              - file: metricbeat/metricbeat-metricset-istio-pilot.md
+              - file: metricbeat/metricbeat-metricset-istio-proxy.md
+          - file: metricbeat/metricbeat-module-jolokia.md
+            children:
+              - file: metricbeat/metricbeat-metricset-jolokia-jmx.md
+          - file: metricbeat/metricbeat-module-kafka.md
+            children:
+              - file: metricbeat/metricbeat-metricset-kafka-broker.md
+              - file: metricbeat/metricbeat-metricset-kafka-consumer.md
+              - file: metricbeat/metricbeat-metricset-kafka-consumergroup.md
+              - file: metricbeat/metricbeat-metricset-kafka-partition.md
+              - file: metricbeat/metricbeat-metricset-kafka-producer.md
+          - file: metricbeat/metricbeat-module-kibana.md
+            children:
+              - file: metricbeat/metricbeat-metricset-kibana-cluster_actions.md
+              - file: metricbeat/metricbeat-metricset-kibana-cluster_rules.md
+              - file: metricbeat/metricbeat-metricset-kibana-node_actions.md
+              - file: metricbeat/metricbeat-metricset-kibana-node_rules.md
+              - file: metricbeat/metricbeat-metricset-kibana-stats.md
+              - file: metricbeat/metricbeat-metricset-kibana-status.md
+          - file: metricbeat/metricbeat-module-kubernetes.md
+            children:
+              - file: metricbeat/metricbeat-metricset-kubernetes-apiserver.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-container.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-controllermanager.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-event.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-node.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-pod.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-proxy.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-scheduler.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_container.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_cronjob.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_daemonset.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_deployment.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_job.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_node.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_persistentvolumeclaim.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_pod.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_replicaset.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_resourcequota.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_service.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_statefulset.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_storageclass.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-system.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-volume.md
+          - file: metricbeat/metricbeat-module-kvm.md
+            children:
+              - file: metricbeat/metricbeat-metricset-kvm-dommemstat.md
+              - file: metricbeat/metricbeat-metricset-kvm-status.md
+          - file: metricbeat/metricbeat-module-linux.md
+            children:
+              - file: metricbeat/metricbeat-metricset-linux-conntrack.md
+              - file: metricbeat/metricbeat-metricset-linux-iostat.md
+              - file: metricbeat/metricbeat-metricset-linux-ksm.md
+              - file: metricbeat/metricbeat-metricset-linux-memory.md
+              - file: metricbeat/metricbeat-metricset-linux-pageinfo.md
+              - file: metricbeat/metricbeat-metricset-linux-pressure.md
+              - file: metricbeat/metricbeat-metricset-linux-rapl.md
+          - file: metricbeat/metricbeat-module-logstash.md
+            children:
+              - file: metricbeat/metricbeat-metricset-logstash-node.md
+              - file: metricbeat/metricbeat-metricset-logstash-node_stats.md
+          - file: metricbeat/metricbeat-module-memcached.md
+            children:
+              - file: metricbeat/metricbeat-metricset-memcached-stats.md
+          - file: metricbeat/metricbeat-module-meraki.md
+            children:
+              - file: metricbeat/metricbeat-metricset-meraki-device_health.md
+          - file: metricbeat/metricbeat-module-mongodb.md
+            children:
+              - file: metricbeat/metricbeat-metricset-mongodb-collstats.md
+              - file: metricbeat/metricbeat-metricset-mongodb-dbstats.md
+              - file: metricbeat/metricbeat-metricset-mongodb-metrics.md
+              - file: metricbeat/metricbeat-metricset-mongodb-replstatus.md
+              - file: metricbeat/metricbeat-metricset-mongodb-status.md
+          - file: metricbeat/metricbeat-module-mssql.md
+            children:
+              - file: metricbeat/metricbeat-metricset-mssql-performance.md
+              - file: metricbeat/metricbeat-metricset-mssql-transaction_log.md
+          - file: metricbeat/metricbeat-module-munin.md
+            children:
+              - file: metricbeat/metricbeat-metricset-munin-node.md
+          - file: metricbeat/metricbeat-module-mysql.md
+            children:
+              - file: metricbeat/metricbeat-metricset-mysql-galera_status.md
+              - file: metricbeat/_galera_status_metricset.md
+              - file: metricbeat/metricbeat-metricset-mysql-performance.md
+              - file: metricbeat/metricbeat-metricset-mysql-query.md
+              - file: metricbeat/metricbeat-metricset-mysql-status.md
+          - file: metricbeat/metricbeat-module-nats.md
+            children:
+              - file: metricbeat/metricbeat-metricset-nats-connection.md
+              - file: metricbeat/metricbeat-metricset-nats-connections.md
+              - file: metricbeat/metricbeat-metricset-nats-jetstream.md
+              - file: metricbeat/metricbeat-metricset-nats-route.md
+              - file: metricbeat/metricbeat-metricset-nats-routes.md
+              - file: metricbeat/metricbeat-metricset-nats-stats.md
+              - file: metricbeat/metricbeat-metricset-nats-subscriptions.md
+          - file: metricbeat/metricbeat-module-nginx.md
+            children:
+              - file: metricbeat/metricbeat-metricset-nginx-stubstatus.md
+          - file: metricbeat/metricbeat-module-openai.md
+            children:
+              - file: metricbeat/metricbeat-metricset-openai-usage.md
+          - file: metricbeat/metricbeat-module-openmetrics.md
+            children:
+              - file: metricbeat/metricbeat-metricset-openmetrics-collector.md
+          - file: metricbeat/metricbeat-module-oracle.md
+            children:
+              - file: metricbeat/metricbeat-metricset-oracle-performance.md
+              - file: metricbeat/metricbeat-metricset-oracle-sysmetric.md
+              - file: metricbeat/metricbeat-metricset-oracle-tablespace.md
+          - file: metricbeat/metricbeat-module-panw.md
+            children:
+              - file: metricbeat/metricbeat-metricset-panw-interfaces.md
+              - file: metricbeat/metricbeat-metricset-panw-routing.md
+              - file: metricbeat/metricbeat-metricset-panw-system.md
+              - file: metricbeat/metricbeat-metricset-panw-vpn.md
+          - file: metricbeat/metricbeat-module-php_fpm.md
+            children:
+              - file: metricbeat/metricbeat-metricset-php_fpm-pool.md
+              - file: metricbeat/metricbeat-metricset-php_fpm-process.md
+          - file: metricbeat/metricbeat-module-postgresql.md
+            children:
+              - file: metricbeat/metricbeat-metricset-postgresql-activity.md
+              - file: metricbeat/metricbeat-metricset-postgresql-bgwriter.md
+              - file: metricbeat/metricbeat-metricset-postgresql-database.md
+              - file: metricbeat/metricbeat-metricset-postgresql-statement.md
+          - file: metricbeat/metricbeat-module-prometheus.md
+            children:
+              - file: metricbeat/metricbeat-metricset-prometheus-collector.md
+              - file: metricbeat/metricbeat-metricset-prometheus-query.md
+              - file: metricbeat/metricbeat-metricset-prometheus-remote_write.md
+          - file: metricbeat/metricbeat-module-rabbitmq.md
+            children:
+              - file: metricbeat/metricbeat-metricset-rabbitmq-connection.md
+              - file: metricbeat/metricbeat-metricset-rabbitmq-exchange.md
+              - file: metricbeat/metricbeat-metricset-rabbitmq-node.md
+              - file: metricbeat/metricbeat-metricset-rabbitmq-queue.md
+              - file: metricbeat/metricbeat-metricset-rabbitmq-shovel.md
+          - file: metricbeat/metricbeat-module-redis.md
+            children:
+              - file: metricbeat/metricbeat-metricset-redis-info.md
+              - file: metricbeat/metricbeat-metricset-redis-key.md
+              - file: metricbeat/metricbeat-metricset-redis-keyspace.md
+          - file: metricbeat/metricbeat-module-redisenterprise.md
+            children:
+              - file: metricbeat/metricbeat-metricset-redisenterprise-node.md
+              - file: metricbeat/metricbeat-metricset-redisenterprise-proxy.md
+          - file: metricbeat/metricbeat-module-sql.md
+            children:
+              - file: metricbeat/_host_setup.md
+              - file: metricbeat/metricbeat-metricset-sql-query.md
+          - file: metricbeat/metricbeat-module-stan.md
+            children:
+              - file: metricbeat/metricbeat-metricset-stan-channels.md
+              - file: metricbeat/metricbeat-metricset-stan-stats.md
+              - file: metricbeat/metricbeat-metricset-stan-subscriptions.md
+          - file: metricbeat/metricbeat-module-statsd.md
+            children:
+              - file: metricbeat/_metricsets_70.md
+              - file: metricbeat/metricbeat-metricset-statsd-server.md
+          - file: metricbeat/metricbeat-module-syncgateway.md
+            children:
+              - file: metricbeat/metricbeat-metricset-syncgateway-db.md
+              - file: metricbeat/metricbeat-metricset-syncgateway-memory.md
+              - file: metricbeat/metricbeat-metricset-syncgateway-replication.md
+              - file: metricbeat/metricbeat-metricset-syncgateway-resources.md
+          - file: metricbeat/metricbeat-module-system.md
+            children:
+              - file: metricbeat/metricbeat-metricset-system-core.md
+              - file: metricbeat/metricbeat-metricset-system-cpu.md
+              - file: metricbeat/metricbeat-metricset-system-diskio.md
+              - file: metricbeat/metricbeat-metricset-system-entropy.md
+              - file: metricbeat/metricbeat-metricset-system-filesystem.md
+              - file: metricbeat/metricbeat-metricset-system-fsstat.md
+              - file: metricbeat/metricbeat-metricset-system-load.md
+              - file: metricbeat/metricbeat-metricset-system-memory.md
+              - file: metricbeat/metricbeat-metricset-system-network.md
+              - file: metricbeat/metricbeat-metricset-system-network_summary.md
+              - file: metricbeat/metricbeat-metricset-system-process.md
+              - file: metricbeat/metricbeat-metricset-system-process_summary.md
+              - file: metricbeat/metricbeat-metricset-system-raid.md
+              - file: metricbeat/metricbeat-metricset-system-service.md
+              - file: metricbeat/metricbeat-metricset-system-socket.md
+              - file: metricbeat/metricbeat-metricset-system-socket_summary.md
+              - file: metricbeat/metricbeat-metricset-system-uptime.md
+              - file: metricbeat/metricbeat-metricset-system-users.md
+          - file: metricbeat/metricbeat-module-tomcat.md
+            children:
+              - file: metricbeat/metricbeat-metricset-tomcat-cache.md
+              - file: metricbeat/metricbeat-metricset-tomcat-memory.md
+              - file: metricbeat/metricbeat-metricset-tomcat-requests.md
+              - file: metricbeat/metricbeat-metricset-tomcat-threading.md
+          - file: metricbeat/metricbeat-module-traefik.md
+            children:
+              - file: metricbeat/metricbeat-metricset-traefik-health.md
+          - file: metricbeat/metricbeat-module-uwsgi.md
+            children:
+              - file: metricbeat/metricbeat-metricset-uwsgi-status.md
+          - file: metricbeat/metricbeat-module-vsphere.md
+            children:
+              - file: metricbeat/metricbeat-metricset-vsphere-cluster.md
+              - file: metricbeat/metricbeat-metricset-vsphere-datastore.md
+              - file: metricbeat/metricbeat-metricset-vsphere-datastorecluster.md
+              - file: metricbeat/metricbeat-metricset-vsphere-host.md
+              - file: metricbeat/metricbeat-metricset-vsphere-network.md
+              - file: metricbeat/metricbeat-metricset-vsphere-resourcepool.md
+              - file: metricbeat/metricbeat-metricset-vsphere-virtualmachine.md
+          - file: metricbeat/metricbeat-module-windows.md
+            children:
+              - file: metricbeat/metricbeat-metricset-windows-perfmon.md
+              - file: metricbeat/metricbeat-metricset-windows-service.md
+              - file: metricbeat/metricbeat-metricset-windows-wmi.md
+          - file: metricbeat/metricbeat-module-zookeeper.md
+            children:
+              - file: metricbeat/metricbeat-metricset-zookeeper-connection.md
+              - file: metricbeat/metricbeat-metricset-zookeeper-mntr.md
+              - file: metricbeat/metricbeat-metricset-zookeeper-server.md
+      - file: metricbeat/exported-fields.md
+        children:
+          - file: metricbeat/exported-fields-activemq.md
+          - file: metricbeat/exported-fields-aerospike.md
+          - file: metricbeat/exported-fields-airflow.md
+          - file: metricbeat/exported-fields-apache.md
+          - file: metricbeat/exported-fields-aws.md
+          - file: metricbeat/exported-fields-awsfargate.md
+          - file: metricbeat/exported-fields-azure.md
+          - file: metricbeat/exported-fields-beat-common.md
+          - file: metricbeat/exported-fields-beat.md
+          - file: metricbeat/exported-fields-benchmark.md
+          - file: metricbeat/exported-fields-ceph.md
+          - file: metricbeat/exported-fields-cloud.md
+          - file: metricbeat/exported-fields-cloudfoundry.md
+          - file: metricbeat/exported-fields-cockroachdb.md
+          - file: metricbeat/exported-fields-common.md
+          - file: metricbeat/exported-fields-consul.md
+          - file: metricbeat/exported-fields-containerd.md
+          - file: metricbeat/exported-fields-coredns.md
+          - file: metricbeat/exported-fields-couchbase.md
+          - file: metricbeat/exported-fields-couchdb.md
+          - file: metricbeat/exported-fields-docker-processor.md
+          - file: metricbeat/exported-fields-docker.md
+          - file: metricbeat/exported-fields-dropwizard.md
+          - file: metricbeat/exported-fields-ecs.md
+          - file: metricbeat/exported-fields-elasticsearch.md
+          - file: metricbeat/exported-fields-envoyproxy.md
+          - file: metricbeat/exported-fields-etcd.md
+          - file: metricbeat/exported-fields-gcp.md
+          - file: metricbeat/exported-fields-golang.md
+          - file: metricbeat/exported-fields-graphite.md
+          - file: metricbeat/exported-fields-haproxy.md
+          - file: metricbeat/exported-fields-host-processor.md
+          - file: metricbeat/exported-fields-http.md
+          - file: metricbeat/exported-fields-ibmmq.md
+          - file: metricbeat/exported-fields-iis.md
+          - file: metricbeat/exported-fields-istio.md
+          - file: metricbeat/exported-fields-jolokia.md
+          - file: metricbeat/exported-fields-jolokia-autodiscover.md
+          - file: metricbeat/exported-fields-kafka.md
+          - file: metricbeat/exported-fields-kibana.md
+          - file: metricbeat/exported-fields-kubernetes-processor.md
+          - file: metricbeat/exported-fields-kubernetes.md
+          - file: metricbeat/exported-fields-kvm.md
+          - file: metricbeat/exported-fields-linux.md
+          - file: metricbeat/exported-fields-logstash.md
+          - file: metricbeat/exported-fields-memcached.md
+          - file: metricbeat/exported-fields-mongodb.md
+          - file: metricbeat/exported-fields-mssql.md
+          - file: metricbeat/exported-fields-munin.md
+          - file: metricbeat/exported-fields-mysql.md
+          - file: metricbeat/exported-fields-nats.md
+          - file: metricbeat/exported-fields-nginx.md
+          - file: metricbeat/exported-fields-openai.md
+          - file: metricbeat/exported-fields-openmetrics.md
+          - file: metricbeat/exported-fields-oracle.md
+          - file: metricbeat/exported-fields-panw.md
+          - file: metricbeat/exported-fields-php_fpm.md
+          - file: metricbeat/exported-fields-postgresql.md
+          - file: metricbeat/exported-fields-process.md
+          - file: metricbeat/exported-fields-prometheus.md
+          - file: metricbeat/exported-fields-prometheus-xpack.md
+          - file: metricbeat/exported-fields-rabbitmq.md
+          - file: metricbeat/exported-fields-redis.md
+          - file: metricbeat/exported-fields-redisenterprise.md
+          - file: metricbeat/exported-fields-sql.md
+          - file: metricbeat/exported-fields-stan.md
+          - file: metricbeat/exported-fields-statsd.md
+          - file: metricbeat/exported-fields-syncgateway.md
+          - file: metricbeat/exported-fields-system.md
+          - file: metricbeat/exported-fields-tomcat.md
+          - file: metricbeat/exported-fields-traefik.md
+          - file: metricbeat/exported-fields-uwsgi.md
+          - file: metricbeat/exported-fields-vsphere.md
+          - file: metricbeat/exported-fields-windows.md
+          - file: metricbeat/exported-fields-zookeeper.md
+      - file: metricbeat/monitoring.md
+        children:
+          - file: metricbeat/monitoring-internal-collection.md
+            children:
+              - file: metricbeat/configuration-monitor.md
+          - file: metricbeat/monitoring-metricbeat-collection.md
+      - file: metricbeat/securing-metricbeat.md
+        children:
+          - file: metricbeat/feature-roles.md
+            children:
+              - file: metricbeat/privileges-to-setup-beats.md
+              - file: metricbeat/privileges-to-publish-monitoring.md
+              - file: metricbeat/privileges-to-publish-events.md
+              - file: metricbeat/kibana-user-privileges.md
+              - file: metricbeat/learn-more-security.md
+          - file: metricbeat/beats-api-keys.md
+          - file: metricbeat/securing-communication-elasticsearch.md
+          - file: metricbeat/configuring-ssl-logstash.md
+          - file: metricbeat/linux-seccomp.md
+      - file: metricbeat/troubleshooting.md
+        children:
+          - file: metricbeat/getting-help.md
+          - file: metricbeat/enable-metricbeat-debugging.md
+          - file: metricbeat/understand-metricbeat-logs.md
+          - file: metricbeat/faq.md
+            children:
+              - file: metricbeat/freebsd-no-such-file.md
+              - file: metricbeat/faq-unexpected-metrics.md
+              - file: metricbeat/bandwidth-throttling.md
+              - file: metricbeat/error-loading-config.md
+              - file: metricbeat/error-found-unexpected-character.md
+              - file: metricbeat/connection-problem.md
+              - file: metricbeat/publishing-ls-fails-connection-reset-by-peer.md
+              - file: metricbeat/metadata-missing.md
+              - file: metricbeat/diff-logstash-beats.md
+              - file: metricbeat/ssl-client-fails.md
+              - file: metricbeat/monitoring-shows-fewer-than-expected-beats.md
+              - file: metricbeat/could-not-locate-index-pattern.md
+              - file: metricbeat/madvdontneed-rss.md
+      - file: metricbeat/contributing-to-beats.md
+  - file: packetbeat/index.md
+    children:
+      - file: packetbeat/packetbeat-installation-configuration.md
+      - file: packetbeat/setting-up-running.md
+        children:
+          - file: packetbeat/directory-layout.md
+          - file: packetbeat/keystore.md
+          - file: packetbeat/command-line-options.md
+          - file: packetbeat/setup-repositories.md
+          - file: packetbeat/running-on-docker.md
+          - file: packetbeat/running-with-systemd.md
+          - file: packetbeat/packetbeat-starting.md
+          - file: packetbeat/shutdown.md
+      - file: packetbeat/upgrading-packetbeat.md
+      - file: packetbeat/configuring-howto-packetbeat.md
+        children:
+          - file: packetbeat/configuration-interfaces.md
+          - file: packetbeat/configuration-flows.md
+          - file: packetbeat/configuration-protocols.md
+            children:
+              - file: packetbeat/common-protocol-options.md
+              - file: packetbeat/packetbeat-icmp-options.md
+              - file: packetbeat/packetbeat-dns-options.md
+              - file: packetbeat/packetbeat-http-options.md
+              - file: packetbeat/packetbeat-amqp-options.md
+              - file: packetbeat/configuration-cassandra.md
+              - file: packetbeat/packetbeat-memcache-options.md
+              - file: packetbeat/packetbeat-mysql-options.md
+              - file: packetbeat/packetbeat-pgsql-options.md
+              - file: packetbeat/configuration-thrift.md
+              - file: packetbeat/configuration-mongodb.md
+              - file: packetbeat/configuration-tls.md
+              - file: packetbeat/packetbeat-redis-options.md
+          - file: packetbeat/configuration-processes.md
+          - file: packetbeat/configuration-general-options.md
+          - file: packetbeat/configuration-path.md
+          - file: packetbeat/configuring-output.md
+            children:
+              - file: packetbeat/configure-cloud-id.md
+              - file: packetbeat/elasticsearch-output.md
+              - file: packetbeat/logstash-output.md
+              - file: packetbeat/kafka-output.md
+              - file: packetbeat/redis-output.md
+              - file: packetbeat/file-output.md
+              - file: packetbeat/console-output.md
+              - file: packetbeat/discard-output.md
+              - file: packetbeat/configuration-output-codec.md
+          - file: packetbeat/configuration-kerberos.md
+          - file: packetbeat/configuration-ssl.md
+          - file: packetbeat/ilm.md
+          - file: packetbeat/configuration-template.md
+          - file: packetbeat/setup-kibana-endpoint.md
+          - file: packetbeat/configuration-dashboards.md
+          - file: packetbeat/filtering-enhancing-data.md
+            children:
+              - file: packetbeat/defining-processors.md
+              - file: packetbeat/add-cloud-metadata.md
+              - file: packetbeat/add-cloudfoundry-metadata.md
+              - file: packetbeat/add-docker-metadata.md
+              - file: packetbeat/add-fields.md
+              - file: packetbeat/add-host-metadata.md
+              - file: packetbeat/add-id.md
+              - file: packetbeat/add-kubernetes-metadata.md
+              - file: packetbeat/add-labels.md
+              - file: packetbeat/add-locale.md
+              - file: packetbeat/add-network-direction.md
+              - file: packetbeat/add-nomad-metadata.md
+              - file: packetbeat/add-observer-metadata.md
+              - file: packetbeat/add-process-metadata.md
+              - file: packetbeat/add-tags.md
+              - file: packetbeat/append.md
+              - file: packetbeat/community-id.md
+              - file: packetbeat/convert.md
+              - file: packetbeat/copy-fields.md
+              - file: packetbeat/decode-base64-field.md
+              - file: packetbeat/decode-duration.md
+              - file: packetbeat/decode-json-fields.md
+              - file: packetbeat/decode-xml.md
+              - file: packetbeat/decode-xml-wineventlog.md
+              - file: packetbeat/decompress-gzip-field.md
+              - file: packetbeat/detect-mime-type.md
+              - file: packetbeat/dissect.md
+              - file: packetbeat/processor-dns.md
+              - file: packetbeat/drop-event.md
+              - file: packetbeat/drop-fields.md
+              - file: packetbeat/extract-array.md
+              - file: packetbeat/fingerprint.md
+              - file: packetbeat/include-fields.md
+              - file: packetbeat/move-fields.md
+              - file: packetbeat/rate-limit.md
+              - file: packetbeat/processor-registered-domain.md
+              - file: packetbeat/rename-fields.md
+              - file: packetbeat/replace-fields.md
+              - file: packetbeat/syslog.md
+              - file: packetbeat/processor-translate-guid.md
+              - file: packetbeat/processor-translate-sid.md
+              - file: packetbeat/truncate-fields.md
+              - file: packetbeat/urldecode.md
+          - file: packetbeat/configuring-internal-queue.md
+          - file: packetbeat/configuration-logging.md
+          - file: packetbeat/http-endpoint.md
+            children:
+              - file: packetbeat/protocol-metrics-packetbeat.md
+          - file: packetbeat/configuration-instrumentation.md
+          - file: packetbeat/configuration-feature-flags.md
+          - file: packetbeat/packetbeat-reference-yml.md
+      - file: packetbeat/howto-guides.md
+        children:
+          - file: packetbeat/packetbeat-template.md
+          - file: packetbeat/change-index-name.md
+          - file: packetbeat/load-kibana-dashboards.md
+          - file: packetbeat/packetbeat-geoip.md
+          - file: packetbeat/load-ingest-pipelines.md
+          - file: packetbeat/using-environ-vars.md
+          - file: packetbeat/configuring-ingest-node.md
+          - file: packetbeat/yaml-tips.md
+      - file: packetbeat/exported-fields.md
+        children:
+          - file: packetbeat/exported-fields-amqp.md
+          - file: packetbeat/exported-fields-beat-common.md
+          - file: packetbeat/exported-fields-cassandra.md
+          - file: packetbeat/exported-fields-cloud.md
+          - file: packetbeat/exported-fields-common.md
+          - file: packetbeat/exported-fields-dhcpv4.md
+          - file: packetbeat/exported-fields-dns.md
+          - file: packetbeat/exported-fields-docker-processor.md
+          - file: packetbeat/exported-fields-ecs.md
+          - file: packetbeat/exported-fields-flows_event.md
+          - file: packetbeat/exported-fields-host-processor.md
+          - file: packetbeat/exported-fields-http.md
+          - file: packetbeat/exported-fields-icmp.md
+          - file: packetbeat/exported-fields-jolokia-autodiscover.md
+          - file: packetbeat/exported-fields-kubernetes-processor.md
+          - file: packetbeat/exported-fields-memcache.md
+          - file: packetbeat/exported-fields-mongodb.md
+          - file: packetbeat/exported-fields-mysql.md
+          - file: packetbeat/exported-fields-nfs.md
+          - file: packetbeat/exported-fields-pgsql.md
+          - file: packetbeat/exported-fields-process.md
+          - file: packetbeat/exported-fields-raw.md
+          - file: packetbeat/exported-fields-redis.md
+          - file: packetbeat/exported-fields-sip.md
+          - file: packetbeat/exported-fields-thrift.md
+          - file: packetbeat/exported-fields-tls_detailed.md
+          - file: packetbeat/exported-fields-trans_event.md
+          - file: packetbeat/exported-fields-trans_measurements.md
+      - file: packetbeat/monitoring.md
+        children:
+          - file: packetbeat/monitoring-internal-collection.md
+            children:
+              - file: packetbeat/configuration-monitor.md
+          - file: packetbeat/monitoring-metricbeat-collection.md
+      - file: packetbeat/securing-packetbeat.md
+        children:
+          - file: packetbeat/feature-roles.md
+            children:
+              - file: packetbeat/privileges-to-setup-beats.md
+              - file: packetbeat/privileges-to-publish-monitoring.md
+              - file: packetbeat/privileges-to-publish-events.md
+              - file: packetbeat/kibana-user-privileges.md
+              - file: packetbeat/learn-more-security.md
+          - file: packetbeat/beats-api-keys.md
+          - file: packetbeat/securing-communication-elasticsearch.md
+          - file: packetbeat/configuring-ssl-logstash.md
+          - file: packetbeat/linux-seccomp.md
+      - file: packetbeat/visualizing-data-packetbeat.md
+        children:
+          - file: packetbeat/customizing-discover.md
+          - file: packetbeat/kibana-queries-filters.md
+      - file: packetbeat/troubleshooting.md
+        children:
+          - file: packetbeat/getting-help.md
+          - file: packetbeat/enable-packetbeat-debugging.md
+          - file: packetbeat/understand-packetbeat-logs.md
+          - file: packetbeat/recording-trace.md
+          - file: packetbeat/faq.md
+            children:
+              - file: packetbeat/dashboard-fields-incorrect.md
+              - file: packetbeat/packetbeat-mirror-ports.md
+              - file: packetbeat/packetbeat-loopback-interface.md
+              - file: packetbeat/packetbeat-missing-transactions.md
+              - file: packetbeat/mysql-no-data.md
+              - file: packetbeat/bandwidth-throttling.md
+              - file: packetbeat/error-loading-config.md
+              - file: packetbeat/error-found-unexpected-character.md
+              - file: packetbeat/connection-problem.md
+              - file: packetbeat/publishing-ls-fails-connection-reset-by-peer.md
+              - file: packetbeat/metadata-missing.md
+              - file: packetbeat/diff-logstash-beats.md
+              - file: packetbeat/ssl-client-fails.md
+              - file: packetbeat/monitoring-shows-fewer-than-expected-beats.md
+              - file: packetbeat/could-not-locate-index-pattern.md
+              - file: packetbeat/madvdontneed-rss.md
+              - file: packetbeat/refresh-index-pattern.md
+      - file: packetbeat/contributing-to-beats.md
+  - file: winlogbeat/index.md
+    children:
+      - file: winlogbeat/winlogbeat-installation-configuration.md
+      - file: winlogbeat/setting-up-running.md
+        children:
+          - file: winlogbeat/directory-layout.md
+          - file: winlogbeat/keystore.md
+          - file: winlogbeat/command-line-options.md
+          - file: winlogbeat/winlogbeat-starting.md
+          - file: winlogbeat/shutdown.md
+      - file: winlogbeat/upgrading-winlogbeat.md
+      - file: winlogbeat/configuring-howto-winlogbeat.md
+        children:
+          - file: winlogbeat/configuration-winlogbeat-options.md
+          - file: winlogbeat/configuration-general-options.md
+          - file: winlogbeat/configuration-path.md
+          - file: winlogbeat/configuring-output.md
+            children:
+              - file: winlogbeat/configure-cloud-id.md
+              - file: winlogbeat/elasticsearch-output.md
+              - file: winlogbeat/logstash-output.md
+              - file: winlogbeat/kafka-output.md
+              - file: winlogbeat/redis-output.md
+              - file: winlogbeat/file-output.md
+              - file: winlogbeat/console-output.md
+              - file: winlogbeat/discard-output.md
+              - file: winlogbeat/configuration-output-codec.md
+          - file: winlogbeat/configuration-kerberos.md
+          - file: winlogbeat/configuration-ssl.md
+          - file: winlogbeat/ilm.md
+          - file: winlogbeat/configuration-template.md
+          - file: winlogbeat/setup-kibana-endpoint.md
+          - file: winlogbeat/configuration-dashboards.md
+          - file: winlogbeat/filtering-enhancing-data.md
+            children:
+              - file: winlogbeat/defining-processors.md
+              - file: winlogbeat/add-cloud-metadata.md
+              - file: winlogbeat/add-cloudfoundry-metadata.md
+              - file: winlogbeat/add-docker-metadata.md
+              - file: winlogbeat/add-fields.md
+              - file: winlogbeat/add-host-metadata.md
+              - file: winlogbeat/add-id.md
+              - file: winlogbeat/add-kubernetes-metadata.md
+              - file: winlogbeat/add-labels.md
+              - file: winlogbeat/add-locale.md
+              - file: winlogbeat/add-network-direction.md
+              - file: winlogbeat/add-nomad-metadata.md
+              - file: winlogbeat/add-observer-metadata.md
+              - file: winlogbeat/add-process-metadata.md
+              - file: winlogbeat/add-tags.md
+              - file: winlogbeat/append.md
+              - file: winlogbeat/community-id.md
+              - file: winlogbeat/convert.md
+              - file: winlogbeat/copy-fields.md
+              - file: winlogbeat/decode-base64-field.md
+              - file: winlogbeat/decode-duration.md
+              - file: winlogbeat/decode-json-fields.md
+              - file: winlogbeat/decode-xml.md
+              - file: winlogbeat/decode-xml-wineventlog.md
+              - file: winlogbeat/decompress-gzip-field.md
+              - file: winlogbeat/detect-mime-type.md
+              - file: winlogbeat/dissect.md
+              - file: winlogbeat/processor-dns.md
+              - file: winlogbeat/drop-event.md
+              - file: winlogbeat/drop-fields.md
+              - file: winlogbeat/extract-array.md
+              - file: winlogbeat/fingerprint.md
+              - file: winlogbeat/include-fields.md
+              - file: winlogbeat/move-fields.md
+              - file: winlogbeat/rate-limit.md
+              - file: winlogbeat/processor-registered-domain.md
+              - file: winlogbeat/rename-fields.md
+              - file: winlogbeat/replace-fields.md
+              - file: winlogbeat/processor-script.md
+              - file: winlogbeat/syslog.md
+              - file: winlogbeat/processor-timestamp.md
+              - file: winlogbeat/processor-translate-guid.md
+              - file: winlogbeat/processor-translate-sid.md
+              - file: winlogbeat/truncate-fields.md
+              - file: winlogbeat/urldecode.md
+          - file: winlogbeat/configuring-internal-queue.md
+          - file: winlogbeat/configuration-logging.md
+          - file: winlogbeat/http-endpoint.md
+            children:
+              - file: winlogbeat/metrics-winlogbeat.md
+          - file: winlogbeat/configuration-instrumentation.md
+          - file: winlogbeat/winlogbeat-reference-yml.md
+      - file: winlogbeat/howto-guides.md
+        children:
+          - file: winlogbeat/winlogbeat-geoip.md
+          - file: winlogbeat/winlogbeat-template.md
+          - file: winlogbeat/change-index-name.md
+          - file: winlogbeat/load-kibana-dashboards.md
+          - file: winlogbeat/load-ingest-pipelines.md
+          - file: winlogbeat/using-environ-vars.md
+          - file: winlogbeat/configuring-ingest-node.md
+          - file: winlogbeat/yaml-tips.md
+      - file: winlogbeat/winlogbeat-modules.md
+        children:
+          - file: winlogbeat/winlogbeat-module-powershell.md
+          - file: winlogbeat/winlogbeat-module-security.md
+          - file: winlogbeat/winlogbeat-module-sysmon.md
+      - file: winlogbeat/exported-fields.md
+        children:
+          - file: winlogbeat/exported-fields-beat-common.md
+          - file: winlogbeat/exported-fields-cloud.md
+          - file: winlogbeat/exported-fields-docker-processor.md
+          - file: winlogbeat/exported-fields-ecs.md
+          - file: winlogbeat/exported-fields-eventlog.md
+          - file: winlogbeat/exported-fields-host-processor.md
+          - file: winlogbeat/exported-fields-jolokia-autodiscover.md
+          - file: winlogbeat/exported-fields-kubernetes-processor.md
+          - file: winlogbeat/exported-fields-powershell.md
+          - file: winlogbeat/exported-fields-process.md
+          - file: winlogbeat/exported-fields-security.md
+          - file: winlogbeat/exported-fields-sysmon.md
+          - file: winlogbeat/exported-fields-winlog.md
+      - file: winlogbeat/monitoring.md
+        children:
+          - file: winlogbeat/monitoring-internal-collection.md
+            children:
+              - file: winlogbeat/configuration-monitor.md
+          - file: winlogbeat/monitoring-metricbeat-collection.md
+      - file: winlogbeat/securing-winlogbeat.md
+        children:
+          - file: winlogbeat/feature-roles.md
+            children:
+              - file: winlogbeat/privileges-to-setup-beats.md
+              - file: winlogbeat/privileges-to-publish-monitoring.md
+              - file: winlogbeat/privileges-to-publish-events.md
+              - file: winlogbeat/kibana-user-privileges.md
+              - file: winlogbeat/learn-more-security.md
+          - file: winlogbeat/beats-api-keys.md
+          - file: winlogbeat/securing-communication-elasticsearch.md
+          - file: winlogbeat/configuring-ssl-logstash.md
+      - file: winlogbeat/troubleshooting.md
+        children:
+          - file: winlogbeat/getting-help.md
+          - file: winlogbeat/enable-winlogbeat-debugging.md
+          - file: winlogbeat/understand-winlogbeat-logs.md
+          - file: winlogbeat/faq.md
+            children:
+              - file: winlogbeat/dashboard-fields-incorrect.md
+              - file: winlogbeat/bogus-computer-name-fields.md
+              - file: winlogbeat/error-loading-config.md
+              - file: winlogbeat/error-found-unexpected-character.md
+              - file: winlogbeat/connection-problem.md
+              - file: winlogbeat/publishing-ls-fails-connection-reset-by-peer.md
+              - file: winlogbeat/metadata-missing.md
+              - file: winlogbeat/diff-logstash-beats.md
+              - file: winlogbeat/ssl-client-fails.md
+              - file: winlogbeat/monitoring-shows-fewer-than-expected-beats.md
+              - file: winlogbeat/could-not-locate-index-pattern.md
+              - file: winlogbeat/madvdontneed-rss.md
+              - file: winlogbeat/reading-from-evtx.md
+      - file: winlogbeat/contributing-to-beats.md
+  - file: libbeat/upgrading.md
+  - file: libbeat/community-beats.md
+  - file: libbeat/contributing-to-beats.md
+  - file: loggingplugin/index.md
+    children:
+      - file: loggingplugin/log-driver-installation.md
+      - file: loggingplugin/log-driver-configuration.md
+      - file: loggingplugin/log-driver-usage-examples.md
+      - file: loggingplugin/log-driver-limitations.md

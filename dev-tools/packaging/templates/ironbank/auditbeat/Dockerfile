@@ -4,7 +4,7 @@
 ################################################################################
 ARG BASE_REGISTRY=registry1.dsop.io
 ARG BASE_IMAGE=redhat/ubi/ubi9
-ARG BASE_TAG=9.4
+ARG BASE_TAG=9.5
 
 FROM ${BASE_REGISTRY}/${BASE_IMAGE}:${BASE_TAG} as builder
 
@@ -80,7 +80,7 @@ ENV ELASTIC_PRODUCT=${ELASTIC_PRODUCT}
 
 # TODO: eventually /tinit will be replaced by /usr/bin/tini
 ENTRYPOINT ["/tinit", "--", "/usr/share/auditbeat/auditbeat", "-E", "http.enabled=true", "-E", "http.host=unix:///usr/share/auditbeat/data/auditbeat.sock"]
-CMD ["-environment", "container"]
+CMD ["--environment", "container"]
 
 # see https://www.elastic.co/guide/en/beats/auditbeat/current/http-endpoint.html
 HEALTHCHECK --interval=10s --timeout=5s --start-period=1m --retries=5 CMD curl -I -f --max-time 5 --unix-socket '/usr/share/auditbeat/data/auditbeat.sock' 'http:/stats?pretty'

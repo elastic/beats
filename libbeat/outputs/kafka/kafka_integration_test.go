@@ -23,15 +23,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"os"
 	"strconv"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -40,7 +41,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -55,9 +56,8 @@ type eventInfo struct {
 }
 
 func TestKafkaPublish(t *testing.T) {
-	logp.TestingSetup(logp.WithSelectors("kafka"))
 
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	id := strconv.Itoa(rand.Int())
 	testTopic := fmt.Sprintf("test-libbeat-%s", id)
 	logType := fmt.Sprintf("log-type-%s", id)
 
@@ -273,14 +273,15 @@ func TestKafkaPublish(t *testing.T) {
 		}
 
 		t.Run(name, func(t *testing.T) {
-			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"}, outputs.NewNilObserver(), cfg)
+			logger := logptest.NewTestingLogger(t, "")
+			grp, err := makeKafka(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat", Logger: logger}, outputs.NewNilObserver(), cfg)
 			if err != nil {
 				t.Fatal(err)
 			}
 
 			output, ok := grp.Clients[0].(*client)
 			assert.True(t, ok, "grp.Clients[0] didn't contain a ptr to client")
-			if err := output.Connect(); err != nil {
+			if err := output.Connect(context.Background()); err != nil {
 				t.Fatal(err)
 			}
 			assert.Equal(t, output.index, "testbeat")
@@ -318,7 +319,7 @@ func TestKafkaPublish(t *testing.T) {
 
 			validate := validateJSON
 			if fmt, exists := test.config["codec.format.string"]; exists {
-				validate = makeValidateFmtStr(fmt.(string))
+				validate = makeValidateFmtStr(fmt.(string)) //nolint:errcheck //This is a test file
 			}
 
 			cfgHeaders, headersSet := test.config["headers"]

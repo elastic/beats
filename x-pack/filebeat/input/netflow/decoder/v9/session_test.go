@@ -5,12 +5,12 @@
 package v9
 
 import (
-	"io"
-	"log"
 	"math"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
 
@@ -18,13 +18,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
-var logger = log.New(io.Discard, "", 0)
+func init() {
+	logp.TestingSetup()
+}
 
 func makeSessionKey(t testing.TB, ipPortPair string, domain uint32) SessionKey {
 	return MakeSessionKey(test.MakeAddress(t, ipPortPair), domain, false)
 }
 
 func TestSessionMap_GetOrCreate(t *testing.T) {
+	var logger = logp.NewLogger("session_map")
 	t.Run("consistent behavior", func(t *testing.T) {
 		sm := NewSessionMap(logger, nil)
 
@@ -101,7 +104,7 @@ func testTemplate(id uint16) *template.Template {
 }
 
 func TestSessionState(t *testing.T) {
-	logger := log.New(io.Discard, "", 0)
+	var logger = logp.NewLogger("session_state")
 	t.Run("create and get", func(t *testing.T) {
 		s := NewSession(logger)
 		t1 := testTemplate(1)
@@ -133,7 +136,7 @@ func TestSessionState(t *testing.T) {
 }
 
 func TestSessionMap_Cleanup(t *testing.T) {
-	sm := NewSessionMap(logger, nil)
+	sm := NewSessionMap(logp.L(), nil)
 
 	// Session is created
 	k1 := makeSessionKey(t, "127.0.0.1:1234", 1)
@@ -180,7 +183,7 @@ func TestSessionMap_Cleanup(t *testing.T) {
 
 func TestSessionMap_CleanupLoop(t *testing.T) {
 	timeout := time.Millisecond * 100
-	sm := NewSessionMap(log.New(io.Discard, "", 0), nil)
+	sm := NewSessionMap(logp.NewLogger(""), nil)
 	key := makeSessionKey(t, "127.0.0.1:1", 42)
 	s := sm.GetOrCreate(key)
 
@@ -201,7 +204,7 @@ func TestSessionMap_CleanupLoop(t *testing.T) {
 }
 
 func TestTemplateExpiration(t *testing.T) {
-	s := NewSession(logger)
+	s := NewSession(logp.L())
 	assert.Nil(t, s.GetTemplate(256))
 	assert.Nil(t, s.GetTemplate(257))
 	s.AddTemplate(testTemplate(256))
@@ -263,7 +266,7 @@ func TestSessionCheckReset(t *testing.T) {
 		},
 	} {
 		t.Run(testCase.title, func(t *testing.T) {
-			s := NewSession(logger)
+			s := NewSession(logp.L())
 			s.lastSequence = testCase.current
 			prev, isReset := s.CheckReset(testCase.next)
 			assert.Equal(t, prev, testCase.current)

@@ -5,6 +5,7 @@
       "version": "1.12.0"
     },
     "event": {
+      "action": "Image loaded (rule: ImageLoad)",
       "category": [
         "process"
       ],
@@ -46,8 +47,9 @@
     "log": {
       "level": "information"
     },
+    "message": "Image loaded:\nRuleName: -\nUtcTime: 2020-10-28 02:39:26.374\nProcessGuid: {9F32B55F-D9DE-5F98-F006-000000000600}\nProcessId: 0\nImage: C:\\Windows\\System32\\dllhost.exe\nImageLoaded: C:\\Windows\\System32\\IDStore.dll\nFileVersion: 10.0.17763.1 (WinBuild.160101.0800)\nDescription: Identity Store\nProduct: Microsoft® Windows® Operating System\nCompany: Microsoft Corporation\nOriginalFileName: IdStore.dll\nHashes: SHA1=9955A1C071C44A7CEECC0D928A9CFB7F64CC3F93,MD5=C7C45610F644906E6F7D664EF2E45B08,SHA256=4808F1101F4E42387D8DDB7A355668BAE3BF6F781C42D3BCD82E23446B1DEB3E,IMPHASH=194F3797B52231028C718B6D776C6853\nSigned: true\nSignature: Microsoft Windows\nSignatureStatus: Valid\nUser: %16",
     "process": {
-      "entity_id": "{9f32b55f-d9de-5f98-f006-000000000600}",
+      "entity_id": "{9F32B55F-D9DE-5F98-F006-000000000600}",
       "executable": "C:\\Windows\\System32\\dllhost.exe",
       "name": "dllhost.exe",
       "pid": 5184
@@ -64,7 +66,6 @@
       "id": "S-1-5-18"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant",
       "event_data": {
@@ -84,9 +85,10 @@
           "id": 4796
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": "10685",
+      "task": "Image loaded (rule: ImageLoad)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",

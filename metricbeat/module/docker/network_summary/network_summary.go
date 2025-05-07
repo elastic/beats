@@ -84,7 +84,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 
-	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout)
+	stats, err := docker.FetchStats(m.dockerClient, m.Module().Config().Timeout, false, m.Logger())
 	if err != nil {
 		return fmt.Errorf("failed to get docker stats: %w", err)
 	}

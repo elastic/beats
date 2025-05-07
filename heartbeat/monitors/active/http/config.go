@@ -19,6 +19,7 @@ package http
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -137,7 +138,7 @@ func (r *responseConfig) Validate() error {
 // Validate validates of the requestParameters object is valid or not
 func (r *requestParameters) Validate() error {
 	switch strings.ToUpper(r.Method) {
-	case "HEAD", "GET", "POST", "OPTIONS":
+	case http.MethodOptions, http.MethodHead, http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodConnect, http.MethodTrace:
 	default:
 		return fmt.Errorf("HTTP method '%v' not supported", r.Method)
 	}

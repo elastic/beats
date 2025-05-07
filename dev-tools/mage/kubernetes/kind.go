@@ -19,7 +19,8 @@ package kubernetes
 
 import (
 	"fmt"
-	"io/ioutil"
+	"go/build"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -66,8 +67,8 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 	}
 
 	clusterName := kubernetesClusterName()
-	stdOut := ioutil.Discard
-	stdErr := ioutil.Discard
+	stdOut := io.Discard
+	stdErr := io.Discard
 	if mg.Verbose() {
 		stdOut = os.Stdout
 		stdErr = os.Stderr
@@ -86,9 +87,29 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 		return err
 	}
 
+	cfg, err := os.CreateTemp("", "kind-")
+	if err != nil {
+		return err
+	}
+	if _, err := cfg.WriteString(fmt.Sprintf(`
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: %s
+        containerPath: /go/pkg/mod
+`, filepath.Join(build.Default.GOPATH, "pkg", "mod"))); err != nil {
+		return err
+	}
+	if err := cfg.Close(); err != nil {
+		return err
+	}
+
 	args := []string{
 		"create",
 		"cluster",
+		"--config", cfg.Name(),
 		"--name", clusterName,
 		"--kubeconfig", kubeConfig,
 		"--wait",
@@ -116,8 +137,8 @@ func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 
 // Teardown destroys the kubernetes cluster.
 func (m *KindIntegrationTestStep) Teardown(env map[string]string) error {
-	stdOut := ioutil.Discard
-	stdErr := ioutil.Discard
+	stdOut := io.Discard
+	stdErr := io.Discard
 	if mg.Verbose() {
 		stdOut = os.Stdout
 		stdErr = os.Stderr

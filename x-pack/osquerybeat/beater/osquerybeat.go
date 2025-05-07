@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	lru "github.com/hashicorp/golang-lru"
+	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/osquery/osquery-go"
 	kconfig "github.com/osquery/osquery-go/plugin/config"
 	klogger "github.com/osquery/osquery-go/plugin/logger"
@@ -46,7 +46,7 @@ const (
 	configurationRefreshIntervalSecs = 60
 
 	osqueryTimeout    = 1 * time.Minute
-	osqueryMaxTimeout = 15 * time.Minute
+	osqueryMaxTimeout = 24 * time.Hour
 )
 
 const (
@@ -254,7 +254,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	socketPath := osq.SocketPath()
 
 	// Create a cache for queries types resolution
-	cache, err := lru.New(adhocOsqueriesTypesCacheSize)
+	cache, err := lru.New[string, map[string]string](adhocOsqueriesTypesCacheSize)
 	if err != nil {
 		bt.log.Errorf("Failed to create osquery query results types cache: %v", err)
 		return err

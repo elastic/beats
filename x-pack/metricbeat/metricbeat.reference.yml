@@ -142,6 +142,11 @@ metricbeat.modules:
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
 
+  # This option enables the use of performance counters to collect data for cpu/core metricset.
+  # Only effective for Windows.
+  # You should use this option if running beats on machins with more than 64 cores.
+  #use_performance_counters: false
+
 #------------------------------- ActiveMQ Module -------------------------------
 - module: activemq
   metricsets: ['broker', 'queue', 'topic']
@@ -404,6 +409,14 @@ metricbeat.modules:
   # Monitoring instead of metricbeat-* indices.
   #xpack.enabled: false
 
+#------------------------------ Benchmark Module ------------------------------
+- module: benchmark
+  metricsets:
+    - info
+  enabled: false
+  period: 10s
+
+
 #--------------------------------- Ceph Module ---------------------------------
 # Metricsets depending on the Ceph REST API (default port: 5000)
 - module: ceph
@@ -513,6 +526,9 @@ metricbeat.modules:
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
 
+  # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
+  # podman: false
+
   # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 
   # or other configurations where virtual disks will sum metrics from other disks.
@@ -560,15 +576,6 @@ metricbeat.modules:
   #xpack.enabled: false
   #scope: node
 
-#-------------------------- Enterprise Search Module --------------------------
-- module: enterprisesearch
-  metricsets: ["health", "stats"]
-  enabled: true
-  period: 10s
-  hosts: ["http://localhost:3002"]
-  #username: "user"
-  #password: "secret"
-
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
@@ -596,7 +603,6 @@ metricbeat.modules:
     - pubsub
     - loadbalancing
     - firestore
-    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -618,6 +624,7 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  location_label: "resource.labels.zone"
   metrics:
     - aligner: ALIGN_NONE
       service: compute
@@ -654,6 +661,16 @@ metricbeat.modules:
   endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
+
+- module: gcp
+  metricsets:
+    - dataproc
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  collect_dataproc_user_labels: true
 
 #-------------------------------- Golang Module --------------------------------
 - module: golang
@@ -979,6 +996,7 @@ metricbeat.modules:
     - state_persistentvolume
     - state_persistentvolumeclaim
     - state_storageclass
+    # - state_horizontalpodautoscaler
     # Uncomment this to get k8s events:
     #- event  period: 10s
   hosts: ["kube-state-metrics:8080"]
@@ -1246,6 +1264,7 @@ metricbeat.modules:
     - "subscriptions"
     #- "connection"
     #- "route"
+    #- "jetstream"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
@@ -1254,6 +1273,24 @@ metricbeat.modules:
   #subscriptions.metrics_path: "/subsz"
   #connection.metrics_path: "/connz"
   #route.metrics_path: "/routez"
+  #jetstream:
+  #  stats:
+  #    enabled: true
+  #  account:
+  #    enabled: true
+  #    names:
+  #      - default
+  #  stream:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1
+  #      - another-stream
+  #  consumer:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1-consumer-1
+  #      - my-stream-1-consumer-2
+  #      - another-stream-consumer-1
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -1266,6 +1303,42 @@ metricbeat.modules:
 
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
+
+#-------------------------------- Openai Module --------------------------------
+- module: openai
+  metricsets: ["usage"]
+  enabled: false
+  period: 1h
+
+  # # Project API Keys - Multiple API keys can be specified for different projects
+  # api_keys:
+  # - key: "api_key1"
+  # - key: "api_key2"
+
+  # # API Configuration
+  # ## Base URL for the OpenAI usage API endpoint
+  # api_url: "https://api.openai.com/v1/usage"
+  # ## Custom headers to be included in API requests
+  # headers:
+  # - "k1: v1"
+  # - "k2: v2"
+  ## Rate Limiting Configuration
+  # rate_limit:
+  #   limit: 12 # seconds between requests
+  #   burst: 1  # max concurrent requests
+  # ## Request Timeout Duration
+  # timeout: 30s
+
+  # # Data Collection Configuration
+  # collection:
+  #   ## Number of days to look back when collecting usage data
+  #   lookback_days: 30
+  #   ## Whether to collect usage data in realtime. Defaults to false as how
+  #   # OpenAI usage data is collected will end up adding duplicate data to ES
+  #   # and also making it harder to do analytics. Best approach is to avoid
+  #   # realtime collection and collect only upto last day (in UTC). So, there's
+  #   # at most 24h delay.
+  #   realtime: false
 
 #----------------------------- Openmetrics Module -----------------------------
 - module: openmetrics
@@ -1668,6 +1741,34 @@ metricbeat.modules:
   metricsets: ["service"]
   enabled: true
   period: 60s
+
+- module: windows
+  metricsets: ["wmi"]
+  period: 10m
+  wmi:
+    # Do not include the query string in the output
+    include_queries: false
+    # Exclude properties with null values from the output
+    include_null_properties: false
+    # Exclude properties with empty string values from the output
+    include_empty_string_properties: false
+    # Maximum time to wait for a query result before logging a warning (defaults to period)
+    warning_threshold: 10m
+    # Default WMI namespace for all queries (if not specified per query)
+    # Uncomment to override the default, which is "root\\cimv2".
+    # namespace: "root\\cimv2"
+    queries:
+    - class: Win32_OperatingSystem          # FROM: Class to fetch
+      properties:                           # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
+       - FreePhysicalMemory
+       - FreeSpaceInPagingFiles
+       - FreeVirtualMemory
+       - LocalDateTime
+       - NumberOfUsers
+      where: ""                             # Optional WHERE clause to filter query results
+      # Override the WMI namespace for this specific query (optional).
+      # If set, this takes precedence over the default namespace above.
+      # namespace: "root\\cimv2" # Overrides the metric
 
 #------------------------------ ZooKeeper Module ------------------------------
 - module: zookeeper
@@ -3075,7 +3176,7 @@ logging.files:
   #path: /var/log/metricbeat
 
   # The name of the files where the logs are written to.
-  #name: metricbeat-event-data
+  #name: metricbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

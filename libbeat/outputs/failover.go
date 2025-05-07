@@ -21,7 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"

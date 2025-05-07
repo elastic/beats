@@ -14,6 +14,9 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -22,6 +25,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -32,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/testing/certutil"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management/tests"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
@@ -213,9 +218,11 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 				nextState()
 			}
 			for _, unit := range observed.GetUnits() {
-				if state := unit.GetState(); !(state == proto.State_HEALTHY || state != proto.State_CONFIGURING || state == proto.State_STARTING) {
-					t.Fatalf("Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
+				expected := []proto.State{proto.State_HEALTHY, proto.State_CONFIGURING, proto.State_STARTING}
+				if !waiting {
+					expected = append(expected, proto.State_STOPPING)
 				}
+				require.Containsf(t, expected, unit.GetState(), "Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
 			}
 			return &proto.CheckinExpected{
 				Units: units[idx],
@@ -232,50 +239,15 @@ func TestInputReloadUnderElasticAgent(t *testing.T) {
 		"-E", "management.enabled=true",
 	)
 
-	// waitDeadlineOr5Mins looks at the test deadline
-	// and returns a reasonable value of waiting for a
-	// condition to be met. The possible values are:
-	// - if no test deadline is set, return 5 minutes
-	// - if a deadline is set and there is less than
-	//   0.5 second left, return the time left
-	// - otherwise return the time left minus 0.5 second.
-	waitDeadlineOr5Min := func() time.Duration {
-		deadline, deadileSet := t.Deadline()
-		if deadileSet {
-			left := time.Until(deadline)
-			final := left - 500*time.Millisecond
-			if final <= 0 {
-				return left
-			}
-			return final
-		}
-		return 5 * time.Minute
+	for _, contains := range []string{
+		"Can only start an input when all related states are finished",
+		"file 'flog.log' is not finished, will retry starting the input soon",
+		"ForceReload set to TRUE",
+		"Reloading Beats inputs because forceReload is true",
+		"ForceReload set to FALSE",
+	} {
+		checkFilebeatLogs(t, filebeat, contains)
 	}
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("Can only start an input when all related states are finished")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
-		"String 'Can only start an input when all related states are finished' not found on Filebeat logs")
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("file 'flog.log' is not finished, will retry starting the input soon")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
-		"String 'file 'flog.log' is not finished, will retry starting the input soon' not found on Filebeat logs")
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("ForceReload set to TRUE")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
-		"String 'ForceReload set to TRUE' not found on Filebeat logs")
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("Reloading Beats inputs because forceReload is true")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
-		"String 'Reloading Beats inputs because forceReload is true' not found on Filebeat logs")
-
-	require.Eventually(t, func() bool {
-		return filebeat.LogContains("ForceReload set to FALSE")
-	}, waitDeadlineOr5Min(), 100*time.Millisecond,
-		"String 'ForceReload set to FALSE' not found on Filebeat logs")
 }
 
 // TestFailedOutputReportsUnhealthy ensures that if an output
@@ -829,4 +801,274 @@ func writeStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
 
 	_, err = w.Write(infoBytes)
 	require.NoError(t, err, "failed to write connection information")
+}
+
+// Response structure for JSON
+type response struct {
+	Message   string `json:"message"`
+	Published string `json:"published"`
+}
+
+func TestHTTPJSONInputReloadUnderElasticAgentWithElasticStateStore(t *testing.T) {
+	// First things first, ensure ES is running and we can connect to it.
+	// If ES is not running, the test will timeout and the only way to know
+	// what caused it is going through Filebeat's logs.
+	integration.EnsureESIsRunning(t)
+
+	// Create a test httpjson server for httpjson input
+	h := serverHelper{t: t}
+	defer func() {
+		assert.GreaterOrEqual(t, h.called, 2, "HTTP server should be called at least twice")
+	}()
+	testServer := httptest.NewServer(http.HandlerFunc(h.handler))
+	defer testServer.Close()
+
+	inputID := "httpjson-generic-" + uuid.Must(uuid.NewV4()).String()
+	inputUnit := &proto.UnitExpected{
+		Id:             inputID,
+		Type:           proto.UnitType_INPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id: inputID,
+			Source: tests.RequireNewStruct(map[string]any{
+				"id":      inputID,
+				"type":    "httpjson",
+				"name":    "httpjson-1",
+				"enabled": true,
+			}),
+			Type: "httpjson",
+			Name: "httpjson-1",
+			Streams: []*proto.Stream{
+				{
+					Id: inputID,
+					Source: integration.RequireNewStruct(t, map[string]any{
+						"id":             inputID,
+						"enabled":        true,
+						"type":           "httpjson",
+						"interval":       "5s",
+						"request.url":    testServer.URL,
+						"request.method": "GET",
+						"request.transforms": []any{
+							map[string]any{
+								"set": map[string]any{
+									"target":  "url.params.since",
+									"value":   "[[.cursor.published]]",
+									"default": `[[formatDate (now (parseDuration "-24h")) "RFC3339"]]`,
+								},
+							},
+						},
+						"cursor": map[string]any{
+							"published": map[string]any{
+								"value": "[[.last_event.published]]",
+							},
+						},
+					}),
+				},
+			},
+		},
+	}
+	units := [][]*proto.UnitExpected{
+		{outputUnitES(t, 1), inputUnit},
+		{outputUnitES(t, 2), inputUnit},
+	}
+
+	idx := 0
+	waiting := false
+	when := time.Now()
+
+	final := atomic.Bool{}
+	nextState := func() {
+		if waiting {
+			if time.Now().After(when) {
+				t.Log("Next state")
+				idx = (idx + 1) % len(units)
+				waiting = false
+				h.notifyChange()
+				return
+			}
+			return
+		}
+		waiting = true
+		when = time.Now().Add(10 * time.Second)
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			if management.DoesStateMatch(observed, units[idx], 0) {
+				if idx < len(units)-1 {
+					nextState()
+				} else {
+					final.Store(true)
+				}
+			}
+			for _, unit := range observed.GetUnits() {
+				expected := []proto.State{proto.State_HEALTHY, proto.State_CONFIGURING, proto.State_STARTING}
+				if !waiting {
+					expected = append(expected, proto.State_STOPPING)
+				}
+				require.Containsf(t, expected, unit.GetState(), "Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
+			}
+			return &proto.CheckinExpected{
+				Units: units[idx],
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	require.NoError(t, server.Start())
+	t.Cleanup(server.Stop)
+
+	t.Setenv("AGENTLESS_ELASTICSEARCH_STATE_STORE_INPUT_TYPES", "httpjson,cel")
+	filebeat := NewFilebeat(t)
+	filebeat.RestartOnBeatOnExit = true
+	filebeat.Start(
+		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
+		"-E", "management.enabled=true",
+		"-E", "management.restart_on_output_change=true",
+	)
+
+	for _, contains := range []string{
+		"Configuring ES store",
+		"input-cursor::openStore: prefix: httpjson inputID: " + inputID,
+		"input-cursor store read 0 keys", // first, no previous data exists
+		"input-cursor store read 1 keys", // after the restart, previous key is read
+	} {
+		checkFilebeatLogs(t, filebeat, contains)
+	}
+
+	require.Eventually(t,
+		final.Load,
+		waitDeadlineOr5Min(t),
+		100*time.Millisecond,
+		"Failed to reach the final state",
+	)
+}
+
+type serverHelper struct {
+	t            *testing.T
+	lock         sync.Mutex
+	previous     time.Time
+	called       int
+	stateChanged bool
+}
+
+func (h *serverHelper) verifyTime(since time.Time) time.Time {
+	h.lock.Lock()
+	defer h.lock.Unlock()
+
+	h.called++
+
+	if h.previous.IsZero() {
+		assert.WithinDurationf(h.t, time.Now().Add(-24*time.Hour), since, 15*time.Minute, "since should be ~24h ago")
+	} else {
+		// XXX: `since` field is expected to be equal to the last published time. However, between unit restarts, the last
+		// updated field might not be persisted successfully. As a workaround, we allow a larger delta between restarts.
+		// However, we are still checking that the `since` field is not too far in the past, like 24h ago which is the
+		// initial value.
+		assert.WithinDurationf(h.t, h.previous, since, h.getDelta(since), "since should re-use last value")
+	}
+	h.previous = time.Now()
+	return h.previous
+}
+
+func (h *serverHelper) getDelta(actual time.Time) time.Duration {
+	const delta = 1 * time.Second
+	if !h.stateChanged {
+		return delta
+	}
+
+	dt := h.previous.Sub(actual)
+	if dt < -delta || dt > delta {
+		h.stateChanged = false
+		return time.Minute
+	}
+	return delta
+}
+
+func (h *serverHelper) handler(w http.ResponseWriter, r *http.Request) {
+	since := parseParams(h.t, r.RequestURI)
+	published := h.verifyTime(since)
+
+	w.Header().Set("Content-Type", "application/json")
+	err := json.NewEncoder(w).Encode(response{
+		Message:   "Hello",
+		Published: published.Format(time.RFC3339),
+	})
+	require.NoError(h.t, err)
+}
+
+func (h *serverHelper) notifyChange() {
+	h.lock.Lock()
+	defer h.lock.Unlock()
+	h.stateChanged = true
+}
+
+func parseParams(t *testing.T, uri string) time.Time {
+	myUrl, err := url.Parse(uri)
+	require.NoError(t, err)
+	params, err := url.ParseQuery(myUrl.RawQuery)
+	require.NoError(t, err)
+	since := params["since"]
+	require.NotEmpty(t, since)
+	sinceStr := since[0]
+	sinceTime, err := time.Parse(time.RFC3339, sinceStr)
+	require.NoError(t, err)
+	return sinceTime
+}
+
+func checkFilebeatLogs(t *testing.T, filebeat *integration.BeatProc, contains string) {
+	t.Helper()
+	const tick = 100 * time.Millisecond
+
+	require.Eventually(t,
+		func() bool { return filebeat.LogContains(contains) },
+		waitDeadlineOr5Min(t),
+		tick,
+		fmt.Sprintf("String '%s' not found on Filebeat logs", contains),
+	)
+}
+
+// waitDeadlineOr5Min looks at the test deadline and returns a reasonable value of waiting for a condition to be met.
+// The possible values are:
+// - if no test deadline is set, return 5 minutes
+// - if a deadline is set and there is less than 0.5 second left, return the time left
+// - otherwise return the time left minus 0.5 second.
+func waitDeadlineOr5Min(t *testing.T) time.Duration {
+	deadline, deadlineSet := t.Deadline()
+	if !deadlineSet {
+		return 5 * time.Minute
+	}
+	left := time.Until(deadline)
+	final := left - 500*time.Millisecond
+	if final <= 0 {
+		return left
+	}
+	return final
+}
+
+func outputUnitES(t *testing.T, id int) *proto.UnitExpected {
+	return &proto.UnitExpected{
+		Id:             fmt.Sprintf("output-unit-%d", id),
+		Type:           proto.UnitType_OUTPUT,
+		ConfigStateIdx: 1,
+		State:          proto.State_HEALTHY,
+		LogLevel:       proto.UnitLogLevel_DEBUG,
+		Config: &proto.UnitExpectedConfig{
+			Id:   "default",
+			Type: "elasticsearch",
+			Name: fmt.Sprintf("elasticsearch-%d", id),
+			Source: integration.RequireNewStruct(t,
+				map[string]interface{}{
+					"type":                 "elasticsearch",
+					"hosts":                []interface{}{"http://localhost:9200"},
+					"username":             "admin",
+					"password":             "testing",
+					"protocol":             "http",
+					"enabled":              true,
+					"allow_older_versions": true,
+				}),
+		},
+	}
 }

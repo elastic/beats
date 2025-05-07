@@ -71,16 +71,6 @@ func CrossBuild() error {
 	return devtools.CrossBuild()
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
-}
-
 // UnitTest executes the unit tests (Go and Python).
 func UnitTest() {
 	mg.SerialDeps(GoUnitTest, PythonUnitTest)
@@ -96,6 +86,17 @@ func GoUnitTest(ctx context.Context) error {
 		args.ExtraFlags = append(args.ExtraFlags, "-ldflags=-w")
 	}
 	return devtools.GoTest(ctx, args)
+}
+
+// GoFIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests
+func GoFIPSOnlyUnitTest() error {
+	ctx := context.Background()
+
+	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
+	if isWindows32bitRunner() {
+		fipsArgs.ExtraFlags = append(fipsArgs.ExtraFlags, "-ldflags=-w")
+	}
+	return devtools.GoTest(ctx, fipsArgs)
 }
 
 // PythonUnitTest executes the python system tests.
@@ -164,7 +165,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 
 	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 

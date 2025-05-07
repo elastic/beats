@@ -19,12 +19,11 @@ package diskqueue
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type addFramesTestStep struct {
@@ -238,12 +237,7 @@ func TestAddFrames(t *testing.T) {
 }
 
 func runAddFramesTest(t *testing.T, name string, test addFramesTest) {
-	dir, err := ioutil.TempDir("", "diskqueue_acks_test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
-
+	dir := t.TempDir()
 	path := filepath.Join(dir, "state.dat")
 	stateFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
@@ -251,7 +245,8 @@ func runAddFramesTest(t *testing.T, name string, test addFramesTest) {
 	}
 	defer stateFile.Close()
 
-	dqa := newDiskQueueACKs(logp.L(), test.position, stateFile)
+	logger := logptest.NewTestingLogger(t, "")
+	dqa := newDiskQueueACKs(logger, test.position, stateFile)
 	dqa.nextFrameID = test.frameID
 	for _, step := range test.steps {
 		prefix := fmt.Sprintf("[%v] %v", name, step.description)

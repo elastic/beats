@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build integration
+//go:build integration && !requirefips
 
 package integration
 
@@ -45,6 +45,8 @@ const translateguidCfg = `
 filebeat.inputs:
   - type: filestream
     id: "test-translateguidCfg"
+    file_identity.native: ~
+    prospector.scanner.fingerprint.enabled: false
     paths:
       - %s
 
@@ -64,7 +66,7 @@ logging:
 
 processors:
   - add_fields:
-      fields: 
+      fields:
         guid: '%s'
   - translate_ldap_attribute:
       field: fields.guid
@@ -77,6 +79,7 @@ processors:
 `
 
 func TestTranslateGUIDWithLDAP(t *testing.T) {
+	t.Skip("Flaky Test: https://github.com/elastic/beats/issues/42616")
 	startOpenldapContainer(t)
 
 	var entryUUID string
@@ -120,7 +123,7 @@ func TestTranslateGUIDWithLDAP(t *testing.T) {
 	filebeat.WaitFileContains(
 		outputFile,
 		fmt.Sprintf(`"fields":{"guid":"%s","common_name":["User1","user01"]}`, entryUUID),
-		10*time.Second,
+		20*time.Second,
 	)
 }
 

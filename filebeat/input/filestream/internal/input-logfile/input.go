@@ -49,7 +49,7 @@ func (inp *managedInput) Test(ctx input.TestContext) error {
 	return inp.prospector.Test()
 }
 
-// Run
+// Run runs the input
 func (inp *managedInput) Run(
 	ctx input.Context,
 	pipeline beat.PipelineConnector,
@@ -64,8 +64,7 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	metrics := NewMetrics(inp.metricsID)
-	defer metrics.Close()
+	metrics := NewMetrics(ctx.MetricsRegistry)
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
@@ -85,10 +84,10 @@ func (inp *managedInput) Run(
 
 	prospectorStore := inp.manager.getRetainedStore()
 	defer prospectorStore.Release()
-	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier)
+	sourceStore := newSourceStore(prospectorStore, inp.sourceIdentifier, nil)
 
 	// Mark it as running for now.
-	// Any errors encountered by harverter will change state to Degraded
+	// Any errors encountered by harvester will change state to Degraded
 	ctx.UpdateStatus(status.Running, "")
 
 	inp.prospector.Run(ctx, sourceStore, hg)

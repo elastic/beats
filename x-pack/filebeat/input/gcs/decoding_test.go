@@ -79,7 +79,7 @@ func TestDecoding(t *testing.T) {
 			}
 			defer f.Close()
 			p := &pub{t: t}
-			j := newJob(&storage.BucketHandle{}, &storage.ObjectAttrs{Name: "test_object"}, "gs://test_uri", newState(), &Source{}, p, log, false)
+			j := newJob(&storage.BucketHandle{}, &storage.ObjectAttrs{Name: "test_object"}, "gs://test_uri", newState(), &Source{}, p, nil, log, false)
 			j.src.ReaderConfig.Decoding = tc.config
 			err = j.decode(context.Background(), f, "test")
 			if err != nil {
