@@ -104,6 +104,24 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
 
 
+[[release-notes-8.17.6]]
+=== Beats version 8.17.6
+https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Journald input is again usable in the Filebeat Docker container (except Wolfi) by including journalctl by default. The included version of journalctl must be compatible with the one on that wrote the journal files being ingested. The Wolfi container remains distroless and does not contain journalctl or any part of systemd. {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+
+==== Added
+
+*Filebeat*
+
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+
+
 [[release-notes-8.17.5]]
 === Beats version 8.17.5
 https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
