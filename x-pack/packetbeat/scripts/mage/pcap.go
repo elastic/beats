@@ -89,5 +89,5 @@ func GetNpcapInstallerFn(dir string) func() error {
 }
 
 func getBucketName() string {
-	return "ingest-buildkite-ci"
+	return "golang-crossbuild-ci-internal"
 }
