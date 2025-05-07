@@ -296,10 +296,7 @@ func (r *Reader) getApplicationPools(names []string) ([]ApplicationPool, error) 
 	var applicationPools []ApplicationPool
 	for key, value := range appPoolWithStatus {
 		applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: appPools[key], status: value})
-		// applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: appPools[], status: value})
 	}
-
-	r.log.Info("WITH STATUS: ", applicationPools)
 
 	if len(names) == 0 {
 		return applicationPools, nil
