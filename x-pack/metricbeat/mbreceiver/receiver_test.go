@@ -33,14 +33,7 @@ import (
 )
 
 func TestFactory(t *testing.T) {
-	monitorSocket := genSocketPath()
-	var monitorHost string
-	if runtime.GOOS == "windows" {
-		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-	} else {
-		monitorHost = "unix://" + monitorSocket
-	}
-
+	monitorSocket, monitorHost := genSocketPath()
 	cfg := &Config{
 		Beatconfig: map[string]interface{}{
 			"metricbeat": map[string]any{
@@ -93,13 +86,7 @@ func TestFactory(t *testing.T) {
 }
 
 func TestNewReceiver(t *testing.T) {
-	monitorSocket := genSocketPath()
-	var monitorHost string
-	if runtime.GOOS == "windows" {
-		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-	} else {
-		monitorHost = "unix://" + monitorSocket
-	}
+	monitorSocket, monitorHost := genSocketPath()
 	config := Config{
 		Beatconfig: map[string]any{
 			"metricbeat": map[string]any{
@@ -162,20 +149,8 @@ func TestNewReceiver(t *testing.T) {
 }
 
 func TestMultipleReceivers(t *testing.T) {
-	monitorSocket1 := genSocketPath()
-	var monitorHost1 string
-	if runtime.GOOS == "windows" {
-		monitorHost1 = "npipe:///" + filepath.Base(monitorSocket1)
-	} else {
-		monitorHost1 = "unix://" + monitorSocket1
-	}
-	monitorSocket2 := genSocketPath()
-	var monitorHost2 string
-	if runtime.GOOS == "windows" {
-		monitorHost2 = "npipe:///" + filepath.Base(monitorSocket2)
-	} else {
-		monitorHost2 = "unix://" + monitorSocket2
-	}
+	monitorSocket1, monitorHost1 := genSocketPath()
+	monitorSocket2, monitorHost2 := genSocketPath()
 	config1 := Config{
 		Beatconfig: map[string]any{
 			"metricbeat": map[string]any{
@@ -266,14 +241,23 @@ func TestMultipleReceivers(t *testing.T) {
 	})
 }
 
-func genSocketPath() string {
+func genSocketPath() (socketPath string, socketHost string) {
 	randData := make([]byte, 16)
 	for i := range len(randData) {
 		randData[i] = uint8(rand.UintN(255)) //nolint:gosec // 0-255 fits in a uint8
 	}
 	socketName := base64.URLEncoding.EncodeToString(randData) + ".sock"
 	socketDir := os.TempDir()
-	return filepath.Join(socketDir, socketName)
+	socketPath = filepath.Join(socketDir, socketName)
+
+	switch runtime.GOOS {
+	case "windows":
+		socketHost = "npipe:///" + filepath.Base(socketPath)
+	default:
+		socketHost = "unix://" + socketPath
+	}
+
+	return
 }
 
 func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {

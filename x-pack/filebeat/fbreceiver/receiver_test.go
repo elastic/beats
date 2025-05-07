@@ -34,14 +34,7 @@ import (
 func TestNewReceiver(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	monitorSocket := genSocketPath()
-	var monitorHost string
-	if runtime.GOOS == "windows" {
-		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-	} else {
-		monitorHost = "unix://" + monitorSocket
-	}
-
+	monitorSocket, monitorHost := genSocketPath()
 	config := Config{
 		Beatconfig: map[string]interface{}{
 			"filebeat": map[string]interface{}{
@@ -104,14 +97,7 @@ func TestNewReceiver(t *testing.T) {
 func TestFactory(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	monitorSocket := genSocketPath()
-	var monitorHost string
-	if runtime.GOOS == "windows" {
-		monitorHost = "npipe:///" + filepath.Base(monitorSocket)
-	} else {
-		monitorHost = "unix://" + monitorSocket
-	}
-
+	monitorSocket, monitorHost := genSocketPath()
 	cfg := &Config{
 		Beatconfig: map[string]interface{}{
 			"filebeat": map[string]interface{}{
@@ -162,14 +148,23 @@ func TestFactory(t *testing.T) {
 	}, "failed to connect to monitoring socket, last error was: %s", &lastError)
 }
 
-func genSocketPath() string {
+func genSocketPath() (socketPath string, socketHost string) {
 	randData := make([]byte, 16)
 	for i := range len(randData) {
 		randData[i] = uint8(rand.UintN(255)) //nolint:gosec // 0-255 fits in a uint8
 	}
 	socketName := base64.URLEncoding.EncodeToString(randData) + ".sock"
 	socketDir := os.TempDir()
-	return filepath.Join(socketDir, socketName)
+	socketPath = filepath.Join(socketDir, socketName)
+
+	switch runtime.GOOS {
+	case "windows":
+		socketHost = "npipe:///" + filepath.Base(socketPath)
+	default:
+		socketHost = "unix://" + socketPath
+	}
+
+	return
 }
 
 func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
@@ -263,21 +258,8 @@ func TestMultipleReceivers(t *testing.T) {
 	// in isolation, started, and can ingest logs without interfering
 	// with each other.
 
-	monitorSocket1 := genSocketPath()
-	var monitorHost1 string
-	if runtime.GOOS == "windows" {
-		monitorHost1 = "npipe:///" + filepath.Base(monitorSocket1)
-	} else {
-		monitorHost1 = "unix://" + monitorSocket1
-	}
-	monitorSocket2 := genSocketPath()
-	var monitorHost2 string
-	if runtime.GOOS == "windows" {
-		monitorHost2 = "npipe:///" + filepath.Base(monitorSocket2)
-	} else {
-		monitorHost2 = "unix://" + monitorSocket2
-	}
-
+	monitorSocket1, monitorHost1 := genSocketPath()
+	monitorSocket2, monitorHost2 := genSocketPath()
 	// Receivers need distinct home directories so wrap the config in a function.
 	config1 := Config{
 		Beatconfig: map[string]interface{}{
