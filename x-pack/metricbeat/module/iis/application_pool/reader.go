@@ -194,7 +194,8 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 	for _, appPool := range r.applicationPools {
 		events[appPool.name] = mb.Event{
 			MetricSetFields: mapstr.M{
-				"name": appPool.name,
+				"name":   appPool.name,
+				"status": appPool.status,
 			},
 			RootFields: mapstr.M{},
 		}
@@ -282,32 +283,30 @@ func (r *Reader) getApplicationPools(names []string) ([]ApplicationPool, error) 
 	if err != nil {
 		return nil, err
 	}
-	applicationPoolWithStatus, err := r.getAllAppPool()
+
+	appPoolWithStatus, err := r.getAllAppPool()
 	if err != nil {
 		return nil, err
 	}
-	var appPools = make(map[string][]int)
+
+	appPools := make(map[string][]int)
 	for key, value := range processes {
 		appPools[value] = append(appPools[value], key)
 	}
 	var applicationPools []ApplicationPool
-	for key, value := range appPools {
-		if status, ok := applicationPoolWithStatus[key]; ok {
-			applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value, status: status})
-		} else {
-			applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value})
-		}
+	for key, value := range appPoolWithStatus {
+		applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: appPools[key], status: value})
+		// applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: appPools[], status: value})
 	}
 
-	for key, status := range applicationPoolWithStatus {
-		if _, ok := appPools[key]; !ok { // adding only those values which are not present in appPools
-			applicationPools = append(applicationPools, ApplicationPool{name: key, status: status})
-		}
-	}
+	r.log.Info("WITH STATUS: ", applicationPools)
 
 	if len(names) == 0 {
 		return applicationPools, nil
 	}
+
+	r.log.Info("here4")
+
 	var filtered []ApplicationPool
 	for _, n := range names {
 		for _, w3 := range applicationPools {
@@ -316,6 +315,7 @@ func (r *Reader) getApplicationPools(names []string) ([]ApplicationPool, error) 
 			}
 		}
 	}
+
 	return filtered, nil
 }
 
