@@ -3,7 +3,28 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
+
+[[release-notes-8.18.1]]
+=== Beats version 8.18.1
+https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Journald input now works on Docker containers (except Wolfi). {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+
+==== Added
+
+*Filebeat*
+
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
+
+
 [[release-notes-8.18.0]]
 === Beats version 8.18.0
 https://github.com/elastic/beats/compare/v8.17.4\...v8.18.0[View commits]
@@ -102,7 +123,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
-=======
+
+
 [[release-notes-8.17.6]]
 === Beats version 8.17.6
 https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
@@ -119,7 +141,6 @@ https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
 *Filebeat*
 
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
->>>>>>> 01247ae34 (docs: Prepare Changelog for 8.17.6 (#44163))
 
 
 [[release-notes-8.17.5]]
