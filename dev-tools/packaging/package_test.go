@@ -842,6 +842,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 		case "-tags":
 			foundTags = true
 			require.Contains(t, setting.Value, "requirefips")
+			require.Contains(t, setting.Value, "ms_tls13kdf")
 			continue
 		case "GOEXPERIMENT":
 			foundExperiment = true
