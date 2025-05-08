@@ -360,7 +360,6 @@ steps:
     steps:
       - label: ":ubuntu: x-pack/metricbeat: AWS Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
           MODULE_DIR: "x-pack/metricbeat/module/aws"
@@ -386,6 +385,9 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-aws-buildkite-oidc.tf
+          - elastic/oblt-aws-auth#v0.1.0:
+              duration: 3600 # seconds
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: AWS Tests"
