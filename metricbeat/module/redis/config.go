@@ -15,15 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-/*
-Package info fetches Redis server information and statistics using the Redis
-INFO command.
+package redis
 
-The current implementation is tested with redis 3.2.3
-More details on all the fields provided by the redis info command can be found here: http://redis.io/commands/INFO
+import (
+	"crypto/tls"
+	"time"
 
-`info.go` uses the Redis `INFO default` command for stats. This allows us to fetch  all metrics at once and filter out
-undesired metrics based on user configuration on the client. The alternative would be to fetch each type as an
-independent `INFO` call, which has the potential of introducing higher latency (e.g., more round trip Redis calls).
-*/
-package info
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+)
+
+type Config struct {
+	IdleTimeout time.Duration     `config:"idle_timeout"`
+	Network     string            `config:"network"`
+	MaxConn     int               `config:"maxconn" validate:"min=1"`
+	TLS         *tlscommon.Config `config:"ssl"`
+
+	UseTLSConfig *tls.Config
+}
+
+// DefaultConfig return default config for the redis module.
+func DefaultConfig() Config {
+	return Config{Network: "tcp", MaxConn: 10}
+}
