@@ -47,7 +47,6 @@ steps:
         - "v1.30.4"
         - "v1.29.8"
         - "v1.28.13"
-      key: "k8s-test-{{matrix}}"
       env:
         K8S_VERSION: "{{matrix}}"
         MODULE: "${MODULE}"
