@@ -68,7 +68,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch method implements the data gathering
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	node, err := munin.Connect(m.Host(), m.timeout)
+	node, err := munin.Connect(m.Host(), m.timeout, m.Logger())
 	if err != nil {
 		return fmt.Errorf("error in Connect: %w", err)
 	}
