@@ -78,7 +78,9 @@ func TestFactory(t *testing.T) {
 	rc, err := factory.CreateLogs(ctx, receiverSettings, cfg, nil)
 	require.NotEmpty(t, rc, "receiver should not be empty")
 	require.NoError(t, err)
-	defer assert.NoError(t, rc.Shutdown(ctx))
+	t.Cleanup(func() {
+		assert.NoError(t, rc.Shutdown(ctx))
+	})
 
 	// Ensure http metrics endpoint is reachable on receiver creation
 	var lastError strings.Builder
