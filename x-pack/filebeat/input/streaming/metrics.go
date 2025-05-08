@@ -30,8 +30,8 @@ type inputMetrics struct {
 	pongMessageReceivedTime metrics.Sample     // histogram of the elapsed successful pong message receive times in nanoseconds
 }
 
-func newInputMetrics(id string) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
 	out := &inputMetrics{
 		unregister:              unreg,
 		url:                     monitoring.NewString(reg, "url"),

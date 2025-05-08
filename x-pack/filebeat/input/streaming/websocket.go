@@ -84,22 +84,19 @@ func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start t
 
 		for {
 			select {
-			case now := <-ticker.C:
-				if conn != nil {
-					err := conn.WriteControl(websocket.PingMessage, nil, now.Add(k.cfg.KeepAlive.WriteControlDeadline))
-					if err != nil {
-						k.log.Debugw("error sending ping control frame to websocket server:", err)
-						k.metrics.writeControlErrors.Inc()
-						k.metrics.errorsTotal.Inc()
-					}
-					k.log.Debugw("sent ping control frame to websocket server")
-					k.metrics.pingMessageSendTime.Update(time.Since(start).Nanoseconds())
-				} else {
-					k.log.Debugw("websocket connection is nil but heartbeat routine is still running!")
-				}
 			case <-ctx.Done():
 				k.log.Debugw("heartbeat stopped")
 				return
+			case now := <-ticker.C:
+				err := conn.WriteControl(websocket.PingMessage, nil, now.Add(k.cfg.KeepAlive.WriteControlDeadline))
+				if err != nil {
+					k.log.Debugw("error sending ping control frame to websocket server:", err)
+					k.metrics.writeControlErrors.Inc()
+					k.metrics.errorsTotal.Inc()
+				} else {
+					k.log.Debugw("sent ping control frame to websocket server")
+					k.metrics.pingMessageSendTime.Update(time.Since(start).Nanoseconds())
+				}
 			}
 		}
 	}()
@@ -120,7 +117,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id),
+			metrics: newInputMetrics(id, nil),
 		},
 		// the token expiry handler will never trigger unless a valid expiry time is assigned
 		tokenExpiry: nil,
