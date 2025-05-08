@@ -8,7 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -164,8 +164,13 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	return formattedStats, nil
 }
 
+<<<<<<< HEAD
 func getTaskStats(taskStatsResp *http.Response) (map[string]dcontainer.StatsResponse, error) {
 	taskStatsBody, err := ioutil.ReadAll(taskStatsResp.Body)
+=======
+func getTaskStats(taskStatsResp *http.Response) (map[string]types.StatsJSON, error) {
+	taskStatsBody, err := io.ReadAll(taskStatsResp.Body)
+>>>>>>> 11713f01a ([Chore] Replace global logger with local loggers in mb modules #5 (#44107))
 	if err != nil {
 		return nil, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
@@ -179,7 +184,7 @@ func getTaskStats(taskStatsResp *http.Response) (map[string]dcontainer.StatsResp
 }
 
 func getTask(taskResp *http.Response) (TaskMetadata, error) {
-	taskBody, err := ioutil.ReadAll(taskResp.Body)
+	taskBody, err := io.ReadAll(taskResp.Body)
 	if err != nil {
 		return TaskMetadata{}, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
