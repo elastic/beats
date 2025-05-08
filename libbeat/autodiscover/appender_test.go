@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type fakeAppender struct{}
@@ -32,7 +33,7 @@ func (f *fakeAppender) Append(event bus.Event) {
 	event["foo"] = "bar"
 }
 
-func newFakeAppender(_ *conf.C) (Appender, error) {
+func newFakeAppender(_ *conf.C, _ *logp.Logger) (Appender, error) {
 	return &fakeAppender{}, nil
 }
 
