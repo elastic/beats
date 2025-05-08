@@ -484,7 +484,7 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	}
 
 	// lookup ips for all brokers
-	m.logger.Debug("match by ips")
+	m.logger.Named("kafka").Debug("match by ips")
 	for i, b := range brokers {
 		m.logger.Named("kafka").Debugf("test broker address: %v", b)
 		bh, bp, err := net.SplitHostPort(b)
