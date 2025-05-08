@@ -26,6 +26,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/sarama"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type dummyNet struct{}
@@ -146,7 +148,7 @@ func TestFindMatchingAddress(t *testing.T) {
 		},
 	}
 
-	finder := brokerFinder{Net: &dummyNet{}}
+	finder := brokerFinder{Net: &dummyNet{}, logger: logptest.NewTestingLogger(t, "")}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
 			i, found := finder.findAddress(c.address, c.brokers)

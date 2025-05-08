@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -179,7 +180,7 @@ func getTaskStats(taskStatsResp *http.Response) (map[string]dcontainer.StatsResp
 }
 
 func getTask(taskResp *http.Response) (TaskMetadata, error) {
-	taskBody, err := ioutil.ReadAll(taskResp.Body)
+	taskBody, err := io.ReadAll(taskResp.Body)
 	if err != nil {
 		return TaskMetadata{}, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
