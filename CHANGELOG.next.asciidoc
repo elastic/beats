@@ -301,7 +301,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
 
-
 *Auditbeat*
 
 - Added `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
