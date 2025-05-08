@@ -284,8 +284,6 @@ func TestSQSReaderLoop(t *testing.T) {
 func TestSQSWorkerLoop(t *testing.T) {
 
 }
-<<<<<<< HEAD
-=======
 
 func TestCancelWithGrace(t *testing.T) {
 	// TODO: Rewrite this to use testing/synctest when it is available without
@@ -319,4 +317,3 @@ func TestCancelWithGrace(t *testing.T) {
 		t.Errorf("unexpected wait time between parent and child cancellation: got=%v want=%v", waited, wait)
 	}
 }
->>>>>>> 7a95d64c1 (Increase timeout on flaky SQS test (#43672))

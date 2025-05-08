@@ -78,12 +78,13 @@ func CheckReceivers(params CheckReceiversParams) {
 		// Replicate the behavior of the collector logger
 		receiverCore := core.
 			With([]zapcore.Field{
-				zap.String("name", rc.Name),
-				zap.String("kind", "receiver"),
-				zap.String("data_type", "logs"),
+				zap.String("otelcol.component.id", rc.Name),
+				zap.String("otelcol.component.kind", "Receiver"),
+				zap.String("otelcol.signals", "logs"),
 			})
 
 		receiverSettings.Logger = zap.New(receiverCore)
+		receiverSettings.ID = component.NewIDWithName(rc.Factory.Type(), rc.Name)
 
 		logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
 			for i := 0; i < ld.ResourceLogs().Len(); i++ {
@@ -121,18 +122,27 @@ func CheckReceivers(params CheckReceiversParams) {
 		}()
 	}
 
+	t.Cleanup(func() {
+		if t.Failed() {
+			logsMu.Lock()
+			defer logsMu.Unlock()
+			t.Logf("Ingested Logs: %v", logs)
+		}
+	})
+
 	require.EventuallyWithT(t, func(ct *assert.CollectT) {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
 		// Ensure the logger fields from the otel collector are present in the logs.
 		for _, zl := range zapLogs.All() {
-			require.Contains(t, zl.ContextMap(), "name")
-			require.Equal(t, zl.ContextMap()["kind"], "receiver")
-			require.Equal(t, zl.ContextMap()["data_type"], "logs")
+			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
+			require.Equal(t, zl.ContextMap()["otelcol.component.kind"], "Receiver")
+			require.Equal(t, zl.ContextMap()["otelcol.signals"], "logs")
 			break
 		}
 
 		params.AssertFunc(ct, logs, zapLogs)
-	}, time.Minute, 100*time.Millisecond, "timeout waiting for assertion to pass")
+	}, 2*time.Minute, 100*time.Millisecond,
+		"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 }

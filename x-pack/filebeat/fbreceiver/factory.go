@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
@@ -67,12 +68,20 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		HTTP *config.C `config:"http"`
 	}{}
 	if err := b.RawConfig.Unpack(&httpConf); err != nil {
-		return nil, fmt.Errorf("error starting API :%w", err)
+		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
 	}
 
-	return &filebeatReceiver{beat: b, beater: fbBeater, logger: set.Logger, httpConf: httpConf.HTTP}, nil
+	base := beatreceiver.BeatReceiver{
+		HttpConf: httpConf.HTTP,
+		Beat:     b,
+		Beater:   fbBeater,
+		Logger:   set.Logger,
+	}
+
+	return &filebeatReceiver{BeatReceiver: base}, nil
 }
 
+// copied from filebeat cmd.
 func defaultProcessors() []mapstr.M {
 	// processors:
 	// - add_host_metadata:

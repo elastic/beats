@@ -13,7 +13,7 @@ mapped_pages:
 The recommended index template file for Winlogbeat is installed by the Winlogbeat packages. If you accept the default configuration in the `winlogbeat.yml` config file, Winlogbeat loads the template automatically after successfully connecting to {{es}}. If the template already exists, it’s not overwritten unless you configure Winlogbeat to do so.
 
 ::::{note}
-A connection to {{es}} is required to load the index template. If the output is not {{es}} (or {{ess}}), you must [load the template manually](#load-template-manually).
+A connection to {{es}} is required to load the index template. If the output is not {{es}} (or {{ech}}), you must [load the template manually](#load-template-manually).
 ::::
 
 
@@ -104,19 +104,19 @@ If the host running Winlogbeat does not have direct connectivity to {{es}}, you 
 
 To export the index template, run:
 
-```sh
-PS > .\winlogbeat.exe export template --es.version 9.0.0-beta1 | Out-File -Encoding UTF8 winlogbeat.template.json
+```sh subs=true
+PS > .\winlogbeat.exe export template --es.version {{stack-version}} | Out-File -Encoding UTF8 winlogbeat.template.json
 ```
 
 To install the template, run:
 
-```sh
-PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile winlogbeat.template.json -Uri http://localhost:9200/_index_template/winlogbeat-9.0.0-beta1
+```sh subs=true
+PS > Invoke-RestMethod -Method Put -ContentType "application/json" -InFile winlogbeat.template.json -Uri http://localhost:9200/_index_template/winlogbeat-{{stack-version}}
 ```
 
-Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on winlogbeat-9.0.0-beta1 index.
+Once you have loaded the index template, load the data stream as well. If you do not load it, you have to give the publisher user `manage` permission on winlogbeat-{{stack-version}} index.
 
-```sh
-PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/winlogbeat-9.0.0-beta1
+```sh subs=true
+PS > Invoke-RestMethod -Method Put -Uri http://localhost:9200/_data_stream/winlogbeat-{{stack-version}}
 ```
 

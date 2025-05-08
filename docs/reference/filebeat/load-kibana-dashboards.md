@@ -48,8 +48,8 @@ filebeat setup --dashboards
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/filebeat:9.0.0-beta1 setup --dashboards
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/filebeat:{{stack-version}} setup --dashboards
 ```
 ::::::
 
@@ -84,7 +84,7 @@ filebeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=filebeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -95,7 +95,7 @@ filebeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=filebeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -106,7 +106,7 @@ filebeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=filebeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -117,18 +117,18 @@ filebeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=filebeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/filebeat:9.0.0-beta1 setup -e \
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/filebeat:{{stack-version}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=filebeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -143,7 +143,7 @@ PS > .\filebeat.exe setup -e `
   -E output.logstash.enabled=false `
   -E output.elasticsearch.hosts=['localhost:9200'] `
   -E output.elasticsearch.username=filebeat_internal `
-  -E output.elasticsearch.password={pwd} `
+  -E output.elasticsearch.password=YOUR_PASSWORD `
   -E setup.kibana.host=localhost:5601
 ```
 ::::::

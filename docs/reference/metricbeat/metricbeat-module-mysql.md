@@ -6,7 +6,7 @@ mapped_pages:
 # MySQL module [metricbeat-module-mysql]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/mysql.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/mysql/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -50,9 +50,7 @@ The mysql MetricSets were tested with MySQL and Percona 5.7 and 8.0 and are expe
 
 The mysql module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-mysql.png
-:alt: metricbeat mysql
-:::
+![metricbeat mysql](images/metricbeat-mysql.png)
 
 
 ## Example configuration [_example_configuration_46]

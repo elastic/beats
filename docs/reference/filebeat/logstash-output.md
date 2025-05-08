@@ -35,12 +35,12 @@ Want to use [Filebeat modules](/reference/filebeat/filebeat-modules.md) with {{l
 
 Every event sent to {{ls}} contains the following metadata fields that you can use in {{ls}} for indexing and filtering:
 
-```json
+```json subs=true
 {
     ...
     "@metadata": { <1>
       "beat": "filebeat", <2>
-      "version": "9.0.0-beta1" <3>
+      "version": "{{stack-version}}" <3>
     }
 }
 ```
@@ -70,7 +70,7 @@ output {
 }
 ```
 
-1. `%{[@metadata][beat]}` sets the first part of the index name to the value of the `beat` metadata field and `%{[@metadata][version]}` sets the second part to the Beat’s version. For example: `filebeat-9.0.0-beta1`.
+1. `%{[@metadata][beat]}` sets the first part of the index name to the value of the `beat` metadata field and `%{[@metadata][version]}` sets the second part to the Beat’s version. For example: `filebeat-9[version]`.
 
 
 Events indexed into {{es}} with the {{ls}} configuration shown here will be similar to events directly indexed by Filebeat into {{es}}.
@@ -122,12 +122,16 @@ The default value is `false`.
 
 ### `worker` or `workers` [_worker_or_workers]
 
-The number of workers per configured host publishing events to {{ls}}. This is best used with load balancing mode enabled. Example: If you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
+`worker` or `workers` specifies the number of connections created per host for publishing events.
+Refer to the `loadblance` setting for details about how the load balancing works to distribute requests across the Elasticsearch cluster nodes.
+
+The default value is `1`.
 
 
 ### `loadbalance` [loadbalance]
 
 When `loadbalance: true` is set, Filebeat connects to all configured hosts and sends data through all connections in parallel. If a connection fails, data is sent to the remaining hosts until it can be reestablished. Data will still be sent as long as Filebeat can connect to at least one of its configured hosts.
+Use the `worker` or `workers` setting to specify the number of connections per host.
 
 When `loadbalance: false` is set, Filebeat sends data to a single host at a time. The target host is chosen at random from the list of configured hosts, and all data is sent to that target until the connection fails, when a new target is selected. Data will still be sent as long as Filebeat can connect to at least one of its configured hosts. To rotate through the list of configured hosts over time, use this option in conjunction with the `ttl` setting to close the connection at the configured interval and choose a new target host.
 
@@ -180,7 +184,7 @@ The `proxy_use_local_resolver` option determines if {{ls}} hostnames are resolve
 
 ### `index` [logstash-index]
 
-The index root name to write events to. The default is the Beat name. For example `"filebeat"` generates `"[filebeat-]9.0.0-beta1-YYYY.MM.DD"` indices (for example, `"filebeat-9.0.0-beta1-2017.04.26"`).
+The index root name to write events to. The default is the Beat name. For example `"filebeat"` generates `"[filebeat-][version]-YYYY.MM.DD"` indices (for example, `"filebeat-9.0.0-2017.04.26"`).
 
 ::::{note}
 This parameter’s value will be assigned to the `metadata.beat` field. It can then be accessed in {{ls}}'s output section as `%{[@metadata][beat]}`.

@@ -6,7 +6,7 @@ mapped_pages:
 # Google Cloud module [filebeat-module-gcp]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/gcp.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/gcp/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -52,10 +52,8 @@ When you specify a setting at the command line, remember to prefix the setting w
 
 ### `audit` fileset settings [_audit_fileset_settings_2]
 
-:::{image} images/filebeat-gcp-audit.png
-:alt: filebeat gcp audit
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![filebeat gcp audit](images/filebeat-gcp-audit.png)
 
 Example config:
 

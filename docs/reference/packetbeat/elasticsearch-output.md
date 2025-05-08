@@ -31,7 +31,7 @@ When sending data to a secured cluster through the `elasticsearch` output, Packe
 output.elasticsearch:
   hosts: ["https://myEShost:9200"]
   username: "packetbeat_writer"
-  password: "{pwd}"
+  password: "YOUR_PASSWORD"
 ```
 
 **API key authentication:**
@@ -107,7 +107,8 @@ The default value is `false`.
 
 ### `worker` or `workers` [worker-option]
 
-The number of workers per configured host publishing events to Elasticsearch. This is best used with load balancing mode enabled. Example: If you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
+`worker` or `workers` specifies the number of connections created per host for publishing events.
+Refer to the `loadblance` setting for details about how the load balancing works to distribute requests across the Elasticsearch cluster nodes.
 
 The default value is `1`.
 
@@ -115,6 +116,7 @@ The default value is `1`.
 ### `loadbalance` [_loadbalance]
 
 When `loadbalance: true` is set, Packetbeat connects to all configured hosts and sends data through all connections in parallel. If a connection fails, data is sent to the remaining hosts until it can be reestablished. Data will still be sent as long as Packetbeat can connect to at least one of its configured hosts.
+Use the `worker` or `workers` setting to specify the number of connections per host.
 
 When `loadbalance: false` is set, Packetbeat sends data to a single host at a time. The target host is chosen at random from the list of configured hosts, and all data is sent to that target until the connection fails, when a new target is selected. Data will still be sent as long as Packetbeat can connect to at least one of its configured hosts.
 
@@ -190,11 +192,11 @@ Additional headers to send to proxies during CONNECT requests.
 
 ### `index` [index-option-es]
 
-The indexing target to write events to. Can point to an [index](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-mgmt.html), [alias](docs-content://manage-data/data-store/aliases.md), or [data stream](docs-content://manage-data/data-store/data-streams.md). When using daily indices, this will be the index name. The default is `"packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}"`, for example, `"packetbeat-9.0.0-beta1-2025-01-30"`. If you change this setting, you also need to configure the `setup.template.name` and `setup.template.pattern` options (see [Elasticsearch index template](/reference/packetbeat/configuration-template.md)).
+The indexing target to write events to. Can point to an [index](https://www.elastic.co/guide/en/elasticsearch/reference/current/index-mgmt.html), [alias](docs-content://manage-data/data-store/aliases.md), or [data stream](docs-content://manage-data/data-store/data-streams.md). When using daily indices, this will be the index name. The default is `"packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}"`, for example, `"packetbeat-[version]-2025-01-30"`. If you change this setting, you also need to configure the `setup.template.name` and `setup.template.pattern` options (see [Elasticsearch index template](/reference/packetbeat/configuration-template.md)).
 
 If you are using the pre-built Kibana dashboards, you also need to set the `setup.dashboards.index` option (see [Kibana dashboards](/reference/packetbeat/configuration-dashboards.md)).
 
-When [index lifecycle management (ILM)](/reference/packetbeat/ilm.md) is enabled, the default `index` is `"packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}-%{{index_num}}"`, for example, `"packetbeat-9.0.0-beta1-2025-01-30-000001"`. Custom `index` settings are ignored when ILM is enabled. If you’re sending events to a cluster that supports index lifecycle management, see [Index lifecycle management (ILM)](/reference/packetbeat/ilm.md) to learn how to change the index name.
+When [index lifecycle management (ILM)](/reference/packetbeat/ilm.md) is enabled, the default `index` is `"packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}-%{{index_num}}"`, for example, `"packetbeat-[version]-2025-01-30-000001"`. Custom `index` settings are ignored when ILM is enabled. If you’re sending events to a cluster that supports index lifecycle management, see [Index lifecycle management (ILM)](/reference/packetbeat/ilm.md) to learn how to change the index name.
 
 You can set the index dynamically by using a format string to access any event field. For example, this configuration uses a custom field, `fields.log_type`, to set the index:
 
@@ -207,7 +209,7 @@ output.elasticsearch:
 1. We recommend including `agent.version` in the name to avoid mapping issues when you upgrade.
 
 
-With this configuration, all events with `log_type: normal` are sent to an index named `normal-9.0.0-beta1-2025-01-30`, and all events with `log_type: critical` are sent to an index named `critical-9.0.0-beta1-2025-01-30`.
+With this configuration, all events with `log_type: normal` are sent to an index named `normal-[version]-2025-01-30`, and all events with `log_type: critical` are sent to an index named `critical-[version]-2025-01-30`.
 
 ::::{tip}
 To learn how to add custom fields to events, see the [`fields`](/reference/packetbeat/configuration-general-options.md#libbeat-configuration-fields) option.
@@ -251,7 +253,7 @@ output.elasticsearch:
         message: "ERR"
 ```
 
-This configuration results in indices named `warning-9.0.0-beta1-2025-01-30` and `error-9.0.0-beta1-2025-01-30` (plus the default index if no matches are found).
+This configuration results in indices named `warning-[version]-2025-01-30` and `error-[version]-2025-01-30` (plus the default index if no matches are found).
 
 The following example sets the index by taking the name returned by the `index` format string and mapping it to a new name that’s used for the index:
 
@@ -430,7 +432,9 @@ Configuration options for internal queue.
 
 See [Internal queue](/reference/packetbeat/configuring-internal-queue.md) for more information.
 
-Note:`queue` options can be set under `packetbeat.yml` or the `output` section but not both. ===== `non_indexable_policy`
+Note:`queue` options can be set under `packetbeat.yml` or the `output` section but not both.
+
+### `non_indexable_policy`[_non_indexable_policy]
 
 Specifies the behavior when the elasticsearch cluster explicitly rejects documents, for example on mapping conflicts.
 
@@ -485,7 +489,12 @@ output.elasticsearch:
   preset: balanced
 ```
 
-Performance presets apply a set of configuration overrides based on a desired performance goal. If set, a performance preset will override other configuration flags to match the recommended settings for that preset. If a preset doesn’t set a value for a particular field, the user-specified value will be used if present, otherwise the default. Valid options are: * `balanced`: good starting point for general efficiency * `throughput`: good for high data volumes, may increase cpu and memory requirements * `scale`: reduces ambient resource use in large low-throughput deployments * `latency`: minimize the time for fresh data to become visible in Elasticsearch * `custom`: apply user configuration directly with no overrides
+Performance presets apply a set of configuration overrides based on a desired performance goal. If set, a performance preset will override other configuration flags to match the recommended settings for that preset. If a preset doesn’t set a value for a particular field, the user-specified value will be used if present, otherwise the default. Valid options are:
+* `balanced`: good starting point for general efficiency
+* `throughput`: good for high data volumes, may increase cpu and memory requirements
+* `scale`: reduces ambient resource use in large low-throughput deployments
+* `latency`: minimize the time for fresh data to become visible in Elasticsearch
+* `custom`: apply user configuration directly with no overrides
 
 The default if unspecified is `custom`.
 
