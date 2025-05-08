@@ -40,10 +40,16 @@ steps:
         - github_commit_status:
             context: "deploy/k8s checks"
 
-    - label: "K8S Test/K8S version: v1.32.0"
-      key: "k8s-test-132"
+    - label: "K8S Test/K8S version: {{matrix}}"
+      matrix:
+        - "v1.32.0"
+        - "v1.31.0"
+        - "v1.30.4"
+        - "v1.29.8"
+        - "v1.28.13"
+      key: "k8s-test-{{matrix}}"
       env:
-        K8S_VERSION: "v1.32.0"
+        K8S_VERSION: "{{matrix}}"
         MODULE: "${MODULE}"
       commands: |
         set -euo pipefail
@@ -60,92 +66,4 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
-            context: "deploy/k8s test v1.32.0"
-
-    - label: "K8S Test/K8S version: v1.31.0"
-      key: "k8s-test-131"
-      env:
-        K8S_VERSION: "v1.31.0"
-        MODULE: "${MODULE}"
-      commands: |
-        set -euo pipefail
-        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-        echo "--- Executing Tests"
-        make -C metricbeat integration-tests
-        make -C deploy/kubernetes test
-      retry:
-        automatic:
-          - limit: 1
-      agents:
-        provider: "gcp"
-        image: "${IMAGE_UBUNTU_X86_64}"
-        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-      notify:
-        - github_commit_status:
-            context: "deploy/k8s test v1.31.0"
-
-    - label: "K8S Test/K8S version: v1.30.4"
-      key: "k8s-test-130"
-      env:
-        K8S_VERSION: "v1.30.4"
-        MODULE: "${MODULE}"
-      commands: |
-        set -euo pipefail
-        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-        echo "--- Executing Tests"
-        make -C metricbeat integration-tests
-        make -C deploy/kubernetes test
-      retry:
-        automatic:
-          - limit: 1
-      agents:
-        provider: "gcp"
-        image: "${IMAGE_UBUNTU_X86_64}"
-        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-      notify:
-        - github_commit_status:
-            context: "deploy/k8s test v1.30.4"
-
-    - label: "K8S Test/K8S version: v1.29.8"
-      key: "k8s-test-129"
-      env:
-        K8S_VERSION: "v1.29.8"
-        MODULE: "${MODULE}"
-      commands: |
-        set -euo pipefail
-        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-        echo "--- Executing Tests"
-        make -C metricbeat integration-tests
-        make -C deploy/kubernetes test
-      retry:
-        automatic:
-          - limit: 1
-      agents:
-        provider: "gcp"
-        image: "${IMAGE_UBUNTU_X86_64}"
-        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-      notify:
-        - github_commit_status:
-            context: "deploy/k8s test v1.29.8"
-
-    - label: "K8S Test/K8S version: v1.28.13"
-      key: "k8s-test-128"
-      env:
-        K8S_VERSION: "v1.28.13"
-        MODULE: "${MODULE}"
-      commands: |
-        set -euo pipefail
-        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-        echo "--- Executing Tests"
-        make -C metricbeat integration-tests
-        make -C deploy/kubernetes test
-      retry:
-        automatic:
-          - limit: 1
-      agents:
-        provider: "gcp"
-        image: "${IMAGE_UBUNTU_X86_64}"
-        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-      notify:
-        - github_commit_status:
-            context: "deploy/k8s test v1.28.13"
+            context: "deploy/k8s test {{matrix}}"
