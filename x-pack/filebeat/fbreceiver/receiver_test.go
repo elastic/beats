@@ -96,6 +96,7 @@ func TestNewReceiver(t *testing.T) {
 
 func TestFactory(t *testing.T) {
 	tmpDir := t.TempDir()
+	ctx := t.Context()
 
 	monitorSocket, monitorHost := genSocketPath()
 	cfg := &Config{
@@ -137,9 +138,10 @@ func TestFactory(t *testing.T) {
 	receiverSettings.Logger = zap.New(core)
 	receiverSettings.ID = component.NewIDWithName(factory.Type(), "r1")
 
-	rc, err := factory.CreateLogs(t.Context(), receiverSettings, cfg, nil)
+	rc, err := factory.CreateLogs(ctx, receiverSettings, cfg, nil)
 	require.NotEmpty(t, rc, "receiver should not be empty")
 	require.NoError(t, err)
+	defer assert.NoError(t, rc.Shutdown(ctx))
 
 	// Ensure http metrics endpoint is reachable on receiver creation
 	var lastError strings.Builder
