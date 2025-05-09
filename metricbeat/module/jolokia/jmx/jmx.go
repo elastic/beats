@@ -74,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	jolokiaFetcher := NewJolokiaHTTPRequestFetcher(config.HTTPMethod)
 
-	log := logp.NewLogger(metricsetName).With("host", base.HostData().Host)
+	log := base.Logger().Named(metricsetName).With("host", base.HostData().Host)
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {
