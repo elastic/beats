@@ -33,7 +33,7 @@ Set to `true` to enable instrumentation of Heartbeat. Defaults to `false`.
 
 ### `environment` [_environment]
 
-Set the environment in which Heartbeat is running, for example, `staging`, `production`, `dev`, etc. Environments can be filtered in the [APM app](docs-content://solutions/observability/apps/overviews.md).
+Set the environment in which Heartbeat is running, for example, `staging`, `production`, `dev`, etc. Environments can be filtered in the [APM app](docs-content://solutions/observability/apm/overviews.md).
 
 
 ### `hosts` [_hosts_3]
