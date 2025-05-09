@@ -137,6 +137,7 @@ func CreatePool(host string, cfg config) *rd.Pool {
 		Dial: func() (rd.Conn, error) {
 			dialOptions := []rd.DialOption{
 				rd.DialUsername(cfg.Username),
+				rd.DialPassword(cfg.Password),
 				rd.DialConnectTimeout(cfg.IdleTimeout),
 				rd.DialReadTimeout(cfg.IdleTimeout),
 				rd.DialWriteTimeout(cfg.IdleTimeout),
@@ -149,19 +150,7 @@ func CreatePool(host string, cfg config) *rd.Pool {
 				)
 			}
 
-			c, err := rd.Dial(cfg.Network, host, dialOptions...)
-			if err != nil {
-				return nil, err
-			}
-
-			if cfg.Password != "" {
-				if _, err := c.Do("AUTH", cfg.Password); err != nil {
-					c.Close()
-					return nil, err
-				}
-			}
-
-			return c, err
+			return rd.Dial(cfg.Network, host, dialOptions...)
 		},
 	}
 }

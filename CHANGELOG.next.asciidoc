@@ -68,6 +68,7 @@ already present as `container.id` and `container.log.tag` is dropped because it 
 `log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
+- Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
 
 
 *Heartbeat*
@@ -132,6 +133,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 
 *Auditbeat*
 
@@ -541,34 +543,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 ==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
