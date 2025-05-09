@@ -37,16 +37,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
 // factory implements the cfgfile.RunnerFactory interface and wraps the
 // v2.Loader to create cfgfile.Runner instances based on available v2 inputs.
 type factory struct {
-	log        *logp.Logger
-	info       beat.Info
-	monitoring beat.Monitoring
-	loader     *v2.Loader
+	log    *logp.Logger
+	info   beat.Info
+	loader *v2.Loader
+
+	rootInputsRegistry *monitoring.Registry
 }
 
 // runner wraps a v2.Input, starting a go-routine
@@ -55,14 +57,15 @@ type factory struct {
 // On stop the runner triggers the shutdown signal and waits until the input
 // has returned.
 type runner struct {
-	id             string
-	log            *logp.Logger
-	agent          *beat.Info
-	wg             sync.WaitGroup
-	sig            ctxtool.CancelContext
-	input          v2.Input
-	connector      beat.PipelineConnector
-	statusReporter status.StatusReporter
+	id                 string
+	log                *logp.Logger
+	agent              *beat.Info
+	wg                 sync.WaitGroup
+	sig                ctxtool.CancelContext
+	input              v2.Input
+	connector          beat.PipelineConnector
+	statusReporter     status.StatusReporter
+	rootInputsRegistry *monitoring.Registry
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
@@ -71,10 +74,10 @@ type runner struct {
 func RunnerFactory(
 	log *logp.Logger,
 	info beat.Info,
-	monitoring beat.Monitoring,
+	rootInputsRegistry *monitoring.Registry,
 	loader *v2.Loader,
 ) cfgfile.RunnerFactory {
-	return &factory{log: log, info: info, monitoring: monitoring, loader: loader}
+	return &factory{log: log, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {
@@ -139,10 +142,10 @@ func (r *runner) Start() {
 		log.Infof("Input '%s' starting", name)
 
 		reg := inputmon.NewMetricsRegistry(
-			r.id, r.input.Name(), r.agent.Monitoring.NamespaceRegistry(), log)
+			r.id, r.input.Name(), r.rootInputsRegistry, log)
 		// Unregister the metrics when the input finishes running.
 		defer inputmon.CancelMetricsRegistry(
-			r.id, r.input.Name(), r.agent.Monitoring.NamespaceRegistry(), log)
+			r.id, r.input.Name(), r.rootInputsRegistry, log)
 
 		ctx := v2.Context{
 			ID:              r.id,

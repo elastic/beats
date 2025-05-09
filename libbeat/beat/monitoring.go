@@ -24,8 +24,10 @@ type Monitoring struct {
 
 	InfoRegistry  *monitoring.Registry
 	StateRegistry *monitoring.Registry
+	// Previously monitoring.Default or monitoring.GetNamespace("stats")
 	StatsRegistry *monitoring.Registry
 
+	// Previously monitoring.GetNamespace("dataset")
 	InputsRegistry *monitoring.Registry
 }
 

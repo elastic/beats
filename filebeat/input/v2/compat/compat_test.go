@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/input/v2/internal/inputest"
@@ -50,7 +51,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 			},
 		})
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "test")
-		factory := RunnerFactory(log, beat.Info{}, beat.NewMonitoring(), loader.Loader)
+		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		err := factory.CheckConfig(conf.NewConfig())
@@ -96,7 +97,7 @@ func TestRunnerFactory_CheckConfig(t *testing.T) {
 		factory := RunnerFactory(
 			log,
 			beat.Info{Logger: log},
-			beat.NewMonitoring(),
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		inputID := "filestream-kubernetes-pod-aee2af1c6365ecdd72416f44aab49cd8bdc7522ab008c39784b7fd9d46f794a4"
@@ -141,7 +142,7 @@ type: test
 		factory := RunnerFactory(
 			log,
 			beat.Info{Logger: log},
-			beat.NewMonitoring(),
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		// run
@@ -169,7 +170,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		factory := RunnerFactory(
 			log,
 			beat.Info{Logger: log},
-			beat.NewMonitoring(),
+			monitoring.NewRegistry(),
 			loader.Loader)
 
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
@@ -188,7 +189,7 @@ func TestRunnerFactory_CreateAndRun(t *testing.T) {
 		log := logp.NewLogger("test")
 		plugins := inputest.SinglePlugin("test", inputest.ConstInputManager(nil))
 		loader := inputest.MustNewTestLoader(t, plugins, "type", "")
-		factory := RunnerFactory(log, beat.Info{}, beat.NewMonitoring(), loader.Loader)
+		factory := RunnerFactory(log, beat.Info{}, monitoring.NewRegistry(), loader.Loader)
 
 		// run
 		runner, err := factory.Create(nil, conf.MustNewConfigFrom(map[string]interface{}{
