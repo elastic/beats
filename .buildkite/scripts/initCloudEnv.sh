@@ -2,26 +2,6 @@
 set -euo pipefail
 
 REPO_DIR=$(pwd)
-<<<<<<< HEAD
-AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_ingest_ci"
-
-exportAwsSecrets() {
-  local awsSecretKey
-  local awsAccessKey
-
-  awsSecretKey=$(retry -t 5 -- vault kv get -field secret_key "${AWS_SERVICE_ACCOUNT_SECRET_PATH}")
-  awsAccessKey=$(retry -t 5 -- vault kv get -field access_key "${AWS_SERVICE_ACCOUNT_SECRET_PATH}")
-
-  echo "~~~ Exporting AWS secrets"
-  export AWS_ACCESS_KEY_ID=$awsAccessKey
-  export AWS_SECRET_ACCESS_KEY=$awsSecretKey
-
-  # AWS_REGION is not set here, since AWS region is taken from *.tf file:
-  # - x-pack/metricbeat/module/aws/terraform.tf
-  # - x-pack/filebeat/input/awscloudwatch/_meta/terraform/variables.tf
-}
-=======
->>>>>>> 20a009464 (bk: use OIDC to create AWS cloud resources (#44202))
 
 terraformApply() {
   echo "~~~ Exporting Terraform Env Vars"
@@ -57,9 +37,7 @@ terraformDestroy() {
   return 0
 }
 
-<<<<<<< HEAD
 trap 'terraformDestroy' EXIT
-exportAwsSecrets
 
 max_retries=2
 timeout=5
@@ -90,56 +68,3 @@ while true; do
     sleep $sleep_time
   fi
 done
-=======
-dockerUp() {
-  echo "~~~ Run docker-compose services for emulated cloud env"
-  docker-compose -f .buildkite/deploy/docker/docker-compose.yml up -d
-}
-
-dockerTeardown() {
-  echo "~~~ Docker Compose Teardown"
-  docker-compose -f .buildkite/deploy/docker/docker-compose.yml down -v
-}
-
-terraformSetup() {
-  max_retries=2
-  timeout=5
-  retries=0
-
-  while true; do
-    echo "~~~ Setting up Terraform"
-    out=$(terraformApply 2>&1)
-    exit_code=$?
-
-    echo "$out"
-
-    if [ $exit_code -eq 0 ]; then
-      break
-    else
-      retries=$((retries + 1))
-
-      if [ $retries -gt $max_retries ]; then
-        teardown
-        echo "+++ Terraform init & apply failed: $out"
-        exit 1
-      fi
-
-      teardown
-
-      sleep_time=$((timeout * retries))
-      echo "~~~~ Retry #$retries failed. Retrying after ${sleep_time}s..."
-      sleep $sleep_time
-    fi
-  done
-}
-
-teardown() {
-  terraformDestroy
-  dockerTeardown
-}
-
-trap 'teardown' EXIT
-
-dockerUp
-terraformSetup
->>>>>>> 20a009464 (bk: use OIDC to create AWS cloud resources (#44202))
