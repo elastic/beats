@@ -24,14 +24,20 @@ type MetricCollectionInfo struct {
 	timeGrain string
 }
 
+// BaseClient represents the base azure client which will make use of the azure sdk go metrics related clients
+// It implements all the common methods between Client and BatchClient
+type BaseClient struct {
+	AzureMonitorService Service
+	Config              Config
+	Log                 *logp.Logger
+	Resources           []Resource
+	MetricRegistry      *MetricRegistry
+}
+
 // Client represents the azure client which will make use of the azure sdk go metrics related clients
 type Client struct {
-	AzureMonitorService    Service
-	Config                 Config
+	*BaseClient
 	ResourceConfigurations ResourceConfiguration
-	Log                    *logp.Logger
-	Resources              []Resource
-	MetricRegistry         *MetricRegistry
 }
 
 // mapResourceMetrics function type will map the configuration options to client metrics (depending on the metricset)
@@ -47,10 +53,12 @@ func NewClient(config Config) (*Client, error) {
 	logger := logp.NewLogger("azure monitor client")
 
 	client := &Client{
-		AzureMonitorService: azureMonitorService,
-		Config:              config,
-		Log:                 logger,
-		MetricRegistry:      NewMetricRegistry(logger),
+		BaseClient: &BaseClient{
+			AzureMonitorService: azureMonitorService,
+			Config:              config,
+			Log:                 logger,
+			MetricRegistry:      NewMetricRegistry(logger),
+		},
 	}
 
 	client.ResourceConfigurations.RefreshInterval = config.RefreshListInterval
@@ -339,7 +347,7 @@ func (client *Client) MapMetricByPrimaryAggregation(metrics []armmonitor.MetricD
 
 // GetVMForMetadata func will retrieve the VM details in order to fill in the cloud metadata
 // and also update the client resources
-func (client *Client) GetVMForMetadata(resource *Resource, referencePoint KeyValuePoint) VmResource {
+func (client *BaseClient) GetVMForMetadata(resource *Resource, referencePoint KeyValuePoint) VmResource {
 	var (
 		vm           VmResource
 		resourceName = resource.Name
@@ -373,10 +381,10 @@ func (client *Client) GetVMForMetadata(resource *Resource, referencePoint KeyVal
 		if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
 			if hardware, ok := properties["hardwareProfile"]; ok {
 				if vmSz, ok := hardware.(map[string]interface{})["vmSize"]; ok {
-					vm.Size = vmSz.(string)
+					vm.Size, _ = vmSz.(string)
 				}
 				if vmID, ok := properties["vmId"]; ok {
-					vm.Id = vmID.(string)
+					vm.Id, _ = vmID.(string)
 				}
 			}
 		}
@@ -395,7 +403,7 @@ func (client *Client) GetVMForMetadata(resource *Resource, referencePoint KeyVal
 }
 
 // GetResourceForMetaData will retrieve resource details for the selected metric configuration
-func (client *Client) GetResourceForMetaData(grouped Metric) Resource {
+func (client *BaseClient) GetResourceForMetaData(grouped Metric) Resource {
 	for _, res := range client.Resources {
 		if res.Id == grouped.ResourceId {
 			return res
@@ -404,7 +412,7 @@ func (client *Client) GetResourceForMetaData(grouped Metric) Resource {
 	return Resource{}
 }
 
-func (client *Client) LookupResource(resourceId string) Resource {
+func (client *BaseClient) LookupResource(resourceId string) Resource {
 	for _, res := range client.Resources {
 		if res.Id == resourceId {
 			return res
@@ -414,7 +422,7 @@ func (client *Client) LookupResource(resourceId string) Resource {
 }
 
 // AddVmToResource will add the vm details to the resource
-func (client *Client) AddVmToResource(resourceId string, vm VmResource) {
+func (client *BaseClient) AddVmToResource(resourceId string, vm VmResource) {
 	if len(vm.Id) > 0 && len(vm.Name) > 0 {
 		for i, res := range client.Resources {
 			if res.Id == resourceId {
@@ -424,15 +432,92 @@ func (client *Client) AddVmToResource(resourceId string, vm VmResource) {
 	}
 }
 
+// mapToEvents maps the metric values to events and reports them to Elasticsearch.
+func (client *BaseClient) MapToEvents(metrics []Metric, reporter mb.ReporterV2) error {
+
+	// Map the metric values into a list of key/value points.
+	//
+	// This makes it easier to group the metrics by timestamp
+	// and dimensions.
+	points := mapToKeyValuePoints(metrics)
+
+	// Group the points by timestamp and other fields we consider
+	// as dimensions for the whole event.
+	//
+	// Metrics have their own dimensions, and this is fine at the
+	// metric level.
+	//
+	// We identified a set of field we consider as dimensions
+	// at the event level. The event level dimensions define
+	// the time series when TSDB is enabled.
+	groupedPoints := make(map[string][]KeyValuePoint)
+	for _, point := range points {
+		groupingKey := fmt.Sprintf(
+			"%s,%s,%s,%s,%s,%s",
+			point.Timestamp,
+			point.Namespace,
+			point.ResourceId,
+			point.ResourceSubId,
+			point.Dimensions,
+			point.TimeGrain,
+		)
+
+		groupedPoints[groupingKey] = append(groupedPoints[groupingKey], point)
+	}
+
+	// Create an event for each group of points and send
+	// it to Elasticsearch.
+	for _, _points := range groupedPoints {
+		if len(_points) == 0 {
+			// This should never happen, but I don't feel like
+			// writing points[0] without checking the length first.
+			continue
+		}
+
+		// We assume that all points have the same timestamp and
+		// dimensions because they were grouped by the same key.
+		//
+		// We use the reference point to get the resource ID and
+		// all other information common to all points.
+		referencePoint := _points[0]
+
+		// Look up the full cloud resource information in the cache.
+		resource := client.LookupResource(referencePoint.ResourceId)
+
+		// Build the event using all the information we have.
+		event, err := buildEventFrom(referencePoint, _points, resource, client.Config.DefaultResourceType)
+		if err != nil {
+			return err
+		}
+
+		//
+		// Enrich the event with cloud metadata.
+		//
+		if client.Config.AddCloudMetadata {
+			vm := client.GetVMForMetadata(&resource, referencePoint)
+			addCloudVMMetadata(&event, vm, resource.Subscription)
+		}
+
+		//
+		// Report the event to Elasticsearch.
+		//
+		reporter.Event(event)
+	}
+
+	return nil
+}
+
 // NewMockClient instantiates a new client with the mock azure service
 func NewMockClient() *Client {
 	azureMockService := new(MockService)
 	logger := logp.NewLogger("test azure monitor")
 	client := &Client{
-		AzureMonitorService: azureMockService,
-		Config:              Config{},
-		Log:                 logger,
-		MetricRegistry:      NewMetricRegistry(logger),
+		BaseClient: &BaseClient{
+			AzureMonitorService: azureMockService,
+			Config:              Config{},
+			Log:                 logger,
+			MetricRegistry:      NewMetricRegistry(logger),
+		},
 	}
 	return client
 }
