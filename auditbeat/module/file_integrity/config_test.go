@@ -24,7 +24,6 @@ import (
 	"regexp/syntax"
 	"testing"
 
-	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -85,11 +84,13 @@ func TestConfigInvalid(t *testing.T) {
 		t.Fatal("expected ucfg.Error")
 	}
 
-	merr, ok := ucfgErr.Reason().(*multierror.MultiError)
+	merr, ok := ucfgErr.Reason().(interface {
+		Unwrap() []error
+	})
 	if !ok {
-		t.Fatal("expected MultiError")
+		t.Fatal("expected slice error unwrapper")
 	}
-	assert.Len(t, merr.Errors, 4)
+	assert.Len(t, merr.Unwrap(), 4)
 
 	config, err = conf.NewConfigFrom(map[string]interface{}{
 		"paths":         []string{"/usr/bin"},

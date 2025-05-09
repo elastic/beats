@@ -11,7 +11,7 @@ You configure Packetbeat to write to a specific output by setting options in the
 
 The following topics describe how to configure each supported output. If you’ve secured the {{stack}}, also read [Secure](/reference/packetbeat/securing-packetbeat.md) for more about security-related configuration options.
 
-* [{{ess}}](/reference/packetbeat/configure-cloud-id.md)
+* [{{ech}}](/reference/packetbeat/configure-cloud-id.md)
 * [Elasticsearch](/reference/packetbeat/elasticsearch-output.md)
 * [Logstash](/reference/packetbeat/logstash-output.md)
 * [Kafka](/reference/packetbeat/kafka-output.md)

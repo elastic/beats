@@ -18,12 +18,12 @@
 package monitor
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -113,7 +113,7 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 		return nil
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	if err := watcher.watchFile(path, nil); err != nil {
 		errs = append(errs, fmt.Errorf("failed adding watcher to '%s': %w", path, err))
 	}
@@ -147,7 +147,7 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 	if err != nil {
 		errs = append(errs, fmt.Errorf("failed to walk path '%s': %w", path, err))
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (watcher *recursiveWatcher) close() error {

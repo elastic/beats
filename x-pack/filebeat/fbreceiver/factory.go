@@ -81,6 +81,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	return &filebeatReceiver{BeatReceiver: base}, nil
 }
 
+// copied from filebeat cmd.
 func defaultProcessors() []mapstr.M {
 	// processors:
 	// - add_host_metadata:
