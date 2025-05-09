@@ -35,7 +35,6 @@ exporters:
       - https://localhost:9200
     idle_conn_timeout: 3s
     logs_index: form-otel-exporter
-    num_workers: 1
     password: changeme
     retry:
       enabled: true
@@ -177,7 +176,6 @@ exporters:
       - https://es-hostname.elastic.co:443
     idle_conn_timeout: 3s
     logs_index: form-otel-exporter
-    num_workers: 1
     password: password
     retry:
       enabled: true
