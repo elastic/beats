@@ -18,92 +18,137 @@
 package v2
 
 import (
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestNewPipelineClientListener_emptyReg(t *testing.T) {
 	reg := monitoring.NewRegistry()
 
-	listener := NewPipelineClientListener(reg, nil)
+	listener := NewPipelineClientListener(reg)
 	require.NotNil(t, listener, "Listener should not be nil")
 
-	pcl, ok := listener.(*PipelineClientListener)
-	require.True(t, ok,
-		"listener should be of type %T", &PipelineClientListener{})
-	assert.NotNilf(t, pcl.eventsTotal,
+	assert.NotNilf(t, listener.eventsTotal,
 		"%q metric should be created", metricEventsPipelineTotal)
-	assert.NotNilf(t, pcl.eventsFiltered,
+	assert.NotNilf(t, listener.eventsFiltered,
 		"%q metric should be created", metricEventsPipelineFiltered)
-	assert.NotNilf(t, pcl.eventsPublished,
+	assert.NotNilf(t, listener.eventsPublished,
 		"%q metric should be created", metricEventsPipelinePublished)
 }
 
-func TestNewPipelineClientListener_reusedReg(t *testing.T) {
-	reg := monitoring.NewRegistry()
+func TestPrepareInputMetrics(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "TestPrepareInputMetrics")
+	inputID := "test_input_id"
+	inputType := "test_input_type"
 
-	listener := NewPipelineClientListener(reg, nil)
-	require.NotNil(t, listener, "Listener should not be nil")
-	pcl, ok := listener.(*PipelineClientListener)
-	require.True(t, ok,
-		"listener should be of type %T", &PipelineClientListener{})
-	gotTotal := pcl.eventsTotal
-	gotFiltered := pcl.eventsFiltered
-	gotPublished := pcl.eventsPublished
-
-	assert.NotPanics(t, func() {
-		// Call NewPipelineClientListener again reusing the metrics registry
-		listener = NewPipelineClientListener(reg, nil)
-	}, "Should not panic when reusing a metrics registry")
-	require.NotNil(t, listener, "Listener should not be nil")
-
-	pcl, ok = listener.(*PipelineClientListener)
-	require.True(t, ok,
-		"listener should be of type %T", &PipelineClientListener{})
-
-	assert.Equalf(t, pcl.eventsTotal, gotTotal,
-		"%q metric should have been reused", metricEventsPipelineTotal)
-	assert.Equalf(t, pcl.eventsFiltered, gotFiltered,
-		"%q metric should have been reused", metricEventsPipelineFiltered)
-	assert.Equalf(t, pcl.eventsPublished, gotPublished,
-		"%q metric should have been reused", metricEventsPipelinePublished)
-}
-
-func TestNewPipelineClientListener_ClientListener(t *testing.T) {
 	tcs := []struct {
-		name   string
-		cl     beat.ClientListener
-		assert func(*testing.T, any)
+		name     string
+		cfg      beat.ClientConfig
+		assertFn func(t *testing.T, cfg beat.ClientConfig)
 	}{
 		{
-			name: "nil clientListener",
-			cl:   nil,
-			assert: func(t *testing.T, got any) {
-				assert.IsTypef(t, &PipelineClientListener{}, got,
-					"want %T, got %T", &PipelineClientListener{}, got)
+			name: "nil client listener",
+			cfg:  beat.ClientConfig{},
+			assertFn: func(t *testing.T, cfg beat.ClientConfig) {
+				assert.NotNil(t, cfg.ClientListener, "ClientListener should not be nil")
+				assert.IsTypef(t, &PipelineClientListener{}, cfg.ClientListener,
+					"ClientListener should be of type %T", &PipelineClientListener{})
 			},
 		},
 		{
-			name: "existing clientListener",
-			cl:   &PipelineClientListener{},
-			assert: func(t *testing.T, got any) {
-				assert.IsTypef(t, &beat.CombinedClientListener{}, got,
-					"want %T, got %T", &PipelineClientListener{}, got)
+			name: "existing client listener",
+			cfg: beat.ClientConfig{
+				ClientListener: &beat.CombinedClientListener{}},
+			assertFn: func(t *testing.T, cfg beat.ClientConfig) {
+				assert.NotNil(t, cfg.ClientListener, "ClientListener should not be nil")
+				combListener, ok := cfg.ClientListener.(*beat.CombinedClientListener)
+				assert.True(t, ok, "ClientListener should be of type %T", &beat.CombinedClientListener{})
+				_, aOK := combListener.A.(*PipelineClientListener)
+				_, bOK := combListener.B.(*PipelineClientListener)
+				assert.True(t, aOK || bOK, "Either A or B should be of type %T", &PipelineClientListener{})
 			},
 		},
 	}
 
 	for _, tc := range tcs {
-		t.Run(tc.name, func(t *testing.T) {
-			reg := monitoring.NewRegistry()
-			got := NewPipelineClientListener(reg, tc.cl)
-			assert.NotNil(t, got, "ClientListener should not be nil")
-			tc.assert(t, got)
-		})
+		parent := monitoring.NewRegistry()
+
+		pc := pipetool.WithClientConfigEdit(pipeline.NewNilPipeline(),
+			func(orig beat.ClientConfig) (beat.ClientConfig, error) {
+				tc.assertFn(t, orig)
+				return orig, nil
+			})
+		reg, wrappedconnector, cancelMetrics :=
+			PrepareInputMetrics(inputID, inputType, parent, pc, log)
+		t.Cleanup(cancelMetrics)
+
+		require.NotNil(t, reg, "input metrics registry should not be nil")
+		require.NotNil(t, wrappedconnector, "wrapped connector should not be nil")
+
+		c, err := wrappedconnector.ConnectWith(tc.cfg)
+		assert.NoError(t, err, "ConnectWith should not return an error")
+		assert.NotNil(t, c, "client should not be nil")
 	}
+}
+
+func TestPrepareInputMetrics_safeConcurrentPipelineClientCreation(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "TestPrepareInputMetrics")
+	inputID := "test_input_id"
+	inputType := "test_input_type"
+
+	parent := monitoring.NewRegistry()
+	connector := pipeline.NewNilPipeline()
+
+	reg, wrappedconnector, cancelMetrics :=
+		PrepareInputMetrics(inputID, inputType, parent, connector, log)
+	defer cancelMetrics()
+
+	require.NotNil(t, reg, "input metrics registry should not be nil")
+	require.NotNil(t, wrappedconnector, "wrapped connector should not be nil")
+
+	// make sure ConnectWith can be called multiple times concurrently.
+	// It simulates an input, like the AWS sqs input, that creates multiple
+	// workers, each one with its own client.
+	wg := sync.WaitGroup{}
+	for range 10000 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			c, err := wrappedconnector.ConnectWith(beat.ClientConfig{})
+			assert.NoError(t, err, "ConnectWith should not return an error")
+			assert.NotNil(t, c, "client should not be nil")
+		}()
+	}
+	wg.Wait()
+}
+
+func TestPrepareInputMetrics_reusedReg_deprecatedNewInputRegistry(t *testing.T) {
+	log := logptest.NewTestingLogger(t, "TestPrepareInputMetrics")
+	inputID := "test_input_id"
+	inputType := "test_input_type"
+
+	parent := monitoring.NewRegistry()
+
+	connector := pipeline.NewNilPipeline()
+	reg, wrappedconnector, cancelMetrics :=
+		PrepareInputMetrics(inputID, inputType, parent, connector, log)
+	defer cancelMetrics()
+
+	require.NotNil(t, reg, "input metrics registry should not be nil")
+	require.NotNil(t, wrappedconnector, "wrapped connector should not be nil")
+
+	got, cancel := inputmon.NewInputRegistry(inputType, inputID, parent)
+	defer cancel()
+	assert.Equal(t, reg, got, "metrics registry should be the same")
 }
