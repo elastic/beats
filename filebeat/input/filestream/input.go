@@ -86,20 +86,14 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func updateDefaults(cfg config, inactiveSet bool) config {
-	defaultInactive := defaultCloserConfig().OnStateChange.Inactive
-	if cfg.Delete.OnClose.Inactive && !inactiveSet {
-		// This means the `close.on_state_change.inactive` is either not set or
-		// it is set to the default value, in either case, overwrite it to
-		// 30min
-		if cfg.Close.OnStateChange.Inactive == defaultInactive {
-			logp.
-				L().
-				Named("filestream").
-				Info("setting 'close.on_state_change.inactive' to 30min" +
-					" because 'delete.on_close.inactive' is true.")
-			cfg.Close.OnStateChange.Inactive = 30 * time.Minute
-		}
+func applyDeleteOverrides(cfg config, inactiveSet bool) config {
+	if !inactiveSet {
+		logp.
+			L().
+			Named("filestream").
+			Info("setting 'close.on_state_change.inactive' to 30min" +
+				" because 'delete.on_close.inactive' is true.")
+		cfg.Close.OnStateChange.Inactive = 30 * time.Minute
 	}
 
 	if cfg.Delete.OnClose.EOF {
@@ -127,7 +121,7 @@ func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 		return nil, nil, fmt.Errorf("cannot read 'close.on_state_change.inactive': %w", err)
 	}
 
-	c = updateDefaults(c, inactiveSet)
+	c = applyDeleteOverrides(c, inactiveSet)
 
 	prospector, err := newProspector(c)
 	if err != nil {

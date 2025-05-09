@@ -21,16 +21,8 @@ grace period, check if no new data has been added to the file, by
 comparing its current size with the size when the last event was read,
 then it will try to remove the file.
 
-When a file reader is closed, either because it reached the end of the
-file (EOF) or due to inactivity, Filestream will check if all
-events have been published. If all events are published, it will wait
-for the configured grace period. After the grace period, it will compare the
-file's current size with its size when the last event was read to
-ensure no new data has been added. If no new data has been added, then
-it will attempt to remove the file.
-
 If any of the checks fail, the harvester is closed. One the next
-file system scan happens, a new harvester, and reader, will be
+file system scan happens, a new harvester, will be
 started, once the close condition (EOF or inactivity) is met, then the
 remove process will start again.
 
@@ -71,11 +63,13 @@ configuration is:
 ```
 
 ### Log files from long running tasks
-Filebeat will be used to ingest log files from tasks that run for a
-few minutes, appending to their log files, if the tasks are still
-running log entries are added every few seconds. Once no more entries
-have been added for a few minutes, it is safe to remove the log file. The
-log files are located at `/var/log/long-tasks/*.log`.
+Filebeat will be used to collect logs from long-running tasks that
+continuously add information to their log files. While these tasks are
+active, new log entries appear in their respective files located at
+`/var/log/long-tasks/*.log` every few seconds. Filebeat monitors these
+files, and once a log file hasn't been updated for several minutes, it
+indicates that the corresponding task has likely finished, making it
+safe to remove the log file.
 
 For this case Filestream can be configured to remove files after a
 period of inactivity, the simplest configuration is:

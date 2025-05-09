@@ -171,16 +171,13 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		case prevDesc.Info.Size() < fd.Info.Size():
 			e = writeEvent(path, fd)
 			writtenCount++
-		}
 
-		// For the delete feature we need to run the harvester for
-		// files that have not changed until they're deleted.
-		//
-		// Op.Done is the default value for a loginp.Operation,
-		// it is used below to indicate the file has not changed and
-		// by the copytruncate prospector.
-		if w.cfg.SendNotChanged && e.Op == loginp.OpDone {
-			e = notChangedEvent(path, fd)
+		default:
+			// For the delete feature we need to run the harvester for
+			// files that have not changed until they're deleted.
+			if w.cfg.SendNotChanged {
+				e = notChangedEvent(path, fd)
+			}
 		}
 
 		// if none of the conditions were true, the file remained unchanged and we don't need to create an event
