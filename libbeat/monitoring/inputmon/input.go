@@ -116,6 +116,9 @@ func MetricSnapshotJSON(reg *monitoring.Registry) ([]byte, error) {
 // any '.' is replaced by '_'. The new registry is initialized with
 // 'id: inputID' and 'input: inputType'.
 //
+// If there is already a registry with the same name on parent, a new registry
+// not associated with parent will be returned.
+//
 // Call CancelMetricsRegistry to remove it from the parent registry and free up
 // the associated resources.
 func NewMetricsRegistry(
@@ -129,8 +132,10 @@ func NewMetricsRegistry(
 	if reg == nil {
 		reg = parent.NewRegistry(registryID)
 	} else {
+		// Null route metrics for duplicated ID.
+		reg = monitoring.NewRegistry()
 		log.Warnw(fmt.Sprintf(
-			"parent metrics registry already contains a %q registry, reusing it",
+			"parent metrics registry already contains a %q registry, returning an unregistered registry. Metrics won't be available for this input instance",
 			registryID),
 			"registry_id", registryID,
 			"input_type", inputType,
