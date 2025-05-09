@@ -232,7 +232,6 @@ steps:
 
       - label: ":ubuntu: x-pack/metricbeat: AWS Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
-<<<<<<< HEAD
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         command: |
           set -euo pipefail
@@ -240,8 +239,6 @@ steps:
           echo "~~~ Running tests"
           cd x-pack/metricbeat
           mage build test
-=======
->>>>>>> 20a009464 (bk: use OIDC to create AWS cloud resources (#44202))
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
           MODULE_DIR: "x-pack/metricbeat/module/aws"
