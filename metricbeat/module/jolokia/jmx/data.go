@@ -18,10 +18,9 @@
 package jmx
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -120,7 +119,7 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error)
 	// Generate a different event for each wildcard mbean, and and additional one
 	// for non-wildcard requested mbeans, group them by event name if defined
 	mbeanEvents := make(map[eventKey]mapstr.M)
-	var errs multierror.Errors
+	var errs []error
 
 	for _, v := range entries {
 		if v.Value == nil || v.Request.Attribute == nil {
@@ -136,11 +135,13 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error)
 					errs = append(errs, err)
 				}
 			case map[string]interface{}:
-				constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs)
 			}
 		case []interface{}:
-			entryValues := v.Value.(map[string]interface{})
-			constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+			entryValues, ok := v.Value.(map[string]interface{})
+			if ok {
+				errs = constructEvents(entryValues, v, mbeanEvents, mapping, errs)
+			}
 		}
 	}
 
@@ -149,10 +150,10 @@ func eventMapping(entries []Entry, mapping AttributeMapping) ([]mapstr.M, error)
 		events = append(events, event)
 	}
 
-	return events, errs.Err()
+	return events, errors.Join(errs...)
 }
 
-func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs multierror.Errors) {
+func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents map[eventKey]mapstr.M, mapping AttributeMapping, errs []error) []error {
 	hasWildcard := strings.Contains(v.Request.Mbean, "*")
 	for attribute, value := range entryValues {
 		if !hasWildcard {
@@ -180,6 +181,7 @@ func constructEvents(entryValues map[string]interface{}, v Entry, mbeanEvents ma
 			}
 		}
 	}
+	return errs
 }
 
 func selectEvent(events map[eventKey]mapstr.M, key eventKey) mapstr.M {

@@ -13,7 +13,7 @@ mapped_pages:
 The recommended index template file for Heartbeat is installed by the Heartbeat packages. If you accept the default configuration in the `heartbeat.yml` config file, Heartbeat loads the template automatically after successfully connecting to {{es}}. If the template already exists, it’s not overwritten unless you configure Heartbeat to do so.
 
 ::::{note}
-A connection to {{es}} is required to load the index template. If the output is not {{es}} (or {{ess}}), you must [load the template manually](#load-template-manually).
+A connection to {{es}} is required to load the index template. If the output is not {{es}} (or {{ech}}), you must [load the template manually](#load-template-manually).
 ::::
 
 

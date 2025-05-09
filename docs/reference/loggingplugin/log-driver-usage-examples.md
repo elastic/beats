@@ -36,7 +36,7 @@ docker run --log-driver=elastic/elastic-logging-plugin:{{stack-version}} \
 ```
 
 
-## Send Docker logs to {{ess}} on {{ecloud}} [_send_docker_logs_to_ess_on_ecloud]
+## Send Docker logs to {{ech}} [_send_docker_logs_to_ess_on_ecloud]
 
 **Docker run command:**
 
