@@ -34,6 +34,11 @@ const (
 	metricEventsPipelineTotal     = "events_pipeline_total"
 	metricEventsPipelineFiltered  = "events_pipeline_filtered_total"
 	metricEventsPipelinePublished = "events_pipeline_published_total"
+
+	metricEventOutputTotal           = "events_output_total"
+	metricEventOutputAckedTotal      = "events_output_acked_total"
+	metricEventOutputDroppedTotal    = "events_output_dropped_total"
+	metricEventOutputDeadLetterTotal = "events_output_dead_letter_total"
 )
 
 // InputManager creates and maintains actions and background processes for an
@@ -142,6 +147,17 @@ func NewPipelineClientListener(
 	return pcl
 }
 
+// NewPipelineOutputListener ...
+// TODO: add test to ensure it implements pipeline.OutputListener
+func NewPipelineOutputListener(reg *monitoring.Registry) *OutputListener {
+	return &OutputListener{
+		eventsTotal:      getMonitoringUint(reg, metricEventOutputTotal),
+		eventsAcked:      getMonitoringUint(reg, metricEventOutputAckedTotal),
+		eventsDropped:    getMonitoringUint(reg, metricEventOutputDroppedTotal),
+		eventsDeadLetter: getMonitoringUint(reg, metricEventOutputDeadLetterTotal),
+	}
+}
+
 // getMonitoringUint returns a *monitoring.Uint metric with the given name.
 // If the metric does not exist, it will be created and registered in the
 // registry. If the metric already exists, it will be returned.
@@ -155,18 +171,51 @@ func getMonitoringUint(reg *monitoring.Registry, name string) *monitoring.Uint {
 	return monVar.(*monitoring.Uint)
 }
 
+var _ beat.OutputListener = (*OutputListener)(nil)
+
+type OutputListener struct {
+	eventsAcked,
+	eventsDeadLetter,
+	eventsDropped,
+	eventsDuplicateEvents,
+	eventsErrTooMany,
+	eventsRetryableErrors,
+	eventsTotal *monitoring.Uint
+}
+
+func (o *OutputListener) Acked() {
+	o.eventsAcked.Inc()
+}
+
+func (o *OutputListener) DeadLetter() {
+	o.eventsDeadLetter.Inc()
+}
+func (o *OutputListener) Dropped() {
+	o.eventsDropped.Inc()
+}
+
+func (o *OutputListener) DuplicateEvents() {
+	o.eventsDuplicateEvents.Inc()
+}
+
+func (o *OutputListener) ErrTooMany() {
+	o.eventsErrTooMany.Inc()
+}
+
+func (o *OutputListener) RetryableError() {
+	o.eventsRetryableErrors.Inc()
+}
+
+func (o *OutputListener) NewEvent() {
+	o.eventsTotal.Inc()
+}
+
 // PipelineClientListener implements beat.ClientListener to collect pipeline
 // metrics per-input.
 type PipelineClientListener struct {
 	eventsTotal,
 	eventsFiltered,
 	eventsPublished *monitoring.Uint
-}
-
-func (i *PipelineClientListener) Closing() {
-}
-
-func (i *PipelineClientListener) Closed() {
 }
 
 func (i *PipelineClientListener) NewEvent() {
@@ -181,6 +230,8 @@ func (i *PipelineClientListener) Published() {
 	i.eventsPublished.Inc()
 }
 
+func (i *PipelineClientListener) Closing()                    {}
+func (i *PipelineClientListener) Closed()                     {}
 func (i *PipelineClientListener) DroppedOnPublish(beat.Event) {}
 
 // TestContext provides the Input Test function with common environmental

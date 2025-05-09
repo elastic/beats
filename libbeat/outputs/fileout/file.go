@@ -109,7 +109,6 @@ func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {
 	return nil
 }
 
-// Implement Outputer
 func (out *fileOutput) Close() error {
 	return out.rotator.Close()
 }
@@ -119,12 +118,31 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 	st := out.observer
 	events := batch.Events()
-	st.NewBatch(len(events))
-
-	dropped := 0
+	st.NewBatch(events)
 
 	for i := range events {
 		event := &events[i]
+
+		// switch rand.IntN(10) {
+		// case 0:
+		// 	msg := "forced failure to simulate PermanentError"
+		// 	if event.Guaranteed() {
+		// 		out.log.Error(msg)
+		// 	} else {
+		// 		out.log.Warn(msg)
+		// 	}
+		// 	st.PermanentError(events[i])
+		// 	continue
+		// case 1:
+		// 	msg := "forced failure to simulate DeadLetterEvents"
+		// 	if event.Guaranteed() {
+		// 		out.log.Error(msg)
+		// 	} else {
+		// 		out.log.Warn(msg)
+		// 	}
+		// 	st.DeadLetterEvents([]publisher.Event{events[i]})
+		// 	continue
+		// }
 
 		serializedEvent, err := out.codec.Encode(out.beat.Beat, &event.Content)
 		if err != nil {
@@ -136,7 +154,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 			out.log.Debug("Failed event logged to event log file")
 			out.log.Debugw(fmt.Sprintf("Failed event: %v", event), logp.TypeKey, logp.EventType)
 
-			dropped++
+			st.PermanentError(events[i])
 			continue
 		}
 
@@ -150,18 +168,15 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 				out.log.Warnf("Writing event to file failed with: %+v", err)
 			}
 
-			dropped++
+			st.PermanentError(events[i])
 			continue
 		}
 
 		st.WriteBytes(len(serializedEvent) + 1)
 		took := time.Since(begin)
 		st.ReportLatency(took)
+		st.AckedEvent(events[i])
 	}
-
-	st.PermanentErrors(dropped)
-
-	st.AckedEvents(len(events) - dropped)
 
 	return nil
 }

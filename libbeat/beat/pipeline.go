@@ -18,6 +18,8 @@
 package beat
 
 import (
+	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -57,6 +59,9 @@ type ClientConfig struct {
 
 	// Callbacks for when events are added / acknowledged
 	EventListener EventListener
+
+	// OutputListener configures callbacks for monitoring the output
+	OutputListener OutputListener
 
 	// ClientListener configures callbacks for monitoring pipeline clients
 	ClientListener ClientListener
@@ -138,6 +143,17 @@ type ClientListener interface {
 	DroppedOnPublish(Event) // event has been dropped, while waiting for the queue
 }
 
+// OutputListener provides an interface to track status of events in the output.
+type OutputListener interface {
+	NewEvent()        // event has arrived in the output
+	Acked()           // event has been acked
+	DeadLetter()      // event has been sent to dead letter index
+	Dropped()         // event has been events dropped
+	DuplicateEvents() // event has been detected as duplicate
+	ErrTooMany()      // output replied with too many requests
+	RetryableError()  // event has a retryable error
+}
+
 type ProcessorList interface {
 	Processor
 	Close() error
@@ -203,4 +219,104 @@ func (c *CombinedClientListener) Published() {
 func (c *CombinedClientListener) DroppedOnPublish(event Event) {
 	c.A.DroppedOnPublish(event)
 	c.B.DroppedOnPublish(event)
+}
+
+// NoopClientListener is a no-op ClientListener.
+type NoopClientListener struct{}
+
+func (n NoopClientListener) Closing()               {}
+func (n NoopClientListener) Closed()                {}
+func (n NoopClientListener) NewEvent()              {}
+func (n NoopClientListener) Filtered()              {}
+func (n NoopClientListener) Published()             {}
+func (n NoopClientListener) DroppedOnPublish(Event) {}
+
+var _ OutputListener = (*NoopOutputListener)(nil)
+
+// NoopOutputListener is a no-op OutputListener.
+type NoopOutputListener struct{}
+
+func (n NoopOutputListener) DuplicateEvents() {}
+func (n NoopOutputListener) ErrTooMany()      {}
+func (n NoopOutputListener) RetryableError()  {}
+func (n NoopOutputListener) NewEvent()        {}
+func (n NoopOutputListener) Acked()           {}
+func (n NoopOutputListener) Dropped()         {}
+func (n NoopOutputListener) DeadLetter()      {}
+
+var _ OutputListener = (*CountOutputListener)(nil)
+
+// CountOutputListener is a simple implementation of OutputListener that uses
+// atomic counters. It's intended for use in tests.
+type CountOutputListener struct {
+	acked,
+	deadLetter,
+	dropped,
+	duplicateEvents,
+	errTooMany,
+	new,
+	retryableErrors atomic.Int64
+}
+
+func (c *CountOutputListener) Acked() {
+	c.acked.Add(1)
+}
+
+func (c *CountOutputListener) DeadLetter() {
+	c.deadLetter.Add(1)
+}
+
+func (c *CountOutputListener) Dropped() {
+	c.dropped.Add(1)
+}
+
+func (c *CountOutputListener) DuplicateEvents() {
+	c.duplicateEvents.Add(1)
+}
+
+func (c *CountOutputListener) ErrTooMany() {
+	c.errTooMany.Add(1)
+}
+
+func (c *CountOutputListener) NewEvent() {
+	c.new.Add(1)
+}
+
+func (c *CountOutputListener) RetryableError() {
+	c.retryableErrors.Add(1)
+}
+
+func (c *CountOutputListener) AckedLoad() int64 {
+	return c.acked.Load()
+}
+
+func (c *CountOutputListener) DeadLetterLoad() int64 {
+	return c.deadLetter.Load()
+}
+
+func (c *CountOutputListener) DroppedLoad() int64 {
+	return c.dropped.Load()
+}
+
+func (c *CountOutputListener) DuplicateEventsLoad() int64 {
+	return c.duplicateEvents.Load()
+}
+
+func (c *CountOutputListener) ErrTooManyLoad() int64 {
+	return c.errTooMany.Load()
+}
+
+func (c *CountOutputListener) NewLoad() int64 {
+	return c.new.Load()
+}
+
+func (c *CountOutputListener) RetryableErrorsLoad() int64 {
+	return c.retryableErrors.Load()
+}
+
+func (c *CountOutputListener) String() string {
+	return fmt.Sprintf(
+		"New: %d, Acked: %d, Dropped: %d, DeadLetter: %d, DuplicateEvents: %d, ErrTooMany: %d, RetryableErrors: %d",
+		c.new.Load(), c.acked.Load(), c.dropped.Load(), c.deadLetter.Load(),
+		c.duplicateEvents.Load(), c.errTooMany.Load(), c.retryableErrors.Load())
 }

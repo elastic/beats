@@ -153,6 +153,7 @@ func (inp *managedInput) Run(
 					orig.ClientListener =
 						input.NewPipelineClientListener(
 							inpCtx.MetricsRegistry, orig.ClientListener)
+					orig.OutputListener = input.NewPipelineOutputListener(reg)
 					return orig, nil
 				})
 
