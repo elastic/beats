@@ -114,7 +114,7 @@ func (c converter) Convert(_ context.Context, conf *confmap.Conf) error {
 		// inject log level
 		receiverConfig, err := config.NewConfigFrom(receiverCfg.ToStringMap())
 		if err != nil {
-			return fmt.Errorf("Error getting receiver config: %w", err)
+			return fmt.Errorf("error getting receiver config: %w", err)
 		}
 
 		if level, _ := receiverConfig.String("logging.level", -1); level != "" {
