@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -87,7 +86,11 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	tempDir := filebeat.TempDir()
 
 	// 1. Generate the log file path, but do not write data to it
-	logFilePath := path.Join(tempDir, "log.log")
+	logFilePath := filepath.Join(tempDir, "log.log")
+	msgLogFilePath := logFilePath
+	if runtime.GOOS == "windows" {
+		msgLogFilePath = strings.ReplaceAll(logFilePath, `\`, `\\`)
+	}
 
 	// 2. Write configuration file ans start Filebeat
 	filebeat.WriteConfigFile(fmt.Sprintf(filestreamCleanInactiveCfg, logFilePath, tempDir))
@@ -97,14 +100,18 @@ func TestFilestreamCleanInactive(t *testing.T) {
 	integration.GenerateLogFile(t, logFilePath, 10, false)
 
 	// 4. Wait for Filebeat to start scanning for files
-	//
 	filebeat.WaitForLogs(
-		fmt.Sprintf("A new file %s has been found", logFilePath),
+		fmt.Sprintf("A new file %s has been found", msgLogFilePath),
 		10*time.Second,
 		"Filebeat did not start looking for files to ingest")
 
 	filebeat.WaitForLogs(
-		fmt.Sprintf("Reader was closed. Closing. Path='%s", logFilePath),
+		fmt.Sprintf("File is inactive. Closing. Path='%s'", msgLogFilePath),
+		10*time.Second,
+		"File did not became inactive")
+
+	filebeat.WaitForLogs(
+		fmt.Sprintf("Closed reader. Path='%s'", msgLogFilePath),
 		10*time.Second, "Filebeat did not close the file")
 
 	// 5. Now that the reader has been closed, nothing is holding the state
@@ -363,6 +370,10 @@ logging:
 			workDir := filebeat.TempDir()
 			outputFile := filepath.Join(workDir, "output-file*")
 			logFilepath := filepath.Join(workDir, "log.log")
+			msgLogFilepath := logFilepath
+			if runtime.GOOS == "windows" {
+				msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
+			}
 			integration.GenerateLogFile(t, logFilepath, 25, false)
 
 			cfgYAML := fmt.Sprintf(cfgTemplate, logFilepath, tc.oldIdentityCfg, workDir)
@@ -370,7 +381,7 @@ logging:
 			filebeat.Start()
 
 			// Wait for the file to be fully ingested
-			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
+			eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
 			filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 			requirePublishedEvents(t, filebeat, 25, outputFile)
 			filebeat.Stop()
@@ -385,7 +396,7 @@ logging:
 			// The happy path is to migrate keys, so we assert it first
 			if tc.expectMigration {
 				// Test the case where the registry migration happens
-				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", logFilepath)
+				migratingMsg := fmt.Sprintf("are the same, migrating. Source: '%s'", msgLogFilepath)
 				filebeat.WaitForLogs(migratingMsg, time.Second*5, "prospector did not migrate registry entry")
 				filebeat.WaitForLogs("migrated entry in registry from", time.Second*10, "store did not update registry key")
 				filebeat.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached the second time")
@@ -420,7 +431,7 @@ logging:
 	}
 }
 
-func TestFilestreamMigrateIdentityCornerCases(t *testing.T) {
+func TestFilestreamCanMigrateIdentityCornerCases(t *testing.T) {
 	cfgTemplate := `
 filebeat.inputs:
   - type: filestream
@@ -547,12 +558,12 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	workDir := filebeat.TempDir()
 	outputFile := filepath.Join(workDir, "output-file*")
 
-	vars := map[string]string{
+	vars := map[string]any{
 		"inputID":  oldID,
 		"homePath": workDir,
 		"testdata": testDataPath,
 	}
-	cfgYAML := getTakeOverConfig(t, vars, "happy-path.yml")
+	cfgYAML := getConfig(t, vars, "take-over", "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
@@ -564,10 +575,10 @@ func TestFilestreamTakeOverFromFilestream(t *testing.T) {
 	vars["previousID"] = oldID
 	vars["inputID"] = newID
 
-	cfgYAML = getTakeOverConfig(t, vars, "happy-path.yml")
+	cfgYAML = getConfig(t, vars, "take-over", "happy-path.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
-	removeOldLogFiles(t, workDir)
+	filebeat.RemoveLogFiles()
 
 	// Start Filebeat again.
 	// This time the states must be migrated and no new data ingested
@@ -611,11 +622,11 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 	workDir := filebeat.TempDir()
 	outputFile := filepath.Join(workDir, "output-file*")
 
-	vars := map[string]string{
+	vars := map[string]any{
 		"homePath": workDir,
 		"testdata": testDataPath,
 	}
-	cfgYAML := getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	cfgYAML := getConfig(t, vars, "take-over", "happy-path-log-input.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 	filebeat.Start()
 
@@ -626,10 +637,10 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 
 	vars["takeOver"] = "true"
 
-	cfgYAML = getTakeOverConfig(t, vars, "happy-path-log-input.yml")
+	cfgYAML = getConfig(t, vars, "take-over", "happy-path-log-input.yml")
 	filebeat.WriteConfigFile(cfgYAML)
 
-	removeOldLogFiles(t, workDir)
+	filebeat.RemoveLogFiles()
 
 	// Start Filebeat again.
 	// This time the states must be migrated and no new data ingested
@@ -655,6 +666,354 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 			"expected-registry-happy-path-log-input.json"),
 		"Entries in the registry are different from the expectation",
 	)
+}
+
+func TestFilestreamDelete(t *testing.T) {
+	testCases := map[string]struct {
+		configTmpl          string
+		msgs                []string
+		resourceNotFinished bool
+		dataAdded           bool
+		gracePeriod         time.Duration
+	}{
+		"EOF": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+		},
+		"EOF and resource not finished": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+			resourceNotFinished: true,
+		},
+		"EOF resource not finished and data added": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+			resourceNotFinished: true,
+			dataAdded:           true,
+		},
+		"EOF resource not finished data added and grace priod": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+			resourceNotFinished: true,
+			dataAdded:           true,
+			gracePeriod:         2 * time.Second,
+		},
+		"Inactive": {
+			configTmpl: "inactive.yml",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
+		},
+		"Inactive and resource not finished": {
+			configTmpl: "inactive.yml",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
+			resourceNotFinished: true,
+		},
+		"Inactive resource not finished and data added": {
+			configTmpl: "inactive.yml",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
+			resourceNotFinished: true,
+			dataAdded:           true,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			s, esAddr, es, _ := integration.StartMockES(t, "", 0, 0, 0, 0, 0)
+			defer s.Close()
+
+			if tc.resourceNotFinished {
+				if err := es.UpdateOdds(0, 100, 0, 0); err != nil {
+					t.Fatalf("cannot update odds from Mock-ES: %s", err)
+				}
+			}
+
+			testDataPath, err := filepath.Abs("./testdata")
+			if err != nil {
+				t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+			}
+
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+			workDir := filebeat.TempDir()
+
+			logFile := filepath.Join(workDir, "log.log")
+			// Escape filepaths for Windows
+			msgLogFilePath := logFile
+			if runtime.GOOS == "windows" {
+				msgLogFilePath = strings.ReplaceAll(logFile, `\`, `\\`)
+			}
+			integration.GenerateLogFile(t, logFile, 100, false)
+
+			vars := map[string]any{
+				"homePath":    workDir,
+				"logfile":     logFile,
+				"testdata":    testDataPath,
+				"esHost":      esAddr,
+				"gracePeriod": tc.gracePeriod.String(),
+			}
+			cfgYAML := getConfig(t, vars, "delete", tc.configTmpl)
+			filebeat.WriteConfigFile(cfgYAML)
+			filebeat.Start()
+
+			for _, msgFmt := range tc.msgs {
+				msg := fmt.Sprintf(msgFmt, msgLogFilePath)
+				filebeat.WaitForLogs(
+					msg,
+					10*time.Second,
+					"did not find '%s' in the logs",
+					msg,
+				)
+			}
+
+			if tc.resourceNotFinished {
+				// Wait a few times for the 'not finished' logs
+				notFinishedMsg := fmt.Sprintf(
+					"not all events from '%s' have been published, "+
+						"closing harvester",
+					msgLogFilePath)
+				for i := range 2 {
+					filebeat.WaitForLogs(
+						notFinishedMsg,
+						10*time.Second,
+						"[%d] Filebeat did not wait for the resource to be finished",
+						i,
+					)
+				}
+
+				if tc.dataAdded {
+					// Add more data to the log file
+					integration.GenerateLogFile(t, msgLogFilePath, 5, true)
+
+					// Wait for the "file update" log
+					filebeat.WaitForLogs(
+						fmt.Sprintf("File %s has been updated", msgLogFilePath),
+						time.Second,
+						"filewatcher did not detect the file as updated")
+
+					// Wait for the harvester to be closed
+					filebeat.WaitForLogs(
+						fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
+						10*time.Second,
+						"harvester was not closed after data added to the file")
+
+					// Wait for the "not changed" log
+					filebeat.WaitForLogs(
+						fmt.Sprintf("File %s has not changed, trying to start new harvester because 'delete' is enabled", msgLogFilePath),
+						time.Second,
+						"Filestream did not try to start a new harvester for the unchanged file")
+
+					// Ensure harvester closes without removing the file
+					filebeat.WaitForLogs(
+						fmt.Sprintf("not all events from '%s' have been published, closing harvester", msgLogFilePath),
+						10*time.Second,
+						"Harvester was not closed because the resource is not finished")
+
+					if !fileExists(t, logFile) {
+						t.Fatalf("%q should not have been removed", logFile)
+					}
+				}
+
+				if err := es.UpdateOdds(0, 0, 0, 0); err != nil {
+					t.Fatalf("cannot update mock-es odds: %s", err)
+				}
+			}
+
+			msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
+			filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
+			removedMsg := filebeat.GetLastLogLine(msg)
+
+			gracePeriodMsg := fmt.Sprintf("all events from '%s' have been published, waiting for %s grace period", msgLogFilePath, tc.gracePeriod)
+			beforeWait := filebeat.GetLastLogLine(gracePeriodMsg)
+
+			delta := timeBetweenLogEntries(t, beforeWait, removedMsg)
+			if delta < tc.gracePeriod {
+				t.Errorf("grace period of %s was not respected", tc.gracePeriod)
+				t.Log("grace period waiting calculated based on the following log entries:")
+				t.Log("First :", beforeWait)
+				t.Log("Second:", removedMsg)
+			}
+
+			if fileExists(t, logFile) {
+				t.Fatalf("%q should have been removed", logFile)
+			}
+		})
+	}
+}
+
+func TestFilestreamDeleteRestart(t *testing.T) {
+	testCases := map[string]struct {
+		configTmpl          string
+		msgs                []string
+		resourceNotFinished bool
+		dataAdded           bool
+		gracePeriod         time.Duration
+	}{
+		"EOF and grace priod": {
+			configTmpl: "eof.yml",
+			msgs: []string{
+				"EOF has been reached. Closing. Path='%s'",
+				"'%s' will be removed because 'delete.on_close.eof' is set",
+			},
+			gracePeriod: 5 * time.Second,
+		},
+		"Inactive and grace period": {
+			configTmpl: "inactive.yml",
+			msgs: []string{
+				"'%s' is inactive",
+				"'%s' will be removed because 'delete.on_close.inactive' is set",
+			},
+			gracePeriod: 5 * time.Second,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			s, esAddr, _, _ := integration.StartMockES(t, "", 0, 0, 0, 0, 0)
+			defer s.Close()
+
+			testDataPath, err := filepath.Abs("./testdata")
+			if err != nil {
+				t.Fatalf("cannot get absolute path for 'testdata': %s", err)
+			}
+
+			filebeat := integration.NewBeat(
+				t,
+				"filebeat",
+				"../../filebeat.test",
+			)
+			workDir := filebeat.TempDir()
+
+			logFile := filepath.Join(workDir, "log.log")
+			// Escape filepaths for Windows
+			msgLogFilePath := logFile
+			if runtime.GOOS == "windows" {
+				msgLogFilePath = strings.ReplaceAll(logFile, `\`, `\\`)
+			}
+			integration.GenerateLogFile(t, logFile, 100, false)
+
+			vars := map[string]any{
+				"homePath":    workDir,
+				"logfile":     logFile,
+				"testdata":    testDataPath,
+				"esHost":      esAddr,
+				"gracePeriod": tc.gracePeriod.String(),
+			}
+			cfgYAML := getConfig(t, vars, "delete", tc.configTmpl)
+			filebeat.WriteConfigFile(cfgYAML)
+			filebeat.Start()
+
+			for _, msgFmt := range tc.msgs {
+				msg := fmt.Sprintf(msgFmt, msgLogFilePath)
+				filebeat.WaitForLogs(
+					msg,
+					10*time.Second,
+					"did not find '%s' in the logs",
+					msg,
+				)
+			}
+
+			gracePeriodMsg := fmt.Sprintf("all events from '%s' have been published, waiting for %s grace period", msgLogFilePath, tc.gracePeriod)
+			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
+
+			filebeat.Stop()
+			filebeat.WaitForLogs("filebeat stopped.", 2*time.Second, "Filebeat did not stop successfully")
+			filebeat.RemoveLogFiles()
+
+			if !fileExists(t, logFile) {
+				t.Fatalf("%q should not have been removed", logFile)
+			}
+
+			filebeat.Start()
+			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
+
+			msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
+			filebeat.WaitForLogs(msg, 10*time.Second, "file removed log entry not found")
+
+			if fileExists(t, logFile) {
+				t.Fatalf("%q should have been removed", logFile)
+			}
+		})
+	}
+}
+
+func timeBetweenLogEntries(t *testing.T, l1, l2 string) time.Duration {
+	type entry struct {
+		TS string `json:"@timestamp"`
+	}
+
+	e1 := entry{}
+	if err := json.Unmarshal([]byte(l1), &e1); err != nil {
+		t.Fatalf("cannot parse log entry. Err: %s. Entry: %s", err, l1)
+	}
+
+	e2 := entry{}
+	if err := json.Unmarshal([]byte(l2), &e2); err != nil {
+		t.Fatalf("cannot parse log entry. Err: %s. Entry: %s", err, l1)
+	}
+
+	t1, err := time.Parse("2006-01-02T15:04:05Z0700", e1.TS)
+	if err != nil {
+		t.Fatalf("cannot parse time from first log entry: %s", err)
+	}
+
+	t2, err := time.Parse("2006-01-02T15:04:05Z0700", e2.TS)
+	if err != nil {
+		t.Fatalf("cannot parse time from second log entry: %s", err)
+	}
+
+	return t2.Sub(t1)
+}
+
+func fileExists(t *testing.T, path string) bool {
+	t.Helper()
+	_, err := os.Stat(path)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return false
+		}
+		t.Fatalf("cannot stat file: %s", err)
+	}
+
+	return true
+}
+
+// getConfig renders the template in testdata/<folder>/<tmplPath> using vars
+func getConfig(t *testing.T, vars map[string]any, folder, tmplPath string) string {
+	t.Helper()
+	tmpl := template.Must(
+		template.ParseFiles(
+			filepath.Join("testdata", folder, tmplPath)))
+
+	str := strings.Builder{}
+	if err := tmpl.Execute(&str, vars); err != nil {
+		t.Fatalf("cannot execute template: %s", err)
+	}
+
+	ret := str.String()
+	return ret
 }
 
 func requireRegistryEntryRemoved(t *testing.T, workDir, identity string) {
@@ -707,31 +1066,20 @@ func createFileAndWaitIngestion(
 	}
 
 	integration.GenerateLogFile(t, logFilepath, n, false)
-
-	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", logFilepath)
-	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
-	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
-}
-
-func getTakeOverConfig(t *testing.T, vars map[string]string, tmplPath string) string {
-	t.Helper()
-	tmpl := template.Must(
-		template.ParseFiles(
-			filepath.Join("testdata", "take-over", tmplPath)))
-
-	str := strings.Builder{}
-	if err := tmpl.Execute(&str, vars); err != nil {
-		t.Fatalf("cannot execute template: %s", err)
+	msgLogFilepath := logFilepath
+	if runtime.GOOS == "windows" {
+		msgLogFilepath = strings.ReplaceAll(logFilepath, `\`, `\\`)
 	}
 
-	ret := str.String()
-	return ret
+	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
+	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
+	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
 }
 
 func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
 	for _, path := range files {
 		if runtime.GOOS == "windows" {
-			path = strings.Replace(path, `\`, `\\`, -1)
+			path = strings.ReplaceAll(path, `\`, `\\`)
 		}
 		eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", path)
 
@@ -749,9 +1097,6 @@ func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
 
 func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []string) {
 	for _, path := range files {
-		if runtime.GOOS == "windows" {
-			path = strings.Replace(path, `\`, `\\`, -1)
-		}
 		eofMsg := fmt.Sprintf("File didn't change: %s", path)
 
 		require.Eventuallyf(
@@ -763,21 +1108,6 @@ func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []s
 			100*time.Millisecond,
 			"'File didn't change' log not found for %q", path,
 		)
-	}
-}
-
-func removeOldLogFiles(t *testing.T, workDir string) {
-	// Remove old log file so we can correctly search stuff
-	glob := filepath.Join(workDir, "filebeat-*.ndjson")
-	files, err := filepath.Glob(glob)
-	if err != nil {
-		t.Fatalf("cannot list log files: %s", err)
-	}
-
-	for _, f := range files {
-		if err := os.Remove(f); err != nil {
-			t.Fatalf("cannot remove old log file: %s", err)
-		}
 	}
 }
 
