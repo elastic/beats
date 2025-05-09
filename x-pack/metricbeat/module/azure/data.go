@@ -291,16 +291,16 @@ func buildEventFrom(referencePoint KeyValuePoint, points []KeyValuePoint, resour
 // managePropertyName function will handle metric names, there are several formats the metric names are written
 func managePropertyName(metric string) string {
 	// replace spaces with underscores
-	resultMetricName := strings.Replace(metric, " ", "_", -1)
+	resultMetricName := strings.ReplaceAll(metric, " ", "_")
 	// replace backslashes with "per"
-	resultMetricName = strings.Replace(resultMetricName, "/", "_per_", -1)
-	resultMetricName = strings.Replace(resultMetricName, "\\", "_", -1)
+	resultMetricName = strings.ReplaceAll(resultMetricName, "/", "_per_")
+	resultMetricName = strings.ReplaceAll(resultMetricName, "\\", "_")
 	// replace actual percentage symbol with the smbol "pct"
-	resultMetricName = strings.Replace(resultMetricName, "_%_", "_pct_", -1)
+	resultMetricName = strings.ReplaceAll(resultMetricName, "_%_", "_pct_")
 	// create an object in case of ":"
-	resultMetricName = strings.Replace(resultMetricName, ":", "_", -1)
+	resultMetricName = strings.ReplaceAll(resultMetricName, ":", "_")
 	// create an object in case of ":"
-	resultMetricName = strings.Replace(resultMetricName, "_-_", "_", -1)
+	resultMetricName = strings.ReplaceAll(resultMetricName, "_-_", "_")
 	// replace uppercases with underscores
 	resultMetricName = ReplaceUpperCase(resultMetricName)
 

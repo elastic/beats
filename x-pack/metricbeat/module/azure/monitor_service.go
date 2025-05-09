@@ -351,7 +351,7 @@ func (service *MonitorService) QueryResources(
 			return nil, err
 		}
 
-		resp = append(resp, r.MetricResults.Values...)
+		resp = append(resp, r.Values...)
 	}
 
 	return resp, nil
