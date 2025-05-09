@@ -87,9 +87,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-
-*Auditbeat*
-
+- system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
 
 *Filebeat*
 
