@@ -50,7 +50,7 @@ func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor ma
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id),
+			metrics: newInputMetrics(id, nil),
 		},
 		creds: &clientcredentials.Config{
 			ClientID:       cfg.Auth.OAuth2.ClientID,
