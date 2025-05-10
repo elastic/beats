@@ -4,7 +4,9 @@
 
 package task_stats
 
-import "github.com/docker/docker/api/types"
+import (
+	dcontainer "github.com/docker/docker/api/types/container"
+)
 
 // BlkioRaw sums raw Blkio stats
 type BlkioRaw struct {
@@ -26,7 +28,7 @@ type blkioStats struct {
 }
 
 // getBlkioStats collects diskio metrics from BlkioStats structures(not populated in Windows)
-func getBlkioStats(raw types.BlkioStats) blkioStats {
+func getBlkioStats(raw dcontainer.BlkioStats) blkioStats {
 	return blkioStats{
 		serviced:      getNewStats(raw.IoServicedRecursive),
 		servicedBytes: getNewStats(raw.IoServiceBytesRecursive),
@@ -36,7 +38,7 @@ func getBlkioStats(raw types.BlkioStats) blkioStats {
 	}
 }
 
-func getNewStats(blkioEntry []types.BlkioStatEntry) BlkioRaw {
+func getNewStats(blkioEntry []dcontainer.BlkioStatEntry) BlkioRaw {
 	stats := BlkioRaw{
 		reads:  0,
 		writes: 0,

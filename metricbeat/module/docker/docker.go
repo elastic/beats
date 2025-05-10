@@ -26,8 +26,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
+	dcontainer "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/tlsconfig"
 
@@ -95,7 +94,7 @@ func NewDockerClient(endpoint string, config Config) (*client.Client, error) {
 func FetchStats(client *client.Client, timeout time.Duration, stream bool, logger *logp.Logger) ([]Stat, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	containers, err := client.ContainerList(ctx, container.ListOptions{})
+	containers, err := client.ContainerList(ctx, dcontainer.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +106,7 @@ func FetchStats(client *client.Client, timeout time.Duration, stream bool, logge
 	wg.Add(len(containers))
 
 	for _, container := range containers {
-		go func(container types.Container) {
+		go func(container dcontainer.Summary) {
 			defer wg.Done()
 			statsQueue <- exportContainerStats(ctx, client, &container, stream, logger)
 		}(container)
@@ -137,7 +136,7 @@ func FetchStats(client *client.Client, timeout time.Duration, stream bool, logge
 // In case stream is true, we use get a stream of results for container stats. From the stream we keep the second result.
 // This is needed for podman use case where in case stream is false, no precpu stats are returned. The precpu stats
 // are required for the cpu percentage calculation. We keep the second  result as in the first result, the stats are not correct.
-func exportContainerStats(ctx context.Context, client *client.Client, container *types.Container, stream bool, logger *logp.Logger) Stat {
+func exportContainerStats(ctx context.Context, client *client.Client, container *dcontainer.Summary, stream bool, logger *logp.Logger) Stat {
 	var event Stat
 	event.Container = container
 	containerStats, err := client.ContainerStats(ctx, container.ID, stream)

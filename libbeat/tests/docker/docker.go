@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/client"
@@ -109,7 +108,7 @@ func (c Client) ContainerWait(ID string) error {
 }
 
 // ContainerInspect recovers information of the container
-func (c Client) ContainerInspect(ID string) (types.ContainerJSON, error) {
+func (c Client) ContainerInspect(ID string) (container.InspectResponse, error) {
 	ctx := context.Background()
 	return c.cli.ContainerInspect(ctx, ID)
 }
