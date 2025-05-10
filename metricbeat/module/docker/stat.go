@@ -17,7 +17,9 @@
 
 package docker
 
-import "github.com/docker/docker/api/types"
+import (
+	"github.com/docker/docker/api/types/container"
+)
 
 // Types don't need build constraints, unlike the docker.Client code, which is linux-only.
 // Put this here for client code that's importing it on non-linux systems
@@ -27,6 +29,6 @@ const dockerAPIVersion = "1.22"
 
 // Stat contains container and statistics information
 type Stat struct {
-	Container *types.Container
-	Stats     types.StatsJSON
+	Container *container.Summary
+	Stats     container.StatsResponse
 }

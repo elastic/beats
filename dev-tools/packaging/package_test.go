@@ -582,7 +582,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 			t.Fatalf("failed to get a Docker client: %s", err)
 		}
 
-		loadResp, err := c.ImageLoad(ctx, f, true)
+		loadResp, err := c.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
 		if err != nil {
 			t.Fatalf("error loading docker image: %s", err)
 		}
