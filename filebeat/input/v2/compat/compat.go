@@ -33,8 +33,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -136,11 +134,13 @@ func (r *runner) Start() {
 		defer r.wg.Done()
 		log.Infof("Input '%s' starting", name)
 
-		reg := inputmon.NewMetricsRegistry(
-			r.id, r.input.Name(), r.agent.Monitoring.NamespaceRegistry(), log)
-		// Unregister the metrics when the input finishes running.
-		defer inputmon.CancelMetricsRegistry(
-			r.id, r.input.Name(), r.agent.Monitoring.NamespaceRegistry(), log)
+		reg, pc, cancelMetrics := v2.PrepareInputMetrics(
+			r.id,
+			r.input.Name(),
+			r.agent.Monitoring.NamespaceRegistry(),
+			r.connector,
+			r.log)
+		defer cancelMetrics()
 
 		ctx := v2.Context{
 			ID:              r.id,
@@ -152,14 +152,6 @@ func (r *runner) Start() {
 			MetricsRegistry: reg,
 			Logger:          log,
 		}
-
-		pc := pipetool.WithClientConfigEdit(r.connector,
-			func(orig beat.ClientConfig) (beat.ClientConfig, error) {
-				orig.ClientListener =
-					v2.NewPipelineClientListener(
-						ctx.MetricsRegistry, orig.ClientListener)
-				return orig, nil
-			})
 
 		err := r.input.Run(ctx, pc)
 		if err != nil && !errors.Is(err, context.Canceled) {
