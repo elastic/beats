@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_X86_64: "platform-ingest-beats-ubuntu-2204-1744855248"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   MODULE: "kubernetes"
 
