@@ -13,7 +13,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/docker/docker/api/types"
+	dcontainer "github.com/docker/docker/api/types/container"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -164,13 +164,18 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	return formattedStats, nil
 }
 
+<<<<<<< HEAD
 func getTaskStats(taskStatsResp *http.Response) (map[string]types.StatsJSON, error) {
 	taskStatsBody, err := ioutil.ReadAll(taskStatsResp.Body)
+=======
+func getTaskStats(taskStatsResp *http.Response) (map[string]dcontainer.StatsResponse, error) {
+	taskStatsBody, err := io.ReadAll(taskStatsResp.Body)
+>>>>>>> c88250fb4 (Bump github.com/docker/docker dependency from v27.3.1+incompatible to v28.1.1+incompatible (#44285))
 	if err != nil {
 		return nil, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
 
-	var taskStatsOutput map[string]types.StatsJSON
+	var taskStatsOutput map[string]dcontainer.StatsResponse
 	err = json.Unmarshal(taskStatsBody, &taskStatsOutput)
 	if err != nil {
 		return nil, fmt.Errorf("json.Unmarshal failed: %w", err)
@@ -192,7 +197,7 @@ func getTask(taskResp *http.Response) (TaskMetadata, error) {
 	return taskOutput, nil
 }
 
-func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMetadata) []Stats {
+func getStatsList(taskStatsOutput map[string]dcontainer.StatsResponse, taskOutput TaskMetadata) []Stats {
 	containersInfo := map[string]container{}
 
 	taskInfo := TaskInfo{
@@ -217,7 +222,7 @@ func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMet
 	for id, taskStats := range taskStatsOutput {
 		if c, ok := containersInfo[id]; ok {
 			statsPerContainer := Stats{
-				Time:         common.Time(taskStats.Stats.Read),
+				Time:         common.Time(taskStats.Read),
 				taskInfo:     taskInfo,
 				Container:    getContainerMetadata(&c),
 				cpuStats:     getCPUStats(taskStats),
