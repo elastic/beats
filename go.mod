@@ -173,15 +173,9 @@ require (
 	github.com/dgraph-io/badger/v4 v4.4.0
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
-<<<<<<< HEAD
-	github.com/elastic/elastic-agent-autodiscover v0.9.0
-	github.com/elastic/elastic-agent-libs v0.19.1
-	github.com/elastic/elastic-agent-system-metrics v0.11.10
-=======
 	github.com/elastic/elastic-agent-autodiscover v0.9.2
 	github.com/elastic/elastic-agent-libs v0.19.4
-	github.com/elastic/elastic-agent-system-metrics v0.11.11
->>>>>>> c88250fb4 (Bump github.com/docker/docker dependency from v27.3.1+incompatible to v28.1.1+incompatible (#44285))
+	github.com/elastic/elastic-agent-system-metrics v0.11.10
 	github.com/elastic/go-elasticsearch/v8 v8.17.1
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
@@ -239,10 +233,6 @@ require (
 
 require (
 	aqwari.net/xml v0.0.0-20210331023308-d9421b293817 // indirect
-<<<<<<< HEAD
-=======
-	cel.dev/expr v0.20.0 // indirect
->>>>>>> c88250fb4 (Bump github.com/docker/docker dependency from v27.3.1+incompatible to v28.1.1+incompatible (#44285))
 	cloud.google.com/go/auth v0.13.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.6 // indirect
 	cloud.google.com/go/compute/metadata v0.6.0 // indirect
@@ -261,12 +251,6 @@ require (
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.4.0 // indirect
-<<<<<<< HEAD
-=======
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v1.26.0 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v0.48.1 // indirect
-	github.com/GoogleCloudPlatform/opentelemetry-operations-go/internal/resourcemapping v0.48.1 // indirect
->>>>>>> c88250fb4 (Bump github.com/docker/docker dependency from v27.3.1+incompatible to v28.1.1+incompatible (#44285))
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
@@ -289,11 +273,7 @@ require (
 	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cilium/ebpf v0.16.0 // indirect
-<<<<<<< HEAD
-=======
-	github.com/cncf/xds/go v0.0.0-20250121191232-2f005788dc42 // indirect
 	github.com/containerd/containerd/v2 v2.1.0 // indirect
->>>>>>> c88250fb4 (Bump github.com/docker/docker dependency from v27.3.1+incompatible to v28.1.1+incompatible (#44285))
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
@@ -317,7 +297,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.5 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -400,7 +379,6 @@ require (
 	github.com/rs/cors v1.11.1 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tklauser/numcpus v0.8.0 // indirect
@@ -409,7 +387,6 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
-	github.com/zeebo/errs v1.4.0 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.elastic.co/apm/module/apmzap/v2 v2.6.3 // indirect
 	go.elastic.co/fastjson v1.4.0 // indirect
@@ -457,14 +434,8 @@ require (
 	go.opentelemetry.io/collector/service/hostcapabilities v0.121.0 // indirect
 	go.opentelemetry.io/contrib/bridges/otelzap v0.9.0 // indirect
 	go.opentelemetry.io/contrib/config v0.14.0 // indirect
-<<<<<<< HEAD
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.54.0 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.59.0 // indirect
-=======
-	go.opentelemetry.io/contrib/detectors/gcp v1.34.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.60.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.60.0 // indirect
->>>>>>> c88250fb4 (Bump github.com/docker/docker dependency from v27.3.1+incompatible to v28.1.1+incompatible (#44285))
 	go.opentelemetry.io/contrib/propagators/b3 v1.34.0 // indirect
 	go.opentelemetry.io/ebpf-profiler v0.0.0-20250212075250-7bf12d3f962f // indirect
 	go.opentelemetry.io/otel v1.35.0 // indirect
