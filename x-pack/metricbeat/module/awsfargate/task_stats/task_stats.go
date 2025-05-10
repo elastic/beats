@@ -164,13 +164,8 @@ func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
 	return formattedStats, nil
 }
 
-<<<<<<< HEAD
-func getTaskStats(taskStatsResp *http.Response) (map[string]types.StatsJSON, error) {
-	taskStatsBody, err := ioutil.ReadAll(taskStatsResp.Body)
-=======
 func getTaskStats(taskStatsResp *http.Response) (map[string]dcontainer.StatsResponse, error) {
-	taskStatsBody, err := io.ReadAll(taskStatsResp.Body)
->>>>>>> c88250fb4 (Bump github.com/docker/docker dependency from v27.3.1+incompatible to v28.1.1+incompatible (#44285))
+	taskStatsBody, err := ioutil.ReadAll(taskStatsResp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("ioutil.ReadAll failed: %w", err)
 	}
