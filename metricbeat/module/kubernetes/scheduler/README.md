@@ -75,6 +75,39 @@ Kubernetes scheduler will usually run at every master node, but that might not b
     - A metricbeat instance can be also executed using the same affinity and deployment object (deployment, daemonset, ...) as the kubernetes scheduler.
     - A metricbeat instance can be launched as a sidecar container
 
+## Generating expectation files
+
+In order to support a new Kubernetes release you'll have to generate new expectation files for this module in `_meta/test`. For that, start by deploying a new kubernetes cluster on the required Kubernetes version, for example:
+
+```bash
+kind create cluster --image kindest/node:v1.32.0
+```
+
+After that, you can apply the `kubernetes.yml` file from the root of the kubernetes module:
+
+```bash
+kubectl apply -f kubernetes.yml
+```
+
+This is required since accessing the scheduler metrics requires additional permissions.
+
+Then you can expose the scheduler api:
+
+```bash
+kubectl -n kube-system port-forward pod/kube-scheduler-kind-control-plane 10259
+```
+
+Save the metrics output from `https://localhost:10259/metrics` to a new `_meta/test/metrics.x.xx` file.
+
+After that, you can run the following commands to generate and test the expected files:
+
+```bash
+cd metricbeat/module/kubernetes/scheduler
+# generate the expected files
+go test ./state... --data
+# test the expected files
+go test ./state...
+```
 
 
 
