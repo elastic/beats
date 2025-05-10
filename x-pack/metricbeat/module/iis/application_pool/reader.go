@@ -9,6 +9,7 @@ package application_pool
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"syscall"
 
@@ -36,6 +37,7 @@ type Reader struct {
 type ApplicationPool struct {
 	name             string
 	workerProcessIds []int
+	status           string
 }
 
 // WorkerProcess struct contains the worker process details
@@ -103,7 +105,7 @@ func newReader(config Config) (*Reader, error) {
 
 // initAppPools will check for any new instances and add them to the counter list
 func (r *Reader) initAppPools() error {
-	apps, err := getApplicationPools(r.config.Names)
+	apps, err := r.getApplicationPools(r.config.Names)
 	if err != nil {
 		return fmt.Errorf("failed retrieving running worker processes: %w", err)
 	}
@@ -126,7 +128,6 @@ func (r *Reader) initAppPools() error {
 	for key, value := range appPoolCounters {
 		childQueries, err := r.query.GetCounterPaths(value)
 		if err != nil {
-			// Handle known PDH errors as informational (e.g. missing counters).
 			if isPDHError(err) {
 				r.log.Infow("Ignoring non existent counter", "error", err,
 					logp.Namespace("application pool"), "query", value,
@@ -193,7 +194,8 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 	for _, appPool := range r.applicationPools {
 		events[appPool.name] = mb.Event{
 			MetricSetFields: mapstr.M{
-				"name": appPool.name,
+				"name":   appPool.name,
+				"status": appPool.status,
 			},
 			RootFields: mapstr.M{},
 		}
@@ -232,23 +234,76 @@ func (r *Reader) close() error {
 	return r.query.Close()
 }
 
+func (r *Reader) getAllAppPool() (map[string]string, error) {
+	commands := "Get-IISAppPool"
+	stdout, stderr, err := Run(commands)
+
+	if err != nil {
+		// Log the error, but continue gracefully
+		r.log.Infow("warning: failed to get IIS App Pools: %v\n", err)
+		return map[string]string{}, nil
+	}
+	if *stderr != "" {
+		r.log.Infow("warning: stderr from Get-IISAppPool: %v\n", *stderr)
+		return map[string]string{}, nil
+	}
+
+	allPooldata := parseApplicationPool(*stdout)
+	return allPooldata, nil
+}
+
+func parseApplicationPool(data string) map[string]string {
+	lines := strings.Split(data, "\n")
+	// Skip the header lines
+	lines = lines[2:]
+	var applicationPools = make(map[string]string)
+	if len(lines) == 0 {
+		return applicationPools
+	}
+	// Regular expression to match the name and status
+	re := regexp.MustCompile(`^(.+?)\s{2,}(\S+)`)
+
+	for _, line := range lines {
+		matches := re.FindStringSubmatch(line)
+		if len(matches) == 3 {
+			name := strings.TrimSpace(matches[1])
+			if name == "----" {
+				continue
+			}
+			status := matches[2]
+			applicationPools[name] = status
+		}
+	}
+	return applicationPools
+}
+
 // getApplicationPools method retrieves the w3wp.exe processes and the application pool name, also filters on the application pool names configured by users
-func getApplicationPools(names []string) ([]ApplicationPool, error) {
+func (r *Reader) getApplicationPools(names []string) ([]ApplicationPool, error) {
 	processes, err := getw3wpProceses()
 	if err != nil {
 		return nil, err
 	}
+
+	appPoolWithStatus, err := r.getAllAppPool()
+	if err != nil {
+		return nil, err
+	}
+
 	appPools := make(map[string][]int)
 	for key, value := range processes {
 		appPools[value] = append(appPools[value], key)
 	}
 	var applicationPools []ApplicationPool
-	for key, value := range appPools {
-		applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: value})
+	for key, value := range appPoolWithStatus {
+		applicationPools = append(applicationPools, ApplicationPool{name: key, workerProcessIds: appPools[key], status: value})
 	}
+
 	if len(names) == 0 {
 		return applicationPools, nil
 	}
+
+	r.log.Info("here4")
+
 	var filtered []ApplicationPool
 	for _, n := range names {
 		for _, w3 := range applicationPools {
@@ -257,6 +312,7 @@ func getApplicationPools(names []string) ([]ApplicationPool, error) {
 			}
 		}
 	}
+
 	return filtered, nil
 }
 
@@ -279,7 +335,6 @@ func getw3wpProceses() (map[int]string, error) {
 				for i, ar := range info.Args {
 					if ar == "-ap" && len(info.Args) > i+1 {
 						wps[info.PID] = info.Args[i+1]
-						break
 					}
 				}
 			}
@@ -293,7 +348,12 @@ func getProcessIds(counterValues map[string][]pdh.CounterValue) []WorkerProcess 
 	var workers []WorkerProcess
 	for key, values := range counterValues {
 		if strings.Contains(key, "\\ID Process") && values[0].Measurement != nil {
-			workers = append(workers, WorkerProcess{instanceName: values[0].Instance, processId: int(values[0].Measurement.(float64))})
+			if pidFloat, ok := values[0].Measurement.(float64); ok {
+				workers = append(workers, WorkerProcess{
+					instanceName: values[0].Instance,
+					processId:    int(pidFloat),
+				})
+			}
 		}
 	}
 	return workers
