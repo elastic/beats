@@ -345,7 +345,7 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 		since = state.whenChanged
 	}
 
-	entries, err := activedirectory.GetDetails(p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	entries, err := activedirectory.GetDetails("(&(objectCategory=person)(objectClass=user))", p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
 	p.logger.Debugf("received %d users from API", len(entries))
 	if err != nil {
 		return nil, err
