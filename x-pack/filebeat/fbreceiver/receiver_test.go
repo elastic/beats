@@ -211,9 +211,9 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 			fmt.Fprintf(sb, "%s: io.ReadAll of body failed: %s", endpoint, err)
 			return false
 		}
-		if len(body) <= 0 {
+		if len(body) <= 5 {
 			sb.Reset()
-			fmt.Fprintf(sb, "%s: body too short", endpoint)
+			fmt.Fprintf(sb, "%s: body too short: %s", endpoint, body)
 			return false
 		}
 	}

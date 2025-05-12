@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand/v2"
@@ -85,7 +86,7 @@ func TestFactory(t *testing.T) {
 	// Ensure http metrics endpoint is reachable on receiver creation
 	var lastError strings.Builder
 	assert.Conditionf(t, func() bool {
-		return getFromSocket(t, &lastError, monitorSocket)
+		return getFromSocket(t, &lastError, monitorSocket, true)
 	}, "failed to connect to monitoring socket, last error was: %s", &lastError)
 }
 
@@ -135,7 +136,7 @@ func TestNewReceiver(t *testing.T) {
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
 			var lastError strings.Builder
 			assert.Conditionf(c, func() bool {
-				return getFromSocket(t, &lastError, monitorSocket)
+				return getFromSocket(t, &lastError, monitorSocket, false)
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
 			assert.Condition(c, func() bool {
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
@@ -235,7 +236,7 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Conditionf(c, func() bool {
 				tests := []string{monitorSocket1, monitorSocket2}
 				for _, tc := range tests {
-					if ret := getFromSocket(t, &lastError, tc); ret == false {
+					if ret := getFromSocket(t, &lastError, tc, false); ret == false {
 						return false
 					}
 				}
@@ -277,7 +278,7 @@ func genSocketPath() (socketPath string, socketHost string) {
 	return
 }
 
-func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
+func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, allowEmpty bool) bool {
 	// skip windows for now
 	if runtime.GOOS == "windows" {
 		return true
@@ -317,10 +318,62 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 			fmt.Fprintf(sb, "%s: io.ReadAll of body failed: %s", endpoint, err)
 			return false
 		}
-		if len(body) <= 0 {
+		t.Logf("metrics endpoint %q body: %s", endpoint, string(body))
+		if allowEmpty {
+			return true
+		}
+
+		if len(body) <= 5 {
 			sb.Reset()
-			fmt.Fprintf(sb, "%s: body too short", endpoint)
+			fmt.Fprintf(sb, "%s: body too short: %s", endpoint, body)
 			return false
+		}
+
+		switch endpoint {
+		case "inputs/":
+			var bodyMap []mapstr.M
+			if err := json.Unmarshal(body, &bodyMap); err != nil {
+				sb.Reset()
+				fmt.Fprintf(sb, "%s: json.Unmarshal failed: %s", endpoint, err)
+				return false
+			}
+
+			if len(bodyMap) == 0 {
+				sb.Reset()
+				fmt.Fprintf(sb, "%s: body is empty", endpoint)
+				return false
+			}
+			for _, v := range bodyMap {
+				if _, ok := v["input"]; !ok {
+					sb.Reset()
+					fmt.Fprintf(sb, "%s: body does not contain input key", endpoint)
+					return false
+				}
+
+				if v["input"] != "system/cpu" {
+					sb.Reset()
+					fmt.Fprintf(sb, "%s: unexpected input type: %s", endpoint, v["input"])
+					return false
+				}
+			}
+		case "stats/":
+			var bodyMap mapstr.M
+			if err := json.Unmarshal(body, &bodyMap); err != nil {
+				sb.Reset()
+				fmt.Fprintf(sb, "%s: json.Unmarshal failed: %s", endpoint, err)
+				return false
+			}
+			if len(bodyMap) == 0 {
+				sb.Reset()
+				fmt.Fprintf(sb, "%s: body is empty", endpoint)
+				return false
+			}
+			if _, ok := bodyMap["beat"]; !ok {
+				sb.Reset()
+				fmt.Fprintf(sb, "%s: body does not contain beat key", endpoint)
+				return false
+			}
+		default:
 		}
 	}
 	return true
