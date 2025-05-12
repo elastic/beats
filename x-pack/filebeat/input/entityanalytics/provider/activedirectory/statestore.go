@@ -115,19 +115,6 @@ func (s *stateStore) storeUser(u activedirectory.Entry) *User {
 	return &su
 }
 
-// len returns the number of user entries in the state store.
-func (s *stateStore) len() int {
-	return len(s.users)
-}
-
-// forEach iterates over all users in the state store. Changes to the
-// User's fields will be reflected in the state store.
-func (s *stateStore) forEach(fn func(*User)) {
-	for _, u := range s.users {
-		fn(u)
-	}
-}
-
 // close will close out the stateStore. If commit is true, the staged values on the
 // stateStore will be set in the kvstore database, and the transaction will be
 // committed. Otherwise, all changes will be discarded and the transaction will

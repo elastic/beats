@@ -223,7 +223,7 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 	start := time.Now()
 	p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
 
-	for _, u := range p.unifyState(ctx, state, users) {
+	for _, u := range p.unifyState(ctx, state.users, users) {
 		p.publishUser(u, state, inputCtx.ID, client, tracker)
 	}
 
@@ -249,8 +249,8 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 	return latest, nil
 }
 
-func (p *adInput) unifyState(ctx context.Context, state *stateStore, users []*User) []*User {
-	if len(users) == 0 && state.len() == 0 {
+func (p *adInput) unifyState(ctx context.Context, state map[string]*User, users []*User) []*User {
+	if len(users) == 0 && len(state) == 0 {
 		return nil
 	}
 
@@ -260,32 +260,32 @@ func (p *adInput) unifyState(ctx context.Context, state *stateStore, users []*Us
 	// are in the store but not returned in the previous fetch,
 	// mark them as deleted and publish the deletion. We do not
 	// have the time of the deletion, so use now.
-	if state.len() != 0 {
+	if len(state) != 0 {
 		found := make(map[string]bool)
 		for _, u := range users {
 			found[u.ID] = true
 		}
 		deleted := make(map[string]*User)
 		now := time.Now()
-		state.forEach(func(u *User) {
+		for _, u := range state {
 			if u.State == Deleted {
 				// We have already seen that this is deleted
 				// so we do not need to publish again. The
 				// user will be deleted from the store when
 				// the state is closed.
-				return
+				continue
 			}
 			if found[u.ID] {
 				// We have the user, so we do not need to
 				// mark it as deleted.
-				return
+				continue
 			}
 			// This modifies the state store's copy since u
 			// is a pointer held by the state store map.
 			u.State = Deleted
 			u.WhenChanged = now
 			deleted[u.ID] = u
-		})
+		}
 		for _, u := range deleted {
 			users = append(users, u)
 		}
