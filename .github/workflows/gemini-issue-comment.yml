@@ -1,0 +1,27 @@
+name: Gemini Action on Issue Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  run_gemini_action:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    if: 
+      ${{ !contains(github.event.comment.html_url, '/pull/') && contains(github.event.comment.body, '/gemini') }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run Gemini Action
+        uses: strawgate/gemini-for-github@main
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_issue_number: ${{ github.event.issue.number }}
+          user_question: ${{ github.event.comment.body }}
+          command_restrictions: "research,investigate,propose_solution_for_issue,whole_repo_code_review,create_pr_from_suggestion,update_solution_for_issue"
