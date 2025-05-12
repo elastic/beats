@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
@@ -233,7 +234,7 @@ func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
 		inputID,
 		inputType,
 		parent,
-		logp.NewTestingLogger(t, "test"))
+		logptest.NewTestingLogger(t, "test"))
 
 	require.NotNil(t, got, "new metrics registry should not be nil")
 	assert.Equal(t, parent.GetRegistry(inputID), got)
@@ -246,7 +247,7 @@ func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
 		inputID,
 		inputType,
 		parent,
-		logp.NewTestingLogger(t, "test"))
+		logptest.NewTestingLogger(t, "test"))
 	require.NotNil(t, got, "new metrics registry should not be nil")
 	assert.NotEqual(t, parent.GetRegistry(inputID), got,
 		"should get an unregistered registry, but found the registry on parent")
