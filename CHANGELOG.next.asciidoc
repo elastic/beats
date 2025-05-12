@@ -61,6 +61,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Metricbeat*
 
+- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
