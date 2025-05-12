@@ -27,6 +27,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 //nolint:gosec // These are test tokens and are not used in production code.
@@ -899,9 +900,10 @@ func TestInput(t *testing.T) {
 			defer cancel()
 
 			v2Ctx := v2.Context{
-				Logger:      logp.NewLogger("websocket_test"),
-				ID:          "test_id:" + test.name,
-				Cancelation: ctx,
+				Logger:          logp.NewLogger("websocket_test"),
+				ID:              "test_id:" + test.name,
+				Cancelation:     ctx,
+				MetricsRegistry: monitoring.NewRegistry(),
 			}
 			var client publisher
 			client.done = func() {

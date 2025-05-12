@@ -97,9 +97,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	// want to be a registry. Until then, let's keep this simple.
 	switch cfg.Type {
 	case "", "websocket":
-		s, err = NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+		s, err = NewWebsocketFollower(ctx, env, cfg, cursor, pub, log, i.time)
 	case "crowdstrike":
-		s, err = NewFalconHoseFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+		s, err = NewFalconHoseFollower(ctx, env, cfg, cursor, pub, log, i.time)
 	}
 	if err != nil {
 		return err
