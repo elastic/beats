@@ -70,7 +70,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	content, err := m.HTTP.FetchContent()
+	content, err := m.FetchContent()
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (m *MetricSet) updateServiceURI(majorVersion int) error {
 		return err
 	}
 
-	m.HTTP.SetURI(u)
+	m.SetURI(u)
 	return nil
 
 }
