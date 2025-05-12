@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"fmt"
+	"encoding/json"
 	"io"
 	"math/rand/v2"
 	"net"
@@ -16,7 +16,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -74,10 +73,7 @@ func TestNewReceiver(t *testing.T) {
 		AssertFunc: func(ct *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs) {
 			require.Lenf(ct, logs["r1"], 1, "expected 1 log, got %d", len(logs["r1"]))
 
-			var lastError strings.Builder
-			assert.Conditionf(t, func() bool {
-				return getFromSocket(t, &lastError, monitorSocket)
-			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+			assertGetFromSocket(t, monitorSocket, false)
 
 			assert.Condition(ct, func() bool {
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
@@ -146,10 +142,7 @@ func TestFactory(t *testing.T) {
 	})
 
 	// Ensure http metrics endpoint is reachable on receiver creation
-	var lastError strings.Builder
-	assert.Conditionf(t, func() bool {
-		return getFromSocket(t, &lastError, monitorSocket)
-	}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+	assertGetFromSocket(t, monitorSocket, true)
 }
 
 func genSocketPath() (socketPath string, socketHost string) {
@@ -171,10 +164,11 @@ func genSocketPath() (socketPath string, socketHost string) {
 	return
 }
 
-func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
+func assertGetFromSocket(t *testing.T, socketPath string, skipBodyCheck bool) {
+	t.Helper()
 	// skip windows for now
 	if runtime.GOOS == "windows" {
-		return true
+		return
 	}
 	client := http.Client{
 		Transport: &http.Transport{
@@ -186,38 +180,41 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string) bool {
 
 	for _, endpoint := range []string{"inputs/", "stats/"} {
 		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/"+endpoint, nil)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: error creating request: %s", endpoint, err)
-			return false
-		}
+		require.NoErrorf(t, err, "error creating request to %q: %s", endpoint, err)
 		resp, err := client.Do(req)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: client.Get failed: %s", endpoint, err)
-			return false
-		}
+		require.NoErrorf(t, err, "client.Get failed for %q: %s", endpoint, err)
 		defer resp.Body.Close()
 
-		if resp.StatusCode != http.StatusOK {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: unexpected status code: %d", endpoint, resp.StatusCode)
-			return false
-		}
+		require.Equal(t, resp.StatusCode, http.StatusOK, "unexpected status code for %q: %d", endpoint, resp.StatusCode)
 
 		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: io.ReadAll of body failed: %s", endpoint, err)
-			return false
+		require.NoErrorf(t, err, "io.ReadAll of body failed for %q: %s", endpoint, err)
+		t.Logf("metrics endpoint %q body: %s", endpoint, string(body))
+		if skipBodyCheck {
+			return
 		}
-		if len(body) <= 5 {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: body too short: %s", endpoint, body)
-			return false
+
+		require.GreaterOrEqualf(t, len(body), 5, "body too short for %q: %s", endpoint, body)
+
+		switch endpoint {
+		case "inputs/":
+			var bodyMap []mapstr.M
+			err := json.Unmarshal(body, &bodyMap)
+			require.NoErrorf(t, err, "json.Unmarshal failed for %q: %s", endpoint, err)
+			require.Greaterf(t, len(bodyMap), 0, "body is empty for %q", endpoint)
+			for _, v := range bodyMap {
+				require.Containsf(t, v, "input", "body does not contain input key for %q", endpoint)
+				require.Equalf(t, v["input"], "benchmark", "expected input type benchmark for %q, got %s", endpoint, v["input"])
+			}
+		case "stats/":
+			var bodyMap mapstr.M
+			err := json.Unmarshal(body, &bodyMap)
+			require.NoErrorf(t, err, "json.Unmarshal failed for %q: %s", endpoint, err)
+			require.Greaterf(t, len(bodyMap), 0, "body is empty for %q", endpoint)
+			require.Containsf(t, bodyMap, "beat", "body does not contain beat key for %q", endpoint)
+		default:
 		}
 	}
-	return true
 }
 
 func BenchmarkFactory(b *testing.B) {
@@ -348,16 +345,10 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Greater(c, len(logs["r1"]), 0, "receiver r1 does not have any logs")
 			require.Greater(c, len(logs["r2"]), 0, "receiver r2 does not have any logs")
 
-			var lastError strings.Builder
-			assert.Conditionf(c, func() bool {
-				tests := []string{monitorSocket1, monitorSocket2}
-				for _, tc := range tests {
-					if ret := getFromSocket(t, &lastError, tc); ret == false {
-						return false
-					}
-				}
-				return true
-			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+			tests := []string{monitorSocket1, monitorSocket2}
+			for _, tc := range tests {
+				assertGetFromSocket(t, tc, false)
+			}
 
 			assert.Condition(c, func() bool {
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").

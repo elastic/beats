@@ -9,7 +9,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"math/rand/v2"
 	"net"
@@ -17,7 +16,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -84,10 +82,7 @@ func TestFactory(t *testing.T) {
 	})
 
 	// Ensure http metrics endpoint is reachable on receiver creation
-	var lastError strings.Builder
-	assert.Conditionf(t, func() bool {
-		return getFromSocket(t, &lastError, monitorSocket, true)
-	}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+	assertGetFromSocket(t, monitorSocket, true)
 }
 
 func TestNewReceiver(t *testing.T) {
@@ -134,10 +129,7 @@ func TestNewReceiver(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0
 			}, "expected at least one ingest log, got logs: %v", logs["r1"])
-			var lastError strings.Builder
-			assert.Conditionf(c, func() bool {
-				return getFromSocket(t, &lastError, monitorSocket, false)
-			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+			assertGetFromSocket(t, monitorSocket, false)
 			assert.Condition(c, func() bool {
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
 					FilterMessageSnippet("add_host_metadata").
@@ -232,16 +224,11 @@ func TestMultipleReceivers(t *testing.T) {
 			require.Conditionf(c, func() bool {
 				return len(logs["r1"]) > 0 && len(logs["r2"]) > 0
 			}, "expected at least one ingest log for each receiver, got logs: %v", logs)
-			var lastError strings.Builder
-			assert.Conditionf(c, func() bool {
-				tests := []string{monitorSocket1, monitorSocket2}
-				for _, tc := range tests {
-					if ret := getFromSocket(t, &lastError, tc, false); ret == false {
-						return false
-					}
-				}
-				return true
-			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+
+			tests := []string{monitorSocket1, monitorSocket2}
+			for _, tc := range tests {
+				assertGetFromSocket(t, tc, true)
+			}
 
 			assert.Condition(c, func() bool {
 				processorsLoaded := zapLogs.FilterMessageSnippet("Generated new processors").
@@ -278,10 +265,11 @@ func genSocketPath() (socketPath string, socketHost string) {
 	return
 }
 
-func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, allowEmpty bool) bool {
+func assertGetFromSocket(t *testing.T, socketPath string, skipBodyCheck bool) {
+	t.Helper()
 	// skip windows for now
 	if runtime.GOOS == "windows" {
-		return true
+		return
 	}
 	client := http.Client{
 		Transport: &http.Transport{
@@ -293,90 +281,41 @@ func getFromSocket(t *testing.T, sb *strings.Builder, socketPath string, allowEm
 
 	for _, endpoint := range []string{"inputs/", "stats/"} {
 		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://unix/"+endpoint, nil)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: error creating request: %s", endpoint, err)
-			return false
-		}
+		require.NoErrorf(t, err, "error creating request to %q: %s", endpoint, err)
 		resp, err := client.Do(req)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: client.Get failed: %s", endpoint, err)
-			return false
-		}
+		require.NoErrorf(t, err, "client.Get failed for %q: %s", endpoint, err)
 		defer resp.Body.Close()
 
-		if resp.StatusCode != http.StatusOK {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: unexpected status code: %d", endpoint, resp.StatusCode)
-			return false
-		}
+		require.Equal(t, resp.StatusCode, http.StatusOK, "unexpected status code for %q: %d", endpoint, resp.StatusCode)
 
 		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: io.ReadAll of body failed: %s", endpoint, err)
-			return false
-		}
+		require.NoErrorf(t, err, "io.ReadAll of body failed for %q: %s", endpoint, err)
 		t.Logf("metrics endpoint %q body: %s", endpoint, string(body))
-		if allowEmpty {
-			return true
+		if skipBodyCheck {
+			return
 		}
 
-		if len(body) <= 5 {
-			sb.Reset()
-			fmt.Fprintf(sb, "%s: body too short: %s", endpoint, body)
-			return false
-		}
+		require.GreaterOrEqualf(t, len(body), 5, "body too short for %q: %s", endpoint, body)
 
 		switch endpoint {
 		case "inputs/":
 			var bodyMap []mapstr.M
-			if err := json.Unmarshal(body, &bodyMap); err != nil {
-				sb.Reset()
-				fmt.Fprintf(sb, "%s: json.Unmarshal failed: %s", endpoint, err)
-				return false
-			}
-
-			if len(bodyMap) == 0 {
-				sb.Reset()
-				fmt.Fprintf(sb, "%s: body is empty", endpoint)
-				return false
-			}
+			err := json.Unmarshal(body, &bodyMap)
+			require.NoErrorf(t, err, "json.Unmarshal failed for %q: %s", endpoint, err)
+			require.Greaterf(t, len(bodyMap), 0, "body is empty for %q", endpoint)
 			for _, v := range bodyMap {
-				if _, ok := v["input"]; !ok {
-					sb.Reset()
-					fmt.Fprintf(sb, "%s: body does not contain input key", endpoint)
-					return false
-				}
-
-				if v["input"] != "system/cpu" {
-					sb.Reset()
-					fmt.Fprintf(sb, "%s: unexpected input type: %s", endpoint, v["input"])
-					return false
-				}
+				require.Containsf(t, v, "input", "body does not contain input key for %q", endpoint)
+				require.Equalf(t, v["input"], "system/cpu", "expected input type system/cpu for %q, got %s", endpoint, v["input"])
 			}
 		case "stats/":
 			var bodyMap mapstr.M
-			if err := json.Unmarshal(body, &bodyMap); err != nil {
-				sb.Reset()
-				fmt.Fprintf(sb, "%s: json.Unmarshal failed: %s", endpoint, err)
-				return false
-			}
-			if len(bodyMap) == 0 {
-				sb.Reset()
-				fmt.Fprintf(sb, "%s: body is empty", endpoint)
-				return false
-			}
-			if _, ok := bodyMap["beat"]; !ok {
-				sb.Reset()
-				fmt.Fprintf(sb, "%s: body does not contain beat key", endpoint)
-				return false
-			}
+			err := json.Unmarshal(body, &bodyMap)
+			require.NoErrorf(t, err, "json.Unmarshal failed for %q: %s", endpoint, err)
+			require.Greaterf(t, len(bodyMap), 0, "body is empty for %q", endpoint)
+			require.Containsf(t, bodyMap, "beat", "body does not contain beat key for %q", endpoint)
 		default:
 		}
 	}
-	return true
 }
 
 func BenchmarkFactory(b *testing.B) {
