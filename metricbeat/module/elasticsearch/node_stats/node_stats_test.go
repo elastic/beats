@@ -18,6 +18,7 @@
 package node_stats
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
@@ -26,25 +27,51 @@ import (
 )
 
 func TestGetServiceURI(t *testing.T) {
-	tests := map[string]struct {
-		scope       elasticsearch.Scope
-		expectedURI string
+	scopes := []struct {
+		name  string
+		scope elasticsearch.Scope
 	}{
-		"scope_node": {
-			scope:       elasticsearch.ScopeNode,
-			expectedURI: "/_nodes/_local/stats/jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest/bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush",
-		},
-		"scope_cluster": {
-			scope:       elasticsearch.ScopeCluster,
-			expectedURI: "/_nodes/_all/stats/jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest/bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush",
-		},
+		{name: "scope_node", scope: elasticsearch.ScopeNode},
+		{name: "scope_cluster", scope: elasticsearch.ScopeCluster},
 	}
 
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			newURI, err := getServiceURI("/foo/bar", test.scope)
-			require.NoError(t, err)
-			require.Equal(t, test.expectedURI, newURI)
-		})
+	latestScopedURIs := map[elasticsearch.Scope]string{
+		elasticsearch.ScopeNode:    "/_nodes/_local/stats/jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest/bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush",
+		elasticsearch.ScopeCluster: "/_nodes/_all/stats/jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest/bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush",
+	}
+
+	legacyScopedURIs := map[elasticsearch.Scope]string{
+		elasticsearch.ScopeNode:    "/_nodes/_local/stats",
+		elasticsearch.ScopeCluster: "/_nodes/_all/stats",
+	}
+
+	tests := []struct {
+		majorVersion int
+		legacy       bool
+	}{
+		{majorVersion: 10, legacy: false},
+		{majorVersion: 9, legacy: false},
+		{majorVersion: 8, legacy: false},
+		{majorVersion: 7, legacy: true},
+		{majorVersion: 6, legacy: true},
+		{majorVersion: 5, legacy: true},
+		{majorVersion: 2, legacy: true},
+	}
+
+	for _, scope := range scopes {
+		for _, test := range tests {
+			t.Run("scope_"+scope.name+"_v"+strconv.Itoa(test.majorVersion), func(t *testing.T) {
+				newURI, err := getServiceURI("/foo/bar", scope.scope, test.majorVersion)
+				require.NoError(t, err)
+
+				scopedURIs := latestScopedURIs
+
+				if test.legacy {
+					scopedURIs = legacyScopedURIs
+				}
+
+				require.Equal(t, scopedURIs[scope.scope], newURI)
+			})
+		}
 	}
 }
