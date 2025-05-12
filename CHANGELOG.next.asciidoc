@@ -126,6 +126,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The following output latency metrics are now included in metrics monitoring: `output.latency.{count, max, median, p99}`. {pull}42439[42439]
 - Restored event Meta fields in the Elasticsearch output's error logs. {pull}42559[42559]
 - Restore `maintainer` label for container images {pull}43683[43683]
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 
 *Auditbeat*
 
@@ -136,6 +137,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
 - Split common tty definitions. {pull}42004[42004]
 - Fix potential data loss in add_session_metadata. {pull}42795[42795]
+- system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
 
 *Auditbeat*
 

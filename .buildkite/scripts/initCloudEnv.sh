@@ -2,23 +2,6 @@
 set -euo pipefail
 
 REPO_DIR=$(pwd)
-AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_ingest_ci"
-
-exportAwsSecrets() {
-  local awsSecretKey
-  local awsAccessKey
-
-  awsSecretKey=$(retry -t 5 -- vault kv get -field secret_key "${AWS_SERVICE_ACCOUNT_SECRET_PATH}")
-  awsAccessKey=$(retry -t 5 -- vault kv get -field access_key "${AWS_SERVICE_ACCOUNT_SECRET_PATH}")
-
-  echo "~~~ Exporting AWS secrets"
-  export AWS_ACCESS_KEY_ID=$awsAccessKey
-  export AWS_SECRET_ACCESS_KEY=$awsSecretKey
-
-  # AWS_REGION is not set here, since AWS region is taken from beat corresponding *.tf file:
-  # - x-pack/metricbeat/module/aws/terraform.tf
-  # - x-pack/filebeat/input/awscloudwatch/_meta/terraform/variables.tf
-}
 
 terraformApply() {
   echo "~~~ Exporting Terraform Env Vars"
@@ -102,6 +85,5 @@ teardown() {
 
 trap 'teardown' EXIT
 
-exportAwsSecrets
 dockerUp
 terraformSetup
