@@ -110,3 +110,12 @@ func (c *conf) wantUsers() bool {
 		return false
 	}
 }
+
+func (c *conf) wantDevices() bool {
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "devices":
+		return true
+	default:
+		return false
+	}
+}
