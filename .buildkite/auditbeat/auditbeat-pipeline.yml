@@ -82,6 +82,7 @@ steps:
       - label: ":ubuntu: Auditbeat: Ubuntu x86_64 Unit Tests"
         command: |
           set -euo pipefail
+          SOME_DUMMY_TOKEN="Lorem_ipsum_dolor_sit_amet"
           cd auditbeat
           mage build unitTest
         retry:
