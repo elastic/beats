@@ -69,7 +69,7 @@ func NewMetricSet(base mb.BaseMetricSet, options MetricSetOptions) (*MetricSet, 
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		broker:        NewBroker(base.Host(), cfg),
+		broker:        NewBroker(base.Host(), base.Logger(), cfg),
 	}, nil
 
 }
