@@ -47,8 +47,9 @@ type loggingRoundTripper struct {
 	log *logp.Logger
 }
 
+// keepAliveConfig is the configuration for keep-alive settings.
 type keepAlive struct {
-	cfg     config
+	cfg     keepAliveConfig
 	metrics *inputMetrics
 	log     *logp.Logger
 }
@@ -69,17 +70,17 @@ func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start time.Time) context.CancelFunc {
 	ctx, cancel := context.WithCancel(ctx)
 	// set initial read deadline
-	conn.SetReadDeadline(time.Now().Add(k.cfg.KeepAlive.readControlDeadline))
+	conn.SetReadDeadline(time.Now().Add(k.cfg.readControlDeadline))
 	// set pong handler to update read deadline
 	conn.SetPongHandler(func(string) error {
 		k.log.Debugw("received pong message from websocket server")
 		k.metrics.pongMessageReceivedTime.Update(time.Since(start).Nanoseconds())
-		return conn.SetReadDeadline(time.Now().Add(k.cfg.KeepAlive.readControlDeadline))
+		return conn.SetReadDeadline(time.Now().Add(k.cfg.readControlDeadline))
 	})
 
 	// set heartbeat ping routine
 	go func() {
-		ticker := time.NewTicker(k.cfg.KeepAlive.Interval)
+		ticker := time.NewTicker(k.cfg.Interval)
 		defer ticker.Stop()
 
 		for {
@@ -88,7 +89,7 @@ func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start t
 				k.log.Debugw("heartbeat stopped")
 				return
 			case now := <-ticker.C:
-				err := conn.WriteControl(websocket.PingMessage, nil, now.Add(k.cfg.KeepAlive.WriteControlDeadline))
+				err := conn.WriteControl(websocket.PingMessage, nil, now.Add(k.cfg.WriteControlDeadline))
 				if err != nil {
 					k.log.Debugw("error sending ping control frame to websocket server:", err)
 					k.metrics.writeControlErrors.Inc()
@@ -158,7 +159,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 	if cfg.KeepAlive.Enable {
 		// create a new keepAlive instance
 		k := &keepAlive{
-			cfg:     cfg,
+			cfg:     cfg.KeepAlive,
 			metrics: s.metrics,
 			log:     log,
 		}
@@ -210,8 +211,9 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 		s.log.Errorw("failed to establish websocket connection", "error", err)
 		return err
 	}
-	// start the keep-alive routine if enabled and the connection is established successfully
-	// this is for the initial connection only, the keep-alive will be restarted during the reconnect logic/ token refresh
+	// Start the keep-alive routine if enabled and the connection is established successfully
+	// this is for the initial connection only, the keep-alive will be restarted during the reconnect
+	// logic/token refresh.
 	if s.keepAlive != nil {
 		heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
 	}
@@ -228,13 +230,15 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 
 	for {
 		select {
-		// if the keep-alive is enabled, heartbeat will be automatically cancelled when the parent context is done()
+		// If the keep-alive is enabled, heartbeat will be automatically cancelled when
+		// the parent context is done().
 		case <-ctx.Done():
 			s.log.Debugw("context cancelled, closing websocket connection")
 			return ctx.Err()
 		// s.tokenExpiry channel will only trigger if oauth2 is enabled and the token is about to expire
 		case <-s.tokenExpiry:
-			// cancel the keep-alive routine if enabled since we need to establish a new connection instance with the refreshed token
+			// Cancel the keep-alive routine if enabled since we need to establish a new
+			// connection instance with the refreshed token.
 			if s.keepAlive != nil {
 				heartBeatCancel()
 			}
@@ -264,7 +268,8 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				s.log.Errorw("failed to establish a new websocket connection on token refresh", "error", err)
 				return err
 			}
-			// restart the keep-alive routine on a token refresh if enabled and the connection is established successfully
+			// Restart the keep-alive routine on a token refresh if enabled and the
+			// connection is established successfully.
 			if s.keepAlive != nil {
 				heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
 			}
@@ -272,7 +277,8 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
-				// cancel the keep-alive routine if enabled since we need to establish a new connection via our reconnect logic
+				// Cancel the keep-alive routine if enabled since we need to establish a
+				// new connection via our reconnect logic.
 				if s.keepAlive != nil {
 					heartBeatCancel()
 				}
@@ -281,14 +287,14 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 					return err
 				}
 				s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
-				// close the old connection gracefully and reconnect
 				if c != nil {
 					if err := c.Close(); err != nil {
 						s.metrics.errorsTotal.Inc()
 						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
 					}
 				}
-				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
+				// Since c is already a pointer, we can reassign it to the new connection
+				// and the defer func will still handle it.
 				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
 				handleConnectionResponse(resp, s.metrics, s.log)
 				if err != nil {
@@ -296,7 +302,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 					s.log.Errorw("failed to reconnect websocket connection", "error", err)
 					return err
 				}
-				// restart the keep-alive routine if enabled after a successful reconnection
+				// Restart the keep-alive routine if enabled after a successful reconnection.
 				if s.keepAlive != nil {
 					heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
 				}

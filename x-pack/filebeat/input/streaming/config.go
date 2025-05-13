@@ -51,7 +51,7 @@ type config struct {
 	// Transport is the common the transport config.
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 	// KeepAlive is the configuration for keep-alive settings.
-	KeepAlive KeepAlive `config:"keep_alive"`
+	KeepAlive keepAliveConfig `config:"keep_alive"`
 	// CrowdstrikeAppID is the value used to set the
 	// appId request parameter in the FalconHose stream
 	// discovery request.
@@ -76,7 +76,7 @@ type retry struct {
 }
 
 // KeepAlive is the configuration for keep-alive settings.
-type KeepAlive struct {
+type keepAliveConfig struct {
 	// Enable indicates whether keep-alive is enabled.
 	Enable bool `config:"enable"`
 	// Interval is the interval between keep-alive messages.
@@ -231,7 +231,7 @@ func defaultConfig() config {
 			WaitMin:     1 * time.Second,
 			WaitMax:     30 * time.Second,
 		},
-		KeepAlive: KeepAlive{
+		KeepAlive: keepAliveConfig{
 			Interval:             30 * time.Second,
 			WriteControlDeadline: 10 * time.Second,
 		},
