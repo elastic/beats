@@ -18,10 +18,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Gemini Action
-        uses: strawgate/gemini-for-github@main
+        uses: ./
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_issue_number: ${{ github.event.issue.number }}
           user_question: "Please triage this new github issue created by an unknown (untrusted) user."
-          command_restrictions: "triage_new_issue"
+          command_restrictions: "triage_new_issue_question"
