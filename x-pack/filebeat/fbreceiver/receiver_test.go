@@ -6,6 +6,11 @@ package fbreceiver
 
 import (
 	"bytes"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"sync/atomic"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
@@ -14,7 +19,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/pipeline"
 	"go.opentelemetry.io/collector/receiver"
+	"go.opentelemetry.io/collector/receiver/receivertest"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -181,5 +188,107 @@ func TestMultipleReceivers(t *testing.T) {
 			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 		},
+	})
+}
+
+type logGenerator struct {
+	t           *testing.T
+	tmpDir      string
+	f           *os.File
+	filePattern string
+	sequenceNum int64
+}
+
+func newLogGenerator(t *testing.T, tmpDir string) *logGenerator {
+	return &logGenerator{
+		t:           t,
+		tmpDir:      tmpDir,
+		filePattern: "input-*.log",
+	}
+}
+
+func (g *logGenerator) Start() {
+	f, err := os.CreateTemp(g.tmpDir, g.filePattern)
+	require.NoError(g.t, err)
+	g.f = f
+}
+
+func (g *logGenerator) Stop() {
+	require.NoError(g.t, g.f.Close())
+	require.NoError(g.t, os.Remove(g.f.Name()))
+}
+
+func (g *logGenerator) Generate() []receivertest.UniqueIDAttrVal {
+	// Generate may be called concurrently.
+	id := receivertest.UniqueIDAttrVal(strconv.FormatInt(atomic.AddInt64(&g.sequenceNum, 1), 10))
+
+	_, err := fmt.Fprintln(g.f, `{"id": "`+id+`", "message": "log message"}`)
+	require.NoError(g.t, err, "failed to write log line to file")
+	require.NoError(g.t, g.f.Sync(), "failed to sync log file")
+
+	// And return the ids for bookkeeping by the test.
+	return []receivertest.UniqueIDAttrVal{id}
+}
+
+func TestConsumeContract(t *testing.T) {
+	tmpDir := t.TempDir()
+	// TODO(mauri870): why setting this to a bigger number such as 100 or more causes multiple events to not be delivered?
+	const logsPerTest = 10
+
+	gen := newLogGenerator(t, tmpDir)
+
+	os.Setenv("OTELCONSUMER_RECEIVERTEST", "1")
+
+	cfg := &Config{
+		Beatconfig: map[string]interface{}{
+			"queue.mem.flush.timeout": "0s",
+			"filebeat": map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":    "filestream",
+						"id":      "filestream-test",
+						"enabled": true,
+						"paths": []string{
+							filepath.Join(tmpDir, "input-*.log"),
+						},
+						"file_identity.native": map[string]interface{}{},
+						"prospector": map[string]interface{}{
+							"scanner": map[string]interface{}{
+								"fingerprint.enabled": false,
+								"check_interval":      "0.1s",
+							},
+						},
+						"parsers": []map[string]interface{}{
+							{
+								"ndjson": map[string]interface{}{
+									"document_id": "id",
+								},
+							},
+						},
+					},
+				},
+			},
+			"output": map[string]interface{}{
+				"otelconsumer": map[string]interface{}{},
+			},
+			"logging": map[string]interface{}{
+				"level": "debug",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": tmpDir,
+			"path.logs": tmpDir,
+		},
+	}
+
+	// Run the contract checker. This will trigger test failures if any problems are found.
+	receivertest.CheckConsumeContract(receivertest.CheckConsumeContractParams{
+		T:             t,
+		Factory:       NewFactory(),
+		Signal:        pipeline.SignalLogs,
+		Config:        cfg,
+		Generator:     gen,
+		GenerateCount: logsPerTest,
 	})
 }
