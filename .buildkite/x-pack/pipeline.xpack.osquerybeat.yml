@@ -14,7 +14,8 @@ env:
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
-  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1748253140"
+#  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -25,74 +26,92 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
 
 steps:
-  - group: "Check/Update"
-    key: "x-pack-osquerybeat-check-update"
+#  - group: "Check/Update"
+#    key: "x-pack-osquerybeat-check-update"
+#
+#    steps:
+#      - label: "x-pack/osquerybeat: Run check/update"
+#        command: |
+#          set -eo pipefail
+#          make -C x-pack/osquerybeat check update
+#          make check-no-changes
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+#          cpu: "4000m"
+#          memory: "8Gi"
+#          useCustomGlobalHooks: true
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: check/update"
+#
+#      - label: "x-pack/osquerybeat: Run pre-commit"
+#        command: "pre-commit run --all-files"
+#        agents:
+#          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
+#          memory: "2Gi"
+#          useCustomGlobalHooks: true
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: pre-commit"
+#
+#  - wait: ~
+#    # with PRs, we want to run mandatory tests only if check/update step succeed
+#    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
+#    # this allows building DRA artifacts even if there is flakiness in check/update step
+#    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+#    depends_on: "x-pack-osquerybeat-check-update"
+#
+#  - group: "Mandatory Tests"
+#    key: "x-pack-osquerybeat-mandatory-tests"
+#
+#    steps:
+#      - label: ":ubuntu: x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
+#        key: "mandatory-linux-unit-test"
+#        command: |
+#          cd x-pack/osquerybeat
+#          mage build unitTest
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_UBUNTU_X86_64}"
+#          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+#        artifact_paths:
+#          - "x-pack/osquerybeat/build/*.xml"
+#          - "x-pack/osquerybeat/build/*.json"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
+#
+#      - label: ":ubuntu: x-pack/osquerybeat: Go Integration Tests"
+#        key: "mandatory-int-test"
+#        command: |
+#          cd x-pack/osquerybeat
+#          mage goIntegTest
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_UBUNTU_X86_64}"
+#          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+#        artifact_paths:
+#          - "x-pack/osquerybeat/build/*.xml"
+#          - "x-pack/osquerybeat/build/*.json"
+#          - "x-pack/osquerybeat/build/integration-tests/*"
+#          - "x-pack/osquerybeat/build/integration-tests/Test*/*"
+#          - "x-pack/osquerybeat/build/integration-tests/Test*/data/**/*"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Go Integration Tests / Ubuntu x86_64"
 
-    steps:
-      - label: "x-pack/osquerybeat: Run check/update"
-        command: |
-          set -eo pipefail
-          make -C x-pack/osquerybeat check update
-          make check-no-changes
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
-          cpu: "4000m"
-          memory: "8Gi"
-          useCustomGlobalHooks: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: check/update"
-
-      - label: "x-pack/osquerybeat: Run pre-commit"
-        command: "pre-commit run --all-files"
-        agents:
-          image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
-          memory: "2Gi"
-          useCustomGlobalHooks: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: pre-commit"
-
-  - wait: ~
-    # with PRs, we want to run mandatory tests only if check/update step succeed
-    # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
-    # this allows building DRA artifacts even if there is flakiness in check/update step
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on: "x-pack-osquerybeat-check-update"
-
-  - group: "Mandatory Tests"
-    key: "x-pack-osquerybeat-mandatory-tests"
-
-    steps:
-      - label: ":ubuntu: x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-linux-unit-test"
-        command: |
-          cd x-pack/osquerybeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "x-pack/osquerybeat/build/*.xml"
-          - "x-pack/osquerybeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
-
-      - label: ":ubuntu: x-pack/osquerybeat: Go Integration Tests"
+      - label: ":windows: x-pack/osquerybeat: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           cd x-pack/osquerybeat
@@ -102,7 +121,8 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          imageProject: "elastic-images-qa"
+          image: "${IMAGE_WIN_2022}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
           - "x-pack/osquerybeat/build/*.xml"
@@ -112,163 +132,163 @@ steps:
           - "x-pack/osquerybeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: Go Integration Tests"
+              context: "x-pack/osquerybeat: Go Integration Tests / Win 2022"
 
-      - label: ":windows: x-pack/osquerybeat: Win 2016 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/osquerybeat
-          mage build unitTest
-        key: "mandatory-win-2016-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/osquerybeat/build/*.xml"
-          - "x-pack/osquerybeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Win 2016 Unit Tests"
-
-      - label: ":windows: x-pack/osquerybeat: Win 2022 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/osquerybeat
-          mage build unitTest
-        key: "mandatory-win-2022-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/osquerybeat/build/*.xml"
-          - "x-pack/osquerybeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Win-2022 Unit Tests"
-
-  - group: "Extended Windows Tests"
-    key: "x-pack-osquerybeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-
-    steps:
-      - label: ":windows: x-pack/osquerybeat: Win 10 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/osquerybeat
-          mage build unitTest
-        key: "extended-win-10-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/osquerybeat/build/*.xml"
-          - "x-pack/osquerybeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Win 10 Unit Tests"
-
-      - label: ":windows: x-pack/osquerybeat: Win 11 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/osquerybeat
-          mage build unitTest
-        key: "extended-win-11-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/osquerybeat/build/*.xml"
-          - "x-pack/osquerybeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Win 11 Unit Tests"
-
-      - label: ":windows: x-pack/osquerybeat: Win 2019 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/osquerybeat
-          mage build unitTest
-        key: "extended-win-2019-unit-tests"
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/osquerybeat/build/*.xml"
-          - "x-pack/osquerybeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Win 2019 Unit Tests"
-
-  - wait: ~
-    # with PRs, we want to run packaging only if mandatory tests succeed
-    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
-    # this allows building DRA artifacts even if there is flakiness in mandatory tests
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on:
-      - step: "x-pack-osquerybeat-mandatory-tests"
-
-  - group: "Packaging"
-    key: "x-pack-querybeat-packaging"
-    steps:
-      - label: ":ubuntu: Packaging Linux"
-        key: "packaging-linux"
-        env:
-          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
-        command: |
-          .buildkite/scripts/packaging/packaging.sh x-pack/osquerybeat
-        retry:
-          automatic:
-            - limit: 1
-        timeout_in_minutes: 20
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Packaging Linux"
-
-      - label: ":ubuntu: x-pack/osquerybeat: Packaging Linux arm64"
-        key: "packaging-arm"
-        env:
-          PLATFORMS: "+all linux/arm64 darwin/arm64"
-        command: |
-          .buildkite/scripts/packaging/packaging.sh x-pack/osquerybeat
-        retry:
-          automatic:
-            - limit: 1
-        timeout_in_minutes: 20
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Packaging Linux arm64"
+#      - label: ":windows: x-pack/osquerybeat: Win 2016 Unit Tests"
+#        command: |
+#          Set-Location -Path x-pack/osquerybeat
+#          mage build unitTest
+#        key: "mandatory-win-2016-unit-tests"
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_WIN_2016}"
+#          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+#          disk_size: 100
+#          disk_type: "pd-ssd"
+#        artifact_paths:
+#          - "x-pack/osquerybeat/build/*.xml"
+#          - "x-pack/osquerybeat/build/*.json"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Win 2016 Unit Tests"
+#
+#      - label: ":windows: x-pack/osquerybeat: Win 2022 Unit Tests"
+#        command: |
+#          Set-Location -Path x-pack/osquerybeat
+#          mage build unitTest
+#        key: "mandatory-win-2022-unit-tests"
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_WIN_2022}"
+#          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+#          disk_size: 100
+#          disk_type: "pd-ssd"
+#        artifact_paths:
+#          - "x-pack/osquerybeat/build/*.xml"
+#          - "x-pack/osquerybeat/build/*.json"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Win-2022 Unit Tests"
+#
+#  - group: "Extended Windows Tests"
+#    key: "x-pack-osquerybeat-extended-win-tests"
+#    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+#
+#    steps:
+#      - label: ":windows: x-pack/osquerybeat: Win 10 Unit Tests"
+#        command: |
+#          Set-Location -Path x-pack/osquerybeat
+#          mage build unitTest
+#        key: "extended-win-10-unit-tests"
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_WIN_10}"
+#          machineType: "${GCP_WIN_MACHINE_TYPE}"
+#          disk_size: 100
+#          disk_type: "pd-ssd"
+#        artifact_paths:
+#          - "x-pack/osquerybeat/build/*.xml"
+#          - "x-pack/osquerybeat/build/*.json"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Win 10 Unit Tests"
+#
+#      - label: ":windows: x-pack/osquerybeat: Win 11 Unit Tests"
+#        command: |
+#          Set-Location -Path x-pack/osquerybeat
+#          mage build unitTest
+#        key: "extended-win-11-unit-tests"
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_WIN_11}"
+#          machineType: "${GCP_WIN_MACHINE_TYPE}"
+#          disk_size: 100
+#          disk_type: "pd-ssd"
+#        artifact_paths:
+#          - "x-pack/osquerybeat/build/*.xml"
+#          - "x-pack/osquerybeat/build/*.json"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Win 11 Unit Tests"
+#
+#      - label: ":windows: x-pack/osquerybeat: Win 2019 Unit Tests"
+#        command: |
+#          Set-Location -Path x-pack/osquerybeat
+#          mage build unitTest
+#        key: "extended-win-2019-unit-tests"
+#        retry:
+#          automatic:
+#            - limit: 1
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_WIN_2019}"
+#          machineType: "${GCP_WIN_MACHINE_TYPE}"
+#          disk_size: 100
+#          disk_type: "pd-ssd"
+#        artifact_paths:
+#          - "x-pack/osquerybeat/build/*.xml"
+#          - "x-pack/osquerybeat/build/*.json"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Win 2019 Unit Tests"
+#
+#  - wait: ~
+#    # with PRs, we want to run packaging only if mandatory tests succeed
+#    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+#    # this allows building DRA artifacts even if there is flakiness in mandatory tests
+#    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+#    depends_on:
+#      - step: "x-pack-osquerybeat-mandatory-tests"
+#
+#  - group: "Packaging"
+#    key: "x-pack-querybeat-packaging"
+#    steps:
+#      - label: ":ubuntu: Packaging Linux"
+#        key: "packaging-linux"
+#        env:
+#          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
+#        command: |
+#          .buildkite/scripts/packaging/packaging.sh x-pack/osquerybeat
+#        retry:
+#          automatic:
+#            - limit: 1
+#        timeout_in_minutes: 20
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_UBUNTU_X86_64}"
+#          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+#          disk_size: 100
+#          disk_type: "pd-ssd"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Packaging Linux"
+#
+#      - label: ":ubuntu: x-pack/osquerybeat: Packaging Linux arm64"
+#        key: "packaging-arm"
+#        env:
+#          PLATFORMS: "+all linux/arm64 darwin/arm64"
+#        command: |
+#          .buildkite/scripts/packaging/packaging.sh x-pack/osquerybeat
+#        retry:
+#          automatic:
+#            - limit: 1
+#        timeout_in_minutes: 20
+#        agents:
+#          provider: "aws"
+#          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+#          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+#        notify:
+#          - github_commit_status:
+#              context: "x-pack/osquerybeat: Packaging Linux arm64"
