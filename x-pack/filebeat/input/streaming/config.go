@@ -75,7 +75,7 @@ type retry struct {
 	InfiniteRetries bool          `config:"infinite_retries"`
 }
 
-// KeepAlive is the configuration for keep-alive settings.
+// keepAliveConfig is the configuration for keep-alive settings.
 type keepAliveConfig struct {
 	// Enable indicates whether keep-alive is enabled.
 	Enable bool `config:"enable"`
