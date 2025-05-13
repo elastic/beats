@@ -24,4 +24,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_issue_number: ${{ github.event.issue.number }}
           user_question: "Please triage this new github issue created by an unknown (untrusted) user."
-          command_restrictions: "triage_new_issue_question"
+          command_restrictions: "triage_new_issue_question,triage_new_issue_feature_request,triage_new_issue_bug_report"
