@@ -91,7 +91,7 @@ func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start t
 			case now := <-ticker.C:
 				err := conn.WriteControl(websocket.PingMessage, nil, now.Add(k.cfg.WriteControlDeadline))
 				if err != nil {
-					k.log.Debugw("error sending ping control frame to websocket server:", err)
+					k.log.Debugw("error sending ping control frame to websocket server", err)
 					k.metrics.writeControlErrors.Inc()
 					k.metrics.errorsTotal.Inc()
 				} else {
