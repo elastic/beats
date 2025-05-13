@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build freebsd || linux
-// +build freebsd linux
+//go:build freebsd || linux || aix
+// +build freebsd linux aix
 
 package filesystem
 

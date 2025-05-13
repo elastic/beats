@@ -46,7 +46,7 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	pid := C.pid_t(0)
 
 	procMap := make(ProcsMap, 0)
-	var wrappedErr err
+	var wrappedErr error
 	var plist []ProcState
 	for {
 		// getprocs first argument is a void*
@@ -200,4 +200,8 @@ func FillPidMetrics(_ resolve.Resolver, pid int, state ProcState, filter func(st
 
 func FillMetricsRequiringMoreAccess(_ int, state ProcState) (ProcState, error) {
 	return state, nil
+}
+
+func GetSelfPid(hostfs resolve.Resolver) (int, error) {
+	return os.Getpid(), nil
 }
