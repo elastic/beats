@@ -236,7 +236,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
-- 
+-
 
 *Heartbeat*
 
