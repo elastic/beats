@@ -72,8 +72,8 @@ func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start t
 	// set initial read deadline
 	conn.SetReadDeadline(time.Now().Add(k.cfg.readControlDeadline))
 	// set pong handler to update read deadline
-	conn.SetPongHandler(func(string) error {
-		k.log.Debugw("received pong message from websocket server")
+	conn.SetPongHandler(func(pongData string) error {
+		k.log.Debugw("received pong message from websocket server", "pong_data", pongData)
 		k.metrics.pongMessageReceivedTime.Update(time.Since(start).Nanoseconds())
 		return conn.SetReadDeadline(time.Now().Add(k.cfg.readControlDeadline))
 	})
