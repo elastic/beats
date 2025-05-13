@@ -236,6 +236,7 @@ func TestFleetListAgents(t *testing.T) {
 	require.Equal(t, "eba58282-ec1c-4d9e-aac0-2b29f754b437", item.Agent.ID)
 	require.Equal(t, "8.8.0", item.Agent.Version)
 	require.Equal(t, "c75d66b1dac5", item.LocalMetadata.Host.Hostname)
+	require.Equal(t, true, item.LocalMetadata.Elastic.Agent.FIPS)
 }
 
 func TestFleetGetAgent(t *testing.T) {

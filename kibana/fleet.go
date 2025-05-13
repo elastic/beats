@@ -321,6 +321,11 @@ type AgentCommon struct {
 		Host struct {
 			Hostname string `json:"hostname"`
 		} `json:"host"`
+		Elastic struct {
+			Agent struct {
+				FIPS bool `json:"fips"`
+			} `json:"agent"`
+		} `json:"elastic"`
 	} `json:"local_metadata"`
 	PolicyID       string               `json:"policy_id"`
 	PolicyRevision int                  `json:"policy_revision"`
