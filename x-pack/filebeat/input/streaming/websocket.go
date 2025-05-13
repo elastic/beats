@@ -47,7 +47,7 @@ type loggingRoundTripper struct {
 	log *logp.Logger
 }
 
-// keepAliveConfig is the configuration for keep-alive settings.
+// keepAlive manages the configuration and metrics for WebSocket keep-alive functionality
 type keepAlive struct {
 	cfg     keepAliveConfig
 	metrics *inputMetrics
