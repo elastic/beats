@@ -1,0 +1,27 @@
+name: Gemini Action on Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  run_gemini_action:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    if: 
+      ${{ !contains(github.event.issue.html_url, '/pull/') }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run Gemini Action
+        uses: strawgate/gemini-for-github@main
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_issue_number: ${{ github.event.issue.number }}
+          user_question: "Please triage this new github issue created by an unknown (untrusted) user."
+          command_restrictions: "triage_new_issue"
