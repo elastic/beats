@@ -423,6 +423,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update CEL mito extensions to v1.18.0. {pull}43855[43855]
 - Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
 - Update CEL mito extensions to v1.19.0. {pull}44098[44098]
+- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Add milliseconds to document timestamp from awscloudwatch Filebeat input {pull}44306[44306]
 
 *Auditbeat*
