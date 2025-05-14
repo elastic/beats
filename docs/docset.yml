@@ -2,6 +2,7 @@ project: 'Beats docs'
 cross_links:
   - docs-content
   - ecs
+  - ecs-logging
   - elasticsearch
   - integration-docs
   - logstash
@@ -11,9 +12,11 @@ toc:
   - toc: release-notes
   - toc: extend
 subs:
+  version: "9.0.0"
   beats-ref:   "https://www.elastic.co/guide/en/beats/libbeat/current"
   ecloud:   "Elastic Cloud"
   ess:   "Elasticsearch Service"
+  ech: "Elastic Cloud Hosted"
   es-serverless:   "Elasticsearch Serverless"
   uptime-app:   "Uptime app"
   logs-app:   "Logs app"
@@ -42,3 +45,6 @@ subs:
   monitor-features:   "monitoring features"
   stack-version: "9.0.0"
   major-version: "9.0"
+  major-release: "9.x"
+  beats-pull: "https://github.com/elastic/beats/pull/"
+  beats-issue: "https://github.com/elastic/beats/issues/"

@@ -34,7 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -50,15 +50,14 @@ func TestPublish(t *testing.T) {
 	makeOtelConsumer := func(t *testing.T, consumeFn func(ctx context.Context, ld plog.Logs) error) *otelConsumer {
 		t.Helper()
 
-		assert.NoError(t, logp.TestingSetup(logp.WithSelectors("otelconsumer")))
-
+		logger := logptest.NewTestingLogger(t, "")
 		logConsumer, err := consumer.NewLogs(consumeFn)
 		assert.NoError(t, err)
 		consumer := &otelConsumer{
 			observer:     outputs.NewNilObserver(),
 			logsConsumer: logConsumer,
 			beatInfo:     beat.Info{},
-			log:          logp.NewLogger("otelconsumer"),
+			log:          logger.Named("otelconsumer"),
 		}
 		return consumer
 	}
@@ -202,5 +201,47 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 		assert.Equal(t, bodyTimestamp, recordTimestamp, "log record timestamp should match body timestamp")
+	})
+
+	t.Run("sets observed timestamp with the correct format", func(t *testing.T) {
+		eventTime := time.Date(2025, time.January, 29, 9, 2, 39, 0, time.UTC)
+		eventCreatedTime := eventTime.Add(-time.Minute)
+
+		eventWithTime := beat.Event{Fields: mapstr.M{"event": mapstr.M{"created": eventCreatedTime}}}
+		eventWithInvalidTime := beat.Event{Fields: mapstr.M{"event": mapstr.M{"created": 42}}}
+		events := []beat.Event{event1, eventWithTime, eventWithInvalidTime}
+		batch := outest.NewBatch(events...)
+		for _, ev := range batch.Events() {
+			ev.Content.Timestamp = eventTime
+		}
+
+		otelConsumer := makeOtelConsumer(t, func(ctx context.Context, ld plog.Logs) error {
+			logRecords := ld.ResourceLogs().At(0).ScopeLogs().At(0).LogRecords()
+			assert.Equal(t, len(events), logRecords.Len(), "log records should be equal to events in the batch")
+
+			// no event.created, observed timestamp should be the same as the event timestamp
+			record := logRecords.At(0)
+			recordTimestamp := record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			observedTimestamp := record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			assert.Equal(t, recordTimestamp, observedTimestamp, "observed timestamp should match event timestamp")
+
+			// has event.created, observed timestamp should be the same as event.created
+			record = logRecords.At(1)
+			observedTimestamp = record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			eventCreatedTimestamp := eventCreatedTime.UTC().Format("2006-01-02T15:04:05.000Z")
+			assert.Equal(t, eventCreatedTimestamp, observedTimestamp, "observed timestamp should match event.created")
+
+			// has event.created with invalid type, observed timestamp should fall back to the event timestamp
+			record = logRecords.At(2)
+			recordTimestamp = record.Timestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			observedTimestamp = record.ObservedTimestamp().AsTime().UTC().Format("2006-01-02T15:04:05.000Z")
+			assert.Equal(t, recordTimestamp, observedTimestamp, "observed timestamp should match log record timestamp")
+			return nil
+		})
+
+		err := otelConsumer.Publish(ctx, batch)
+		assert.NoError(t, err)
+		assert.Len(t, batch.Signals, 1)
+		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 	})
 }

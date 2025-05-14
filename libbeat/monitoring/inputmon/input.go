@@ -19,23 +19,35 @@ package inputmon
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
-
-	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// NewInputRegistry returns a new monitoring.Registry for metrics related to
-// an input instance. The returned registry will be initialized with a static
-// string values for the input and id. When the input stops it should invoke
-// the returned cancel function to unregister the metrics. For testing purposes
-// an optional monitoring.Registry may be provided as an alternative to using
-// the global 'dataset' monitoring namespace. The inputType and id must be
-// non-empty for the metrics to be published to the global 'dataset' monitoring
-// namespace.
-func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
+// NewInputRegistry returns the *monitoring.Registry for metrics related to
+// an input instance, identified by ID. If a registry with the given ID
+// already exists, it is returned. Otherwise, a new registry is created.
+//
+// If a parent registry is provided, it will be used instead of the default
+// 'dataset' monitoring namespace.
+// If parent is nil, the default 'dataset' namespace is used. Therefore,
+// inputType and id should be non-empty. If either is empty, the returned
+// registry will not be registered in the global 'dataset' namespace. This will
+// cause the metrics to not be available in the HTTP monitoring endpoint.
+//
+// The returned cancel function *must* be called when the input stops to
+// unregister the metrics and prevent resource leaks.
+//
+// Deprecated. Use NewMetricsRegistry instead.
+func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
+	// Log the registration to ease tracking down duplicate ID registrations.
+	// Logged at INFO rather than DEBUG since it is not in a hot path and having
+	// the information available by default can short-circuit requests for debug
+	// logs during support interactions.
+	log := logp.NewLogger("metric_registry")
+
 	// Use the default registry unless one was provided (this would be for testing).
 	parentRegistry := optionalParent
 	if parentRegistry == nil {
@@ -44,31 +56,41 @@ func NewInputRegistry(inputType, id string, optionalParent *monitoring.Registry)
 
 	// If an ID has not been assigned to an input then metrics cannot be exposed
 	// in the global metric registry. The returned registry still behaves the same.
-	if (id == "" || inputType == "") && parentRegistry == globalRegistry() {
+	if (inputID == "" || inputType == "") && parentRegistry == globalRegistry() {
 		// Null route metrics without ID or input type.
 		parentRegistry = monitoring.NewRegistry()
 	}
 
 	// Sanitize dots from the id because they created nested objects within
 	// the monitoring registry, and we want a consistent flat level of nesting
-	key := sanitizeID(id)
+	registryID := sanitizeID(inputID)
 
-	// Log the registration to ease tracking down duplicate ID registrations.
-	// Logged at INFO rather than DEBUG since it is not in a hot path and having
-	// the information available by default can short-circuit requests for debug
-	// logs during support interactions.
-	log := logp.NewLogger("metric_registry")
-	// Make an orthogonal ID to allow tracking register/deregister pairs.
-	uuid := uuid.Must(uuid.NewV4()).String()
-	log.Infow("registering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
+	reg = parentRegistry.GetRegistry(registryID)
+	if reg == nil {
+		reg = parentRegistry.NewRegistry(registryID)
+	} else {
+		log.Warnw(fmt.Sprintf(
+			"parent metrics registry already contains a %q registry, reusing it",
+			registryID),
+			"input_type", inputType,
+			"input_id", inputID,
+			"registry_id", registryID)
+	}
 
-	reg = parentRegistry.NewRegistry(key)
 	monitoring.NewString(reg, "input").Set(inputType)
-	monitoring.NewString(reg, "id").Set(id)
+	monitoring.NewString(reg, "id").Set(inputID)
+
+	log.Infow("registering",
+		"input_type", inputType,
+		"input_id", inputID,
+		"registry_id", registryID)
 
 	return reg, func() {
-		log.Infow("unregistering", "input_type", inputType, "id", id, "key", key, "uuid", uuid)
-		parentRegistry.Remove(key)
+		log.Infow("unregistering",
+			"input_type", inputType,
+			"input_id", inputID,
+			"registry_id", registryID)
+		parentRegistry.Remove(registryID)
 	}
 }
 
@@ -81,7 +103,70 @@ func globalRegistry() *monitoring.Registry {
 }
 
 // MetricSnapshotJSON returns a snapshot of the input metric values from the
-// global 'dataset' monitoring namespace encoded as a JSON array (pretty formatted).
-func MetricSnapshotJSON() ([]byte, error) {
-	return json.MarshalIndent(filteredSnapshot(globalRegistry(), ""), "", "  ")
+// global 'dataset' monitoring namespace and from the reg parameter
+// encoded as a JSON array (pretty formatted). It's safe to pass in a nil
+// reg.
+func MetricSnapshotJSON(reg *monitoring.Registry) ([]byte, error) {
+	return json.MarshalIndent(filteredSnapshot(globalRegistry(), reg, ""), "", "  ")
+}
+
+// NewMetricsRegistry creates a monitoring.Registry for an input.
+//
+// The metric registry is created on parent using inputID as the name,
+// any '.' is replaced by '_'. The new registry is initialized with
+// 'id: inputID' and 'input: inputType'.
+//
+// If there is already a registry with the same name on parent, a new registry
+// not associated with parent will be returned.
+//
+// Call CancelMetricsRegistry to remove it from the parent registry and free up
+// the associated resources.
+func NewMetricsRegistry(
+	inputID string,
+	inputType string,
+	parent *monitoring.Registry,
+	log *logp.Logger) *monitoring.Registry {
+
+	registryID := sanitizeID(inputID)
+	reg := parent.GetRegistry(registryID)
+	if reg == nil {
+		reg = parent.NewRegistry(registryID)
+	} else {
+		// Null route metrics for duplicated ID.
+		reg = monitoring.NewRegistry()
+		log.Warnw(fmt.Sprintf(
+			"parent metrics registry already contains a %q registry, returning an unregistered registry. Metrics won't be available for this input instance",
+			registryID),
+			"registry_id", registryID,
+			"input_type", inputType,
+			"input_id", inputID)
+	}
+
+	// add the necessary information so the registry can be published by the
+	// HTTP monitoring endpoint.
+	monitoring.NewString(reg, "input").Set(inputType)
+	monitoring.NewString(reg, "id").Set(inputID)
+
+	log.Named("metric_registry").Infow("registering",
+		"registry_id", registryID,
+		"input_id", inputID,
+		"input_type", inputType)
+
+	return reg
+}
+
+// CancelMetricsRegistry removes the metrics registry for inputID from parent.
+func CancelMetricsRegistry(
+	inputID string,
+	inputType string,
+	parent *monitoring.Registry,
+	log *logp.Logger) {
+
+	metricsID := sanitizeID(inputID)
+	log.Named("metric_registry").Infow("unregistering",
+		"registry_id", metricsID,
+		"input_id", inputID,
+		"input_type", inputType)
+
+	parent.Remove(metricsID)
 }

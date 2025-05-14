@@ -96,6 +96,8 @@ func TestNetFlow(t *testing.T) {
 			pluginCfg, err := conf.NewConfigFrom(mapstr.M{})
 			require.NoError(t, err)
 			if isReversed {
+				t.Skip("Flaky on macOS: https://github.com/elastic/beats/issues/43670")
+
 				// if pcap is reversed packet order we need to have multiple workers
 				// and thus enable the input packets lru
 				err = pluginCfg.SetInt("workers", -1, 2)
@@ -135,6 +137,8 @@ func TestNetFlow(t *testing.T) {
 			require.NoError(t, err)
 
 			goldenData := readGoldenFile(t, filepath.Join(goldenDir, testName+".pcap.golden.json"))
+
+			stripCommunityID(&goldenData)
 
 			// Process packets in PCAP and get flow records.
 			var totalBytes, totalPackets int
@@ -228,6 +232,7 @@ func TestPCAPFiles(t *testing.T) {
 			}
 
 			goldenData := readGoldenFile(t, goldenName)
+			stripCommunityID(&goldenData)
 			assert.EqualValues(t, goldenData, normalize(t, result))
 		})
 	}
@@ -260,6 +265,7 @@ func TestDatFiles(t *testing.T) {
 			}
 
 			goldenData := readGoldenFile(t, goldenName)
+			stripCommunityID(&goldenData)
 			jsonGolden, err := json.Marshal(goldenData)
 			if !assert.NoError(t, err) {
 				t.Fatal(err)
@@ -417,7 +423,7 @@ func readGoldenFile(t testing.TB, file string) TestResult {
 }
 
 // This test converts a flow and its reverse flow to a Beat event
-// to check that they have the same flow.id, locality and community-id.
+// to check that they have the same flow.id, locality and community-id (non-fips only).
 func TestReverseFlows(t *testing.T) {
 	parseMAC := func(s string) net.HardwareAddr {
 		addr, err := net.ParseMAC(s)
@@ -486,7 +492,7 @@ func TestReverseFlows(t *testing.T) {
 	if !assert.Len(t, evs, 2) {
 		t.Fatal()
 	}
-	for _, key := range []string{"flow.id", "flow.locality", "network.community_id"} {
+	for _, key := range reverseFlowsTestKeys {
 		var keys [2]interface{}
 		for i := range keys {
 			var err error

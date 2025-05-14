@@ -27,14 +27,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
 
 func TestEventMapping(t *testing.T) {
-	logger := logp.NewLogger("kubernetes.volume")
+	logger := logptest.NewTestingLogger(t, "kubernetes.volume")
 
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)

@@ -193,6 +193,7 @@ class Test(BaseTest):
         self._test_non_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
+    @unittest.skip("ebpf backend is failing: https://github.com/elastic/beats/issues/44174")
     def test_non_recursive__ebpf(self):
         self._test_non_recursive("ebpf")
 

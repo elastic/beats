@@ -22,10 +22,8 @@ Although this module has been developed against Envoy proxy 1.10.0 and Kubernete
 
 This module comes with a sample dashboard.
 
-:::{image} images/kibana-envoyproxy.jpg
-:alt: kibana envoyproxy
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana envoyproxy](images/kibana-envoyproxy.jpg)
 
 
 ## Fields [_fields_16]

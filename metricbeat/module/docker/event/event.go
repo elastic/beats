@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/events"
 	"github.com/docker/docker/client"
 
@@ -74,13 +73,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		dockerClient:  client,
 		dedot:         config.DeDot,
-		logger:        logp.NewLogger("docker"),
+		logger:        base.Logger().Named("docker"),
 	}, nil
 }
 
 // Run listens for docker events and reports them
 func (m *MetricSet) Run(ctx context.Context, reporter mb.ReporterV2) {
-	options := types.EventsOptions{
+	options := events.ListOptions{
 		Since: fmt.Sprintf("%d", time.Now().Unix()),
 	}
 

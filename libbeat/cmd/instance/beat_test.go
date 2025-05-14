@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid/v5"
@@ -124,7 +125,7 @@ func TestInitKibanaConfig(t *testing.T) {
 
 func TestEmptyMetaJson(t *testing.T) {
 	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	b.Info.Logger = logger
 	if err != nil {
 		panic(err)
@@ -147,7 +148,7 @@ func TestEmptyMetaJson(t *testing.T) {
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
 	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	firstBeat.Info.Logger = logger
 	if err != nil {
 		panic(err)
@@ -337,7 +338,7 @@ output:
 			err = cfg.Unpack(&config)
 			require.NoError(t, err)
 
-			logger := logp.NewTestingLogger(t, "")
+			logger := logptest.NewTestingLogger(t, "")
 
 			b := &Beat{Config: config, Beat: beat.Beat{
 				Info: beat.Info{
@@ -485,7 +486,7 @@ func TestLogSystemInfo(t *testing.T) {
 		buff.Reset()
 
 		b.Manager = mockManager{enabled: tc.managed}
-		b.logSystemInfo()
+		b.logSystemInfo(log)
 
 		tc.assertFn(t, buff)
 	}

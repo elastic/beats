@@ -4,16 +4,17 @@ env:
   BEAT: "x-pack/auditbeat"
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
-      - auditbeat/
-      - x-pack/auditbeat/
+      - auditbeat/**
+      - x-pack/auditbeat/**
       # OSS
       - go.mod
       - pytest.ini
-      - dev-tools/
-      - libbeat/
-      - x-pack/libbeat/
+      - dev-tools/**
+      - libbeat/**
+      - x-pack/libbeat/**
       # Workflow
       - .github/workflows/xpack-auditbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml
@@ -21,14 +22,14 @@ on:
     branches:
       - main
     paths:
-      - auditbeat/
-      - x-pack/auditbeat/
+      - auditbeat/**
+      - x-pack/auditbeat/**
       # OSS
       - go.mod
       - pytest.ini
-      - dev-tools/
-      - libbeat/
-      - x-pack/libbeat/
+      - dev-tools/**
+      - libbeat/**
+      - x-pack/libbeat/**
       # Workflow
       - .github/workflows/xpack-auditbeat-macos-unit-tests.yml
       - .github/actions/unit-test/action.yml

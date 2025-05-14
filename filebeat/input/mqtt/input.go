@@ -64,8 +64,9 @@ func NewInput(
 	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
-	return newInput(cfg, connector, inputContext, libmqtt.NewClient, backoff.NewEqualJitterBackoff)
+	return newInput(cfg, connector, inputContext, libmqtt.NewClient, backoff.NewEqualJitterBackoff, logger)
 }
 
 func newInput(
@@ -74,6 +75,7 @@ func newInput(
 	inputContext input.Context,
 	newMqttClient func(options *libmqtt.ClientOptions) libmqtt.Client,
 	newBackoff func(done <-chan struct{}, init, max time.Duration) backoff.Backoff,
+	logger *logp.Logger,
 ) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -85,7 +87,7 @@ func newInput(
 		return nil, err
 	}
 
-	logger := logp.NewLogger("mqtt input").With("hosts", config.Hosts)
+	logger = logger.Named("mqtt input").With("hosts", config.Hosts)
 	setupLibraryLogging()
 
 	clientDisconnected := new(sync.WaitGroup)
@@ -102,7 +104,7 @@ func newInput(
 		client:             newMqttClient(clientOptions),
 		clientDisconnected: clientDisconnected,
 		inflightMessages:   inflightMessages,
-		logger:             logp.NewLogger("mqtt input").With("hosts", config.Hosts),
+		logger:             logger,
 	}, nil
 }
 
@@ -186,7 +188,7 @@ func (mi *mqttInput) Stop() {
 
 	mi.clientDisconnected.Add(1)
 	go func() {
-		mi.client.Disconnect(uint(disconnectTimeout.Milliseconds()))
+		mi.client.Disconnect(uint(disconnectTimeout.Milliseconds())) //nolint:gosec //can ignore
 		mi.clientDisconnected.Done()
 	}()
 }

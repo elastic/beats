@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/mysql-no-data.html
 ---
 
-# Packetbeat isn���t capturing MySQL performance data [mysql-no-data]
+# Packetbeat isn't capturing MySQL performance data [mysql-no-data]
 
 You may be listening on the wrong interface or trying to capture data sent over an encrypted connection. Packetbeat can only monitor MySQL traffic if it is unencrypted. To resolve your issue:
 

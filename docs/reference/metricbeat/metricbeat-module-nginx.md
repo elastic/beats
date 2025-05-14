@@ -31,9 +31,7 @@ The Nginx metricsets were tested with Nginx 1.23.2 and are expected to work with
 
 The nginx module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-nginx.png
-:alt: metricbeat nginx
-:::
+![metricbeat nginx](images/metricbeat-nginx.png)
 
 
 ## Example configuration [_example_configuration_48]
