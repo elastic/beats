@@ -209,8 +209,25 @@ filebeat.inputs:
   url: wss://localhost:443/_stream
 ----
 
+<<<<<<< HEAD:x-pack/filebeat/docs/inputs/input-streaming.asciidoc
 [[input-state-streaming]]
 ==== Input state
+=======
+## Keep Alive configuration
+
+The `streaming` input currently supports keep-alive configuration options for streams of `type: websocket`. Use these configuration options to further optimize the stability
+of your WebSocket connections and prevent them from idling out.
+
+The `keep_alive` setting has the following configuration options:
+
+* `enable`: Indicates whether Keep-Alive is enabled. By default, this is set to `false`.
+* `interval`: Interval between Keep-Alive messages, expressed as a time duration value. The default value is `30s`.
+* `write_control_deadline`: Deadline for writing control frames, like `PING`, `PONG`, or `CLOSE`, on a WebSocket connection. The timeout, expressed as a time duration value, helps prevent indefinite blocking when the server or client is not responding to control frame requests. The default value is `10s`.
+   
+::::{note}
+Don't use the `blanket_retries` and `infinite_retries` configuration options together with the `keep_alive` settings. The purpose of `keep_alive` is to keep the connection open so you don't need to `retry` and reconnect all the time. In some scenarios `keep_alive` might not work if the host WebSocket server is not configured to handle `ping` frames.
+::::
+>>>>>>> 73eed8ba7 ([filebeat][streaming] - Added support for websocket keep_alive heartbeat, updated metrics & docs (#44204)):docs/reference/filebeat/filebeat-input-streaming.md
 
 The `streaming` input keeps a runtime state between every message received. This state can be accessed by the CEL program and may contain arbitrary objects.
 The state must contain a `response` map and may contain any object the user wishes to store in it. All objects are stored at runtime, except `cursor`, which has values that are persisted between restarts.
@@ -448,7 +465,25 @@ observe the activity of the input.
 | `batch_processing_time`   | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 |=======
 
+<<<<<<< HEAD:x-pack/filebeat/docs/inputs/input-streaming.asciidoc
 ==== Developer tools
+=======
+| Metric | Description |
+| --- | --- |
+| `url` | URL of the input resource. |
+| `cel_eval_errors` | Number of errors encountered during cel program evaluation. |
+| `errors_total` | Number of errors encountered over the life cycle of the input. |
+| `batches_received_total` | Number of event arrays received. |
+| `batches_published_total` | Number of event arrays published. |
+| `received_bytes_total` | Number of bytes received over the life cycle of the input. |
+| `events_received_total` | Number of events received. |
+| `events_published_total` | Number of events published. |
+| `write_control_errors` | Number of errors encountered for write control operations. |
+| `cel_processing_time` | Histogram of the elapsed successful CEL program processing times in nanoseconds. |
+| `batch_processing_time` | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches). |
+| `ping_message_send_time` | Histogram of the elapsed successful ping message send times in nanoseconds. |
+| `pong_message_received_time` | Histogram of the elapsed successful pong message receive times in nanoseconds. |
+>>>>>>> 73eed8ba7 ([filebeat][streaming] - Added support for websocket keep_alive heartbeat, updated metrics & docs (#44204)):docs/reference/filebeat/filebeat-input-streaming.md
 
 A stand-alone CEL environment that implements the majority of the streaming input's Comment Expression Language functionality is available in the https://github.com/elastic/mito[Elastic Mito] repository. This tool may be used to help develop CEL programs to be used by the input. Installation is available from source by running `go install github.com/elastic/mito/cmd/mito@latest` and requires a Go toolchain.
 
