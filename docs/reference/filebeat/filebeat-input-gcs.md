@@ -147,7 +147,7 @@ $$$supported-attributes-gcs$$$
 3. [auth.credentials_file.path](#attrib-auth-credentials-file)
 4. [buckets](#attrib-buckets)
 5. [name](#attrib-bucket-name)
-6. [batch_size](attrib-batch_size-gcs)
+6. [batch_size](#attrib-batch_size-gcs)
 7. [max_workers](#attrib-max_workers-gcs)
 8. [poll](#attrib-poll-gcs)
 9. [poll_interval](#attrib-poll_interval-gcs)
