@@ -15,6 +15,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/cloud"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	azlog "github.com/Azure/azure-sdk-for-go/sdk/azcore/log"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs"
 	"github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs/checkpoints"
@@ -60,9 +61,23 @@ type eventHubInputV2 struct {
 // newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
 // that uses the modern Azure Event Hub SDK for Go.
 func newEventHubInputV2(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
+	logger := log.Named(inputName)
+
+	if config.ProcessorLogEvents {
+		azlog.SetEvents(
+			azeventhubs.EventConn,
+			azeventhubs.EventAuth,
+			azeventhubs.EventConsumer,
+		)
+
+		azlog.SetListener(func(event azlog.Event, msg string) {
+			logger.Debugw(msg, "event", event)
+		})
+	}
+
 	return &eventHubInputV2{
 		config: config,
-		log:    log.Named(inputName),
+		log:    logger,
 	}, nil
 }
 
