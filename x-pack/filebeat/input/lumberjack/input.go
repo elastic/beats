@@ -10,6 +10,7 @@ import (
 	inputv2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -49,7 +50,7 @@ func newLumberjackInput(lumberjackConfig config) (*lumberjackInput, error) {
 func (i *lumberjackInput) Name() string { return inputName }
 
 func (i *lumberjackInput) Test(inputCtx inputv2.TestContext) error {
-	s, err := newServer(i.config, inputCtx.Logger, nil, nil)
+	s, err := newServer(i.config, inputCtx.Logger, nil, nil, nil)
 	if err != nil {
 		return err
 	}
@@ -57,6 +58,7 @@ func (i *lumberjackInput) Test(inputCtx inputv2.TestContext) error {
 }
 
 func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) error {
+	inputCtx.UpdateStatus(status.Starting, "")
 	inputCtx.Logger.Info("Starting " + inputName + " input")
 	defer inputCtx.Logger.Info(inputName + " input stopped")
 
@@ -65,7 +67,9 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 		EventListener: newEventACKHandler(),
 	})
 	if err != nil {
-		return fmt.Errorf("failed to create pipeline client: %w", err)
+		err := fmt.Errorf("failed to create pipeline client: %w", err)
+		inputCtx.UpdateStatus(status.Failed, err.Error())
+		return err
 	}
 	defer client.Close()
 
@@ -74,7 +78,7 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 	metrics := newInputMetrics(inputCtx.ID, nil)
 	defer metrics.Close()
 
-	s, err := newServer(i.config, inputCtx.Logger, client.Publish, metrics)
+	s, err := newServer(i.config, inputCtx.Logger, client.Publish, inputCtx.StatusReporter, metrics)
 	if err != nil {
 		return err
 	}
