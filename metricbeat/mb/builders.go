@@ -23,7 +23,6 @@ import (
 	"strings"
 
 	"github.com/gofrs/uuid/v5"
-	"github.com/joeshaw/multierror"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -109,7 +108,7 @@ func createModule(r *Register, bm BaseModule) (Module, error) {
 
 func initMetricSets(r *Register, m Module, logger *logp.Logger) ([]MetricSet, error) {
 	var (
-		errs multierror.Errors
+		errs []error
 	)
 
 	bms, err := newBaseMetricSets(r, m, logger)
@@ -152,7 +151,7 @@ func initMetricSets(r *Register, m Module, logger *logp.Logger) ([]MetricSet, er
 		metricsets = append(metricsets, metricSet)
 	}
 
-	return metricsets, errs.Err()
+	return metricsets, errors.Join(errs...)
 }
 
 // newBaseMetricSets creates a new BaseMetricSet for all MetricSets defined

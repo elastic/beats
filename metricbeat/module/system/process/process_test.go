@@ -35,7 +35,6 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	logp.DevelopmentSetup()
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)

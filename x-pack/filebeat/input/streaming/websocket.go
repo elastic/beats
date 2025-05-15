@@ -39,11 +39,19 @@ type websocketStream struct {
 	tokenSource oauth2.TokenSource
 	tokenExpiry <-chan time.Time
 	time        func() time.Time
+	keepAlive   *keepAlive
 }
 
 type loggingRoundTripper struct {
 	rt  http.RoundTripper
 	log *logp.Logger
+}
+
+// keepAlive manages the configuration and metrics for WebSocket keep-alive functionality
+type keepAlive struct {
+	cfg     keepAliveConfig
+	metrics *inputMetrics
+	log     *logp.Logger
 }
 
 func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -56,6 +64,45 @@ func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 		}
 	}
 	return resp, err
+}
+
+// heartBeat sends a ping message to the websocket server at regular intervals
+func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start time.Time) context.CancelFunc {
+	ctx, cancel := context.WithCancel(ctx)
+	// set initial read deadline
+	conn.SetReadDeadline(time.Now().Add(k.cfg.readControlDeadline))
+	// set pong handler to update read deadline
+	conn.SetPongHandler(func(pongData string) error {
+		k.log.Debugw("received pong message from websocket server", "pong_data", pongData)
+		k.metrics.pongMessageReceivedTime.Update(time.Since(start).Nanoseconds())
+		return conn.SetReadDeadline(time.Now().Add(k.cfg.readControlDeadline))
+	})
+
+	// set heartbeat ping routine
+	go func() {
+		ticker := time.NewTicker(k.cfg.Interval)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				k.log.Debugw("heartbeat stopped")
+				return
+			case now := <-ticker.C:
+				err := conn.WriteControl(websocket.PingMessage, nil, now.Add(k.cfg.WriteControlDeadline))
+				if err != nil {
+					k.log.Debugw("error sending ping control frame to websocket server", "error", err)
+					k.metrics.writeControlErrors.Inc()
+					k.metrics.errorsTotal.Inc()
+				} else {
+					k.log.Debugw("sent ping control frame to websocket server")
+					k.metrics.pingMessageSendTime.Update(time.Since(start).Nanoseconds())
+				}
+			}
+		}
+	}()
+
+	return cancel
 }
 
 // NewWebsocketFollower performs environment construction including CEL
@@ -71,7 +118,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id),
+			metrics: newInputMetrics(id, nil),
 		},
 		// the token expiry handler will never trigger unless a valid expiry time is assigned
 		tokenExpiry: nil,
@@ -108,6 +155,17 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 		s.tokenExpiry = time.After(time.Until(token.Expiry) - cfg.Auth.OAuth2.TokenExpiryBuffer)
 	}
 
+	// set and assign KeepAlive if enabled
+	if cfg.KeepAlive.Enable {
+		// create a new keepAlive instance
+		k := &keepAlive{
+			cfg:     cfg.KeepAlive,
+			metrics: s.metrics,
+			log:     log,
+		}
+		s.keepAlive = k
+	}
+
 	patterns, err := regexpsFromConfig(cfg)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
@@ -128,7 +186,9 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 // FollowStream receives, processes and publishes events from the subscribed
 // websocket stream.
 func (s *websocketStream) FollowStream(ctx context.Context) error {
+	var heartBeatCancel context.CancelFunc
 	state := s.cfg.State
+
 	if state == nil {
 		state = make(map[string]any)
 	}
@@ -151,6 +211,12 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 		s.log.Errorw("failed to establish websocket connection", "error", err)
 		return err
 	}
+	// Start the keep-alive routine if enabled and the connection is established successfully
+	// this is for the initial connection only, the keep-alive will be restarted during the reconnect
+	// logic/token refresh.
+	if s.keepAlive != nil {
+		heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
+	}
 
 	// ensures this is the last connection closed when the function returns
 	defer func() {
@@ -164,11 +230,18 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 
 	for {
 		select {
+		// If the keep-alive is enabled, heartbeat will be automatically cancelled when
+		// the parent context is done().
 		case <-ctx.Done():
 			s.log.Debugw("context cancelled, closing websocket connection")
 			return ctx.Err()
 		// s.tokenExpiry channel will only trigger if oauth2 is enabled and the token is about to expire
 		case <-s.tokenExpiry:
+			// Cancel the keep-alive routine if enabled since we need to establish a new
+			// connection instance with the refreshed token.
+			if s.keepAlive != nil {
+				heartBeatCancel()
+			}
 			// get the new token
 			token, err := s.tokenSource.Token()
 			if err != nil {
@@ -177,9 +250,11 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				return err
 			}
 			// gracefully close current connection
-			if err := c.Close(); err != nil {
-				s.metrics.errorsTotal.Inc()
-				s.log.Errorw("encountered an error while closing the existing websocket connection during token refresh", "error", err)
+			if c != nil {
+				if err := c.Close(); err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.log.Errorw("encountered an error while closing the existing websocket connection during token refresh", "error", err)
+				}
 			}
 			// set the new token in the config
 			s.cfg.Auth.OAuth2.accessToken = token.AccessToken
@@ -193,21 +268,33 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 				s.log.Errorw("failed to establish a new websocket connection on token refresh", "error", err)
 				return err
 			}
+			// Restart the keep-alive routine on a token refresh if enabled and the
+			// connection is established successfully.
+			if s.keepAlive != nil {
+				heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
+			}
 		default:
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
+				// Cancel the keep-alive routine if enabled since we need to establish a
+				// new connection via our reconnect logic.
+				if s.keepAlive != nil {
+					heartBeatCancel()
+				}
 				if !s.cfg.Retry.BlanketRetries && !isRetryableError(err) {
 					s.log.Errorw("failed to read websocket data", "error", err)
 					return err
 				}
 				s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
-				// close the old connection and reconnect
-				if err := c.Close(); err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+				if c != nil {
+					if err := c.Close(); err != nil {
+						s.metrics.errorsTotal.Inc()
+						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+					}
 				}
-				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
+				// Since c is already a pointer, we can reassign it to the new connection
+				// and the defer func will still handle it.
 				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
 				handleConnectionResponse(resp, s.metrics, s.log)
 				if err != nil {
@@ -215,8 +302,14 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 					s.log.Errorw("failed to reconnect websocket connection", "error", err)
 					return err
 				}
+				// Restart the keep-alive routine if enabled after a successful reconnection.
+				if s.keepAlive != nil {
+					heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
+				}
+
 				continue
 			}
+
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
 			s.log.Debugw("received websocket message", logp.Namespace(s.ns), "msg", string(message))
@@ -318,11 +411,16 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				if err == nil {
 					return conn, response, nil
 				}
-				//nolint:errorlint // it will never be a wrapped error at this point
-				if err == websocket.ErrBadHandshake {
-					log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				// in case of sudden network errors or server crashes the response will be nil and logging should be done gracefully
+				if response != nil {
+					//nolint:errorlint // it will never be a wrapped error at this point
+					if err == websocket.ErrBadHandshake {
+						log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+					} else {
+						log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+					}
 				} else {
-					log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 				time.Sleep(waitTime)
@@ -334,11 +432,16 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				if err == nil {
 					return conn, response, nil
 				}
-				//nolint:errorlint // it will never be a wrapped error at this point
-				if err == websocket.ErrBadHandshake {
-					log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+				// in case of sudden network errors or server crashes the response will be nil and logging should be done gracefully
+				if response != nil {
+					//nolint:errorlint // it will never be a wrapped error at this point
+					if err == websocket.ErrBadHandshake {
+						log.Errorf("attempt %d: webSocket connection failed with bad handshake (status %d) retrying...\n", attempt, response.StatusCode)
+					} else {
+						log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+					}
 				} else {
-					log.Errorf("attempt %d: webSocket connection failed with error %v and (status %d), retrying...\n", attempt, err, response.StatusCode)
+					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 				time.Sleep(waitTime)
