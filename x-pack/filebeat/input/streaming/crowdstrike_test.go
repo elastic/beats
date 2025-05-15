@@ -83,7 +83,7 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 	if *offset >= 0 {
 		cursor = map[string]any{"offset": *offset}
 	}
-	s, err := NewFalconHoseFollower(ctx, "crowdstrike_testing", cfg, cursor, &testPublisher{logger}, logger, time.Now)
+	s, err := NewFalconHoseFollower(ctx, "crowdstrike_testing", cfg, cursor, &testPublisher{logger}, nil, logger, time.Now)
 	if err != nil {
 		t.Fatalf("unexpected error constructing follower: %v", err)
 	}

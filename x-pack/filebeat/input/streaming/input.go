@@ -20,6 +20,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -74,6 +75,7 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks as long as websocket connections are alive. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
+	env.UpdateStatus(status.Starting, "")
 	var cursor map[string]interface{}
 	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
 		err := crsr.Unpack(&cursor)
@@ -97,9 +99,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	// want to be a registry. Until then, let's keep this simple.
 	switch cfg.Type {
 	case "", "websocket":
-		s, err = NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+		s, err = NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, env.StatusReporter, log, i.time)
 	case "crowdstrike":
-		s, err = NewFalconHoseFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+		s, err = NewFalconHoseFollower(ctx, env.ID, cfg, cursor, pub, env.StatusReporter, log, i.time)
 	}
 	if err != nil {
 		return err
@@ -108,6 +110,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 
 	return s.FollowStream(ctx)
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // getURL initializes the input URL with the help of the url_program.
 func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, log *logp.Logger, now func() time.Time) (string, error) {
