@@ -34,7 +34,7 @@ const (
 type SysInfoMetricSet struct {
 	MetricSet
 	hasher    *hasher.FileHasher
-	cache     *cache.Cache
+	cache     *cache.Cache[*Process]
 	bucket    datastore.Bucket
 	lastState time.Time
 
@@ -116,7 +116,7 @@ func NewFromSysInfo(ms MetricSet) (mb.MetricSet, error) {
 
 	sm := &SysInfoMetricSet{
 		MetricSet: ms,
-		cache:     cache.New(),
+		cache:     cache.New[*Process](),
 		bucket:    bucket,
 		lastState: lastState,
 		hasher:    hasher,
@@ -186,7 +186,7 @@ func (ms *SysInfoMetricSet) reportState(report mb.ReporterV2) error {
 
 	if ms.cache != nil {
 		// This will initialize the cache with the current processes
-		ms.cache.DiffAndUpdateCache(convertToCacheable(processes))
+		ms.cache.DiffAndUpdateCache(processes)
 	}
 
 	// Save time so we know when to send the state again (config.StatePeriod)
@@ -210,13 +210,9 @@ func (ms *SysInfoMetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 	ms.log.Debugf("Found %v processes", len(processes))
 
-	started, stopped := ms.cache.DiffAndUpdateCache(convertToCacheable(processes))
+	started, stopped := ms.cache.DiffAndUpdateCache(processes)
 
-	for _, cacheValue := range started {
-		p, ok := cacheValue.(*Process)
-		if !ok {
-			return fmt.Errorf("cache type error")
-		}
+	for _, p := range started {
 		ms.enrichProcess(p)
 
 		if p.Error == nil {
@@ -227,12 +223,7 @@ func (ms *SysInfoMetricSet) reportChanges(report mb.ReporterV2) error {
 		}
 	}
 
-	for _, cacheValue := range stopped {
-		p, ok := cacheValue.(*Process)
-		if !ok {
-			return fmt.Errorf("cache type error")
-		}
-
+	for _, p := range stopped {
 		if p.Error == nil {
 			report.Event(ms.processEvent(p, eventTypeEvent, eventActionProcessStopped))
 		}
@@ -354,16 +345,6 @@ func processMessage(process *Process, action eventAction) string {
 	}
 
 	return makeMessage(process.Info.PID, action, process.Info.Name, username, process.Error)
-}
-
-func convertToCacheable(processes []*Process) []cache.Cacheable {
-	c := make([]cache.Cacheable, 0, len(processes))
-
-	for _, p := range processes {
-		c = append(c, p)
-	}
-
-	return c
 }
 
 func (ms *SysInfoMetricSet) getProcesses() ([]*Process, error) {
