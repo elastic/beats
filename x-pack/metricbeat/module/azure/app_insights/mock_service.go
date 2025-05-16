@@ -5,6 +5,8 @@
 package app_insights
 
 import (
+	"fmt"
+
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
 	"github.com/stretchr/testify/mock"
 
@@ -33,5 +35,8 @@ func NewMockClient() *Client {
 // GetMetricValues will return specified app insights metrics
 func (service *MockService) GetMetricValues(applicationId string, bodyMetrics []insights.MetricsPostBodySchema) (insights.ListMetricsResultsItem, error) {
 	args := service.Called(applicationId, bodyMetrics)
-	return args.Get(0).(insights.ListMetricsResultsItem), args.Error(1)
+	if res, ok := args.Get(0).(insights.ListMetricsResultsItem); ok {
+		return res, args.Error(1)
+	}
+	return insights.ListMetricsResultsItem{}, fmt.Errorf("error casting to insights.ListMetricsResultsItem")
 }
