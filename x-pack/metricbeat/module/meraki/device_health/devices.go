@@ -165,6 +165,9 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 		}
 
 		for _, d := range result {
+			if d.ByBand == nil {
+				continue
+			}
 			for _, band := range *d.ByBand {
 				if device, ok := devices[Serial(d.Serial)]; ok {
 					if device.bandUtilization == nil {
