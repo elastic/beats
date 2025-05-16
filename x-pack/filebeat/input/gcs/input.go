@@ -56,6 +56,10 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		return nil, nil, err
 	}
 	sources := make([]cursor.Source, 0, len(config.Buckets))
+	// This is to maintain backward compatibility with the old config.
+	if config.BatchSize == 0 {
+		config.BatchSize = config.MaxWorkers
+	}
 	for _, b := range config.Buckets {
 		bucket := tryOverrideOrDefault(config, b)
 		if bucket.TimeStampEpoch != nil && !isValidUnixTimestamp(*bucket.TimeStampEpoch) {
@@ -64,6 +68,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		sources = append(sources, &Source{
 			ProjectId:                config.ProjectId,
 			BucketName:               bucket.Name,
+			BatchSize:                *bucket.BatchSize,
 			MaxWorkers:               *bucket.MaxWorkers,
 			Poll:                     *bucket.Poll,
 			PollInterval:             *bucket.PollInterval,
@@ -83,6 +88,15 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
 		b.MaxWorkers = &cfg.MaxWorkers
+	}
+	if b.BatchSize == nil && cfg.BatchSize != 0 {
+		// If the global batch size is set, use it
+		b.BatchSize = &cfg.BatchSize
+	} else {
+		// If the global batch size is not set, use the local max_workers as the batch size
+		// since at this point we know `b.MaxWorkers` will be set to a non-nil value.
+		// This is to maintain backward compatibility with the old config.
+		b.BatchSize = b.MaxWorkers
 	}
 	if b.Poll == nil {
 		b.Poll = &cfg.Poll
@@ -122,7 +136,8 @@ func (input *gcsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
-	cursor cursor.Cursor, publisher cursor.Publisher) error {
+	cursor cursor.Cursor, publisher cursor.Publisher,
+) error {
 	st := newState()
 	currentSource := src.(*Source)
 
