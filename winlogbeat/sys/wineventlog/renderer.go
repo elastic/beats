@@ -478,6 +478,19 @@ func (r *XMLRenderer) Render(handle EvtHandle) (*winevent.Event, string, error) 
 		}
 	}
 
+	var pairs *[]winevent.KeyValue
+	if len(event.UserData.Pairs) > 0 {
+		pairs = &event.UserData.Pairs
+	} else if len(event.EventData.Pairs) > 0 {
+		pairs = &event.EventData.Pairs
+	}
+
+	if pairs != nil {
+		for i, pair := range *pairs {
+			(*pairs)[i].Value = expandMessageIDs(md, pair.Value)
+		}
+	}
+
 	if len(errs) > 0 {
 		return event, string(outBytes), multierr.Combine(errs...)
 	}
