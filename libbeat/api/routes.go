@@ -24,13 +24,14 @@ import (
 
 	"go.uber.org/multierr"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// RegistryLookupFunc is used for looking up specfic registry inside a namespace
+// RegistryLookupFunc is used for looking up specific registry inside a namespace
 func RegistryLookupFunc(rootNamespace *monitoring.Namespace) LookupFunc {
 	return func(s string) *monitoring.Registry {
 		return rootNamespace.GetRegistry().GetRegistry(s)
@@ -58,6 +59,7 @@ func NewWithDefaultRoutes(log *logp.Logger, config *config.C, reg LookupFunc) (*
 		api.AttachHandler("/state", makeAPIHandler(reg("state"))),
 		api.AttachHandler("/stats", makeAPIHandler(reg("stats"))),
 		api.AttachHandler("/dataset", makeAPIHandler(reg("dataset"))),
+		inputmon.AttachHandler(api.mux, reg("inputs")),
 	)
 	if err != nil {
 		return nil, err
