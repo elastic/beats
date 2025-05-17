@@ -40,7 +40,7 @@ type receiveTestCase struct {
 func TestReceive(t *testing.T) {
 	// We use a mocked clock so scan frequency can be any positive value.
 	const defaultScanFrequency = time.Microsecond
-	t0 := time.Time{}
+	t0 := time.Unix(0, 0)
 	t1 := t0.Add(time.Hour)
 	t2 := t1.Add(time.Minute)
 	t3 := t2.Add(time.Hour)
@@ -107,7 +107,7 @@ func TestReceive(t *testing.T) {
 			logGroupIDs: []string{"a"},
 			startTime:   t1,
 			configOverrides: func(c *config) {
-				c.StartPosition = "end"
+				c.StartPosition = end
 			},
 			steps: []receiveTestStep{
 				{
@@ -128,7 +128,7 @@ func TestReceive(t *testing.T) {
 			logGroupIDs: []string{"a", "b"},
 			startTime:   t1,
 			configOverrides: func(c *config) {
-				c.StartPosition = "end"
+				c.StartPosition = end
 				c.Latency = time.Second
 			},
 			steps: []receiveTestStep{
@@ -176,6 +176,10 @@ func TestReceive(t *testing.T) {
 	clock := &clock{}
 	for stepIndex, test := range testCases {
 		ctx, cancel := context.WithCancel(context.Background())
+
+		handler, err := createStateHandler(createTestInputStore())
+		assert.Nil(t, err)
+
 		p := &cloudwatchPoller{
 			workRequestChan: make(chan struct{}),
 			// Unlike the live cwPoller, we make workResponseChan unbuffered,
@@ -183,6 +187,7 @@ func TestReceive(t *testing.T) {
 			// decided on its output
 			workResponseChan: make(chan workResponse),
 			log:              logp.NewLogger("test"),
+			stateHandler:     handler,
 		}
 
 		p.config = defaultConfig()
