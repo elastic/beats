@@ -171,7 +171,31 @@ steps:
           - "heartbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "heartbeat: Go Integration Tests"
+              context: "heartbeat: Go Integration Tests / Ubuntu x86_64"
+
+      - label: ":windows: Heartbeat: Go Integration Tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+        command: |
+          cd heartbeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+          - "heartbeat/build/integration-tests/*"
+          - "heartbeat/build/integration-tests/Test*/*"
+          - "heartbeat/build/integration-tests/Test*/data/**/*"
+        notify:
+          - github_commit_status:
+              context: "heartbeat: Go Integration Tests / Win 2022"
 
       # Heartbeat has no modules yet
       - label: ":ubuntu: Heartbeat: Python Integration Tests"
