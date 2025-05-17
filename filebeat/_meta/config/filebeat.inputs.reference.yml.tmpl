@@ -523,7 +523,8 @@ filebeat.inputs:
   # When enabling this option, a file handler is closed immediately in case a file can't be found
   # any more. In case the file shows up again later, harvesting will continue at the last known position
   # after scan_frequency.
-  #close.on_state_change.removed: true
+  # By default, it's `true` on Windows and `false` on the rest of the platforms.
+  #close.on_state_change.removed: false
 
   # Closes the file handler as soon as the harvesters reaches the end of the file.
   # By default this option is disabled.
