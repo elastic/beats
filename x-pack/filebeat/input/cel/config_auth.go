@@ -197,9 +197,18 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			return cfg.Client(ctx), nil
 		}
 
-		creds, err := google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
-		if err != nil {
-			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+		var creds *google.Credentials
+		var err error
+		if o.GoogleCredentialsJSON != nil {
+			creds, err = google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+			}
+		} else {
+			creds, err = findDefaultGoogleCredentials(ctx, o.Scopes...)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: no valid auth specified: %w", err)
+			}
 		}
 		return oauth2.NewClient(ctx, creds.TokenSource), nil
 	case oAuth2ProviderOkta:
@@ -313,8 +322,7 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 
 	// Application Default Credentials (ADC)
 	ctx := context.Background()
-	if creds, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
-		o.GoogleCredentialsJSON = creds.JSON
+	if _, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
 		return nil
 	}
 

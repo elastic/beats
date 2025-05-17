@@ -159,10 +159,21 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			cfg.Subject = o.GoogleDelegatedAccount
 			return cfg.Client(ctx), nil
 		}
-
-		creds, err := google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
-		if err != nil {
-			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+		var creds *google.Credentials
+		var err error
+		if o.GoogleCredentialsJSON != nil {
+			creds, err = google.CredentialsFromJSON(ctx, o.GoogleCredentialsJSON, o.Scopes...)
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
+			}
+		} else {
+			creds, err = findDefaultGoogleCredentials(ctx, google.CredentialsParams{
+				Scopes:  o.Scopes,
+				Subject: o.GoogleDelegatedAccount,
+			})
+			if err != nil {
+				return nil, fmt.Errorf("oauth2 client: no valid auth specified: %w", err)
+			}
 		}
 		return oauth2.NewClient(ctx, creds.TokenSource), nil
 	case oAuth2ProviderOkta:
@@ -281,8 +292,7 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 		Scopes:  o.Scopes,
 		Subject: o.GoogleDelegatedAccount,
 	}
-	if creds, err := findDefaultGoogleCredentials(ctx, params); err == nil {
-		o.GoogleCredentialsJSON = creds.JSON
+	if _, err := findDefaultGoogleCredentials(ctx, params); err == nil {
 		return nil
 	}
 
