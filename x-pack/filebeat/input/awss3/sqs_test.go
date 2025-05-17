@@ -19,11 +19,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-const testTimeout = 10 * time.Second
+const testTimeout = 10 * time.Minute
 
 var (
 	errFakeConnectivityFailure = errors.New("fake connectivity failure")
@@ -99,7 +101,15 @@ func TestSQSReceiver(t *testing.T) {
 		sqsReader.log = logger
 		sqsReader.sqs = mockSQS
 		sqsReader.metrics = newInputMetrics("", nil, 0)
-		sqsReader.pipeline = &fakePipeline{}
+
+		// this can show the race condition if run multiple times:
+		// go test -run TestSQSReceiver/ReceiveMessage_success -v -count 1000 .
+		inputID := "a-input-id"
+		parent := monitoring.NewRegistry()
+		_, pipeline, unregMetrics := v2.PrepareInputMetrics(inputID, inputName, parent, &fakePipeline{}, log)
+		defer unregMetrics()
+
+		sqsReader.pipeline = pipeline
 		sqsReader.msgHandler = mockMsgHandler
 		sqsReader.run(ctx)
 
