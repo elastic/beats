@@ -151,7 +151,6 @@ func getDeviceChannelUtilization(client NetworkHealthService, devices map[Serial
 		)
 
 		if err != nil {
-<<<<<<< HEAD
 			if strings.Contains(string(res.Body()), "MR 27.0") {
 				// "This endpoint is only available for networks on MR 27.0 or above."
 				continue
@@ -166,31 +165,6 @@ func getDeviceChannelUtilization(client NetworkHealthService, devices map[Serial
 					// only take the first bucket - collection intervals which result in multiple buckets are not supported
 					if device.wifi0 == nil {
 						device.wifi0 = &meraki.ResponseItemNetworksGetNetworkNetworkHealthChannelUtilizationWifi0{}
-=======
-			if res != nil {
-				return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed; [%d] %s. %w", orgID, res.StatusCode(), res.Body(), err)
-			}
-			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed: %w", orgID, err)
-		}
-
-		if res == nil {
-			continue
-		}
-
-		var result meraki.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice
-		if err := json.Unmarshal(res.Body(), &result); err != nil {
-			return fmt.Errorf("failed to unmarshal response body for organization %s: %w", orgID, err)
-		}
-
-		for _, d := range result {
-			if d.ByBand == nil {
-				continue
-			}
-			for _, band := range *d.ByBand {
-				if device, ok := devices[Serial(d.Serial)]; ok {
-					if device.bandUtilization == nil {
-						device.bandUtilization = make(map[string]*meraki.ResponseItemOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDeviceByBand)
->>>>>>> 812b877e0 ([meraki] Add `nil` checks for Resty response in Meraki API calls (#44193))
 					}
 					device.wifi0.Utilization80211 = (*utilization.Wifi0)[0].Utilization80211
 					device.wifi0.UtilizationNon80211 = (*utilization.Wifi0)[0].UtilizationNon80211
