@@ -20,6 +20,7 @@ import (
 	"github.com/PaesslerAG/jsonpath"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -57,7 +58,9 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 			// perform and store regular call responses
 			httpResp, err = rf.collectResponse(ctx, trCtx, r)
 			if err != nil {
-				return fmt.Errorf("failed to collect first response: %w", err)
+				err = fmt.Errorf("failed to collect first response: %w", err)
+				r.status.UpdateStatus(status.Degraded, err.Error())
+				return err
 			}
 
 			if rf.saveFirstResponse {
@@ -65,12 +68,16 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				var bodyMap map[string]interface{}
 				body, err := io.ReadAll(httpResp.Body)
 				if err != nil {
-					return fmt.Errorf("failed to read http response body: %w", err)
+					err = fmt.Errorf("failed to read http response body: %w", err)
+					r.status.UpdateStatus(status.Degraded, err.Error())
+					return err
 				}
 				httpResp.Body = io.NopCloser(bytes.NewReader(body))
 				err = json.Unmarshal(body, &bodyMap)
 				if err != nil {
-					r.log.Errorf("unable to unmarshal first_response.body: %v", textContextError{error: err, body: body})
+					err = textContextError{error: err, body: body}
+					r.status.UpdateStatus(status.Degraded, "unable to unmarshal first response body: "+err.Error())
+					r.log.Errorf("unable to unmarshal first_response.body: %v", err)
 				}
 				firstResponse := response{
 					url:    *httpResp.Request.URL,
@@ -82,7 +89,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 
 			if len(r.requestFactories) == 1 {
 				finalResps = append(finalResps, httpResp)
-				p := newPublisher(trCtx, publisher, true, r.metrics, r.log)
+				p := newPublisher(trCtx, publisher, true, r.metrics, r.status, r.log)
 				r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, true, p)
 				n = p.eventCount()
 				continue
@@ -119,7 +126,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				return err
 			}
 			// we avoid unnecessary pagination here since chaining is present, thus avoiding any unexpected updates to cursor values
-			p := newPublisher(trCtx, publisher, false, r.metrics, r.log)
+			p := newPublisher(trCtx, publisher, false, r.metrics, r.status, r.log)
 			r.responseProcessors[i].startProcessing(ctx, trCtx, finalResps, false, p)
 			n = p.eventCount()
 		} else {
@@ -152,20 +159,26 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				// reformat urls of requestFactory using ids
 				rf.url, err = generateNewUrl(rf.replace, urlString, id)
 				if err != nil {
-					return fmt.Errorf("failed to generate new url: %w", err)
+					err = fmt.Errorf("failed to generate new url: %w", err)
+					r.status.UpdateStatus(status.Degraded, err.Error())
+					return err
 				}
 
 				// reformat url accordingly if replaceWith clause exists
 				if doReplaceWith {
 					rf.url, err = generateNewUrl(strings.TrimSpace(replaceArr[0]), rf.url.String(), val)
 					if err != nil {
-						return fmt.Errorf("failed to generate new url with replacement: %w", err)
+						err = fmt.Errorf("failed to generate new url with replacement: %w", err)
+						r.status.UpdateStatus(status.Degraded, err.Error())
+						return err
 					}
 				}
 				// collect data from new urls
 				httpResp, err = rf.collectResponse(ctx, chainTrCtx, r)
 				if err != nil {
-					return fmt.Errorf("failed to collect tail response %d: %w", i, err)
+					err = fmt.Errorf("failed to collect tail response %d: %w", i, err)
+					r.status.UpdateStatus(status.Degraded, err.Error())
+					return err
 				}
 				// store data according to response type
 				if i == len(r.requestFactories)-1 && len(ids) != 0 {
@@ -189,7 +202,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 				resps = intermediateResps
 			}
 
-			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.log)
+			p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.status, r.log)
 			if rf.isChain {
 				rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 			} else {
@@ -204,6 +217,7 @@ func (r *requester) doRequest(ctx context.Context, trCtx *transformContext, publ
 	if isChainWithPageExpected {
 		n += r.processRemainingChainEvents(ctx, trCtx, publisher, initialResponse, chainIndex)
 	}
+	r.status.UpdateStatus(status.Running, "")
 	r.log.Infof("request finished: %d events published", n)
 
 	return nil
@@ -222,12 +236,16 @@ func (rf *requestFactory) collectResponse(ctx context.Context, trCtx *transformC
 	if rf.isChain && rf.chainClient != nil {
 		httpResp, err = rf.chainClient.do(ctx, req)
 		if err != nil {
-			return nil, fmt.Errorf("failed to execute chain http %s: %w", req.Method, err)
+			err = fmt.Errorf("failed to execute chain http %s: %w", req.Method, err)
+			r.status.UpdateStatus(status.Degraded, err.Error())
+			return nil, err
 		}
 	} else {
 		httpResp, err = r.client.do(ctx, req)
 		if err != nil {
-			return nil, fmt.Errorf("failed to execute http %s: %w", req.Method, err)
+			err = fmt.Errorf("failed to execute http %s: %w", req.Method, err)
+			r.status.UpdateStatus(status.Degraded, err.Error())
+			return nil, err
 		}
 	}
 
@@ -276,10 +294,10 @@ type requestFactory struct {
 	log                    *logp.Logger
 }
 
-func newRequestFactory(ctx context.Context, config config, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
+func newRequestFactory(ctx context.Context, config config, stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics, reg *monitoring.Registry) ([]*requestFactory, error) {
 	// config validation already checked for errors here
 	rfs := make([]*requestFactory, 0, len(config.Chain)+1)
-	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, log)
+	ts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, stat, log)
 	// regular call requestFactory object
 	rf := &requestFactory{
 		url:               *config.Request.URL.URL,
@@ -300,6 +318,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 		xmlDetails, err = xml.Details([]byte(config.Response.XSD))
 		if err != nil {
 			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			stat.UpdateStatus(status.Failed, "error while collecting xml decoder type hints: "+err.Error())
 			return nil, err
 		}
 	}
@@ -308,14 +327,16 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 		var rf *requestFactory
 		// chain calls requestFactory object
 		if ch.Step != nil {
-			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.Step.Request.Transforms, requestNamespace, log)
+			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.Step.Request.Transforms, requestNamespace, stat, log)
 			ch.Step.Auth = tryAssignAuth(config.Auth, ch.Step.Auth)
-			client, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, log, reg)
+			client, err := newChainHTTPClient(ctx, ch.Step.Auth, ch.Step.Request, stat, log, reg)
 			if err != nil {
-				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
+				err = fmt.Errorf("failed in creating chain http client with error: %w", err)
+				stat.UpdateStatus(status.Degraded, err.Error())
+				return nil, err
 			}
 
-			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, log)
+			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
 			rf = &requestFactory{
 				url:                    *ch.Step.Request.URL.URL,
 				method:                 ch.Step.Request.Method,
@@ -334,15 +355,17 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				rf.password = ch.Step.Auth.Basic.Password
 			}
 		} else if ch.While != nil {
-			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.While.Request.Transforms, requestNamespace, log)
-			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, log)
+			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.While.Request.Transforms, requestNamespace, stat, log)
+			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, stat, log)
 			ch.While.Auth = tryAssignAuth(config.Auth, ch.While.Auth)
-			client, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, reg, policy)
+			client, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, stat, log, reg, policy)
 			if err != nil {
-				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
+				err = fmt.Errorf("failed in creating chain http client with error: %w", err)
+				stat.UpdateStatus(status.Degraded, err.Error())
+				return nil, err
 			}
 
-			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, log)
+			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, stat, log)
 			rf = &requestFactory{
 				url:                    *ch.While.Request.URL.URL,
 				method:                 ch.While.Request.Method,
@@ -367,7 +390,7 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 	return rfs, nil
 }
 
-func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool, error) {
+func evaluateResponse(expression *valueTpl, data []byte, stat status.StatusReporter, log *logp.Logger) (bool, error) {
 	var dataMap mapstr.M
 
 	err := json.Unmarshal(data, &dataMap)
@@ -382,8 +405,9 @@ func evaluateResponse(expression *valueTpl, data []byte, log *logp.Logger) (bool
 		lastResponse:  &response{body: dataMap},
 	}
 
-	val, err := expression.Execute(paramCtx, tr, "response_evaluation", nil, log)
+	val, err := expression.Execute(paramCtx, tr, "response_evaluation", nil, stat, log)
 	if err != nil {
+
 		return false, fmt.Errorf("error while evaluating expression: %w", err)
 	}
 	result, err := strconv.ParseBool(val)
@@ -475,15 +499,17 @@ type requester struct {
 	requestFactories   []*requestFactory
 	responseProcessors []*responseProcessor
 	metrics            *inputMetrics
+	status             status.StatusReporter
 	log                *logp.Logger
 }
 
-func newRequester(client *httpClient, reqs []*requestFactory, resps []*responseProcessor, metrics *inputMetrics, log *logp.Logger) *requester {
+func newRequester(client *httpClient, reqs []*requestFactory, resps []*responseProcessor, metrics *inputMetrics, stat status.StatusReporter, log *logp.Logger) *requester {
 	return &requester{
 		client:             client,
 		requestFactories:   reqs,
 		responseProcessors: resps,
 		metrics:            metrics,
+		status:             stat,
 		log:                log,
 	}
 }
@@ -540,27 +566,29 @@ func (r *requester) getIdsFromResponses(intermediateResps []*http.Response, repl
 // processRemainingChainEvents, processes the remaining pagination events for chain blocks
 func (r *requester) processRemainingChainEvents(stdCtx context.Context, trCtx *transformContext, publisher inputcursor.Publisher, initialResp []*http.Response, chainIndex int) int {
 	// we start from 0, and skip the 1st event since we have already processed it
-	p := newChainProcessor(r, trCtx, publisher, chainIndex)
+	p := newChainProcessor(r, trCtx, publisher, chainIndex, r.status)
 	r.responseProcessors[0].startProcessing(stdCtx, trCtx, initialResp, true, p)
 	return p.eventCount()
 }
 
 // chainProcessor is a chained processing handler.
 type chainProcessor struct {
-	req   *requester
-	trCtx *transformContext
-	pub   inputcursor.Publisher
-	idx   int
-	tail  bool
-	n     int
+	req    *requester
+	trCtx  *transformContext
+	pub    inputcursor.Publisher
+	idx    int
+	tail   bool
+	n      int
+	status status.StatusReporter
 }
 
-func newChainProcessor(req *requester, trCtx *transformContext, pub inputcursor.Publisher, idx int) *chainProcessor {
+func newChainProcessor(req *requester, trCtx *transformContext, pub inputcursor.Publisher, idx int, stat status.StatusReporter) *chainProcessor {
 	return &chainProcessor{
-		req:   req,
-		trCtx: trCtx,
-		pub:   pub,
-		idx:   idx,
+		req:    req,
+		trCtx:  trCtx,
+		pub:    pub,
+		idx:    idx,
+		status: stat,
 	}
 }
 
@@ -610,6 +638,7 @@ func (p *chainProcessor) handleError(err error) {
 		p.req.log.Debugf("ignored error processing response: %v", err)
 		return
 	}
+	p.status.UpdateStatus(status.Degraded, "error processing response: "+err.Error())
 	p.req.log.Errorf("error processing response: %v", err)
 }
 
@@ -718,7 +747,7 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 			}
 			resps = intermediateResps
 		}
-		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.log)
+		p := newPublisher(chainTrCtx, publisher, i < len(r.requestFactories), r.metrics, r.status, r.log)
 		rf.chainResponseProcessor.startProcessing(ctx, chainTrCtx, resps, true, p)
 		n += p.eventCount()
 	}
@@ -757,18 +786,20 @@ type publisher struct {
 	trCtx   *transformContext
 	pub     inputcursor.Publisher
 	n       int
+	status  status.StatusReporter
 	log     *logp.Logger
 	metrics *inputMetrics
 }
 
-func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, metrics *inputMetrics, log *logp.Logger) *publisher {
+func newPublisher(trCtx *transformContext, pub inputcursor.Publisher, publish bool, metrics *inputMetrics, stat status.StatusReporter, log *logp.Logger) *publisher {
 	if !publish {
 		pub = nil
 	}
 	return &publisher{
-		trCtx: trCtx,
-		pub:   pub,
-		log:   log,
+		trCtx:  trCtx,
+		pub:    pub,
+		status: stat,
+		log:    log,
 	}
 }
 
@@ -802,6 +833,7 @@ func (p *publisher) handleError(err error) {
 		p.log.Debugf("ignored error processing response: %v", err)
 		return
 	}
+	p.status.UpdateStatus(status.Degraded, "error processing response: "+err.Error())
 	p.log.Errorf("error processing response: %v", err)
 }
 
