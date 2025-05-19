@@ -155,7 +155,7 @@ roleRef:
 
 ## Compatibility [_compatibility_31]
 
-The Kubernetes module is tested with the following versions of Kubernetes: 1.28.x, 1.29.x, 1.30.x and 1.31.x
+The Kubernetes module is tested with the following versions of Kubernetes: 1.28.x, 1.29.x, 1.30.x, 1.31.x and 1.32.x.
 
 
 ## Dashboard [_dashboard_32]
