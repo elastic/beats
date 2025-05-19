@@ -103,12 +103,6 @@ Optional, by default is set to False. Set this to True when facing scalability i
 to fetch metrics of multiple resources in one api call. 
 Currently supported metricsets are monitor, container_registry, container_instance, container_service, compute_vm, compute_vm_scaleset, database_account and storage.
 
-`latency` ::
-_string_
-Optional, by default is set to 0s. Latency is the time it takes for the Azure service to publish the metric values.
-If you experience missing metrics, you can use the `latency` configuration option to compensate for the delay in metric publication.
-Typical values are 1m or 5m.
-
 [float]
 == Metricsets
 
