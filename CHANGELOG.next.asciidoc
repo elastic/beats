@@ -146,6 +146,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Split common tty definitions. {pull}42004[42004]
 - Fix potential data loss in add_session_metadata. {pull}42795[42795]
 - system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
+- auditbeat/fim: Fix FIM@ebpfevents for new kernels #44371. {pull}44371[44371]
 
 *Auditbeat*
 
