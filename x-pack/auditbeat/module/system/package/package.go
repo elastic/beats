@@ -735,11 +735,6 @@ func migrateDatastoreSchema(tx *bbolt.Tx) error {
 	log := logp.NewLogger(metricsetName)
 	log.Debugf("Migrating data from %v to %v bucket.", bucketNameV1, bucketNameV2)
 
-	var timestampGob []byte
-	if timestampGob = v1Bucket.Get([]byte(bucketKeyStateTimestamp)); len(timestampGob) == 0 {
-		return fmt.Errorf("error migrating %v data: no timestamp found", bucketNameV1)
-	}
-
 	var packages []*Package
 	if data := v1Bucket.Get([]byte(bucketKeyPackages)); len(data) > 0 {
 		dec := gob.NewDecoder(bytes.NewReader(data))
@@ -772,8 +767,11 @@ func migrateDatastoreSchema(tx *bbolt.Tx) error {
 		return fmt.Errorf("error migrating data: failed to create %v bucket: %w", bucketNameV2, err)
 	}
 
-	if err = v2Bucket.Put([]byte(bucketKeyStateTimestamp), timestampGob); err != nil {
-		return fmt.Errorf("error migrating data: failed to write %v to %v bucket: %w", bucketKeyStateTimestamp, bucketNameV2, err)
+	// Copy the gob encoded state timestamp from the v1 bucket to the v2 bucket.
+	if timestampGob := v1Bucket.Get([]byte(bucketKeyStateTimestamp)); timestampGob != nil {
+		if err = v2Bucket.Put([]byte(bucketKeyStateTimestamp), timestampGob); err != nil {
+			return fmt.Errorf("error migrating data: failed to write %v to %v bucket: %w", bucketKeyStateTimestamp, bucketNameV2, err)
+		}
 	}
 
 	builder, release := fbGetBuilder()
