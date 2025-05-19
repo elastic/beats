@@ -324,6 +324,7 @@ Metricbeat comes with predefined assets for parsing, indexing, and visualizing y
     PS > .\metricbeat.exe setup -e
     ```
     ::::::
+
     :::::::
 
     `-e` is optional and sends output to standard error instead of the configured log output.

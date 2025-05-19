@@ -19,6 +19,7 @@ Systemd/journal version. To get the version of the `journalctl` binary
 in Filebeat's image run the following, adjusting the image name/tag
 according to the version that you are running:
 
+
 ```sh
 docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat-wolfi:<VERSION> --version
 ```

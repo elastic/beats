@@ -350,8 +350,6 @@ visualizing your data. To load these assets:
     PS > .\filebeat.exe setup -e
     ```
     ::::::
-
-    ::::::
     :::::::
 
     `-e` is optional and sends output to standard error instead of the configured log output.

@@ -249,8 +249,6 @@ Auditbeat comes with predefined assets for parsing, indexing, and visualizing yo
     PS > .\auditbeat.exe setup -e
     ```
     ::::::
-
-    ::::::
     :::::::
 
     `-e` is optional and sends output to standard error instead of the configured log output.
