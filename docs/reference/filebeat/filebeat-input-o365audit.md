@@ -6,10 +6,9 @@ mapped_pages:
 
 # Office 365 Management Activity API input [filebeat-input-o365audit]
 
-[8.14.0]
-
+:::{admonition} Deprecated in 8.14.0
 The o365audit input is deprecated. For collecting Microsoft Office 365 log data, please use the [Microsoft 365](integration-docs://reference/o365/index.md) integration package. For more complex or user-specific use cases, similar functionality can be achieved using the [`CEL input`](/reference/filebeat/filebeat-input-cel.md) .
-
+:::
 
 ::::{warning}
 This functionality is in beta and is subject to change. The design and code is less mature than official GA features and is being provided as-is with no warranties. Beta features are not subject to the support SLA of official GA features.

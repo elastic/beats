@@ -68,6 +68,7 @@ already present as `container.id` and `container.log.tag` is dropped because it 
 `log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
 otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
+- Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
 
 
 *Heartbeat*
@@ -75,6 +76,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Metricbeat*
 
+- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
@@ -85,6 +87,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
 - Remove kibana.settings metricset since the API was removed in 8.0 {issue}30592[30592] {pull}42937[42937]
 - Removed support for the Enterprise Search module {pull}42915[42915]
+- Update NATS module compatibility. Oldest version supported is now 2.2.6 {pull}43310[43310]
 - Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
 - Updated list of supported vSphere versions in the documentation. {pull}43642[43642]
 - Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
@@ -131,7 +134,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- Restore `maintainer` label for container images {pull}43683[43683]
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 
 *Auditbeat*
 
@@ -142,6 +145,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
 - Split common tty definitions. {pull}42004[42004]
 - Fix potential data loss in add_session_metadata. {pull}42795[42795]
+- system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
 
 *Auditbeat*
 
@@ -228,6 +232,10 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 
 
 *Heartbeat*
@@ -254,7 +262,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
-- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 
 *Osquerybeat*
 
@@ -414,6 +421,10 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
 - Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
 - Update CEL mito extensions to v1.18.0. {pull}43855[43855]
+- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
+- Segregated `max_workers`` from `batch_size` in the GCS input. {issue}44311[44311] {pull}44333[44333]
+- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 
 *Auditbeat*
 
@@ -480,8 +491,11 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 - Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
 - Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
+- Add a `jetstream` metricset to the NATS module {pull}43310[43310]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
+- Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
+- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 
 *Metricbeat*
 
@@ -534,34 +548,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 
 ==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

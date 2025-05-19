@@ -76,8 +76,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/joeshaw/multierror"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/schema"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -92,18 +90,19 @@ type ConvMap struct {
 }
 
 // Map drills down in the data dictionary by using the key
-func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface{}) multierror.Errors {
+func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface{}) []error {
 	d, err := mapstr.M(data).GetValue(convMap.Key)
 	if err != nil {
 		err := schema.NewKeyNotFoundError(convMap.Key)
 		err.Optional = convMap.Optional
 		err.Required = convMap.Required
-		return multierror.Errors{err}
+		return []error{err}
 	}
 	switch subData := d.(type) {
 	case map[string]interface{}, mapstr.M:
 		subEvent := mapstr.M{}
-		_, errs := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
+		convertedSubData, _ := subData.(map[string]interface{})
+		_, errs := convMap.Schema.ApplyTo(subEvent, convertedSubData)
 		for _, err := range errs {
 			var keyErr schema.KeyError
 			if errors.As(err, &keyErr) {
@@ -116,7 +115,7 @@ func (convMap ConvMap) Map(key string, event mapstr.M, data map[string]interface
 		msg := fmt.Sprintf("expected dictionary, found %T", subData)
 		err := schema.NewWrongFormatError(convMap.Key, msg)
 		logp.Err("%s", err.Error())
-		return multierror.Errors{err}
+		return []error{err}
 	}
 }
 
@@ -210,7 +209,7 @@ func toInteger(key string, data map[string]interface{}) (interface{}, error) {
 		return 0, schema.NewKeyNotFoundError(key)
 	}
 	switch val := emptyIface.(type) {
-	case int64:
+	case int64, uint64:
 		return val, nil
 	case int:
 		return int64(val), nil
@@ -269,7 +268,7 @@ func toFloat(key string, data map[string]interface{}) (interface{}, error) {
 }
 
 // Int creates a Conv object for converting integers. Acceptable input
-// types are int64, int, and float64.
+// types are int64, uint64, int, and float64.
 func Int(key string, opts ...schema.SchemaOption) schema.Conv {
 	return schema.SetOptions(schema.Conv{Key: key, Func: toInteger}, opts)
 }
