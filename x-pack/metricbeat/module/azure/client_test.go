@@ -274,9 +274,11 @@ func TestBuildBuildTimespan(t *testing.T) {
 	t.Run("Collection period greater than the time grain (PT1M metric every 5 minutes)", func(t *testing.T) {
 		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
 		timeGain := "PT1M"
-		collectionPeriod := 5 * time.Minute
+		cfg := Config{
+			Period: 5 * time.Minute,
+		}
 
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
+		timespan := buildTimespan(referenceTime, timeGain, cfg)
 
 		assert.Equal(t, "2024-07-30T18:51:00Z/2024-07-30T18:56:00Z", timespan)
 	})
@@ -284,9 +286,11 @@ func TestBuildBuildTimespan(t *testing.T) {
 	t.Run("Collection period equal to time grain (PT1M metric every 1 minutes)", func(t *testing.T) {
 		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
 		timeGain := "PT1M"
-		collectionPeriod := 1 * time.Minute
+		cfg := Config{
+			Period: 1 * time.Minute,
+		}
 
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
+		timespan := buildTimespan(referenceTime, timeGain, cfg)
 
 		assert.Equal(t, "2024-07-30T18:55:00Z/2024-07-30T18:56:00Z", timespan)
 	})
@@ -294,9 +298,11 @@ func TestBuildBuildTimespan(t *testing.T) {
 	t.Run("Collection period equal to time grain (PT5M metric every 5 minutes)", func(t *testing.T) {
 		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
 		timeGain := "PT5M"
-		collectionPeriod := 5 * time.Minute
+		cfg := Config{
+			Period: 5 * time.Minute,
+		}
 
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
+		timespan := buildTimespan(referenceTime, timeGain, cfg)
 
 		assert.Equal(t, "2024-07-30T18:51:00Z/2024-07-30T18:56:00Z", timespan)
 	})
@@ -304,9 +310,11 @@ func TestBuildBuildTimespan(t *testing.T) {
 	t.Run("Collection period equal to time grain (PT1H metric every 60 minutes)", func(t *testing.T) {
 		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
 		timeGain := "PT1H"
-		collectionPeriod := 60 * time.Minute
+		cfg := Config{
+			Period: 60 * time.Minute,
+		}
 
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
+		timespan := buildTimespan(referenceTime, timeGain, cfg)
 
 		assert.Equal(t, "2024-07-30T17:56:00Z/2024-07-30T18:56:00Z", timespan)
 	})
@@ -314,9 +322,10 @@ func TestBuildBuildTimespan(t *testing.T) {
 	t.Run("Collection period is less that time grain (PT1H metric every 5 minutes)", func(t *testing.T) {
 		referenceTime, _ := time.Parse(time.RFC3339, "2024-07-30T18:56:00Z")
 		timeGain := "PT1H"
-		collectionPeriod := 5 * time.Minute
-
-		timespan := buildTimespan(referenceTime, timeGain, collectionPeriod)
+		cfg := Config{
+			Period: 5 * time.Minute,
+		}
+		timespan := buildTimespan(referenceTime, timeGain, cfg)
 
 		assert.Equal(t, "2024-07-30T17:56:00Z/2024-07-30T18:56:00Z", timespan)
 	})

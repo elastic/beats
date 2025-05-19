@@ -129,7 +129,7 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 }
 
 // buildTimespan returns the timespan for the metric values given the reference time,
-// time grain and collection period.
+// time grain, collection period, and latency.
 //
 // (1) When the collection period is greater than the time grain, the timespan
 // will be:
@@ -195,10 +195,15 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 // |
 //
 // In this case, the API will return one metric value.
-func buildTimespan(referenceTime time.Time, timeGrain string, collectionPeriod time.Duration) string {
-	timespanDuration := max(asDuration(timeGrain), collectionPeriod)
+func buildTimespan(referenceTime time.Time, timeGrain string, config Config) string {
+	timespanDuration := max(asDuration(timeGrain), config.Period) // Period is the collection period.
 
-	endTime := referenceTime
+	// The end time is the reference time in most cases.
+	//
+	// However, if the Azure service publishes the metric values with
+	// a delay, we can translate the reference time to compensate
+	// for the latency.
+	endTime := referenceTime.Add(config.Latency * -1)
 	startTime := endTime.Add(timespanDuration * -1)
 
 	return fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
@@ -209,7 +214,7 @@ func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric,
 	var result []Metric
 
 	for _, metric := range metrics {
-		timespan := buildTimespan(referenceTime, metric.TimeGrain, client.Config.Period)
+		timespan := buildTimespan(referenceTime, metric.TimeGrain, client.Config)
 
 		//
 		// Before fetching the metric values, check if the metric
