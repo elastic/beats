@@ -143,8 +143,8 @@ func reportMetricsForOrganization(reporter mb.ReporterV2, organizationID string,
 		for _, metric := range metricSlice {
 			event := mb.Event{ModuleFields: mapstr.M{"organization_id": organizationID}}
 			if ts, ok := metric["@timestamp"]; ok {
-				tsVal, _ := ts.(string)
-				if !ok {
+				tsVal, tsValOk := ts.(string)
+				if !tsValOk {
 					continue
 				}
 				t, err := time.Parse(time.RFC3339, tsVal)
