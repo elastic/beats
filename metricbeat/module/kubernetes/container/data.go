@@ -68,9 +68,6 @@ func eventMapping(content []byte, metricsRepo *util.MetricsRepo, logger *logp.Lo
 					"pod": mapstr.M{
 						"name": pod.PodRef.Name,
 					},
-					"workload": mapstr.M{
-						"name": util.ExtractWorkloadName(pod.PodRef.Name),
-					},
 				},
 
 				"name": container.Name,
