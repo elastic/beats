@@ -35,7 +35,7 @@ type Config struct {
 	Period         time.Duration `config:"period" validate:"nonzero,required"`
 	// Latency is the time it takes for the Azure service to publish the metric values.
 	// This is used to compensate for the latency in the timespan.
-	Latency                 time.Duration `config:"latency" validate:"min=0"`
+	Latency                 time.Duration `config:"latency" validate:"positive"`
 	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
 	ResourceManagerAudience string        `config:"resource_manager_audience"`
 	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
