@@ -29,7 +29,10 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 	// and attach it to the relevant device in the supplied `devices` data structure.
 	applicanceUplinks, res, err := client.Appliance.GetOrganizationApplianceUplinkStatuses(organizationID, &meraki.GetOrganizationApplianceUplinkStatusesQueryParams{})
 	if err != nil {
-		return fmt.Errorf("GetOrganizationApplianceUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationApplianceUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationApplianceUplinkStatuses failed; %w", err)
 	}
 
 	lossAndLatency, res, err := client.Organizations.GetOrganizationDevicesUplinksLossAndLatency(
@@ -39,7 +42,10 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("GetOrganizationDevicesUplinksLossAndLatency failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationDevicesUplinksLossAndLatency failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationDevicesUplinksLossAndLatency failed; %w", err)
 	}
 
 	if applicanceUplinks == nil || lossAndLatency == nil {
@@ -80,7 +86,10 @@ func getDeviceUplinks(client *meraki.Client, organizationID string, devices map[
 
 	cellularGatewayUplinks, res, err := client.CellularGateway.GetOrganizationCellularGatewayUplinkStatuses(organizationID, &meraki.GetOrganizationCellularGatewayUplinkStatusesQueryParams{})
 	if err != nil {
-		return fmt.Errorf("GetOrganizationCellularGatewayUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationCellularGatewayUplinkStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationCellularGatewayUplinkStatuses failed; %w", err)
 	}
 
 	if cellularGatewayUplinks == nil {
