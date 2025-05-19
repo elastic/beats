@@ -20785,11 +20785,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/tommyers-elastic/dashboard-api-go/v3
-Version: v3.0.0-20240913150833-a945473a8f25
+Version: v3.0.0-20250514220331-e52c94766b6f
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/tommyers-elastic/dashboard-api-go/v3@v3.0.0-20240913150833-a945473a8f25/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/tommyers-elastic/dashboard-api-go/v3@v3.0.0-20250514220331-e52c94766b6f/LICENSE:
 
 MIT License
 
