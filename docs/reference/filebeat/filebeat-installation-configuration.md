@@ -351,12 +351,13 @@ visualizing your data. To load these assets:
     ```
     ::::::
 
-    By default, Windows log files are stored in `C:\Program Files\filebeat-Data\logs`.
-    For versions < 9.1.0, logs are stored by default in `C:\ProgramData\filebeat\Logs`.
     ::::::
     :::::::
 
     `-e` is optional and sends output to standard error instead of the configured log output.
+
+By default, Windows log files are stored in `C:\Program Files\filebeat-Data\logs`.
+For versions < 9.1.0, logs are stored by default in `C:\ProgramData\filebeat\Logs`.
 
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} and deploys the sample dashboards for visualizing the data in {{kib}}.
 
