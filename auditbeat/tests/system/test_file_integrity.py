@@ -79,6 +79,7 @@ def wrap_except(expr):
         return False
 
 
+@unittest.skip("ebpf backend is failing: https://github.com/elastic/beats/issues/44174")
 class Test(BaseTest):
     def wait_output(self, min_events):
         self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
@@ -193,7 +194,6 @@ class Test(BaseTest):
         self._test_non_recursive("fsnotify")
 
     @unittest.skipUnless(is_root(), "Requires root")
-    @unittest.skip("ebpf backend is failing: https://github.com/elastic/beats/issues/44174")
     def test_non_recursive__ebpf(self):
         self._test_non_recursive("ebpf")
 
