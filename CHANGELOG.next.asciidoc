@@ -444,6 +444,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
+- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 
 *Metricbeat*
 
