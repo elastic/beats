@@ -327,7 +327,8 @@ func TestEventNormalizationOverride(t *testing.T) {
 
 		processor, err := builder.Create(beat.ProcessingConfig{EventNormalization: tc.normalizeOverride}, false)
 		require.NoError(t, err)
-		group := processor.(*group)
+		group, ok := processor.(*group)
+		require.True(t, ok)
 
 		if tc.hasGeneralizeProcessor {
 			if assert.NotEmpty(t, group.list) {
@@ -443,7 +444,8 @@ func TestProcessingClose(t *testing.T) {
 
 	// Inject a processor in the builder that we can check if has been closed.
 	factoryProcessor := &processorWithClose{}
-	b := factory.(*builder)
+	b, ok := factory.(*builder)
+	require.True(t, ok)
 	if b.processors == nil {
 		b.processors = newGroup("global", logp.L())
 	}
