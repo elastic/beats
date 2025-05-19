@@ -155,12 +155,8 @@ require (
 	cloud.google.com/go/redis v1.16.4
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.17.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.8.2
-<<<<<<< HEAD
 	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.1
-=======
-	github.com/Azure/azure-sdk-for-go/sdk/messaging/azeventhubs v1.3.0
 	github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics v1.1.0
->>>>>>> 13f8fde9a (Concurrent fetch of azure metricdefinitions and batchApi usage (#41790))
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.8.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.1
