@@ -29,11 +29,13 @@ import (
 
 const (
 	defaultScheme = "http"
+	defaultport   = "9090"
 )
 
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
+		DefaultPort:   defaultport,
 	}.Build()
 )
 

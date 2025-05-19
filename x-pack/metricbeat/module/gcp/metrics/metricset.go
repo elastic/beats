@@ -100,15 +100,16 @@ type metricMeta struct {
 }
 
 type config struct {
-	Zone                string   `config:"zone"`
-	Region              string   `config:"region"`
-	Regions             []string `config:"regions"`
-	LocationLabel       string   `config:"location_label"`
-	ProjectID           string   `config:"project_id" validate:"required"`
-	ExcludeLabels       bool     `config:"exclude_labels"`
-	CredentialsFilePath string   `config:"credentials_file_path"`
-	CredentialsJSON     string   `config:"credentials_json"`
-	Endpoint            string   `config:"endpoint"`
+	Zone                      string   `config:"zone"`
+	Region                    string   `config:"region"`
+	Regions                   []string `config:"regions"`
+	LocationLabel             string   `config:"location_label"`
+	ProjectID                 string   `config:"project_id" validate:"required"`
+	ExcludeLabels             bool     `config:"exclude_labels"`
+	CredentialsFilePath       string   `config:"credentials_file_path"`
+	CredentialsJSON           string   `config:"credentials_json"`
+	Endpoint                  string   `config:"endpoint"`
+	CollectDataprocUserLabels bool     `config:"collect_dataproc_user_labels"`
 
 	opt              []option.ClientOption
 	period           *durationpb.Duration

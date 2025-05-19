@@ -45,8 +45,8 @@ For more examples, see [Usage examples](/reference/loggingplugin/log-driver-usag
 
 | Option | Description |
 | --- | --- |
-| `cloud_id` | The Cloud ID found in the Elastic Cloud web console. This ID isused to resolve the {{stack}} URLs when connecting to {{ess}} on {{ecloud}}. |
-| `cloud_auth` | The username and password combination for connecting to {{ess}} on {{ecloud}}. Theformat is `"username:password"`. |
+| `cloud_id` | The Cloud ID found in the Elastic Cloud web console. This ID isused to resolve the {{stack}} URLs when connecting to {{ech}}. |
+| `cloud_auth` | The username and password combination for connecting to {{ech}}. Theformat is `"username:password"`. |
 
 
 ## {{es}} output options [es-output-options]

@@ -12,6 +12,10 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 % Description and impact of the breaking change.
 % For more information, check [PR #](PR link).
 
+## 9.0.1 [beats-9.0.1-breaking-changes]
+
+_No breaking changes_
+
 ## 9.0.0 [beats-900-breaking-changes]
 
 % Description and impact of the breaking change.
@@ -25,7 +29,7 @@ For more information, check [#41662]({{beats-pull}}41662).
 For more information, check  [#42150]({{beats-pull}}42150).
 ::::
 
-::::{dropdown} Removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead.
+::::{dropdown} Removed support for a single "-" to precede multi-letter command line arguments.  Use "--" instead.
 For more information, check [#42117]({{beats-issue}}42117) [#42209]({{beats-pull}}42209).
 ::::
 
@@ -37,18 +41,18 @@ For more information, check [#41731]({{beats-pull}}41731).
 For more information, check [#41938]({{beats-issue}}41938) [#41954]({{beats-pull}}41954).
 ::::
 
-::::{dropdown} Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs.
+::::{dropdown} Filestream inputs can define "allow_deprecated_id_duplication: true" to run keep the previous behaviour of running inputs with duplicated IDs.
 For more information, check [#41938]({{beats-issue}}41938) [#41954]({{beats-pull}}41954).
 ::::
 
-::::{dropdown} Filestream inputs now starts ingesting files only if they are 1024 bytes or larger because the default file identity has changed from `native` to `fingerprint`.
+::::{dropdown} Filestream inputs now starts ingesting files only if they are 1024 bytes or larger because the default file identity has changed from native to fingerprint.
 
 At startup Filebeat automatically updates the state from known, active files (i.e: files that are still present on the disk and have not changed path since Filebeat was stopped) to use the new file identity. If Filebeat cannot migrate the state to the new file identity, the file will be re-ingested. To preserve the behaviour from 8.x, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false`.
 
 Refer to the file identity documentation for more details. You can also check [#40197]({{beats-issue}}40197) [#41762]({{beats-pull}}41762).
 ::::
 
-::::{dropdown} Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be used when `allow_deprecated_use: true` is set in their configuration.
+::::{dropdown} Filebeat fails to start when its configuration contains usage of the deprecated log or container inputs. However, they can still be used when "allow_deprecated_use: true" is set in their configuration.
 For more information, check [#42295]({{beats-pull}}42295).
 ::::
 
@@ -56,7 +60,7 @@ For more information, check [#42295]({{beats-pull}}42295).
 For more information, check [#40849]({{beats-pull}}40849).
 ::::
 
-::::{dropdown} Use base-16 for reporting `serial_number` value in TLS fields in line with the ECS recommendation.
+::::{dropdown} Use base-16 for reporting serial_number value in TLS fields in line with the ECS recommendation.
 For more information, check [#41542]({{beats-pull}}41542).
 ::::
 

@@ -64,20 +64,20 @@ func enableSeDebugPrivilege() error {
 
 // CheckAndEnableSeDebugPrivilege checks if the process's token has the
 // SeDebugPrivilege and enables it if it is disabled.
-func CheckAndEnableSeDebugPrivilege() error {
+func CheckAndEnableSeDebugPrivilege(logger *logp.Logger) error {
 	var err error
 	once.Do(func() {
-		err = checkAndEnableSeDebugPrivilege()
+		err = checkAndEnableSeDebugPrivilege(logger)
 	})
 	return err
 }
 
-func checkAndEnableSeDebugPrivilege() error {
+func checkAndEnableSeDebugPrivilege(logger *logp.Logger) error {
 	info, err := windows.GetDebugInfo()
 	if err != nil {
 		return fmt.Errorf("GetDebugInfo failed: %w", err)
 	}
-	logp.Info("Metricbeat process and system info: %v", info)
+	logger.Infof("Metricbeat process and system info: %v", info)
 
 	seDebug, found := info.ProcessPrivs[windows.SeDebugPrivilege]
 	if !found {
@@ -85,12 +85,12 @@ func checkAndEnableSeDebugPrivilege() error {
 	}
 
 	if seDebug.Enabled {
-		logp.Info("SeDebugPrivilege is enabled. %v", seDebug)
+		logger.Infof("SeDebugPrivilege is enabled. %v", seDebug)
 		return nil
 	}
 
 	if err = enableSeDebugPrivilege(); err != nil {
-		logp.Warn("Failure while attempting to enable SeDebugPrivilege. %v", err)
+		logger.Warnf("Failure while attempting to enable SeDebugPrivilege. %v", err)
 	}
 
 	info, err = windows.GetDebugInfo()
@@ -109,6 +109,6 @@ func checkAndEnableSeDebugPrivilege() error {
 			"metrics from other processes. %v", seDebug)
 	}
 
-	logp.Info("SeDebugPrivilege is now enabled. %v", seDebug)
+	logger.Infof("SeDebugPrivilege is now enabled. %v", seDebug)
 	return nil
 }
