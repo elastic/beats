@@ -124,11 +124,11 @@ func fetchGoPackages(module string) ([]string, error) {
 
 // testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
 // environment variables, e.g: TEST_TAGS=aws,azure.
-// If the FIPS env var is set to true, the requirefips tag is injected.
+// If the FIPS env var is set to true, the requirefips and ms_tls13kdf tags are injected.
 func testTagsFromEnv() []string {
 	tags := strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
 	if FIPSBuild {
-		tags = append(tags, "requirefips")
+		tags = append(tags, "requirefips", "ms_tls13kdf")
 	}
 	return tags
 }
