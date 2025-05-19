@@ -136,6 +136,7 @@ func TestPolicy_CustomRetryPolicy(t *testing.T) {
 			p := &Policy{
 				fn:         tt.fields.fn,
 				expression: tt.fields.expression,
+				status:     noopReporter{},
 				log:        tt.fields.log,
 			}
 			got, err := p.CustomRetryPolicy(tt.args.ctx, tt.args.resp, tt.args.err)

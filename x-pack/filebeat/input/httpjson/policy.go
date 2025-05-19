@@ -15,11 +15,11 @@ import (
 	"net/url"
 	"regexp"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
-
 	// A regular expression to match the error returned by net/http when the
 	// configured number of redirects is exhausted. This error isn't typed
 	// specifically so we resort to matching on the error string.
@@ -36,20 +36,22 @@ var (
 // field value present in data using the defined operator/function in the given expression.
 // Example : [[ eq .last_response.body.status "completed" ]] -- which means here data is a http response
 // containing a field "status" under the field "body" , and value status should be equal to the string "completed"
-type Evaluate func(expression *valueTpl, data []byte, log *logp.Logger) (bool, error)
+type Evaluate func(expression *valueTpl, data []byte, stat status.StatusReporter, log *logp.Logger) (bool, error)
 
 // Policy is responsible for maintaining different http client policies
 // Currently just contains a retry policy function
 type Policy struct {
 	fn         Evaluate
 	expression *valueTpl
+	status     status.StatusReporter
 	log        *logp.Logger
 }
 
-func newHTTPPolicy(fn Evaluate, expression *valueTpl, log *logp.Logger) *Policy {
+func newHTTPPolicy(fn Evaluate, expression *valueTpl, stat status.StatusReporter, log *logp.Logger) *Policy {
 	return &Policy{
 		fn:         fn,
 		expression: expression,
+		status:     stat,
 		log:        log,
 	}
 }
@@ -115,7 +117,7 @@ func (p *Policy) CustomRetryPolicy(ctx context.Context, resp *http.Response, err
 		}
 		resp.Body = io.NopCloser(bytes.NewBuffer(body))
 
-		result, err := p.fn(p.expression, body, p.log)
+		result, err := p.fn(p.expression, body, p.status, p.log)
 		if err != nil {
 			return retry, err
 		}

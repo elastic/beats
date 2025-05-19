@@ -58,18 +58,18 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	log := logp.NewLogger("")
 	ctx := context.Background()
-	client, err := newHTTPClient(ctx, config, log, nil)
+	client, err := newHTTPClient(ctx, config, noopReporter{}, log, nil)
 	assert.NoError(t, err)
 
-	requestFactory, err := newRequestFactory(ctx, config, log, nil, nil)
+	requestFactory, err := newRequestFactory(ctx, config, noopReporter{}, log, nil, nil)
 	assert.NoError(t, err)
-	pagination := newPagination(config, client, log)
-	responseProcessor := newResponseProcessor(config, pagination, nil, nil, log)
+	pagination := newPagination(config, client, noopReporter{}, log)
+	responseProcessor := newResponseProcessor(config, pagination, nil, nil, noopReporter{}, log)
 
-	requester := newRequester(client, requestFactory, responseProcessor, nil, log)
+	requester := newRequester(client, requestFactory, responseProcessor, nil, noopReporter{}, log)
 
 	trCtx := emptyTransformContext()
-	trCtx.cursor = newCursor(config.Cursor, log)
+	trCtx.cursor = newCursor(config.Cursor, noopReporter{}, log)
 
 	// first request
 	assert.NoError(t, requester.doRequest(ctx, trCtx, statelessPublisher{&beattest.FakeClient{}}))
@@ -193,7 +193,7 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 
 			tt.args.cfg.Chain[0].Step = tt.args.step
 			tt.args.cfg.Chain[0].While = tt.args.while
-			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, log, nil, nil)
+			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, noopReporter{}, log, nil, nil)
 			assert.NoError(t, err)
 			assert.NotNil(t, requestFactories)
 			for _, rf := range requestFactories {
@@ -235,7 +235,7 @@ func Test_newChainHTTPClient(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := newChainHTTPClient(tt.args.ctx, tt.args.authCfg, tt.args.requestCfg, tt.args.log, nil, tt.args.p...)
+			got, err := newChainHTTPClient(tt.args.ctx, tt.args.authCfg, tt.args.requestCfg, noopReporter{}, tt.args.log, nil, tt.args.p...)
 			assert.NoError(t, err)
 			assert.NotNil(t, got)
 		})
@@ -315,7 +315,7 @@ func Test_evaluateResponse(t *testing.T) {
 			err := expression.Unpack(tt.args.expression)
 			assert.NoError(t, err)
 
-			got, err := evaluateResponse(expression, tt.args.data, tt.args.log)
+			got, err := evaluateResponse(expression, tt.args.data, noopReporter{}, tt.args.log)
 			if err != nil {
 				assert.EqualError(t, err, tt.expectedError)
 			} else {
