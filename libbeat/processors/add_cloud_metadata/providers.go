@@ -200,8 +200,8 @@ func acceptFirstPriorityResult(
 ) *result {
 	var response *result
 
-outerLoop:
-	for ctx.Err() == nil {
+	done := false
+	for !done {
 		select {
 		case result := <-results:
 			logger.Debugf("add_cloud_metadata: received disposition for %v after %v. %v",
@@ -212,11 +212,10 @@ outerLoop:
 					// We got a valid response from a priority provider, we don't need
 					// to wait for the rest.
 					response = &result
-					break outerLoop
-				}
-				// For non-priority providers, only set the response if it's currently
-				// empty.
-				if response == nil {
+					done = true
+				} else if response == nil {
+					// For non-priority providers, only set the response if it's currently
+					// empty.
 					response = &result
 				}
 			}
@@ -225,6 +224,7 @@ outerLoop:
 				logger.Debugf("add_cloud_metadata: received error for provider %s: %v", result.provider, result.err)
 			}
 		case <-ctx.Done():
+			done = true
 		}
 	}
 
