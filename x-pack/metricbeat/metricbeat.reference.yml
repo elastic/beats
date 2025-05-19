@@ -603,7 +603,6 @@ metricbeat.modules:
     - pubsub
     - loadbalancing
     - firestore
-    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -662,6 +661,16 @@ metricbeat.modules:
   endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
+
+- module: gcp
+  metricsets:
+    - dataproc
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  collect_dataproc_user_labels: true
 
 #-------------------------------- Golang Module --------------------------------
 - module: golang
@@ -1255,6 +1264,7 @@ metricbeat.modules:
     - "subscriptions"
     #- "connection"
     #- "route"
+    #- "jetstream"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
@@ -1263,6 +1273,24 @@ metricbeat.modules:
   #subscriptions.metrics_path: "/subsz"
   #connection.metrics_path: "/connz"
   #route.metrics_path: "/routez"
+  #jetstream:
+  #  stats:
+  #    enabled: true
+  #  account:
+  #    enabled: true
+  #    names:
+  #      - default
+  #  stream:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1
+  #      - another-stream
+  #  consumer:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1-consumer-1
+  #      - my-stream-1-consumer-2
+  #      - another-stream-consumer-1
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx

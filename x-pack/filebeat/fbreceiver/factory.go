@@ -68,7 +68,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		HTTP *config.C `config:"http"`
 	}{}
 	if err := b.RawConfig.Unpack(&httpConf); err != nil {
-		return nil, fmt.Errorf("error starting API :%w", err)
+		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
 	}
 
 	base := beatreceiver.BeatReceiver{
@@ -81,6 +81,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	return &filebeatReceiver{BeatReceiver: base}, nil
 }
 
+// copied from filebeat cmd.
 func defaultProcessors() []mapstr.M {
 	// processors:
 	// - add_host_metadata:

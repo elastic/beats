@@ -297,7 +297,7 @@ filebeat setup [FLAGS]
 **FLAGS**
 
 **`--dashboards`**
-:   Sets up the {{kib}} dashboards (when available). This option loads the dashboards from the Filebeat package. For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](http://www.elastic.co/guide/en/beats/devguide/master/import-dashboards.md) in [Contribute to Beats](../../extend/index.md).
+:   Sets up the {{kib}} dashboards (when available). This option loads the dashboards from the Filebeat package. For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](../../extend/import-dashboards.md).
 
 **`-h, --help`**
 :   Shows help for the `setup` command.

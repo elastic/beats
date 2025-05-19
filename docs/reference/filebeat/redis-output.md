@@ -131,12 +131,17 @@ See [Change the output codec](/reference/filebeat/configuration-output-codec.md)
 
 ### `worker` or `workers` [_worker_or_workers_2]
 
-The number of workers to use for each host configured to publish events to Redis. Use this setting along with the `loadbalance` option. For example, if you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
+`worker` or `workers` specifies the number of connections created per host for publishing events.
+Refer to the `loadblance` setting for details about how the load balancing works to distribute requests across the Elasticsearch cluster nodes.
+
+The default value is `1`.
+
 
 
 ### `loadbalance` [_loadbalance_2]
 
 When `loadbalance: true` is set, Filebeat connects to all configured hosts and sends data through all connections in parallel. If a connection fails, data is sent to the remaining hosts until it can be reestablished. Data will still be sent as long as Filebeat can connect to at least one of its configured hosts.
+Use the `worker` or `workers` setting to specify the number of connections per host.
 
 When `loadbalance: false` is set, Filebeat sends data to a single host at a time. The target host is chosen at random from the list of configured hosts, and all data is sent to that target until the connection fails, when a new target is selected. Data will still be sent as long as Filebeat can connect to at least one of its configured hosts.
 
