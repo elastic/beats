@@ -231,13 +231,32 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 //	Start                                                     End             |
 //	  │                                                        │              |
 func buildTimespan(referenceTime time.Time, timeGrain string, config Config) string {
-	timespanDuration := max(asDuration(timeGrain), config.Period) // Period is the collection period.
+	// The timespan duration is the maximum of the time grain and the
+	// collection period.
+	//
+	// This is to ensure that we always collect all the metric values
+	// for the given time grain.
+	//
+	// For example, if the time grain is 1 minute and the collection
+	// period is 5 minutes, we will collect five PT1M metric values
+	// per collection.
+	//
+	// If the time grain is 5 minutes and the collection period is
+	// 5 minutes, we will collect one PT5M metric value per collection.
+	//
+	// If the time grain is 5 minutes and the collection period is
+	// 1 minute, we will collect one PT5M metric in five collections.
+	timespanDuration := max(asDuration(timeGrain), config.Period)
 
-	// The end time is the reference time in most cases.
+	// The end time is equal to the reference time in most cases.
 	//
 	// However, if the Azure service publishes the metric values with
 	// a delay, we can translate the reference time to compensate
 	// for the latency.
+	//
+	// For example, if the Azure service publishes the metric values
+	// with a delay of 30s / 1m, we can set the delay to one minute
+	// to always collect the latest metric values.
 	endTime := referenceTime.Add(config.Latency * -1)
 	startTime := endTime.Add(timespanDuration * -1)
 
