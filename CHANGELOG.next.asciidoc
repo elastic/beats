@@ -293,6 +293,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
+
 
 *Metricbeat*
 

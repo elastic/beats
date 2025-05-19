@@ -63,7 +63,9 @@ func mapMetricValues(metricValues insights.ListMetricsResultsItem) []MetricValue
 				metrics := getAdditionalPropMetric(item.Body.Value.AdditionalProperties)
 				for key, metric := range metrics {
 					if isSegment(key) {
-						metricValue.SegmentName[key] = metric.(string)
+						if m, ok := metric.(string); ok {
+							metricValue.SegmentName[key] = m
+						}
 					} else {
 						metricValue.Value[key] = metric
 					}
@@ -88,7 +90,9 @@ func mapSegment(segment insights.MetricsSegmentInfo, parentSeg map[string]string
 		metrics := getAdditionalPropMetric(segment.AdditionalProperties)
 		for key, metric := range metrics {
 			if isSegment(key) {
-				metricValue.SegmentName[key] = metric.(string)
+				if m, ok := metric.(string); ok {
+					metricValue.SegmentName[key] = m
+				}
 			} else {
 				metricValue.Value[key] = metric
 			}
@@ -329,8 +333,8 @@ func getAdditionalPropMetric(addProp map[string]interface{}) map[string]interfac
 }
 
 func cleanMetricNames(metric string) string {
-	metric = strings.Replace(metric, "/", "_", -1)
-	metric = strings.Replace(metric, " ", "_", -1)
+	metric = strings.ReplaceAll(metric, "/", "_")
+	metric = strings.ReplaceAll(metric, " ", "_")
 	metric = azure.ReplaceUpperCase(metric)
 	obj := strings.Split(metric, ".")
 	for index := range obj {
@@ -341,7 +345,7 @@ func cleanMetricNames(metric string) string {
 	metric = strings.ToLower(strings.Join(obj, "_"))
 	aggsRegex := regexp.MustCompile(aggsRegex)
 	metric = aggsRegex.ReplaceAllStringFunc(metric, func(str string) string {
-		return strings.Replace(str, "_", ".", -1)
+		return strings.ReplaceAll(str, "_", ".")
 	})
 	return metric
 }
