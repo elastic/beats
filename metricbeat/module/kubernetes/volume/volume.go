@@ -135,6 +135,9 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if m.clusterMeta != nil {
 			event.RootFields.DeepUpdate(m.clusterMeta)
 		}
+
+		util.EnrichWorkloadInfo(event.ModuleFields, "pod.name", event)
+
 		isOpen := reporter.Event(event)
 		if !isOpen {
 			return nil
