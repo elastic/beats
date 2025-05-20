@@ -265,6 +265,8 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 	return latest, nil
 }
 
+// unifyState merges the state and entries, updating User values that have
+// are in state, but not in entries to mark them as deleted.
 func (p *adInput) unifyState(ctx context.Context, state map[string]*User, entries []*User) []*User {
 	if len(entries) == 0 && len(state) == 0 {
 		return nil
