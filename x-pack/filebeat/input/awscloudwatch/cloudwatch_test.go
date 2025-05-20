@@ -237,7 +237,9 @@ func TestFilterLogEventsInput(t *testing.T) {
 		},
 	}
 	for _, test := range testCases {
-		p := cloudwatchPoller{}
+		p := cloudwatchPoller{
+			log: logp.NewLogger("test"),
+		}
 		result := p.constructFilterLogEventsInput(test.startTime, test.endTime, test.logGroupId)
 		assert.Equal(t, test.expected, result)
 	}
