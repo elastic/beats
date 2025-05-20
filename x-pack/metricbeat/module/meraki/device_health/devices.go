@@ -41,7 +41,10 @@ func getDevices(client *meraki.Client, organizationID string) (map[Serial]*Devic
 	val, res, err := client.Organizations.GetOrganizationDevices(organizationID, &meraki.GetOrganizationDevicesQueryParams{})
 
 	if err != nil {
-		return nil, fmt.Errorf("GetOrganizationDevices failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return nil, fmt.Errorf("GetOrganizationDevices failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return nil, fmt.Errorf("GetOrganizationDevices failed; %w", err)
 	}
 
 	devices := make(map[Serial]*Device)
@@ -59,7 +62,10 @@ func getDeviceStatuses(client *meraki.Client, organizationID string, devices map
 	val, res, err := client.Organizations.GetOrganizationDevicesStatuses(organizationID, &meraki.GetOrganizationDevicesStatusesQueryParams{})
 
 	if err != nil {
-		return fmt.Errorf("GetOrganizationDevicesStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationDevicesStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationDevicesStatuses failed; %w", err)
 	}
 
 	if val == nil {
@@ -88,7 +94,7 @@ func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devi
 
 		val, res, err := client.Appliance.GetDeviceAppliancePerformance(device.details.Serial)
 		if err != nil {
-			if res.StatusCode() == http.StatusBadRequest || !strings.Contains(string(res.Body()), "Feature not supported") {
+			if res != nil && (res.StatusCode() == http.StatusBadRequest || !strings.Contains(string(res.Body()), "Feature not supported")) {
 				logger.Errorf("GetDeviceAppliancePerformance failed; [%d] %s. %v", res.StatusCode(), res.Body(), err)
 			}
 
@@ -96,7 +102,7 @@ func getDevicePerformanceScores(logger *logp.Logger, client *meraki.Client, devi
 		}
 
 		// 204 indicates there is no data for the device, it's likely 'offline' or 'dormant'
-		if res.StatusCode() != 204 {
+		if res != nil && res.StatusCode() != 204 {
 			device.performanceScore = val
 		}
 	}
@@ -143,7 +149,14 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 			Interval: 300,
 		})
 		if err != nil {
-			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed; [%d] %s. %w", orgID, res.StatusCode(), res.Body(), err)
+			if res != nil {
+				return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed; [%d] %s. %w", orgID, res.StatusCode(), res.Body(), err)
+			}
+			return fmt.Errorf("GetOrganizationWirelessDevicesChannelUtilizationByDevice for organization %s failed: %w", orgID, err)
+		}
+
+		if res == nil {
+			continue
 		}
 
 		var result meraki.ResponseOrganizationsGetOrganizationWirelessDevicesChannelUtilizationByDevice
@@ -152,6 +165,9 @@ func getDeviceChannelUtilization(client DeviceService, devices map[Serial]*Devic
 		}
 
 		for _, d := range result {
+			if d.ByBand == nil {
+				continue
+			}
 			for _, band := range *d.ByBand {
 				if device, ok := devices[Serial(d.Serial)]; ok {
 					if device.bandUtilization == nil {
@@ -173,10 +189,18 @@ func getDeviceLicenses(client *meraki.Client, organizationID string, devices map
 	val, res, err := client.Organizations.GetOrganizationLicenses(organizationID, &meraki.GetOrganizationLicensesQueryParams{})
 	if err != nil {
 		// Ignore 400 error for per-device licensing not supported
-		if res.StatusCode() == 400 && strings.Contains(string(res.Body()), "does not support per-device licensing") {
+		if res != nil && res.StatusCode() == 400 && strings.Contains(string(res.Body()), "does not support per-device licensing") {
 			return nil
 		}
-		return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+
+		if strings.Contains(err.Error(), "does not support per-device licensing") {
+			return nil
+		}
+
+		if res != nil {
+			return fmt.Errorf("GetOrganizationLicenses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationLicenses failed; %w", err)
 	}
 
 	if val == nil {
