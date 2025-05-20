@@ -30,6 +30,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
+const (
+	// spread is the induced jitter for the backoff logic. This is not user configurable
+	// as it is not a common use case. The value of 0.2 is chosen as it produces a smooth
+	// backoff curve.
+	spread = 0.2
+)
+
 type websocketStream struct {
 	processor
 
@@ -422,8 +429,11 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				} else {
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
-				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
+				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
 				time.Sleep(waitTime)
+			}
+			if response == nil {
+				return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
 			}
 			return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w and (status %d)", retryConfig.MaxAttempts, err, response.StatusCode)
 		} else {
@@ -443,7 +453,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				} else {
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
-				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
+				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
 				time.Sleep(waitTime)
 			}
 		}
@@ -453,20 +463,37 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 }
 
 // calculateWaitTime calculates the wait time for the next attempt based on the exponential backoff algorithm.
-func calculateWaitTime(waitMin, waitMax time.Duration, attempt int) time.Duration {
-	base := float64(waitMin)
-	exponential := base * math.Pow(1.5, float64(attempt-1))
-
-	// apply jitter as a fraction, up to 50% of the exponential
-	jitter := rand.Float64() * exponential * 0.5
-	waitTime := time.Duration(exponential + jitter)
-
+func calculateWaitTime(waitMin, waitMax time.Duration, attempt, maxAttempts int) time.Duration {
+	// calculate exponential backoff
+	waitTime := wait(waitMin, waitMax, attempt, maxAttempts, spread)
 	// caps the wait time to the maximum wait time
 	if waitTime > waitMax {
 		waitTime = waitMax
 	}
 
 	return waitTime
+}
+
+// wait returns a logistic backoff duration with jitter. The duration increases
+// from min to max in n steps, with i indicating the step. Jitter is added around
+// the logistic based on the value of spread. Zero spread results in no jitter,
+// and unit spread is maximal. Spread values above one may result in durations
+// outside [min, max]. min must not be greater than max.
+func wait(min, max time.Duration, i, n int, spread float64) time.Duration {
+	l := logistic(i, n-1) // n-1 because of fence posts.
+	return min + time.Duration(float64(max-min)*(l+spread*jitter(l)))
+}
+
+// logistic returns the ith value of n of the logistic function shifted
+// n/2 right. The returned value is in (0, 1) for all sensible values.
+func logistic(i, n int) float64 {
+	return 1 / (1 + math.Exp(float64(n)/2-float64(i)))
+}
+
+// jitter returns a jittered value around f, f±eps, where eps is f(1-f).
+// f must be in [0, 1].
+func jitter(f float64) float64 {
+	return (rand.Float64() - 0.5) * f * (1 - f)
 }
 
 // now is time.Now with a modifiable time source.
