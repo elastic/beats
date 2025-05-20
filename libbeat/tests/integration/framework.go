@@ -67,10 +67,10 @@ type BeatProc struct {
 	stdin               io.WriteCloser
 	stdout              *os.File
 	stderr              *os.File
-	Process             *os.Process
 	cleanUpOnce         sync.Once
 	jobObject           Job
 	stopOnce            sync.Once
+	Cmd                 *exec.Cmd
 }
 
 type Meta struct {
@@ -254,7 +254,7 @@ func (b *BeatProc) startBeat() {
 	_, _ = b.stderr.Seek(0, 0)
 	_ = b.stderr.Truncate(0)
 
-	cmd := exec.Cmd{
+	b.Cmd = &exec.Cmd{
 		Path:   b.fullPath,
 		Args:   b.Args,
 		Stdout: b.stdout,
@@ -264,23 +264,22 @@ func (b *BeatProc) startBeat() {
 	}
 
 	var err error
-	b.stdin, err = cmd.StdinPipe()
+	b.stdin, err = b.Cmd.StdinPipe()
 	require.NoError(b.t, err, "could not get cmd StdinPipe")
 
-	err = cmd.Start()
+	err = b.Cmd.Start()
 	require.NoError(b.t, err, "error starting beat process")
 
-	b.Process = cmd.Process
-	if err := b.jobObject.Assign(b.Process); err != nil {
-		_ = cmd.Process.Kill()
+	if err := b.jobObject.Assign(b.Cmd.Process); err != nil {
+		_ = b.Cmd.Process.Kill()
 		b.t.Fatalf("failed job assignment: %s", err)
 	}
 
 	b.t.Cleanup(func() {
 		// If the test failed, print the whole cmd line to help debugging
 		if b.t.Failed() {
-			args := strings.Join(cmd.Args, " ")
-			b.t.Log("CMD line to execute Beat:", cmd.Path, args)
+			args := strings.Join(b.Cmd.Args, " ")
+			b.t.Log("CMD line to execute Beat:", b.Cmd.Path, args)
 		}
 	})
 
@@ -297,11 +296,10 @@ func (b *BeatProc) waitBeatToExit() {
 	}
 	defer b.waitingMutex.Unlock()
 
-	processState, err := b.Process.Wait()
-	if err != nil {
+	if err := b.Cmd.Wait(); err != nil {
 		exitCode := "unknown"
-		if processState != nil {
-			exitCode = strconv.Itoa(processState.ExitCode())
+		if b.Cmd.ProcessState != nil {
+			exitCode = strconv.Itoa(b.Cmd.ProcessState.ExitCode())
 		}
 
 		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
@@ -321,7 +319,12 @@ func (b *BeatProc) Stop() {
 // by methods that have already acquired the lock.
 func (b *BeatProc) stopNonsynced() {
 	b.stopOnce.Do(func() {
-		if err := stopCmd(b.Process); err != nil {
+		// If the test/caller has already stopped the process, do nothing.
+		if b.Cmd.ProcessState != nil {
+			return
+		}
+
+		if err := stopCmd(b.Cmd.Process); err != nil {
 			b.t.Fatalf("cannot stop process: %s", err)
 		}
 
@@ -330,13 +333,13 @@ func (b *BeatProc) stopNonsynced() {
 			return
 		}
 		defer b.waitingMutex.Unlock()
-		ps, err := b.Process.Wait()
+		err := b.Cmd.Wait()
 		if err != nil {
 			b.t.Logf("[WARN] got an error waiting %s to stop: %v", b.beatName, err)
 			return
 		}
-		if !ps.Success() {
-			b.t.Logf("[WARN] %s did not stopped successfully: %v", b.beatName, ps.String())
+		if !b.Cmd.ProcessState.Success() {
+			b.t.Logf("[WARN] %s did not stop successfully: %v", b.beatName, b.Cmd.ProcessState.String())
 		}
 	})
 }

@@ -238,10 +238,9 @@ logging:
 				10*time.Second,
 				"Filebeat did not log a filestream input validation error")
 
-			proc, err := filebeat.Process.Wait()
-			require.NoError(t, err, "filebeat process.Wait returned an error")
-			assert.False(t, proc.Success(), "filebeat should have failed to start")
-
+			err := filebeat.Cmd.Wait()
+			require.Error(t, err, "filebeat Cmd.Process.Wait must return an error because Filebeat should fail to start")
+			assert.False(t, filebeat.Cmd.ProcessState.Success(), "filebeat should have failed to start")
 		})
 	}
 }
