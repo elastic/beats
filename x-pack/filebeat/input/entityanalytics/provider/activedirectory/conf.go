@@ -36,6 +36,12 @@ type conf struct {
 	// the API. It can be ""/"all", "users", or
 	// "devices".
 	Dataset string `config:"dataset"`
+	// UserQuery and DeviceQuery are the LDAP queries
+	// to obtain users and devices if set.
+	// These are not currently intended to be used
+	// but are included for future behavior expansion.
+	UserQuery   string `config:"user_query"`
+	DeviceQuery string `config:"device_query"`
 
 	UserAttrs []string `config:"user_attributes"`
 	GrpAttrs  []string `config:"group_attributes"`

@@ -379,7 +379,11 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 		since = state.whenChanged
 	}
 
-	entries, err := activedirectory.GetDetails("(&(objectCategory=person)(objectClass=user))", p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	query := "(&(objectCategory=person)(objectClass=user))"
+	if p.cfg.UserQuery != "" {
+		query = p.cfg.UserQuery
+	}
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
 	p.logger.Debugf("received %d users from API", len(entries))
 	if err != nil {
 		return nil, err
@@ -407,7 +411,11 @@ func (p *adInput) doFetchDevices(ctx context.Context, state *stateStore, fullSyn
 		since = state.whenChanged
 	}
 
-	entries, err := activedirectory.GetDetails("(&(objectClass=computer)(objectClass=user))", p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	query := "(&(objectClass=computer)(objectClass=user))"
+	if p.cfg.DeviceQuery != "" {
+		query = p.cfg.DeviceQuery
+	}
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
 	p.logger.Debugf("received %d devices from API", len(entries))
 	if err != nil {
 		return nil, err
