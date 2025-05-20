@@ -263,6 +263,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
+- Add latency config option to Azure Monitor module. {pull}44366[44366]
 
 *Metricbeat*
 
