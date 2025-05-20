@@ -128,88 +128,13 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 	return nil
 }
 
-// buildTimespan returns the timespan for the metric values given the reference time,
-// time grain and collection period.
-//
-// (1) When the collection period is greater than the time grain, the timespan
-// will be:
-//
-// |                                            time grain
-// │                                          │◀──(PT1M)──▶ │
-// │                                                        │
-// ├──────────────────────────────────────────┼─────────────┼─────────────
-// │                                                        │
-// │                       timespan           │             │
-// |◀───────────────────────(5min)─────────────────────────▶│
-// │                                          │             │
-// |                        period                          │
-// │◀───────────────────────(5min)────────────┼────────────▶│
-// │                                                        │
-// │                                          │             │
-// |                                                        │
-// |                                                       Now
-// |                                                        │
-//
-// In this case, the API will return five metric values, because
-// the time grain is 1 minute and the timespan is 5 minutes.
-//
-// (2) When the collection period is equal to the time grain,
-// the timespan will be:
-//
-// |
-// │                       time grain                       │
-// |◀───────────────────────(5min)─────────────────────────▶│
-// │                                                        │
-// ├────────────────────────────────────────────────────────┼─────────────
-// │                                                        │
-// │                       timespan                         │
-// |◀───────────────────────(5min)─────────────────────────▶│
-// │                                                        │
-// |                        period                          │
-// │◀───────────────────────(5min)─────────────────────────▶│
-// │                                                        │
-// │                                                        │
-// |                                                        │
-// |                                                       Now
-// |                                                        │
-//
-// In this case, the API will return one metric value.
-//
-// (3) When the collection period is less than the time grain,
-// the timespan will be:
-//
-// |                                              period
-// │                                          │◀──(5min)──▶ │
-// │                                                        │
-// ├──────────────────────────────────────────┼─────────────┼─────────────
-// │                                                        │
-// │                       timespan           │             │
-// |◀───────────────────────(60min)────────────────────────▶│
-// │                                          │             │
-// |                      time grain                        │
-// │◀───────────────────────(PT1H)────────────┼────────────▶│
-// │                                                        │
-// │                                          │             │
-// |                                                       Now
-// |                                                        │
-// |
-//
-// In this case, the API will return one metric value.
-func buildTimespan(referenceTime time.Time, timeGrain string, collectionPeriod time.Duration) string {
-	timespanDuration := max(asDuration(timeGrain), collectionPeriod)
-
-	endTime := referenceTime
-	startTime := endTime.Add(timespanDuration * -1)
-
-	return fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
-}
-
 // GetMetricValues returns the metric values for the given cloud resources.
 func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric, reporter mb.ReporterV2) []Metric {
 	var result []Metric
 
 	for _, metric := range metrics {
-		timespan := buildTimespan(referenceTime, metric.TimeGrain, client.Config.Period)
+		startTime, endTime := calculateTimespan(referenceTime, metric.TimeGrain, client.Config)
+		timespan := fmt.Sprintf("%s/%s", startTime.Format(time.RFC3339), endTime.Format(time.RFC3339))
 
 		//
 		// Before fetching the metric values, check if the metric
@@ -380,8 +305,10 @@ func (client *BaseClient) GetVMForMetadata(resource *Resource, referencePoint Ke
 	if expandedResource.Properties != nil {
 		if properties, ok := expandedResource.Properties.(map[string]interface{}); ok {
 			if hardware, ok := properties["hardwareProfile"]; ok {
-				if vmSz, ok := hardware.(map[string]interface{})["vmSize"]; ok {
-					vm.Size, _ = vmSz.(string)
+				if vmSz, ok := hardware.(map[string]interface{}); ok {
+					if vmSz, ok := vmSz["vmSize"]; ok {
+						vm.Size, _ = vmSz.(string)
+					}
 				}
 				if vmID, ok := properties["vmId"]; ok {
 					vm.Id, _ = vmID.(string)
