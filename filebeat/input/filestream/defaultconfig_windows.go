@@ -15,20 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package actions
+//go:build windows
 
-import (
-	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
-	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
-)
+package filestream
 
-func init() {
-	processors.RegisterPlugin("add_fields",
-		checks.ConfigChecked(addfields.CreateAddFields,
-			checks.RequireFields(addfields.FieldsKey),
-			checks.AllowedFields(addfields.FieldsKey, "target", "when")))
-
-	jsprocessor.RegisterPlugin("AddFields", addfields.CreateAddFields)
+// defaultCloserOnStateChangeRemoved returns the default configuration value for
+// close.on_state_change.removed
+func defaultCloserOnStateChangeRemoved() bool {
+	return true
 }
