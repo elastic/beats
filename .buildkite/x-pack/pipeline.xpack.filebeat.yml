@@ -433,7 +433,7 @@ steps:
 
     steps:
       - label: ":linux: x-pack/filebeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "x-pack-filebeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -453,7 +453,7 @@ steps:
               context: "x-pack/filebeat: Packaging Linux"
 
       - label: ":linux: x-pack/filebeat: Packaging arm64"
-        key: "packaging-arm"
+        key: "x-pack-filebeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
@@ -471,7 +471,7 @@ steps:
               context: "x-pack/filebeat: Packaging Linux arm64"
 
       - label: ":linux: x-pack/filebeat: Packaging Linux amd64 FIPS"
-        key: "packaging-linux-fips"
+        key: "x-pack-filebeat-packaging-linux-fips"
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           FIPS: true
@@ -492,7 +492,7 @@ steps:
               context: "x-pack/filebeat: Packaging Linux amd64 FIPS"
 
       - label: ":linux: x-pack/filebeat: Packaging Linux arm64 FIPS"
-        key: "packaging-arm-fips"
+        key: "x-pack-filebeat-packaging-arm-fips"
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           FIPS: true

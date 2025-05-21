@@ -79,7 +79,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/heartbeat: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-linux-unit-test"
+        key: "x-pack-heartbeat-mandatory-linux-unit-test"
         command: |
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics"
@@ -108,7 +108,7 @@ steps:
               context: "x-pack/heartbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: x-pack/heartbeat: Go Integration Tests"
-        key: "mandatory-int-test"
+        key: "x-pack-heartbeat-mandatory-int-test"
         command: |
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics"
@@ -140,7 +140,7 @@ steps:
               context: "x-pack/heartbeat: Go Integration Tests"
 
       - label: ":windows: x-pack/heartbeat: Win 2016 Unit Tests"
-        key: "mandatory-win-2016-unit-tests"
+        key: "x-pack-heartbeat-mandatory-win-2016-unit-tests"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build unitTest
@@ -167,7 +167,7 @@ steps:
               context: "x-pack/heartbeat: Win 2016 Unit Tests"
 
       - label: ":windows: x-pack/heartbeat: Win 2022 Unit Tests"
-        key: "mandatory-win-2022-unit-tests"
+        key: "x-pack-heartbeat-mandatory-win-2022-unit-tests"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build unitTest
@@ -202,7 +202,7 @@ steps:
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build unitTest
-        key: "extended-win-10-unit-tests"
+        key: "x-pack-heartbeat-extended-win-10-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -229,7 +229,7 @@ steps:
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build unitTest
-        key: "extended-win-11-unit-tests"
+        key: "x-pack-heartbeat-extended-win-11-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -259,7 +259,7 @@ steps:
         retry:
           automatic:
             - limit: 1
-        key: "extended-win-2019-unit-tests"
+        key: "x-pack-heartbeat-extended-win-2019-unit-tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -293,7 +293,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "x-pack-heartbeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -313,7 +313,7 @@ steps:
               context: "x-pack/heartbeat: Packaging Linux"
 
       - label: ":ubuntu: x-pack/heartbeat: Packaging Linux arm64"
-        key: "packaging-arm"
+        key: "x-pack-heartbeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |

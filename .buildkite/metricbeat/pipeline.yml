@@ -399,7 +399,7 @@ steps:
     key: "metricbeat-packaging"
     steps:
       - label: ":ubuntu: Metricbeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "metricbeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -419,7 +419,7 @@ steps:
               context: "metricbeat: Packaging Linux"
 
       - label: ":ubuntu: Metricbeat: Packaging Linux arm64"
-        key: "packaging-arm"
+        key: "metricbeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |

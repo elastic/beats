@@ -75,7 +75,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-linux-unit-test"
+        key: "x-pack-metricbeat-mandatory-linux-unit-test"
         command: |
           cd x-pack/metricbeat
           mage build unitTest
@@ -100,7 +100,7 @@ steps:
               context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
-        key: "mandatory-linux-unit-test-fips-tag"
+        key: "x-pack-metricbeat-mandatory-linux-unit-test-fips-tag"
         command: |
           cd x-pack/metricbeat
           mage unitTest
@@ -127,7 +127,7 @@ steps:
               context: "x-pack/metricbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
 
       - label: ":ubuntu: x-pack/metricbeat: Ubuntu x86_64 fips140=only Unit Tests"
-        key: "mandatory-linux-unit-test-fips-only"
+        key: "x-pack-metricbeat-mandatory-linux-unit-test-fips-only"
         command: |
           cd x-pack/metricbeat
           mage goFIPSOnlyUnitTest
@@ -154,7 +154,7 @@ steps:
               context: "x-pack/metricbeat: Ubuntu x86_64 fips140=only Unit Tests"
 
       - label: ":ubuntu: x-pack/metricbeat: Go Integration Tests (Module)"
-        key: "mandatory-int-test"
+        key: "x-pack-metricbeat-mandatory-int-test"
         env:
           TEST_TAGS: "oracle"
         command: |
@@ -184,7 +184,7 @@ steps:
               context: "x-pack/metricbeat: Go Integration Tests (Module)"
 
       - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
-        key: "mandatory-python-int-test"
+        key: "x-pack-metricbeat-mandatory-python-int-test"
         env:
           TEST_TAGS: "oracle"
         command: |
@@ -217,7 +217,7 @@ steps:
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
-        key: "mandatory-win-2016-unit-tests"
+        key: "x-pack-metricbeat-mandatory-win-2016-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -244,7 +244,7 @@ steps:
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
-        key: "mandatory-win-2022-unit-tests"
+        key: "x-pack-metricbeat-mandatory-win-2022-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -276,7 +276,7 @@ steps:
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
-        key: "extended-win-10-unit-tests"
+        key: "x-pack-metricbeat-extended-win-10-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -303,7 +303,7 @@ steps:
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
-        key: "extended-win-11-unit-tests"
+        key: "x-pack-metricbeat-extended-win-11-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -330,7 +330,7 @@ steps:
         command: |
           Set-Location -Path x-pack/metricbeat
           mage build unitTest
-        key: "extended-win-2019-unit-tests"
+        key: "x-pack-metricbeat-extended-win-2019-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -405,7 +405,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/metricbeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "x-pack-metricbeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -425,7 +425,7 @@ steps:
               context: "x-pack/metricbeat: Packaging Linux"
 
       - label: ":ubuntu: x-pack/metricbeat: Packaging linux arm64"
-        key: "packaging-arm"
+        key: "x-pack-metricbeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
@@ -443,7 +443,7 @@ steps:
               context: "x-pack/metricbeat: Packaging Linux arm64"
 
       - label: ":ubuntu: x-pack/metricbeat: Packaging Linux amd64 FIPS"
-        key: "packaging-linux-fips"
+        key: "x-pack-metricbeat-packaging-linux-fips"
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           FIPS: true
@@ -464,7 +464,7 @@ steps:
               context: "x-pack/metricbeat: Packaging Linux amd64 FIPS"
 
       - label: ":ubuntu: x-pack/metricbeat: Packaging linux arm64"
-        key: "packaging-arm-fips"
+        key: "x-pack-metricbeat-packaging-arm-fips"
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           FIPS: true

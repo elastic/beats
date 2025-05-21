@@ -76,7 +76,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/packetbeat: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-linux-unit-test"
+        key: "x-pack-packetbeat-mandatory-linux-unit-test"
         command: |
           cd x-pack/packetbeat
           mage build unitTest
@@ -101,7 +101,7 @@ steps:
               context: "x-pack/packetbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: x-pack/packetbeat: Ubuntu x86_64 System Tests"
-        key: "mandatory-linux-system-test"
+        key: "x-pack-packetbeat-mandatory-linux-system-test"
         command: |
           cd x-pack/packetbeat
           mage systemTest
@@ -126,7 +126,7 @@ steps:
               context: "x-pack/packetbeat: Ubuntu x86_64 System Tests"
 
       - label: ":rhel: x-pack/packetbeat: RHEL9 Unit Tests"
-        key: "mandatory-rhel9-unit-test"
+        key: "x-pack-packetbeat-mandatory-rhel9-unit-test"
         command: |
           cd x-pack/packetbeat
           mage build unitTest
@@ -154,7 +154,7 @@ steps:
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
-        key: "mandatory-win-2016-unit-tests"
+        key: "x-pack-packetbeat-mandatory-win-2016-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -181,7 +181,7 @@ steps:
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
-        key: "mandatory-win-2022-unit-tests"
+        key: "x-pack-packetbeat-mandatory-win-2022-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -205,7 +205,7 @@ steps:
               context: "x-pack/packetbeat: Win 2022 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 2022 System Tests"
-        key: "mandatory-win-2022-system-tests"
+        key: "x-pack-packetbeat-mandatory-win-2022-system-tests"
         command: |
           Set-Location -Path x-pack/packetbeat
           mage systemTest
@@ -241,7 +241,7 @@ steps:
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
-        key: "mandatory-win-2025-unit-tests"
+        key: "x-pack-packetbeat-mandatory-win-2025-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -265,7 +265,7 @@ steps:
               context: "x-pack/packetbeat: Win 2025 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 2025 System Tests"
-        key: "mandatory-win-2025-system-tests"
+        key: "x-pack-packetbeat-mandatory-win-2025-system-tests"
         command: |
           Set-Location -Path x-pack/packetbeat
           mage systemTest
@@ -306,7 +306,7 @@ steps:
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
-        key: "extended-win-10-unit-tests"
+        key: "x-pack-packetbeat-extended-win-10-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -333,7 +333,7 @@ steps:
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
-        key: "extended-win-11-unit-tests"
+        key: "x-pack-packetbeat-extended-win-11-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -360,7 +360,7 @@ steps:
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
-        key: "extended-win-2019-unit-tests"
+        key: "x-pack-packetbeat-extended-win-2019-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -384,7 +384,7 @@ steps:
               context: "x-pack/packetbeat: Win 2019 Unit Tests"
 
       - label: ":windows: x-pack/packetbeat: Win 10 System Tests"
-        key: "extended-win-10-system-tests"
+        key: "x-pack-packetbeat-extended-win-10-system-tests"
         command: |
           Set-Location -Path x-pack/packetbeat
           mage systemTest
@@ -422,7 +422,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/packetbeat: Ubuntu arm64 Unit Tests"
-        key: "extended-arm64-unit-test"
+        key: "x-pack-packetbeat-extended-arm64-unit-test"
         if: build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
           cd x-pack/packetbeat
@@ -448,7 +448,7 @@ steps:
               context: "x-pack/packetbeat: Ubuntu arm64 Unit Tests"
 
   - group: "Packaging"
-    key: "x-pack-packetbeat-packaging"
+    key: "x-pack-packetbeat-x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
       - step: "x-pack-packetbeat-mandatory-tests"
@@ -456,7 +456,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/packetbeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "x-pack-packetbeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -476,7 +476,7 @@ steps:
               context: "x-pack/packetbeat: Packaging Linux"
 
       - label: ":ubuntu: x-pack/packetbeat: Packaging arm64"
-        key: "packaging-arm"
+        key: "x-pack-packetbeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |

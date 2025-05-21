@@ -37,12 +37,12 @@ steps:
     depends_on: "x-pack-agentbeat-check-update"
 
   - group: "Agentbeat tests"
-    key: "agentbeat-mandatory-tests"
+    key: "x-pack-agentbeat-mandatory-tests"
 
     steps:
 
       - label: ":windows: x-pack/agentbeat: Win 2022 System Tests"
-        key: "mandatory-win-2022-system-tests"
+        key: "x-pack-agentbeat-mandatory-win-2022-system-tests"
         command: |
           Set-Location -Path x-pack/agentbeat
           mage systemTest
@@ -74,9 +74,9 @@ steps:
           - github_commit_status:
               context: "x-pack/agentbeat: Win 2022 System Tests"
       - label: ":linux: Agentbeat packaging Linux"
-        key: "agentbeat-package-linux"
+        key: "x-pack-agentbeat-package-linux"
         depends_on:
-          - mandatory-win-2022-system-tests
+          - x-pack-agentbeat-mandatory-win-2022-system-tests
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
           SNAPSHOT: true
@@ -100,9 +100,9 @@ steps:
           - github_commit_status:
               context: "agentbeat: Packaging"
       - label: ":linux: Agentbeat packaging linux/amd64 FIPS"
-        key: "agentbeat-package-linux-x86-fips"
+        key: "x-pack-agentbeat-package-linux-x86-fips"
         depends_on:
-          - mandatory-win-2022-system-tests
+          - x-pack-agentbeat-mandatory-win-2022-system-tests
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           SNAPSHOT: true
@@ -127,9 +127,9 @@ steps:
           - github_commit_status:
               context: "agentbeat: Packaging linux/amd64 FIPS"
       - label: ":linux: Agentbeat packaging linux/arm64 FIPS"
-        key: "agentbeat-package-linux-arm-fips"
+        key: "x-pack-agentbeat-package-linux-arm-fips"
         depends_on:
-          - mandatory-win-2022-system-tests
+          - x-pack-agentbeat-mandatory-win-2022-system-tests
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           SNAPSHOT: true
@@ -153,9 +153,9 @@ steps:
               context: "agentbeat: Packaging linux/arm64 FIPS"
 
       - label: ":linux: Agentbeat/Integration tests Linux"
-        key: "agentbeat-it-linux"
+        key: "x-pack-agentbeat-it-linux"
         depends_on:
-          - agentbeat-package-linux
+          - x-pack-agentbeat-package-linux
         env:
           ASDF_NODEJS_VERSION: 18.17.1
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"

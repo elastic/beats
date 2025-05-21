@@ -74,7 +74,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-linux-unit-test"
+        key: "x-pack-osquerybeat-mandatory-linux-unit-test"
         command: |
           cd x-pack/osquerybeat
           mage build unitTest
@@ -93,7 +93,7 @@ steps:
               context: "x-pack/osquerybeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: x-pack/osquerybeat: Go Integration Tests"
-        key: "mandatory-int-test"
+        key: "x-pack-osquerybeat-mandatory-int-test"
         command: |
           cd x-pack/osquerybeat
           mage goIntegTest
@@ -118,7 +118,7 @@ steps:
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
-        key: "mandatory-win-2016-unit-tests"
+        key: "x-pack-osquerybeat-mandatory-win-2016-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -139,7 +139,7 @@ steps:
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
-        key: "mandatory-win-2022-unit-tests"
+        key: "x-pack-osquerybeat-mandatory-win-2022-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -165,7 +165,7 @@ steps:
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
-        key: "extended-win-10-unit-tests"
+        key: "x-pack-osquerybeat-extended-win-10-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -186,7 +186,7 @@ steps:
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
-        key: "extended-win-11-unit-tests"
+        key: "x-pack-osquerybeat-extended-win-11-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -207,7 +207,7 @@ steps:
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
-        key: "extended-win-2019-unit-tests"
+        key: "x-pack-osquerybeat-extended-win-2019-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -233,10 +233,10 @@ steps:
       - step: "x-pack-osquerybeat-mandatory-tests"
 
   - group: "Packaging"
-    key: "x-pack-querybeat-packaging"
+    key: "x-pack-osquerybeat-packaging"
     steps:
       - label: ":ubuntu: Packaging Linux"
-        key: "packaging-linux"
+        key: "x-pack-osquerybeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -256,7 +256,7 @@ steps:
               context: "x-pack/osquerybeat: Packaging Linux"
 
       - label: ":ubuntu: x-pack/osquerybeat: Packaging Linux arm64"
-        key: "packaging-arm"
+        key: "x-pack-osquerybeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |

@@ -58,11 +58,11 @@ steps:
     depends_on: "libbeat-check-update"
 
   - group: "Mandatory Tests"
-    key: "mandatory-tests"
+    key: "libbeat-mandatory-tests"
 
     steps:
       - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-linux-unit-test"
+        key: "libbeat-mandatory-linux-unit-test"
         command: |
           set -euo pipefail
           cd libbeat
@@ -88,7 +88,7 @@ steps:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
-        key: "mandatory-linux-unit-test-fips-tag"
+        key: "libbeat-mandatory-linux-unit-test-fips-tag"
         command: |
           set -euo pipefail
           cd libbeat
@@ -116,7 +116,7 @@ steps:
               context: "libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
 
       - label: ":ubuntu: Libbeat: Ubuntu x86_64 fips140=only Unit Tests"
-        key: "mandatory-linux-unit-test-fips-only"
+        key: "libbeat-mandatory-linux-unit-test-fips-only"
         command: |
           set -euo pipefail
           cd libbeat
@@ -144,7 +144,7 @@ steps:
               context: "libbeat: Ubuntu x86_64 fips140=only Unit Tests"
 
       - label: ":ubuntu: Libbeat: Go Integration Tests"
-        key: "mandatory-int-test"
+        key: "libbeat-mandatory-int-test"
         command: |
           set -euo pipefail
           cd libbeat
@@ -173,7 +173,7 @@ steps:
               context: "libbeat: Go Integration Tests"
 
       - label: ":ubuntu: Libbeat: Python Integration Tests"
-        key: "mandatory-python-int-test"
+        key: "libbeat-mandatory-python-int-test"
         command: |
           set -euo pipefail
           cd libbeat
@@ -202,7 +202,7 @@ steps:
               context: "libbeat: Python Integration Tests"
 
       - label: ":ubuntu: Libbeat: Stress Tests"
-        key: "mandatory-stress-test"
+        key: "libbeat-mandatory-stress-test"
         command: |
           set -euo pipefail
           cd libbeat
@@ -220,12 +220,12 @@ steps:
               context: "libbeat: Stress Tests"
 
   - group: "Extended Tests"
-    key: "extended-tests"
+    key: "libbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
 
     steps:
       - label: ":ubuntu: Libbeat: Ubuntu arm64 Unit Tests"
-        key: "extended-arm64-unit-tests"
+        key: "libbeat-extended-arm64-unit-tests"
         command: |
           set -euo pipefail
           cd libbeat

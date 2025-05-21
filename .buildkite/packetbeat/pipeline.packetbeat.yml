@@ -236,7 +236,7 @@ steps:
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
-        key: "extended-win-11-unit-tests"
+        key: "packetbeat-extended-win-11-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -263,7 +263,7 @@ steps:
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
-        key: "extended-win-2019-unit-tests"
+        key: "packetbeat-extended-win-2019-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -287,11 +287,11 @@ steps:
               context: "packetbeat: Win 2019 Unit Tests"
 
   - group: "Extended Tests"
-    key: "extended-tests"
+    key: "packetbeat-extended-tests"
 
     steps:
       - label: ":ubuntu: Packetbeat: Ubuntu arm64 Unit Tests"
-        key: "linux-arm64-unit-tests-extended"
+        key: "packetbeat-linux-arm64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
           cd packetbeat
@@ -324,10 +324,10 @@ steps:
     depends_on: "packetbeat-mandatory-tests"
 
   - group: "Packetbeat Packaging"
-    key: "packaging"
+    key: "packetbeat-packaging"
     steps:
       - label: ":ubuntu: Packetbeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "packetbeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -347,7 +347,7 @@ steps:
               context: "packetbeat: Packaging Linux"
 
       - label: ":ubuntu: Packetbeat: Packaging Linux arm64"
-        key: "packaging-arm"
+        key: "packetbeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |

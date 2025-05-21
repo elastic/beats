@@ -416,10 +416,10 @@ steps:
     depends_on: "filebeat-mandatory-tests"
 
   - group: "Packaging"
-    key: "packaging"
+    key: "auditbeat-packaging"
     steps:
       - label: ":ubuntu: Filebeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "auditbeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -439,7 +439,7 @@ steps:
               context: "filebeat: Packaging Linux"
 
       - label: ":ubuntu: Filebeat: Packaging arm64"
-        key: "packaging-arm"
+        key: auditbeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
