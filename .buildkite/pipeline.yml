@@ -551,7 +551,7 @@ steps:
                 - testing/
               config:
                 label: ":pipeline: Upload beats-packetbeat"
-                command: "buildkite-agent pipeline upload .buildkite/packetbeat/pipeline.winlogbeat.yml"
+                command: "buildkite-agent pipeline upload .buildkite/packetbeat/pipeline.packetbeat.yml"
                 env:
                   - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                   - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
