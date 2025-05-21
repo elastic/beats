@@ -156,12 +156,7 @@ roleRef:
 [float]
 === Compatibility
 
-<<<<<<< HEAD:metricbeat/docs/modules/kubernetes.asciidoc
-The Kubernetes module is tested with the following versions of Kubernetes:
-1.28.x, 1.29.x, 1.30.x, 1.31.x and 1.32.x.
-=======
 The Kubernetes module is tested with the following versions of Kubernetes: 1.28.x, 1.29.x, 1.30.x, 1.31.x, 1.32.x and 1.33.x.
->>>>>>> 5ee7cb216 (chore: add test coverage for k8s v1.33 (#44346)):docs/reference/metricbeat/metricbeat-module-kubernetes.md
 
 [float]
 === Dashboard
