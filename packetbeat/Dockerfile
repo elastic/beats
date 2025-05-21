@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-FROM golang:1.23.8
-=======
-FROM golang:1.24.3
->>>>>>> 9f2953ed7 ([Automation] Bump Golang version to 1.24.3 (#44270))
+
+ROM golang:1.24.3
 
 RUN \
     apt-get update \
