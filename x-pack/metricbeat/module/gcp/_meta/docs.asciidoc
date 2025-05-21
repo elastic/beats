@@ -45,6 +45,12 @@ and metadata information from metricsets and fetch metrics only. At the moment,
 * *collect_dataproc_user_labels*: (`true`/`false` default `false`) Retrieve additional
 user-defined labels from Dataproc clusters.
 
+* *metadata_cache*: (`true`/`false` default `false`) Enable caching of metadata.
+If set to true, metadata will be cached to improve performance.
+
+* *metadata_cache_refresh_period*: A duration specifying how often the cached
+metadata should be refreshed (e.g., `5m`, `1h`).
+
 [float]
 == Example configuration
 * `compute` metricset is enabled to collect metrics from `us-central1-a` zone

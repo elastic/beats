@@ -597,6 +597,8 @@ metricbeat.modules:
   credentials_file_path: "your JSON credentials file path"
   exclude_labels: false
   period: 1m
+  metadata_cache: true
+  metadata_cache_refresh_period: 1h
 
 - module: gcp
   metricsets:
