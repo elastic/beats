@@ -21,7 +21,7 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Redis resource
-func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:        projectID,
 		projectName:      projectName,
@@ -31,7 +31,7 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 		region:           region,
 		regions:          regions,
 		opt:              opt,
-		instances:        make(map[string]*redispb.Instance),
+		cacheRegistry:    cacheRegistry,
 		logger:           logp.NewLogger("metrics-redis"),
 	}, nil
 }
@@ -61,8 +61,8 @@ type metadataCollector struct {
 	opt              []option.ClientOption
 	// NOTE: instances holds data used for all metrics collected in a given period
 	// this avoids calling the remote endpoint for each metric, which would take a long time overall
-	instances map[string]*redispb.Instance
-	logger    *logp.Logger
+	cacheRegistry *gcp.CacheRegistry
+	logger        *logp.Logger
 }
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Redis TimeSeries single point of data.
@@ -135,16 +135,33 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 
 // instance returns data from an instance ID using the cache or making a request
 func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*redispb.Instance, error) {
-	s.getInstances(ctx)
-
-	instance, ok := s.instances[instanceID]
-	if ok {
-		return instance, nil
+	if s.cacheRegistry == nil {
+		s.logger.Warn("Metadata cache disabled, fetching instance directly (no caching).")
+		instanceDataMap, err := s.fetchRedisInstances(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("direct fetch failed: %w", err)
+		}
+		instanceData, ok := instanceDataMap[instanceID]
+		if !ok {
+			return nil, nil
+		}
+		return instanceData, nil
 	}
 
-	s.instances = make(map[string]*redispb.Instance)
+	err := s.cacheRegistry.EnsureRedisCacheFresh(ctx, s.fetchRedisInstances)
+	if err != nil {
+		s.logger.Errorf("Error ensuring compute cache freshness (fetch might have failed): %v", err)
+		return nil, err
+	}
 
-	return nil, nil
+	cache := s.cacheRegistry.GetRedisCache()
+	instance, ok := cache[instanceID]
+	if !ok {
+		s.logger.Debugf("Instance %s not found in redis cache.", instanceID)
+		return nil, nil // Instance not found is not necessarily an error here
+	}
+
+	return instance, nil
 }
 
 func (s *metadataCollector) instanceID(ts *monitoringpb.TimeSeries) string {
@@ -163,17 +180,13 @@ func (s *metadataCollector) instanceRegion(ts *monitoringpb.TimeSeries) string {
 	return ""
 }
 
-func (s *metadataCollector) getInstances(ctx context.Context) {
-	if len(s.instances) > 0 {
-		return
-	}
-
+func (s *metadataCollector) fetchRedisInstances(ctx context.Context) (map[string]*redispb.Instance, error) {
 	s.logger.Debug("get redis instances with ListInstances API")
 
 	client, err := redis.NewCloudRedisClient(ctx, s.opt...)
 	if err != nil {
 		s.logger.Errorf("error getting client from redis service: %v", err)
-		return
+		return nil, err
 	}
 
 	defer client.Close()
@@ -183,6 +196,8 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 	it := client.ListInstances(ctx, &redispb.ListInstancesRequest{
 		Parent: fmt.Sprintf("projects/%s/locations/-", s.projectID),
 	})
+	fetchedInstances := make(map[string]*redispb.Instance)
+
 	for {
 		instance, err := it.Next()
 		if errors.Is(err, iterator.Done) {
@@ -191,9 +206,11 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 
 		if err != nil {
 			s.logger.Errorf("redis ListInstances error: %v", err)
-			break
+			return nil, fmt.Errorf("error iterating redis instances: %w", err)
 		}
 
-		s.instances[instance.Name] = instance
+		fetchedInstances[instance.GetName()] = instance
 	}
+
+	return fetchedInstances, nil
 }
