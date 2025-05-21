@@ -12,9 +12,10 @@ import (
 
 	"cloud.google.com/go/compute/apiv1/computepb"
 	"cloud.google.com/go/redis/apiv1/redispb"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"google.golang.org/api/dataproc/v1"
 	"google.golang.org/api/sqladmin/v1"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // CacheEntry stores metadata about a specific cache type.
