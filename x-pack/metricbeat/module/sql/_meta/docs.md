@@ -1,8 +1,6 @@
-The SQL module allows you to execute custom queries against an SQL database and
-store the results in {es}. It also enables the development of various SQL metrics integrations, using SQL query as input.
+The SQL module allows you to execute custom queries against an SQL database and store the results in {{es}}. It also enables the development of various SQL metrics integrations, using SQL query as input.
 
-This module supports the databases that you can monitor with {metricbeat},
-including:
+This module supports the databases that you can monitor with {{metricbeat}}, including:
 
 * PostgreSQL
 * MySQL
@@ -12,47 +10,53 @@ including:
 
 To enable the module, run:
 
-[source,shell]
-----
+```shell
 metricbeat module enable sql
-----
+```
 
-After enabling the module, open `modules.d/sql.yml` and set the required
-fields:
+After enabling the module, open `modules.d/sql.yml` and set the required fields:
 
-`driver`:: The driver can be any driver that has a {metricbeat} module, such as
-`mssql` or `postgres`.
+`driver`
+:   The driver can be any driver that has a {{metricbeat}} module, such as `mssql` or `postgres`.
 
-`fetch_from_all_databases`:: Expects either `true` or `false` and it is by default set to `false`. Marking as `true` will enable execution `sql_queries` or `sql_query` for all databases in a server. Currently only `mssql` driver supports this feature. For other drivers, if enabled, "fetch from all databases feature is not supported for driver: <driver_name>" error would be logged.
+`fetch_from_all_databases`
+:   Expects either `true` or `false` and it is by default set to `false`. Marking as `true` will enable execution `sql_queries` or `sql_query` for all databases in a server. Currently only `mssql` driver supports this feature. For other drivers, if enabled, "fetch from all databases feature is not supported for driver: <driver_name>" error would be logged.
 
-`raw_data.enabled`:: Expects either `true` or `false` and it is by default set to `false`. Marking as `true` will generate event results in a new field format.
+`raw_data.enabled`
+:   Expects either `true` or `false` and it is by default set to `false`. Marking as `true` will generate event results in a new field format.
 
 Use `sql_queries` or `sql_query` depending on the use-case.
 
-`sql_queries`:: List of queries to execute. `query` and `response_format` fields are repeated to get multiple query inputs.
+`sql_queries`
+:   List of queries to execute. `query` and `response_format` fields are repeated to get multiple query inputs.
 
-`query`::: Single SQL query.
+    `query`
+    :   Single SQL query.
 
-`response_format`::: Either `variables` or `table`.
-`variables`:::: Expects a two-column table that looks like a key-value result. The left column is considered a key and the right column is the value. This mode generates a single event on each fetch operation.
-`table`:::: Expects any number of columns. This mode generates a single event for each row.
+    `response_format`
+    :   Either `variables` or `table`.
 
-`sql_query` (`Backward Compatibility`):: Single query you want to run. Also, provide corresponding `sql_response_format` (value: `variables` or `table`) similar to `sql_queries`'s `response_format`.
+        `variables`
+        :   Expects a two-column table that looks like a key-value result. The left column is considered a key and the right column is the value. This mode generates a single event on each fetch operation.
 
-[float]
-== Example
+        `table`
+        :   Expects any number of columns. This mode generates a single event for each row.
 
-Examples of configurations in `sql.yml` to connect with supported databases are mentioned below. 
 
-[float]
-=== Example: Capture Innodb-related metrics
+`sql_query` (`Backward Compatibility`)
+:   Single query you want to run. Also, provide corresponding `sql_response_format` (value: `variables` or `table`) similar to `sql_queries`'s `response_format`.
 
-This `sql.yml` configuration shows how to capture Innodb-related metrics that
-result from the query `SHOW GLOBAL STATUS LIKE 'Innodb_system%'` in a MySQL
-database:
 
-[source,yaml]
-----
+## Example [_example_4]
+
+Examples of configurations in `sql.yml` to connect with supported databases are mentioned below.
+
+
+### Example: Capture Innodb-related metrics [_example_capture_innodb_related_metrics]
+
+This `sql.yml` configuration shows how to capture Innodb-related metrics that result from the query `SHOW GLOBAL STATUS LIKE 'Innodb_system%'` in a MySQL database:
+
+```yaml
 - module: sql
   metricsets:
     - query
@@ -62,27 +66,22 @@ database:
   driver: "mysql"
   sql_query: "SHOW GLOBAL STATUS LIKE 'Innodb_system%'"
   sql_response_format: variables
-----
+```
 
 The `SHOW GLOBAL STATUS` query results in this table:
 
-|====
-|Variable_name|Value
+| Variable_name | Value |
+| --- | --- |
+| Innodb_system_rows_deleted | 0 |
+| Innodb_system_rows_inserted | 0 |
+| Innodb_system_rows_read | 5062 |
+| Innodb_system_rows_updated | 315 |
 
-|Innodb_system_rows_deleted|0
-|Innodb_system_rows_inserted|0
-|Innodb_system_rows_read|5062
-|Innodb_system_rows_updated|315
-|====
-
-Results are grouped by type in the result event for convenient mapping in
-{es}. For example, `strings` values are grouped into `sql.strings`, `numeric`
-into `sql.numeric`, and so on.
+Results are grouped by type in the result event for convenient mapping in {{es}}. For example, `strings` values are grouped into `sql.strings`, `numeric` into `sql.numeric`, and so on.
 
 The example shown earlier generates this event:
 
-[source,json]
-----
+```json
 {
   "@timestamp": "2020-06-09T15:09:14.407Z",
   "@metadata": {
@@ -129,17 +128,14 @@ The example shown earlier generates this event:
     "id": "670ef211-87f0-4f38-8beb-655c377f1629"
   }
 }
-----
+```
 
-[float]
-=== Example: Query PostgreSQL and generate a "table" result
 
-This `sql.yml` configuration shows how to query PostgreSQL and generate
-a "table" result. This configuration generates a single event for each row
-returned:
+### Example: Query PostgreSQL and generate a "table" result [_example_query_postgresql_and_generate_a_table_result]
 
-[source,yaml]
-----
+This `sql.yml` configuration shows how to query PostgreSQL and generate a "table" result. This configuration generates a single event for each row returned:
+
+```yaml
 - module: sql
   metricsets:
     - query
@@ -149,23 +145,19 @@ returned:
   driver: "postgres"
   sql_query: "SELECT datid, datname, blks_read, blks_hit, tup_returned, tup_fetched, stats_reset FROM pg_stat_database"
   sql_response_format: table
-----
+```
 
 The SELECT query results in this table:
 
-|====
-|datid|datname|blks_read|blks_hit|tup_returned|tup_fetched|stats_reset
+| datid | datname | blks_read | blks_hit | tup_returned | tup_fetched | stats_reset |
+| --- | --- | --- | --- | --- | --- | --- |
+| 69448 | stuff | 8652 | 205976 | 1484625 | 53218 | 2020-06-07 22:50:12 |
+| 13408 | postgres | 0 | 0 | 0 | 0 |  |
+| 13407 | template0 | 0 | 0 | 0 | 0 |  |
 
-|69448|stuff|8652|205976|1484625|53218|2020-06-07 22:50:12
-|13408|postgres|0|0|0|0|
-|13407|template0|0|0|0|0|
-|====
+Because the table contains three rows, three events are generated, one event for each row. For example, this event is created for the first row:
 
-Because the table contains three rows, three events are generated, one event
-for each row. For example, this event is created for the first row:
-
-[source,json]
-----
+```json
 {
   "@timestamp": "2020-06-09T14:47:35.481Z",
   "@metadata": {
@@ -217,15 +209,14 @@ for each row. For example, this event is created for the first row:
     "period": 10000
   }
 }
-----
+```
 
-[float]
-=== Example: Get the buffer catch hit ratio in Oracle
+
+### Example: Get the buffer catch hit ratio in Oracle [_example_get_the_buffer_catch_hit_ratio_in_oracle]
 
 This `sql.yml` configuration shows how to get the buffer cache hit ratio:
 
-[source,yaml]
-----
+```yaml
 - module: sql
   metricsets:
     - query
@@ -235,12 +226,11 @@ This `sql.yml` configuration shows how to get the buffer cache hit ratio:
   driver: "oracle"
   sql_query: 'SELECT name, physical_reads, db_block_gets, consistent_gets, 1 - (physical_reads / (db_block_gets + consistent_gets)) "Hit Ratio" FROM V$BUFFER_POOL_STATISTICS'
   sql_response_format: table
-----
+```
 
 The example generates this event:
 
-[source,json]
-----
+```json
 {
   "@timestamp": "2020-06-09T15:41:02.200Z",
   "@metadata": {
@@ -290,17 +280,14 @@ The example generates this event:
     "ephemeral_id": "49e00060-0fa4-4b34-80f1-446881f7a788"
   }
 }
+```
 
 
-----
-
-[float]
-=== Example: Get the buffer cache hit ratio for MSSQL
+### Example: Get the buffer cache hit ratio for MSSQL [_example_get_the_buffer_cache_hit_ratio_for_mssql]
 
 This `sql.yml` configuration gets the buffer cache hit ratio:
 
-[source,yaml]
-----
+```yaml
 - module: sql
   metricsets:
     - query
@@ -310,12 +297,11 @@ This `sql.yml` configuration gets the buffer cache hit ratio:
   driver: "mssql"
   sql_query: 'SELECT * FROM sys.dm_db_log_space_usage'
   sql_response_format: table
-----
+```
 
 The example generates this event:
 
-[source,json]
-----
+```json
 {
   "@timestamp": "2020-06-09T15:39:14.421Z",
   "@metadata": {
@@ -342,17 +328,14 @@ The example generates this event:
     "duration": 40750570
   }
 }
-----
-
-[float]
-=== Example: Launch two or more queries.
+```
 
 
-To launch two or more queries, specify the full configuration for each query.
-For example:
+### Example: Launch two or more queries. [_example_launch_two_or_more_queries]
 
-[source,yaml]
-----
+To launch two or more queries, specify the full configuration for each query. For example:
+
+```yaml
 - module: sql
   metricsets:
     - query
@@ -367,12 +350,11 @@ For example:
 
     - query: "SELECT datname, datid FROM pg_stat_database;"
       response_format: variables
-----
+```
 
 The example generates this event: The response event is generated in new format by enabling the flag `raw_data.enabled`.
 
-[source,json]
-----
+```json
 {
   "@timestamp": "2022-05-13T12:47:32.071Z",
   "@metadata": {
@@ -419,12 +401,11 @@ The example generates this event: The response event is generated in new format 
     "name": "mps"
   }
 }
-----
+```
 
 The example generates this event: By disabling the flag `raw_data.enabled`, which is the old format.
 
-[source,json]
-----
+```json
 {
   "@timestamp": "2022-05-13T13:09:19.599Z",
   "@metadata": {
@@ -476,10 +457,10 @@ The example generates this event: By disabling the flag `raw_data.enabled`, whic
     "type": "metricbeat"
   }
 }
-----
+```
 
-[float]
-=== Example: Merge multiple queries into a single event.
+
+### Example: Merge multiple queries into a single event. [_example_merge_multiple_queries_into_a_single_event]
 
 Multiple queries will create multiple events, one for each query.  It may be preferable to create a single event by combining the metrics together in a single event.
 
@@ -489,8 +470,7 @@ However, such a merge is possible only if the table queries are merged, each pro
 
 For example:
 
-[source,yaml]
-----
+```yaml
 - module: sql
   metricsets:
     - query
@@ -505,12 +485,11 @@ For example:
       response_format: table
     - query: "select checkpoints_timed,checkpoints_req from pg_stat_bgwriter;"
       response_format: table
-----
+```
 
 This creates a combined event as below, where `blks_hit`, `blks_read`, `checkpoints_timed` and `checkpoints_req` are part of same event.
 
-[source,json]
-----
+```json
 {
   "@timestamp": "2022-07-21T07:07:06.747Z",
   "agent": {
@@ -543,19 +522,16 @@ This creates a combined event as below, where `blks_hit`, `blks_read`, `checkpoi
     "dataset": "sql.query"
   }
 }
-----
+```
 
-[float]
-=== Example: Execute given queries for all database(s) present in a server
 
-Assuming a user could have 100s of databases on their server and then it becomes cumbersome to add them manually to the query. If `fetch_from_all_databases` is set to `true` then SQL module would fetch the databases names automatically and prefix
-the database selector statement to the queries so that the queries can run against
-the database provided.
+### Example: Execute given queries for all database(s) present in a server [_example_execute_given_queries_for_all_databases_present_in_a_server]
+
+Assuming a user could have 100s of databases on their server and then it becomes cumbersome to add them manually to the query. If `fetch_from_all_databases` is set to `true` then SQL module would fetch the databases names automatically and prefix the database selector statement to the queries so that the queries can run against the database provided.
 
 Currently, this feature only works with `mssql` driver. For example:
 
-[source,yaml]
-----
+```yaml
 - module: sql
   metricsets:
     - query
@@ -569,13 +545,11 @@ Currently, this feature only works with `mssql` driver. For example:
   sql_queries:
     - query: SELECT DB_NAME() AS 'database_name';
       response_format: table
-----
+```
 
 For an mssql instance, by default only four databases are present namely — `master`, `model`, `msdb`, `tempdb`. So, if `fetch_from_all_databases` is enabled then query `SELECT DB_NAME() AS 'database_name'` runs for each one of them i.e., there would be in total 4 documents (one each for 4 databases) for every scrape.
 
-
-[source,json]
-----
+```json
 {
     "@timestamp": "2023-07-16T22:05:26.976Z",
     "@metadata": {
@@ -812,64 +786,66 @@ For an mssql instance, by default only four databases are present namely — `ma
         "version": "8.0.0"
     }
 }
-----
+```
 
-
-=== Host Setup
+### Host Setup
 
 Some drivers require additional configuration to work. Find here instructions for these drivers.
 
-==== Oracle Database Connection Pre-requisites
+### Oracle Database Connection Pre-requisites
 
 To get connected with the Oracle Database `ORACLE_SID`, `ORACLE_BASE`, `ORACLE_HOME` environment variables should be set.
 
-For example: Let us consider Oracle Database 21c installation using RPM manually by following https://docs.oracle.com/en/database/oracle/oracle-database/21/ladbi/running-rpm-packages-to-install-oracle-database.html[this] link, environment variables should be set as follows:
+For example: Let us consider Oracle Database 21c installation using RPM manually by following [this](https://docs.oracle.com/en/database/oracle/oracle-database/21/ladbi/running-rpm-packages-to-install-oracle-database.html) link, environment variables should be set as follows:
 
-[source,bash]
-----
+```bash
 export ORACLE_BASE=/opt/oracle/oradata
 export ORACLE_HOME=/opt/oracle/product/21c/dbhome_1
-----
+```
+
 Also, add `ORACLE_HOME/bin` to the `PATH` environment variable. 
 
-===== Oracle Instant Client Installation
+#### Oracle Instant Client Installation
 
 Oracle Instant Client enables the development and deployment of applications that connect to the Oracle Database. The Instant Client libraries provide the necessary network connectivity and advanced data features to make full use of the Oracle Database. If you have an OCI Oracle server which comes with these libraries pre-installed, you don't need a separate client installation.
 
-The OCI library installs a few Client Shared Libraries that must be referenced on the machine where Metricbeat is installed. Please follow https://docs.oracle.com/en/database/oracle/oracle-database/21/lacli/install-instant-client-using-zip.html#GUID-D3DCB4FB-D3CA-4C25-BE48-3A1FB5A22E84[this] link for OCI Instant Client set up. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found at https://www.oracle.com/database/technologies/instant-client/downloads.html[here].
+The OCI library installs a few Client Shared Libraries that must be referenced on the machine where Metricbeat is installed. Please follow [this](https://docs.oracle.com/en/database/oracle/oracle-database/21/lacli/install-instant-client-using-zip.html#GUID-D3DCB4FB-D3CA-4C25-BE48-3A1FB5A22E84) link for OCI Instant Client set up. The OCI Instant Client is available with the Oracle Universal Installer, RPM file or ZIP file. Download links can be found at here(https://www.oracle.com/database/technologies/instant-client/downloads.html).
 
-===== Enable Oracle Listener
+##### Enable Oracle Listener
 
-The Oracle listener is a service that runs on the database host and receives requests from Oracle clients. Make sure that https://docs.oracle.com/cd/B19306_01/network.102/b14213/lsnrctl.htm[listener] should be running. 
+The Oracle listener is a service that runs on the database host and receives requests from Oracle clients. Make sure that [listener](https://docs.oracle.com/cd/B19306_01/network.102/b14213/lsnrctl.htm) should be running. 
 To check if the listener is running or not, run: 
 
-[source,bash]
-----
+```bash
 lsnrctl STATUS
-----
+```
 
 If the listener is not running, use the command to start:
 
-[source,bash]
-----
+```bash
 lsnrctl START
-----
+```
 
 Then, Metricbeat can be launched.
 
-===== Host Configuration for Oracle
+##### Host Configuration for Oracle
 
 The following types of host configuration are supported:
 
 1. An old-style Oracle connection string, for backwards compatibility:
+
     a. `hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]`
+
     b. `hosts: ["user/password@0.0.0.0:1521/ORCLPDB1.localdomain as sysdba"]`
 
 2. DSN configuration as a URL:
+
     a. `hosts: ["oracle://user:pass@0.0.0.0:1521/ORCLPDB1.localdomain?sysdba=1"]`
 
 3. DSN configuration as a logfmt-encoded parameter list:
+
     a. `hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']`
+    
     b. `hosts: ['user="user" password="password" connectString="host:port/service_name" sysdba=true']`
 
 DSN host configuration is the recommended configuration type as it supports the use of special characters in the password.
@@ -880,8 +856,7 @@ In the logfmt-encoded DSN format, if the password contains a backslash character
 
 The username and password to connect to the database can be provided as values to the `username` and `password` keys of `sql.yml`.
 
-[source,yml]
-----
+```yaml
 - module: sql
   metricsets:
     - query
@@ -894,4 +869,4 @@ The username and password to connect to the database can be provided as values t
   sql_queries: 
   - query: SELECT METRIC_NAME, VALUE FROM V$SYSMETRIC WHERE GROUP_ID = 2 and METRIC_NAME LIKE '%'
     response_format: variables 
-----
+```

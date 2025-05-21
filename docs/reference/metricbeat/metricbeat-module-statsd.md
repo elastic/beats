@@ -3,10 +3,11 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-statsd.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Statsd module [metricbeat-module-statsd]
 
 The `statsd` module is a Metricbeat module which spawns a UDP server and listens for metrics in StatsD compatible format.
-
 
 ## Metric types [_metric_types]
 
@@ -74,5 +75,22 @@ statsd.mappings:
 4. `label[].field`, required when using named label placeholder field name where to save the named label placeholder value from the template in the event json
 
 
+## Example configuration [_example_configuration]
+
+The Statsd module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
+
+```yaml
+metricbeat.modules:
+- module: statsd
+  host: "localhost"
+  port: "8125"
+  enabled: false
+  #ttl: "30s"
+```
 
 
+## Metricsets [_metricsets]
+
+The following metricsets are available:
+
+* [server](/reference/metricbeat/metricbeat-metricset-statsd-server.md)

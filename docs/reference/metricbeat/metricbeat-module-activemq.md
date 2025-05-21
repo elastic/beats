@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-activemq.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # ActiveMQ module [metricbeat-module-activemq]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -46,14 +48,10 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_2]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [broker](/reference/metricbeat/metricbeat-metricset-activemq-broker.md)
 * [queue](/reference/metricbeat/metricbeat-metricset-activemq-queue.md)
 * [topic](/reference/metricbeat/metricbeat-metricset-activemq-topic.md)
-
-
-
-

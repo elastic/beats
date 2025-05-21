@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-containerd.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Containerd module [metricbeat-module-containerd]
 
 ::::{warning}
@@ -51,7 +53,7 @@ For cpu metricset if `calcpct.cpu` setting is set to true, cpu usage percentages
 For memory metricset if `calcpct.memory` setting is set to true, memory usage percentages will be calculated and more specifically fields `containerd.memory.usage.pct` and  `containerd.memory.workingset.pct`. Default value is true.
 
 
-## Example configuration [_example_configuration_14]
+## Example configuration [_example_configuration]
 
 The Containerd module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -71,14 +73,10 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_20]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [blkio](/reference/metricbeat/metricbeat-metricset-containerd-blkio.md)
 * [cpu](/reference/metricbeat/metricbeat-metricset-containerd-cpu.md)
 * [memory](/reference/metricbeat/metricbeat-metricset-containerd-memory.md)
-
-
-
-

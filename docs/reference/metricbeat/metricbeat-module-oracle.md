@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-oracle.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Oracle module [metricbeat-module-oracle]
 
 This is the [Oracle](https://www.oracle.com) module for Metricbeat. It is under active development with feedback from the community. A single Metricset for Tablespace monitoring is added so the community can start gathering metrics from their nodes and contributing to the module.
@@ -94,7 +96,7 @@ Includes information about data files and temp files, grouped by Tablespace with
 Includes the system metric values captured for the most current time interval from Oracle system metrics.
 
 
-### Example configuration [_example_configuration_51]
+## Example configuration [_example_configuration]
 
 The Oracle module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -127,14 +129,10 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_59]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [performance](/reference/metricbeat/metricbeat-metricset-oracle-performance.md)
 * [sysmetric](/reference/metricbeat/metricbeat-metricset-oracle-sysmetric.md)
 * [tablespace](/reference/metricbeat/metricbeat-metricset-oracle-tablespace.md)
-
-
-
-

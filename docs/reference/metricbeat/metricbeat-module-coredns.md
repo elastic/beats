@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-coredns.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Coredns module [metricbeat-module-coredns]
 
 This is the CoreDNS module. The CoreDNS module collects metrics from the CoreDNS [prometheus exporter endpoint](https://github.com/coredns/coredns/tree/master/plugin/metrics).
@@ -22,7 +24,7 @@ The CoreDNS module comes with a predefined dashboard. For example:
 ![metricbeat coredns dashboard](images/metricbeat_coredns_dashboard.png)
 
 
-## Example configuration [_example_configuration_15]
+## Example configuration [_example_configuration]
 
 The Coredns module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -35,10 +37,8 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_21]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
 * [stats](/reference/metricbeat/metricbeat-metricset-coredns-stats.md)
-
-

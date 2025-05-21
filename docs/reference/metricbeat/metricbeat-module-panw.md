@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-panw.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Panw module [metricbeat-module-panw]
 
 ::::{warning}
@@ -111,7 +113,8 @@ This metricset reports temperature for various slots on the device and reports o
 This metricset enumerates ipsec tunnels and their status.
 
 
-### Example configuration [_example_configuration_52]
+
+## Example configuration [_example_configuration]
 
 The Panw module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -125,7 +128,7 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_61]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 

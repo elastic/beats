@@ -39,7 +39,7 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_73]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 

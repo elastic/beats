@@ -1,4 +1,3 @@
-
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/gcp/index.md).
 

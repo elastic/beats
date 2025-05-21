@@ -1,4 +1,3 @@
-
 This is the [Oracle](https://www.oracle.com) module for Metricbeat. It is under active development with feedback from the community. A single Metricset for Tablespace monitoring is added so the community can start gathering metrics from their nodes and contributing to the module.
 
 
@@ -86,4 +85,3 @@ Includes information about data files and temp files, grouped by Tablespace with
 ### `sysmetric` [_sysmetric]
 
 Includes the system metric values captured for the most current time interval from Oracle system metrics.
-

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-tomcat.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Tomcat module [metricbeat-module-tomcat]
 
 ::::{warning}
@@ -42,7 +44,7 @@ An overview dashboard for Kibana is already included:
 The Tomcat module requires [Jolokia](/reference/metricbeat/metricbeat-module-jolokia.md)to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
 
 
-### Example configuration [_example_configuration_64]
+## Example configuration [_example_configuration]
 
 The Tomcat module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -56,7 +58,7 @@ metricbeat.modules:
 ```
 
 
-### Metricsets [_metricsets_74]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
@@ -64,8 +66,3 @@ The following metricsets are available:
 * [memory](/reference/metricbeat/metricbeat-metricset-tomcat-memory.md)
 * [requests](/reference/metricbeat/metricbeat-metricset-tomcat-requests.md)
 * [threading](/reference/metricbeat/metricbeat-metricset-tomcat-threading.md)
-
-
-
-
-

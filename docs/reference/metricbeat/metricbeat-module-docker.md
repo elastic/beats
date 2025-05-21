@@ -81,7 +81,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md).
 
 
-## Metricsets [_metricsets_73]
+## Metricsets [_metricsets]
 
 The following metricsets are available:
 
