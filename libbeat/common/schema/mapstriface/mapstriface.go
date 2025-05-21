@@ -81,7 +81,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/schema"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type ConvMap struct {
@@ -101,8 +100,8 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 		return multierror.Errors{err}
 	}
 	switch subData := d.(type) {
-	case map[string]interface{}, mapstr.M:
-		subEvent := mapstr.M{}
+	case map[string]interface{}, common.MapStr:
+		subEvent := common.MapStr{}
 		_, errs := convMap.Schema.ApplyTo(subEvent, subData.(map[string]interface{}))
 		for _, err := range errs {
 			var keyErr schema.KeyError

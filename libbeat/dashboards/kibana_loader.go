@@ -32,7 +32,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var importAPI = "/api/saved_objects/_import"
@@ -114,7 +113,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 }
 
 // ImportIndex imports the passed index pattern to Kibana
-func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
+func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
 		return fmt.Errorf("kibana version must be at least %s", kibana.MinimumRequiredVersionSavedObjects.String())
 	}
