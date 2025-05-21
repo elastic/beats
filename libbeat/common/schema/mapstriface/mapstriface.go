@@ -117,16 +117,6 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 		logp.Err("%s", err.Error())
 		return multierror.Errors{err}
 	}
-
-	subEvent := common.MapStr{}
-	_, errors := convMap.Schema.ApplyTo(subEvent, subData)
-	for _, err := range errors {
-		if err, ok := err.(schema.KeyError); ok {
-			err.SetKey(convMap.Key + "." + err.Key())
-		}
-	}
-	event[key] = subEvent
-	return errors
 }
 
 func (convMap ConvMap) HasKey(key string) bool {
