@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-nginx.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Nginx module [metricbeat-module-nginx]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -34,7 +36,7 @@ The nginx module comes with a predefined dashboard. For example:
 ![metricbeat nginx](images/metricbeat-nginx.png)
 
 
-## Example configuration [_example_configuration_48]
+## Example configuration [_example_configuration]
 
 The Nginx module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -55,10 +57,8 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_55]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
 * [stubstatus](/reference/metricbeat/metricbeat-metricset-nginx-stubstatus.md)
-
-

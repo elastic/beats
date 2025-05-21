@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-uwsgi.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # uWSGI module [metricbeat-module-uwsgi]
 
 This is the uwsgi module. By default collects the `stats` metricset, using [StatsServer](http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.html).
@@ -23,7 +25,7 @@ The uwsgi module comes with a predefined dashboard. For example:
 ![uwsgi dashboard](images/uwsgi_dashboard.png)
 
 
-## Example configuration [_example_configuration_66]
+## Example configuration [_example_configuration]
 
 The uWSGI module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -37,10 +39,8 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_76]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
 * [status](/reference/metricbeat/metricbeat-metricset-uwsgi-status.md)
-
-

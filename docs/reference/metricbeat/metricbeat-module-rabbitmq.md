@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-rabbitmq.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # RabbitMQ module [metricbeat-module-rabbitmq]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -29,7 +31,7 @@ If `management.path_prefix` is set in RabbitMQ configuration, `management_path_p
 The rabbitmq module is fully tested with RabbitMQ 3.7.4 and it should be compatible with any version supporting the management plugin (which needs to be installed and enabled). Exchange metricset is also tested with 3.6.0, 3.6.5 and 3.7.14
 
 
-## Example configuration [_example_configuration_56]
+## Example configuration [_example_configuration]
 
 The RabbitMQ module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -52,7 +54,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_65]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
@@ -61,9 +63,3 @@ The following metricsets are available:
 * [node](/reference/metricbeat/metricbeat-metricset-rabbitmq-node.md)
 * [queue](/reference/metricbeat/metricbeat-metricset-rabbitmq-queue.md)
 * [shovel](/reference/metricbeat/metricbeat-metricset-rabbitmq-shovel.md)
-
-
-
-
-
-

@@ -1,0 +1,34 @@
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-{{.Base}}.html
+---
+
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
+# {{.Title}} module [metricbeat-module-{{.Base}}]
+
+{{.Asciidoc}}
+
+## Example configuration [_example_configuration]
+
+The {{.Title}} module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
+
+```yaml
+{{getBeatName}}.modules:
+{{.CfgFile}}
+```
+{{/* This is ugly, yes. The python script basically does the same thing, to ensure we always get SSL, then HTTP */ -}}{{$added := false}}
+{{- range $opt := .Settings}}{{if eq $opt "ssl"}}
+This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md).{{$added = true}}{{end}}{{end -}}{{- range $opt := .Settings}}{{if eq $opt "http"}} It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).{{$added = true}}{{end}}{{end -}}
+{{- if $added}}
+{{end}}
+
+## Metricsets [_metricsets_73]
+
+The following metricsets are available:
+
+{{range $metricset := .Metricsets -}}
+* [{{$metricset.Title}}](/reference/metricbeat/metricbeat-metricset-{{$.Base}}-{{$metricset.Title}}.md)
+{{end -}}
+
+

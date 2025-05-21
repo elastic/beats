@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-apache.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Apache module [metricbeat-module-apache]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -15,7 +17,6 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/a
 
 
 :::::
-
 
 This module periodically fetches metrics from [Apache HTTPD](https://httpd.apache.org/) servers. The default metricset is `status`.
 
@@ -32,7 +33,7 @@ The Apache module comes with a predefined dashboard. For example:
 ![apache httpd server status](images/apache_httpd_server_status.png)
 
 
-## Example configuration [_example_configuration_4]
+## Example configuration [_example_configuration]
 
 The Apache module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -59,10 +60,8 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_5]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
 * [status](/reference/metricbeat/metricbeat-metricset-apache-status.md)
-
-

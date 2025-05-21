@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-redis.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Redis module [metricbeat-module-redis]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -47,7 +49,7 @@ The Redis module has these additional config options:
 The redis metricsets `info`, `key` and `keyspace` are compatible with all distributions of Redis (OSS and enterprise). They were tested with Redis 3.2.12, 4.0.11, 5.0-rc4 and 6.2.6, and are expected to work with all versions >= 3.0.
 
 
-## Example configuration [_example_configuration_57]
+## Example configuration [_example_configuration]
 
 The Redis module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -101,14 +103,10 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_66]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
 * [info](/reference/metricbeat/metricbeat-metricset-redis-info.md)
 * [key](/reference/metricbeat/metricbeat-metricset-redis-key.md)
 * [keyspace](/reference/metricbeat/metricbeat-metricset-redis-keyspace.md)
-
-
-
-

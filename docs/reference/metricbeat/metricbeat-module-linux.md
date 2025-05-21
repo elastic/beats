@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-linux.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Linux module [metricbeat-module-linux]
 
 ::::{warning}
@@ -25,7 +27,7 @@ Refer to the [Elastic Integrations documentation](integration-docs://reference/l
 The Linux module reports on metrics exclusive to the Linux kernel and GNU/Linux OS.
 
 
-## Example configuration [_example_configuration_39]
+## Example configuration [_example_configuration]
 
 The Linux module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -47,7 +49,7 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_45]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
@@ -58,11 +60,3 @@ The following metricsets are available:
 * [pageinfo](/reference/metricbeat/metricbeat-metricset-linux-pageinfo.md)
 * [pressure](/reference/metricbeat/metricbeat-metricset-linux-pressure.md)
 * [rapl](/reference/metricbeat/metricbeat-metricset-linux-rapl.md)
-
-
-
-
-
-
-
-

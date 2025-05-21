@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-postgresql.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # PostgreSQL module [metricbeat-module-postgresql]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -67,7 +69,7 @@ You can also separately specify the username and password using the respective c
 This module was tested with PostgreSQL 9, 10, 11, 12 and 13. It is expected to work with all versions >= 9.
 
 
-## Example configuration [_example_configuration_54]
+## Example configuration [_example_configuration]
 
 The PostgreSQL module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -105,7 +107,7 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_63]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
@@ -113,8 +115,3 @@ The following metricsets are available:
 * [bgwriter](/reference/metricbeat/metricbeat-metricset-postgresql-bgwriter.md)
 * [database](/reference/metricbeat/metricbeat-metricset-postgresql-database.md)
 * [statement](/reference/metricbeat/metricbeat-metricset-postgresql-statement.md)
-
-
-
-
-

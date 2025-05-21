@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mongodb.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # MongoDB module [metricbeat-module-mongodb]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -110,7 +112,7 @@ db.grantRolesToUser("user", ["clusterMonitor"])
 ```
 
 
-## Example configuration [_example_configuration_43]
+## Example configuration [_example_configuration]
 
 The MongoDB module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -153,7 +155,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md).
 
 
-## Metricsets [_metricsets_49]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
@@ -162,9 +164,3 @@ The following metricsets are available:
 * [metrics](/reference/metricbeat/metricbeat-metricset-mongodb-metrics.md)
 * [replstatus](/reference/metricbeat/metricbeat-metricset-mongodb-replstatus.md)
 * [status](/reference/metricbeat/metricbeat-metricset-mongodb-status.md)
-
-
-
-
-
-

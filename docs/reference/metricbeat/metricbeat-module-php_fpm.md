@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-php_fpm.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # PHP_FPM module [metricbeat-module-php_fpm]
 
 This module periodically fetches metrics from [PHP-FPM](https://php-fpm.org) servers.
@@ -33,7 +35,7 @@ location ~ /status {
 The PHP_FPM metricsets were tested with PHP 7.1.1 and are expected to work with all versions >= 5.
 
 
-## Example configuration [_example_configuration_53]
+## Example configuration [_example_configuration]
 
 The PHP_FPM module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -52,12 +54,9 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_62]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
 * [pool](/reference/metricbeat/metricbeat-metricset-php_fpm-pool.md)
 * [process](/reference/metricbeat/metricbeat-metricset-php_fpm-process.md)
-
-
-

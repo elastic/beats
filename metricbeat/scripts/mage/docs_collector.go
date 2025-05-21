@@ -234,7 +234,7 @@ func getConfigfile(modulePath string) (string, error) {
 	}
 
 	raw, err := ioutil.ReadFile(goodPath)
-	return string(raw), err
+	return strings.TrimSpace(string(raw)), err
 
 }
 
@@ -329,8 +329,8 @@ func gatherData(modules []string) ([]moduleData, error) {
 			return moduleList, err
 		}
 
-		//dump the contents of the module asciidoc
-		moduleDoc, err := ioutil.ReadFile(filepath.Join(module, "_meta/docs.asciidoc"))
+		//dump the contents of the module markdown
+		moduleDoc, err := ioutil.ReadFile(filepath.Join(module, "_meta/docs.md"))
 		if err != nil {
 			return moduleList, err
 		}
@@ -353,8 +353,9 @@ func gatherData(modules []string) ([]moduleData, error) {
 // writeModuleDocs writes the module-level docs
 func writeModuleDocs(modules []moduleData, t *template.Template) error {
 	for _, mod := range modules {
-		filename := mage.OSSBeatDir("docs", "modules", fmt.Sprintf("%s.asciidoc", mod.Base))
-		err := writeTemplate(filename, t.Lookup("moduleDoc.tmpl"), mod)
+		// filename := mage.OSSBeatDir("docs", "modules", fmt.Sprintf("%s.md", mod.Base))
+		filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
+		err := writeTemplate(filename, t.Lookup("moduleDocMD.tmpl"), mod)
 		if err != nil {
 			return err
 		}
@@ -445,18 +446,23 @@ func CollectDocs() error {
 		return err
 	}
 
-	// collect additional x-pack modules
-	xpackModuleGlob := mage.XPackBeatDir("module", "/*/")
-	xpackModules, err := filepath.Glob(xpackModuleGlob)
-	if err != nil {
-		return err
-	}
-	modules = append(modules, xpackModules...)
-
 	moduleMap, err := gatherData(modules)
 	if err != nil {
 		return err
 	}
+
+	// // collect additional x-pack modules
+	// xpackModuleGlob := mage.XPackBeatDir("module", "/*/")
+	// xpackModules, err := filepath.Glob(xpackModuleGlob)
+	// if err != nil {
+	// 	return err
+	// }
+	// modules = append(modules, xpackModules...)
+
+	// moduleMap, err := gatherData(modules)
+	// if err != nil {
+	// 	return err
+	// }
 
 	return writeDocs(moduleMap)
 }

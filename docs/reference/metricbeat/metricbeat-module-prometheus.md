@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-prometheus.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Prometheus module [metricbeat-module-prometheus]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -28,7 +30,7 @@ The Prometheus module comes with a predefined dashboard for Prometheus specific 
 ![metricbeat prometheus overview](images/metricbeat-prometheus-overview.png)
 
 
-## Example configuration [_example_configuration_55]
+## Example configuration [_example_configuration]
 
 The Prometheus module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -98,14 +100,10 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_64]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
 * [collector](/reference/metricbeat/metricbeat-metricset-prometheus-collector.md)
 * [query](/reference/metricbeat/metricbeat-metricset-prometheus-query.md)
 * [remote_write](/reference/metricbeat/metricbeat-metricset-prometheus-remote_write.md)
-
-
-
-

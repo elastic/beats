@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-kafka.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Kafka module [metricbeat-module-kafka]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -53,7 +55,7 @@ The Kafka module comes with a predefined dashboard. For example:
 ![metricbeat kafka dashboard](images/metricbeat_kafka_dashboard.png)
 
 
-## Example configuration [_example_configuration_35]
+## Example configuration [_example_configuration]
 
 The Kafka module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -118,7 +120,7 @@ metricbeat.modules:
 ```
 
 
-## Metricsets [_metricsets_41]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
@@ -127,9 +129,3 @@ The following metricsets are available:
 * [consumergroup](/reference/metricbeat/metricbeat-metricset-kafka-consumergroup.md)
 * [partition](/reference/metricbeat/metricbeat-metricset-kafka-partition.md)
 * [producer](/reference/metricbeat/metricbeat-metricset-kafka-producer.md)
-
-
-
-
-
-

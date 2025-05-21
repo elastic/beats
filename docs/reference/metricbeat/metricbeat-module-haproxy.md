@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-haproxy.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # HAProxy module [metricbeat-module-haproxy]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -68,7 +70,7 @@ To enable the HAProxy stats page, add the following lines to the HAProxy config,
 The HAProxy metricsets are tested with HAProxy versions from 1.6 to 1.8.
 
 
-## Example configuration [_example_configuration_29]
+## Example configuration [_example_configuration]
 
 The HAProxy module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -92,12 +94,9 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
 
 
-## Metricsets [_metricsets_34]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
 * [info](/reference/metricbeat/metricbeat-metricset-haproxy-info.md)
 * [stat](/reference/metricbeat/metricbeat-metricset-haproxy-stat.md)
-
-
-

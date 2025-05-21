@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-docker.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Docker module [metricbeat-module-docker]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -32,7 +34,7 @@ The Docker module supports collection of metrics from Podman’s Docker-compatib
 It is strongly recommended that you run Docker metricsets with a [`period`](/reference/metricbeat/configuration-metricbeat.md#metricset-period) that is 3 seconds or longer. The request to the Docker API already takes up to 2 seconds. Specifying less than 3 seconds will result in requests that timeout, and no data will be reported for those requests. In the case of Podman, the configuration parameter `podman` should be set to `true`. This enables streaming of container stats output, which allows for more accurate CPU percentage calculations when using Podman.
 
 
-## Example configuration [_example_configuration_18]
+## Example configuration [_example_configuration]
 
 The Docker module supports the standard configuration options that are described in [Modules](/reference/metricbeat/configuration-metricbeat.md). Here is an example configuration:
 
@@ -60,8 +62,8 @@ metricbeat.modules:
   # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
   # podman: false
 
-  # Skip metrics for certain device major numbers in docker/diskio.
-  # Necessary on systems with software RAID, device mappers,
+  # Skip metrics for certain device major numbers in docker/diskio. 
+  # Necessary on systems with software RAID, device mappers, 
   # or other configurations where virtual disks will sum metrics from other disks.
   # By default, it will skip devices with major numbers 9 or 253.
   #skip_major: []
@@ -79,7 +81,7 @@ metricbeat.modules:
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md).
 
 
-## Metricsets [_metricsets_24]
+## Metricsets [_metricsets_73]
 
 The following metricsets are available:
 
@@ -93,14 +95,3 @@ The following metricsets are available:
 * [memory](/reference/metricbeat/metricbeat-metricset-docker-memory.md)
 * [network](/reference/metricbeat/metricbeat-metricset-docker-network.md)
 * [network_summary](/reference/metricbeat/metricbeat-metricset-docker-network_summary.md)
-
-
-
-
-
-
-
-
-
-
-
