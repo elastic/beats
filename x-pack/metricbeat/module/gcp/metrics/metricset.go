@@ -110,6 +110,7 @@ type config struct {
 	CredentialsFilePath        string        `config:"credentials_file_path"`
 	CredentialsJSON            string        `config:"credentials_json"`
 	Endpoint                   string        `config:"endpoint"`
+	CollectDataprocUserLabels  bool          `config:"collect_dataproc_user_labels"`
 	MetadataCache              bool          `config:"metadata_cache"`
 	MetadataCacheRefreshPeriod time.Duration `config:"metadata_cache_refresh_period"`
 
