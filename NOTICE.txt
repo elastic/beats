@@ -40367,11 +40367,19 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/ebitengine/purego
+<<<<<<< HEAD
 Version: v0.8.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/ebitengine/purego@v0.8.1/LICENSE:
+=======
+Version: v0.9.0-alpha.3.0.20250507171635-5047c08daa38
+Licence type (autodetected): Apache-2.0
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/ebitengine/purego@v0.9.0-alpha.3.0.20250507171635-5047c08daa38/LICENSE:
+>>>>>>> 9f2953ed7 ([Automation] Bump Golang version to 1.24.3 (#44270))
 
                                  Apache License
                            Version 2.0, January 2004
