@@ -1,6 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.24.1
+go 1.24.3
 
 require (
 	cloud.google.com/go/bigquery v1.65.0
@@ -288,7 +288,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20230731223053-c322873962e3 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-	github.com/ebitengine/purego v0.8.2 // indirect
+	github.com/ebitengine/purego v0.9.0-alpha.3.0.20250507171635-5047c08daa38 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.6.1 // indirect
 	github.com/elastic/go-docappender/v2 v2.6.0 // indirect
 	github.com/elastic/go-freelru v0.16.0 // indirect
