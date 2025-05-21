@@ -1,1 +1,0 @@
-`performance` metricset fetches performance related metrics (events statements and table io waits) from MySQL

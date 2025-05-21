@@ -1,0 +1,3 @@
+The `shard` metricset interrogates the [Cluster State API endpoint](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cluster-state) to fetch information about all shards.
+
+This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

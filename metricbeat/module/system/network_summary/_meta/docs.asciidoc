@@ -1,6 +1,0 @@
-The System `network_summary` metricset provides network IO metrics collected from the
-operating system. These events are global and sorted by protocol.
-
-This metricset is available on:
-
-- Linux

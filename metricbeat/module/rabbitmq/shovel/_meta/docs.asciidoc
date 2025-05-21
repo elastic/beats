@@ -1,1 +1,0 @@
-This is the shovel metricset of the module rabbitmq.
