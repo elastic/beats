@@ -307,7 +307,7 @@ A set of response headers to add to the response for OPTIONS requests. Headers w
 
 ### `options_response_code` [_options_response_code]
 
-The HTTP response code to return for OPTIONS requests. Defaults to 200 Status OK.
+The HTTP response code to return for OPTIONS requests. Defaults to `200` (OK).
 
 
 ### `listen_address` [_listen_address]
