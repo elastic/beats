@@ -104,7 +104,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
 	}
 
-	var indexContent mapstr.M
+	var indexContent common.MapStr
 	err = json.Unmarshal(reader, &indexContent)
 	if err != nil {
 		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
