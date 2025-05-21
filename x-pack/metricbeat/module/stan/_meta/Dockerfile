@@ -2,11 +2,7 @@ ARG STAN_VERSION=0.15.1
 FROM nats-streaming:$STAN_VERSION
 
 # build stage
-<<<<<<< HEAD
-FROM golang:1.23.8 AS build-env
-=======
 FROM golang:1.24.3 AS build-env
->>>>>>> 9f2953ed7 ([Automation] Bump Golang version to 1.24.3 (#44270))
 RUN apt-get install git mercurial gcc
 RUN git clone https://github.com/nats-io/stan.go.git /stan-go
 RUN cd /stan-go/examples/stan-bench && git checkout tags/v0.5.2 && go build .
