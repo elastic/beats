@@ -1,5 +1,4 @@
-
-ROM golang:1.24.3
+FROM golang:1.24.3
 
 RUN \
     apt-get update \
