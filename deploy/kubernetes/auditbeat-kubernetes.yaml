@@ -209,7 +209,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
-        image: docker.elastic.co/beats/auditbeat-wolfi:8.18.1
+        image: docker.elastic.co/beats/auditbeat-wolfi:8.18.2
         args: [
           "-c", "/etc/auditbeat.yml",
           "-e",
