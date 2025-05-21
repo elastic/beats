@@ -159,6 +159,8 @@ steps:
           TEST_TAGS: "oracle"
         command: |
           cd x-pack/metricbeat
+          # for some reason it's set when using the buildkite pipeline upload
+          unset MODULE
           mage goIntegTest
         retry:
           automatic:
