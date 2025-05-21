@@ -287,7 +287,7 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID str
 func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expectedOffset int) {
 	entry, err := e.getRegistryState(key)
 	if err != nil {
-		e.t.Fatalf(err.Error())
+		e.t.Fatalf("%s", err.Error())
 	}
 
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
