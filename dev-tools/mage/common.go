@@ -139,13 +139,8 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 		return err
 	}
 
-<<<<<<< HEAD
-	if err = ioutil.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
-		return errors.Wrap(err, "failed to write rendered template")
-=======
 	if err = os.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
 		return fmt.Errorf("failed to write rendered template: %w", err)
->>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 
 	return nil
@@ -270,16 +265,12 @@ func DownloadFile(url, destinationDir string) (string, error) {
 
 	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, url, nil)
 	if err != nil {
-<<<<<<< HEAD
-		return "", errors.Wrap(err, "http get failed")
-=======
 		return "", fmt.Errorf("failed to create http request: %w", err)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("failed to download file: %w", err)
->>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 	defer resp.Body.Close()
 
@@ -332,15 +323,9 @@ func unzip(sourceFile, destinationDir string) error {
 		}
 		defer innerFile.Close()
 
-<<<<<<< HEAD
-		path := filepath.Join(destinationDir, f.Name)
-		if !strings.HasPrefix(path, destinationDir) {
-			return errors.Errorf("illegal file path in zip: %v", f.Name)
-=======
 		path, err := sanitizeFilePath(f.Name, destinationDir)
 		if err != nil {
 			return err
->>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 		}
 
 		if f.FileInfo().IsDir() {
@@ -496,15 +481,9 @@ func untar(sourceFile, destinationDir string) error {
 			return err
 		}
 
-<<<<<<< HEAD
-		path := filepath.Join(destinationDir, header.Name)
-		if !strings.HasPrefix(path, destinationDir) {
-			return errors.Errorf("illegal file path in tar: %v", header.Name)
-=======
 		path, err := sanitizeFilePath(header.Name, destinationDir)
 		if err != nil {
 			return err
->>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 		}
 
 		switch header.Typeflag {
@@ -630,11 +609,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 
 	wg.Wait()
 	if len(errs) > 0 {
-<<<<<<< HEAD
-		panic(errors.Errorf(strings.Join(errs, "\n")))
-=======
 		panic(errors.New(strings.Join(errs, "\n")))
->>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 }
 
@@ -919,13 +894,8 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	names := parseVersionRegex.SubexpNames()
 	matches := parseVersionRegex.FindStringSubmatch(version)
 	if len(matches) == 0 {
-<<<<<<< HEAD
-		err = errors.Errorf("failed to parse version '%v'", version)
-		return
-=======
 		err = fmt.Errorf("failed to parse version '%v'", version)
 		return major, minor, patch, err
->>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 	}
 
 	data := map[string]string{}

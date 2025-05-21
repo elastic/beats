@@ -28,6 +28,7 @@ import (
 
 	reason2 "github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // helper
@@ -57,13 +58,8 @@ func TestReason(t *testing.T) {
 
 func TestReasonGenericError(t *testing.T) {
 	msg := "An error"
-<<<<<<< HEAD
-	res := Reason(fmt.Errorf(msg))
-	assert.Equal(t, common.MapStr{
-=======
 	res := Reason(errors.New(msg))
 	assert.Equal(t, mapstr.M{
->>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 		"type":    "io",
 		"message": msg,
 	}, res)

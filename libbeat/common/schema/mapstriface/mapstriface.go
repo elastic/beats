@@ -81,6 +81,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/schema"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type ConvMap struct {
@@ -99,10 +100,6 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 		err.Required = convMap.Required
 		return multierror.Errors{err}
 	}
-<<<<<<< HEAD
-	subData, ok := d.(map[string]interface{})
-	if !ok {
-=======
 	switch subData := d.(type) {
 	case map[string]interface{}, mapstr.M:
 		subEvent := mapstr.M{}
@@ -116,7 +113,6 @@ func (convMap ConvMap) Map(key string, event common.MapStr, data map[string]inte
 		event[key] = subEvent
 		return errs
 	default:
->>>>>>> 5de228739 (fix go vet errors with Go 1.24 (#41076))
 		msg := fmt.Sprintf("expected dictionary, found %T", subData)
 		err := schema.NewWrongFormatError(convMap.Key, msg)
 		logp.Err("%s", err.Error())
