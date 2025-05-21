@@ -500,6 +500,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
+- Add GCP cache for metadata collectors. {pull}0[0]
 
 *Metricbeat*
 
