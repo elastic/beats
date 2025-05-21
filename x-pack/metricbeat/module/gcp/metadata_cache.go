@@ -9,6 +9,7 @@ import (
 	"cloud.google.com/go/compute/apiv1/computepb"
 	"cloud.google.com/go/redis/apiv1/redispb"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"google.golang.org/api/dataproc/v1"
 	"google.golang.org/api/sqladmin/v1"
 )
 
@@ -37,14 +38,17 @@ type CacheRegistry struct {
 	compute  map[string]*computepb.Instance
 	cloudsql map[string]*sqladmin.DatabaseInstance
 	redis    map[string]*redispb.Instance
+	dataproc map[string]*dataproc.Cluster
 
 	computeMeta  CacheEntry
 	cloudsqlMeta CacheEntry
 	redisMeta    CacheEntry
+	dataprocMeta CacheEntry
 
 	computeFetchMutex  sync.Mutex
 	cloudsqlFetchMutex sync.Mutex
 	redisFetchMutex    sync.Mutex
+	dataprocFetchMutex sync.Mutex
 }
 
 // NewCacheRegistry creates a new cache registry.
@@ -54,9 +58,11 @@ func NewCacheRegistry(logger *logp.Logger, refreshInterval time.Duration) *Cache
 		compute:      make(map[string]*computepb.Instance),
 		cloudsql:     make(map[string]*sqladmin.DatabaseInstance),
 		redis:        make(map[string]*redispb.Instance),
+		dataproc:     make(map[string]*dataproc.Cluster),
 		computeMeta:  CacheEntry{RefreshInterval: refreshInterval},
 		cloudsqlMeta: CacheEntry{RefreshInterval: refreshInterval},
 		redisMeta:    CacheEntry{RefreshInterval: refreshInterval},
+		dataprocMeta: CacheEntry{RefreshInterval: refreshInterval},
 	}
 }
 
@@ -135,6 +141,31 @@ func (r *CacheRegistry) UpdateRedisCache(update map[string]*redispb.Instance) {
 	r.redisMeta.LastRefreshed = time.Now()
 }
 
+// GetDataprocCache returns a copy of the Dataproc cluster cache.
+func (r *CacheRegistry) GetDataprocCache() map[string]*dataproc.Cluster {
+	r.dataMutex.RLock()
+	defer r.dataMutex.RUnlock()
+
+	cacheCopy := make(map[string]*dataproc.Cluster, len(r.dataproc))
+	for k, v := range r.dataproc {
+		cacheCopy[k] = v
+	}
+	return cacheCopy
+}
+
+// UpdateDataprocCache appends the provided map to the dataproc instance cache.
+func (r *CacheRegistry) UpdateDataprocCache(update map[string]*dataproc.Cluster) {
+	if r.dataproc == nil {
+		r.dataproc = make(map[string]*dataproc.Cluster)
+	}
+
+	for k, v := range update {
+		r.dataproc[k] = v
+	}
+
+	r.dataprocMeta.LastRefreshed = time.Now()
+}
+
 func (r *CacheRegistry) isComputeCacheExpired() bool {
 	return r.computeMeta.IsExpired()
 }
@@ -145,6 +176,10 @@ func (r *CacheRegistry) isRedisCacheExpired() bool {
 
 func (r *CacheRegistry) isCloudSQLCacheExpired() bool {
 	return r.cloudsqlMeta.IsExpired()
+}
+
+func (r *CacheRegistry) isDataprocCacheExpired() bool {
+	return r.dataprocMeta.IsExpired()
 }
 
 // EnsureComputeCacheFresh checks if the cache is fresh. If not, it acquires a
@@ -270,5 +305,47 @@ func (r *CacheRegistry) EnsureCloudSQLCacheFresh(ctx context.Context, fetchFunc 
 	r.dataMutex.Unlock()
 
 	r.logger.Info("CloudSQL cache successfully refreshed.")
+	return nil
+}
+
+// EnsureDataprocCacheFresh checks if the cache is fresh. If not, it acquires a
+// lock specific to dataproc fetching, re-checks, and if still expired, calls
+// the provided fetchFunc to update the cache.
+func (r *CacheRegistry) EnsureDataprocCacheFresh(ctx context.Context, fetchFunc func(context.Context) (map[string]*dataproc.Cluster, error)) error {
+	r.dataMutex.RLock()
+	expired := r.isDataprocCacheExpired()
+	r.dataMutex.RUnlock()
+
+	if !expired {
+		r.logger.Debug("Dataproc cache is fresh.")
+		return nil
+	}
+
+	r.logger.Debug("Dataproc cache potentially expired, acquiring fetch lock...")
+	r.dataprocFetchMutex.Lock()
+	defer r.dataprocFetchMutex.Unlock()
+	r.logger.Debug("Dataproc fetch lock acquired.")
+
+	r.dataMutex.RLock()
+	expired = r.isDataprocCacheExpired()
+	r.dataMutex.RUnlock()
+
+	if !expired {
+		r.logger.Debug("Dataproc cache was refreshed by another goroutine while waiting for fetch lock.")
+		return nil
+	}
+
+	r.logger.Info("Dataproc cache expired, executing fetch function...")
+	newData, err := fetchFunc(ctx)
+	if err != nil {
+		r.logger.Errorf("Dataproc cache fetch function failed: %v", err)
+		return fmt.Errorf("dataproc cache fetch failed: %w", err)
+	}
+
+	r.dataMutex.Lock()
+	r.UpdateDataprocCache(newData)
+	r.dataMutex.Unlock()
+
+	r.logger.Info("Dataproc cache successfully refreshed.")
 	return nil
 }

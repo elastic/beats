@@ -24,7 +24,7 @@ import (
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Dataproc cluster
-func NewMetadataService(projectID string, regions []string, organizationID, organizationName string, projectName string, collectUserLabels bool, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID string, regions []string, organizationID, organizationName string, projectName string, collectUserLabels bool, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
 		projectID:         projectID,
 		projectName:       projectName,
@@ -33,7 +33,7 @@ func NewMetadataService(projectID string, regions []string, organizationID, orga
 		regions:           regions,
 		collectUserLabels: collectUserLabels,
 		opt:               opt,
-		clusters:          make(map[string]*dataproc.Cluster),
+		cacheRegistry:     cacheRegistry,
 		logger:            logp.NewLogger("metrics-dataproc"),
 	}, nil
 }
@@ -62,8 +62,8 @@ type metadataCollector struct {
 	opt               []option.ClientOption
 	// NOTE: clusters holds data used for all metrics collected in a given period
 	// this avoids calling the remote endpoint for each metric, which would take a long time overall
-	clusters map[string]*dataproc.Cluster
-	logger   *logp.Logger
+	cacheRegistry *gcp.CacheRegistry // Use CacheRegistry
+	logger        *logp.Logger
 }
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Dataproc TimeSeries single point of data.
@@ -133,17 +133,35 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 }
 
 // instance returns data from an instance ID from the cache.
-func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*dataproc.Cluster, error) {
-	s.getInstances(ctx)
-
-	instance, ok := s.clusters[instanceID]
-	if ok {
-		return instance, nil
+func (s *metadataCollector) instance(ctx context.Context, clusterUUID string) (*dataproc.Cluster, error) {
+	if s.cacheRegistry == nil {
+		s.logger.Warn("Dataproc metadata cache disabled, fetching clusters directly (no caching).")
+		clusterDataMap, err := s.fetchDataprocClusters(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("direct fetch failed for Dataproc: %w", err)
+		}
+		clusterData, ok := clusterDataMap[clusterUUID]
+		if !ok {
+			s.logger.Debugf("Cluster %s not found in direct fetch.", clusterUUID)
+			return nil, nil
+		}
+		return clusterData, nil
 	}
 
-	s.clusters = make(map[string]*dataproc.Cluster)
+	err := s.cacheRegistry.EnsureDataprocCacheFresh(ctx, s.fetchDataprocClusters)
+	if err != nil {
+		s.logger.Errorf("Error ensuring Dataproc cache freshness (fetch might have failed): %v", err)
+		return nil, err
+	}
 
-	return nil, nil
+	dataprocCache := s.cacheRegistry.GetDataprocCache()
+	cluster, ok := dataprocCache[clusterUUID]
+	if !ok {
+		s.logger.Debugf("Cluster UUID %s not found in Dataproc cache.", clusterUUID)
+		return nil, nil // Cluster not found is not necessarily an error here
+	}
+
+	return cluster, nil
 }
 
 func (s *metadataCollector) instanceID(ts *monitoringpb.TimeSeries) string {
@@ -162,10 +180,8 @@ func (s *metadataCollector) instanceRegion(ts *monitoringpb.TimeSeries) string {
 	return ""
 }
 
-func (s *metadataCollector) getInstances(ctx context.Context) {
-	if len(s.clusters) > 0 {
-		return
-	}
+func (s *metadataCollector) fetchDataprocClusters(ctx context.Context) (map[string]*dataproc.Cluster, error) {
+	fetchedClusters := make(map[string]*dataproc.Cluster)
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
@@ -175,7 +191,7 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 		regions, err := s.fetchAvailableRegions(ctx)
 		if err != nil {
 			s.logger.Errorf("error fetching available regions: %v", err)
-			return
+			return nil, fmt.Errorf("error fetching available regions for Dataproc: %w", err)
 		}
 		regionsToQuery = regions
 	}
@@ -183,7 +199,7 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 	dataprocService, err := dataproc.NewService(ctx, s.opt...)
 	if err != nil {
 		s.logger.Errorf("error creating dataproc service %v", err)
-		return
+		return nil, fmt.Errorf("error creating dataproc service: %w", err)
 	}
 	clustersService := dataproc.NewProjectsRegionsClustersService(dataprocService)
 
@@ -194,26 +210,27 @@ func (s *metadataCollector) getInstances(ctx context.Context) {
 
 	for _, region := range regionsToQuery {
 		wg.Add(1)
-		go func(region string) {
+		go func(currentRegion string) {
 			defer wg.Done()
 
-			listCall := clustersService.List(s.projectID, region).Fields("clusters.labels", "clusters.clusterUuid").Context(queryCtx)
+			listCall := clustersService.List(s.projectID, currentRegion).Fields("clusters.labels", "clusters.clusterUuid").Context(queryCtx)
 			resp, err := listCall.Do()
 			if err != nil {
-				s.logger.Errorf("dataproc ListClusters error in region %s: %v", region, err)
+				s.logger.Errorf("dataproc ListClusters error in region %s: %v", currentRegion, err)
 				return
 			}
 
+			mu.Lock()
 			for _, cluster := range resp.Clusters {
-				mu.Lock()
-				s.clusters[cluster.ClusterUuid] = cluster
-				mu.Unlock()
+				fetchedClusters[cluster.ClusterUuid] = cluster
 			}
+			mu.Unlock()
 		}(region)
 	}
 
 	wg.Wait()
-	s.logger.Debugf("completed fetching dataproc clusters, found %d clusters", len(s.clusters))
+	s.logger.Debugf("completed fetching dataproc clusters, found %d clusters", len(fetchedClusters))
+	return fetchedClusters, nil
 }
 
 // fetchAvailableRegions gets all available GCP regions
