@@ -40,6 +40,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -63,11 +64,11 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	closerConfig    closerConfig
 	parsers         parser.Config
-	takeOver        bool
+	takeOver        takeOverConfig
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
-func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Stable,
@@ -365,7 +366,7 @@ func (inp *filestream) readFromSource(
 			if errors.Is(err, ErrFileTruncate) {
 				log.Infof("File was truncated, nothing to read. Path='%s'", path)
 			} else if errors.Is(err, ErrClosed) {
-				log.Infof("Reader was closed. Closing. Path='%s'", path)
+				log.Debugf("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
 			} else {
@@ -395,7 +396,7 @@ func (inp *filestream) readFromSource(
 		metrics.BytesProcessed.Add(uint64(message.Bytes))
 
 		// add "take_over" tag if `take_over` is set to true
-		if inp.takeOver {
+		if inp.takeOver.Enabled {
 			_ = mapstr.AddTags(message.Fields, []string{"take_over"})
 		}
 

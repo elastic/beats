@@ -49,7 +49,7 @@
         "user_agent.os.full": "Windows 7",
         "user_agent.os.name": "Windows",
         "user_agent.os.version": "7",
-        "user_agent.version": "24.0."
+        "user_agent.version": "24.0"
     },
     {
         "@timestamp": "2014-07-08T17:35:27.000Z",
@@ -102,7 +102,7 @@
         "user_agent.os.full": "Windows 7",
         "user_agent.os.name": "Windows",
         "user_agent.os.version": "7",
-        "user_agent.version": "24.0."
+        "user_agent.version": "24.0"
     },
     {
         "@timestamp": "2014-07-08T17:35:27.000Z",
@@ -158,6 +158,6 @@
         "user_agent.os.full": "Windows 7",
         "user_agent.os.name": "Windows",
         "user_agent.os.version": "7",
-        "user_agent.version": "24.0."
+        "user_agent.version": "24.0"
     }
 ]

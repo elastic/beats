@@ -68,8 +68,8 @@ var (
 	modulesDFilePattern    = regexp.MustCompile(`modules.d/.+`)
 	monitorsDFilePattern   = regexp.MustCompile(`monitors.d/.+`)
 	systemdUnitFilePattern = regexp.MustCompile(`/lib/systemd/system/.*\.service`)
-
-	licenseFiles = []string{"LICENSE.txt", "NOTICE.txt"}
+	fipsPackagePattern     = regexp.MustCompile(`\w+-fips-\w+`)
+	licenseFiles           = []string{"LICENSE.txt", "NOTICE.txt"}
 )
 
 var (
@@ -80,7 +80,6 @@ var (
 	monitorsd         = flag.Bool("monitors.d", false, "check monitors.d folder contents")
 	rootOwner         = flag.Bool("root-owner", false, "expect root to own package files")
 	rootUserContainer = flag.Bool("root-user-container", false, "expect root in container user")
-	fips              = flag.Bool("fips", false, "check agent binary for FIPS compliance")
 )
 
 func TestRPM(t *testing.T) {
@@ -94,23 +93,20 @@ func TestDeb(t *testing.T) {
 	debs := getFiles(t, regexp.MustCompile(`\.deb$`))
 	buf := new(bytes.Buffer)
 	for _, deb := range debs {
-		checkDeb(t, deb, buf)
+		fipsPackage := fipsPackagePattern.MatchString(deb)
+		checkDeb(t, deb, buf, fipsPackage)
 	}
 }
 
 func TestTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
-	tars := getFiles(t, regexp.MustCompile(`-\w+\.tar\.gz$`))
-	for _, tar := range tars {
-		checkTar(t, tar, false)
-	}
-}
-
-func TestFIPSTar(t *testing.T) {
-	// Regexp matches *-arch.tar.gz, but not *-arch.docker.tar.gz
-	tars := getFiles(t, regexp.MustCompile(`-\w+-fips\.tar\.gz$`))
-	for _, tar := range tars {
-		checkTar(t, tar, *fips)
+	tars := getFiles(t, regexp.MustCompile(`^-\w+\.tar\.gz$`))
+	for _, tarFile := range tars {
+		if strings.HasSuffix(tarFile, "docker.tar.gz") {
+			// We should skip the docker images archives , since those have their dedicated check
+			continue
+		}
+		fipsPackage := fipsPackagePattern.MatchString(tarFile)
+		checkTar(t, tarFile, fipsPackage)
 	}
 }
 
@@ -152,7 +148,7 @@ func checkRPM(t *testing.T, file string) {
 	ensureNoBuildIDLinks(t, p)
 }
 
-func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
+func checkDeb(t *testing.T, file string, buf *bytes.Buffer, fipsCheck bool) {
 	p, err := readDeb(file, buf)
 	if err != nil {
 		t.Error(err)
@@ -171,6 +167,27 @@ func checkDeb(t *testing.T, file string, buf *bytes.Buffer) {
 	checkModulesOwner(t, p, true)
 	checkModulesPermissions(t, p)
 	checkSystemdUnitPermissions(t, p)
+	if fipsCheck {
+		t.Run(p.Name+"_fips_test", func(t *testing.T) {
+			extractDir := t.TempDir()
+			t.Logf("Extracting file %s into %s", file, extractDir)
+			err := mage.Extract(file, extractDir)
+			require.NoError(t, err, "Error extracting file %s", file)
+
+			require.FileExists(t, filepath.Join(extractDir, "debian-binary"))
+			require.FileExists(t, filepath.Join(extractDir, "control.tar.gz"))
+			dataTarFile := filepath.Join(extractDir, "data.tar.gz")
+			require.FileExists(t, dataTarFile)
+
+			dataExtractionDir := filepath.Join(extractDir, "data")
+			err = mage.Extract(dataTarFile, dataExtractionDir)
+			require.NoError(t, err, "Error extracting data tarball")
+			beatName := extractBeatNameFromTarName(t, filepath.Base(file))
+			// the expected location for the binary is under /usr/share/<beatName>/bin
+			containingDir := filepath.Join(dataExtractionDir, "usr", "share", beatName, "bin")
+			checkFIPS(t, beatName, containingDir)
+		})
+	}
 }
 
 func checkTar(t *testing.T, file string, fipsCheck bool) {
@@ -574,7 +591,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 			t.Fatalf("failed to get a Docker client: %s", err)
 		}
 
-		loadResp, err := c.ImageLoad(ctx, f, true)
+		loadResp, err := c.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
 		if err != nil {
 			t.Fatalf("error loading docker image: %s", err)
 		}
@@ -803,7 +820,7 @@ func readTarContents(tarName string, data io.Reader) (*packageFile, error) {
 			File: header.Name,
 			UID:  header.Uid,
 			GID:  header.Gid,
-			Mode: os.FileMode(header.Mode),
+			Mode: os.FileMode(header.Mode), //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 		}
 	}
 
@@ -825,6 +842,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 		case "-tags":
 			foundTags = true
 			require.Contains(t, setting.Value, "requirefips")
+			require.Contains(t, setting.Value, "ms_tls13kdf")
 			continue
 		case "GOEXPERIMENT":
 			foundExperiment = true

@@ -603,7 +603,6 @@ metricbeat.modules:
     - pubsub
     - loadbalancing
     - firestore
-    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -662,6 +661,16 @@ metricbeat.modules:
   endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
+
+- module: gcp
+  metricsets:
+    - dataproc
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  collect_dataproc_user_labels: true
 
 #-------------------------------- Golang Module --------------------------------
 - module: golang
@@ -987,6 +996,7 @@ metricbeat.modules:
     - state_persistentvolume
     - state_persistentvolumeclaim
     - state_storageclass
+    # - state_horizontalpodautoscaler
     # Uncomment this to get k8s events:
     #- event  period: 10s
   hosts: ["kube-state-metrics:8080"]
@@ -1254,6 +1264,7 @@ metricbeat.modules:
     - "subscriptions"
     #- "connection"
     #- "route"
+    #- "jetstream"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
@@ -1262,6 +1273,24 @@ metricbeat.modules:
   #subscriptions.metrics_path: "/subsz"
   #connection.metrics_path: "/connz"
   #route.metrics_path: "/routez"
+  #jetstream:
+  #  stats:
+  #    enabled: true
+  #  account:
+  #    enabled: true
+  #    names:
+  #      - default
+  #  stream:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1
+  #      - another-stream
+  #  consumer:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1-consumer-1
+  #      - my-stream-1-consumer-2
+  #      - another-stream-consumer-1
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -1715,24 +1744,28 @@ metricbeat.modules:
 
 - module: windows
   metricsets: ["wmi"]
-  period: 60s
+  period: 10m
   wmi:
-    include_null: false          # Exclude fields with null values from the output
-    include_queries: false       # Do not include the query string in the output
-    include_empty_string: false  # Exclude fields with empty string values from the output
-    warning_threshold: 30s       # Maximum time to wait for a query result before logging a warning (defaults to period)
+    # Do not include the query string in the output
+    include_queries: false
+    # Exclude properties with null values from the output
+    include_null_properties: false
+    # Exclude properties with empty string values from the output
+    include_empty_string_properties: false
+    # Maximum time to wait for a query result before logging a warning (defaults to period)
+    warning_threshold: 10m
     # Default WMI namespace for all queries (if not specified per query)
     # Uncomment to override the default, which is "root\\cimv2".
     # namespace: "root\\cimv2"
     queries:
-    - class: Win32_OperatingSystem # FROM: Class to fetch
-      fields:                      # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
+    - class: Win32_OperatingSystem          # FROM: Class to fetch
+      properties:                           # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
        - FreePhysicalMemory
        - FreeSpaceInPagingFiles
        - FreeVirtualMemory
        - LocalDateTime
        - NumberOfUsers
-      where: ""                   # Optional WHERE clause to filter query results
+      where: ""                             # Optional WHERE clause to filter query results
       # Override the WMI namespace for this specific query (optional).
       # If set, this takes precedence over the default namespace above.
       # namespace: "root\\cimv2" # Overrides the metric

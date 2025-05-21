@@ -50,7 +50,7 @@ func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor ma
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id),
+			metrics: newInputMetrics(id, nil),
 		},
 		creds: &clientcredentials.Config{
 			ClientID:       cfg.Auth.OAuth2.ClientID,
@@ -177,6 +177,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 				case <-ctx.Done():
 					return
 				case <-time.After(refreshAfter - grace):
+					s.log.Debugw("session refresh", "url", r.RefreshURL)
 					req, err := http.NewRequestWithContext(ctx, http.MethodPost, r.RefreshURL, nil)
 					if err != nil {
 						s.metrics.errorsTotal.Inc()
@@ -213,6 +214,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 			r.FeedURL = feedURL.String()
 		}
 
+		s.log.Debugw("stream request", "url", r.FeedURL)
 		req, err := http.NewRequestWithContext(ctx, "GET", r.FeedURL, nil)
 		if err != nil {
 			return state, Warning{fmt.Errorf("failed to make firehose request to %s: %w", r.FeedURL, err)}

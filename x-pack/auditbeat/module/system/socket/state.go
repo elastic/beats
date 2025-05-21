@@ -17,7 +17,6 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/auditbeat/tracing"
@@ -962,13 +961,6 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"transport": f.proto.String(),
 			"packets":   f.local.packets + f.remote.packets,
 			"bytes":     f.local.bytes + f.remote.bytes,
-			"community_id": flowhash.CommunityID.Hash(flowhash.Flow{
-				SourceIP:        localAddr.IP,
-				SourcePort:      uint16(localAddr.Port),
-				DestinationIP:   remoteAddr.IP,
-				DestinationPort: uint16(remoteAddr.Port),
-				Protocol:        uint8(f.proto),
-			}),
 		},
 		"event": mapstr.M{
 			"kind":     "event",
@@ -984,7 +976,17 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"complete": f.complete,
 		},
 	}
-	var errs multierror.Errors
+	if communityid := flowhash.CommunityID.Hash(flowhash.Flow{
+		SourceIP:        localAddr.IP,
+		SourcePort:      uint16(localAddr.Port),
+		DestinationIP:   remoteAddr.IP,
+		DestinationPort: uint16(remoteAddr.Port),
+		Protocol:        uint8(f.proto),
+	}); communityid != "" {
+		(root["network"].(mapstr.M))["community_id"] = communityid
+	}
+
+	var errs []error
 	rootPut := func(key string, value interface{}) {
 		if _, err := root.Put(key, value); err != nil {
 			errs = append(errs, err)
@@ -1052,7 +1054,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	return mb.Event{
 		RootFields:      root,
 		MetricSetFields: metricset,
-	}, errs.Err()
+	}, errors.Join(errs...)
 }
 
 func (s *state) SyncClocks(kernelNanos, userNanos uint64) error {

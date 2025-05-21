@@ -28,7 +28,6 @@ import (
 	"strings"
 
 	"github.com/dustin/go-humanize"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
@@ -43,15 +42,6 @@ type HashType string
 func (t *HashType) Unpack(v string) error {
 	*t = HashType(v)
 	return nil
-}
-
-var validHashes = []HashType{
-	BLAKE2B_256, BLAKE2B_384, BLAKE2B_512,
-	MD5,
-	SHA1,
-	SHA224, SHA256, SHA384, SHA512, SHA512_224, SHA512_256,
-	SHA3_224, SHA3_256, SHA3_384, SHA3_512,
-	XXH64,
 }
 
 // Enum of hash types.
@@ -131,7 +121,7 @@ func (c *Config) Validate() error {
 	sort.Strings(c.Paths)
 	c.Paths = deduplicate(c.Paths)
 
-	var errs multierror.Errors
+	var errs []error
 	var err error
 
 nextHash:
@@ -187,7 +177,7 @@ nextHash:
 		errs = append(errs, errors.New("backend can only be specified on linux"))
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // deduplicate deduplicates the given sorted string slice. The returned slice
@@ -230,7 +220,7 @@ func (c *Config) IsIncludedPath(path string) bool {
 }
 
 var defaultConfig = Config{
-	HashTypes:        []HashType{SHA1},
+	HashTypes:        defaultHashes,
 	MaxFileSize:      "100 MiB",
 	MaxFileSizeBytes: 100 * 1024 * 1024,
 	ScanAtStart:      true,

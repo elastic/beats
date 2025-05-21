@@ -18,6 +18,7 @@
 package elasticsearchtranslate
 
 import (
+	"encoding/base64"
 	"fmt"
 	"reflect"
 	"strings"
@@ -69,8 +70,9 @@ var defaultOptions = esToOTelOptions{
 	Preset:   "custom", // default is custom if not set
 }
 
-// ToOTelConfig converts a Beat config into an OTel elasticsearch exporter config
+// ToOTelConfig converts a Beat config into OTel elasticsearch exporter config
 // Ensure cloudid is handled before calling this method
+// Note: This method may override output queue settings defined by user.
 func ToOTelConfig(output *config.C) (map[string]any, error) {
 	escfg := defaultOptions
 	// check if unsupported configuration is provided
@@ -107,6 +109,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		return nil, err
 	}
 
+	// Create url using host name, protocol and path
 	hosts := []string{}
 	for _, h := range escfg.Hosts {
 		esURL, err := common.MakeURL(escfg.Protocol, escfg.Path, h, 9200)
@@ -123,18 +126,12 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 	}
 
 	otelYAMLCfg := map[string]any{
-		"logs_index":  escfg.Index,        // index
-		"endpoints":   hosts,              // hosts, protocol, path, port
-		"num_workers": escfg.NumWorkers(), // worker/workers
-
-		// Authentication
-		"user":     escfg.Username, // username
-		"password": escfg.Password, // password
-		"api_key":  escfg.APIKey,   // api_key
+		"logs_index": escfg.Index, // index
+		"endpoints":  hosts,       // hosts, protocol, path, port
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
-		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_connection_timeout
+		"idle_conn_timeout": escfg.Transport.IdleConnTimeout, // idle_connection_timeout
 
 		// Retry
 		"retry": map[string]any{
@@ -147,15 +144,20 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 
 		// Batcher is experimental
 		"batcher": map[string]any{
-			"enabled":        true,
-			"max_size_items": escfg.BulkMaxSize, // bulk_max_size
-			"min_size_items": 0,                 // 0 means immediately trigger a flush
+			"enabled":  true,
+			"max_size": escfg.BulkMaxSize, // bulk_max_size
+			"min_size": 0,                 // 0 means immediately trigger a flush
 		},
 
 		"mapping": map[string]any{
 			"mode": "bodymap",
 		},
 	}
+
+	// Authentication
+	setIfNotNil(otelYAMLCfg, "user", escfg.Username)                                             // username
+	setIfNotNil(otelYAMLCfg, "password", escfg.Password)                                         // password
+	setIfNotNil(otelYAMLCfg, "api_key", base64.StdEncoding.EncodeToString([]byte(escfg.APIKey))) // api_key
 
 	setIfNotNil(otelYAMLCfg, "headers", escfg.Headers)    // headers
 	setIfNotNil(otelYAMLCfg, "tls", otelTLSConfg)         // tls config

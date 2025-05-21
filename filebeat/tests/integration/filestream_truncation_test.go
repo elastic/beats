@@ -26,6 +26,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -154,7 +155,7 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 
 func assertLastOffset(t *testing.T, path string, offset int) {
 	t.Helper()
-	entries := readFilestreamRegistryLog(t, path)
+	entries, _ := readFilestreamRegistryLog(t, path)
 	lastEntry := entries[len(entries)-1]
 	if lastEntry.Offset != offset {
 		t.Errorf("expecting offset %d got %d instead", offset, lastEntry.Offset)
@@ -177,17 +178,21 @@ type registryEntry struct {
 	Offset   int
 	Filename string
 	TTL      time.Duration
+	Op       string
+	Removed  bool
 }
 
-func readFilestreamRegistryLog(t *testing.T, path string) []registryEntry {
+func readFilestreamRegistryLog(t *testing.T, path string) ([]registryEntry, map[string]string) {
 	file, err := os.Open(path)
 	if err != nil {
 		t.Fatalf("could not open file '%s': %s", path, err)
 	}
 
 	entries := []registryEntry{}
+	fileNameToNative := map[string]string{}
 	s := bufio.NewScanner(file)
 
+	var lastOperation string
 	for s.Scan() {
 		line := s.Bytes()
 
@@ -199,29 +204,62 @@ func readFilestreamRegistryLog(t *testing.T, path string) []registryEntry {
 		// Skips registry log entries containing the operation ID like:
 		// '{"op":"set","id":46}'
 		if e.Key == "" {
+			lastOperation = e.Op
 			continue
 		}
-
-		entries = append(entries, registryEntry{
+		// Filestream entry
+		et := registryEntry{
 			Key:      e.Key,
 			Offset:   e.Value.Cursor.Offset,
 			TTL:      e.Value.TTL,
 			Filename: e.Value.Meta.Source,
-		})
+			Removed:  lastOperation == "remove",
+			Op:       lastOperation,
+		}
+
+		// Handle the log input entries, they have a different format.
+		if strings.HasPrefix(e.Key, "filebeat::logs") {
+			et.Offset = e.Value.Offset
+			et.Filename = e.Value.Source
+
+			if lastOperation != "set" {
+				continue
+			}
+
+			// Extract the native file identity so we can update the
+			// expected registry accordingly
+			name := filepath.Base(et.Filename)
+			id := strings.Join(strings.Split(et.Key, "::")[2:], "::")
+			fileNameToNative[name] = id
+		}
+
+		entries = append(entries, et)
 	}
 
-	return entries
+	return entries, fileNameToNative
 }
 
 type entry struct {
 	Key   string `json:"k"`
 	Value struct {
+		// Filestream fields
 		Cursor struct {
 			Offset int `json:"offset"`
 		} `json:"cursor"`
 		Meta struct {
 			Source string `json:"source"`
 		} `json:"meta"`
+
+		// Log input fields
+		Source string `json:"source"`
+		Offset int    `json:"offset"`
+
+		// Common to both inputs
 		TTL time.Duration `json:"ttl"`
 	} `json:"v"`
+
+	// Keys to read the "operation"
+	// e.g: {"op":"set","id":46}
+	Op string `json:"op"`
+	ID int    `json:"id"`
 }

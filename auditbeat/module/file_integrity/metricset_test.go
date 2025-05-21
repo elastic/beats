@@ -18,7 +18,6 @@
 package file_integrity
 
 import (
-	"crypto/sha1"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -108,12 +107,18 @@ func TestActions(t *testing.T) {
 	}
 
 	// Insert fake file event into db to simulate when a file has changed
-	digest := sha1.New().Sum([]byte("different string"))
 	updatedFileEvent := &Event{
 		Timestamp: time.Now().UTC(),
 		Path:      updatedFilepath,
 		Action:    Created,
-		Hashes:    map[HashType]Digest{SHA1: digest},
+		Hashes:    map[HashType]Digest{},
+	}
+	for _, h := range defaultHashes {
+		fn, ok := hashTypes[h]
+		require.Truef(t, ok, "missing hash type %s", h)
+
+		digest := fn().Sum([]byte("different string"))
+		updatedFileEvent.Hashes[h] = digest
 	}
 	if err = store(bucket, updatedFileEvent); err != nil {
 		t.Fatal(err)
@@ -472,7 +477,7 @@ func (e expectedEvents) validate(t *testing.T) {
 	}
 	defer bucket.Close()
 	config := getConfig("somepath")
-	config["hash_types"] = []string{"sha1"}
+	config["hash_types"] = []string{"sha256"}
 	ms, ok := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry).(*MetricSet)
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
@@ -500,13 +505,13 @@ func TestEventFailedHash(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("11111111111111111111"),
+						SHA256: []byte("11111111111111111111"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": Digest("11111111111111111111"),
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": Digest("11111111111111111111"),
 				},
 			},
 			expectedEvent{
@@ -522,13 +527,13 @@ func TestEventFailedHash(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Updated,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("22222222222222222222"),
+						SHA256: []byte("22222222222222222222"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": Digest("22222222222222222222"),
+					"event.action":     []string{"updated"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": Digest("22222222222222222222"),
 				},
 			},
 			expectedEvent{
@@ -546,9 +551,9 @@ func TestEventFailedHash(t *testing.T) {
 					hashFailed: true,
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": nil,
+					"event.action":     []string{"updated"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": nil,
 				},
 			},
 			expectedEvent{
@@ -564,13 +569,13 @@ func TestEventFailedHash(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Updated,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("33333333333333333333"),
+						SHA256: []byte("33333333333333333333"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": Digest("33333333333333333333"),
+					"event.action":     []string{"updated"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": Digest("33333333333333333333"),
 				},
 			},
 			expectedEvent{
@@ -586,13 +591,13 @@ func TestEventFailedHash(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Updated,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("33333333333333333333"),
+						SHA256: []byte("33333333333333333333"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"attributes_modified"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": Digest("33333333333333333333"),
+					"event.action":     []string{"attributes_modified"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": Digest("33333333333333333333"),
 				},
 			},
 		}.validate(t)
@@ -614,9 +619,9 @@ func TestEventFailedHash(t *testing.T) {
 					hashFailed: true,
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": nil,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": nil,
 				},
 			},
 			expectedEvent{
@@ -632,13 +637,13 @@ func TestEventFailedHash(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Updated,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("22222222222222222222"),
+						SHA256: []byte("22222222222222222222"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated", "attributes_modified"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": Digest("22222222222222222222"),
+					"event.action":     []string{"updated", "attributes_modified"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": Digest("22222222222222222222"),
 				},
 			},
 		}.validate(t)
@@ -658,13 +663,13 @@ func TestEventFailedHash(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("22222222222222222222"),
+						SHA256: []byte("22222222222222222222"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": Digest("22222222222222222222"),
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": Digest("22222222222222222222"),
 				},
 			},
 			expectedEvent{
@@ -678,9 +683,9 @@ func TestEventFailedHash(t *testing.T) {
 					Hashes:    nil,
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"deleted"},
-					"event.type":     []string{"deletion"},
-					"file.hash.sha1": nil,
+					"event.action":     []string{"deleted"},
+					"event.type":       []string{"deletion"},
+					"file.hash.sha256": nil,
 				},
 			},
 		}.validate(t)
@@ -700,13 +705,13 @@ func TestEventFailedHash(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: []byte("22222222222222222222"),
+						SHA256: []byte("22222222222222222222"),
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": Digest("22222222222222222222"),
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": Digest("22222222222222222222"),
 				},
 			},
 			expectedEvent{
@@ -721,9 +726,9 @@ func TestEventFailedHash(t *testing.T) {
 					Hashes: nil,
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"moved"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": nil,
+					"event.action":     []string{"moved"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": nil,
 				},
 			},
 		}.validate(t)
@@ -745,7 +750,7 @@ func TestEventDelete(t *testing.T) {
 	}
 	defer bucket.Close()
 	config := getConfig("somepath")
-	config["hash_types"] = []string{"sha1"}
+	config["hash_types"] = []string{"sha256"}
 	ms, ok := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry).(*MetricSet)
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
@@ -769,13 +774,13 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": sha,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": sha,
 				},
 			},
 			expectedEvent{
@@ -804,13 +809,13 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": sha,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": sha,
 				},
 			},
 		}.validate(t)
@@ -834,13 +839,13 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": sha,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": sha,
 				},
 			},
 			expectedEvent{
@@ -856,13 +861,13 @@ func TestEventDelete(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Deleted,
 					Hashes: map[HashType]Digest{
-						SHA1: shaNext,
+						SHA256: shaNext,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"updated"},
-					"event.type":     []string{"change"},
-					"file.hash.sha1": shaNext,
+					"event.action":     []string{"updated"},
+					"event.type":       []string{"change"},
+					"file.hash.sha256": shaNext,
 				},
 			},
 			expectedEvent{
@@ -878,7 +883,7 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: shaNext,
+						SHA256: shaNext,
 					},
 				},
 				expected: nil, // Already observed during handling of previous event.
@@ -901,13 +906,13 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				expected: map[string]interface{}{
-					"event.action":   []string{"created"},
-					"event.type":     []string{"creation"},
-					"file.hash.sha1": sha,
+					"event.action":     []string{"created"},
+					"event.type":       []string{"creation"},
+					"file.hash.sha256": sha,
 				},
 			},
 			expectedEvent{
@@ -923,7 +928,7 @@ func TestEventDelete(t *testing.T) {
 					Source: SourceFSNotify,
 					Action: Deleted,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				// No event because it has the same contents as before.
@@ -942,7 +947,7 @@ func TestEventDelete(t *testing.T) {
 					Action: Created,
 					Source: SourceFSNotify,
 					Hashes: map[HashType]Digest{
-						SHA1: sha,
+						SHA256: sha,
 					},
 				},
 				// No event because it has the same contents as before.

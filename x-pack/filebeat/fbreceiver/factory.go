@@ -11,10 +11,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/component"
@@ -62,9 +64,24 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
 	}
 
-	return &filebeatReceiver{beat: &b.Beat, beater: fbBeater, logger: set.Logger}, nil
+	httpConf := struct {
+		HTTP *config.C `config:"http"`
+	}{}
+	if err := b.RawConfig.Unpack(&httpConf); err != nil {
+		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
+	}
+
+	base := beatreceiver.BeatReceiver{
+		HttpConf: httpConf.HTTP,
+		Beat:     b,
+		Beater:   fbBeater,
+		Logger:   set.Logger,
+	}
+
+	return &filebeatReceiver{BeatReceiver: base}, nil
 }
 
+// copied from filebeat cmd.
 func defaultProcessors() []mapstr.M {
 	// processors:
 	// - add_host_metadata:

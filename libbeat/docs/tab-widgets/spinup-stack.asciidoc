@@ -1,9 +1,0 @@
-// tag::cloud[]
-To get started quickly, spin up a deployment of our
-https://www.elastic.co/cloud/elasticsearch-service[hosted {ess}]. The {ess} is
-available on AWS, GCP, and Azure. {ess-trial}[Try it out for free].
-// end::cloud[]
-
-// tag::self-managed[]
-To install and run {es} and {kib}, see {stack-ref}/installing-elastic-stack.html[Installing the {stack}].
-// end::self-managed[]

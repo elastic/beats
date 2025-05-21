@@ -31,33 +31,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Updatecli in the runner
-        uses: updatecli/updatecli-action@d2e5d2667ba67a8599e636531baef731f54858bc # v2.78.1
-
-      - name: Run Updatecli in Apply mode
-        run: updatecli --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/values.d/scm.yml
+      - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
+        with:
+          command: --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/values.d/scm.yml
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          slack-channel-id: "#ingest-notifications"
+          slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          slack-send-when: "failure"
+          version-file: .tool-versions
         env:
           BRANCH: ${{ matrix.branch }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - if: ${{ failure()  }}
-        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
-        with:
-          method: chat.postMessage
-          token: ${{ secrets.SLACK_BOT_TOKEN }}
-          payload: |
-            {
-              "channel": "#ingest-notifications",
-              "text": "${{ env.SLACK_MESSAGE }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ env.SLACK_MESSAGE }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_MESSAGE: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
