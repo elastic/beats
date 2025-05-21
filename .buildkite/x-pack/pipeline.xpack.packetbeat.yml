@@ -354,7 +354,6 @@ steps:
               lifetime: 10800 # seconds
               project-id: "elastic-observability-ci"
               project-number: "911195782929"
->>>>>>> 3eec2b65a (bk: use GCP OIDC (#44259))
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Win 10 System Tests"
