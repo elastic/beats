@@ -439,7 +439,7 @@ steps:
               context: "filebeat: Packaging Linux"
 
       - label: ":ubuntu: Filebeat: Packaging arm64"
-        key: filebeat-packaging-arm"
+        key: "filebeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
