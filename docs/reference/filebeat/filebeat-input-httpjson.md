@@ -539,7 +539,7 @@ Optionally start rate-limiting prior to the value specified in the Response.
 
 Under the default behavior, Requests will continue while the `remaining` value is non-zero. Specifying an `early_limit` will mean that rate-limiting will occur prior to reaching `0`.
 
-* If the value specified for `early_limit` is less than `1`, the value is treated as a percentage of the Response provided `limit`. e.g. specifying `0.9` will mean that Requests will continue until reaching 90% of the rate-limit — for a `limit` value of `120`, the rate-limit starts when the `remaining` reaches `12`. If the `limit` header is missing from the Response, default rate-limiting will occur (when `remaining` reaches `0`).
+* If the value specified for `early_limit` is less than `1`, the value is treated as a percentage of the Response provided `limit`. e.g. specifying `0.9` will mean that Requests will continue until reaching 90% of the rate-limit — for a `limit` value of `120`, the rate-limit starts when the `remaining` reaches `12`. If the `limit` header is missing from the Response, default rate-limiting will occur (when `remaining` reaches `0`).
 * If the value specified for `early_limit` is greater than or equal to `1`, the value is treated as the target value for `remaining`. e.g. instead of rate-limiting when `remaining` hits `0`, rate-limiting will occur when `remaining` hits the value specified.
 
 It is not set by default (by default the rate-limiting as specified in the Response is followed).

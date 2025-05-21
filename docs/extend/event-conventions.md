@@ -60,7 +60,7 @@ These are well-known suffixes to represent units of stored values, use them as a
 
 Here is a list of standardised names and units that are used across all Beats:
 
-| Use…​ | Instead of…​ |
+| Use… | Instead of… |
 | --- | --- |
 | avg | average |
 | connection | conn |
