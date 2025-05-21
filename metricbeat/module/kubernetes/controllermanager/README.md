@@ -97,14 +97,18 @@ kubectl -n kube-system port-forward pod/kube-controller-manager-kind-control-pla
 
 Save the metrics output from `https://localhost:10257/metrics` to a new `_meta/test/metrics.x.xx` file.
 
-After that, you can run the following commands to generate and test the expected files:
+```bash
+curl -k https://localhost:10257/metrics > _meta/test/metrics.x.xx
+```
+
+After that, you need to add the new expectation file to `controllermanager_test.go` and then run the following commands to generate and test the expected files:
 
 ```bash
 cd metricbeat/module/kubernetes/controllermanager
 # generate the expected files
-go test ./state... --data
+go test ./... --data
 # test the expected files
-go test ./state...
+go test ./...
 ```
 
 
