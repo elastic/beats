@@ -1,8 +1,0 @@
-Requests Metricset retrieves the JMX key `Catalina:name=*,type=GlobalRequestProcessor` using Jolokia. It exposes the following metrics:
-
-* `tomcat.requests.mbean`: Number of requests processed
-* `tomcat.requests.total`: Number of requests processed
-* `tomcat.requests.bytes.received`: Amount of data received, in bytes
-* `tomcat.requests.bytes.sent`: Amount of data sent, in bytes
-* `tomcat.requests.processing.ms`: Total time to process the requests
-* `tomcat.requests.errors.total`: Number of errors

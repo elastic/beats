@@ -1,4 +1,0 @@
-This is the istiod metricset of the module istio.
-This metricset collects metrics from the Istio Daemon of Istio versions higher than 1.5
-
-Tested with Istio 1.7
