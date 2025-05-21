@@ -1,6 +1,10 @@
 module github.com/elastic/beats/v7
 
+<<<<<<< HEAD
 go 1.23.8
+=======
+go 1.24.3
+>>>>>>> 9f2953ed7 ([Automation] Bump Golang version to 1.24.3 (#44270))
 
 require (
 	cloud.google.com/go/bigquery v1.62.0
@@ -281,7 +285,14 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+<<<<<<< HEAD
 	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
+=======
+	github.com/ebitengine/purego v0.9.0-alpha.3.0.20250507171635-5047c08daa38 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.6.1 // indirect
+	github.com/elastic/go-docappender/v2 v2.6.0 // indirect
+	github.com/elastic/go-freelru v0.16.0 // indirect
+>>>>>>> 9f2953ed7 ([Automation] Bump Golang version to 1.24.3 (#44270))
 	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/elastic/pkcs8 v1.0.0 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect

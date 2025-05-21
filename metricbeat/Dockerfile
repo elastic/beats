@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 FROM golang:1.23.8
+=======
+FROM golang:1.24.3
+>>>>>>> 9f2953ed7 ([Automation] Bump Golang version to 1.24.3 (#44270))
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
 
 RUN \
