@@ -40,6 +40,7 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* [db](/reference/metricbeat/metricbeat-metricset-syncgateway-db.md)
 * [memory](/reference/metricbeat/metricbeat-metricset-syncgateway-memory.md)
 * [replication](/reference/metricbeat/metricbeat-metricset-syncgateway-replication.md)
 * [resources](/reference/metricbeat/metricbeat-metricset-syncgateway-resources.md)

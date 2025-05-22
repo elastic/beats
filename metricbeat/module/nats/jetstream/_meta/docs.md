@@ -1,13 +1,12 @@
 This is the JetStream metricset of the NATS module. It supports gathering basic stats about a JetStream server as well as specific details about streams and consumers.
 
-The data is pulled from the https://docs.nats.io/running-a-nats-service/nats_admin/monitoring#jetstream-information-jsz[/jsz] API of a JetStream server.
+The data is pulled from the [/jsz](https://docs.nats.io/running-a-nats-service/nats_admin/monitoring#jetstream-information-jsz) API of a JetStream server.
 
-[float]
-=== Configuration
+## Configuration [metricbeat-metricset-nats-jetstream-config]
 
 You can enable each of the specific data points via configuration for the `jetstream` metricset. For example:
 
-[source,yaml]
+```yaml
 jetstream:
   stats:
     # Enables basic stats collection about the JetStream server
@@ -21,10 +20,11 @@ jetstream:
   consumer:
     # Enables data collection about consumers on the server 
     enabled: true
+```
 
 You can also filter account, stream, and consumer metrics by name:
 
-[source,yaml]
+```yaml
 jetstream:
   account:
     names:
@@ -38,5 +38,6 @@ jetstream:
     names:
       - my-stream-1-consumer-1
       - my-stream-1-consumer-2
+```
 
 Since this data is hierarchical, these filters are cumulative and apply even if the particular data set is not enabled but filters are configured. When there are no names configured, all information about all accounts, streams, and consumers will be reported.
