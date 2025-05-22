@@ -11,16 +11,23 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"math/rand/v2"
 )
 
 func Run(commands string) (*string, *string, error) {
 	rInt := rand.Int()
-	filename := fmt.Sprintf("command-%d.ps1", rInt)
+
+	tempDir := os.TempDir()
+	baseFilename := fmt.Sprintf("command-%d.ps1", rInt)
+	filename := filepath.Join(tempDir, baseFilename)
+
+	defer os.Remove(filename)
+
 	err := os.WriteFile(filename, []byte(commands), os.FileMode(0700))
 	if err != nil {
-		return nil, nil, fmt.Errorf("error writing command file: %w", err)
+		return nil, nil, fmt.Errorf("error writing command file %s: %w", filename, err)
 	}
 
 	var stderr bytes.Buffer
@@ -31,14 +38,12 @@ func Run(commands string) (*string, *string, error) {
 	cmd.Stderr = &stderr
 	cmd.Stdout = &stdout
 
-	defer os.Remove(filename)
-
 	if err := cmd.Start(); err != nil {
-		return nil, nil, fmt.Errorf("error starting: %w", err)
+		return nil, nil, fmt.Errorf("error starting command with script %s: %w", filename, err)
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return nil, nil, fmt.Errorf("error waiting: %w", err)
+		return nil, nil, fmt.Errorf("error waiting for command with script %s: %w", filename, err)
 	}
 
 	stdOutStr := stdout.String()

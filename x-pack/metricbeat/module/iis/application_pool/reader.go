@@ -83,6 +83,9 @@ var appPoolCounters = map[string]string{
 	"net_clr.locks_and_threads.current_queue_length":    "\\.NET CLR LocksAndThreads(w3wp*)\\Current Queue Length",
 }
 
+// Regular expression to match the name and status, compiled once for application pool.
+var reAppPoolParser = regexp.MustCompile(`^(.+?)\s{2,}(\S+)`)
+
 // newReader creates a new instance of Reader.
 func newReader(config Config) (*Reader, error) {
 	var query pdh.Query
@@ -239,12 +242,17 @@ func (r *Reader) getAllAppPool() (map[string]string, error) {
 	stdout, stderr, err := Run(commands)
 
 	if err != nil {
-		// Log the error, but continue gracefully
 		r.log.Infow("warning: failed to get IIS App Pools: %v\n", err)
 		return map[string]string{}, nil
 	}
-	if *stderr != "" {
+
+	if stderr != nil && *stderr != "" {
 		r.log.Infow("warning: stderr from Get-IISAppPool: %v\n", *stderr)
+		return map[string]string{}, nil
+	}
+
+	if stdout == nil {
+		r.log.Infow("warning: stdout from Get-IISAppPool is nil, though no error was reported.")
 		return map[string]string{}, nil
 	}
 
@@ -260,11 +268,10 @@ func parseApplicationPool(data string) map[string]string {
 	if len(lines) == 0 {
 		return applicationPools
 	}
-	// Regular expression to match the name and status
-	re := regexp.MustCompile(`^(.+?)\s{2,}(\S+)`)
 
 	for _, line := range lines {
-		matches := re.FindStringSubmatch(line)
+		// Use the pre-compiled package-level regex
+		matches := reAppPoolParser.FindStringSubmatch(line)
 		if len(matches) == 3 {
 			name := strings.TrimSpace(matches[1])
 			if name == "----" {
@@ -302,8 +309,6 @@ func (r *Reader) getApplicationPools(names []string) ([]ApplicationPool, error) 
 		return applicationPools, nil
 	}
 
-	r.log.Info("here4")
-
 	var filtered []ApplicationPool
 	for _, n := range names {
 		for _, w3 := range applicationPools {
@@ -335,6 +340,7 @@ func getw3wpProceses() (map[int]string, error) {
 				for i, ar := range info.Args {
 					if ar == "-ap" && len(info.Args) > i+1 {
 						wps[info.PID] = info.Args[i+1]
+						break
 					}
 				}
 			}
