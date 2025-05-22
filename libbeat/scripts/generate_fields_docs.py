@@ -8,14 +8,14 @@ import requests
 import yaml
 
 
-def document_fields(output, section, sections, path):
+def document_fields(output, section, sections, path, beat):
     if "skipdocs" in section:
         return
     if "anchor" in section:
         output.write('''---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-{}.html
----\n\n'''.format(section["anchor"]))
+  - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html
+---\n\n'''.format(beat, section["anchor"]))
 
     # Intermediate level titles
     # if ("description" in section and "prefix" not in section and
@@ -59,7 +59,7 @@ See the {ecs-ref}[ECS reference] for more information.
             newpath = path + "." + field["name"]
 
         if "type" in field and field["type"] == "group":
-            document_fields(output, field, sections, newpath)
+            document_fields(output, field, sections, newpath, beat)
         else:
             document_field(output, field, newpath)
 
@@ -181,7 +181,7 @@ This document describes the fields that are exported by {title}. They are groupe
         if "anchor" not in section:
             section["anchor"] = section["key"]
         output_fields = open(os.path.join(output_path, "exported-fields-{}.md".format(section["anchor"])), 'w', encoding='utf-8')
-        document_fields(output_fields, section, sections, "")
+        document_fields(output_fields, section, sections, "", beat)
 
     # output.write(":edit_url!:")
 
