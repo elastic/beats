@@ -327,3 +327,138 @@ func hasConfigOptions(config []string) bool {
 	}
 	return true
 }
+
+// calculateTimespan returns the start and end times for the metric values given
+// the reference time, time grain, collection period, and service latency.
+//
+// (1) When the collection period is greater than the time grain, the timespan
+// will be:
+//
+//	  |                                                        |
+//	  |                                                       Now
+//	  |                                                        |
+//	  |                                            time grain  │
+//	  │                                          │◀──(PT1M)──▶ │
+//	  │                                                        │
+//	  ├──────────────────────────────────────────┼─────────────┼─────────────
+//	  │                                          │             │
+//	  |                        period                          │
+//	  │◀───────────────────────(5min)────────────┼────────────▶│
+//	  │                                                        │
+//	  │                       timespan           │             │
+//	  │◀───────────────────────(5min)─────────────────────────▶│
+//	  │                                                        │
+//	  │                                          │             │
+//	  |                                                        │
+//	Start                                                     End
+//	  |                                                        │
+//
+// In this case, the API will return five metric values, because
+// the time grain is 1 minute and the timespan is 5 minutes.
+//
+// (2) When the collection period is equal to the time grain,
+// the timespan will be:
+//
+//	  |                                                        |
+//	  |                                                       Now
+//	  |                                                        |
+//	  │                       time grain                       │
+//	  |◀───────────────────────(5min)─────────────────────────▶│
+//	  │                                                        │
+//	  ├────────────────────────────────────────────────────────┼─────────────
+//	  │                                                        │
+//	  │                       timespan                         │
+//	  |◀───────────────────────(5min)─────────────────────────▶│
+//	  │                                                        │
+//	  |                        period                          │
+//	  │◀───────────────────────(5min)─────────────────────────▶│
+//	  │                                                        │
+//	  │                                                        │
+//	  |                                                        │
+//	Start                                                     End
+//	  |                                                        │
+//
+// In this case, the API will return one metric value.
+//
+// (3) When the collection period is less than the time grain,
+// the timespan will be:
+//
+//	  |                                                        |
+//	  |                                                       Now
+//	  |                                                        |
+//	  |                                              period    |
+//	  │                                          │◀──(5min)──▶ │
+//	  │                                                        │
+//	  ├──────────────────────────────────────────┼─────────────┼─────────────
+//	  │                                                        │
+//	  │                       timespan           │             │
+//	  |◀───────────────────────(60min)────────────────────────▶│
+//	  │                                          │             │
+//	  |                      time grain                        │
+//	  │◀───────────────────────(PT1H)────────────┼────────────▶│
+//	  │                                                        │
+//	  │                                          │             │
+//	  │                                                        │
+//	  |                                                        |
+//	Start                                                     End
+//	  |                                                        │
+//
+// In this case, the API will return one metric value.
+//
+// (4) When the Azure service publishes the metric values with
+// a delay, we can translate the reference time to compensate
+// for the latency.
+//
+//	  |                                                        |
+//	  |                                                        |             Now
+//	  |                                                        │              |
+//	  |                                            time grain  │              |
+//	  │                                          │◀──(PT1M)──▶ │              |
+//	  │                                                        │              |
+//	  ├──────────────────────────────────────────┼─────────────┼──────────────|
+//	  │                                                        │              |
+//	  │                       timespan           │             │              |
+//	  |◀───────────────────────(5min)─────────────────────────▶│              |
+//	  │                                          │             │              |
+//	  |                        period                          │              |
+//	  │◀───────────────────────(5min)─────────────────────────▶|              │
+//	  │                                                        │              |
+//	  │                                                        │              |
+//	  |                                                        │   latency    |
+//	  |                                                        | ◀──(1min)──▶ |
+//	  │                                                        │              |
+//	  │                                                        │              |
+//	Start                                                     End             |
+//	  │                                                        │              |
+func calculateTimespan(referenceTime time.Time, timeGrain string, config Config) (time.Time, time.Time) {
+	// The timespan duration is the maximum of the time grain and the
+	// collection period.
+	//
+	// This is to ensure that we always collect all the metric values
+	// for the given time grain.
+	//
+	// For example, if the time grain is 1 minute and the collection
+	// period is 5 minutes, we will collect five PT1M metric values
+	// per collection.
+	//
+	// If the time grain is 5 minutes and the collection period is
+	// 5 minutes, we will collect one PT5M metric value per collection.
+	//
+	// If the time grain is 5 minutes and the collection period is
+	// 1 minute, we will collect one PT5M metric in five collections.
+	timespanDuration := max(asDuration(timeGrain), config.Period)
+
+	// The end time is equal to the reference time in most cases.
+	//
+	// However, if the Azure service publishes the metric values with
+	// a delay, we can translate the reference time to compensate
+	// for the latency.
+	//
+	// For example, if the Azure service publishes the metric values
+	// with a delay of 30s / 1m, we can set the delay to one minute
+	// to always collect the latest metric values.
+	endTime := referenceTime.Add(config.Latency * -1)
+	startTime := endTime.Add(timespanDuration * -1)
+
+	return startTime, endTime
+}
