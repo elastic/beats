@@ -112,9 +112,9 @@ func (p *PerformanceDataFetcher) GetPerfMetrics(ctx context.Context,
 
 	for _, result := range results[0].Value {
 		if len(result.Value) > 0 {
-			value := result.Value[0]
+			value := float64(result.Value[0])
 			if result.Unit == string(types.PerformanceManagerUnitPercent) {
-				value = value / 100
+				value = value / 100.0
 			}
 			metricMap[result.Name] = value
 			continue
