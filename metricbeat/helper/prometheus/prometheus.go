@@ -27,7 +27,6 @@ import (
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
-	"github.com/prometheus/common/expfmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/easyops"
@@ -53,6 +52,7 @@ type Prometheus interface {
 type prometheus struct {
 	httpfetcher
 	logger *logp.Logger
+	parser *Parser
 }
 
 type httpfetcher interface {
@@ -68,7 +68,11 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 
 	http.SetHeaderDefault("Accept", acceptHeader)
 	http.SetHeaderDefault("Accept-Encoding", "gzip")
-	return &prometheus{http, base.Logger()}, nil
+	return &prometheus{
+		http,
+		base.Logger(),
+		NewParser(),
+	}, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
@@ -92,37 +96,16 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 		reader = resp.Body
 	}
 
+	bodyBytes, err := ioutil.ReadAll(reader)
+	if err == nil {
+		p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
+	}
+
 	if resp.StatusCode > 399 {
-		bodyBytes, err := ioutil.ReadAll(reader)
-		if err == nil {
-			p.logger.Debug("error received from prometheus endpoint: ", string(bodyBytes))
-		}
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
 
-	format := expfmt.ResponseFormat(resp.Header)
-	if format == "" {
-		return nil, fmt.Errorf("Invalid format for response of response")
-	}
-
-	decoder := expfmt.NewDecoder(reader, format)
-	if decoder == nil {
-		return nil, fmt.Errorf("Unable to create decoder to decode response")
-	}
-
-	families := []*dto.MetricFamily{}
-	for {
-		mf := &dto.MetricFamily{}
-		err = decoder.Decode(mf)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return nil, errors.Wrap(err, "decoding of metric family failed")
-		} else {
-			families = append(families, mf)
-		}
-	}
+	families := p.parser.Parse(bodyBytes)
 
 	return families, nil
 }
@@ -146,119 +129,138 @@ type MetricsMapping struct {
 }
 
 func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error) {
-
+	// 创建一个map来存储所有事件数据，key是标签组合，value是事件数据
 	eventsMap := map[string]mapstr.M{}
-	infoMetrics := []*infoMetricData{}
+	// 创建一个map来存储info类型的指标数据，key为labels的hash值
+	infoMetricMap := map[string]*infoMetricData{}
+
+	// 遍历所有指标族（metric family）
 	for _, family := range families {
+		// 遍历该指标族下的所有具体指标
 		for _, metric := range family.GetMetric() {
+			// 从映射配置中获取该指标的处理规则
+			// 例如：http_requests_total 可能被映射为 "http.requests.total"
 			m, ok := mapping.Metrics[family.GetName()]
 			if m == nil || !ok {
-				// Ignore unknown metrics
+				// 如果找不到映射规则，跳过该指标
 				continue
 			}
 
+			// 获取指标字段名，例如 "http.requests.total"
 			field := m.GetField()
+			// 获取指标值，例如 100
 			value := m.GetValue(metric)
 
-			// Ignore retrieval errors (bad conf)
+			// 如果获取值失败，跳过该指标
 			if value == nil {
 				continue
 			}
 
+			// 配置标签处理选项
 			storeAllLabels := false
 			labelsLocation := ""
 			var extraFields mapstr.M
 			if m != nil {
 				c := m.GetConfiguration()
+				// 是否存储所有未映射的标签
 				storeAllLabels = c.StoreNonMappedLabels
+				// 未映射标签的存储位置
 				labelsLocation = c.NonMappedLabelsPlacement
+				// 额外的字段配置
 				extraFields = c.ExtraFields
 			}
 
-			// Apply extra options
+			// 获取指标的所有标签
+			// 例如：{"instance": "localhost:9090", "job": "prometheus", "method": "GET", "path": "/metrics"}
 			allLabels := getLabels(metric)
+
+			// 应用额外的处理选项
 			for _, option := range m.GetOptions() {
 				field, value, allLabels = option.Process(field, value, allLabels)
 			}
 
-			// Convert labels
-			labels := mapstr.M{}
-			keyLabels := mapstr.M{}
+			// 处理标签映射
+			labels := mapstr.M{}    // 普通标签
+			keyLabels := mapstr.M{} // 关键标签（用于事件分组）
 			for k, v := range allLabels {
 				if l, ok := mapping.Labels[k]; ok {
 					if l.IsKey() {
+						// 如果是关键标签，放入keyLabels
 						keyLabels.Put(l.GetField(), v)
 					} else {
+						// 如果是普通标签，放入labels
 						labels.Put(l.GetField(), v)
 					}
 				} else if storeAllLabels {
-					// if label for this metric is not found at the label mappings but
-					// it is configured to store any labels found, make it so
-					// TODO dedot
+					// 如果配置了存储所有标签，将未映射的标签也存储起来
 					labels.Put(labelsLocation+"."+k, v)
 				}
 			}
 
-			// if extra fields have been added through metric configuration
-			// add them to labels.
-			//
-			// not considering these extra fields to be keylabels as that case
-			// have not appeared yet
+			// 添加额外配置的字段到标签中
 			for k, v := range extraFields {
 				labels.Put(k, v)
 			}
 
-			// Keep a info document if it's an infoMetric
+			// 处理info类型的指标
 			if _, ok = m.(*infoMetric); ok {
 				labels.DeepUpdate(keyLabels)
-				infoMetrics = append(infoMetrics, &infoMetricData{
+				// 使用keyLabels的String()作为hash值
+				hashKey := keyLabels.String()
+				infoMetricMap[hashKey] = &infoMetricData{
 					Labels: keyLabels,
 					Meta:   labels,
-				})
+				}
 				continue
 			}
 
+			// 处理普通指标
 			if field != "" {
+				// 获取或创建事件
 				event := getEvent(eventsMap, keyLabels)
+				// 创建更新数据
 				update := mapstr.M{}
 				update.Put(field, value)
-				// value may be a mapstr (for histograms and summaries), do a deep update to avoid smashing existing fields
+				// 更新事件数据
 				event.DeepUpdate(update)
-
+				// 添加标签数据
 				event.DeepUpdate(labels)
 			}
 		}
 	}
 
-	// populate events array from values in eventsMap
-	events := make([]mapstr.M, 0, len(eventsMap))
+	// 为所有事件添加额外字段
 	for _, event := range eventsMap {
 		// Add extra fields
 		for k, v := range mapping.ExtraFields {
 			event[k] = v
 		}
-		events = append(events, event)
 	}
 
-	// fill info from infoMetrics
-	for _, info := range infoMetrics {
-		for _, event := range events {
-			found := true
-			for k, v := range info.Labels.Flatten() {
-				value, err := event.GetValue(k)
-				if err != nil || v != value {
-					found = false
-					break
-				}
+	// 使用hash值匹配并更新info数据
+	for _, event := range eventsMap {
+		// 获取当前事件的keyLabels
+		keyLabels := mapstr.M{}
+		for k, v := range event {
+			if l, ok := mapping.Labels[k]; ok && l.IsKey() {
+				keyLabels.Put(k, v)
 			}
+		}
 
-			// fill info from this metric
-			if found {
-				event.DeepUpdate(info.Meta)
-			}
+		// 使用keyLabels的hash值查找对应的infoMetric
+		hashKey := keyLabels.String()
+		if info, ok := infoMetricMap[hashKey]; ok {
+			event.DeepUpdate(info.Meta)
 		}
 	}
 
+	// 将eventsMap转换为events数组
+	events := make([]mapstr.M, 0, len(eventsMap))
+	for _, event := range eventsMap {
+		events = append(events, event)
+	}
+
+	// 处理聚合指标
 	for _, am := range mapping.AggregateMetrics {
 		builder := easyops.NewAggregateMetricBuilder(am)
 		es := builder.Build(events)
