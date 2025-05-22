@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-memcached-stats.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Memcached stats metricset [metricbeat-metricset-memcached-stats]
 
 This is the `stats` metricset of the Memcached module.

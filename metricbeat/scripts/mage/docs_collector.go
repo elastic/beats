@@ -43,17 +43,18 @@ type moduleData struct {
 	Dashboards bool
 	Settings   []string `yaml:"settings"`
 	CfgFile    string
-	Asciidoc   string
+	Doc        string
 	IsXpack    bool
 	Metricsets []metricsetData
 }
 
 type metricsetData struct {
-	Path       string
+	Doc        string
 	Title      string
 	Link       string
 	Release    string
 	DataExists bool
+	Data       string
 	IsDefault  bool
 }
 
@@ -119,10 +120,9 @@ func createDocsPath(module string) error {
 	return os.MkdirAll(mage.OSSBeatDir("docs/modules", module), 0755)
 }
 
-// testIfDocsInDir tests for a `_meta/docs.asciidoc` in a given directory
+// testIfDocsInDir tests for a `_meta/docs.md` in a given directory
 func testIfDocsInDir(moduleDir string) bool {
-
-	_, err := os.Stat(filepath.Join(moduleDir, "_meta/docs.asciidoc"))
+	_, err := os.Stat(filepath.Join(moduleDir, "_meta/docs.md"))
 	if err != nil {
 		return false
 	}
@@ -253,6 +253,10 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		if !isMetricset {
 			continue
 		}
+		metricsetDoc, err := ioutil.ReadFile(filepath.Join(metricset, "_meta/docs.md"))
+		if err != nil {
+			return nil, err
+		}
 		metricsetName := filepath.Base(metricset)
 		release, err := getReleaseState(filepath.Join(metricset, "_meta/fields.yml"))
 		if err != nil {
@@ -264,8 +268,10 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 
 		// test to see if the metricset has a data.json
 		hasData := false
+		data := []byte{}
 		_, err = os.Stat(filepath.Join(metricset, "_meta/data.json"))
 		if err == nil {
+			data, _ = ioutil.ReadFile(filepath.Join(metricset, "_meta/data.json"))
 			hasData = true
 		}
 
@@ -278,11 +284,12 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		}
 
 		ms := metricsetData{
-			Path:       metricset,
+			Doc:        strings.TrimSpace(string(metricsetDoc)),
 			Title:      metricsetName,
 			Release:    release,
 			Link:       link,
 			DataExists: hasData,
+			Data:       strings.TrimSpace(string(data)),
 			IsDefault:  isDefault,
 		}
 
@@ -300,7 +307,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 		return nil, fmt.Errorf("error getting default metricsets: %w", err)
 	}
 	moduleList := make([]moduleData, 0)
-	//iterate over all the modules, checking to make sure we have an asciidoc file
+	//iterate over all the modules, checking to make sure we have an docs.md file
 	for _, module := range modules {
 
 		isModule := testIfDocsInDir(module)
@@ -339,7 +346,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 		fieldsm.Path = module
 		fieldsm.CfgFile = cfgPath
 		fieldsm.Metricsets = metricsets
-		fieldsm.Asciidoc = string(moduleDoc)
+		fieldsm.Doc = string(moduleDoc)
 		fieldsm.Dashboards = hasDashboards(module)
 		fieldsm.Base = moduleName
 
@@ -374,8 +381,10 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 				mod,
 				metricset,
 			}
-			filename := mage.OSSBeatDir("docs", "modules", mod.Base, fmt.Sprintf("%s.asciidoc", metricset.Title))
-			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
+			filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
+
+			// filename := mage.OSSBeatDir("docs", "modules", mod.Base, fmt.Sprintf("%s.md", metricset.Title))
+			err := writeTemplate(filename, t.Lookup("metricsetDocMD.tmpl"), modData)
 			if err != nil {
 				return fmt.Errorf("error opening file at %s: %w", filename, err)
 			}
@@ -393,8 +402,8 @@ func writeModuleList(modules []moduleData, t *template.Template) error {
 		return modules[i].Base < modules[j].Base
 	})
 	//write and execute the template
-	filepath := mage.OSSBeatDir("docs", "modules_list.asciidoc")
-	return writeTemplate(filepath, t.Lookup("moduleList.tmpl"), modules)
+	filepath := filepath.Join(mage.DocsDir(), "reference", "metricbeat", "metricbeat-modules.md")
+	return writeTemplate(filepath, t.Lookup("moduleListMD.tmpl"), modules)
 
 }
 
@@ -431,7 +440,7 @@ func writeDocs(modules []moduleData) error {
 // Generate the module-level docs under docs/
 // Generate the module lists
 // Generate the metricset-level docs
-// All these are 'collected' from the asciidoc files under _meta/ in each module & metricset
+// All these are 'collected' from the docs.md files under _meta/ in each module & metricset
 func CollectDocs() error {
 
 	//create the docs/modules dir
@@ -446,23 +455,18 @@ func CollectDocs() error {
 		return err
 	}
 
+	// collect additional x-pack modules
+	xpackModuleGlob := mage.XPackBeatDir("module", "/*/")
+	xpackModules, err := filepath.Glob(xpackModuleGlob)
+	if err != nil {
+		return err
+	}
+	modules = append(modules, xpackModules...)
+
 	moduleMap, err := gatherData(modules)
 	if err != nil {
 		return err
 	}
-
-	// // collect additional x-pack modules
-	// xpackModuleGlob := mage.XPackBeatDir("module", "/*/")
-	// xpackModules, err := filepath.Glob(xpackModuleGlob)
-	// if err != nil {
-	// 	return err
-	// }
-	// modules = append(modules, xpackModules...)
-
-	// moduleMap, err := gatherData(modules)
-	// if err != nil {
-	// 	return err
-	// }
 
 	return writeDocs(moduleMap)
 }

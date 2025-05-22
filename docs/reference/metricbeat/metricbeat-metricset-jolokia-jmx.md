@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-jolokia-jmx.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Jolokia jmx metricset [metricbeat-metricset-jolokia-jmx]
 
 The `jmx` metricset collects metrics from [Jolokia agents](https://jolokia.org/reference/html/agents.md).

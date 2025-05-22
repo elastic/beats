@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_container.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Kubernetes state_container metricset [metricbeat-metricset-kubernetes-state_container]
 
 This is the `state_container` metricset of the Kubernetes module.

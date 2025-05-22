@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-index_summary.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Elasticsearch index_summary metricset [metricbeat-metricset-elasticsearch-index_summary]
 
 This is the index summary metricset of the module elasticsearch.

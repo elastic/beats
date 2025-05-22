@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-healthcheck.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Docker healthcheck metricset [metricbeat-metricset-docker-healthcheck]
 
 The Docker `healthcheck` metricset collects healthcheck status metrics about running Docker containers.

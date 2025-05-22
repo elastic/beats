@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-postgresql-bgwriter.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # PostgreSQL bgwriter metricset [metricbeat-metricset-postgresql-bgwriter]
 
 This is the `bgwriter` metricset of the PostgreSQL module.

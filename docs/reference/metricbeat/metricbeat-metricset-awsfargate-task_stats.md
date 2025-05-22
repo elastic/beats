@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-awsfargate-task_stats.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # AWS Fargate task_stats metricset [metricbeat-metricset-awsfargate-task_stats]
 
 ::::{warning}

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-beat-stats.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Beat stats metricset [metricbeat-metricset-beat-stats]
 
 This is the stats metricset of the beat module.

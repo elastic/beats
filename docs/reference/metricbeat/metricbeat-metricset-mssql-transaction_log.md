@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mssql-transaction_log.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # MSSQL transaction_log metricset [metricbeat-metricset-mssql-transaction_log]
 
 `transaction_log` Metricset fetches information about the operation and transaction log of each MSSQL database in the monitored instance. All data is extracted from the [Database Dynamic Management Views](https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/database-related-dynamic-management-views-transact-sql?view=sql-server-2017)

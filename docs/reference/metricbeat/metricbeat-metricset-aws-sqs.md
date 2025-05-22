@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-sqs.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # AWS sqs metricset [metricbeat-metricset-aws-sqs]
 
 The sqs metricset of aws module allows you to monitor your AWS SQS queues. `sqs` metricset fetches a set of values from [Amazon SQS Metrics](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-available-cloudwatch-metrics.html). CloudWatch metrics for Amazon SQS queues are automatically collected and pushed to CloudWatch every five minutes.

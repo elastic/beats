@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-cluster_stats.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Elasticsearch cluster_stats metricset [metricbeat-metricset-elasticsearch-cluster_stats]
 
 This is the `cluster_stats` metricset of the Elasticsearch module. It interrogates the [Cluster Stats API endpoint](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cluster-stats) to fetch information about the Elasticsearch cluster.

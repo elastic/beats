@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-haproxy-stat.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # HAProxy stat metricset [metricbeat-metricset-haproxy-stat]
 
 The HAProxy `stat` metricset collects *stat* fields from HAProxy processes.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-entropy.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # System entropy metricset [metricbeat-metricset-system-entropy]
 
 This is the entropy metricset of the module system. It collects the amount of available entropy in bits. On kernel versions greater than 2.6, entropy will be out of a total pool size of 4096.

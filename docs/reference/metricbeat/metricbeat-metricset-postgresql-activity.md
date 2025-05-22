@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-postgresql-activity.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # PostgreSQL activity metricset [metricbeat-metricset-postgresql-activity]
 
 This is the `activity` metricset of the PostgreSQL module.

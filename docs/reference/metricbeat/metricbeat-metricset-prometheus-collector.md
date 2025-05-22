@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-prometheus-collector.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Prometheus collector metricset [metricbeat-metricset-prometheus-collector]
 
 The Prometheus `collector` metricset scrapes data from [prometheus exporters](https://prometheus.io/docs/instrumenting/exporters/).

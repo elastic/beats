@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-ml_job.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Elasticsearch ml_job metricset [metricbeat-metricset-elasticsearch-ml_job]
 
 This is the `ml_job` metricset of the Elasticsearch module. This metricset requires [Machine Learning](https://www.elastic.co/products/x-pack/machine-learning) to be enabled.

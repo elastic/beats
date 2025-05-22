@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-etcd-leader.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Etcd leader metricset [metricbeat-metricset-etcd-leader]
 
 This is the leader metricset of the module etcd. This metrics is being read from the Etcd V2 endpoint and won’t show any activity regarding Etcd V3.

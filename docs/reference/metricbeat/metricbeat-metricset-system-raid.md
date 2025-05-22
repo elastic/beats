@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-raid.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # System raid metricset [metricbeat-metricset-system-raid]
 
 This is the raid metricset of the module system. It collects stats about the raid.

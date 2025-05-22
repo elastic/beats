@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-nats-connections.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # NATS connections metricset [metricbeat-metricset-nats-connections]
 
 This is the connections metricset of the module nats collecting top level metrics about connections.

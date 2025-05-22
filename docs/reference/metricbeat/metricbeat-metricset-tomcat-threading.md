@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-tomcat-threading.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Tomcat threading metricset [metricbeat-metricset-tomcat-threading]
 
 ::::{warning}

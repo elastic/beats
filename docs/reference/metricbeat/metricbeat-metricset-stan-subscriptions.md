@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-stan-subscriptions.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Stan subscriptions metricset [metricbeat-metricset-stan-subscriptions]
 
 NATS streaming server (STAN) subscription statistics

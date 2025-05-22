@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-php_fpm-pool.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # PHP_FPM pool metricset [metricbeat-metricset-php_fpm-pool]
 
 This is the `pool` metricset of the PHP_FPM module.

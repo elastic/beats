@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-nats-stats.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # NATS stats metricset [metricbeat-metricset-nats-stats]
 
 This is the stats metricset of the module nats collecting generic stats.

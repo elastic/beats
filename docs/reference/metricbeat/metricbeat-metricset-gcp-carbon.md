@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-carbon.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Google Cloud Platform carbon metricset [metricbeat-metricset-gcp-carbon]
 
 ::::{warning}

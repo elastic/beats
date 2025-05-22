@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-linux-ksm.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Linux ksm metricset [metricbeat-metricset-linux-ksm]
 
 ::::{warning}

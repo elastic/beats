@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-azure-app_insights.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Azure app_insights metricset [metricbeat-metricset-azure-app_insights]
 
 ::::{warning}

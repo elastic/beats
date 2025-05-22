@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-cockroachdb-status.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # CockroachDB status metricset [metricbeat-metricset-cockroachdb-status]
 
 The CockroachDB `status` metricset collects metrics exposed by the [Prometheus endpoint](https://www.cockroachlabs.com/docs/v2.1/monitoring-and-alerting.html#prometheus-endpoint) of CockroachDB.

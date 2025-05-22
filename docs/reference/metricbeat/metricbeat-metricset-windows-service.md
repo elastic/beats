@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-windows-service.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Windows service metricset [metricbeat-metricset-windows-service]
 
 The `service` metricset of the Windows module reads the status of Windows services.

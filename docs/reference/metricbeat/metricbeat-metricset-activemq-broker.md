@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-activemq-broker.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # ActiveMQ broker metricset [metricbeat-metricset-activemq-broker]
 
 This is the `broker` metricset of the ActiveMQ module.

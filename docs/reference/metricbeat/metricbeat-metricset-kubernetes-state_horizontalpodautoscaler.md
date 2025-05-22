@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_horizontalpodautoscaler.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Kubernetes state_horizontalpodautoscaler metricset [metricbeat-metricset-kubernetes-state_horizontalpodautoscaler]
 
 This is the `state_horizontalpodautoscaler` metricset of the Kubernetes module.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-socket_summary.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # System socket_summary metricset [metricbeat-metricset-system-socket_summary]
 
 The System `socket_summary` metricset provides the summary of open network sockets in the host system.

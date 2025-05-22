@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-container.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Kubernetes container metricset [metricbeat-metricset-kubernetes-container]
 
 This is the `container` metricset of the Kubernetes module.

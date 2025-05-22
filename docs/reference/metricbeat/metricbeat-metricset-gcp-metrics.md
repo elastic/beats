@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-metrics.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Google Cloud Platform metrics metricset [metricbeat-metricset-gcp-metrics]
 
 Operations monitoring provides visibility into the performance, uptime, and overall health of cloud-powered applications. It collects metrics, events, and metadata from different services from Google Cloud. This metricset is to collect monitoring metrics from Google Cloud using `ListTimeSeries` API. The full list of metric types that Google Cloud monitoring supports can be found in [Google Cloud Metrics](https://cloud.google.com/monitoring/api/metrics_gcp#gcp).

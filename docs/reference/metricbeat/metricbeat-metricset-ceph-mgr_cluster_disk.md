@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-mgr_cluster_disk.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Ceph mgr_cluster_disk metricset [metricbeat-metricset-ceph-mgr_cluster_disk]
 
 ::::{warning}

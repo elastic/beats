@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-monitor_health.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Ceph monitor_health metricset [metricbeat-metricset-ceph-monitor_health]
 
 This is the `monitor_health` metricset of the Ceph module.

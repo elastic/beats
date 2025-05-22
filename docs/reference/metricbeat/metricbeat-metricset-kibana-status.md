@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kibana-status.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Kibana status metricset [metricbeat-metricset-kibana-status]
 
 This is the `status` metricset of the Kibana module. This status endpoint is available in 6.0 by default and can be enabled in Kibana >= 5.4 with the config option `status.v6ApiFormat: true`.

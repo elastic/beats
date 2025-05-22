@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-event.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Docker event metricset [metricbeat-metricset-docker-event]
 
 This is the event metricset of the module docker.

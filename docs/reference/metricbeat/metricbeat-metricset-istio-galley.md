@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-istio-galley.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Istio galley metricset [metricbeat-metricset-istio-galley]
 
 ::::{warning}

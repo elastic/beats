@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kibana-stats.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Kibana stats metricset [metricbeat-metricset-kibana-stats]
 
 This is the `stats` metricset of the Kibana module. This stats endpoint is available in 6.4 by default.

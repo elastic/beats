@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mongodb-dbstats.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # MongoDB dbstats metricset [metricbeat-metricset-mongodb-dbstats]
 
 This is the `dbstats` metricset of the MongoDB module.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-zookeeper-server.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # ZooKeeper server metricset [metricbeat-metricset-zookeeper-server]
 
 `server` Metricset fetches the data returned by the `srvr` admin keyword.

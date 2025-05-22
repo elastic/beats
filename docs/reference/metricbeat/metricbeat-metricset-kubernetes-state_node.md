@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_node.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Kubernetes state_node metricset [metricbeat-metricset-kubernetes-state_node]
 
 This is the `state_node` metricset of the Kubernetes module.

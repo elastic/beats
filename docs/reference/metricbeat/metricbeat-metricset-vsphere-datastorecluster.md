@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-vsphere-datastorecluster.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # vSphere datastorecluster metricset [metricbeat-metricset-vsphere-datastorecluster]
 
 ::::{warning}

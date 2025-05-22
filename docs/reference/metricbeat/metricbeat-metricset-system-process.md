@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-process.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # System process metricset [metricbeat-metricset-system-process]
 
 The System `process` metricset provides process statistics. One document is provided for each process.

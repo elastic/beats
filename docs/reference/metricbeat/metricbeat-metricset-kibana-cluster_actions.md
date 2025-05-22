@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kibana-cluster_actions.html
 ---
 
+<!-- This file is generated! See scripts/mage/docs_collector.go -->
+
 # Kibana cluster_actions metricset [metricbeat-metricset-kibana-cluster_actions]
 
 ::::{warning}
