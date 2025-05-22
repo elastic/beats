@@ -8,6 +8,7 @@
     "iis": {
         "application_pool": {
             "name": "test.local",
+            "status":"started",
             "net_clr": {
                 "total_exceptions_thrown": 0,
                 "finallys_per_sec": 0,
