@@ -401,7 +401,8 @@ func (r reporterV2) Done() <-chan struct{} { return r.done }
 func (r reporterV2) Error(err error) bool  { return r.Event(mb.Event{Error: err}) }
 func (r reporterV2) Event(event mb.Event) bool {
 	if event.Took == 0 && !r.start.IsZero() {
-		event.Took = time.Since(r.start)
+		// ensure elapsed time is always > 0
+		event.Took = max(time.Since(r.start), time.Microsecond)
 	}
 	if r.msw.periodic {
 		event.Period = r.msw.Module().Config().Period
