@@ -16,5 +16,3 @@ The `agent` metricset fetches information from a Hashicorp Consul agent in *Clie
 * **agent.runtime.heap_objects**: This measures the number of objects allocated on the heap and is a general memory pressure indicator. This may burst from time to time but should return to a steady state value.
 * **agent.runtime.malloc_count**: Heap objects allocated
 * **agent.runtime.sys.bytes**: Total number of bytes of memory obtained from the OS.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

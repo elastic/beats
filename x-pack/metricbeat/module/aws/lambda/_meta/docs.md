@@ -53,5 +53,3 @@ Please see more details for each metric in [lambda-cloudwatch-metric](https://do
 | ProvisionedConcurrencyInvocations | Sum |
 | ProvisionedConcurrencySpilloverInvocations | Sum |
 | ProvisionedConcurrencyUtilization | Maximum |
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

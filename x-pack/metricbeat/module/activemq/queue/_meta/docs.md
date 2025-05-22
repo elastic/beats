@@ -7,5 +7,3 @@ To collect data, the module communicates with a Jolokia HTTP/REST endpoint that 
 The queue metricset comes with a predefined dashboard:
 
 ![metricbeat activemq queues overview](images/metricbeat-activemq-queues-overview.png)
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

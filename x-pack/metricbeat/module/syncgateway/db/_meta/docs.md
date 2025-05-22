@@ -4,5 +4,3 @@ This functionality is in beta and is subject to change. The design and code is l
 
 
 SyncGateway `db` metriset contains the most relevant information of the module about the db metrics
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

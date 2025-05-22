@@ -18,5 +18,3 @@
 * `zookeeper.mntr.version`: Version and build string reported.
 * `zookeeper.mntr.watch_count`: Number of watches currently set on the local ZooKeeper process.
 * `zookeeper.mntr.znode_count`: Number of znodes reported by the local ZooKeeper process.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

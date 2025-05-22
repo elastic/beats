@@ -10,6 +10,3 @@ This functionality is in technical preview and may be changed or removed in a fu
 The MySQL Status Metricset supports the `raw` config option. When enabled, in addition to the existing data structure, all fields available from the mysql service through `"SHOW /*!50002 GLOBAL */ STATUS;"` will be added to the event.
 
 These fields will be added under the namespace `mysql.status.raw`. The fields can vary from one MySQL instance to an other and no guarantees are provided for the  mapping of the fields as the mapping happens dynamically. This option is intended for advanced use cases.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
-

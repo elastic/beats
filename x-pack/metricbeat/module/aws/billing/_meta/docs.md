@@ -54,5 +54,3 @@ When querying AWS Cost Explorer API, you can group AWS costs using up to two dif
 
 * **group_by_dimension_keys**: A list of keys used in Cost Explorer to group by dimensions. Valid values are AZ, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, PURCHASE_TYPE, REGION, SERVICE, USAGE_TYPE, USAGE_TYPE_GROUP, RECORD_TYPE, OPERATING_SYSTEM, TENANCY, SCOPE, PLATFORM, SUBSCRIPTION_ID, LEGAL_ENTITY_NAME, DEPLOYMENT_OPTION, DATABASE_ENGINE, CACHE_ENGINE, INSTANCE_TYPE_FAMILY, BILLING_ENTITY and RESERVATION_ID.
 * **group_by_tag_keys**: A list of keys used in Cost Explorer to group by tags.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

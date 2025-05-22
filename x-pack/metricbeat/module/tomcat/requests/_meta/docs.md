@@ -11,5 +11,3 @@ Requests Metricset retrieves the JMX key `Catalina:name=*,type=GlobalRequestProc
 * `tomcat.requests.bytes.sent`: Amount of data sent, in bytes
 * `tomcat.requests.processing.ms`: Total time to process the requests
 * `tomcat.requests.errors.total`: Number of errors
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

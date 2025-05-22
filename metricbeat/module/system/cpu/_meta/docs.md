@@ -24,6 +24,3 @@ This metricset is available on:
       cpu.metrics: [percentages, normalized_percentages, ticks]
       #use_performance_counters: false
     ```
-
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

@@ -9,5 +9,3 @@
 * **stats.recovery_size.bytes**: Log size in bytes since log recovery log sequence number (LSN).
 * **stats.since_last_checkpoint.bytes**: Log size in bytes since last checkpoint log sequence number (LSN).
 * **stats.total_size.bytes**: Total transaction log size in bytes.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

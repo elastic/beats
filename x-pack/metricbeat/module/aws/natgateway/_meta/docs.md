@@ -67,5 +67,3 @@ Dimensions:
 | NatGatewayId | Filter the metric data by the NAT gateway ID. |
 
 Please see [NAT Gateway CloudWatch Metrics](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway-cloudwatch.html) for more details.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

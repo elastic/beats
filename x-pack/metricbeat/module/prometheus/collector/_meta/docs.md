@@ -124,5 +124,3 @@ To keep only specific metrics, anchor the start and the end of the regexp of eac
   metrics_filters:
     include: ["^node_network_net_dev_group$", "^node_network_up$"]
 ```
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

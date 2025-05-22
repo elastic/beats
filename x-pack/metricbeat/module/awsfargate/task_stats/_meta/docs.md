@@ -180,5 +180,3 @@ aws --region us-east-1 cloudformation delete-stack --stack-name <your-stack-name
 The task_stats metricset comes with a predefined dashboard. For example:
 
 ![metricbeat awsfargate overview](images/metricbeat-awsfargate-overview.png)
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

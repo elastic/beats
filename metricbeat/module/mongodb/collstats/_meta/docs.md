@@ -15,5 +15,3 @@ It is using the `top` administrative command to return usage statistics for each
 It requires the following privileges, which is covered by the [`clusterMonitor` role](https://docs.mongodb.com/manual/reference/built-in-roles/#clusterMonitor):
 
 * [`top` action](https://docs.mongodb.com/manual/reference/privilege-actions/#top) on [`cluster` resource](https://docs.mongodb.com/manual/reference/resource-document/#cluster-resource)
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

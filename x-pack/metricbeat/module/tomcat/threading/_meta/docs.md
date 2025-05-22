@@ -15,5 +15,3 @@ Threading Metricset retrieves the JMX key `Catalina:name=*,type=ThreadPool` and 
 * `tomcat.threading.cpu.time.ms`: CPU time in milliseconds (from java.lang:type=Threading)
 * `tomcat.threading.total`: Total threads at the JVM level (from java.lang:type=Threading)
 * `tomcat.threading.peak`: Peak number of threads at JVM level (from java.lang:type=Threading)
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

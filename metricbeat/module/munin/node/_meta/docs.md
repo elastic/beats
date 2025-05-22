@@ -39,5 +39,3 @@ Currently this module only collects metrics using the basic protocol. It doesnâ€
 ## Exposed fields, dashboards, indexes, etc. [_exposed_fields_dashboards_indexes_etc_3]
 
 Munin supports a great variety of plugins each of them can be used to obtain different sets of metrics. Metricbeat cannot know the metrics exposed beforehand, so no field description or dashboard is generated automatically.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

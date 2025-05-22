@@ -4,5 +4,3 @@ The `node_stats` metricset interrogates the [Cluster API endpoint](https://www.e
 The indices stats are node-specific. That means for example the total number of docs reported by all nodes together is not the total number of documents in all indices as there can also be replicas.
 ::::
 
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

@@ -64,5 +64,3 @@ Users can select the options to retrieve all metrics from a specific namespace u
 ```
 
 If no aggregations are entered under a metric level the metricset will retrieve the primary aggregation assigned for this metric.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

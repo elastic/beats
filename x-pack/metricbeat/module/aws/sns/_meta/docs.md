@@ -56,5 +56,3 @@ Please see more details for each metric in [CloudWatch SNS Metrics](https://docs
 | PublishSize | Average |
 | SMSMonthToDateSpentUSD | Sum |
 | SMSSuccessRate | Average |
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

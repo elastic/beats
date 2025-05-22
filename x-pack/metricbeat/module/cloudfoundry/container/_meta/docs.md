@@ -4,5 +4,3 @@ This functionality is in beta and is subject to change. The design and code is l
 
 
 The container metricset of Cloud Foundry module allows you to collect container metrics that the loggregator sends to metricbeat.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

@@ -36,5 +36,3 @@ Note: If s3 request metrics are not enabled for the specific S3 bucket, some vis
   secret_access_key: '<secret_access_key>'
   session_token: '<session_token>'
 ```
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

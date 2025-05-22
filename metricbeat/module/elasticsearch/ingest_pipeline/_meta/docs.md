@@ -22,5 +22,3 @@ Processor-level metrics can produce a high volume of data, so the default behavi
     - ingest_pipeline
   ingest.processor_sample_rate: 0.1 # decrease to 10% of fetches
 ```
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

@@ -33,6 +33,3 @@ Here is a list of labels collected by `compute` metricset depending on the type 
 * `loadBalanced`: Whether traffic was sent from an L3 loadbalanced IP address assigned to the VM. Traffic that is externally routed from the VM’s standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric. Collected with:
 
     * `gcp.instance.network.*`
-
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

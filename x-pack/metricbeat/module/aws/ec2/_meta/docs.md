@@ -66,5 +66,3 @@ The aws ec2 metricset comes with a predefined dashboard. For example:
 ```
 
 `tags_filter` can be specified to only collect metrics with certain tag keys/values. For example, with the configuration example above, ec2 metricset will only collect metrics from EC2 instances that have tag key equals "Organization" and tag value equals to "Engineering" or "Product".
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

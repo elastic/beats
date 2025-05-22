@@ -40,5 +40,3 @@ The kinesis metricset comes with a predefined dashboard. For example:
   # This module uses the aws cloudwatch metricset, all
   # the options for this metricset are also available here.
 ```
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

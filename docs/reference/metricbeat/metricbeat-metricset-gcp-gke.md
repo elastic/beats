@@ -31,8 +31,7 @@ None
 
 This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
 
-## Fields [_fields_104]
+## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-gcp.md) section.
-
 

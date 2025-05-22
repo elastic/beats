@@ -58,5 +58,3 @@ Please see more details for each metric in [Amazon DynamoDB Metrics](https://doc
 | AccountMaxWrites | Maximum |
 | MaxProvisionedTableReadCapacityUtilization | Maximum |
 | MaxProvisionedTableWriteCapacityUtilization | Maximum |
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

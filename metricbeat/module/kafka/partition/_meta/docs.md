@@ -9,5 +9,3 @@ As the partition metricset fetches the data from the complete Kafka cluster, onl
 
 The current implementation of the partition metricset fetches the data for all leader partitions. Data for the replicas is not available yet.
 
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
-

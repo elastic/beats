@@ -19,4 +19,3 @@ We fetch the following data:
 * **buffer.database_pages**: Indicates the number of pages in the buffer pool with database content.
 * **buffer.target_pages**: Ideal number of pages in the buffer pool.
 
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

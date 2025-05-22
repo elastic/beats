@@ -13,5 +13,3 @@ Memory Metricset retrieves the JMX key `java.lang:type=Memory` using Jolokia. It
 * `tomcat.memory.other.usage.max`: Max non-heap memory usage.
 * `tomcat.memory.other.usage.used`: Used non-heap memory usage.
 * `tomcat.memory.other.usage.init`: Initial non-heap memory usage.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

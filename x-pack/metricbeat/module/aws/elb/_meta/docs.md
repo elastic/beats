@@ -118,5 +118,3 @@ elb metricset collects Cloudwatch metrics from [classic ELB](https://docs.aws.am
 | TCP_Target_Reset_Count | Sum |
 | UnHealthyHostCount | Maximum |
 | HealthyHostCount | Maximum |
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

@@ -10,5 +10,3 @@ Reported metrics are broken down by page type: DMA, DMA32, Normal, and Highmem. 
 This information can be used to determine memory fragmentation. The kernel [buddy algorithim](https://www.kernel.org/doc/gorman/html/understand/understand009.html) will always search for the smallest page order to allocate, and if none is available, a larger page order will be split into two "buddies." When memory is freed, the kernel will attempt to merge the "buddies." If the only available pages are at lower orders, this indicates fragmentation, as buddy pages cannot be merged.
 
 Note that page counts from `/proc/pagetypeinfo` will only display values up to 100,000.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

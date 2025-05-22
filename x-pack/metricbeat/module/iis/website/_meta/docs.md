@@ -8,5 +8,3 @@ The metrics contain the IIS Performance counter values like: Web Service: Bytes 
 ### Dashboard [_dashboard_29]
 
 ![metricbeat iis website overview](images/metricbeat-iis-website-overview.png)
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

@@ -33,5 +33,3 @@ The aws rds metricset comes with a predefined dashboard.
   secret_access_key: '<secret_access_key>'
   session_token: '<session_token>'
 ```
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

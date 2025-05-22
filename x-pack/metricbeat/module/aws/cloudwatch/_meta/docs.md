@@ -169,5 +169,3 @@ With the configuration below, user can filter out only `LoadBalacer` and `Target
           value: "*"
       resource_type: elasticloadbalancing
 ```
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

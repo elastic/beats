@@ -4,5 +4,3 @@ This functionality is in beta and is subject to change. The design and code is l
 
 
 This is the `qmgr` metricset of the IBM MQ module. It collects status information for the Queue Manager. The manager is a system program that is responsible for maintaining the queues and ensuring that the messages in the queues reach their destination.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

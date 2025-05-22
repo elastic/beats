@@ -51,5 +51,3 @@ Please see more details for each metric in [ebs-cloudwatch-metric](https://docs.
 | VolumeTotalReadTime | Sum |
 | VolumeTotalWriteTime | Sum |
 | VolumeIdleTime | Sum |
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

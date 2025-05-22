@@ -8,6 +8,3 @@ The memory metricset extends system/memory and adds linux-specific memory metric
 ::::{note}
 as of now, this data is part of system/memory on Metricbeat, but can only be found in the Linux integration in Fleet. In the future, this data will be removed from system/memory.
 ::::
-
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

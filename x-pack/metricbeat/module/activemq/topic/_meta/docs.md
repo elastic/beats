@@ -7,5 +7,3 @@ To collect data, the module communicates with a Jolokia HTTP/REST endpoint that 
 The topic metricset comes with a predefined dashboard:
 
 ![metricbeat activemq topics overview](images/metricbeat-activemq-topics-overview.png)
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

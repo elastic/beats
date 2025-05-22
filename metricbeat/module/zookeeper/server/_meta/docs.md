@@ -13,5 +13,3 @@
 * `zookeeper.server.zxid`: Original value of the Zookeeper transaction ID
 * `zookeeper.server.count`: Total transactions of the leader in epoch
 * `zookeeper.server.epoch`: Epoch value of the Zookeeper transaction ID
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

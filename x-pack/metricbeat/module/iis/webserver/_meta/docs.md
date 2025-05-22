@@ -18,5 +18,3 @@ The `asp_net` and `asp_net_application` contain asp.net related performance coun
 ![metricbeat iis webserver overview](images/metricbeat-iis-webserver-overview.png)
 
 ![metricbeat iis webserver process](images/metricbeat-iis-webserver-process.png)
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

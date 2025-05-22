@@ -21,5 +21,3 @@ This metricset allows users to retrieve all metrics from specified container gro
 :   (*[]string*) This option will return all container groups inside the resource group.
 
 If none of the options are entered then all the container groups inside the subscription are taken in account. For each metric the primary aggregation assigned will be retrieved. A default non configurable timegrain of 5 min is set so users are advised to configure an interval of 300s or  a multiply of it.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

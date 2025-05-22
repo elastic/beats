@@ -34,5 +34,3 @@ Note: If only `s3_daily_storage` metricset is enabled or s3 request metrics are 
   secret_access_key: '<secret_access_key>'
   session_token: '<session_token>'
 ```
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

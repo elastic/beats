@@ -4,5 +4,3 @@ This functionality is in beta and is subject to change. The design and code is l
 
 
 This is the blkio metricset of the module containerd.
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.

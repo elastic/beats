@@ -11,5 +11,3 @@ Cache Metricset retrieves the JMX key `Catalina:context=*,host=*,name=Cache,type
 * `tomcat.cache.size.max.kb`: The maximum permitted size of the cache in kB
 * `tomcat.cache.lookup.total`: The number of requests for resources
 * `tomcat.cache.ttl.ms`: The time-to-live for cache entries in milliseconds
-
-This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
