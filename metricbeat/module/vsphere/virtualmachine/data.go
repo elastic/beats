@@ -23,6 +23,7 @@ import (
 
 func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	const bytesMultiplier = int64(1024 * 1024)
+	const kilobytesToBytesMultiplier = int64(1024)
 	usedMemory := int64(data.VM.Summary.QuickStats.GuestMemoryUsage) * bytesMultiplier
 	usedCPU := data.VM.Summary.QuickStats.OverallCpuUsage
 	totalCPU := data.VM.Summary.Config.CpuReservation
@@ -82,13 +83,13 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 		event.Put("cpu.usage.percent", val)
 	}
 	if val, ok := data.PerformanceData["disk.usage.average"]; ok {
-		event.Put("disk.average.kiloBytesPerSecond", val)
+		event.Put("disk.average.bytes", val.(int64)*kilobytesToBytesMultiplier)
 	}
 	if val, ok := data.PerformanceData["disk.read.average"]; ok {
-		event.Put("disk.read.average.kiloBytesPerSecond", val)
+		event.Put("disk.read.average.bytes", val.(int64)*kilobytesToBytesMultiplier)
 	}
 	if val, ok := data.PerformanceData["disk.write.average"]; ok {
-		event.Put("disk.write.average.kiloBytesPerSecond", val)
+		event.Put("disk.write.average.bytes", val.(int64)*kilobytesToBytesMultiplier)
 	}
 	if val, ok := data.PerformanceData["disk.numberRead.summation"]; ok {
 		event.Put("disk.numberRead", val)

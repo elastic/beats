@@ -124,15 +124,15 @@
     - name: disk
       type: group
       fields:
-        - name: average.kiloBytesPerSecond
+        - name: average.bytesPerSecond
           type: long
           description: >
             Aggregated disk I/O rate.
-        - name: read.average.kiloBytesPerSecond
+        - name: read.average.bytesPerSecond
           type: long
           description: >
             Rate at which data is read from each virtual disk on the virtual machine.
-        - name: write.average.kiloBytesPerSecond
+        - name: write.average.bytesPerSecond
           type: long
           description: >
             Rate at which data is written to each virtual disk on the virtual machine.
