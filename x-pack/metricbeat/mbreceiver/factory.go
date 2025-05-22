@@ -62,7 +62,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 
 	b.RegisterMetrics()
 
-	statsReg := b.Beat.Info.Monitoring.StatsRegistry
+	statsReg := b.Info.Monitoring.StatsRegistry
 
 	// stats.beat
 	processReg := statsReg.GetRegistry("beat")
@@ -76,14 +76,14 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		systemReg = statsReg.NewRegistry("system")
 	}
 
-	err = metricreport.SetupMetrics(b.Beat.Info.Logger.Named("metrics"), b.Beat.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
+	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
 	if err != nil {
 		return nil, fmt.Errorf("error setting up metrics report: %w", err)
 	}
 
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(b.Beat.Info.Logger.Named("metrics.http"), b.Config.HTTP, api.NamespaceLookupFunc())
+		b.API, err = api.NewWithDefaultRoutes(b.Info.Logger.Named("metrics.http"), b.Config.HTTP, api.NamespaceLookupFunc())
 		if err != nil {
 			return nil, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
