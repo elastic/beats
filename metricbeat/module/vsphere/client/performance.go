@@ -112,11 +112,12 @@ func (p *PerformanceDataFetcher) GetPerfMetrics(ctx context.Context,
 
 	for _, result := range results[0].Value {
 		if len(result.Value) > 0 {
-			value := float64(result.Value[0])
+			value := result.Value[0]
 			if result.Unit == string(types.PerformanceManagerUnitPercent) {
-				value = value / 100.0
+				metricMap[result.Name] = float64(value) / 100.0
+			} else {
+				metricMap[result.Name] = value
 			}
-			metricMap[result.Name] = value
 			continue
 		}
 		p.logger.Debugf("For %s %s, Metric %s: No result found", objectType, objectName, result.Name)
