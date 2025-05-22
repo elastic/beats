@@ -10,14 +10,16 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/filebeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
-	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -59,23 +61,45 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		return nil, fmt.Errorf("error getting beat config: %w", err)
 	}
 
+	b.RegisterMetrics()
+
+	statsReg := b.Beat.Info.Monitoring.StatsRegistry
+
+	// stats.beat
+	processReg := statsReg.GetRegistry("beat")
+	if processReg == nil {
+		processReg = statsReg.NewRegistry("beat")
+	}
+
+	// stats.system
+	systemReg := statsReg.GetRegistry("system")
+	if systemReg == nil {
+		systemReg = statsReg.NewRegistry("system")
+	}
+
+	err = metricreport.SetupMetrics(b.Beat.Info.Logger.Named("metrics"), b.Beat.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
+	if err != nil {
+		return nil, fmt.Errorf("error setting up metrics report: %w", err)
+	}
+
+	if b.Config.HTTP.Enabled() {
+		var err error
+		b.API, err = api.NewWithDefaultRoutes(b.Beat.Info.Logger.Named("metrics.http"), b.Config.HTTP, api.NamespaceLookupFunc())
+		if err != nil {
+			return nil, fmt.Errorf("could not start the HTTP server for the API: %w", err)
+		}
+		b.API.Start()
+	}
+
 	fbBeater, err := beatCreator(&b.Beat, beatConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
 	}
 
-	httpConf := struct {
-		HTTP *config.C `config:"http"`
-	}{}
-	if err := b.RawConfig.Unpack(&httpConf); err != nil {
-		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
-	}
-
 	base := beatreceiver.BeatReceiver{
-		HttpConf: httpConf.HTTP,
-		Beat:     b,
-		Beater:   fbBeater,
-		Logger:   set.Logger,
+		Beat:   b,
+		Beater: fbBeater,
+		Logger: set.Logger,
 	}
 
 	return &filebeatReceiver{BeatReceiver: base}, nil
