@@ -428,6 +428,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
 - Add milliseconds to document timestamp from awscloudwatch Filebeat input {pull}44306[44306]
 - Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}1[1]
 
 *Auditbeat*
 
