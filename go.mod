@@ -1,10 +1,6 @@
 module github.com/elastic/beats/v7
 
-<<<<<<< HEAD
-go 1.23.8
-=======
 go 1.24.3
->>>>>>> 9f2953ed7 ([Automation] Bump Golang version to 1.24.3 (#44270))
 
 require (
 	cloud.google.com/go/bigquery v1.62.0
@@ -221,9 +217,9 @@ require (
 	github.com/tklauser/go-sysconf v0.3.12
 	github.com/xdg-go/scram v1.1.2
 	github.com/zyedidia/generic v1.2.1
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.0
-	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
-	go.elastic.co/apm/v2 v2.6.0
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.3
+	go.elastic.co/apm/module/apmhttp/v2 v2.6.3
+	go.elastic.co/apm/v2 v2.6.3
 	go.mongodb.org/mongo-driver v1.14.0
 	go.opentelemetry.io/collector/component v0.109.0
 	go.opentelemetry.io/collector/consumer v0.109.0
@@ -285,14 +281,7 @@ require (
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
-<<<<<<< HEAD
-	github.com/elastic/elastic-transport-go/v8 v8.6.0 // indirect
-=======
-	github.com/ebitengine/purego v0.9.0-alpha.3.0.20250507171635-5047c08daa38 // indirect
 	github.com/elastic/elastic-transport-go/v8 v8.6.1 // indirect
-	github.com/elastic/go-docappender/v2 v2.6.0 // indirect
-	github.com/elastic/go-freelru v0.16.0 // indirect
->>>>>>> 9f2953ed7 ([Automation] Bump Golang version to 1.24.3 (#44270))
 	github.com/elastic/go-windows v1.0.2 // indirect
 	github.com/elastic/pkcs8 v1.0.0 // indirect
 	github.com/elazarl/goproxy v0.0.0-20240909085733-6741dbfc16a1 // indirect
@@ -386,16 +375,17 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	go.elastic.co/fastjson v1.1.0 // indirect
+	go.elastic.co/fastjson v1.4.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.109.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumerprofiles v0.109.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.109.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
-	go.opentelemetry.io/otel v1.29.0 // indirect
-	go.opentelemetry.io/otel/metric v1.29.0 // indirect
-	go.opentelemetry.io/otel/trace v1.29.0 // indirect
+	go.opentelemetry.io/otel v1.32.0 // indirect
+	go.opentelemetry.io/otel/metric v1.32.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
+	go.opentelemetry.io/otel/trace v1.32.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	golang.org/x/exp v0.0.0-20240205201215-2c58cdc269a3 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
