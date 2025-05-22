@@ -83,13 +83,22 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 		event.Put("cpu.usage.percent", val)
 	}
 	if val, ok := data.PerformanceData["disk.usage.average"]; ok {
-		event.Put("disk.average.bytes", val.(int64)*kilobytesToBytesMultiplier)
+		intVal, assertOk := val.(int64)
+		if assertOk {
+			event.Put("disk.average.bytes", intVal*kilobytesToBytesMultiplier)
+		}
 	}
 	if val, ok := data.PerformanceData["disk.read.average"]; ok {
-		event.Put("disk.read.average.bytes", val.(int64)*kilobytesToBytesMultiplier)
+		intVal, assertOk := val.(int64)
+		if assertOk {
+			event.Put("disk.read.average.bytes", intVal*kilobytesToBytesMultiplier)
+		}
 	}
 	if val, ok := data.PerformanceData["disk.write.average"]; ok {
-		event.Put("disk.write.average.bytes", val.(int64)*kilobytesToBytesMultiplier)
+		intVal, assertOk := val.(int64)
+		if assertOk {
+			event.Put("disk.write.average.bytes", intVal*kilobytesToBytesMultiplier)
+		}
 	}
 	if val, ok := data.PerformanceData["disk.numberRead.summation"]; ok {
 		event.Put("disk.numberRead", val)
