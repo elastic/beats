@@ -72,7 +72,7 @@ func BuildSystemTestBinary() error {
 
 // CollectAll generates the docs and the fields.
 func CollectAll() {
-	mg.Deps(CollectDocs)
+	mg.Deps(CollectDocs, FieldsDocs)
 }
 
 // Package packages the Beat for distribution.
