@@ -362,7 +362,7 @@ func writeModuleDocs(modules []moduleData, t *template.Template) error {
 	for _, mod := range modules {
 		// filename := mage.OSSBeatDir("docs", "modules", fmt.Sprintf("%s.md", mod.Base))
 		filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
-		err := writeTemplate(filename, t.Lookup("moduleDocMD.tmpl"), mod)
+		err := writeTemplate(filename, t.Lookup("moduleDoc.tmpl"), mod)
 		if err != nil {
 			return err
 		}
@@ -384,7 +384,7 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 			filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
 
 			// filename := mage.OSSBeatDir("docs", "modules", mod.Base, fmt.Sprintf("%s.md", metricset.Title))
-			err := writeTemplate(filename, t.Lookup("metricsetDocMD.tmpl"), modData)
+			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
 			if err != nil {
 				return fmt.Errorf("error opening file at %s: %w", filename, err)
 			}
@@ -403,7 +403,7 @@ func writeModuleList(modules []moduleData, t *template.Template) error {
 	})
 	//write and execute the template
 	filepath := filepath.Join(mage.DocsDir(), "reference", "metricbeat", "metricbeat-modules.md")
-	return writeTemplate(filepath, t.Lookup("moduleListMD.tmpl"), modules)
+	return writeTemplate(filepath, t.Lookup("moduleList.tmpl"), modules)
 
 }
 

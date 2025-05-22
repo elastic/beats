@@ -1,19 +1,14 @@
-////
-This file is generated! See scripts/mage/docs_collector.go
-////
+---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-modules.html
+---
 
-[options="header"]
-|===
-|Modules   |Dashboards   |Metricsets   
+# Modules [metricbeat-modules]
+
+This section contains detailed information about the metric collecting modules contained in Metricbeat. Each module contains one or multiple metricsets. More details about each module can be found under the links below.
+
+| Modules | Dashboards | Metricsets |
+| --- | --- | --- |
 {{range $k := . -}}
-|<<{{getBeatName}}-module-{{$k.Base}},{{$k.Title}}>>  {{if not (eq $k.Release "ga")}}{{$k.Release}}[]{{end}}   |{{if $k.Dashboards}}image:./images/icon-yes.png[Prebuilt dashboards are available] {{else}}image:./images/icon-no.png[No prebuilt dashboards] {{end}}   |  
-.{{$k.Metricsets | len}}+| .{{$k.Metricsets | len}}+|  {{range $m := $k.Metricsets}}|{{$m.Link}} {{if not (eq $m.Release "ga")}}{{$m.Release}}[]{{end}}  
+| [{{$k.Title}}](/reference/metricbeat/metricbeat-module-{{$k.Base}}.md){{if not (eq $k.Release "ga")}}  [{{$k.Release}}]{{end}} | {{if $k.Dashboards}}![Prebuilt dashboards are available](images/icon-yes.png ""){{else}}![No prebuilt dashboards](images/icon-no.png ""){{end}} | {{range $index, $m := $k.Metricsets}}{{ if gt $index 0 }}<br>{{end}}[{{$m.Title}}](/reference/metricbeat/metricbeat-metricset-{{$k.Base}}-{{$m.Title}}.md){{if not (eq $m.Release "ga")}} [{{$m.Release}}]{{end}}{{end}} |
 {{end -}}
-{{end -}}
-|===
-
---
-
-{{range $k := . -}}
-include::modules/{{$k.Base}}.asciidoc[]
-{{end}}
