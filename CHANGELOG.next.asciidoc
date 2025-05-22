@@ -89,7 +89,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
 - Updated list of supported vSphere versions in the documentation. {pull}43642[43642]
 - Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
-- Add status field to IIS application pool and create events regardless of status.
+- Add status field to IIS application pool and create events regardless of status. {pull}43656[43656]
 
 *Osquerybeat*
 
