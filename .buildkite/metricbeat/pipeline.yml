@@ -190,6 +190,39 @@ steps:
           - github_commit_status:
               context: "metricbeat: Go Integration Tests (Module)"
 
+      - label: ":ubuntu: Metricbeat: Go fips140=only Integration Tests (Module)"
+        key: "mandatory-int-fipsonly-test"
+        command: |
+          set -euo pipefail
+          echo "~~~ Running tests"
+          export KUBECONFIG="$$PWD/kubecfg"
+          cd metricbeat
+          mage goFIPSOnlyIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+          - "metricbeat/build/integration-tests/*"
+          - "metricbeat/build/integration-tests/Test*/*"
+          - "metricbeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Go fips140=only Integration Tests (Module)"
+
       - label: ":ubuntu: Metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
         command: |
