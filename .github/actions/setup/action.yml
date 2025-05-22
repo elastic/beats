@@ -1,0 +1,15 @@
+---
+name: setup
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: .go-version
+
+    - run: go install github.com/magefile/mage@v1.15.0
+      shell: bash
+
+    - run: go install gotest.tools/gotestsum@latest
+      shell: bash

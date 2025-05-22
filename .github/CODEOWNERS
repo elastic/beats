@@ -1,3 +1,6 @@
 # GitHub CODEOWNERS definition
 # See: https://help.github.com/articles/about-codeowners/
 * @elastic/elastic-agent-data-plane
+
+# CI workflows
+/.github/workflows/ @elastic/observablt-ci

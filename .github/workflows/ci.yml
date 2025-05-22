@@ -1,0 +1,46 @@
+---
+name: ci
+
+on:
+  push:
+    branches: 
+      - main
+  pull_request:
+  merge_group:
+
+# limit the access of the generated GITHUB_TOKEN
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: mage notice
+      - run: mage -v check
+
+  test:
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-22.04', 'windows-2022', 'macos-15']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: gotestsum --format testname -- -v ./...
+
+  test-preview:
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-24.04-arm', 'windows-11-arm']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: gotestsum --format testname -- -v ./...
