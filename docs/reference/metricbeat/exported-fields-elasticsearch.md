@@ -7,8 +7,10 @@ mapped_pages:
 
 Elasticsearch module
 
+
 **`cluster_settings.cluster.metadata.display_name`**
 :   type: keyword
+
 
 
 **`index_recovery.shards.start_time_in_millis`**
@@ -29,6 +31,7 @@ alias to: elasticsearch.index.recovery.stop_time.ms
 alias to: elasticsearch.index.recovery.total_time.ms
 
 
+
 **`stack_stats.apm.found`**
 :   type: alias
 
@@ -47,6 +50,7 @@ alias to: elasticsearch.cluster.stats.stack.xpack.ccr.enabled
 alias to: elasticsearch.cluster.stats.stack.xpack.ccr.available
 
 
+
 **`license.status`**
 :   type: alias
 
@@ -57,6 +61,7 @@ alias to: elasticsearch.cluster.stats.license.status
 :   type: alias
 
 alias to: elasticsearch.cluster.stats.license.type
+
 
 
 **`shard.primary`**
@@ -89,6 +94,8 @@ alias to: elasticsearch.node.id
 alias to: elasticsearch.shard.number
 
 
+
+
 **`cluster_stats.indices.count`**
 :   type: alias
 
@@ -101,10 +108,12 @@ alias to: elasticsearch.cluster.stats.indices.total
 alias to: elasticsearch.cluster.stats.indices.shards.count
 
 
+
 **`cluster_stats.nodes.count.total`**
 :   type: alias
 
 alias to: elasticsearch.cluster.stats.nodes.count
+
 
 
 **`cluster_stats.nodes.jvm.max_uptime_in_millis`**
@@ -123,6 +132,7 @@ alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.used.bytes
 :   type: alias
 
 alias to: elasticsearch.cluster.stats.nodes.jvm.memory.heap.max.bytes
+
 
 
 **`cluster_state.nodes_hash`**
@@ -167,6 +177,7 @@ alias to: @timestamp
 alias to: elasticsearch.cluster.id
 
 
+
 **`source_node.uuid`**
 :   type: alias
 
@@ -191,10 +202,12 @@ alias to: elasticsearch.ml.job.id
 alias to: elasticsearch.ml.job.forecasts_stats.total
 
 
+
 **`index_stats.index`**
 :   type: alias
 
 alias to: elasticsearch.index.name
+
 
 
 **`index_stats.primaries.store.size_in_bytes`**
@@ -227,6 +240,7 @@ alias to: elasticsearch.index.primaries.refresh.total_time_in_millis
 alias to: elasticsearch.index.primaries.merges.total_size_in_bytes
 
 
+
 **`index_stats.primaries.indexing.index_total`**
 :   type: alias
 
@@ -243,6 +257,7 @@ alias to: elasticsearch.index.primaries.indexing.index_time_in_millis
 :   type: alias
 
 alias to: elasticsearch.index.primaries.indexing.throttle_time_in_millis
+
 
 
 **`index_stats.total.query_cache.memory_size_in_bytes`**
@@ -281,6 +296,7 @@ alias to: elasticsearch.index.total.refresh.total_time_in_millis
 alias to: elasticsearch.index.total.store.size_in_bytes
 
 
+
 **`index_stats.total.indexing.index_total`**
 :   type: alias
 
@@ -299,6 +315,7 @@ alias to: elasticsearch.index.total.indexing.index_time_in_millis
 alias to: elasticsearch.index.total.indexing.throttle_time_in_millis
 
 
+
 **`index_stats.total.search.query_total`**
 :   type: alias
 
@@ -309,6 +326,7 @@ alias to: elasticsearch.index.total.search.query_total
 :   type: alias
 
 alias to: elasticsearch.index.total.search.query_time_in_millis
+
 
 
 **`index_stats.total.segments.terms_memory_in_bytes`**
@@ -377,6 +395,7 @@ alias to: elasticsearch.index.total.segments.index_writer_memory_in_bytes
 alias to: elasticsearch.index.total.segments.memory_in_bytes
 
 
+
 **`ccr_auto_follow_stats.number_of_failed_follow_indices`**
 :   type: alias
 
@@ -399,6 +418,7 @@ alias to: elasticsearch.ccr.auto_follow.success.follow_indices.count
 :   type: alias
 
 alias to: elasticsearch.ccr.requests.failed.read.count
+
 
 
 **`ccr_stats.shard_id`**
@@ -557,6 +577,9 @@ alias to: elasticsearch.ccr.requests.successful.write.count
 alias to: elasticsearch.ccr.requests.failed.write.count
 
 
+
+
+
 **`node_stats.fs.total.available_in_bytes`**
 :   type: alias
 
@@ -569,6 +592,7 @@ alias to: elasticsearch.node.stats.fs.summary.available.bytes
 alias to: elasticsearch.node.stats.fs.summary.total.bytes
 
 
+
 **`node_stats.fs.summary.available.bytes`**
 :   type: alias
 
@@ -579,6 +603,8 @@ alias to: elasticsearch.node.stats.fs.summary.available.bytes
 :   type: alias
 
 alias to: elasticsearch.node.stats.fs.summary.total.bytes
+
+
 
 
 **`node_stats.fs.io_stats.total.operations`**
@@ -599,6 +625,8 @@ alias to: elasticsearch.node.stats.fs.io_stats.total.read.operations.count
 alias to: elasticsearch.node.stats.fs.io_stats.total.write.operations.count
 
 
+
+
 **`node_stats.indices.store.size_in_bytes`**
 :   type: alias
 
@@ -615,6 +643,7 @@ alias to: elasticsearch.node.stats.indices.store.size.bytes
 :   type: alias
 
 alias to: elasticsearch.node.stats.indices.docs.count
+
 
 
 **`node_stats.indices.indexing.index_time_in_millis`**
@@ -635,10 +664,12 @@ alias to: elasticsearch.node.stats.indices.indexing.index_total.count
 alias to: elasticsearch.node.stats.indices.indexing.throttle_time.ms
 
 
+
 **`node_stats.indices.fielddata.memory_size_in_bytes`**
 :   type: alias
 
 alias to: elasticsearch.node.stats.indices.fielddata.memory.bytes
+
 
 
 **`node_stats.indices.query_cache.memory_size_in_bytes`**
@@ -647,10 +678,12 @@ alias to: elasticsearch.node.stats.indices.fielddata.memory.bytes
 alias to: elasticsearch.node.stats.indices.query_cache.memory.bytes
 
 
+
 **`node_stats.indices.request_cache.memory_size_in_bytes`**
 :   type: alias
 
 alias to: elasticsearch.node.stats.indices.request_cache.memory.bytes
+
 
 
 **`node_stats.indices.search.query_time_in_millis`**
@@ -663,6 +696,7 @@ alias to: elasticsearch.node.stats.indices.search.query_time.ms
 :   type: alias
 
 alias to: elasticsearch.node.stats.indices.search.query_total.count
+
 
 
 **`node_stats.indices.segments.count`**
@@ -731,6 +765,10 @@ alias to: elasticsearch.node.stats.indices.segments.terms.memory.bytes
 alias to: elasticsearch.node.stats.indices.segments.version_map.memory.bytes
 
 
+
+
+
+
 **`node_stats.jvm.gc.collectors.old.collection_count`**
 :   type: alias
 
@@ -743,6 +781,7 @@ alias to: elasticsearch.node.stats.jvm.gc.collectors.old.collection.count
 alias to: elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms
 
 
+
 **`node_stats.jvm.gc.collectors.young.collection_count`**
 :   type: alias
 
@@ -753,6 +792,7 @@ alias to: elasticsearch.node.stats.jvm.gc.collectors.young.collection.count
 :   type: alias
 
 alias to: elasticsearch.node.stats.jvm.gc.collectors.young.collection.ms
+
 
 
 **`node_stats.jvm.mem.heap_max_in_bytes`**
@@ -779,10 +819,15 @@ alias to: elasticsearch.node.stats.jvm.mem.heap.used.pct
 alias to: elasticsearch.node.id
 
 
+
+
+
 **`node_stats.os.cpu.load_average.1m`**
 :   type: alias
 
 alias to: elasticsearch.node.stats.os.cpu.load_avg.1m
+
+
 
 
 **`node_stats.os.cgroup.cpuacct.usage_nanos`**
@@ -791,10 +836,12 @@ alias to: elasticsearch.node.stats.os.cpu.load_avg.1m
 alias to: elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns
 
 
+
 **`node_stats.os.cgroup.cpu.cfs_quota_micros`**
 :   type: alias
 
 alias to: elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us
+
 
 
 **`node_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`**
@@ -815,6 +862,7 @@ alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.times_throttled.count
 alias to: elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns
 
 
+
 **`node_stats.os.cgroup.memory.control_group`**
 :   type: alias
 
@@ -833,10 +881,14 @@ alias to: elasticsearch.node.stats.os.cgroup.memory.limit.bytes
 alias to: elasticsearch.node.stats.os.cgroup.memory.usage.bytes
 
 
+
+
 **`node_stats.process.cpu.percent`**
 :   type: alias
 
 alias to: elasticsearch.node.stats.process.cpu.pct
+
+
 
 
 **`node_stats.thread_pool.bulk.queue`**
@@ -851,6 +903,7 @@ alias to: elasticsearch.node.stats.thread_pool.bulk.queue.count
 alias to: elasticsearch.node.stats.thread_pool.bulk.rejected.count
 
 
+
 **`node_stats.thread_pool.get.queue`**
 :   type: alias
 
@@ -861,6 +914,7 @@ alias to: elasticsearch.node.stats.thread_pool.get.queue.count
 :   type: alias
 
 alias to: elasticsearch.node.stats.thread_pool.get.rejected.count
+
 
 
 **`node_stats.thread_pool.index.queue`**
@@ -875,6 +929,7 @@ alias to: elasticsearch.node.stats.thread_pool.index.queue.count
 alias to: elasticsearch.node.stats.thread_pool.index.rejected.count
 
 
+
 **`node_stats.thread_pool.search.queue`**
 :   type: alias
 
@@ -885,6 +940,7 @@ alias to: elasticsearch.node.stats.thread_pool.search.queue.count
 :   type: alias
 
 alias to: elasticsearch.node.stats.thread_pool.search.rejected.count
+
 
 
 **`node_stats.thread_pool.write.queue`**
@@ -899,6 +955,10 @@ alias to: elasticsearch.node.stats.thread_pool.write.queue.count
 alias to: elasticsearch.node.stats.thread_pool.write.rejected.count
 
 
+
+
+
+
 **`indices_stats._all.primaries.indexing.index_total`**
 :   type: alias
 
@@ -909,6 +969,8 @@ alias to: elasticsearch.index.summary.primaries.indexing.index.count
 :   type: alias
 
 alias to: elasticsearch.index.summary.primaries.indexing.index.time.ms
+
+
 
 
 **`indices_stats._all.total.search.query_total`**
@@ -923,10 +985,12 @@ alias to: elasticsearch.index.summary.total.search.query.count
 alias to: elasticsearch.index.summary.total.search.query.time.ms
 
 
+
 **`indices_stats._all.total.indexing.index_total`**
 :   type: alias
 
 alias to: elasticsearch.index.summary.total.indexing.index.count
+
 
 
 **`elasticsearch.cluster.name`**
@@ -945,6 +1009,7 @@ type: keyword
 :   Elasticsearch state id.
 
 type: keyword
+
 
 
 **`elasticsearch.node.id`**
@@ -977,10 +1042,10 @@ type: boolean
 type: boolean
 
 
-
 ## ccr [_ccr]
 
 Cross-cluster replication stats
+
 
 **`elasticsearch.ccr.remote_cluster`**
 :   type: keyword
@@ -996,6 +1061,7 @@ Cross-cluster replication stats
 
 **`elasticsearch.ccr.shard_id`**
 :   type: integer
+
 
 
 **`elasticsearch.ccr.total_time.read.ms`**
@@ -1014,12 +1080,15 @@ Cross-cluster replication stats
 :   type: nested
 
 
+
+
 **`elasticsearch.ccr.requests.successful.read.count`**
 :   type: long
 
 
 **`elasticsearch.ccr.requests.successful.write.count`**
 :   type: long
+
 
 
 **`elasticsearch.ccr.requests.failed.read.count`**
@@ -1030,12 +1099,14 @@ Cross-cluster replication stats
 :   type: long
 
 
+
 **`elasticsearch.ccr.requests.outstanding.read.count`**
 :   type: long
 
 
 **`elasticsearch.ccr.requests.outstanding.write.count`**
 :   type: long
+
 
 
 **`elasticsearch.ccr.write_buffer.size.bytes`**
@@ -1046,6 +1117,8 @@ Cross-cluster replication stats
 :   type: long
 
 
+
+
 **`elasticsearch.ccr.auto_follow.failed.follow_indices.count`**
 :   type: long
 
@@ -1054,8 +1127,10 @@ Cross-cluster replication stats
 :   type: long
 
 
+
 **`elasticsearch.ccr.auto_follow.success.follow_indices.count`**
 :   type: long
+
 
 
 **`elasticsearch.ccr.leader.index`**
@@ -1072,6 +1147,7 @@ type: long
 
 **`elasticsearch.ccr.leader.global_checkpoint`**
 :   type: long
+
 
 
 **`elasticsearch.ccr.follower.index`**
@@ -1126,13 +1202,14 @@ type: long
 :   type: long
 
 
-
-## cluster.stats [_cluster_stats]
+## cluster.stats [_cluster.stats]
 
 Cluster stats
 
+
 **`elasticsearch.cluster.stats.version`**
 :   type: keyword
+
 
 
 **`elasticsearch.cluster.stats.state.nodes_hash`**
@@ -1161,10 +1238,10 @@ Cluster stats
 type: keyword
 
 
-
 ## nodes [_nodes]
 
 Nodes statistics.
+
 
 **`elasticsearch.cluster.stats.nodes.fs.total.bytes`**
 :   type: long
@@ -1192,6 +1269,7 @@ type: long
 type: long
 
 
+
 **`elasticsearch.cluster.stats.nodes.jvm.max_uptime.ms`**
 :   type: long
 
@@ -1204,10 +1282,10 @@ type: long
 :   type: long
 
 
-
 ## indices [_indices]
 
 Indices statistics.
+
 
 **`elasticsearch.cluster.stats.indices.store.size.bytes`**
 :   type: long
@@ -1223,10 +1301,10 @@ Indices statistics.
 type: long
 
 
-
 ## shards [_shards]
 
 Shard statistics.
+
 
 **`elasticsearch.cluster.stats.indices.shards.docs.total`**
 :   type: long
@@ -1250,6 +1328,7 @@ type: long
 type: long
 
 
+
 **`elasticsearch.cluster.stats.license.expiry_date_in_millis`**
 :   type: long
 
@@ -1260,6 +1339,7 @@ type: long
 
 **`elasticsearch.cluster.stats.license.type`**
 :   type: keyword
+
 
 
 **`elasticsearch.cluster.stats.stack.apm.found`**
@@ -1274,13 +1354,15 @@ type: long
 :   type: boolean
 
 
-
 ## enrich [_enrich]
 
 Enrich stats
 
+
+
 **`elasticsearch.enrich.executing_policy.name`**
 :   type: keyword
+
 
 
 **`elasticsearch.enrich.executing_policy.task.id`**
@@ -1303,6 +1385,7 @@ Enrich stats
 :   type: keyword
 
 
+
 **`elasticsearch.enrich.executing_policy.task.time.start.ms`**
 :   type: long
 
@@ -1323,6 +1406,7 @@ type: long
 type: long
 
 
+
 **`elasticsearch.enrich.remote_requests.current`**
 :   Current number of outstanding remote requests.
 
@@ -1335,13 +1419,14 @@ type: long
 type: long
 
 
-
-## index [_index_3]
+## index [_index]
 
 index
 
+
 **`elasticsearch.index.hidden`**
 :   type: boolean
+
 
 
 **`elasticsearch.index.shards.total`**
@@ -1378,12 +1463,15 @@ index
 type: keyword
 
 
+
+
 **`elasticsearch.index.primaries.search.query_total`**
 :   type: long
 
 
 **`elasticsearch.index.primaries.search.query_time_in_millis`**
 :   type: long
+
 
 
 **`elasticsearch.index.primaries.request_cache.memory_size_in_bytes`**
@@ -1400,6 +1488,7 @@ type: keyword
 
 **`elasticsearch.index.primaries.request_cache.miss_count`**
 :   type: long
+
 
 
 **`elasticsearch.index.primaries.query_cache.memory_size_in_bytes`**
@@ -1428,6 +1517,7 @@ type: keyword
 
 **`elasticsearch.index.primaries.docs.deleted`**
 :   type: long
+
 
 
 **`elasticsearch.index.primaries.segments.count`**
@@ -1486,6 +1576,7 @@ type: keyword
 :   type: long
 
 
+
 **`elasticsearch.index.primaries.indexing.index_total`**
 :   type: long
 
@@ -1496,6 +1587,7 @@ type: keyword
 
 **`elasticsearch.index.primaries.indexing.throttle_time_in_millis`**
 :   type: long
+
 
 
 **`elasticsearch.index.total.docs.count`**
@@ -1526,6 +1618,7 @@ type: long
 format: bytes
 
 
+
 **`elasticsearch.index.total.query_cache.memory_size_in_bytes`**
 :   type: long
 
@@ -1548,6 +1641,7 @@ format: bytes
 
 **`elasticsearch.index.total.fielddata.evictions`**
 :   type: long
+
 
 
 **`elasticsearch.index.total.request_cache.memory_size_in_bytes`**
@@ -1576,6 +1670,7 @@ format: bytes
 
 **`elasticsearch.index.total.refresh.external_total_time_in_millis`**
 :   type: long
+
 
 
 **`elasticsearch.index.total.segments.memory_in_bytes`**
@@ -1628,12 +1723,14 @@ type: long
 :   type: long
 
 
+
 **`elasticsearch.index.total.search.query_total`**
 :   type: long
 
 
 **`elasticsearch.index.total.search.query_time_in_millis`**
 :   type: long
+
 
 
 **`elasticsearch.index.total.indexing.index_total`**
@@ -1646,6 +1743,7 @@ type: long
 
 **`elasticsearch.index.total.indexing.throttle_time_in_millis`**
 :   type: long
+
 
 
 **`elasticsearch.index.total.bulk.total_size_in_bytes`**
@@ -1668,10 +1766,12 @@ type: long
 :   type: long
 
 
-
-## index.recovery [_index_recovery]
+## index.recovery [_index.recovery]
 
 index
+
+
+
 
 **`elasticsearch.index.recovery.index.files.percent`**
 :   type: keyword
@@ -1687,6 +1787,7 @@ index
 
 **`elasticsearch.index.recovery.index.files.total`**
 :   type: long
+
 
 
 **`elasticsearch.index.recovery.index.size.recovered_in_bytes`**
@@ -1739,6 +1840,7 @@ type: boolean
 :   Recovery stage.
 
 type: keyword
+
 
 
 **`elasticsearch.index.recovery.translog.percent`**
@@ -1797,6 +1899,7 @@ type: keyword
 type: keyword
 
 
+
 **`elasticsearch.index.recovery.verify_index.check_index_time.ms`**
 :   type: long
 
@@ -1805,10 +1908,11 @@ type: keyword
 :   type: long
 
 
-
-## index.summary [_index_summary]
+## index.summary [_index.summary]
 
 index
+
+
 
 **`elasticsearch.index.summary.primaries.docs.count`**
 :   Total number of documents in the index.
@@ -1852,12 +1956,15 @@ type: long
 format: bytes
 
 
+
 **`elasticsearch.index.summary.primaries.indexing.index.count`**
 :   type: long
 
 
 **`elasticsearch.index.summary.primaries.indexing.index.time.ms`**
 :   type: long
+
+
 
 
 **`elasticsearch.index.summary.primaries.search.query.count`**
@@ -1868,12 +1975,14 @@ format: bytes
 :   type: long
 
 
+
 **`elasticsearch.index.summary.primaries.bulk.operations.count`**
 :   type: long
 
 
 **`elasticsearch.index.summary.primaries.bulk.size.bytes`**
 :   type: long
+
 
 
 **`elasticsearch.index.summary.primaries.bulk.time.count.ms`**
@@ -1886,6 +1995,7 @@ format: bytes
 
 **`elasticsearch.index.summary.primaries.bulk.time.avg.bytes`**
 :   type: long
+
 
 
 **`elasticsearch.index.summary.total.docs.count`**
@@ -1930,6 +2040,7 @@ type: long
 format: bytes
 
 
+
 **`elasticsearch.index.summary.total.indexing.index.count`**
 :   type: long
 
@@ -1946,12 +2057,15 @@ format: bytes
 :   type: long
 
 
+
+
 **`elasticsearch.index.summary.total.search.query.count`**
 :   type: long
 
 
 **`elasticsearch.index.summary.total.search.query.time.ms`**
 :   type: long
+
 
 
 **`elasticsearch.index.summary.total.bulk.operations.count`**
@@ -1962,6 +2076,7 @@ format: bytes
 :   type: long
 
 
+
 **`elasticsearch.index.summary.total.bulk.time.avg.ms`**
 :   type: long
 
@@ -1970,10 +2085,10 @@ format: bytes
 :   type: long
 
 
-
 ## ingest_pipeline [_ingest_pipeline]
 
 Runtime metrics on ingest pipeline execution
+
 
 **`elasticsearch.ingest_pipeline.name`**
 :   Name / id of the ingest pipeline
@@ -1981,10 +2096,10 @@ Runtime metrics on ingest pipeline execution
 type: wildcard
 
 
-
 ## total [_total]
 
 Metrics on the total ingest pipeline execution, including all processors.
+
 
 **`elasticsearch.ingest_pipeline.total.count`**
 :   Number of documents processed by this pipeline
@@ -2008,6 +2123,7 @@ type: long
 :   Time spent processing documents through this pipeline, exclusive of other pipelines called
 
 type: long
+
 
 
 **`elasticsearch.ingest_pipeline.processor.type`**
@@ -2046,10 +2162,10 @@ type: long
 type: long
 
 
-
-## ml.job [_ml_job]
+## ml.job [_ml.job]
 
 ml
+
 
 **`elasticsearch.ml.job.id`**
 :   Unique ml job id.
@@ -2067,8 +2183,10 @@ type: keyword
 :   type: long
 
 
+
 **`elasticsearch.ml.job.model_size.memory_status`**
 :   type: keyword
+
 
 
 **`elasticsearch.ml.job.data_counts.invalid_date_count`**
@@ -2087,10 +2205,10 @@ type: long
 type: long
 
 
-
-## node [_node_2]
+## node [_node]
 
 node
+
 
 **`elasticsearch.node.version`**
 :   Node version.
@@ -2098,10 +2216,10 @@ node
 type: keyword
 
 
-
 ## jvm [_jvm]
 
 JVM Info.
+
 
 **`elasticsearch.node.jvm.version`**
 :   JVM version.
@@ -2147,10 +2265,12 @@ format: bytes
 type: boolean
 
 
-
-## node.stats [_node_stats]
+## node.stats [_node.stats]
 
 Statistics about each node in a Elasticsearch cluster
+
+
+
 
 **`elasticsearch.node.stats.ingest.total.count`**
 :   type: long
@@ -2168,16 +2288,22 @@ Statistics about each node in a Elasticsearch cluster
 :   type: long
 
 
+
+
+
 **`elasticsearch.node.stats.indices.bulk.avg_time.ms`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.indices.bulk.total_time.ms`**
 :   type: long
 
 
+
 **`elasticsearch.node.stats.indices.bulk.total_size.bytes`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.indices.bulk.avg_size.bytes`**
@@ -2226,6 +2352,7 @@ type: long
 type: long
 
 
+
 **`elasticsearch.node.stats.indices.fielddata.evictions.count`**
 :   type: long
 
@@ -2236,6 +2363,7 @@ type: long
 format: bytes
 
 
+
 **`elasticsearch.node.stats.indices.flush.total_time.ms`**
 :   type: long
 
@@ -2244,12 +2372,14 @@ format: bytes
 :   type: long
 
 
+
 **`elasticsearch.node.stats.indices.get.time.ms`**
 :   type: long
 
 
 **`elasticsearch.node.stats.indices.get.total.count`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.indices.indexing.index_time.ms`**
@@ -2264,6 +2394,7 @@ format: bytes
 :   type: long
 
 
+
 **`elasticsearch.node.stats.indices.merges.total_time.ms`**
 :   type: long
 
@@ -2272,10 +2403,12 @@ format: bytes
 :   type: long
 
 
+
 **`elasticsearch.node.stats.indices.query_cache.memory.bytes`**
 :   type: long
 
 format: bytes
+
 
 
 **`elasticsearch.node.stats.indices.refresh.total_time.ms`**
@@ -2286,10 +2419,12 @@ format: bytes
 :   type: long
 
 
+
 **`elasticsearch.node.stats.indices.request_cache.memory.bytes`**
 :   type: long
 
 format: bytes
+
 
 
 **`elasticsearch.node.stats.indices.search.query_time.ms`**
@@ -2308,8 +2443,10 @@ format: bytes
 :   type: long
 
 
+
 **`elasticsearch.node.stats.indices.shard_stats.total_count`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.indices.segments.doc_values.memory.bytes`**
@@ -2366,6 +2503,7 @@ format: bytes
 format: bytes
 
 
+
 **`elasticsearch.node.stats.indices.translog.size.bytes`**
 :   type: long
 
@@ -2374,10 +2512,12 @@ format: bytes
 :   type: long
 
 
+
 **`elasticsearch.node.stats.jvm.mem.heap.max.bytes`**
 :   type: long
 
 format: bytes
+
 
 
 **`elasticsearch.node.stats.jvm.mem.heap.used.bytes`**
@@ -2394,6 +2534,8 @@ format: percent
 
 **`elasticsearch.node.stats.jvm.threads.count`**
 :   type: long
+
+
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.old.max.bytes`**
@@ -2428,6 +2570,7 @@ type: long
 format: bytes
 
 
+
 **`elasticsearch.node.stats.jvm.mem.pools.young.max.bytes`**
 :   Max bytes.
 
@@ -2458,6 +2601,7 @@ format: bytes
 type: long
 
 format: bytes
+
 
 
 **`elasticsearch.node.stats.jvm.mem.pools.survivor.max.bytes`**
@@ -2492,12 +2636,15 @@ type: long
 format: bytes
 
 
+
+
 **`elasticsearch.node.stats.jvm.gc.collectors.old.collection.count`**
 :   type: long
 
 
 **`elasticsearch.node.stats.jvm.gc.collectors.old.collection.ms`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.jvm.gc.collectors.young.collection.count`**
@@ -2508,6 +2655,8 @@ format: bytes
 :   type: long
 
 
+
+
 **`elasticsearch.node.stats.fs.total.total_in_bytes`**
 :   type: long
 
@@ -2516,10 +2665,10 @@ format: bytes
 :   type: long
 
 
-
-## summary [_summary_4]
+## summary [_summary]
 
 File system summary
+
 
 **`elasticsearch.node.stats.fs.summary.total.bytes`**
 :   type: long
@@ -2539,6 +2688,8 @@ format: bytes
 format: bytes
 
 
+
+
 **`elasticsearch.node.stats.fs.io_stats.total.operations.count`**
 :   type: long
 
@@ -2551,16 +2702,21 @@ format: bytes
 :   type: long
 
 
+
+
 **`elasticsearch.node.stats.os.cpu.load_avg.1m`**
 :   type: half_float
+
 
 
 **`elasticsearch.node.stats.os.cgroup.cpuacct.usage.ns`**
 :   type: long
 
 
+
 **`elasticsearch.node.stats.os.cgroup.cpu.cfs.quota.us`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.os.cgroup.cpu.stat.elapsed_periods.count`**
@@ -2573,6 +2729,7 @@ format: bytes
 
 **`elasticsearch.node.stats.os.cgroup.cpu.stat.time_throttled.ns`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.os.cgroup.memory.control_group`**
@@ -2601,6 +2758,8 @@ format: percent
 :   type: long
 
 
+
+
 **`elasticsearch.node.stats.transport.rx.count`**
 :   type: long
 
@@ -2609,12 +2768,15 @@ format: percent
 :   type: long
 
 
+
 **`elasticsearch.node.stats.transport.tx.count`**
 :   type: long
 
 
 **`elasticsearch.node.stats.transport.tx.size.bytes`**
 :   type: long
+
+
 
 
 **`elasticsearch.node.stats.thread_pool.bulk.active.count`**
@@ -2629,6 +2791,7 @@ format: percent
 :   type: long
 
 
+
 **`elasticsearch.node.stats.thread_pool.esql_worker.active.count`**
 :   type: long
 
@@ -2639,6 +2802,7 @@ format: percent
 
 **`elasticsearch.node.stats.thread_pool.esql_worker.rejected.count`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.thread_pool.force_merge.active.count`**
@@ -2653,6 +2817,7 @@ format: percent
 :   type: long
 
 
+
 **`elasticsearch.node.stats.thread_pool.flush.active.count`**
 :   type: long
 
@@ -2663,6 +2828,7 @@ format: percent
 
 **`elasticsearch.node.stats.thread_pool.flush.rejected.count`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.thread_pool.get.active.count`**
@@ -2677,6 +2843,7 @@ format: percent
 :   type: long
 
 
+
 **`elasticsearch.node.stats.thread_pool.index.active.count`**
 :   type: long
 
@@ -2687,6 +2854,7 @@ format: percent
 
 **`elasticsearch.node.stats.thread_pool.index.rejected.count`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.thread_pool.search.active.count`**
@@ -2701,6 +2869,7 @@ format: percent
 :   type: long
 
 
+
 **`elasticsearch.node.stats.thread_pool.search_worker.active.count`**
 :   type: long
 
@@ -2711,6 +2880,7 @@ format: percent
 
 **`elasticsearch.node.stats.thread_pool.search_worker.rejected.count`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.thread_pool.snapshot.active.count`**
@@ -2725,6 +2895,7 @@ format: percent
 :   type: long
 
 
+
 **`elasticsearch.node.stats.thread_pool.system_read.active.count`**
 :   type: long
 
@@ -2735,6 +2906,7 @@ format: percent
 
 **`elasticsearch.node.stats.thread_pool.system_read.rejected.count`**
 :   type: long
+
 
 
 **`elasticsearch.node.stats.thread_pool.system_write.active.count`**
@@ -2749,6 +2921,7 @@ format: percent
 :   type: long
 
 
+
 **`elasticsearch.node.stats.thread_pool.write.active.count`**
 :   type: long
 
@@ -2759,6 +2932,8 @@ format: percent
 
 **`elasticsearch.node.stats.thread_pool.write.rejected.count`**
 :   type: long
+
+
 
 
 **`elasticsearch.node.stats.indexing_pressure.memory.current.combined_coordinating_and_primary.bytes`**
@@ -2845,10 +3020,10 @@ format: bytes
 format: bytes
 
 
-
-## cluster.pending_task [_cluster_pending_task]
+## cluster.pending_task [_cluster.pending_task]
 
 `cluster.pending_task` contains a pending task description.
+
 
 **`elasticsearch.cluster.pending_task.insert_order`**
 :   Insert order
@@ -2874,10 +3049,10 @@ type: keyword
 type: long
 
 
-
 ## shard [_shard]
 
 shard fields
+
 
 **`elasticsearch.shard.primary`**
 :   True if this is the primary shard.
@@ -2907,6 +3082,7 @@ type: keyword
 :   The node the shard was relocated from. It has the exact same value than relocating_node.name for compatibility purposes.
 
 type: keyword
+
 
 
 **`elasticsearch.shard.source_node.name`**

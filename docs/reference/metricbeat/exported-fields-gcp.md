@@ -7,6 +7,8 @@ mapped_pages:
 
 GCP module
 
+
+
 **`gcp.labels`**
 :   GCP monitoring metrics labels
 
@@ -19,10 +21,10 @@ type: object
 type: object
 
 
-
-## billing [_billing_6]
+## billing [_billing]
 
 Google Cloud Billing metrics
+
 
 **`gcp.billing.cost_type`**
 :   Cost types include regular, tax, adjustment, and rounding_error.
@@ -79,15 +81,15 @@ type: nested
 
 
 **`gcp.billing.effective_price`**
-:   The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it’s the list price.
+:   The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it's the list price.
 
 type: float
-
 
 
 ## carbon [_carbon]
 
 Google Cloud Carbon Footprint metrics
+
 
 **`gcp.carbon.project_id`**
 :   Project ID the carbon footprint report belongs to.
@@ -149,10 +151,10 @@ type: float
 type: float
 
 
-
-## compute [_compute_2]
+## compute [_compute]
 
 Google Cloud Compute metrics
+
 
 **`gcp.compute.firewall.dropped.bytes`**
 :   Incoming bytes dropped by the firewall
@@ -268,10 +270,10 @@ type: long
 type: long
 
 
-
 ## dataproc [_dataproc]
 
 Google Cloud Dataproc metrics
+
 
 **`gcp.dataproc.cluster.hdfs.datanodes.count`**
 :   Indicates the number of HDFS DataNodes that are running inside a cluster.
@@ -399,10 +401,10 @@ type: object
 type: object
 
 
-
 ## firestore [_firestore]
 
 Google Cloud Firestore metrics
+
 
 **`gcp.firestore.document.delete.count`**
 :   The number of successful document deletes.
@@ -422,10 +424,10 @@ type: long
 type: long
 
 
-
-## gke [_gke_2]
+## gke [_gke]
 
 `gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE
+
 
 **`gcp.gke.container.cpu.core_usage_time.sec`**
 :   Cumulative CPU usage on all cores used by the container in seconds. Sampled every 60 seconds.
@@ -667,10 +669,10 @@ type: long
 type: double
 
 
-
-## loadbalancing [_loadbalancing_2]
+## loadbalancing [_loadbalancing]
 
 Google Cloud Load Balancing metrics
+
 
 **`gcp.loadbalancing.https.backend_request.bytes`**
 :   The number of bytes sent as requests from HTTP/S load balancer to backends.
@@ -709,7 +711,7 @@ type: long
 
 
 **`gcp.loadbalancing.l3.external.egress.bytes`**
-:   The number of bytes sent from external TCP/UDP network load balancer backend to client of the flow. For TCP flows it’s counting bytes on application stream only.
+:   The number of bytes sent from external TCP/UDP network load balancer backend to client of the flow. For TCP flows it's counting bytes on application stream only.
 
 type: long
 
@@ -721,7 +723,7 @@ type: long
 
 
 **`gcp.loadbalancing.l3.external.ingress.bytes`**
-:   The number of bytes sent from client to external TCP/UDP network load balancer backend. For TCP flows it’s counting bytes on application stream only.
+:   The number of bytes sent from client to external TCP/UDP network load balancer backend. For TCP flows it's counting bytes on application stream only.
 
 type: long
 
@@ -733,7 +735,7 @@ type: long
 
 
 **`gcp.loadbalancing.l3.internal.egress.bytes`**
-:   The number of bytes sent from ILB backend to client (for TCP flows it’s counting bytes on application stream only).
+:   The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
 
 type: long
 
@@ -745,7 +747,7 @@ type: long
 
 
 **`gcp.loadbalancing.l3.internal.ingress.bytes`**
-:   The number of bytes sent from client to ILB backend (for TCP flows it’s counting bytes on application stream only).
+:   The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
 
 type: long
 
@@ -841,15 +843,15 @@ type: object
 
 
 **`gcp.loadbalancing.tcp_ssl_proxy.frontend_tcp_rtt.value`**
-:   A distribution of the smoothed RTT (in ms) measured by the proxy’s TCP stack, each minute application layer bytes pass from proxy to client.
+:   A distribution of the smoothed RTT (in ms) measured by the proxy's TCP stack, each minute application layer bytes pass from proxy to client.
 
 type: object
 
 
-
-## pubsub [_pubsub_2]
+## pubsub [_pubsub]
 
 Google Cloud PubSub metrics
+
 
 **`gcp.pubsub.snapshot.backlog.bytes`**
 :   Total byte size of the messages retained in a snapshot.
@@ -942,7 +944,7 @@ type: long
 
 
 **`gcp.pubsub.subscription.num_outstanding_messages.value`**
-:   Number of messages delivered to a subscription’s push endpoint, but not yet acknowledged.
+:   Number of messages delivered to a subscription's push endpoint, but not yet acknowledged.
 
 type: long
 
@@ -1145,10 +1147,10 @@ type: object
 type: object
 
 
-
-## storage [_storage_3]
+## storage [_storage]
 
 Google Cloud Storage metrics
+
 
 **`gcp.storage.api.request.count`**
 :   Delta count of API calls, grouped by the API method name and response code.

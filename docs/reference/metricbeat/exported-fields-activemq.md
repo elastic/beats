@@ -11,9 +11,12 @@ activemq module
 ## activemq [_activemq]
 
 
+
+
 ## broker [_broker]
 
 Broker metrics from org.apache.activemq:brokerName=*,type=Broker
+
 
 **`activemq.broker.mbean`**
 :   Mbean that this event is related to
@@ -87,10 +90,10 @@ type: long
 type: long
 
 
+## queue [_queue]
 
-## queue [_queue_7]
+Queue metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Queue,type=Broker
 
-Queue metrics from org.apache.activemq:brokerName=**,destinationName=**,destinationType=Queue,type=Broker
 
 **`activemq.queue.mbean`**
 :   Mbean that this event is related to
@@ -184,10 +187,10 @@ type: long
 type: long
 
 
-
 ## topic [_topic]
 
-Topic metrics from org.apache.activemq:brokerName=**,destinationName=**,destinationType=Topic,type=Broker
+Topic metrics from org.apache.activemq:brokerName=*,destinationName=*,destinationType=Topic,type=Broker
+
 
 **`activemq.topic.mbean`**
 :   Mbean that this event is related to

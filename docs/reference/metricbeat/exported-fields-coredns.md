@@ -13,9 +13,10 @@ coredns Module
 `coredns` contains statistics that were read from coreDNS
 
 
-## stats [_stats_3]
+## stats [_stats]
 
 Contains statistics related to the coreDNS service
+
 
 **`coredns.stats.panic.count`**
 :   Total number of panics

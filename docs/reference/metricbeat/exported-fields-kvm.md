@@ -7,6 +7,7 @@ mapped_pages:
 
 kvm module
 
+
 **`kvm.id`**
 :   Domain id
 
@@ -19,8 +20,9 @@ type: long
 type: keyword
 
 
-
 ## kvm [_kvm]
+
+
 
 
 ## dommemstat [_dommemstat]
@@ -28,9 +30,10 @@ type: keyword
 dommemstat
 
 
-## stat [_stat_2]
+## stat [_stat]
 
 Memory stat
+
 
 **`kvm.dommemstat.stat.name`**
 :   Memory stat name
@@ -56,10 +59,10 @@ type: long
 type: keyword
 
 
-
-## status [_status_5]
+## status [_status]
 
 status
+
 
 **`kvm.status.state`**
 :   Domain state

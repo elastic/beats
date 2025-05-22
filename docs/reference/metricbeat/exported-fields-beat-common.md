@@ -7,6 +7,7 @@ mapped_pages:
 
 Contains common beat fields available in all event types.
 
+
 **`agent.hostname`**
 :   Deprecated - use agent.name or agent.id to identify an agent.
 

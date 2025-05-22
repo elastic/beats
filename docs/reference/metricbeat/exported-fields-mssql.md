@@ -17,6 +17,7 @@ The root field containing all MSSQL fields
 
 The database that the metrics is being referred to
 
+
 **`mssql.database.id`**
 :   Unique ID of the database inside MSSQL
 
@@ -29,10 +30,10 @@ type: long
 type: keyword
 
 
-
-## performance [_performance_3]
+## performance [_performance]
 
 performance metricset fetches information about the Performance Counters
+
 
 **`mssql.performance.page_splits_per_sec`**
 :   Number of page splits per second that occur as the result of overflowing index pages.
@@ -105,16 +106,17 @@ type: long
 
 Indicates the percentage of pages found in the buffer cache without having to read from disk.
 
+
 **`mssql.performance.buffer.cache_hit.pct`**
 :   The ratio is the total number of cache hits divided by the total number of cache lookups over the last few thousand page accesses. After a long period of time, the ratio moves very little. Because reading from the cache is much less expensive than reading from disk, you want this ratio to be high
 
 type: double
 
 
-
 ## page_life_expectancy [_page_life_expectancy]
 
 Indicates the number of seconds a page will stay in the buffer pool without references.
+
 
 **`mssql.performance.buffer.page_life_expectancy.sec`**
 :   Indicates the number of seconds a page will stay in the buffer pool without references (in seconds).
@@ -140,8 +142,7 @@ type: long
 type: long
 
 
-
-## transaction_log [_transaction_log_2]
+## transaction_log [_transaction_log]
 
 transaction_log metricset will fetch information about the operation and transaction log of each database from a MSSQL instance
 
@@ -155,16 +156,17 @@ Space usage information for the transaction log
 
 The amount of space used since the last log backup
 
+
 **`mssql.transaction_log.space_usage.since_last_backup.bytes`**
 :   The amount of space used since the last log backup in bytes
 
 type: long
 
 
-
-## total [_total_2]
+## total [_total]
 
 The size of the log
+
 
 **`mssql.transaction_log.space_usage.total.bytes`**
 :   The size of the log in bytes
@@ -172,10 +174,10 @@ The size of the log
 type: long
 
 
-
 ## used [_used]
 
 The occupied size of the log
+
 
 **`mssql.transaction_log.space_usage.used.bytes`**
 :   The occupied size of the log in bytes
@@ -189,8 +191,7 @@ type: long
 type: float
 
 
-
-## stats [_stats_8]
+## stats [_stats]
 
 Returns summary level attributes and information on transaction log files of databases. Use this information for monitoring and diagnostics of transaction log health.
 
@@ -198,6 +199,7 @@ Returns summary level attributes and information on transaction log files of dat
 ## active_size [_active_size]
 
 Total active transaction log size.
+
 
 **`mssql.transaction_log.stats.active_size.bytes`**
 :   Total active transaction log size in bytes
@@ -211,10 +213,10 @@ type: long
 type: date
 
 
-
 ## recovery_size [_recovery_size]
 
 Log size since log recovery log sequence number (LSN).
+
 
 **`mssql.transaction_log.stats.recovery_size.bytes`**
 :   Log size in bytes since log recovery log sequence number (LSN).
@@ -222,10 +224,10 @@ Log size since log recovery log sequence number (LSN).
 type: long
 
 
-
 ## since_last_checkpoint [_since_last_checkpoint]
 
 Log size since last checkpoint log sequence number (LSN).
+
 
 **`mssql.transaction_log.stats.since_last_checkpoint.bytes`**
 :   Log size in bytes since last checkpoint log sequence number (LSN).
@@ -233,10 +235,10 @@ Log size since last checkpoint log sequence number (LSN).
 type: long
 
 
-
 ## total_size [_total_size]
 
 Total transaction log size.
+
 
 **`mssql.transaction_log.stats.total_size.bytes`**
 :   Total transaction log size in bytes.

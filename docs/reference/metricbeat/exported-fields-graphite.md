@@ -11,9 +11,12 @@ graphite Module
 ## graphite [_graphite]
 
 
-## server [_server_6]
+
+
+## server [_server]
 
 server
+
 
 **`graphite.server.example`**
 :   Example field

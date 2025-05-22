@@ -10,6 +10,9 @@ mapped_pages:
 
 ## aws [_aws]
 
+
+
+
 **`aws.tags.*`**
 :   Tag key value pairs from aws resources.
 
@@ -34,6 +37,7 @@ type: object
 type: object
 
 
+
 **`aws.linked_account.id`**
 :   ID used to identify linked account.
 
@@ -46,10 +50,10 @@ type: keyword
 type: keyword
 
 
-
 ## awshealth [_awshealth]
 
 AWS Health metrics
+
 
 **`aws.awshealth.affected_entities_others`**
 :   The number of affected resources related to the event whose status cannot be verified.
@@ -177,10 +181,10 @@ type: keyword
 type: keyword
 
 
-
-## billing [_billing_4]
+## billing [_billing]
 
 `billing` contains the estimated charges for your AWS account in Cloudwatch.
+
 
 **`aws.billing.EstimatedCharges`**
 :   Maximum estimated charges for AWS acccount.
@@ -200,6 +204,7 @@ type: keyword
 type: keyword
 
 
+
 **`aws.billing.AmortizedCost.amount`**
 :   Amortized cost amount
 
@@ -210,6 +215,7 @@ type: double
 :   Amortized cost unit
 
 type: keyword
+
 
 
 **`aws.billing.BlendedCost.amount`**
@@ -224,6 +230,7 @@ type: double
 type: keyword
 
 
+
 **`aws.billing.NormalizedUsageAmount.amount`**
 :   Normalized usage amount
 
@@ -236,6 +243,7 @@ type: double
 type: keyword
 
 
+
 **`aws.billing.UnblendedCost.amount`**
 :   Unblended cost amount
 
@@ -246,6 +254,7 @@ type: double
 :   Unblended cost unit
 
 type: keyword
+
 
 
 **`aws.billing.UsageQuantity.amount`**
@@ -272,6 +281,7 @@ type: keyword
 type: keyword
 
 
+
 **`aws.billing.group_definition.key`**
 :   The string that represents a key for a specified group
 
@@ -290,10 +300,10 @@ type: keyword
 type: object
 
 
-
-## cloudwatch [_cloudwatch_2]
+## cloudwatch [_cloudwatch]
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
+
 
 **`aws.cloudwatch.namespace`**
 :   The namespace specified when query cloudwatch api.
@@ -301,10 +311,11 @@ type: object
 type: keyword
 
 
-
-## dynamodb [_dynamodb_2]
+## dynamodb [_dynamodb]
 
 `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
+
+
 
 **`aws.dynamodb.metrics.SuccessfulRequestLatency.avg`**
 :   The average latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
@@ -468,10 +479,11 @@ type: double
 type: double
 
 
-
-## ebs [_ebs_2]
+## ebs [_ebs]
 
 `ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
+
+
 
 **`aws.ebs.metrics.VolumeReadBytes.avg`**
 :   Average size of each read operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.
@@ -539,10 +551,10 @@ type: double
 type: double
 
 
-
-## ec2 [_ec2_2]
+## ec2 [_ec2]
 
 `ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
+
 
 **`aws.ec2.cpu.total.pct`**
 :   The percentage of allocated EC2 compute units that are currently in use on the instance.
@@ -756,10 +768,11 @@ type: keyword
 type: integer
 
 
-
-## elb [_elb_2]
+## elb [_elb]
 
 `elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
+
+
 
 **`aws.elb.metrics.BackendConnectionErrors.sum`**
 :   The number of connections that were not successfully established between the load balancer and the registered instances.
@@ -863,10 +876,11 @@ type: double
 type: double
 
 
-
 ## applicationelb [_applicationelb]
 
 `applicationelb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ApplicationELB.
+
+
 
 **`aws.applicationelb.metrics.ActiveConnectionCount.sum`**
 :   The total number of concurrent TCP connections active from clients to the load balancer and from the load balancer to targets.
@@ -893,7 +907,7 @@ type: long
 
 
 **`aws.applicationelb.metrics.HTTP_Redirect_Url_Limit_Exceeded_Count.sum`**
-:   The number of redirect actions that couldn’t be completed because the URL in the response location header is larger than 8K.
+:   The number of redirect actions that couldn't be completed because the URL in the response location header is larger than 8K.
 
 type: long
 
@@ -1000,10 +1014,11 @@ type: long
 type: long
 
 
-
 ## networkelb [_networkelb]
 
 `networkelb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS NetworkELB.
+
+
 
 **`aws.networkelb.metrics.ActiveFlowCount.avg`**
 :   The total number of concurrent flows (or connections) from clients to targets.
@@ -1101,10 +1116,11 @@ type: long
 type: long
 
 
-
 ## kinesis [_kinesis]
 
 `kinesis` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by Amazon Kinesis.
+
+
 
 **`aws.kinesis.metrics.GetRecords_Bytes.avg`**
 :   The average number of bytes retrieved from the Kinesis stream, measured over the specified time period.
@@ -1245,7 +1261,7 @@ type: long
 
 
 **`aws.kinesis.metrics.SubscribeToShardEvent_Success.avg`**
-:   This metric is emitted every time an event is published successfully. It is only emitted when there’s an active subscription.
+:   This metric is emitted every time an event is published successfully. It is only emitted when there's an active subscription.
 
 type: long
 
@@ -1256,10 +1272,11 @@ type: long
 type: long
 
 
-
-## lambda [_lambda_2]
+## lambda [_lambda]
 
 `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
+
+
 
 **`aws.lambda.metrics.Invocations.avg`**
 :   The number of times your function code is executed, including successful executions and executions that result in a function error.
@@ -1310,7 +1327,7 @@ type: double
 
 
 **`aws.lambda.metrics.UnreservedConcurrentExecutions.avg`**
-:   For an AWS Region, the number of events that are being processed by functions that don’t have reserved concurrency.
+:   For an AWS Region, the number of events that are being processed by functions that don't have reserved concurrency.
 
 type: double
 
@@ -1339,10 +1356,11 @@ type: long
 type: long
 
 
-
-## natgateway [_natgateway_2]
+## natgateway [_natgateway]
 
 `natgateway` contains the metrics from Cloudwatch to track usage of NAT gateway related resources.
+
+
 
 **`aws.natgateway.metrics.BytesInFromDestination.sum`**
 :   The number of bytes received by the NAT gateway from the destination.
@@ -1428,10 +1446,10 @@ type: long
 type: long
 
 
-
-## rds [_rds_2]
+## rds [_rds]
 
 `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
+
 
 **`aws.rds.burst_balance.pct`**
 :   The percent of General Purpose SSD (gp2) burst-bucket I/O credits available.
@@ -1876,7 +1894,7 @@ type: long
 
 
 **`aws.rds.storage_used.backup_retention_period.bytes`**
-:   The total amount of backup storage in bytes used to support the point-in-time restore feature within the Aurora DB cluster’s backup retention window.
+:   The total amount of backup storage in bytes used to support the point-in-time restore feature within the Aurora DB cluster's backup retention window.
 
 type: long
 
@@ -1923,10 +1941,10 @@ type: long
 type: long
 
 
-
-## s3_daily_storage [_s3_daily_storage_2]
+## s3_daily_storage [_s3_daily_storage]
 
 `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
 
 **`aws.s3_daily_storage.bucket.size.bytes`**
 :   The amount of data in bytes stored in a bucket.
@@ -1942,10 +1960,10 @@ format: bytes
 type: long
 
 
-
-## s3_request [_s3_request_2]
+## s3_request [_s3_request]
 
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
+
 
 **`aws.s3_request.requests.total`**
 :   The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
@@ -2055,10 +2073,11 @@ type: long
 format: duration
 
 
-
 ## sns [_sns]
 
 `sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
+
+
 
 **`aws.sns.metrics.PublishSize.avg`**
 :   The size of messages published.
@@ -2115,7 +2134,7 @@ type: long
 
 
 **`aws.sns.metrics.NumberOfNotificationsFailedToRedriveToDlq.sum`**
-:   The number of messages that couldn’t be moved to a dead-letter queue.
+:   The number of messages that couldn't be moved to a dead-letter queue.
 
 type: long
 
@@ -2126,10 +2145,10 @@ type: long
 type: long
 
 
-
-## sqs [_sqs_2]
+## sqs [_sqs]
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
+
 
 **`aws.sqs.oldest_message_age.sec`**
 :   The maximum approximate age of the oldest non-deleted message in the queue.
@@ -2195,10 +2214,11 @@ format: bytes
 type: keyword
 
 
-
-## transitgateway [_transitgateway_2]
+## transitgateway [_transitgateway]
 
 `transitgateway` contains the metrics from Cloudwatch to track usage of transit gateway related resources.
+
+
 
 **`aws.transitgateway.metrics.BytesIn.sum`**
 :   The number of bytes received by the transit gateway.
@@ -2248,10 +2268,11 @@ type: long
 type: long
 
 
-
-## usage [_usage_10]
+## usage [_usage]
 
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
+
+
 
 **`aws.usage.metrics.CallCount.sum`**
 :   The number of specified API operations performed in your account.
@@ -2265,10 +2286,11 @@ type: long
 type: long
 
 
-
-## vpn [_vpn_2]
+## vpn [_vpn]
 
 `vpn` contains the metrics from Cloudwatch to track usage of VPN related resources.
+
+
 
 **`aws.vpn.metrics.TunnelState.avg`**
 :   The state of the tunnel. For static VPNs, 0 indicates DOWN and 1 indicates UP. For BGP VPNs, 1 indicates ESTABLISHED and 0 is used for all other states.

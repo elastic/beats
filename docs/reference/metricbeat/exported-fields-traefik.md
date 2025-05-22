@@ -13,9 +13,10 @@ Traefik reverse proxy / load balancer metrics
 Traefik reverse proxy / load balancer metrics
 
 
-## health [_health_2]
+## health [_health]
 
-Metrics obtained from Traefik’s health API endpoint
+Metrics obtained from Traefik's health API endpoint
+
 
 **`traefik.health.uptime.sec`**
 :   Uptime of Traefik instance in seconds
@@ -23,10 +24,10 @@ Metrics obtained from Traefik’s health API endpoint
 type: long
 
 
-
-## response [_response_2]
+## response [_response]
 
 Response metrics
+
 
 **`traefik.health.response.count`**
 :   Number of responses

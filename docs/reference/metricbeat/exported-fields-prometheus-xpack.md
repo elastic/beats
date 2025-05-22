@@ -7,6 +7,7 @@ mapped_pages:
 
 Stats scraped from a Prometheus endpoint.
 
+
 **`prometheus.*.value`**
 :   Prometheus gauge metric
 

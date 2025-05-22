@@ -8,14 +8,15 @@ mapped_pages:
 Docker stats collected from Docker.
 
 
-## docker [_docker_4]
+## docker [_docker]
 
-Information and statistics about docker’s running containers.
+Information and statistics about docker's running containers.
 
 
-## container [_container_3]
+## container [_container]
 
 Docker container metrics.
+
 
 **`docker.container.command`**
 :   Command that was executed in the Docker container.
@@ -41,10 +42,10 @@ type: keyword
 type: ip
 
 
-
 ## size [_size]
 
 Container size metrics.
+
 
 **`docker.container.size.root_fs`**
 :   Total size of all the files in the container.
@@ -64,10 +65,10 @@ type: long
 type: keyword
 
 
-
-## cpu [_cpu_5]
+## cpu [_cpu]
 
 Runtime CPU metrics.
+
 
 **`docker.cpu.kernel.pct`**
 :   Percentage of time in kernel space, expressed as a value between 0 and 1.
@@ -173,15 +174,15 @@ format: percent
 type: object
 
 
-
-## diskio [_diskio_3]
+## diskio [_diskio]
 
 Disk I/O metrics.
 
 
-## read [_read_5]
+## read [_read]
 
 Accumulated reads during the life of the container
+
 
 **`docker.diskio.read.ops`**
 :   Number of reads during the life of the container
@@ -221,10 +222,10 @@ type: long
 type: long
 
 
-
-## write [_write_5]
+## write [_write]
 
 Accumulated writes during the life of the container
+
 
 **`docker.diskio.write.ops`**
 :   Number of writes during the life of the container
@@ -264,10 +265,10 @@ type: long
 type: long
 
 
-
-## summary [_summary_3]
+## summary [_summary]
 
 Accumulated reads and writes during the life of the container
+
 
 **`docker.diskio.summary.ops`**
 :   Number of I/O operations during the life of the container
@@ -307,10 +308,10 @@ type: long
 type: long
 
 
-
 ## event [_event]
 
 Docker event
+
 
 **`docker.event.status`**
 :   Event status
@@ -342,10 +343,10 @@ type: keyword
 type: keyword
 
 
-
 ## actor [_actor]
 
 Actor
+
 
 **`docker.event.actor.id`**
 :   The ID of the object emitting the event
@@ -359,10 +360,11 @@ type: keyword
 type: object
 
 
-
 ## healthcheck [_healthcheck]
 
-Docker healthcheck metrics. Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
+Docker healthcheck metrics.
+Healthcheck data will only be available from docker containers where the docker `HEALTHCHECK` instruction has been used to build the docker image.
+
 
 **`docker.healthcheck.failingstreak`**
 :   concurent failed check
@@ -376,10 +378,10 @@ type: integer
 type: keyword
 
 
-
-## event [_event_2]
+## event [_event]
 
 event fields.
+
 
 **`docker.healthcheck.event.end_date`**
 :   Healthcheck end date
@@ -405,7 +407,6 @@ type: keyword
 type: integer
 
 
-
 ## image [_image]
 
 Docker image metrics.
@@ -414,6 +415,7 @@ Docker image metrics.
 ## id [_id]
 
 The image layers identifier.
+
 
 **`docker.image.id.current`**
 :   Unique image identifier given upon its creation.
@@ -433,10 +435,10 @@ type: keyword
 type: date
 
 
-
-## size [_size_2]
+## size [_size]
 
 Image size layers.
+
 
 **`docker.image.size.virtual`**
 :   Size of the image.
@@ -462,15 +464,15 @@ type: object
 type: keyword
 
 
+## info [_info]
 
-## info [_info_4]
-
-Info metrics based on [https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information](https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information).
+Info metrics based on https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information.
 
 
 ## containers [_containers]
 
 Overall container stats.
+
 
 **`docker.info.containers.paused`**
 :   Total number of paused containers.
@@ -508,10 +510,10 @@ type: keyword
 type: long
 
 
-
-## memory [_memory_5]
+## memory [_memory]
 
 Memory metrics.
+
 
 **`docker.memory.stats.*`**
 :   Raw memory stats from the cgroups memory.stat interface
@@ -519,10 +521,10 @@ Memory metrics.
 type: object
 
 
-
-## commit [_commit_2]
+## commit [_commit]
 
 Committed bytes on Windows
+
 
 **`docker.memory.commit.total`**
 :   Total bytes
@@ -562,10 +564,10 @@ type: long
 format: bytes
 
 
-
-## rss [_rss_2]
+## rss [_rss]
 
 RSS memory stats.
+
 
 **`docker.memory.rss.total`**
 :   Total memory resident set size.
@@ -583,10 +585,10 @@ type: scaled_float
 format: percent
 
 
-
-## usage [_usage_13]
+## usage [_usage]
 
 Usage memory stats.
+
 
 **`docker.memory.usage.max`**
 :   Max memory usage.
@@ -612,10 +614,10 @@ type: long
 format: bytes
 
 
-
-## network [_network_2]
+## network [_network]
 
 Network metrics.
+
 
 **`docker.network.interface`**
 :   Network interface name.
@@ -623,10 +625,10 @@ Network metrics.
 type: keyword
 
 
-
 ## in [_in]
 
 Incoming network stats per second.
+
 
 **`docker.network.in.bytes`**
 :   Incoming bytes per seconds.
@@ -654,10 +656,10 @@ type: long
 type: long
 
 
-
 ## out [_out]
 
 Outgoing network stats per second.
+
 
 **`docker.network.out.bytes`**
 :   Outgoing bytes per second.
@@ -685,10 +687,10 @@ type: long
 type: long
 
 
-
 ## inbound [_inbound]
 
 Incoming network stats since the container started.
+
 
 **`docker.network.inbound.bytes`**
 :   Total number of incoming bytes.
@@ -716,10 +718,10 @@ type: long
 type: long
 
 
-
 ## outbound [_outbound]
 
 Outgoing network stats since the container started.
+
 
 **`docker.network.outbound.bytes`**
 :   Total number of outgoing bytes.
@@ -747,10 +749,10 @@ type: long
 type: long
 
 
-
 ## network_summary [_network_summary]
 
 network_summary
+
 
 **`docker.network_summary.ip.*`**
 :   IP counters

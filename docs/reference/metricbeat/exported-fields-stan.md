@@ -12,6 +12,7 @@ stan Module
 
 `stan` contains statistics that were read from Nats Streaming server (STAN)
 
+
 **`stan.server.id`**
 :   The server ID
 
@@ -24,10 +25,10 @@ type: keyword
 type: keyword
 
 
-
 ## channels [_channels]
 
 Contains stan / nats streaming/serverz endpoint metrics
+
 
 **`stan.channels.name`**
 :   The name of the STAN streaming channel
@@ -65,10 +66,10 @@ type: long
 type: long
 
 
-
-## stats [_stats_11]
+## stats [_stats]
 
 Contains only high-level stan / nats streaming server related metrics
+
 
 **`stan.stats.state`**
 :   The cluster / streaming configuration state (STANDALONE, CLUSTERED)
@@ -112,10 +113,10 @@ type: long
 type: long
 
 
-
-## subscriptions [_subscriptions_2]
+## subscriptions [_subscriptions]
 
 Contains stan / nats streaming/serverz endpoint subscription metrics
+
 
 **`stan.subscriptions.id`**
 :   The name of the STAN channel subscription (client_id)

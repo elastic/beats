@@ -13,7 +13,7 @@ couchdb module
 Couchdb metrics
 
 
-## server [_server_2]
+## server [_server]
 
 Contains CouchDB server stats
 
@@ -21,6 +21,7 @@ Contains CouchDB server stats
 ## httpd [_httpd]
 
 HTTP statistics
+
 
 **`couchdb.server.httpd.view_reads`**
 :   Number of view reads
@@ -52,10 +53,10 @@ type: long
 type: long
 
 
-
 ## httpd_request_methods [_httpd_request_methods]
 
 HTTP request methods
+
 
 **`couchdb.server.httpd_request_methods.COPY`**
 :   Number of HTTP COPY requests
@@ -93,10 +94,10 @@ type: long
 type: long
 
 
-
 ## httpd_status_codes [_httpd_status_codes]
 
 HTTP status codes statistics
+
 
 **`couchdb.server.httpd_status_codes.200`**
 :   Number of HTTP 200 OK responses
@@ -176,10 +177,10 @@ type: long
 type: long
 
 
-
-## couchdb [_couchdb_2]
+## couchdb [_couchdb]
 
 couchdb statistics
+
 
 **`couchdb.server.couchdb.database_writes`**
 :   Number of times a database was changed

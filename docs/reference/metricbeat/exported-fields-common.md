@@ -7,6 +7,7 @@ mapped_pages:
 
 Contains common fields available in all event types.
 
+
 **`metricset.module`**
 :   The name of the module that generated the event.
 

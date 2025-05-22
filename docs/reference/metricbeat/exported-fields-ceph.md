@@ -17,6 +17,7 @@ Ceph module
 
 cluster_disk
 
+
 **`ceph.cluster_disk.available.bytes`**
 :   Available bytes of the cluster
 
@@ -41,10 +42,10 @@ type: long
 format: bytes
 
 
-
 ## cluster_health [_cluster_health]
 
 cluster_health
+
 
 **`ceph.cluster_health.overall_status`**
 :   Overall status of the cluster
@@ -70,10 +71,10 @@ type: long
 type: keyword
 
 
-
 ## cluster_status [_cluster_status]
 
 cluster_status
+
 
 **`ceph.cluster_status.version`**
 :   Ceph Status version
@@ -241,20 +242,18 @@ type: long
 type: long
 
 
-
 ## mgr_cluster_disk [_mgr_cluster_disk]
 
 see: cluster_disk
-
 
 ## mgr_cluster_health [_mgr_cluster_health]
 
 see: cluster_health
 
-
 ## mgr_osd_perf [_mgr_osd_perf]
 
 OSD performance metrics of Ceph cluster
+
 
 **`ceph.mgr_osd_perf.id`**
 :   OSD ID
@@ -286,10 +285,10 @@ type: long
 type: long
 
 
-
 ## mgr_osd_pool_stats [_mgr_osd_pool_stats]
 
 OSD pool stats of Ceph cluster
+
 
 **`ceph.mgr_osd_pool_stats.pool_name`**
 :   Pool name
@@ -309,20 +308,18 @@ type: long
 type: object
 
 
-
 ## mgr_osd_tree [_mgr_osd_tree]
 
 see: osd_tree
-
 
 ## mgr_pool_disk [_mgr_pool_disk]
 
 see: pool_disk
 
-
 ## monitor_health [_monitor_health]
 
 monitor_health stats data
+
 
 **`ceph.monitor_health.available.pct`**
 :   Available percent of the MON
@@ -404,10 +401,10 @@ format: bytes
 type: long
 
 
-
 ## osd_df [_osd_df]
 
 ceph osd disk usage information
+
 
 **`ceph.osd_df.id`**
 :   osd node id
@@ -465,10 +462,10 @@ type: scaled_float
 format: percent
 
 
-
 ## osd_tree [_osd_tree]
 
 ceph osd tree info
+
 
 **`ceph.osd_tree.id`**
 :   osd or bucket node id
@@ -548,10 +545,10 @@ type: keyword
 type: keyword
 
 
-
 ## pool_disk [_pool_disk]
 
 pool_disk
+
 
 **`ceph.pool_disk.id`**
 :   Id of the pool

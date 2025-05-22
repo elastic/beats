@@ -11,9 +11,12 @@ Memcached module
 ## memcached [_memcached]
 
 
-## stats [_stats_7]
+
+
+## stats [_stats]
 
 stats
+
 
 **`memcached.stats.pid`**
 :   Current process ID of the Memcached task.
@@ -82,7 +85,7 @@ type: long
 
 
 **`memcached.stats.items.current`**
-:   Number of items currently in this server’s cache.
+:   Number of items currently in this server's cache.
 
 type: long
 
@@ -94,7 +97,7 @@ type: long
 
 
 **`memcached.stats.evictions`**
-:   Number of objects removed from the cache to free up memory for new items because Memcached reached it’s maximum memory setting (limit_maxbytes).
+:   Number of objects removed from the cache to free up memory for new items because Memcached reached it's maximum memory setting (limit_maxbytes).
 
 type: long
 
@@ -110,6 +113,4 @@ type: long
 
 type: long
 
-
-$$$exported-fields-meraki$$$
 

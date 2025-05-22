@@ -1240,6 +1240,7 @@ toc:
           - file: metricbeat/exported-fields-linux.md
           - file: metricbeat/exported-fields-logstash.md
           - file: metricbeat/exported-fields-memcached.md
+          - file: metricbeat/exported-fields-meraki.md
           - file: metricbeat/exported-fields-mongodb.md
           - file: metricbeat/exported-fields-mssql.md
           - file: metricbeat/exported-fields-munin.md

@@ -11,9 +11,12 @@ Kafka module
 ## kafka [_kafka]
 
 
-## broker [_broker_2]
+
+
+## broker [_broker]
 
 Broker Consumer Group Information have been read from (Broker handling the consumer group).
+
 
 **`kafka.broker.id`**
 :   Broker id
@@ -57,10 +60,10 @@ type: keyword
 type: keyword
 
 
-
-## broker [_broker_3]
+## broker [_broker]
 
 Broker metrics from Kafka Broker JMX
+
 
 **`kafka.broker.mbean`**
 :   Mbean that this event is related to
@@ -188,10 +191,10 @@ type: float
 type: float
 
 
-
 ## consumer [_consumer]
 
 Consumer metrics from Kafka Consumer JMX
+
 
 **`kafka.consumer.mbean`**
 :   Mbean that this event is related to
@@ -247,10 +250,10 @@ type: float
 type: float
 
 
-
 ## consumergroup [_consumergroup]
 
 consumergroup
+
 
 **`kafka.consumergroup.id`**
 :   Consumer Group ID
@@ -282,10 +285,10 @@ type: long
 type: long
 
 
-
-## client [_client_3]
+## client [_client]
 
 Assigned client reading events from partition
+
 
 **`kafka.consumergroup.client.id`**
 :   Client ID (kafka setting client.id)
@@ -305,8 +308,7 @@ type: keyword
 type: keyword
 
 
-
-## partition [_partition_2]
+## partition [_partition]
 
 partition
 
@@ -314,6 +316,7 @@ partition
 ## offset [_offset]
 
 Available offsets of the given partition.
+
 
 **`kafka.partition.offset.newest`**
 :   Newest offset of the partition.
@@ -327,10 +330,10 @@ type: long
 type: long
 
 
-
-## partition [_partition_3]
+## partition [_partition]
 
 Partition data.
+
 
 **`kafka.partition.partition.leader`**
 :   Leader id (broker).
@@ -362,10 +365,10 @@ type: boolean
 type: long
 
 
-
 ## producer [_producer]
 
 Producer metrics from Kafka Producer JMX
+
 
 **`kafka.producer.mbean`**
 :   Mbean that this event is related to

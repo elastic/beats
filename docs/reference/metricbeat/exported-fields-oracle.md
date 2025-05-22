@@ -13,9 +13,10 @@ Oracle database module
 Oracle module
 
 
-## performance [_performance_5]
+## performance [_performance]
 
 Performance related metrics on a single database instance
+
 
 **`oracle.performance.machine`**
 :   Operating system machine name
@@ -42,21 +43,21 @@ type: double
 
 
 **`oracle.performance.lock_requests`**
-:   Average of the ratio between *gethits* and *gets* being *Gethits* the number of times an object’s handle was found in memory and *gets* the number of times a lock was requested for objects of this namespace.
+:   Average of the ratio between 'gethits' and 'gets' being 'Gethits' the number of times an object's handle was found in memory and 'gets' the number of times a lock was requested for objects of this namespace.
 
 type: long
 
 
 **`oracle.performance.pin_requests`**
-:   Average of all pinhits/pins ratios being *PinHits* the number of times all of the metadata pieces of the library object were found in memory and *pins* the number of times a PIN was requested for objects of this namespace
+:   Average of all pinhits/pins ratios being 'PinHits' the number of times all of the metadata pieces of the library object were found in memory and 'pins' the number of times a PIN was requested for objects of this namespace
 
 type: double
 
 
-
-## cache [_cache_4]
+## cache [_cache]
 
 Statistics about all buffer pools available for the instance
+
 
 **`oracle.performance.cache.buffer.hit.pct`**
 :   The cache hit ratio of the specified buffer pool.
@@ -70,10 +71,10 @@ type: double
 type: long
 
 
-
 ## get [_get]
 
-Buffer pool *get* statistics
+Buffer pool 'get' statistics
+
 
 **`oracle.performance.cache.get.consistent`**
 :   Consistent gets statistic
@@ -87,10 +88,10 @@ type: long
 type: long
 
 
-
 ## cursors [_cursors]
 
 Cursors information
+
 
 **`oracle.performance.cursors.avg`**
 :   Average cursors opened by username and machine
@@ -110,10 +111,10 @@ type: double
 type: double
 
 
-
 ## opened [_opened]
 
 Opened cursors statistic
+
 
 **`oracle.performance.cursors.opened.current`**
 :   Total number of current open cursors
@@ -127,10 +128,10 @@ type: long
 type: long
 
 
-
 ## parse [_parse]
 
 Parses statistic information that occured in the current session
+
 
 **`oracle.performance.cursors.parse.real`**
 :   Real number of parses that occurred: session cursor cache hits - parse count (total)
@@ -156,10 +157,10 @@ type: long
 type: double
 
 
-
-## sysmetric [_sysmetric_2]
+## sysmetric [_sysmetric]
 
 Sysmetric related metrics.
+
 
 **`oracle.sysmetric.session_count`**
 :   Session Count.
@@ -251,10 +252,10 @@ type: double
 type: double
 
 
-
 ## tablespace [_tablespace]
 
 tablespace
+
 
 **`oracle.tablespace.name`**
 :   Tablespace name
@@ -262,10 +263,10 @@ tablespace
 type: keyword
 
 
-
 ## data_file [_data_file]
 
 Database files information
+
 
 **`oracle.tablespace.data_file.id`**
 :   Tablespace unique identifier
@@ -279,10 +280,10 @@ type: long
 type: keyword
 
 
-
-## size [_size_3]
+## size [_size]
 
 Size information about the file
+
 
 **`oracle.tablespace.data_file.size.max.bytes`**
 :   Maximum file size in bytes
@@ -309,7 +310,7 @@ format: bytes
 
 
 **`oracle.tablespace.data_file.status`**
-:   *File status: AVAILABLE or INVALID (INVALID means that the file number is not in use, for example, a file in a tablespace that was dropped)*
+:   'File status: AVAILABLE or INVALID (INVALID means that the file number is not in use, for example, a file in a tablespace that was dropped)'
 
 type: keyword
 
@@ -320,10 +321,10 @@ type: keyword
 type: keyword
 
 
-
 ## space [_space]
 
 Tablespace space usage information
+
 
 **`oracle.tablespace.space.free.bytes`**
 :   Tablespace total free space available, in bytes.

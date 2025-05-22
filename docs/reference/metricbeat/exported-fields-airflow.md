@@ -7,6 +7,8 @@ mapped_pages:
 
 Airflow module
 
+
+
 **`airflow.*.1m_rate`**
 :   Airflow 1m rate timers metric
 

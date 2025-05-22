@@ -1,8 +1,6 @@
 ---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-openai.html
-  # That link will 404 until 8.18 is current
-  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/exported-fields-openai.html)
 ---
 
 # openai fields [exported-fields-openai]
@@ -13,9 +11,12 @@ openai module
 ## openai [_openai]
 
 
-## usage [_usage_14]
+
+
+## usage [_usage]
 
 OpenAI API usage metrics and statistics
+
 
 **`openai.usage.organization_id`**
 :   Organization identifier
@@ -65,10 +66,10 @@ type: keyword
 type: keyword
 
 
-
-## data [_data_2]
+## data [_data]
 
 General usage data metrics
+
 
 **`openai.usage.data.requests_total`**
 :   Number of requests made
@@ -118,10 +119,10 @@ type: keyword
 type: keyword
 
 
-
 ## dalle [_dalle]
 
 DALL-E API usage metrics
+
 
 **`openai.usage.dalle.num_images`**
 :   Number of images generated
@@ -159,10 +160,10 @@ type: keyword
 type: keyword
 
 
-
 ## whisper [_whisper]
 
 Whisper API usage metrics
+
 
 **`openai.usage.whisper.model_id`**
 :   Model identifier
@@ -188,10 +189,10 @@ type: long
 type: keyword
 
 
-
 ## tts [_tts]
 
 Text-to-Speech API usage metrics
+
 
 **`openai.usage.tts.model_id`**
 :   Model identifier
@@ -217,10 +218,10 @@ type: long
 type: keyword
 
 
-
 ## ft_data [_ft_data]
 
 Fine-tuning data metrics
+
 
 **`openai.usage.ft_data.original`**
 :   Raw fine-tuning data
@@ -228,10 +229,10 @@ Fine-tuning data metrics
 type: object
 
 
-
 ## assistant_code_interpreter [_assistant_code_interpreter]
 
 Assistant Code Interpreter usage metrics
+
 
 **`openai.usage.assistant_code_interpreter.original`**
 :   Raw assistant code interpreter data
@@ -239,10 +240,10 @@ Assistant Code Interpreter usage metrics
 type: object
 
 
-
 ## retrieval_storage [_retrieval_storage]
 
 Retrieval storage usage metrics
+
 
 **`openai.usage.retrieval_storage.original`**
 :   Raw retrieval storage data

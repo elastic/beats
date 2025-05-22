@@ -11,9 +11,12 @@ iis module
 ## iis [_iis]
 
 
-## application_pool [_application_pool_2]
+
+
+## application_pool [_application_pool]
 
 Application pool process stats.
+
 
 **`iis.application_pool.name`**
 :   application pool name
@@ -21,10 +24,10 @@ Application pool process stats.
 type: keyword
 
 
-
-## process [_process_4]
+## process [_process]
 
 Worker process overview.
+
 
 **`iis.application_pool.process.handle_count`**
 :   The number of handles.
@@ -80,10 +83,10 @@ type: float
 type: float
 
 
-
 ## net_clr [_net_clr]
 
 Common Language Runtime overview.
+
 
 **`iis.application_pool.net_clr.finallys_per_sec`**
 :   The number of finallys per sec.
@@ -115,10 +118,10 @@ type: float
 type: float
 
 
-
-## memory [_memory_7]
+## memory [_memory]
 
 Memory overview.
+
 
 **`iis.application_pool.net_clr.memory.bytes_in_all_heaps`**
 :   Number of bytes in all heaps.
@@ -186,10 +189,10 @@ type: float
 type: float
 
 
-
 ## locks_and_threads [_locks_and_threads]
 
 LocksAndThreads overview.
+
 
 **`iis.application_pool.net_clr.locks_and_threads.contention_rate_per_sec`**
 :   Contention Rate / sec.
@@ -203,15 +206,15 @@ type: float
 type: float
 
 
-
-## webserver [_webserver_2]
+## webserver [_webserver]
 
 Webserver related metrics.
 
 
-## process [_process_5]
+## process [_process]
 
 The process related stats.
+
 
 **`iis.webserver.process.cpu_usage_perc`**
 :   The CPU usage percentage.
@@ -273,10 +276,10 @@ type: float
 type: float
 
 
-
 ## asp_net [_asp_net]
 
 Common Language Runtime overview.
+
 
 **`iis.webserver.asp_net.application_restarts`**
 :   Number of applications restarts.
@@ -290,10 +293,10 @@ type: float
 type: long
 
 
-
 ## asp_net_application [_asp_net_application]
 
 ASP.NET application overview.
+
 
 **`iis.webserver.asp_net_application.errors_total_per_sec`**
 :   Total number of errors per sec.
@@ -325,10 +328,10 @@ type: float
 type: float
 
 
-
 ## cache [_cache]
 
 The cache overview.
+
 
 **`iis.webserver.cache.current_file_cache_memory_usage`**
 :   The current file cache memory usage size.
@@ -414,10 +417,10 @@ type: float
 type: float
 
 
-
-## network [_network_6]
+## network [_network]
 
 The network related stats.
+
 
 **`iis.webserver.network.anonymous_users_per_sec`**
 :   The number of anonymous users per sec.
@@ -533,10 +536,10 @@ type: float
 type: float
 
 
-
-## website [_website_2]
+## website [_website]
 
 Website related metrics.
+
 
 **`iis.website.name`**
 :   website name
@@ -544,10 +547,10 @@ Website related metrics.
 type: keyword
 
 
-
-## network [_network_7]
+## network [_network]
 
 The network overview.
+
 
 **`iis.website.network.bytes_received_per_sec`**
 :   The bytes received per sec size.

@@ -11,9 +11,13 @@ envoyproxy module
 ## envoyproxy [_envoyproxy]
 
 
-## server [_server_4]
+
+
+## server [_server]
 
 Contains envoy proxy server stats
+
+
 
 **`envoyproxy.server.cluster_manager.active_clusters`**
 :   Number of currently active (warmed) clusters
@@ -69,6 +73,7 @@ type: integer
 type: integer
 
 
+
 **`envoyproxy.server.filesystem.flushed_by_timer`**
 :   Total number of times internal flush buffers are written to a file due to flush timeout
 
@@ -103,6 +108,7 @@ type: integer
 :   Total number of times an error occurred during a file write operation
 
 type: integer
+
 
 
 **`envoyproxy.server.runtime.load_error`**
@@ -151,6 +157,7 @@ type: integer
 :   Number of layers currently active (without loading errors)
 
 type: integer
+
 
 
 **`envoyproxy.server.listener_manager.listener_added`**
@@ -207,10 +214,12 @@ type: integer
 type: integer
 
 
+
 **`envoyproxy.server.stats.overflow`**
 :   Total number of times Envoy cannot allocate a statistic due to a shortage of shared memory
 
 type: integer
+
 
 
 **`envoyproxy.server.server.days_until_first_cert_expiring`**
@@ -305,6 +314,7 @@ type: integer
 
 **`envoyproxy.server.server.stats_recent_lookups`**
 :   type: integer
+
 
 
 **`envoyproxy.server.http2.header_overflow`**

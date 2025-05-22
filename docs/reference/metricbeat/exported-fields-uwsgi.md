@@ -11,9 +11,12 @@ uwsgi module
 ## uwsgi [_uwsgi]
 
 
-## status [_status_8]
+
+
+## status [_status]
 
 uwsgi.status metricset fields
+
 
 **`uwsgi.status.total.requests`**
 :   Total requests handled

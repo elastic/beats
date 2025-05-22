@@ -7,10 +7,14 @@ mapped_pages:
 
 Logstash module
 
+
+
 **`logstash_stats.timestamp`**
 :   type: alias
 
 alias to: @timestamp
+
+
 
 
 **`logstash_stats.jvm.mem.heap_used_in_bytes`**
@@ -31,6 +35,7 @@ alias to: logstash.node.stats.jvm.mem.heap_max_in_bytes
 alias to: logstash.node.stats.jvm.uptime_in_millis
 
 
+
 **`logstash_stats.events.in`**
 :   type: alias
 
@@ -49,6 +54,7 @@ alias to: logstash.node.stats.events.out
 alias to: logstash.node.stats.events.duration_in_millis
 
 
+
 **`logstash_stats.logstash.uuid`**
 :   type: alias
 
@@ -63,6 +69,9 @@ alias to: logstash.node.stats.logstash.version
 
 **`logstash_stats.pipelines`**
 :   type: nested
+
+
+
 
 
 **`logstash_stats.os.cpu.load_average.15m`**
@@ -83,16 +92,19 @@ alias to: logstash.node.stats.os.cpu.load_average.1m
 alias to: logstash.node.stats.os.cpu.load_average.5m
 
 
+
 **`logstash_stats.os.cgroup.cpuacct.usage_nanos`**
 :   type: alias
 
 alias to: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
 
 
+
 **`logstash_stats.os.cgroup.cpu.cfs_quota_micros`**
 :   type: alias
 
 alias to: logstash.node.stats.os.cgroup.cpu.cfs_quota_micros
+
 
 
 **`logstash_stats.os.cgroup.cpu.stat.number_of_elapsed_periods`**
@@ -125,6 +137,7 @@ alias to: logstash.node.stats.process.cpu.percent
 alias to: logstash.node.stats.queue.events_count
 
 
+
 **`logstash_state.pipeline.id`**
 :   type: alias
 
@@ -137,22 +150,23 @@ alias to: logstash.node.state.pipeline.id
 alias to: logstash.node.state.pipeline.hash
 
 
+
 **`logstash.elasticsearch.cluster.id`**
 :   type: keyword
 
 
-
-## node [_node_6]
+## node [_node]
 
 node
 
-
-## node [_node_7]
+## node [_node]
 
 node_stats metrics.
 
+
 **`logstash.node.id`**
 :   type: keyword
+
 
 
 **`logstash.node.state.pipeline.id`**
@@ -175,6 +189,7 @@ node_stats metrics.
 :   type: long
 
 
+
 **`logstash.node.state.pipeline.representation.hash`**
 :   type: keyword
 
@@ -185,6 +200,7 @@ node_stats metrics.
 
 **`logstash.node.state.pipeline.representation.version`**
 :   type: keyword
+
 
 
 **`logstash.node.state.pipeline.representation.graph.edges`**
@@ -211,10 +227,10 @@ type: alias
 alias to: service.version
 
 
-
-## jvm [_jvm_3]
+## jvm [_jvm]
 
 JVM Info
+
 
 **`logstash.node.jvm.version`**
 :   Version
@@ -230,12 +246,15 @@ type: alias
 alias to: process.pid
 
 
+
 **`logstash.node.stats.timestamp`**
 :   type: date
 
 
+
 **`logstash.node.stats.jvm.uptime_in_millis`**
 :   type: long
+
 
 
 **`logstash.node.stats.jvm.mem.heap_used_in_bytes`**
@@ -246,10 +265,10 @@ alias to: process.pid
 :   type: long
 
 
-
-## events [_events_2]
+## events [_events]
 
 Events stats
+
 
 **`logstash.node.stats.events.in`**
 :   Incoming events counter.
@@ -273,12 +292,16 @@ type: long
 :   type: long
 
 
+
 **`logstash.node.stats.logstash.uuid`**
 :   type: keyword
 
 
 **`logstash.node.stats.logstash.version`**
 :   type: keyword
+
+
+
 
 
 **`logstash.node.stats.os.cpu.load_average.15m`**
@@ -293,12 +316,15 @@ type: long
 :   type: half_float
 
 
+
 **`logstash.node.stats.os.cgroup.cpuacct.usage_nanos`**
 :   type: long
 
 
+
 **`logstash.node.stats.os.cgroup.cpu.cfs_quota_micros`**
 :   type: long
+
 
 
 **`logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods`**

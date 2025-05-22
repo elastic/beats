@@ -17,6 +17,7 @@ Metrics collected from Couchbase servers.
 
 Couchbase bucket metrics.
 
+
 **`couchbase.bucket.name`**
 :   Name of the bucket.
 
@@ -87,10 +88,10 @@ type: double
 type: long
 
 
-
 ## cluster [_cluster]
 
 Couchbase cluster metrics.
+
 
 **`couchbase.cluster.hdd.free.bytes`**
 :   Free hard drive space in the cluster (bytes).
@@ -206,10 +207,10 @@ type: long
 format: bytes
 
 
-
 ## node [_node]
 
 Couchbase node metrics.
+
 
 **`couchbase.node.cmd_get`**
 :   Number of get commands

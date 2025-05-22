@@ -12,11 +12,11 @@ etcd Module
 
 `etcd` contains statistics that were read from Etcd
 
+
 **`etcd.api_version`**
 :   Etcd API version for metrics retrieval
 
 type: keyword
-
 
 
 ## leader [_leader]
@@ -28,16 +28,17 @@ Contains etcd leader statistics.
 
 Contains follower statistics.
 
+
 **`etcd.leader.follower.id`**
 :   ID of follower
 
 type: keyword
 
 
-
 ## latency [_latency]
 
 latency to each peer in the cluster
+
 
 **`etcd.leader.follower.latency.ms`**
 :   type: scaled_float
@@ -61,10 +62,10 @@ type: integer
 type: keyword
 
 
-
-## server [_server_5]
+## server [_server]
 
 Server metrics from the Etcd V3 /metrics endpoint
+
 
 **`etcd.server.has_leader`**
 :   Whether a leader exists in the cluster
@@ -108,10 +109,10 @@ type: long
 type: long
 
 
-
 ## disk [_disk]
 
 Disk metrics from the Etcd V3 /metrics endpoint
+
 
 **`etcd.disk.mvcc_db_total_size.bytes`**
 :   Size of stored data at MVCC
@@ -157,10 +158,10 @@ type: long
 type: long
 
 
-
-## memory [_memory_6]
+## memory [_memory]
 
 Memory metrics from the Etcd V3 /metrics endpoint
+
 
 **`etcd.memory.go_memstats_alloc.bytes`**
 :   Memory allocated bytes as of MemStats Go
@@ -170,10 +171,10 @@ type: long
 format: bytes
 
 
-
-## network [_network_5]
+## network [_network]
 
 Network metrics from the Etcd V3 /metrics endpoint
+
 
 **`etcd.network.client_grpc_sent.bytes`**
 :   gRPC sent bytes total
@@ -191,10 +192,10 @@ type: long
 format: bytes
 
 
-
 ## self [_self]
 
 Contains etcd self statistics.
+
 
 **`etcd.self.id`**
 :   the unique identifier for the member
@@ -221,7 +222,7 @@ type: keyword
 
 
 **`etcd.self.name`**
-:   this member’s name
+:   this member's name
 
 type: keyword
 
@@ -274,10 +275,10 @@ type: keyword
 type: keyword
 
 
-
 ## store [_store]
 
 The store statistics include information about the operations that this node has handled.
+
 
 **`etcd.store.gets.success`**
 :   type: integer

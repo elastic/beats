@@ -10,16 +10,19 @@ RabbitMQ module
 
 ## rabbitmq [_rabbitmq]
 
+
+
+
 **`rabbitmq.vhost`**
 :   Virtual host name with non-ASCII characters escaped as in C.
 
 type: keyword
 
 
-
-## connection [_connection_4]
+## connection [_connection]
 
 connection
+
 
 **`rabbitmq.connection.name`**
 :   The name of the connection with non-ASCII characters escaped as in C.
@@ -143,10 +146,10 @@ type: long
 type: keyword
 
 
-
 ## exchange [_exchange]
 
 exchange
+
 
 **`rabbitmq.exchange.name`**
 :   The name of the queue with non-ASCII characters escaped as in C.
@@ -212,10 +215,10 @@ type: long
 type: float
 
 
-
-## node [_node_8]
+## node [_node]
 
 node
+
 
 **`rabbitmq.node.disk.free.bytes`**
 :   Disk free space in bytes.
@@ -451,10 +454,10 @@ type: keyword
 type: long
 
 
-
-## queue [_queue_9]
+## queue [_queue]
 
 queue
+
 
 **`rabbitmq.queue.name`**
 :   The name of the queue with non-ASCII characters escaped as in C.
@@ -497,7 +500,7 @@ alias to: rabbitmq.node.name
 
 
 **`rabbitmq.queue.state`**
-:   The state of the queue. Normally *running*, but may be "{syncing, MsgCount}" if the queue is synchronising. Queues which are located on cluster nodes that are currently down will be shown with a status of *down*.
+:   The state of the queue. Normally 'running', but may be "{syncing, MsgCount}" if the queue is synchronising. Queues which are located on cluster nodes that are currently down will be shown with a status of 'down'.
 
 type: keyword
 
@@ -584,10 +587,10 @@ type: long
 type: long
 
 
-
 ## shovel [_shovel]
 
 shovel
+
 
 **`rabbitmq.shovel.name`**
 :   The name of the shovel with non-ASCII characters escaped as in C.
@@ -612,13 +615,13 @@ alias to: rabbitmq.node.name
 
 
 **`rabbitmq.shovel.state`**
-:   The state of the shovel. Normally *running*, but could be *starting* or *terminated*.
+:   The state of the shovel. Normally 'running', but could be 'starting' or 'terminated'.
 
 type: keyword
 
 
 **`rabbitmq.shovel.type`**
-:   The type of the shovel. Either *static* or *dynamic*.
+:   The type of the shovel. Either 'static' or 'dynamic'.
 
 type: keyword
 

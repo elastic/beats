@@ -7,6 +7,7 @@ mapped_pages:
 
 Munin node metrics exporter
 
+
 **`munin.metrics.*`**
 :   Metrics exposed by a plugin of a munin node agent.
 
@@ -17,5 +18,6 @@ type: object
 :   Name of the plugin collecting these metrics.
 
 type: keyword
+
 
 

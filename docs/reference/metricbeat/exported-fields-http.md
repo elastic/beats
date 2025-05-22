@@ -8,12 +8,15 @@ mapped_pages:
 HTTP module
 
 
-## http [_http_4]
+## http [_http]
+
+
 
 
 ## request [_request]
 
 HTTP request information
+
 
 **`http.request.headers`**
 :   The HTTP headers sent
@@ -21,10 +24,10 @@ HTTP request information
 type: object
 
 
-
 ## response [_response]
 
 HTTP response information
+
 
 **`http.response.headers`**
 :   The HTTP headers received
@@ -48,13 +51,11 @@ type: keyword
 example: Not found
 
 
-
 ## json [_json]
 
 json metricset
 
-
-## server [_server_8]
+## server [_server]
 
 server
 

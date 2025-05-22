@@ -11,9 +11,12 @@ Golang module
 ## golang [_golang]
 
 
+
+
 ## expvar [_expvar]
 
 expvar
+
 
 **`golang.expvar.cmdline`**
 :   The cmdline of this Go program start with.
@@ -21,10 +24,10 @@ expvar
 type: keyword
 
 
-
 ## heap [_heap]
 
 The Go program heap information exposed by expvar.
+
 
 **`golang.heap.cmdline`**
 :   The cmdline of this Go program start with.
@@ -32,8 +35,7 @@ The Go program heap information exposed by expvar.
 type: keyword
 
 
-
-## gc [_gc_2]
+## gc [_gc]
 
 Garbage collector summary.
 
@@ -41,6 +43,7 @@ Garbage collector summary.
 ## total_pause [_total_pause]
 
 Total GC pause duration over lifetime of process.
+
 
 **`golang.heap.gc.total_pause.ns`**
 :   Duration in Ns.
@@ -68,10 +71,10 @@ format: bytes
 type: float
 
 
-
-## pause [_pause_2]
+## pause [_pause]
 
 Last GC pause durations during the monitoring period.
+
 
 **`golang.heap.gc.pause.count`**
 :   Count of GC pause duration during this collect period.
@@ -79,10 +82,10 @@ Last GC pause durations during the monitoring period.
 type: long
 
 
-
 ## sum [_sum]
 
 Total GC pause duration during this collect period.
+
 
 **`golang.heap.gc.pause.sum.ns`**
 :   Duration in Ns.
@@ -90,10 +93,10 @@ Total GC pause duration during this collect period.
 type: long
 
 
-
 ## max [_max]
 
 Max GC pause duration during this collect period.
+
 
 **`golang.heap.gc.pause.max.ns`**
 :   Duration in Ns.
@@ -101,10 +104,10 @@ Max GC pause duration during this collect period.
 type: long
 
 
-
 ## avg [_avg]
 
 Average GC pause duration during this collect period.
+
 
 **`golang.heap.gc.pause.avg.ns`**
 :   Duration in Ns.
@@ -112,10 +115,10 @@ Average GC pause duration during this collect period.
 type: long
 
 
-
-## system [_system_2]
+## system [_system]
 
 Heap summary,which bytes was obtained from system.
+
 
 **`golang.heap.system.total`**
 :   Total bytes obtained from system (sum of XxxSys below).
@@ -149,10 +152,10 @@ type: long
 format: bytes
 
 
-
 ## allocations [_allocations]
 
 Heap allocations summary.
+
 
 **`golang.heap.allocations.mallocs`**
 :   Number of mallocs.

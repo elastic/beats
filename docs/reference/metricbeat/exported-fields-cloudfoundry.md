@@ -10,16 +10,19 @@ Cloud Foundry module
 
 ## cloudfoundry [_cloudfoundry]
 
+
+
+
 **`cloudfoundry.type`**
-:   The type of event from Cloud Foundry. Possible values include *container*, *counter* and *value*.
+:   The type of event from Cloud Foundry. Possible values include 'container', 'counter' and 'value'.
 
 type: keyword
-
 
 
 ## app [_app]
 
 The application the metric is associated with.
+
 
 **`cloudfoundry.app.id`**
 :   The ID of the application.
@@ -27,10 +30,10 @@ The application the metric is associated with.
 type: keyword
 
 
-
-## container [_container_2]
+## container [_container]
 
 `container` contains container metrics from Cloud Foundry.
+
 
 **`cloudfoundry.container.instance_index`**
 :   Index of the instance the metric belongs to.
@@ -68,10 +71,10 @@ type: long
 type: long
 
 
-
-## counter [_counter_2]
+## counter [_counter]
 
 `counter` contains counter metrics from Cloud Foundry.
+
 
 **`cloudfoundry.counter.name`**
 :   The name of the counter.
@@ -91,10 +94,10 @@ type: long
 type: long
 
 
-
-## value [_value_2]
+## value [_value]
 
 `value` contains counter metrics from Cloud Foundry.
+
 
 **`cloudfoundry.value.name`**
 :   The name of the value.

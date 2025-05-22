@@ -18,9 +18,10 @@ linux system metrics
 conntrack
 
 
-## summary [_summary_5]
+## summary [_summary]
 
 summary of nf_conntrack statistics, summed across CPU cores
+
 
 **`linux.conntrack.summary.drop`**
 :   packets dropped due to conntrack failiure
@@ -70,10 +71,10 @@ type: long
 type: long
 
 
-
 ## iostat [_iostat]
 
 iostat
+
 
 **`linux.iostat.read.request.merges_per_sec`**
 :   The number of read requests merged per second that were queued to the device.
@@ -157,15 +158,15 @@ type: float
 type: float
 
 
-
 ## ksm [_ksm]
 
 ksm
 
 
-## stats [_stats_6]
+## stats [_stats]
 
 KSM statistics
+
 
 **`linux.ksm.stats.pages_shared`**
 :   Shared pages in use.
@@ -203,8 +204,7 @@ type: long
 type: long
 
 
-
-## memory [_memory_8]
+## memory [_memory]
 
 Linux memory data
 
@@ -212,6 +212,7 @@ Linux memory data
 ## page_stats [_page_stats]
 
 memory page statistics
+
 
 **`linux.memory.page_stats.pgscan_kswapd.pages`**
 :   pages scanned by kswapd
@@ -269,10 +270,10 @@ type: scaled_float
 format: percent
 
 
-
 ## hugepages [_hugepages]
 
 This group contains statistics related to huge pages usage on the system.
+
 
 **`linux.memory.hugepages.total`**
 :   Number of huge pages in the pool.
@@ -330,10 +331,10 @@ type: long
 format: bytes
 
 
-
-## swap [_swap_2]
+## swap [_swap]
 
 This group contains statistics related to the swap memory usage on the system.
+
 
 **`linux.memory.swap.total`**
 :   Total swap memory.
@@ -391,7 +392,6 @@ type: long
 type: long
 
 
-
 ## pageinfo [_pageinfo]
 
 pageinfo
@@ -402,9 +402,10 @@ pageinfo
 Data from /proc/buddyinfo grouping used pages by order
 
 
-## DMA [_dma]
+## DMA [_DMA]
 
 DMA page Data
+
 
 **`linux.pageinfo.buddy_info.DMA.0`**
 :   free chunks of 2^0*PAGE_SIZE
@@ -478,10 +479,10 @@ type: long
 type: object
 
 
-
 ## pressure [_pressure]
 
 Linux pressure stall information metrics for cpu, memory, and io
+
 
 **`linux.pressure.cpu.some.10.pct`**
 :   The average share of time in which at least some tasks were stalled on CPU over a ten second window.
@@ -633,10 +634,10 @@ format: percent
 type: long
 
 
-
 ## rapl [_rapl]
 
 Wattage as reported by Intel RAPL
+
 
 **`linux.rapl.core`**
 :   The core where the RAPL request originated from. Only one core is queried per hardware CPU.

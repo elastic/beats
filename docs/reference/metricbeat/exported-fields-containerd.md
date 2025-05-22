@@ -10,7 +10,8 @@ Containerd stats collected from containerd
 
 ## containerd [_containerd]
 
-Information and statistics about containerd’s running containers.
+Information and statistics about containerd's running containers.
+
 
 **`containerd.namespace`**
 :   Containerd namespace
@@ -18,10 +19,10 @@ Information and statistics about containerd’s running containers.
 type: keyword
 
 
-
 ## blkio [_blkio]
 
 Block I/O metrics.
+
 
 **`containerd.blkio.device`**
 :   Name of block device
@@ -29,10 +30,10 @@ Block I/O metrics.
 type: keyword
 
 
-
-## read [_read_4]
+## read [_read]
 
 Accumulated reads during the life of the container
+
 
 **`containerd.blkio.read.ops`**
 :   Number of reads during the life of the container
@@ -48,10 +49,10 @@ type: long
 format: bytes
 
 
-
-## write [_write_4]
+## write [_write]
 
 Accumulated writes during the life of the container
+
 
 **`containerd.blkio.write.ops`**
 :   Number of writes during the life of the container
@@ -67,10 +68,10 @@ type: long
 format: bytes
 
 
-
-## summary [_summary_2]
+## summary [_summary]
 
 Accumulated reads and writes during the life of the container
+
 
 **`containerd.blkio.summary.ops`**
 :   Number of I/O operations during the life of the container
@@ -86,15 +87,17 @@ type: long
 format: bytes
 
 
-
-## cpu [_cpu_4]
+## cpu [_cpu]
 
 Containerd Runtime CPU metrics.
+
 
 **`containerd.cpu.system.total`**
 :   Total user and system CPU time spent in seconds.
 
 type: double
+
+
 
 
 **`containerd.cpu.usage.kernel.ns`**
@@ -103,10 +106,12 @@ type: double
 type: double
 
 
+
 **`containerd.cpu.usage.user.ns`**
 :   CPU User usage nanoseconds
 
 type: double
+
 
 
 **`containerd.cpu.usage.total.ns`**
@@ -145,10 +150,10 @@ format: percent
 type: object
 
 
-
-## memory [_memory_4]
+## memory [_memory]
 
 memory
+
 
 **`containerd.memory.workingset.pct`**
 :   Memory working set percentage.
@@ -190,10 +195,10 @@ type: long
 format: bytes
 
 
-
-## usage [_usage_12]
+## usage [_usage]
 
 Usage memory stats.
+
 
 **`containerd.memory.usage.max`**
 :   Max memory usage.
@@ -233,10 +238,10 @@ type: long
 format: bytes
 
 
-
 ## kernel [_kernel]
 
 Kernel memory stats.
+
 
 **`containerd.memory.kernel.max`**
 :   Kernel max memory usage.
@@ -268,10 +273,10 @@ type: long
 format: bytes
 
 
-
 ## swap [_swap]
 
 Swap memory stats.
+
 
 **`containerd.memory.swap.max`**
 :   Swap max memory usage.

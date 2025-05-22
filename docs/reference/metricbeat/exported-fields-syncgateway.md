@@ -13,9 +13,10 @@ SyncGateway metrics
 `syncgateway` contains the information and statistics from SyncGateway.
 
 
-## syncgateway [_syncgateway_2]
+## syncgateway [_syncgateway]
 
 Couchbase Sync Gateway metrics.
+
 
 **`syncgateway.syncgateway.name`**
 :   Name of the database on when field `couchbase.syncgateway.type` is `db_stats`.
@@ -23,10 +24,12 @@ Couchbase Sync Gateway metrics.
 type: keyword
 
 
-
-## metrics [_metrics_10]
+## metrics [_metrics]
 
 Metrics of all databases contained in the config file of the SyncGateway instance.
+
+
+
 
 **`syncgateway.syncgateway.metrics.docs.writes.conflict.count`**
 :   type: long
@@ -38,6 +41,7 @@ Metrics of all databases contained in the config file of the SyncGateway instanc
 
 **`syncgateway.syncgateway.metrics.docs.writes.bytes`**
 :   type: long
+
 
 
 **`syncgateway.syncgateway.metrics.replications.active`**
@@ -52,6 +56,10 @@ type: long
 type: long
 
 
+
+
+
+
 **`syncgateway.syncgateway.gsi.views.tombstones.query.count`**
 :   type: double
 
@@ -64,8 +72,11 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.access.query.count`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.gsi.views.access.query.error.count`**
@@ -76,8 +87,11 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.channels.query.count`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.gsi.views.channels.query.error.count`**
@@ -88,6 +102,8 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.channels.star.query.time`**
 :   type: double
 
@@ -96,12 +112,16 @@ type: long
 :   type: double
 
 
+
 **`syncgateway.syncgateway.gsi.views.channels.star.query.error.count`**
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.role_access.query.count`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.gsi.views.role_access.query.error.count`**
@@ -112,8 +132,11 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.sequences.query.count`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.gsi.views.sequences.query.error.count`**
@@ -124,8 +147,11 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.all_docs.query.count`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.gsi.views.all_docs.query.error.count`**
@@ -136,8 +162,11 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.principals.query.count`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.gsi.views.principals.query.error.count`**
@@ -148,8 +177,11 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.resync.query.count`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.gsi.views.resync.query.error.count`**
@@ -160,8 +192,11 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.gsi.views.sessions.query.count`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.gsi.views.sessions.query.error.count`**
@@ -172,16 +207,24 @@ type: long
 :   type: double
 
 
+
+
 **`syncgateway.syncgateway.security.access_errors.count`**
 :   type: double
+
+
 
 
 **`syncgateway.syncgateway.security.auth.failed.count`**
 :   type: double
 
 
+
 **`syncgateway.syncgateway.security.docs_rejected.count`**
 :   type: double
+
+
+
 
 
 **`syncgateway.syncgateway.cache.channel.revs.active`**
@@ -204,12 +247,16 @@ type: long
 :   type: double
 
 
+
 **`syncgateway.syncgateway.cache.revs.hits`**
 :   type: double
 
 
 **`syncgateway.syncgateway.cache.revs.misses`**
 :   type: double
+
+
+
 
 
 **`syncgateway.syncgateway.cbl.replication.pull.caught_up`**
@@ -220,12 +267,14 @@ type: long
 :   type: double
 
 
+
 **`syncgateway.syncgateway.cbl.replication.pull.total.continuous`**
 :   type: double
 
 
 **`syncgateway.syncgateway.cbl.replication.pull.total.one_shot`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.cbl.replication.pull.active.continuous`**
@@ -240,12 +289,14 @@ type: long
 :   type: double
 
 
+
 **`syncgateway.syncgateway.cbl.replication.pull.attachment.bytes`**
 :   type: long
 
 
 **`syncgateway.syncgateway.cbl.replication.pull.attachment.count`**
 :   type: long
+
 
 
 **`syncgateway.syncgateway.cbl.replication.pull.request_changes.count`**
@@ -256,8 +307,10 @@ type: long
 :   type: double
 
 
+
 **`syncgateway.syncgateway.cbl.replication.pull.rev.processing_time`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.cbl.replication.pull.rev.send.count`**
@@ -266,6 +319,8 @@ type: long
 
 **`syncgateway.syncgateway.cbl.replication.pull.rev.send.latency`**
 :   type: double
+
+
 
 
 **`syncgateway.syncgateway.cbl.replication.push.attachment.bytes`**
@@ -280,12 +335,14 @@ type: long
 :   type: double
 
 
+
 **`syncgateway.syncgateway.cbl.replication.push.propose_change.count`**
 :   type: double
 
 
 **`syncgateway.syncgateway.cbl.replication.push.propose_change.time`**
 :   type: double
+
 
 
 **`syncgateway.syncgateway.cbl.replication.push.sync_function.count`**
@@ -300,10 +357,10 @@ type: long
 :   type: double
 
 
-
 ## memstats [_memstats]
 
 Dumps a large amount of information about the memory heap and garbage collector
+
 
 **`syncgateway.syncgateway.memstats.BuckHashSys`**
 :   type: double
@@ -421,10 +478,10 @@ Dumps a large amount of information about the memory heap and garbage collector
 :   type: double
 
 
-
-## memory [_memory_11]
+## memory [_memory]
 
 SyncGateway memory metrics. It dumps a large amount of information about the memory heap and garbage collector
+
 
 **`syncgateway.memory.BuckHashSys`**
 :   type: double
@@ -542,15 +599,17 @@ SyncGateway memory metrics. It dumps a large amount of information about the mem
 :   type: double
 
 
-
-## replication [_replication_3]
+## replication [_replication]
 
 SyncGateway per replication metrics.
 
 
-## metrics [_metrics_11]
+## metrics [_metrics]
 
 Metrics related with data replication.
+
+
+
 
 **`syncgateway.replication.metrics.attachment.transferred.bytes`**
 :   Number of attachment bytes transferred for this replica.
@@ -564,10 +623,12 @@ type: long
 type: long
 
 
+
 **`syncgateway.replication.metrics.docs.checked_sent`**
 :   The total number of documents checked for changes since replication started.
 
 type: double
+
 
 
 **`syncgateway.replication.metrics.docs.pushed.count`**
@@ -588,10 +649,10 @@ type: long
 type: keyword
 
 
-
 ## resources [_resources]
 
 SyncGateway global resource utilization
+
 
 **`syncgateway.resources.error_count`**
 :   type: long
@@ -605,6 +666,7 @@ SyncGateway global resource utilization
 :   type: long
 
 
+
 **`syncgateway.resources.process.cpu_percent_utilization`**
 :   type: long
 
@@ -613,12 +675,16 @@ SyncGateway global resource utilization
 :   type: long
 
 
+
+
 **`syncgateway.resources.pub_net.recv.bytes`**
 :   type: long
 
 
+
 **`syncgateway.resources.pub_net.sent.bytes`**
 :   type: long
+
 
 
 **`syncgateway.resources.admin_net_bytes.recv`**
@@ -627,6 +693,8 @@ SyncGateway global resource utilization
 
 **`syncgateway.resources.admin_net_bytes.sent`**
 :   type: long
+
+
 
 
 **`syncgateway.resources.go_memstats.heap.alloc`**
@@ -645,8 +713,10 @@ SyncGateway global resource utilization
 :   type: long
 
 
+
 **`syncgateway.resources.go_memstats.pause.ns`**
 :   type: long
+
 
 
 **`syncgateway.resources.go_memstats.stack.inuse`**

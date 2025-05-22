@@ -17,6 +17,7 @@ Nginx server status metrics collected from various modules.
 
 `stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
 
+
 **`nginx.stubstatus.hostname`**
 :   Nginx hostname.
 

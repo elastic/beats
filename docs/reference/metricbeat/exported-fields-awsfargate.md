@@ -7,6 +7,8 @@ mapped_pages:
 
 `awsfargate` module collects AWS fargate metrics from task metadata endpoint.
 
+
+
 **`awsfargate.container.labels.com_amazonaws_ecs_cluster`**
 :   ECS Cluster name
 
@@ -37,10 +39,10 @@ type: keyword
 type: keyword
 
 
-
-## task_stats [_task_stats_2]
+## task_stats [_task_stats]
 
 `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
+
 
 **`awsfargate.task_stats.cluster_name`**
 :   Cluster name (Pippero)
@@ -55,7 +57,7 @@ type: keyword
 
 
 **`awsfargate.task_stats.identifier`**
-:   Container identifier across tasks and clusters, which equals to container.name + */* + container.id.
+:   Container identifier across tasks and clusters, which equals to container.name + '/' + container.id.
 
 type: keyword
 
@@ -78,10 +80,10 @@ type: keyword
 type: scaled_float
 
 
-
-## cpu [_cpu_3]
+## cpu [_cpu]
 
 Runtime CPU metrics.
+
 
 **`awsfargate.task_stats.cpu.kernel.pct`**
 :   Percentage of time in kernel space, expressed as a value between 0 and 1.
@@ -165,15 +167,15 @@ type: scaled_float
 format: percent
 
 
-
-## diskio [_diskio_2]
+## diskio [_diskio]
 
 Disk I/O metrics.
 
 
-## read [_read_2]
+## read [_read]
 
 Accumulated reads during the life of the container
+
 
 **`awsfargate.task_stats.diskio.read.ops`**
 :   Number of reads during the life of the container
@@ -214,19 +216,17 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.reads`**
-:   :::{admonition} Deprecated in 6.4
-    The `awsfargate.task_stats.diskio.reads` field was deprecated in 6.4.
-    :::
+:   Number of current reads per second
 
-Number of current reads per second
+deprecated:[6.4]
 
 type: scaled_float
 
 
-
-## write [_write_2]
+## write [_write]
 
 Accumulated writes during the life of the container
+
 
 **`awsfargate.task_stats.diskio.write.ops`**
 :   Number of writes during the life of the container
@@ -267,19 +267,17 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.writes`**
-:   :::{admonition} Deprecated in 6.4
-    The `awsfargate.task_stats.diskio.writes` field was deprecated in 6.4.
-    :::
+:   Number of current writes per second
 
-Number of current writes per second
+deprecated:[6.4]
 
 type: scaled_float
-
 
 
 ## summary [_summary]
 
 Accumulated reads and writes during the life of the container
+
 
 **`awsfargate.task_stats.diskio.summary.ops`**
 :   Number of I/O operations during the life of the container
@@ -320,19 +318,17 @@ type: long
 
 
 **`awsfargate.task_stats.diskio.total`**
-:   :::{admonition} Deprecated in 6.4
-    The `aawsfargate.task_stats.diskio.total` field was deprecated in 6.4.
-    :::
+:   Number of reads and writes per second
 
-Number of reads and writes per second
+deprecated:[6.4]
 
 type: scaled_float
 
 
-
-## memory [_memory_3]
+## memory [_memory]
 
 Memory metrics.
+
 
 **`awsfargate.task_stats.memory.stats`**
 :   Raw memory stats from the cgroups memory.stat interface
@@ -340,10 +336,10 @@ Memory metrics.
 type: object
 
 
-
 ## commit [_commit]
 
 Committed bytes on Windows
+
 
 **`awsfargate.task_stats.memory.commit.total`**
 :   Total bytes
@@ -383,10 +379,10 @@ type: long
 format: bytes
 
 
-
 ## rss [_rss]
 
 RSS memory stats.
+
 
 **`awsfargate.task_stats.memory.rss.total`**
 :   Total memory resident set size.
@@ -404,10 +400,10 @@ type: scaled_float
 format: percent
 
 
-
-## usage [_usage_11]
+## usage [_usage]
 
 Usage memory stats.
+
 
 **`awsfargate.task_stats.memory.usage.max`**
 :   Max memory usage.
@@ -423,6 +419,7 @@ format: bytes
 type: long
 
 format: bytes
+
 
 
 **`awsfargate.task_stats.network.*.inbound.bytes`**
@@ -449,6 +446,7 @@ type: long
 :   Total number of incoming packets.
 
 type: long
+
 
 
 **`awsfargate.task_stats.network.*.outbound.bytes`**
