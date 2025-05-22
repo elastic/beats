@@ -113,7 +113,3 @@ type: long
 
 $$$exported-fields-meraki$$$
 
-**`meraki.device.serial`**
-:   type: keyword
-
-
