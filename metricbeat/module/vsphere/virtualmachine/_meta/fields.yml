@@ -39,7 +39,7 @@
       type: long
       description: >
         Available CPU in Mhz.
-    - name: cpu.percent
+    - name: cpu.usage.percent
       type: long
       description: >
         CPU usage as a percentage.
@@ -63,7 +63,7 @@
       description: >
         Free memory of Guest in bytes.
       format: bytes
-    - name: memory.percent
+    - name: memory.usage.percent
       type: long
       description: >
         Memory usage as percent of total configured or available memory.
