@@ -104,7 +104,7 @@ func TestGetPerfMetrics(t *testing.T) {
 			assertResults: func(t2 *testing.T, metricMap map[string]interface{}, err error) {
 				require.NoError(t, err)
 				assert.InDeltaMapValues(t, map[string]interface{}{
-					"metric1": 53,
+					"metric1": 53.2,
 				}, metricMap, 0)
 			},
 		},
