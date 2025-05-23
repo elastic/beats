@@ -425,6 +425,9 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 				time.Sleep(waitTime)
 			}
+			if response == nil {
+				return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
+			}
 			return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w and (status %d)", retryConfig.MaxAttempts, err, response.StatusCode)
 		} else {
 			for attempt := 1; ; attempt++ {
