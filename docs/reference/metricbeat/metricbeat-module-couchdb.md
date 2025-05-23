@@ -37,7 +37,6 @@ metricbeat.modules:
   hosts: ["localhost:5984"]
   username: "admin"
   password: "password"
-----
 ```
 
 This module supports TLS connections when using `ssl` config field, as described in [SSL](/reference/metricbeat/configuration-ssl.md). It also supports the options described in [Standard HTTP config options](/reference/metricbeat/configuration-metricbeat.md#module-http-config-options).
