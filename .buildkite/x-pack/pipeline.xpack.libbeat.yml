@@ -39,7 +39,7 @@ steps:
             - limit: 1
         agents:
           image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
-          cpu: "8000m"
+          cpu: "4000m"
           memory: "8Gi"
           useCustomGlobalHooks: true
         notify:
