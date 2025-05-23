@@ -14,7 +14,7 @@
       "action": "Executing Pipeline",
       "category": "process",
       "code": "4103",
-      "ingested": "2022-06-08T06:07:25.896041700Z",
+      "ingested": "2025-01-15T10:02:22.083664757Z",
       "kind": "event",
       "module": "powershell",
       "provider": "Microsoft-Windows-PowerShell",
@@ -22,7 +22,11 @@
       "type": "info"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -89,8 +93,7 @@
       "name": "vagrant"
     },
     "winlog": {
-      "activity_id": "{1aca0717-2acb-0002-c208-ca1acb2ad601}",
-      "api": "wineventlog",
+      "activity_id": "{1ACA0717-2ACB-0002-C208-CA1ACB2AD601}",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
       "event_id": "4103",
@@ -101,7 +104,7 @@
           "id": 3616
         }
       },
-      "provider_guid": "{a0c1853b-5c40-4b15-8766-3cf1c58f985a}",
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
       "provider_name": "Microsoft-Windows-PowerShell",
       "record_id": "3885",
       "task": "Executing Pipeline",
@@ -120,7 +123,7 @@
       "action": "Executing Pipeline",
       "category": "process",
       "code": "4103",
-      "ingested": "2022-06-08T06:07:25.896068100Z",
+      "ingested": "2025-01-15T10:02:22.083688734Z",
       "kind": "event",
       "module": "powershell",
       "provider": "Microsoft-Windows-PowerShell",
@@ -128,7 +131,11 @@
       "type": "info"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -215,8 +222,7 @@
       "name": "vagrant"
     },
     "winlog": {
-      "activity_id": "{1aca0717-2acb-0003-db0b-ca1acb2ad601}",
-      "api": "wineventlog",
+      "activity_id": "{1ACA0717-2ACB-0003-DB0B-CA1ACB2AD601}",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
       "event_id": "4103",
@@ -227,7 +233,7 @@
           "id": 4160
         }
       },
-      "provider_guid": "{a0c1853b-5c40-4b15-8766-3cf1c58f985a}",
+      "provider_guid": "{A0C1853B-5C40-4B15-8766-3CF1C58F985A}",
       "provider_name": "Microsoft-Windows-PowerShell",
       "record_id": "3917",
       "task": "Executing Pipeline",

@@ -12,8 +12,8 @@ import (
 // Source, it is the cursor source
 type Source struct {
 	BucketName               string
-	BucketTimeOut            time.Duration
 	ProjectId                string
+	BatchSize                int
 	MaxWorkers               int
 	Poll                     bool
 	PollInterval             time.Duration
@@ -22,6 +22,7 @@ type Source struct {
 	FileSelectors            []fileSelectorConfig
 	ReaderConfig             readerConfig
 	ExpandEventListFromField string
+	Retry                    retryConfig
 }
 
 func (s *Source) Name() string {

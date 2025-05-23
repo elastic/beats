@@ -49,20 +49,21 @@ type publishClient struct {
 func newPublishClient(
 	es *eslegclient.Connection,
 	params map[string]string,
+	logger *logp.Logger,
 ) (*publishClient, error) {
 	p := &publishClient{
 		es:     es,
 		params: params,
 
-		log: logp.NewLogger(logSelector),
+		log: logger.Named(logSelector),
 	}
 	return p, nil
 }
 
-func (c *publishClient) Connect() error {
+func (c *publishClient) Connect(ctx context.Context) error {
 	c.log.Debug("Monitoring client: connect.")
 
-	err := c.es.Connect()
+	err := c.es.Connect(ctx)
 	if err != nil {
 		return fmt.Errorf("cannot connect underlying Elasticsearch client: %w", err)
 	}

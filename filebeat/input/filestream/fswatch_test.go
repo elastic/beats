@@ -222,6 +222,7 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
+  fingerprint.enabled: false
   check_interval: 10ms
 `
 
@@ -260,10 +261,11 @@ scanner:
 		paths := []string{filepath.Join(dir, "*.log")}
 		cfgStr := `
 scanner:
-  check_interval: 10ms
+  fingerprint.enabled: false
+  check_interval: 50ms
 `
 
-		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
 		logp.DevelopmentSetup(logp.ToObserverOutput())
@@ -289,7 +291,7 @@ scanner:
 					}
 				}
 				return false
-			}, 100*time.Millisecond, 10*time.Millisecond, "required a debug message %q but never found", expLogMsg)
+			}, time.Second, 10*time.Millisecond, "required a debug message %q but never found", expLogMsg)
 		})
 
 		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {
@@ -370,6 +372,7 @@ scanner:
 		}
 		cfgStr := `
 scanner:
+  fingerprint.enabled: false
   check_interval: 100ms
 `
 
@@ -615,6 +618,7 @@ scanner:
 			name: "returns no symlink if the original file is excluded",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   exclude_files: ['.*exclude.*', '.*traveler.*']
   symlinks: true
 `,
@@ -661,6 +665,7 @@ scanner:
 			name: "returns no included symlink if the original file is not included",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   include_files: ['.*include.*', '.*portal.*']
   symlinks: true
 `,
@@ -678,6 +683,7 @@ scanner:
 			name: "returns an included symlink if the original file is included",
 			cfgStr: `
 scanner:
+  fingerprint.enabled: false
   include_files: ['.*include.*', '.*portal.*', '.*traveler.*']
   symlinks: true
 `,

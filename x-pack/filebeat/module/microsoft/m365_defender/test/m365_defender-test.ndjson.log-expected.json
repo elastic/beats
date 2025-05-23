@@ -674,7 +674,7 @@
         "microsoft.m365_defender.alerts.detectionSource": "WindowsDefenderAv",
         "microsoft.m365_defender.alerts.devices": [
             {
-                "deviceDnsName": "TestServer4",
+                "deviceDnsName": "TestServer5",
                 "firstSeen": "2020-06-30T08:55:08.8320449Z",
                 "healthStatus": "Inactive",
                 "mdatpDeviceId": "75a63a39f9bc5a964f417c11f6277d5bf9489f0d",
@@ -686,7 +686,7 @@
                 "version": "Other"
             },
             {
-                "deviceDnsName": "TestServer5",
+                "deviceDnsName": "TestServer4",
                 "firstSeen": "2020-06-30T08:55:08.8320449Z",
                 "healthStatus": "Inactive",
                 "mdatpDeviceId": "75a63a39f9bc5a964f417c11f6277d5bf9489f0d",

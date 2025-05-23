@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -128,7 +129,7 @@ func baseModule(t *testing.T, r *Register, module, metricSet string) BaseMetricS
 	c.Query = QueryParams{"default": "foo"}
 	raw, err := conf.NewConfigFrom(c)
 	require.NoError(t, err)
-	baseModule, err := newBaseModuleFromConfig(raw)
+	baseModule, err := newBaseModuleFromConfig(raw, logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	bm := BaseMetricSet{

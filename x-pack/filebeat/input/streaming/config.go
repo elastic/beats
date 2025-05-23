@@ -12,8 +12,15 @@ import (
 	"regexp"
 	"time"
 
+	"golang.org/x/oauth2"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+)
+
+const (
+	authStyleInHeader = "in_header"
+	authStyleInParams = "in_params"
 )
 
 type config struct {
@@ -41,9 +48,10 @@ type config struct {
 	Redact *redact `config:"redact"`
 	// Retry is the configuration for retrying failed connections.
 	Retry *retry `config:"retry"`
-
+	// Transport is the common the transport config.
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
-
+	// KeepAlive is the configuration for keep-alive settings.
+	KeepAlive keepAliveConfig `config:"keep_alive"`
 	// CrowdstrikeAppID is the value used to set the
 	// appId request parameter in the FalconHose stream
 	// discovery request.
@@ -60,11 +68,27 @@ type redact struct {
 }
 
 type retry struct {
-	MaxAttempts int           `config:"max_attempts"`
-	WaitMin     time.Duration `config:"wait_min"`
-	WaitMax     time.Duration `config:"wait_max"`
+	MaxAttempts     int           `config:"max_attempts"`
+	WaitMin         time.Duration `config:"wait_min"`
+	WaitMax         time.Duration `config:"wait_max"`
+	BlanketRetries  bool          `config:"blanket_retries"`
+	InfiniteRetries bool          `config:"infinite_retries"`
 }
 
+// keepAliveConfig is the configuration for keep-alive settings.
+type keepAliveConfig struct {
+	// Enable indicates whether keep-alive is enabled.
+	Enable bool `config:"enable"`
+	// Interval is the interval between keep-alive messages.
+	// by default, this is set to 30 seconds.
+	Interval time.Duration `config:"interval"`
+	// WriteControlDeadline is the deadline for write control messages.
+	// by default, this is set to 10 seconds.
+	WriteControlDeadline time.Duration `config:"write_control_deadline"`
+	// readControlDeadline is the deadline for read control messages.
+	// this is internally set to 3x the value of the writeControlDeadline to account for network latency/jitter.
+	readControlDeadline time.Duration
+}
 type authConfig struct {
 	// Custom auth config to use for authentication.
 	CustomAuth *customAuthConfig `config:"custom"`
@@ -84,11 +108,30 @@ type customAuthConfig struct {
 
 type oAuth2Config struct {
 	// common oauth fields
-	ClientID       string              `config:"client_id"`
-	ClientSecret   string              `config:"client_secret"`
-	EndpointParams map[string][]string `config:"endpoint_params"`
-	Scopes         []string            `config:"scopes"`
-	TokenURL       string              `config:"token_url"`
+	AuthStyle         string        `config:"auth_style"`
+	ClientID          string        `config:"client_id"`
+	ClientSecret      string        `config:"client_secret"`
+	EndpointParams    url.Values    `config:"endpoint_params"`
+	Scopes            []string      `config:"scopes"`
+	TokenExpiryBuffer time.Duration `config:"token_expiry_buffer" validate:"min=0"`
+	TokenURL          string        `config:"token_url"`
+	// accessToken is only used internally to set the initial headers via formHeader() if oauth2 is enabled
+	accessToken string
+}
+
+func (o oAuth2Config) isEnabled() bool {
+	return o.ClientID != "" && o.ClientSecret != "" && o.TokenURL != ""
+}
+
+func (o oAuth2Config) getAuthStyle() oauth2.AuthStyle {
+	switch o.AuthStyle {
+	case authStyleInHeader:
+		return oauth2.AuthStyleInHeader
+	case authStyleInParams:
+		return oauth2.AuthStyleInParams
+	default:
+		return oauth2.AuthStyleAutoDetect
+	}
 }
 
 type urlConfig struct {
@@ -137,10 +180,16 @@ func (c config) Validate() error {
 
 	if c.Retry != nil {
 		switch {
-		case c.Retry.MaxAttempts <= 0:
+		case c.Retry.MaxAttempts <= 0 && !c.Retry.InfiniteRetries:
 			return errors.New("max_attempts must be greater than zero")
 		case c.Retry.WaitMin > c.Retry.WaitMax:
 			return errors.New("wait_min must be less than or equal to wait_max")
+		}
+	}
+
+	if c.Auth.OAuth2.isEnabled() {
+		if c.Auth.OAuth2.AuthStyle != authStyleInHeader && c.Auth.OAuth2.AuthStyle != authStyleInParams && c.Auth.OAuth2.AuthStyle != "" {
+			return fmt.Errorf("unsupported auth style: %s", c.Auth.OAuth2.AuthStyle)
 		}
 	}
 	return nil
@@ -164,5 +213,27 @@ func checkURLScheme(c config) error {
 		}
 	default:
 		return fmt.Errorf("unknown stream type: %s", c.Type)
+	}
+}
+
+func defaultConfig() config {
+	return config{
+		Transport: httpcommon.HTTPTransportSettings{
+			Timeout: 180 * time.Second,
+		},
+		Auth: authConfig{
+			OAuth2: oAuth2Config{
+				TokenExpiryBuffer: 2 * time.Minute,
+			},
+		},
+		Retry: &retry{
+			MaxAttempts: 5,
+			WaitMin:     1 * time.Second,
+			WaitMax:     30 * time.Second,
+		},
+		KeepAlive: keepAliveConfig{
+			Interval:             30 * time.Second,
+			WriteControlDeadline: 10 * time.Second,
+		},
 	}
 }

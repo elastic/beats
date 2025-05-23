@@ -32,22 +32,22 @@ func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Cli
 	}
 }
 
-func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logGroup string, regionName string) {
+func (p *logProcessor) processLogEvents(logEvents []types.FilteredLogEvent, logGroupId string, regionName string) {
 	for _, logEvent := range logEvents {
-		event := createEvent(logEvent, logGroup, regionName)
+		event := createEvent(logEvent, logGroupId, regionName)
 		p.metrics.cloudwatchEventsCreatedTotal.Inc()
 		p.publisher.Publish(event)
 	}
 }
 
-func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName string) beat.Event {
+func createEvent(logEvent types.FilteredLogEvent, logGroupId string, regionName string) beat.Event {
 	event := beat.Event{
-		Timestamp: time.Unix(*logEvent.Timestamp/1000, 0).UTC(),
+		Timestamp: time.UnixMilli(*logEvent.Timestamp).UTC(),
 		Fields: mapstr.M{
 			"message": *logEvent.Message,
 			"log": mapstr.M{
 				"file": mapstr.M{
-					"path": logGroup + "/" + *logEvent.LogStreamName,
+					"path": logGroupId + "/" + *logEvent.LogStreamName,
 				},
 			},
 			"event": mapstr.M{
@@ -55,9 +55,9 @@ func createEvent(logEvent types.FilteredLogEvent, logGroup string, regionName st
 				"ingested": time.Now(),
 			},
 			"aws.cloudwatch": mapstr.M{
-				"log_group":      logGroup,
+				"log_group":      logGroupId,
 				"log_stream":     *logEvent.LogStreamName,
-				"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+				"ingestion_time": time.UnixMilli(*logEvent.IngestionTime),
 			},
 			"cloud": mapstr.M{
 				"provider": "aws",

@@ -1450,7 +1450,7 @@ logging.files:
   #path: /var/log/winlogbeat
 
   # The name of the files where the logs are written to.
-  #name: winlogbeat-event-data
+  #name: winlogbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

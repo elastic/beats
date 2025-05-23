@@ -252,6 +252,7 @@ class Test(metricbeat.BaseTest):
             if 'error' not in evt:
                 if "system" in evt:
                     diskio = evt["system"]["diskio"]
+                    self.remove_fields(diskio, ["serial_number"])
                     self.assert_fields_for_platform(SYSTEM_DISKIO, diskio)
                 elif "host" in evt:
                     host_disk = evt["host"]["disk"]
@@ -562,9 +563,9 @@ class Test(metricbeat.BaseTest):
         output = self.read_output()[0]
 
         assert re.match("(?i)metricbeat.test(.exe)?", output["process.name"])
-        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
+        assert re.match("(?i).*metricbeat.test(.exe)? --systemTest",
                         output["system.process.cmdline"])
-        assert re.match("(?i).*metricbeat.test(.exe)? -systemTest",
+        assert re.match("(?i).*metricbeat.test(.exe)? --systemTest",
                         output["process.command_line"])
         assert isinstance(output["system.process.state"], six.string_types)
         assert isinstance(

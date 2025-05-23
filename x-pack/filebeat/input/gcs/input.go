@@ -15,6 +15,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -33,7 +34,7 @@ const (
 	inputName = "gcs"
 )
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
@@ -50,11 +51,15 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 }
 
 func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
-	config := config{}
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, err
 	}
 	sources := make([]cursor.Source, 0, len(config.Buckets))
+	// This is to maintain backward compatibility with the old config.
+	if config.BatchSize == 0 {
+		config.BatchSize = config.MaxWorkers
+	}
 	for _, b := range config.Buckets {
 		bucket := tryOverrideOrDefault(config, b)
 		if bucket.TimeStampEpoch != nil && !isValidUnixTimestamp(*bucket.TimeStampEpoch) {
@@ -63,7 +68,7 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 		sources = append(sources, &Source{
 			ProjectId:                config.ProjectId,
 			BucketName:               bucket.Name,
-			BucketTimeOut:            *bucket.BucketTimeOut,
+			BatchSize:                *bucket.BatchSize,
 			MaxWorkers:               *bucket.MaxWorkers,
 			Poll:                     *bucket.Poll,
 			PollInterval:             *bucket.PollInterval,
@@ -72,50 +77,35 @@ func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 			ExpandEventListFromField: bucket.ExpandEventListFromField,
 			FileSelectors:            bucket.FileSelectors,
 			ReaderConfig:             bucket.ReaderConfig,
+			Retry:                    config.Retry,
 		})
 	}
 
 	return sources, &gcsInput{config: config}, nil
 }
 
-// tryOverrideOrDefault, overrides global values with local
-// bucket level values if present. If both global & local values
-// are absent, assigns default values
+// tryOverrideOrDefault, overrides the bucket level values with global values if the bucket fields are not set
 func tryOverrideOrDefault(cfg config, b bucket) bucket {
 	if b.MaxWorkers == nil {
-		maxWorkers := 1
-		if cfg.MaxWorkers != nil {
-			maxWorkers = *cfg.MaxWorkers
-		}
-		b.MaxWorkers = &maxWorkers
+		b.MaxWorkers = &cfg.MaxWorkers
+	}
+	if b.BatchSize == nil && cfg.BatchSize != 0 {
+		// If the global batch size is set, use it
+		b.BatchSize = &cfg.BatchSize
+	} else {
+		// If the global batch size is not set, use the local max_workers as the batch size
+		// since at this point we know `b.MaxWorkers` will be set to a non-nil value.
+		// This is to maintain backward compatibility with the old config.
+		b.BatchSize = b.MaxWorkers
 	}
 	if b.Poll == nil {
-		var poll bool
-		if cfg.Poll != nil {
-			poll = *cfg.Poll
-		}
-		b.Poll = &poll
+		b.Poll = &cfg.Poll
 	}
 	if b.PollInterval == nil {
-		interval := time.Second * 300
-		if cfg.PollInterval != nil {
-			interval = *cfg.PollInterval
-		}
-		b.PollInterval = &interval
+		b.PollInterval = &cfg.PollInterval
 	}
 	if b.ParseJSON == nil {
-		parse := false
-		if cfg.ParseJSON != nil {
-			parse = *cfg.ParseJSON
-		}
-		b.ParseJSON = &parse
-	}
-	if b.BucketTimeOut == nil {
-		timeOut := time.Second * 50
-		if cfg.BucketTimeOut != nil {
-			timeOut = *cfg.BucketTimeOut
-		}
-		b.BucketTimeOut = &timeOut
+		b.ParseJSON = &cfg.ParseJSON
 	}
 	if b.TimeStampEpoch == nil {
 		b.TimeStampEpoch = cfg.TimeStampEpoch
@@ -146,15 +136,22 @@ func (input *gcsInput) Test(src cursor.Source, ctx v2.TestContext) error {
 }
 
 func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
-	cursor cursor.Cursor, publisher cursor.Publisher) error {
+	cursor cursor.Cursor, publisher cursor.Publisher,
+) error {
 	st := newState()
 	currentSource := src.(*Source)
 
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
+	// create a new inputMetrics instance
+	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.BucketName, nil)
+	metrics.url.Set("gs://" + currentSource.BucketName)
+	defer metrics.Close()
+
 	var cp *Checkpoint
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
+			metrics.errorsTotal.Inc()
 			return err
 		}
 
@@ -167,20 +164,26 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		cancel()
 	}()
 
-	client, err := fetchStorageClient(ctx, input.config, log)
+	client, err := fetchStorageClient(ctx, input.config)
 	if err != nil {
+		metrics.errorsTotal.Inc()
 		return err
 	}
+
 	bucket := client.Bucket(currentSource.BucketName).Retryer(
+		// Use WithMaxAttempts to change the maximum number of attempts.
+		storage.WithMaxAttempts(currentSource.Retry.MaxAttempts),
 		// Use WithBackoff to change the timing of the exponential backoff.
 		storage.WithBackoff(gax.Backoff{
-			Initial: 2 * time.Second,
+			Initial:    currentSource.Retry.InitialBackOffDuration,
+			Max:        currentSource.Retry.MaxBackOffDuration,
+			Multiplier: currentSource.Retry.BackOffMultiplier,
 		}),
 		// RetryAlways will retry the operation even if it is non-idempotent.
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, log)
+	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, metrics, log)
 
 	return scheduler.schedule(ctx)
 }

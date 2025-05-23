@@ -42,7 +42,7 @@ type Store interface {
 	Close() error
 
 	// Has checks if the key exists. No error must be returned if the key does
-	// not exists, but the bool return must be false.
+	// not exist, but the bool return must be false.
 	// An error return value must indicate internal errors only. The store is
 	// assumed to be in a 'bad' but recoverable state if 'Has' fails.
 	Has(key string) (bool, error)
@@ -68,4 +68,8 @@ type Store interface {
 	// is assumed to be invalidated once fn returns
 	// The loop shall return if fn returns an error or false.
 	Each(fn func(string, ValueDecoder) (bool, error)) error
+
+	// SetID Sets the store ID when the full input configuration is acquired.
+	// This is needed in order to support Elasticsearch state store naming convention based on the input ID.
+	SetID(id string)
 }

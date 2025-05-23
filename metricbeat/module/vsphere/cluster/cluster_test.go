@@ -51,6 +51,7 @@ func TestFetchEventContents(t *testing.T) {
 
 	testEvent := mapstr.M{
 		"name": "DC0_C0",
+		"id":   "domain-c29",
 		"host": mapstr.M{
 			"count": 3,
 			"names": []string{"DC0_C0_H0", "DC0_C0_H1", "DC0_C0_H2"},

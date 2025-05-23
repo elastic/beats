@@ -14,6 +14,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -33,7 +34,7 @@ const (
 	inputName string = "azure-blob-storage"
 )
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Stable,
@@ -156,6 +157,10 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 
 	log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container_name", currentSource.ContainerName)
 	log.Infof("Running azure blob storage for account: %s", input.config.AccountName)
+	// create a new inputMetrics instance
+	metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+	metrics.url.Set(input.serviceURL + currentSource.ContainerName)
+	defer metrics.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
@@ -165,18 +170,15 @@ func (input *azurebsInput) run(inputCtx v2.Context, src cursor.Source, st *state
 
 	serviceClient, credential, err := fetchServiceClientAndCreds(input.config, input.serviceURL, log)
 	if err != nil {
+		metrics.errorsTotal.Inc()
 		return err
 	}
 	containerClient, err := fetchContainerClient(serviceClient, currentSource.ContainerName, log)
 	if err != nil {
+		metrics.errorsTotal.Inc()
 		return err
 	}
 
-	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, log)
-	err = scheduler.schedule(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	scheduler := newScheduler(publisher, containerClient, credential, currentSource, &input.config, st, input.serviceURL, metrics, log)
+	return scheduler.schedule(ctx)
 }

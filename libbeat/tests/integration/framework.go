@@ -33,16 +33,17 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 type BeatProc struct {
@@ -63,6 +64,7 @@ type BeatProc struct {
 	stdout              *os.File
 	stderr              *os.File
 	Process             *os.Process
+	cleanUpOnce         sync.Once
 }
 
 type Meta struct {
@@ -188,7 +190,7 @@ func (b *BeatProc) Start(args ...string) {
 	b.fullPath = fullPath
 	b.Args = append(b.baseArgs, args...)
 
-	done := atomic.MakeBool(false)
+	var done atomic.Bool
 	wg := sync.WaitGroup{}
 	if b.RestartOnBeatOnExit {
 		wg.Add(1)
@@ -204,26 +206,28 @@ func (b *BeatProc) Start(args ...string) {
 	}
 
 	t.Cleanup(func() {
-		b.cmdMutex.Lock()
-		// 1. Send an interrupt signal to the Beat
-		b.stopNonsynced()
+		b.cleanUpOnce.Do(func() {
+			b.cmdMutex.Lock()
+			// 1. Send an interrupt signal to the Beat
+			b.stopNonsynced()
 
-		// Make sure the goroutine restarting the Beat has exited
-		if b.RestartOnBeatOnExit {
-			// 2. Set the done flag so the goroutine loop can exit
-			done.Store(true)
-			// 3. Release the mutex, keeping it locked
-			// until now ensures a new process won't
-			// start.  Lock must be released before
-			// wg.Wait() or there is a possibility of
-			// deadlock.
-			b.cmdMutex.Unlock()
-			// 4. Wait for the goroutine to finish, this helps to ensure
-			// no other Beat process was started
-			wg.Wait()
-		} else {
-			b.cmdMutex.Unlock()
-		}
+			// Make sure the goroutine restarting the Beat has exited
+			if b.RestartOnBeatOnExit {
+				// 2. Set the done flag so the goroutine loop can exit
+				done.Store(true)
+				// 3. Release the mutex, keeping it locked
+				// until now ensures a new process won't
+				// start.  Lock must be released before
+				// wg.Wait() or there is a possibility of
+				// deadlock.
+				b.cmdMutex.Unlock()
+				// 4. Wait for the goroutine to finish, this helps to ensure
+				// no other Beat process was started
+				wg.Wait()
+			} else {
+				b.cmdMutex.Unlock()
+			}
+		})
 	})
 }
 
@@ -282,8 +286,6 @@ func (b *BeatProc) waitBeatToExit() {
 		b.t.Fatalf("error waiting for %q to finish: %s. Exit code: %s",
 			b.beatName, err, exitCode)
 	}
-
-	return
 }
 
 // Stop stops the Beat process
@@ -297,12 +299,21 @@ func (b *BeatProc) Stop() {
 // stopNonsynced is the actual stop code, but without locking so it can be reused
 // by methods that have already acquired the lock.
 func (b *BeatProc) stopNonsynced() {
-	if err := b.Process.Signal(os.Interrupt); err != nil {
-		if errors.Is(err, os.ErrProcessDone) {
-			return
+	// Windows does not support interrupt
+	if runtime.GOOS == "windows" {
+		if err := b.Process.Kill(); err != nil {
+			b.t.Logf("[WARN] could not send kill signal to process with PID: %d, err: %s",
+				b.Process.Pid, err)
 		}
-		b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
-			b.Process.Pid, err)
+	} else {
+		if err := b.Process.Signal(os.Interrupt); err != nil {
+			if errors.Is(err, os.ErrProcessDone) {
+				return
+			}
+
+			b.t.Fatalf("could not send interrupt signal to process with PID: %d, err: %s",
+				b.Process.Pid, err)
+		}
 	}
 
 	if !b.waitingMutex.TryLock() {
@@ -312,10 +323,11 @@ func (b *BeatProc) stopNonsynced() {
 	defer b.waitingMutex.Unlock()
 	ps, err := b.Process.Wait()
 	if err != nil {
-		b.t.Logf("[WARN] got an error waiting mockbeat to top: %v", err)
+		b.t.Logf("[WARN] got an error waiting %s to stop: %v", b.beatName, err)
+		return
 	}
 	if !ps.Success() {
-		b.t.Logf("[WARN] mockbeat did not stopped successfully: %v", ps.String())
+		b.t.Logf("[WARN] %s did not stopped successfully: %v", b.beatName, ps.String())
 	}
 }
 
@@ -430,6 +442,29 @@ func (b *BeatProc) GetLogLine(s string) string {
 	return line
 }
 
+// GetLastLogLine search for the string s starting at the end
+// of the logs, if it is found the whole log line is returned, otherwise
+// an empty string is returned. GetLastLogLine does not keep track of
+// any offset.
+func (b *BeatProc) GetLastLogLine(s string) string {
+	logFile := b.openLogFile()
+	defer logFile.Close()
+
+	found, line := b.searchStrInLogsReversed(logFile, s)
+	if found {
+		return line
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return ""
+	}
+	defer eventLogFile.Close()
+	_, line = b.searchStrInLogsReversed(eventLogFile, s)
+
+	return line
+}
+
 // searchStrInLogs search for s as a substring of any line in logFile starting
 // from offset.
 //
@@ -469,6 +504,44 @@ func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bo
 	}
 
 	return false, offset, ""
+}
+
+// searchStrInLogs search for s as a substring of any line in logFile starting
+// from offset.
+//
+// It will close logFile and return the current offset.
+func (b *BeatProc) searchStrInLogsReversed(logFile *os.File, s string) (bool, string) {
+	t := b.t
+
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			// That's not quite a test error, but it can impact
+			// next executions of LogContains, so treat it as an error
+			t.Errorf("could not close log file: %s", err)
+		}
+	}()
+
+	r := bufio.NewReader(logFile)
+	lines := []string{}
+	for {
+		line, err := r.ReadString('\n')
+		if err != nil {
+			if err != io.EOF {
+				t.Fatalf("error reading log file '%s': %s", logFile.Name(), err)
+			}
+			break
+		}
+		lines = append(lines, line)
+	}
+
+	slices.Reverse(lines)
+	for _, line := range lines {
+		if strings.Contains(line, s) {
+			return true, line
+		}
+	}
+
+	return false, ""
 }
 
 // WaitForLogs waits for the specified string s to be present in the logs within
@@ -592,7 +665,17 @@ func createTempDir(t *testing.T) string {
 	cleanup := func() {
 		if !t.Failed() {
 			if err := os.RemoveAll(tempDir); err != nil {
-				t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
+				// Ungly workaround Windows limitations
+				// Windows does not support the Interrup signal, so it might
+				// happen that Filebeat is still running, keeping it's registry
+				// file open, thus preventing the temporary folder from being
+				// removed. So we log the error and move on without failing the
+				// test
+				if runtime.GOOS == "windows" {
+					t.Logf("[WARN] Could not remove temporatry directory '%s': %s", tempDir, err)
+				} else {
+					t.Errorf("could not remove temp dir '%s': %s", tempDir, err)
+				}
 			}
 		} else {
 			t.Logf("Temporary directory saved: %s", tempDir)
@@ -933,4 +1016,9 @@ func (b *BeatProc) CountFileLines(glob string) int {
 	}
 
 	return bytes.Count(data, []byte{'\n'})
+}
+
+// ConfigFilePath returns the config file path
+func (b *BeatProc) ConfigFilePath() string {
+	return b.configFile
 }

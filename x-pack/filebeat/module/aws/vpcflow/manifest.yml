@@ -22,7 +22,6 @@ var:
     default: [forwarded, preserve_original_event]
   - name: fips_enabled
   - name: proxy_url
-  - name: max_number_of_messages
   - name: ssl
   - name: format
     default:

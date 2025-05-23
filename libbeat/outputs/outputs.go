@@ -57,5 +57,5 @@ type Connectable interface {
 	// The connection attempt shall report an error if no connection could been
 	// established within the given time interval. A timeout value of 0 == wait
 	// forever.
-	Connect() error
+	Connect(context.Context) error
 }

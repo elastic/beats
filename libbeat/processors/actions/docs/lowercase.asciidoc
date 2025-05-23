@@ -1,0 +1,119 @@
+[[lowercase]]
+=== Lowercase fields in events
+
+++++
+<titleabbrev>lowercase</titleabbrev>
+++++
+
+The `lowercase` processor specifies a list of `fields` and `values` to be converted to lowercase. Keys listed in `fields` will be matched case-insensitively and converted to lowercase. For `values`, only exact, case-sensitive matches are transformed to lowercase. This way, keys and values can be selectively converted based on the specified criteria.
+
+
+==== Examples: 
+
+1. Default scenario 
+
+[source,yaml]
+----
+processors:
+  - rename:
+      fields:
+        - "ab.cd"
+      values:
+        - "testKey"          
+      ignore_missing: false
+      fail_on_error: true
+      alter_full_field: true
+----
+[source,json]
+----
+// Input
+{
+  "AB": {"CD":"data"},
+  "CD": {"ef":"data"},
+  "testKey": {"TESTVALUE"}   
+}
+
+
+// output
+{
+  "ab": {"cd":"data"},  // `AB.CD` -> `ab.cd`
+  "CD": {"ef":"data"},
+  "testKey": {"testvalue"} // `TESTVALUE` -> `testvalue` is lowercased 
+}
+----
+
+[start=2]
+2. When `alter_full_field` is false (applicable only for fields)
+
+[source,yaml]
+----
+processors:
+  - rename:
+      fields:
+        - "ab.cd"
+      ignore_missing: false
+      fail_on_error: true
+      alter_full_field: false
+----
+
+[source,json]
+----
+// Input
+{
+  "AB": {"CD":"data"},
+  "CD": {"ef":"data"}, 
+}
+
+
+// output
+{
+  "AB": {"cd":"data"},  // `AB.CD` -> `AB.cd` (only `cd` is lowercased)
+  "CD": {"ef":"data"}, 
+}
+----
+
+[start=2]
+2. In case of non unique path to the key
+
+[source,yaml]
+----
+processors:
+  - rename:
+      fields:
+        - "ab"
+      ignore_missing: false
+      fail_on_error: true
+      alter_full_field: true
+----
+
+[source,json]
+----
+// Input
+{
+  "ab": "first",
+  "aB": "second"
+}
+
+// Output
+{
+  "ab": "first",
+  "aB": "second",
+  "err": "... Error: key collision"
+}
+----
+
+==== Configuration:
+
+The `lowercase` processor has the following configuration settings:
+
+`fields`:: The field names to lowercase. The match is case-insensitive, e.g. `a.b.c.d` would match `A.b.C.d` or `A.B.C.D`.
+`values`:: (Optional) Specifies the exact values to be converted to lowercase. Each entry should include the full path to the value. Key matching is case-sensitive. If the target value is not a string, an error is triggered (`fail_on_error: true`) or the value is skipped (`fail_on_error: false`).
+`ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source field.
+                    The default is `false`, which will fail processing of an event if a field is missing.
+`fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original event is returned.
+                    If set to `false`, processing continues if an error occurs. Default is `true`.
+`alter_full_field`:: (Optional) If set to `true`, the entire key path is lowercased. If set to `false` only the final part of the key path is lowercased. Default is true    
+
+                                  
+
+See <<conditions>> for a list of supported conditions.

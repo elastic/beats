@@ -12,12 +12,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 	v9 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/v9"
 )
+
+func init() {
+	logp.TestingSetup()
+}
 
 func TestMessageWithOptions(t *testing.T) {
 	rawString := "" +
@@ -67,7 +73,7 @@ func TestMessageWithOptions(t *testing.T) {
 			"version":      uint64(10),
 		},
 	}
-	proto := New(config.Defaults())
+	proto := New(config.Defaults(logp.L()))
 	flows, err := proto.OnPacket(bytes.NewBuffer(raw), test.MakeAddress(t, "127.0.0.1:1234"))
 	assert.NoError(t, err)
 	if assert.Len(t, flows, 7) {
@@ -84,7 +90,7 @@ func TestOptionTemplates(t *testing.T) {
 	key := v9.MakeSessionKey(addr, 1234, false)
 
 	t.Run("Single options template", func(t *testing.T) {
-		proto := New(config.Defaults())
+		proto := New(config.Defaults(logp.L()))
 		flows, err := proto.OnPacket(test.MakePacket([]uint16{
 			// Header
 			// Version, Length, Ts, SeqNo, Source
@@ -113,7 +119,7 @@ func TestOptionTemplates(t *testing.T) {
 	})
 
 	t.Run("Multiple options template", func(t *testing.T) {
-		proto := New(config.Defaults())
+		proto := New(config.Defaults(logp.L()))
 		raw := test.MakePacket([]uint16{
 			// Header
 			// Version, Count, Ts, SeqNo, Source
@@ -151,7 +157,7 @@ func TestOptionTemplates(t *testing.T) {
 	})
 
 	t.Run("records discarded", func(t *testing.T) {
-		proto := New(config.Defaults())
+		proto := New(config.Defaults(logp.L()))
 		raw := test.MakePacket([]uint16{
 			// Header
 			// Version, Count, Ts, SeqNo, Source
@@ -193,7 +199,7 @@ func TestOptionTemplates(t *testing.T) {
 func TestCustomFields(t *testing.T) {
 	addr := test.MakeAddress(t, "127.0.0.1:12345")
 
-	conf := config.Defaults()
+	conf := config.Defaults(logp.L())
 	conf.WithCustomFields(fields.FieldDict{
 		fields.Key{EnterpriseID: 0x12345678, FieldID: 33}: &fields.Field{Name: "customField", Decoder: fields.String},
 	})

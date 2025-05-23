@@ -17,6 +17,7 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/mito/lib"
 )
 
 const defaultMaxExecutions = 1000
@@ -58,6 +59,13 @@ type config struct {
 	// Resource is the configuration for establishing an
 	// HTTP request or for locating a local resource.
 	Resource *ResourceConfig `config:"resource" validate:"required"`
+
+	// FailureDump configures failure dump behaviour.
+	FailureDump *dumpConfig `config:"failure_dump"`
+
+	// RecordCoverage indicates whether a program should
+	// record and log execution coverage.
+	RecordCoverage bool `config:"record_coverage"`
 }
 
 type redact struct {
@@ -69,10 +77,27 @@ type redact struct {
 	Delete bool `config:"delete"`
 }
 
+// dumpConfig configures the CEL program to retain
+// the full evaluation state using the cel.OptTrackState
+// option. The state is written to a file in the path if
+// the evaluation fails.
+type dumpConfig struct {
+	Enabled  *bool  `config:"enabled"`
+	Filename string `config:"filename"`
+}
+
+func (t *dumpConfig) enabled() bool {
+	return t != nil && (t.Enabled == nil || *t.Enabled)
+}
+
 func (c config) Validate() error {
+	if c.RecordCoverage {
+		logp.L().Named("input.cel").Warn("execution coverage enabled: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-record-coverage")
+	}
 	if c.Redact == nil {
 		logp.L().Named("input.cel").Warn("missing recommended 'redact' configuration: " +
-			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#_redact")
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-cel.html#cel-state-redact")
 	}
 	if c.Interval <= 0 {
 		return errors.New("interval must be greater than 0")
@@ -89,7 +114,8 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
+	wantDump := c.FailureDump.enabled() && c.FailureDump.Filename != ""
+	_, _, _, err = newProgram(context.Background(), c.Program, root, nil, &http.Client{}, lib.HTTPOptions{}, patterns, c.XSDs, logp.L().Named("input.cel"), nil, wantDump, false)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
@@ -208,10 +234,12 @@ func (c keepAlive) settings() httpcommon.WithKeepaliveSettings {
 
 type ResourceConfig struct {
 	URL                    *urlConfig       `config:"url" validate:"required"`
+	Headers                http.Header      `config:"headers"`
 	Retry                  retryConfig      `config:"retry"`
 	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
 	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
 	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
+	MaxBodySize            int64            `config:"max_body_size"`
 	RateLimit              *rateLimitConfig `config:"rate_limit"`
 	KeepAlive              keepAlive        `config:"keep_alive"`
 

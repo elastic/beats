@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"flag"
 	"io"
@@ -26,6 +25,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -38,13 +38,12 @@ func Test_httpReadJSON(t *testing.T) {
 	log := logp.NewLogger("http_endpoint_test")
 
 	tests := []struct {
-		name           string
-		body           string
-		program        string
-		wantObjs       []mapstr.M
-		wantStatus     int
-		wantErr        bool
-		wantRawMessage []json.RawMessage
+		name       string
+		body       string
+		program    string
+		wantObjs   []mapstr.M
+		wantStatus int
+		wantErr    bool
 	}{
 		{
 			name:       "single object",
@@ -82,10 +81,6 @@ func Test_httpReadJSON(t *testing.T) {
 			name: "sequence of objects accepted (LF)",
 			body: `{"a":"1"}
 									{"a":"2"}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":"1"}`),
-				[]byte(`{"a":"2"}`),
-			},
 			wantObjs:   []mapstr.M{{"a": "1"}, {"a": "2"}},
 			wantStatus: http.StatusOK,
 		},
@@ -110,26 +105,14 @@ func Test_httpReadJSON(t *testing.T) {
 			wantErr:    true,
 		},
 		{
-			name: "array of objects in stream",
-			body: `{"a":"1"} [{"a":"2"},{"a":"3"}] {"a":"4"}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":"1"}`),
-				[]byte(`{"a":"2"}`),
-				[]byte(`{"a":"3"}`),
-				[]byte(`{"a":"4"}`),
-			},
+			name:       "array of objects in stream",
+			body:       `{"a":"1"} [{"a":"2"},{"a":"3"}] {"a":"4"}`,
 			wantObjs:   []mapstr.M{{"a": "1"}, {"a": "2"}, {"a": "3"}, {"a": "4"}},
 			wantStatus: http.StatusOK,
 		},
 		{
 			name: "numbers",
 			body: `{"a":1} [{"a":false},{"a":3.14}] {"a":-4}`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"a":1}`),
-				[]byte(`{"a":false}`),
-				[]byte(`{"a":3.14}`),
-				[]byte(`{"a":-4}`),
-			},
 			wantObjs: []mapstr.M{
 				{"a": int64(1)},
 				{"a": false},
@@ -171,13 +154,6 @@ func Test_httpReadJSON(t *testing.T) {
 				"timestamp": string(obj.timestamp), // leave timestamp in unix milli for ingest to handle.
 				"event": r,
 			})`,
-			wantRawMessage: []json.RawMessage{
-				[]byte(`{"event":{"data":"aGVsbG8=","number":1},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"c21hbGwgd29ybGQ=","number":9007199254740991},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"aGVsbG8gd29ybGQ=","number":"9007199254740992"},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"YmlnIHdvcmxk","number":"9223372036854775808"},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-				[]byte(`{"event":{"data":"d2lsbCBpdCBiZSBmcmllbmRzIHdpdGggbWU=","number":3.14},"requestId":"ed4acda5-034f-9f42-bba1-f29aea6d7d8f","timestamp":"1578090901599"}`),
-			},
 			wantObjs: []mapstr.M{
 				{"event": map[string]any{"data": "aGVsbG8=", "number": int64(1)}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
 				{"event": map[string]any{"data": "c21hbGwgd29ybGQ=", "number": int64(9007199254740991)}, "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f", "timestamp": "1578090901599"},
@@ -194,7 +170,7 @@ func Test_httpReadJSON(t *testing.T) {
 			if err != nil {
 				t.Fatalf("failed to compile program: %v", err)
 			}
-			gotObjs, rawMessages, gotStatus, err := httpReadJSON(strings.NewReader(tt.body), prg)
+			gotObjs, gotStatus, err := httpReadJSON(strings.NewReader(tt.body), prg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("httpReadJSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -205,10 +181,6 @@ func Test_httpReadJSON(t *testing.T) {
 			if gotStatus != tt.wantStatus {
 				t.Errorf("httpReadJSON() gotStatus = %v, want %v", gotStatus, tt.wantStatus)
 			}
-			if tt.wantRawMessage != nil {
-				assert.Equal(t, tt.wantRawMessage, rawMessages)
-			}
-			assert.Equal(t, len(gotObjs), len(rawMessages))
 		})
 	}
 }
@@ -221,6 +193,9 @@ type publisher struct {
 func (p *publisher) Publish(e beat.Event) {
 	p.mu.Lock()
 	p.events = append(p.events, e)
+	if ack, ok := e.Private.(*batchACKTracker); ok {
+		ack.ACK()
+	}
 	p.mu.Unlock()
 }
 
@@ -236,12 +211,13 @@ func Test_apiResponse(t *testing.T) {
 		}
 	}
 	testCases := []struct {
-		name         string        // Sub-test name.
-		conf         config        // Load configuration.
-		request      *http.Request // Input request.
-		events       []mapstr.M    // Expected output events.
-		wantStatus   int           // Expected response code.
-		wantResponse string        // Expected response message.
+		name         string             // Sub-test name.
+		setup        func(t *testing.T) // setup function
+		conf         config             // Load configuration.
+		request      *http.Request      // Input request.
+		events       []mapstr.M         // Expected output events.
+		wantStatus   int                // Expected response code.
+		wantResponse string             // Expected response message.
 	}{
 		{
 			name: "single_event",
@@ -282,7 +258,54 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_hex",
+			name: "options_with_headers",
+			conf: func() config {
+				c := defaultConfig()
+				c.OptionsHeaders = http.Header{
+					"optional-response-header": {"Optional-response-value"},
+				}
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusOK,
+			wantResponse: "",
+		},
+		{
+			name: "options_empty_headers",
+			conf: func() config {
+				c := defaultConfig()
+				c.OptionsHeaders = http.Header{}
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusOK,
+			wantResponse: "",
+		},
+		{
+			name: "options_no_header",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusBadRequest,
+			wantResponse: `{"message":"OPTIONS requests are only allowed with options_headers set"}`,
+		},
+		{
+			name:  "hmac_hex",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -307,7 +330,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_base64",
+			name:  "hmac_base64",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -332,7 +356,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_raw_base64",
+			name:  "hmac_raw_base64",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -355,6 +380,81 @@ func Test_apiResponse(t *testing.T) {
 			},
 			wantStatus:   http.StatusOK,
 			wantResponse: `{"message": "success"}`,
+		},
+		{
+			name: "hmac_header_not_present",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"missing HMAC header"}`,
+		},
+		{
+			name: "hmac_header_value_is_empty",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: unexpected empty header value"}`,
+		},
+		{
+			name: "hmac_header_value_only_contains_prefix",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "HMAC-SHA256 ")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: unexpected empty header value"}`,
+		},
+		{
+			name: "hmac_header_value_bad_encoding",
+			conf: func() config {
+				c := defaultConfig()
+				c.HMACHeader = "Authorization"
+				c.HMACKey = "mysecretkey"
+				c.HMACType = "sha256"
+				c.HMACPrefix = "HMAC-SHA256 "
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				req.Header.Set("Authorization", "HMAC-SHA256 not-hex-or-base64")
+				return req
+			}(),
+			wantStatus:   http.StatusUnauthorized,
+			wantResponse: `{"message":"invalid HMAC signature encoding: encoding/hex: invalid byte: U+006E 'n'\nillegal base64 data at input byte 3\nillegal base64 data at input byte 3"}`,
 		},
 		{
 			name: "single_event_gzip",
@@ -492,6 +592,9 @@ func Test_apiResponse(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
+			if tc.setup != nil {
+				tc.setup(t)
+			}
 			pub := new(publisher)
 			metrics := newInputMetrics("")
 			defer metrics.Close()

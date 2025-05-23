@@ -19,6 +19,7 @@ package kafka
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -26,10 +27,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/sarama"
 )
 
 // Version returns a kafka version from its string representation
@@ -46,6 +47,7 @@ type Broker struct {
 	advertisedAddr string
 	id             int32
 	matchID        bool
+	logger         *logp.Logger
 }
 
 // BrokerSettings defines common configurations used when connecting to a broker
@@ -75,7 +77,7 @@ type MemberDescription struct {
 const noID = -1
 
 // NewBroker creates a new unconnected kafka Broker connection instance.
-func NewBroker(host string, settings BrokerSettings) *Broker {
+func NewBroker(host string, logger *logp.Logger, settings BrokerSettings) *Broker {
 	cfg := sarama.NewConfig()
 	cfg.Net.DialTimeout = settings.DialTimeout
 	cfg.Net.ReadTimeout = settings.ReadTimeout
@@ -100,6 +102,7 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 		client:  nil,
 		id:      noID,
 		matchID: settings.MatchID,
+		logger:  logger,
 	}
 }
 
@@ -134,14 +137,14 @@ func (b *Broker) Connect() error {
 		return fmt.Errorf("failed to query metadata: %w", err)
 	}
 
-	finder := brokerFinder{Net: &defaultNet{}}
+	finder := brokerFinder{Net: &defaultNet{}, logger: b.logger}
 	other := finder.findBroker(brokerAddress(b.broker), meta.Brokers)
 	if other == nil { // no broker found
 		closeBroker(b.broker)
 		return fmt.Errorf("No advertised broker with address %v found", b.Addr())
 	}
 
-	debugf("found matching broker %v with id %v", other.Addr(), other.ID())
+	b.logger.Named("kafka").Debugf("found matching broker %v with id %v", other.Addr(), other.ID())
 	b.id = other.ID()
 	b.advertisedAddr = other.Addr()
 
@@ -302,13 +305,20 @@ func queryMetadataWithRetry(
 	b *sarama.Broker,
 	cfg *sarama.Config,
 	topics []string,
-) (r *sarama.MetadataResponse, err error) {
-	err = withRetry(b, cfg, func() (e error) {
+) (*sarama.MetadataResponse, error) {
+	var r *sarama.MetadataResponse
+	var err error
+
+	err = withRetry(b, cfg, func() error {
 		requ := &sarama.MetadataRequest{Topics: topics}
-		r, e = b.GetMetadata(requ)
-		return
+		r, err = b.GetMetadata(requ)
+		return err
 	})
-	return
+
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 func closeBroker(b *sarama.Broker) {
@@ -354,22 +364,20 @@ func checkRetryQuery(err error) (retry, reconnect bool) {
 		return false, false
 	}
 
-	if err == io.EOF {
+	if errors.Is(err, io.EOF) {
 		return true, true
 	}
 
-	k, ok := err.(sarama.KError)
-	if !ok {
-		return false, false
-	}
-
-	switch k {
-	case sarama.ErrLeaderNotAvailable, sarama.ErrReplicaNotAvailable,
-		sarama.ErrOffsetsLoadInProgress, sarama.ErrRebalanceInProgress:
-		return true, false
-	case sarama.ErrRequestTimedOut, sarama.ErrBrokerNotAvailable,
-		sarama.ErrNetworkException:
-		return true, true
+	var k *sarama.KError
+	if errors.As(err, &k) {
+		switch *k {
+		case sarama.ErrLeaderNotAvailable, sarama.ErrReplicaNotAvailable,
+			sarama.ErrOffsetsLoadInProgress, sarama.ErrRebalanceInProgress:
+			return true, false
+		case sarama.ErrRequestTimedOut, sarama.ErrBrokerNotAvailable,
+			sarama.ErrNetworkException:
+			return true, true
+		}
 	}
 
 	return false, false
@@ -406,7 +414,8 @@ func (m *defaultNet) Hostname() (string, error) {
 }
 
 type brokerFinder struct {
-	Net NetInfo
+	Net    NetInfo
+	logger *logp.Logger
 }
 
 func (m *brokerFinder) findBroker(addr string, brokers []*sarama.Broker) *sarama.Broker {
@@ -418,7 +427,7 @@ func (m *brokerFinder) findBroker(addr string, brokers []*sarama.Broker) *sarama
 }
 
 func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
-	debugf("Try to match broker to: %v", addr)
+	m.logger.Named("kafka").Debugf("Try to match broker to: %v", addr)
 
 	// get connection 'port'
 	host, port, err := net.SplitHostPort(addr)
@@ -437,14 +446,14 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	if err != nil || len(localIPs) == 0 {
 		return -1, false
 	}
-	debugf("local machine ips: %v", localIPs)
+	m.logger.Named("kafka").Debugf("local machine ips: %v", localIPs)
 
 	// try to find broker by comparing the fqdn for each known ip to list of
 	// brokers
 	localHosts := m.lookupHosts(localIPs)
-	debugf("local machine addresses: %v", localHosts)
+	m.logger.Named("kafka").Debugf("local machine addresses: %v", localHosts)
 	for _, host := range localHosts {
-		debugf("try to match with fqdn: %v (%v)", host, port)
+		m.logger.Named("kafka").Debugf("try to match with fqdn: %v (%v)", host, port)
 		if i, found := indexOf(net.JoinHostPort(host, port), brokers); found {
 			return i, true
 		}
@@ -466,7 +475,7 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	// try to find broker id by comparing the machines local hostname to
 	// broker hostnames in metadata
 	if host, err := m.Net.Hostname(); err == nil {
-		debugf("try to match with hostname only: %v (%v)", host, port)
+		m.logger.Named("kafka").Debugf("try to match with hostname only: %v (%v)", host, port)
 
 		tmp := net.JoinHostPort(strings.ToLower(host), port)
 		if i, found := indexOf(tmp, brokers); found {
@@ -475,9 +484,9 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 	}
 
 	// lookup ips for all brokers
-	debugf("match by ips")
+	m.logger.Named("kafka").Debug("match by ips")
 	for i, b := range brokers {
-		debugf("test broker address: %v", b)
+		m.logger.Named("kafka").Debugf("test broker address: %v", b)
 		bh, bp, err := net.SplitHostPort(b)
 		if err != nil {
 			continue
@@ -490,12 +499,12 @@ func (m *brokerFinder) findAddress(addr string, brokers []string) (int, bool) {
 
 		// lookup all ips for brokers host:
 		ips, err := m.Net.LookupIP(bh)
-		debugf("broker %v ips: %v, %v", bh, ips, err)
+		m.logger.Named("kafka").Debugf("broker %v ips: %v, %v", bh, ips, err)
 		if err != nil {
 			continue
 		}
 
-		debugf("broker (%v) ips: %v", bh, ips)
+		m.logger.Named("kafka").Debugf("broker (%v) ips: %v", bh, ips)
 
 		// check if ip is known
 		if anyIPsMatch(ips, localIPs) {
@@ -515,7 +524,7 @@ func (m *brokerFinder) lookupHosts(ips []net.IP) []string {
 		}
 
 		hosts, err := m.Net.LookupAddr(string(txt))
-		debugf("lookup %v => %v, %v", string(txt), hosts, err)
+		m.logger.Named("kafka").Debugf("lookup %v => %v, %v", string(txt), hosts, err)
 		if err != nil {
 			continue
 		}

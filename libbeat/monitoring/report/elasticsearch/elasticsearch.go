@@ -18,9 +18,10 @@
 package elasticsearch
 
 import (
+	"context"
 	"errors"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"strconv"
 	"time"
 
@@ -96,7 +97,7 @@ func defaultConfig(settings report.Settings) config {
 }
 
 func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
-	log := logp.NewLogger(logSelector)
+	log := beat.Logger.Named(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -214,8 +215,10 @@ func (r *reporter) initLoop(c config) {
 
 	for {
 		// Select one configured endpoint by random and check if xpack is available
-		client := r.out[rand.Intn(len(r.out))]
-		err := client.Connect()
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		client := r.out[rand.IntN(len(r.out))]
+		err := client.Connect(ctx)
 		if err == nil {
 			closing(log, client)
 			break
@@ -318,7 +321,7 @@ func makeClient(host string, params map[string]string, config *config, beat beat
 		return nil, err
 	}
 
-	return newPublishClient(esClient, params)
+	return newPublishClient(esClient, params, beat.Logger)
 }
 
 func closing(log *logp.Logger, c io.Closer) {

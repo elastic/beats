@@ -63,6 +63,8 @@ var presetConfigs = map[string]*config.C{
 		"queue.mem.flush.timeout":    20 * time.Second,
 		"compression_level":          1,
 		"idle_connection_timeout":    1 * time.Second,
+		"backoff.init":               5 * time.Second,
+		"backoff.max":                300 * time.Second,
 	}),
 	presetLatency: config.MustNewConfigFrom(map[string]interface{}{
 		"bulk_max_size":              50,
@@ -79,7 +81,7 @@ var presetConfigs = map[string]*config.C{
 // config overrides.
 // Returns a list of the user fields that were overwritten, and the full
 // preset config that was applied.
-func applyPreset(preset string, userConfig *config.C) ([]string, *config.C, error) {
+func ApplyPreset(preset string, userConfig *config.C) ([]string, *config.C, error) {
 	presetConfig := presetConfigs[preset]
 	if presetConfig == nil {
 		return nil, nil, fmt.Errorf("unknown preset value %v", preset)

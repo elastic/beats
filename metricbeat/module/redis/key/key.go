@@ -98,12 +98,12 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			continue
 		}
 		if p.Limit > 0 && len(keys) > int(p.Limit) {
-			m.Logger().Debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit)
+			m.Logger().Debugf("Collecting stats for %d keys, but there are more available for pattern '%s' in keyspace %d", p.Limit, p.Pattern, keyspace)
 			keys = keys[:p.Limit]
 		}
 
 		for _, key := range keys {
-			keyInfo, err := redis.FetchKeyInfo(conn, key)
+			keyInfo, err := redis.FetchKeyInfo(conn, key, m.Logger())
 			if err != nil {
 				msg := fmt.Errorf("Failed to fetch key info for key %s in keyspace %d", key, keyspace)
 				m.Logger().Error(msg)

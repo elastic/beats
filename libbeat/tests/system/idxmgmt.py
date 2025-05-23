@@ -35,7 +35,7 @@ class IdxMgmt(unittest.TestCase):
             index = self._index
 
         for pattern in self.patterns:
-            index_with_pattern = index+"-"+pattern
+            index_with_pattern = index + "-" + pattern
             try:
                 self._client.indices.delete(index_with_pattern)
                 self._client.indices.delete_alias(index, index_with_pattern)

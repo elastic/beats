@@ -7,16 +7,17 @@ package o365audit
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/joeshaw/multierror"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -51,7 +52,7 @@ type apiEnvironment struct {
 	Clock       func() time.Time
 }
 
-func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Experimental,
@@ -99,7 +100,7 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 		return err
 	}
 
-	if _, err := auth.Token(); err != nil {
+	if _, err := auth.Token(ctxtool.FromCanceller(ctx.Cancelation)); err != nil {
 		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", tenantID, err)
 	}
 
@@ -117,7 +118,8 @@ func (inp *o365input) Run(
 		if err == nil {
 			break
 		}
-		if ctx.Cancelation.Err() != err && err != context.Canceled {
+		//nolint:errorlint // ignore
+		if ctx.Cancelation.Err() != err && !errors.Is(err, context.Canceled) {
 			msg := mapstr.M{}
 			msg.Put("error.message", err.Error())
 			msg.Put("event.kind", "pipeline_error")
@@ -125,9 +127,12 @@ func (inp *o365input) Run(
 				Timestamp: time.Now(),
 				Fields:    msg,
 			}
-			publisher.Publish(event, nil)
+			if err := publisher.Publish(event, nil); err != nil {
+				ctx.Logger.Errorf("publisher.Publish failed: %v", err)
+			}
 			ctx.Logger.Errorf("Input failed: %v", err)
 			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
+			//nolint:errcheck // ignore
 			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
 		}
 	}
@@ -135,21 +140,25 @@ func (inp *o365input) Run(
 }
 
 func (inp *o365input) runOnce(
-	ctx v2.Context,
+	v2ctx v2.Context,
 	src cursor.Source,
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
-	stream := src.(*stream)
+	stream, ok := src.(*stream)
+	if !ok {
+		return errors.New("unable to cast src to stream")
+	}
 	tenantID, contentType := stream.tenantID, stream.contentType
-	log := ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
+	log := v2ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
+	ctx := ctxtool.FromCanceller(v2ctx.Cancelation)
 
 	tokenProvider, err := inp.config.NewTokenProvider(stream.tenantID)
 	if err != nil {
 		return err
 	}
 
-	if _, err := tokenProvider.Token(); err != nil {
+	if _, err := tokenProvider.Token(ctx); err != nil {
 		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", stream.tenantID, err)
 	}
 
@@ -162,7 +171,7 @@ func (inp *o365input) runOnce(
 		poll.WithTokenProvider(tokenProvider),
 		poll.WithMinRequestInterval(delay),
 		poll.WithLogger(log),
-		poll.WithContext(ctxtool.FromCanceller(ctx.Cancelation)),
+		poll.WithContext(ctx),
 		poll.WithRequestDecorator(
 			autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+pluginName, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())),
 			autorest.WithQueryParameters(mapstr.M{
@@ -239,7 +248,7 @@ func (env apiEnvironment) ReportAPIError(err apiError) poll.Action {
 }
 
 func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Event {
-	var errs multierror.Errors
+	var errs []error
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
 		ts = time.Now()
@@ -257,6 +266,7 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 		}
 	}
 	if env.Config.PreserveOriginalEvent {
+		//nolint:errcheck // ignore
 		b.PutValue("event.original", string(raw))
 	}
 	if len(errs) > 0 {
@@ -264,6 +274,7 @@ func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Ev
 		for idx, e := range errs {
 			msgs[idx] = e.Error()
 		}
+		//nolint:errcheck // ignore
 		b.PutValue("error.message", msgs)
 	}
 	return b

@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/agentbeat x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/functionbeat x-pack/heartbeat x-pack/metricbeat x-pack/osquerybeat x-pack/packetbeat x-pack/winlogbeat
+BEATS?=auditbeat filebeat heartbeat metricbeat packetbeat winlogbeat x-pack/agentbeat x-pack/auditbeat x-pack/dockerlogbeat x-pack/filebeat x-pack/heartbeat x-pack/metricbeat x-pack/osquerybeat x-pack/packetbeat x-pack/winlogbeat
 PROJECTS=libbeat x-pack/libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -49,16 +49,6 @@ setup-commit-hook:
 ## stop-environments : Stop the environment for each project.
 stop-environments:
 	@$(foreach var,$(PROJECTS_ENV),$(MAKE) -C $(var) stop-environment || exit 0;)
-
-## test : Runs unit and system tests without coverage and race detection.
-.PHONY: test
-test:
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) test || exit 1;)
-
-## unit : Runs unit tests without coverage and race detection.
-.PHONY: unit
-unit:
-	@$(foreach var,$(PROJECTS),$(MAKE) -C $(var) unit || exit 1;)
 
 ## crosscompile : Crosscompile all beats.
 .PHONY: crosscompile
@@ -214,16 +204,6 @@ release: beats-dashboards
 	@$(foreach var,$(BEATS) $(PROJECTS_XPACK_PKG), \
       test -d $(var)/build/distributions && test -n "$$(ls $(var)/build/distributions)" || exit 0; \
       mkdir -p build/distributions/$(subst $(XPACK_SUFFIX),'',$(var)) && mv -f $(var)/build/distributions/* build/distributions/$(subst $(XPACK_SUFFIX),'',$(var))/ || exit 1;)
-
-## release-manager-snapshot : Builds a snapshot release. The Go version defined in .go-version will be installed and used for the build.
-.PHONY: release-manager-snapshot
-release-manager-snapshot:
-	@$(MAKE) SNAPSHOT=true release-manager-release
-
-## release-manager-release : Builds a snapshot release. The Go version defined in .go-version will be installed and used for the build.
-.PHONY: release-manager-release
-release-manager-release:
-	GO_VERSION=$(shell cat ./.go-version) ./dev-tools/run_with_go_ver $(MAKE) release
 
 ## beats-dashboards : Collects dashboards from all Beats and generates a zip file distribution.
 .PHONY: beats-dashboards

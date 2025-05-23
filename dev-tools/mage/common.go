@@ -32,7 +32,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -48,6 +47,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/blakesmith/ar"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
@@ -125,7 +125,7 @@ func joinMaps(args ...map[string]interface{}) map[string]interface{} {
 }
 
 func expandFile(src, dst string, args ...map[string]interface{}) error {
-	tmplData, err := ioutil.ReadFile(src)
+	tmplData, err := os.ReadFile(src)
 	if err != nil {
 		return fmt.Errorf("failed reading from template %v: %w", src, err)
 	}
@@ -140,7 +140,7 @@ func expandFile(src, dst string, args ...map[string]interface{}) error {
 		return err
 	}
 
-	if err = ioutil.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
+	if err = os.WriteFile(createDir(dst), []byte(output), 0644); err != nil {
 		return fmt.Errorf("failed to write rendered template: %w", err)
 	}
 
@@ -262,13 +262,13 @@ func FindReplace(file string, re *regexp.Regexp, repl string) error {
 		return err
 	}
 
-	contents, err := ioutil.ReadFile(file)
+	contents, err := os.ReadFile(file)
 	if err != nil {
 		return err
 	}
 
 	out := re.ReplaceAllString(string(contents), repl)
-	return ioutil.WriteFile(file, []byte(out), info.Mode().Perm())
+	return os.WriteFile(file, []byte(out), info.Mode().Perm())
 }
 
 // MustFindReplace invokes FindReplace and panics if an error occurs.
@@ -283,9 +283,14 @@ func MustFindReplace(file string, re *regexp.Regexp, repl string) {
 func DownloadFile(url, destinationDir string) (string, error) {
 	log.Println("Downloading", url)
 
-	resp, err := http.Get(url)
+	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, url, nil)
 	if err != nil {
-		return "", fmt.Errorf("http get failed: %w", err)
+		return "", fmt.Errorf("failed to create http request: %w", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to download file: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -315,9 +320,65 @@ func Extract(sourceFile, destinationDir string) error {
 		return untar(sourceFile, destinationDir)
 	case ext == ".zip":
 		return unzip(sourceFile, destinationDir)
+	case ext == ".deb" || ext == ".ar":
+		return unarchive(sourceFile, destinationDir)
 	default:
 		return fmt.Errorf("failed to extract %v, unhandled file extension", sourceFile)
 	}
+}
+
+func unarchive(sourceFile string, destinationDir string) error {
+	file, err := os.Open(sourceFile)
+	if err != nil {
+		return fmt.Errorf("opening source archive file %s: %w", sourceFile, err)
+	}
+	defer file.Close()
+
+	if err = os.MkdirAll(destinationDir, 0755); err != nil {
+		return fmt.Errorf("creating destination directory %s: %w", destinationDir, err)
+	}
+
+	archiveReader := ar.NewReader(file)
+	for {
+		arHeader, err := archiveReader.Next()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return fmt.Errorf("reading next header: %w", err)
+		}
+		path, err := sanitizeFilePath(arHeader.Name, destinationDir)
+		if err != nil {
+			return err
+		}
+
+		// create containing folder if it doesn't exist yet
+		targetContainingDir := filepath.Dir(filepath.FromSlash(path))
+		if mkDirErr := os.MkdirAll(targetContainingDir, 0755); mkDirErr != nil {
+			return fmt.Errorf("creating container directory for file %s: %w", arHeader.Name, mkDirErr)
+		}
+
+		writer, err := os.Create(path)
+		if err != nil {
+			return fmt.Errorf("creating output file %s: %w", path, err)
+		}
+
+		if _, err = io.Copy(writer, archiveReader); err != nil {
+			return fmt.Errorf("copying bytes of file %s: %w", path, err)
+		}
+
+		if arHeader.Mode != 0 {
+			if err = os.Chmod(path, os.FileMode(arHeader.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
+				return fmt.Errorf("changing mode for file %s: %w", path, err)
+			}
+		}
+
+		if err = writer.Close(); err != nil {
+			return fmt.Errorf("closing writer for file %s: %w", path, err)
+		}
+	}
+
+	return nil
 }
 
 func unzip(sourceFile, destinationDir string) error {
@@ -338,9 +399,9 @@ func unzip(sourceFile, destinationDir string) error {
 		}
 		defer innerFile.Close()
 
-		path := filepath.Join(destinationDir, f.Name)
-		if !strings.HasPrefix(path, destinationDir) {
-			return fmt.Errorf("illegal file path in zip: %v", f.Name)
+		path, err := sanitizeFilePath(f.Name, destinationDir)
+		if err != nil {
+			return err
 		}
 
 		if f.FileInfo().IsDir() {
@@ -357,7 +418,7 @@ func unzip(sourceFile, destinationDir string) error {
 		}
 		defer out.Close()
 
-		if _, err = io.Copy(out, innerFile); err != nil {
+		if _, err = io.Copy(out, innerFile); err != nil { //nolint:gosec // this is only used for dev tools
 			return err
 		}
 
@@ -372,6 +433,16 @@ func unzip(sourceFile, destinationDir string) error {
 	}
 
 	return nil
+}
+
+// sanitizeExtractPath sanitizes against path traversal attacks.
+// See https://security.snyk.io/research/zip-slip-vulnerability.
+func sanitizeFilePath(filePath string, workdir string) (string, error) {
+	destPath := filepath.Join(workdir, filePath)
+	if !strings.HasPrefix(destPath, filepath.Clean(workdir)+string(os.PathSeparator)) {
+		return filePath, fmt.Errorf("failed to extract illegal file path: %s", filePath)
+	}
+	return destPath, nil
 }
 
 // Tar compress a directory using tar + gzip algorithms but without adding
@@ -390,7 +461,7 @@ func TarWithOptions(src string, targetFile string, trimSource bool) error {
 	tw := tar.NewWriter(zr)
 
 	// walk through every file in the folder
-	filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
+	err = filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
 		if errFn != nil {
 			return fmt.Errorf("error traversing the file system: %w", errFn)
 		}
@@ -438,6 +509,9 @@ func TarWithOptions(src string, targetFile string, trimSource bool) error {
 		}
 		return nil
 	})
+	if err != nil {
+		return fmt.Errorf("error walking dir: %w", err)
+	}
 
 	// produce tar
 	if err := tw.Close(); err != nil {
@@ -477,33 +551,45 @@ func untar(sourceFile, destinationDir string) error {
 	for {
 		header, err := tarReader.Next()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return err
 		}
 
-		path := filepath.Join(destinationDir, header.Name)
-		if !strings.HasPrefix(path, destinationDir) {
-			return fmt.Errorf("illegal file path in tar: %v", header.Name)
+		path, err := sanitizeFilePath(header.Name, destinationDir)
+		if err != nil {
+			if header.Name == "./" && header.Typeflag == tar.TypeDir {
+				// When extracting from data.tar.gz coming from a .deb artifact we encounter a ./ directory entry which
+				// will fail the sanitizeFilePath check. Only for this case skip the entry and continue to the next header
+				log.Printf("skipping directory: %s\n", header.Name)
+				continue
+			}
+			return err
 		}
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 		case tar.TypeReg:
+			// create containing folder if it doesn't exist yet
+			targetContainingDir := filepath.Dir(filepath.FromSlash(path))
+			if mkDirErr := os.MkdirAll(targetContainingDir, 0755); mkDirErr != nil {
+				return fmt.Errorf("creating container directory for file %s: %w", header.Name, mkDirErr)
+			}
+
 			writer, err := os.Create(path)
 			if err != nil {
 				return err
 			}
 
-			if _, err = io.Copy(writer, tarReader); err != nil {
+			if _, err = io.Copy(writer, tarReader); err != nil { //nolint:gosec // this is only used for dev tools
 				return err
 			}
 
-			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 
@@ -613,7 +699,7 @@ func ParallelCtx(ctx context.Context, fns ...interface{}) {
 
 	wg.Wait()
 	if len(errs) > 0 {
-		panic(fmt.Errorf(strings.Join(errs, "\n")))
+		panic(errors.New(strings.Join(errs, "\n")))
 	}
 }
 
@@ -773,7 +859,7 @@ func CreateSHA512File(file string) error {
 	computedHash := hex.EncodeToString(sum.Sum(nil))
 	out := fmt.Sprintf("%v  %v", computedHash, filepath.Base(file))
 
-	return ioutil.WriteFile(file+".sha512", []byte(out), 0644)
+	return os.WriteFile(file+".sha512", []byte(out), 0644)
 }
 
 // Mage executes mage targets in the specified directory.
@@ -800,7 +886,7 @@ func IsUpToDate(dst string, sources ...string) bool {
 
 	var files []string
 	for _, s := range sources {
-		filepath.Walk(s, func(path string, info os.FileInfo, err error) error {
+		err := filepath.Walk(s, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				if os.IsNotExist(err) {
 					return nil
@@ -814,6 +900,9 @@ func IsUpToDate(dst string, sources ...string) bool {
 
 			return nil
 		})
+		if err != nil {
+			panic(fmt.Errorf("failed to walk source %v: %w", s, err))
+		}
 	}
 
 	execute, err := target.Path(dst, files...)
@@ -896,7 +985,7 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	matches := parseVersionRegex.FindStringSubmatch(version)
 	if len(matches) == 0 {
 		err = fmt.Errorf("failed to parse version '%v'", version)
-		return
+		return major, minor, patch, err
 	}
 
 	data := map[string]string{}
@@ -906,7 +995,7 @@ func ParseVersion(version string) (major, minor, patch int, err error) {
 	major, _ = strconv.Atoi(data["major"])
 	minor, _ = strconv.Atoi(data["minor"])
 	patch, _ = strconv.Atoi(data["patch"])
-	return
+	return major, minor, patch, nil
 }
 
 // ListMatchingEnvVars returns all of the environment variables names that begin

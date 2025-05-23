@@ -2,6 +2,7 @@
   {
     "@timestamp": "2020-05-07T08:14:44.4899785Z",
     "event": {
+      "action": "File Delete archived (rule: FileDelete)",
       "code": "23",
       "kind": "event",
       "provider": "Microsoft-Windows-Sysmon"
@@ -12,8 +13,8 @@
     "log": {
       "level": "information"
     },
+    "message": "File Delete archived:\nRuleName: -\nUtcTime: 2020-05-07 08:14:44.489\nProcessGuid: {42F11C3B-C36F-5EB3-2C07-290000000000}\nProcessId: 2184\nUser: VAGRANT-2012-R2\\vagrant\nImage: C:\\Users\\vagrant\\.gvm\\versions\\go1.13.10.windows.amd64\\bin\\go.exe\nTargetFilename: C:\\Users\\vagrant\\AppData\\Local\\Temp\\1\\go-build583768550\\b001\\test.test.exe\nHashes: MD5=199E1CF5B2250BD515ECCCF4CA686301,IMPHASH=D90D8C7812AEC8DA0FA173AFA1293AB2\nIsExecutable: true\nArchived: true",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -21,7 +22,7 @@
         "Hashes": "MD5=199E1CF5B2250BD515ECCCF4CA686301,IMPHASH=D90D8C7812AEC8DA0FA173AFA1293AB2",
         "Image": "C:\\Users\\vagrant\\.gvm\\versions\\go1.13.10.windows.amd64\\bin\\go.exe",
         "IsExecutable": "true",
-        "ProcessGuid": "{42f11c3b-c36f-5eb3-2c07-290000000000}",
+        "ProcessGuid": "{42F11C3B-C36F-5EB3-2C07-290000000000}",
         "ProcessId": "2184",
         "RuleName": "-",
         "TargetFilename": "C:\\Users\\vagrant\\AppData\\Local\\Temp\\1\\go-build583768550\\b001\\test.test.exe",
@@ -36,9 +37,10 @@
           "id": 2360
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 612,
+      "task": "File Delete archived (rule: FileDelete)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -51,6 +53,7 @@
   {
     "@timestamp": "2020-05-07T07:27:18.7221361Z",
     "event": {
+      "action": "File Delete archived (rule: FileDelete)",
       "code": "23",
       "kind": "event",
       "provider": "Microsoft-Windows-Sysmon"
@@ -61,8 +64,8 @@
     "log": {
       "level": "information"
     },
+    "message": "File Delete archived:\nRuleName: -\nUtcTime: 2020-05-07 07:27:18.722\nProcessGuid: {42F11C3B-B2B6-5EB3-18AB-000000000000}\nProcessId: 776\nUser: NT AUTHORITY\\LOCAL SERVICE\nImage: C:\\Windows\\System32\\svchost.exe\nTargetFilename: C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Local\\lastalive0.dat\nHashes: SHA1=115106F5B338C87AE6836D50DD890DE3DA296367\nIsExecutable: false\nArchived: true",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -70,7 +73,7 @@
         "Hashes": "SHA1=115106F5B338C87AE6836D50DD890DE3DA296367",
         "Image": "C:\\Windows\\System32\\svchost.exe",
         "IsExecutable": "false",
-        "ProcessGuid": "{42f11c3b-b2b6-5eb3-18ab-000000000000}",
+        "ProcessGuid": "{42F11C3B-B2B6-5EB3-18AB-000000000000}",
         "ProcessId": "776",
         "RuleName": "-",
         "TargetFilename": "C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Local\\lastalive0.dat",
@@ -85,9 +88,10 @@
           "id": 2360
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 11,
+      "task": "File Delete archived (rule: FileDelete)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",
@@ -100,6 +104,7 @@
   {
     "@timestamp": "2020-05-12T06:48:27.0840442Z",
     "event": {
+      "action": "File Delete archived (rule: FileDelete)",
       "code": "23",
       "kind": "event",
       "provider": "Microsoft-Windows-Sysmon"
@@ -110,8 +115,8 @@
     "log": {
       "level": "information"
     },
+    "message": "File Delete archived:\nRuleName: -\nUtcTime: 2020-05-12 06:48:27.084\nProcessGuid: {42F11C3B-4664-5EBA-91AE-000000000000}\nProcessId: 820\nUser: NT AUTHORITY\\SYSTEM\nImage: C:\\Windows\\system32\\svchost.exe\nTargetFilename: C:\\Windows\\System32\\LogFiles\\Scm\\8b34f644-f627-47e7-98e0-957ba1c5eb6d\nHashes: MD5=5A9BDDF83BE530B481F0FD24DB28A6FF,IMPHASH=00000000000000000000000000000000\nIsExecutable: false\nArchived: true",
     "winlog": {
-      "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
       "event_data": {
@@ -119,7 +124,7 @@
         "Hashes": "MD5=5A9BDDF83BE530B481F0FD24DB28A6FF,IMPHASH=00000000000000000000000000000000",
         "Image": "C:\\Windows\\system32\\svchost.exe",
         "IsExecutable": "false",
-        "ProcessGuid": "{42f11c3b-4664-5eba-91ae-000000000000}",
+        "ProcessGuid": "{42F11C3B-4664-5EBA-91AE-000000000000}",
         "ProcessId": "820",
         "RuleName": "-",
         "TargetFilename": "C:\\Windows\\System32\\LogFiles\\Scm\\8b34f644-f627-47e7-98e0-957ba1c5eb6d",
@@ -134,9 +139,10 @@
           "id": 1600
         }
       },
-      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_guid": "{5770385F-C22A-43E0-BF4C-06F5698FFBD9}",
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2243,
+      "task": "File Delete archived (rule: FileDelete)",
       "user": {
         "domain": "NT AUTHORITY",
         "identifier": "S-1-5-18",

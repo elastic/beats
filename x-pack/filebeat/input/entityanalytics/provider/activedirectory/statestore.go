@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	usersBucket = []byte("users")
-	stateBucket = []byte("state")
+	usersBucket   = []byte("users")
+	devicesBucket = []byte("devices")
+	stateBucket   = []byte("state")
 
 	whenChangedKey = []byte("when_changed")
 	lastSyncKey    = []byte("last_sync")
@@ -33,6 +34,7 @@ const (
 	Deleted
 )
 
+// User is an Active Directory entity. It may be a person or a computer.
 type User struct {
 	activedirectory.Entry `json:"activedirectory"`
 	State                 State `json:"state"`
@@ -52,6 +54,7 @@ type stateStore struct {
 	lastSync   time.Time
 	lastUpdate time.Time
 	users      map[string]*User
+	devices    map[string]*User
 }
 
 // newStateStore creates a new instance of stateStore. It will open a new write
@@ -66,8 +69,9 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	}
 
 	s := stateStore{
-		users: make(map[string]*User),
-		tx:    tx,
+		users:   make(map[string]*User),
+		devices: make(map[string]*User),
+		tx:      tx,
 	}
 
 	err = s.tx.Get(stateBucket, lastSyncKey, &s.lastSync)
@@ -96,6 +100,19 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 	if err != nil && !errIsItemNotFound(err) {
 		return nil, fmt.Errorf("unable to get users from state: %w", err)
 	}
+	err = s.tx.ForEach(devicesBucket, func(key, value []byte) error {
+		var d User
+		err = json.Unmarshal(value, &d)
+		if err != nil {
+			return fmt.Errorf("unable to unmarshal user from state: %w", err)
+		}
+		s.devices[d.ID] = &d
+
+		return nil
+	})
+	if err != nil && !errIsItemNotFound(err) {
+		return nil, fmt.Errorf("unable to get devices from state: %w", err)
+	}
 
 	return &s, nil
 }
@@ -115,17 +132,19 @@ func (s *stateStore) storeUser(u activedirectory.Entry) *User {
 	return &su
 }
 
-// len returns the number of user entries in the state store.
-func (s *stateStore) len() int {
-	return len(s.users)
-}
-
-// forEach iterates over all users in the state store. Changes to the
-// User's fields will be reflected in the state store.
-func (s *stateStore) forEach(fn func(*User)) {
-	for _, u := range s.users {
-		fn(u)
+// storeUser stores a user. If the user does not exist in the store, then the
+// user will be marked as discovered. Otherwise, the user will be marked
+// as modified.
+func (s *stateStore) storeDevice(d activedirectory.Entry) *User {
+	sd := User{Entry: d}
+	if existing, ok := s.devices[d.ID]; ok {
+		sd.State = Modified
+		*existing = sd
+	} else {
+		sd.State = Discovered
+		s.devices[d.ID] = &sd
 	}
+	return &sd
 }
 
 // close will close out the stateStore. If commit is true, the staged values on the
@@ -170,9 +189,29 @@ func (s *stateStore) close(commit bool) (err error) {
 	}
 
 	for key, value := range s.users {
+		if value.State == Deleted {
+			err = s.tx.Delete(usersBucket, []byte(key))
+			if err != nil {
+				return fmt.Errorf("unable to delete user %q from state: %w", key, err)
+			}
+			continue
+		}
 		err = s.tx.Set(usersBucket, []byte(key), value)
 		if err != nil {
 			return fmt.Errorf("unable to save user %q to state: %w", key, err)
+		}
+	}
+	for key, value := range s.devices {
+		if value.State == Deleted {
+			err = s.tx.Delete(devicesBucket, []byte(key))
+			if err != nil {
+				return fmt.Errorf("unable to delete device %q from state: %w", key, err)
+			}
+			continue
+		}
+		err = s.tx.Set(devicesBucket, []byte(key), value)
+		if err != nil {
+			return fmt.Errorf("unable to save device %q to state: %w", key, err)
 		}
 	}
 

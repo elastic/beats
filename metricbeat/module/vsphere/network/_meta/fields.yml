@@ -23,6 +23,10 @@
           type: long
           description: >
             Number of hosts connected to this network.
+    - name: id
+      type: keyword
+      description: >
+        Unique network ID.
     - name: name
       type: keyword
       description: >
@@ -30,7 +34,7 @@
     - name: status
       type: keyword
       description: >
-        General health of the Network.
+        General health of the network.
     - name: type
       type: keyword
       description: >

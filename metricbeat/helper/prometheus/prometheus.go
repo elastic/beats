@@ -35,6 +35,9 @@ const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
 
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
+	// GetHttp returns the HTTP Client that handles the connection towards remote endpoint
+	GetHttp() (*helper.HTTP, error)
+
 	// GetFamilies requests metric families from prometheus endpoint and returns them
 	GetFamilies() ([]*MetricFamily, error)
 
@@ -64,6 +67,15 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 	http.SetHeaderDefault("Accept", acceptHeader)
 	http.SetHeaderDefault("Accept-Encoding", "gzip")
 	return &prometheus{http, base.Logger()}, nil
+}
+
+// GetHttp returns HTTP Client
+func (p *prometheus) GetHttp() (*helper.HTTP, error) {
+	httpClient, ok := p.httpfetcher.(*helper.HTTP)
+	if !ok {
+		return nil, fmt.Errorf("httpfetcher is not of type *helper.HTTP")
+	}
+	return httpClient, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them

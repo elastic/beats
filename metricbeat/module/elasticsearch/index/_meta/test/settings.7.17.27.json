@@ -1,0 +1,274 @@
+{
+  ".ds-.logs-deprecation.elasticsearch-default-2025.01.28-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : ".deprecation-indexing-ilm-policy"
+        },
+        "codec" : "best_compression",
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".ds-.logs-deprecation.elasticsearch-default-2025.01.28-000001",
+        "query" : {
+          "default_field" : [
+            "message"
+          ]
+        },
+        "creation_date" : "1738083664360",
+        "number_of_replicas" : "0",
+        "uuid" : "_VOBmFhgQti45LmDjNVM3g",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  "testindex" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "provided_name" : "testindex",
+        "creation_date" : "1738083727759",
+        "number_of_replicas" : "1",
+        "uuid" : "3tMg27yoRJCH3iftDWEuPA",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  ".kibana_security_session_1" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "refresh_interval" : "1s",
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_security_session_1",
+        "creation_date" : "1738083662277",
+        "priority" : "1000",
+        "number_of_replicas" : "0",
+        "uuid" : "ijwYRwQcQgKUAZe44wJr-w",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  ".ds-ilm-history-5-2025.01.28-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : "ilm-history-ilm-policy"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_hot"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".ds-ilm-history-5-2025.01.28-000001",
+        "creation_date" : "1738083667644",
+        "number_of_replicas" : "0",
+        "uuid" : "5iT-D9P9SWSzHNXq9RF3_A",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  ".security-7" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "refresh_interval" : "1s",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".security-7",
+        "format" : "6",
+        "creation_date" : "1738083657220",
+        "analysis" : {
+          "filter" : {
+            "email" : {
+              "type" : "pattern_capture",
+              "preserve_original" : "true",
+              "patterns" : [
+                "([^@]+)",
+                "(\\p{L}+)",
+                "(\\d+)",
+                "@(.+)"
+              ]
+            }
+          },
+          "analyzer" : {
+            "email" : {
+              "filter" : [
+                "email",
+                "lowercase",
+                "unique"
+              ],
+              "tokenizer" : "uax_url_email"
+            }
+          }
+        },
+        "priority" : "1000",
+        "number_of_replicas" : "0",
+        "uuid" : "f5Wgq4gzRuehsYoH8WUaRA",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  ".kibana_7.17.27_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "refresh_interval" : "1s",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_7.17.27_001",
+        "creation_date" : "1738083660648",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "5FAgbdhwST-Qy-KOm81iHg",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  ".apm-custom-link" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".apm-custom-link",
+        "creation_date" : "1738083661966",
+        "number_of_replicas" : "0",
+        "uuid" : "Mg5y8NayQyC5heW-2e07pQ",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  ".kibana_task_manager_7.17.27_001" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "refresh_interval" : "1s",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana_task_manager_7.17.27_001",
+        "creation_date" : "1738083660616",
+        "priority" : "10",
+        "number_of_replicas" : "0",
+        "uuid" : "ZmJdoPZKRseP-TF2y8nkzg",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  ".kibana-event-log-7.17.27-000001" : {
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : "kibana-event-log-policy",
+          "rollover_alias" : ".kibana-event-log-7.17.27"
+        },
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "hidden" : "true",
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".kibana-event-log-7.17.27-000001",
+        "creation_date" : "1738083662578",
+        "number_of_replicas" : "0",
+        "uuid" : "4kJZ5qiDRWKKriEYc1SSpA",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  },
+  ".apm-agent-configuration" : {
+    "settings" : {
+      "index" : {
+        "routing" : {
+          "allocation" : {
+            "include" : {
+              "_tier_preference" : "data_content"
+            }
+          }
+        },
+        "number_of_shards" : "1",
+        "auto_expand_replicas" : "0-1",
+        "provided_name" : ".apm-agent-configuration",
+        "creation_date" : "1738083662009",
+        "number_of_replicas" : "0",
+        "uuid" : "1LtqEimaQhmUQQxNWCadXQ",
+        "version" : {
+          "created" : "7172799"
+        }
+      }
+    }
+  }
+}

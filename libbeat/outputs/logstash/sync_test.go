@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 )
 
@@ -67,7 +68,11 @@ func makeTestClient(conn *transport.Client) testClientDriver {
 	config := defaultConfig()
 	config.Timeout = 1 * time.Second
 	config.TTL = 5 * time.Second
-	client, err := newSyncClient(beat.Info{}, conn, outputs.NewNilObserver(), &config)
+	logger, err := logp.NewDevelopmentLogger("")
+	if err != nil {
+		panic(err)
+	}
+	client, err := newSyncClient(beat.Info{Logger: logger}, conn, outputs.NewNilObserver(), &config)
 	if err != nil {
 		panic(err)
 	}
@@ -86,6 +91,8 @@ func newClientTestDriver(client outputs.NetworkClient) *testSyncDriver {
 	go func() {
 		defer driver.wg.Done()
 
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
 		for {
 			cmd, ok := <-driver.ch
 			if !ok {
@@ -96,7 +103,7 @@ func newClientTestDriver(client outputs.NetworkClient) *testSyncDriver {
 			case driverCmdQuit:
 				return
 			case driverCmdConnect:
-				driver.client.Connect()
+				driver.client.Connect(ctx)
 			case driverCmdClose:
 				driver.client.Close()
 			case driverCmdPublish:

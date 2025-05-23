@@ -9,7 +9,7 @@ import (
 	"fmt"
 
 	// Register driver.
-	_ "github.com/denisenkom/go-mssqldb"
+	_ "github.com/microsoft/go-mssqldb"
 )
 
 // NewConnection returns a connection already established with MSSQL

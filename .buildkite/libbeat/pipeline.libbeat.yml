@@ -79,13 +79,69 @@ steps:
           - "libbeat/build/*.json"
         plugins:
           - test-collector#v1.10.2:
-              files: "libbeat/build/TEST-*-unit.xml"
+              files: "libbeat/build/TEST-*.xml"
               format: "junit"
               branches: "main"
               debug: true
         notify:
           - github_commit_status:
               context: "libbeat: Ubuntu x86_64 Unit Tests"
+
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "mandatory-linux-unit-test-fips-tag"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          mage unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "libbeat/build/*.xml"
+          - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+
+      - label: ":ubuntu: Libbeat: Ubuntu x86_64 fips140=only Unit Tests"
+        key: "mandatory-linux-unit-test-fips-only"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          mage goFIPSOnlyUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "libbeat/build/*.xml"
+          - "libbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "libbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "libbeat: Ubuntu x86_64 fips140=only Unit Tests"
 
       - label: ":ubuntu: Libbeat: Go Integration Tests"
         key: "mandatory-int-test"
@@ -103,6 +159,9 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+          - "libbeat/build/integration-tests/*"
+          - "libbeat/build/integration-tests/Test*/*"
+          - "libbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "libbeat/build/TEST-*.xml"
@@ -129,6 +188,9 @@ steps:
         artifact_paths:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
+          - "libbeat/build/integration-tests/*"
+          - "libbeat/build/integration-tests/Test*/*"
+          - "libbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "libbeat/build/TEST-*.xml"
@@ -138,26 +200,6 @@ steps:
         notify:
           - github_commit_status:
               context: "libbeat: Python Integration Tests"
-
-      - label: ":ubuntu: Libbeat: Crosscompile"
-        key: "mandatory-cross-compile"
-        command: |
-          set -euo pipefail
-          cd libbeat
-          make crosscompile
-        retry:
-          automatic:
-            - limit: 1
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "libbeat/build/*.xml"
-          - "libbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "libbeat: Crosscompile"
 
       - label: ":ubuntu: Libbeat: Stress Tests"
         key: "mandatory-stress-test"

@@ -24,7 +24,7 @@
     "log": {
       "level": "information"
     },
-    "message": "A trust to a domain was removed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-2024912787-2692429404-2351956786-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x6A868\n\nDomain Information:\n\tDomain Name:\t\t192.168.230.153\n\tDomain ID:\t\tS-1-0-0",
+    "message": "A trust to a domain was removed.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-2024912787-2692429404-2351956786-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x6a868\n\nDomain Information:\n\tDomain Name:\t\t192.168.230.153\n\tDomain ID:\t\tS-1-0-0",
     "related": {
       "user": [
         "Administrator"
@@ -36,7 +36,6 @@
       "name": "Administrator"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-BVM4LI1L1Q6.TEST.local",
       "event_data": {
@@ -61,7 +60,7 @@
           "id": 2012
         }
       },
-      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_guid": "{54849625-5478-4994-A5BA-3E3B0328C30D}",
       "provider_name": "Microsoft-Windows-Security-Auditing",
       "record_id": "13679",
       "task": "Authentication Policy Change"

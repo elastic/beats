@@ -142,6 +142,11 @@ metricbeat.modules:
   # Filter systemd services based on a name pattern
   #service.pattern_filter: ["ssh*", "nfs*"]
 
+  # This option enables the use of performance counters to collect data for cpu/core metricset.
+  # Only effective for Windows.
+  # You should use this option if running beats on machins with more than 64 cores.
+  #use_performance_counters: false
+
 #------------------------------ Aerospike Module ------------------------------
 - module: aerospike
   metricsets: ["namespace"]
@@ -151,6 +156,16 @@ metricbeat.modules:
 
   # Aerospike Cluster Name
   #cluster_name: myclustername
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # Authentication modes: https://aerospike.com/docs/server/guide/security/access-control
+  # Possible values: internal (default), external, pki
+  #auth_mode: internal
 
   # Optional SSL/TLS (disabled by default)
   #ssl.enabled: true
@@ -259,6 +274,9 @@ metricbeat.modules:
 
   # If set to true, replace dots in labels with `_`.
   #labels.dedot: false
+
+  # Docker module supports metrics collection from podman's docker compatible API. In case of podman set to true.
+  # podman: false
 
   # Skip metrics for certain device major numbers in docker/diskio. 
   # Necessary on systems with software RAID, device mappers, 
@@ -571,6 +589,7 @@ metricbeat.modules:
     - state_persistentvolume
     - state_persistentvolumeclaim
     - state_storageclass
+    # - state_horizontalpodautoscaler
     # Uncomment this to get k8s events:
     #- event  period: 10s
   hosts: ["kube-state-metrics:8080"]
@@ -819,6 +838,7 @@ metricbeat.modules:
     - "subscriptions"
     #- "connection"
     #- "route"
+    #- "jetstream"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
@@ -827,6 +847,24 @@ metricbeat.modules:
   #subscriptions.metrics_path: "/subsz"
   #connection.metrics_path: "/connz"
   #route.metrics_path: "/routez"
+  #jetstream:
+  #  stats:
+  #    enabled: true
+  #  account:
+  #    enabled: true
+  #    names:
+  #      - default
+  #  stream:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1
+  #      - another-stream
+  #  consumer:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1-consumer-1
+  #      - my-stream-1-consumer-2
+  #      - another-stream-consumer-1
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -1074,6 +1112,34 @@ metricbeat.modules:
   metricsets: ["service"]
   enabled: true
   period: 60s
+
+- module: windows
+  metricsets: ["wmi"]
+  period: 10m
+  wmi:
+    # Do not include the query string in the output
+    include_queries: false
+    # Exclude properties with null values from the output
+    include_null_properties: false
+    # Exclude properties with empty string values from the output
+    include_empty_string_properties: false
+    # Maximum time to wait for a query result before logging a warning (defaults to period)
+    warning_threshold: 10m
+    # Default WMI namespace for all queries (if not specified per query)
+    # Uncomment to override the default, which is "root\\cimv2".
+    # namespace: "root\\cimv2"
+    queries:
+    - class: Win32_OperatingSystem          # FROM: Class to fetch
+      properties:                           # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
+       - FreePhysicalMemory
+       - FreeSpaceInPagingFiles
+       - FreeVirtualMemory
+       - LocalDateTime
+       - NumberOfUsers
+      where: ""                             # Optional WHERE clause to filter query results
+      # Override the WMI namespace for this specific query (optional).
+      # If set, this takes precedence over the default namespace above.
+      # namespace: "root\\cimv2" # Overrides the metric
 
 #------------------------------ ZooKeeper Module ------------------------------
 - module: zookeeper
@@ -2481,7 +2547,7 @@ logging.files:
   #path: /var/log/metricbeat
 
   # The name of the files where the logs are written to.
-  #name: metricbeat-event-data
+  #name: metricbeat-events-data
 
   # Configure log file size limit. If the limit is reached, log file will be
   # automatically rotated.

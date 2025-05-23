@@ -130,6 +130,10 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 	p.cfg.UserAttrs = withMandatory(p.cfg.UserAttrs, "distinguishedName", "whenChanged")
 	p.cfg.GrpAttrs = withMandatory(p.cfg.GrpAttrs, "distinguishedName", "whenChanged")
 
+	var (
+		last time.Time
+		err  error
+	)
 	for {
 		select {
 		case <-inputCtx.Cancelation.Done():
@@ -137,9 +141,9 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 				return inputCtx.Cancelation.Err()
 			}
 			return nil
-		case <-syncTimer.C:
-			start := time.Now()
-			if err := p.runFullSync(inputCtx, store, client); err != nil {
+		case start := <-syncTimer.C:
+			last, err = p.runFullSync(inputCtx, store, client)
+			if err != nil {
 				p.logger.Errorw("Error running full sync", "error", err)
 				p.metrics.syncError.Inc()
 			}
@@ -157,9 +161,9 @@ func (p *adInput) Run(inputCtx v2.Context, store *kvstore.Store, client beat.Cli
 			}
 			updateTimer.Reset(p.cfg.UpdateInterval)
 			p.logger.Debugf("Next update expected at: %v", time.Now().Add(p.cfg.UpdateInterval))
-		case <-updateTimer.C:
-			start := time.Now()
-			if err := p.runIncrementalUpdate(inputCtx, store, client); err != nil {
+		case start := <-updateTimer.C:
+			last, err = p.runIncrementalUpdate(inputCtx, store, last, client)
+			if err != nil {
 				p.logger.Errorw("Error running incremental update", "error", err)
 				p.metrics.updateError.Inc()
 			}
@@ -192,13 +196,13 @@ outer:
 // identities from Azure Active Directory, enrich users with group memberships,
 // and publishes all known users (regardless if they have been modified) to the
 // given beat.Client.
-func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client beat.Client) (time.Time, error) {
 	p.logger.Debugf("Running full sync...")
 
 	p.logger.Debugf("Opening new transaction...")
 	state, err := newStateStore(store)
 	if err != nil {
-		return fmt.Errorf("unable to begin transaction: %w", err)
+		return time.Time{}, fmt.Errorf("unable to begin transaction: %w", err)
 	}
 	p.logger.Debugf("Transaction opened")
 	defer func() { // If commit is successful, call to this close will be no-op.
@@ -208,50 +212,114 @@ func (p *adInput) runFullSync(inputCtx v2.Context, store *kvstore.Store, client 
 		}
 	}()
 
-	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	p.logger.Debugf("Starting fetch...")
-	_, err = p.doFetchUsers(ctx, state, true)
-	if err != nil {
-		return err
-	}
+	wantUsers := p.cfg.wantUsers()
+	wantDevices := p.cfg.wantDevices()
+	if wantUsers || wantDevices {
+		var users, devices []*User
+		ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
+		p.logger.Debugf("Starting fetch...")
+		if wantUsers {
+			users, err = p.doFetchUsers(ctx, state, true)
+			if err != nil {
+				return time.Time{}, err
+			}
+		}
+		if wantDevices {
+			devices, err = p.doFetchDevices(ctx, state, true)
+			if err != nil {
+				return time.Time{}, err
+			}
+		}
 
-	if len(state.users) != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
-
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-		for _, u := range state.users {
+
+		for _, u := range p.unifyState(ctx, state.users, users) {
 			p.publishUser(u, state, inputCtx.ID, client, tracker)
+		}
+		for _, d := range p.unifyState(ctx, state.devices, devices) {
+			p.publishDevice(d, state, inputCtx.ID, client, tracker)
 		}
 
 		end := time.Now()
 		p.publishMarker(end, end, inputCtx.ID, false, client, tracker)
-
 		tracker.Wait()
+
+		if ctx.Err() != nil {
+			return time.Time{}, ctx.Err()
+		}
 	}
 
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
-
-	state.lastSync = time.Now()
+	// state.whenChanged is modified by the call to doFetchUsers to be
+	// the latest modification time for all of the users that have been
+	// collected in that call. This will not include any of the deleted
+	// users since they were not collected.
+	latest := state.whenChanged
+	state.lastSync = latest
 	err = state.close(true)
 	if err != nil {
-		return fmt.Errorf("unable to commit state: %w", err)
+		return time.Time{}, fmt.Errorf("unable to commit state: %w", err)
 	}
 
-	return nil
+	return latest, nil
+}
+
+// unifyState merges the state and entries, updating User values that have
+// are in state, but not in entries to mark them as deleted.
+func (p *adInput) unifyState(ctx context.Context, state map[string]*User, entries []*User) []*User {
+	if len(entries) == 0 && len(state) == 0 {
+		return nil
+	}
+
+	// Active Directory does not have a notion of deleted users
+	// beyond absence from the directory, so compare found users
+	// with users already known by the state store and if any
+	// are in the store but not returned in the previous fetch,
+	// mark them as deleted and publish the deletion. We do not
+	// have the time of the deletion, so use now.
+	if len(state) != 0 {
+		found := make(map[string]bool)
+		for _, u := range entries {
+			found[u.ID] = true
+		}
+		deleted := make(map[string]*User)
+		now := time.Now()
+		for _, e := range state {
+			if e.State == Deleted {
+				// We have already seen that this is deleted
+				// so we do not need to publish again. The
+				// user will be deleted from the store when
+				// the state is closed.
+				continue
+			}
+			if found[e.ID] {
+				// We have the user, so we do not need to
+				// mark it as deleted.
+				continue
+			}
+			// This modifies the state store's copy since u
+			// is a pointer held by the state store map.
+			e.State = Deleted
+			e.WhenChanged = now
+			deleted[e.ID] = e
+		}
+		for _, d := range deleted {
+			entries = append(entries, d)
+		}
+	}
+	return entries
 }
 
 // runIncrementalUpdate will run an incremental update. The process is similar
 // to full synchronization, except only users which have changed (newly
 // discovered, modified, or deleted) will be published.
-func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, client beat.Client) error {
+func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, last time.Time, client beat.Client) (time.Time, error) {
 	p.logger.Debugf("Running incremental update...")
 
 	state, err := newStateStore(store)
 	if err != nil {
-		return fmt.Errorf("unable to begin transaction: %w", err)
+		return last, fmt.Errorf("unable to begin transaction: %w", err)
 	}
 	defer func() { // If commit is successful, call to this close will be no-op.
 		closeErr := state.close(false)
@@ -260,65 +328,52 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 		}
 	}()
 
+	var updatedUsers, updatedDevices []*User
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	updatedUsers, err := p.doFetchUsers(ctx, state, false)
-	if err != nil {
-		return err
+	if p.cfg.wantUsers() {
+		updatedUsers, err = p.doFetchUsers(ctx, state, false)
+		if err != nil {
+			return last, err
+		}
+	}
+	if p.cfg.wantDevices() {
+		updatedDevices, err = p.doFetchDevices(ctx, state, false)
+		if err != nil {
+			return last, err
+		}
 	}
 
-	var tracker *kvstore.TxTracker
-	if len(updatedUsers) != 0 || state.len() != 0 {
-		// Active Directory does not have a notion of deleted users
-		// beyond absence from the directory, so compare found users
-		// with users already known by the state store and if any
-		// are in the store but not returned in the previous fetch,
-		// mark them as deleted and publish the deletion. We do not
-		// have the time of the deletion, so use now.
-		if state.len() != 0 {
-			found := make(map[string]bool)
-			for _, u := range updatedUsers {
-				found[u.ID] = true
-			}
-			deleted := make(map[string]*User)
-			now := time.Now()
-			state.forEach(func(u *User) {
-				if u.State == Deleted || found[u.ID] {
-					return
-				}
-				// This modifies the state store's copy since u
-				// is a pointer held by the state store map.
-				u.State = Deleted
-				u.WhenChanged = now
-				deleted[u.ID] = u
-			})
-			for _, u := range deleted {
-				updatedUsers = append(updatedUsers, u)
-			}
+	if len(updatedUsers) != 0 || len(updatedDevices) != 0 {
+		tracker := kvstore.NewTxTracker(ctx)
+		for _, u := range updatedUsers {
+			p.publishUser(u, state, inputCtx.ID, client, tracker)
 		}
-		if len(updatedUsers) != 0 {
-			tracker = kvstore.NewTxTracker(ctx)
-			for _, u := range updatedUsers {
-				p.publishUser(u, state, inputCtx.ID, client, tracker)
-			}
-			tracker.Wait()
+		for _, d := range updatedDevices {
+			p.publishDevice(d, state, inputCtx.ID, client, tracker)
 		}
+		tracker.Wait()
 	}
 
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return last, ctx.Err()
 	}
 
-	state.lastUpdate = time.Now()
+	// state.whenChanged is modified by the call to doFetchUsers to be
+	// the latest modification time for all of the users that have been
+	// collected in that call.
+	latest := state.whenChanged
+	state.lastUpdate = latest
 	if err = state.close(true); err != nil {
-		return fmt.Errorf("unable to commit state: %w", err)
+		return last, fmt.Errorf("unable to commit state: %w", err)
 	}
 
-	return nil
+	return latest, nil
 }
 
 // doFetchUsers handles fetching user identities from Active Directory. If
 // fullSync is true, then any existing whenChanged will be ignored, forcing a
-// full synchronization from Active Directory.
+// full synchronization from Active Directory. The whenChanged time of state
+// is modified to be the time stamp of the latest User.WhenChanged value.
 // Returns a set of modified users by ID.
 func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
 	var since time.Time
@@ -326,38 +381,57 @@ func (p *adInput) doFetchUsers(ctx context.Context, state *stateStore, fullSync 
 		since = state.whenChanged
 	}
 
-	entries, err := activedirectory.GetDetails(p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	query := "(&(objectCategory=person)(objectClass=user))"
+	if p.cfg.UserQuery != "" {
+		query = p.cfg.UserQuery
+	}
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
 	p.logger.Debugf("received %d users from API", len(entries))
 	if err != nil {
 		return nil, err
 	}
 
-	var (
-		users       []*User
-		whenChanged time.Time
-	)
-	if fullSync {
-		for _, u := range entries {
-			state.storeUser(u)
-			if u.WhenChanged.After(whenChanged) {
-				whenChanged = u.WhenChanged
-			}
+	users := make([]*User, 0, len(entries))
+	for _, u := range entries {
+		users = append(users, state.storeUser(u))
+		if u.WhenChanged.After(state.whenChanged) {
+			state.whenChanged = u.WhenChanged
 		}
-	} else {
-		users = make([]*User, 0, len(entries))
-		for _, u := range entries {
-			users = append(users, state.storeUser(u))
-			if u.WhenChanged.After(whenChanged) {
-				whenChanged = u.WhenChanged
-			}
-		}
-		p.logger.Debugf("processed %d users from API", len(users))
 	}
-	if whenChanged.After(state.whenChanged) {
-		state.whenChanged = whenChanged
+	p.logger.Debugf("processed %d users from API", len(users))
+	return users, nil
+}
+
+// doFetchDevices handles fetching device identities from Active Directory. If
+// fullSync is true, then any existing whenChanged will be ignored, forcing a
+// full synchronization from Active Directory. The whenChanged time of state
+// is modified to be the time stamp of the latest User.WhenChanged value.
+// Returns a set of modified users by ID.
+func (p *adInput) doFetchDevices(ctx context.Context, state *stateStore, fullSync bool) ([]*User, error) {
+	var since time.Time
+	if !fullSync {
+		since = state.whenChanged
 	}
 
-	return users, nil
+	query := "(&(objectClass=computer)(objectClass=user))"
+	if p.cfg.DeviceQuery != "" {
+		query = p.cfg.DeviceQuery
+	}
+	entries, err := activedirectory.GetDetails(query, p.cfg.URL, p.cfg.User, p.cfg.Password, p.baseDN, since, p.cfg.UserAttrs, p.cfg.GrpAttrs, p.cfg.PagingSize, nil, p.tlsConfig)
+	p.logger.Debugf("received %d devices from API", len(entries))
+	if err != nil {
+		return nil, err
+	}
+
+	devices := make([]*User, 0, len(entries))
+	for _, d := range entries {
+		devices = append(devices, state.storeDevice(d))
+		if d.WhenChanged.After(state.whenChanged) {
+			state.whenChanged = d.WhenChanged
+		}
+	}
+	p.logger.Debugf("processed %d devices from API", len(devices))
+	return devices, nil
 }
 
 // publishMarker will publish a write marker document using the given beat.Client.
@@ -414,6 +488,35 @@ func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client
 	tracker.Add()
 
 	p.logger.Debugf("Publishing user %q", u.ID)
+
+	client.Publish(event)
+}
+
+// publishDevices will publish a device document using the given beat.Client.
+func (p *adInput) publishDevice(u *User, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
+	userDoc := mapstr.M{}
+
+	_, _ = userDoc.Put("activedirectory", u.Entry)
+	_, _ = userDoc.Put("labels.identity_source", inputID)
+	_, _ = userDoc.Put("device.id", u.ID)
+
+	switch u.State {
+	case Deleted:
+		_, _ = userDoc.Put("event.action", "device-deleted")
+	case Discovered:
+		_, _ = userDoc.Put("event.action", "device-discovered")
+	case Modified:
+		_, _ = userDoc.Put("event.action", "device-modified")
+	}
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    userDoc,
+		Private:   tracker,
+	}
+	tracker.Add()
+
+	p.logger.Debugf("Publishing device %q", u.ID)
 
 	client.Publish(event)
 }

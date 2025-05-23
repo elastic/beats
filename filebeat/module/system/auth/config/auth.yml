@@ -1,14 +1,22 @@
+{{ if .use_journald }}
+type: journald
+id: system-auth
+facilities:
+  - 4
+  - 10
+{{ else }}
 type: log
 paths:
 {{ range $i, $path := .paths }}
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
-
 multiline:
   pattern: "^\\s"
   match: after
+{{ end }}
 
+# Common configuration
 processors:
   - add_locale: ~
 

@@ -19,6 +19,8 @@ package add_kubernetes_metadata
 
 import (
 	"fmt"
+	"regexp"
+	"slices"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
@@ -32,6 +34,7 @@ import (
 const (
 	FieldMatcherName       = "fields"
 	FieldFormatMatcherName = "field_format"
+	regexKeyGroupName      = "key"
 )
 
 // Matcher takes a new event and returns the index
@@ -87,42 +90,67 @@ func (m *Matchers) MetadataIndex(event mapstr.M) string {
 }
 
 func (m *Matchers) Empty() bool {
-	if len(m.matchers) == 0 {
-		return true
-	}
-
-	return false
+	return len(m.matchers) == 0
 }
 
 type FieldMatcher struct {
 	MatchFields []string
+	Regexp      *regexp.Regexp
 }
 
 func NewFieldMatcher(cfg config.C) (Matcher, error) {
-	config := struct {
+	matcherConfig := struct {
 		LookupFields []string `config:"lookup_fields"`
+		RegexPattern string   `config:"regex_pattern"`
 	}{}
 
-	err := cfg.Unpack(&config)
+	err := cfg.Unpack(&matcherConfig)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the `lookup_fields` configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the fields matcher configuration: %w", err)
 	}
 
-	if len(config.LookupFields) == 0 {
+	if len(matcherConfig.LookupFields) == 0 {
 		return nil, fmt.Errorf("lookup_fields can not be empty")
 	}
 
-	return &FieldMatcher{MatchFields: config.LookupFields}, nil
+	if len(matcherConfig.RegexPattern) == 0 {
+		return &FieldMatcher{MatchFields: matcherConfig.LookupFields}, nil
+	}
+	regex, err := regexp.Compile(matcherConfig.RegexPattern)
+	if err != nil {
+		return nil, fmt.Errorf("invalid regex: %w", err)
+	}
+
+	captureGroupNames := regex.SubexpNames()
+	if !slices.Contains(captureGroupNames, regexKeyGroupName) {
+		return nil, fmt.Errorf("regex missing required capture group `key`")
+	}
+
+	return &FieldMatcher{MatchFields: matcherConfig.LookupFields, Regexp: regex}, nil
 }
 
 func (f *FieldMatcher) MetadataIndex(event mapstr.M) string {
 	for _, field := range f.MatchFields {
-		keyIface, err := event.GetValue(field)
-		if err == nil {
-			key, ok := keyIface.(string)
-			if ok {
-				return key
-			}
+		fieldIface, err := event.GetValue(field)
+		if err != nil {
+			continue
+		}
+		fieldValue, ok := fieldIface.(string)
+		if !ok {
+			continue
+		}
+		if f.Regexp == nil {
+			return fieldValue
+		}
+
+		matches := f.Regexp.FindStringSubmatch(fieldValue)
+		if matches == nil {
+			continue
+		}
+		keyIndex := f.Regexp.SubexpIndex(regexKeyGroupName)
+		key := matches[keyIndex]
+		if key != "" {
+			return key
 		}
 	}
 
@@ -140,7 +168,7 @@ func NewFieldFormatMatcher(cfg config.C) (Matcher, error) {
 
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the `format` configuration of `field_format` matcher: %s", err)
+		return nil, fmt.Errorf("fail to unpack the `format` configuration of `field_format` matcher: %w", err)
 	}
 
 	if config.Format == "" {

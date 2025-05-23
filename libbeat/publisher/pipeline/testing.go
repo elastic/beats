@@ -19,7 +19,7 @@ package pipeline
 
 import (
 	"context"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
 	"time"
 
@@ -54,7 +54,7 @@ type mockNetworkClient struct {
 	outputs.Client
 }
 
-func (c *mockNetworkClient) Connect() error { return nil }
+func (c *mockNetworkClient) Connect(_ context.Context) error { return nil }
 
 type mockBatch struct {
 	mu     sync.Mutex
@@ -169,7 +169,7 @@ func randomBatch(min, max int) *mockBatch {
 
 // randIntBetween returns a random integer in [min, max)
 func randIntBetween(min, max int) int {
-	return rand.Intn(max-min) + min
+	return rand.IntN(max-min) + min
 }
 
 func waitUntilTrue(duration time.Duration, fn func() bool) bool {

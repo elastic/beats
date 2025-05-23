@@ -48,10 +48,11 @@ type Node struct {
 
 	writer io.Writer
 	reader *bufio.Reader
+	logger *logp.Logger
 }
 
 // Connect with a munin node
-func Connect(address string, timeout time.Duration) (*Node, error) {
+func Connect(address string, timeout time.Duration, logger *logp.Logger) (*Node, error) {
 	conn, err := net.DialTimeout("tcp", address, timeout)
 	if err != nil {
 		return nil, err
@@ -59,6 +60,7 @@ func Connect(address string, timeout time.Duration) (*Node, error) {
 	n := &Node{conn: conn,
 		writer: conn,
 		reader: bufio.NewReader(conn),
+		logger: logger,
 	}
 	// Consume and ignore first line returned by munin, it is a comment
 	// about the node
@@ -111,17 +113,17 @@ func (n *Node) Fetch(plugin string, sanitize bool) (mapstr.M, error) {
 		value := scanner.Text()
 
 		if strings.Contains(name, ".") {
-			logp.Debug("munin", "ignoring field name with dot '%s'", name)
+			n.logger.Named("munin").Debugf("ignoring field name with dot '%s'", name)
 			continue
 		}
 
 		if value == unknownValue {
-			logp.Debug("munin", "unknown value for '%s'", name)
+			n.logger.Named("munin").Debugf("unknown value for '%s'", name)
 			continue
 		}
 
 		if sanitize && !nameRegexp.MatchString(name) {
-			logp.Debug("munin", "sanitizing name with invalid characters '%s'", name)
+			n.logger.Named("munin").Debugf("sanitizing name with invalid characters '%s'", name)
 			name = sanitizeName(name)
 		}
 		if f, err := strconv.ParseFloat(value, 64); err == nil {

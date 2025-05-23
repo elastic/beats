@@ -290,7 +290,7 @@ var batchPool = sync.Pool{
 }
 
 func newBatch(queue *broker, start, count int) *batch {
-	batch := batchPool.Get().(*batch)
+	batch := batchPool.Get().(*batch) //nolint:errcheck //safe to ignore type check
 	batch.next = nil
 	batch.queue = queue
 	batch.start = start
@@ -356,9 +356,9 @@ func (l *batchList) pop() *batch {
 		if l.head == nil {
 			l.tail = nil
 		}
+		ch.next = nil
 	}
 
-	ch.next = nil
 	return ch
 }
 
@@ -396,6 +396,15 @@ func (b *batch) rawEntry(i int) *queueEntry {
 // Return the event referenced by the i-th element of this batch
 func (b *batch) Entry(i int) queue.Entry {
 	return b.rawEntry(i).event
+}
+
+func (b *batch) FreeEntries() {
+	// This signals that the event data has been copied out of the batch, and is
+	// safe to free from the queue buffer, so set all the event pointers to nil.
+	for i := 0; i < b.count; i++ {
+		index := (b.start + i) % len(b.queue.buf)
+		b.queue.buf[index].event = nil
+	}
 }
 
 func (b *batch) Done() {

@@ -20,14 +20,16 @@ package helper
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/useragent"
+
+	"k8s.io/client-go/transport"
 
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
@@ -69,14 +71,6 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		headers.Set(k, v)
 	}
 
-	if config.BearerTokenFile != "" {
-		header, err := getAuthHeaderFromToken(config.BearerTokenFile)
-		if err != nil {
-			return nil, err
-		}
-		headers.Set("Authorization", header)
-	}
-
 	// Ensure backward compatibility
 	builder := hostData.Transport
 	if builder == nil {
@@ -93,6 +87,15 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		httpcommon.WithAPMHTTPInstrumentation(),
 		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Apply the token refreshing roundtripper. We can't do this in a transport option because we need to handle the
+	// error it can return at creation
+	if config.BearerTokenFile != "" {
+		client.Transport, err = transport.NewBearerAuthWithRefreshRoundTripper("", config.BearerTokenFile, client.Transport)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +121,7 @@ func (h *HTTP) FetchResponse() (*http.Response, error) {
 		reader = bytes.NewReader(h.body)
 	}
 
-	req, err := http.NewRequest(h.method, h.uri, reader)
+	req, err := http.NewRequestWithContext(context.Background(), h.method, h.uri, reader) // TODO: get context from caller
 	if err != nil {
 		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
 	}
@@ -211,35 +214,4 @@ func (h *HTTP) FetchJSON() (map[string]interface{}, error) {
 	}
 
 	return data, nil
-}
-
-func (h *HTTP) RefreshAuthorizationHeader() (bool, error) {
-	if h.bearerFile != "" {
-		header, err := getAuthHeaderFromToken(h.bearerFile)
-		if err != nil {
-			return false, err
-		}
-		h.headers.Set("Authorization", header)
-		return true, nil
-	}
-	return false, nil
-}
-
-// getAuthHeaderFromToken reads a bearer authorization token from the given file
-func getAuthHeaderFromToken(path string) (string, error) {
-	var token string
-
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return "", fmt.Errorf("reading bearer token file: %w", err)
-	}
-
-	if len(b) != 0 {
-		if b[len(b)-1] == '\n' {
-			b = b[0 : len(b)-1]
-		}
-		token = fmt.Sprintf("Bearer %s", string(b))
-	}
-
-	return token, nil
 }

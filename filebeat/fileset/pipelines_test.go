@@ -20,6 +20,7 @@
 package fileset
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -101,7 +102,9 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			err = testESClient.Connect()
+			ctx, cancel := context.WithCancel(context.Background())
+			t.Cleanup(cancel)
+			err = testESClient.Connect(ctx)
 			require.NoError(t, err)
 
 			err = testRegistry.LoadPipelines(testESClient, false)

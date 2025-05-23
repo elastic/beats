@@ -20,12 +20,16 @@ package add_cloud_metadata
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	awshttp "github.com/aws/aws-sdk-go-v2/aws/transport/http"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/credentials/ec2rolecreds"
 	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
@@ -35,7 +39,14 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
+const (
+	eksClusterNameTagKey = "eks:cluster-name"
+	tagsCategory         = "tags/instance"
+	tagPrefix            = "aws.tags"
+)
+
 type IMDSClient interface {
+	ec2rolecreds.GetMetadataAPIClient
 	GetInstanceIdentityDocument(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
 }
 
@@ -55,7 +66,7 @@ var NewEC2Client func(cfg awssdk.Config) EC2Client = func(cfg awssdk.Config) EC2
 var ec2MetadataFetcher = provider{
 	Name: "aws-ec2",
 
-	Local: true,
+	DefaultEnabled: true,
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		ec2Schema := func(m map[string]interface{}) mapstr.M {
@@ -84,48 +95,142 @@ func fetchRawProviderMetadata(
 ) {
 	logger := logp.NewLogger("add_cloud_metadata")
 
+	// generate AWS specific client with overriding requirements
+	var awsHTTPClient awshttp.BuildableClient
+	awsHTTPClient = *awsHTTPClient.WithTimeout(client.Timeout).WithTransportOptions(func(tr *http.Transport) {
+		transport, ok := client.Transport.(*http.Transport)
+		if ok {
+			tr.TLSClientConfig = transport.TLSClientConfig
+		}
+
+		tr.DisableKeepAlives = true
+	})
+
 	// LoadDefaultConfig loads the EC2 role credentials
-	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&client))
+	awsConfig, err := awscfg.LoadDefaultConfig(context.TODO(), awscfg.WithHTTPClient(&awsHTTPClient))
 	if err != nil {
 		result.err = fmt.Errorf("failed loading AWS default configuration: %w", err)
 		return
 	}
-	awsClient := NewIMDSClient(awsConfig)
 
-	instanceIdentity, err := awsClient.GetInstanceIdentityDocument(context.TODO(), &imds.GetInstanceIdentityDocumentInput{})
+	imdsClient := NewIMDSClient(awsConfig)
+	instanceIdentity, err := imdsClient.GetInstanceIdentityDocument(ctx, &imds.GetInstanceIdentityDocumentInput{})
 	if err != nil {
 		result.err = fmt.Errorf("failed fetching EC2 Identity Document: %w", err)
 		return
 	}
 
-	// AWS Region must be set to be able to get EC2 Tags
-	awsRegion := instanceIdentity.InstanceIdentityDocument.Region
-	awsConfig.Region = awsRegion
-	accountID := instanceIdentity.InstanceIdentityDocument.AccountID
+	awsRegion := instanceIdentity.Region
+	accountID := instanceIdentity.AccountID
+	instanceID := instanceIdentity.InstanceID
 
-	clusterName, err := fetchEC2ClusterNameTag(awsConfig, instanceIdentity.InstanceIdentityDocument.InstanceID)
-	if err != nil {
-		logger.Warnf("error fetching cluster name metadata: %s.", err)
-	} else if clusterName != "" {
+	_, _ = result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceID)
+	_, _ = result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceType)
+	_, _ = result.metadata.Put("cloud.region", awsRegion)
+	_, _ = result.metadata.Put("cloud.availability_zone", instanceIdentity.AvailabilityZone)
+	_, _ = result.metadata.Put("cloud.account.id", accountID)
+	_, _ = result.metadata.Put("cloud.image.id", instanceIdentity.ImageID)
+
+	// AWS Region must be set to be able to get EC2 Tags
+	awsConfig.Region = awsRegion
+	tags := getTags(ctx, imdsClient, NewEC2Client(awsConfig), instanceID, logger)
+
+	if tags[eksClusterNameTagKey] != "" {
 		// for AWS cluster ID is used cluster ARN: arn:partition:service:region:account-id:resource-type/resource-id, example:
 		// arn:aws:eks:us-east-2:627286350134:cluster/cluster-name
-		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, clusterName)
+		clusterARN := fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%v", awsRegion, accountID, tags[eksClusterNameTagKey])
 
 		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterARN)
-		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
+		_, _ = result.metadata.Put("orchestrator.cluster.name", tags[eksClusterNameTagKey])
 	}
 
-	_, _ = result.metadata.Put("cloud.instance.id", instanceIdentity.InstanceIdentityDocument.InstanceID)
-	_, _ = result.metadata.Put("cloud.machine.type", instanceIdentity.InstanceIdentityDocument.InstanceType)
-	_, _ = result.metadata.Put("cloud.region", awsRegion)
-	_, _ = result.metadata.Put("cloud.availability_zone", instanceIdentity.InstanceIdentityDocument.AvailabilityZone)
-	_, _ = result.metadata.Put("cloud.account.id", accountID)
-	_, _ = result.metadata.Put("cloud.image.id", instanceIdentity.InstanceIdentityDocument.ImageID)
+	if len(tags) == 0 {
+		return
+	}
 
+	logger.Infof("Adding retrieved tags with key: %s", tagPrefix)
+	for k, v := range tags {
+		_, _ = result.metadata.Put(fmt.Sprintf("%s.%s", tagPrefix, k), v)
+	}
 }
 
-func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (string, error) {
-	svc := NewEC2Client(awsConfig)
+// getTags is a helper to extract EC2 tags. Internally it utilize multiple extraction methods.
+func getTags(ctx context.Context, imdsClient IMDSClient, ec2Client EC2Client, instanceId string, logger *logp.Logger) map[string]string {
+	logger.Info("Extracting EC2 tags from IMDS endpoint")
+	tags, ok := getTagsFromIMDS(ctx, imdsClient, logger)
+	if ok {
+		return tags
+	}
+
+	logger.Info("Tag extraction from IMDS failed, fallback to DescribeTags API to obtain EKS cluster name.")
+	clusterName, err := clusterNameFromDescribeTag(ctx, ec2Client, instanceId)
+	if err != nil {
+		logger.Warnf("error obtaining cluster name: %v.", err)
+		return tags
+	}
+
+	if clusterName != "" {
+		tags[eksClusterNameTagKey] = clusterName
+	}
+	return tags
+}
+
+// getTagsFromIMDS is a helper to extract EC2 tags using instance metadata service.
+// Note that this call could get throttled and currently does not implement a retry mechanism.
+// See - https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html#instancedata-throttling
+func getTagsFromIMDS(ctx context.Context, client IMDSClient, logger *logp.Logger) (tags map[string]string, ok bool) {
+	tags = make(map[string]string)
+
+	b, err := getMetadataHelper(ctx, client, tagsCategory, logger)
+	if err != nil {
+		logger.Warnf("error obtaining tags category: %v", err)
+		return tags, false
+	}
+
+	for _, tag := range strings.Split(string(b), "\n") {
+		tagPath := fmt.Sprintf("%s/%s", tagsCategory, tag)
+		b, err := getMetadataHelper(ctx, client, tagPath, logger)
+		if err != nil {
+			logger.Warnf("error extracting tag value of %s: %v", tag, err)
+			return tags, false
+		}
+
+		tagValue := string(b)
+		if tagValue == "" {
+			logger.Infof("Ignoring tag key %s as value is empty", tag)
+			continue
+		}
+
+		tags[tag] = tagValue
+	}
+
+	return tags, true
+}
+
+// getMetadataHelper performs the IMDS call for the given path and returns the response content after closing the underlying content reader.
+func getMetadataHelper(ctx context.Context, client IMDSClient, path string, logger *logp.Logger) (content []byte, err error) {
+	metadata, err := client.GetMetadata(ctx, &imds.GetMetadataInput{Path: path})
+	if err != nil {
+		return nil, fmt.Errorf("error from IMDS metadata request: %w", err)
+	}
+
+	defer func(Content io.ReadCloser) {
+		err := Content.Close()
+		if err != nil {
+			logger.Warnf("error closing IMDS metadata response body: %v", err)
+		}
+	}(metadata.Content)
+
+	content, err = io.ReadAll(metadata.Content)
+	if err != nil {
+		return nil, fmt.Errorf("error extracting metadata from the IMDS response: %w", err)
+	}
+
+	return content, nil
+}
+
+// clusterNameFromDescribeTag is a helper to extract EKS cluster name using DescribeTag.
+func clusterNameFromDescribeTag(ctx context.Context, ec2Client EC2Client, instanceID string) (string, error) {
 	input := &ec2.DescribeTagsInput{
 		Filters: []types.Filter{
 			{
@@ -135,15 +240,13 @@ func fetchEC2ClusterNameTag(awsConfig awssdk.Config, instanceID string) (string,
 				},
 			},
 			{
-				Name: awssdk.String("key"),
-				Values: []string{
-					"eks:cluster-name",
-				},
+				Name:   awssdk.String("key"),
+				Values: []string{eksClusterNameTagKey},
 			},
 		},
 	}
 
-	tagsResult, err := svc.DescribeTags(context.TODO(), input)
+	tagsResult, err := ec2Client.DescribeTags(ctx, input)
 	if err != nil {
 		return "", fmt.Errorf("error fetching EC2 Tags: %w", err)
 	}

@@ -1,4 +1,5 @@
 variants:
+  - KAFKA_VERSION: 3.6.0
   - KAFKA_VERSION: 2.2.2
   - KAFKA_VERSION: 2.1.1
   - KAFKA_VERSION: 2.0.0

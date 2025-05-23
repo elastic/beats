@@ -43,7 +43,7 @@ type Mockbeat struct {
 func New(b *beat.Beat, _ *config.C) (beat.Beater, error) {
 	return &Mockbeat{
 		done:   make(chan struct{}),
-		logger: logp.NewLogger("mock"),
+		logger: b.Info.Logger.Named("mock"),
 	}, nil
 }
 

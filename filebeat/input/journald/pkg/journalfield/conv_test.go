@@ -50,8 +50,10 @@ func TestConversion(t *testing.T) {
 				"SYSLOG_PID": "123456",
 			},
 			want: mapstr.M{
-				"syslog": mapstr.M{
-					"pid": int64(123456),
+				"log": mapstr.M{
+					"syslog": mapstr.M{
+						"procid": int64(123456),
+					},
 				},
 			},
 		},
@@ -60,9 +62,6 @@ func TestConversion(t *testing.T) {
 				"PRIORITY": "123456, ",
 			},
 			want: mapstr.M{
-				"syslog": mapstr.M{
-					"priority": int64(123456),
-				},
 				"log": mapstr.M{
 					"syslog": mapstr.M{
 						"priority": int64(123456),
@@ -75,8 +74,10 @@ func TestConversion(t *testing.T) {
 				"SYSLOG_PID": "123456,root",
 			},
 			want: mapstr.M{
-				"syslog": mapstr.M{
-					"pid": int64(123456),
+				"log": mapstr.M{
+					"syslog": mapstr.M{
+						"procid": int64(123456),
+					},
 				},
 			},
 		},
@@ -85,8 +86,10 @@ func TestConversion(t *testing.T) {
 				"SYSLOG_PID": "",
 			},
 			want: mapstr.M{
-				"syslog": mapstr.M{
-					"pid": "",
+				"log": mapstr.M{
+					"syslog": mapstr.M{
+						"procid": "",
+					},
 				},
 			},
 		},

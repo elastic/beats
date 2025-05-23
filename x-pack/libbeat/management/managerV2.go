@@ -14,7 +14,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -681,10 +680,19 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*agentUnit) {
 	//
 	// in v2 only a single input type will be started per component, so we don't need to
 	// worry about getting multiple re-loaders (we just need the one for the type)
-	if err := cm.reloadInputs(inputUnits); err != nil {
-		merror := &multierror.MultiError{}
-		if errors.As(err, &merror) {
-			for _, err := range merror.Errors {
+	if err := cm.reloadInputs(inputUnits); err != nil { // HERE
+		// cm.reloadInputs will use fmt.Errorf and join an error slice
+		// using errors.Join, so we need to unwrap the fmt wrapped error,
+		// then we can iterate over the errors list.
+		err = errors.Unwrap(err)
+		type unwrapList interface {
+			Unwrap() []error
+		}
+
+		//nolint:errorlint // That's a custom logic based on how reloadInputs builds the error
+		errList, isErrList := err.(unwrapList)
+		if isErrList {
+			for _, err := range errList.Unwrap() {
 				unitErr := cfgfile.UnitError{}
 				if errors.As(err, &unitErr) {
 					unitErrors[unitErr.UnitID] = append(unitErrors[unitErr.UnitID], unitErr.Err)
@@ -824,8 +832,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 	}
 
 	if err := obj.Reload(inputBeatCfgs); err != nil {
-		merror := &multierror.MultiError{}
-		realErrors := multierror.Errors{}
+		var errs []error
 
 		// At the moment this logic is tightly bound to the current RunnerList
 		// implementation from libbeat/cfgfile/list.go and Input.loadStates from
@@ -833,8 +840,12 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		// If they change the way they report errors, this will break.
 		// TODO (Tiago): update all layers to use the most recent features from
 		// the standard library errors package.
-		if errors.As(err, &merror) {
-			for _, err := range merror.Errors {
+		type unwrapList interface {
+			Unwrap() []error
+		}
+		errList, isErrList := err.(unwrapList) //nolint:errorlint // see the comment above
+		if isErrList {
+			for _, err := range errList.Unwrap() {
 				causeErr := errors.Unwrap(err)
 				// A Log input is only marked as finished when all events it
 				// produced are acked by the acker so when we see this error,
@@ -850,12 +861,12 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 				}
 
 				// This is an error that cannot be ignored, so we report it
-				realErrors = append(realErrors, err)
+				errs = append(errs, err)
 			}
 		}
 
-		if len(realErrors) != 0 {
-			return fmt.Errorf("failed to reload inputs: %w", realErrors.Err())
+		if len(errs) != 0 {
+			return fmt.Errorf("failed to reload inputs: %w", errors.Join(errs...))
 		}
 	} else {
 		// If there was no error reloading input and forceReload was
@@ -893,6 +904,13 @@ func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 			apmConfig = expected.APMConfig
 		}
 	}
+
+	if (cm.lastAPMCfg == nil && apmConfig == nil) || (cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig)) {
+		// configuration for the APM tracing did not change; do nothing
+		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
+		return
+	}
+
 	if apmConfig == nil {
 		// APM tracing is being stopped
 		cm.logger.Debug("Stopping APM tracing")
@@ -904,12 +922,6 @@ func (cm *BeatV2Manager) reloadAPM(unit *agentUnit) {
 		cm.lastAPMCfg = nil
 		cm.lastBeatAPMCfg = nil
 		cm.logger.Debug("Stopped APM tracing")
-		return
-	}
-
-	if cm.lastAPMCfg != nil && gproto.Equal(cm.lastAPMCfg, apmConfig) {
-		// configuration for the APM tracing did not change; do nothing
-		cm.logger.Debug("Skipped reloading APM tracing; configuration didn't change")
 		return
 	}
 

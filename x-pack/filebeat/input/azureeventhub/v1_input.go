@@ -23,6 +23,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -68,9 +69,13 @@ func (in *eventHubInputV1) Run(
 ) error {
 	var err error
 
+	// Update the status to starting
+	inputContext.UpdateStatus(status.Starting, "")
+
 	// Create pipelineClient for publishing events.
 	in.pipelineClient, err = createPipelineClient(pipeline)
 	if err != nil {
+		inputContext.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
 	}
 	defer in.pipelineClient.Close()
@@ -82,6 +87,7 @@ func (in *eventHubInputV1) Run(
 	// Set up new and legacy sanitizers, if any.
 	sanitizers, err := newSanitizers(in.config.Sanitizers, in.config.LegacySanitizeOptions)
 	if err != nil {
+		inputContext.UpdateStatus(status.Failed, err.Error())
 		return fmt.Errorf("failed to create sanitizers: %w", err)
 	}
 
@@ -98,6 +104,8 @@ func (in *eventHubInputV1) Run(
 	// in preparation for the main run loop.
 	err = in.setup(ctx)
 	if err != nil {
+		in.log.Errorw("error setting up input", "error", err)
+		inputContext.UpdateStatus(status.Failed, err.Error())
 		return err
 	}
 
@@ -105,9 +113,11 @@ func (in *eventHubInputV1) Run(
 	err = in.run(ctx)
 	if err != nil {
 		in.log.Errorw("error running input", "error", err)
+		inputContext.UpdateStatus(status.Failed, err.Error())
 		return err
 	}
 
+	inputContext.UpdateStatus(status.Stopping, "")
 	return nil
 }
 

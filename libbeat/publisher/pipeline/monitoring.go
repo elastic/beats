@@ -55,8 +55,8 @@ type retryObserver interface {
 	eventsRetry(int)
 }
 
-// metricsObserver is used by many component in the publisher pipeline, to report
-// internal events. The oberserver can call registered global event handlers or
+// metricsObserver is used by many components in the publisher pipeline, to report
+// internal events. The observer can call registered global event handlers or
 // updated shared counters/metrics for reporting.
 // All events required for reporting events/metrics on the pipeline-global level
 // are defined by observer. The components are only allowed to serve localized
@@ -72,13 +72,9 @@ type metricsObserverVars struct {
 
 	// eventsTotal publish/dropped stats
 	eventsTotal, eventsFiltered, eventsPublished, eventsFailed *monitoring.Uint
-	eventsDropped, eventsRetry                                 *monitoring.Uint // (retryer) drop/retry counters
-	activeEvents                                               *monitoring.Uint
 
-	// queue metrics
-	queueACKed       *monitoring.Uint
-	queueMaxEvents   *monitoring.Uint
-	percentQueueFull *monitoring.Float
+	eventsDropped, eventsRetry *monitoring.Uint // (retryer) drop/retry counters
+	activeEvents               *monitoring.Uint
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
@@ -118,19 +114,6 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 			// events.dropped counts events that were dropped because errors from
 			// the output workers exceeded the configured maximum retry count.
 			eventsDropped: monitoring.NewUint(reg, "events.dropped"),
-
-			// (Gauge) queue.max_events measures the maximum number of events the
-			// queue will accept, or 0 if there is none.
-			queueMaxEvents: monitoring.NewUint(reg, "queue.max_events"),
-
-			// queue.acked counts events that have been acknowledged by the output
-			// workers. This includes events that were dropped for fatal errors,
-			// which are also reported in events.dropped.
-			queueACKed: monitoring.NewUint(reg, "queue.acked"),
-
-			// (Gauge) queue.filled.pct.events measures the fraction (from 0 to 1)
-			// of the queue's event capacity that is currently filled.
-			percentQueueFull: monitoring.NewFloat(reg, "queue.filled.pct.events"),
 		},
 	}
 }

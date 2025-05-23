@@ -29,6 +29,7 @@ class TestAutodiscover(filebeat.BaseTest):
                                 equals.docker.container.name: {container.name}
                             config:
                               - type: log
+                                allow_deprecated_use: true
                                 paths:
                                   - %s/${{data.docker.container.name}}.log
                         ''' % self.working_dir,
@@ -58,6 +59,7 @@ class TestAutodiscover(filebeat.BaseTest):
                         'hints.enabled': 'true',
                         'hints.default_config': '''
                           type: log
+                          allow_deprecated_use: true
                           paths:
                             - %s/${data.container.name}.log
                         ''' % self.working_dir,

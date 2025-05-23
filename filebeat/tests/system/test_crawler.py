@@ -585,6 +585,8 @@ class Test(BaseTest):
         inputs = []
         for enc_go, enc_py, _ in encodings:
             inputs.append({
+                "type": "log",
+                "allow_deprecated_use": True,
                 "path": self.working_dir + "/log/test-{}".format(enc_py),
                 "encoding": enc_go
             })

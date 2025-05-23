@@ -29,6 +29,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/43253")
 	config := test.GetKubeStateMetricsConfig(t, "state_job")
 	metricSet := mbtest.NewFetcher(t, config)
 	events, errs := metricSet.FetchEvents()

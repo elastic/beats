@@ -40,7 +40,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			folder, _ := cmd.Flags().GetString("folder")
 
 			if len(folder) == 0 {
-				fatalf("-folder must be specified")
+				fatalf("--folder must be specified")
 			}
 
 			b, err := instance.NewInitializedBeat(settings)

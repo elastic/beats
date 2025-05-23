@@ -2,7 +2,7 @@
 
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.0-07587139-SNAPSHOT
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.0-6b336443-SNAPSHOT
     # When extend is used it merges healthcheck.tests, see:
     # https://github.com/docker/compose/issues/8962
     # healthcheck:
@@ -11,6 +11,13 @@ services:
     #   interval: 1s
     environment:
     - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    # >>> The next two environment variables are a workaround for
+    # running the Elasticsearch Docker image on Macs with the M4 CPU
+    # see https://github.com/elastic/elasticsearch/issues/118583#issuecomment-2546897726
+    # Uncomment the next 2 lines if you run the tests on Mac M4.
+    # - 'ES_JAVA_OPTS=-XX:UseSVE=0'
+    # - 'CLI_JAVA_OPTS=-XX:UseSVE=0'
+    # <<< end of the workaround
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
     - "xpack.security.enabled=true"
@@ -30,7 +37,7 @@ services:
     - "./docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:8.16.0-07587139-SNAPSHOT
+    image: docker.elastic.co/logstash/logstash:9.1.0-6b336443-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
@@ -43,7 +50,7 @@ services:
       - 5055:5055
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.16.0-07587139-SNAPSHOT
+    image: docker.elastic.co/kibana/kibana:9.1.0-6b336443-SNAPSHOT
     environment:
     - "ELASTICSEARCH_USERNAME=kibana_system_user"
     - "ELASTICSEARCH_PASSWORD=testing"

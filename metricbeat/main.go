@@ -32,7 +32,7 @@ import (
 )
 
 func main() {
-	if err := cmd.RootCmd.Execute(); err != nil {
+	if err := cmd.Initialize(cmd.MetricbeatSettings("")).Execute(); err != nil {
 		os.Exit(1)
 	}
 }
