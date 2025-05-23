@@ -10,25 +10,20 @@
     the new default is 'C:\Program Files\{{.BeatName}}-Data'
     (set from '$env:ProgramFiles').
 
-    If the legacy data path exists, then the script will use it, regardless
-    of {{.BeatName}} version.
+    If the legacy data path exists, then the script will move it to the new place,
+    regardless of {{.BeatName}} version.
 
-    You can pass -UseLegacyPath or -ForceNewDataPath to override this behaviour.
+    You can pass ForceLegacyPath to use the legacy data path.
 
     If the Windows service already exits, it will be stopped and deleted, then
     the new one will be installed.
 #>
 
 Param (
-  # Use the legacy ( < 9.1.0) data path
-  [switch]$UseLegacyPath,
-  # Force the usage of the new ( >= 9.1.0) data path, even if the legacy one exists
-  [switch]$ForceNewDataPath
-)
+  # Force the usage of the legacy ( < 9.1.0) data path.
+  [switch]$ForceLegacyPath
 
-If (($UseLegacyPath -eq $True) -and ($ForceNewDataPath -eq $True)){
-  Throw "-UseLegacyPath and -ForceNewDataPath cannot be passed on the same invocation."
-}
+)
 
 # Delete and stop the service if it already exists.
 if (Get-Service {{.BeatName}} -ErrorAction SilentlyContinue) {
@@ -45,10 +40,18 @@ $WorkDir = Split-Path $MyInvocation.MyCommand.Path
 $BasePath = "$env:ProgramFiles\{{.BeatName}}-Data"
 $LegacyDataPath = "$env:PROGRAMDATA\{{.BeatName}}"
 
-# Overwrite $BasePath to the legacy default
-If ($ForceNewDataPath -eq $False){
-  If (($UseLegacyPath -eq $True) -or (Test-Path $LegacyDataPath)) {
-    $BasePath = $env:PROGRAMDATA
+# Move the data path from ProgramData to Program Files
+If ($ForceLegacyPath -eq $True) {
+  $BasePath = $LegacyDataPath
+} elseif (Test-Path $LegacyDataPath) {
+    Write-Output "Files found at $LegacyDataPath, moving them to $BasePath"
+  Try {
+    Move-Item $LegacyDataPath $BasePath -ErrorAction Stop
+  } Catch {
+    Write-Output "Could not move $LegacyDataPath to $BasePath"
+    Write-Output "make sure the folder can be moved or set -ForceLegacyPath"
+    Write-Output "to force using $LegacyDataPath as the data path"
+    Throw $_.Exception
   }
 }
 
