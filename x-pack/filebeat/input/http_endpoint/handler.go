@@ -13,6 +13,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"reflect"
 	"sort"
@@ -84,10 +85,18 @@ type handler struct {
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	txID := h.nextTxID()
-	h.log.Debugw("request", "url", r.URL, "tx_id", txID)
+	h.log.Debugw("request", "url", r.URL, "method", r.Method, "tx_id", txID)
 	status, err := h.validator.validateRequest(r)
 	if err != nil {
 		h.sendAPIErrorResponse(txID, w, r, h.log, status, err)
+		return
+	}
+
+	if r.Method == http.MethodOptions {
+		for k, v := range h.validator.optionsHeaders {
+			w.Header()[textproto.CanonicalMIMEHeaderKey(k)] = v
+		}
+		w.WriteHeader(h.validator.optionsStatus)
 		return
 	}
 
