@@ -40,7 +40,7 @@
       description: >
         Available CPU in Mhz.
     - name: cpu.usage.percent
-      type: long
+      type: scaled_float
       description: >
         CPU usage as a percentage.
     - name: memory.used.guest.bytes
@@ -64,7 +64,7 @@
         Free memory of Guest in bytes.
       format: bytes
     - name: memory.usage.percent
-      type: long
+      type: scaled_float
       description: >
         Memory usage as percent of total configured or available memory.
     - name: custom_fields
