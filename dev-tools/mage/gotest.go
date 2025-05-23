@@ -102,6 +102,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 //
 //	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
 func fetchGoPackages(module string) ([]string, error) {
+	//nolint:gosec // G204 can be ignored as we don't send any input
 	cmd := execabs.Command(
 		"go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module))
 	output, err := cmd.Output()
@@ -183,7 +184,7 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 	return args
 }
 
-// FIPSOnlyGoTestIngrationFromHostArgs returns a deafult set of arguments for running
+// FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
 // all integration tests from the host system (outside the docker network) along
 // with the GODEBUG=fips140=only arg set.
 func FIPSOnlyGoTestIntegrationFromHostArgs() GoTestArgs {
