@@ -205,7 +205,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 
 	// Start each metricset randomly over a period of MaxDelayPeriod.
 	if msw.module.maxStartDelay > 0 {
-		delay := time.Duration(rand.Int64N(int64(msw.module.maxStartDelay)))
+		delay := rand.N(msw.module.maxStartDelay)
 		debugf("%v/%v will start after %v", msw.module.Name(), msw.Name(), delay)
 		select {
 		case <-done:
