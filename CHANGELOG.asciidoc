@@ -3,6 +3,174 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.18.2]]
+=== Beats version 8.18.2
+https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
+
+*Osquerybeat*
+
+- Disable allow_unsafe osquery configuration. {pull}40130[40130]
+- Upgrade to osquery 5.12.1. {pull}40368[40368]
+- Upgrade to osquery 5.13.1. {pull}40849[40849]
+- Upgrade to osquery 5.15.0 {pull}43426[43426]
+
+
+*Packetbeat*
+
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
+
+*Auditbeat*
+
+- system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
+
+*Filebeat*
+
+- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
+- Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+- Update to Go 1.24.3. {pull}44270[44270]
+
+*Auditbeat*
+
+
+*Auditbeat*
+
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+
+*Libbeat*
+
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
+
+- Add latency config option to Azure Monitor module. {pull}44366[44366]
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+
+*Functionbeat*
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
 [[release-notes-8.18.1]]
 === Beats version 8.18.1
 https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
