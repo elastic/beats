@@ -9,8 +9,6 @@ import (
 	"testing"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -177,7 +175,10 @@ func TestReceive(t *testing.T) {
 	for stepIndex, test := range testCases {
 		ctx, cancel := context.WithCancel(context.Background())
 
-		handler, err := createStateHandler(createTestInputStore())
+		cfg := defaultConfig()
+		cfg.LogGroupName = "LogGroup"
+
+		handler, err := newStateHandler(nil, cfg, createTestInputStore())
 		assert.Nil(t, err)
 
 		p := &cloudwatchPoller{
@@ -190,7 +191,7 @@ func TestReceive(t *testing.T) {
 			stateHandler:     handler,
 		}
 
-		p.config = defaultConfig()
+		p.config = cfg
 		p.config.ScanFrequency = defaultScanFrequency
 		if test.configOverrides != nil {
 			test.configOverrides(&p.config)
@@ -211,42 +212,4 @@ func TestReceive(t *testing.T) {
 		}
 		cancel()
 	}
-}
-
-type filterLogEventsTestCase struct {
-	name       string
-	logGroupId string
-	startTime  time.Time
-	endTime    time.Time
-	expected   *cloudwatchlogs.FilterLogEventsInput
-}
-
-func TestFilterLogEventsInput(t *testing.T) {
-	now, _ := time.Parse(time.RFC3339, "2024-07-12T13:00:00+00:00")
-	id := "myLogGroup"
-
-	testCases := []filterLogEventsTestCase{
-		{
-			name:       "StartPosition: beginning, first iteration",
-			logGroupId: id,
-			// The zero value of type time.Time{} is January 1, year 1, 00:00:00.000000000 UTC
-			// Events with a timestamp before the time - January 1, 1970, 00:00:00 UTC are not returned by AWS API
-			// make sure zero value of time.Time{} was converted
-			startTime: time.Time{},
-			endTime:   now,
-			expected: &cloudwatchlogs.FilterLogEventsInput{
-				LogGroupIdentifier: awssdk.String(id),
-				StartTime:          awssdk.Int64(0),
-				EndTime:            awssdk.Int64(1720789200000),
-			},
-		},
-	}
-	for _, test := range testCases {
-		p := cloudwatchPoller{
-			log: logp.NewLogger("test"),
-		}
-		result := p.constructFilterLogEventsInput(test.startTime, test.endTime, test.logGroupId)
-		assert.Equal(t, test.expected, result)
-	}
-
 }

@@ -10,8 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
@@ -20,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
@@ -58,10 +57,10 @@ func (im *cloudwatchInputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 // cloudwatchInput is an input for reading logs from CloudWatch periodically.
 type cloudwatchInput struct {
-	config       config
-	awsConfig    awssdk.Config
-	stateHandler *stateHandler
-	metrics      *inputMetrics
+	config    config
+	awsConfig awssdk.Config
+	store     statestore.States
+	metrics   *inputMetrics
 }
 
 func newInput(config config, store statestore.States) (*cloudwatchInput, error) {
@@ -73,15 +72,10 @@ func newInput(config config, store statestore.States) (*cloudwatchInput, error) 
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
-	handler, err := createStateHandler(store)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create state handler: %w", err)
-	}
-
 	return &cloudwatchInput{
-		config:       config,
-		stateHandler: handler,
-		awsConfig:    awsConfig,
+		config:    config,
+		store:     store,
+		awsConfig: awsConfig,
 	}, nil
 }
 
@@ -93,15 +87,13 @@ func (in *cloudwatchInput) Test(ctx v2.TestContext) error {
 
 func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	log := inputContext.Logger
 
-	defer in.stateHandler.Close()
-
-	// Create client for publishing events and receive notification of their ACKs.
-	client, err := pipeline.ConnectWith(beat.ClientConfig{})
+	handler, err := newStateHandler(log, in.config, in.store)
 	if err != nil {
-		return fmt.Errorf("failed to create pipeline client: %w", err)
+		return fmt.Errorf("failed to create state handler: %w", err)
 	}
-	defer client.Close()
+	defer handler.Close()
 
 	var logGroupIDs []string
 	logGroupIDs, region, err := fromConfig(in.config, in.awsConfig)
@@ -125,7 +117,6 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		}
 	}
 
-	log := inputContext.Logger
 	in.metrics = newInputMetrics(inputContext.ID, nil)
 	defer in.metrics.Close()
 	cwPoller := newCloudwatchPoller(
@@ -133,10 +124,10 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		in.metrics,
 		region,
 		in.config,
-		in.stateHandler)
-	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
+		handler)
+
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupIDs)))
-	cwPoller.startWorkers(ctx, svc, logProcessor)
+	cwPoller.startWorkers(ctx, svc, pipeline)
 
 	log.Debugf("Config latency = %f", cwPoller.config.Latency)
 	log.Debugf("Config scan_frequency = %f", cwPoller.config.ScanFrequency)

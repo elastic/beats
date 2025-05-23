@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -15,72 +16,131 @@ import (
 )
 
 func TestStateHandler(t *testing.T) {
+	t.Run("simple run - register once and complete once", func(t *testing.T) {
+		cfg := config{LogGroupARN: "logGroupARN"}
+		st, err := newStateHandler(nil, cfg, createTestInputStore())
+		assert.NoError(t, err)
+
+		st.WorkRegister(100, 1)
+		st.WorkComplete(100)
+
+		// pause for backgroundRunner to complete
+		<-time.After(100 * time.Millisecond)
+
+		state, err := st.GetState()
+		assert.NoError(t, err)
+		assert.NotNil(t, state)
+		assert.Equal(t, int64(100), state.LastSyncEpoch)
+	})
+
+	t.Run("Track and validate multiple work counts", func(t *testing.T) {
+		// given
+		cfg := config{LogGroupARN: "logGroupARN"}
+		st, err := newStateHandler(nil, cfg, createTestInputStore())
+		assert.NoError(t, err)
+
+		tStamp := int64(100)
+		workCount := 5
+		st.WorkRegister(tStamp, workCount)
+
+		for i := 0; i < (workCount - 1); i++ {
+			st.WorkComplete(tStamp)
+			<-time.After(100 * time.Millisecond)
+
+			state, err := st.GetState()
+			assert.NoError(t, err)
+			// zero value - state not updated
+			assert.Equal(t, int64(0), state.LastSyncEpoch)
+		}
+
+		st.WorkComplete(tStamp)
+		<-time.After(100 * time.Millisecond)
+
+		state, err := st.GetState()
+		assert.NoError(t, err)
+		assert.Equal(t, tStamp, state.LastSyncEpoch)
+
+	})
+
+	t.Run("State is not updated if oldest work is not yet complete", func(t *testing.T) {
+		cfg := config{LogGroupARN: "logGroupARN"}
+		st, err := newStateHandler(nil, cfg, createTestInputStore())
+		assert.NoError(t, err)
+
+		st.WorkRegister(100, 1)
+		st.WorkRegister(200, 1)
+
+		// complete the newest
+		st.WorkComplete(200)
+
+		// pause for backgroundRunner to run
+		<-time.After(100 * time.Millisecond)
+
+		state, err := st.GetState()
+		assert.NoError(t, err)
+		assert.NotNil(t, state)
+
+		// we get zero so that sync starts from epoch zero
+		assert.Equal(t, int64(0), state.LastSyncEpoch)
+	})
+}
+
+func TestStoreAndGetState(t *testing.T) {
 	tests := []struct {
-		name            string
-		storeWithCfg    config
-		storingState    StorableState
-		retrieveWithCfg config
-		expectEpoch     int64
+		name         string
+		cfg          config
+		storingState storableState
+		expectEpoch  int64
 	}{
 		{
-			name: "Simple store and retrival",
-			storeWithCfg: config{
+			name: "Store with arn",
+			cfg: config{
 				LogGroupARN: "logGroupARN",
 			},
-			storingState: StorableState{
+			storingState: storableState{
 				LastSyncEpoch: 1111111111,
-			},
-			retrieveWithCfg: config{
-				LogGroupARN: "logGroupARN",
 			},
 			expectEpoch: 1111111111,
 		},
 		{
-			name: "Missing retrival should return epoch zero - different ARN",
-			storeWithCfg: config{
-				LogGroupARN: "MyLogGroup_A",
+			name: "Store with group name",
+			cfg: config{
+				LogGroupName: "LogGroupName",
 			},
-			storingState: StorableState{
-				LastSyncEpoch: 1111111111,
+			storingState: storableState{
+				LastSyncEpoch: 22222222,
 			},
-			retrieveWithCfg: config{
-				LogGroupARN: "MyLogGroup_B",
-			},
-			expectEpoch: 0,
+			expectEpoch: 22222222,
 		},
 		{
-			name: "Missing retrival should return epoch zero - different log group identification",
-			storeWithCfg: config{
-				LogGroupARN: "MyLogGroup_A",
+			name: "Store with prefix",
+			cfg: config{
+				LogGroupNamePrefix: "LogGroupNamePrefix",
 			},
-			storingState: StorableState{
-				LastSyncEpoch: 1111111111,
+			storingState: storableState{
+				LastSyncEpoch: 333333333,
 			},
-			retrieveWithCfg: config{
-				LogGroupName: "logGroupName",
-				RegionName:   "region-A",
-			},
-			expectEpoch: 0,
+			expectEpoch: 333333333,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			stHandler, err := createStateHandler(createTestInputStore())
+			stHandler, err := newStateHandler(nil, test.cfg, createTestInputStore())
 			require.NoError(t, err)
 
-			err = stHandler.StoreState(test.storeWithCfg, test.storingState)
+			err = stHandler.storeState(test.storingState)
 			require.NoError(t, err)
 
-			retried, err := stHandler.GetState(test.retrieveWithCfg)
+			got, err := stHandler.GetState()
 			require.NoError(t, err)
 
-			require.Equal(t, test.expectEpoch, retried.LastSyncEpoch)
+			require.Equal(t, test.expectEpoch, got.LastSyncEpoch)
 		})
 	}
 }
 
-func Test_getID(t *testing.T) {
+func TestGenerateID(t *testing.T) {
 	tests := []struct {
 		name    string
 		cfg     config
