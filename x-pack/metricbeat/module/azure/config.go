@@ -28,11 +28,14 @@ var (
 // Config options
 type Config struct {
 	// shared config options
-	ClientId                string        `config:"client_id"  validate:"required"`
-	ClientSecret            string        `config:"client_secret"  validate:"required"`
-	TenantId                string        `config:"tenant_id"  validate:"required"`
-	SubscriptionId          string        `config:"subscription_id"  validate:"required"`
-	Period                  time.Duration `config:"period" validate:"nonzero,required"`
+	ClientId       string        `config:"client_id"  validate:"required"`
+	ClientSecret   string        `config:"client_secret"  validate:"required"`
+	TenantId       string        `config:"tenant_id"  validate:"required"`
+	SubscriptionId string        `config:"subscription_id"  validate:"required"`
+	Period         time.Duration `config:"period" validate:"nonzero,required"`
+	// Latency is the time it takes for the Azure service to publish the metric values.
+	// This is used to compensate for the latency in the timespan.
+	Latency                 time.Duration `config:"latency" validate:"positive"`
 	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
 	ResourceManagerAudience string        `config:"resource_manager_audience"`
 	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
