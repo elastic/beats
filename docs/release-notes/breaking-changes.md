@@ -17,9 +17,9 @@ The base folder has changed from `C:\ProgramData\` to `C:\Program
 Files\` because the latter has more strict permissions.
 
 When the installation script runs, it looks for the previous default
-data path, if it is found, then the new service is installed using the
-old default. The script also accepts parameters (`UseLegacyPath` and
-`ForceNewDataPath`) to control this behaviour.
+data path, if it is found, the data is moved to the new path.
+The installation script accepts the parameter `-UseLegacyPath` to
+force using the legacy data path.
 
 In a PowerShell prompt you can use `Get-Help install-service-<Beat Name>.ps1
 -detailed` to get detailed help.
