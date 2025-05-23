@@ -48,17 +48,18 @@ func NamespaceLookupFunc() LookupFunc {
 type LookupFunc func(string) *monitoring.Registry
 
 // NewWithDefaultRoutes creates a new server with default API routes.
-func NewWithDefaultRoutes(log *logp.Logger, config *config.C, reg LookupFunc) (*Server, error) {
+func NewWithDefaultRoutes(log *logp.Logger, config *config.C,
+	info, state, stats, inputs *monitoring.Registry) (*Server, error) {
 	api, err := New(log, config)
 	if err != nil {
 		return nil, err
 	}
 
 	err = multierr.Combine(
-		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(reg("info")))),
-		api.AttachHandler("/state", makeAPIHandler(reg("state"))),
-		api.AttachHandler("/stats", makeAPIHandler(reg("stats"))),
-		api.AttachHandler("/dataset", makeAPIHandler(reg("dataset"))),
+		api.AttachHandler("/", makeRootAPIHandler(makeAPIHandler(info))),
+		api.AttachHandler("/state", makeAPIHandler(state)),
+		api.AttachHandler("/stats", makeAPIHandler(stats)),
+		api.AttachHandler("/dataset", makeAPIHandler(inputs)),
 	)
 	if err != nil {
 		return nil, err

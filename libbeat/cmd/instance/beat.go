@@ -663,7 +663,11 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// that would be set at runtime.
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP, api.NamespaceLookupFunc())
+		b.API, err = api.NewWithDefaultRoutes(logger, b.Config.HTTP,
+			b.Monitoring.InfoRegistry,
+			b.Monitoring.StateRegistry,
+			b.Monitoring.StatsRegistry,
+			b.Monitoring.InputsRegistry)
 		if err != nil {
 			return fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}

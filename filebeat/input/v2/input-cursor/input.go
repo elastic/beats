@@ -120,10 +120,10 @@ func (inp *managedInput) Run(
 			log := ctx.Logger.With("input_source", source.Name())
 
 			reg := inputmon.NewMetricsRegistry(
-				inpCtxID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), log)
+				inpCtxID, ctx.Name, ctx.MetricsRegistry, log)
 			// Unregister the metrics when input finishes running
 			defer inputmon.CancelMetricsRegistry(
-				inpCtxID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), log)
+				inpCtxID, ctx.Name, ctx.MetricsRegistry, log)
 
 			inpCtx := input.Context{
 				ID:              inpCtxID,

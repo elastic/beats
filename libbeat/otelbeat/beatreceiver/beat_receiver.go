@@ -79,7 +79,11 @@ func (b *BeatReceiver) startMonitoring() error {
 	if err != nil {
 		return err
 	}
-	b.Beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), b.HttpConf, api.RegistryLookupFunc(b.Beat.Monitoring.Namespace))
+	b.Beat.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), b.HttpConf,
+		b.Beat.Monitoring.InfoRegistry,
+		b.Beat.Monitoring.StateRegistry,
+		b.Beat.Monitoring.StatsRegistry,
+		b.Beat.Monitoring.InputsRegistry)
 	if err != nil {
 		return err
 	}
