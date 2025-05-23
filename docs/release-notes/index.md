@@ -14,6 +14,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 % ## version.next [beats-versionext-release-notes]
 
 % ### Features and enhancements [beats-versionext-features-enhancements]
+* Add support for CouchDB v3 in Metricbeat. [#22743]({{beats-issue}}22743) [#26950]({{beats-pull}}4362695018)
 
 % ### Fixes [beats-versionext-fixes]
 
