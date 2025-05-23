@@ -131,10 +131,10 @@ type MetricsMapping struct {
 func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error) {
 	// 创建一个map来存储所有事件数据，key是标签组合，value是事件数据
 	eventsMap := map[string]mapstr.M{}
-	// 存储所有info类型的指标数据
-	infoMetrics := []*infoMetricData{}
-	// 创建一个集合用于存储所有infoMetrics中使用的label字段
-	infoMetricLabelFields := make(map[string]struct{})
+	// 创建keyLabels到meta的映射
+	infoMetaMap := map[string]mapstr.M{}
+	// 创建keyLabels到事件索引集合的映射
+	keyLabelsToEventIndices := map[string]map[int]struct{}{}
 
 	// 遍历所有指标族（metric family）
 	for _, family := range families {
@@ -204,17 +204,19 @@ func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *Metri
 				labels.Put(k, v)
 			}
 
+			keyLabelsHash := keyLabels.String()
+
 			// 处理info类型的指标
 			if _, ok = m.(*infoMetric); ok {
-				labels.DeepUpdate(keyLabels)
-				infoMetrics = append(infoMetrics, &infoMetricData{
-					Labels: keyLabels,
-					Meta:   labels,
-				})
+				// 将labels合并到keyLabels中
+				metaInfo := mapstr.M{}
+				metaInfo.DeepUpdate(labels)
 
-				// 收集这个infoMetric中所有label字段
-				for k := range keyLabels {
-					infoMetricLabelFields[k] = struct{}{}
+				// 如果已经有对应的meta，则合并
+				if existingMeta, exists := infoMetaMap[keyLabelsHash]; exists {
+					existingMeta.DeepUpdate(metaInfo)
+				} else {
+					infoMetaMap[keyLabelsHash] = metaInfo
 				}
 				continue
 			}
@@ -242,80 +244,25 @@ func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *Metri
 		}
 	}
 
-	// 将eventsMap转换为events数组
+	// 将eventsMap转换为events数组，同时建立keyLabels到事件索引的映射
 	events := make([]mapstr.M, 0, len(eventsMap))
-	for _, event := range eventsMap {
+	for keyLabelsHash, event := range eventsMap {
+		eventIndex := len(events)
 		events = append(events, event)
+
+		// 更新keyLabels到事件索引的映射
+		if _, exists := keyLabelsToEventIndices[keyLabelsHash]; !exists {
+			keyLabelsToEventIndices[keyLabelsHash] = make(map[int]struct{})
+		}
+		keyLabelsToEventIndices[keyLabelsHash][eventIndex] = struct{}{}
 	}
 
-	// 构建标签与事件索引的映射关系，但只处理infoMetric中出现的label字段
-	// 格式: labelKey -> labelValue -> eventIndices
-	labelValueToEventIndices := make(map[string]map[interface{}][]int)
-
-	// 如果有infoMetrics，才需要构建实际的映射关系
-	if len(infoMetrics) > 0 {
-		// 遍历所有事件，构建映射关系
-		for i, event := range events {
-			// 遍历事件中的所有字段
-			flattenEvent := event.Flatten()
-			for k, v := range flattenEvent {
-				// 只处理infoMetric中出现的label字段
-				if _, exists := infoMetricLabelFields[k]; exists {
-					// 初始化映射关系
-					if _, ok := labelValueToEventIndices[k]; !ok {
-						labelValueToEventIndices[k] = make(map[interface{}][]int)
-					}
-					// 添加事件索引到对应的label value下
-					labelValueToEventIndices[k][v] = append(labelValueToEventIndices[k][v], i)
-				}
-			}
-		}
-
-		// 处理infoMetrics
-		for _, info := range infoMetrics {
-			// 使用map实现集合，提高交集计算效率
-			matchingIndices := make(map[int]struct{})
-			firstLabel := true
-
-			// 遍历info的所有label
-			for k, v := range info.Labels.Flatten() {
-				// 如果这个label有对应的事件索引映射
-				if valueToIndices, ok := labelValueToEventIndices[k]; ok {
-					if indices, ok := valueToIndices[v]; ok {
-						if firstLabel {
-							// 第一个标签：初始化集合
-							for _, idx := range indices {
-								matchingIndices[idx] = struct{}{}
-							}
-							firstLabel = false
-						} else {
-							// 后续标签：计算交集
-							// 创建一个新的集合，只保留在当前标签索引列表中存在的元素
-							newMatchingIndices := make(map[int]struct{})
-							for _, idx := range indices {
-								if _, exists := matchingIndices[idx]; exists {
-									newMatchingIndices[idx] = struct{}{}
-								}
-							}
-							matchingIndices = newMatchingIndices
-						}
-					} else if !firstLabel {
-						// 如果后续标签没有匹配的索引，结果集将为空
-						matchingIndices = make(map[int]struct{})
-						break
-					}
-				}
-
-				// 如果集合为空，提前退出循环
-				if len(matchingIndices) == 0 && !firstLabel {
-					break
-				}
-			}
-
-			// 将info的meta信息更新到匹配的事件中
-			for idx := range matchingIndices {
+	// 将info meta信息更新到对应的事件中
+	for keyLabelsHash, meta := range infoMetaMap {
+		if eventIndices, exists := keyLabelsToEventIndices[keyLabelsHash]; exists {
+			for idx := range eventIndices {
 				if idx < len(events) {
-					events[idx].DeepUpdate(info.Meta)
+					events[idx].DeepUpdate(meta)
 				}
 			}
 		}
