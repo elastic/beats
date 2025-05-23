@@ -39,9 +39,9 @@ After running the `make create-module` command, you’ll find the module, along 
 module/{module}
 ├── module.yml
 └── _meta
-    └── docs.asciidoc
-    └── fields.yml
-    └── kibana
+    └── docs.asciidoc
+    └── fields.yml
+    └── kibana
 ```
 
 Let’s look at these files one by one.
@@ -116,13 +116,13 @@ After running the `make create-fileset` command, you’ll find the fileset, alon
 module/{module}/{fileset}
 ├── manifest.yml
 ├── config
-│   └── {fileset}.yml
+│   └── {fileset}.yml
 ├── ingest
-│   └── pipeline.json
+│   └── pipeline.json
 ├── _meta
-│   └── fields.yml
-│   └── kibana
-│       └── default
+│   └── fields.yml
+│   └── kibana
+│       └── default
 └── test
 ```
 

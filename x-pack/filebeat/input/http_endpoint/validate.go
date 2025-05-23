@@ -38,6 +38,9 @@ type apiValidator struct {
 	hmacType           string
 	hmacPrefix         string
 	maxBodySize        int64
+
+	optionsHeaders http.Header
+	optionsStatus  int
 }
 
 func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) {
@@ -54,7 +57,10 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 		}
 	}
 
-	if v.method != "" && v.method != r.Method {
+	if !v.isMethodOK(r.Method) {
+		if r.Method == http.MethodOptions {
+			return http.StatusBadRequest, errors.New("OPTIONS requests are only allowed with options_headers set")
+		}
 		return http.StatusMethodNotAllowed, fmt.Errorf("only %v requests are allowed", v.method)
 	}
 
@@ -107,6 +113,13 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 	}
 
 	return http.StatusAccepted, nil
+}
+
+func (v *apiValidator) isMethodOK(m string) bool {
+	if m == http.MethodOptions {
+		return v.optionsHeaders != nil
+	}
+	return v.method == "" || m == v.method
 }
 
 // decoders is the priority-ordered set of decoders to use for HMAC header values.
