@@ -131,8 +131,10 @@ type MetricsMapping struct {
 func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *MetricsMapping) ([]mapstr.M, error) {
 	// 创建一个map来存储所有事件数据，key是标签组合，value是事件数据
 	eventsMap := map[string]mapstr.M{}
-	// 创建一个map来存储info类型的指标数据，key为labels的hash值
-	infoMetricMap := map[string]*infoMetricData{}
+	// 创建keyLabels到meta的映射
+	infoMetaMap := map[string]mapstr.M{}
+	// 创建keyLabels到事件索引集合的映射
+	keyLabelsToEventIndices := map[string]map[int]struct{}{}
 
 	// 遍历所有指标族（metric family）
 	for _, family := range families {
@@ -202,14 +204,19 @@ func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *Metri
 				labels.Put(k, v)
 			}
 
+			keyLabelsHash := keyLabels.String()
+
 			// 处理info类型的指标
 			if _, ok = m.(*infoMetric); ok {
-				labels.DeepUpdate(keyLabels)
-				// 使用keyLabels的String()作为hash值
-				hashKey := keyLabels.String()
-				infoMetricMap[hashKey] = &infoMetricData{
-					Labels: keyLabels,
-					Meta:   labels,
+				// 将labels合并到keyLabels中
+				metaInfo := mapstr.M{}
+				metaInfo.DeepUpdate(labels)
+
+				// 如果已经有对应的meta，则合并
+				if existingMeta, exists := infoMetaMap[keyLabelsHash]; exists {
+					existingMeta.DeepUpdate(metaInfo)
+				} else {
+					infoMetaMap[keyLabelsHash] = metaInfo
 				}
 				continue
 			}
@@ -237,27 +244,28 @@ func (p *prometheus) ProcessMetrics(families []*dto.MetricFamily, mapping *Metri
 		}
 	}
 
-	// 使用hash值匹配并更新info数据
-	for _, event := range eventsMap {
-		// 获取当前事件的keyLabels
-		keyLabels := mapstr.M{}
-		for k, v := range event {
-			if l, ok := mapping.Labels[k]; ok && l.IsKey() {
-				keyLabels.Put(k, v)
-			}
-		}
+	// 将eventsMap转换为events数组，同时建立keyLabels到事件索引的映射
+	events := make([]mapstr.M, 0, len(eventsMap))
+	for keyLabelsHash, event := range eventsMap {
+		eventIndex := len(events)
+		events = append(events, event)
 
-		// 使用keyLabels的hash值查找对应的infoMetric
-		hashKey := keyLabels.String()
-		if info, ok := infoMetricMap[hashKey]; ok {
-			event.DeepUpdate(info.Meta)
+		// 更新keyLabels到事件索引的映射
+		if _, exists := keyLabelsToEventIndices[keyLabelsHash]; !exists {
+			keyLabelsToEventIndices[keyLabelsHash] = make(map[int]struct{})
 		}
+		keyLabelsToEventIndices[keyLabelsHash][eventIndex] = struct{}{}
 	}
 
-	// 将eventsMap转换为events数组
-	events := make([]mapstr.M, 0, len(eventsMap))
-	for _, event := range eventsMap {
-		events = append(events, event)
+	// 将info meta信息更新到对应的事件中
+	for keyLabelsHash, meta := range infoMetaMap {
+		if eventIndices, exists := keyLabelsToEventIndices[keyLabelsHash]; exists {
+			for idx := range eventIndices {
+				if idx < len(events) {
+					events[idx].DeepUpdate(meta)
+				}
+			}
+		}
 	}
 
 	// 处理聚合指标
