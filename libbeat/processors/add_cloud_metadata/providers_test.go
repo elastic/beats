@@ -18,9 +18,12 @@
 package add_cloud_metadata
 
 import (
+	"context"
+	"errors"
 	"os"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -155,6 +158,16 @@ func Test_priorityResult(t *testing.T) {
 			want:      nil,
 		},
 		{
+			name: "Error result returns nil",
+			collected: []result{
+				{
+					provider: "aws",
+					err:      errors.New("some error"),
+				},
+			},
+			want: nil,
+		},
+		{
 			name:      "Single result returns the same",
 			collected: []result{awsRsp},
 			want:      &awsRsp,
@@ -172,7 +185,29 @@ func Test_priorityResult(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, priorityResult(tt.collected, tLogger))
+			// Create a buffered result channel with the test results preloaded
+			resultChan := make(chan result)
+			ctx, cancel := context.WithCancel(context.Background())
+
+			responseChan := make(chan *result)
+			go func() {
+				response := acceptFirstPriorityResult(ctx, tLogger, time.Now(), resultChan)
+				cancel()
+				responseChan <- response
+			}()
+
+			for _, result := range tt.collected {
+				select {
+				case resultChan <- result:
+				case <-ctx.Done():
+				}
+			}
+			// Cancel the context for cases that haven't returned yet and
+			// fetch the final response.
+			cancel()
+			response := <-responseChan
+
+			assert.Equal(t, tt.want, response)
 		})
 	}
 }

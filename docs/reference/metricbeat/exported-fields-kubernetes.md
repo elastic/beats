@@ -2054,7 +2054,7 @@ type: ip
 Kubernetes pod status metrics
 
 **`kubernetes.pod.status.phase`**
-:   Kubernetes pod phase (Running, Pending…​)
+:   Kubernetes pod phase (Running, Pending…)
 
 type: keyword
 
