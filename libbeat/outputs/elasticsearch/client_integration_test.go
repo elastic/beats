@@ -78,7 +78,8 @@ func TestClientPublishEventKerberosAware(t *testing.T) {
 }
 
 func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
-	output, client := connectTestEsWithStats(t, cfg, index)
+	registry := monitoring.NewRegistry()
+	output, client := connectTestEs(t, cfg, outputs.NewStats(registry))
 
 	// drop old index preparing test
 	_, _, _ = client.conn.Delete(index, "", "", nil)
@@ -121,10 +122,10 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	index := "beat-int-pub-single-with-pipeline"
 	pipeline := "beat-int-pub-single-pipeline"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	// Check version
@@ -202,14 +203,14 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 	index := "beat-int-test-dli-index"
 	deadletterIndex := "beat-int-test-dli-dead-letter-index"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index": index,
 		"non_indexable_policy": map[string]interface{}{
 			"dead_letter_index": map[string]interface{}{
 				"index": deadletterIndex,
 			},
 		},
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 	_, _, _ = client.conn.Delete(deadletterIndex, "", "", nil)
 
@@ -262,10 +263,10 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	index := "beat-int-pub-bulk-with-pipeline"
 	pipeline := "beat-int-pub-bulk-pipeline"
 
-	output, client := connectTestEsWithoutStats(t, obj{
+	output, client := connectTestEs(t, obj{
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
-	})
+	}, nil)
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	if client.conn.GetVersion().Major < 5 {
@@ -340,9 +341,9 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 
 func TestClientPublishTracer(t *testing.T) {
 	index := "beat-apm-tracer-test"
-	output, client := connectTestEsWithoutStats(t, map[string]interface{}{
+	output, client := connectTestEs(t, map[string]interface{}{
 		"index": index,
-	})
+	}, nil)
 
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
@@ -378,17 +379,11 @@ func TestClientPublishTracer(t *testing.T) {
 	assert.Equal(t, "/_bulk", secondSpan.Context.HTTP.URL.Path)
 }
 
-func connectTestEsWithStats(t *testing.T, cfg interface{}, suffix string) (outputs.Client, *Client) {
-	m := monitoring.Default.NewRegistry("output-" + suffix)
-	s := outputs.NewStats(m)
-	return connectTestEs(t, cfg, s)
-}
-
-func connectTestEsWithoutStats(t *testing.T, cfg interface{}) (outputs.Client, *Client) {
-	return connectTestEs(t, cfg, outputs.NewNilObserver())
-}
-
 func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outputs.Client, *Client) {
+	t.Helper()
+	if stats == nil {
+		stats = outputs.NewNilObserver()
+	}
 	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"hosts":            eslegtest.GetEsHost(),
 		"username":         eslegtest.GetUser(),
@@ -437,11 +432,11 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 
 // setupRoleMapping sets up role mapping for the Kerberos user beats@ELASTIC
 func setupRoleMapping(t *testing.T, host string) error {
-	_, client := connectTestEsWithoutStats(t, map[string]interface{}{
+	_, client := connectTestEs(t, map[string]interface{}{
 		"hosts":    host,
 		"username": "elastic",
 		"password": "changeme",
-	})
+	}, nil)
 
 	roleMappingURL := client.conn.URL + "/_security/role_mapping/kerbrolemapping"
 
