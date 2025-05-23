@@ -27,6 +27,8 @@ type config struct {
 	ProjectId string `config:"project_id" validate:"required"`
 	// Auth - Defines the authentication mechanism to be used for accessing the gcs bucket.
 	Auth authConfig `config:"auth"`
+	// BatchSize - Defines the maximum number of objects that will be fetched from the bucket in a single request.
+	BatchSize int `config:"batch_size"`
 	// MaxWorkers - Defines the maximum number of go routines that will be spawned.
 	MaxWorkers int `config:"max_workers" validate:"max=5000"`
 	// Poll - Defines if polling should be performed on the input bucket source.
@@ -55,6 +57,7 @@ type config struct {
 // bucket contains the config for each specific object storage bucket in the root account
 type bucket struct {
 	Name                     string               `config:"name" validate:"required"`
+	BatchSize                *int                 `config:"batch_size"`
 	MaxWorkers               *int                 `config:"max_workers" validate:"max=5000"`
 	Poll                     *bool                `config:"poll"`
 	PollInterval             *time.Duration       `config:"poll_interval"`
