@@ -101,10 +101,10 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 		}
 	}
 	if val, ok := data.PerformanceData["disk.numberRead.summation"]; ok {
-		event.Put("disk.numberRead", val)
+		event.Put("disk.numberRead.count", val)
 	}
 	if val, ok := data.PerformanceData["disk.numberWrite.summation"]; ok {
-		event.Put("disk.numberWrite", val)
+		event.Put("disk.numberWrite.count", val)
 	}
 	if val, ok := data.PerformanceData["mem.usage.average"]; ok {
 		event.Put("memory.usage.percent", val)

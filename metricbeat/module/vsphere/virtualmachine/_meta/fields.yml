@@ -136,11 +136,11 @@
           type: long
           description: >
             Rate at which data is written to each virtual disk on the virtual machine.
-        - name: numberRead
+        - name: numberRead.count
           type: long
           description: >
             Number of times data was read.
-        - name: numberWrite
+        - name: numberWrite.count
           type: long
           description: >
             Number of disk writes.
