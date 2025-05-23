@@ -54,6 +54,7 @@ steps:
         set -euo pipefail
         source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
         echo "--- Executing Tests"
+        echo $MODULE
         make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:
