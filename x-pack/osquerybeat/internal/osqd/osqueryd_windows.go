@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-// +build windows
 
 package osqd
 
@@ -12,7 +11,7 @@ import (
 	"os/exec"
 	"syscall"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 const (
@@ -29,9 +28,7 @@ func SocketPath(dir string) string {
 }
 
 func platformArgs() map[string]interface{} {
-	return map[string]interface{}{
-		"allow_unsafe": true,
-	}
+	return nil
 }
 
 func setpgid() *syscall.SysProcAttr {
@@ -42,6 +39,6 @@ func setpgid() *syscall.SysProcAttr {
 // For clean process tree kill
 func killProcessGroup(cmd *exec.Cmd) error {
 	// https://github.com/golang/dep/pull/857
-	exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprint(cmd.Process.Pid)).Run()
-	return nil
+	//nolint:gosec // works as expected
+	return exec.Command("taskkill", "/F", "/T", "/PID", fmt.Sprint(cmd.Process.Pid)).Run()
 }

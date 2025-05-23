@@ -20,7 +20,10 @@
 package include
 
 import (
-	// Import packages that need to register themselves.
+	// Import packages to perform 'func InitializeModule()' when in-use.
+	m0 "github.com/elastic/beats/v7/packetbeat/processor/add_kubernetes_metadata"
+
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/packetbeat/protos/amqp"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/cassandra"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/dhcpv4"
@@ -37,3 +40,8 @@ import (
 	_ "github.com/elastic/beats/v7/packetbeat/protos/thrift"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/tls"
 )
+
+// InitializeModules initialize all of the modules.
+func InitializeModule() {
+	m0.InitializeModule()
+}

@@ -5,9 +5,8 @@
 package azure
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -29,12 +28,16 @@ var (
 // Config options
 type Config struct {
 	// shared config options
-	ClientId                string        `config:"client_id"  validate:"required"`
-	ClientSecret            string        `config:"client_secret"  validate:"required"`
-	TenantId                string        `config:"tenant_id"  validate:"required"`
-	SubscriptionId          string        `config:"subscription_id"  validate:"required"`
-	Period                  time.Duration `config:"period" validate:"nonzero,required"`
+	ClientId       string        `config:"client_id"  validate:"required"`
+	ClientSecret   string        `config:"client_secret"  validate:"required"`
+	TenantId       string        `config:"tenant_id"  validate:"required"`
+	SubscriptionId string        `config:"subscription_id"  validate:"required"`
+	Period         time.Duration `config:"period" validate:"nonzero,required"`
+	// Latency is the time it takes for the Azure service to publish the metric values.
+	// This is used to compensate for the latency in the timespan.
+	Latency                 time.Duration `config:"latency" validate:"positive"`
 	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
+	ResourceManagerAudience string        `config:"resource_manager_audience"`
 	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
 	// specific to resource metrics
 	Resources           []ResourceConfig `config:"resources"`
@@ -44,6 +47,8 @@ type Config struct {
 	// specific to billing
 	BillingScopeDepartment string `config:"billing_scope_department"` // retrieve usage details from department scope
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
+	// Use BatchApi for metric values collection
+	EnableBatchApi bool `config:"enable_batch_api"` // defaults to false
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
@@ -81,17 +86,17 @@ func (conf *Config) Validate() error {
 	if conf.ActiveDirectoryEndpoint == "" {
 		ok, err := AzureEnvs.HasKey(conf.ResourceManagerEndpoint)
 		if err != nil {
-			return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
+			return fmt.Errorf("no active directory endpoint found for the resource manager endpoint selected: %w", err)
 		}
 		if ok {
 			add, err := AzureEnvs.GetValue(conf.ResourceManagerEndpoint)
 			if err != nil {
-				return errors.Wrap(err, "No active directory endpoint found for the resource manager endpoint selected.")
+				return fmt.Errorf("no active directory endpoint found for the resource manager endpoint selected: %w", err)
 			}
-			conf.ActiveDirectoryEndpoint = add.(string)
+			conf.ActiveDirectoryEndpoint, _ = add.(string)
 		}
 		if conf.ActiveDirectoryEndpoint == "" {
-			return errors.New("no active directory endpoint has been configured")
+			return fmt.Errorf("no active directory endpoint has been configured")
 		}
 	}
 	return nil

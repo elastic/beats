@@ -24,24 +24,36 @@ import "strconv"
 type Type byte
 
 const (
-	TypeUnknown Type = 0
-	TypeFile    Type = 1
-	TypeDir     Type = 2
-	TypeSymlink Type = 3
+	TypeUnknown     Type = 0
+	TypeFile        Type = 1
+	TypeDir         Type = 2
+	TypeSymlink     Type = 3
+	TypeCharDevice  Type = 4
+	TypeBlockDevice Type = 5
+	TypeFIFO        Type = 6
+	TypeSocket      Type = 7
 )
 
 var EnumNamesType = map[Type]string{
-	TypeUnknown: "Unknown",
-	TypeFile:    "File",
-	TypeDir:     "Dir",
-	TypeSymlink: "Symlink",
+	TypeUnknown:     "Unknown",
+	TypeFile:        "File",
+	TypeDir:         "Dir",
+	TypeSymlink:     "Symlink",
+	TypeCharDevice:  "CharDevice",
+	TypeBlockDevice: "BlockDevice",
+	TypeFIFO:        "FIFO",
+	TypeSocket:      "Socket",
 }
 
 var EnumValuesType = map[string]Type{
-	"Unknown": TypeUnknown,
-	"File":    TypeFile,
-	"Dir":     TypeDir,
-	"Symlink": TypeSymlink,
+	"Unknown":     TypeUnknown,
+	"File":        TypeFile,
+	"Dir":         TypeDir,
+	"Symlink":     TypeSymlink,
+	"CharDevice":  TypeCharDevice,
+	"BlockDevice": TypeBlockDevice,
+	"FIFO":        TypeFIFO,
+	"Socket":      TypeSocket,
 }
 
 func (v Type) String() string {

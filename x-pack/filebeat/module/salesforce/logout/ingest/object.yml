@@ -1,0 +1,68 @@
+---
+description: Pipeline for parsing Salesforce Logout (Object) logs.
+processors:
+  - date:
+      field: json.EventDate
+      target_field: "@timestamp"
+      formats:
+        - ISO8601
+      on_failure:
+        - append:
+            field: error.message
+            value: "Failed to parse EventDate field: {{{_ingest.on_failure_message}}}"
+  - rename:
+      field: json.RelatedEventIdentifier
+      target_field: salesforce.logout.related_event_identifier
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.LoginKey
+      target_field: salesforce.logout.login_key
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.SessionLevel
+      target_field: salesforce.logout.session.level
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.SessionKey
+      target_field: salesforce.logout.session.key
+      ignore_missing: true
+      ignore_failure: true
+  - date:
+      field: json.CreatedDate
+      target_field: event.created
+      formats:
+        - ISO8601
+      on_failure:
+        - append:
+            field: error.message
+            value: "Failed to parse CreatedDate field: {{{_ingest.on_failure_message}}}"
+  - rename:
+      field: json.Username
+      target_field: user.email
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: json.UserId
+      target_field: user.id
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: json.SourceIp
+      type: ip
+      target_field: source.ip
+      ignore_missing: true
+      on_failure:
+        - append:
+            field: error.message
+            value: "Failed to convert SourceIp to IP: {{{_ingest.on_failure_message}}}"
+
+on_failure:
+  - set:
+      field: event.kind
+      value: pipeline_error
+  - append:
+      field: error.message
+      value: "{{{ _ingest.on_failure_message }}}"

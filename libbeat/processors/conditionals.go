@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -32,7 +30,7 @@ import (
 func NewConditional(
 	ruleFactory Constructor,
 ) Constructor {
-	return func(cfg *config.C) (Processor, error) {
+	return func(cfg *config.C) (beat.Processor, error) {
 		rule, err := ruleFactory(cfg)
 		if err != nil {
 			return nil, err
@@ -45,8 +43,8 @@ func NewConditional(
 // NewConditionList takes a slice of Config objects and turns them into real Condition objects.
 func NewConditionList(configs []conditions.Config) ([]conditions.Condition, error) {
 	out := make([]conditions.Condition, len(configs))
-	for i, condConfig := range configs {
-		cond, err := conditions.NewCondition(&condConfig)
+	for i := range configs {
+		cond, err := conditions.NewCondition(&configs[i])
 		if err != nil {
 			return nil, err
 		}
@@ -59,17 +57,17 @@ func NewConditionList(configs []conditions.Config) ([]conditions.Condition, erro
 // WhenProcessor is a tuple of condition plus a Processor.
 type WhenProcessor struct {
 	condition conditions.Condition
-	p         Processor
+	p         beat.Processor
 }
 
 // NewConditionRule returns a processor that will execute the provided processor if the condition is true.
 func NewConditionRule(
 	c conditions.Config,
-	p Processor,
-) (Processor, error) {
+	p beat.Processor,
+) (beat.Processor, error) {
 	cond, err := conditions.NewCondition(&c)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize condition")
+		return nil, fmt.Errorf("failed to initialize condition: %w", err)
 	}
 
 	if cond == nil {
@@ -92,8 +90,8 @@ func (r *WhenProcessor) String() string {
 
 func addCondition(
 	cfg *config.C,
-	p Processor,
-) (Processor, error) {
+	p beat.Processor,
+) (beat.Processor, error) {
 	if !cfg.HasField("when") {
 		return p, nil
 	}

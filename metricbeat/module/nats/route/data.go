@@ -19,9 +19,8 @@ package route
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -62,16 +61,16 @@ type Routes struct {
 func eventMapping(content map[string]interface{}, fieldsSchema s.Schema) (mb.Event, error) {
 	fields, err := fieldsSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying routes schema")
+		return mb.Event{}, fmt.Errorf("error applying routes schema: %w", err)
 	}
 
 	moduleFields, err := moduleSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying module schema")
+		return mb.Event{}, fmt.Errorf("error applying module schema: %w", err)
 	}
 
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "failure parsing server timestamp")
+		return mb.Event{}, fmt.Errorf("failure parsing server timestamp: %w", err)
 	}
 	event := mb.Event{
 		MetricSetFields: fields,
@@ -85,7 +84,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	var err error
 	connections := Routes{}
 	if err = json.Unmarshal(content, &connections); err != nil {
-		return errors.Wrap(err, "failure parsing NATS connections API response")
+		return fmt.Errorf("failure parsing NATS connections API response: %w", err)
 	}
 
 	for _, con := range connections.Routes {
@@ -93,7 +92,7 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 		con["server_id"] = connections.ServerID
 		evt, err = eventMapping(con, routesSchema)
 		if err != nil {
-			r.Error(errors.Wrap(err, "error mapping connection event"))
+			r.Error(fmt.Errorf("error mapping connection event: %w", err))
 			continue
 		}
 		evt.Timestamp = connections.Now

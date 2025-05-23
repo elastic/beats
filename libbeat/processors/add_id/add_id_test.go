@@ -61,8 +61,8 @@ func TestNonDefaultTargetField(t *testing.T) {
 	assert.NotEmpty(t, v)
 
 	v, err = newEvent.GetValue("@metadata._id")
-	assert.NoError(t, err)
-	assert.Empty(t, v)
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, mapstr.ErrKeyNotFound)
 }
 
 func TestNonDefaultMetadataTarget(t *testing.T) {

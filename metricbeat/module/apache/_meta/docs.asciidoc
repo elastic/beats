@@ -8,7 +8,7 @@ HTTPD] servers. The default metricset is `status`.
 [float]
 === Compatibility
 
-The Apache metricsets were tested with Apache 2.4.12 and 2.4.20 and are expected to work with
+The Apache metricsets were tested with Apache 2.4.12 and 2.4.54 and are expected to work with
 all versions >= 2.2.31 and >= 2.4.16.
 
 

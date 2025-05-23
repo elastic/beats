@@ -18,17 +18,23 @@
 package beater
 
 import (
+	"context"
 	"flag"
+	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/service"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
+	"github.com/elastic/beats/v7/packetbeat/module"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 
 	// Add packetbeat default processors
@@ -77,9 +83,11 @@ func initialConfig() config.Config {
 
 // Beater object. Contains all objects needed to run the beat
 type packetbeat struct {
-	config  *conf.C
-	factory *processorFactory
-	done    chan struct{}
+	config             *conf.C
+	factory            *processorFactory
+	overwritePipelines bool
+	done               chan struct{}
+	stopOnce           sync.Once
 }
 
 // New returns a new Packetbeat beat.Beater.
@@ -89,28 +97,42 @@ func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 		configurator = initialConfig().FromStatic
 	}
 
-	// Install Npcap if needed. This need to happen before any other
-	// work on Windows, including config checking, because that involves
-	// probing interfaces.
-	err := installNpcap(b)
-	if err != nil {
-		return nil, err
-	}
-
 	factory := newProcessorFactory(b.Info.Name, make(chan error, maxSniffers), b, configurator)
 	if err := factory.CheckConfig(rawConfig); err != nil {
 		return nil, err
 	}
 
+	var overwritePipelines bool
+	if !b.Manager.Enabled() {
+		// Pipeline overwrite is only enabled on standalone packetbeat
+		// since pipelines are managed by fleet otherwise.
+		config, err := configurator(rawConfig)
+		if err != nil {
+			return nil, err
+		}
+		overwritePipelines = config.OverwritePipelines
+		b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Packetbeat")
+			if err != nil {
+				return err
+			}
+			_, err = module.UploadPipelines(b.Info, esClient, overwritePipelines)
+			return err
+		}
+	}
+
 	return &packetbeat{
-		config:  rawConfig,
-		factory: factory,
-		done:    make(chan struct{}),
+		config:             rawConfig,
+		factory:            factory,
+		overwritePipelines: overwritePipelines,
+		done:               make(chan struct{}),
 	}, nil
 }
 
 // Run starts the packetbeat network capture, decoding and event publication, sending
-// events to b.Publisher. If b is mananaged, packetbeat is registered with the
+// events to b.Publisher. If b is managed, packetbeat is registered with the
 // reload.Registry and handled by fleet. Otherwise it is run until cancelled or a
 // fatal error.
 func (pb *packetbeat) Run(b *beat.Beat) error {
@@ -122,11 +144,47 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		}
 	}()
 
+	if b.API != nil {
+		err := inputmon.AttachHandler(b.API.Router(), nil)
+		if err != nil {
+			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+		}
+	}
+
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON(nil)
+				if err != nil {
+					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+	}
+
 	if !b.Manager.Enabled() {
+		if b.Config.Output.Name() == "elasticsearch" {
+			_, err := elasticsearch.RegisterConnectCallback(func(esClient *eslegclient.Connection) error {
+				_, err := module.UploadPipelines(b.Info, esClient, pb.overwritePipelines)
+				return err
+			})
+			if err != nil {
+				return err
+			}
+		} else {
+			logp.L().Warn(pipelinesWarning)
+		}
+
 		return pb.runStatic(b, pb.factory)
 	}
 	return pb.runManaged(b, pb.factory)
 }
+
+const pipelinesWarning = "Packetbeat is unable to load the ingest pipelines for the configured" +
+	" modules because the Elasticsearch output is not configured/enabled. If you have" +
+	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
+	" can ignore this warning."
 
 // runStatic constructs a packetbeat runner and starts it, returning on cancellation
 // or the first fatal error.
@@ -143,7 +201,7 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 	select {
 	case <-pb.done:
 	case err := <-factory.err:
-		close(pb.done)
+		pb.stopOnce.Do(func() { close(pb.done) })
 		return err
 	}
 	return nil
@@ -152,8 +210,8 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 // runManaged registers a packetbeat runner with the reload.Registry and starts
 // the runner by starting the beat's manager. It returns on the first fatal error.
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
-	runner := newReloader(management.DebugK, factory, b.Publisher)
-	reload.Register.MustRegisterList("inputs", runner)
+	runner := newReloader(management.DebugK, factory, b.Publisher, b.Info.Logger)
+	b.Registry.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
 
 	// Start the manager after all the hooks are registered and terminates when
@@ -176,7 +234,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 			// to stop if the sniffer(s) exited without an error
 			// this would happen during a configuration reload
 			if err != nil {
-				close(pb.done)
+				pb.stopOnce.Do(func() { close(pb.done) })
 				return err
 			}
 		}
@@ -186,5 +244,5 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 // Called by the Beat stop function
 func (pb *packetbeat) Stop() {
 	logp.Info("Packetbeat send stop signal")
-	close(pb.done)
+	pb.stopOnce.Do(func() { close(pb.done) })
 }

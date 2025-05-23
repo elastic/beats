@@ -19,12 +19,13 @@ package cursor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"time"
 
-	"github.com/urso/sderr"
-
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -81,7 +82,7 @@ func (inp *managedInput) Test(ctx input.TestContext) error {
 
 	errs := grp.Wait()
 	if len(errs) > 0 {
-		return sderr.WrapAll(errs, "input tests failed")
+		return fmt.Errorf("input tests failed: %w", errors.Join(errs...))
 	}
 	return nil
 }
@@ -110,16 +111,52 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	// The metrics from the parent v2.Context needs to be canceled otherwise
+	// there will be a set of metrics being published for this context by the
+	// HTTP monitoring endpoint. There would be an "empty registry", only with
+	// 'id' and 'input' and also the registries for the 'child' contexts being
+	// published. E.g.:
+	//  - registry from parent context:
+	//    - {"id": "my-cel-id", "input": "cel"}
+	//  - registry from child context:
+	//    - {"id": "my-cel-id::source-name", "input": "cel", [ ... ] }
+	inputmon.CancelMetricsRegistry(
+		ctx.ID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), ctx.Logger)
+
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
 		grp.Go(func() (err error) {
 			// refine per worker context
-			inpCtx := ctx
-			inpCtx.ID = ctx.ID + "::" + source.Name()
-			inpCtx.Logger = ctx.Logger.With("input_source", source.Name())
+			inpCtxID := ctx.ID + "::" + source.Name()
+			log := ctx.Logger.With("input_source", source.Name())
 
-			if err = inp.runSource(inpCtx, inp.manager.store, source, pipeline); err != nil {
+			reg := inputmon.NewMetricsRegistry(
+				inpCtxID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), log)
+			// Unregister the metrics when input finishes running
+			defer inputmon.CancelMetricsRegistry(
+				inpCtxID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), log)
+
+			inpCtx := input.Context{
+				ID:              inpCtxID,
+				IDWithoutName:   ctx.ID, // Preserve IDWithoutName, in case the context was constructed who knows how
+				Name:            ctx.Name,
+				Agent:           ctx.Agent,
+				Cancelation:     ctx.Cancelation,
+				StatusReporter:  ctx.StatusReporter,
+				MetricsRegistry: reg,
+				Logger:          log,
+			}
+
+			pc := pipetool.WithClientConfigEdit(pipeline,
+				func(orig beat.ClientConfig) (beat.ClientConfig, error) {
+					orig.ClientListener =
+						input.NewPipelineClientListener(
+							inpCtx.MetricsRegistry, orig.ClientListener)
+					return orig, nil
+				})
+
+			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
 				cancel()
 			}
 			return err
@@ -127,7 +164,7 @@ func (inp *managedInput) Run(
 	}
 
 	if errs := grp.Wait(); len(errs) > 0 {
-		return sderr.WrapAll(errs, "input %{id} failed", ctx.ID)
+		return fmt.Errorf("input %s failed: %w", ctx.ID, errors.Join(errs...))
 	}
 	return nil
 }
@@ -146,8 +183,7 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:   ctx.Cancelation,
-		ACKHandler: newInputACKHandler(ctx.Logger),
+		EventListener: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
 		return err
@@ -175,7 +211,7 @@ func (inp *managedInput) createSourceID(s Source) string {
 	return fmt.Sprintf("%v::%v", inp.manager.Type, s.Name())
 }
 
-func newInputACKHandler(log *logp.Logger) beat.ACKer {
+func newInputACKHandler(log *logp.Logger) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int

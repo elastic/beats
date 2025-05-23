@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package decode_xml_wineventlog
 
@@ -30,11 +29,13 @@ import (
 )
 
 type winDecoder struct {
-	cache *metadataCache
+	locale uint32
+	cache  *metadataCache
 }
 
-func newDecoder() decoder {
+func newDecoder(locale uint32) decoder {
 	return &winDecoder{
+		locale: locale,
 		cache: &metadataCache{
 			store: map[string]*winevent.WinMeta{},
 			log:   logp.NewLogger(logName),
@@ -47,7 +48,7 @@ func (dec *winDecoder) decode(data []byte) (mapstr.M, mapstr.M, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	md := dec.cache.getPublisherMetadata(evt.Provider.Name)
+	md := dec.cache.getPublisherMetadata(evt.Provider.Name, dec.locale)
 	winevent.EnrichRawValuesWithNames(md, &evt)
 	win, ecs := fields(evt)
 	return win, ecs, nil
@@ -60,7 +61,7 @@ type metadataCache struct {
 	log *logp.Logger
 }
 
-func (c *metadataCache) getPublisherMetadata(publisher string) *winevent.WinMeta {
+func (c *metadataCache) getPublisherMetadata(publisher string, locale uint32) *winevent.WinMeta {
 	// NOTE: This code uses double-check locking to elevate to a write-lock
 	// when a cache value needs initialized.
 	c.mutex.RLock()
@@ -80,7 +81,7 @@ func (c *metadataCache) getPublisherMetadata(publisher string) *winevent.WinMeta
 		}
 
 		// Load metadata from the publisher.
-		md, err := wineventlog.NewPublisherMetadataStore(wineventlog.NilHandle, publisher, c.log)
+		md, err := wineventlog.NewPublisherMetadataStore(wineventlog.NilHandle, publisher, locale, c.log)
 		if err != nil {
 			// Return an empty store on error (can happen in cases where the
 			// log was forwarded and the provider doesn't exist on collector).

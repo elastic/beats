@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -24,7 +25,7 @@ var (
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
-		"tenant_id":       "unique identifier",
+		"tenant_id":       "07482715-b847-4056-86e6-5eec1c7b5996",
 	}
 
 	resourceConfig = mapstr.M{
@@ -34,7 +35,7 @@ var (
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
-		"tenant_id":       "unique identifier",
+		"tenant_id":       "07482715-b847-4056-86e6-5eec1c7b5996",
 		"resources": []mapstr.M{
 			{
 				"resource_id": "test",
@@ -52,7 +53,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err := mb.NewModule(c, mb.Registry)
+	module, metricsets, err := mb.NewModule(c, mb.Registry, logptest.NewTestingLogger(t, ""))
 	assert.Nil(t, module)
 	assert.Nil(t, metricsets)
 	assert.Error(t, err, "no resource options defined: module azure - monitor metricset")
@@ -60,7 +61,7 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err = mb.NewModule(c, mb.Registry)
+	module, metricsets, err = mb.NewModule(c, mb.Registry, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

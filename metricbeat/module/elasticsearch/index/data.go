@@ -19,15 +19,14 @@ package index
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -41,15 +40,18 @@ type Index struct {
 	Primaries primaries `json:"primaries"`
 	Total     total     `json:"total"`
 
-	Index  string     `json:"index"`
-	Status string     `json:"status"`
-	Hidden bool       `json:"hidden"`
-	Shards shardStats `json:"shards"`
+	Index          string     `json:"index"`
+	Status         string     `json:"status"`
+	TierPreference string     `json:"tier_preference,omitempty"`
+	CreationDate   string     `json:"creation_date,omitempty"`
+	Version        string     `json:"version,omitempty"`
+	Shards         shardStats `json:"shards"`
 }
 
 type primaries struct {
 	Docs struct {
-		Count int `json:"count"`
+		Count   int `json:"count"`
+		Deleted int `json:"deleted"`
 	} `json:"docs"`
 	Indexing struct {
 		IndexTotal           int `json:"index_total"`
@@ -60,22 +62,51 @@ type primaries struct {
 		TotalSizeInBytes int `json:"total_size_in_bytes"`
 	} `json:"merges"`
 	Segments struct {
-		Count int `json:"count"`
+		Count                     int `json:"count"`
+		MemoryInBytes             int `json:"memory_in_bytes"`
+		TermsMemoryInBytes        int `json:"terms_memory_in_bytes"`
+		StoredFieldsMemoryInBytes int `json:"stored_fields_memory_in_bytes"`
+		TermVectorsMemoryInBytes  int `json:"term_vectors_memory_in_bytes"`
+		NormsMemoryInBytes        int `json:"norms_memory_in_bytes"`
+		PointsMemoryInBytes       int `json:"points_memory_in_bytes"`
+		DocValuesMemoryInBytes    int `json:"doc_values_memory_in_bytes"`
+		IndexWriterMemoryInBytes  int `json:"index_writer_memory_in_bytes"`
+		VersionMapMemoryInBytes   int `json:"version_map_memory_in_bytes"`
+		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
-		SizeInBytes int `json:"size_in_bytes"`
+		SizeInBytes             int `json:"size_in_bytes"`
+		TotalDataSetSizeInBytes int `json:"total_data_set_size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		TotalTimeInMillis int `json:"total_time_in_millis"`
+		TotalTimeInMillis         int `json:"total_time_in_millis"`
+		ExternalTotalTimeInMillis int `json:"external_total_time_in_millis"`
 	} `json:"refresh"`
+	QueryCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+	} `json:"query_cache"`
+	RequestCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"request_cache"`
+	Search struct {
+		QueryTotal        int `json:"query_total"`
+		QueryTimeInMillis int `json:"query_time_in_millis"`
+	} `json:"search"`
 }
 
 type total struct {
 	Docs struct {
-		Count int `json:"count"`
+		Count   int `json:"count"`
+		Deleted int `json:"deleted"`
 	} `json:"docs"`
 	FieldData struct {
 		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		Evictions         int `json:"evictions"`
 	} `json:"fielddata"`
 	Indexing struct {
 		IndexTotal           int `json:"index_total"`
@@ -104,11 +135,25 @@ type total struct {
 		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
-		SizeInBytes int `json:"size_in_bytes"`
+		SizeInBytes             int `json:"size_in_bytes"`
+		TotalDataSetSizeInBytes int `json:"total_data_set_size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		TotalTimeInMillis int `json:"total_time_in_millis"`
+		TotalTimeInMillis         int `json:"total_time_in_millis"`
+		ExternalTotalTimeInMillis int `json:"external_total_time_in_millis"`
 	} `json:"refresh"`
+	QueryCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"query_cache"`
+	RequestCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"request_cache"`
 }
 
 type shardStats struct {
@@ -136,39 +181,51 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
+var logger = logp.NewLogger("elasticsearch.index")
+
 func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
 	clusterStateMetrics := []string{"routing_table"}
-	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
+	clusterStateFilterPaths := []string{"routing_table"}
+	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, clusterStateFilterPaths)
 	if err != nil {
-		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
+		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
+
+	indicesSettingsPattern := "*,-.*"
+	indicesSettingsFilterPaths := []string{"*.settings.index.creation_date", "*.settings.index.**._tier_preference", "*.settings.index.version.created"}
+	indicesSettings, err := elasticsearch.GetIndexSettings(httpClient, httpClient.GetURI(), indicesSettingsPattern, indicesSettingsFilterPaths)
+	if err != nil {
+		return fmt.Errorf("failure retrieving index settings from Elasticsearch: %w", err)
+	}
+
+	// Under some very rare circumstances, an index in the stats response might not have an entry in the settings or cluster state.
+	// This can happen if the index got deleted between the time the settings and cluster state were retrieved and the time the stats were retrieved.
 
 	var indicesStats stats
 	if err := parseAPIResponse(content, &indicesStats); err != nil {
-		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
+		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
 	}
 
-	indicesSettings, err := elasticsearch.GetIndicesSettings(httpClient, httpClient.GetURI())
-	if err != nil {
-		return errors.Wrap(err, "failure retrieving indices settings from Elasticsearch")
-	}
-
-	var errs multierror.Errors
-	for name, idx := range indicesStats.Indices {
+	var errs []error
+	for name := range indicesStats.Indices {
 		event := mb.Event{
 			ModuleFields: mapstr.M{},
 		}
+		idx := indicesStats.Indices[name]
 		idx.Index = name
-
-		settings, exists := indicesSettings[name]
-		if exists {
-			idx.Hidden = settings.Hidden
-		}
 
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure adding cluster state fields"))
+			// We can't continue processing this index, so we skip it.
+			errs = append(errs, fmt.Errorf("failure adding cluster state fields: %w", err))
 			continue
+		}
+
+		err = addIndexSettings(&idx, indicesSettings)
+		if err != nil {
+			// Failure to add index settings is sometimes expected and won't be breaking,
+			// so we log it as debug and carry on with regular processing.
+			logger.Debugf("failure adding index settings: %v", err)
 		}
 
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
@@ -178,12 +235,12 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		// metricset level
 		indexBytes, err := json.Marshal(idx)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure trying to convert metrics results to JSON"))
+			errs = append(errs, fmt.Errorf("failure trying to convert metrics results to JSON: %w", err))
 			continue
 		}
 		var indexOutput mapstr.M
 		if err = json.Unmarshal(indexBytes, &indexOutput); err != nil {
-			errs = append(errs, errors.Wrap(err, "failure trying to convert JSON metrics back to mapstr"))
+			errs = append(errs, fmt.Errorf("failure trying to convert JSON metrics back to mapstr: %w", err))
 			continue
 		}
 
@@ -201,7 +258,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func parseAPIResponse(content []byte, indicesStats *stats) error {
@@ -213,12 +270,12 @@ func parseAPIResponse(content []byte, indicesStats *stats) error {
 func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, idx.Index, "routing_table")
 	if err != nil {
-		return errors.Wrap(err, "failed to get index routing table from cluster state")
+		return fmt.Errorf("failed to get index routing table from cluster state: %w", err)
 	}
 
 	shards, err := getShardsFromRoutingTable(indexRoutingTable)
 	if err != nil {
-		return errors.Wrap(err, "failed to get shards from routing table")
+		return fmt.Errorf("failed to get shards from routing table: %w", err)
 	}
 
 	// "index_stats.version.created", <--- don't think this is being used in the UI, so can we skip it?
@@ -226,23 +283,77 @@ func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 
 	status, err := getIndexStatus(shards)
 	if err != nil {
-		return errors.Wrap(err, "failed to get index status")
+		return fmt.Errorf("failed to get index status: %w", err)
 	}
 	idx.Status = status
 
 	shardStats, err := getIndexShardStats(shards)
 	if err != nil {
-		return errors.Wrap(err, "failed to get index shard stats")
+		return fmt.Errorf("failed to get index shard stats: %w", err)
 	}
 	idx.Shards = *shardStats
 	return nil
+}
+
+func addIndexSettings(idx *Index, indicesSettings mapstr.M) error {
+
+	// Recover the index settings for our specific index
+	indexSettingsValue, err := indicesSettings.GetValue(idx.Index)
+	if err != nil {
+		return fmt.Errorf("failed to get index settings for index %s: %w", idx.Index, err)
+	}
+
+	indexSettings, ok := indexSettingsValue.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("index settings is not a map for index: %s", idx.Index)
+	}
+
+	indexCreationDate, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.creation_date")
+	if err != nil {
+		return fmt.Errorf("failed to get index creation date: %w", err)
+	}
+
+	idx.CreationDate = indexCreationDate
+
+	indexTierPreference, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.routing.allocation.require._tier_preference")
+	if err != nil {
+		indexTierPreference, err = getIndexSettingForIndex(indexSettings, idx.Index, "index.routing.allocation.include._tier_preference")
+		if err != nil {
+			return fmt.Errorf("failed to get index tier preference: %w", err)
+		}
+	}
+
+	idx.TierPreference = indexTierPreference
+
+	indexVersion, err := getIndexSettingForIndex(indexSettings, idx.Index, "index.version.created")
+	if err != nil {
+		return fmt.Errorf("failed to get index version: %w", err)
+	}
+
+	idx.Version = indexVersion
+
+	return nil
+}
+
+func getIndexSettingForIndex(indexSettings mapstr.M, index, settingKey string) (string, error) {
+	fieldKey := "settings." + settingKey
+	value, err := indexSettings.GetValue(fieldKey)
+	if err != nil {
+		return "", fmt.Errorf("'"+fieldKey+"': %w", err)
+	}
+
+	setting, ok := value.(string)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
+	}
+	return setting, nil
 }
 
 func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey string) (mapstr.M, error) {
 	fieldKey := metricKey + ".indices." + index
 	value, err := clusterState.GetValue(fieldKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "'"+fieldKey+"'")
+		return nil, fmt.Errorf("'"+fieldKey+"': %w", err)
 	}
 
 	metric, ok := value.(map[string]interface{})
@@ -275,8 +386,15 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[%v].primary is not a boolean", indexName, shardIdx)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return "", fmt.Errorf("%v.shards[%v].state is not a string", indexName, shardIdx)
+			}
 
 			if isPrimary {
 				areAllPrimariesStarted = areAllPrimariesStarted && (state == "STARTED")
@@ -324,8 +442,15 @@ func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 
 			shard := mapstr.M(s)
 
-			isPrimary := shard["primary"].(bool)
-			state := shard["state"].(string)
+			isPrimary, ok := shard["primary"].(bool)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[%v].primary is not a boolean", indexName, shardIdx)
+			}
+
+			state, ok := shard["state"].(string)
+			if !ok {
+				return nil, fmt.Errorf("%v.shards[%v].state is not a string", indexName, shardIdx)
+			}
 
 			if isPrimary {
 				primaries++

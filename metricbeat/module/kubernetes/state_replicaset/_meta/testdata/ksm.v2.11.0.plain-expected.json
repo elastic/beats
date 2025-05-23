@@ -1,0 +1,142 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "local-path-storage",
+            "replicaset": {
+                "name": "local-path-provisioner-7577fdbbfb",
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "labeled": 1,
+                    "observed": 1,
+                    "ready": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "replicaset": {
+                "name": "kube-state-metrics-885b7d5c8",
+                "replicas": {
+                    "available": 0,
+                    "desired": 0,
+                    "labeled": 0,
+                    "observed": 2,
+                    "ready": 0
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "replicaset": {
+                "name": "coredns-76f75df574",
+                "replicas": {
+                    "available": 2,
+                    "desired": 2,
+                    "labeled": 2,
+                    "observed": 1,
+                    "ready": 2
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "replicaset": {
+                "name": "kube-state-metrics-5bcd4898",
+                "replicas": {
+                    "available": 0,
+                    "desired": 0,
+                    "labeled": 0,
+                    "observed": 2,
+                    "ready": 0
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.replicaset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "replicaset": {
+                "name": "kube-state-metrics-cbc966f68",
+                "replicas": {
+                    "available": 1,
+                    "desired": 1,
+                    "labeled": 1,
+                    "observed": 1,
+                    "ready": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_replicaset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

@@ -14,13 +14,14 @@ import (
 	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metadataPrefix = "aws.ec2.instance."
 
 // AddMetadata adds metadata for EC2 instances from a specific region
-func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
+func AddMetadata(logger *logp.Logger, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
 	svcEC2 := ec2.NewFromConfig(awsConfig, func(o *ec2.Options) {
 		if fips_enabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
@@ -30,76 +31,85 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 
 	instancesOutputs, err := getInstancesPerRegion(svcEC2)
 	if err != nil {
-		return events, fmt.Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err)
+		return events, fmt.Errorf("aws.ec2.instance fields are not available, skipping region %s: %w", regionName, err)
 	}
 
-	// collect monitoring state for each instance
-	monitoringStates := map[string]string{}
-	for instanceID, output := range instancesOutputs {
-		if _, ok := events[instanceID]; !ok {
-			continue
+	for eventIdentifier := range events {
+		eventIdentifierComponents := strings.Split(eventIdentifier, "-")
+		potentialInstanceID := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+
+		// add host cpu/network/disk fields and host.id and rate metrics for all instances from both the monitoring
+		// account and linked source accounts if include_linked_accounts is set to true
+		addHostFields(events[eventIdentifier], potentialInstanceID)
+		period, err := events[eventIdentifier].RootFields.GetValue(aws.CloudWatchPeriodName)
+		if err != nil {
+			logger.Warnf("can't get period information for instance %s, skipping rate calculation", eventIdentifier)
+		} else {
+			calculateRate(events[eventIdentifier], period.(int))
 		}
 
-		for _, tag := range output.Tags {
-			if *tag.Key == "Name" {
-				_, _ = events[instanceID].RootFields.Put("cloud.instance.name", *tag.Value)
-				_, _ = events[instanceID].RootFields.Put("host.name", *tag.Value)
+		// add instance ID from dimension value
+		if dimInstanceID, err := events[eventIdentifier].RootFields.GetValue("aws.dimensions.InstanceId"); err == nil {
+			_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.id", dimInstanceID)
+		}
+
+		for instanceID, output := range instancesOutputs {
+			if instanceID != potentialInstanceID {
+				continue
 			}
+			for _, tag := range output.Tags {
+				if *tag.Key == "Name" {
+					_, _ = events[eventIdentifier].RootFields.Put("cloud.instance.name", *tag.Value)
+					_, _ = events[eventIdentifier].RootFields.Put("host.name", *tag.Value)
+				}
+			}
+
+			if output.InstanceType != "" {
+				_, _ = events[eventIdentifier].RootFields.Put("cloud.machine.type", output.InstanceType)
+			} else {
+				logger.Error("InstanceType is empty")
+			}
+
+			placement := output.Placement
+			if placement != nil {
+				_, _ = events[eventIdentifier].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
+			}
+
+			if output.State.Name != "" {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
+			} else {
+				logger.Error("instance.State.Name is empty")
+			}
+
+			if output.Monitoring.State != "" {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
+			} else {
+				logger.Error("Monitoring.State is empty")
+			}
+
+			cpuOptions := output.CpuOptions
+			if cpuOptions != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"core.count", *cpuOptions.CoreCount)
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"threads_per_core", *cpuOptions.ThreadsPerCore)
+			}
+
+			publicIP := output.PublicIpAddress
+			if publicIP != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"public.ip", *publicIP)
+			}
+
+			privateIP := output.PrivateIpAddress
+			if privateIP != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"private.ip", *privateIP)
+			}
+
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"image.id", *output.ImageId)
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"state.code", *output.State.Code)
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"public.dns_name", *output.PublicDnsName)
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"private.dns_name", *output.PrivateDnsName)
 		}
-
-		_, _ = events[instanceID].RootFields.Put("cloud.instance.id", instanceID)
-
-		if output.InstanceType != "" {
-			_, _ = events[instanceID].RootFields.Put("cloud.machine.type", output.InstanceType)
-		} else {
-			logp.Error(fmt.Errorf("InstanceType is empty"))
-		}
-
-		placement := output.Placement
-		if placement != nil {
-			_, _ = events[instanceID].RootFields.Put("cloud.availability_zone", *placement.AvailabilityZone)
-		}
-
-		if output.State.Name != "" {
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"state.name", output.State.Name)
-		} else {
-			logp.Error(fmt.Errorf("instance.State.Name is empty"))
-		}
-
-		if output.Monitoring.State != "" {
-			monitoringStates[instanceID] = string(output.Monitoring.State)
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"monitoring.state", output.Monitoring.State)
-		} else {
-			logp.Error(fmt.Errorf("Monitoring.State is empty"))
-		}
-
-		cpuOptions := output.CpuOptions
-		if cpuOptions != nil {
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"core.count", *cpuOptions.CoreCount)
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"threads_per_core", *cpuOptions.ThreadsPerCore)
-		}
-
-		publicIP := output.PublicIpAddress
-		if publicIP != nil {
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"public.ip", *publicIP)
-		}
-
-		privateIP := output.PrivateIpAddress
-		if privateIP != nil {
-			_, _ = events[instanceID].RootFields.Put(metadataPrefix+"private.ip", *privateIP)
-		}
-
-		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"image.id", *output.ImageId)
-		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"state.code", *output.State.Code)
-		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"public.dns_name", *output.PublicDnsName)
-		_, _ = events[instanceID].RootFields.Put(metadataPrefix+"private.dns_name", *output.PrivateDnsName)
-
-		// add host cpu/network/disk fields and host.id
-		addHostFields(events[instanceID], instanceID)
-
-		// add rate metrics
-		calculateRate(events[instanceID], monitoringStates[instanceID])
 	}
+
 	return events, nil
 }
 
@@ -154,7 +164,7 @@ func addHostFields(event mb.Event, instanceID string) {
 		}
 
 		if value, ok := metricValue.(float64); ok {
-			if ec2MetricName == "cpu.total.pct" {
+			if ec2MetricName == "aws.ec2.metrics.CPUUtilization.avg" {
 				value = value / 100
 			}
 			_, _ = event.RootFields.Put(hostMetricName, value)
@@ -162,12 +172,7 @@ func addHostFields(event mb.Event, instanceID string) {
 	}
 }
 
-func calculateRate(event mb.Event, monitoringState string) {
-	var period = 300.0
-	if monitoringState != "disabled" {
-		period = 60.0
-	}
-
+func calculateRate(event mb.Event, periodInSeconds int) {
 	metricList := []string{
 		"aws.ec2.metrics.NetworkIn.sum",
 		"aws.ec2.metrics.NetworkOut.sum",
@@ -181,7 +186,7 @@ func calculateRate(event mb.Event, monitoringState string) {
 	for _, metricName := range metricList {
 		metricValue, err := event.RootFields.GetValue(metricName)
 		if err == nil && metricValue != nil {
-			rateValue := metricValue.(float64) / period
+			rateValue := metricValue.(float64) / float64(periodInSeconds)
 			_, _ = event.RootFields.Put(strings.Replace(metricName, ".sum", ".rate", -1), rateValue)
 		}
 	}

@@ -197,7 +197,10 @@ class Test(BaseTest):
 
         # expecting 6 more events
         self.wait_until(
-            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
+            lambda: self.output_has(
+                lines=iterations1 +
+                iterations2),
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -247,7 +250,10 @@ class Test(BaseTest):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
+            lambda: self.output_has(
+                lines=iterations1 +
+                iterations2),
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -317,7 +323,10 @@ class Test(BaseTest):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
+            lambda: self.output_has(
+                lines=iterations1 +
+                iterations2),
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -468,14 +477,15 @@ class Test(BaseTest):
             f.write("hello world 2\n")
             f.flush()
 
-        # Sleep 1 second to make sure the file is persisted on disk and timestamp is in the past
+        # Sleep 1 second to make sure the file is persisted on disk and
+        # timestamp is in the past
         time.sleep(1)
 
         filebeat = self.start_beat()
         self.wait_until(
             lambda: self.log_contains(
                 "Start next scan"),
-            max_timeout=5)
+            max_timeout=10)
 
         with open(testfile, 'a') as f:
             # write additional lines
@@ -569,11 +579,14 @@ class Test(BaseTest):
             with codecs.open(self.working_dir + "/log/test-{}".format(enc_py),
                              "w", enc_py) as f:
                 f.write(text + "\n")
+                f.close()
 
         # create the config file
         inputs = []
         for enc_go, enc_py, _ in encodings:
             inputs.append({
+                "type": "log",
+                "allow_deprecated_use": True,
                 "path": self.working_dir + "/log/test-{}".format(enc_py),
                 "encoding": enc_go
             })
@@ -585,17 +598,18 @@ class Test(BaseTest):
         # run filebeat
         filebeat = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=len(encodings)),
-                        max_timeout=15)
+                        max_timeout=25)
 
         # write another line in all files
         for _, enc_py, text in encodings:
             with codecs.open(self.working_dir + "/log/test-{}".format(enc_py),
                              "a", enc_py) as f:
                 f.write(text + " 2" + "\n")
+                f.close()
 
         # wait again
         self.wait_until(lambda: self.output_has(lines=len(encodings) * 2),
-                        max_timeout=15)
+                        max_timeout=60)
         filebeat.check_kill_and_wait()
 
         # check that all outputs are present in the JSONs in UTF-8

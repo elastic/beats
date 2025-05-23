@@ -16,13 +16,14 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows || aix
-// +build darwin freebsd linux openbsd windows aix
 
 package core
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+	"runtime"
 
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
@@ -40,6 +41,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	opts  metrics.MetricOpts
 	cores *metrics.Monitor
+	sys   resolve.Resolver
 }
 
 // New returns a new core MetricSet.
@@ -51,17 +53,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	opts, err := config.Validate()
 	if err != nil {
-		return nil, errors.Wrap(err, "error validating config")
+		return nil, fmt.Errorf("error validating config: %w", err)
 	}
 
 	if config.CPUTicks != nil && *config.CPUTicks {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type: %T", base.Module())
+	}
+
+	cpuOpts := make([]metrics.OptionFunc, 0)
+	if config.UserPerformanceCounters {
+		cpuOpts = append(cpuOpts, metrics.WithWindowsPerformanceCounter())
+	}
+	cpu, err := metrics.New(sys, cpuOpts...)
+	if err != nil {
+		return nil, fmt.Errorf("error initializing system.cpu metricset: %w", err)
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		opts:          opts,
-		cores:         metrics.New(sys),
+		cores:         cpu,
+		sys:           sys,
 	}, nil
 }
 
@@ -69,14 +85,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	samples, err := m.cores.FetchCores()
 	if err != nil {
-		return errors.Wrap(err, "failed to sample CPU core times")
+		return fmt.Errorf("failed to sample CPU core times: %w", err)
 
 	}
 
 	for id, sample := range samples {
 		event, err := sample.Format(m.opts)
 		if err != nil {
-			return errors.Wrap(err, "error formatting core data")
+			return fmt.Errorf("error formatting core data: %w", err)
 		}
 		event.Put("id", id)
 
@@ -89,4 +105,24 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/core")
+	if runtime.GOOS == "linux" {
+		return []diagnostics.DiagnosticSetup{{
+			Name:        "core-stat",
+			Description: "/proc/stat file",
+			Filename:    "stat",
+			Callback:    m.getDiagData,
+		}}
+	} else {
+		return nil
+	}
+
+}
+
+func (m *MetricSet) getDiagData() []byte {
+	return diagnostics.GetRawFileOrErrorString(m.sys, "/proc/stat")
 }

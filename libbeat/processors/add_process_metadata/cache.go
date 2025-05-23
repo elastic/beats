@@ -53,7 +53,7 @@ func (pc *processCache) getEntryUnlocked(pid int) (entry processCacheEntry, vali
 	if entry, valid = pc.cache[pid]; valid {
 		valid = entry.expiration.After(time.Now())
 	}
-	return
+	return entry, valid
 }
 
 func (pc *processCache) GetProcessMetadata(pid int) (*processMetadata, error) {

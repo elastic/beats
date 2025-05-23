@@ -7,6 +7,8 @@ package azureblobstorage
 import (
 	"context"
 
+	"golang.org/x/sync/errgroup"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
@@ -43,19 +45,28 @@ func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
 func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher) error {
 	pub := statelessPublisher{wrapped: publisher}
 	var source cursor.Source
+	var g errgroup.Group
 	for _, c := range in.config.Containers {
 		container := tryOverrideOrDefault(in.config, c)
 		source = &Source{
-			AccountName:   in.config.AccountName,
-			ContainerName: c.Name,
-			MaxWorkers:    *container.MaxWorkers,
-			Poll:          *container.Poll,
-			PollInterval:  *container.PollInterval,
+			AccountName:              in.config.AccountName,
+			ContainerName:            c.Name,
+			MaxWorkers:               *container.MaxWorkers,
+			Poll:                     *container.Poll,
+			PollInterval:             *container.PollInterval,
+			TimeStampEpoch:           container.TimeStampEpoch,
+			ExpandEventListFromField: container.ExpandEventListFromField,
+			FileSelectors:            container.FileSelectors,
+			ReaderConfig:             container.ReaderConfig,
 		}
 
 		st := newState()
 		currentSource := source.(*Source)
 		log := inputCtx.Logger.With("account_name", currentSource.AccountName).With("container", currentSource.ContainerName)
+		// create a new inputMetrics instance
+		metrics := newInputMetrics(inputCtx.ID+":"+currentSource.ContainerName, nil)
+		metrics.url.Set(in.serviceURL + currentSource.ContainerName)
+		defer metrics.Close()
 
 		ctx, cancel := context.WithCancel(context.Background())
 		go func() {
@@ -72,11 +83,14 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			return err
 		}
 
-		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, log)
-		err = scheduler.schedule(ctx)
-		if err != nil {
-			return err
-		}
+		scheduler := newScheduler(pub, containerClient, credential, currentSource, &in.config, st, in.serviceURL, metrics, log)
+		// allows multiple containers to be scheduled concurrently while testing
+		// the stateless input is triggered only while testing and till now it did not mimic
+		// the real world concurrent execution of multiple containers. This fix allows it to do so.
+		g.Go(func() error {
+			return scheduler.schedule(ctx)
+		})
+
 	}
-	return nil
+	return g.Wait()
 }

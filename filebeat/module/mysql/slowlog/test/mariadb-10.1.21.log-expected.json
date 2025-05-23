@@ -24,6 +24,12 @@
         "mysql.slowlog.rows_examined": 0,
         "mysql.slowlog.rows_sent": 1,
         "mysql.thread_id": "5",
+        "related.ip": [
+            "121.0.0.1"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "source.ip": "121.0.0.1",

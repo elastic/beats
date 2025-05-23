@@ -1,14 +1,14 @@
 {{header "HTTP Endpoint"}}
 
-# Each beat can expose internal metrics through a HTTP endpoint. For security
+# Each beat can expose internal metrics through an HTTP endpoint. For security
 # reasons the endpoint is disabled by default. This feature is currently experimental.
-# Stats can be access through http://localhost:5066/stats . For pretty JSON output
+# Stats can be accessed through http://localhost:5066/stats. For pretty JSON output
 # append ?pretty to the URL.
 
 # Defines if the HTTP endpoint is enabled.
 #http.enabled: false
 
-# The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+# The HTTP endpoint will bind to this hostname, IP address, unix socket, or named pipe.
 # When using IP addresses, it is recommended to only use localhost.
 #http.host: localhost
 
@@ -18,7 +18,7 @@
 # Define which user should be owning the named pipe.
 #http.named_pipe.user:
 
-# Define which the permissions that should be applied to the named pipe, use the Security
+# Define which permissions should be applied to the named pipe, use the Security
 # Descriptor Definition Language (SDDL) to define the permission. This option cannot be used with
 # `http.user`.
 #http.named_pipe.security_descriptor:
@@ -26,3 +26,15 @@
 # Defines if the HTTP pprof endpoints are enabled.
 # It is recommended that this is only enabled on localhost as these endpoints may leak data.
 #http.pprof.enabled: false
+
+# Controls the fraction of goroutine blocking events that are reported in the
+# blocking profile.
+#http.pprof.block_profile_rate: 0
+
+# Controls the fraction of memory allocations that are recorded and reported in
+# the memory profile.
+#http.pprof.mem_profile_rate: 524288
+
+# Controls the fraction of mutex contention events that are reported in the
+# mutex profile.
+#http.pprof.mutex_profile_rate: 0

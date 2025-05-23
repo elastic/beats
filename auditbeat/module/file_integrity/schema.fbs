@@ -12,6 +12,8 @@ enum Action : ubyte (bit_flags) {
 enum Source : ubyte {
   Scan,
   FSNotify,
+  eBPF,
+  KProbes
 }
 
 enum Type : ubyte {
@@ -19,6 +21,10 @@ enum Type : ubyte {
   File,
   Dir,
   Symlink,
+  CharDevice,
+  BlockDevice,
+  FIFO,
+  Socket,
 }
 
 table Metadata {
@@ -31,6 +37,8 @@ table Metadata {
   mtime_ns:long;
   ctime_ns:long;
   type:Type = 1;
+  selinux:string;
+  posix_acl_access:[byte];
 }
 
 table Hash {

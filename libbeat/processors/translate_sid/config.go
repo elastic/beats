@@ -17,7 +17,7 @@
 
 package translate_sid
 
-import "github.com/pkg/errors"
+import "errors"
 
 type config struct {
 	Field             string `config:"field"  validate:"required"`

@@ -16,13 +16,12 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package collstats
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,7 +31,7 @@ import (
 
 func TestEventMapping(t *testing.T) {
 
-	content, err := ioutil.ReadFile("./_meta/test/input.json")
+	content, err := os.ReadFile("./_meta/test/input.json")
 	assert.NoError(t, err)
 
 	data := mapstr.M{}

@@ -8,7 +8,7 @@
       "action": "Pipeline Execution Details",
       "category": "process",
       "code": "800",
-      "ingested": "2022-06-08T06:07:25.991754100Z",
+      "ingested": "2025-01-15T10:02:22.127700838Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -22,7 +22,11 @@
       "path": "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Archive\\Microsoft.PowerShell.Archive.psm1"
     },
     "host": {
-      "name": "vagrant-2019"
+      "name": "vagrant-2019",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -91,14 +95,12 @@
       "name": "vagrant"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant-2019",
       "event_id": "800",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "191",
       "task": "Pipeline Execution Details"
@@ -113,7 +115,7 @@
       "action": "Pipeline Execution Details",
       "category": "process",
       "code": "800",
-      "ingested": "2022-06-08T06:07:25.991821100Z",
+      "ingested": "2025-01-15T10:02:22.127748302Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -121,7 +123,11 @@
       "type": "info"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -177,14 +183,12 @@
       "name": "vagrant"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "800",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "1843",
       "task": "Pipeline Execution Details"
@@ -199,7 +203,7 @@
       "action": "Pipeline Execution Details",
       "category": "process",
       "code": "800",
-      "ingested": "2022-06-08T06:07:25.991832300Z",
+      "ingested": "2025-01-15T10:02:22.127760188Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -207,7 +211,11 @@
       "type": "info"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -274,14 +282,12 @@
       "name": "vagrant"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "800",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "1846",
       "task": "Pipeline Execution Details"
@@ -296,7 +302,7 @@
       "action": "Pipeline Execution Details",
       "category": "process",
       "code": "800",
-      "ingested": "2022-06-08T06:07:25.991841100Z",
+      "ingested": "2025-01-15T10:02:22.127766919Z",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -304,7 +310,11 @@
       "type": "info"
     },
     "host": {
-      "name": "vagrant"
+      "name": "vagrant",
+      "os": {
+        "family": "windows",
+        "type": "windows"
+      }
     },
     "log": {
       "level": "information"
@@ -359,14 +369,12 @@
       "name": "vagrant"
     },
     "winlog": {
-      "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
       "event_id": "800",
       "keywords": [
         "Classic"
       ],
-      "opcode": "Info",
       "provider_name": "PowerShell",
       "record_id": "1847",
       "task": "Pipeline Execution Details"

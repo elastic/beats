@@ -18,8 +18,9 @@
 package dashboards
 
 import (
+	"errors"
+
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -44,6 +45,7 @@ type Dashboards mg.Namespace
 //
 // Optional environment variables:
 // - KIBANA_URL: URL of Kibana
+// - KIBANA_INSECURE: Disable TLS verification.
 // - KIBANA_ALWAYS: Connect to Kibana without checking ES version. Default true.
 // - ES_URL: URL of Elasticsearch (only used with KIBANA_ALWAYS=false).
 func (Dashboards) Import() error {
@@ -58,6 +60,7 @@ func (Dashboards) Import() error {
 //
 // Required environment variables:
 // - KIBANA_URL: URL of Kibana
+// - KIBANA_INSECURE: Disable TLS verification.
 // - MODULE:     Name of the module
 // - ID:         Dashboard ID
 func (Dashboards) Export() error {

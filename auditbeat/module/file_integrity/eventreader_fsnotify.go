@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build linux || freebsd || openbsd || netbsd || windows
-// +build linux freebsd openbsd netbsd windows
 
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"syscall"
@@ -32,22 +32,16 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type reader struct {
+type fsNotifyReader struct {
 	watcher monitor.Watcher
 	config  Config
 	eventC  chan Event
 	log     *logp.Logger
+
+	parsers []FileParser
 }
 
-// NewEventReader creates a new EventProducer backed by fsnotify.
-func NewEventReader(c Config) (EventProducer, error) {
-	return &reader{
-		config: c,
-		log:    logp.NewLogger(moduleName),
-	}, nil
-}
-
-func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
+func (r *fsNotifyReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath)
 	if err != nil {
 		return nil, err
@@ -75,7 +69,7 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	// deadlock. Do it on all platforms for simplicity.
 	for _, p := range r.config.Paths {
 		if err := r.watcher.Add(p); err != nil {
-			if err == syscall.EMFILE {
+			if errors.Is(err, syscall.EMFILE) {
 				r.log.Warnw("Failed to add watch (check the max number of "+
 					"open files allowed with 'ulimit -a')",
 					"file_path", p, "error", err)
@@ -102,17 +96,18 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	return r.eventC, nil
 }
 
-func (r *reader) enqueueEvents(done <-chan struct{}) (events []*Event) {
+func (r *fsNotifyReader) enqueueEvents(done <-chan struct{}) []*Event {
+	events := make([]*Event, 0)
 	for {
 		ev := r.nextEvent(done)
 		if ev == nil {
-			return
+			return events
 		}
 		events = append(events, ev)
 	}
 }
 
-func (r *reader) consumeEvents(done <-chan struct{}) {
+func (r *fsNotifyReader) consumeEvents(done <-chan struct{}) {
 	defer close(r.eventC)
 	defer r.watcher.Close()
 
@@ -126,7 +121,7 @@ func (r *reader) consumeEvents(done <-chan struct{}) {
 	}
 }
 
-func (r *reader) nextEvent(done <-chan struct{}) *Event {
+func (r *fsNotifyReader) nextEvent(done <-chan struct{}) *Event {
 	for {
 		select {
 		case <-done:
@@ -154,7 +149,7 @@ func (r *reader) nextEvent(done <-chan struct{}) *Event {
 
 			start := time.Now()
 			e := NewEvent(event.Name, opToAction(event.Op), SourceFSNotify,
-				r.config.MaxFileSizeBytes, r.config.HashTypes)
+				r.config.MaxFileSizeBytes, r.config.HashTypes, r.parsers)
 			e.rtt = time.Since(start)
 
 			return &e

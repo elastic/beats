@@ -2,7 +2,9 @@
     {
         "@timestamp": "2020-12-09T11:57:34.870-05:00",
         "event.action": "http_request",
-        "event.category": "web",
+        "event.category": [
+            "web"
+        ],
         "event.dataset": "kibana.audit",
         "event.kind": "event",
         "event.module": "kibana",
@@ -12,6 +14,8 @@
         "http.request.method": "get",
         "input.type": "log",
         "kibana.space_id": "default",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
         "log.offset": 0,
         "message": "User is requesting [/foo/spaces/enter] endpoint",
         "process.pid": 20699,
@@ -21,7 +25,6 @@
         "service.type": "kibana",
         "trace.id": "71a7d4d1-e9ba-474c-a844-9d9c1dc11ba5",
         "url.domain": "0.0.0.0",
-        "url.original": "/foo/spaces/enter",
         "url.path": "/foo/spaces/enter",
         "url.port": 5603,
         "url.scheme": "https:",
@@ -33,7 +36,9 @@
     {
         "@timestamp": "2020-12-09T11:59:21.458-05:00",
         "event.action": "user_login",
-        "event.category": "authentication",
+        "event.category": [
+            "authentication"
+        ],
         "event.dataset": "kibana.audit",
         "event.kind": "event",
         "event.module": "kibana",
@@ -41,6 +46,12 @@
         "event.timezone": "-02:00",
         "fileset.name": "audit",
         "input.type": "log",
+        "kibana.authentication_provider": "basic",
+        "kibana.authentication_realm": "reserved",
+        "kibana.authentication_type": "basic",
+        "kibana.lookup_realm": "reserved",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
         "log.offset": 545,
         "message": "User [elastic] has logged in using basic provider [name=basic]",
         "process.pid": 20699,
@@ -57,18 +68,24 @@
     {
         "@timestamp": "2020-12-09T12:01:36.210-05:00",
         "event.action": "saved_object_create",
-        "event.category": "database",
+        "event.category": [
+            "database"
+        ],
         "event.dataset": "kibana.audit",
         "event.kind": "event",
         "event.module": "kibana",
         "event.outcome": "unknown",
         "event.timezone": "-02:00",
-        "event.type": "creation",
+        "event.type": [
+            "creation"
+        ],
         "fileset.name": "audit",
         "input.type": "log",
         "kibana.saved_object.id": "325b1500-3a40-11eb-a93c-7bbeae51ac96",
         "kibana.saved_object.type": "index-pattern",
         "kibana.space_id": "default",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
         "log.offset": 1097,
         "message": "User is creating index-pattern [id=325b1500-3a40-11eb-a93c-7bbeae51ac96]",
         "process.pid": 20699,
@@ -97,6 +114,8 @@
         "kibana.saved_object.id": "325b1500-3a40-11eb-a93c-7bbeae51ac96",
         "kibana.saved_object.type": "index-pattern",
         "kibana.space_id": "default",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
         "log.offset": 1663,
         "message": "User has accessed index-pattern [id=325b1500-3a40-11eb-a93c-7bbeae51ac96]",
         "process.pid": 20699,

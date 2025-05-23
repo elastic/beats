@@ -19,11 +19,10 @@ package stats
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -36,6 +35,7 @@ var (
 		"cgroup":     c.Ifc("beat.cgroup"),
 		"system":     c.Ifc("system"),
 		"apm_server": c.Ifc("apm-server"),
+		"output":     c.Ifc("output"),
 		"cpu":        c.Ifc("beat.cpu"),
 		"info":       c.Ifc("beat.info"),
 		"uptime": c.Dict("beat.info.uptime", s.Schema{
@@ -71,11 +71,42 @@ var (
 				"write": c.Dict("write", s.Schema{
 					"bytes":  c.Int("bytes"),
 					"errors": c.Int("errors"),
+					"latency": c.Dict("latency", s.Schema{
+						"histogram": c.Dict("histogram", s.Schema{
+							"count":  c.Int("count"),
+							"max":    c.Int("max"),
+							"median": c.Float("median"),
+							"p95":    c.Float("p95"),
+							"p99":    c.Float("p99"),
+						}),
+					}),
 				}),
 			}),
 			"pipeline": c.Dict("pipeline", s.Schema{
 				"clients": c.Int("clients"),
 				"queue": c.Dict("queue", s.Schema{
+					"max_events": c.Int("max_events"),
+
+					"added": c.Dict("added", s.Schema{
+						"events": c.Int("events"),
+						"bytes":  c.Int("bytes"),
+					}),
+					"consumed": c.Dict("consumed", s.Schema{
+						"events": c.Int("events"),
+						"bytes":  c.Int("bytes"),
+					}),
+					"removed": c.Dict("removed", s.Schema{
+						"events": c.Int("events"),
+						"bytes":  c.Int("bytes"),
+					}),
+					"filled": c.Dict("filled", s.Schema{
+						"events": c.Int("events"),
+						"bytes":  c.Int("bytes"),
+						"pct":    c.Float("pct"),
+					}),
+
+					// Backwards compatibility: "acked" is the old name for
+					// "removed.events" and should not be used by new code/dashboards.
 					"acked": c.Int("acked"),
 				}),
 				"events": c.Dict("events", s.Schema{
@@ -129,7 +160,7 @@ func eventMapping(r mb.ReporterV2, info beat.Info, clusterUUID string, content [
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Beat's Stats API response")
+		return fmt.Errorf("failure parsing Beat's Stats API response: %w", err)
 	}
 
 	event.MetricSetFields, _ = schema.Apply(data)

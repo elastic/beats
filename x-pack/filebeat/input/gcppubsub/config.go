@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package gcppubsub
 
 import (
@@ -73,7 +75,9 @@ func defaultConfig() config {
 		Type: "gcp-pubsub",
 	}
 	c.Subscription.NumGoroutines = 1
-	c.Subscription.MaxOutstandingMessages = 1000
+	// The input gets blocked until flush.min_events or flush.timeout is reached.
+	// Hence max_outstanding_message has to be at least flush.min_events to avoid this blockage.
+	c.Subscription.MaxOutstandingMessages = 1600
 	c.Subscription.Create = true
 	return c
 }

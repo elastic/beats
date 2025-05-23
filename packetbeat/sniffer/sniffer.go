@@ -25,6 +25,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/google/gopacket"
@@ -33,7 +34,6 @@ import (
 	"github.com/google/gopacket/pcapgo"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
@@ -44,13 +44,14 @@ import (
 // to a Worker.
 type Sniffer struct {
 	sniffers []sniffer
+	cancel   func()
+	log      *logp.Logger
 }
 
 type sniffer struct {
 	config config.InterfaceConfig
 
-	state atomic.Int32  // store snifferState
-	done  chan struct{} // done is required to wire state into a select.
+	state *atomic.Int32 // store snifferState
 
 	// device is the first active device after calling New.
 	// It is not updated by default route polling.
@@ -63,7 +64,13 @@ type sniffer struct {
 	// filter is the bpf filter program used by the sniffer.
 	filter string
 
+	// id and idx identify the sniffer for metric collection.
+	id  string
+	idx int
+
 	decoders Decoders
+
+	log *logp.Logger
 }
 
 type snifferHandle interface {
@@ -81,28 +88,41 @@ const (
 
 // New create a new Sniffer instance. Settings are validated in a best effort
 // only, but no device is opened yet. Accessing and configuring the actual device
-// is done by the Run method.
-func New(testMode bool, _ string, decoders Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
-	s := &Sniffer{sniffers: make([]sniffer, len(interfaces))}
+// is done by the Run method. The id parameter is used to specify the metric
+// collection ID for AF_PACKET sniffers on Linux.
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
+	s := &Sniffer{
+		sniffers: make([]sniffer, len(interfaces)),
+		log:      logp.NewLogger("sniffer"),
+	}
 
 	for i, iface := range interfaces {
-		child := sniffer{
-			state:         atomic.MakeInt32(snifferInactive),
-			followDefault: iface.PollDefaultRoute > 0 && strings.HasPrefix(iface.Device, "default_route"),
-			decoders:      decoders,
+		dec, ok := decoders[iface.Device]
+		if !ok {
+			// This should never happen.
+			return nil, fmt.Errorf("no decoder for %s", iface.Device)
 		}
+		child := sniffer{
+			state:         &atomic.Int32{},
+			followDefault: iface.PollDefaultRoute > 0 && strings.HasPrefix(iface.Device, "default_route"),
+			id:            id,
+			idx:           i,
+			decoders:      dec,
+			log:           s.log,
+		}
+		child.state.Store(snifferInactive)
 
-		logp.Debug("sniffer", "interface: %d, BPF filter: '%s'", i, iface.BpfFilter)
+		s.log.Debugf("interface: %d, BPF filter: '%s'", i, iface.BpfFilter)
 
 		// pre-check and normalize configuration:
 		// - resolve potential device name
 		// - check for file output
 		// - set some defaults
 		if iface.File != "" {
-			logp.Debug("sniffer", "Reading from file: %s", iface.File)
+			s.log.Debugf("Reading from file: %s", iface.File)
 
 			if iface.BpfFilter != "" {
-				logp.Warn("Packet filters are not applied to pcap files.")
+				s.log.Warn("Packet filters are not applied to pcap files. Ignoring BFP filter.")
 			}
 
 			// we read file with the pcap provider
@@ -126,11 +146,14 @@ func New(testMode bool, _ string, decoders Decoders, interfaces []config.Interfa
 				if iface.BufferSizeMb <= 0 {
 					iface.BufferSizeMb = 24
 				}
+				if iface.MetricsInterval <= 0 {
+					iface.MetricsInterval = 5 * time.Second
+				}
 
 				if t := iface.Type; t == "autodetect" || t == "" {
 					iface.Type = "pcap"
 				}
-				logp.Debug("sniffer", "Sniffer type: %s device: %s", iface.Type, child.device)
+				s.log.Debugf("Sniffer type: %s device: %s", iface.Type, child.device)
 			}
 		}
 
@@ -141,6 +164,7 @@ func New(testMode bool, _ string, decoders Decoders, interfaces []config.Interfa
 		}
 
 		child.config = iface
+		child.filter = iface.BpfFilter
 		s.sniffers[i] = child
 	}
 
@@ -156,7 +180,7 @@ func validateConfig(filter string, cfg *config.InterfaceConfig) error {
 
 	switch cfg.Type {
 	case "pcap":
-		return validatePcapConfig(cfg)
+		return nil
 	case "af_packet":
 		return validateAfPacketConfig(cfg)
 	default:
@@ -172,10 +196,6 @@ func validatePcapFilter(expr string) error {
 	return err
 }
 
-func validatePcapConfig(cfg *config.InterfaceConfig) error {
-	return nil
-}
-
 func validateAfPacketConfig(cfg *config.InterfaceConfig) error {
 	_, _, _, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
 	return err
@@ -184,16 +204,17 @@ func validateAfPacketConfig(cfg *config.InterfaceConfig) error {
 // Run opens the sniffing device and processes packets being read from that device.
 // Worker instances are instantiated as needed.
 func (s *Sniffer) Run() error {
-	g, ctx := errgroup.WithContext(context.Background())
-	for _, c := range s.sniffers {
-		c := c
+	ctx, cancel := context.WithCancel(context.Background())
+	s.cancel = cancel
+	g, ctx := errgroup.WithContext(ctx)
+	for i := range s.sniffers {
+		c := &s.sniffers[i]
 		g.Go(func() error {
 			var (
 				defaultRoute chan string
 				refresh      chan struct{}
 			)
 			if c.followDefault {
-				c.done = make(chan struct{})
 				defaultRoute = make(chan string)
 				refresh = make(chan struct{}, 1)
 				go c.pollDefaultRoute(ctx, defaultRoute, refresh)
@@ -208,14 +229,14 @@ func (s *Sniffer) Run() error {
 }
 
 // pollDefaultRoute repeatedly polls the default route's device at intervals
-// specified in config.PollDefaultRoute. The poller is terminated by closing
-// done and the device chan can be read for changes in the default route.
+// specified in config.PollDefaultRoute. The poller is terminated by cancelling
+// the context and the device chan can be read for changes in the default route.
 // Changes in default route will put the Sniffer into the inactive state to
 // trigger a new sniffer connection. Termination of the sniffer is not under
 // the control of the poller.
 func (s *sniffer) pollDefaultRoute(ctx context.Context, device chan<- string, refresh <-chan struct{}) {
 	go func() {
-		logp.Info("starting default route poller")
+		s.log.Info("starting default route poller")
 
 		// Prime the channel.
 		current := s.device
@@ -226,18 +247,13 @@ func (s *sniffer) pollDefaultRoute(ctx context.Context, device chan<- string, re
 		for {
 			select {
 			case <-tick.C:
-				logp.Debug("sniffer", "polling default route")
+				s.log.Debug("polling default route")
 				current = s.poll(current, device)
 			case <-refresh:
-				logp.Debug("sniffer", "requested new default route")
+				s.log.Debug("requested new default route")
 				current = s.poll(current, device)
 			case <-ctx.Done():
-				logp.Info("polling cancelled")
-				close(device)
-				tick.Stop()
-				return
-			case <-s.done:
-				logp.Info("closing default route poller")
+				s.log.Info("closing default route poller")
 				close(device)
 				tick.Stop()
 				return
@@ -254,16 +270,16 @@ func (s *sniffer) pollDefaultRoute(ctx context.Context, device chan<- string, re
 }
 
 // poll returns the current default route interface and sends it on device
-// if it has change from the old default route interface. If device resolution
+// if it has a change from the old default route interface. If device resolution
 // fails, the default route interface is left unchanged.
 func (s *sniffer) poll(old string, device chan<- string) (current string) {
 	current, err := resolveDeviceName(s.config.Device)
 	if err != nil {
-		logp.Warn("sniffer failed to poll default route device: %v", err)
+		s.log.Warnf("sniffer failed to poll default route device: %v", err)
 		return old
 	}
 	if current != old {
-		logp.Info("sniffer changing default route device: %s -> %s", old, current)
+		s.log.Infof("sniffer changing default route device: %s -> %s", old, current)
 		s.state.Store(snifferInactive) // Mark current device as stale. ¯\_(ツ)_/¯
 		device <- current              // Pass the new device name.
 		defaultRouteMetric.Set(current)
@@ -279,11 +295,13 @@ func (s *sniffer) sniffStatic(ctx context.Context, device string) error {
 	}
 	defer handle.Close()
 
-	dec, err := s.decoders(handle.LinkType())
+	dec, cleanup, err := s.decoders(handle.LinkType(), device, s.idx)
 	if err != nil {
 		return err
 	}
-
+	if cleanup != nil {
+		defer cleanup()
+	}
 	return s.sniffHandle(ctx, handle, dec, nil)
 }
 
@@ -318,10 +336,14 @@ func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layer
 
 	linkType := handle.LinkType()
 	if dec == nil || linkType != last {
-		logp.Info("changing link type: %d -> %d", last, linkType)
-		dec, err = s.decoders(linkType)
+		s.log.Infof("changing link type: %d -> %d", last, linkType)
+		var cleanup func()
+		dec, cleanup, err = s.decoders(linkType, device, s.idx)
 		if err != nil {
 			return linkType, dec, err
+		}
+		if cleanup != nil {
+			defer cleanup()
 		}
 	}
 
@@ -335,7 +357,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 	if s.config.Dumpfile != "" {
 		const timeSuffixFormat = "20060102150405"
 		filename := fmt.Sprintf("%s-%s.pcap", s.config.Dumpfile, time.Now().Format(timeSuffixFormat))
-		logp.Info("creating new dump file %s", filename)
+		s.log.Infof("creating new dump file %s", filename)
 		f, err := os.Create(filename)
 		if err != nil {
 			return err
@@ -352,7 +374,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 	// Mark inactive sniffer as active. In case of the sniffer/packetbeat closing
 	// before/while Run is executed, the state will be snifferClosing.
 	// => return if state is already snifferClosing.
-	if !s.state.CAS(snifferInactive, snifferActive) {
+	if !s.state.CompareAndSwap(snifferInactive, snifferActive) {
 		return nil
 	}
 	defer s.state.Store(snifferInactive)
@@ -364,7 +386,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 	for s.state.Load() == snifferActive {
 		select {
 		case <-ctx.Done():
-			logp.Info("sniffing cancelled: %q", s.config.Device)
+			s.log.Infof("sniffing cancelled: %q", s.config.Device)
 
 			// Return nil since this must have been due to an errgroup
 			// termination and any error that caused that will already
@@ -380,9 +402,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 
 		data, ci, err := handle.ReadPacketData()
 		if err == pcap.NextErrorTimeoutExpired || isAfpacketErrTimeout(err) { //nolint:errorlint // pcap.NextErrorTimeoutExpired is not wrapped.
-			logp.Debug("sniffer", "timed out")
-
-			// If we have timed out too many times and we are following
+			// If we have timed out too many times, and we are following
 			// a default route, request a new default route interface.
 			const maxTimeouts = 10 // Place-holder until we have a sensible notion of how big this should be.
 			timeouts++
@@ -412,7 +432,7 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 				default:
 					// Don't request to refresh if already requested.
 				}
-				logp.Warn("error during packet capture: %v", err)
+				s.log.Warnf("error during packet capture: %v", err)
 				continue
 			}
 
@@ -434,7 +454,9 @@ func (s *sniffer) sniffHandle(ctx context.Context, handle snifferHandle, dec *de
 			}
 		}
 
-		logp.Debug("sniffer", "Packet number: %d", packets)
+		if s.config.OneAtATime {
+			s.log.Debugw("Packet received.", "network.packets", packets)
+		}
 		dec.OnPacket(data, &ci)
 	}
 
@@ -450,7 +472,7 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 	case "pcap":
 		return openPcap(device, s.filter, &s.config)
 	case "af_packet":
-		return openAFPacket(device, s.filter, &s.config)
+		return openAFPacket(fmt.Sprintf("%s_%d", s.id, s.idx), device, s.filter, &s.config)
 	default:
 		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config.Type)
 	}
@@ -459,11 +481,14 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 // Stop marks a sniffer as stopped. The Run method will return once the stop
 // signal has been given.
 func (s *Sniffer) Stop() {
+	s.log.Debug("sending stop to all sniffers")
 	for _, c := range s.sniffers {
+		s.log.Debugf("sending closing to %s", c.config.Device)
 		c.state.Store(snifferClosing)
-		if c.done != nil {
-			close(c.done)
-		}
+	}
+	if s.cancel != nil {
+		s.log.Debug("cancelling sniffers")
+		s.cancel()
 	}
 }
 
@@ -484,14 +509,24 @@ func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle
 	return h, nil
 }
 
-func openAFPacket(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
 	szFrame, szBlock, numBlocks, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
 	if err != nil {
 		return nil, err
 	}
 
 	timeout := 500 * time.Millisecond
-	h, err := newAfpacketHandle(device, szFrame, szBlock, numBlocks, timeout, cfg.EnableAutoPromiscMode)
+	h, err := newAfpacketHandle(afPacketConfig{
+		ID:              id,
+		Device:          device,
+		FrameSize:       szFrame,
+		BlockSize:       szBlock,
+		NumBlocks:       numBlocks,
+		PollTimeout:     timeout,
+		MetricsInterval: cfg.MetricsInterval,
+		FanoutGroupID:   cfg.FanoutGroup,
+		Promiscuous:     cfg.EnableAutoPromiscMode,
+	})
 	if err != nil {
 		return nil, err
 	}

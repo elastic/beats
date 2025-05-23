@@ -44,3 +44,10 @@ processors:
       fields:
         internal_interfaces: {{ .internal_interfaces | tojson }}
 {{ end }}
+
+{{ if .internal_networks }}
+  - add_fields:
+      target: _temp
+      fields:
+        internal_networks: {{ .internal_networks | tojson }}
+{{ end }}

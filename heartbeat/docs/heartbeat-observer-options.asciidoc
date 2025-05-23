@@ -1,7 +1,0 @@
-[[configuration-observer-options]]
-== Add observer and geo metadata
-
-It is often useful to view and query various attributes of the instance Heartbeat is running on. This data is attached to events via the <<add-observer-metadata,`add_observer_metadata`>> processor. This processor populates the ECS `observer.*` fields. One field of particular utility is the `observer.geo.name` field, which you can configure via this processor. Use this field to create distinctive geographic regions for your uptime checks. You might label your regions by datacenter name or geographic region, e.g. `virginia-dc-1`, or `us-east-1a`, or `virginia-us`.
-
-Note that Heartbeat should not be used with the similarly named <<add-host-metadata,`add_host_metadata`>> processor. In ECS parlance the host is the thing that is monitored, not the thing doing the monitoring, which is the observer.
-

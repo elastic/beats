@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build darwin
-// +build darwin
 
 package file_integrity
 
@@ -32,12 +31,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type fsreader struct {
+type fsEventsReader struct {
 	stream      *fsevents.EventStream
 	config      Config
 	eventC      chan Event
 	watchedDirs []os.FileInfo
 	log         *logp.Logger
+
+	parsers []FileParser
 }
 
 var flagToAction = map[fsevents.EventFlags]Action{
@@ -88,7 +89,7 @@ var flagNames = map[fsevents.EventFlags]string{
 }
 
 // NewEventReader creates a new EventProducer backed by FSEvents macOS facility.
-func NewEventReader(c Config) (EventProducer, error) {
+func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
 	stream := &fsevents.EventStream{
 		Paths: c.Paths,
 		// NoDefer: Ignore Latency field and send events as fast as possible.
@@ -107,27 +108,27 @@ func NewEventReader(c Config) (EventProducer, error) {
 		stream.Flags |= fsevents.IgnoreSelf
 	}
 
-	log := logp.NewLogger(moduleName)
 	var dirs []os.FileInfo
 	if !c.Recursive {
 		for _, path := range c.Paths {
 			if info, err := getFileInfo(path); err == nil {
 				dirs = append(dirs, info)
 			} else {
-				log.Warnw("Failed to get file info", "file_path", path, "error", err)
+				logger.Warnw("Failed to get file info", "file_path", path, "error", err)
 			}
 		}
 	}
-	return &fsreader{
+	return &fsEventsReader{
 		stream:      stream,
 		config:      c,
 		eventC:      make(chan Event, 1),
 		watchedDirs: dirs,
-		log:         log,
+		log:         logger,
+		parsers:     FileParsers(c),
 	}, nil
 }
 
-func (r *fsreader) Start(done <-chan struct{}) (<-chan Event, error) {
+func (r *fsEventsReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	r.stream.Start()
 	go r.consumeEvents(done)
 	r.log.Infow("Started FSEvents watcher",
@@ -136,7 +137,7 @@ func (r *fsreader) Start(done <-chan struct{}) (<-chan Event, error) {
 	return r.eventC, nil
 }
 
-func (r *fsreader) consumeEvents(done <-chan struct{}) {
+func (r *fsEventsReader) consumeEvents(done <-chan struct{}) {
 	defer close(r.eventC)
 	defer r.stream.Stop()
 
@@ -169,7 +170,7 @@ func (r *fsreader) consumeEvents(done <-chan struct{}) {
 
 				start := time.Now()
 				e := NewEvent(event.Path, flagsToAction(event.Flags), SourceFSNotify,
-					r.config.MaxFileSizeBytes, r.config.HashTypes)
+					r.config.MaxFileSizeBytes, r.config.HashTypes, r.parsers)
 
 				e.rtt = time.Since(start)
 				r.eventC <- e
@@ -207,7 +208,7 @@ func getFileInfo(path string) (os.FileInfo, error) {
 	return info, fmt.Errorf("failed to stat: %w", err)
 }
 
-func (r *fsreader) isWatched(path string) bool {
+func (r *fsEventsReader) isWatched(path string) bool {
 	if r.config.Recursive {
 		return true
 	}

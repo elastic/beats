@@ -1,0 +1,228 @@
+[
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-33333333333333333",
+                "log_status": "OK",
+                "pkt_dstaddr": "10.40.2.236",
+                "pkt_srcaddr": "10.20.33.164",
+                "subnet_id": "subnet-22222222bbbbbbbbb",
+                "tcp_flags": 3,
+                "tcp_flags_array": [
+                    "fin",
+                    "syn"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "10.40.2.236",
+            "ip": "10.40.2.236",
+            "port": 80
+        },
+        "event": {
+            "action": "accept",
+            "outcome": "success",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 eni-33333333333333333 123456789010 vpc-abcdefab012345678 subnet-22222222bbbbbbbbb i-01234567890123456 10.20.33.164 10.40.2.236 39812 80 6 3 IPv4 10.20.33.164 10.40.2.236 ACCEPT OK",
+        "network": {
+            "iana_number": "6",
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.20.33.164",
+                "10.40.2.236"
+            ]
+        },
+        "source": {
+            "address": "10.20.33.164",
+            "ip": "10.20.33.164",
+            "port": 39812
+        }
+    },
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-33333333333333333",
+                "log_status": "OK",
+                "pkt_dstaddr": "10.20.33.164",
+                "pkt_srcaddr": "10.40.2.236",
+                "subnet_id": "subnet-22222222bbbbbbbbb",
+                "tcp_flags": 19,
+                "tcp_flags_array": [
+                    "fin",
+                    "syn",
+                    "ack"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "10.20.33.164",
+            "ip": "10.20.33.164",
+            "port": 39812
+        },
+        "event": {
+            "action": "accept",
+            "outcome": "success",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 eni-33333333333333333 123456789010 vpc-abcdefab012345678 subnet-22222222bbbbbbbbb i-01234567890123456 10.40.2.236 10.20.33.164 80 39812 6 19 IPv4 10.40.2.236 10.20.33.164 ACCEPT OK",
+        "network": {
+            "iana_number": "6",
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.40.2.236",
+                "10.20.33.164"
+            ]
+        },
+        "source": {
+            "address": "10.40.2.236",
+            "ip": "10.40.2.236",
+            "port": 80
+        }
+    },
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-11111111111111111",
+                "log_status": "OK",
+                "pkt_dstaddr": "10.40.2.236",
+                "pkt_srcaddr": "10.20.33.164",
+                "subnet_id": "subnet-11111111aaaaaaaaa",
+                "tcp_flags": 3,
+                "tcp_flags_array": [
+                    "fin",
+                    "syn"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "destination": {
+            "address": "10.40.2.236",
+            "ip": "10.40.2.236",
+            "port": 80
+        },
+        "event": {
+            "action": "accept",
+            "outcome": "success",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 eni-11111111111111111 123456789010 vpc-abcdefab012345678 subnet-11111111aaaaaaaaa - 10.40.1.175 10.40.2.236 39812 80 6 3 IPv4 10.20.33.164 10.40.2.236 ACCEPT OK",
+        "network": {
+            "iana_number": "6",
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.40.1.175",
+                "10.40.2.236",
+                "10.20.33.164"
+            ]
+        },
+        "source": {
+            "address": "10.40.1.175",
+            "ip": "10.40.1.175",
+            "port": 39812
+        }
+    },
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-22222222222222222",
+                "log_status": "OK",
+                "pkt_dstaddr": "10.20.33.164",
+                "pkt_srcaddr": "10.40.2.236",
+                "subnet_id": "subnet-22222222bbbbbbbbb",
+                "tcp_flags": 19,
+                "tcp_flags_array": [
+                    "fin",
+                    "syn",
+                    "ack"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            }
+        },
+        "destination": {
+            "address": "10.40.2.31",
+            "ip": "10.40.2.31",
+            "port": 39812
+        },
+        "event": {
+            "action": "accept",
+            "outcome": "success",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 eni-22222222222222222 123456789010 vpc-abcdefab012345678 subnet-22222222bbbbbbbbb - 10.40.2.236 10.40.2.31 80 39812 6 19 IPv4 10.40.2.236 10.20.33.164 ACCEPT OK",
+        "network": {
+            "iana_number": "6",
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.40.2.236",
+                "10.40.2.31",
+                "10.20.33.164"
+            ]
+        },
+        "source": {
+            "address": "10.40.2.236",
+            "ip": "10.40.2.236",
+            "port": 80
+        }
+    }
+]

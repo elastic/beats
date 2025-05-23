@@ -86,9 +86,9 @@ func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 		RootFields: mapstr.M{
 			"service.id":      serviceId,
 			"service.version": version,
-			"service.address": serviceAddress,
 		},
 		MetricSetFields: actionsFields,
+		Host:            fmt.Sprintf("%v", serviceAddress),
 	}
 
 	// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`

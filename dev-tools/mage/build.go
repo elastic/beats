@@ -18,16 +18,17 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"go/build"
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/josephspurrier/goversioninfo"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 // BuildArgs are the arguments used for the "build" target and they define how
@@ -46,11 +47,45 @@ type BuildArgs struct {
 	WinMetadata bool // Add resource metadata to Windows binaries (like add the version number to the .exe properties).
 }
 
+// buildTagRE is a regexp to match strings like "-tags=abcd"
+// but does not match "-tags= "
+var buildTagRE = regexp.MustCompile(`-tags=([\S]+)?`)
+
+// ParseBuildTags returns the ExtraFlags param where all flags that are go build tags are joined by a comma.
+//
+// For example if given -someflag=val1 -tags=buildtag1 -tags=buildtag2
+// It will return -someflag=val1 -tags=buildtag1,buildtag2
+func (b BuildArgs) ParseBuildTags() []string {
+	flags := make([]string, 0)
+	if len(b.ExtraFlags) == 0 {
+		return flags
+	}
+
+	buildTags := make([]string, 0)
+	for _, flag := range b.ExtraFlags {
+		if buildTagRE.MatchString(flag) {
+			arr := buildTagRE.FindStringSubmatch(flag)
+			if len(arr) != 2 || arr[1] == "" {
+				log.Printf("Parsing buildargs.ExtraFlags found strange flag %q ignoring value", flag)
+				continue
+			}
+			buildTags = append(buildTags, arr[1])
+		} else {
+			flags = append(flags, flag)
+		}
+	}
+	if len(buildTags) > 0 {
+		flags = append(flags, "-tags="+strings.Join(buildTags, ","))
+	}
+	return flags
+}
+
 // DefaultBuildArgs returns the default BuildArgs for use in builds.
 func DefaultBuildArgs() BuildArgs {
 	args := BuildArgs{
 		Name: BeatName,
 		CGO:  build.Default.CgoEnabled,
+		Env:  map[string]string{},
 		Vars: map[string]string{
 			elasticBeatsModulePath + "/libbeat/version.buildTime": "{{ date }}",
 			elasticBeatsModulePath + "/libbeat/version.commit":    "{{ commit }}",
@@ -73,6 +108,15 @@ func DefaultBuildArgs() BuildArgs {
 		args.LDFlags = append(args.LDFlags, "-s")
 		// Remove all file system paths from the compiled executable, to improve build reproducibility
 		args.ExtraFlags = append(args.ExtraFlags, "-trimpath")
+	}
+	if FIPSBuild {
+		for _, tag := range FIPSConfig.Compile.Tags {
+			args.ExtraFlags = append(args.ExtraFlags, "-tags="+tag)
+		}
+		args.CGO = args.CGO || FIPSConfig.Compile.CGO
+		for varName, value := range FIPSConfig.Compile.Env {
+			args.Env[varName] = value
+		}
 	}
 
 	return args
@@ -130,6 +174,27 @@ func GolangCrossBuild(params BuildArgs) error {
 
 	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
 	defer DockerChown(filepath.Join(params.OutputDir))
+
+	mountPoint, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", mountPoint); err != nil {
+		return err
+	}
+
+	// Support projects outside of the beats directory.
+	repoInfo, err := GetProjectRepoInfo()
+	if err != nil {
+		return err
+	}
+
+	// TODO: Support custom build dir/subdir
+	projectMountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
+	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", projectMountPoint); err != nil {
+		return err
+	}
+
 	return Build(params)
 }
 
@@ -165,7 +230,7 @@ func Build(params BuildArgs) error {
 	if params.BuildMode != "" {
 		args = append(args, "-buildmode", params.BuildMode)
 	}
-	args = append(args, params.ExtraFlags...)
+	args = append(args, params.ParseBuildTags()...)
 
 	// ldflags
 	ldflags := params.LDFlags
@@ -188,7 +253,7 @@ func Build(params BuildArgs) error {
 		log.Println("Generating a .syso containing Windows file metadata.")
 		syso, err := MakeWindowsSysoFile()
 		if err != nil {
-			return errors.Wrap(err, "failed generating Windows .syso metadata file")
+			return fmt.Errorf("failed generating Windows .syso metadata file: %w", err)
 		}
 		defer os.Remove(syso)
 	}
@@ -241,7 +306,7 @@ func MakeWindowsSysoFile() (string, error) {
 	vi.Walk()
 	sysoFile := BeatName + "_windows_" + GOARCH + ".syso"
 	if err = vi.WriteSyso(sysoFile, GOARCH); err != nil {
-		return "", errors.Wrap(err, "failed to generate syso file with Windows metadata")
+		return "", fmt.Errorf("failed to generate syso file with Windows metadata: %w", err)
 	}
 	return sysoFile, nil
 }

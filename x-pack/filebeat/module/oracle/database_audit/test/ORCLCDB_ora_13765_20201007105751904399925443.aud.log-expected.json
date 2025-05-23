@@ -23,6 +23,12 @@
         "oracle.database_audit.session_id": "4294967295",
         "oracle.database_audit.status": "0",
         "process.pid": "13765",
+        "related.hosts": [
+            "testlab.local"
+        ],
+        "related.user": [
+            "oracle"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -56,6 +62,12 @@
         "oracle.database_audit.session_id": "4294967295",
         "oracle.database_audit.status": "0",
         "process.pid": "13765",
+        "related.hosts": [
+            "testlab.local"
+        ],
+        "related.user": [
+            "oracle"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",
@@ -90,6 +102,12 @@
         "oracle.database_audit.session_id": "4294967295",
         "oracle.database_audit.status": "0",
         "process.pid": "13765",
+        "related.hosts": [
+            "testlab.local"
+        ],
+        "related.user": [
+            "oracle"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "/",

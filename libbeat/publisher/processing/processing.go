@@ -35,6 +35,10 @@ type SupportFactory func(info beat.Info, log *logp.Logger, cfg *config.C) (Suppo
 // If `drop` is set, then the processor generated must always drop all events.
 // A Supporter needs to be closed with `Close()` to release its global resources.
 type Supporter interface {
+	// Create a running processor interface based on the given config
 	Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, error)
+	// Processors returns a list of config strings for the given processor, for debug purposes
+	Processors() []string
+	// Close the processor supporter
 	Close() error
 }

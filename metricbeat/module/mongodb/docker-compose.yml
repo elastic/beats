@@ -2,11 +2,10 @@ version: '2.3'
 
 services:
   mongodb:
-    image: docker.elastic.co/integrations-ci/beats-mongodb:${MONGODB_VERSION:-3.4}-1
+    image: docker.elastic.co/integrations-ci/beats-mongodb:${MONGODB_VERSION:-5.0}-1
     build:
       context: ./_meta
       args:
-        MONGODB_VERSION: ${MONGODB_VERSION:-3.4}
-    command: mongod --replSet beats
+        MONGODB_VERSION: ${MONGODB_VERSION:-5.0}
     ports:
-      - 27017
+      - 27017:27017

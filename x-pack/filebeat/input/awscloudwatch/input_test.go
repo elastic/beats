@@ -15,109 +15,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestGetStartPosition(t *testing.T) {
-	currentTime := time.Date(2020, time.June, 1, 0, 0, 0, 0, time.UTC)
-	cases := []struct {
-		title             string
-		startPosition     string
-		prevEndTime       int64
-		scanFrequency     time.Duration
-		latency           time.Duration
-		expectedStartTime int64
-		expectedEndTime   int64
-	}{
-		{
-			"startPosition=beginning",
-			"beginning",
-			int64(0),
-			30 * time.Second,
-			0,
-			int64(0),
-			int64(1590969600000),
-		},
-		{
-			"startPosition=end",
-			"end",
-			int64(0),
-			30 * time.Second,
-			0,
-			int64(1590969570000),
-			int64(1590969600000),
-		},
-		{
-			"startPosition=typo",
-			"typo",
-			int64(0),
-			30 * time.Second,
-			0,
-			int64(0),
-			int64(0),
-		},
-		{
-			"startPosition=beginning with prevEndTime",
-			"beginning",
-			int64(1590000000000),
-			30 * time.Second,
-			0,
-			int64(1590000000000),
-			int64(1590969600000),
-		},
-		{
-			"startPosition=end with prevEndTime",
-			"end",
-			int64(1590000000000),
-			30 * time.Second,
-			0,
-			int64(1590000000000),
-			int64(1590969600000),
-		},
-		{
-			"startPosition=beginning with latency",
-			"beginning",
-			int64(0),
-			30 * time.Second,
-			10 * time.Minute,
-			int64(0),
-			int64(1590969000000),
-		},
-		{
-			"startPosition=beginning with prevEndTime and latency",
-			"beginning",
-			int64(1590000000000),
-			30 * time.Second,
-			10 * time.Minute,
-			int64(1590000000000),
-			int64(1590969000000),
-		},
-		{
-			"startPosition=end with latency",
-			"end",
-			int64(0),
-			30 * time.Second,
-			10 * time.Minute,
-			int64(1590968970000),
-			int64(1590969000000),
-		},
-		{
-			"startPosition=end with prevEndTime and latency",
-			"end",
-			int64(1590000000000),
-			30 * time.Second,
-			10 * time.Minute,
-			int64(1590000000000),
-			int64(1590969000000),
-		},
-	}
-
-	for _, c := range cases {
-		t.Run(c.title, func(t *testing.T) {
-			startTime, endTime := getStartPosition(c.startPosition, currentTime, c.prevEndTime, c.scanFrequency, c.latency)
-			assert.Equal(t, c.expectedStartTime, startTime)
-			assert.Equal(t, c.expectedEndTime, endTime)
-		})
-	}
-}
-
 func TestCreateEvent(t *testing.T) {
 	logEvent := &types.FilteredLogEvent{
 		EventId:       awssdk.String("id-1"),
@@ -132,11 +29,10 @@ func TestCreateEvent(t *testing.T) {
 		"event": mapstr.M{
 			"id": *logEvent.EventId,
 		},
-		"log.file.path": "logGroup1" + "/" + *logEvent.LogStreamName,
-		"awscloudwatch": mapstr.M{
-			"log_group":      "logGroup1",
-			"log_stream":     *logEvent.LogStreamName,
-			"ingestion_time": time.Unix(*logEvent.IngestionTime/1000, 0),
+		"log": mapstr.M{
+			"file": mapstr.M{
+				"path": "logGroup1" + "/" + *logEvent.LogStreamName,
+			},
 		},
 		"aws.cloudwatch": mapstr.M{
 			"log_group":      "logGroup1",
@@ -154,9 +50,97 @@ func TestCreateEvent(t *testing.T) {
 	assert.Equal(t, expectedEventFields, event.Fields)
 }
 
-func TestParseARN(t *testing.T) {
-	logGroup, regionName, err := parseARN("arn:aws:logs:us-east-1:428152502467:log-group:test:*")
-	assert.Equal(t, "test", logGroup)
-	assert.Equal(t, "us-east-1", regionName)
-	assert.NoError(t, err)
+func Test_FromConfig(t *testing.T) {
+	tests := []struct {
+		name         string
+		cfg          config
+		awsCfg       awssdk.Config
+		expectGroups []string
+		expectRegion string
+		isError      bool
+	}{
+		{
+			name: "Valid log group ARN",
+			cfg: config{
+				LogGroupARN: "arn:aws:logs:us-east-1:123456789012:myLogs",
+			},
+			awsCfg: awssdk.Config{
+				Region: "us-east-1",
+			},
+			expectGroups: []string{"arn:aws:logs:us-east-1:123456789012:myLogs"},
+			expectRegion: "us-east-1",
+			isError:      false,
+		},
+		{
+			name: "Invalid ARN results in an error",
+			cfg: config{
+				LogGroupARN: "invalidARN",
+			},
+			awsCfg: awssdk.Config{
+				Region: "us-east-1",
+			},
+			expectRegion: "",
+			isError:      true,
+		},
+		{
+			name: "Valid log group ARN but empty region cause error",
+			cfg: config{
+				LogGroupARN: "arn:aws:logs::123456789012:otherLogs",
+			},
+			awsCfg: awssdk.Config{
+				Region: "us-east-1",
+			},
+			expectRegion: "",
+			isError:      true,
+		},
+		{
+			name: "ARN suffix trimming to match logGroupIdentifier requirement",
+			cfg: config{
+				LogGroupARN: "arn:aws:logs:us-east-1:123456789012:log-group:/aws/kinesisfirehose/ProjectA:*",
+			},
+			awsCfg: awssdk.Config{
+				Region: "us-east-1",
+			},
+			expectGroups: []string{"arn:aws:logs:us-east-1:123456789012:log-group:/aws/kinesisfirehose/ProjectA"},
+			expectRegion: "us-east-1",
+			isError:      false,
+		},
+		{
+			name: "LogGroupName only",
+			cfg: config{
+				LogGroupName: "myLogGroup",
+			},
+			awsCfg: awssdk.Config{
+				Region: "us-east-1",
+			},
+			expectGroups: []string{"myLogGroup"},
+			expectRegion: "us-east-1",
+			isError:      false,
+		},
+		{
+			name: "LogGroupName and region override",
+			cfg: config{
+				LogGroupName: "myLogGroup",
+				RegionName:   "sa-east-1",
+			},
+			awsCfg: awssdk.Config{
+				Region: "us-east-1",
+			},
+			expectGroups: []string{"myLogGroup"},
+			expectRegion: "sa-east-1",
+			isError:      false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			groups, region, err := fromConfig(tt.cfg, tt.awsCfg)
+			if tt.isError {
+				assert.Error(t, err)
+			}
+
+			assert.Equal(t, tt.expectGroups, groups)
+			assert.Equal(t, tt.expectRegion, region)
+		})
+	}
 }

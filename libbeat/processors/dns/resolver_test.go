@@ -19,41 +19,45 @@ package dns
 
 import (
 	"crypto/tls"
+	"errors"
 	"net"
 	"strings"
 	"testing"
 
 	"github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-var _ PTRResolver = (*MiekgResolver)(nil)
+var _ resolver = (*miekgResolver)(nil)
 
 func TestMiekgResolverLookupPTR(t *testing.T) {
-	stop, addr, err := ServeDNS(FakeDNSHandler)
+	stop, addr, err := serveDNS(fakeDNSHandler)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer stop()
+	defer func() {
+		require.NoError(t, stop())
+	}()
 
 	reg := monitoring.NewRegistry()
-	res, err := NewMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
+	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Success
-	ptr, err := res.LookupPTR("8.8.8.8")
+	ptr, err := res.Lookup("8.8.8.8", typePTR)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, "google-public-dns-a.google.com", ptr.Host)
+	assert.EqualValues(t, "google-public-dns-a.google.com", ptr.Data[0])
 	assert.EqualValues(t, 19273, ptr.TTL)
 
 	// NXDOMAIN
-	_, err = res.LookupPTR("1.1.1.1")
+	_, err = res.Lookup("1.1.1.1", typePTR)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), "NXDOMAIN")
 	}
@@ -70,42 +74,45 @@ func TestMiekgResolverLookupPTR(t *testing.T) {
 }
 
 func TestMiekgResolverLookupPTRTLS(t *testing.T) {
-	//Build Cert
-	cert, err := tls.X509KeyPair(CertPEMBlock, KeyPEMBlock)
+	// Build Cert
+	cert, err := tls.X509KeyPair(certPEMBlock, keyPEMBlock)
 	if err != nil {
 		t.Fatalf("unable to build certificate: %v", err)
 	}
 	config := tls.Config{
 		Certificates: []tls.Certificate{cert},
+		MinVersion:   tls.VersionTLS13,
 	}
 	// serve TLS with cert
-	stop, addr, err := ServeDNSTLS(FakeDNSHandler, &config)
+	stop, addr, err := serveDNSTLS(fakeDNSHandler, &config)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer stop()
+	defer func() {
+		require.NoError(t, stop())
+	}()
 
 	reg := monitoring.NewRegistry()
 
-	res, err := NewMiekgResolver(reg.NewRegistry(logName), 0, "tls", addr)
+	res, err := newMiekgResolver(reg.NewRegistry(logName), 0, "tls", addr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// we use a self signed certificate for localhost
-	// we have to pass InsecureSSL to the DNS resolver
+	//nolint:gosec // Don't verify the self-signed cert. This is only for testing purposes.
 	res.client.TLSConfig = &tls.Config{
 		InsecureSkipVerify: true,
 	}
+
 	// Success
-	ptr, err := res.LookupPTR("8.8.8.8")
+	ptr, err := res.Lookup("8.8.8.8", typePTR)
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.EqualValues(t, "google-public-dns-a.google.com", ptr.Host)
+	assert.EqualValues(t, "google-public-dns-a.google.com", ptr.Data[0])
 	assert.EqualValues(t, 19273, ptr.TTL)
 
 	// NXDOMAIN
-	_, err = res.LookupPTR("1.1.1.1")
+	_, err = res.Lookup("1.1.1.1", typePTR)
 	if assert.Error(t, err) {
 		assert.Contains(t, err.Error(), "NXDOMAIN")
 	}
@@ -121,7 +128,7 @@ func TestMiekgResolverLookupPTRTLS(t *testing.T) {
 	assert.Equal(t, 12, metricCount)
 }
 
-func ServeDNS(h dns.HandlerFunc) (cancel func() error, addr string, err error) {
+func serveDNS(h dns.HandlerFunc) (cancel func() error, addr string, err error) {
 	// Setup listener on ephemeral port.
 
 	a, err := net.ResolveUDPAddr("udp4", "localhost:0")
@@ -136,11 +143,23 @@ func ServeDNS(h dns.HandlerFunc) (cancel func() error, addr string, err error) {
 	var s dns.Server
 	s.PacketConn = l
 	s.Handler = h
-	go s.ActivateAndServe()
-	return s.Shutdown, s.PacketConn.LocalAddr().String(), err
+
+	serveErr := make(chan error, 1)
+	go func() {
+		defer close(serveErr)
+		serveErr <- s.ActivateAndServe()
+	}()
+
+	cancel = func() error {
+		return errors.Join(
+			s.Shutdown(),
+			<-serveErr,
+		)
+	}
+	return cancel, s.PacketConn.LocalAddr().String(), err
 }
 
-func ServeDNSTLS(h dns.HandlerFunc, config *tls.Config) (cancel func() error, addr string, err error) {
+func serveDNSTLS(h dns.HandlerFunc, config *tls.Config) (cancel func() error, addr string, err error) {
 	// Setup listener on ephemeral port.
 	l, err := tls.Listen("tcp", "localhost:0", config)
 	if err != nil {
@@ -150,11 +169,23 @@ func ServeDNSTLS(h dns.HandlerFunc, config *tls.Config) (cancel func() error, ad
 	var s dns.Server
 	s.Handler = h
 	s.Listener = l
-	go s.ActivateAndServe()
-	return s.Shutdown, l.Addr().String(), err
+
+	serveErr := make(chan error, 1)
+	go func() {
+		defer close(serveErr)
+		serveErr <- s.ActivateAndServe()
+	}()
+
+	cancel = func() error {
+		return errors.Join(
+			s.Shutdown(),
+			<-serveErr,
+		)
+	}
+	return cancel, l.Addr().String(), err
 }
 
-func FakeDNSHandler(w dns.ResponseWriter, msg *dns.Msg) {
+func fakeDNSHandler(w dns.ResponseWriter, msg *dns.Msg) {
 	m := new(dns.Msg)
 	m.SetReply(msg)
 	switch {
@@ -164,11 +195,11 @@ func FakeDNSHandler(w dns.ResponseWriter, msg *dns.Msg) {
 	default:
 		m.SetRcode(msg, dns.RcodeNameError)
 	}
-	w.WriteMsg(m)
+	_ = w.WriteMsg(m)
 }
 
 var (
-	KeyPEMBlock = []byte(`-----BEGIN RSA PRIVATE KEY-----
+	keyPEMBlock = []byte(`-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA2g2zpEtWaIUx5o6MEnWnGsf0Ba1SDc3AwgOmxeNIPBJYVCrk
 sWe8Qt/5nymReVFcum76995ncr/zT+e4e8l+hXuGzTKZJpOj27Igb0/wa3j2hIcu
 rnbzfwkJ+KMag2UUKdSo31ChMU+64bwziEXunF347Ot7dBLtw3PJKbabNCP+/oil
@@ -196,7 +227,7 @@ LatVl7h6ud25ZJYnP7DelGxHsZnDXNirLFlSB0CL4F6I5xNoBvCoH0Q8ckDSh4C7
 tlAyD5m9gwvgdkNFWq6/lcUPxGksTtTk8dGnhJz8pGlZvp6+dZCM
 -----END RSA PRIVATE KEY-----`)
 
-	CertPEMBlock = []byte(`-----BEGIN CERTIFICATE-----
+	certPEMBlock = []byte(`-----BEGIN CERTIFICATE-----
 MIIDaTCCAlGgAwIBAgIQGqg47wLgbjwwrZASuakmwjANBgkqhkiG9w0BAQsFADAy
 MRQwEgYDVQQKEwtMb2cgQ291cmllcjEaMBgGA1UEAxMRYmVhdHMuZWxhc3RpYy5j
 b20wHhcNMjAwNjIzMDY0NDEwWhcNMjEwNjIzMDY0NDEwWjAyMRQwEgYDVQQKEwtM

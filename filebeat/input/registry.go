@@ -22,32 +22,36 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+type GetStatusReporter func() status.StatusReporter
+
 type Context struct {
-	States   []file.State
-	Done     chan struct{}
-	BeatDone chan struct{}
-	Meta     map[string]string
+	States            []file.State
+	Done              chan struct{}
+	BeatDone          chan struct{}
+	Meta              map[string]string
+	GetStatusReporter GetStatusReporter
 }
 
 // Factory is used to register functions creating new Input instances.
-type Factory = func(config *conf.C, connector channel.Connector, context Context) (Input, error)
+type Factory = func(config *conf.C, connector channel.Connector, context Context, logger *logp.Logger) (Input, error)
 
 var registry = make(map[string]Factory)
 
 func Register(name string, factory Factory) error {
 	logp.Info("Registering input factory")
 	if name == "" {
-		return fmt.Errorf("Error registering input: name cannot be empty")
+		return fmt.Errorf("Error registering input: name cannot be empty") //nolint:staticcheck //Keep old behavior
 	}
 	if factory == nil {
-		return fmt.Errorf("Error registering input '%v': factory cannot be empty", name)
+		return fmt.Errorf("Error registering input '%v': factory cannot be empty", name) //nolint:staticcheck //Keep old behavior
 	}
 	if _, exists := registry[name]; exists {
-		return fmt.Errorf("Error registering input '%v': already registered", name)
+		return fmt.Errorf("Error registering input '%v': already registered", name) //nolint:staticcheck //Keep old behavior
 	}
 
 	registry[name] = factory
@@ -58,7 +62,7 @@ func Register(name string, factory Factory) error {
 
 func GetFactory(name string) (Factory, error) {
 	if _, exists := registry[name]; !exists {
-		return nil, fmt.Errorf("Error creating input. No such input type exist: '%v'", name)
+		return nil, fmt.Errorf("Error creating input. No such input type exist: '%v'", name) //nolint:staticcheck //Keep old behavior
 	}
 	return registry[name], nil
 }

@@ -1,0 +1,352 @@
+[
+  {
+    "@timestamp": "2023-01-17T22:37:25.192Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "session-disconnected",
+      "category": [
+        "authentication",
+        "session"
+      ],
+      "code": "4779",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "end"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "source": {
+      "domain": "DESKTOP"
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "name": "USER1"
+    },
+    "winlog": {
+      "activity_id": "{01f78c75-2270-0002-52ab-626e802ad901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "USER1",
+        "ClientAddress": "Unknown",
+        "ClientName": "DESKTOP",
+        "LogonID": "0x4c636b9",
+        "SessionName": "rdp-sxs220817450#18"
+      },
+      "event_id": "4779",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x4c636b9"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 932,
+        "thread": {
+          "id": 9584
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "3480043",
+      "time_created": "2023-01-17T22:37:25.1926737Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T22:09:56.356Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "session-disconnected",
+      "category": [
+        "authentication",
+        "session"
+      ],
+      "code": "4779",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "end"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "source": {
+      "domain": "DESKTOP"
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "name": "USER1"
+    },
+    "winlog": {
+      "activity_id": "{01f78c75-2270-0002-52ab-626e802ad901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "USER1",
+        "ClientAddress": "Unknown",
+        "ClientName": "DESKTOP",
+        "LogonID": "0x3fc8b36",
+        "SessionName": "rdp-sxs220817450#12"
+      },
+      "event_id": "4779",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0x3fc8b36"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 932,
+        "thread": {
+          "id": 7788
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "3479302",
+      "time_created": "2023-01-17T22:09:56.3562679Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T21:55:25.393Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "session-disconnected",
+      "category": [
+        "authentication",
+        "session"
+      ],
+      "code": "4779",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "end"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "source": {
+      "domain": "DESKTOP"
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "name": "USER1"
+    },
+    "winlog": {
+      "activity_id": "{01f78c75-2270-0002-52ab-626e802ad901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "USER1",
+        "ClientAddress": "Unknown",
+        "ClientName": "DESKTOP",
+        "LogonID": "0xe03a99",
+        "SessionName": "rdp-sxs220817450#16"
+      },
+      "event_id": "4779",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0xe03a99"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 932,
+        "thread": {
+          "id": 4660
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "3479095",
+      "time_created": "2023-01-17T21:55:25.3931099Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T21:54:30.313Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "session-disconnected",
+      "category": [
+        "authentication",
+        "session"
+      ],
+      "code": "4779",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "end"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "source": {
+      "domain": "DESKTOP"
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "name": "USER1"
+    },
+    "winlog": {
+      "activity_id": "{01f78c75-2270-0002-52ab-626e802ad901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "USER1",
+        "ClientAddress": "Unknown",
+        "ClientName": "DESKTOP",
+        "LogonID": "0xe03a99",
+        "SessionName": "rdp-sxs220817450#15"
+      },
+      "event_id": "4779",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0xe03a99"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 932,
+        "thread": {
+          "id": 4660
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "3479032",
+      "time_created": "2023-01-17T21:54:30.3134111Z"
+    }
+  },
+  {
+    "@timestamp": "2023-01-17T21:53:19.623Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "action": "session-disconnected",
+      "category": [
+        "authentication",
+        "session"
+      ],
+      "code": "4779",
+      "kind": "event",
+      "module": "security",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing",
+      "type": [
+        "end"
+      ]
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "related": {
+      "user": [
+        "USER1"
+      ]
+    },
+    "source": {
+      "domain": "DESKTOP"
+    },
+    "user": {
+      "domain": "CONTOSO",
+      "name": "USER1"
+    },
+    "winlog": {
+      "activity_id": "{01f78c75-2270-0002-52ab-626e802ad901}",
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "AccountDomain": "CONTOSO",
+        "AccountName": "USER1",
+        "ClientAddress": "Unknown",
+        "ClientName": "DESKTOP",
+        "LogonID": "0xe03a99",
+        "SessionName": "rdp-sxs220817450#3"
+      },
+      "event_id": "4779",
+      "keywords": [
+        "Audit Success"
+      ],
+      "logon": {
+        "id": "0xe03a99"
+      },
+      "opcode": "Info",
+      "process": {
+        "pid": 932,
+        "thread": {
+          "id": 7328
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": "3478947",
+      "time_created": "2023-01-17T21:53:19.6235931Z"
+    }
+  }
+]

@@ -19,7 +19,7 @@ package ptest
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -35,14 +35,17 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 )
 
-// TestCases holds the list of test cases to test a metricset
-type TestCases []struct {
+// TestCase represents a single test case for testing a metricset
+type TestCase struct {
 	// MetricsFile containing Prometheus outputted metrics
 	MetricsFile string
 
 	// ExpectedFile containing resulting documents
 	ExpectedFile string
 }
+
+// TestCases holds the list of test cases to test a metricset
+type TestCases []TestCase
 
 // TestMetricSet goes over the given TestCases and ensures that source Prometheus metrics gets converted into the expected
 // events when passed by the given metricset.
@@ -54,13 +57,13 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 		file, err := os.Open(test.MetricsFile)
 		assert.NoError(t, err, "cannot open test file "+test.MetricsFile)
 
-		body, err := ioutil.ReadAll(file)
+		body, err := io.ReadAll(file)
 		assert.NoError(t, err, "cannot read test file "+test.MetricsFile)
 
 		server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "text/plain; charset=ISO-8859-1")
-			w.Write([]byte(body))
+			w.Header().Set("Content-Type", "text/plain; version=0.0.4")
+			_, _ = w.Write(body)
 		}))
 
 		server.Start()
@@ -83,12 +86,12 @@ func TestMetricSet(t *testing.T, module, metricset string, cases TestCases) {
 				return h1 < h2
 			})
 			eventsJSON, _ := json.MarshalIndent(events, "", "\t")
-			err = ioutil.WriteFile(test.ExpectedFile, eventsJSON, 0644)
+			err = os.WriteFile(test.ExpectedFile, eventsJSON, 0644)
 			assert.NoError(t, err)
 		}
 
 		// Read expected events from reference file
-		expected, err := ioutil.ReadFile(test.ExpectedFile)
+		expected, err := os.ReadFile(test.ExpectedFile)
 		if err != nil {
 			t.Fatal(err)
 		}

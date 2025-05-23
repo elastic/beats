@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux && cgo
-// +build linux,cgo
 
 package user
 
@@ -11,6 +10,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"io"
 	"os/user"
@@ -20,9 +20,9 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/gofrs/uuid"
-	"github.com/joeshaw/multierror"
+	"github.com/gofrs/uuid/v5"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -33,7 +33,6 @@ import (
 )
 
 const (
-	moduleName    = "system"
 	metricsetName = "user"
 	namespace     = "system.audit.user"
 
@@ -137,17 +136,27 @@ type User struct {
 func (user User) Hash() uint64 {
 	h := xxhash.New()
 	// Use everything except userInfo
+	//nolint:errcheck // err always nil
 	h.WriteString(user.Name)
+	//nolint:errcheck // err always nil
 	binary.Write(h, binary.BigEndian, uint8(user.PasswordType))
+	//nolint:errcheck // err always nil
 	h.WriteString(user.PasswordChanged.String())
+	//nolint:errcheck // err always nil
 	h.Write(user.PasswordHashHash)
+	//nolint:errcheck // err always nil
 	h.WriteString(user.UID)
+	//nolint:errcheck // err always nil
 	h.WriteString(user.GID)
+	//nolint:errcheck // err always nil
 	h.WriteString(user.Dir)
+	//nolint:errcheck // err always nil
 	h.WriteString(user.Shell)
 
 	for _, group := range user.Groups {
+		//nolint:errcheck // err always nil
 		h.WriteString(group.Name)
+		//nolint:errcheck // err always nil
 		h.WriteString(group.Gid)
 	}
 
@@ -200,16 +209,16 @@ func (user User) PrimaryGroup() *user.Group {
 }
 
 // entityID creates an ID that uniquely identifies this user across machines.
-func (u User) entityID(hostID string) string {
+func (user User) entityID(hostID string) string {
 	h := system.NewEntityHash()
 	h.Write([]byte(hostID))
-	h.Write([]byte(u.Name))
-	h.Write([]byte(u.UID))
+	h.Write([]byte(user.Name))
+	h.Write([]byte(user.UID))
 	return h.Sum()
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)
@@ -220,7 +229,7 @@ type MetricSet struct {
 	system.SystemMetricSet
 	config    config
 	log       *logp.Logger
-	cache     *cache.Cache
+	cache     *cache.Cache[*User]
 	bucket    datastore.Bucket
 	lastState time.Time
 	userFiles []string
@@ -229,14 +238,14 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName)
 	if runtime.GOOS != "linux" {
-		return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", moduleName, metricsetName)
+		return nil, fmt.Errorf("the %v/%v dataset is only supported on Linux", system.ModuleName, metricsetName)
 	}
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -248,7 +257,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		config:          config,
 		log:             logp.NewLogger(metricsetName),
-		cache:           cache.New(),
+		cache:           cache.New[*User](),
 		bucket:          bucket,
 	}
 
@@ -281,7 +290,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	ms.log.Debugf("Restored %d users from disk", len(users))
 
-	ms.cache.DiffAndUpdateCache(convertToCacheable(users))
+	ms.cache.DiffAndUpdateCache(users)
 
 	return ms, nil
 }
@@ -316,7 +325,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 // reportState reports all existing users on the system.
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
-	var errs multierror.Errors
+	var errs []error
 	ms.lastState = time.Now()
 
 	users, err := GetUsers(ms.config.DetectPasswordChanges)
@@ -339,7 +348,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 		if ms.cache != nil {
 			// This will initialize the cache with the current processes
-			ms.cache.DiffAndUpdateCache(convertToCacheable(users))
+			ms.cache.DiffAndUpdateCache(users)
 		}
 
 		// Save time so we know when to send the state again (config.StatePeriod)
@@ -359,12 +368,12 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // reportChanges detects and reports any changes to users on this system since the last call.
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
-	var errs multierror.Errors
+	var errs []error
 	currentTime := time.Now()
 
 	// If this is not the first call to Fetch/reportChanges,
@@ -387,17 +396,17 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	ms.log.Debugf("Found %v users", len(users))
 
 	if len(users) > 0 {
-		newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(users))
+		newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(users)
 
 		if len(newInCache) > 0 && len(missingFromCache) > 0 {
 			// Check for changes to users
 			missingUserMap := make(map[string](*User))
 			for _, missingUser := range missingFromCache {
-				missingUserMap[missingUser.(*User).UID] = missingUser.(*User)
+				missingUserMap[missingUser.UID] = missingUser
 			}
 
 			for _, userFromCache := range newInCache {
-				newUser := userFromCache.(*User)
+				newUser := userFromCache
 				oldUser, found := missingUserMap[newUser.UID]
 
 				if found {
@@ -434,11 +443,11 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		} else {
 			// No changes to users
 			for _, user := range newInCache {
-				report.Event(ms.userEvent(user.(*User), eventTypeEvent, eventActionUserAdded))
+				report.Event(ms.userEvent(user, eventTypeEvent, eventActionUserAdded))
 			}
 
 			for _, user := range missingFromCache {
-				report.Event(ms.userEvent(user.(*User), eventTypeEvent, eventActionUserRemoved))
+				report.Event(ms.userEvent(user, eventTypeEvent, eventActionUserRemoved))
 			}
 		}
 
@@ -450,7 +459,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction) mb.Event {
@@ -526,16 +535,6 @@ func fmtGroups(groups []*user.Group) string {
 	return b.String()
 }
 
-func convertToCacheable(users []*User) []cache.Cacheable {
-	c := make([]cache.Cacheable, 0, len(users))
-
-	for _, u := range users {
-		c = append(c, u)
-	}
-
-	return c
-}
-
 // restoreUsersFromDisk loads the user cache from disk.
 func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
 	var decoder *gob.Decoder
@@ -556,7 +555,7 @@ func (ms *MetricSet) restoreUsersFromDisk() (users []*User, err error) {
 			err = decoder.Decode(user)
 			if err == nil {
 				users = append(users, user)
-			} else if err == io.EOF {
+			} else if errors.Is(err, io.EOF) {
 				// Read all users
 				break
 			} else {
@@ -595,6 +594,7 @@ func (ms *MetricSet) haveFilesChanged() (bool, error) {
 			return true, fmt.Errorf("failed to stat %v: %w", path, err)
 		}
 
+		//nolint:unconvert // false positive
 		ctime := time.Unix(int64(stats.Ctim.Sec), int64(stats.Ctim.Nsec))
 		if ms.lastRead.Before(ctime) {
 			ms.log.Debugf("File changed: %v (lastRead=%v, ctime=%v)", path, ms.lastRead, ctime)

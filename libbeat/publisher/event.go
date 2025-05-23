@@ -27,6 +27,8 @@ import (
 // errors), one of the signal methods must be called. In normal operation
 // every batch will eventually receive an ACK() or a Drop().
 type Batch interface {
+	// The output that receives a batch owns the entries in its Events array,
+	// and changes to them will persist between retries.
 	Events() []Event
 
 	// All events have been acknowledged by the output.
@@ -41,6 +43,12 @@ type Batch interface {
 	// Try sending the events in this list again; all others are acknowledged.
 	RetryEvents(events []Event)
 
+	// Split this batch's events into two smaller batches and retry them both.
+	// If SplitRetry returns false, the batch could not be split, and the
+	// caller is responsible for reporting the error (including calling
+	// batch.Drop() if necessary).
+	SplitRetry() bool
+
 	// Send was aborted, try again but don't decrease the batch's TTL counter.
 	Cancelled()
 }
@@ -51,6 +59,12 @@ type Event struct {
 	Content beat.Event
 	Flags   EventFlags
 	Cache   EventCache
+
+	// If the output provides an early encoder for incoming events,
+	// it should store the encoded form in EncodedEvent and clear Content
+	// to free the unencoded data. The updated event will be provided to
+	// output workers when calling Publish.
+	EncodedEvent interface{}
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.
@@ -64,6 +78,7 @@ type EventCache struct {
 
 // Put lets outputs put key-value pairs into the event cache
 func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
+	//nolint:typecheck // Nil checks are ok here
 	if ec.m == nil {
 		// uninitialized map
 		ec.m = mapstr.M{}
@@ -74,6 +89,7 @@ func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 
 // GetValue lets outputs retrieve values from the event cache by key
 func (ec *EventCache) GetValue(key string) (interface{}, error) {
+	//nolint:typecheck // Nil checks are ok here
 	if ec.m == nil {
 		// uninitialized map
 		return nil, mapstr.ErrKeyNotFound

@@ -100,6 +100,10 @@ metricbeat.modules:
   query:
     'match[]': '{__name__!=""}'
 -------------------------------------------------------------------------------------
+NOTE: federation API returns all metrics as untyped, as a result even in case `use_types` and
+`rate_counters` parameters are enabled, rate metrics will NOT be calculated out of Prometheus
+counters. To get rate metrics calculated should be used <<metricbeat-metricset-prometheus-remote_write,remote_write>>
+metricset instead.
 
 [float]
 === Filtering metrics

@@ -20,11 +20,8 @@ package consumergroup
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -49,12 +46,10 @@ type groupAssignment struct {
 	clientHost string
 }
 
-var debugf = logp.MakeDebug("kafka")
-
 // New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	opts := kafka.MetricSetOptions{
-		Version: "0.9.0.0",
+		Version: "3.6.0",
 	}
 
 	ms, err := kafka.NewMetricSet(base, opts)
@@ -81,7 +76,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	broker, err := m.Connect()
 	if err != nil {
-		return errors.Wrap(err, "error in connect")
+		return fmt.Errorf("error in connect: %w", err)
 	}
 	defer broker.Close()
 
@@ -112,9 +107,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			MetricSetFields: event,
 		})
 	}
-	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred())
+	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred(), m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	return nil

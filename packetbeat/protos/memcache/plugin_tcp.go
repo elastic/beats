@@ -97,8 +97,6 @@ func (mc *memcache) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseMemcache(TCP) exception")
-
 	tcpConn := ensureMemcacheConnection(private)
 	debug("memcache connection %p", tcpConn)
 	tcpConn = mc.memcacheParseTCP(tcpConn, pkt, tcptuple, dir)
@@ -340,7 +338,6 @@ func (mc *memcache) GapInStream(
 ) (priv protos.ProtocolData, drop bool) {
 	debug("memcache(tcp) stream gap detected")
 
-	defer logp.Recover("GapInStream(memcache) exception")
 	if !isMemcacheConnection(private) {
 		return private, false
 	}

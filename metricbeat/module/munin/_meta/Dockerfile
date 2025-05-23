@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 
 RUN apt-get update && \
-    apt-get install -y munin-node netcat && \
+    apt-get install -y munin-node netcat-openbsd && \
     apt-get clean && rm rm -rf /var/lib/apt/lists/*
 
 EXPOSE 4949

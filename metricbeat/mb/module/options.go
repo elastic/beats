@@ -50,12 +50,12 @@ func WithEventModifier(modifier mb.EventModifier) Option {
 // module names. And it will add the host and rtt (round-trip time in
 // microseconds) values if they are non-zero values.
 //
-//     "metricset": {
-//       "host": "apache",
-//       "module": "apache",
-//       "name": "status",
-//       "rtt": 115
-//     }
+//	"metricset": {
+//	  "host": "apache",
+//	  "module": "apache",
+//	  "name": "status",
+//	  "rtt": 115
+//	}
 func WithMetricSetInfo() Option {
 	return WithEventModifier(mb.AddMetricSetInfo)
 }

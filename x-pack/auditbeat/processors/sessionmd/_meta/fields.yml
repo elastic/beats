@@ -1,0 +1,1352 @@
+# process fields from ECS version 8.12.0-dev.
+
+- key: ecs
+  title: ECS
+  description: ECS Fields.
+  fields:
+  - name: process
+    title: Process
+    group: 2
+    description: 'These fields contain information about a process.
+
+      These fields can help you correlate metrics information with a process id/name
+      from a log message.  The `process.pid` often stays in the metric itself and
+      is copied to the global field for correlation.'
+    type: group
+    default_field: true
+    fields:
+    - name: entry_leader.args
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Array of process arguments, starting with the absolute path to
+        the executable.
+
+        May be filtered to protect sensitive information.'
+      example: '["/usr/bin/ssh", "-l", "user", "10.0.0.16"]'
+      default_field: false
+    - name: entry_leader.args_count
+      level: extended
+      type: long
+      description: 'Length of the process.args array.
+
+        This field can be useful for querying or performing bucket analysis on how
+        many arguments were provided to start a process. More arguments may be an
+        indication of suspicious activity.'
+      example: 4
+      default_field: false
+    - name: entry_leader.command_line
+      level: extended
+      type: wildcard
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: 'Full command line that started the process, including the absolute
+        path to the executable, and all arguments.
+
+        Some arguments may be filtered to protect sensitive information.'
+      example: /usr/bin/ssh -l user 10.0.0.16
+      default_field: false
+    - name: entry_leader.entity_id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Unique identifier for the process.
+
+        The implementation of this is specified by the data source, but some examples
+        of what could be used here are a process-generated UUID, Sysmon Process GUIDs,
+        or a hash of some uniquely identifying components of a process.
+
+        Constructing a globally unique identifier is a common practice to mitigate
+        PID reuse as well as to identify a specific process over time, across multiple
+        monitored hosts.'
+      example: c2c455d9f99375d
+      default_field: false
+    - name: entry_leader.entry_meta.source.ip
+      level: core
+      type: ip
+      description: IP address of the source (IPv4 or IPv6).
+      default_field: false
+    - name: entry_leader.entry_meta.type
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'The entry type for the entry session leader. Values include: init(e.g
+        systemd), sshd, ssm, kubelet, teleport, terminal, console
+
+        Note: This field is only set on process.session_leader.'
+      default_field: false
+    - name: entry_leader.executable
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Absolute path to the process executable.
+      example: /usr/bin/ssh
+      default_field: false
+    - name: entry_leader.group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: entry_leader.group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: entry_leader.interactive
+      level: extended
+      type: boolean
+      description: 'Whether the process is connected to an interactive shell.
+
+        Process interactivity is inferred from the processes file descriptors. If
+        the character device for the controlling tty is the same as stdin and stderr
+        for the process, the process is considered interactive.
+
+        Note: A non-interactive process can belong to an interactive session and is
+        simply one that does not have open file descriptors reading the controlling
+        TTY on FD 0 (stdin) or writing to the controlling TTY on FD 2 (stderr). A
+        backgrounded process is still considered interactive if stdin and stderr are
+        connected to the controlling TTY.'
+      example: true
+      default_field: false
+    - name: entry_leader.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: 'Process name.
+
+        Sometimes called program name or similar.'
+      example: ssh
+      default_field: false
+    - name: entry_leader.parent.entity_id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Unique identifier for the process.
+
+        The implementation of this is specified by the data source, but some examples
+        of what could be used here are a process-generated UUID, Sysmon Process GUIDs,
+        or a hash of some uniquely identifying components of a process.
+
+        Constructing a globally unique identifier is a common practice to mitigate
+        PID reuse as well as to identify a specific process over time, across multiple
+        monitored hosts.'
+      example: c2c455d9f99375d
+      default_field: false
+    - name: entry_leader.parent.pid
+      level: core
+      type: long
+      format: string
+      description: Process id.
+      example: 4242
+      default_field: false
+    - name: entry_leader.parent.session_leader.entity_id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Unique identifier for the process.
+
+        The implementation of this is specified by the data source, but some examples
+        of what could be used here are a process-generated UUID, Sysmon Process GUIDs,
+        or a hash of some uniquely identifying components of a process.
+
+        Constructing a globally unique identifier is a common practice to mitigate
+        PID reuse as well as to identify a specific process over time, across multiple
+        monitored hosts.'
+      example: c2c455d9f99375d
+      default_field: false
+    - name: entry_leader.parent.session_leader.pid
+      level: core
+      type: long
+      format: string
+      description: Process id.
+      example: 4242
+      default_field: false
+    - name: entry_leader.parent.session_leader.start
+      level: extended
+      type: date
+      description: The time the process started.
+      example: '2016-05-23T08:05:34.853Z'
+      default_field: false
+    - name: entry_leader.parent.session_leader.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: entry_leader.parent.start
+      level: extended
+      type: date
+      description: The time the process started.
+      example: '2016-05-23T08:05:34.853Z'
+      default_field: false
+    - name: entry_leader.parent.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: entry_leader.pid
+      level: core
+      type: long
+      format: string
+      description: Process id.
+      example: 4242
+      default_field: false
+    - name: previous.args
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Array of process arguments, starting with the absolute path to
+        the executable.
+
+        May be filtered to protect sensitive information.'
+      example: '["/usr/bin/ssh", "-l", "user", "10.0.0.16"]'
+      default_field: false
+    - name: previous.args_count
+      level: extended
+      type: long
+      description: 'Length of the process.args array.
+
+        This field can be useful for querying or performing bucket analysis on how
+        many arguments were provided to start a process. More arguments may be an
+        indication of suspicious activity.'
+      example: 4
+      default_field: false
+    - name: previous.executable
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Absolute path to the process executable.
+      example: /usr/bin/ssh
+      default_field: false
+    - name: entry_leader.real_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: entry_leader.real_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: entry_leader.real_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: entry_leader.real_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: entry_leader.same_as_process
+      level: extended
+      type: boolean
+      description: 'This boolean is used to identify if a leader process is the same
+        as the top level process.
+
+        For example, if `process.group_leader.same_as_process = true`, it means the
+        process event in question is the leader of its process group. Details under
+        `process.*` like `pid` would be the same under `process.group_leader.*` The
+        same applies for both `process.session_leader` and `process.entry_leader`.
+
+        This field exists to the benefit of EQL and other rule engines since it''s
+        not possible to compare equality between two fields in a single document.
+        e.g `process.entity_id` = `process.group_leader.entity_id` (top level process
+        is the process group leader) OR `process.entity_id` = `process.entry_leader.entity_id`
+        (top level process is the entry session leader)
+
+        Instead these rules could be written like: `process.group_leader.same_as_process:
+        true` OR `process.entry_leader.same_as_process: true`
+
+        Note: This field is only set on `process.entry_leader`, `process.session_leader`
+        and `process.group_leader`.'
+      example: true
+      default_field: false
+    - name: entry_leader.saved_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: entry_leader.saved_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: entry_leader.saved_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: entry_leader.saved_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: entry_leader.start
+      level: extended
+      type: date
+      description: The time the process started.
+      example: '2016-05-23T08:05:34.853Z'
+      default_field: false
+    - name: entry_leader.supplemental_groups.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: entry_leader.supplemental_groups.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: entry_leader.tty
+      level: extended
+      type: object
+      description: Information about the controlling TTY device. If set, the process
+        belongs to an interactive session.
+      default_field: false
+    - name: entry_leader.tty.char_device.major
+      level: extended
+      type: long
+      description: The major number identifies the driver associated with the device.
+        The character device's major and minor numbers can be algorithmically combined
+        to produce the more familiar terminal identifiers such as "ttyS0" and "pts/0".
+        For more details, please refer to the Linux kernel documentation.
+      example: 4
+      default_field: false
+    - name: entry_leader.tty.char_device.minor
+      level: extended
+      type: long
+      description: "The minor number is used only by the driver specified by the major\
+        \ number; other parts of the kernel don\u2019t use it, and merely pass it\
+        \ along to the driver. It is common for a driver to control several devices;\
+        \ the minor number provides a way for the driver to differentiate among them."
+      example: 1
+      default_field: false
+    - name: entry_leader.user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: entry_leader.user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: entry_leader.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: entry_leader.working_directory
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: The working directory of the process.
+      example: /home/alice
+      default_field: false
+    - name: env_vars
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Array of environment variable bindings. Captured from a snapshot
+        of the environment at the time of execution.
+
+        May be filtered to protect sensitive information.'
+      example: '["PATH=/usr/local/bin:/usr/bin", "USER=ubuntu"]'
+      default_field: false
+    - name: group_leader.args
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Array of process arguments, starting with the absolute path to
+        the executable.
+
+        May be filtered to protect sensitive information.'
+      example: '["/usr/bin/ssh", "-l", "user", "10.0.0.16"]'
+      default_field: false
+    - name: group_leader.args_count
+      level: extended
+      type: long
+      description: 'Length of the process.args array.
+
+        This field can be useful for querying or performing bucket analysis on how
+        many arguments were provided to start a process. More arguments may be an
+        indication of suspicious activity.'
+      example: 4
+      default_field: false
+    - name: group_leader.command_line
+      level: extended
+      type: wildcard
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: 'Full command line that started the process, including the absolute
+        path to the executable, and all arguments.
+
+        Some arguments may be filtered to protect sensitive information.'
+      example: /usr/bin/ssh -l user 10.0.0.16
+      default_field: false
+    - name: group_leader.entity_id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Unique identifier for the process.
+
+        The implementation of this is specified by the data source, but some examples
+        of what could be used here are a process-generated UUID, Sysmon Process GUIDs,
+        or a hash of some uniquely identifying components of a process.
+
+        Constructing a globally unique identifier is a common practice to mitigate
+        PID reuse as well as to identify a specific process over time, across multiple
+        monitored hosts.'
+      example: c2c455d9f99375d
+      default_field: false
+    - name: group_leader.executable
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Absolute path to the process executable.
+      example: /usr/bin/ssh
+      default_field: false
+    - name: group_leader.group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: group_leader.group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: group_leader.interactive
+      level: extended
+      type: boolean
+      description: 'Whether the process is connected to an interactive shell.
+
+        Process interactivity is inferred from the processes file descriptors. If
+        the character device for the controlling tty is the same as stdin and stderr
+        for the process, the process is considered interactive.
+
+        Note: A non-interactive process can belong to an interactive session and is
+        simply one that does not have open file descriptors reading the controlling
+        TTY on FD 0 (stdin) or writing to the controlling TTY on FD 2 (stderr). A
+        backgrounded process is still considered interactive if stdin and stderr are
+        connected to the controlling TTY.'
+      example: true
+      default_field: false
+    - name: group_leader.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: 'Process name.
+
+        Sometimes called program name or similar.'
+      example: ssh
+      default_field: false
+    - name: group_leader.pid
+      level: core
+      type: long
+      format: string
+      description: Process id.
+      example: 4242
+      default_field: false
+    - name: group_leader.real_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: group_leader.real_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: group_leader.real_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: group_leader.real_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: group_leader.same_as_process
+      level: extended
+      type: boolean
+      description: 'This boolean is used to identify if a leader process is the same
+        as the top level process.
+
+        For example, if `process.group_leader.same_as_process = true`, it means the
+        process event in question is the leader of its process group. Details under
+        `process.*` like `pid` would be the same under `process.group_leader.*` The
+        same applies for both `process.session_leader` and `process.entry_leader`.
+
+        This field exists to the benefit of EQL and other rule engines since it''s
+        not possible to compare equality between two fields in a single document.
+        e.g `process.entity_id` = `process.group_leader.entity_id` (top level process
+        is the process group leader) OR `process.entity_id` = `process.entry_leader.entity_id`
+        (top level process is the entry session leader)
+
+        Instead these rules could be written like: `process.group_leader.same_as_process:
+        true` OR `process.entry_leader.same_as_process: true`
+
+        Note: This field is only set on `process.entry_leader`, `process.session_leader`
+        and `process.group_leader`.'
+      example: true
+      default_field: false
+    - name: group_leader.saved_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: group_leader.saved_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: group_leader.saved_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: group_leader.saved_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: group_leader.start
+      level: extended
+      type: date
+      description: The time the process started.
+      example: '2016-05-23T08:05:34.853Z'
+      default_field: false
+    - name: group_leader.tty
+      level: extended
+      type: object
+      description: Information about the controlling TTY device. If set, the process
+        belongs to an interactive session.
+      default_field: false
+    - name: group_leader.tty.char_device.major
+      level: extended
+      type: long
+      description: The major number identifies the driver associated with the device.
+        The character device's major and minor numbers can be algorithmically combined
+        to produce the more familiar terminal identifiers such as "ttyS0" and "pts/0".
+        For more details, please refer to the Linux kernel documentation.
+      example: 4
+      default_field: false
+    - name: group_leader.tty.char_device.minor
+      level: extended
+      type: long
+      description: "The minor number is used only by the driver specified by the major\
+        \ number; other parts of the kernel don\u2019t use it, and merely pass it\
+        \ along to the driver. It is common for a driver to control several devices;\
+        \ the minor number provides a way for the driver to differentiate among them."
+      example: 1
+      default_field: false
+    - name: group_leader.user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: group_leader.user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: group_leader.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: group_leader.working_directory
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: The working directory of the process.
+      example: /home/alice
+      default_field: false
+    - name: interactive
+      level: extended
+      type: boolean
+      description: 'Whether the process is connected to an interactive shell.
+
+        Process interactivity is inferred from the processes file descriptors. If
+        the character device for the controlling tty is the same as stdin and stderr
+        for the process, the process is considered interactive.
+
+        Note: A non-interactive process can belong to an interactive session and is
+        simply one that does not have open file descriptors reading the controlling
+        TTY on FD 0 (stdin) or writing to the controlling TTY on FD 2 (stderr). A
+        backgrounded process is still considered interactive if stdin and stderr are
+        connected to the controlling TTY.'
+      example: true
+      default_field: false
+    - name: parent.group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: parent.group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: parent.group_leader.entity_id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Unique identifier for the process.
+
+        The implementation of this is specified by the data source, but some examples
+        of what could be used here are a process-generated UUID, Sysmon Process GUIDs,
+        or a hash of some uniquely identifying components of a process.
+
+        Constructing a globally unique identifier is a common practice to mitigate
+        PID reuse as well as to identify a specific process over time, across multiple
+        monitored hosts.'
+      example: c2c455d9f99375d
+      default_field: false
+    - name: parent.group_leader.pid
+      level: core
+      type: long
+      format: string
+      description: Process id.
+      example: 4242
+      default_field: false
+    - name: parent.group_leader.start
+      level: extended
+      type: date
+      description: The time the process started.
+      example: '2016-05-23T08:05:34.853Z'
+      default_field: false
+    - name: parent.group_leader.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: parent.interactive
+      level: extended
+      type: boolean
+      description: 'Whether the process is connected to an interactive shell.
+
+        Process interactivity is inferred from the processes file descriptors. If
+        the character device for the controlling tty is the same as stdin and stderr
+        for the process, the process is considered interactive.
+
+        Note: A non-interactive process can belong to an interactive session and is
+        simply one that does not have open file descriptors reading the controlling
+        TTY on FD 0 (stdin) or writing to the controlling TTY on FD 2 (stderr). A
+        backgrounded process is still considered interactive if stdin and stderr are
+        connected to the controlling TTY.'
+      example: true
+      default_field: false
+    - name: parent.real_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: parent.real_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: parent.real_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: parent.real_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: parent.saved_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: parent.saved_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: parent.saved_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: parent.saved_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: parent.thread.capabilities.effective
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: This is the set of capabilities used by the kernel to perform permission
+        checks for the thread.
+      example: '["CAP_BPF", "CAP_SYS_ADMIN"]'
+      pattern: ^(CAP_[A-Z_]+|\d+)$
+      default_field: false
+    - name: parent.thread.capabilities.permitted
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: This is a limiting superset for the effective capabilities that
+        the thread may assume.
+      example: '["CAP_BPF", "CAP_SYS_ADMIN"]'
+      pattern: ^(CAP_[A-Z_]+|\d+)$
+      default_field: false
+    - name: parent.tty
+      level: extended
+      type: object
+      description: Information about the controlling TTY device. If set, the process
+        belongs to an interactive session.
+      default_field: false
+    - name: parent.tty.char_device.major
+      level: extended
+      type: long
+      description: The major number identifies the driver associated with the device.
+        The character device's major and minor numbers can be algorithmically combined
+        to produce the more familiar terminal identifiers such as "ttyS0" and "pts/0".
+        For more details, please refer to the Linux kernel documentation.
+      example: 4
+      default_field: false
+    - name: parent.tty.char_device.minor
+      level: extended
+      type: long
+      description: "The minor number is used only by the driver specified by the major\
+        \ number; other parts of the kernel don\u2019t use it, and merely pass it\
+        \ along to the driver. It is common for a driver to control several devices;\
+        \ the minor number provides a way for the driver to differentiate among them."
+      example: 1
+      default_field: false
+    - name: parent.user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: parent.user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: parent.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: real_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: real_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: real_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: real_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: saved_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: saved_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: saved_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: saved_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: session_leader.args
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Array of process arguments, starting with the absolute path to
+        the executable.
+
+        May be filtered to protect sensitive information.'
+      example: '["/usr/bin/ssh", "-l", "user", "10.0.0.16"]'
+      default_field: false
+    - name: session_leader.args_count
+      level: extended
+      type: long
+      description: 'Length of the process.args array.
+
+        This field can be useful for querying or performing bucket analysis on how
+        many arguments were provided to start a process. More arguments may be an
+        indication of suspicious activity.'
+      example: 4
+      default_field: false
+    - name: session_leader.command_line
+      level: extended
+      type: wildcard
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: 'Full command line that started the process, including the absolute
+        path to the executable, and all arguments.
+
+        Some arguments may be filtered to protect sensitive information.'
+      example: /usr/bin/ssh -l user 10.0.0.16
+      default_field: false
+    - name: session_leader.entity_id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Unique identifier for the process.
+
+        The implementation of this is specified by the data source, but some examples
+        of what could be used here are a process-generated UUID, Sysmon Process GUIDs,
+        or a hash of some uniquely identifying components of a process.
+
+        Constructing a globally unique identifier is a common practice to mitigate
+        PID reuse as well as to identify a specific process over time, across multiple
+        monitored hosts.'
+      example: c2c455d9f99375d
+      default_field: false
+    - name: session_leader.executable
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Absolute path to the process executable.
+      example: /usr/bin/ssh
+      default_field: false
+    - name: session_leader.group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: session_leader.group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: session_leader.interactive
+      level: extended
+      type: boolean
+      description: 'Whether the process is connected to an interactive shell.
+
+        Process interactivity is inferred from the processes file descriptors. If
+        the character device for the controlling tty is the same as stdin and stderr
+        for the process, the process is considered interactive.
+
+        Note: A non-interactive process can belong to an interactive session and is
+        simply one that does not have open file descriptors reading the controlling
+        TTY on FD 0 (stdin) or writing to the controlling TTY on FD 2 (stderr). A
+        backgrounded process is still considered interactive if stdin and stderr are
+        connected to the controlling TTY.'
+      example: true
+      default_field: false
+    - name: session_leader.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: 'Process name.
+
+        Sometimes called program name or similar.'
+      example: ssh
+      default_field: false
+    - name: session_leader.parent.entity_id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Unique identifier for the process.
+
+        The implementation of this is specified by the data source, but some examples
+        of what could be used here are a process-generated UUID, Sysmon Process GUIDs,
+        or a hash of some uniquely identifying components of a process.
+
+        Constructing a globally unique identifier is a common practice to mitigate
+        PID reuse as well as to identify a specific process over time, across multiple
+        monitored hosts.'
+      example: c2c455d9f99375d
+      default_field: false
+    - name: session_leader.parent.pid
+      level: core
+      type: long
+      format: string
+      description: Process id.
+      example: 4242
+      default_field: false
+    - name: session_leader.parent.session_leader.entity_id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: 'Unique identifier for the process.
+
+        The implementation of this is specified by the data source, but some examples
+        of what could be used here are a process-generated UUID, Sysmon Process GUIDs,
+        or a hash of some uniquely identifying components of a process.
+
+        Constructing a globally unique identifier is a common practice to mitigate
+        PID reuse as well as to identify a specific process over time, across multiple
+        monitored hosts.'
+      example: c2c455d9f99375d
+      default_field: false
+    - name: session_leader.parent.session_leader.pid
+      level: core
+      type: long
+      format: string
+      description: Process id.
+      example: 4242
+      default_field: false
+    - name: session_leader.parent.session_leader.start
+      level: extended
+      type: date
+      description: The time the process started.
+      example: '2016-05-23T08:05:34.853Z'
+      default_field: false
+    - name: session_leader.parent.session_leader.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: session_leader.parent.start
+      level: extended
+      type: date
+      description: The time the process started.
+      example: '2016-05-23T08:05:34.853Z'
+      default_field: false
+    - name: session_leader.parent.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: session_leader.pid
+      level: core
+      type: long
+      format: string
+      description: Process id.
+      example: 4242
+      default_field: false
+    - name: session_leader.real_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: session_leader.real_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: session_leader.real_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: session_leader.real_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: session_leader.same_as_process
+      level: extended
+      type: boolean
+      description: 'This boolean is used to identify if a leader process is the same
+        as the top level process.
+
+        For example, if `process.group_leader.same_as_process = true`, it means the
+        process event in question is the leader of its process group. Details under
+        `process.*` like `pid` would be the same under `process.group_leader.*` The
+        same applies for both `process.session_leader` and `process.entry_leader`.
+
+        This field exists to the benefit of EQL and other rule engines since it''s
+        not possible to compare equality between two fields in a single document.
+        e.g `process.entity_id` = `process.group_leader.entity_id` (top level process
+        is the process group leader) OR `process.entity_id` = `process.entry_leader.entity_id`
+        (top level process is the entry session leader)
+
+        Instead these rules could be written like: `process.group_leader.same_as_process:
+        true` OR `process.entry_leader.same_as_process: true`
+
+        Note: This field is only set on `process.entry_leader`, `process.session_leader`
+        and `process.group_leader`.'
+      example: true
+      default_field: false
+    - name: session_leader.saved_group.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: session_leader.saved_group.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: session_leader.saved_user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: session_leader.saved_user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: session_leader.start
+      level: extended
+      type: date
+      description: The time the process started.
+      example: '2016-05-23T08:05:34.853Z'
+      default_field: false
+    - name: session_leader.tty
+      level: extended
+      type: object
+      description: Information about the controlling TTY device. If set, the process
+        belongs to an interactive session.
+      default_field: false
+    - name: session_leader.tty.char_device.major
+      level: extended
+      type: long
+      description: The major number identifies the driver associated with the device.
+        The character device's major and minor numbers can be algorithmically combined
+        to produce the more familiar terminal identifiers such as "ttyS0" and "pts/0".
+        For more details, please refer to the Linux kernel documentation.
+      example: 4
+      default_field: false
+    - name: session_leader.tty.char_device.minor
+      level: extended
+      type: long
+      description: "The minor number is used only by the driver specified by the major\
+        \ number; other parts of the kernel don\u2019t use it, and merely pass it\
+        \ along to the driver. It is common for a driver to control several devices;\
+        \ the minor number provides a way for the driver to differentiate among them."
+      example: 1
+      default_field: false
+    - name: session_leader.user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: session_leader.user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: session_leader.vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false
+    - name: session_leader.working_directory
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: The working directory of the process.
+      example: /home/alice
+      default_field: false
+    - name: supplemental_groups.id
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier for the group on the system/platform.
+      default_field: false
+    - name: supplemental_groups.name
+      level: extended
+      type: keyword
+      ignore_above: 1024
+      description: Name of the group.
+      default_field: false
+    - name: tty
+      level: extended
+      type: object
+      description: Information about the controlling TTY device. If set, the process
+        belongs to an interactive session.
+      default_field: false
+    - name: tty.char_device.major
+      level: extended
+      type: long
+      description: The major number identifies the driver associated with the device.
+        The character device's major and minor numbers can be algorithmically combined
+        to produce the more familiar terminal identifiers such as "ttyS0" and "pts/0".
+        For more details, please refer to the Linux kernel documentation.
+      example: 4
+      default_field: false
+    - name: tty.char_device.minor
+      level: extended
+      type: long
+      description: "The minor number is used only by the driver specified by the major\
+        \ number; other parts of the kernel don\u2019t use it, and merely pass it\
+        \ along to the driver. It is common for a driver to control several devices;\
+        \ the minor number provides a way for the driver to differentiate among them."
+      example: 1
+      default_field: false
+    - name: tty.columns
+      level: extended
+      type: long
+      description: 'The number of character columns per line. e.g terminal width
+
+        Terminal sizes can change, so this value reflects the maximum value for a
+        given IO event. i.e. where event.action = ''text_output'''
+      example: 80
+      default_field: false
+    - name: tty.rows
+      level: extended
+      type: long
+      description: 'The number of character rows in the terminal. e.g terminal height
+
+        Terminal sizes can change, so this value reflects the maximum value for a
+        given IO event. i.e. where event.action = ''text_output'''
+      example: 24
+      default_field: false
+    - name: user.id
+      level: core
+      type: keyword
+      ignore_above: 1024
+      description: Unique identifier of the user.
+      example: S-1-5-21-202424912787-2692429404-2351956786-1000
+      default_field: false
+    - name: user.name
+      level: core
+      type: keyword
+      ignore_above: 1024
+      multi_fields:
+      - name: text
+        type: match_only_text
+      description: Short name or login of the user.
+      example: a.einstein
+      default_field: false
+    - name: vpid
+      level: core
+      type: long
+      format: string
+      description: 'Virtual process id.
+
+        The process id within a pid namespace. This is not necessarily unique across
+        all processes on the host but it is unique within the process namespace that
+        the process exists within.'
+      example: 4242
+      default_field: false

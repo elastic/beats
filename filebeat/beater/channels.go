@@ -52,12 +52,8 @@ type countingClient struct {
 	client  beat.Client
 }
 
-type countingEventer struct {
+type countingClientListener struct {
 	wgEvents *eventCounter
-}
-
-type combinedEventer struct {
-	a, b beat.ClientEventer
 }
 
 func newRegistrarLogger(reg *registrar.Registrar) *registrarLogger {
@@ -111,13 +107,14 @@ func (c *eventCounter) Wait() {
 // all events published, dropped and ACKed by any active client.
 // The type accepted by counter is compatible with sync.WaitGroup.
 func withPipelineEventCounter(pipeline beat.PipelineConnector, counter *eventCounter) beat.PipelineConnector {
-	counterListener := &countingEventer{counter}
+	counterListener := &countingClientListener{counter}
 
 	pipeline = pipetool.WithClientConfigEdit(pipeline, func(config beat.ClientConfig) (beat.ClientConfig, error) {
-		if evts := config.Events; evts != nil {
-			config.Events = &combinedEventer{evts, counterListener}
+		if evts := config.ClientListener; evts != nil {
+			config.ClientListener = &beat.CombinedClientListener{
+				A: evts, B: counterListener}
 		} else {
-			config.Events = counterListener
+			config.ClientListener = counterListener
 		}
 		return config, nil
 	})
@@ -145,36 +142,12 @@ func (c *countingClient) Close() error {
 	return c.client.Close()
 }
 
-func (*countingEventer) Closing()   {}
-func (*countingEventer) Closed()    {}
-func (*countingEventer) Published() {}
+func (*countingClientListener) Closing()   {}
+func (*countingClientListener) Closed()    {}
+func (*countingClientListener) NewEvent()  {}
+func (*countingClientListener) Filtered()  {}
+func (*countingClientListener) Published() {}
 
-func (c *countingEventer) FilteredOut(_ beat.Event) {}
-func (c *countingEventer) DroppedOnPublish(_ beat.Event) {
+func (c *countingClientListener) DroppedOnPublish(_ beat.Event) {
 	c.wgEvents.Done()
-}
-
-func (c *combinedEventer) Closing() {
-	c.a.Closing()
-	c.b.Closing()
-}
-
-func (c *combinedEventer) Closed() {
-	c.a.Closed()
-	c.b.Closed()
-}
-
-func (c *combinedEventer) Published() {
-	c.a.Published()
-	c.b.Published()
-}
-
-func (c *combinedEventer) FilteredOut(event beat.Event) {
-	c.a.FilteredOut(event)
-	c.b.FilteredOut(event)
-}
-
-func (c *combinedEventer) DroppedOnPublish(event beat.Event) {
-	c.a.DroppedOnPublish(event)
-	c.b.DroppedOnPublish(event)
 }

@@ -40,6 +40,15 @@ type info struct {
 }
 
 func TestReceiveEventFromUDP(t *testing.T) {
+	// Excluding udp6 for now, since it fails in our CI
+	for _, network := range []string{networkUDP, networkUDP4} {
+		t.Run(network, func(t *testing.T) {
+			testReceiveEventFromUDPWithNetwork(t, network)
+		})
+	}
+}
+
+func testReceiveEventFromUDPWithNetwork(t *testing.T, network string) {
 	tests := []struct {
 		name     string
 		message  []byte
@@ -64,6 +73,7 @@ func TestReceiveEventFromUDP(t *testing.T) {
 		MaxMessageSize: maxMessageSize,
 		Timeout:        timeout,
 		ReadBuffer:     maxSocketSize,
+		Network:        network,
 	}
 	fn := func(message []byte, metadata inputsource.NetworkMetadata) {
 		ch <- info{message: message, mt: metadata}
@@ -77,7 +87,7 @@ func TestReceiveEventFromUDP(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			conn, err := net.Dial("udp", s.localaddress)
+			conn, err := net.Dial(s.network(), s.localaddress)
 			if !assert.NoError(t, err) {
 				return
 			}

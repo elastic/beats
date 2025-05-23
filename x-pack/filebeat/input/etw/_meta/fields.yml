@@ -1,0 +1,111 @@
+- key: winlog
+  title: "Windows ETW"
+  description: >
+    Fields from the ETW input (Event Tracing for Windows).
+  fields:
+
+    - name: winlog
+      type: group
+      description: >
+        All fields specific to the Windows Event Tracing are defined here.
+      fields:
+
+        - name: activity_id
+          type: keyword
+          required: false
+          description: >
+            A globally unique identifier that identifies the current activity. The
+            events that are published with this identifier are part of the same
+            activity.
+
+        - name: channel
+          type: keyword
+          required: false
+          description: >
+            Used to enable special event processing. Channel values below 16 are reserved for use by Microsoft to enable special treatment by the ETW runtime. Channel values 16 and above will be ignored by the ETW runtime (treated the same as channel 0) and can be given user-defined semantics.
+
+        - name: event_data
+          type: object
+          object_type: keyword
+          required: false
+          description: >
+            The event-specific data. The content of this object is specific to
+            any provider and event.
+
+        - name: flags
+          type: keyword
+          required: false
+          description: >
+            Flags that provide information about the event such as the type of session it was logged to and if the event contains extended data.
+
+        - name: keywords
+          type: keyword
+          required: false
+          description: >
+            The keywords are used to indicate an event's membership in a set of event categories.
+
+        - name: level
+          type: keyword
+          required: false
+          description: >
+            Level of severity. Level values 0 through 5 are defined by Microsoft. Level values 6 through 15 are reserved. Level values 16 through 255 can be defined by the event provider.
+
+        - name: opcode
+          type: keyword
+          required: false
+          description: >
+            The opcode defined in the event. Task and opcode are typically used to
+            identify the location in the application from where the event was
+            logged.
+
+        - name: process_id
+          type: keyword
+          required: false
+          description: >
+            Identifies the process that generated the event.
+
+        - name: provider_guid
+          type: keyword
+          required: false
+          description: >
+            A globally unique identifier that identifies the provider that logged
+            the event.
+
+        - name: provider_name
+          type: keyword
+          required: false
+          description: >
+            The source of the event log record (the application or service that
+            logged the record).
+
+        - name: session
+          type: keyword
+          required: false
+          description: >
+            Configured session to forward ETW events from providers to consumers.
+
+        - name: severity
+          type: keyword
+          required: false
+          description: >
+            Human-readable level of severity.
+
+        - name: task
+          type: keyword
+          required: false
+          description: >
+            The task defined in the event. Task and opcode are typically used to
+            identify the location in the application from where the event was
+            logged.
+
+        - name: thread_id
+          type: keyword
+          required: false
+          description: >
+            Identifies the thread that generated the event.
+
+        - name: version
+          type: long
+          required: false
+          description: >
+            Specify the version of a manifest-based event.

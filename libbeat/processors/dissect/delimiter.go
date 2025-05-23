@@ -22,7 +22,7 @@ import (
 	"strings"
 )
 
-//delimiter represents a text section after or before a key, it keeps track of the needle and allows
+// delimiter represents a text section after or before a key, it keeps track of the needle and allows
 // to retrieve the position where it starts from a haystack.
 type delimiter interface {
 	// IndexOf receives the haystack and a offset position and will return the absolute position where

@@ -25,6 +25,5 @@ The interface used is:
 	}
 
 Each time Next is called on a reader, a Message object is returned.
-
 */
 package reader

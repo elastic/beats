@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -24,7 +25,7 @@ var (
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
-		"tenant_id":       "unique identifier",
+		"tenant_id":       "07482715-b847-4056-86e6-5eec1c7b5996",
 	}
 
 	resourceConfig = mapstr.M{
@@ -34,7 +35,7 @@ var (
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
-		"tenant_id":       "unique identifier",
+		"tenant_id":       "07482715-b847-4056-86e6-5eec1c7b5996",
 		"resources": []mapstr.M{
 			{
 				"resource_id": "test",
@@ -51,11 +52,12 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err := mb.NewModule(c, mb.Registry)
+	module, metricsets, err := mb.NewModule(c, mb.Registry, logptest.NewTestingLogger(t, ""))
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)
 	assert.NoError(t, err)
 	ms, ok := metricsets[0].(*MetricSet)
+	assert.True(t, ok)
 	assert.Equal(t, len(ms.Client.Config.Resources), 1)
 	assert.Equal(t, ms.Client.Config.Resources[0].Query, fmt.Sprintf("resourceType eq '%s'", defaultStorageAccountNamespace))
 
@@ -63,7 +65,8 @@ func TestFetch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	module, metricsets, err = mb.NewModule(c, mb.Registry)
+	module, metricsets, err = mb.NewModule(c, mb.Registry, logptest.NewTestingLogger(t, ""))
+	assert.NoError(t, err)
 	assert.NotNil(t, module)
 	assert.NotNil(t, metricsets)
 	ms, ok = metricsets[0].(*MetricSet)

@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_id/generator"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -40,7 +40,7 @@ type addID struct {
 }
 
 // New constructs a new Add ID processor.
-func New(cfg *conf.C) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)

@@ -105,6 +105,29 @@ var httpResponseTestEvent = &beat.Event{
 	},
 }
 
+var httpResponseEventIPList = &beat.Event{
+	Timestamp: time.Now(),
+	Fields: mapstr.M{
+		"@timestamp": "2024-12-05T09:51:23.642Z",
+		"ecs": mapstr.M{
+			"version": "8.11.0",
+		},
+		"host": mapstr.M{
+			"hostname": "testhost",
+			"os": mapstr.M{
+				"type":     "linux",
+				"family":   "debian",
+				"version":  "11 (bullseye)",
+				"platform": "debian",
+			},
+			"ip": []string{
+				"10.1.0.55",
+				"fe80::4001:aff:fe9a:55",
+			},
+		},
+	},
+}
+
 func testConfig(t *testing.T, expected bool, event *beat.Event, config *Config) {
 	t.Helper()
 	logp.TestingSetup()

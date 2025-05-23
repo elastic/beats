@@ -5,6 +5,7 @@
 package httpjson
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,8 +16,6 @@ import (
 )
 
 func TestSplit(t *testing.T) {
-	registerResponseTransforms()
-	t.Cleanup(func() { registeredTransforms = newRegistry() })
 	cases := []struct {
 		name             string
 		config           *splitConfig
@@ -624,27 +623,113 @@ func TestSplit(t *testing.T) {
 				{"@timestamp": "1234567890", "other_items": "Line 3"},
 			},
 		},
+		{
+			name: "Array of Strings with keep_parent",
+			config: &splitConfig{
+				Target:     "body.alerts",
+				Type:       "array",
+				KeepParent: true,
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": mapstr.M{
+					"this": "is kept",
+					"alerts": []interface{}{
+						"test1",
+						"test2",
+						"test3",
+					},
+				},
+			},
+			expectedMessages: []mapstr.M{
+				{
+					"this":   "is kept",
+					"alerts": "test1",
+				},
+				{
+					"this":   "is kept",
+					"alerts": "test2",
+				},
+				{
+					"this":   "is kept",
+					"alerts": "test3",
+				},
+			},
+			expectedErr: nil,
+		},
+		{
+			name: "Array of Arrays with keep_parent",
+			config: &splitConfig{
+				Target:     "body.alerts",
+				Type:       "array",
+				KeepParent: true,
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": mapstr.M{
+					"this": "is kept",
+					"alerts": []interface{}{
+						[]interface{}{"test1-1", "test1-2"},
+						[]string{"test2-1", "test2-2"},
+						[]int{1, 2},
+					},
+				},
+			},
+			expectedMessages: []mapstr.M{
+				{
+					"this": "is kept",
+					"alerts": []interface{}{
+						"test1-1",
+						"test1-2",
+					},
+				},
+				{
+					"this": "is kept",
+					"alerts": []string{
+						"test2-1",
+						"test2-2",
+					},
+				},
+				{
+					"this": "is kept",
+					"alerts": []int{
+						1,
+						2,
+					},
+				},
+			},
+			expectedErr: nil,
+		},
 	}
 
 	for _, tc := range cases {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			ch := make(chan maybeMsg, len(tc.expectedMessages))
+			events := &stream{t: t}
 			split, err := newSplitResponse(tc.config, logp.NewLogger(""))
 			assert.NoError(t, err)
-			err = split.run(tc.ctx, tc.resp, ch)
+			err = split.run(context.Background(), tc.ctx, tc.resp, events)
 			if tc.expectedErr == nil {
 				assert.NoError(t, err)
 			} else {
 				assert.EqualError(t, err, tc.expectedErr.Error())
 			}
-			close(ch)
-			assert.Equal(t, len(tc.expectedMessages), len(ch))
-			for _, msg := range tc.expectedMessages {
-				e := <-ch
-				assert.NoError(t, e.err)
-				assert.Equal(t, msg.Flatten(), e.msg.Flatten())
+			assert.Equal(t, len(tc.expectedMessages), len(events.collected))
+			for i, msg := range tc.expectedMessages {
+				assert.Equal(t, msg.Flatten(), events.collected[i].Flatten())
 			}
 		})
 	}
+}
+
+type stream struct {
+	collected []mapstr.M
+	t         *testing.T
+}
+
+func (s *stream) handleEvent(_ context.Context, msg mapstr.M) {
+	s.collected = append(s.collected, msg)
+}
+
+func (s *stream) handleError(err error) {
+	s.t.Errorf("fail: %v", err)
 }

@@ -7,9 +7,11 @@ package httpjson
 import (
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/elastic/mito/lib/xml"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -17,21 +19,15 @@ import (
 
 const paginationNamespace = "pagination"
 
-func registerPaginationTransforms() {
-	registerTransform(paginationNamespace, appendName, newAppendPagination)
-	registerTransform(paginationNamespace, deleteName, newDeletePagination)
-	registerTransform(paginationNamespace, setName, newSetRequestPagination)
-}
-
 type pagination struct {
-	log            *logp.Logger
-	httpClient     *httpClient
+	client         *httpClient
 	requestFactory *requestFactory
 	decoder        decoderFunc
+	log            *logp.Logger
 }
 
-func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pagination {
-	pagination := &pagination{httpClient: httpClient, log: log}
+func newPagination(config config, client *httpClient, log *logp.Logger) *pagination {
+	pagination := &pagination{client: client, log: log}
 	if config.Response == nil {
 		return pagination
 	}
@@ -42,8 +38,8 @@ func newPagination(config config, httpClient *httpClient, log *logp.Logger) *pag
 		return pagination
 	}
 
-	rts, _ := newBasicTransformsFromConfig(config.Request.Transforms, requestNamespace, log)
-	pts, _ := newBasicTransformsFromConfig(config.Response.Pagination, paginationNamespace, log)
+	rts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Request.Transforms, requestNamespace, log)
+	pts, _ := newBasicTransformsFromConfig(registeredTransforms, config.Response.Pagination, paginationNamespace, log)
 
 	body := func() *mapstr.M {
 		if config.Response.RequestBodyOnPagination {
@@ -90,18 +86,21 @@ type pageIterator struct {
 
 	resp *http.Response
 
+	xmlDetails map[string]xml.Detail
+
 	isFirst bool
 	done    bool
 
 	n int64
 }
 
-func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformContext, resp *http.Response) *pageIterator {
+func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformContext, resp *http.Response, xmlDetails map[string]xml.Detail) *pageIterator {
 	return &pageIterator{
 		pagination: p,
 		stdCtx:     stdCtx,
 		trCtx:      trCtx,
 		resp:       resp,
+		xmlDetails: xmlDetails,
 		isFirst:    true,
 	}
 }
@@ -138,7 +137,8 @@ func (iter *pageIterator) next() (*response, bool, error) {
 		return nil, false, err
 	}
 
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, httpReq) //nolint:bodyclose // Bad linter! The body is closed in the call.
+	//nolint:bodyclose // response body is closed through drainBody method
+	resp, err := iter.pagination.client.do(iter.stdCtx, httpReq)
 	if err != nil {
 		return nil, false, err
 	}
@@ -159,22 +159,26 @@ func (iter *pageIterator) next() (*response, bool, error) {
 }
 
 func (iter *pageIterator) getPage() (*response, error) {
-	bodyBytes, err := ioutil.ReadAll(iter.resp.Body)
+	bodyBytes, err := io.ReadAll(iter.resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	iter.resp.Body.Close()
-	iter.n += 1
 
 	var r response
 	r.header = iter.resp.Header
 	r.url = *iter.resp.Request.URL
+
+	// we set the page number before increasing its value
+	// because the first page needs to be 0 for every interval
 	r.page = iter.n
+	iter.n++
 
 	if len(bodyBytes) > 0 {
 		if iter.pagination.decoder != nil {
 			err = iter.pagination.decoder(bodyBytes, &r)
 		} else {
+			r.xmlDetails = iter.xmlDetails
 			err = decode(iter.resp.Header.Get("Content-Type"), bodyBytes, &r)
 		}
 		if err != nil {

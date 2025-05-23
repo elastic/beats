@@ -1,0 +1,38 @@
+- name: salesforce.setup_audit_trail
+  type: group
+  release: beta
+  description: >
+    Fileset for ingesting Salesforce SetupAuditTrail logs.
+  fields:
+    - name: document_id
+      type: keyword
+      description: >
+        Unique Id.
+    - name: created_by_context
+      type: keyword
+      description: >
+        The context under which the Setup change was made. For example, if Einstein uses cloud-to-cloud services to make a change in Setup, the value of this field is Einstein.
+    - name: created_by_id
+      type: keyword
+      description: >
+        Unknown
+    - name: created_by_issuer
+      type: keyword
+      description: >
+        Reserved for future use.
+    - name: delegate_user
+      type: keyword
+      description: >
+        The Login-As user who executed the action in Setup. If a Login-As user didn't perform the action, this field is blank. This field is available in API version 35.0 and later.
+    - name: display
+      type: keyword
+      description: >
+        The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like “Created permission set MAD: with user license Salesforce.
+    - name: responsible_namespace_prefix
+      type: keyword
+      description: >
+        Unknown
+    - name: section
+      type: keyword
+      description: >
+        The section in the Setup menu where the action occurred. For example, Manage Users or Company Profile.

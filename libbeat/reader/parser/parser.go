@@ -121,6 +121,13 @@ func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing syslog parser config: %w", err)
 			}
+		case "include_message":
+			config := filter.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return nil, fmt.Errorf("error while parsing include_message parser config: %w", err)
+			}
 		default:
 			return nil, fmt.Errorf("%s: %w", name, ErrNoSuchParser)
 		}

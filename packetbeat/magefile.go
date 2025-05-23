@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -30,19 +29,20 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
 	unittest.RegisterPythonTestDeps(packetbeat.FieldsYML, Dashboards)
+	packetbeat.SelectLogic = devtools.OSSProject
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 }
@@ -58,19 +58,9 @@ func GolangCrossBuild() error {
 	return packetbeat.GolangCrossBuild()
 }
 
-// BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
-func BuildGoDaemon() error {
-	return devtools.BuildGoDaemon()
-}
-
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
 	return packetbeat.CrossBuild()
-}
-
-// CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
-func CrossBuildGoDaemon() error {
-	return devtools.CrossBuildGoDaemon()
 }
 
 // AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
@@ -93,7 +83,7 @@ func Package() {
 	packetbeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(CrossBuild, CrossBuildGoDaemon)
+	mg.Deps(CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -122,7 +112,7 @@ func Config() error {
 
 func includeList() error {
 	options := devtools.DefaultIncludeListOptions()
-	options.ImportDirs = []string{"protos/*"}
+	options.ImportDirs = []string{"processor/*", "protos/*"}
 	options.ModuleDirs = nil
 	return devtools.GenerateIncludeListGo(options)
 }

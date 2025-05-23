@@ -19,9 +19,9 @@ package index_recovery
 
 import (
 	"encoding/json"
+	"errors"
 
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -80,6 +80,10 @@ var (
 		"start_time": s.Object{
 			"ms": c.Int("start_time_in_millis", s.Optional),
 		},
+
+		"total_time": s.Object{
+			"ms": c.Int("total_time_in_millis", s.Optional),
+		},
 	}
 )
 
@@ -89,10 +93,10 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
+		return fmt.Errorf("failure parsing Elasticsearch Recovery API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for indexName, d := range data {
 		shards, ok := d["shards"]
 		if !ok {
@@ -103,19 +107,20 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 			event := mb.Event{}
 
 			event.RootFields = mapstr.M{}
-			event.RootFields.Put("service.name", elasticsearch.ModuleName)
+			_, _ = event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
 			event.ModuleFields = mapstr.M{}
-			event.ModuleFields.Put("cluster.name", info.ClusterName)
-			event.ModuleFields.Put("cluster.id", info.ClusterID)
-			event.ModuleFields.Put("index.name", indexName)
+			_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+			_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
+			_, _ = event.ModuleFields.Put("index.name", indexName)
 
 			event.MetricSetFields, err = schema.Apply(data)
 			if err != nil {
-				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
+				errs = append(errs, fmt.Errorf("failure applying shard schema: %w", err))
+
 				continue
 			}
-			event.MetricSetFields.Put("name", indexName)
+			_, _ = event.MetricSetFields.Put("name", indexName)
 
 			// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 			// When using Agent, the index name is overwritten anyways.
@@ -127,5 +132,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 			r.Event(event)
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }

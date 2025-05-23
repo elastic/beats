@@ -27,7 +27,7 @@ import (
 )
 
 type fakeInputManager struct {
-	OnInit      func(Mode) error
+	OnInit      func() error
 	OnConfigure func(*conf.C) (Input, error)
 }
 
@@ -44,9 +44,9 @@ func makeConfigFakeInput(prototype fakeInput) func(*conf.C) (Input, error) {
 	}
 }
 
-func (m *fakeInputManager) Init(_ unison.Group, mode Mode) error {
+func (m *fakeInputManager) Init(_ unison.Group) error {
 	if m.OnInit != nil {
-		return m.OnInit(mode)
+		return m.OnInit()
 	}
 	return nil
 }

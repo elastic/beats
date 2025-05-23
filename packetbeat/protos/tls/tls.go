@@ -61,7 +61,7 @@ type tlsPlugin struct {
 	fingerprints           []*FingerprintAlgorithm
 	transactionTimeout     time.Duration
 	results                protos.Reporter
-	watcher                procs.ProcessesWatcher
+	watcher                *procs.ProcessesWatcher
 }
 
 var (
@@ -80,7 +80,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &tlsPlugin{}
@@ -97,7 +97,7 @@ func New(
 	return p, nil
 }
 
-func (plugin *tlsPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *tlsConfig) error {
+func (plugin *tlsPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *tlsConfig) error {
 	if err := plugin.setFromConfig(config); err != nil {
 		return err
 	}
@@ -139,8 +139,6 @@ func (plugin *tlsPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseTLS exception")
-
 	conn := ensureTLSConnection(private)
 	if private == nil {
 		conn.startTime = pkt.Ts
@@ -250,8 +248,7 @@ func (plugin *tlsPlugin) sendEvent(conn *tlsConnectionData) {
 	if !conn.eventSent {
 		conn.eventSent = true
 		if conn.hasInfo() {
-			event := plugin.createEvent(conn)
-			plugin.results(event)
+			plugin.results(plugin.createEvent(conn))
 		}
 	}
 }
@@ -293,6 +290,7 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	if server.parser.hello != nil {
 		serverHello = server.parser.hello
 		detailed["server_hello"] = serverHello.toMap()
+		tls.ServerJa3s, _ = getJa3Fingerprint(serverHello)
 		tls.Cipher = serverHello.selected.cipherSuite.String()
 	} else {
 		serverHello = emptyHello

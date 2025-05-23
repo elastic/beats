@@ -41,7 +41,7 @@ import (
 type memcache struct {
 	ports   protos.PortsConfig
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 	config  parserConfig
 
 	udpMemcache
@@ -135,7 +135,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &memcache{}
@@ -153,7 +153,7 @@ func New(
 }
 
 // Called to initialize the Plugin
-func (mc *memcache) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *memcacheConfig) error {
+func (mc *memcache) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *memcacheConfig) error {
 	debug("init memcache plugin")
 
 	mc.handler = mc
@@ -198,6 +198,9 @@ func (mc *memcache) GetPorts() []int {
 }
 
 func (mc *memcache) finishTransaction(t *transaction) error {
+	if t == nil {
+		return nil
+	}
 	mc.handler.onTransaction(t)
 	return nil
 }

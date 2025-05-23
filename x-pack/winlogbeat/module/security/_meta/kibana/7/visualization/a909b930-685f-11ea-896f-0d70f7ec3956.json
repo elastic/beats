@@ -13,6 +13,7 @@
                 "axis_formatter": "number",
                 "axis_position": "left",
                 "axis_scale": "normal",
+                "drop_last_bucket": 1,
                 "filter": {
                     "language": "kuery",
                     "query": "event.code: \"4672\" or event.code: \"4624\" "
@@ -75,13 +76,13 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:08.430Z",
     "id": "a909b930-685f-11ea-896f-0d70f7ec3956",
-    "migrationVersion": {
-        "visualization": "7.14.0"
-    },
+    "managed": false,
     "references": [],
     "type": "visualization",
-    "updated_at": "2021-08-11T13:18:58.346Z",
-    "version": "WzIyNzIsMl0="
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:08.430Z",
+    "version": "WzI4NCwxXQ=="
 }

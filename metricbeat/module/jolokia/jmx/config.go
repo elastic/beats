@@ -19,14 +19,12 @@ package jmx
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -52,26 +50,28 @@ type Target struct {
 // RequestBlock is used to build the request blocks of the following format:
 //
 // [
-//    {
-//       "type":"read",
-//       "mbean":"java.lang:type=Runtime",
-//       "attribute":[
-//          "Uptime"
-//       ]
-//    },
-//    {
-//       "type":"read",
-//       "mbean":"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
-//       "attribute":[
-//          "CollectionTime",
-//          "CollectionCount"
-//       ],
-//       "target":{
-//          "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
-//          "user":"jolokia",
-//          "password":"s!cr!t"
-//       }
-//    }
+//
+//	{
+//	   "type":"read",
+//	   "mbean":"java.lang:type=Runtime",
+//	   "attribute":[
+//	      "Uptime"
+//	   ]
+//	},
+//	{
+//	   "type":"read",
+//	   "mbean":"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
+//	   "attribute":[
+//	      "CollectionTime",
+//	      "CollectionCount"
+//	   ],
+//	   "target":{
+//	      "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
+//	      "user":"jolokia",
+//	      "password":"s!cr!t"
+//	   }
+//	}
+//
 // ]
 type RequestBlock struct {
 	Type      string                 `json:"type"`
@@ -83,11 +83,11 @@ type RequestBlock struct {
 
 // TargetBlock is used to build the target blocks of the following format into RequestBlock.
 //
-// "target":{
-//    "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
-//    "user":"jolokia",
-//    "password":"s!cr!t"
-// }
+//	"target":{
+//	   "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
+//	   "user":"jolokia",
+//	   "password":"s!cr!t"
+//	}
 type TargetBlock struct {
 	URL      string `json:"url"`
 	User     string `json:"user,omitempty"`
@@ -117,12 +117,12 @@ type MBeanName struct {
 }
 
 // Parse strings with properties with the format key=value, being:
-// - Key a nonempty string of characters which may not contain any of the characters,
-//   comma (,), equals (=), colon, asterisk, or question mark.
-// - Value a string that can be quoted or unquoted, if unquoted it cannot be empty and
-//   cannot contain any of the characters comma, equals, colon, or quote.
-//   If quoted, it can contain any character, including newlines, but quote needs to be
-//   escaped with a backslash.
+//   - Key a nonempty string of characters which may not contain any of the characters,
+//     comma (,), equals (=), colon, asterisk, or question mark.
+//   - Value a string that can be quoted or unquoted, if unquoted it cannot be empty and
+//     cannot contain any of the characters comma, equals, colon, or quote.
+//     If quoted, it can contain any character, including newlines, but quote needs to be
+//     escaped with a backslash.
 var mbeanRegexp = regexp.MustCompile(`([^,=:*?]+)=([^,=:"]+|"([^\\"]|\\.)*?")`)
 
 // This replacer is responsible for adding a "!" before special characters in GET request URIs
@@ -352,11 +352,9 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 	}
 
 	// Log request information
-	if logp.IsDebug(metricsetName) {
-		for _, r := range httpReqs {
-			m.log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", r.URI, "body", string(r.Body), "type", "request")
-		}
+	for _, r := range httpReqs {
+		m.log.Debugw("Jolokia request URI and body",
+			"httpMethod", r.HTTPMethod, "URI", r.URI, "body", string(r.Body), "type", "request")
 	}
 
 	for _, r := range httpReqs {
@@ -368,10 +366,8 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 			return nil, err
 		}
 
-		if logp.IsDebug(metricsetName) {
-			m.log.Debugw("Jolokia response body",
-				"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
-		}
+		m.log.Debugw("Jolokia response body",
+			"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 
 		// Map response to Metricbeat events
 		events, err := pc.EventMapping(resBody, mapping)
@@ -393,7 +389,7 @@ func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeM
 
 	// When we use GET, the response is a single Entry
 	if err := json.Unmarshal(content, &singleEntry); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
 	return eventMapping([]Entry{singleEntry}, mapping)
@@ -479,11 +475,9 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 	}
 
 	// Log request information
-	if logp.IsDebug(metricsetName) {
-		for _, r := range httpReqs {
-			m.log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", m.http.GetURI(), "body", string(r.Body), "type", "request")
-		}
+	for _, r := range httpReqs {
+		m.log.Debugw("Jolokia request URI and body",
+			"httpMethod", r.HTTPMethod, "URI", m.http.GetURI(), "body", string(r.Body), "type", "request")
 	}
 
 	m.http.SetMethod(httpReqs[0].HTTPMethod)
@@ -494,10 +488,8 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 		return nil, err
 	}
 
-	if logp.IsDebug(metricsetName) {
-		m.log.Debugw("Jolokia response body",
-			"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
-	}
+	m.log.Debugw("Jolokia response body",
+		"host", m.HostData().Host, "uri", m.http.GetURI(), "body", string(resBody), "type", "response")
 
 	// Map response to Metricbeat events
 	events, err := pc.EventMapping(resBody, mapping)
@@ -515,8 +507,7 @@ func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping Attribute
 
 	// When we use POST, the response is an array of Entry objects
 	if err := json.Unmarshal(content, &entries); err != nil {
-
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
 	return eventMapping(entries, mapping)

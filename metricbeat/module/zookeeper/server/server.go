@@ -23,8 +23,9 @@ https://zookeeper.apache.org/doc/current/zookeeperAdmin.html
 
 ZooKeeper srvr Command Output
 
-  $ echo srvr | nc localhost 2181
-	Zookeeper version: 3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03, built on 06/29/2018 04:05 GMT
+	  $ echo srvr | nc localhost 2181
+		Zookeeper version: 3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03, built on 06/29/2018 04:05 GMT
+
 Latency min/avg/max: 1/2/3
 Received: 46
 Sent: 45
@@ -34,13 +35,11 @@ Zxid: 0x700601132
 Mode: standalone
 Node count: 4
 Proposal sizes last/min/max: -3/-999/-1
-
-
 */
 package server
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -72,18 +71,18 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("srvr", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "srvr command failed")
+		return fmt.Errorf("srvr command failed: %w", err)
 
 	}
 
 	metricsetFields, version, err := parseSrvr(outputReader, m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "error parsing srvr output")
+		return fmt.Errorf("error parsing srvr output: %w", err)
 	}
 
 	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error obtaining server id")
+		return fmt.Errorf("error obtaining server id: %w", err)
 	}
 
 	event := mb.Event{

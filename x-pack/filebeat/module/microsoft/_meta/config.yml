@@ -26,25 +26,7 @@
 
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
-    
+
     # Related scopes, default should be included
     #var.oauth2.scopes:
     #  - "https://api.security.microsoft.com/.default"
-  dhcp:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9515
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local

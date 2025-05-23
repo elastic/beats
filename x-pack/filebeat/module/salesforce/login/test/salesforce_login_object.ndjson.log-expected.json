@@ -1,0 +1,60 @@
+[
+    {
+        "@timestamp": "2021-10-19T11:47:22.000Z",
+        "event.action": "login-attempt",
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "salesforce.login",
+        "event.id": "06af6d92-1167-467d-a826-ee8583f7134d",
+        "event.kind": "event",
+        "event.module": "salesforce",
+        "event.outcome": "success",
+        "event.provider": "Object",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "event.url": "login.salesforce.com",
+        "fileset.name": "login",
+        "http.request.method": "POST",
+        "input.type": "log",
+        "log.offset": 0,
+        "related.ip": [
+            "123.201.231.106"
+        ],
+        "salesforce.instance_url": "<no value>",
+        "salesforce.login.additional_info": "{}",
+        "salesforce.login.api.type": "N/A",
+        "salesforce.login.api.version": "N/A",
+        "salesforce.login.application": "elastic integration",
+        "salesforce.login.client_version": "N/A",
+        "salesforce.login.evaluation_time": 0.0,
+        "salesforce.login.geo_id": "04F5j00000FadrI",
+        "salesforce.login.history_id": "0Ya5j00000GLxCdCAL",
+        "salesforce.login.key": "o3vhFaSRBb0OzpCl",
+        "salesforce.login.session.level": "STANDARD",
+        "salesforce.login.type": "Remote Access 2.0",
+        "service.type": "salesforce",
+        "source.geo.city_name": "Surat",
+        "source.geo.country_iso_code": "IN",
+        "source.geo.country_name": "India",
+        "source.geo.location.lat": 21.1888,
+        "source.geo.location.lon": 72.8293,
+        "source.geo.postal_code": "395007",
+        "source.geo.region_name": "Gujarat",
+        "source.ip": "123.201.231.106",
+        "tags": [
+            "forwarded",
+            "salesforce-login"
+        ],
+        "tls.cipher": "ECDHE-RSA-AES256-GCM-SHA384",
+        "tls.version": "1.2",
+        "tls.version_protocol": "TLS",
+        "user.email": "kush.rana@elastic.co",
+        "user.id": "0055j000000utlPAAQ",
+        "user.roles": "Standard",
+        "user_agent.name": "Unknown",
+        "user_agent.os.platform": "Unknown"
+    }
+]

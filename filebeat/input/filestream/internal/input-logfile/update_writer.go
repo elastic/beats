@@ -61,10 +61,13 @@ func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
 		store: store,
 		ch:    ch,
 	}
-	w.tg.Go(func(ctx context.Context) error {
+	err := w.tg.Go(func(ctx context.Context) error {
 		w.run(ctx)
 		return nil
 	})
+	if err != nil {
+		store.log.Errorf("failed to schedule the update writer routine: %w", err)
+	}
 
 	return w
 }
@@ -72,7 +75,10 @@ func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
 // Close stops the background writing provess and attempts to serialize
 // all pending operations.
 func (w *updateWriter) Close() {
-	w.tg.Stop()
+	err := w.tg.Stop()
+	if err != nil {
+		w.store.log.Errorf("failed to stop the update writer routine: %w", err)
+	}
 	w.syncStates(w.ch.TryRecv())
 }
 

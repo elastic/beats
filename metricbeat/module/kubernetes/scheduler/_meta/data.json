@@ -7,43 +7,48 @@
     },
     "kubernetes": {
         "scheduler": {
-            "handler": "prometheus",
-            "http": {
-                "request": {
-                    "duration": {
-                        "us": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 7644.523,
-                                "90": 7644.523,
-                                "99": 7644.523
-                            },
-                            "sum": 16210.005000000001
-                        }
+            "process": {
+                "cpu": {
+                    "sec": 3
+                },
+                "fds": {
+                    "max": {
+                        "count": 1048576
                     },
-                    "size": {
-                        "bytes": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 64,
-                                "90": 64,
-                                "99": 64
-                            },
-                            "sum": 256
-                        }
+                    "open": {
+                        "count": 11
                     }
                 },
-                "response": {
-                    "size": {
-                        "bytes": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 48741,
-                                "90": 48741,
-                                "99": 48741
-                            },
-                            "sum": 184429
-                        }
+                "memory": {
+                    "resident": {
+                        "bytes": 59043840
+                    },
+                    "virtual": {
+                        "bytes": 1317883904
+                    }
+                },
+                "started": {
+                    "sec": 1714044432.82
+                }
+            },
+            "scheduling": {
+                "preemption": {
+                    "attempts": {
+                        "count": 1
+                    },
+                    "victims": {
+                        "bucket": {
+                            "+Inf": 0,
+                            "1": 0,
+                            "16": 0,
+                            "2": 0,
+                            "32": 0,
+                            "4": 0,
+                            "64": 0,
+                            "8": 0
+                        },
+                        "count": 0,
+                        "sum": 0
                     }
                 }
             }

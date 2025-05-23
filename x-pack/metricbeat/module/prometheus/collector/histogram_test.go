@@ -4,7 +4,6 @@
 
 // skipping tests on windows 32 bit versions, not supported
 //go:build !integration && !windows && !386
-// +build !integration,!windows,!386
 
 package collector
 
@@ -12,9 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
+
+	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -23,7 +23,7 @@ import (
 // times with the same cache produces each time the expected results.
 func TestPromHistogramToES(t *testing.T) {
 	type sample struct {
-		histogram dto.Histogram
+		histogram p.Histogram
 		expected  mapstr.M
 	}
 
@@ -33,10 +33,10 @@ func TestPromHistogramToES(t *testing.T) {
 		"one histogram": {
 			samples: []sample{
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(10),
@@ -53,10 +53,10 @@ func TestPromHistogramToES(t *testing.T) {
 		"two histogram": {
 			samples: []sample{
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(10),
@@ -69,10 +69,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(12),
 						SampleSum:   proto.Float64(10.123),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(12),
@@ -89,10 +89,10 @@ func TestPromHistogramToES(t *testing.T) {
 		"new bucket on the go": {
 			samples: []sample{
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(10),
@@ -105,10 +105,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(13),
 						SampleSum:   proto.Float64(15.23),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(12),
@@ -126,10 +126,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(15),
 						SampleSum:   proto.Float64(16.33),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(13),
@@ -146,10 +146,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(16),
 						SampleSum:   proto.Float64(16.33),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(13),
@@ -170,10 +170,10 @@ func TestPromHistogramToES(t *testing.T) {
 		"new smaller bucket on the go": {
 			samples: []sample{
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(10),
@@ -186,10 +186,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(13),
 						SampleSum:   proto.Float64(15.23),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							// New bucket on the go
 							{
 								UpperBound:      proto.Float64(0.09),
@@ -207,10 +207,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(15),
 						SampleSum:   proto.Float64(16.33),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.09),
 								CumulativeCount: proto.Uint64(2),
@@ -227,10 +227,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(16),
 						SampleSum:   proto.Float64(16.33),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.09),
 								CumulativeCount: proto.Uint64(3),
@@ -251,10 +251,10 @@ func TestPromHistogramToES(t *testing.T) {
 		"new bucket between two other buckets on the go": {
 			samples: []sample{
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.09),
 								CumulativeCount: proto.Uint64(0),
@@ -271,10 +271,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(13),
 						SampleSum:   proto.Float64(15.23),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.09),
 								CumulativeCount: proto.Uint64(1),
@@ -296,10 +296,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(16),
 						SampleSum:   proto.Float64(16.33),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.09),
 								CumulativeCount: proto.Uint64(2),
@@ -320,10 +320,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(18),
 						SampleSum:   proto.Float64(16.33),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.09),
 								CumulativeCount: proto.Uint64(3),
@@ -348,10 +348,10 @@ func TestPromHistogramToES(t *testing.T) {
 		"wrong buckets": {
 			samples: []sample{
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.09),
 								CumulativeCount: proto.Uint64(10),
@@ -368,10 +368,10 @@ func TestPromHistogramToES(t *testing.T) {
 					},
 				},
 				{
-					histogram: dto.Histogram{
+					histogram: p.Histogram{
 						SampleCount: proto.Uint64(12),
 						SampleSum:   proto.Float64(10.45),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.09),
 								CumulativeCount: proto.Uint64(12),
@@ -385,6 +385,64 @@ func TestPromHistogramToES(t *testing.T) {
 					expected: mapstr.M{
 						"counts": []uint64{2, 0},
 						"values": []float64{0.045, 0.54},
+					},
+				},
+			},
+		},
+		"histogram with negative buckets": {
+			samples: []sample{
+				{
+					histogram: p.Histogram{
+						SampleCount: proto.Uint64(30),
+						SampleSum:   proto.Float64(5),
+						Bucket: []*p.Bucket{
+							{
+								UpperBound:      proto.Float64(-100),
+								CumulativeCount: proto.Uint64(2),
+							},
+							{
+								UpperBound:      proto.Float64(-99),
+								CumulativeCount: proto.Uint64(10),
+							},
+							{
+								UpperBound:      proto.Float64(0),
+								CumulativeCount: proto.Uint64(30),
+							},
+						},
+					},
+					expected: mapstr.M{
+						// rate of the first bucket is always 0, meaning that it was not increased as it is the first
+						// count rate: [0, 8, 20]
+						"counts": []uint64{0, 0, 0},
+						"values": []float64{-100, -99.5, -49.5},
+					},
+				},
+				{
+					histogram: p.Histogram{
+						SampleCount: proto.Uint64(100),
+						SampleSum:   proto.Float64(20),
+						Bucket: []*p.Bucket{
+							{
+								UpperBound:      proto.Float64(-100),
+								CumulativeCount: proto.Uint64(5),
+							},
+							{
+								UpperBound:      proto.Float64(-99),
+								CumulativeCount: proto.Uint64(16),
+							},
+							{
+								UpperBound:      proto.Float64(0),
+								CumulativeCount: proto.Uint64(100),
+							},
+						},
+					},
+					expected: mapstr.M{
+						// counts calculation:
+						// UpperBound -100: 5-2
+						// UpperBound -99: 16 - 5 (undo accumulation) - 8 (calculate rate)
+						// UpperBound 0: 100 - 16 (undo accumulation) - 20 (calculate rate)
+						"counts": []uint64{3, 3, 64},
+						"values": []float64{-100, -99.5, -49.5},
 					},
 				},
 			},

@@ -4,111 +4,282 @@
 :pull: https://github.com/elastic/beats/pull/
 
 === Beats version HEAD
-https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
+https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 ==== Breaking changes
 
 *Affecting all Beats*
 
-* Upgrade to Go 1.18. Certificates signed with SHA-1 are now rejected. See the Go 1.18 https://tip.golang.org/doc/go1.18#sha1[release notes] for details. {pull}32493[32493]
-
-
-- Fix namespacing on self-monitoring {pull}32336[32336]
-- Fix formatting of hardware addresses populated by the add-host-metadata processor. {issue}32264[32264] {pull}32265[32265]
+- Fix FQDN being lowercased when used as `host.hostname` {issue}39993[39993]
+- Beats won't log start up information when running under the Elastic Agent {40390}40390[40390]
+- Drop support for Debian 10 and upgrade statically linked glibc from 2.28 to 2.31 {pull}41402[41402]
+- Fix metrics not being ingested, due to "Limit of total fields [10000] has been exceeded while adding new fields [...]". The total fields limit has been increased to 12500. No significant performance impact on Elasticsearch is anticipated. {pull}41640[41640]
+- Set default kafka version to 2.1.0 in kafka output and filebeat. {pull}41662[41662]
+- Replace default Ubuntu-based images with UBI-minimal-based ones {pull}42150[42150]
+- Fix templates and docs to use correct `--` version of command line arguments. {issue}42038[42038] {pull}42060[42060]
+- removed support for a single `-` to precede multi-letter command line arguments.  Use `--` instead. {issue}42117[42117] {pull}42209[42209]
+- Removed encryption from diskqueue V2 for fips compliance {issue}4534[4534]{pull}42848[42848]
+- The Beats logger and file output rotate files when necessary. The beat now forces a file rotation when unexpectedly writing to a file through a symbolic link.
+- Allow faccessat(2) in seccomp. {pull}43322[43322]
 
 *Auditbeat*
 
 
 *Filebeat*
-- [Httpjson]- Fix for pagination at root level not working when used with chaining.
-- Import dashboard from Fortinet Fortigate firewall integration. {issue}19810[19810] {pull}33003[33003]
+
+- Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
+- Removed deprecated Squid from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Sonicwall from Beats. Use the https://docs.elastic.co/integrations/sonicwall[SonicWall Firewall] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Radware from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Netscout from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Juniper Netscreen from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Impreva from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Cylance from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Bluecoat from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
+- Update Salesforce module to use new Salesforce input. {pull}37509[37509]
+- Tag events that come from a filestream in "take over" mode. {pull}39828[39828]
+- Fix high IO and handling of a corrupted registry log file. {pull}35893[35893]
+- Enable file ingestion to report detailed status to Elastic Agent {pull}40075[40075]
+- Filebeat, when running with Elastic-Agent, reports status for Filestream input. {pull}40121[40121]
+- Fix filestream's registry GC: registry entries will never be removed if clean_inactive is set to "-1". {pull}40258[40258]
+- Added `ignore_empty_values` flag in `decode_cef` Filebeat processor. {pull}40268[40268]
+- Added support for hyphens in extension keys in `decode_cef` Filebeat processor. {pull}40427[40427]
+- Journald: removed configuration options `include_matches.or`, `include_matches.and`, `backoff`, `max_backoff`, `cursor_seek_fallback`. {pull}40061[40061]
+- Journald: `include_matches.match` now behaves in the same way as matchers in `journalctl`. Users should carefully update their input configuration. {pull}40061[40061]
+- Journald: `seek` and `since` behaviour have been simplified, if there is a cursor (state) `seek` and `since` are ignored and the cursor is used. {pull}40061[40061]
+- Redis: Added replication role as a field to submitted slowlogs
+- Added `container.image.name` to `journald` Filebeat input's Docker-specific translated fields. {pull}40450[40450]
+- Change log.file.path field in awscloudwatch input to nested object. {pull}41099[41099]
+- Remove deprecated awscloudwatch field from Filebeat. {pull}41089[41089]
+- The performance of ingesting SQS data with the S3 input has improved by up to 60x for queues with many small events. `max_number_of_messages` config for SQS mode is now ignored, as the new design no longer needs a manual cap on messages. Instead, use `number_of_workers` to scale ingestion rate in both S3 and SQS modes. The increased efficiency may increase network bandwidth consumption, which can be throttled by lowering `number_of_workers`. It may also increase number of events stored in memory, which can be throttled by lowering the configured size of the internal queue. {pull}40699[40699]
+- Fixes filestream logging the error "filestream input with ID 'ID' already exists, this will lead to data duplication[...]" on Kubernetes when using autodiscover. {pull}41585[41585]
+- Add kafka compression support for ZSTD.
+- Filebeat fails to start if there is any input with a duplicated ID. It logs the duplicated IDs and the offending inputs configurations. {pull}41731[41731]
+- Filestream inputs with duplicated IDs will fail to start. An error is logged showing the ID and the full input configuration. {issue}41938[41938] {pull}41954[41954]
+- Filestream inputs can define `allow_deprecated_id_duplication: true` to run keep the previous behaviour of running inputs with duplicated IDs. {issue}41938[41938] {pull}41954[41954]
+- The Filestream input only starts to ingest a file when it is >= 1024 bytes in size. This happens because the fingerprint` is the default file identity now. To restore the previous behaviour, set `file_identity.native: ~` and `prospector.scanner.fingerprint.enabled: false` {issue}40197[40197] {pull}41762[41762]
+- Filebeat fails to start when its configuration contains usage of the deprecated `log` or `container` inputs. However, they can still be using while setting `allow_deprecated_use: true` in their configuration {pull}42295[42295]
+- The fields produced by the Journald input are updated to better match ECS. Renamed fields:
+Dropped fields: `syslog.priority` and `syslog.facility` while keeping their duplicated equivalent:
+`log.syslog.priority`,`log.syslog.facility.code`. Renamed fields: `syslog.identifier` -> `log.syslog.appname`,
+`syslog.pid` -> `log.syslog.procid`. `container.id_truncated` is dropped because the full container ID is
+already present as `container.id` and `container.log.tag` is dropped because it is already present as
+`log.syslog.appname`. The field `container.partial` is replaced by the tag `partial_message` if it was `true`,
+otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
+- Fixed race conditions in the global ratelimit processor that could drop events or apply rate limiting incorrectly.
+- Fixed password authentication for ACL users in the Redis input of Filebeat. {pull}44137[44137]
+
 
 *Heartbeat*
-- Deprecate zip_url and local monitor options. {pull}33123[33123]
+
 
 *Metricbeat*
 
 - Add support for CouchDB v3 {issue}22743[22743] {pull}26950[26950]
+- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
+- Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
+- Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
+- Add support for Kibana status metricset in v8 format {pull}40275[40275]
+- Mark system process metricsets as running if metrics are partially available {pull}40565[40565]
+- Added back `elasticsearch.node.stats.jvm.mem.pools.*` to the `node_stats` metricset {pull}40571[40571]
+- Add GCP organization and project details to ECS cloud fields. {pull}40461[40461]
+- Add support for specifying a custom endpoint for GCP service clients. {issue}40848[40848] {pull}40918[40918]
+- Fix incorrect handling of types in SQL module. {issue}40090[40090] {pull}41607[41607]
+- Remove kibana.settings metricset since the API was removed in 8.0 {issue}30592[30592] {pull}42937[42937]
+- Removed support for the Enterprise Search module {pull}42915[42915]
+- Update NATS module compatibility. Oldest version supported is now 2.2.6 {pull}43310[43310]
+- Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
+- Updated list of supported vSphere versions in the documentation. {pull}43642[43642]
+- Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
+
+*Osquerybeat*
+
+- Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
+- Disable allow_unsafe osquery configuration. {pull}40130[40130]
+- Upgrade to osquery 5.12.1. {pull}40368[40368]
+- Upgrade to osquery 5.13.1. {pull}40849[40849]
+- Upgrade to osquery 5.15.0 {pull}43426[43426]
+
 
 *Packetbeat*
 
 
+
 *Winlogbeat*
 
+- Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
+- Default to use raw api and delete older xml implementation. {pull}42275[42275]
 
 *Functionbeat*
+
+
+*Elastic Logging Plugin*
 
 
 ==== Bugfixes
 
 *Affecting all Beats*
 
-- Fix namespacing for agent self-monitoring, CPU no longer reports as zero. {pull}32336[32336]
+- Support for multiline zookeeper logs {issue}2496[2496]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 - Fix namespacing on self-monitoring {pull}32336[32336]
-- Expand fields in `decode_json_fields` if target is set. {issue}31712[31712] {pull}32010[32010]
-- Fix race condition when stopping runners {pull}32433[32433]
-- Fix concurrent map writes when system/process code called from reporter code {pull}32491[32491]
-- Fix in AWS related services initialisation relying on custom endpoint resolver. {issue}32888[32888] {pull}32921[32921]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Fix performance issues when we have a lot of inputs starting and stopping by allowing to disable global processors under fleet. {issue}35000[35000] {pull}35031[35031]
+- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
+- 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
+- Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
+- Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
+- Support build of projects outside of beats directory {pull}36126[36126]
+- Support Elastic Agent control protocol chunking support {pull}37343[37343]
+- Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
+- Set timeout of 1 minute for FQDN requests {pull}37756[37756]
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 
 *Auditbeat*
 
-- auditd module: Fix parsing of audit rules where arguments are quoted (like file paths containing spaces). {pull}32421[32421]
-- auditd module: Fix minimum AuditStatus length so that library can support kernels from 2.6.32. {pull}32421[32421]
-- system/socket: Reduce memory usage of the dataset. {issue}32191[32191] {pull}32192[32192]
-- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
-- Fixes a bug with the auditd module where data is corrupted because it was not copied before the byte slice was reused. {issue}32818[32818] {pull}32823[32823]
-
-*Filebeat*
-
-- Fix counter for number of events published in `httpjson` input. {pull}31993[31993]
-- Fix handling of Checkpoint event for R81. {issue}32380[32380] {pull}32458[32458]
-- Fix a hang on `apt-get update` stage in packaging. {pull}32580[32580]
-- gcp-pubsub input: Restart Pub/Sub client on all errors. {issue}32550[32550] {pull}32712[32712]
-- Fix not parsing as json when `json` and `ndjson` content types have charset information in `aws-s3` input {pull}32767[32767]
-- Update `cloud.region` parsing in cloudtrail fileset. {pull}32763[32763]
-- Fix file.path field in cloudtrail fileset to use json.digestS3Object. {pull}32759[32759]
-- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
-- Import dashboards from CEF integration. {pull}32766[32766]
-- Fix how to handle IPv6 addresses in the fileset `nginx/ingress_controller` for Filebeat. {pull}32989[32989]
-- Fix handling of Cisco 302020 messages in ASA and FTD modules. {pull}33089[33089]
-- Fix requestID parsing in AWS cloudtrail fileset. {pull}33143[33143]
+- auditd: Request status from a separate socket to avoid data congestion {pull}41207[41207]
+- auditd: Use ECS `event.type: end` instead of `stop` for SERVICE_STOP, DAEMON_ABORT, and DAEMON_END messages. {pull}41558[41558]
+- auditd: Update syscall names for Linux 6.11. {pull}41558[41558]
+- hasher: Geneneral improvements and fixes. {pull}41863[41863]
+- hasher: Add a cached hasher for upcoming backend. {pull}41952[41952]
+- Split common tty definitions. {pull}42004[42004]
+- Fix potential data loss in add_session_metadata. {pull}42795[42795]
+- system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
+- auditbeat/fim: Fix FIM@ebpfevents for new kernels #44371. {pull}44371[44371]
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- Add handling of AAA operations for Cisco ASA module. {issue}32257[32257] {pull}32789[32789]
-- Fix gc.log always shipped even if gc fileset is disabled {issue}30995[30995]
-- Fix handling of empty array in httpjson input. {pull}32001[32001]
+- [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
+- Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
+- Fixes "Can only start an input when all related states are finished" error when running under Elastic-Agent {pull}35250[35250] {issue}33653[33653]
+- [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
+- Fixed concurrency and flakey tests issue in azure blob storage input. {issue}35983[35983] {pull}36124[36124]
+- Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
+- Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
+- Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
+- Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
+- [threatintel] MISP pagination fixes {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream {pull}37973[37973]
+- Fix a race condition that could crash Filebeat with a "negative WaitGroup counter" error {pull}38094[38094]
+- Fix "failed processing S3 event for object key" error on aws-s3 input when key contains the "+" character {issue}38012[38012] {pull}38125[38125]
+- Fix filebeat gcs input panic {pull}38407[38407]
+- Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
+- Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
+- [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
+- Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
+- Updated Websocket input title to align with existing inputs {pull}39006[39006]
+- Restore netflow input on Windows {pull}39024[39024]
+- Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
+- Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
+- Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
+- Fix for Google Workspace duplicate events issue by adding canonical sorting over fingerprint keys array to maintain key order. {pull}40055[40055] {issue}39859[39859]
+- Fix handling of deeply nested numeric values in HTTP Endpoint CEL programs. {pull}40115[40115]
+- Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
+- Fix bug in CEL input rate limit logic. {issue}40106[40106] {pull}40270[40270]
+- Relax requirements in Okta entity analytics provider user and device profile data shape. {pull}40359[40359]
+- Fix bug in Okta entity analytics rate limit logic. {issue}40106[40106] {pull}40267[40267]
+- Fix crashes in the journald input. {pull}40061[40061]
+- Fix order of configuration for EntraID entity analytics provider. {pull}40487[40487]
+- Ensure Entra ID request bodies are not truncated and trace logs are rotated before 100MB. {pull}40494[40494]
+- The Elasticsearch output now correctly logs the event fields to the event log file {issue}40509[40509] {pull}40512[40512]
+- Fix the "No such input type exist: 'azure-eventhub'" error on the Windows platform {issue}40608[40608] {pull}40609[40609]
+- awss3 input: Fix handling of SQS notifications that don't contain a region. {pull}40628[40628]
+- Fix credential handling when workload identity is being used in GCS input. {issue}39977[39977] {pull}40663[40663]
+- Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
+- Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
+- Fix replace processor handling of zero string replacement validation. {pull}40751[40751]
+- Fix long filepaths in diagnostics exceeding max path limits on Windows. {pull}40909[40909]
+- Add backup and delete for AWS S3 polling mode feature back. {pull}41071[41071]
+- Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
+- Fixed failed job handling and removed false-positive error logs in the GCS input. {pull}41142[41142]
+- Bump github.com/elastic/go-sfdc dependency used by x-pack/filebeat/input/salesforce. {pull}41192[41192]
+- Log bad handshake details when websocket connection fails {pull}41300[41300]
+- Improve modification time handling for entities and entity deletion logic in the Active Directory entityanalytics input. {pull}41179[41179]
+- Journald input now can read events from all boots {issue}41083[41083] {pull}41244[41244]
+- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fix errors in SQS host resolution in the `aws-s3` input when using custom (non-AWS) endpoints. {pull}41504[41504]
+- Fix double encoding of client_secret in the Entity Analytics input's Azure Active Directory provider {pull}41393[41393]
+- The azure-eventhub input now correctly reports its status to the Elastic Agent on fatal errors {pull}41469[41469]
+- Add support for Access Points in the `aws-s3` input. {pull}41495[41495]
+- Fix the "No such input type exist: 'salesforce'" error on the Windows/AIX platform. {pull}41664[41664]
+- Fix missing key in streaming input logging. {pull}41600[41600]
+- Improve S3 object size metric calculation to support situations where Content-Length is not available. {pull}41755[41755]
+- Fix handling of http_endpoint request exceeding memory limits. {issue}41764[41764] {pull}41765[41765]
+- Rate limiting fixes in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41583[41583]
+- Redact authorization headers in HTTPJSON debug logs. {pull}41920[41920]
+- Further rate limiting fix in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
+- Fix streaming input handling of invalid or empty websocket messages. {pull}42036[42036]
+- Fix awss3 document ID construction when using the CSV decoder. {pull}42019[42019]
+- The `_id` generation process for S3 events has been updated to incorporate the LastModified field. This enhancement ensures that the `_id` is unique. {pull}42078[42078]
+- Fix Netflow Template Sharing configuration handling. {pull}42080[42080]
+- Updated websocket retry error code list to allow more scenarios to be retried which could have been missed previously. {pull}42218[42218]
+- In the `streaming` input, prevent panics on shutdown with a null check and apply a consistent namespace to contextual data in debug logs. {pull}42315[42315]
+- Remove erroneous status reporting to Elastic-Agent from the Filestream input {pull}42435[42435]
+- Fix truncation of bodies in request tracing by limiting bodies to 10% of the maximum file size. {pull}42327[42327]
+- [Journald] Fixes handling of `journalctl` restart. A known symptom was broken multiline messages when there was a restart of journalctl while aggregating the lines. {issue}41331[41331] {pull}42595[42595]
+- Fix entityanalytics activedirectory provider full sync use before initialization bug. {pull}42682[42682]
+- In the `http_endpoint` input, fix the check for a missing HMAC HTTP header. {pull}42756[42756]
+- Prevent computer details being returned for user queries by Activedirectory Entity Analytics provider. {issue}11818[11818] {pull}42796[42796]
+- Handle unexpectedEOF error in aws-s3 input and enforce retrying using download failed error {pull}42420[42756]
+- Prevent azureblobstorage input from logging key details during blob fetch operations. {pull}43169[43169]
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
+- Log bad handshake details when websocket connection fails {pull}41300[41300]
+- Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
+- Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 
 *Heartbeat*
+
+- Added maintenance windows support for Heartbeat. {pull}41508[41508]
 
 
 *Metricbeat*
 
-- Fix GCP storage field naming {pull}32806[32806]
-- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
-- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
-- Add GCP CloudSQL region filter {pull}32943[32943]
-- Fix logstash cgroup mappings {pull}33131[33131]
+- Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
+- Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
+- rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
+- Fix timeout caused by the retrival of which indices are hidden {pull}39165[39165]
+- Fix Azure Monitor support for multiple aggregation types {issue}39192[39192] {pull}39204[39204]
+- Fix handling of access errors when reading process metrics {pull}39627[39627]
+- Fix behavior of cgroups path discovery when monitoring the host system from within a container {pull}39627[39627]
+- Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
+- Normalize AWS RDS CPU Utilization values before making the metadata API call. {pull}39664[39664]
+- Fix behavior of pagetypeinfo metrics {pull}39985[39985]
+- Update beat module with apm-server monitoring metrics fields {pull}40127[40127]
+- Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
+- Remove excessive info-level logs in cgroups setup {pull}40491[40491]
+- Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
+- Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
+- Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
+- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
+
+*Osquerybeat*
+
 
 *Packetbeat*
 
-- Fix formatting of debug logs. {pull}32698[32698]
-- Fix rendering of MAC addresses to conform to ECS. {issue}32621[32621] {pull}32622[32622]
+- Properly marshal nested structs in ECS fields, fixing issues with mixed cases in field names {pull}42116[42116]
+
 
 *Winlogbeat*
 
-- Powershell: Fix processing of parameter details. {pull}31833[31833]
-- Security: Fix processing of sidlist, access list and access mask. {pull}31833[31833]
-- Fix fatal invalid memory write on Windows 11. {issue}32469[32469] {pull}32519[32519]
-- Fix handling of event formatting when no metadata is available on Windows 11. {issue}32468[32468] {pull}32519[32519]
-- Reduce severity of message salvage failure logging. {pull}32697[32697]
-
-*Functionbeat*
-
+- Fix message handling in the experimental api. {issue}19338[19338] {pull}41730[41730]
+- Sync missing changes in modules pipelines. {pull}42619[42619]
+- Reset EventLog if error EOF is encountered. {pull}42826[42826]
+- Implement backoff on error retrial. {pull}42826[42826]
+- Fix boolean key in security pipelines and sync pipelines with integration. {pull}43027[43027]
 
 
 *Elastic Logging Plugin*
@@ -118,22 +289,242 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Improve performance of disk queue by coalescing writes. {pull}31935[31935]
-- Update `elastic/go-structform` from `v0.0.9` to `v0.0.10` to reduce memory usage. {pull}32536[32536]
-- Added `--enable-all-filesets` to the `setup` command to simplify loading all ingest pipelines. {issue}30916[30916] {pull}33114[33114]
+- Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
+- dns processor: Add support for forward lookups (`A`, `AAAA`, and `TXT`). {issue}11416[11416] {pull}36394[36394]
+- [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
+- allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36788[36788]
+- Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
+- Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
+- elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
+- Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
+- The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
+- When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
+- The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
+- Update to Go 1.24.3. {pull}44270[44270]
+- Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
+- Replace `compress/gzip` with https://github.com/klauspost/compress/gzip library for gzip compression {pull}41584[41584]
+- Add regex pattern matching to add_kubernetes_metadata processor {pull}41903[41903]
+- Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
+- Publish cloud.availability_zone by add_cloud_metadata processor in azure environments {issue}42601[42601] {pull}43618[43618]
+
+*Auditbeat*
+
+- Added `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
+- Add linux capabilities to processes in the system/process. {pull}37453[37453]
+- Add linux capabilities to processes in the system/process. {pull}37453[37453]
+- Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
+- Split module/system/process into common and provider bits. {pull}41868[41868]
+
+*Auditbeat*
+
+
 
 *Auditbeat*
 
 
 *Filebeat*
 
-- httpjson input: Add `toJSON` helper function to template context. {pull}32472[32472]
-- Optimize grok patterns in system.auth module pipeline. {pull}32360[32360]
-- Checkpoint module: add authentication operation outcome enrichment. {issue}32230[32230] {pull}32431[32431]
 - add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
 - httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
 - Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
 - Add support for single string containing multiple relation-types in getRFC5988Link. {pull}32811[32811]
+- Added separation of transform context object inside httpjson. Introduced new clause `.parent_last_response.*` {pull}33499[33499]
+- Added metric `sqs_messages_waiting_gauge` for aws-s3 input. {pull}34488[34488]
+- Add nginx.ingress_controller.upstream.ip to related.ip {issue}34645[34645] {pull}34672[34672]
+- Add unix socket log parsing for nginx ingress_controller {pull}34732[34732]
+- Added metric `sqs_worker_utilization` for aws-s3 input. {pull}34793[34793]
+- Add MySQL authentication message parsing and `related.ip` and `related.user` fields {pull}34810[34810]
+- Add nginx ingress_controller parsing if one of upstreams fails to return response {pull}34787[34787]
+- Add oracle authentication messages parsing {pull}35127[35127]
+- Add `clean_session` configuration setting for MQTT input.  {pull}35806[16204]
+- Add support for a simplified input configuraton when running under Elastic-Agent {pull}36390[36390]
+- Added support for Okta OAuth2 provider in the CEL input. {issue}36336[36336] {pull}36521[36521]
+- Added support for new features & removed partial save mechanism in the Azure Blob Storage input. {issue}35126[35126] {pull}36690[36690]
+- Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
+- Use filestream input with file_identity.fingerprint as default for hints autodiscover. {issue}35984[35984] {pull}36950[36950]
+- Add setup option `--force-enable-module-filesets`, that will act as if all filesets have been enabled in a module during setup. {issue}30915[30915] {pull}99999[99999]
+- Made Azure Blob Storage input GA and updated docs accordingly. {pull}37128[37128]
+- Made GCS input GA and updated docs accordingly. {pull}37127[37127]
+- Add parseDateInTZ value template for the HTTPJSON input {pull}37738[37738]
+- Improve rate limit handling by HTTPJSON {issue}36207[36207] {pull}38161[38161] {pull}38237[38237]
+- Parse more fields from Elasticsearch slowlogs {pull}38295[38295]
+- added benchmark input {pull}37437[37437]
+- added benchmark input and discard output {pull}37437[37437]
+- Update CEL mito extensions to v1.11.0 to improve type checking. {pull}39460[39460]
+- Update CEL mito extensions to v1.12.2. {pull}39755[39755]
+- Add support for base64-encoded HMAC headers to HTTP Endpoint. {pull}39655[39655]
+- Add user group membership support to Okta entity analytics provider. {issue}39814[39814] {pull}39815[39815]
+- Add request trace support for Okta and EntraID entity analytics providers. {pull}39821[39821]
+- Fix handling of infinite rate values in CEL rate limit handling logic. {pull}39940[39940]
+- Allow elision of set and append failure logging. {issue}34544[34544] {pull}39929[39929]
+- Add ability to remove request trace logs from CEL input. {pull}39969[39969]
+- Add ability to remove request trace logs from HTTPJSON input. {pull}40003[40003]
+- Added out of the box support for Amazon EventBridge notifications over SQS to S3 input {pull}40006[40006]
+- Update CEL mito extensions to v1.13.0 {pull}40035[40035]
+- Add Jamf entity analytics provider. {pull}39996[39996]
+- Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
+- Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
+- Relax constraint on Base DN in entity analytics Active Directory provider. {pull}40054[40054]
+- Implement Elastic Agent status and health reporting for Netflow Filebeat input. {pull}40080[40080]
+- Enhance input state reporting for CEL evaluations that return a single error object in events. {pull}40083[40083]
+- Allow absent credentials when using GCS with Application Default Credentials. {issue}39977[39977] {pull}40072[40072]
+- Add SSL and username support for Redis input, now the input includes support for Redis 6.0+. {pull}40111[40111]
+- Add scaling up support for Netflow input. {issue}37761[37761] {pull}40122[40122]
+- Update CEL mito extensions to v1.15.0. {pull}40294[40294]
+- Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
+- Improve logging in Okta Entity Analytics provider. {issue}40106[40106] {pull}40347[40347]
+- Document `winlog` input. {issue}40074[40074] {pull}40462[40462]
+- Added retry logic to websocket connections in the streaming input. {issue}40271[40271] {pull}40601[40601]
+- Disable event normalization for netflow input {pull}40635[40635]
+- Allow attribute selection in the Active Directory entity analytics provider. {issue}40482[40482] {pull}40662[40662]
+- Improve error quality when CEL program does not correctly return an events array. {pull}40580[40580]
+- Added support for Microsoft Entra ID RBAC authentication. {issue}40434[40434] {pull}40879[40879]
+- Add `use_kubeadm` config option for filebeat (both filbeat.input and autodiscovery) in order to toggle kubeadm-config api requests {pull}40301[40301]
+- Make HTTP library function inclusion non-conditional in CEL input. {pull}40912[40912]
+- Add support for Crowdstrike streaming API to the streaming input. {issue}40264[40264] {pull}40838[40838]
+- Add support to CEL for reading host environment variables. {issue}40762[40762] {pull}40779[40779]
+- Add CSV decoder to awss3 input. {pull}40896[40896]
+- Change request trace logging to include headers instead of complete request. {pull}41072[41072]
+- Improved GCS input documentation. {pull}41143[41143]
+- Add CSV decoding capacity to azureblobstorage input {pull}40978[40978]
+- Add CSV decoding capacity to gcs input {pull}40979[40979]
+- Add support to source AWS cloudwatch logs from linked accounts. {pull}41188[41188]
+- Jounrald input now supports filtering by facilities {pull}41061[41061]
+- Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
+- Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
+- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Update CEL mito extensions to v1.16.0. {pull}41727[41727]
+- Filebeat's registry is now added to the Elastic-Agent diagnostics bundle {issue}33238[33238] {pull}41795[41795]
+- Add `unifiedlogs` input for MacOS. {pull}41791[41791]
+- Add evaluation state dump debugging option to CEL input. {pull}41335[41335]
+- Added support for retry configuration in GCS input. {issue}11580[11580] {pull}41862[41862]
+- Improve S3 polling mode states registry when using list prefix option. {pull}41869[41869]
+- Add support for SSL and Proxy configurations for websoket type in streaming input. {pull}41934[41934]
+- AWS S3 input registry cleanup for untracked s3 objects. {pull}41694[41694]
+- The environment variable `BEATS_AZURE_EVENTHUB_INPUT_TRACING_ENABLED: true` enables internal logs tracer for the azure-eventhub input. {issue}41931[41931] {pull}41932[41932]
+- The Filestream input now uses the `fingerprint` file identity by default. The state from files are automatically migrated if the previous file identity was `native` (the default) or `path`. If the `file_identity` is explicitly set, there is no change in behaviour. {issue}40197[40197] {pull}41762[41762]
+- Rate limiting operability improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}41977[41977]
+- Added default values in the streaming input for websocket retries and put a cap on retry wait time to be lesser than equal to the maximum defined wait time. {pull}42012[42012]
+- Rate limiting fault tolerance improvements in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42094[42094]
+- Added OAuth2 support with auto token refresh for websocket streaming input. {issue}41989[41989] {pull}42212[42212]
+- Added infinite & blanket retry options to websockets and improved logging and retry logic. {pull}42225[42225]
+- Introduce ignore older and start timestamp filters for AWS S3 input. {pull}41804[41804]
+- Journald input now can report its status to Elastic-Agent {issue}39791[39791] {pull}42462[42462]
+- Publish events progressively in the Okta provider of the Entity Analytics input. {issue}40106[40106] {pull}42567[42567]
+- Journald `include_matches.match` now accepts `+` to represent a logical disjunction (OR) {issue}40185[40185] {pull}42517[42517]
+- The journald input is now generally available. {pull}42107[42107]
+- Add metrics for number of events and pages published by HTTPJSON input. {issue}42340[42340] {pull}42442[42442]
+- Filestram take over now supports taking over states from other Filestream inputs and dynamic loading of inputs (autodiscover and Elastic-Agent). {issue}42472[42472] {issue}42884[42884] {pull}42624[42624]
+- Add `etw` input fallback to attach an already existing session. {pull}42847[42847]
+- Update CEL mito extensions to v1.17.0. {pull}42851[42851]
+- Winlog input now can report its status to Elastic-Agent {pull}43089[43089]
+- Add configuration option to limit HTTP Endpoint body size. {pull}43171[43171]
+- Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+- Update CEL mito extensions to v1.18.0. {pull}43855[43855]
+- Added input metrics to Azure Blob Storage input. {issue}36641[36641] {pull}43954[43954]
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
+- Segregated `max_workers`` from `batch_size` in the GCS input. {issue}44311[44311] {pull}44333[44333]
+- Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
+- Add milliseconds to document timestamp from awscloudwatch Filebeat input {pull}44306[44306]
+- Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
+- Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
+
+
+*Auditbeat*
+
+
+*Libbeat*
+
+- enrich events with EC2 tags in add_cloud_metadata processor {pull}41477[41477]
+
+
+*Heartbeat*
+
+- Added status to monitor run log report.
+- Upgrade node to latest LTS v18.20.3. {pull}40038[40038]
+- Add support for RFC7231 methods to http monitors. {pull}41975[41975]
+- Upgrade node to latest LTS v18.20.7. {pull}43511[43511]
+
+*Metricbeat*
+
+- Add per-thread metrics to system_summary {pull}33614[33614]
+- Add GCP CloudSQL metadata {pull}33066[33066]
+- Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
+- Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Add metrics grouping by dimensions and time to Azure app insights {pull}36634[36634]
+- Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
+- Add linux IO metrics to system/process {pull}37213[37213]
+- Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
+- Add SSL support to mysql module {pull}37997[37997]
+- Add SSL support for aerospike module {pull}38126[38126]
+- Add `use_kubeadm` config option in kubernetes module in order to toggle kubeadm-config api requests {pull}40086[40086]
+- Log the total time taken for GCP `ListTimeSeries` and `AggregatedList` requests {pull}40661[40661]
+- Add new metrics for the vSphere Host metricset. {pull}40429[40429]
+- Add new metrics for the vSphere Datastore metricset. {pull}40441[40441]
+- Add new metricset cluster for the vSphere module. {pull}40536[40536]
+- Add new metricset network for the vSphere module. {pull}40559[40559]
+- Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
+- Add AWS Cloudwatch capability to retrieve tags from AWS/ApiGateway resources {pull}40755[40755]
+- Add new metricset datastorecluster for vSphere module. {pull}40634[40634]
+- Add support for new metrics in datastorecluster metricset. {pull}40694[40694]
+- Add new metrics for the vSphere Virtualmachine metricset. {pull}40485[40485]
+- Add support for snapshot in vSphere virtualmachine metricset {pull}40683[40683]
+- Update fields to use mapstr in vSphere virtualmachine metricset  {pull}40707[40707]
+- Add metrics related to triggered alarms in all the vSphere metricsets. {pull}40714[40714] {pull}40876[40876]
+- Add support for period based intervalID in vSphere host and datastore metricsets {pull}40678[40678]
+- Add new metrics fot datastore and minor changes to overall vSphere metrics {pull}40766[40766]
+- Add `metrics_count` to Prometheus module if `metrics_count: true` is set. {pull}40411[40411]
+- Added Cisco Meraki module {pull}40836[40836]
+- Added Palo Alto Networks module {pull}40686[40686]
+- Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
+- Bump aerospike-client-go to version v7.7.1 and add support for basic auth in Aerospike module {pull}41233[41233]
+- Only watch metadata for ReplicaSets in metricbeat k8s module {pull}41289[41289]
+- Add support for region/zone for Vertex AI service in GCP module {pull}41551[41551]
+- Add support for location label as an optional configuration parameter in GCP metrics metricset. {issue}41550[41550] {pull}41626[41626]
+- Collect .NET CLR (IIS) Memory, Exceptions and LocksAndThreads metrics {pull}41929[41929]
+- Added `tier_preference`, `creation_date` and `version` fields to the `elasticsearch.index` metricset. {pull}41944[41944]
+- Add `use_performance_counters` to collect CPU metrics using performance counters on Windows for `system/cpu` and `system/core` {pull}41965[41965]
+- Add support of additional `collstats` metrics in mongodb module. {pull}42171[42171]
+- Preserve queries for debugging when `merge_results: true` in SQL module {pull}42271[42271]
+- Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
+- Collect more fields from ES node/stats metrics and only those that are necessary {pull}42421[42421]
+- Add new metricset wmi for the windows module. {pull}42017[42017]
+- Update beat module with apm-server tail sampling monitoring metrics fields {pull}42569[42569]
+- Log every 401 response from Kubernetes API Server {pull}42714[42714]
+- Add a new `match_by_parent_instance` option to `perfmon` module. {pull}43002[43002]
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+- Changed the Elasticsearch module behavior to only pull settings from non-system indices. {pull}43243[43243]
+- Exclude dotted indices from settings pull in Elasticsearch module. {pull}43306[43306]
+- Add a `jetstream` metricset to the NATS module {pull}43310[43310]
+- Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
+- Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
+- Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
+- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add latency config option to Azure Monitor module. {pull}44366[44366]
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+- Add handling for missing `EvtVarType`s in experimental api. {issue}19337[19337] {pull}41418[41418]
+
+
+*Functionbeat*
+
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
 
 *Auditbeat*
 
@@ -142,66 +533,28 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 
 *Heartbeat*
-- Add new states field for internal use by new synthetics app. {pull}30632[30632]
 
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-- Add option to allow sniffer to change device when default route changes. {issue}31905[31905] {pull}32681[32681]
-- Add option to allow sniffing multiple interface devices. {issue}31905[31905] {pull}32933[32933]
-- Bump Windows Npcap version to v1.71. {issue}33164[33164] {pull}33172[33172]
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
 
 
 *Metricbeat*
 
 
+*Osquerybeat*
+
+
 *Packetbeat*
+
 
 *Winlogbeat*
 
 
 *Functionbeat*
 
-==== Known Issue
+
+*Elastic Logging Plugin*
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+==== Known Issues
 
 
 

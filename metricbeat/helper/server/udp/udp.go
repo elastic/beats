@@ -20,8 +20,7 @@ package udp
 import (
 	"fmt"
 	"net"
-
-	"github.com/pkg/errors"
+	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -35,6 +34,7 @@ type UdpServer struct {
 	receiveBufferSize int
 	done              chan struct{}
 	eventQueue        chan server.Event
+	logger            *logp.Logger
 }
 
 type UdpEvent struct {
@@ -57,7 +57,7 @@ func NewUdpServer(base mb.BaseMetricSet) (server.Server, error) {
 		return nil, err
 	}
 
-	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", config.Host, config.Port))
+	addr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(config.Host, strconv.Itoa(config.Port)))
 
 	if err != nil {
 		return nil, err
@@ -68,6 +68,7 @@ func NewUdpServer(base mb.BaseMetricSet) (server.Server, error) {
 		receiveBufferSize: config.ReceiveBufferSize,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
+		logger:            base.Logger(),
 	}, nil
 }
 
@@ -78,10 +79,10 @@ func (g *UdpServer) GetHost() string {
 func (g *UdpServer) Start() error {
 	listener, err := net.ListenUDP("udp", g.udpaddr)
 	if err != nil {
-		return errors.Wrap(err, "failed to start UDP server")
+		return fmt.Errorf("failed to start UDP server: %w", err)
 	}
 
-	logp.Info("Started listening for UDP on: %s", g.udpaddr.String())
+	g.logger.Infof("Started listening for UDP on: %s", g.udpaddr.String())
 	g.listener = listener
 
 	go g.watchMetrics()
@@ -99,7 +100,7 @@ func (g *UdpServer) watchMetrics() {
 
 		length, addr, err := g.listener.ReadFromUDP(buffer)
 		if err != nil {
-			logp.Err("Error reading from buffer: %v", err.Error())
+			g.logger.Errorf("Error reading from buffer: %v", err.Error())
 			continue
 		}
 

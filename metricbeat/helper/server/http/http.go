@@ -19,10 +19,11 @@ package http
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -37,6 +38,7 @@ type HttpServer struct {
 	stop       context.CancelFunc
 	done       chan struct{}
 	eventQueue chan server.Event
+	logger     *logp.Logger
 }
 
 type HttpEvent struct {
@@ -70,13 +72,15 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 		eventQueue: make(chan server.Event),
 		ctx:        ctx,
 		stop:       cancel,
+		logger:     mb.Logger(),
 	}
 
 	httpServer := &http.Server{
-		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
+		Addr:              net.JoinHostPort(config.Host, strconv.Itoa(config.Port)),
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 	if tlsConfig != nil {
-		httpServer.TLSConfig = tlsConfig.BuildModuleClientConfig(config.Host)
+		httpServer.TLSConfig = tlsConfig.BuildServerConfig(config.Host)
 	}
 	h.server = httpServer
 	return h, nil
@@ -105,17 +109,17 @@ func NewHttpServerWithHandler(mb mb.BaseMetricSet, handlerFunc http.HandlerFunc)
 func (h *HttpServer) Start() error {
 	go func() {
 		if h.server.TLSConfig != nil {
-			logp.Info("Starting HTTPS server on %s", h.server.Addr)
+			h.logger.Infof("Starting HTTPS server on %s", h.server.Addr)
 			//certificate is already loaded. That's why the parameters are empty
 			err := h.server.ListenAndServeTLS("", "")
 			if err != nil && err != http.ErrServerClosed {
-				logp.Critical("Unable to start HTTPS server due to error: %v", err)
+				h.logger.Errorf("Unable to start HTTPS server due to error: %v", err)
 			}
 		} else {
-			logp.Info("Starting HTTP server on %s", h.server.Addr)
+			h.logger.Infof("Starting HTTP server on %s", h.server.Addr)
 			err := h.server.ListenAndServe()
 			if err != nil && err != http.ErrServerClosed {
-				logp.Critical("Unable to start HTTP server due to error: %v", err)
+				h.logger.Errorf("Unable to start HTTP server due to error: %v", err)
 			}
 		}
 	}()
@@ -126,7 +130,7 @@ func (h *HttpServer) Start() error {
 func (h *HttpServer) Stop() {
 	close(h.done)
 	h.stop()
-	h.server.Shutdown(h.ctx)
+	_ = h.server.Shutdown(h.ctx)
 	close(h.eventQueue)
 }
 
@@ -147,9 +151,9 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 			meta["Content-Type"] = contentType
 		}
 
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
-			logp.Err("Error reading body: %v", err)
+			h.logger.Errorf("Error reading body: %v", err)
 			http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
 			return
 		}
@@ -168,9 +172,9 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	case "GET":
 		writer.WriteHeader(http.StatusOK)
 		if req.TLS != nil {
-			writer.Write([]byte("HTTPS Server accepts data via POST"))
+			_, _ = writer.Write([]byte("HTTPS Server accepts data via POST"))
 		} else {
-			writer.Write([]byte("HTTP Server accepts data via POST"))
+			_, _ = writer.Write([]byte("HTTP Server accepts data via POST"))
 		}
 
 	}

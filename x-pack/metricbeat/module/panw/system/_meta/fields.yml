@@ -1,0 +1,7 @@
+- name: system
+  type: group
+  release: beta
+  fields:
+    - name: example
+      type: keyword
+      dimension: true

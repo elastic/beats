@@ -8,16 +8,25 @@ Please label this PR with one of the following labels, depending on the scope of
 - Docs
 -->
 
-## What does this PR do?
+## Proposed commit message
 
 <!-- Mandatory
-Explain here the changes you made on the PR. Please explain the WHAT: patterns used, algorithms implemented, design architecture, message processing, etc.
--->
+Explain here the changes you made on the PR.
 
-## Why is it important?
+Please explain:
 
-<!-- Mandatory
-Explain here the WHY, or the rationale/motivation for the changes.
+- WHAT: patterns used, algorithms implemented, design architecture, message processing, etc.
+- WHY:  the rationale/motivation for the changes
+
+This text will be pasted into the squash dialog when the change is committed and will be
+a long term historical record of the change to help future contributors understand the
+change, please help them by making it clear and comprehensive, they may be you.
+
+If the commit title is adequate to describe both of these things, The text here may be omitted
+or replaced with "See title". The title of the PR will be used as the commit message title when
+the merge is made and the "See title" marker will be removed if present.
+
+The text here and the PR title will be subject to the PR review process.
 -->
 
 ## Checklist
@@ -34,6 +43,14 @@ List here all the items you have verified BEFORE sending this PR. Please DO NOT 
 - [ ] I have made corresponding change to the default configuration files
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] I have added an entry in `CHANGELOG.next.asciidoc` or `CHANGELOG-developer.next.asciidoc`.
+
+## Disruptive User Impact
+
+<!--
+Will the changes introduced by this PR cause disruption to users in any way? If so, please describe what changes users
+could make on their end to nullify or minimize this disruption. Consider impacts in related systems, not just directly
+when using Beats.
+-->
 
 ## Author's Checklist
 
@@ -58,7 +75,7 @@ Link related issues below. Insert the issue link or reference after the word "Cl
 - Requires #123
 - Superseds #123
 -->
-- 
+-
 
 ## Use cases
 

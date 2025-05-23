@@ -59,6 +59,11 @@ Set to 0.0.0.0 to bind to all available interfaces.
 
 The UDP port to listen for syslog traffic. Defaults to 9001.
 
+*`var.timezone_offset`*::
+
+IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+timestamps without a time zone. Defaults to UTC.
+
 *`var.tags`*::
 
 A list of tags to include in events. Including `forwarded` indicates that the

@@ -4,7 +4,7 @@
 
 package gcp
 
-import monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+import "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
 const (
 	// ModuleName in Metricbeat
@@ -15,6 +15,7 @@ const (
 )
 
 // Metricsets / GCP services names
+// NOTE: if you are adding a service make sure to update tests in metrics/metrics_requester_test.go.
 const (
 	ServiceCloudFunctions = "cloudfunctions"
 	ServiceCompute        = "compute"
@@ -25,9 +26,11 @@ const (
 	ServiceFirestore      = "firestore"
 	ServiceDataproc       = "dataproc"
 	ServiceCloudSQL       = "cloudsql"
+	ServiceRedis          = "redis"
+	ServiceAIPlatform     = "aiplatform"
 )
 
-//Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
+// Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
 const (
 	TimeSeriesResponsePathForECSAvailabilityZone = "zone"
 	TimeSeriesResponsePathForECSAccountID        = "project_id"
@@ -46,9 +49,9 @@ const (
 
 	ECSCloudRegion = "region"
 
-	ECSCloudAccount     = "account"
-	ECSCloudAccountID   = "id"
-	ECSCloudAccountName = "name"
+	ECSCloudAccount = "account"
+	ECSCloudID      = "id"
+	ECSCloudName    = "name"
 
 	ECSCloudInstance        = "instance"
 	ECSCloudInstanceKey     = ECSCloud + "." + ECSCloudInstance
@@ -61,6 +64,7 @@ const (
 	ECSCloudMachineKey     = ECSCloud + "." + ECSCloudMachine
 	ECSCloudMachineType    = "type"
 	ECSCloudMachineTypeKey = ECSCloudMachineKey + "." + ECSCloudMachineType
+	ECSCloudProject        = "project"
 )
 
 // Metadata keys used for events. They follow GCP structure.
@@ -77,13 +81,16 @@ const (
 	LabelMetadata = "metadata"
 )
 
+// NOTE: if you are adding labels make sure to update tests in metrics/metrics_requester_test.go.
 const (
-	DefaultResourceLabelZone      = "resource.label.zone"
-	ComputeResourceLabelZone      = "resource.labels.zone"
-	GKEResourceLabelLocation      = "resource.label.location"
-	StorageResourceLabelLocation  = "resource.label.location"
-	CloudSQLResourceLabelRegion   = "resource.labels.region"
-	DataprocResourceLabelLocation = "resource.label.region"
+	DefaultResourceLabel    = "resource.label.zone"
+	ComputeResourceLabel    = "resource.labels.zone"
+	GKEResourceLabel        = "resource.label.location"
+	StorageResourceLabel    = "resource.label.location"
+	CloudSQLResourceLabel   = "resource.labels.region"
+	DataprocResourceLabel   = "resource.label.region"
+	RedisResourceLabel      = "resource.label.region"
+	AIPlatformResourceLabel = "resource.label.location"
 )
 
 // AlignersMapToGCP map contains available perSeriesAligner

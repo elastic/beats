@@ -1,0 +1,48 @@
+---
+name: updatecli-compose
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  compose:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
+        with:
+          command: --experimental compose diff
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          slack-channel-id: "#ingest-notifications"
+          slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          slack-send-when: "failure"
+          version-file: .tool-versions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
+        with:
+          command: --experimental compose apply
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          slack-channel-id: "#ingest-notifications"
+          slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          slack-send-when: "failure"
+          version-file: .tool-versions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

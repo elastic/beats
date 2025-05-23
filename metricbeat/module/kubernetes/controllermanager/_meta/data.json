@@ -7,7 +7,7 @@
     },
     "kubernetes": {
         "controllermanager": {
-            "name": "serviceaccount",
+            "name": "daemonset",
             "workqueue": {
                 "adds": {
                     "count": 5

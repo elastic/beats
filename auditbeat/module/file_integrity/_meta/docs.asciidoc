@@ -12,7 +12,7 @@ This module uses features of the operating system to monitor file changes in
 realtime. When the module starts it creates a subscription with the OS to
 receive notifications of changes to the specified files or directories. Upon
 receiving notification of a change the module will read the file's metadata
-and the compute a hash of the file's contents.
+and then compute a hash of the file's contents.
 
 At startup this module will perform an initial scan of the configured files
 and directories to generate baseline data for the monitored paths and detect
@@ -21,8 +21,14 @@ to only send events for new or modified files.
 
 The operating system features that power this feature are as follows.
 
-* Linux - `inotify` is used, and therefore the kernel must have inotify support.
+* Linux - Multiple backends are supported: `auto`, `fsnotify`, `kprobes`, `ebpf`.
+By default, `fsnotify` is used, and therefore the kernel must have inotify support.
 Inotify was initially merged into the 2.6.13 Linux kernel.
+The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels.
+The `Kprobes` backend uses tracefs and supports 3.10+ kernels.
+FSNotify doesn't have the ability to associate user data to file events.
+The preferred backend can be selected by specifying the `backend` config option.
+Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API
 coalesces multiple changes to a file into a single event. {beatname_uc} translates
 this coalesced changes into a meaningful sequence of actions. However,
@@ -49,6 +55,7 @@ Linux.
   - /sbin
   - /usr/sbin
   - /etc
+  recursive: false
   exclude_files:
   - '(?i)\.sw[nop]$'
   - '~$'
@@ -58,7 +65,6 @@ Linux.
   scan_rate_per_sec: 50 MiB
   max_file_size: 100 MiB
   hash_types: [sha1]
-  recursive: false
 ----
 
 This module also supports the
@@ -68,7 +74,18 @@ described later.
 *`paths`*:: A list of paths (directories or files) to watch. Globs are
 not supported. The specified paths should exist when the metricset is started.
 Paths should be absolute, although the file integrity module will attempt to
-resolve relative path events to their absolute file path.
+resolve relative path events to their absolute file path. Symbolic links will
+be resolved on module start and the link target will be watched if link resolution
+is successful. Changes to the symbolic link after module start will not change
+the watch target. If the link does not resolve to a valid target, the symbolic
+link itself will be watched; if the symlink target becomes valid after module
+start up this will not be picked up by the file system watches.
+
+*`recursive`*:: By default, the watches set to the paths specified in
+`paths` are not recursive. This means that only changes to the contents
+of this directories are watched. If `recursive` is set to `true`, the
+`file_integrity` module will watch for changes on this directory and all
+its subdirectories.
 
 *`exclude_files`*:: A list of regular expressions used to filter out events
 for unwanted files. The expressions are matched against the full path of every
@@ -78,6 +95,8 @@ By default, no files are excluded. See <<regexp-support>>
 for a list of supported regexp patterns. It is recommended to wrap regular
 expressions in single quotation marks to avoid issues with YAML escaping
 rules.
+If `recursive` is set to true, subdirectories can also be excluded here by
+specifying them.
 
 *`include_files`*:: A list of regular expressions used to specify which files to
 select. When configured, only files matching the pattern will be monitored.
@@ -107,20 +126,26 @@ units are `b` (default), `kib`, `kb`, `mib`, `mb`, `gib`, `gb`, `tib`, `tb`,
 `pib`, `pb`, `eib`, and `eb`.
 
 *`max_file_size`*:: The maximum size of a file in bytes for which
-{beatname_uc} will compute hashes. Files larger than this size will not be
-hashed. The default value is 100 MiB. For convenience units can be specified as
-a suffix to the value. The supported units are `b` (default), `kib`, `kb`, `mib`,
-`mb`, `gib`, `gb`, `tib`, `tb`, `pib`, `pb`, `eib`, and `eb`.
+{beatname_uc} will compute hashes and run file parsers. Files larger than this
+size will not be hashed or analysed by configured file parsers. The default
+value is 100 MiB. For convenience, units can be specified as a suffix to the
+value. The supported units are `b` (default), `kib`, `kb`, `mib`, `mb`, `gib`,
+`gb`, `tib`, `tb`, `pib`, `pb`, `eib`, and `eb`.
 
 *`hash_types`*:: A list of hash types to compute when the file changes.
 The supported hash types are `blake2b_256`, `blake2b_384`, `blake2b_512`, `md5`,
 `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `sha512_224`, `sha512_256`,
 `sha3_224`, `sha3_256`, `sha3_384`, `sha3_512`, and `xxh64`. The default value is `sha1`.
 
-*`recursive`*:: By default, the watches set to the paths specified in
-`paths` are not recursive. This means that only changes to the contents
-of this directories are watched. If `recursive` is set to `true`, the
-`file_integrity` module will watch for changes on this directories and all
-their subdirectories.
+*`file_parsers`*:: A list of `file_integrity` fields under `file` that will be
+populated by file format parsers. The available fields that can be analysed
+are listed in the auditbeat.reference.yml file. File parsers are run on all
+files within the `max_file_size` limit in the configured paths during a scan or
+when a file event involves the file. Files that are not targets of the specific
+file parser are only sniffed to examine whether analysis should proceed. This will
+usually only involve reading a small number of bytes.
+
+*`backend`*:: (*Linux only*) Select the backend which will be used to
+source events. Valid values: `auto`, `fsnotify`, `kprobes`, `ebpf`. Default: `fsnotify`.
 
 include::{docdir}/auditbeat-options.asciidoc[]

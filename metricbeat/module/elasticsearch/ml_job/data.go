@@ -19,9 +19,8 @@ package ml_job
 
 import (
 	"encoding/json"
-
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -58,10 +57,10 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 	jobsData := &jobsStruct{}
 	err := json.Unmarshal(content, jobsData)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch ML Job Stats API response: %w", err)
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for _, job := range jobsData.Jobs {
 
 		if err := elastic.FixTimestampField(job, "data_counts.earliest_record_timestamp"); err != nil {
@@ -83,7 +82,12 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 		if node, exists := job["node"]; exists {
-			nodeHash := node.(map[string]interface{})
+			nodeHash, ok := node.(map[string]interface{})
+			if !ok {
+				errs = append(errs, errors.New("job[node] is not a map"))
+				continue
+			}
+
 			event.ModuleFields.Put("node.id", nodeHash["id"])
 			event.ModuleFields.Put("node.name", nodeHash["name"])
 		}
@@ -100,5 +104,5 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		r.Event(event)
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }

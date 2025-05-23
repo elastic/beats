@@ -20,8 +20,7 @@ package jolokia
 import (
 	"fmt"
 
-	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -31,6 +30,7 @@ import (
 )
 
 func init() {
+	//nolint:errcheck // init function
 	autodiscover.Registry.AddProvider("jolokia", AutodiscoverBuilder)
 }
 
@@ -43,7 +43,6 @@ type DiscoveryProber interface {
 
 // Provider is the Jolokia Discovery autodiscover provider
 type Provider struct {
-	config    *Config
 	bus       bus.Bus
 	builders  autodiscover.Builders
 	appenders autodiscover.Appenders
@@ -61,7 +60,7 @@ func AutodiscoverBuilder(
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	errWrap := func(err error) error {
-		return errors.Wrap(err, "error setting up jolokia autodiscover provider")
+		return fmt.Errorf("error setting up jolokia autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()

@@ -5,11 +5,9 @@
 package management
 
 import (
+	"errors"
 	"fmt"
 	"strings"
-
-	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -52,7 +50,7 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	for field, pattern := range cfg.Patterns {
 		exp, err := match.Compile(pattern)
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("Given expression is not a valid regexp: %s", pattern))
+			return nil, fmt.Errorf("given expression is not a valid regexp: %s", pattern)
 		}
 
 		list.patterns[field] = exp
@@ -63,15 +61,15 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 
 // Detect an error if any of the given config blocks is blacklisted
 func (c *ConfigBlacklist) Detect(configBlocks ConfigBlocks) error {
-	var err *multierror.Error
+	var errs []error
 	for _, configs := range configBlocks {
 		for _, block := range configs.Blocks {
 			if c.isBlacklisted(configs.Type, block) {
-				err = multierror.Append(err, fmt.Errorf("Config for '%s' is blacklisted", configs.Type))
+				errs = append(errs, fmt.Errorf("Config for '%s' is blacklisted", configs.Type))
 			}
 		}
 	}
-	return err.ErrorOrNil()
+	return errors.Join(errs...)
 }
 
 func (c *ConfigBlacklist) isBlacklisted(blockType string, block *ConfigBlock) bool {

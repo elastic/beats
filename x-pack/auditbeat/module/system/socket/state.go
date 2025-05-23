@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package socket
 
@@ -18,15 +17,14 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 )
@@ -309,8 +307,12 @@ func (dt *dnsTracker) AddTransaction(tr dns.Transaction) {
 		}
 	}
 	var list []dns.Transaction
+	var ok bool
 	if prev := dt.transactionByClient.Get(clientAddr); prev != nil {
-		list = prev.([]dns.Transaction)
+		list, ok = prev.([]dns.Transaction)
+		if !ok {
+			return
+		}
 	}
 	list = append(list, tr)
 	dt.transactionByClient.Put(clientAddr, list)
@@ -333,7 +335,11 @@ func (dt *dnsTracker) RegisterEndpoint(addr net.UDPAddr, proc *process) {
 	key := addr.String()
 	dt.processByClient.Put(key, proc)
 	if listIf := dt.transactionByClient.Get(key); listIf != nil {
-		list := listIf.([]dns.Transaction)
+		list, ok := listIf.([]dns.Transaction)
+		if !ok {
+			return
+		}
+
 		for _, tr := range list {
 			proc.addTransaction(tr)
 		}
@@ -563,6 +569,7 @@ func (s *state) ForkProcess(parentPID, childPID uint32, ts kernelTime) error {
 		for k, v := range parent.resolvedDomains {
 			child.resolvedDomains[k] = v
 		}
+		s.log.Debugf("forking process %d with %d associated domains", childPID, len(child.resolvedDomains))
 		s.processes[childPID] = child
 	}
 	return nil
@@ -572,10 +579,18 @@ func (s *state) TerminateProcess(pid uint32) error {
 	if pid == 0 {
 		return errors.New("can't terminate process with PID 0")
 	}
+	s.log.Debugf("terminating process %d", pid)
 	s.Lock()
 	defer s.Unlock()
 	delete(s.processes, pid)
 	return nil
+}
+
+func (s *state) processExists(pid uint32) bool {
+	s.Lock()
+	defer s.Unlock()
+	_, ok := s.processes[pid]
+	return ok
 }
 
 func (s *state) getProcess(pid uint32) *process {
@@ -662,6 +677,7 @@ func (s *state) CreateSocket(ref flow) error {
 func (s *state) OnDNSTransaction(tr dns.Transaction) error {
 	s.Lock()
 	defer s.Unlock()
+	s.log.Debugf("adding DNS transaction for domain %s for client %s", tr.Domain, tr.Client.String())
 	s.dns.AddTransaction(tr)
 	return nil
 }
@@ -707,6 +723,10 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 }
 
 func (s *state) createFlow(ref flow) error {
+	if ref.process != nil {
+		s.log.Debugf("creating flow for pid %s", ref.process.pid)
+	}
+
 	// Get or create a socket for this flow
 	sock := s.getSocket(ref.sock)
 	ref.createdTime = ref.lastSeenTime
@@ -806,6 +826,9 @@ func (s *state) enrichDNS(f *flow) {
 		localUDP := net.UDPAddr{
 			IP:   f.local.addr.IP,
 			Port: f.local.addr.Port,
+		}
+		if f.process != nil {
+			s.log.Debugf("registering endpoint %s for process %d", localUDP.String(), f.process.pid)
 		}
 		s.dns.RegisterEndpoint(localUDP, f.process)
 	}
@@ -938,13 +961,6 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"transport": f.proto.String(),
 			"packets":   f.local.packets + f.remote.packets,
 			"bytes":     f.local.bytes + f.remote.bytes,
-			"community_id": flowhash.CommunityID.Hash(flowhash.Flow{
-				SourceIP:        localAddr.IP,
-				SourcePort:      uint16(localAddr.Port),
-				DestinationIP:   remoteAddr.IP,
-				DestinationPort: uint16(remoteAddr.Port),
-				Protocol:        uint8(f.proto),
-			}),
 		},
 		"event": mapstr.M{
 			"kind":     "event",
@@ -960,7 +976,17 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			"complete": f.complete,
 		},
 	}
-	var errs multierror.Errors
+	if communityid := flowhash.CommunityID.Hash(flowhash.Flow{
+		SourceIP:        localAddr.IP,
+		SourcePort:      uint16(localAddr.Port),
+		DestinationIP:   remoteAddr.IP,
+		DestinationPort: uint16(remoteAddr.Port),
+		Protocol:        uint8(f.proto),
+	}); communityid != "" {
+		(root["network"].(mapstr.M))["community_id"] = communityid
+	}
+
+	var errs []error
 	rootPut := func(key string, value interface{}) {
 		if _, err := root.Put(key, value); err != nil {
 			errs = append(errs, err)
@@ -1028,7 +1054,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	return mb.Event{
 		RootFields:      root,
 		MetricSetFields: metricset,
-	}, errs.Err()
+	}, errors.Join(errs...)
 }
 
 func (s *state) SyncClocks(kernelNanos, userNanos uint64) error {

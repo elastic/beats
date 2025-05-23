@@ -1,0 +1,44 @@
+---
+name: bump-elastic-stack-snapshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 15 * * 1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      matrix: ${{ steps.generator.outputs.matrix }}
+    steps:
+      - id: generator
+        uses: elastic/oblt-actions/elastic/active-branches@v1
+
+  bump-elastic-stack:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    needs: [filter]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
+        with:
+          command: --experimental apply --config .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml --values .github/workflows/updatecli.d/values.d/scm.yml
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          slack-channel-id: "#ingest-notifications"
+          slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          slack-send-when: "failure"
+          version-file: .tool-versions
+        env:
+          BRANCH: ${{ matrix.branch }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,34 @@
+---
+name: bump-golang
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 20 * * 1-6"
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        file: ['bump-golang.yml', 'bump-golang-7.17.yml']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: elastic/oblt-actions/updatecli/run-and-notify@v1
+        with:
+          command: --experimental apply --config .github/workflows/updatecli.d/${{ matrix.file }} --values .github/workflows/updatecli.d/values.d/scm.yml
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
+          slack-channel-id: "#ingest-notifications"
+          slack-message: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, @robots-ci please look what's going on <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|here>"
+          slack-send-when: "failure"
+          version-file: .tool-versions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

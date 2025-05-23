@@ -19,6 +19,8 @@ package testing
 
 // ChanClient implements Client interface, forwarding published events to some
 import (
+	"sync"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
@@ -31,6 +33,7 @@ type ChanClient struct {
 	done            chan struct{}
 	Channel         chan beat.Event
 	publishCallback func(event beat.Event)
+	closeOnce       sync.Once
 }
 
 func PublisherWithClient(client beat.Client) beat.Pipeline {
@@ -68,7 +71,9 @@ func NewChanClientWith(ch chan beat.Event) *ChanClient {
 }
 
 func (c *ChanClient) Close() error {
-	close(c.done)
+	c.closeOnce.Do(func() {
+		close(c.done)
+	})
 	return nil
 }
 

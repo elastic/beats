@@ -7,13 +7,14 @@ package decoder
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net"
 	"sync"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
@@ -59,7 +60,7 @@ func (p *Decoder) Start() error {
 	for _, proto := range p.protos {
 		if err := proto.Start(); err != nil {
 			p.stop()
-			return errors.Wrapf(err, "failed to start protocol version %d", proto.Version())
+			return fmt.Errorf("failed to start protocol version %d: %w", proto.Version(), err)
 		}
 	}
 	p.started = true
@@ -94,8 +95,8 @@ func (p *Decoder) Read(buf *bytes.Buffer, source net.Addr) (records []record.Rec
 }
 
 // NewConfig returns a new configuration structure to be passed to NewDecoder.
-func NewConfig() *config.Config {
-	cfg := config.Defaults()
+func NewConfig(logger *logp.Logger) *config.Config {
+	cfg := config.Defaults(logger)
 	return &cfg
 }
 

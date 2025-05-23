@@ -16,10 +16,11 @@
 // under the License.
 
 //go:build !linux && !windows
-// +build !linux,!windows
 
 package sysinit
 
-func InitModule(config string) {
+import "github.com/elastic/elastic-agent-libs/logp"
+
+func InitModule(config string, logger *logp.Logger) {
 	// Stub method for non-linux.
 }

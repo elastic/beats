@@ -23,7 +23,7 @@ class Test(metricbeat.BaseTest):
             "period": "1s"
         }])
         proc = self.start_beat(
-            extra_args=["-httpprof", "localhost:6060"])
+            extra_args=["--httpprof", "localhost:6060"])
 
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()

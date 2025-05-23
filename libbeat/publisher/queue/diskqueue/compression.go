@@ -23,13 +23,13 @@ import (
 	lz4V4 "github.com/pierrec/lz4/v4"
 )
 
-//CompressionReader allows reading a stream compressed with LZ4
+// CompressionReader allows reading a stream compressed with LZ4
 type CompressionReader struct {
 	src        io.ReadCloser
 	pLZ4Reader *lz4V4.Reader
 }
 
-//NewCompressionReader returns a new LZ4 frame decoder
+// NewCompressionReader returns a new LZ4 frame decoder
 func NewCompressionReader(r io.ReadCloser) *CompressionReader {
 	zr := lz4V4.NewReader(r)
 	return &CompressionReader{
@@ -46,20 +46,20 @@ func (r *CompressionReader) Close() error {
 	return r.src.Close()
 }
 
-//Reset Sets up compression again, assumes that caller has already set
+// Reset Sets up compression again, assumes that caller has already set
 // the src to the correct position
 func (r *CompressionReader) Reset() error {
 	r.pLZ4Reader.Reset(r.src)
 	return nil
 }
 
-//CompressionWriter allows writing an LZ4 stream
+// CompressionWriter allows writing an LZ4 stream
 type CompressionWriter struct {
 	dst        WriteCloseSyncer
 	pLZ4Writer *lz4V4.Writer
 }
 
-//NewCompressionWriter returns a new LZ4 frame encoder
+// NewCompressionWriter returns a new LZ4 frame encoder
 func NewCompressionWriter(w WriteCloseSyncer) *CompressionWriter {
 	zw := lz4V4.NewWriter(w)
 	return &CompressionWriter{

@@ -19,21 +19,21 @@ request.transforms:
       value: "MdatpPartner-Elastic-Filebeat/1.0.0"
   - set:
       target: "url.params.$filter"
-      value: 'lastUpdateTime gt [[formatDate .cursor.lastUpdateTime "2006-01-02T15:04:05.9999999Z"]]'
+      value: 'lastUpdateTime gt [[.cursor.lastUpdateTime]]'
       default: 'lastUpdateTime gt [[formatDate (now (parseDuration "-55m")) "2006-01-02T15:04:05.9999999Z"]]'
-
 response.split:
   target: body.value
+  ignore_empty_value: true
   split:
     target: body.alerts
     keep_parent: true
     split:
       target: body.alerts.entities
       keep_parent: true
-
 cursor:
   lastUpdateTime:
-    value: "[[.last_response.body.lastUpdateTime]]"
+    value: "[[.last_event.lastUpdateTime]]"
+    ignore_empty_value: true
 
 {{ else if eq .input "file" }}
 

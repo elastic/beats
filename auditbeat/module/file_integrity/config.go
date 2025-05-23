@@ -18,14 +18,16 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"path/filepath"
+	"regexp"
+	"runtime"
 	"sort"
 	"strings"
 
 	"github.com/dustin/go-humanize"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
@@ -40,15 +42,6 @@ type HashType string
 func (t *HashType) Unpack(v string) error {
 	*t = HashType(v)
 	return nil
-}
-
-var validHashes = []HashType{
-	BLAKE2B_256, BLAKE2B_384, BLAKE2B_512,
-	MD5,
-	SHA1,
-	SHA224, SHA256, SHA384, SHA512, SHA512_224, SHA512_256,
-	SHA3_224, SHA3_256, SHA3_384, SHA3_512,
-	XXH64,
 }
 
 // Enum of hash types.
@@ -71,11 +64,31 @@ const (
 	XXH64       HashType = "xxh64"
 )
 
+type Backend string
+
+const (
+	BackendFSNotify Backend = "fsnotify"
+	BackendKprobes  Backend = "kprobes"
+	BackendEBPF     Backend = "ebpf"
+	BackendAuto     Backend = "auto"
+)
+
+func (b *Backend) Unpack(v string) error {
+	*b = Backend(v)
+	switch *b {
+	case BackendFSNotify, BackendKprobes, BackendEBPF, BackendAuto:
+		return nil
+	default:
+		return fmt.Errorf("invalid backend: %q", v)
+	}
+}
+
 // Config contains the configuration parameters for the file integrity
 // metricset.
 type Config struct {
 	Paths               []string        `config:"paths" validate:"required"`
 	HashTypes           []HashType      `config:"hash_types"`
+	FileParsers         []string        `config:"file_parsers"`
 	MaxFileSize         string          `config:"max_file_size"`
 	MaxFileSizeBytes    uint64          `config:",ignore"`
 	ScanAtStart         bool            `config:"scan_at_start"`
@@ -84,22 +97,31 @@ type Config struct {
 	Recursive           bool            `config:"recursive"` // Recursive enables recursive monitoring of directories.
 	ExcludeFiles        []match.Matcher `config:"exclude_files"`
 	IncludeFiles        []match.Matcher `config:"include_files"`
+	Backend             Backend         `config:"backend"`
 }
 
 // Validate validates the config data and return an error explaining all the
 // problems with the config. This method modifies the given config.
 func (c *Config) Validate() error {
-	// Resolve symlinks.
+	// Resolve symlinks and make filepaths absolute if possible.
+	// Anything that does not resolve will be logged during
+	// scanning and metric set collection.
 	for i, p := range c.Paths {
-		if evalPath, err := filepath.EvalSymlinks(p); err == nil {
-			c.Paths[i] = evalPath
+		p, err := filepath.EvalSymlinks(p)
+		if err != nil {
+			continue
 		}
+		p, err = filepath.Abs(p)
+		if err != nil {
+			continue
+		}
+		c.Paths[i] = p
 	}
 	// Sort and deduplicate.
 	sort.Strings(c.Paths)
 	c.Paths = deduplicate(c.Paths)
 
-	var errs multierror.Errors
+	var errs []error
 	var err error
 
 nextHash:
@@ -111,6 +133,30 @@ nextHash:
 			}
 		}
 		errs = append(errs, fmt.Errorf("invalid hash_types value '%v'", ht))
+	}
+
+	for _, p := range c.FileParsers {
+		if pat, ok := unquoteRegexp(p); ok {
+			re, err := regexp.Compile(pat)
+			if err != nil {
+				errs = append(errs, err)
+				continue
+			}
+			found := false
+			for k := range fileParserFor {
+				if re.MatchString(k) {
+					found = true
+					break
+				}
+			}
+			if !found {
+				errs = append(errs, fmt.Errorf("invalid file_parsers value '%v'", p))
+			}
+			continue
+		}
+		if _, ok := fileParserFor[p]; !ok {
+			errs = append(errs, fmt.Errorf("invalid file_parsers value '%v'", p))
+		}
 	}
 
 	c.MaxFileSizeBytes, err = humanize.ParseBytes(c.MaxFileSize)
@@ -126,7 +172,12 @@ nextHash:
 	if err != nil {
 		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
-	return errs.Err()
+
+	if c.Backend != "" && c.Backend != BackendAuto && runtime.GOOS != "linux" {
+		errs = append(errs, errors.New("backend can only be specified on linux"))
+	}
+
+	return errors.Join(errs...)
 }
 
 // deduplicate deduplicates the given sorted string slice. The returned slice
@@ -169,7 +220,7 @@ func (c *Config) IsIncludedPath(path string) bool {
 }
 
 var defaultConfig = Config{
-	HashTypes:        []HashType{SHA1},
+	HashTypes:        defaultHashes,
 	MaxFileSize:      "100 MiB",
 	MaxFileSizeBytes: 100 * 1024 * 1024,
 	ScanAtStart:      true,

@@ -22,9 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// authStyleInParams sends the "client_id" and "client_secret" in the POST body as application/x-www-form-urlencoded parameters.
-const authStyleInParams = 1
-
 type authConfig struct {
 	Basic  *basicAuthConfig `config:"basic"`
 	OAuth2 *oAuth2Config    `config:"oauth2"`
@@ -68,6 +65,7 @@ const (
 	oAuth2ProviderDefault oAuth2Provider = ""       // oAuth2ProviderDefault means no specific provider is set.
 	oAuth2ProviderAzure   oAuth2Provider = "azure"  // oAuth2ProviderAzure AzureAD.
 	oAuth2ProviderGoogle  oAuth2Provider = "google" // oAuth2ProviderGoogle Google.
+	oAuth2ProviderOkta    oAuth2Provider = "okta"   // oAuth2ProviderOkta Okta.
 )
 
 func (p *oAuth2Provider) Unpack(in string) error {
@@ -84,7 +82,7 @@ type oAuth2Config struct {
 
 	// common oauth fields
 	ClientID       string              `config:"client.id"`
-	ClientSecret   string              `config:"client.secret"`
+	ClientSecret   *string             `config:"client.secret"`
 	EndpointParams map[string][]string `config:"endpoint_params"`
 	Password       string              `config:"password"`
 	Provider       oAuth2Provider      `config:"provider"`
@@ -102,6 +100,11 @@ type oAuth2Config struct {
 	// microsoft azure specific
 	AzureTenantID string `config:"azure.tenant_id"`
 	AzureResource string `config:"azure.resource"`
+
+	// okta specific RSA JWK private key
+	OktaJWKFile string          `config:"okta.jwk_file"`
+	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
+	OktaJWKPEM  string          `config:"okta.jwk_pem"`
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
@@ -114,7 +117,7 @@ func (o *oAuth2Config) isEnabled() bool {
 func (o *oAuth2Config) clientCredentialsGrant(ctx context.Context, _ *http.Client) *http.Client {
 	creds := clientcredentials.Config{
 		ClientID:       o.ClientID,
-		ClientSecret:   o.ClientSecret,
+		ClientSecret:   maybeString(o.ClientSecret),
 		TokenURL:       o.getTokenURL(),
 		Scopes:         o.Scopes,
 		EndpointParams: o.getEndpointParams(),
@@ -131,10 +134,10 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 		if o.User != "" || o.Password != "" {
 			conf := &oauth2.Config{
 				ClientID:     o.ClientID,
-				ClientSecret: o.ClientSecret,
+				ClientSecret: maybeString(o.ClientSecret),
 				Endpoint: oauth2.Endpoint{
 					TokenURL:  o.TokenURL,
-					AuthStyle: authStyleInParams,
+					AuthStyle: oauth2.AuthStyleAutoDetect,
 				},
 			}
 			token, err := conf.PasswordCredentialsToken(ctx, o.User, o.Password)
@@ -162,9 +165,20 @@ func (o *oAuth2Config) client(ctx context.Context, client *http.Client) (*http.C
 			return nil, fmt.Errorf("oauth2 client: error loading credentials: %w", err)
 		}
 		return oauth2.NewClient(ctx, creds.TokenSource), nil
+	case oAuth2ProviderOkta:
+		return o.fetchOktaOauthClient(ctx, client)
+
 	default:
 		return nil, errors.New("oauth2 client: unknown provider")
 	}
+}
+
+// maybeString returns the string pointed to by p or "" if p in nil.
+func maybeString(p *string) string {
+	if p == nil {
+		return ""
+	}
+	return *p
 }
 
 // getTokenURL returns the TokenURL.
@@ -210,12 +224,14 @@ func (o *oAuth2Config) Validate() error {
 		return o.validateAzureProvider()
 	case oAuth2ProviderGoogle:
 		return o.validateGoogleProvider()
+	case oAuth2ProviderOkta:
+		return o.validateOktaProvider()
 	case oAuth2ProviderDefault:
-		if o.TokenURL == "" || o.ClientID == "" || o.ClientSecret == "" {
-			return errors.New("both token_url and client credentials must be provided")
-		}
 		if (o.User != "" && o.Password == "") || (o.User == "" && o.Password != "") {
 			return errors.New("both user and password credentials must be provided")
+		}
+		if o.TokenURL == "" || ((o.ClientID == "" || o.ClientSecret == nil) && (o.User == "" || o.Password == "")) {
+			return errors.New("both token_url and client credentials must be provided")
 		}
 	default:
 		return fmt.Errorf("unknown provider %q", o.getProvider())
@@ -225,10 +241,10 @@ func (o *oAuth2Config) Validate() error {
 }
 
 // findDefaultGoogleCredentials will default to google.FindDefaultCredentials and will only be changed for testing purposes
-var findDefaultGoogleCredentials = google.FindDefaultCredentials
+var findDefaultGoogleCredentials = google.FindDefaultCredentialsWithParams
 
 func (o *oAuth2Config) validateGoogleProvider() error {
-	if o.TokenURL != "" || o.ClientID != "" || o.ClientSecret != "" ||
+	if o.TokenURL != "" || o.ClientID != "" || o.ClientSecret != nil ||
 		o.AzureTenantID != "" || o.AzureResource != "" || len(o.EndpointParams) != 0 {
 		return errors.New("none of token_url and client credentials can be used, use google.credentials_file, google.jwt_file, google.credentials_json or ADC instead")
 	}
@@ -261,12 +277,53 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 
 	// Application Default Credentials (ADC)
 	ctx := context.Background()
-	if creds, err := findDefaultGoogleCredentials(ctx, o.Scopes...); err == nil {
+	params := google.CredentialsParams{
+		Scopes:  o.Scopes,
+		Subject: o.GoogleDelegatedAccount,
+	}
+	if creds, err := findDefaultGoogleCredentials(ctx, params); err == nil {
 		o.GoogleCredentialsJSON = creds.JSON
 		return nil
 	}
 
 	return fmt.Errorf("no authentication credentials were configured or detected (ADC)")
+}
+
+func (o *oAuth2Config) validateOktaProvider() error {
+	if o.TokenURL == "" || o.ClientID == "" || len(o.Scopes) == 0 {
+		return errors.New("okta validation error: token_url, client_id, scopes must be provided")
+	}
+	var n int
+	if o.OktaJWKJSON != nil {
+		n++
+	}
+	if o.OktaJWKFile != "" {
+		n++
+	}
+	if o.OktaJWKPEM != "" {
+		n++
+	}
+	if n != 1 {
+		return errors.New("okta validation error: one of okta.jwk_json, okta.jwk_file or okta.jwk_pem must be provided")
+	}
+	// jwk_pem
+	if o.OktaJWKPEM != "" {
+		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM))
+		if err != nil {
+			return fmt.Errorf("okta validation error: %w", err)
+		}
+		return nil
+	}
+	// jwk_file
+	if o.OktaJWKFile != "" {
+		return populateJSONFromFile(o.OktaJWKFile, &o.OktaJWKJSON)
+	}
+	// jwk_json
+	if len(o.OktaJWKJSON) != 0 {
+		return nil
+	}
+
+	return fmt.Errorf("okta validation error: no authentication credentials were configured or detected")
 }
 
 func populateJSONFromFile(file string, dst *common.JSONBlob) error {
@@ -295,7 +352,7 @@ func (o *oAuth2Config) validateAzureProvider() error {
 	if o.TokenURL != "" && o.AzureTenantID != "" {
 		return errors.New("only one of token_url and tenant_id can be used")
 	}
-	if o.ClientID == "" || o.ClientSecret == "" {
+	if o.ClientID == "" || o.ClientSecret == nil {
 		return errors.New("client credentials must be provided")
 	}
 

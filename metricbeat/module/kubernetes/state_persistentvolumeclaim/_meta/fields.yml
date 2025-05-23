@@ -1,7 +1,7 @@
 - name: persistentvolumeclaim
   type: group
   description: >
-    kubernetes persistent volume clame metrics from kube-state-metrics
+    kubernetes persistent volume claim metrics from kube-state-metrics
   release: ga
   fields:
     - name: name
@@ -22,4 +22,7 @@
     - name: storage_class
       type: keyword
       description: Storage class for the PVC.
-      
+    - name: created
+      type: date
+      description: PersistentVolumeClaim creation date
+

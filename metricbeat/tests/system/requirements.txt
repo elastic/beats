@@ -1,4 +1,4 @@
 kafka-python==1.4.3
 elasticsearch==7.1.0
 semver==2.8.1
-protobuf==3.19.4 #Temporary change because of protobuf new version bug: https://github.com/protocolbuffers/protobuf/issues/10051
+protobuf==3.19.5 #Temporary change because of protobuf new version bug: https://github.com/protocolbuffers/protobuf/issues/10051

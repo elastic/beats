@@ -34,7 +34,7 @@
                         "line_width": "1",
                         "metrics": [
                             {
-                                "field": "kafka.consumergroup.partition",
+                                "field": "kafka.partition.id",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "sum"
                             },

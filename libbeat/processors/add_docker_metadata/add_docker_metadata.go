@@ -16,19 +16,17 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package add_docker_metadata
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
 	"regexp"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -49,9 +47,11 @@ const (
 	cgroupCacheExpiration = 5 * time.Minute
 )
 
-// processGroupPaths returns the cgroups associated with a process. This enables
+// initCgroupPaths initializes a new cgroup reader. This enables
 // unit testing by allowing us to stub the OS interface.
-var processCgroupPaths = cgroup.ProcessCgroupPaths
+var initCgroupPaths processors.InitCgroupHandler = func(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (processors.CGReader, error) {
+	return cgroup.NewReader(rootfsMountpoint, ignoreRootCgroups)
+}
 
 func init() {
 	processors.RegisterPlugin(processorName, New)
@@ -61,26 +61,26 @@ type addDockerMetadata struct {
 	log             *logp.Logger
 	watcher         docker.Watcher
 	fields          []string
-	sourceProcessor processors.Processor
+	sourceProcessor beat.Processor
 
-	pidFields       []string         // Field names that contain PIDs.
-	cgroups         *common.Cache    // Cache of PID (int) to cgropus (map[string]string).
-	hostFS          resolve.Resolver // Directory where /proc is found
-	dedot           bool             // If set to true, replace dots in labels with `_`.
-	dockerAvailable bool             // If Docker exists in env, then it is set to true
+	pidFields       []string      // Field names that contain PIDs.
+	cgroups         *common.Cache // Cache of PID (int) to container ids (string).
+	dedot           bool          // If set to true, replace dots in labels with `_`.
+	dockerAvailable bool          // If Docker exists in env, then it is set to true
+	cgreader        processors.CGReader
 }
 
 const selector = "add_docker_metadata"
 
 // New constructs a new add_docker_metadata processor.
-func New(cfg *conf.C) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
 }
 
-func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
+func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	var dockerAvailable bool
@@ -93,12 +93,12 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		dockerAvailable = true
 		log.Debugf("%v: docker environment detected", processorName)
 		if err = watcher.Start(); err != nil {
-			return nil, errors.Wrap(err, "failed to start watcher")
+			return nil, fmt.Errorf("failed to start watcher: %w", err)
 		}
 	}
 
 	// Use extract_field processor to get container ID from source file path.
-	var sourceProcessor processors.Processor
+	var sourceProcessor beat.Processor
 	if config.MatchSource {
 		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     "log.file.path",
@@ -112,15 +112,22 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstruc
 		}
 	}
 
+	reader, err := initCgroupPaths(resolve.NewTestResolver(config.HostFS), false)
+	if errors.Is(err, cgroup.ErrCgroupsMissing) {
+		reader = &processors.NilCGReader{}
+	} else if err != nil {
+		return nil, fmt.Errorf("error creating cgroup reader: %w", err)
+	}
+
 	return &addDockerMetadata{
 		log:             log,
 		watcher:         watcher,
 		fields:          config.Fields,
 		sourceProcessor: sourceProcessor,
 		pidFields:       config.MatchPIDs,
-		hostFS:          resolve.NewTestResolver(config.HostFS),
 		dedot:           config.DeDot,
 		dockerAvailable: dockerAvailable,
+		cgreader:        reader,
 	}, nil
 }
 
@@ -162,11 +169,11 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if cid == "" && len(d.pidFields) > 0 {
 		id, err := d.lookupContainerIDByPID(event)
 		if err != nil {
-			return nil, errors.Wrap(err, "error reading container ID")
+			return nil, fmt.Errorf("error reading container ID: %w", err)
 		}
 		if id != "" {
 			cid = id
-			event.PutValue(dockerContainerIDKey, cid)
+			_, _ = event.PutValue(dockerContainerIDKey, cid)
 		}
 	}
 
@@ -198,17 +205,17 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 			for k, v := range container.Labels {
 				if d.dedot {
 					label := common.DeDot(k)
-					labels.Put(label, v)
+					_, _ = labels.Put(label, v)
 				} else {
-					safemapstr.Put(labels, k, v)
+					_ = safemapstr.Put(labels, k, v)
 				}
 			}
-			meta.Put("container.labels", labels)
+			_, _ = meta.Put("container.labels", labels)
 		}
 
-		meta.Put("container.id", container.ID)
-		meta.Put("container.image.name", container.Image)
-		meta.Put("container.name", container.Name)
+		_, _ = meta.Put("container.id", container.ID)
+		_, _ = meta.Put("container.image.name", container.Image)
+		_, _ = meta.Put("container.name", container.Name)
 		event.Fields.DeepUpdate(meta.Clone())
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
@@ -227,7 +234,7 @@ func (d *addDockerMetadata) Close() error {
 	}
 	err := processors.Close(d.sourceProcessor)
 	if err != nil {
-		return errors.Wrap(err, "closing source processor of add_docker_metadata")
+		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
 	}
 	return nil
 }
@@ -240,7 +247,8 @@ func (d *addDockerMetadata) String() string {
 // lookupContainerIDByPID finds the container ID based on PID fields contained
 // in the event.
 func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, error) {
-	var cgroups cgroup.PathList
+	pids := make([]int, 0, len(d.pidFields))
+
 	for _, field := range d.pidFields {
 		v, err := event.GetValue(field)
 		if err != nil {
@@ -253,7 +261,18 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 			continue
 		}
 
-		cgroups, err = d.getProcessCgroups(pid)
+		if d.cgroups != nil {
+			if cid := d.cgroups.Get(pid); cid != nil {
+				d.log.Debugf("Using cached cgroups for pid=%v", pid)
+				return cid.(string), nil
+			}
+		}
+
+		pids = append(pids, pid)
+	}
+
+	for _, pid := range pids {
+		cgroups, err := d.getProcessCgroups(pid)
 		if err != nil && errors.Is(err, fs.ErrNotExist) {
 			continue
 		}
@@ -261,32 +280,32 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 			d.log.Debugf("failed to get cgroups for pid=%v: %v", pid, err)
 		}
 
-		break
+		// Initialize at time of first use.
+		lazyCgroupCacheInit(d)
+
+		cid, err := getContainerIDFromCgroups(cgroups)
+		d.cgroups.Put(pid, cid)
+
+		return cid, err
 	}
 
-	return getContainerIDFromCgroups(cgroups)
+	return "", nil
 }
 
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
 // returns an error if it failed to retrieve the cgroup info.
 func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) {
-	// Initialize at time of first use.
-	lazyCgroupCacheInit(d)
-
-	cgroups, ok := d.cgroups.Get(pid).(cgroup.PathList)
-	if ok {
-		d.log.Debugf("Using cached cgroups for pid=%v", pid)
-		return cgroups, nil
-	}
-
-	cgroups, err := processCgroupPaths(d.hostFS, pid)
+	cgroups, err := d.cgreader.ProcessCgroupPaths(pid)
 	if err != nil {
-		return cgroups, errors.Wrapf(err, "failed to read cgroups for pid=%v", pid)
+		return cgroups, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
 	}
-
-	d.cgroups.Put(pid, cgroups)
+	if len(cgroups.Flatten()) == 0 {
+		return cgroup.PathList{}, fs.ErrNotExist
+	}
 	return cgroups, nil
 }
+
+var re = regexp.MustCompile(`[\w]{64}`)
 
 // getContainerIDFromCgroups checks all of the processes' paths to see if any
 // of them are associated with Docker. For cgroups V1, Docker uses /docker/<CID> when
@@ -294,7 +313,6 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) 
 // it's part of a more complex string.
 func getContainerIDFromCgroups(cgroups cgroup.PathList) (string, error) {
 	for _, path := range cgroups.Flatten() {
-		re := regexp.MustCompile(`[\w]{64}`)
 		rs := re.FindStringSubmatch(path.ControllerPath)
 		if rs != nil {
 			return rs[0], nil

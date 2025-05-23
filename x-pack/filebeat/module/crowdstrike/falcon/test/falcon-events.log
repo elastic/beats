@@ -19,7 +19,7 @@
         "SeverityName": "High",
         "FileName": "explorer.exe",
         "FilePath": "\\Device\\HarddiskVolume1\\Windows",
-        "CommandLine": "C:\\Windows\\Explorer.EXE",
+        "CommandLine": "C:\\Windows\\Explorer.EXE  --test",
         "SHA256String": "6a671b92a69755de6fd063fcbe4ba926d83b49f78c42dbaeed8cdb6bbc57576a",
         "MD5String": "ac4c51eb24aa95b77f705ab159189e24",
         "MachineDomain": "CORP-DOMAIN",

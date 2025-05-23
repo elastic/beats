@@ -22,15 +22,12 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"text/template"
-
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/licenses"
@@ -57,6 +54,7 @@ var (
 	moduleDirs        stringSliceFlag
 	moduleExcludeDirs stringSliceFlag
 	importDirs        stringSliceFlag
+	skipInitModule    bool
 )
 
 func init() {
@@ -67,6 +65,7 @@ func init() {
 	flag.Var(&moduleDirs, "moduleDir", "Directory to search for modules to include")
 	flag.Var(&moduleExcludeDirs, "moduleExcludeDirs", "Directory to exclude from the list")
 	flag.Var(&importDirs, "import", "Directory to include")
+	flag.BoolVar(&skipInitModule, "skip-init-module", false, "Skip finding and importing modules with InitializeModule")
 	flag.Usage = usageFlag
 }
 
@@ -102,10 +101,12 @@ func main() {
 
 	// Build import paths.
 	var imports []string
+	var modules []string
 	for _, dir := range dirs {
 		// Skip packages without an init() function because that cannot register
 		// anything as a side-effect of being imported (e.g. filebeat/input/file).
 		var foundInitMethod bool
+		var foundInitModuleMethod bool
 		goFiles, err := filepath.Glob(filepath.Join(dir, "*.go"))
 		if err != nil {
 			log.Fatalf("Failed checking for .go files in package dir: %v", err)
@@ -115,15 +116,14 @@ func main() {
 			if strings.HasSuffix(f, "_test.go") {
 				continue
 			}
-			if hasInitMethod(f) {
+			hasInit, hasInitModule := hasMethods(f)
+			if hasInit {
 				foundInitMethod = true
-				break
+			}
+			if hasInitModule && !skipInitModule {
+				foundInitModuleMethod = true
 			}
 		}
-		if !foundInitMethod {
-			continue
-		}
-
 		importDir := dir
 		if filepath.IsAbs(dir) {
 			// Make it relative to the current package if it's absolute.
@@ -133,8 +133,13 @@ func main() {
 			}
 		}
 
-		imports = append(imports, filepath.ToSlash(
-			filepath.Join(repo.ImportPath, importDir)))
+		if foundInitModuleMethod {
+			modules = append(modules, filepath.ToSlash(
+				filepath.Join(repo.ImportPath, importDir)))
+		} else if foundInitMethod {
+			imports = append(imports, filepath.ToSlash(
+				filepath.Join(repo.ImportPath, importDir)))
+		}
 	}
 
 	sort.Strings(imports)
@@ -146,6 +151,7 @@ func main() {
 		Package:   pkg,
 		BuildTags: buildTags,
 		Imports:   imports,
+		Modules:   modules,
 	})
 	if err != nil {
 		log.Fatalf("Failed executing template: %v", err)
@@ -157,13 +163,13 @@ func main() {
 	}
 
 	// Write the output file.
-	if err = ioutil.WriteFile(outFile, buf.Bytes(), 0644); err != nil {
+	if err = os.WriteFile(outFile, buf.Bytes(), 0644); err != nil {
 		log.Fatalf("Failed writing output file: %v", err)
 	}
 }
 
 func usageFlag() {
-	fmt.Fprintf(os.Stderr, usageText)
+	fmt.Fprint(os.Stderr, usageText)
 	flag.PrintDefaults()
 }
 
@@ -177,11 +183,26 @@ var Template = template.Must(template.New("normalizations").Funcs(map[string]int
 package {{ .Package }}
 
 import (
-	// Import packages that need to register themselves.
+{{- if .Modules }}
+	// Import packages to perform 'func InitializeModule()' when in-use.
+{{- range $i, $import := .Modules }}
+	m{{ $i }} "{{ $import }}"
+{{- end }}
+{{ end }}
+	// Import packages that perform 'func init()'.
 {{- range $import := .Imports }}
 	_ "{{ $import }}"
 {{- end }}
 )
+{{- if .Modules }}
+
+// InitializeModules initialize all of the modules.
+func InitializeModule() {
+{{- range $i, $import := .Modules }}
+	m{{ $i }}.InitializeModule()
+{{- end }}
+}
+{{- end }}
 `[1:]))
 
 type Data struct {
@@ -189,9 +210,10 @@ type Data struct {
 	Package   string
 	BuildTags string
 	Imports   []string
+	Modules   []string
 }
 
-//stringSliceFlag is a flag type that allows more than one value to be specified.
+// stringSliceFlag is a flag type that allows more than one value to be specified.
 type stringSliceFlag []string
 
 func (f *stringSliceFlag) String() string { return strings.Join(*f, ", ") }
@@ -212,7 +234,7 @@ func findModuleAndDatasets() ([]string, error) {
 			filepath.Join(moduleDir, "*/*/_meta"),
 		)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed finding modules and datasets")
+			return nil, fmt.Errorf("failed finding modules and datasets: %w", err)
 		}
 
 		for _, metaDir := range metaDirs {
@@ -238,8 +260,8 @@ func findImports() ([]string, error) {
 	return devtools.FindFiles(importDirs...)
 }
 
-// hasInitMethod returns true if the file contains 'func init()'.
-func hasInitMethod(file string) bool {
+// hasMethods returns true if the file contains 'func init()' and/or `func InitializeModule()'.
+func hasMethods(file string) (bool, bool) {
 	f, err := os.Open(file)
 	if err != nil {
 		log.Fatalf("Failed to read from %v: %v", file, err)
@@ -247,14 +269,21 @@ func hasInitMethod(file string) bool {
 	defer f.Close()
 
 	var initSignature = []byte("func init()")
+	var initModuleSignature = []byte("func InitializeModule()")
+
+	hasInit := false
+	hasModuleInit := false
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		if bytes.Contains(scanner.Bytes(), initSignature) {
-			return true
+			hasInit = true
+		}
+		if bytes.Contains(scanner.Bytes(), initModuleSignature) {
+			hasModuleInit = true
 		}
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatalf("Failed scanning %v: %v", file, err)
 	}
-	return false
+	return hasInit, hasModuleInit
 }

@@ -19,8 +19,7 @@ package node
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -86,7 +85,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Logstash Node API response")
+		return fmt.Errorf("failure parsing Logstash Node API response: %w", err)
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
@@ -96,7 +95,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 		for _, pipeline := range pipelines {
 			fields, err := schema.Apply(data)
 			if err != nil {
-				return errors.Wrap(err, "failure applying node schema")
+				return fmt.Errorf("failure applying node schema: %w", err)
 			}
 			removeClusterUUIDsFromPipeline(pipeline)
 

@@ -23,13 +23,13 @@ package zookeeper
 import (
 	"bufio"
 	"bytes"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 // RunCommand establishes a TCP connection the ZooKeeper command port that
@@ -39,7 +39,7 @@ import (
 func RunCommand(command, address string, timeout time.Duration) (io.Reader, error) {
 	conn, err := net.DialTimeout("tcp", address, timeout)
 	if err != nil {
-		return nil, errors.Wrapf(err, "connection to host '%s' failed", address)
+		return nil, fmt.Errorf("connection to host '%s' failed: %w", address, err)
 	}
 	defer conn.Close()
 
@@ -52,12 +52,12 @@ func RunCommand(command, address string, timeout time.Duration) (io.Reader, erro
 	// Write four-letter command.
 	_, err = conn.Write([]byte(command))
 	if err != nil {
-		return nil, errors.Wrapf(err, "writing command '%s' failed", command)
+		return nil, fmt.Errorf("writing command '%s' failed: %w", command, err)
 	}
 
 	result, err := ioutil.ReadAll(conn)
 	if err != nil {
-		return nil, errors.Wrap(err, "read failed")
+		return nil, fmt.Errorf("read failed: %w", err)
 	}
 
 	return bytes.NewReader(result), nil
@@ -67,7 +67,7 @@ func RunCommand(command, address string, timeout time.Duration) (io.Reader, erro
 func ServerID(address string, timeout time.Duration) (string, error) {
 	response, err := RunCommand("conf", address, timeout)
 	if err != nil {
-		return "", errors.Wrap(err, "execution of 'conf' command failed")
+		return "", fmt.Errorf("execution of 'conf' command failed: %w", err)
 	}
 
 	scanner := bufio.NewScanner(response)

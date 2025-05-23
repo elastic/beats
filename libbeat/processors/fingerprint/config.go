@@ -17,13 +17,15 @@
 
 package fingerprint
 
+import "encoding/json"
+
 // Config for fingerprint processor.
 type Config struct {
-	Method        hashMethod     `config:"method"`                     // Hash function to use for fingerprinting
-	Fields        []string       `config:"fields" validate:"required"` // Source fields to compute fingerprint from
-	TargetField   string         `config:"target_field"`               // Target field for the fingerprint
-	Encoding      encodingMethod `config:"encoding"`                   // Encoding to use for target field value
-	IgnoreMissing bool           `config:"ignore_missing"`             // Ignore missing fields?
+	Method        namedHashMethod     `config:"method"`                     // Hash function to use for fingerprinting
+	Fields        []string            `config:"fields" validate:"required"` // Source fields to compute fingerprint from
+	TargetField   string              `config:"target_field"`               // Target field for the fingerprint
+	Encoding      namedEncodingMethod `config:"encoding"`                   // Encoding to use for target field value
+	IgnoreMissing bool                `config:"ignore_missing"`             // Ignore missing fields?
 }
 
 func defaultConfig() Config {
@@ -33,4 +35,17 @@ func defaultConfig() Config {
 		Encoding:      encodings["hex"],
 		IgnoreMissing: false,
 	}
+}
+
+func (c *Config) MarshalJSON() ([]byte, error) {
+	type Alias Config
+	return json.Marshal(&struct {
+		Method   string
+		Encoding string
+		*Alias
+	}{
+		Method:   c.Method.Name,
+		Encoding: c.Encoding.Name,
+		Alias:    (*Alias)(c),
+	})
 }

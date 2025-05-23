@@ -45,7 +45,7 @@ type Flows struct {
 
 // NewFlows returns a Flows publishing to pub after enrichment by the given
 // process watcher. Publication timeout and period are specified by config.
-func NewFlows(pub Reporter, watcher procs.ProcessesWatcher, config *config.Flows) (*Flows, error) {
+func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flows) (*Flows, error) {
 	duration := func(s string, d time.Duration) (time.Duration, error) {
 		if s == "" {
 			return d, nil
@@ -71,7 +71,7 @@ func NewFlows(pub Reporter, watcher procs.ProcessesWatcher, config *config.Flows
 
 	counter := &counterReg{}
 
-	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period)
+	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period, config.EnableDeltaFlowReports)
 	if err != nil {
 		logp.Err("failed to configure flows processing intervals: %v", err)
 		return nil, err

@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package replstatus
 
@@ -105,9 +104,10 @@ func getConfig(host string) map[string]interface{} {
 }
 
 func initiateReplicaSet(t *testing.T, host string) error {
+	uri := "mongodb://" + host
 	client, err := mongodb.NewClient(mongodb.ModuleConfig{
 		Hosts: []string{host},
-	}, time.Second*5, readpref.PrimaryMode)
+	}, uri, time.Second*5, readpref.PrimaryMode)
 	if err != nil {
 		return fmt.Errorf("could not create mongodb client: %w", err)
 	}

@@ -189,11 +189,10 @@
             "type": "table"
         }
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:05.336Z",
     "id": "da5ffe40-bcd9-11e9-b6a2-c9b4015c4baf",
-    "migrationVersion": {
-        "visualization": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "winlogbeat-*",
@@ -207,6 +206,7 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-11T13:19:00.386Z",
-    "version": "WzIzMTMsMl0="
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:05.336Z",
+    "version": "WzI0NCwxXQ=="
 }

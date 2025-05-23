@@ -12,6 +12,7 @@ var:
   - name: ssl
   - name: internal_zones
   - name: external_zones
+  - name: timezone_offset
 
 ingest_pipeline:
   - ingest/pipeline.yml

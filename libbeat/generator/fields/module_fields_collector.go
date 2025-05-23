@@ -18,8 +18,9 @@
 package fields
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
+	"strings"
 )
 
 var indentByModule = map[string]int{
@@ -30,16 +31,17 @@ var indentByModule = map[string]int{
 	"protos":     8,
 }
 
-// GetModules returns a the list of modules for the given modules directory
+// GetModules returns a list of modules for the given modules directory
 func GetModules(modulesDir string) ([]string, error) {
-	moduleInfos, err := ioutil.ReadDir(modulesDir)
+	moduleInfos, err := os.ReadDir(modulesDir)
 	if err != nil {
 		return nil, err
 	}
 
-	var names []string
+	names := make([]string, 0, len(moduleInfos))
 	for _, info := range moduleInfos {
-		if !info.IsDir() {
+		// skip the ones that are not directories or with suffix @tmp, which are created by Jenkins build job
+		if !info.IsDir() || strings.HasSuffix(info.Name(), "@tmp") {
 			continue
 		}
 		names = append(names, info.Name())
@@ -79,7 +81,7 @@ func CollectFiles(module string, modulesPath string) ([]*YmlFile, error) {
 	files = append(files, ymls...)
 
 	modulesRoot := filepath.Base(modulesPath)
-	sets, err := ioutil.ReadDir(filepath.Join(modulesPath, module))
+	sets, err := os.ReadDir(filepath.Join(modulesPath, module))
 	if err != nil {
 		return nil, err
 	}

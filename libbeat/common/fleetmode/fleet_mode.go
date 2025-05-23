@@ -17,33 +17,18 @@
 
 package fleetmode
 
-import (
-	"flag"
+var managementEnabled bool
 
-	"github.com/elastic/elastic-agent-libs/config"
-)
+// SetAgentMode stores if the Beat is running under Elastic Agent.
+// Normally this is called when the command line flags are parsed.
+// This is stored as a package level variable because some components
+// (like filebeat/metricbeat modules) don't have access to the
+// configuration information to determine this on their own.
+func SetAgentMode(enabled bool) {
+	managementEnabled = enabled
+}
 
-// Enabled checks to see if filebeat/metricbeat is running under Agent
-// The management setting is stored in the main Beat runtime object, but we can't see that from a module
-// So instead we check the CLI flags, since Agent starts filebeat/metricbeat with "-E", "management.enabled=true"
+// Enabled returns true if the Beat is running under Elastic Agent.
 func Enabled() bool {
-	type management struct {
-		Enabled bool `config:"management.enabled"`
-	}
-	var managementSettings management
-
-	cfgFlag := flag.Lookup("E")
-	if cfgFlag == nil {
-		return false
-	}
-
-	cfgObject, _ := cfgFlag.Value.(*config.SettingsFlag)
-	cliCfg := cfgObject.Config()
-
-	err := cliCfg.Unpack(&managementSettings)
-	if err != nil {
-		return false
-	}
-
-	return managementSettings.Enabled
+	return managementEnabled
 }

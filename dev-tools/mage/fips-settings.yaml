@@ -1,0 +1,17 @@
+# beats contains the list of beats that are FIPS-enabled
+beats:
+  - agentbeat
+  - auditbeat
+  - filebeat
+  - metricbeat
+compile:
+  cgo: true
+  env:
+    GOEXPERIMENT: systemcrypto
+  tags:
+    - requirefips
+    - ms_tls13kdf
+  platforms:
+    # If the platform list changes, update the platforms for FIPS packaging in CI pipelines '.buildkite/**/pipeline.<beat>.yml' and '.buildkite/packaging-pipeline.yml'
+    - linux/amd64
+    - linux/arm64

@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package eventlog
 
 import (
+	"fmt"
 	"io"
 	"os/exec"
 	"path/filepath"
@@ -29,13 +29,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/sys/windows/registry"
+	"golang.org/x/sys/windows/svc/eventlog"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/go-sysinfo/providers/windows"
 )
 
 const (
@@ -57,98 +59,89 @@ const (
 
 func TestWinEventLogConfig_Validate(t *testing.T) {
 	tests := []struct {
-		In      winEventLogConfig
+		In      config
 		WantErr bool
 		Desc    string
 	}{
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:       "test",
+				XMLQuery: customXMLQuery,
 			},
 			WantErr: false,
 			Desc:    "xml query: all good",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery[:len(customXMLQuery)-4], // Malformed XML by truncation.
-				},
+			In: config{
+
+				ID:       "test",
+				XMLQuery: customXMLQuery[:len(customXMLQuery)-4], // Malformed XML by truncation.
+
 			},
 			WantErr: true,
 			Desc:    "xml query: malformed XML",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				XMLQuery: customXMLQuery,
 			},
 			WantErr: true,
 			Desc:    "xml query: missing ID",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					Name:     "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:       "test",
+				Name:     "test",
+				XMLQuery: customXMLQuery,
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and name)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:          "test",
+				XMLQuery:    customXMLQuery,
 				SimpleQuery: query{IgnoreOlder: 1},
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and ignore_older)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:          "test",
+				XMLQuery:    customXMLQuery,
 				SimpleQuery: query{Level: "error"},
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and level)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:          "test",
+				XMLQuery:    customXMLQuery,
 				SimpleQuery: query{EventID: "1000"},
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and event_id)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{
-					ID:       "test",
-					XMLQuery: customXMLQuery,
-				},
+			In: config{
+
+				ID:          "test",
+				XMLQuery:    customXMLQuery,
 				SimpleQuery: query{Provider: []string{providerName}},
 			},
 			WantErr: true,
 			Desc:    "xml query: conflicting keys (xml query and provider)",
 		},
 		{
-			In: winEventLogConfig{
-				ConfigCommon: ConfigCommon{},
-			},
+			In:      config{},
 			WantErr: true,
 			Desc:    "missing name",
 		},
@@ -166,14 +159,11 @@ func TestWinEventLogConfig_Validate(t *testing.T) {
 }
 
 func TestWindowsEventLogAPI(t *testing.T) {
-	testWindowsEventLog(t, winEventLogAPIName)
+	testWindowsEventLog(t, true)
+	testWindowsEventLog(t, false)
 }
 
-func TestWindowsEventLogAPIExperimental(t *testing.T) {
-	testWindowsEventLog(t, winEventLogExpAPIName)
-}
-
-func testWindowsEventLog(t *testing.T, api string) {
+func testWindowsEventLog(t *testing.T, includeXML bool) {
 	writer, teardown := createLog(t)
 	defer teardown()
 
@@ -183,15 +173,15 @@ func testWindowsEventLog(t *testing.T, api string) {
 	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
-		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000)+1, []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
+		safeWriteEvent(t, writer, uint32(i%1000)+1, strconv.Itoa(i)+" "+randomSentence(messageSize))
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
-		return openLog(t, api, nil, config)
+		return openLog(t, nil, config)
 	}
 
 	t.Run("has_message", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1, "include_xml": includeXML})
 		defer log.Close()
 
 		for i := 0; i < 10; i++ {
@@ -207,8 +197,9 @@ func testWindowsEventLog(t *testing.T, api string) {
 	// Test reading from an event log using a custom XML query.
 	t.Run("custom_xml_query", func(t *testing.T) {
 		cfg := map[string]interface{}{
-			"id":        "custom-xml-query",
-			"xml_query": customXMLQuery,
+			"id":          "custom-xml-query",
+			"xml_query":   customXMLQuery,
+			"include_xml": includeXML,
 		}
 
 		log := openLog(t, cfg)
@@ -235,7 +226,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	t.Run("batch_read_size_config", func(t *testing.T) {
 		const batchReadSize = 2
 
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": batchReadSize, "include_xml": includeXML})
 		defer log.Close()
 
 		records, err := log.Read()
@@ -250,7 +241,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 	// When combined with large messages this causes EvtNext to fail with
 	// RPC_S_INVALID_BOUND error. The reader should recover from the error.
 	t.Run("large_batch_read", func(t *testing.T) {
-		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1024})
+		log := openLog(t, map[string]interface{}{"name": providerName, "batch_read_size": 1024, "include_xml": includeXML})
 		defer log.Close()
 
 		var eventCount int
@@ -271,6 +262,7 @@ func testWindowsEventLog(t *testing.T, api string) {
 		assert.Equal(t, totalEvents, eventCount)
 	})
 
+	// Test reading .evtx file without any query filters
 	t.Run("evtx_file", func(t *testing.T) {
 		path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
 		if err != nil {
@@ -280,15 +272,11 @@ func testWindowsEventLog(t *testing.T, api string) {
 		log := openLog(t, map[string]interface{}{
 			"name":           path,
 			"no_more_events": "stop",
+			"include_xml":    includeXML,
 		})
 		defer log.Close()
 
 		records, err := log.Read()
-
-		// This implementation returns the EOF on the next call.
-		if err == nil && api == winEventLogAPIName {
-			_, err = log.Read()
-		}
 
 		if assert.Error(t, err, "no_more_events=stop requires io.EOF to be returned") {
 			assert.Equal(t, io.EOF, err)
@@ -296,6 +284,66 @@ func testWindowsEventLog(t *testing.T, api string) {
 
 		assert.Len(t, records, 32)
 	})
+
+	// Test reading .evtx file with event_id filter
+	t.Run("evtx_file_with_query", func(t *testing.T) {
+		path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		log := openLog(t, map[string]interface{}{
+			"name":           path,
+			"no_more_events": "stop",
+			"event_id":       "3, 5",
+			"include_xml":    includeXML,
+		})
+		defer log.Close()
+
+		records, err := log.Read()
+
+		if assert.Error(t, err, "no_more_events=stop requires io.EOF to be returned") {
+			assert.Equal(t, io.EOF, err)
+		}
+
+		assert.Len(t, records, 21)
+	})
+}
+
+func TestWindows2025IgnoresFilters(t *testing.T) {
+	os, err := windows.OperatingSystem()
+	if err != nil {
+		t.Fatalf("failed to get operating system info: %v", err)
+	}
+	t.Logf("running tests on %s", os.Name)
+
+	path, err := filepath.Abs("../sys/wineventlog/testdata/sysmon-9.01.evtx")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	log := openLog(t, nil, map[string]interface{}{
+		"name":           path,
+		"no_more_events": "stop",
+		"event_id":       "3, 5",
+		"include_xml":    false,
+		"forwarded":      true,
+	})
+	defer log.Close()
+
+	records, err := log.Read()
+
+	if assert.Error(t, err, "no_more_events=stop requires io.EOF to be returned") {
+		assert.Equal(t, io.EOF, err)
+	}
+
+	if !strings.Contains(os.Name, "2025") {
+		assert.Len(t, records, 21)
+	} else {
+		// we get all events on 2025
+		// because the event log is not filtered by event id
+		assert.Len(t, records, 32)
+	}
 }
 
 // ---- Utility Functions -----
@@ -311,7 +359,7 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 		messageFile = strings.Join(messageFiles, ";")
 	}
 
-	existed, err := eventlog.Install(name, source, messageFile, true, eventlog.Error|eventlog.Warning|eventlog.Info)
+	existed, err := install(name, source, messageFile, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -323,8 +371,8 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	log, err = eventlog.Open(source)
 	//nolint:errcheck // This is just a resource release.
 	if err != nil {
-		eventlog.RemoveSource(name, source)
-		eventlog.RemoveProvider(name)
+		removeSource(name, source)
+		removeProvider(name)
 		t.Fatal(err)
 	}
 
@@ -332,17 +380,17 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	tearDown = func() {
 		log.Close()
 		wineventlog.EvtClearLog(wineventlog.NilHandle, name, "")
-		eventlog.RemoveSource(name, source)
-		eventlog.RemoveProvider(name)
+		removeSource(name, source)
+		removeProvider(name)
 	}
 
 	return log, tearDown
 }
 
-func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, msgs []string) {
+func safeWriteEvent(t testing.TB, log *eventlog.Log, eid uint32, msg string) {
 	deadline := time.Now().Add(time.Second * 10)
 	for {
-		err := log.Report(etype, eid, msgs)
+		err := log.Info(eid, msg)
 		if err == nil {
 			return
 		}
@@ -361,21 +409,13 @@ func setLogSize(t testing.TB, provider string, sizeBytes int) {
 	}
 }
 
-func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config map[string]interface{}) EventLog {
+func openLog(t testing.TB, state *checkpoint.EventLogState, config map[string]interface{}) EventLog {
 	cfg, err := conf.NewConfigFrom(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	var log EventLog
-	switch api {
-	case winEventLogAPIName:
-		log, err = newWinEventLog(cfg)
-	case winEventLogExpAPIName:
-		log, err = newWinEventLogExp(cfg)
-	default:
-		t.Fatalf("Unknown API name: '%s'", api)
-	}
+	log, err := newWinEventLog(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -391,4 +431,72 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 	}
 
 	return log
+}
+
+const Application = "Application"
+
+const eventLogKeyName = `SYSTEM\CurrentControlSet\Services\EventLog`
+
+// removeSource deletes all registry elements installed for an event logging source.
+func removeSource(provider, src string) error {
+	providerKeyName := fmt.Sprintf("%s\\%s", eventLogKeyName, provider)
+	pk, err := registry.OpenKey(registry.LOCAL_MACHINE, providerKeyName, registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer pk.Close()
+	return registry.DeleteKey(pk, src)
+}
+
+// removeProvider deletes all registry elements installed for an event logging provider.
+// Only use this method if you have installed a custom provider.
+func removeProvider(provider string) error {
+	// Protect against removing Application.
+	if provider == Application {
+		return fmt.Errorf("%s cannot be removed. Only custom providers can be removed.", provider)
+	}
+
+	eventLogKey, err := registry.OpenKey(registry.LOCAL_MACHINE, eventLogKeyName, registry.SET_VALUE)
+	if err != nil {
+		return err
+	}
+	defer eventLogKey.Close()
+	return registry.DeleteKey(eventLogKey, provider)
+}
+
+func install(provider, src, msgFile string, eventsSupported uint32) (bool, error) {
+	eventLogKey, err := registry.OpenKey(registry.LOCAL_MACHINE, eventLogKeyName, registry.CREATE_SUB_KEY)
+	if err != nil {
+		return false, err
+	}
+	defer eventLogKey.Close()
+
+	pk, _, err := registry.CreateKey(eventLogKey, provider, registry.SET_VALUE)
+	if err != nil {
+		return false, err
+	}
+	defer pk.Close()
+
+	sk, alreadyExist, err := registry.CreateKey(pk, src, registry.SET_VALUE)
+	if err != nil {
+		return false, err
+	}
+	defer sk.Close()
+	if alreadyExist {
+		return true, nil
+	}
+
+	err = sk.SetDWordValue("CustomSource", 1)
+	if err != nil {
+		return false, err
+	}
+	err = sk.SetExpandStringValue("EventMessageFile", msgFile)
+	if err != nil {
+		return false, err
+	}
+	err = sk.SetDWordValue("TypesSupported", eventsSupported)
+	if err != nil {
+		return false, err
+	}
+	return false, nil
 }

@@ -21,7 +21,7 @@ import (
 	"syscall"
 	"testing"
 
-	"github.com/shirou/gopsutil/v3/net"
+	"github.com/shirou/gopsutil/v4/net"
 	"github.com/stretchr/testify/assert"
 )
 

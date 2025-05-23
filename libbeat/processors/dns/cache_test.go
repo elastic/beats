@@ -29,85 +29,85 @@ import (
 
 type stubResolver struct{}
 
-func (r *stubResolver) LookupPTR(ip string) (*PTR, error) {
+func (r *stubResolver) Lookup(ip string, _ queryType) (*result, error) {
 	switch ip {
 	case gatewayIP:
-		return &PTR{Host: gatewayName, TTL: gatewayTTL}, nil
+		return &result{Data: []string{gatewayName}, TTL: gatewayTTL}, nil
 	case gatewayIP + "1":
 		return nil, io.ErrUnexpectedEOF
 	case gatewayIP + "2":
-		return &PTR{Host: gatewayName, TTL: 0}, nil
+		return &result{Data: []string{gatewayName}, TTL: 0}, nil
 	}
 	return nil, &dnsError{"fake lookup returned NXDOMAIN"}
 }
 
 func TestCache(t *testing.T) {
-	c, err := NewPTRLookupCache(
+	c, err := newLookupCache(
 		monitoring.NewRegistry(),
-		defaultConfig.CacheConfig,
+		defaultConfig().cacheConfig,
 		&stubResolver{})
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Initial success query.
-	ptr, err := c.LookupPTR(gatewayIP)
+	r, err := c.Lookup(gatewayIP, typePTR)
 	if assert.NoError(t, err) {
-		assert.EqualValues(t, gatewayName, ptr.Host)
-		assert.EqualValues(t, gatewayTTL, ptr.TTL)
+		assert.EqualValues(t, []string{gatewayName}, r.Data)
+		assert.EqualValues(t, gatewayTTL, r.TTL)
 		assert.EqualValues(t, 0, c.stats.Hit.Get())
 		assert.EqualValues(t, 1, c.stats.Miss.Get())
 	}
 
 	// Cached success query.
-	ptr, err = c.LookupPTR(gatewayIP)
+	r, err = c.Lookup(gatewayIP, typePTR)
 	if assert.NoError(t, err) {
-		assert.EqualValues(t, gatewayName, ptr.Host)
+		assert.EqualValues(t, []string{gatewayName}, r.Data)
 		// TTL counts down while in cache.
-		assert.InDelta(t, gatewayTTL, ptr.TTL, 1)
+		assert.InDelta(t, gatewayTTL, r.TTL, 1)
 		assert.EqualValues(t, 1, c.stats.Hit.Get())
 		assert.EqualValues(t, 1, c.stats.Miss.Get())
 	}
 
 	// Initial failure query (like a dns error response code).
-	ptr, err = c.LookupPTR(gatewayIP + "0")
+	r, err = c.Lookup(gatewayIP+"0", typePTR)
 	if assert.Error(t, err) {
-		assert.Nil(t, ptr)
+		assert.Nil(t, r)
 		assert.EqualValues(t, 1, c.stats.Hit.Get())
 		assert.EqualValues(t, 2, c.stats.Miss.Get())
 	}
 
 	// Cached failure query.
-	ptr, err = c.LookupPTR(gatewayIP + "0")
+	r, err = c.Lookup(gatewayIP+"0", typePTR)
 	if assert.Error(t, err) {
-		assert.Nil(t, ptr)
+		assert.Nil(t, r)
 		assert.EqualValues(t, 2, c.stats.Hit.Get())
 		assert.EqualValues(t, 2, c.stats.Miss.Get())
 	}
 
 	// Initial network failure (like I/O timeout).
-	ptr, err = c.LookupPTR(gatewayIP + "1")
+	r, err = c.Lookup(gatewayIP+"1", typePTR)
 	if assert.Error(t, err) {
-		assert.Nil(t, ptr)
+		assert.Nil(t, r)
 		assert.EqualValues(t, 2, c.stats.Hit.Get())
 		assert.EqualValues(t, 3, c.stats.Miss.Get())
 	}
 
 	// Check for a cache hit for the network failure.
-	ptr, err = c.LookupPTR(gatewayIP + "1")
+	r, err = c.Lookup(gatewayIP+"1", typePTR)
 	if assert.Error(t, err) {
-		assert.Nil(t, ptr)
+		assert.Nil(t, r)
 		assert.EqualValues(t, 3, c.stats.Hit.Get())
 		assert.EqualValues(t, 3, c.stats.Miss.Get()) // Cache miss.
 	}
 
-	minTTL := defaultConfig.CacheConfig.SuccessCache.MinTTL
+	minTTL := defaultConfig().cacheConfig.SuccessCache.MinTTL
 	// Initial success returned TTL=0 with MinTTL.
-	ptr, err = c.LookupPTR(gatewayIP + "2")
+	r, err = c.Lookup(gatewayIP+"2", typePTR)
 	if assert.NoError(t, err) {
-		assert.EqualValues(t, gatewayName, ptr.Host)
+		assert.EqualValues(t, []string{gatewayName}, r.Data)
 
-		assert.EqualValues(t, minTTL/time.Second, ptr.TTL)
+		assert.EqualValues(t, minTTL/time.Second, r.TTL)
 		assert.EqualValues(t, 3, c.stats.Hit.Get())
 		assert.EqualValues(t, 4, c.stats.Miss.Get())
 
@@ -117,11 +117,11 @@ func TestCache(t *testing.T) {
 	}
 
 	// Cached success from a previous TTL=0 response.
-	ptr, err = c.LookupPTR(gatewayIP + "2")
+	r, err = c.Lookup(gatewayIP+"2", typePTR)
 	if assert.NoError(t, err) {
-		assert.EqualValues(t, gatewayName, ptr.Host)
+		assert.EqualValues(t, []string{gatewayName}, r.Data)
 		// TTL counts down while in cache.
-		assert.InDelta(t, minTTL/time.Second, ptr.TTL, 1)
+		assert.InDelta(t, minTTL/time.Second, r.TTL, 1)
 		assert.EqualValues(t, 4, c.stats.Hit.Get())
 		assert.EqualValues(t, 4, c.stats.Miss.Get())
 	}

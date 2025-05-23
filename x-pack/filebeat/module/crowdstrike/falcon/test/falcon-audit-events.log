@@ -275,3 +275,20 @@
         "UTCTimestamp": 1581603262
     }
 }
+{
+    "metadata": {
+        "customerIDString": "8f69fe9e-b995-4204-95ad-44f9bcf75b6b",
+        "offset": 9,
+        "eventType": "AuthActivityAuditEvent",
+        "eventCreationTime": 1581601820289,
+        "version": "1.0"
+    },
+    "event": {
+        "UserId": "alice@company.com",
+        "UserIp": "N/A",
+        "OperationName": "selfAcceptEula",
+        "ServiceName": "CrowdStrike Authentication",
+        "Success": true,
+        "UTCTimestamp": 1581601820289
+    }
+}

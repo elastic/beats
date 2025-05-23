@@ -5,10 +5,10 @@
 package app_insights
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

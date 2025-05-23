@@ -55,7 +55,7 @@ class TestKeystore(BaseTest):
         Add new secret using the --stdin option
         """
         args = [self.test_binary,
-                "-systemTest",
+                "--systemTest",
                 "-c", os.path.join(self.working_dir, self.beat_name + ".yml"),
                 "-e", "-v", "-d", "*",
                 "keystore", "add", key, "--stdin",

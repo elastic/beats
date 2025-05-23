@@ -6,6 +6,7 @@ package billing
 
 import (
 	"context"
+	"crypto/fips140"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -28,9 +29,8 @@ import (
 )
 
 var (
-	metricsetName  = "billing"
-	regionName     = "us-east-1"
-	labelSeparator = "|"
+	metricsetName = "billing"
+	regionName    = "us-east-1"
 
 	// This list is from https://github.com/aws/aws-sdk-go-v2/blob/master/service/costexplorer/api_enums.go#L60-L90
 	supportedDimensionKeys = []string{
@@ -63,9 +63,10 @@ type MetricSet struct {
 	*aws.MetricSet
 	logger             *logp.Logger
 	CostExplorerConfig CostExplorerConfig `config:"cost_explorer_config"`
+	PreviousEndTime    time.Time
 }
 
-// Config holds a configuration specific for billing metricset.
+// CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
 	GroupByDimensionKeys []string `config:"group_by_dimension_keys"`
 	GroupByTagKeys       []string `config:"group_by_tag_keys"`
@@ -118,11 +119,21 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return err
 	}
+
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
+	}
+
 	// Get startDate and endDate
 	startDate, endDate := getStartDateEndDate(m.Period)
 
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency, m.PreviousEndTime)
+	m.PreviousEndTime = endTime
 
 	// get cost metrics from cost explorer
 	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
@@ -171,7 +182,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	endTime time.Time) []mb.Event {
 	var events []mb.Event
 	namespace := "AWS/Billing"
-	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
+	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.OwningAccount, m.MonitoringAccountID, svcCloudwatch)
 	if err != nil {
 		m.Logger().Error(err.Error())
 		return nil
@@ -181,7 +192,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 		return events
 	}
 
-	metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.Period)
+	metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.DataGranularity)
 	metricDataOutput, err := aws.GetMetricDataResults(metricDataQueriesTotal, svcCloudwatch, startTime, endTime)
 	if err != nil {
 		err = fmt.Errorf("aws GetMetricDataResults failed with %w, skipping region %s", err, regionName)
@@ -189,24 +200,22 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 		return nil
 	}
 
-	// Find a timestamp for all metrics in output
-	timestamp := aws.FindTimestamp(metricDataOutput)
-	if timestamp.IsZero() {
-		return nil
-	}
-
 	for _, output := range metricDataOutput {
 		if len(output.Values) == 0 {
 			continue
 		}
-		exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-		if exists {
-			labels := strings.Split(*output.Label, labelSeparator)
+		for valI, metricDataResultValue := range output.Values {
+			labels := strings.Split(*output.Label, aws.LabelConst.LabelSeparator)
+			event := mb.Event{}
+			if labels[aws.LabelConst.AccountIdIdx] != "" {
+				event = aws.InitEvent("", labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], "")
+			} else {
+				event = aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI], "")
+			}
 
-			event := aws.InitEvent("", m.AccountName, m.AccountID, timestamp)
-			_, _ = event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+			_, _ = event.MetricSetFields.Put(labels[aws.LabelConst.MetricNameIdx], metricDataResultValue)
 
-			i := 1
+			i := aws.LabelConst.BillingDimensionStartIdx
 			for i < len(labels)-1 {
 				_, _ = event.MetricSetFields.Put(labels[i], labels[i+1])
 				i += 2
@@ -228,6 +237,15 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 	if err != nil {
 		return nil
 	}
+
+	// Starting from Go 1.24, when FIPS 140-3 mode is active, fips140.Enabled() will return true.
+	// So, regardless of whether `fips_enabled` is set to true or false, when FIPS 140-3 mode is active, the
+	// resolver will resolve to the FIPS endpoint.
+	// See: https://go.dev/doc/security/fips140#fips-140-3-mode
+	if fips140.Enabled() {
+		config.AWSConfig.FIPSEnabled = true
+	}
+
 	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 
@@ -316,7 +334,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 }
 
 func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricValue, groupDefinition costexplorertypes.GroupDefinition, startDate string, endDate string) mb.Event {
-	event := aws.InitEvent("", m.AccountName, m.AccountID, time.Now())
+	event := aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, time.Now(), "")
 
 	// add group definition
 	_, _ = event.MetricSetFields.Put("group_definition", mapstr.M{
@@ -345,11 +363,11 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricVa
 	return event
 }
 
-func constructMetricQueries(listMetricsOutput []types.Metric, period time.Duration) []types.MetricDataQuery {
+func constructMetricQueries(listMetricsOutput []aws.MetricWithID, dataGranularity time.Duration) []types.MetricDataQuery {
 	var metricDataQueries []types.MetricDataQuery
 	metricDataQueryEmpty := types.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, i, period)
+		metricDataQuery := createMetricDataQuery(listMetric, i, dataGranularity)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}
@@ -358,27 +376,32 @@ func constructMetricQueries(listMetricsOutput []types.Metric, period time.Durati
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric types.Metric, index int, period time.Duration) types.MetricDataQuery {
+func createMetricDataQuery(metric aws.MetricWithID, index int, dataGranularity time.Duration) types.MetricDataQuery {
 	statistic := "Maximum"
-	periodInSeconds := int32(period.Seconds())
+	dataGranularityInSeconds := int32(dataGranularity.Seconds())
 	id := metricsetName + strconv.Itoa(index)
-	metricDims := metric.Dimensions
-	metricName := *metric.MetricName
+	metricDims := metric.Metric.Dimensions
+	metricName := *metric.Metric.MetricName
 
-	label := metricName + labelSeparator
+	label := strings.Join([]string{metric.AccountID, aws.LabelConst.AccountLabel, metricName}, aws.LabelConst.LabelSeparator)
 	for _, dim := range metricDims {
-		label += *dim.Name + labelSeparator + *dim.Value + labelSeparator
+		label += aws.LabelConst.LabelSeparator + *dim.Name + aws.LabelConst.LabelSeparator + *dim.Value
 	}
 
-	return types.MetricDataQuery{
+	metricDataQuery := types.MetricDataQuery{
 		Id: &id,
 		MetricStat: &types.MetricStat{
-			Period: &periodInSeconds,
+			Period: &dataGranularityInSeconds,
 			Stat:   &statistic,
-			Metric: &metric,
+			Metric: &metric.Metric,
 		},
 		Label: &label,
 	}
+
+	if metric.AccountID != "" {
+		metricDataQuery.AccountId = &metric.AccountID
+	}
+	return metricDataQuery
 }
 
 func getStartDateEndDate(period time.Duration) (string, string) {

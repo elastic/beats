@@ -26,7 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestMakeXPackMonitoringIndexName(t *testing.T) {
@@ -86,7 +86,7 @@ func TestReportErrorForMissingField(t *testing.T) {
 	r := MockReporterV2{}
 	err := ReportErrorForMissingField(field, Elasticsearch, r)
 
-	expectedError := fmt.Errorf("Could not find field '%v' in Elasticsearch API response", field)
+	expectedError := fmt.Errorf("could not find field '%v' in Elasticsearch API response", field)
 	assert.Equal(t, expectedError, err)
 	assert.Equal(t, expectedError, currentErr)
 }
@@ -157,11 +157,14 @@ func TestConfigureModule(t *testing.T) {
 	require.NoError(t, err)
 	err = mockRegistry.AddMetricSet(moduleName, "baz", mockMetricSetFactory)
 	require.NoError(t, err)
+	err = mockRegistry.AddMetricSet(moduleName, "thud", mockMetricSetFactory)
+	require.NoError(t, err)
 
 	tests := map[string]struct {
-		initConfig             metricSetConfig
-		xpackEnabledMetricsets []string
-		newConfig              metricSetConfig
+		initConfig              metricSetConfig
+		xpackEnabledMetricsets  []string
+		optionalXpackMetricsets []string
+		newConfig               metricSetConfig
 	}{
 		"no_xpack_enabled": {
 			metricSetConfig{
@@ -169,6 +172,7 @@ func TestConfigureModule(t *testing.T) {
 				MetricSets: []string{"foo", "bar"},
 			},
 			[]string{"baz", "qux", "foo"},
+			[]string{},
 			metricSetConfig{
 				Module:     moduleName,
 				MetricSets: []string{"foo", "bar"},
@@ -181,10 +185,25 @@ func TestConfigureModule(t *testing.T) {
 				MetricSets:   []string{"foo", "bar"},
 			},
 			[]string{"baz", "qux", "foo"},
+			[]string{},
 			metricSetConfig{
 				Module:       moduleName,
 				XPackEnabled: true,
 				MetricSets:   []string{"baz", "qux", "foo"},
+			},
+		},
+		"xpack_enabled_with_optional": {
+			metricSetConfig{
+				Module:       moduleName,
+				XPackEnabled: true,
+				MetricSets:   []string{"foo", "bar", "thud"},
+			},
+			[]string{"baz", "qux", "foo"},
+			[]string{"bar"},
+			metricSetConfig{
+				Module:       moduleName,
+				XPackEnabled: true,
+				MetricSets:   []string{"baz", "qux", "foo", "bar"}, // include optional, exclude others
 			},
 		},
 	}
@@ -192,7 +211,7 @@ func TestConfigureModule(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.initConfig)
-			m, _, err := mb.NewModule(cfg, mockRegistry)
+			m, _, err := mb.NewModule(cfg, mockRegistry, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			bm, ok := m.(*mb.BaseModule)
@@ -200,7 +219,7 @@ func TestConfigureModule(t *testing.T) {
 				require.Fail(t, "expecting module to be base module")
 			}
 
-			newM, err := NewModule(bm, test.xpackEnabledMetricsets, logp.L())
+			newM, err := NewModule(bm, test.xpackEnabledMetricsets, test.optionalXpackMetricsets, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			var newConfig metricSetConfig

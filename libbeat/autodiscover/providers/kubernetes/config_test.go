@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg"
 
@@ -31,7 +32,8 @@ import (
 )
 
 func TestConfigWithCustomBuilders(t *testing.T) {
-	autodiscover.Registry.AddBuilder("mock", newMockBuilder)
+	err := autodiscover.Registry.AddBuilder("mock", newMockBuilder)
+	assert.NoError(t, err)
 
 	cfg := mapstr.M{
 		"hints.enabled": false,
@@ -44,13 +46,15 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 
 	config := conf.MustNewConfigFrom(&cfg)
 	c := defaultConfig()
-	err := config.Unpack(&c)
+	err = config.Unpack(&c)
 	assert.NoError(t, err)
 
 	cfg1 := mapstr.M{
 		"hints.enabled": false,
 	}
 	config, err = conf.NewConfigFrom(&cfg1)
+	assert.NoError(t, err)
+
 	c = defaultConfig()
 	err = config.Unpack(&c)
 	assert.Error(t, err)
@@ -72,10 +76,55 @@ func TestConfigWithIncorrectScope(t *testing.T) {
 	assert.Equal(t, "cluster", c.Scope)
 }
 
+func TestConfigLeaseFields(t *testing.T) {
+	cfg := mapstr.M{
+		"scope":  "cluster",
+		"unique": "true",
+	}
+
+	tests := []struct {
+		LeaseDuration string
+		RenewDeadline string
+		RetryPeriod   string
+		message       string
+	}{
+		{
+			LeaseDuration: "20seconds",
+			RenewDeadline: "15s",
+			RetryPeriod:   "2s",
+			message:       "incorrect lease duration, should be set to default",
+		},
+		{
+			LeaseDuration: "20s",
+			RenewDeadline: "15minutes",
+			RetryPeriod:   "2s",
+			message:       "incorrect renew deadline, should be set to default",
+		},
+		{
+			LeaseDuration: "20s",
+			RenewDeadline: "15s",
+			RetryPeriod:   "2hrs",
+			message:       "incorrect retry period, should be set to default",
+		},
+	}
+
+	for _, test := range tests {
+		cfg["leader_leaseduration"] = test.LeaseDuration
+		cfg["leader_renewdeadline"] = test.RenewDeadline
+		cfg["leader_retryperiod"] = test.RetryPeriod
+
+		config := conf.MustNewConfigFrom(&cfg)
+
+		c := defaultConfig()
+		err := config.Unpack(&c)
+		assert.Errorf(t, err, test.message)
+	}
+}
+
 type mockBuilder struct {
 }
 
-func newMockBuilder(_ *conf.C) (autodiscover.Builder, error) {
+func newMockBuilder(_ *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	return &mockBuilder{}, nil
 }
 

@@ -19,12 +19,12 @@ package sysinit
 
 import (
 	"flag"
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var hostfsCLI = flag.String("system.hostfs", "", "Mount point of the host's filesystem for use in monitoring a host from within a container")
@@ -39,50 +39,52 @@ type HostFSConfig struct {
 	HostFS string `config:"hostfs"`
 }
 
-// MetricbeatHostFSConfig
+// MetricbeatHostFSConfig carries config information for the hostfs setting
 type MetricbeatHostFSConfig struct {
 	HostFS string `config:"system.hostfs"`
 }
 
-// Init either the system or linux module. This will produce different modules depending on if we're running under agent or not.
+// InitSystemModule initializes either either the system or linux module. This will produce different modules depending on if we're running under agent or not.
 func InitSystemModule(base mb.BaseModule) (mb.Module, error) {
 	// common code for the base use case of `hostfs` being set at the module-level
-	logger := logp.L()
-	hostfs, userSet := findConfigValue(base)
+	logger := base.Logger
+	hostfs, userSet, err := findConfigValue(base)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching config value: %w", err)
+	}
 	if fleetmode.Enabled() {
 		logger.Infof("initializing HostFS values under agent: %s", hostfs)
 		return fleetInit(base, hostfs, userSet)
 	}
-	return metricbeatInit(base, hostfs, userSet)
+	return metricbeatInit(base, hostfs)
 }
 
 func fleetInit(base mb.BaseModule, modulepath string, moduleSet bool) (mb.Module, error) {
 	once.Do(func() {
-		InitModule(modulepath)
+		InitModule(modulepath, base.Logger)
 	})
 
 	// The multiple invocations here might seem buggy, but we're dealing with a case were agent's config schemea (local, per-datastream) must mesh with the global HostFS scheme used by some libraries
 	// Strictly speaking, we can't guarantee that agent will send consistent HostFS config values across all datastreams, as it treats a global value as per-datastream.
 	if moduleSet {
-		InitModule(modulepath)
+		InitModule(modulepath, base.Logger)
 	}
 
 	return &Module{BaseModule: base, HostFS: modulepath, UserSetHostFS: moduleSet}, nil
 }
 
 // Deal with the legacy configs available to metricbeat
-func metricbeatInit(base mb.BaseModule, modulePath string, moduleSet bool) (mb.Module, error) {
+func metricbeatInit(base mb.BaseModule, modulePath string) (mb.Module, error) {
 	var hostfs = modulePath
 	var userSet bool
 	// allow the CLI to override other settings
 	if hostfsCLI != nil && *hostfsCLI != "" {
-		cfgwarn.Deprecate("8.0.0", "The --system.hostfs flag will be removed in the future and replaced by a config value.")
 		hostfs = *hostfsCLI
 		userSet = true
 	}
 
 	once.Do(func() {
-		InitModule(hostfs)
+		InitModule(hostfs, base.Logger)
 	})
 	return &Module{BaseModule: base, HostFS: hostfs, UserSetHostFS: userSet}, nil
 
@@ -91,22 +93,29 @@ func metricbeatInit(base mb.BaseModule, modulePath string, moduleSet bool) (mb.M
 // A user can supply either `system.hostfs` or `hostfs`.
 // In additon, we will probably want to change Integration Config values to `hostfs` as well.
 // We need to figure out which one we got, if any.
-func findConfigValue(base mb.BaseModule) (string, bool) {
+// Returns false if no config value was set
+func findConfigValue(base mb.BaseModule) (string, bool, error) {
 	partialConfig := HostFSConfig{}
-	base.UnpackConfig(&partialConfig)
+	err := base.UnpackConfig(&partialConfig)
+	if err != nil {
+		return "", false, fmt.Errorf("error unpacking hostfs config: %w", err)
+	}
 	// if the newer value is set, just use that.
 	if partialConfig.HostFS != "" {
-		return partialConfig.HostFS, true
+		return partialConfig.HostFS, true, nil
 	}
 
 	legacyConfig := MetricbeatHostFSConfig{}
-	base.UnpackConfig(&legacyConfig)
+	err = base.UnpackConfig(&legacyConfig)
+	if err != nil {
+		return "", false, fmt.Errorf("error unpacking legacy config: %w", err)
+	}
 	if legacyConfig.HostFS != "" {
 		cfgwarn.Deprecate("8.0.0", "The system.hostfs config value will be removed, use `hostfs` from within the module config.")
 		// Only fallback to this if the user didn't set anything else
-		return legacyConfig.HostFS, true
+		return legacyConfig.HostFS, true, nil
 	}
 
-	return "/", false
+	return "/", false, nil
 
 }

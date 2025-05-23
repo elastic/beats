@@ -80,8 +80,7 @@ func TestLogFileTimedClosing(t *testing.T) {
 			}
 
 			err = readUntilError(reader)
-
-			assert.Equal(t, test.expectedErr, err)
+			assert.ErrorIs(t, err, test.expectedErr)
 		})
 	}
 }

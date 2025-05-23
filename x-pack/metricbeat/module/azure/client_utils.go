@@ -10,7 +10,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 )
 
 // DefaultTimeGrain is set as default timegrain for the azure metrics
@@ -19,23 +23,19 @@ const DefaultTimeGrain = "PT5M"
 var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
-func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
+func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	for _, v := range metrics {
-		for _, t := range *v.Timeseries {
-			for _, mv := range *t.Data {
-				if metricExists(*v.Name.Value, mv, previousMetrics) || metricIsEmpty(mv) {
-					continue
-				}
-				// remove metric values that are not part of the timeline selected
-				if mv.TimeStamp.Time.After(startTime) && mv.TimeStamp.Time.Before(endTime) {
+		for _, t := range v.Timeseries {
+			for _, mv := range t.Data {
+				if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
 					continue
 				}
 				// define the new metric value and match aggregations values
 				var val MetricValue
 				val.name = *v.Name.Value
-				val.timestamp = mv.TimeStamp.Time
+				val.timestamp = *mv.TimeStamp
 				if mv.Minimum != nil {
 					val.min = mv.Minimum
 				}
@@ -52,7 +52,7 @@ func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, s
 					val.count = mv.Count
 				}
 				if t.Metadatavalues != nil {
-					for _, dim := range *t.Metadatavalues {
+					for _, dim := range t.Metadatavalues {
 						val.dimensions = append(val.dimensions, Dimension{Name: *dim.Name.Value, Value: *dim.Value})
 					}
 				}
@@ -64,7 +64,7 @@ func mapMetricValues(metrics []insights.Metric, previousMetrics []MetricValue, s
 }
 
 // metricExists will check if the metric value has been retrieved in the past
-func metricExists(name string, metric insights.MetricValue, metrics []MetricValue) bool {
+func metricExists(name string, metric armmonitor.MetricValue, metrics []MetricValue) bool {
 	for _, met := range metrics {
 		if name == met.name &&
 			metric.TimeStamp.Equal(met.timestamp) &&
@@ -80,7 +80,7 @@ func metricExists(name string, metric insights.MetricValue, metrics []MetricValu
 }
 
 // metricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
-func metricIsEmpty(metric insights.MetricValue) bool {
+func metricIsEmpty(metric armmonitor.MetricValue) bool {
 	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
 		return true
 	}
@@ -90,7 +90,7 @@ func metricIsEmpty(metric insights.MetricValue) bool {
 // matchMetrics will compare current metrics
 func matchMetrics(prevMet Metric, met Metric) bool {
 	if prevMet.Namespace == met.Namespace && reflect.DeepEqual(prevMet.Names, met.Names) && prevMet.ResourceId == met.ResourceId &&
-		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain {
+		prevMet.Aggregations == met.Aggregations && prevMet.TimeGrain == met.TimeGrain && reflect.DeepEqual(prevMet.Dimensions, met.Dimensions) {
 		return true
 	}
 	return false
@@ -133,33 +133,40 @@ func compareMetricValues(metVal *float64, metricVal *float64) bool {
 	return false
 }
 
-// convertTimegrainToDuration will convert azure timegrain options to actual duration values
-func convertTimegrainToDuration(timegrain string) time.Duration {
+// asDuration converts the Azure time grain options to the equivalent
+// `time.Duration` value.
+//
+// For example, converts "PT1M" to `time.Minute`.
+//
+// See https://docs.microsoft.com/en-us/azure/azure-monitor/platform/metrics-supported#time-grain
+// for more information.
+func asDuration(timeGrain string) time.Duration {
 	var duration time.Duration
-	switch timegrain {
+	switch timeGrain {
 	case "PT1M":
-		duration = time.Duration(time.Minute)
-	default:
+		duration = time.Minute
 	case "PT5M":
-		duration = time.Duration(5 * time.Minute)
+		duration = 5 * time.Minute
 	case "PT15M":
-		duration = time.Duration(15 * time.Minute)
+		duration = 15 * time.Minute
 	case "PT30M":
-		duration = time.Duration(30 * time.Minute)
+		duration = 30 * time.Minute
 	case "PT1H":
-		duration = time.Duration(time.Hour)
+		duration = time.Hour
 	case "PT6H":
-		duration = time.Duration(6 * time.Hour)
+		duration = 6 * time.Hour
 	case "PT12H":
-		duration = time.Duration(12 * time.Hour)
+		duration = 12 * time.Hour
 	case "PT1D":
-		duration = time.Duration(24 * time.Hour)
+		duration = 24 * time.Hour
+	default:
 	}
+
 	return duration
 }
 
-// groupMetricsByResource is used in order to group metrics by resource and return data faster
-func groupMetricsByResource(metrics []Metric) map[string][]Metric {
+// groupMetricsDefinitionsByResourceId is used in order to group metrics by resource and return data faster
+func groupMetricsDefinitionsByResourceId(metrics []Metric) map[string][]Metric {
 	grouped := make(map[string][]Metric)
 	for _, metric := range metrics {
 		if _, ok := grouped[metric.ResourceId]; !ok {
@@ -170,14 +177,17 @@ func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 	return grouped
 }
 
-// getDimension will check if the dimension value is found in the list
-func getDimension(dimension string, dimensions []Dimension) (Dimension, bool) {
-	for _, dim := range dimensions {
-		if strings.ToLower(dim.Name) == strings.ToLower(dimension) {
-			return dim, true
+// getDimension searches for the dimension name in the given dimensions.
+func getDimension(dimensionName string, dimensions mapstr.M) (string, bool) {
+	for name, value := range dimensions {
+		if strings.EqualFold(name, dimensionName) {
+			if valueAsString, ok := value.(string); ok {
+				return valueAsString, true
+			}
 		}
 	}
-	return Dimension{}, false
+
+	return "", false
 }
 
 func containsResource(resourceId string, resources []Resource) bool {
@@ -189,6 +199,8 @@ func containsResource(resourceId string, resources []Resource) bool {
 	return false
 }
 
+// getInstanceId returns the instance id from the given dimension value.
+// The dimension value is expected to be a string in the format "1234567890".
 func getInstanceId(dimensionValue string) string {
 	matches := instanceIdRegex.FindStringSubmatch(dimensionValue)
 	if len(matches) == 2 {
@@ -207,4 +219,92 @@ func getVM(vmName string, vms []VmResource) (VmResource, bool) {
 		}
 	}
 	return VmResource{}, false
+}
+
+// Helper function to generate a string key for the dimensions
+func getDimensionKey(dimensions []Dimension) string {
+	var dimensionKey string
+	for _, dimension := range dimensions {
+		dimensionKey += dimension.Name + ","
+	}
+	return dimensionKey
+}
+
+// Function to get the resource IDs from the batch of metrics
+func getResourceIDs(metrics []Metric) []string {
+	var resourceIDs []string
+	for _, metric := range metrics {
+		resourceIDs = append(resourceIDs, metric.ResourceSubId)
+	}
+	return resourceIDs
+}
+
+// batchMetricIsEmpty will check if the metric value is empty, this seems to be an issue with the azure sdk
+func batchMetricIsEmpty(metric azmetrics.MetricValue) bool {
+	if metric.Average == nil && metric.Total == nil && metric.Minimum == nil && metric.Maximum == nil && metric.Count == nil {
+		return true
+	}
+	return false
+}
+
+func mapBatchMetricValues(client *BatchClient, metricValues azmetrics.MetricData) []MetricValue {
+	var currentMetrics []MetricValue
+	// compare with the previously returned values and filter out any double records
+	for _, v := range metricValues.Values {
+		for _, t := range v.TimeSeries {
+			for _, mv := range t.Data {
+				if batchMetricIsEmpty(mv) {
+					continue
+				}
+				// define the new metric value and match aggregations values
+				var val MetricValue
+				val.name = *v.Name.Value
+				val.timestamp = *mv.TimeStamp
+				if mv.Minimum != nil {
+					val.min = mv.Minimum
+				}
+				if mv.Maximum != nil {
+					val.max = mv.Maximum
+				}
+				if mv.Average != nil {
+					val.avg = mv.Average
+				}
+				if mv.Total != nil {
+					val.total = mv.Total
+				}
+				if mv.Count != nil {
+					val.count = mv.Count
+				}
+				if t.MetadataValues != nil {
+					for _, dim := range t.MetadataValues {
+						val.dimensions = append(val.dimensions, Dimension{Name: *dim.Name.Value, Value: *dim.Value})
+					}
+				}
+				currentMetrics = append(currentMetrics, val)
+			}
+		}
+	}
+
+	return currentMetrics
+}
+
+// processStore collects and return the metric values of the store using the batchAPI. After the metric values are collected, the store gets cleared.
+func processStore(client *BatchClient, criteria ResDefGroupingCriteria, store *MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
+	groupedMetrics := map[ResDefGroupingCriteria][]Metric{
+		criteria: store.GetMetrics(),
+	}
+	metricValues := client.GetMetricsInBatch(groupedMetrics, referenceTime, report)
+	store.ClearMetrics()
+	return metricValues
+}
+
+// processAllStores collects and return the metrics of all the stores using the batchAPI
+func processAllStores(client *BatchClient, stores map[ResDefGroupingCriteria]*MetricStore, referenceTime time.Time, report mb.ReporterV2) []Metric {
+	var metricValues []Metric
+	for criteria, store := range stores {
+		if store.Size() > 0 {
+			metricValues = append(metricValues, processStore(client, criteria, store, referenceTime, report)...)
+		}
+	}
+	return metricValues
 }

@@ -116,21 +116,20 @@ func (e *Event) BeatEvent(module, metricSet string, modifiers ...EventModifier) 
 // duration (round-trip time in nanoseconds) values if they are non-zero
 // values.
 //
-//   {
-//     "event": {
-//       "dataset": "apache.status",
-//       "duration": 115,
-//       "module": "apache"
-//     },
-//     "service": {
-//       "address": "127.0.0.1",
-//     },
-//     "metricset": {
-//       "name": "status",
-//       "period": 10000
-//     }
-//   }
-//
+//	{
+//	  "event": {
+//	    "dataset": "apache.status",
+//	    "duration": 115,
+//	    "module": "apache"
+//	  },
+//	  "service": {
+//	    "address": "127.0.0.1",
+//	  },
+//	  "metricset": {
+//	    "name": "status",
+//	    "period": 10000
+//	  }
+//	}
 func AddMetricSetInfo(module, metricset string, event *Event) {
 	if event.Namespace == "" {
 		event.Namespace = fmt.Sprintf("%s.%s", module, metricset)
@@ -214,4 +213,22 @@ func tryToMapStr(v interface{}) (mapstr.M, bool) {
 	default:
 		return nil, false
 	}
+}
+
+// PartialMetricsError indicates that metrics are only partially filled.
+// This will be removed once we fix the underlying problem.
+// See https://github.com/elastic/beats/issues/40542 for more details.
+type PartialMetricsError struct {
+	Err error
+}
+
+func (p PartialMetricsError) Error() string {
+	if p.Err == nil {
+		return ""
+	}
+	return p.Err.Error()
+}
+
+func (p PartialMetricsError) Unwrap() error {
+	return p.Err
 }

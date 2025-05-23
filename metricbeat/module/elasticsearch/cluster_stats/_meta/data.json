@@ -1,122 +1,146 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "elasticsearch": {
-        "cluster": {
-            "id": "WocBBA0QRma0sGpdQ7vLfQ",
-            "name": "docker-cluster",
-            "stats": {
-                "expiry_date_in_millis": 1638548539004,
-                "indices": {
-                    "docs": {
-                        "total": 81
-                    },
-                    "fielddata": {
-                        "memory": {
-                            "bytes": 0
-                        }
-                    },
-                    "shards": {
-                        "count": 17,
-                        "primaries": 17
-                    },
-                    "store": {
-                        "size": {
-                            "bytes": 44156720
-                        }
-                    },
-                    "total": 17
-                },
-                "license": {
-                    "status": "active",
-                    "type": "trial",
-                    "expiry_date_in_millis": 1638548539004
-                },
-                "nodes": {
-                    "count": 1,
-                    "fs": {
-                        "available": {
-                            "bytes": 126640869376
-                        },
-                        "total": {
-                            "bytes": 330994548736
-                        }
-                    },
-                    "jvm": {
-                        "max_uptime": {
-                            "ms": 795905
-                        },
-                        "memory": {
-                            "heap": {
-                                "max": {
-                                    "bytes": 268435456
-                                },
-                                "used": {
-                                    "bytes": 166911488
-                                }
-                            }
-                        }
-                    },
-                    "master": 1,
-                    "versions": [
-                        "7.14.0"
-                    ]
-                },
-                "stack": {
-                    "xpack": {
-                        "ccr": {
-                            "available": true,
-                            "enabled": true
-                        }
-                    }
-                },
-                "state": {
-                    "master_node": "f5i3v9hMT_q__q6B9WOo5A",
-                    "nodes": {
-                        "f5i3v9hMT_q__q6B9WOo5A": {
-                            "attributes": {
-                                "ml.machine_memory": "33295835136",
-                                "ml.max_jvm_size": "268435456",
-                                "ml.max_open_jobs": "512",
-                                "transform.node": "true",
-                                "xpack.installed": "true"
-                            },
-                            "ephemeral_id": "aQVRUnEIQ5GA3Qe4uBDqLA",
-                            "name": "27fb1c2fd783",
-                            "roles": [
-                                "data",
-                                "data_cold",
-                                "data_content",
-                                "data_frozen",
-                                "data_hot",
-                                "data_warm",
-                                "ingest",
-                                "master",
-                                "ml",
-                                "remote_cluster_client",
-                                "transform"
-                            ],
-                            "transport_address": "127.0.0.1:9300"
-                        }
-                    },
-                    "nodes_hash": -19752840,
-                    "state_uuid": "XNIdeSZxQwyItvGfR5fHSw"
-                },
-                "status": "yellow"
-            }
-        },
-        "version": 106
+    "@timestamp": "2022-09-29T15:29:10.126Z",
+    "agent": {
+      "ephemeral_id": "a5d48d51-ae7e-4d92-8322-480f92a13ad1",
+      "id": "baa161a5-42b3-4ecc-8d2d-578df730f8f2",
+      "name": "host.example.com",
+      "type": "metricbeat",
+      "version": "8.6.0"
     },
-    "event": {
-        "dataset": "elasticsearch.cluster.stats",
-        "duration": 115000,
-        "module": "elasticsearch"
-    },
-    "metricset": {
-        "name": "cluster_stats",
-        "period": 10000
+    "ecs": {
+      "version": "8.0.0"
     },
     "service": {
-        "address": "172.19.0.2:9200",
-        "type": "elasticsearch"
+      "address": "http://localhost:9200",
+      "type": "elasticsearch"
+    },
+    "event": {
+      "duration": 21179060,
+      "dataset": "elasticsearch.cluster.stats",
+      "module": "elasticsearch"
+    },
+    "metricset": {
+      "name": "cluster_stats",
+      "period": 10000
+    },
+    "elasticsearch": {
+      "cluster": {
+        "id": "C69Yz6KEQwqRB3UM6eAw9Q",
+        "stats": {
+          "indices": {
+            "total": 13,
+            "shards": {
+              "count": 13,
+              "primaries": 13
+            },
+            "store": {
+              "size": {
+                "bytes": 215309570
+              }
+            },
+            "fielddata": {
+              "memory": {
+                "bytes": 856
+              }
+            },
+            "docs": {
+              "total": 346281
+            }
+          },
+          "status": "yellow",
+          "nodes": {
+            "fs": {
+              "total": {
+                "bytes": 1000240963584
+              },
+              "available": {
+                "bytes": 748824121344
+              }
+            },
+            "jvm": {
+              "memory": {
+                "heap": {
+                  "used": {
+                    "bytes": 940384488
+                  },
+                  "max": {
+                    "bytes": 1610612736
+                  }
+                }
+              },
+              "max_uptime": {
+                "ms": 276638325
+              }
+            },
+            "versions": [
+              "8.6.0"
+            ],
+            "count": 1,
+            "master": 1,
+            "data": 1
+          },
+          "stack": {
+            "xpack": {
+              "ccr": {
+                "enabled": true,
+                "available": false
+              }
+            },
+            "apm": {
+              "found": false
+            }
+          },
+          "license": {
+            "issuer": "elasticsearch",
+            "uid": "b7b2528a-2420-40a7-9901-27cd17038417",
+            "issue_date": "2022-09-26T10:38:48.488Z",
+            "issue_date_in_millis": 1664188728488,
+            "type": "basic",
+            "status": "active",
+            "start_date_in_millis": -1,
+            "max_nodes": 1000,
+            "issued_to": "elasticsearch",
+            "cluster_needs_tls": false
+          },
+          "state": {
+            "state_uuid": "k33Hi1zfQKyWy5bo1eDIeg",
+            "nodes": {
+              "5zxFRfJuQke2wVTtnREDWQ": {
+                "external_id": "host.example.com",
+                "attributes": {
+                  "ml.allocated_processors_double": "16.0",
+                  "ml.max_jvm_size": "1610612736",
+                  "ml.allocated_processors": "16",
+                  "ml.machine_memory": "68719476736",
+                  "xpack.installed": "true"
+                },
+                "roles": [
+                  "data",
+                  "data_cold",
+                  "data_content",
+                  "data_frozen",
+                  "data_hot",
+                  "data_warm",
+                  "ingest",
+                  "master",
+                  "ml",
+                  "remote_cluster_client",
+                  "transform"
+                ],
+                "name": "host.example.com",
+                "ephemeral_id": "lLzvxF39RpG5SRDFbyzbGw",
+                "transport_address": "127.0.0.1:9300"
+              }
+            },
+            "nodes_hash": 104095561,
+            "master_node": "5zxFRfJuQke2wVTtnREDWQ"
+          }
+        },
+        "name": "elasticsearch"
+      },
+      "version": 96
+    },
+    "host": {
+      "name": "host.example.com"
     }
-}
+  }

@@ -19,8 +19,7 @@ package stats
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -37,14 +36,22 @@ var (
 		},
 	}
 	httpReqStatsSchema = s.Schema{
-		"root_uri":   c.Int("/"),
-		"connz_uri":  c.Int("/connz"),
-		"routez_uri": c.Int("/routez"),
-		"subsz_uri":  c.Int("/subsz"),
-		"varz_uri":   c.Int("/varz"),
+		"root_uri":     c.Int("/", s.Optional),
+		"connz_uri":    c.Int("/connz", s.Optional),
+		"routez_uri":   c.Int("/routez", s.Optional),
+		"subsz_uri":    c.Int("/subsz", s.Optional),
+		"varz_uri":     c.Int("/varz", s.Optional),
+		"jsz_uri":      c.Int("/jsz", s.Optional),
+		"accountz_uri": c.Int("/accountz", s.Optional),
+		"accstatz_uri": c.Int("/accstatz", s.Optional),
+		"gatewayz_uri": c.Int("/gatewayz", s.Optional),
+		"healthz_uri":  c.Int("/healthz", s.Optional),
+		"leafz_uri":    c.Int("/leafz", s.Optional),
 	}
 	statsSchema = s.Schema{
-		"uptime": c.Str("uptime"),
+		"server_name": c.Str("server_name", s.Optional),
+		"version":     c.Str("version", s.Optional),
+		"uptime":      c.Str("uptime"),
 		"mem": s.Object{
 			"bytes": c.Int("mem"),
 		},
@@ -71,62 +78,78 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	err := json.Unmarshal(content, &inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Nats stats API response")
+		return fmt.Errorf("failure parsing Nats stats API response: %w", err)
 	}
 	metricsetMetrics, err = statsSchema.Apply(inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure applying stats schema")
+		return fmt.Errorf("failure applying stats schema: %w", err)
 	}
 
 	err = util.UpdateDuration(metricsetMetrics, "uptime")
 	if err != nil {
-		return errors.Wrap(err, "failure updating uptime key")
+		return fmt.Errorf("failure updating uptime key: %w", err)
 	}
 
 	d, err := metricsetMetrics.GetValue("http_req_stats")
 	if err != nil {
-		return errors.Wrap(err, "failure retrieving http_req_stats key")
+		return fmt.Errorf("failure retrieving http_req_stats key: %w", err)
 	}
 	httpStats, ok := d.(mapstr.M)
 	if !ok {
-		return errors.Wrap(err, "failure casting http_req_stats to common.Mapstr")
-
+		return fmt.Errorf("failure casting http_req_stats to common.Mapstr")
 	}
 	err = metricsetMetrics.Delete("http_req_stats")
 	if err != nil {
-		return errors.Wrap(err, "failure deleting http_req_stats key")
+		return fmt.Errorf("failure deleting http_req_stats key: %w", err)
 
 	}
+
+	httpMetrics := []string{
+		"root",
+		"connz",
+		"routez",
+		"subsz",
+		"varz",
+		"jsz",
+		"accountz",
+		"accstatz",
+		"gatewayz",
+		"healthz",
+		"leafz",
+	}
+
 	metricsetMetrics["http"] = mapstr.M{
 		"req_stats": mapstr.M{
-			"uri": mapstr.M{
-				"root":   httpStats["root_uri"],
-				"connz":  httpStats["connz_uri"],
-				"routez": httpStats["routez_uri"],
-				"subsz":  httpStats["subsz_uri"],
-				"varz":   httpStats["varz_uri"],
-			},
+			"uri": mapstr.M{},
 		},
 	}
+
+	for _, name := range httpMetrics {
+		key := fmt.Sprintf("%s_uri", name)
+		if httpStats[key] != nil {
+			metricsetMetrics.Put(fmt.Sprintf("http.req_stats.uri.%s", name), httpStats[key])
+		}
+	}
+
 	cpu, err := metricsetMetrics.GetValue("cpu")
 	if err != nil {
-		return errors.Wrap(err, "failure retrieving cpu key")
+		return fmt.Errorf("failure retrieving cpu key: %w", err)
 	}
 	cpuUtil, ok := cpu.(float64)
 	if !ok {
-		return errors.Wrap(err, "failure casting cpu to float64")
+		return fmt.Errorf("failure casting cpu to float64")
 	}
 	_, err = metricsetMetrics.Put("cpu", cpuUtil/100.0)
 	if err != nil {
-		return errors.Wrap(err, "failure updating cpu key")
+		return fmt.Errorf("failure updating cpu key: %w", err)
 	}
 	moduleMetrics, err := moduleSchema.Apply(inInterface)
 	if err != nil {
-		return errors.Wrap(err, "failure applying module schema")
+		return fmt.Errorf("failure applying module schema: %w", err)
 	}
 	timestamp, err := util.GetNatsTimestamp(moduleMetrics)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing server timestamp")
+		return fmt.Errorf("failure parsing server timestamp: %w", err)
 	}
 	evt := mb.Event{
 		MetricSetFields: metricsetMetrics,

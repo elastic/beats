@@ -24,15 +24,25 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input/file"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var inputList = monitoring.NewUniqueList()
+var inputListMetricsOnce sync.Once
 
-func init() {
-	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "input", inputList.Report, monitoring.Report)
+// RegisterMonitoringInputs registers a list of inputs with the
+// monitoring system under the provided namespace.  If namespace is
+// empty, it default to "state". Registration only occurs once.
+func RegisterMonitoringInputs(namespace string) {
+	if namespace == "" {
+		namespace = "state"
+	}
+	inputListMetricsOnce.Do(func() {
+		monitoring.NewFunc(monitoring.GetNamespace(namespace).GetRegistry(), "input", inputList.Report, monitoring.Report)
+	})
 }
 
 // Input is the interface common to all input
@@ -44,12 +54,14 @@ type Input interface {
 
 // Runner encapsulate the lifecycle of the input
 type Runner struct {
-	config   inputConfig
-	input    Input
-	done     chan struct{}
-	wg       *sync.WaitGroup
-	Once     bool
-	beatDone chan struct{}
+	config         inputConfig
+	input          Input
+	done           chan struct{}
+	wg             *sync.WaitGroup
+	Once           bool
+	beatDone       chan struct{}
+	statusReporter status.StatusReporter
+	logger         *logp.Logger
 }
 
 // New instantiates a new Runner
@@ -58,6 +70,7 @@ func New(
 	connector channel.Connector,
 	beatDone chan struct{},
 	states []file.State,
+	logger *logp.Logger,
 ) (*Runner, error) {
 	input := &Runner{
 		config:   defaultConfig,
@@ -65,6 +78,7 @@ func New(
 		done:     make(chan struct{}),
 		Once:     false,
 		beatDone: beatDone,
+		logger:   logger,
 	}
 
 	var err error
@@ -79,13 +93,14 @@ func New(
 	}
 
 	context := Context{
-		States:   states,
-		Done:     input.done,
-		BeatDone: input.beatDone,
-		Meta:     nil,
+		States:            states,
+		Done:              input.done,
+		BeatDone:          input.beatDone,
+		Meta:              nil,
+		GetStatusReporter: input.GetStatusReporter,
 	}
 	var ipt Input
-	ipt, err = f(conf, connector, context)
+	ipt, err = f(conf, connector, context, logger)
 	if err != nil {
 		return input, err
 	}
@@ -131,10 +146,10 @@ func (p *Runner) Run() {
 	for {
 		select {
 		case <-p.done:
-			logp.Info("input ticker stopped")
+			p.logger.Info("input ticker stopped")
 			return
 		case <-time.After(p.config.ScanFrequency):
-			logp.Debug("input", "Run input")
+			p.logger.Named("input").Debug("Run input")
 			p.input.Run()
 		}
 	}
@@ -159,4 +174,12 @@ func (p *Runner) stop() {
 
 func (p *Runner) String() string {
 	return fmt.Sprintf("input [type=%s]", p.config.Type)
+}
+
+func (p *Runner) SetStatusReporter(statusReporter status.StatusReporter) {
+	p.statusReporter = statusReporter
+}
+
+func (p *Runner) GetStatusReporter() status.StatusReporter {
+	return p.statusReporter
 }

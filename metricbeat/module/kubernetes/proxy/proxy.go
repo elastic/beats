@@ -28,28 +28,27 @@ import (
 
 var mapping = &prometheus.MetricsMapping{
 	Metrics: map[string]prometheus.MetricMap{
+		"process_cpu_seconds_total":     prometheus.Metric("process.cpu.sec"),
+		"process_resident_memory_bytes": prometheus.Metric("process.memory.resident.bytes"),
+		"process_virtual_memory_bytes":  prometheus.Metric("process.memory.virtual.bytes"),
+		"process_open_fds":              prometheus.Metric("process.fds.open.count"),
+		"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
+		"process_max_fds":               prometheus.Metric("process.fds.max.count"),
 
-		"process_cpu_seconds_total":          prometheus.Metric("process.cpu.sec"),
-		"process_resident_memory_bytes":      prometheus.Metric("process.memory.resident.bytes"),
-		"process_virtual_memory_bytes":       prometheus.Metric("process.memory.virtual.bytes"),
-		"process_open_fds":                   prometheus.Metric("process.fds.open.count"),
-		"process_start_time_seconds":         prometheus.Metric("process.started.sec"),
-		"http_request_duration_microseconds": prometheus.Metric("http.request.duration.us"),
-		"http_request_size_bytes":            prometheus.Metric("http.request.size.bytes"),
-		"http_response_size_bytes":           prometheus.Metric("http.response.size.bytes"),
-		"http_requests_total":                prometheus.Metric("http.request.count"),
-		"rest_client_requests_total":         prometheus.Metric("client.request.count"),
-		"kubeproxy_sync_proxy_rules_duration_seconds": prometheus.Metric("sync.rules.duration.us",
-			prometheus.OpMultiplyBuckets(1000000)),
-		"kubeproxy_network_programming_duration_seconds": prometheus.Metric("sync.networkprogramming.duration.us",
-			prometheus.OpMultiplyBuckets(1000000)),
+		"rest_client_requests_total":           prometheus.Metric("client.request.count"),
+		"rest_client_request_duration_seconds": prometheus.Metric("client.request.duration.us", prometheus.OpMultiplyBuckets(1000000)),
+		"rest_client_request_size_bytes":       prometheus.Metric("client.request.size.bytes"),
+		"rest_client_response_size_bytes":      prometheus.Metric("client.response.size.bytes"),
+
+		"kubeproxy_sync_proxy_rules_duration_seconds":    prometheus.Metric("sync.rules.duration.us", prometheus.OpMultiplyBuckets(1000000)),
+		"kubeproxy_network_programming_duration_seconds": prometheus.Metric("sync.networkprogramming.duration.us", prometheus.OpMultiplyBuckets(1000000)),
 	},
 
 	Labels: map[string]prometheus.LabelMap{
-		"code":    prometheus.KeyLabel("code"),
-		"host":    prometheus.KeyLabel("host"),
-		"method":  prometheus.KeyLabel("method"),
-		"handler": prometheus.KeyLabel("handler"),
+		"code":   prometheus.KeyLabel("code"),
+		"method": prometheus.KeyLabel("method"),
+		"verb":   prometheus.KeyLabel("verb"),
+		"host":   prometheus.KeyLabel("host"),
 	},
 }
 
@@ -95,7 +94,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	for _, e := range events {
 		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
-		if m.clusterMeta != nil {
+		if len(m.clusterMeta) != 0 {
 			event.RootFields.DeepUpdate(m.clusterMeta)
 		}
 		isOpen := reporter.Event(event)

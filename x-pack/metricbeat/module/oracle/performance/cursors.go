@@ -7,8 +7,7 @@ package performance
 import (
 	"context"
 	"database/sql"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -56,7 +55,7 @@ func (e *performanceExtractor) cursorsByUsernameAndMachine(ctx context.Context) 
 						 s.machine
 		ORDER BY 1 DESC`)
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 
 	results := make([]cursorsByUsernameAndMachine, 0)

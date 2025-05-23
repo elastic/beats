@@ -120,3 +120,19 @@ func NewCouldNotConnectErr(host, port string, err error) *ECSErr {
 		fmt.Sprintf("Could not connect to '%s:%s' with error: %s", host, port, err),
 	)
 }
+
+func NewNotSyntheticsCapableError() *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		"AGENT_NOT_BROWSER_CAPABLE",
+		"browser monitors cannot be created outside the official elastic docker image",
+	)
+}
+
+func NewUnsupportedMonitorTypeError(err error) *ECSErr {
+	return NewECSErr(
+		TYPE_IO,
+		"UNSUPPORTED_MONITOR_TYPE",
+		fmt.Sprintf("%s", err),
+	)
+}

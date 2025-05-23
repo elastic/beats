@@ -18,7 +18,6 @@
 package file_integrity
 
 import (
-	"io/ioutil"
 	"os"
 	"syscall"
 	"testing"
@@ -29,7 +28,7 @@ import (
 
 func TestGetNamedSecurityInfo(t *testing.T) {
 	// Create a temp file that we will use in checking the owner.
-	file, err := ioutil.TempFile("", "go")
+	file, err := os.CreateTemp("", "go")
 	if err != nil {
 		t.Fatal(err)
 	}

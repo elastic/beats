@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -34,20 +35,24 @@ var mapping = &prometheus.MetricsMapping{
 		"process_open_fds":              prometheus.Metric("process.fds.open.count"),
 		"process_max_fds":               prometheus.Metric("process.fds.max.count"),
 		"process_start_time_seconds":    prometheus.Metric("process.started.sec"),
-		// rest_client_request_duration_seconds buckets declared in
-		// https://github.com/kubernetes/component-base/blob/3b9b201c27aa896b98da61b94545efe442ae597e/metrics/prometheus/restclient/metrics.go#L39
-		"rest_client_request_duration_seconds":        prometheus.Metric("client.request.duration.us", prometheus.OpMultiplyBuckets(1000000)),
-		"rest_client_requests_total":                  prometheus.Metric("client.request.count"),
+
+		"rest_client_request_duration_seconds": prometheus.Metric("client.request.duration.us", prometheus.OpMultiplyBuckets(1000000)),
+		"rest_client_requests_total":           prometheus.Metric("client.request.count"),
+		"rest_client_response_size_bytes":      prometheus.Metric("client.response.size.bytes"),
+		"rest_client_request_size_bytes":       prometheus.Metric("client.request.size.bytes"),
+
 		"workqueue_longest_running_processor_seconds": prometheus.Metric("workqueue.longestrunning.sec"),
 		"workqueue_unfinished_work_seconds":           prometheus.Metric("workqueue.unfinished.sec"),
 		"workqueue_adds_total":                        prometheus.Metric("workqueue.adds.count"),
 		"workqueue_depth":                             prometheus.Metric("workqueue.depth.count"),
 		"workqueue_retries_total":                     prometheus.Metric("workqueue.retries.count"),
-		"node_collector_evictions_number":             prometheus.Metric("node.collector.eviction.count"),
-		"node_collector_unhealthy_nodes_in_zone":      prometheus.Metric("node.collector.unhealthy.count"),
-		"node_collector_zone_size":                    prometheus.Metric("node.collector.count"),
-		"node_collector_zone_health":                  prometheus.Metric("node.collector.health.pct"),
-		"leader_election_master_status":               prometheus.BooleanMetric("leader.is_master"),
+
+		"node_collector_evictions_total":         prometheus.Metric("node.collector.eviction.count"),
+		"node_collector_unhealthy_nodes_in_zone": prometheus.Metric("node.collector.unhealthy.count"),
+		"node_collector_zone_health":             prometheus.Metric("node.collector.health.pct"),
+		"node_collector_zone_size":               prometheus.Metric("node.collector.count"),
+
+		"leader_election_master_status": prometheus.BooleanMetric("leader.is_master"),
 	},
 
 	Labels: map[string]prometheus.LabelMap{
@@ -56,7 +61,6 @@ var mapping = &prometheus.MetricsMapping{
 		"host":   prometheus.KeyLabel("host"),
 		"name":   prometheus.KeyLabel("name"),
 		"zone":   prometheus.KeyLabel("zone"),
-		"url":    prometheus.KeyLabel("url"),
 		"verb":   prometheus.KeyLabel("verb"),
 	},
 }
@@ -74,6 +78,7 @@ type MetricSet struct {
 	prometheusClient   prometheus.Prometheus
 	prometheusMappings *prometheus.MetricsMapping
 	clusterMeta        mapstr.M
+	mod                k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -84,13 +89,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
+
 	ms := &MetricSet{
 		BaseMetricSet:      base,
 		prometheusClient:   pc,
 		prometheusMappings: mapping,
 		clusterMeta:        util.AddClusterECSMeta(base),
+		mod:                mod,
 	}
-
 	return ms, nil
 }
 
@@ -103,14 +114,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	for _, e := range events {
 		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
-		if m.clusterMeta != nil {
+		if len(m.clusterMeta) != 0 {
 			event.RootFields.DeepUpdate(m.clusterMeta)
 		}
 		isOpen := reporter.Event(event)
 		if !isOpen {
 			return nil
 		}
-	}
 
+	}
 	return nil
 }

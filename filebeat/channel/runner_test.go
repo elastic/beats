@@ -28,8 +28,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -85,7 +89,7 @@ func TestProcessorsForConfig(t *testing.T) {
 		"Set field in ClientConfig": {
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+					Processor: makeProcessors(addfields.NewAddFields(mapstr.M{
 						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
@@ -98,7 +102,7 @@ func TestProcessorsForConfig(t *testing.T) {
 			configStr: `processors: [add_fields: {fields: {testField: inputConfig}}]`,
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+					Processor: makeProcessors(addfields.NewAddFields(mapstr.M{
 						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
@@ -183,7 +187,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	require.NoError(t, err)
 
 	lst := clientCfg.Processing.Processor
-	assert.Equal(t, 2, len(lst.(*processors.Processors).List))
+	assert.Equal(t, 2, len(lst.(*processors.Processors).List)) //nolint:errcheck //Safe to ignore in tests
 }
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a
@@ -206,8 +210,45 @@ func (p *setRawIndex) String() string {
 }
 
 // makeProcessors wraps one or more bare Processor objects in Processors.
-func makeProcessors(procs ...processors.Processor) *processors.Processors {
-	procList := processors.NewList(nil)
+func makeProcessors(procs ...beat.Processor) *processors.Processors {
+	logger, _ := logp.NewDevelopmentLogger("")
+	procList := processors.NewList(logger)
 	procList.List = procs
 	return procList
+}
+
+func TestRunnerFactoryWithCommonInputSettings(t *testing.T) {
+
+	// we use `add_kubernetes_metadata` and `add_cloud_metadata`
+	// for testing because initially the problem we've discovered
+	// was visible with these 2 processors.
+	configYAML := `
+processors:
+  - add_kubernetes_metadata: ~
+  - add_cloud_metadata: ~
+keep_null: true
+publisher_pipeline:
+  disable_host: true
+type: "filestream"
+service.type: "module"
+pipeline: "test"
+index: "%{[fields.log_type]}-%{[agent.version]}-%{+yyyy.MM.dd}"
+`
+	cfg, err := conf.NewConfigWithYAML([]byte(configYAML), configYAML)
+	require.NoError(t, err)
+
+	b := beat.Info{} // not important for the test
+	rf := &runnerFactoryMock{
+		clientCount: 3, // we will create 3 clients from the wrapped pipeline
+	}
+	pcm := &pipelineConnectorMock{} // creates mock pipeline clients and will get wrapped
+
+	rfwc := RunnerFactoryWithCommonInputSettings(b, rf)
+
+	// create a wrapped runner, our mock runner will
+	// create the given amount of clients here using the wrapped pipeline connector.
+	_, err = rfwc.Create(pcm, cfg)
+	require.NoError(t, err)
+
+	rf.Assert(t)
 }

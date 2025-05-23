@@ -1,0 +1,511 @@
+[
+    {
+        "@timestamp": "2019-08-26T19:48:53Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "pkt_dstaddr": "10.0.0.62",
+                "pkt_srcaddr": "52.213.180.42",
+                "subnet_id": "subnet-aaaaaaaa012345678",
+                "tcp_flags": 2,
+                "tcp_flags_array": [
+                    "syn"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "10.0.0.62",
+            "ip": "10.0.0.62",
+            "port": 5001
+        },
+        "event": {
+            "action": "accept",
+            "end": "2019-08-26T19:48:53Z",
+            "outcome": "success",
+            "start": "2019-08-26T19:47:55Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 IPv4 52.213.180.42 10.0.0.62 43416 5001 52.213.180.42 10.0.0.62 6 568 8 1566848875 1566848933 ACCEPT 2 OK",
+        "network": {
+            "bytes": 568,
+            "iana_number": "6",
+            "packets": 8,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "52.213.180.42",
+                "10.0.0.62"
+            ]
+        },
+        "source": {
+            "address": "52.213.180.42",
+            "bytes": 568,
+            "ip": "52.213.180.42",
+            "packets": 8,
+            "port": 43416
+        }
+    },
+    {
+        "@timestamp": "2019-08-26T19:48:53Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "pkt_dstaddr": "52.213.180.42",
+                "pkt_srcaddr": "10.0.0.62",
+                "subnet_id": "subnet-aaaaaaaa012345678",
+                "tcp_flags": 18,
+                "tcp_flags_array": [
+                    "syn",
+                    "ack"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "52.213.180.42",
+            "ip": "52.213.180.42",
+            "port": 43416
+        },
+        "event": {
+            "action": "accept",
+            "end": "2019-08-26T19:48:53Z",
+            "outcome": "success",
+            "start": "2019-08-26T19:47:55Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 IPv4 10.0.0.62 52.213.180.42 5001 43416 10.0.0.62 52.213.180.42 6 376 7 1566848875 1566848933 ACCEPT 18 OK",
+        "network": {
+            "bytes": 376,
+            "iana_number": "6",
+            "packets": 7,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.0.0.62",
+                "52.213.180.42"
+            ]
+        },
+        "source": {
+            "address": "10.0.0.62",
+            "bytes": 376,
+            "ip": "10.0.0.62",
+            "packets": 7,
+            "port": 5001
+        }
+    },
+    {
+        "@timestamp": "2019-08-26T19:48:53Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "pkt_dstaddr": "10.0.0.62",
+                "pkt_srcaddr": "52.213.180.42",
+                "subnet_id": "subnet-aaaaaaaa012345678",
+                "tcp_flags": 2,
+                "tcp_flags_array": [
+                    "syn"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "10.0.0.62",
+            "ip": "10.0.0.62",
+            "port": 5001
+        },
+        "event": {
+            "action": "accept",
+            "end": "2019-08-26T19:48:53Z",
+            "outcome": "success",
+            "start": "2019-08-26T19:47:55Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 IPv4 52.213.180.42 10.0.0.62 43418 5001 52.213.180.42 10.0.0.62 6 100701 70 1566848875 1566848933 ACCEPT 2 OK",
+        "network": {
+            "bytes": 100701,
+            "iana_number": "6",
+            "packets": 70,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "52.213.180.42",
+                "10.0.0.62"
+            ]
+        },
+        "source": {
+            "address": "52.213.180.42",
+            "bytes": 100701,
+            "ip": "52.213.180.42",
+            "packets": 70,
+            "port": 43418
+        }
+    },
+    {
+        "@timestamp": "2019-08-26T19:48:53Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "pkt_dstaddr": "52.213.180.42",
+                "pkt_srcaddr": "10.0.0.62",
+                "subnet_id": "subnet-aaaaaaaa012345678",
+                "tcp_flags": 18,
+                "tcp_flags_array": [
+                    "syn",
+                    "ack"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "52.213.180.42",
+            "ip": "52.213.180.42",
+            "port": 43418
+        },
+        "event": {
+            "action": "accept",
+            "end": "2019-08-26T19:48:53Z",
+            "outcome": "success",
+            "start": "2019-08-26T19:47:55Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 IPv4 10.0.0.62 52.213.180.42 5001 43418 10.0.0.62 52.213.180.42 6 632 12 1566848875 1566848933 ACCEPT 18 OK",
+        "network": {
+            "bytes": 632,
+            "iana_number": "6",
+            "packets": 12,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.0.0.62",
+                "52.213.180.42"
+            ]
+        },
+        "source": {
+            "address": "10.0.0.62",
+            "bytes": 632,
+            "ip": "10.0.0.62",
+            "packets": 12,
+            "port": 5001
+        }
+    },
+    {
+        "@timestamp": "2019-08-26T19:51:53Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "pkt_dstaddr": "52.213.180.42",
+                "pkt_srcaddr": "10.0.0.62",
+                "subnet_id": "subnet-aaaaaaaa012345678",
+                "tcp_flags": 1,
+                "tcp_flags_array": [
+                    "fin"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "52.213.180.42",
+            "ip": "52.213.180.42",
+            "port": 43418
+        },
+        "event": {
+            "action": "accept",
+            "end": "2019-08-26T19:51:53Z",
+            "outcome": "success",
+            "start": "2019-08-26T19:48:53Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 IPv4 10.0.0.62 52.213.180.42 5001 43418 10.0.0.62 52.213.180.42 6 63388 1219 1566848933 1566849113 ACCEPT 1 OK",
+        "network": {
+            "bytes": 63388,
+            "iana_number": "6",
+            "packets": 1219,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.0.0.62",
+                "52.213.180.42"
+            ]
+        },
+        "source": {
+            "address": "10.0.0.62",
+            "bytes": 63388,
+            "ip": "10.0.0.62",
+            "packets": 1219,
+            "port": 5001
+        }
+    },
+    {
+        "@timestamp": "2019-08-26T19:51:53Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "pkt_dstaddr": "10.0.0.62",
+                "pkt_srcaddr": "52.213.180.42",
+                "subnet_id": "subnet-aaaaaaaa012345678",
+                "tcp_flags": 1,
+                "tcp_flags_array": [
+                    "fin"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "10.0.0.62",
+            "ip": "10.0.0.62",
+            "port": 5001
+        },
+        "event": {
+            "action": "accept",
+            "end": "2019-08-26T19:51:53Z",
+            "outcome": "success",
+            "start": "2019-08-26T19:48:53Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 IPv4 52.213.180.42 10.0.0.62 43418 5001 52.213.180.42 10.0.0.62 6 23294588 15774 1566848933 1566849113 ACCEPT 1 OK",
+        "network": {
+            "bytes": 23294588,
+            "iana_number": "6",
+            "packets": 15774,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "52.213.180.42",
+                "10.0.0.62"
+            ]
+        },
+        "source": {
+            "address": "52.213.180.42",
+            "bytes": 23294588,
+            "ip": "52.213.180.42",
+            "packets": 15774,
+            "port": 43418
+        }
+    },
+    {
+        "@timestamp": "2019-08-27T19:13:13Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "pkt_dstaddr": "10.0.0.62",
+                "pkt_srcaddr": "52.213.180.42",
+                "subnet_id": "subnet-aaaaaaaa012345678",
+                "tcp_flags": 3,
+                "tcp_flags_array": [
+                    "fin",
+                    "syn"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "10.0.0.62",
+            "ip": "10.0.0.62",
+            "port": 5001
+        },
+        "event": {
+            "action": "accept",
+            "end": "2019-08-27T19:13:13Z",
+            "outcome": "success",
+            "start": "2019-08-27T19:12:13Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 IPv4 52.213.180.42 10.0.0.62 43638 5001 52.213.180.42 10.0.0.62 6 1260 17 1566933133 1566933193 ACCEPT 3 OK",
+        "network": {
+            "bytes": 1260,
+            "iana_number": "6",
+            "packets": 17,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "52.213.180.42",
+                "10.0.0.62"
+            ]
+        },
+        "source": {
+            "address": "52.213.180.42",
+            "bytes": 1260,
+            "ip": "52.213.180.42",
+            "packets": 17,
+            "port": 43638
+        }
+    },
+    {
+        "@timestamp": "2019-08-27T19:13:13Z",
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "log_status": "OK",
+                "pkt_dstaddr": "52.213.180.42",
+                "pkt_srcaddr": "10.0.0.62",
+                "subnet_id": "subnet-aaaaaaaa012345678",
+                "tcp_flags": 19,
+                "tcp_flags_array": [
+                    "fin",
+                    "syn",
+                    "ack"
+                ],
+                "type": "IPv4",
+                "version": 3,
+                "vpc_id": "vpc-abcdefab012345678"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "123456789010"
+            },
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "52.213.180.42",
+            "ip": "52.213.180.42",
+            "port": 43638
+        },
+        "event": {
+            "action": "accept",
+            "end": "2019-08-27T19:13:13Z",
+            "outcome": "success",
+            "start": "2019-08-27T19:12:13Z",
+            "type": [
+                "connection",
+                "allowed"
+            ]
+        },
+        "message": "3 vpc-abcdefab012345678 subnet-aaaaaaaa012345678 i-01234567890123456 eni-1235b8ca123456789 123456789010 IPv4 10.0.0.62 52.213.180.42 5001 43638  10.0.0.62 52.213.180.42 6 967 14 1566933133 1566933193 ACCEPT 19 OK",
+        "network": {
+            "bytes": 967,
+            "iana_number": "6",
+            "packets": 14,
+            "transport": "tcp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.0.0.62",
+                "52.213.180.42"
+            ]
+        },
+        "source": {
+            "address": "10.0.0.62",
+            "bytes": 967,
+            "ip": "10.0.0.62",
+            "packets": 14,
+            "port": 5001
+        }
+    }
+]

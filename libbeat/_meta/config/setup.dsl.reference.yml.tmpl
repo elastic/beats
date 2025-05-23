@@ -1,0 +1,26 @@
+{{header "Data Stream Lifecycle (DSL)"}}
+
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
+# These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
+
+# Enable DSL support. Valid values are true, or false.
+#setup.dsl.enabled: true
+
+# Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
+# The default data stream pattern is {{.BeatName}}-%{[agent.version]}"
+# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The other possible template value is `%{[beat.name]}`.
+#setup.dsl.data_stream_pattern: "{{.BeatName}}-%{[agent.version]}"
+
+# The path to a JSON file that contains a lifecycle policy configuration. Used
+# to load your own lifecycle policy.
+# If no custom policy is specified, a default policy with a lifetime of 7 days will be created.
+#setup.dsl.policy_file:
+
+# Disable the check for an existing lifecycle policy. The default is true. If
+# you disable this check, set setup.dsl.overwrite: true so the lifecycle policy
+# can be installed.
+#setup.dsl.check_exists: true
+
+# Overwrite the lifecycle policy at startup. The default is false.
+#setup.dsl.overwrite: false

@@ -16,9 +16,14 @@ class Test(metricbeat.BaseTest):
     @unittest.skipIf(platform.platform().startswith("Windows-10"),
                      "flaky test: https://github.com/elastic/beats/issues/26181")
     def test_processors(self):
+
+        def copy2_with_permissions(src, dst, *args, **kwargs):
+            shutil.copy2(src, dst, *args, **kwargs)
+            os.chmod(dst, 0o644)
         shutil.copytree(
             os.path.join(self.beat_path, "mb/testing/testdata/lightmodules"),
             os.path.join(self.working_dir, "module"),
+            copy_function=copy2_with_permissions,
         )
 
         with http_test_server() as server:
@@ -46,7 +51,7 @@ class Test(metricbeat.BaseTest):
 
 @contextmanager
 def http_test_server():
-    server = http.server.HTTPServer(('localhost', 0), TestHTTPHandler)
+    server = http.server.HTTPServer(('localhost', 0), HTTPHandlerForTest)
     child = threading.Thread(target=server.serve_forever)
     child.start()
     yield server
@@ -54,7 +59,7 @@ def http_test_server():
     child.join()
 
 
-class TestHTTPHandler(http.server.BaseHTTPRequestHandler):
+class HTTPHandlerForTest(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "application/json")

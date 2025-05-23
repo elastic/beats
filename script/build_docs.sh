@@ -18,6 +18,7 @@ else
     echo "$docs_dir already exists. Not cloning."
 fi
 
+GOPATH=$(go env GOPATH)
 index_list="$(find ${GOPATH%%:*}/src/$path -name 'index.asciidoc' -maxdepth 1)"
 for index in $index_list
 do

@@ -1,6 +1,6 @@
 - name: pubsub
   description: Google Cloud PubSub metrics
-  release: beta
+  release: ga
   type: group
   fields:
   - name: snapshot.backlog.bytes

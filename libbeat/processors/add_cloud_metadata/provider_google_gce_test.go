@@ -299,7 +299,7 @@ const gceK8sPartialMetadataV1 = `{
 func initGCETestServer(resp string) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == "/computeMetadata/v1/?recursive=true&alt=json" {
-			w.Write([]byte(resp))
+			_, _ = w.Write([]byte(resp))
 			return
 		}
 
@@ -344,6 +344,7 @@ func TestRetrieveGCEMetadata(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -392,6 +393,7 @@ func TestRetrieveGCEMetadataInK8s(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -457,6 +459,7 @@ func TestRetrieveGCEMetadataInK8sNotOverriden(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
@@ -511,11 +514,17 @@ func TestRetrieveGCEMetadataInK8sPartial(t *testing.T) {
 				"type": "f1-micro",
 			},
 			"availability_zone": "us-east1-b",
+			"region":            "us-east1",
 			"project": mapstr.M{
 				"id": "test-dev",
 			},
 			"service": mapstr.M{
 				"name": "GCE",
+			},
+		},
+		"orchestrator": mapstr.M{
+			"cluster": mapstr.M{
+				"name": "staging-marketing-k8s",
 			},
 		},
 	}

@@ -16,13 +16,11 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
 import (
 	"fmt"
-	"unsafe"
 
 	"golang.org/x/sys/windows"
 
@@ -71,29 +69,49 @@ func getEventXML(metadata *PublisherMetadata, eventHandle EvtHandle) (string, er
 func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID uint32, values []EvtVariant, messageFlag EvtFormatMessageFlag) (string, error) {
 	var (
 		valuesCount = uint32(len(values))
-		valuesPtr   uintptr
+		valuesPtr   *EvtVariant
 	)
-	if len(values) > 0 {
-		valuesPtr = uintptr(unsafe.Pointer(&values[0]))
+	if len(values) != 0 {
+		valuesPtr = &values[0]
 	}
 
-	// Determine the buffer size needed (given in WCHARs).
-	var bufferUsed uint32
-	err := _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
-		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
-	}
+	// best guess render buffer size, to avoid rendering message twice in most cases
+	const bestGuessRenderBufferSize = 1 << 19 // 512KB, 256K wide characters
+
+	// EvtFormatMessage operates with WCHAR buffer, assuming the size of the buffer in characters.
+	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
+	var wcharBufferUsed uint32
+	wcharBufferSize := uint32(bestGuessRenderBufferSize / 2)
 
 	// Get a buffer from the pool and adjust its length.
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
-	// The documentation for EventFormatMessage specifies that the buffer is
-	// requested "in characters", and the buffer itself is LPWSTR, meaning the
-	// characters are WCHAR so double the value.
-	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
-	bb.Reserve(int(bufferUsed * 2))
+	bb.Reserve(int(wcharBufferSize * 2))
 
-	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, bufferUsed, bb.PtrAt(0), &bufferUsed)
+	err := _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, wcharBufferSize, bb.PtrAt(0), &wcharBufferUsed)
+	switch err { //nolint:errorlint // This is an errno or nil.
+	// Ignore some errors so it can tolerate missing or mismatched parameter values.
+	case nil, // OK
+		windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT,
+		windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT,
+		windows.ERROR_EVT_MAX_INSERTS_REACHED:
+		// wcharBufferUsed indicates the size used internally to render the message. When called with nil buffer
+		// EvtFormatMessage returns ERROR_INSUFFICIENT_BUFFER, but otherwise succeeds copying only up to
+		// wcharBufferSize to our buffer, truncating the message if our buffer was too small.
+		if wcharBufferUsed <= wcharBufferSize {
+			return sys.UTF16BytesToString(bb.Bytes())
+		}
+		fallthrough
+
+	case windows.ERROR_INSUFFICIENT_BUFFER:
+		bb.Reserve(int(wcharBufferUsed * 2))
+		wcharBufferSize = wcharBufferUsed
+
+	default:
+		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
+	}
+
+	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, wcharBufferSize, bb.PtrAt(0), &wcharBufferUsed)
 	switch err { //nolint:errorlint // This is an errno or nil.
 	case nil: // OK
 

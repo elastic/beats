@@ -1,6 +1,5 @@
 [[rate-limit]]
 === Rate limit the flow of events
-beta[]
 
 ++++
 <titleabbrev>rate_limit</titleabbrev>

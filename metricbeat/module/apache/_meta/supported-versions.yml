@@ -1,3 +1,5 @@
+# all the versions have to be the valid semantic version syntax x.x.x
+# because of the test check for comparing against older field structure
 variants:
-  - APACHE_VERSION: 2.4.12
-  - APACHE_VERSION: 2.4.20
+  - APACHE_VERSION: "2.4.54"
+  - APACHE_VERSION: "2.4.12"

@@ -18,9 +18,9 @@
 package core
 
 import (
+	"errors"
+	"fmt"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
@@ -34,8 +34,9 @@ const (
 
 // Config for the system core metricset.
 type Config struct {
-	Metrics  []string `config:"core.metrics"`
-	CPUTicks *bool    `config:"cpu_ticks"` // Deprecated.
+	Metrics                 []string `config:"core.metrics"`
+	CPUTicks                *bool    `config:"cpu_ticks"` // Deprecated.
+	UserPerformanceCounters bool     `config:"use_performance_counters"`
 }
 
 // Validate validates the core config.
@@ -56,7 +57,7 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 		case ticks:
 			opts.Ticks = true
 		default:
-			return opts, errors.Errorf("invalid core.metrics value '%v' (valid "+
+			return opts, fmt.Errorf("invalid core.metrics value '%v' (valid "+
 				"options are %v and %v)", metric, percentages, ticks)
 		}
 	}
@@ -65,5 +66,6 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 }
 
 var defaultConfig = Config{
-	Metrics: []string{percentages},
+	Metrics:                 []string{percentages},
+	UserPerformanceCounters: false,
 }

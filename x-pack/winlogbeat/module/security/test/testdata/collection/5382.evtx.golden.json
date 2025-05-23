@@ -1,0 +1,237 @@
+[
+  {
+    "event": {
+      "code": "5382",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "10992",
+        "Flags": "0",
+        "Identity": "010500000000000515000000135E3A229957100F0052CF12FC9C0000",
+        "ProcessCreationTime": "2023-01-17T22:25:52.5801675Z",
+        "Resource": "NGC Local Accoount Logon Vault Resource",
+        "ReturnCode": "1168",
+        "Schema": "{1d4350a3-330d-4af9-b3ff-a927a45998ac}",
+        "SchemaFriendlyName": "NGC Local Accoount Logon Vault Resource Schema",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "COMPUTER1$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "5382",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 964,
+        "thread": {
+          "id": 1348
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5474106,
+      "time_created": "2023-01-17T22:25:53.1638862Z"
+    }
+  },
+  {
+    "event": {
+      "code": "5382",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "18228",
+        "Flags": "0",
+        "Identity": "ActiveSyncCredentialDefaultUser",
+        "ProcessCreationTime": "2023-01-17T21:33:15.0527484Z",
+        "Resource": "SYNC_POLICY{000000000-0000-0000-00000-000000000000}",
+        "ReturnCode": "0",
+        "Schema": "{a8fb7545-9029-4cb4-bc2c-7640bfaa234e}",
+        "SchemaFriendlyName": "ActiveSyncCredentialSchema",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x12a119b2",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5382",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 1008,
+        "thread": {
+          "id": 11604
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5472528,
+      "time_created": "2023-01-17T21:53:44.4175183Z"
+    }
+  },
+  {
+    "event": {
+      "code": "5382",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "18228",
+        "Flags": "0",
+        "Identity": "ActiveSyncCredentialDefaultUser",
+        "ProcessCreationTime": "2023-01-17T21:33:15.0527484Z",
+        "Resource": "SyncPassword{000000000-0000-0000-00000-000000000000}Exchange",
+        "ReturnCode": "0",
+        "Schema": "{a8fb7545-9029-4cb4-bc2c-7640bfaa234e}",
+        "SchemaFriendlyName": "ActiveSyncCredentialSchema",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x12a119b2",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5382",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 1008,
+        "thread": {
+          "id": 11604
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5472527,
+      "time_created": "2023-01-17T21:53:44.4122464Z"
+    }
+  },
+  {
+    "event": {
+      "code": "5382",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "18228",
+        "Flags": "0",
+        "Identity": "ActiveSyncCredentialDefaultUser",
+        "ProcessCreationTime": "2023-01-17T21:33:15.0527484Z",
+        "Resource": "SyncUseSSL{000000000-0000-0000-00000-000000000000}Exchange",
+        "ReturnCode": "0",
+        "Schema": "{a8fb7545-9029-4cb4-bc2c-7640bfaa234e}",
+        "SchemaFriendlyName": "ActiveSyncCredentialSchema",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x12a119b2",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5382",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 1008,
+        "thread": {
+          "id": 11604
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5472526,
+      "time_created": "2023-01-17T21:53:44.4119963Z"
+    }
+  },
+  {
+    "event": {
+      "code": "5382",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "18228",
+        "Flags": "0",
+        "Identity": "ActiveSyncCredentialDefaultUser",
+        "ProcessCreationTime": "2023-01-17T21:33:15.0527484Z",
+        "Resource": "SyncServer{000000000-0000-0000-00000-000000000000}Exchange",
+        "ReturnCode": "0",
+        "Schema": "{a8fb7545-9029-4cb4-bc2c-7640bfaa234e}",
+        "SchemaFriendlyName": "ActiveSyncCredentialSchema",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x12a119b2",
+        "SubjectUserName": "user1",
+        "SubjectUserSid": "S-1-5-21-000000000-000000000-000000000-00000"
+      },
+      "event_id": "5382",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 1008,
+        "thread": {
+          "id": 9708
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5472525,
+      "time_created": "2023-01-17T21:53:44.4117359Z"
+    }
+  }
+]

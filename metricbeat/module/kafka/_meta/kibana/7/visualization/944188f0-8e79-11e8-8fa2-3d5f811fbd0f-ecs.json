@@ -25,7 +25,7 @@
                 ],
                 "filter": {
                     "language": "lucene",
-                    "query": "(metricset.name: consumergroup) AND NOT kafka.consumergroup.topic.name:__consumer_offsets"
+                    "query": "(metricset.name: consumergroup) AND NOT kafka.topic.name:__consumer_offsets"
                 },
                 "gauge_color_rules": [
                     {
@@ -61,7 +61,7 @@
                         "split_color_mode": "rainbow",
                         "split_mode": "terms",
                         "stacked": "none",
-                        "terms_field": "kafka.consumergroup.topic",
+                        "terms_field": "kafka.topic.name",
                         "type": "timeseries"
                     }
                 ],

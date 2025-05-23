@@ -11,7 +11,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -63,8 +62,7 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:   inputCtx.Cancelation,
-		ACKHandler: newEventACKHandler(),
+		EventListener: newEventACKHandler(),
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
@@ -73,8 +71,7 @@ func (i *lumberjackInput) Run(inputCtx inputv2.Context, pipeline beat.Pipeline) 
 
 	setGoLumberLogger(inputCtx.Logger.Named("go-lumber"))
 
-	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
-	metrics := newInputMetrics(metricRegistry, inputCtx.ID)
+	metrics := newInputMetrics(inputCtx.ID, nil)
 	defer metrics.Close()
 
 	s, err := newServer(i.config, inputCtx.Logger, client.Publish, metrics)

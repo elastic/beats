@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+env:
+  # Other deps
+  ASDF_MAGE_VERSION: 1.15.0
+
+steps:
+  - label: ":package: :test_tube: Package and Validate Iron Bank for x-pack/heartbeat"
+    command: |
+      set -euo pipefail
+      export BEAT_VERSION=$$(make get-version)
+      echo "~~~ Using BEAT_VERSION: $$BEAT_VERSION"
+      cd x-pack/heartbeat
+      echo "--- Package x-pack/heartbeat for the artifacts consumed by the Iron Bank docker context"
+      make -C ironbank package
+      echo "--- Prepare the Iron Bank container context"
+      mage ironbank
+      echo "--- Build and validate the Iron Bank docker context for x-pack/heartbeat"
+      make -C ironbank validate-ironbank
+    agents:
+      provider: "gcp"
+      image: "family/platform-ingest-beats-ubuntu-2204"
+      machineType: "n2-standard-8"
+    artifact_paths:
+      - "x-pack/heartbeat/build/distributions/*"
+      - "x-pack/heartbeat/build/heartbeat-ironbank-*-docker-build-context/*"

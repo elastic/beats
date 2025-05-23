@@ -22,17 +22,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"golang.org/x/sys/execabs"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
@@ -56,10 +57,11 @@ type GoTestArgs struct {
 type TestBinaryArgs struct {
 	Name       string // Name of the binary to build
 	InputFiles []string
+	ExtraFlags []string // Extra flags to pass to 'go test'.
 }
 
 func makeGoTestArgs(name string) GoTestArgs {
-	fileName := fmt.Sprintf("build/TEST-go-%s", strings.Replace(strings.ToLower(name), " ", "_", -1))
+	fileName := fmt.Sprintf("build/TEST-go-%s", strings.ReplaceAll(strings.ToLower(name), " ", "_"))
 	params := GoTestArgs{
 		TestName:        name,
 		Race:            RaceDetector,
@@ -75,13 +77,15 @@ func makeGoTestArgs(name string) GoTestArgs {
 	return params
 }
 
-func makeGoTestArgsForModule(name, module string) GoTestArgs {
-	fileName := fmt.Sprintf("build/TEST-go-%s-%s", strings.Replace(strings.ToLower(name), " ", "_", -1),
-		strings.Replace(strings.ToLower(module), " ", "_", -1))
+func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
+	fileName := fmt.Sprintf(
+		"build/TEST-go-%s-%s",
+		strings.ReplaceAll(strings.ToLower(name), " ", "_"),
+		strings.ReplaceAll(strings.ToLower(pkg), " ", "_"))
 	params := GoTestArgs{
-		TestName:        fmt.Sprintf("%s-%s", name, module),
+		TestName:        fmt.Sprintf("%s-%s", name, pkg),
 		Race:            RaceDetector,
-		Packages:        []string{fmt.Sprintf("./module/%s/...", module)},
+		Packages:        []string{fmt.Sprintf("./module/%s", pkg)},
 		OutputFile:      fileName + ".out",
 		JUnitReportFile: fileName + ".xml",
 		Tags:            testTagsFromEnv(),
@@ -92,21 +96,79 @@ func makeGoTestArgsForModule(name, module string) GoTestArgs {
 	return params
 }
 
+// fetchGoPackages retrieves all Go packages for a beats module. It uses
+// "go list -tags integration" to obtain the list of packages.
+// Example: for the "kafka" module inside "metricbeat/module", it'll return:
+//
+//	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
+func fetchGoPackages(module string) ([]string, error) {
+	cmd := execabs.Command(
+		"go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module))
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	rawPackages := strings.Split(strings.TrimSpace(string(output)), "\n")
+	var pkgs []string
+	for _, pkg := range rawPackages {
+		tmp := strings.Split(pkg, "/module/")
+		if len(tmp) != 2 {
+			continue
+		}
+
+		pkgs = append(pkgs, tmp[1])
+	}
+	return pkgs, nil
+}
+
 // testTagsFromEnv gets a list of comma-separated tags from the TEST_TAGS
 // environment variables, e.g: TEST_TAGS=aws,azure.
+// If the FIPS env var is set to true, the requirefips and ms_tls13kdf tags are injected.
 func testTagsFromEnv() []string {
-	return strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
+	tags := strings.Split(strings.Trim(os.Getenv("TEST_TAGS"), ", "), ",")
+	if FIPSBuild {
+		tags = append(tags, "requirefips", "ms_tls13kdf")
+	}
+	return tags
 }
 
 // DefaultGoTestUnitArgs returns a default set of arguments for running
 // all unit tests. We tag unit test files with '!integration'.
 func DefaultGoTestUnitArgs() GoTestArgs { return makeGoTestArgs("Unit") }
 
+// DefaultGoFIPSOnlyTestArgs returns a default set of arguments for running
+// fips140=only unit tests.
+func DefaultGoFIPSOnlyTestArgs() GoTestArgs {
+	args := makeGoTestArgs("Unit-FIPS-only")
+	args.Env["GODEBUG"] = "fips140=only"
+	return args
+}
+
 // DefaultGoTestIntegrationArgs returns a default set of arguments for running
 // all integration tests. We tag integration test files with 'integration'.
 func DefaultGoTestIntegrationArgs() GoTestArgs {
 	args := makeGoTestArgs("Integration")
 	args.Tags = append(args.Tags, "integration")
+
+	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	if synth.Run() == nil {
+		// Run an empty journey to ensure playwright can be loaded
+		// catches situations like missing playwright deps
+		cmd := exec.Command("sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
+		var out strings.Builder
+		cmd.Stdout = &out
+		cmd.Stderr = &out
+		err := cmd.Run()
+		if err != nil || cmd.ProcessState.ExitCode() != 0 {
+			fmt.Printf("synthetics is available, but not invokable, command exited with bad code: %s\n", out.String())
+		}
+
+		fmt.Println("npx @elastic/synthetics found, will run with synthetics tags")
+		os.Setenv("ELASTIC_SYNTHETICS_CAPABLE", "true")
+		args.Tags = append(args.Tags, "synthetics")
+	}
+
 	// Use the non-cachable -count=1 flag to disable test caching when running integration tests.
 	// There are reasons to re-run tests even if the code is unchanged (e.g. Dockerfile changes).
 	args.ExtraFlags = append(args.ExtraFlags, "-count=1")
@@ -121,10 +183,11 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 	return args
 }
 
-// GoTestIntegrationArgsForModule returns a default set of arguments for running
+// GoTestIntegrationArgsForPackage returns a default set of arguments for running
 // module integration tests. We tag integration test files with 'integration'.
-func GoTestIntegrationArgsForModule(module string) GoTestArgs {
-	args := makeGoTestArgsForModule("Integration", module)
+func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
+	args := makeGoTestArgsForPackage("Integration", pkg)
+
 	args.Tags = append(args.Tags, "integration")
 	return args
 }
@@ -137,8 +200,9 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 	}
 }
 
-// GoTestIntegrationForModule executes the Go integration tests sequentially.
-// Currently all test cases must be present under "./module" directory.
+// GoTestIntegrationForModule executes the Go integration tests for each Go
+// package within a module sequentially.
+// Currently, all test cases must be present under "./module" directory.
 //
 // Motivation: previous implementation executed all integration tests at once,
 // causing high CPU load, high memory usage and resulted in timeouts.
@@ -148,16 +212,34 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
-	module := EnvOr("MODULE", "")
-	modulesFileInfo, err := ioutil.ReadDir("./module")
+	modules := EnvOr("MODULE", "")
+	if modules == "" {
+		log.Printf("Warning: environment variable MODULE is empty: [%s]\n", modules)
+	}
+	moduleArr := strings.Split(modules, ",")
+
+	for _, module := range moduleArr {
+		err := goTestIntegrationForSingleModule(ctx, module)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// goTestIntegrationForSingleModule sequentially executes the tests every Go
+// packages within a module.
+func goTestIntegrationForSingleModule(ctx context.Context, module string) error {
+	modulesFileInfo, err := os.ReadDir("./module")
 	if err != nil {
 		return err
 	}
 
 	foundModule := false
-	failedModules := []string{}
+	failedModules := make([]string, 0, len(modulesFileInfo))
 	for _, fi := range modulesFileInfo {
-		if !fi.IsDir() {
+		// skip the ones that are not directories or with suffix @tmp, which are created by Jenkins build job
+		if !fi.IsDir() || strings.HasSuffix(fi.Name(), "@tmp") {
 			continue
 		}
 		if module != "" && module != fi.Name() {
@@ -173,13 +255,23 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 			return fmt.Errorf("test setup failed for module %s: %w", fi.Name(), err)
 		}
 		err = runners.Test("goIntegTest", func() error {
-			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
+			pkgs, err := fetchGoPackages("module/" + fi.Name())
 			if err != nil {
-				return err
+				return fmt.Errorf("could not list packages for module %s: %w",
+					fi.Name(), err)
 			}
-			return nil
+
+			var errs []error
+			for _, pkg := range pkgs {
+				err := GoTest(ctx, GoTestIntegrationArgsForPackage(pkg))
+				if err != nil {
+					errs = append(errs, err)
+				}
+			}
+			return errors.Join(errs...)
 		})
 		if err != nil {
+			fmt.Printf("Error: failed to run integration tests for module %s:\n%v\n", fi.Name(), err)
 			// err will already be report to stdout, collect failed module to report at end
 			failedModules = append(failedModules, fi.Name())
 		}
@@ -237,16 +329,26 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 
 	var testArgs []string
 
-	// -race is only supported on */amd64
-	if os.Getenv("DEV_ARCH") == "amd64" {
-		if params.Race {
+	if params.Race {
+		// Enable the race detector for supported platforms.
+		// This is an intersection of the supported platforms for Beats and Go.
+		//
+		// See https://go.dev/doc/articles/race_detector#Requirements.
+		devOS := os.Getenv("DEV_OS")
+		devArch := os.Getenv("DEV_ARCH")
+		raceAmd64 := devArch == "amd64"
+		raceArm64 := devArch == "arm64" &&
+			slices.Contains([]string{"linux", "darwin"}, devOS)
+		if raceAmd64 || raceArm64 {
 			testArgs = append(testArgs, "-race")
+		} else {
+			log.Printf("Warning: skipping -race flag for unsupported platform %s/%s\n", devOS, devArch)
 		}
 	}
 	if len(params.Tags) > 0 {
-		params := strings.Join(params.Tags, " ")
+		params := strings.Join(params.Tags, ",")
 		if params != "" {
-			testArgs = append(testArgs, "-tags", params)
+			testArgs = append(testArgs, "-tags="+params)
 		}
 	}
 	if params.CoverageProfileFile != "" {
@@ -269,7 +371,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	}
 
 	if params.OutputFile != "" {
-		fileOutput, err := os.Create(createDir(params.OutputFile))
+		fileOutput, err := os.Create(CreateDir(params.OutputFile))
 		if err != nil {
 			return fmt.Errorf("failed to create go test output file: %w", err)
 		}
@@ -307,12 +409,15 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	// Generate a HTML code coverage report.
 	var htmlCoverReport string
 	if params.CoverageProfileFile != "" {
+
 		htmlCoverReport = strings.TrimSuffix(params.CoverageProfileFile,
 			filepath.Ext(params.CoverageProfileFile)) + ".html"
+
 		coverToHTML := sh.RunCmd("go", "tool", "cover",
 			"-html="+params.CoverageProfileFile,
 			"-o", htmlCoverReport)
-		if err = coverToHTML(); err != nil {
+
+		if err := coverToHTML(); err != nil {
 			return fmt.Errorf("failed to write HTML code coverage report: %w", err)
 		}
 	}
@@ -333,7 +438,7 @@ func makeCommand(ctx context.Context, env map[string]string, cmd string, args ..
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
 	}
-	c.Stdout = ioutil.Discard
+	c.Stdout = io.Discard
 	if mg.Verbose() {
 		c.Stdout = os.Stdout
 	}
@@ -357,9 +462,16 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 		"test", "-c",
 		"-o", binArgs.Name + ".test",
 	}
+
+	if DevBuild {
+		// Disable optimizations (-N) and inlining (-l) for debugging.
+		args = append(args, `-gcflags=all=-N -l`)
+	}
+
 	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
 	}
+	args = append(args, binArgs.ExtraFlags...)
 	if len(binArgs.InputFiles) > 0 {
 		args = append(args, binArgs.InputFiles...)
 	}

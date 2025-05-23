@@ -16,19 +16,18 @@
 // under the License.
 
 //go:build !linux
-// +build !linux
 
 package socket_summary
 
 import (
-	"github.com/shirou/gopsutil/v3/net"
+	"github.com/shirou/gopsutil/v4/net"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-//a stub function for non-linux systems
-//get a list of platform-specific enhancements and apply them to our mapStr object.
+// a stub function for non-linux systems
+// get a list of platform-specific enhancements and apply them to our mapStr object.
 func applyEnhancements(data mapstr.M, sys resolve.Resolver) (mapstr.M, error) {
 	return data, nil
 }

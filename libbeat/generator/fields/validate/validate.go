@@ -19,8 +19,7 @@ package validate
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 )
 
 // Document takes a document from Elasticsearch in JSON format
@@ -29,12 +28,12 @@ import (
 func Document(docJSON []byte, fieldsYAML []byte) error {
 	var ifDocument interface{}
 	if err := json.Unmarshal(docJSON, &ifDocument); err != nil {
-		return errors.Wrap(err, "decoding JSON document")
+		return fmt.Errorf("decoding JSON document: %w", err)
 	}
 
 	document, ok := ifDocument.(map[string]interface{})
 	if !ok {
-		return errors.Errorf("document must be a dictionary of string keys, but %T", ifDocument)
+		return fmt.Errorf("document must be a dictionary of string keys, but %T", ifDocument)
 	}
 
 	fields, err := NewMapping(fieldsYAML)

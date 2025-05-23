@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package api
 
@@ -39,10 +38,13 @@ func TestNamedPipe(t *testing.T) {
 		"host": p,
 	})
 
-	s, err := New(nil, simpleMux(), cfg)
+	s, err := New(nil, cfg)
 	require.NoError(t, err)
+	attachEchoHelloHandler(t, s)
 	go s.Start()
-	defer s.Stop()
+	defer func() {
+		require.NoError(t, s.Stop())
+	}()
 
 	c := http.Client{
 		Transport: &http.Transport{

@@ -26,17 +26,32 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
-func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet) (RemoteWriteEventsGenerator, error) {
-	return &remoteWriteEventGenerator{}, nil
+type RemoteWriteEventsGeneratorOption func(r *RemoteWriteEventGenerator)
+
+func WithCountMetrics(countMetrics bool) RemoteWriteEventsGeneratorOption {
+	return func(r *RemoteWriteEventGenerator) {
+		r.metricsCount = countMetrics
+	}
 }
 
-type remoteWriteEventGenerator struct{}
+// DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
+func DefaultRemoteWriteEventsGeneratorFactory(ms mb.BaseMetricSet, opts ...RemoteWriteEventsGeneratorOption) (RemoteWriteEventsGenerator, error) {
+	generator := &RemoteWriteEventGenerator{}
+	for _, opt := range opts {
+		opt(generator)
+	}
 
-func (p *remoteWriteEventGenerator) Start() {}
-func (p *remoteWriteEventGenerator) Stop()  {}
+	return generator, nil
+}
 
-func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
+type RemoteWriteEventGenerator struct {
+	metricsCount bool
+}
+
+func (p *RemoteWriteEventGenerator) Start() {}
+func (p *RemoteWriteEventGenerator) Stop()  {}
+
+func (p *RemoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[string]mb.Event {
 	eventList := map[string]mb.Event{}
 
 	for _, metric := range metrics {
@@ -50,6 +65,7 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 			continue
 		}
 
+		//nolint:typecheck,nolintlint // 'name' is being used in as a key in mapstr.M below
 		name := string(metric.Metric["__name__"])
 		delete(metric.Metric, "__name__")
 
@@ -61,6 +77,7 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		labelsHash := labels.String() + metric.Timestamp.Time().String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
+				RootFields: mapstr.M{},
 				ModuleFields: mapstr.M{
 					"metrics": mapstr.M{},
 				},
@@ -75,10 +92,22 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 
 		// Not checking anything here because we create these maps some lines before
 		e := eventList[labelsHash]
-		data := mapstr.M{
-			name: val,
-		}
+
+		data := mapstr.M{name: val}
 		e.ModuleFields["metrics"].(mapstr.M).Update(data)
+	}
+
+	if p.metricsCount {
+		for _, e := range eventList {
+			// In x-pack prometheus module, the metrics are nested under the "prometheus" key directly.
+			// whereas in non-x-pack prometheus module, the metrics are nested under the "prometheus.metrics" key.
+			// Also, it is important that we do not just increment by 1 for each e.ModuleFields["metrics"] may have more than 1 metric.
+			// See unit tests for the same.
+			v, ok := e.ModuleFields["metrics"].(mapstr.M)
+			if ok {
+				e.RootFields["metrics_count"] = len(v)
+			}
+		}
 	}
 
 	return eventList

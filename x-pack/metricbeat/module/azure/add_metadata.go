@@ -9,6 +9,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// addHostMetadata enriches the event with host metadata.
 func addHostMetadata(event *mb.Event, metricList mapstr.M) {
 	hostFieldTable := map[string]string{
 		"percentage_cpu.avg":      "host.cpu.usage",
@@ -30,24 +31,28 @@ func addHostMetadata(event *mb.Event, metricList mapstr.M) {
 			if metricName == "percentage_cpu.avg" {
 				value = value / 100
 			}
-			event.RootFields.Put(hostName, value)
+			_, _ = event.RootFields.Put(hostName, value)
 		}
 	}
 }
 
+// addCloudVMMetadata enriches the event with cloud VM metadata.
 func addCloudVMMetadata(event *mb.Event, vm VmResource, subscriptionId string) {
 	if vm.Name != "" {
-		event.RootFields.Put("cloud.instance.name", vm.Name)
-		event.RootFields.Put("host.name", vm.Name)
+		_, _ = event.RootFields.Put("cloud.instance.name", vm.Name)
+		_, _ = event.RootFields.Put("host.name", vm.Name)
 	}
+
 	if vm.Id != "" {
-		event.RootFields.Put("cloud.instance.id", vm.Id)
-		event.RootFields.Put("host.id", vm.Id)
+		_, _ = event.RootFields.Put("cloud.instance.id", vm.Id)
+		_, _ = event.RootFields.Put("host.id", vm.Id)
 	}
+
 	if vm.Size != "" {
-		event.RootFields.Put("cloud.machine.type", vm.Size)
+		_, _ = event.RootFields.Put("cloud.machine.type", vm.Size)
 	}
+
 	if subscriptionId != "" {
-		event.RootFields.Put("cloud.account.id", subscriptionId)
+		_, _ = event.RootFields.Put("cloud.account.id", subscriptionId)
 	}
 }

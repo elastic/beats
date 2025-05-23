@@ -75,6 +75,21 @@ func (fs *TimestampFormatString) Run(timestamp time.Time) (string, error) {
 	return fs.eventFormatString.Run(placeholderEvent)
 }
 
+// RunEvent executes the format string returning a new expanded string or an error
+// if execution or event field expansion fails.
+func (fs *TimestampFormatString) RunEvent(event *beat.Event) (string, error) {
+	return fs.eventFormatString.Run(event)
+}
+
 func (fs *TimestampFormatString) String() string {
 	return fs.eventFormatString.expression
+}
+
+// Unpack tries to initialize the TimestampFormatString from provided value
+// (which must be a string). Unpack method satisfies go-ucfg.Unpacker interface
+// required by config.C, in order to use TimestampFormatString with
+// `common.(*Config).Unpack()`.
+func (fs *TimestampFormatString) Unpack(v interface{}) error {
+	fs.eventFormatString = &EventFormatString{}
+	return fs.eventFormatString.Unpack(v)
 }

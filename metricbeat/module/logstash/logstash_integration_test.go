@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package logstash_test
 
@@ -25,10 +24,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
@@ -47,7 +48,15 @@ func TestFetch(t *testing.T) {
 		t.Run(metricSet, func(t *testing.T) {
 			config := getConfig(metricSet, service.Host())
 			f := mbtest.NewReportingMetricSetV2Error(t, config)
-			events, errs := mbtest.ReportingFetchV2Error(f)
+			var (
+				events []mb.Event
+				errs   []error
+			)
+
+			require.Eventually(t, func() bool {
+				events, errs = mbtest.ReportingFetchV2Error(f)
+				return len(events) > 0 && len(errs) == 0
+			}, 30*time.Second, time.Second, "events cannot be empty: %v, %v", events, errs)
 
 			require.Empty(t, errs)
 			require.NotEmpty(t, events)

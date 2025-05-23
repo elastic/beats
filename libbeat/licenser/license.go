@@ -28,21 +28,22 @@ import (
 //
 // The x-pack endpoint returns the following JSON response.
 //
-//{
-// "license" : {
-//   "status" : "active",
-//   "uid" : "cbff45e7-c553-41f7-ae4f-9205eabd80xx",
-//   "type" : "trial",
-//   "issue_date" : "2018-10-20T22:05:12.332Z",
-//   "issue_date_in_millis" : 1540073112332,
-//   "expiry_date" : "2018-11-19T22:05:12.332Z",
-//   "expiry_date_in_millis" : 1542665112332,
-//   "max_nodes" : 1000,
-//   "issued_to" : "test",
-//   "issuer" : "elasticsearch",
-//   "start_date_in_millis" : -1
-// }
-// }
+//	{
+//	  "license" : {
+//	    "status" : "active",
+//	    "uid" : "cbff45e7-c553-41f7-ae4f-9205eabd80xx",
+//	    "type" : "trial",
+//	    "issue_date" : "2018-10-20T22:05:12.332Z",
+//	    "issue_date_in_millis" : 1540073112332,
+//	    "expiry_date" : "2018-11-19T22:05:12.332Z",
+//	    "expiry_date_in_millis" : 1542665112332,
+//	    "max_nodes" : 1000,
+//	    "issued_to" : "test",
+//	    "issuer" : "elasticsearch",
+//	    "start_date_in_millis" : -1
+//	  }
+//	}
+//
 // Definition:
 // type is the installed license.
 // mode is the license in operation. (effective license)

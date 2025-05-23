@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package fileset
 
 import (
+	"context"
 	"encoding/json"
 	"path/filepath"
 	"testing"
@@ -35,9 +35,11 @@ import (
 )
 
 func makeTestInfo(version string) beat.Info {
+	logger, _ := logp.NewDevelopmentLogger("")
 	return beat.Info{
 		IndexPrefix: "filebeat",
 		Version:     version,
+		Logger:      logger,
 	}
 }
 
@@ -47,7 +49,7 @@ func TestLoadPipeline(t *testing.T) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
 
-	client.Request("DELETE", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/my-pipeline-id", "", nil, nil)
 
 	content := map[string]interface{}{
 		"description": "describe pipeline",
@@ -89,7 +91,7 @@ func checkUploadedPipeline(t *testing.T, client *eslegclient.Connection, expecte
 	var res map[string]interface{}
 	err = json.Unmarshal(response, &res)
 	if assert.NoError(t, err) {
-		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response))
+		assert.Equal(t, expectedDescription, res["my-pipeline-id"].(map[string]interface{})["description"], string(response)) //nolint:errcheck // Safe to ignore
 	}
 }
 
@@ -99,8 +101,8 @@ func TestSetupNginx(t *testing.T) {
 		t.Skip("Skip tests because ingest is missing in this elasticsearch version: ", client.GetVersion())
 	}
 
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-default", "", nil, nil)
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-access-default", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/filebeat-5.2.0-nginx-error-pipeline", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
@@ -115,7 +117,7 @@ func TestSetupNginx(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"), false)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"), FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,9 +179,9 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		t.Skip("Skip tests because ingest is missing the pipeline processor: ", client.GetVersion())
 	}
 
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multi-pipeline", "", nil, nil)
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multi-json_logs", "", nil, nil)
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multi-plain_logs", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multi-pipeline", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multi-json_logs", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multi-plain_logs", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../_meta/test/module")
 	require.NoError(t, err)
@@ -194,7 +196,7 @@ func TestLoadMultiplePipelines(t *testing.T) {
 		{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), false)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -222,9 +224,9 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 		t.Skip("Skip tests because ingest is missing the pipeline processor: ", client.GetVersion())
 	}
 
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-pipeline", "", nil, nil)
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-json_logs", "", nil, nil)
-	client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-plain_logs_bad", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-pipeline", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-json_logs", "", nil, nil)
+	_, _, _ = client.Request("DELETE", "/_ingest/pipeline/filebeat-6.6.0-foo-multibad-plain_logs_bad", "", nil, nil)
 
 	modulesPath, err := filepath.Abs("../_meta/test/module")
 	require.NoError(t, err)
@@ -239,7 +241,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 		{"foo", &enabled, filesetConfigs},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), false)
+	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("6.6.0"), FilesetOverrides{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -269,7 +271,9 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 
 	conn.Encoder = eslegclient.NewJSONEncoder(nil, false)
 
-	err = conn.Connect()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	err = conn.Connect(ctx)
 	if err != nil {
 		t.Fatal(err)
 		panic(err) // panic in case TestLogger did not stop test

@@ -18,12 +18,11 @@
 package processing
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -44,8 +43,8 @@ type processorFn struct {
 	fn   func(event *beat.Event) (*beat.Event, error)
 }
 
-func newGeneralizeProcessor(keepNull bool) *processorFn {
-	logger := logp.NewLogger("publisher_processing")
+func newGeneralizeProcessor(keepNull bool, logger *logp.Logger) *processorFn {
+	logger = logger.Named("publisher_processing")
 	g := common.NewGenericEventConverter(keepNull)
 	return newProcessor("generalizeEvent", func(event *beat.Event) (*beat.Event, error) {
 		// Filter out empty events. Empty events are still reported by ACK callbacks.
@@ -80,7 +79,7 @@ func newGroup(title string, log *logp.Logger) *group {
 	}
 }
 
-func (p *group) add(processor processors.Processor) {
+func (p *group) add(processor beat.Processor) {
 	if processor != nil {
 		p.list = append(p.list, processor)
 	}
@@ -90,18 +89,18 @@ func (p *group) Close() error {
 	if p == nil {
 		return nil
 	}
-	var errs multierror.Errors
+	var errs []error
 	for _, processor := range p.list {
 		err := processors.Close(processor)
 		if err != nil {
 			errs = append(errs, err)
 		}
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (p *group) String() string {
-	var s []string
+	s := make([]string, 0, len(p.list))
 	for _, p := range p.list {
 		s = append(s, p.String())
 	}
@@ -199,6 +198,10 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		EscapeHTML: false,
 	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
+		if !log.IsDebug() {
+			return event, nil
+		}
+
 		mux.Lock()
 		defer mux.Unlock()
 
@@ -207,7 +210,7 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 			return event, nil
 		}
 
-		log.Debugf("Publish event: %s", b)
+		log.Debugw(fmt.Sprintf("Publish event: %s", b), logp.TypeKey, logp.EventType)
 		return event, nil
 	})
 }

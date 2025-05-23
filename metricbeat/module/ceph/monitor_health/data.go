@@ -19,9 +19,8 @@ package monitor_health
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -90,7 +89,7 @@ func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not get HealthRequest data")
+		return nil, fmt.Errorf("could not get HealthRequest data: %w", err)
 	}
 
 	events := []mapstr.M{}

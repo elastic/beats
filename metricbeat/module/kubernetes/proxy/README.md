@@ -2,40 +2,75 @@
 
 ## Version history
 
-- June 2019, `v1.14.0`
+- December 2022, `v1.25.x`
 
 ## Resources
 
-- https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/metrics/metrics.go
-- https://kubernetes.io/docs/reference/command-line-tools-reference/kube-proxy/
+- [Process metrics](https://github.com/kubernetes/kubernetes/blob/master/vendor/github.com/prometheus/client_golang/prometheus/process_collector.go)
+- [Proxy metrics](https://github.com/kubernetes/kubernetes/blob/master/pkg/proxy/metrics/metrics.go)
+- [Rest client metrics](https://github.com/kubernetes/component-base/blob/master/metrics/prometheus/restclient/metrics.go)
+- [Metrics general information](https://kubernetes.io/docs/reference/instrumentation/metrics/)
+
 
 ## Metrics insight
 
-Process metrics:
 - process_cpu_seconds_total
 - process_resident_memory_bytes
 - process_virtual_memory_bytes
+- process_open_fds
+- process_start_time_seconds
+- process_max_fds
 
-Network rules syncing metrics:
-kubeproxy_sync_proxy_rules_duration_seconds_bucket
-    - le
 
-HTTP server metrics:
-http_request_duration_microseconds
-    - handler
-    - quantile
-
-Rest client metrics:
-rest_client_request_duration_seconds_bucket
-    - url
-    - verb
-    - le
-rest_client_requests_total
+- rest_client_requests_total (alpha)
     - code
     - host
     - method
+- rest_client_response_size_bytes (alpha)
+    - host
+    - verb
+- rest_client_request_size_bytes (alpha)
+    - host
+    - verb
+- rest_client_request_duration_seconds (alpha)
+    - host
+    - verb
+
+
+- kubeproxy_sync_proxy_rules_duration_seconds (alpha)
+- kubeproxy_network_programming_duration_seconds (alpha)
 
 ## Setup environment for manual tests
 
 - Create a kubernetes cluster
 - Deploy metricbeat as a daemonset + host network
+
+## Generating expectation files
+
+In order to support a new Kubernetes releases you'll have to generate new expectation files for this module in `_meta/test`. For that, start by deploying a new kubernetes cluster on the required Kubernetes version, for example:
+
+```bash
+kind create cluster --image kindest/node:v1.32.0
+```
+
+After that, you can fetch the proxy metrics from the api:
+
+```bash
+kubectl proxy
+```
+
+Then you can fetch the metrics from the url provided in the output and save it to a new `_meta/test/metrics.x.xx` file.
+
+```bash
+curl 127.0.0.1:8001/metrics > _meta/test/metrics.x.xx
+```
+
+After that, you need to add the new expectation file to `proxy_test.go` and then run the following commands to generate and test the expected files:
+
+```bash
+cd metricbeat/module/kubernetes/proxy
+# generate the expected files
+go test ./... --data
+# test the expected files
+go test ./...
+```

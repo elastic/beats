@@ -1,0 +1,1015 @@
+{
+  "data_tiers" : {
+    "available" : true,
+    "enabled" : true,
+    "data_warm" : {
+      "node_count" : 1,
+      "index_count" : 0,
+      "total_shard_count" : 0,
+      "primary_shard_count" : 0,
+      "doc_count" : 0,
+      "total_size_bytes" : 0,
+      "primary_size_bytes" : 0,
+      "primary_shard_size_avg_bytes" : 0,
+      "primary_shard_size_median_bytes" : 0,
+      "primary_shard_size_mad_bytes" : 0
+    },
+    "data_frozen" : {
+      "node_count" : 1,
+      "index_count" : 0,
+      "total_shard_count" : 0,
+      "primary_shard_count" : 0,
+      "doc_count" : 0,
+      "total_size_bytes" : 0,
+      "primary_size_bytes" : 0,
+      "primary_shard_size_avg_bytes" : 0,
+      "primary_shard_size_median_bytes" : 0,
+      "primary_shard_size_mad_bytes" : 0
+    },
+    "data_cold" : {
+      "node_count" : 1,
+      "index_count" : 0,
+      "total_shard_count" : 0,
+      "primary_shard_count" : 0,
+      "doc_count" : 0,
+      "total_size_bytes" : 0,
+      "primary_size_bytes" : 0,
+      "primary_shard_size_avg_bytes" : 0,
+      "primary_shard_size_median_bytes" : 0,
+      "primary_shard_size_mad_bytes" : 0
+    },
+    "data_content" : {
+      "node_count" : 1,
+      "index_count" : 9,
+      "total_shard_count" : 9,
+      "primary_shard_count" : 9,
+      "doc_count" : 158,
+      "total_size_bytes" : 40213223,
+      "primary_size_bytes" : 40213223,
+      "primary_shard_size_avg_bytes" : 4468135,
+      "primary_shard_size_median_bytes" : 6148,
+      "primary_shard_size_mad_bytes" : 5921
+    },
+    "data_hot" : {
+      "node_count" : 1,
+      "index_count" : 2,
+      "total_shard_count" : 2,
+      "primary_shard_count" : 2,
+      "doc_count" : 10,
+      "total_size_bytes" : 30823,
+      "primary_size_bytes" : 30823,
+      "primary_shard_size_avg_bytes" : 15411,
+      "primary_shard_size_median_bytes" : 15411,
+      "primary_shard_size_mad_bytes" : 4832
+    }
+  },
+  "monitoring" : {
+    "available" : true,
+    "enabled" : true,
+    "collection_enabled" : false,
+    "enabled_exporters" : {
+      "local" : 1
+    }
+  },
+  "analytics" : {
+    "available" : true,
+    "enabled" : true,
+    "stats" : {
+      "boxplot_usage" : 0,
+      "cumulative_cardinality_usage" : 0,
+      "string_stats_usage" : 0,
+      "top_metrics_usage" : 0,
+      "t_test_usage" : 0,
+      "moving_percentiles_usage" : 0,
+      "normalize_usage" : 0,
+      "rate_usage" : 0,
+      "multi_terms_usage" : 0
+    }
+  },
+  "ml" : {
+    "available" : true,
+    "enabled" : true,
+    "jobs" : {
+      "_all" : {
+        "count" : 0,
+        "detectors" : {
+          "total" : 0.0,
+          "min" : 0.0,
+          "avg" : 0.0,
+          "max" : 0.0
+        },
+        "created_by" : { },
+        "model_size" : {
+          "total" : 0.0,
+          "min" : 0.0,
+          "avg" : 0.0,
+          "max" : 0.0
+        },
+        "forecasts" : {
+          "total" : 0,
+          "forecasted_jobs" : 0
+        }
+      }
+    },
+    "datafeeds" : {
+      "_all" : {
+        "count" : 0
+      }
+    },
+    "data_frame_analytics_jobs" : {
+      "memory_usage" : {
+        "peak_usage_bytes" : {
+          "total" : 0.0,
+          "min" : 0.0,
+          "avg" : 0.0,
+          "max" : 0.0
+        }
+      },
+      "_all" : {
+        "count" : 0
+      },
+      "analysis_counts" : { }
+    },
+    "inference" : {
+      "ingest_processors" : {
+        "_all" : {
+          "num_docs_processed" : {
+            "max" : 0,
+            "sum" : 0,
+            "min" : 0
+          },
+          "pipelines" : {
+            "count" : 0
+          },
+          "num_failures" : {
+            "max" : 0,
+            "sum" : 0,
+            "min" : 0
+          },
+          "time_ms" : {
+            "max" : 0,
+            "sum" : 0,
+            "min" : 0
+          }
+        }
+      },
+      "trained_models" : {
+        "model_size_bytes" : {
+          "total" : 0.0,
+          "min" : 0.0,
+          "avg" : 0.0,
+          "max" : 0.0
+        },
+        "estimated_operations" : {
+          "total" : 0.0,
+          "min" : 0.0,
+          "avg" : 0.0,
+          "max" : 0.0
+        },
+        "estimated_heap_memory_usage_bytes" : {
+          "total" : 0.0,
+          "min" : 0.0,
+          "avg" : 0.0,
+          "max" : 0.0
+        },
+        "count" : {
+          "total" : 1,
+          "prepackaged" : 1,
+          "other" : 0,
+          "regression" : 0,
+          "classification" : 0
+        },
+        "_all" : {
+          "count" : 1
+        }
+      }
+    },
+    "node_count" : 1
+  },
+  "frozen_indices" : {
+    "available" : true,
+    "enabled" : true,
+    "indices_count" : 0
+  },
+  "logstash" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "ccr" : {
+    "available" : true,
+    "enabled" : true,
+    "follower_indices_count" : 0,
+    "auto_follow_patterns_count" : 0
+  },
+  "graph" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "enrich" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "transform" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "spatial" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "rollup" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "security" : {
+    "available" : true,
+    "enabled" : true,
+    "realms" : {
+      "file" : {
+        "name" : [
+          "default_file"
+        ],
+        "available" : true,
+        "cache" : [
+          {
+            "size" : 0
+          }
+        ],
+        "size" : [
+          0
+        ],
+        "enabled" : true,
+        "order" : [
+          2147483647
+        ]
+      },
+      "ldap" : {
+        "available" : true,
+        "enabled" : false
+      },
+      "native" : {
+        "name" : [
+          "default_native"
+        ],
+        "available" : true,
+        "cache" : [
+          {
+            "size" : 0
+          }
+        ],
+        "size" : [
+          0
+        ],
+        "enabled" : true,
+        "order" : [
+          2147483647
+        ]
+      },
+      "saml" : {
+        "available" : true,
+        "enabled" : false
+      },
+      "kerberos" : {
+        "available" : true,
+        "enabled" : false
+      },
+      "oidc" : {
+        "available" : true,
+        "enabled" : false
+      },
+      "active_directory" : {
+        "available" : true,
+        "enabled" : false
+      },
+      "pki" : {
+        "available" : true,
+        "enabled" : false
+      }
+    },
+    "roles" : {
+      "file" : {
+        "size" : 0,
+        "fls" : false,
+        "dls" : false
+      },
+      "native" : {
+        "size" : 0,
+        "fls" : false,
+        "dls" : false
+      },
+      "dls" : {
+        "bit_set_cache" : {
+          "count" : 0,
+          "memory_in_bytes" : 0,
+          "memory" : "0b"
+        }
+      }
+    },
+    "role_mapping" : {
+      "native" : {
+        "size" : 0,
+        "enabled" : 0
+      }
+    },
+    "ssl" : {
+      "http" : {
+        "enabled" : false
+      },
+      "transport" : {
+        "enabled" : false
+      }
+    },
+    "token_service" : {
+      "enabled" : false
+    },
+    "api_key_service" : {
+      "enabled" : false
+    },
+    "audit" : {
+      "enabled" : false
+    },
+    "ipfilter" : {
+      "http" : false,
+      "transport" : false
+    },
+    "anonymous" : {
+      "enabled" : false
+    },
+    "fips_140" : {
+      "enabled" : false
+    },
+    "operator_privileges" : {
+      "enabled" : false,
+      "available" : true
+    }
+  },
+  "searchable_snapshots" : {
+    "available" : true,
+    "enabled" : true,
+    "indices_count" : 0,
+    "full_copy_indices_count" : 0,
+    "shared_cache_indices_count" : 0
+  },
+  "watcher" : {
+    "available" : true,
+    "enabled" : true,
+    "execution" : {
+      "actions" : {
+        "_all" : {
+          "total" : 0,
+          "total_time_in_ms" : 0
+        }
+      }
+    },
+    "watch" : {
+      "input" : {
+        "_all" : {
+          "total" : 0,
+          "active" : 0
+        }
+      },
+      "trigger" : {
+        "_all" : {
+          "total" : 0,
+          "active" : 0
+        }
+      }
+    },
+    "count" : {
+      "total" : 0,
+      "active" : 0
+    }
+  },
+  "ilm" : {
+    "policy_count" : 17,
+    "policy_stats" : [
+      {
+        "phases" : {
+          "warm" : {
+            "min_age" : 172800000,
+            "actions" : [
+              "shrink",
+              "forcemerge",
+              "migrate"
+            ],
+            "configurations" : {
+              "forcemerge" : {
+                "max_num_segments" : 1
+              },
+              "shrink" : {
+                "number_of_shards" : 1
+              }
+            }
+          },
+          "cold" : {
+            "min_age" : 2592000000,
+            "actions" : [
+              "migrate"
+            ],
+            "configurations" : { }
+          },
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 7776000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 7776000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 1
+      },
+      {
+        "phases" : {
+          "warm" : {
+            "min_age" : 172800000,
+            "actions" : [
+              "shrink",
+              "forcemerge",
+              "migrate"
+            ],
+            "configurations" : {
+              "forcemerge" : {
+                "max_num_segments" : 1
+              },
+              "shrink" : {
+                "number_of_shards" : 1
+              }
+            }
+          },
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 2592000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "delete" : {
+            "min_age" : 604800000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_size" : "50gb",
+                "max_size_bytes" : 53687091200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 7776000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 1
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 7776000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_size" : "300gb",
+                "max_size_bytes" : 322122547200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 7776000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "warm" : {
+            "min_age" : 172800000,
+            "actions" : [
+              "shrink",
+              "forcemerge",
+              "migrate"
+            ],
+            "configurations" : {
+              "forcemerge" : {
+                "max_num_segments" : 1
+              },
+              "shrink" : {
+                "number_of_shards" : 1
+              }
+            }
+          },
+          "cold" : {
+            "min_age" : 2592000000,
+            "actions" : [
+              "migrate"
+            ],
+            "configurations" : { }
+          },
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 31536000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "warm" : {
+            "min_age" : 172800000,
+            "actions" : [
+              "shrink",
+              "forcemerge",
+              "migrate"
+            ],
+            "configurations" : {
+              "forcemerge" : {
+                "max_num_segments" : 1
+              },
+              "shrink" : {
+                "number_of_shards" : 1
+              }
+            }
+          },
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "7d",
+                "max_age_millis" : 604800000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 604800000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "10gb",
+                "max_primary_shard_size_bytes" : 10737418240
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 2592000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 1
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "warm" : {
+            "min_age" : 172800000,
+            "actions" : [
+              "shrink",
+              "forcemerge",
+              "migrate"
+            ],
+            "configurations" : {
+              "forcemerge" : {
+                "max_num_segments" : 1
+              },
+              "shrink" : {
+                "number_of_shards" : 1
+              }
+            }
+          },
+          "cold" : {
+            "min_age" : 2592000000,
+            "actions" : [
+              "migrate"
+            ],
+            "configurations" : { }
+          },
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          },
+          "delete" : {
+            "min_age" : 15552000000,
+            "actions" : [
+              "delete",
+              "migrate"
+            ],
+            "configurations" : { }
+          }
+        },
+        "indices_managed" : 0
+      },
+      {
+        "phases" : {
+          "hot" : {
+            "min_age" : 0,
+            "actions" : [
+              "rollover",
+              "migrate"
+            ],
+            "configurations" : {
+              "rollover" : {
+                "max_age" : "30d",
+                "max_age_millis" : 2592000000,
+                "max_primary_shard_size" : "50gb",
+                "max_primary_shard_size_bytes" : 53687091200
+              }
+            }
+          }
+        },
+        "indices_managed" : 0
+      }
+    ]
+  },
+  "slm" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "voting_only" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "data_streams" : {
+    "available" : true,
+    "enabled" : true,
+    "data_streams" : 2,
+    "indices_count" : 2
+  },
+  "aggregate_metric" : {
+    "available" : true,
+    "enabled" : true
+  },
+  "sql" : {
+    "available" : true,
+    "enabled" : true,
+    "features" : {
+      "having" : 0,
+      "subselect" : 0,
+      "limit" : 0,
+      "orderby" : 0,
+      "where" : 0,
+      "join" : 0,
+      "groupby" : 0,
+      "command" : 0,
+      "local" : 0
+    },
+    "queries" : {
+      "cli" : {
+        "total" : 0,
+        "paging" : 0,
+        "failed" : 0
+      },
+      "rest" : {
+        "total" : 0,
+        "paging" : 0,
+        "failed" : 0
+      },
+      "canvas" : {
+        "total" : 0,
+        "paging" : 0,
+        "failed" : 0
+      },
+      "odbc" : {
+        "total" : 0,
+        "paging" : 0,
+        "failed" : 0
+      },
+      "jdbc" : {
+        "total" : 0,
+        "paging" : 0,
+        "failed" : 0
+      },
+      "odbc32" : {
+        "total" : 0,
+        "paging" : 0,
+        "failed" : 0
+      },
+      "odbc64" : {
+        "total" : 0,
+        "paging" : 0,
+        "failed" : 0
+      },
+      "_all" : {
+        "total" : 0,
+        "paging" : 0,
+        "failed" : 0
+      },
+      "translate" : {
+        "count" : 0
+      }
+    }
+  },
+  "eql" : {
+    "available" : true,
+    "enabled" : true,
+    "features" : {
+      "joins" : {
+        "join_queries_three" : 0,
+        "join_queries_two" : 0,
+        "join_until" : 0,
+        "join_queries_five_or_more" : 0,
+        "join_queries_four" : 0
+      },
+      "sequence" : 0,
+      "keys" : {
+        "join_keys_two" : 0,
+        "join_keys_one" : 0,
+        "join_keys_three" : 0,
+        "join_keys_five_or_more" : 0,
+        "join_keys_four" : 0
+      },
+      "join" : 0,
+      "sequences" : {
+        "sequence_queries_three" : 0,
+        "sequence_queries_four" : 0,
+        "sequence_queries_two" : 0,
+        "sequence_until" : 0,
+        "sequence_queries_five_or_more" : 0,
+        "sequence_maxspan" : 0
+      },
+      "event" : 0,
+      "pipes" : {
+        "pipe_tail" : 0,
+        "pipe_head" : 0
+      }
+    },
+    "queries" : {
+      "all" : {
+        "total" : 0,
+        "failed" : 0
+      },
+      "_all" : {
+        "total" : 0,
+        "failed" : 0
+      }
+    }
+  }
+}

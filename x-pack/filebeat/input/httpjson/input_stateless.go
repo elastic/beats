@@ -48,5 +48,5 @@ func (pub statelessPublisher) Publish(event beat.Event, _ interface{}) error {
 // It will return on context cancellation, any other error will be retried.
 func (in *statelessInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	pub := statelessPublisher{wrapped: publisher}
-	return run(ctx, in.config, pub, nil)
+	return runWithMetrics(ctx, in.config, pub, nil)
 }

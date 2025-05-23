@@ -38,7 +38,7 @@ func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputM
 	}
 
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		metrics = newInputMetrics("", monitoring.NewRegistry())
 	}
 
 	bindURI := "tcp://" + bindAddress

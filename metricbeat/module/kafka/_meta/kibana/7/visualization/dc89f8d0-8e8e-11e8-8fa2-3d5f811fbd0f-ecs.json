@@ -84,7 +84,7 @@
                     "id": "3",
                     "params": {
                         "customLabel": "Brokers",
-                        "field": "kafka.partition.broker.id"
+                        "field": "kafka.broker.id"
                     },
                     "schema": "metric",
                     "type": "cardinality"

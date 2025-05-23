@@ -18,8 +18,8 @@
 package dashboards
 
 import (
-	"bytes"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/kibana"
@@ -35,35 +35,25 @@ var (
 // GetDashboard returns the dashboard with the given id with the index pattern removed
 func Get(client *kibana.Client, id string) ([]byte, error) {
 	if client.Version.LessThan(MinimumRequiredVersionSavedObjects) {
-		return nil, fmt.Errorf("Kibana version must be at least " + MinimumRequiredVersionSavedObjects.String())
+		return nil, fmt.Errorf("Kibana version must be at least %s", MinimumRequiredVersionSavedObjects.String())
+	}
+
+	// add a special header for serverless, where saved_objects is "hidden"
+	headers := http.Header{}
+	if serverless, _ := client.KibanaIsServerless(); serverless {
+		headers.Add("x-elastic-internal-origin", "libbeat")
 	}
 
 	body := fmt.Sprintf(`{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true, "excludeExportDetails": true}`, id)
-	statusCode, response, err := client.Request("POST", "/api/saved_objects/_export", nil, nil, strings.NewReader(body))
+	statusCode, response, err := client.Request("POST", "/api/saved_objects/_export", nil, headers, strings.NewReader(body))
 	if err != nil || statusCode >= 300 {
-		return nil, fmt.Errorf("error exporting dashboard: %+v, code: %d", err, statusCode)
+		return nil, fmt.Errorf("error exporting dashboard: %w, code: %d", err, statusCode)
 	}
 
 	result, err := RemoveIndexPattern(response)
 	if err != nil {
-		return nil, fmt.Errorf("error removing index pattern: %+v", err)
+		return nil, fmt.Errorf("error removing index pattern: %w", err)
 	}
 
 	return result, nil
-}
-
-// truncateString returns a truncated string if the length is greater than 250
-// runes. If the string is truncated "... (truncated)" is appended. Newlines are
-// replaced by spaces in the returned string.
-//
-// This function is useful for logging raw HTTP responses with errors when those
-// responses can be very large (such as an HTML page with CSS content).
-func truncateString(b []byte) string {
-	const maxLength = 250
-	runes := bytes.Runes(b)
-	if len(runes) > maxLength {
-		runes = append(runes[:maxLength], []rune("... (truncated)")...)
-	}
-
-	return strings.Replace(string(runes), "\n", " ", -1)
 }

@@ -25,8 +25,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/dev-tools/mage"
 )
 
@@ -58,7 +56,7 @@ func moduleDocs() error {
 		return err
 	}
 	if len(files) == 0 {
-		return errors.Errorf("No modules found matching %v", searchPath)
+		return fmt.Errorf("No modules found matching %v", searchPath)
 	}
 
 	// Clean existing files.
@@ -71,7 +69,7 @@ func moduleDocs() error {
 	for _, f := range files {
 		matches := moduleNameRegex.FindStringSubmatch(filepath.ToSlash(f))
 		if len(matches) != 2 {
-			return errors.Errorf("module path %v does not match regexp", f)
+			return fmt.Errorf("module path %v does not match regexp", f)
 		}
 		name := matches[1]
 		names = append(names, name)

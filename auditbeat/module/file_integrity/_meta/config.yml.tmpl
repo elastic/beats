@@ -27,6 +27,9 @@
 {{ end -}}
 
 {{- if .Reference }}
+  # Detect changes to files included in subdirectories. Disabled by default.
+  recursive: false
+  
   # List of regular expressions to filter out notifications for unwanted files.
   # Wrap in single quotes to workaround YAML escaping rules. By default no files
   # are ignored.
@@ -34,15 +37,27 @@
   exclude_files:
   - '\.DS_Store$'
   - '\.swp$'
+
+  # If recursive is set to true, subdirectories can also be excluded here by
+  #  specifying them.
+  # - '(?i)/tmp/'
   {{- else if eq .GOOS "windows" }}
   exclude_files:
   - '(?i)\.lnk$'
   - '(?i)\.swp$'
+
+  # If recursive is set to true, subdirectories can also be excluded here by
+  #  specifying them.
+  #  - '(?i)\\temp\\'
   {{- else }}
   exclude_files:
   - '(?i)\.sw[nop]$'
   - '~$'
   - '/\.git($|/)'
+
+  # If recursive is set to true, subdirectories can also be excluded here by
+  #  specifying them.
+  # - '(?i)/tmp/'
   {{- end }}
 
   # List of regular expressions used to explicitly include files. When configured,
@@ -53,6 +68,14 @@
   {{- else }}
   #include_files:
   #- '/\.ssh($|/)'
+  {{- end }}
+
+  {{- if eq .GOOS "linux" }}
+  # Select the backend which will be used to source events.
+  # "fsnotify" doesn't have the ability to associate user data to file events.
+  # Valid values: auto, fsnotify, kprobes, ebpf.
+  # Default: fsnotify.
+  backend: fsnotify
   {{- end }}
 
   # Scan over the configured file paths at startup and send events for new or
@@ -72,9 +95,60 @@
   # Default is sha1.
   hash_types: [sha1]
 
-  # Detect changes to files included in subdirectories. Disabled by default.
-  recursive: false
-
   # Set to true to publish fields with null values in events.
   #keep_null: false
-{{ end }}
+
+  # Parse detailed information for the listed fields. Field paths in the list below
+  # that are a prefix of other field paths imply the longer field path. A set of
+  # fields may be specified using an RE2 regular expression quoted in //. For example
+  # /^file\.pe\./ will match all file.pe.* fields. Note that the expression is not
+  # implicitly anchored, so the empty expression will match all fields.
+  # file_parsers:
+  # - file.elf.sections
+  # - file.elf.sections.name
+  # - file.elf.sections.physical_size
+  # - file.elf.sections.virtual_size
+  # - file.elf.sections.entropy
+  # - file.elf.sections.var_entropy
+  # - file.elf.import_hash
+  # - file.elf.imports
+  # - file.elf.imports_names_entropy
+  # - file.elf.imports_names_var_entropy
+  # - file.elf.go_import_hash
+  # - file.elf.go_imports
+  # - file.elf.go_imports_names_entropy
+  # - file.elf.go_imports_names_var_entropy
+  # - file.elf.go_stripped
+  # - file.macho.sections
+  # - file.macho.sections.name
+  # - file.macho.sections.physical_size
+  # - file.macho.sections.virtual_size
+  # - file.macho.sections.entropy
+  # - file.macho.sections.var_entropy
+  # - file.macho.import_hash
+  # - file.macho.symhash
+  # - file.macho.imports
+  # - file.macho.imports_names_entropy
+  # - file.macho.imports_names_var_entropy
+  # - file.macho.go_import_hash
+  # - file.macho.go_imports
+  # - file.macho.go_imports_names_entropy
+  # - file.macho.go_imports_names_var_entropy
+  # - file.macho.go_stripped
+  # - file.pe.sections
+  # - file.pe.sections.name
+  # - file.pe.sections.physical_size
+  # - file.pe.sections.virtual_size
+  # - file.pe.sections.entropy
+  # - file.pe.sections.var_entropy
+  # - file.pe.import_hash
+  # - file.pe.imphash
+  # - file.pe.imports
+  # - file.pe.imports_names_entropy
+  # - file.pe.imports_names_var_entropy
+  # - file.pe.go_import_hash
+  # - file.pe.go_imports
+  # - file.pe.go_imports_names_entropy
+  # - file.pe.go_imports_names_var_entropy
+  # - file.pe.go_stripped
+ {{ end }}

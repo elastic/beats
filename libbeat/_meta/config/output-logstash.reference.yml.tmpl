@@ -56,6 +56,14 @@
   #proxy_use_local_resolver: false
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
+  # Enables restarting {{.BeatName}} if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
+
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, the events are typically dropped.
   # Some Beats, such as Filebeat and Winlogbeat, ignore the max_retries setting

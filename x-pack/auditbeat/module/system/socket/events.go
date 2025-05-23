@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package socket
 
@@ -19,7 +18,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 )
 
 const (
@@ -156,22 +155,6 @@ func (e *tcpConnectResult) Update(s *state) error {
 		})
 	}
 	return fmt.Errorf("stored thread event has unexpected type %T", ev)
-}
-
-var tcpStates = []string{
-	"(zero)",
-	"TCP_ESTABLISHED",
-	"TCP_SYN_SENT",
-	"TCP_SYN_RECV",
-	"TCP_FIN_WAIT1",
-	"TCP_FIN_WAIT2",
-	"TCP_TIME_WAIT",
-	"TCP_CLOSE",
-	"TCP_CLOSE_WAIT",
-	"TCP_LAST_ACK",
-	"TCP_LISTEN",
-	"TCP_CLOSING",
-	"TCP_NEW_SYN_RECV",
 }
 
 type tcpAcceptResult struct {
@@ -895,7 +878,7 @@ func (e *execveCall) getProcess() *process {
 		var err error
 		p.path, err = filepath.EvalSymlinks(fmt.Sprintf("/proc/%d/exe", e.Meta.PID))
 		if err != nil {
-			if pe, ok := err.(*os.PathError); ok && strings.Contains(pe.Path, "(deleted)") {
+			if pe, ok := err.(*os.PathError); ok && strings.Contains(pe.Path, "(deleted)") { //nolint:errorlint // we're fetching the string body
 				// Keep the deleted path from the PathError.
 				p.path = pe.Path
 				// Keep the basename in case we can't get the process name.
@@ -1049,9 +1032,13 @@ func (e *doExit) String() string {
 
 // Update the state with the contents of this event.
 func (e *doExit) Update(s *state) (err error) {
-	// Only report exits of the main thread, a.k.a process exit
+	// Report exit of the main thread,
+	// or a TID that was originally reported by doFork.
 	if e.Meta.PID == e.Meta.TID {
 		err = s.TerminateProcess(e.Meta.PID)
+
+	} else if e.Meta.PID != e.Meta.TID && s.processExists(e.Meta.TID) {
+		err = s.TerminateProcess(e.Meta.TID)
 	}
 	// Cleanup any saved thread state
 	s.ThreadLeave(e.Meta.TID)

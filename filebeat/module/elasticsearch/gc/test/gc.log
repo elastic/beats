@@ -1,4 +1,4 @@
-[2018-06-13T07:44:22.647+0000][32376][gc] Using Concurrent Mark Sweep
+[2018-06-13T07:44:22.647+0000][32376][info         ][gc] Using Concurrent Mark Sweep
 [2018-06-13T07:44:22.647+0000][32376][gc,heap,coops] Heap address: 0x00000000c0000000, size: 1024 MB, Compressed Oops mode: 32-bit
 [2018-06-13T07:44:22.725+0000][32376][safepoint    ] Application time: 0,0011068 seconds
 [2018-06-13T07:44:22.725+0000][32376][safepoint    ] Total time for which application threads were stopped: 0,0000563 seconds, Stopping threads took: 0,0000092 seconds

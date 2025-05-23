@@ -29,7 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -76,7 +76,7 @@ func init() {
 }
 
 // NewDecodeJSONFields construct a new decode_json_fields processor.
-func NewDecodeJSONFields(c *cfg.C) (processors.Processor, error) {
+func NewDecodeJSONFields(c *cfg.C) (beat.Processor, error) {
 	config := defaultConfig
 	logger := logp.NewLogger("truncate_fields")
 
@@ -122,11 +122,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 		if err != nil {
 			f.logger.Debugf("Error trying to unmarshal %s", text)
 			errs = append(errs, err.Error())
-			event.SetErrorWithOption(mapstr.M{
-				"message": "parsing input as JSON: " + err.Error(),
-				"data":    text,
-				"field":   field,
-			}, f.addErrorKey)
+			event.SetErrorWithOption(fmt.Sprintf("parsing input as JSON: %s", err.Error()), f.addErrorKey, text, field)
 			continue
 		}
 
@@ -181,7 +177,7 @@ func (f *decodeJSONFields) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	if len(errs) > 0 {
-		return event, fmt.Errorf(strings.Join(errs, ", "))
+		return event, errors.New(strings.Join(errs, ", "))
 	}
 	return event, nil
 }

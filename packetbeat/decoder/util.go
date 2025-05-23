@@ -17,7 +17,10 @@
 
 package decoder
 
-import "github.com/google/gopacket"
+import (
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+)
 
 // implement DecodingLayer with support of switching between multiple layers to
 // remember outer layer results
@@ -33,6 +36,10 @@ func (m *multiLayer) next() {
 	if m.i >= len(m.layers) {
 		m.i = 0
 	}
+}
+
+func (m *multiLayer) current() gopacket.DecodingLayer {
+	return m.layers[m.i]
 }
 
 func (m *multiLayer) init(layer ...gopacket.DecodingLayer) {
@@ -53,4 +60,18 @@ func (m *multiLayer) NextLayerType() gopacket.LayerType {
 
 func (m *multiLayer) LayerPayload() []byte {
 	return m.layers[m.i].LayerPayload()
+}
+
+func ipv4Layer(l gopacket.DecodingLayer) (ipv4 *layers.IPv4, ok bool) {
+	for maxDepth := 1000; maxDepth > 0; maxDepth-- {
+		switch d := l.(type) {
+		case *layers.IPv4:
+			return d, true
+		case *multiLayer:
+			l = d.current()
+		default:
+			return nil, false
+		}
+	}
+	return nil, false
 }

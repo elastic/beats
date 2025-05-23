@@ -52,7 +52,8 @@ func TestServer(t *testing.T) {
 		c := makeTestConfig()
 		c.TLS = serverConf
 		// Disable mTLS requirements in the server.
-		c.TLS.ClientAuth = 0 // tls.NoClientCert
+		var clientAuth = tlscommon.TLSClientAuthNone
+		c.TLS.ClientAuth = &clientAuth
 		c.TLS.VerificationMode = tlscommon.VerifyNone
 
 		testSendReceive(t, c, 10, clientConf)
@@ -69,7 +70,7 @@ func TestServer(t *testing.T) {
 }
 
 func testSendReceive(t testing.TB, c config, numberOfEvents int, clientTLSConfig *tls.Config) {
-	require.NoError(t, logp.TestingSetup())
+	logp.TestingSetup()
 	log := logp.NewLogger(inputName).With("test_name", t.Name())
 
 	ctx, shutdown := context.WithTimeout(context.Background(), testTimeout)
@@ -127,7 +128,7 @@ func sendData(ctx context.Context, t testing.TB, bindAddress string, numberOfEve
 	}()
 	t.Log("Lumberjack client connected.")
 
-	var events []interface{}
+	events := make([]interface{}, 0, numberOfEvents)
 	for i := 0; i < numberOfEvents; i++ {
 		events = append(events, map[string]interface{}{
 			"message": "hello world!",
@@ -220,11 +221,12 @@ func tlsSetup(t *testing.T) (clientConfig *tls.Config, serverConfig *tlscommon.S
 		MinVersion:   tls.VersionTLS12,
 	}
 
+	var clientAuth = tlscommon.TLSClientAuthRequired
+
 	serverConfig = &tlscommon.ServerConfig{
 		// NOTE: VerifyCertificate is ineffective unless ClientAuth is set to RequireAndVerifyClientCert.
 		VerificationMode: tlscommon.VerifyCertificate,
-		// Unfortunately ServerConfig uses an unexported type in an exported field.
-		ClientAuth: 4, // tls.RequireAndVerifyClientCert
+		ClientAuth:       &clientAuth, // tls.RequireAndVerifyClientCert
 		CAs: []string{
 			string(certData.ca.CertPEM(t)),
 		},

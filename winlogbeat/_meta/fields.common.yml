@@ -23,13 +23,6 @@
         All fields specific to the Windows Event Log are defined here.
       fields:
 
-        - name: api
-          required: true
-          description: >
-            The event log API type used to read the record. The possible values are
-            "wineventlog" for the Windows Event Log API or "wineventlog-experimental" for its
-            experimental implementation.
-
         - name: activity_id
           type: keyword
           required: false
@@ -93,7 +86,13 @@
               type: keyword
             - name: BuildVersion
               type: keyword
+            - name: CallTrace
+              type: keyword
+            - name: ClientInfo
+              type: keyword
             - name: Company
+              type: keyword
+            - name: Configuration
               type: keyword
             - name: CorruptionActionState
               type: keyword
@@ -123,6 +122,10 @@
               type: keyword
             - name: EntryCount
               type: keyword
+            - name: EventType
+              type: keyword
+            - name: EventNamespace
+              type: keyword
             - name: ExtraInfo
               type: keyword
             - name: FailureName
@@ -132,6 +135,8 @@
             - name: FileVersion
               type: keyword
             - name: FinalStatus
+              type: keyword
+            - name: GrantedAccess
               type: keyword
             - name: Group
               type: keyword
@@ -177,11 +182,15 @@
               type: keyword
             - name: MinorVersion
               type: keyword
+            - name: Name
+              type: keyword
             - name: NewProcessId
               type: keyword
             - name: NewProcessName
               type: keyword
             - name: NewSchemeGuid
+              type: keyword
+            - name: NewThreadId
               type: keyword
             - name: NewTime
               type: keyword
@@ -192,6 +201,8 @@
             - name: OldSchemeGuid
               type: keyword
             - name: OldTime
+              type: keyword
+            - name: Operation
               type: keyword
             - name: OriginalFileName
               type: keyword
@@ -221,6 +232,8 @@
               type: keyword
             - name: QfeVersion
               type: keyword
+            - name: Query
+              type: keyword
             - name: Reason
               type: keyword
             - name: SchemaVersion
@@ -230,6 +243,8 @@
             - name: ServiceName
               type: keyword
             - name: ServiceVersion
+              type: keyword
+            - name: Session
               type: keyword
             - name: ShutdownActionType
               type: keyword
@@ -242,6 +257,12 @@
             - name: SignatureStatus
               type: keyword
             - name: Signed
+              type: keyword
+            - name: StartAddress
+              type: keyword
+            - name: StartFunction
+              type: keyword
+            - name: StartModule
               type: keyword
             - name: StartTime
               type: keyword
@@ -263,11 +284,17 @@
               type: keyword
             - name: TargetDomainName
               type: keyword
+            - name: TargetImage
+              type: keyword
             - name: TargetInfo
               type: keyword
             - name: TargetLogonGuid
               type: keyword
             - name: TargetLogonId
+              type: keyword
+            - name: TargetProcessGUID
+              type: keyword
+            - name: TargetProcessId
               type: keyword
             - name: TargetServerName
               type: keyword
@@ -280,6 +307,8 @@
             - name: TokenElevationType
               type: keyword
             - name: TransmittedServices
+              type: keyword
+            - name: Type
               type: keyword
             - name: UserSid
               type: keyword
@@ -463,10 +492,6 @@
     version of Winlogbeat. These are added to the index template when
     `migration.6_to_7.enable: true` is set in the configuration.
   fields:
-    - name: type
-      type: alias
-      path: winlog.api
-      migration: true
 
     - name: activity_id
       type: alias

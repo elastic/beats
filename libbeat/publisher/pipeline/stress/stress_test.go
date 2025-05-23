@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build stresstest
-// +build stresstest
 
 package stress_test
 
@@ -34,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 // additional flags
@@ -55,6 +55,7 @@ func TestPipeline(t *testing.T) {
 		Version:  "0",
 		Name:     "stresser.test",
 		Hostname: "stresser.test",
+		Logger:   logptest.NewTestingLogger(t, ""),
 	}
 
 	if duration == 0 {

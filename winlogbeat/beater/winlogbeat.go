@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/winlogbeat/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -86,26 +87,30 @@ func New(b *beat.Beat, _ *conf.C) (beat.Beater, error) {
 func (eb *Winlogbeat) init(b *beat.Beat) error {
 	config := &eb.config
 
-	// Create the event logs. This will validate the event log specific
-	// configuration.
-	eb.eventLogs = make([]*eventLogger, 0, len(config.EventLogs))
-	for _, config := range config.EventLogs {
-		eventLog, err := eventlog.New(config)
-		if err != nil {
-			return fmt.Errorf("failed to create new event log: %w", err)
-		}
-		eb.log.Debugf("initialized WinEventLog[%s]", eventLog.Name())
+	if !eb.beat.InSetupCmd {
+		// Create the event logs. This will validate the event log specific
+		// configuration.
+		eb.eventLogs = make([]*eventLogger, 0, len(config.EventLogs))
+		for _, config := range config.EventLogs {
+			eventLog, err := eventlog.New(config)
+			if err != nil {
+				return fmt.Errorf("failed to create new event log: %w", err)
+			}
+			eb.log.Debugf("initialized WinEventLog[%s]", eventLog.Name())
 
-		logger, err := newEventLogger(b.Info, eventLog, config, eb.log)
-		if err != nil {
-			return fmt.Errorf("failed to create new event log: %w", err)
-		}
+			logger, err := newEventLogger(b.Info, eventLog, config, eb.log)
+			if err != nil {
+				return fmt.Errorf("failed to create new event log: %w", err)
+			}
 
-		eb.eventLogs = append(eb.eventLogs, logger)
+			eb.eventLogs = append(eb.eventLogs, logger)
+		}
 	}
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		overwritePipelines := config.OverwritePipelines
-		esClient, err := eslegclient.NewConnectedClient(esConfig, "Winlogbeat")
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Winlogbeat")
 		if err != nil {
 			return err
 		}
@@ -154,6 +159,24 @@ func (eb *Winlogbeat) Run(b *beat.Beat) error {
 
 	// Initialize metrics.
 	initMetrics("total")
+	if b.API != nil {
+		err := inputmon.AttachHandler(b.API.Router(), nil)
+		if err != nil {
+			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+		}
+	}
+
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON(nil)
+				if err != nil {
+					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+	}
 
 	var wg sync.WaitGroup
 	for _, log := range eb.eventLogs {

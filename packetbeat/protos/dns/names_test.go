@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 // Unit tests and benchmarks for the dns package.
 // This file contains tests for queries' RR type
@@ -33,6 +32,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -112,7 +112,7 @@ func assertDNSMessage(t testing.TB, q dnsTestMsg) {
 	}
 
 	mapStr := mapstr.M{}
-	addDNSToMapStr(mapStr, pb.NewFields(), dns, true, true)
+	addDNSToMapStr(mapStr, pb.NewFields(), dns, true, true, logp.NewLogger("dns_test"))
 	if q.question != nil {
 		for k, v := range q.question {
 			assert.NotNil(t, mapStr["question"].(mapstr.M)[k])

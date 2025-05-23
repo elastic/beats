@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"io"
 	"math"
@@ -16,11 +17,12 @@ import (
 	"time"
 
 	"github.com/cespare/xxhash/v2"
-	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
@@ -28,7 +30,6 @@ import (
 )
 
 const (
-	moduleName    = "system"
 	metricsetName = "host"
 	namespace     = "system.audit.host"
 
@@ -95,6 +96,7 @@ type Host struct {
 
 // changeDetectionHash creates a hash of selected parts of the host information.
 // This is used later to detect changes to a host over time.
+//
 //nolint:errcheck // All checks are for writes to a hasher.
 func (host *Host) changeDetectionHash() uint64 {
 	h := xxhash.New()
@@ -115,7 +117,6 @@ func (host *Host) changeDetectionHash() uint64 {
 	return h.Sum64()
 }
 
-//nolint:errcheck // All checks are for mapstr.Put.
 func (host *Host) toMapStr() mapstr.M {
 	mapstr := mapstr.M{
 		// https://github.com/elastic/ecs#-host-fields
@@ -180,7 +181,7 @@ func formatHardwareAddr(addr net.HardwareAddr) string {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)
@@ -198,11 +199,11 @@ type MetricSet struct {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName)
 
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -213,7 +214,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms := &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
-		log:           logp.NewLogger(moduleName),
+		log:           logp.NewLogger(system.ModuleName),
 		bucket:        bucket,
 	}
 
@@ -287,7 +288,6 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	var events []mb.Event
 
 	// Report ID changes as a separate, special event.
-	//nolint:errcheck // All checks are for mapstr.Put.
 	if ms.lastHost.Info.UniqueID != currentHost.Info.UniqueID {
 		/*
 		 Issue two events - one for the host with the old ID, one for the new
@@ -508,7 +508,7 @@ func getNetInfo() ([]net.IP, []net.HardwareAddr, error) {
 	}
 
 	// Keep track of all errors
-	var errs multierror.Errors
+	var errs []error
 
 	for _, i := range ifaces {
 		// Skip loopback interfaces
@@ -544,5 +544,5 @@ func getNetInfo() ([]net.IP, []net.HardwareAddr, error) {
 		}
 	}
 
-	return append(ipv4List, ipv6List...), hwList, errs.Err()
+	return append(ipv4List, ipv6List...), hwList, errors.Join(errs...)
 }

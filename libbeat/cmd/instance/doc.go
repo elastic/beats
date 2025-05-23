@@ -27,11 +27,11 @@ documentation for more details.
 
 To use this package, create a simple main that invokes the Run() function.
 
-  func main() {
-  	if err := beat.Run("mybeat", myVersion, beater.New); err != nil {
-  		os.Exit(1)
-  	}
-  }
+	func main() {
+		if err := beat.Run("mybeat", myVersion, beater.New); err != nil {
+			os.Exit(1)
+		}
+	}
 
 In the example above, the beater package contains the implementation of the
 Beater interface and the New method returns a new instance of Beater. The
@@ -40,8 +40,8 @@ or combined with other Beats.
 
 Recommendations
 
-  * Use the logp package for logging rather than writing to stdout or stderr.
-  * Do not call os.Exit in any of your code. Return an error instead. Or if your
+  - Use the logp package for logging rather than writing to stdout or stderr.
+  - Do not call os.Exit in any of your code. Return an error instead. Or if your
     code needs to exit without an error, return beat.GracefulExit.
 */
 package instance

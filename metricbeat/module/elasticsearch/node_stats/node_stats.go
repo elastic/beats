@@ -35,8 +35,13 @@ func init() {
 }
 
 const (
-	nodeLocalStatsPath = "/_nodes/_local/stats"
-	nodesAllStatsPath  = "/_nodes/_all/stats"
+	statsMetrics       = "jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest"
+	indexMetrics       = "bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush"
+	nodeLocalStatsPath = "/_nodes/_local/stats/" + statsMetrics + "/" + indexMetrics
+	nodesAllStatsPath  = "/_nodes/_all/stats/" + statsMetrics + "/" + indexMetrics
+	// versions < 8
+	legacyLocalStatsPath = "/_nodes/_local/stats"
+	legacyAllStatsPath   = "/_nodes/_all/stats"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -56,43 +61,52 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Fetch methods implements the data gathering and data conversion to the right format
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	if err := m.updateServiceURI(); err != nil {
-		return err
-	}
-
-	content, err := m.HTTP.FetchContent()
-	if err != nil {
-		return err
-	}
-
 	info, err := elasticsearch.GetInfo(m.HTTP, m.GetServiceURI())
 	if err != nil {
 		return err
 	}
 
-	return eventsMapping(r, m.MetricSet, *info, content, m.XPackEnabled)
-}
+	if err := m.updateServiceURI(info.Version.Number.Major); err != nil {
+		return err
+	}
 
-func (m *MetricSet) updateServiceURI() error {
-	u, err := getServiceURI(m.GetURI(), m.Scope)
+	content, err := m.FetchContent()
 	if err != nil {
 		return err
 	}
 
-	m.HTTP.SetURI(u)
+	return eventsMapping(r, m.MetricSet, info, content, m.XPackEnabled)
+}
+
+func (m *MetricSet) updateServiceURI(majorVersion int) error {
+	u, err := getServiceURI(m.GetURI(), m.Scope, majorVersion)
+	if err != nil {
+		return err
+	}
+
+	m.SetURI(u)
 	return nil
 
 }
 
-func getServiceURI(currURI string, scope elasticsearch.Scope) (string, error) {
+func getServiceURI(currURI string, scope elasticsearch.Scope, majorVersion int) (string, error) {
 	u, err := url.Parse(currURI)
 	if err != nil {
 		return "", err
 	}
 
-	u.Path = nodeLocalStatsPath
-	if scope == elasticsearch.ScopeCluster {
-		u.Path = nodesAllStatsPath
+	if majorVersion >= 8 {
+		if scope == elasticsearch.ScopeCluster {
+			u.Path = nodesAllStatsPath
+		} else {
+			u.Path = nodeLocalStatsPath
+		}
+	} else {
+		if scope == elasticsearch.ScopeCluster {
+			u.Path = legacyAllStatsPath
+		} else {
+			u.Path = legacyLocalStatsPath
+		}
 	}
 
 	return u.String(), nil

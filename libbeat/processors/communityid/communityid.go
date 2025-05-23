@@ -24,12 +24,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor/registry"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -51,27 +49,24 @@ type processor struct {
 // values that are incorporated into the hash vary by protocol.
 //
 // TCP / UDP / SCTP:
-//   IP src / IP dst / IP proto / source port / dest port
+// IP src / IP dst / IP proto / source port / dest port
 //
 // ICMPv4 / ICMPv6:
-//   IP src / IP dst / IP proto / ICMP type + "counter-type" or code
+// IP src / IP dst / IP proto / ICMP type + "counter-type" or code
 //
 // Other IP-borne protocols:
-//   IP src / IP dst / IP proto
-func New(cfg *cfg.C) (processors.Processor, error) {
+// IP src / IP dst / IP proto
+func New(cfg *cfg.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the community_id configuration")
+		return nil, fmt.Errorf("fail to unpack the community_id configuration: %w", err)
 	}
 
 	return newFromConfig(c)
 }
 
 func newFromConfig(c config) (*processor, error) {
-	hasher := flowhash.CommunityID
-	if c.Seed != 0 {
-		hasher = flowhash.NewCommunityID(c.Seed, flowhash.Base64Encoding, crypto.SHA1)
-	}
+	hasher := flowhash.NewCommunityID(c.Seed, flowhash.Base64Encoding, crypto.SHA1)
 
 	return &processor{
 		config: c,
@@ -155,7 +150,7 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 			return nil
 		}
 		sp, ok := tryToUint(v)
-		if !ok || sp < 1 || sp > 65535 {
+		if !ok || sp > 65535 {
 			return nil
 		}
 		flow.SourcePort = uint16(sp)
@@ -166,7 +161,7 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 			return nil
 		}
 		dp, ok := tryToUint(v)
-		if !ok || dp < 1 || dp > 65535 {
+		if !ok || dp > 65535 {
 			return nil
 		}
 		flow.DestinationPort = uint16(dp)
@@ -228,7 +223,7 @@ func tryToUint(from interface{}) (uint, bool) {
 	case int64:
 		return uint(v), true
 	case uint:
-		return uint(v), true
+		return v, true
 	case uint8:
 		return uint(v), true
 	case uint16:

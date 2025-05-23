@@ -22,7 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 )
 
 // ConnectCallback defines the type for the function to be called when the Elasticsearch client successfully connects to the cluster

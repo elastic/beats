@@ -1,0 +1,30 @@
+Aug 14 00:06:20 shoebill sshd[2305664]: Received disconnect from 192.168.1.141 port 63067:11: disconnected by user
+Aug 14 00:06:20 shoebill sshd[2305664]: Disconnected from user user 192.168.1.141 port 63067
+Aug 14 00:06:20 shoebill sshd[2305661]: pam_unix(sshd:session): session closed for user user
+Aug 14 00:06:22 shoebill sshd[2355631]: Accepted publickey for user from 192.168.1.141 port 63134 ssh2: RSA SHA256:4PSoxRMl32R2k+79E7+Fufpm2bjX9Q+d2aI3F8GbNyI
+Aug 14 00:06:22 shoebill sshd[2355631]: pam_unix(sshd:session): session opened for user user(uid=1000) by (uid=0)
+Aug 14 00:24:21 shoebill sshd[2355634]: Received disconnect from 192.168.1.141 port 63134:11: disconnected by user
+Aug 14 00:24:21 shoebill sshd[2355634]: Disconnected from user user 192.168.1.141 port 63134
+Aug 14 00:24:21 shoebill sshd[2355631]: pam_unix(sshd:session): session closed for user user
+Aug 14 00:24:23 shoebill sshd[2406593]: Accepted publickey for user from 192.168.1.141 port 63206 ssh2: RSA SHA256:4PSoxRMl32R2k+79E7+Fufpm2bjX9Q+d2aI3F8GbNyI
+Aug 14 00:24:23 shoebill sshd[2406593]: pam_unix(sshd:session): session opened for user user(uid=1000) by (uid=0)
+Aug 14 00:43:04 shoebill sshd[2406596]: Received disconnect from 192.168.1.141 port 63206:11: disconnected by user
+Aug 14 00:43:04 shoebill sshd[2406596]: Disconnected from user user 192.168.1.141 port 63206
+Aug 14 00:43:04 shoebill sshd[2406593]: pam_unix(sshd:session): session closed for user user
+Aug 14 00:43:06 shoebill sshd[2459763]: Accepted publickey for user from 192.168.1.141 port 63275 ssh2: RSA SHA256:4PSoxRMl32R2k+79E7+Fufpm2bjX9Q+d2aI3F8GbNyI
+Aug 14 00:43:06 shoebill sshd[2459763]: pam_unix(sshd:session): session opened for user user(uid=1000) by (uid=0)
+Aug 14 01:00:56 shoebill sshd[2459766]: Received disconnect from 192.168.1.141 port 63275:11: disconnected by user
+Aug 14 01:00:56 shoebill sshd[2459766]: Disconnected from user user 192.168.1.141 port 63275
+Aug 14 01:00:56 shoebill sshd[2459763]: pam_unix(sshd:session): session closed for user user
+Aug 14 01:00:58 shoebill sshd[2510537]: Accepted publickey for user from 192.168.1.141 port 63343 ssh2: RSA SHA256:4PSoxRMl32R2k+79E7+Fufpm2bjX9Q+d2aI3F8GbNyI
+Aug 14 01:00:58 shoebill sshd[2510537]: pam_unix(sshd:session): session opened for user user(uid=1000) by (uid=0)
+Aug 14 01:19:28 shoebill sshd[2510571]: Received disconnect from 192.168.1.141 port 63343:11: disconnected by user
+Aug 14 01:19:28 shoebill sshd[2510571]: Disconnected from user user 192.168.1.141 port 63343
+Aug 14 01:19:28 shoebill sshd[2510537]: pam_unix(sshd:session): session closed for user user
+Aug 14 01:19:30 shoebill sshd[2562541]: Accepted publickey for user from 192.168.1.141 port 63413 ssh2: RSA SHA256:4PSoxRMl32R2k+79E7+Fufpm2bjX9Q+d2aI3F8GbNyI
+Aug 14 01:19:30 shoebill sshd[2562541]: pam_unix(sshd:session): session opened for user user(uid=1000) by (uid=0)
+Aug 14 01:36:58 shoebill sshd[2562544]: Received disconnect from 192.168.1.141 port 63413:11: disconnected by user
+Aug 14 01:36:58 shoebill sshd[2562544]: Disconnected from user user 192.168.1.141 port 63413
+Aug 14 01:36:58 shoebill sshd[2562541]: pam_unix(sshd:session): session closed for user user
+Aug 14 01:37:00 shoebill sshd[2612276]: Accepted publickey for user from 192.168.1.141 port 63477 ssh2: RSA SHA256:4PSoxRMl32R2k+79E7+Fufpm2bjX9Q+d2aI3F8GbNyI
+Aug 14 01:37:00 shoebill sshd[2612276]: pam_unix(sshd:session): session opened for user user(uid=1000) by (uid=0)

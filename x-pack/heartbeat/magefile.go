@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -57,7 +56,7 @@ func Package() {
 	heartbeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.Deps(build.CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -75,9 +74,16 @@ func TestPackages() error {
 	return devtools.TestPackages(devtools.WithMonitorsD())
 }
 
+func GenerateModuleIncludeListGo() error {
+	opts := devtools.DefaultIncludeListOptions()
+	opts.ImportDirs = append(opts.ImportDirs, "monitors/*")
+	opts.BuildTags = "\n//go:build linux || darwin || synthetics\n"
+	return devtools.GenerateIncludeListGo(opts)
+}
+
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Fields, FieldDocs, Config)
+	mg.SerialDeps(Fields, FieldDocs, Config, GenerateModuleIncludeListGo)
 }
 
 func IntegTest() {

@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -29,6 +28,7 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/paths"
@@ -46,22 +46,27 @@ type Module struct {
 	config   ModuleConfig
 }
 
+type FilesetOverrides struct {
+	EnableAllFilesets         bool
+	ForceEnableModuleFilesets bool
+}
+
 // newModuleRegistry reads and loads the configured module into the registry.
 func newModuleRegistry(modulesPath string,
 	moduleConfigs []*ModuleConfig,
 	overrides *ModuleOverrides,
 	beatInfo beat.Info,
-	enableAllFilesets bool,
+	filesetOverrides FilesetOverrides,
 ) (*ModuleRegistry, error) {
 	reg := ModuleRegistry{
 		registry: []Module{},
-		log:      logp.NewLogger(logName),
+		log:      beatInfo.Logger.Named(logName),
 	}
 
 	for _, mcfg := range moduleConfigs {
 		// an empty ModuleConfig can reach this so we only force enable a
 		// config if the Module name is set and Enabled pointer is valid.
-		if enableAllFilesets && mcfg.Module != "" && mcfg.Enabled != nil {
+		if (filesetOverrides.EnableAllFilesets || filesetOverrides.ForceEnableModuleFilesets) && mcfg.Module != "" && mcfg.Enabled != nil {
 			*mcfg.Enabled = true
 		}
 		if mcfg.Module == "" || (mcfg.Enabled != nil && !(*mcfg.Enabled)) {
@@ -80,8 +85,18 @@ func newModuleRegistry(modulesPath string,
 			config:   *mcfg,
 			filesets: []Fileset{},
 		}
-		for filesetName, fcfg := range mcfg.Filesets {
+		if filesetOverrides.ForceEnableModuleFilesets {
+			if mcfg.Filesets == nil {
+				mcfg.Filesets = make(map[string]*FilesetConfig)
+			}
+			for _, fName := range moduleFilesets {
+				if _, ok := mcfg.Filesets[fName]; !ok {
+					mcfg.Filesets[fName] = &FilesetConfig{Enabled: func() *bool { b := true; return &b }()}
+				}
+			}
+		}
 
+		for filesetName, fcfg := range mcfg.Filesets {
 			fcfg, err = applyOverrides(fcfg, mcfg.Module, filesetName, overrides)
 			if err != nil {
 				return nil, fmt.Errorf("error applying overrides on fileset %s/%s: %w", mcfg.Module, filesetName, err)
@@ -89,7 +104,7 @@ func newModuleRegistry(modulesPath string,
 
 			// ModuleConfig can have empty Filesets so we only force
 			// enable if the Enabled pointer is valid
-			if enableAllFilesets && fcfg.Enabled != nil {
+			if (filesetOverrides.EnableAllFilesets || filesetOverrides.ForceEnableModuleFilesets) && fcfg.Enabled != nil {
 				*fcfg.Enabled = true
 			}
 			if fcfg.Enabled != nil && !(*fcfg.Enabled) {
@@ -128,14 +143,17 @@ func newModuleRegistry(modulesPath string,
 }
 
 // NewModuleRegistry reads and loads the configured module into the registry.
-func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, enableAllFilesets bool) (*ModuleRegistry, error) {
+func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, filesetOverrides FilesetOverrides) (*ModuleRegistry, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 
 	stat, err := os.Stat(modulesPath)
 	if err != nil || !stat.IsDir() {
-		log := logp.NewLogger(logName)
-		log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
-		return &ModuleRegistry{log: log}, nil // empty registry, no error
+		log := beatInfo.Logger.Named(logName)
+		if !fleetmode.Enabled() {
+			// When run under agent via agentbeat there is no modules directory and this is expected.
+			log.Errorf("Not loading modules. Module directory not found: %s", modulesPath)
+		}
+		return &ModuleRegistry{log: log}, nil
 	}
 
 	var modulesCLIList []string
@@ -146,7 +164,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, e
 			return nil, err
 		}
 	}
-	var mcfgs []*ModuleConfig
+	var mcfgs []*ModuleConfig //nolint:prealloc  //breaks tests
 	for _, cfg := range moduleConfigs {
 		cfg, err = mergePathDefaults(cfg)
 		if err != nil {
@@ -166,7 +184,7 @@ func NewModuleRegistry(moduleConfigs []*conf.C, beatInfo beat.Info, init bool, e
 	}
 
 	enableFilesetsFromOverrides(mcfgs, modulesOverrides)
-	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo, enableAllFilesets)
+	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo, filesetOverrides)
 }
 
 // enableFilesetsFromOverrides enables in mcfgs the filesets mentioned in overrides,
@@ -234,7 +252,7 @@ func mcfgFromConfig(cfg *conf.C) (*ModuleConfig, error) {
 
 func getCurrentModuleName(modulePath, module string) (string, bool) {
 	moduleConfigPath := filepath.Join(modulePath, module, "module.yml")
-	d, err := ioutil.ReadFile(moduleConfigPath)
+	d, err := os.ReadFile(moduleConfigPath)
 	if err != nil {
 		return module, false
 	}
@@ -252,7 +270,7 @@ func getCurrentModuleName(modulePath, module string) (string, bool) {
 
 func getModuleFilesets(modulePath, module string) ([]string, error) {
 	module, _ = getCurrentModuleName(modulePath, module)
-	fileInfos, err := ioutil.ReadDir(filepath.Join(modulePath, module))
+	fileInfos, err := os.ReadDir(filepath.Join(modulePath, module))
 	if err != nil {
 		return []string{}, err
 	}
@@ -433,7 +451,7 @@ func (reg *ModuleRegistry) Empty() bool {
 
 // ModuleNames returns the names of modules in the ModuleRegistry.
 func (reg *ModuleRegistry) ModuleNames() []string {
-	var modules []string
+	var modules []string //nolint:prealloc  //breaks tests
 	for _, m := range reg.registry {
 		modules = append(modules, m.config.Module)
 	}

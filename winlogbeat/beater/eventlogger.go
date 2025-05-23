@@ -18,12 +18,12 @@
 package beater
 
 import (
-	"io"
-	"time"
+	"context"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -51,6 +51,19 @@ type eventLoggerConfig struct {
 
 	// KeepNull determines whether published events will keep null values or omit them.
 	KeepNull bool `config:"keep_null"`
+}
+
+type publisher struct {
+	client     beat.Client
+	eventACKer *eventACKer
+}
+
+func (p *publisher) Publish(records []eventlog.Record) error {
+	p.eventACKer.Add(len(records))
+	for _, lr := range records {
+		p.client.Publish(lr.ToEvent())
+	}
+	return nil
 }
 
 func newEventLogger(
@@ -86,7 +99,7 @@ func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 			Processor:     e.processors,
 			KeepNull:      e.keepNull,
 		},
-		ACKHandler: acker.Counting(func(n int) {
+		EventListener: acker.Counting(func(n int) {
 			addPublished(e.source.Name(), n)
 			e.log.Debugw("Successfully published events.", "event.count", n)
 		}),
@@ -121,68 +134,18 @@ func (e *eventLogger) run(
 		client.Close()
 	}()
 
-	defer func() {
-		e.log.Info("Stop processing.")
-
-		if err := api.Close(); err != nil {
-			e.log.Warnw("Close() error.", "error", err)
-			return
-		}
+	ctx, cancelFn := context.WithCancel(context.Background())
+	go func() {
+		<-done
+		cancelFn()
 	}()
 
-runLoop:
-	for stop := false; !stop; {
-		err = api.Open(state)
-		if eventlog.IsRecoverable(err) {
-			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err)
-			time.Sleep(time.Second * 5)
-			continue
-		} else if err != nil {
-			e.log.Warnw("Open() error. No events will be read from this source.", "error", err)
-			return
-		}
-		e.log.Debug("Opened successfully.")
-
-		for !stop {
-			select {
-			case <-done:
-				return
-			default:
-			}
-
-			// Read from the event.
-			records, err := api.Read()
-			if eventlog.IsRecoverable(err) {
-				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err)
-				if closeErr := api.Close(); closeErr != nil {
-					e.log.Warnw("Close() error.", "error", err)
-				}
-				continue runLoop
-			}
-			switch err {
-			case nil:
-			case io.EOF:
-				// Graceful stop.
-				stop = true
-			default:
-				e.log.Warnw("Read() error.", "error", err)
-				return
-			}
-
-			e.log.Debugf("Read() returned %d records.", len(records))
-			if len(records) == 0 {
-				time.Sleep(time.Second)
-				if stop {
-					return
-				}
-				continue
-			}
-
-			eventACKer.Add(len(records))
-			for _, lr := range records {
-				client.Publish(lr.ToEvent())
-			}
-		}
+	publisher := &publisher{
+		client:     client,
+		eventACKer: eventACKer,
+	}
+	if err := eventlog.Run(noopReporter{}, ctx, api, state, publisher, e.log); err != nil {
+		e.log.Error(err)
 	}
 }
 
@@ -190,7 +153,7 @@ runLoop:
 func processorsForConfig(
 	beatInfo beat.Info, config eventLoggerConfig,
 ) (*processors.Processors, error) {
-	procs := processors.NewList(nil)
+	procs := processors.NewList(beatInfo.Logger)
 
 	// Processor order is important! The index processor, if present, must be
 	// added before the user processors.
@@ -212,3 +175,7 @@ func processorsForConfig(
 
 	return procs, nil
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}

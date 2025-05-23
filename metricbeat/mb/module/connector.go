@@ -18,13 +18,14 @@
 package module
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -34,8 +35,8 @@ type Connector struct {
 	pipeline   beat.PipelineConnector
 	processors *processors.Processors
 	eventMeta  mapstr.EventMetadata
-	timeSeries bool
 	keepNull   bool
+	logger     *logp.Logger
 }
 
 type connectorConfig struct {
@@ -73,6 +74,7 @@ func NewConnector(
 		processors: processors,
 		eventMeta:  config.EventMetadata,
 		keepNull:   config.KeepNull,
+		logger:     beatInfo.Logger,
 	}, nil
 }
 
@@ -80,21 +82,32 @@ func NewConnector(
 func (c *Connector) UseMetricSetProcessors(r metricSetRegister, moduleName, metricSetName string) error {
 	metricSetProcessors, err := r.ProcessorsForMetricSet(moduleName, metricSetName)
 	if err != nil {
-		return errors.Wrapf(err, "reading metricset processors failed (module: %s, metricset: %s)",
-			moduleName, metricSetName)
+		return fmt.Errorf("reading metricset processors failed (module: %s, metricset: %s): %w",
+			moduleName, metricSetName, err)
 	}
 
 	if metricSetProcessors == nil || len(metricSetProcessors.List) == 0 {
 		return nil // no processors are defined
 	}
 
-	procs := processors.NewList(nil)
+	procs := processors.NewList(c.logger)
 	procs.AddProcessors(*metricSetProcessors)
 	for _, p := range c.processors.List {
 		procs.AddProcessor(p)
 	}
 	c.processors = procs
 	return nil
+}
+
+// addProcessors appends processors to the connector properties.
+func (c *Connector) addProcessors(procs []beat.Processor) {
+	if c.processors == nil {
+		c.processors = processors.NewList(c.logger)
+	}
+
+	for _, p := range procs {
+		c.processors.AddProcessor(p)
+	}
 }
 
 func (c *Connector) Connect() (beat.Client, error) {
@@ -111,7 +124,7 @@ func (c *Connector) Connect() (beat.Client, error) {
 func processorsForConfig(
 	beatInfo beat.Info, config connectorConfig,
 ) (*processors.Processors, error) {
-	procs := processors.NewList(nil)
+	procs := processors.NewList(beatInfo.Logger)
 
 	// Processor order is important! The index processor, if present, must be
 	// added before the user processors.

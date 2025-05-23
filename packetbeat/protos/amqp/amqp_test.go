@@ -47,7 +47,7 @@ func amqpModForTests() (*eventStore, *amqpPlugin) {
 	var amqp amqpPlugin
 	results := &eventStore{}
 	config := defaultConfig
-	amqp.init(results.publish, procs.ProcessesWatcher{}, &config)
+	amqp.init(results.publish, &procs.ProcessesWatcher{}, &config)
 	return results, &amqp
 }
 

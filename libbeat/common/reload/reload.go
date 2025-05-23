@@ -21,12 +21,19 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// Register holds a registry of reloadable objects
-var Register = NewRegistry()
+// InputRegName is the registation name for V2 inputs
+const InputRegName = "input"
+
+// OutputRegName is the registation name for V2 Outputs
+const OutputRegName = "output"
+
+// APMRegName is the registation name for APM tracing.
+const APMRegName = "apm"
 
 // ConfigWithMeta holds a pair of config.C and optional metadata for it
 type ConfigWithMeta struct {
@@ -35,6 +42,17 @@ type ConfigWithMeta struct {
 
 	// Meta data related to this config
 	Meta *mapstr.Pointer
+
+	// DiagCallback is a diagnostic handler associated with the underlying unit that maps to the config
+	DiagCallback DiagnosticHandler
+
+	// InputUnitID is the unit's ID that generated this ConfigWithMeta
+	InputUnitID string
+
+	// StatusReporter provides a method to update the status of the underlying unit
+	// that maps to the config. Note: Under standalone execution of a Beat this is
+	// expected to be nil.
+	StatusReporter status.StatusReporter
 }
 
 // ReloadableList provides a method to reload the configuration of a list of entities
@@ -49,6 +67,12 @@ type Reloadable interface {
 
 // ReloadableFunc wraps a custom function in order to implement the Reloadable interface.
 type ReloadableFunc func(config *ConfigWithMeta) error
+
+// DiagnosticHandler is an interface used to register diagnostic callbacks with the central management system
+// This mostly exists to wrap the unit RegisterDiagnostic method
+type DiagnosticHandler interface {
+	Register(name string, description string, filename string, contentType string, callback func() []byte)
+}
 
 // Registry of reloadable objects and lists
 type Registry struct {
@@ -106,18 +130,59 @@ func (r *Registry) MustRegister(name string, obj Reloadable) {
 	}
 }
 
-// MustRegisterList declares a reloadable object list
-func (r *Registry) MustRegisterList(name string, list ReloadableList) {
-	if err := r.RegisterList(name, list); err != nil {
+// MustRegisterOutput is a V2-specific registration function
+// That declares a reloadable output
+func (r *Registry) MustRegisterOutput(obj Reloadable) {
+	if err := r.Register(OutputRegName, obj); err != nil {
 		panic(err)
 	}
+}
+
+// MustRegisterInput is a V2-specific registration function
+// that declares a reloadable object list for a beat input
+func (r *Registry) MustRegisterInput(list ReloadableList) {
+	if err := r.RegisterList(InputRegName, list); err != nil {
+		panic(err)
+	}
+}
+
+// MustRegisterAPM is a V2-specific registration function
+// that declares a reloadable APM tracing configuration
+func (r *Registry) MustRegisterAPM(list Reloadable) {
+	if err := r.Register(APMRegName, list); err != nil {
+		panic(err)
+	}
+}
+
+// GetInputList is a V2-specific function
+// That returns the reloadable list created for an input
+func (r *Registry) GetInputList() ReloadableList {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confsLists[InputRegName]
+}
+
+// GetReloadableOutput is a V2-specific function
+// That returns the reloader for the registered output
+func (r *Registry) GetReloadableOutput() Reloadable {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confs[OutputRegName]
+}
+
+// GetReloadableAPM is a V2-specific function
+// That returns the reloader for the registered APM trace
+func (r *Registry) GetReloadableAPM() Reloadable {
+	r.RLock()
+	defer r.RUnlock()
+	return r.confs[APMRegName]
 }
 
 // GetRegisteredNames returns the list of names registered
 func (r *Registry) GetRegisteredNames() []string {
 	r.RLock()
 	defer r.RUnlock()
-	var names []string
+	names := make([]string, 0, len(r.confs)+len(r.confsLists))
 
 	for name := range r.confs {
 		names = append(names, name)

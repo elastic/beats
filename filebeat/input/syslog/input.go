@@ -18,17 +18,17 @@
 package syslog
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -86,6 +86,8 @@ var (
 		"local6",
 		"local7",
 	}
+
+	deprecatedNotificationOnce sync.Once
 )
 
 func init() {
@@ -110,8 +112,13 @@ func NewInput(
 	cfg *conf.C,
 	outlet channel.Connector,
 	context input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
-	log := logp.NewLogger("syslog")
+	log := logger.Named("syslog")
+
+	deprecatedNotificationOnce.Do(func() {
+		cfgwarn.Deprecate("", "Syslog input. Use Syslog processor instead.")
+	})
 
 	out, err := outlet.Connect(cfg)
 	if err != nil {
@@ -181,7 +188,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 	case syslogFormatRFC5424:
 		return func(data []byte, metadata inputsource.NetworkMetadata) {
 			ev := parseAndCreateEvent5424(data, metadata, cfg.Timezone.Location(), log)
-			forwarder.Send(ev)
+			_ = forwarder.Send(ev)
 		}
 
 	case syslogFormatAuto:
@@ -192,7 +199,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 			} else {
 				ev = parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
 			}
-			forwarder.Send(ev)
+			_ = forwarder.Send(ev)
 		}
 	case syslogFormatRFC3164:
 		break
@@ -200,7 +207,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 
 	return func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
-		forwarder.Send(ev)
+		_ = forwarder.Send(ev)
 	}
 }
 
@@ -262,7 +269,7 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 		syslog["version"] = ev.Version()
 	}
 
-	if ev.data != nil && len(ev.data) > 0 {
+	if len(ev.data) > 0 {
 		syslog["data"] = ev.data
 	}
 
@@ -319,7 +326,7 @@ func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fie
 
 func mapValueToName(v int, m mapper) (string, error) {
 	if v < 0 || v >= len(m) {
-		return "", errors.Errorf("value out of bound: %d", v)
+		return "", fmt.Errorf("value out of bound: %d", v)
 	}
 	return m[v], nil
 }

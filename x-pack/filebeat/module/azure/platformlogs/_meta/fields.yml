@@ -56,6 +56,10 @@
       type: keyword
       description: >
         ActivityId
+    - name: identity_name
+      type: keyword
+      description: |
+        Identity name
     - name: properties
       type: flattened
       description: >

@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package licenser
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -36,7 +36,7 @@ const (
 	elasticsearchPort = "9200"
 )
 
-func getTestClient() *eslegclient.Connection {
+func getTestClient(t *testing.T) *eslegclient.Connection {
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = 60 * time.Second
 
@@ -48,16 +48,22 @@ func getTestClient() *eslegclient.Connection {
 		CompressionLevel: 3,
 		Transport:        transport,
 	})
-
 	if err != nil {
-		panic(err)
+		t.Fatalf("cannot get new ES connection: %s", err)
 	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+	if err := client.Connect(ctx); err != nil {
+		t.Fatalf("cannot connect to ES: %s", err)
+	}
+
 	return client
 }
 
 // Sanity check for schema change on the HTTP response from a live Elasticsearch instance.
 func TestElasticsearch(t *testing.T) {
-	f := NewElasticFetcher(getTestClient())
+	f := NewElasticFetcher(getTestClient(t))
 	license, err := f.Fetch()
 	if !assert.NoError(t, err) {
 		return

@@ -37,13 +37,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func init() {
-	err := autodiscover.Registry.AddBuilder("hints", NewMetricHints)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
-}
-
 const (
 	module         = "module"
 	namespace      = "namespace"
@@ -68,8 +61,16 @@ type metricHints struct {
 	logger *logp.Logger
 }
 
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddBuilder("hints", NewMetricHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
+}
+
 // NewMetricHints builds a new metrics builder based on hints
-func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
+func NewMetricHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 
@@ -77,7 +78,7 @@ func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &metricHints{config.Key, config.Registry, logp.NewLogger("hints.builder")}, nil
+	return &metricHints{config.Key, config.Registry, logger.Named("hints.builder")}, nil
 }
 
 // Create configs based on hints passed from providers
@@ -110,7 +111,7 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 				configs = append(configs, config)
 			}
 		}
-		logp.Debug("hints.builder", "generated config %+v", configs)
+		m.logger.Debugf("generated config %+v", configs)
 		// Apply information in event to the template to generate the final config
 		return template.ApplyConfigTemplate(event, configs, options...)
 
@@ -175,14 +176,14 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 				mod := moduleConfig.Clone()
 				mod["hosts"] = []string{h}
 
-				logp.Debug("hints.builder", "generated config: %v", mod)
+				m.logger.Debugf("generated config: %v", mod)
 
 				// Create config object
 				cfg := m.generateConfig(mod)
 				configs = append(configs, cfg)
 			}
 		} else {
-			logp.Debug("hints.builder", "generated config: %v", moduleConfig)
+			m.logger.Debugf("generated config: %v", moduleConfig)
 
 			// Create config object
 			cfg := m.generateConfig(moduleConfig)
@@ -200,9 +201,9 @@ func (m *metricHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*c
 func (m *metricHints) generateConfig(mod mapstr.M) *conf.C {
 	cfg, err := conf.NewConfigFrom(mod)
 	if err != nil {
-		logp.Debug("hints.builder", "config merge failed with error: %v", err)
+		m.logger.Debugf("config merge failed with error: %v", err)
 	}
-	logp.Debug("hints.builder", "generated config: %+v", conf.DebugString(cfg, true))
+	m.logger.Debugf("generated config: %+v", conf.DebugString(cfg, true))
 	return cfg
 }
 

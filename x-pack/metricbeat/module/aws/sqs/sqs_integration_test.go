@@ -3,12 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration && aws
-// +build integration,aws
 
 package sqs
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -21,7 +21,7 @@ func TestFetch(t *testing.T) {
 	config := mtest.GetConfigForTest(t, "sqs", "300s")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	events, errs := mbtest.PeriodicReportingFetchV2Error(metricSet, 1*time.Minute, 8*time.Minute)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}

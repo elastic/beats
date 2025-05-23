@@ -25,6 +25,13 @@ output.file:
   #rotate_on_startup: true
 ------------------------------------------------------------------------------
 
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
+
 ==== Configuration options
 
 You can specify the following `output.file` options in the +{beatname_lc}.yml+ config file:
@@ -41,6 +48,14 @@ The default value is `true`.
 
 The path to the directory where the generated files will be saved. This option is
 mandatory.
+
+The path may include the timestamp when the file output is initialized using the `+FORMAT` syntax where `FORMAT` is a
+valid https://github.com/elastic/beats/blob/{doc-branch}/libbeat/common/dtfmt/doc.go[time format],
+and enclosed with expansion braces: `%{+FORMAT}`. For example:
+
+```
+path: 'fileoutput-%{+yyyy.MM.dd}'
+```
 
 ===== `filename`
 
@@ -72,3 +87,11 @@ If the output file already exists on startup, immediately rotate it and start wr
 Output codec configuration. If the `codec` section is missing, events will be json encoded.
 
 See <<configuration-output-codec>> for more information.
+
+===== `queue`
+
+Configuration options for internal queue.
+
+See <<configuring-internal-queue>> for more information.
+
+Note:`queue` options can be set under +{beatname_lc}.yml+ or the `output` section but not both.

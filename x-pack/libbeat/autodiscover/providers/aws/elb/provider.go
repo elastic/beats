@@ -8,7 +8,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2"
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
@@ -44,7 +44,7 @@ func AutodiscoverBuilder(
 	c *conf.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("aws_elb autodiscover is experimental")
+	cfgwarn.Deprecate("", "aws_elb autodiscover is now deprecated and will be removed in a future release.")
 
 	config := awsauto.DefaultConfig()
 	err := c.Unpack(&config)
@@ -80,7 +80,7 @@ func AutodiscoverBuilder(
 		config.Regions = completeRegionsList
 	}
 
-	var clients []autodiscoverElbClient
+	clients := make([]autodiscoverElbClient, 0, len(config.Regions))
 	for _, region := range config.Regions {
 		awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,

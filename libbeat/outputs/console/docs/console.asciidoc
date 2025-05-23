@@ -7,7 +7,7 @@
 
 The Console output writes events in JSON format to stdout.
 
-WARNING: The Console output should be used only for debugging issues as it can produce a large amount of logging data. 
+WARNING: The Console output should be used only for debugging issues as it can produce a large amount of logging data.
 
 To use this output, edit the {beatname_uc} configuration file to disable the {es}
 output by commenting it out, and enable the console output by adding `output.console`.
@@ -19,6 +19,13 @@ Example configuration:
 output.console:
   pretty: true
 ------------------------------------------------------------------------------
+
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
 
 ==== Configuration options
 
@@ -51,3 +58,11 @@ setting does not affect how events are published.
 Setting `bulk_max_size` to values less than or equal to 0 disables the
 splitting of batches. When splitting is disabled, the queue decides on the
 number of events to be contained in a batch.
+
+===== `queue`
+
+Configuration options for internal queue.
+
+See <<configuring-internal-queue>> for more information.
+
+Note:`queue` options can be set under +{beatname_lc}.yml+ or the `output` section but not both.

@@ -18,12 +18,12 @@
 package info
 
 import (
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/system"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(info *types.Info) mapstr.M {
+func eventMapping(info *system.Info) mapstr.M {
 	event := mapstr.M{
 		"id": info.ID,
 		"containers": mapstr.M{

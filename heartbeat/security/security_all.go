@@ -15,8 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !linux
+
 package security
 
-// Empty file so that non-linux platforms have *something*
-// to import, thus preventing mage from complaining
-// no files are imported from the package
+// InitializeModule initializes this module.
+func InitializeModule() {
+	// do nothing
+}

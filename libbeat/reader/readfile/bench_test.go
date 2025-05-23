@@ -20,6 +20,7 @@ package readfile
 import (
 	"bytes"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -39,7 +40,7 @@ func BenchmarkEncoderReader(b *testing.B) {
 		b.Run(name, func(b *testing.B) {
 			b.ReportAllocs()
 			for bN := 0; bN < b.N; bN++ {
-				reader, err := NewEncodeReader(ioutil.NopCloser(bytes.NewReader(lines)), Config{encoding.Nop, bufferSize, LineFeed, lineMaxLimit})
+				reader, err := NewEncodeReader(ioutil.NopCloser(bytes.NewReader(lines)), Config{encoding.Nop, bufferSize, LineFeed, lineMaxLimit, false})
 				if err != nil {
 					b.Fatal("failed to initialize reader:", err)
 				}
@@ -48,7 +49,7 @@ func BenchmarkEncoderReader(b *testing.B) {
 				for i := 0; ; i++ {
 					msg, err := reader.Next()
 					if err != nil {
-						if err == io.EOF {
+						if errors.Is(err, io.EOF) {
 							b.ReportMetric(float64(i), "processed_lines")
 							break
 						} else {

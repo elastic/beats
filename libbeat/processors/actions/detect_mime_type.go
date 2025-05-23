@@ -20,8 +20,6 @@ package actions
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/mime"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -42,10 +40,10 @@ type mimeTypeProcessor struct {
 }
 
 // NewDetectMimeType constructs a new mime processor.
-func NewDetectMimeType(cfg *conf.C) (processors.Processor, error) {
+func NewDetectMimeType(cfg *conf.C) (beat.Processor, error) {
 	mimeType := &mimeTypeProcessor{}
 	if err := cfg.Unpack(mimeType); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the detect_mime_type configuration")
+		return nil, fmt.Errorf("fail to unpack the detect_mime_type configuration: %w", err)
 	}
 
 	return mimeType, nil
@@ -54,7 +52,7 @@ func NewDetectMimeType(cfg *conf.C) (processors.Processor, error) {
 func (m *mimeTypeProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	valI, err := event.GetValue(m.Field)
 	if err != nil {
-		// doesn't have the required field value to analyze
+		//nolint:nilerr // doesn't have the required field value to analyze
 		return event, nil
 	}
 	val, _ := valI.(string)

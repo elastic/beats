@@ -18,11 +18,11 @@
 package processors
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -38,6 +38,11 @@ type pluginer interface {
 	Plugin() Constructor
 }
 
+var (
+	ErrExistsAlready           error = errors.New("exists already")
+	ErrPluginAlreadyRegistered error = errors.New("non-namespace plugin already registered")
+)
+
 func NewNamespace() *Namespace {
 	return &Namespace{
 		reg: map[string]pluginer{},
@@ -47,8 +52,8 @@ func NewNamespace() *Namespace {
 func (ns *Namespace) Register(name string, factory Constructor) error {
 	p := plugin{NewConditional(factory)}
 	names := strings.Split(name, ".")
-	if err := ns.add(names, p); err != nil {
-		return fmt.Errorf("plugin %s registration fail %v", name, err)
+	if err := ns.add(names, p); err != nil && !errors.Is(err, ErrExistsAlready) && !errors.Is(err, ErrPluginAlreadyRegistered) {
+		return fmt.Errorf("plugin %s registration fail %w", name, err)
 	}
 	return nil
 }
@@ -59,7 +64,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 	// register plugin if intermediate node in path being processed
 	if len(names) == 1 {
 		if _, found := ns.reg[name]; found {
-			return errors.Errorf("%v exists already", name)
+			return fmt.Errorf("%s %w", name, ErrExistsAlready)
 		}
 
 		ns.reg[name] = p
@@ -71,7 +76,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 	if found {
 		ns, ok := tmp.(*Namespace)
 		if !ok {
-			return errors.New("non-namespace plugin already registered")
+			return ErrPluginAlreadyRegistered
 		}
 		return ns.add(names[1:], p)
 	}
@@ -87,7 +92,7 @@ func (ns *Namespace) add(names []string, p pluginer) error {
 }
 
 func (ns *Namespace) Plugin() Constructor {
-	return NewConditional(func(cfg *config.C) (Processor, error) {
+	return NewConditional(func(cfg *config.C) (beat.Processor, error) {
 		var section string
 		for _, name := range cfg.GetFields() {
 			if name == "when" { // TODO: remove check for "when" once fields are filtered
@@ -95,7 +100,7 @@ func (ns *Namespace) Plugin() Constructor {
 			}
 
 			if section != "" {
-				return nil, errors.Errorf("too many lookup modules "+
+				return nil, fmt.Errorf("too many lookup modules "+
 					"configured (%v, %v)", section, name)
 			}
 
@@ -108,7 +113,7 @@ func (ns *Namespace) Plugin() Constructor {
 
 		backend, found := ns.reg[section]
 		if !found {
-			return nil, errors.Errorf("unknown lookup module: %v", section)
+			return nil, fmt.Errorf("unknown lookup module: %v", section)
 		}
 
 		config, err := cfg.Child(section, -1)

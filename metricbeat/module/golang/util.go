@@ -24,10 +24,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-/**
-Convert cmd array to cmd line
-*/
-func GetCmdStr(v interface{}) interface{} {
+// GetCmdStr Convert cmd array to cmd line
+func GetCmdStr(v interface{}, logger *logp.Logger) interface{} {
 	switch t := v.(type) {
 	case []interface{}:
 		var buffer bytes.Buffer
@@ -38,7 +36,7 @@ func GetCmdStr(v interface{}) interface{} {
 		}
 		return strings.TrimRight(buffer.String(), " ")
 	default:
-		logp.Debug("golang", "unexpected cmdline, %v, %v", t, v)
+		logger.Named("golang").Debugf("unexpected cmdline, %v, %v", t, v)
 		return v
 	}
 }

@@ -18,17 +18,28 @@ var googleWorkspace = (function () {
         ignore_missing: true,
     });
 
-    var addID = new processor.Fingerprint({
-        fields: [
+    var addID = function(evt) {
+        var keys = [
             "json.id.time",
             "json.id.uniqueQualifier",
             "json.id.applicationName",
             "json.id.customerId",
-        ],
-        target_field: "@metadata._id",
-        ignore_missing: true,
-        fail_on_error: false,
-    });
+        ];
+        var dynKeyArr = [];
+        Object.keys(evt.Get("json.events")).forEach(function(evtsKey) {
+            var key = "json.events."+evtsKey;
+            var value = evt.Get(key);
+            if (!Array.isArray(value) && !(typeof value === "object")) {
+                dynKeyArr.push(key);
+            }
+        });
+        new processor.Fingerprint({
+            fields: keys.concat(dynKeyArr.sort()),
+            target_field: "@metadata._id",
+            ignore_missing: true,
+            fail_on_error: false,
+        }).Run(evt);
+    };
 
     var convertFields = new processor.Convert({
         fields: [

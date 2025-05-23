@@ -4,10 +4,46 @@
     Contains nats connection related metrics
   release: ga
   fields:
+    - name: id
+      type: keyword
+      description: >
+        The ID of the connection
     - name: name
       type: keyword
       description: >
         The name of the connection
+    - name: kind
+      type: keyword
+      description: >
+        The kind of connection
+    - name: type
+      type: keyword
+      description: >
+        The type of connection
+    - name: ip
+      type: ip
+      description: >
+        The IP address of the connection
+    - name: port
+      type: integer
+      description: >
+        The port of the connection
+    - name: lang
+      type: keyword
+      description: >
+        The language of the client connection
+    - name: version
+      type: keyword
+      description: >
+        The version of the client connection
+    - name: start
+      type: date
+      description: >
+        The time the connection was started
+    - name: last_activity
+      type: date
+      description: >
+        The last activity time of the connection
     - name: subscriptions
       type: integer
       description: >

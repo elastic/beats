@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package decode_xml_wineventlog
 
@@ -27,7 +26,7 @@ import (
 
 type nonWinDecoder struct{}
 
-func newDecoder() decoder {
+func newDecoder(uint32) decoder {
 	return nonWinDecoder{}
 }
 

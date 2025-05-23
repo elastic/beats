@@ -3,7 +3,6 @@ chroot
 clock_adjtime
 create_module
 delete_module
-execve
 execveat
 fork
 init_module

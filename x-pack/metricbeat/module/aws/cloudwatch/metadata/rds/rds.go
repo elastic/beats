@@ -7,6 +7,7 @@ package rds
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/rds"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metadataPrefix = "aws.rds.db_instance."
@@ -27,13 +27,9 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 		}
 	})
 
-	// Get DBInstance IDs per region
-	dbDetailsMap, err := getDBInstancesPerRegion(svc)
-	if err != nil {
-		logp.Error(fmt.Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err))
-		return events, nil
-	}
-
+	// Normalize CPU Utilization values before making the API call,
+	// because the API call can fail, and we need to ensure the
+	// CPU values are correctly scaled regardless of the API call outcome.
 	for _, event := range events {
 		cpuValue, err := event.RootFields.GetValue("aws.rds.metrics.CPUUtilization.avg")
 		if err == nil {
@@ -43,37 +39,47 @@ func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, 
 		}
 	}
 
-	for identifier, output := range dbDetailsMap {
-		if _, ok := events[identifier]; !ok {
-			continue
-		}
+	// Get DBInstance IDs per region
+	dbDetailsMap, err := getDBInstancesPerRegion(svc)
+	if err != nil {
+		return events, fmt.Errorf("aws.rds.db_instance fields are not available, skipping region %s: %w", regionName, err)
+	}
 
-		if output.DBInstanceArn != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
-		}
+	for dbInstanceIdentifier, output := range dbDetailsMap {
+		for eventIdentifier := range events {
+			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
+			potentialDBInstanceIdentifier := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+			if dbInstanceIdentifier != potentialDBInstanceIdentifier {
+				continue
+			}
 
-		if output.DBInstanceStatus != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
-		}
+			if output.DBInstanceArn != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
+			}
 
-		if output.DBInstanceIdentifier != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
-		}
+			if output.DBInstanceStatus != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
+			}
 
-		if output.DBClusterIdentifier != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
-		}
+			if output.DBInstanceIdentifier != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
+			}
 
-		if output.DBInstanceClass != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
-		}
+			if output.DBClusterIdentifier != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
+			}
 
-		if output.Engine != nil {
-			_, _ = events[identifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
-		}
+			if output.DBInstanceClass != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
+			}
 
-		if output.AvailabilityZone != nil {
-			_, _ = events[identifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+			if output.Engine != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
+			}
+
+			if output.AvailabilityZone != nil {
+				_, _ = events[eventIdentifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+			}
 		}
 	}
 	return events, nil

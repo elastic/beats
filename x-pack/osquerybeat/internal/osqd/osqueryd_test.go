@@ -7,7 +7,6 @@ package osqd
 import (
 	"bufio"
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	"github.com/elastic/elastic-agent-libs/logp"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -29,13 +28,16 @@ func TestNew(t *testing.T) {
 	configPluginName := "config_plugin_test"
 	loggerPluginName := "logger_plugin_test"
 
-	osq := New(
+	osq, err := New(
 		socketPath,
 		WithExtensionsTimeout(extensionsTimeout),
 		WithConfigRefresh(configurationRefreshIntervalSecs),
 		WithConfigPlugin(configPluginName),
 		WithLoggerPlugin(loggerPluginName),
 	)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	diff := cmp.Diff(extensionsTimeout, osq.extensionsTimeout)
 	if diff != "" {
@@ -72,15 +74,11 @@ func TestPrepareAutoloadFile(t *testing.T) {
 	validLogger := logp.NewLogger("osqueryd_test")
 
 	// Prepare the directory with extension
-	dir, err := os.MkdirTemp("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 	mandatoryExtensionPath := filepath.Join(dir, extensionName)
 
 	// Write fake extension file for testing
-	err = ioutil.WriteFile(mandatoryExtensionPath, nil, 0600)
+	err := os.WriteFile(mandatoryExtensionPath, nil, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -123,16 +121,9 @@ func TestPrepareAutoloadFile(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 
 			// Setup
-			dir, err := os.MkdirTemp("", "")
-			if err != nil {
-				t.Fatal(err)
-			}
+			extensionAutoloadPath := filepath.Join(t.TempDir(), osqueryAutoload)
 
-			defer os.RemoveAll(dir)
-
-			extensionAutoloadPath := filepath.Join(dir, osqueryAutoload)
-
-			err = ioutil.WriteFile(extensionAutoloadPath, tc.FileContent, 0600)
+			err = os.WriteFile(extensionAutoloadPath, tc.FileContent, 0600)
 			if err != nil {
 				t.Fatal(err)
 			}

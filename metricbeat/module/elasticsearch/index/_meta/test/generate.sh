@@ -9,14 +9,19 @@
 # Note: Small corrections were made to the output documents as size of the index
 # is not the same across all versions
 
+# It is assumed you used elastic-package to start the elasticsearch server
+USER=elastic
+PASS=elastic
+ENDPOINT=http://localhost:9200
+
 # Delete index first
-curl -XDELETE 'http://localhost:9200/testindex'
+curl --insecure -u ${USER}:${PASS} -XDELETE ${ENDPOINT}/testindex
 
 # Create index
-curl -XPUT 'http://localhost:9200/testindex'
+curl --insecure -u ${USER}:${PASS} -XPUT ${ENDPOINT}/testindex
 
 # Add document
-curl -XPUT 'http://localhost:9200/testindex/test/1?pretty' -H 'Content-Type: application/json' -d'
+curl --insecure -u ${USER}:${PASS} -XPUT ${ENDPOINT}/testindex/_doc/1?pretty -H 'Content-Type: application/json' -d'
 {
     "user" : "kimchy",
     "message" : "trying out Elasticsearch"
@@ -24,8 +29,21 @@ curl -XPUT 'http://localhost:9200/testindex/test/1?pretty' -H 'Content-Type: app
 '
 
 # Make sure index is created
-curl -XPOST 'http://localhost:9200/_forcemerge'
+curl --insecure -u ${USER}:${PASS} -XPOST ${ENDPOINT}/testindex/_forcemerge
+
+# Read root
+curl --insecure -u ${USER}:${PASS} -XGET ${ENDPOINT}/?pretty > root.${1}.json
 
 # Read stats output
-curl -XGET 'http://localhost:9200/_stats?pretty' > stats.${1}.json
+curl --insecure -u ${USER}:${PASS} -XGET ${ENDPOINT}/_stats?pretty > stats.${1}.json
 
+# Read index settings
+# /!\ A test case with missing settings is required! Make sure you curate the result accordingly
+# See data.go and the things logged as debug for more information
+curl --insecure -u ${USER}:${PASS} -XGET ${ENDPOINT}/*,.*/_settings?pretty > settings.${1}.json
+
+# Read cluster state
+curl --insecure -u ${USER}:${PASS} -XGET ${ENDPOINT}/_cluster/state?pretty > cluster_state.${1}.json
+
+# Read xpack usage
+curl --insecure -u ${USER}:${PASS} -XGET ${ENDPOINT}/_xpack/usage?pretty > xpack_usage.${1}.json

@@ -19,7 +19,7 @@ package token
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -30,18 +30,23 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	autodiscover.Registry.AddAppender("kubernetes.token", NewTokenAppender)
-}
-
 type tokenAppender struct {
 	TokenPath string
 	Condition conditions.Condition
+	logger    *logp.Logger
+}
+
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddAppender("kubernetes.token", NewTokenAppender)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `kubernetes.token` appender"))
+	}
 }
 
 // NewTokenAppender creates a token appender that can append a bearer token required to authenticate with
 // protected endpoints
-func NewTokenAppender(cfg *conf.C) (autodiscover.Appender, error) {
+func NewTokenAppender(cfg *conf.C, logger *logp.Logger) (autodiscover.Appender, error) {
 	cfgwarn.Deprecate("7.0.0", "token appender is deprecated in favor of bearer_token_file config parameter")
 	conf := defaultConfig()
 
@@ -61,6 +66,7 @@ func NewTokenAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	appender := tokenAppender{
 		TokenPath: conf.TokenPath,
 		Condition: cond,
+		logger:    logger,
 	}
 
 	return &appender, nil
@@ -93,7 +99,7 @@ func (t *tokenAppender) Append(event bus.Event) {
 			c := mapstr.M{}
 			err := cfg.Unpack(&c)
 			if err != nil {
-				logp.Debug("kubernetes.config", "unable to unpack config due to error: %v", err)
+				t.logger.Named("kubernetes.config").Debugf("unable to unpack config due to error: %v", err)
 				continue
 			}
 			var headers mapstr.M
@@ -113,7 +119,7 @@ func (t *tokenAppender) Append(event bus.Event) {
 			// Repack the configuration
 			newCfg, err := conf.NewConfigFrom(&c)
 			if err != nil {
-				logp.Debug("kubernetes.config", "unable to repack config due to error: %v", err)
+				t.logger.Named("kubernetes.config").Debugf("unable to repack config due to error: %v", err)
 				continue
 			}
 			cfgs[i] = newCfg
@@ -127,9 +133,9 @@ func (t *tokenAppender) getAuthHeaderFromToken() string {
 	var token string
 
 	if t.TokenPath != "" {
-		b, err := ioutil.ReadFile(t.TokenPath)
+		b, err := os.ReadFile(t.TokenPath)
 		if err != nil {
-			logp.Err("Reading token file failed with err: %v", err)
+			t.logger.Errorf("Reading token file failed with err: %v", err)
 		}
 
 		if len(b) != 0 {

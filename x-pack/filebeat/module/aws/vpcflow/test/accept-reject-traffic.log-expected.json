@@ -5,7 +5,7 @@
         "aws.vpcflow.action": "ACCEPT",
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.log_status": "OK",
-        "aws.vpcflow.version": "2",
+        "aws.vpcflow.version": 2,
         "cloud.account.id": "123456789010",
         "cloud.provider": "aws",
         "destination.address": "175.16.199.1",
@@ -19,15 +19,21 @@
         "destination.geo.region_name": "Jilin Sheng",
         "destination.ip": "175.16.199.1",
         "destination.port": 22,
-        "event.category": "network_traffic",
+        "event.action": "accept",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.end": "2014-12-14T04:07:50.000Z",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 175.16.199.1 175.16.199.1 20641 22 6 20 4249 1418530010 1418530070 ACCEPT OK",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.start": "2014-12-14T04:06:50.000Z",
-        "event.type": "flow",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 115,
@@ -38,7 +44,6 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "175.16.199.1",
             "175.16.199.1"
         ],
         "service.type": "aws",
@@ -66,7 +71,7 @@
         "aws.vpcflow.action": "REJECT",
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.log_status": "OK",
-        "aws.vpcflow.version": "2",
+        "aws.vpcflow.version": 2,
         "cloud.account.id": "123456789010",
         "cloud.provider": "aws",
         "destination.address": "175.16.199.1",
@@ -80,15 +85,21 @@
         "destination.geo.region_name": "Jilin Sheng",
         "destination.ip": "175.16.199.1",
         "destination.port": 3389,
-        "event.category": "network_traffic",
+        "event.action": "reject",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.end": "2014-12-14T04:07:50.000Z",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 175.16.199.1 175.16.199.1 49761 3389 6 20 4249 1418530010 1418530070 REJECT OK",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.start": "2014-12-14T04:06:50.000Z",
-        "event.type": "flow",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 229,
@@ -99,7 +110,6 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "175.16.199.1",
             "175.16.199.1"
         ],
         "service.type": "aws",
@@ -127,21 +137,27 @@
         "aws.vpcflow.action": "ACCEPT",
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.log_status": "OK",
-        "aws.vpcflow.version": "2",
+        "aws.vpcflow.version": 2,
         "cloud.account.id": "123456789010",
         "cloud.provider": "aws",
         "destination.address": "172.31.16.139",
         "destination.ip": "172.31.16.139",
         "destination.port": 0,
-        "event.category": "network_traffic",
+        "event.action": "accept",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.end": "2015-05-29T16:32:22.000Z",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 203.0.113.12 172.31.16.139 0 0 1 4 336 1432917027 1432917142 ACCEPT OK",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.start": "2015-05-29T16:30:27.000Z",
-        "event.type": "flow",
+        "event.type": [
+            "allowed",
+            "connection"
+        ],
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 345,
@@ -149,6 +165,7 @@
         "network.community_id": "1:H//CCQJhRqDUJ9c23S0VrQ+drxU=",
         "network.iana_number": "1",
         "network.packets": 4,
+        "network.transport": "icmp",
         "network.type": "ipv4",
         "related.ip": [
             "172.31.16.139",
@@ -171,21 +188,27 @@
         "aws.vpcflow.action": "REJECT",
         "aws.vpcflow.interface_id": "eni-1235b8ca123456789",
         "aws.vpcflow.log_status": "OK",
-        "aws.vpcflow.version": "2",
+        "aws.vpcflow.version": 2,
         "cloud.account.id": "123456789010",
         "cloud.provider": "aws",
         "destination.address": "203.0.113.12",
         "destination.ip": "203.0.113.12",
         "destination.port": 0,
-        "event.category": "network_traffic",
+        "event.action": "reject",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "aws.vpcflow",
         "event.end": "2015-05-29T16:32:22.000Z",
         "event.kind": "event",
         "event.module": "aws",
         "event.original": "2 123456789010 eni-1235b8ca123456789 172.31.16.139 203.0.113.12 0 0 1 4 336 1432917094 1432917142 REJECT OK",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.start": "2015-05-29T16:31:34.000Z",
-        "event.type": "flow",
+        "event.type": [
+            "connection",
+            "denied"
+        ],
         "fileset.name": "vpcflow",
         "input.type": "log",
         "log.offset": 453,
@@ -193,6 +216,7 @@
         "network.community_id": "1:cfQqw/Kh6+4yqhEKgkCw/m3WoJM=",
         "network.iana_number": "1",
         "network.packets": 4,
+        "network.transport": "icmp",
         "network.type": "ipv4",
         "related.ip": [
             "172.31.16.139",

@@ -1,11 +1,11 @@
-version: '2.3'
+version: "2.3"
 
 services:
   nginx:
-    image: docker.elastic.co/integrations-ci/beats-nginx:${NGINX_VERSION:-1.9}-1
-    build: 
+    image: docker.elastic.co/integrations-ci/beats-nginx:${NGINX_VERSION:-1.23.2}-1
+    build:
       context: ./_meta
       args:
-        NGINX_VERSION: ${NGINX_VERSION:-1.9}
+        NGINX_VERSION: "${NGINX_VERSION:-1.23.2}"
     ports:
       - 80

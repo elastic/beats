@@ -7,8 +7,7 @@ metadata:
     k8s-app: heartbeat
 data:
   heartbeat.yml: |-
-    #heartbeat.autodiscover:
-    #  # Autodiscover pods
+    #heartbeat.autodiscover: # Enable one or more of the providers below
     #  providers:
     #    - type: kubernetes
     #      resource: pod
@@ -16,16 +15,12 @@ data:
     #      node: ${NODE_NAME}
     #      hints.enabled: true
     #
-    #  # Autodiscover services
-    #  providers:
     #    - type: kubernetes
     #      resource: service
     #      scope: cluster
     #      node: ${NODE_NAME}
     #      hints.enabled: true
     #
-    #  # Autodiscover nodes
-    #  providers:
     #    - type: kubernetes
     #      resource: node
     #      node: ${NODE_NAME}

@@ -22,18 +22,40 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gofrs/uuid"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 )
+
+func TestGenerateProcessorList(t *testing.T) {
+	inputCfg := []mapstr.M{
+		{"add_host_metadata": nil},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{"add_kubernetes_metadata": nil},
+	}
+
+	plugins, err := processors.NewPluginConfigFromList(inputCfg)
+	require.NoError(t, err)
+
+	processors, err := processors.New(plugins)
+	require.NoError(t, err)
+	// make sure the processor init got the config formatted in a way it expected
+	require.Equal(t, 4, len(processors.List))
+}
 
 func TestProcessorsConfigs(t *testing.T) {
 	defaultInfo := beat.Info{
@@ -167,7 +189,7 @@ func TestProcessorsConfigs(t *testing.T) {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
 					g := newGroup("test", logp.L())
-					g.add(actions.NewAddFields(mapstr.M{"custom": "value"}, true, true))
+					g.add(addfields.NewAddFields(mapstr.M{"custom": "value"}, true, true))
 					return g
 				}(),
 			},
@@ -258,7 +280,7 @@ func TestProcessorsConfigs(t *testing.T) {
 
 			factory := test.factory
 			if factory == nil {
-				factory = MakeDefaultSupport(true)
+				factory = MakeDefaultSupport(true, nil)
 			}
 
 			support, err := factory(info, logp.L(), cfg)
@@ -277,6 +299,44 @@ func TestProcessorsConfigs(t *testing.T) {
 			assert.Equal(t, test.want, actual.Fields)
 			assert.Equal(t, test.wantMeta, actual.Meta)
 		})
+	}
+}
+
+// TestEventNormalizationOverride verifies that the EventNormalization option
+// in beat.ProcessingConfig overrides the "skipNormalize" setting that is
+// specified in the builder (this is the default value set by the Beat).
+func TestEventNormalizationOverride(t *testing.T) {
+	boolPtr := func(b bool) *bool { return &b }
+
+	testCases := []struct {
+		skipNormalize          bool
+		normalizeOverride      *bool
+		hasGeneralizeProcessor bool
+	}{
+		{skipNormalize: false, normalizeOverride: nil, hasGeneralizeProcessor: true},
+		{skipNormalize: false, normalizeOverride: boolPtr(false), hasGeneralizeProcessor: false},
+		{skipNormalize: false, normalizeOverride: boolPtr(true), hasGeneralizeProcessor: true},
+		{skipNormalize: true, normalizeOverride: nil, hasGeneralizeProcessor: false},
+		{skipNormalize: true, normalizeOverride: boolPtr(false), hasGeneralizeProcessor: false},
+		{skipNormalize: true, normalizeOverride: boolPtr(true), hasGeneralizeProcessor: true},
+	}
+
+	for _, tc := range testCases {
+		builder, err := newBuilder(beat.Info{}, logp.NewLogger(""), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
+		require.NoError(t, err)
+
+		processor, err := builder.Create(beat.ProcessingConfig{EventNormalization: tc.normalizeOverride}, false)
+		require.NoError(t, err)
+		group, ok := processor.(*group)
+		require.True(t, ok)
+
+		if tc.hasGeneralizeProcessor {
+			if assert.NotEmpty(t, group.list) {
+				assert.Equal(t, "generalizeEvent", group.list[0].String())
+			}
+		} else {
+			assert.Empty(t, group.list)
+		}
 	}
 }
 
@@ -306,7 +366,7 @@ func TestNormalization(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			s, err := MakeDefaultSupport(test.normalize)(beat.Info{}, logp.L(), config.NewConfig())
+			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{}, logp.L(), config.NewConfig())
 			require.NoError(t, err)
 
 			prog, err := s.Create(beat.ProcessingConfig{}, false)
@@ -327,7 +387,7 @@ func TestNormalization(t *testing.T) {
 }
 
 func BenchmarkNormalization(b *testing.B) {
-	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(b, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, false)
@@ -341,7 +401,7 @@ func BenchmarkNormalization(b *testing.B) {
 }
 
 func TestAlwaysDrop(t *testing.T) {
-	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), config.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, true)
@@ -356,7 +416,7 @@ func TestAlwaysDrop(t *testing.T) {
 }
 
 func TestDynamicFields(t *testing.T) {
-	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	dynFields := mapstr.NewPointer(mapstr.M{})
@@ -379,12 +439,13 @@ func TestDynamicFields(t *testing.T) {
 }
 
 func TestProcessingClose(t *testing.T) {
-	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), config.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	// Inject a processor in the builder that we can check if has been closed.
 	factoryProcessor := &processorWithClose{}
-	b := factory.(*builder)
+	b, ok := factory.(*builder)
+	require.True(t, ok)
 	if b.processors == nil {
 		b.processors = newGroup("global", logp.L())
 	}
@@ -419,6 +480,14 @@ func TestProcessingClose(t *testing.T) {
 	err = factory.Close()
 	require.NoError(t, err)
 	assert.True(t, factoryProcessor.closed)
+}
+
+func TestProcessingDiagnostics(t *testing.T) {
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	require.NoError(t, err)
+
+	p := factory.Processors()
+	assert.Empty(t, p)
 }
 
 func fromJSON(in string) mapstr.M {

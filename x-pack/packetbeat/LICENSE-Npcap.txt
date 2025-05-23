@@ -1,34 +1,43 @@
 
 NPCAP COPYRIGHT / END USER LICENSE AGREEMENT
 
-Npcap is a Windows packet sniffing driver and library and is copyright
-(c) 2013-2022 by Insecure.Com LLC ("The Nmap Project").  All rights
-reserved.
+Npcap (https://npcap.com) is a Windows packet sniffing driver and
+library and is copyright (c) 2013-2023 by Nmap Software LLC ("The Nmap
+Project").  All rights reserved.
 
 Even though Npcap source code is publicly available for review, it is
-not open source software and may not be redistributed without special
-permission from the Nmap Project.  The standard version is also
-limited to installation on five systems. We fund the Npcap project by
-selling two types of commercial licenses to a special Npcap OEM
-edition:
+not open source software and may not be redistributed or used in other
+software without special permission from the Nmap Project.  The
+standard (free) version is usually limited to installation on five
+systems. We fund the Npcap project by selling two types of commercial
+licenses to a special Npcap OEM edition:
 
-1) Npcap OEM Redistribution License allows companies to redistribute
-Npcap with their products.
+1) The Npcap OEM Redistribution License allows companies distribute
+Npcap OEM within their products. Licensees generally use the Npcap OEM
+silent installer, ensuring a seamless experience for end
+users. Licensees may choose between a perpetual unlimited license or
+a quarterly term license, along with options for commercial support and
+updates. Prices and details: https://npcap.com/oem/redist.html
 
-2) Npcap OEM Internal Use License allows companies to use Npcap OEM
-internally in excess of the free/demo version's normal 5-system
-limitation.
+2) The Npcap OEM Internal-Use License is for organizations that wish
+to use Npcap OEM internally, without redistribution outside their
+organization. This allows them to bypass the 5-system usage cap of the
+Npcap free edition. It includes commercial support and update options,
+and provides the extra Npcap OEM features such as the silent installer
+for automated deployment. Prices and details:
+https://npcap.com/oem/internal.html
 
 Both of these licenses include updates and support as well as a
-warranty.  Npcap OEM also includes a silent installer for unattended
-installation.  Further details about Npcap OEM are available from
-https://nmap.org/npcap/oem/, and you are also welcome to contact us at
+warranty. Npcap OEM also includes a silent installer for unattended
+installation. Further details about Npcap OEM are available from
+https://npcap.com/oem/, and you are also welcome to contact us at
 sales@nmap.com to ask any questions or set up a license for your
 organization.
 
 Free and open source software producers are also welcome to contact us
-for redistribution requests.  However, we normally recommend that such
-authors instead ask your users to download and install Npcap themselves.
+for redistribution requests. However, we normally recommend that such
+authors instead ask your users to download and install Npcap
+themselves. It will be free for them if they need 5 or fewer copies.
 
 If the Nmap Project (directly or through one of our commercial
 licensing customers) has granted you additional rights to Npcap or
@@ -41,7 +50,7 @@ features.  By sending these changes to the Nmap Project (including
 through direct email or our mailing lists or submitting pull requests
 through our source code repository), it is understood unless you
 specify otherwise that you are offering the Nmap Project the
-unlimited, non-exclusive right to reuse, modify, and relicence your
+unlimited, non-exclusive right to reuse, modify, and relicense your
 code contribution so that we may (but are not obligated to)
 incorporate it into Npcap.  If you wish to specify special license
 conditions or restrictions on your contributions, just say so when you
@@ -91,7 +100,7 @@ o The Nmap Security Scanner, as distributed from https://nmap.org
 
 o The Wireshark network protocol analyzer, as distributed from
   https://www.wireshark.org/
-  
+
 o Microsoft Defender for Identity, as distributed from
   https://www.microsoft.com/en-us/microsoft-365/security/identity-defender
 
@@ -99,7 +108,7 @@ Users wishing to redistribute Npcap or exceed the usage limits imposed
 by this free license or benefit from commercial support and features
 such as a silent installer should contact sales@nmap.com to obtain an
 appropriate commercial license agreement.  More details on our OEM
-edition is also available from https://nmap.org/npcap/oem/.
+edition is also available from https://npcap.com/oem/.
 
 DISCLAIMER OF WARRANTIES AND LIMITATION OF LIABILITY
 
@@ -186,9 +195,9 @@ breach of this Agreement and/or acts or omissions.
 
 GOVERNING LAW, JURISDICTION AND COSTS
 
-This Agreement is governed by the laws the United States of America
-and Washington State, without regard to Washington's conflict or
-choice of law provisions.
+This Agreement is governed by the laws of the United States of America
+and Deleware State, without regard to Delaware's conflict or choice of
+law provisions.
 
 SEVERABILITY
 
@@ -218,10 +227,10 @@ through Npcap).
 
 The required acknowledgement text as well as full license text and
 source details for these libraries is available from:
-https://npcap.org/src/docs/Npcap-Third-Party-Open-Source.pdf .
+https://npcap.com/src/docs/Npcap-Third-Party-Open-Source.pdf .
 
-Since Insecure.Com LLC is not the author of this 3rd party code, we
-can not waive or modify it’s software copyright or license.  Npcap
+Since Nmap Software LLC is not the author of this 3rd party code, we
+can not waive or modify its software copyright or license.  Npcap
 users and redistributors must comply with the relevant Npcap license
 (either the free/demo license or a commercial Npcap OEM license they
 may have purchased) as well as the minimal requirements of this 3rd

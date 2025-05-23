@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package mongodb
 
@@ -49,7 +48,7 @@ func mongodbModForTests() (*eventStore, *mongodbPlugin) {
 	var mongodb mongodbPlugin
 	results := &eventStore{}
 	config := defaultConfig
-	mongodb.init(results.publish, procs.ProcessesWatcher{}, &config)
+	mongodb.init(results.publish, &procs.ProcessesWatcher{}, &config)
 	return results, &mongodb
 }
 

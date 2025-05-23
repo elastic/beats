@@ -22,8 +22,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
@@ -31,6 +29,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/sarama"
 )
 
 type kafkaInputConfig struct {
@@ -110,7 +109,7 @@ var (
 // were chosen to match sarama's defaults.
 func defaultConfig() kafkaInputConfig {
 	return kafkaInputConfig{
-		Version:        kafka.Version("1.0.0"),
+		Version:        kafka.Version("2.1.0"),
 		InitialOffset:  initialOffsetOldest,
 		ClientID:       "filebeat",
 		ConnectBackoff: 30 * time.Second,
@@ -241,8 +240,8 @@ func (off *initialOffset) Unpack(value string) error {
 
 func (st rebalanceStrategy) asSaramaStrategy() sarama.BalanceStrategy {
 	return map[rebalanceStrategy]sarama.BalanceStrategy{
-		rebalanceStrategyRange:      sarama.BalanceStrategyRange,
-		rebalanceStrategyRoundRobin: sarama.BalanceStrategyRoundRobin,
+		rebalanceStrategyRange:      sarama.NewBalanceStrategyRange(),
+		rebalanceStrategyRoundRobin: sarama.NewBalanceStrategyRoundRobin(),
 	}[st]
 }
 

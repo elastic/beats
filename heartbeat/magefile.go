@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -61,7 +60,7 @@ func Package() {
 	heartbeat.CustomizePackaging()
 
 	mg.Deps(Update)
-	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
+	mg.Deps(build.CrossBuild)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
@@ -82,9 +81,15 @@ func Fields() error {
 	return heartbeat.Fields()
 }
 
+func GenerateModuleIncludeListGo() error {
+	opts := devtools.DefaultIncludeListOptions()
+	opts.ImportDirs = append(opts.ImportDirs, "autodiscover/**/*", "monitors/*", "monitors/**/*", "security")
+	return devtools.GenerateIncludeListGo(opts)
+}
+
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Fields, FieldDocs, Config)
+	mg.SerialDeps(Fields, FieldDocs, Config, GenerateModuleIncludeListGo)
 }
 
 func IntegTest() {

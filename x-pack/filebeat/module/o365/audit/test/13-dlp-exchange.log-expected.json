@@ -792,7 +792,6 @@
             "forwarded"
         ],
         "url.domain": "example.net",
-        "url.extension": "com/sharepoint",
         "url.original": "https://example.net/testsiem2.onmicrosoft.com/sharepoint",
         "url.path": "/testsiem2.onmicrosoft.com/sharepoint",
         "url.scheme": "https",

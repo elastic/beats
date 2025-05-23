@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
-type elasticsearchConfig struct {
+type ElasticsearchConfig struct {
 	Protocol           string            `config:"protocol"`
 	Path               string            `config:"path"`
 	Params             map[string]string `config:"parameters"`
@@ -43,6 +43,7 @@ type elasticsearchConfig struct {
 	Backoff            Backoff           `config:"backoff"`
 	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
 	AllowOlderVersion  bool              `config:"allow_older_versions"`
+	Queue              config.Namespace  `config:"queue"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
@@ -53,11 +54,11 @@ type Backoff struct {
 }
 
 const (
-	defaultBulkSize = 50
+	defaultBulkSize = 1600
 )
 
 var (
-	defaultConfig = elasticsearchConfig{
+	defaultConfig = ElasticsearchConfig{
 		Protocol:         "",
 		Path:             "",
 		Params:           nil,
@@ -65,7 +66,7 @@ var (
 		Password:         "",
 		APIKey:           "",
 		MaxRetries:       3,
-		CompressionLevel: 0,
+		CompressionLevel: 1,
 		EscapeHTML:       false,
 		Kerberos:         nil,
 		LoadBalance:      true,
@@ -73,11 +74,24 @@ var (
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Transport: httpcommon.DefaultHTTPTransportSettings(),
+		BulkMaxSize: defaultBulkSize,
+		Transport:   esDefaultTransportSettings(),
 	}
 )
 
-func (c *elasticsearchConfig) Validate() error {
+func DefaultConfig() ElasticsearchConfig {
+	return defaultConfig
+}
+
+func esDefaultTransportSettings() httpcommon.HTTPTransportSettings {
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	// The ES output differs from the common transport settings by having
+	// a 3-second idle timeout
+	transport.IdleConnTimeout = 3 * time.Second
+	return transport
+}
+
+func (c *ElasticsearchConfig) Validate() error {
 	if c.APIKey != "" && (c.Username != "" || c.Password != "") {
 		return fmt.Errorf("cannot set both api_key and username/password")
 	}

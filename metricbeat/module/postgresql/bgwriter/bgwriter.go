@@ -21,8 +21,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
 )
@@ -57,7 +55,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	ctx := context.Background()
 	results, err := m.QueryStats(ctx, "SELECT * FROM pg_stat_bgwriter")
 	if err != nil {
-		return errors.Wrap(err, "error in QueryStats")
+		return fmt.Errorf("error in QueryStats: %w", err)
 	}
 	if len(results) == 0 {
 		return fmt.Errorf("No results from the pg_stat_bgwriter query")

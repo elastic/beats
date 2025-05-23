@@ -21,8 +21,7 @@ import (
 	"bufio"
 	"fmt"
 	"net"
-
-	"github.com/pkg/errors"
+	"strconv"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -37,6 +36,7 @@ type TcpServer struct {
 	done              chan struct{}
 	eventQueue        chan server.Event
 	delimiter         byte
+	logger            *logp.Logger
 }
 
 type TcpEvent struct {
@@ -58,7 +58,7 @@ func NewTcpServer(base mb.BaseMetricSet) (server.Server, error) {
 		return nil, err
 	}
 
-	addr, err := net.ResolveTCPAddr("tcp", fmt.Sprintf("%s:%d", config.Host, config.Port))
+	addr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(config.Host, strconv.Itoa(config.Port)))
 
 	if err != nil {
 		return nil, err
@@ -69,17 +69,18 @@ func NewTcpServer(base mb.BaseMetricSet) (server.Server, error) {
 		receiveBufferSize: config.ReceiveBufferSize,
 		done:              make(chan struct{}),
 		eventQueue:        make(chan server.Event),
-		delimiter:         byte(config.Delimiter[0]),
+		delimiter:         config.Delimiter[0],
+		logger:            base.Logger(),
 	}, nil
 }
 
 func (g *TcpServer) Start() error {
 	listener, err := net.ListenTCP("tcp", g.tcpAddr)
 	if err != nil {
-		return errors.Wrap(err, "failed to start TCP server")
+		return fmt.Errorf("failed to start TCP server: %w", err)
 	}
 	g.listener = listener
-	logp.Info("Started listening for TCP on: %s", g.tcpAddr.String())
+	g.logger.Infof("Started listening for TCP on: %s", g.tcpAddr.String())
 
 	go g.watchMetrics()
 	return nil
@@ -95,7 +96,7 @@ func (g *TcpServer) watchMetrics() {
 
 		conn, err := g.listener.Accept()
 		if err != nil {
-			logp.Err("Unable to accept connection due to error: %v", err)
+			g.logger.Errorf("Unable to accept connection due to error: %v", err)
 			continue
 		}
 
@@ -107,7 +108,7 @@ func (g *TcpServer) handle(conn net.Conn) {
 	if conn == nil {
 		return
 	}
-	logp.Debug("tcp", "Handling new connection...")
+	g.logger.Named("tcp").Debug("Handling new connection...")
 
 	// Close connection when this function ends
 	defer conn.Close()
@@ -119,7 +120,7 @@ func (g *TcpServer) handle(conn net.Conn) {
 		// Read tokens delimited by delimiter
 		bytes, err := bufReader.ReadBytes(g.delimiter)
 		if err != nil {
-			logp.Debug("tcp", "unable to read bytes due to error: %v", err)
+			g.logger.Named("tcp").Debugf("unable to read bytes due to error: %v", err)
 			return
 		}
 

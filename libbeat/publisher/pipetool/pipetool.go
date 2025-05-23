@@ -87,12 +87,12 @@ func WithDefaultGuarantees(pipeline beat.PipelineConnector, mode beat.PublishMod
 	})
 }
 
-func WithACKer(pipeline beat.PipelineConnector, a beat.ACKer) beat.PipelineConnector {
+func WithACKer(pipeline beat.PipelineConnector, a beat.EventListener) beat.PipelineConnector {
 	return WithClientConfigEdit(pipeline, func(cfg beat.ClientConfig) (beat.ClientConfig, error) {
-		if h := cfg.ACKHandler; h != nil {
-			cfg.ACKHandler = acker.Combine(a, h)
+		if h := cfg.EventListener; h != nil {
+			cfg.EventListener = acker.Combine(a, h)
 		} else {
-			cfg.ACKHandler = a
+			cfg.EventListener = a
 		}
 		return cfg, nil
 	})
