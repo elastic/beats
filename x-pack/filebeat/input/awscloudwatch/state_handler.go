@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/zyedidia/generic/heap"
+
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -18,63 +21,128 @@ const (
 	inputGroupPrefix = "groupPrefix"
 )
 
-type StorableState struct {
+type storableState struct {
 	LastSyncEpoch int64 `json:"last_sync_epoch" struct:"last_sync_epoch"`
 }
 
-type stateHandler struct {
-	lock  sync.Mutex
-	store *statestore.Store
+type tracker struct {
+	timeStamp int64
+	count     int
 }
 
-func createStateHandler(store statestore.States) (*stateHandler, error) {
+// stateHandler wraps state handling.
+// It allows to get stored state, track state updates and store the most appropriate state.
+type stateHandler struct {
+	id    string
+	store *statestore.Store
+	log   *logp.Logger
+
+	registerReceiver chan tracker
+	completeReceiver chan int64
+	done             chan struct{}
+
+	lock sync.Mutex
+}
+
+func newStateHandler(log *logp.Logger, cfg config, store statestore.States) (*stateHandler, error) {
+	id, err := generateID(cfg)
+	if err != nil {
+		return nil, err
+	}
 	st, err := store.StoreFor("")
 	if err != nil {
 		return nil, fmt.Errorf("error accessing persistence store: %w", err)
 	}
 
-	return &stateHandler{store: st}, nil
+	sh := &stateHandler{
+		id:               id,
+		store:            st,
+		log:              log,
+		registerReceiver: make(chan tracker),
+		completeReceiver: make(chan int64),
+		done:             make(chan struct{}),
+	}
+
+	go sh.backgroundRunner()
+	return sh, nil
 }
 
-func (s *stateHandler) GetState(forCfg config) (StorableState, error) {
+// GetState returns the previously stored state if available.
+// Returned state corresponds to the id generated based on configurations.
+func (s *stateHandler) GetState() (storableState, error) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	var ss StorableState
-
-	id, err := generateID(forCfg)
+	var ss storableState
+	got, err := s.store.Has(s.id)
 	if err != nil {
-		return ss, err
-	}
-
-	got, err := s.store.Has(id)
-	if err != nil {
-		return StorableState{}, err
+		return storableState{}, err
 	}
 
 	if !got {
 		// Set to Epoch Zero, which is as if start from beginning
-		return StorableState{LastSyncEpoch: 0}, nil
+		return storableState{LastSyncEpoch: 0}, nil
 	}
 
-	err = s.store.Get(id, &ss)
+	err = s.store.Get(s.id, &ss)
 	if err != nil {
-		return StorableState{}, err
+		return storableState{}, err
 	}
 
 	return ss, nil
 }
 
-func (s *stateHandler) StoreState(forCfg config, ss StorableState) error {
+// WorkRegister accepts work identified through timestamp and amount of work.
+func (s *stateHandler) WorkRegister(timestamp int64, workCount int) {
+	s.registerReceiver <- tracker{
+		timeStamp: timestamp,
+		count:     workCount,
+	}
+}
+
+// WorkComplete accepts an individual work tracked at the given timestamp.
+func (s *stateHandler) WorkComplete(timestamp int64) {
+	s.completeReceiver <- timestamp
+}
+
+// backgroundRunner tracks registered work and completed work.
+// It stores the oldest tracked work once all work for corresponding timestamp is complete.
+func (s *stateHandler) backgroundRunner() {
+	trackingMap := map[int64]*tracker{}
+	bHeap := heap.New[*tracker](func(a, b *tracker) bool {
+		return a.timeStamp < b.timeStamp
+	})
+
+	for {
+		select {
+		case <-s.done:
+			return
+		case r := <-s.registerReceiver:
+			trackingMap[r.timeStamp] = &r
+			bHeap.Push(&r)
+		case cmp := <-s.completeReceiver:
+			// reduce tracked work
+			got := trackingMap[cmp]
+			got.count -= 1
+
+			// check if oldest entry completed all work
+			minElement, _ := bHeap.Peek()
+			if minElement.count == 0 {
+				bHeap.Pop()
+				delete(trackingMap, minElement.timeStamp)
+				if err := s.storeState(storableState{LastSyncEpoch: minElement.timeStamp}); err != nil {
+					s.log.Errorf("error storing state: %v", err)
+				}
+			}
+		}
+	}
+}
+
+func (s *stateHandler) storeState(ss storableState) error {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	id, err := generateID(forCfg)
-	if err != nil {
-		return err
-	}
-
-	err = s.store.Set(id, ss)
+	err := s.store.Set(s.id, ss)
 	if err != nil {
 		return err
 	}
@@ -87,8 +155,10 @@ func (s *stateHandler) Close() {
 	defer s.lock.Unlock()
 
 	s.store.Close()
+	close(s.done)
 }
 
+// generateID is a helper to derive state registry identifier matching provided configurations.
 func generateID(forCfg config) (string, error) {
 	// first check group ARN
 	if forCfg.LogGroupARN != "" {
