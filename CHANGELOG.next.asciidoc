@@ -146,6 +146,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Split common tty definitions. {pull}42004[42004]
 - Fix potential data loss in add_session_metadata. {pull}42795[42795]
 - system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
+- auditbeat/fim: Fix FIM@ebpfevents for new kernels #44371. {pull}44371[44371]
 
 *Auditbeat*
 
@@ -236,7 +237,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
-
+- Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 
 *Heartbeat*
 
@@ -298,7 +299,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
 - The script processor has a new configuration option that only uses the cached javascript sessions and prevents the creation of new javascript sessions.
-- Update to Go 1.24.0. {pull}42705[42705]
+- Update to Go 1.24.3. {pull}44270[44270]
 - Replace Ubuntu 20.04 with 24.04 for Docker base images {issue}40743[40743] {pull}40942[40942]
 - Replace `compress/gzip` with https://github.com/klauspost/compress/gzip library for gzip compression {pull}41584[41584]
 - Add regex pattern matching to add_kubernetes_metadata processor {pull}41903[41903]
@@ -426,6 +427,10 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Update CEL mito extensions to v1.19.0. {pull}44098[44098]
 - Segregated `max_workers`` from `batch_size` in the GCS input. {issue}44311[44311] {pull}44333[44333]
 - Added support for websocket keep_alive heartbeat in the streaming input. {issue}42277[42277] {pull}44204[44204]
+- Add milliseconds to document timestamp from awscloudwatch Filebeat input {pull}44306[44306]
+- Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
+- Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
+
 
 *Auditbeat*
 
@@ -497,6 +502,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
 - Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add latency config option to Azure Monitor module. {pull}44366[44366]
 
 *Metricbeat*
 

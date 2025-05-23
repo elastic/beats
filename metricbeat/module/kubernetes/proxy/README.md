@@ -61,12 +61,16 @@ kubectl proxy
 
 Then you can fetch the metrics from the url provided in the output and save it to a new `_meta/test/metrics.x.xx` file.
 
-After that, you can run the following commands to generate and test the expected files:
+```bash
+curl 127.0.0.1:8001/metrics > _meta/test/metrics.x.xx
+```
+
+After that, you need to add the new expectation file to `proxy_test.go` and then run the following commands to generate and test the expected files:
 
 ```bash
 cd metricbeat/module/kubernetes/proxy
 # generate the expected files
-go test ./state... --data
+go test ./... --data
 # test the expected files
-go test ./state...
+go test ./...
 ```

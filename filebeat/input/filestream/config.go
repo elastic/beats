@@ -139,7 +139,7 @@ func defaultCloserConfig() closerConfig {
 	return closerConfig{
 		OnStateChange: stateChangeCloserConfig{
 			CheckInterval: 5 * time.Second,
-			Removed:       true, // TODO check clean_removed option
+			Removed:       defaultCloserOnStateChangeRemoved(),
 			Inactive:      5 * time.Minute,
 			Renamed:       false,
 		},

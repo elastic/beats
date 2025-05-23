@@ -20,7 +20,7 @@ type: long
 
 
 **`dhcpv4.flags`**
-:   Flags are set by the client to indicate how the DHCP server should its reply — either unicast or broadcast.
+:   Flags are set by the client to indicate how the DHCP server should its reply — either unicast or broadcast.
 
 type: keyword
 
