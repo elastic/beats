@@ -42,6 +42,22 @@ func getFiles(folder string) ([]string, error) {
 	return files, nil
 }
 
+// GetMetricInputFiles returns the metric files from the _meta/test folder located in root.
+func GetMetricInputFiles(t *testing.T, root string) []string {
+	t.Helper()
+	allFiles, err := filepath.Glob(filepath.Join(root, "_meta/test/metrics.*"))
+	if err != nil {
+		t.Fatalf("failed to get test files: %v", err)
+	}
+	var files []string
+	for _, file := range allFiles {
+		if !strings.HasSuffix(file, ".expected") {
+			files = append(files, file)
+		}
+	}
+	return files
+}
+
 // GetTestCases Build test cases based on the files from folder, and the expected files in the expectedFolder
 func GetTestCases(folder string, expectedFolder string) (ptest.TestCases, error) {
 	var cases ptest.TestCases
