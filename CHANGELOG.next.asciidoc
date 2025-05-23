@@ -34,7 +34,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Add support for Kibana status metricset in v8 format {pull}40275[40275]
@@ -46,8 +45,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
 - Disable allow_unsafe osquery configuration. {pull}40130[40130]
 - Upgrade to osquery 5.12.1. {pull}40368[40368]
-- Upgrade to osquery 5.13.1. {pull}40849[40849]
-- Upgrade to osquery 5.15.0 {pull}43426[43426]
 
 
 *Packetbeat*
@@ -82,11 +79,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
-- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 
 *Auditbeat*
 
-- system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
 
 *Filebeat*
 
@@ -117,11 +112,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix request trace filename handling in http_endpoint input. {pull}39410[39410]
 - Upgrade github.com/hashicorp/go-retryablehttp to mitigate CVE-2024-6104 {pull}40036[40036]
 - Prevent panic in CEL and salesforce inputs when github.com/hashicorp/go-retryablehttp exceeds maximum retries. {pull}40144[40144]
-- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
-- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
-- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
-- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
-- Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 
 *Heartbeat*
 
@@ -143,10 +133,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
-- Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
-- Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
-- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
-- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices {pull}43637[43637]
 
 *Osquerybeat*
 
@@ -176,7 +162,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - When running under Elastic-Agent Kafka output allows dynamic topic in `topic` field {pull}40415[40415]
-- Update to Go 1.24.3. {pull}44270[44270]
 
 *Auditbeat*
 
@@ -224,7 +209,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.12.2. {pull}39755[39755]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 - Disable event normalization for netflow input {pull}40635[40635]
-- Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
 
 *Auditbeat*
 
@@ -252,9 +236,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add new metricset network for the vSphere module. {pull}40559[40559]
 - Add new metricset resourcepool for the vSphere module. {pull}40456[40456]
-- Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
-- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
-- Add latency config option to Azure Monitor module. {pull}44366[44366]
 
 *Metricbeat*
 
@@ -305,6 +286,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
