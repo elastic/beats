@@ -174,7 +174,6 @@ This document describes the fields that are exported by {title}. They are groupe
             section["anchor"] = section["key"]
 
         if "skipdocs" not in section:
-            # output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
             output.write("* [*{} fields*](/reference/{}/exported-fields-{}.md)\n".format(section["title"], beat, section["anchor"]))
     output.close()
     # Sort alphabetically by key
@@ -182,10 +181,10 @@ This document describes the fields that are exported by {title}. They are groupe
         section["name"] = section["title"]
         if "anchor" not in section:
             section["anchor"] = section["key"]
+        if "fields" not in section or not section["fields"]:
+            continue
         output_fields = open(os.path.join(output_path, "exported-fields-{}.md".format(section["anchor"])), 'w', encoding='utf-8')
         document_fields(output_fields, section, sections, "", beat)
-
-    # output.write(":edit_url!:")
 
 
 if __name__ == "__main__":
