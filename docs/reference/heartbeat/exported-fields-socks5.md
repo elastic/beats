@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-socks5.html
+  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-socks5.html
 ---
 
 # SOCKS5 proxy fields [exported-fields-socks5]

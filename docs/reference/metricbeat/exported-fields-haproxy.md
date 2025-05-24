@@ -45,9 +45,7 @@ alias to: process.pid
 
 
 **`haproxy.info.run_queue`**
-:   
-
-type: long
+:   type: long
 
 
 **`haproxy.info.stopping`**
@@ -93,9 +91,7 @@ type: long
 
 
 **`haproxy.info.tasks`**
-:   
-
-type: long
+:   type: long
 
 
 **`haproxy.info.uptime.sec`**
@@ -257,9 +253,7 @@ type: long
 
 
 **`haproxy.info.connection.hard_max`**
-:   
-
-type: long
+:   type: long
 
 
 **`haproxy.info.requests.total`**
@@ -596,10 +590,7 @@ type: long
 
 
 **`haproxy.stat.request.denied`**
-:   Requests denied because of security concerns.
-
-  * For TCP this is because of a matched tcp-request content rule.
-  * For HTTP this is because of a matched http-request or tarpit rule.
+:   Requests denied because of security concerns.   * For TCP this is because of a matched tcp-request content rule.   * For HTTP this is because of a matched http-request or tarpit rule.
 
 type: long
 
@@ -629,14 +620,7 @@ type: long
 
 
 **`haproxy.stat.request.errors`**
-:   Request errors. Some of the possible causes are:
-
-  * early termination from the client, before the request has been sent
-  * read error from the client
-  * client timeout
-  * client closed connection
-  * various bad requests from the client.
-  * request was tarpitted.
+:   Request errors. Some of the possible causes are:   * early termination from the client, before the request has been sent   * read error from the client   * client timeout   * client closed connection   * various bad requests from the client.   * request was tarpitted.
 
 type: long
 
@@ -684,8 +668,7 @@ type: long
 
 
 **`haproxy.stat.response.errors`**
-:   Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted). Some other errors are:
-* write errors on the client socket (won't be counted for the server stat) * failure applying filters to the response
+:   Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted). Some other errors are: * write errors on the client socket (won't be counted for the server stat) * failure applying filters to the response
 
 type: long
 
@@ -802,24 +785,7 @@ type: integer
 
 
 **`haproxy.stat.check.status`**
-:   Status of the last health check. One of:
-
-  UNK     -> unknown
-  INI     -> initializing
-  SOCKERR -> socket error
-  L4OK    -> check passed on layer 4, no upper layers testing enabled
-  L4TOUT  -> layer 1-4 timeout
-  L4CON   -> layer 1-4 connection problem, for example
-            "Connection refused" (tcp rst) or "No route to host" (icmp)
-  L6OK    -> check passed on layer 6
-  L6TOUT  -> layer 6 (SSL) timeout
-  L6RSP   -> layer 6 invalid response - protocol error
-  L7OK    -> check passed on layer 7
-  L7OKC   -> check conditionally passed on layer 7, for example 404 with
-            disable-on-404
-  L7TOUT  -> layer 7 (HTTP/SMTP) timeout
-  L7RSP   -> layer 7 invalid response - protocol error
-  L7STS   -> layer 7 response error, for example HTTP 5xx
+:   Status of the last health check. One of:   UNK     -> unknown   INI     -> initializing   SOCKERR -> socket error   L4OK    -> check passed on layer 4, no upper layers testing enabled   L4TOUT  -> layer 1-4 timeout   L4CON   -> layer 1-4 connection problem, for example             "Connection refused" (tcp rst) or "No route to host" (icmp)   L6OK    -> check passed on layer 6   L6TOUT  -> layer 6 (SSL) timeout   L6RSP   -> layer 6 invalid response - protocol error   L7OK    -> check passed on layer 7   L7OKC   -> check conditionally passed on layer 7, for example 404 with             disable-on-404   L7TOUT  -> layer 7 (HTTP/SMTP) timeout   L7RSP   -> layer 7 invalid response - protocol error   L7STS   -> layer 7 response error, for example HTTP 5xx
 
 type: keyword
 
@@ -849,9 +815,7 @@ type: long
 
 
 **`haproxy.stat.check.agent.last`**
-:   
-
-type: integer
+:   type: integer
 
 
 **`haproxy.stat.check.failed`**
@@ -984,17 +948,7 @@ type: integer
 
 
 **`haproxy.stat.agent.status`**
-:   Status of the last health check. One of:
-
-  UNK     -> unknown
-  INI     -> initializing
-  SOCKERR -> socket error
-  L4OK    -> check passed on layer 4, no upper layers enabled
-  L4TOUT  -> layer 1-4 timeout
-  L4CON   -> layer 1-4 connection problem, for example
-            "Connection refused" (tcp rst) or "No route to host" (icmp)
-  L7OK    -> agent reported "up"
-  L7STS   -> agent reported "fail", "stop" or "down"
+:   Status of the last health check. One of:   UNK     -> unknown   INI     -> initializing   SOCKERR -> socket error   L4OK    -> check passed on layer 4, no upper layers enabled   L4TOUT  -> layer 1-4 timeout   L4CON   -> layer 1-4 connection problem, for example             "Connection refused" (tcp rst) or "No route to host" (icmp)   L7OK    -> agent reported "up"   L7STS   -> agent reported "fail", "stop" or "down"
 
 type: keyword
 

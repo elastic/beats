@@ -15,11 +15,7 @@ More information about specific fields can be found at https://developers.google
 
 
 **`google_workspace.actor.type`**
-:   The type of actor.
-Values can be:
-  *USER*: Another user in the same domain.
-  *EXTERNAL_USER*: A user outside the domain.
-  *KEY*: A non-human actor.
+:   The type of actor. Values can be:   *USER*: Another user in the same domain.   *EXTERNAL_USER*: A user outside the domain.   *KEY*: A non-human actor.
 
 type: keyword
 

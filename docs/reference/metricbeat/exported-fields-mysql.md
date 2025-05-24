@@ -535,15 +535,11 @@ type: long
 
 
 **`mysql.status.binlog.cache.disk_use`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.binlog.cache.use`**
-:   
-
-type: long
+:   type: long
 
 
 ## bytes [_bytes]
@@ -597,9 +593,7 @@ type: long
 
 
 **`mysql.status.connections`**
-:   
-
-type: long
+:   type: long
 
 
 ## created [_created]
@@ -608,21 +602,15 @@ type: long
 
 
 **`mysql.status.created.tmp.disk_tables`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.created.tmp.files`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.created.tmp.tables`**
-:   
-
-type: long
+:   type: long
 
 
 ## delayed [_delayed]
@@ -631,33 +619,23 @@ type: long
 
 
 **`mysql.status.delayed.errors`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.delayed.insert_threads`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.delayed.writes`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.flush_commands`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.max_used_connections`**
-:   
-
-type: long
+:   type: long
 
 
 ## open [_open]
@@ -666,27 +644,19 @@ type: long
 
 
 **`mysql.status.open.files`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.open.streams`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.open.tables`**
-:   
-
-type: long
+:   type: long
 
 
 **`mysql.status.opened_tables`**
-:   
-
-type: long
+:   type: long
 
 
 ## command [_command]

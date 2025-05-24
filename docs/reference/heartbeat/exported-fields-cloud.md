@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-cloud.html
+  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-cloud.html
 ---
 
 # Cloud provider metadata fields [exported-fields-cloud]

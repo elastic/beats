@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-docker-processor.html
+  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-docker-processor.html
 ---
 
 # Docker fields [exported-fields-docker-processor]

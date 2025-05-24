@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-common.html
+  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-common.html
 ---
 
 # Common heartbeat monitor fields [exported-fields-common]

@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-synthetics.html
+  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-synthetics.html
 ---
 
 # Synthetics types fields [exported-fields-synthetics]

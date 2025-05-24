@@ -247,8 +247,7 @@ type: keyword
 
 
 **`system.audit.package.entity_id`**
-:   ID uniquely identifying the package. It is computed as a SHA-256 hash of the
-  host ID, package name, and package version.
+:   ID uniquely identifying the package. It is computed as a SHA-256 hash of the   host ID, package name, and package version.
 
 type: keyword
 

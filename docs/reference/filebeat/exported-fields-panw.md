@@ -289,9 +289,7 @@ type: date
 
 
 **`panw.panos.ugflags`**
-:   Displays whether the user group that was found during user group mapping. Supported values are:
-User Group Found—Indicates whether the user could be mapped to a group.
-Duplicate User—Indicates whether duplicate users were found in a user group. Displays N/A if no user group is found.
+:   Displays whether the user group that was found during user group mapping. Supported values are: User Group Found—Indicates whether the user could be mapped to a group. Duplicate User—Indicates whether duplicate users were found in a user group. Displays N/A if no user group is found.
 
 type: keyword
 

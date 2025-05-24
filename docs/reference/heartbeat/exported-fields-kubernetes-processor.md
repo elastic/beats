@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-kubernetes-processor.html
+  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-kubernetes-processor.html
 ---
 
 # Kubernetes fields [exported-fields-kubernetes-processor]

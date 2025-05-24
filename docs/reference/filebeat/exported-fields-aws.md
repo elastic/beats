@@ -223,11 +223,7 @@ type: keyword
 
 
 **`aws.cloudtrail.event_category`**
-:   Shows the event category that is used in LookupEvents calls.
-
- - For management events, the value is management.
- - For data events, the value is data.
- - For Insights events, the value is insight.
+:   Shows the event category that is used in LookupEvents calls.  - For management events, the value is management.  - For data events, the value is data.  - For Insights events, the value is insight.
 
 type: keyword
 

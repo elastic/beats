@@ -161,8 +161,7 @@ type: keyword
 
 
 **`zeek.dhcp.duration`**
-:   Duration of the DHCP session representing the time from the first
-message to the last, in seconds.
+:   Duration of the DHCP session representing the time from the first message to the last, in seconds.
 
 type: double
 
@@ -197,11 +196,7 @@ type: ip
 
 
 **`zeek.dhcp.address.client`**
-:   IP address of the client. If a transaction is only a client sending
-INFORM messages then there is no lease information exchanged so this
-is helpful to know who sent the messages. Getting an address in this
-field does require that the client sources at least one DHCP message
-using a non-broadcast address.
+:   IP address of the client. If a transaction is only a client sending INFORM messages then there is no lease information exchanged so this is helpful to know who sent the messages. Getting an address in this field does require that the client sources at least one DHCP message using a non-broadcast address.
 
 type: ip
 
@@ -232,65 +227,51 @@ type: keyword
 
 
 **`zeek.dhcp.msg.origin`**
-:   (present if policy/protocols/dhcp/msg-orig.bro is loaded)
-The address that originated each message from the msg.types field.
+:   (present if policy/protocols/dhcp/msg-orig.bro is loaded) The address that originated each message from the msg.types field.
 
 type: ip
 
 
 **`zeek.dhcp.msg.client`**
-:   Message typically accompanied with a DHCP_DECLINE so the client can
-tell the server why it rejected an address.
+:   Message typically accompanied with a DHCP_DECLINE so the client can tell the server why it rejected an address.
 
 type: keyword
 
 
 **`zeek.dhcp.msg.server`**
-:   Message typically accompanied with a DHCP_NAK to let the client know
-why it rejected the request.
+:   Message typically accompanied with a DHCP_NAK to let the client know why it rejected the request.
 
 type: keyword
 
 
 
 **`zeek.dhcp.software.client`**
-:   (present if policy/protocols/dhcp/software.bro is loaded)
-Software reported by the client in the vendor_class option.
+:   (present if policy/protocols/dhcp/software.bro is loaded) Software reported by the client in the vendor_class option.
 
 type: keyword
 
 
 **`zeek.dhcp.software.server`**
-:   (present if policy/protocols/dhcp/software.bro is loaded)
-Software reported by the client in the vendor_class option.
+:   (present if policy/protocols/dhcp/software.bro is loaded) Software reported by the client in the vendor_class option.
 
 type: keyword
 
 
 
 **`zeek.dhcp.id.circuit`**
-:   (present if policy/protocols/dhcp/sub-opts.bro is loaded)
-Added by DHCP relay agents which terminate switched or permanent
-circuits. It encodes an agent-local identifier of the circuit from
-which a DHCP client-to-server packet was received. Typically it
-should represent a router or switch interface number.
+:   (present if policy/protocols/dhcp/sub-opts.bro is loaded) Added by DHCP relay agents which terminate switched or permanent circuits. It encodes an agent-local identifier of the circuit from which a DHCP client-to-server packet was received. Typically it should represent a router or switch interface number.
 
 type: keyword
 
 
 **`zeek.dhcp.id.remote_agent`**
-:   (present if policy/protocols/dhcp/sub-opts.bro is loaded)
-A globally unique identifier added by relay agents to identify the
-remote host end of the circuit.
+:   (present if policy/protocols/dhcp/sub-opts.bro is loaded) A globally unique identifier added by relay agents to identify the remote host end of the circuit.
 
 type: keyword
 
 
 **`zeek.dhcp.id.subscriber`**
-:   (present if policy/protocols/dhcp/sub-opts.bro is loaded)
-The subscriber ID is a value independent of the physical network
-configuration so that a customer's DHCP configuration can be given
-to them correctly no matter where they are physically connected.
+:   (present if policy/protocols/dhcp/sub-opts.bro is loaded) The subscriber ID is a value independent of the physical network configuration so that a customer's DHCP configuration can be given to them correctly no matter where they are physically connected.
 
 type: keyword
 
@@ -379,8 +360,7 @@ type: keyword
 
 
 **`zeek.dns.AA`**
-:   The Authoritative Answer bit for response messages specifies that the responding
-name server is an authority for the domain name in the question section.
+:   The Authoritative Answer bit for response messages specifies that the responding name server is an authority for the domain name in the question section.
 
 type: boolean
 
@@ -392,15 +372,13 @@ type: boolean
 
 
 **`zeek.dns.RD`**
-:   The Recursion Desired bit in a request message indicates that the client
-wants recursive service for this query.
+:   The Recursion Desired bit in a request message indicates that the client wants recursive service for this query.
 
 type: boolean
 
 
 **`zeek.dns.RA`**
-:   The Recursion Available bit in a response message indicates that the name
-server supports recursive queries.
+:   The Recursion Available bit in a response message indicates that the name server supports recursive queries.
 
 type: boolean
 
@@ -465,8 +443,7 @@ type: keyword
 
 
 **`zeek.dpd.packet_segment`**
-:   (present if policy/frameworks/dpd/packet-segment-logging.bro is loaded)
-A chunk of the payload that most likely resulted in the protocol violation.
+:   (present if policy/frameworks/dpd/packet-segment-logging.bro is loaded) A chunk of the payload that most likely resulted in the protocol violation.
 
 type: keyword
 
@@ -501,17 +478,13 @@ type: keyword
 
 
 **`zeek.files.source`**
-:   An identification of the source of the file data. E.g. it may be a network protocol
-over which it was transferred, or a local file path which was read, or some other
-input source.
+:   An identification of the source of the file data. E.g. it may be a network protocol over which it was transferred, or a local file path which was read, or some other input source.
 
 type: keyword
 
 
 **`zeek.files.depth`**
-:   A value to represent the depth of this file in relation to its source. In SMTP, it
-is the depth of the MIME attachment on the message. In HTTP, it is the depth of the
-request within the TCP connection.
+:   A value to represent the depth of this file in relation to its source. In SMTP, it is the depth of the MIME attachment on the message. In HTTP, it is the depth of the request within the TCP connection.
 
 type: long
 
@@ -535,15 +508,13 @@ type: keyword
 
 
 **`zeek.files.local_orig`**
-:   If the source of this file is a network connection, this field indicates if the data
-originated from the local network or not.
+:   If the source of this file is a network connection, this field indicates if the data originated from the local network or not.
 
 type: boolean
 
 
 **`zeek.files.is_orig`**
-:   If the source of this file is a network connection, this field indicates if the file is
-being sent by the originator of the connection or the responder.
+:   If the source of this file is a network connection, this field indicates if the file is being sent by the originator of the connection or the responder.
 
 type: boolean
 
@@ -567,15 +538,13 @@ type: long
 
 
 **`zeek.files.missing_bytes`**
-:   The number of bytes in the file stream that were completely missed during the process
-of analysis.
+:   The number of bytes in the file stream that were completely missed during the process of analysis.
 
 type: long
 
 
 **`zeek.files.overflow_bytes`**
-:   The number of bytes in the file stream that were not delivered to stream file analyzers.
-This could be overlapping bytes or bytes that couldn't be reassembled.
+:   The number of bytes in the file stream that were not delivered to stream file analyzers. This could be overlapping bytes or bytes that couldn't be reassembled.
 
 type: long
 
@@ -587,8 +556,7 @@ type: boolean
 
 
 **`zeek.files.parent_fuid`**
-:   Identifier associated with a container file from which this one was extracted as part of
-the file analysis.
+:   Identifier associated with a container file from which this one was extracted as part of the file analysis.
 
 type: keyword
 
@@ -678,8 +646,7 @@ type: keyword
 
 
 **`zeek.ftp.file.fuid`**
-:   (present if base/protocols/ftp/files.bro is loaded)
-File unique ID.
+:   (present if base/protocols/ftp/files.bro is loaded) File unique ID.
 
 type: keyword
 
@@ -774,8 +741,7 @@ type: boolean
 
 
 **`zeek.ftp.last_auth_requested`**
-:   present if base/protocols/ftp/gridftp.bro is loaded.
-Last authentication/security mechanism that was used.
+:   present if base/protocols/ftp/gridftp.bro is loaded. Last authentication/security mechanism that was used.
 
 type: keyword
 
@@ -810,8 +776,7 @@ type: keyword
 
 
 **`zeek.http.tags`**
-:   A set of indicators of various attributes discovered and related to a particular
-request/response pair.
+:   A set of indicators of various attributes discovered and related to a particular request/response pair.
 
 type: keyword
 
@@ -841,15 +806,13 @@ type: boolean
 
 
 **`zeek.http.client_header_names`**
-:   The vector of HTTP header names sent by the client. No header values
-are included here, just the header names.
+:   The vector of HTTP header names sent by the client. No header values are included here, just the header names.
 
 type: keyword
 
 
 **`zeek.http.server_header_names`**
-:   The vector of HTTP header names sent by the server. No header values
-are included here, just the header names.
+:   The vector of HTTP header names sent by the server. No header values are included here, just the header names.
 
 type: keyword
 
@@ -1030,29 +993,25 @@ type: keyword
 
 
 **`zeek.irc.dcc.file.name`**
-:   Present if base/protocols/irc/dcc-send.bro is loaded.
-DCC filename requested.
+:   Present if base/protocols/irc/dcc-send.bro is loaded. DCC filename requested.
 
 type: keyword
 
 
 **`zeek.irc.dcc.file.size`**
-:   Present if base/protocols/irc/dcc-send.bro is loaded.
-Size of the DCC transfer as indicated by the sender.
+:   Present if base/protocols/irc/dcc-send.bro is loaded. Size of the DCC transfer as indicated by the sender.
 
 type: long
 
 
 **`zeek.irc.dcc.mime_type`**
-:   present if base/protocols/irc/dcc-send.bro is loaded.
-Sniffed mime type of the file.
+:   present if base/protocols/irc/dcc-send.bro is loaded. Sniffed mime type of the file.
 
 type: keyword
 
 
 **`zeek.irc.fuid`**
-:   present if base/protocols/irc/files.bro is loaded.
-File unique ID.
+:   present if base/protocols/irc/files.bro is loaded. File unique ID.
 
 type: keyword
 
@@ -1206,8 +1165,7 @@ type: keyword
 
 
 **`zeek.modbus.track_address`**
-:   Present if policy/protocols/modbus/track-memmap.bro is loaded.
-Modbus track address.
+:   Present if policy/protocols/modbus/track-memmap.bro is loaded. Modbus track address.
 
 type: integer
 
@@ -1277,9 +1235,7 @@ type: keyword
 
 
 **`zeek.notice.file.source`**
-:   An identification of the source of the file data. E.g. it may be a network protocol
-over which it was transferred, or a local file path which was read, or some other
-input source.
+:   An identification of the source of the file data. E.g. it may be a network protocol over which it was transferred, or a local file path which was read, or some other input source.
 
 type: keyword
 
@@ -1291,8 +1247,7 @@ type: keyword
 
 
 **`zeek.notice.file.is_orig`**
-:   If the source of this file is a network connection, this field indicates if the file is
-being sent by the originator of the connection or the responder.
+:   If the source of this file is a network connection, this field indicates if the file is being sent by the originator of the connection or the responder.
 
 type: boolean
 
@@ -1310,15 +1265,13 @@ type: long
 
 
 **`zeek.notice.file.missing_bytes`**
-:   The number of bytes in the file stream that were completely missed during the process
-of analysis.
+:   The number of bytes in the file stream that were completely missed during the process of analysis.
 
 type: long
 
 
 **`zeek.notice.file.overflow_bytes`**
-:   The number of bytes in the file stream that were not delivered to stream file analyzers.
-This could be overlapping bytes or bytes that couldn't be reassembled.
+:   The number of bytes in the file stream that were not delivered to stream file analyzers. This could be overlapping bytes or bytes that couldn't be reassembled.
 
 type: long
 
@@ -1372,16 +1325,13 @@ type: keyword
 
 
 **`zeek.notice.email_body_sections`**
-:   By adding chunks of text into this element, other scripts can expand on notices
-that are being emailed.
+:   By adding chunks of text into this element, other scripts can expand on notices that are being emailed.
 
 type: text
 
 
 **`zeek.notice.email_delay_tokens`**
-:   Adding a string token to this set will cause the built-in emailing functionality
-to delay sending the email either the token has been removed or the email
-has been delayed for the specified time duration.
+:   Adding a string token to this set will cause the built-in emailing functionality to delay sending the email either the token has been removed or the email has been delayed for the specified time duration.
 
 type: keyword
 
@@ -1878,8 +1828,7 @@ type: boolean
 
 
 **`zeek.rdp.ssl`**
-:   (present if policy/protocols/rdp/indicate_ssl.bro is loaded)
-Flag the connection if it was seen over SSL.
+:   (present if policy/protocols/rdp/indicate_ssl.bro is loaded) Flag the connection if it was seen over SSL.
 
 type: boolean
 
@@ -2225,15 +2174,13 @@ type: ip
 
 
 **`zeek.smb_cmd.smb1_offered_dialects`**
-:   Present if base/protocols/smb/smb1-main.bro is loaded.
-Dialects offered by the client.
+:   Present if base/protocols/smb/smb1-main.bro is loaded. Dialects offered by the client.
 
 type: keyword
 
 
 **`zeek.smb_cmd.smb2_offered_dialects`**
-:   Present if base/protocols/smb/smb2-main.bro is loaded.
-Dialects offered by the client.
+:   Present if base/protocols/smb/smb2-main.bro is loaded. Dialects offered by the client.
 
 type: integer
 
@@ -2338,8 +2285,7 @@ type: keyword
 
 
 **`zeek.smb_mapping.share_type`**
-:   If this is SMB2, a share type will be included. For SMB1, the type of share
-will be deduced and included as well.
+:   If this is SMB2, a share type will be included. For SMB1, the type of share will be deduced and included as well.
 
 type: keyword
 
@@ -2476,8 +2422,7 @@ type: boolean
 
 
 **`zeek.smtp.fuids`**
-:   (present if base/protocols/smtp/files.bro is loaded)
-An ordered vector of file unique IDs seen attached to the message.
+:   (present if base/protocols/smtp/files.bro is loaded) An ordered vector of file unique IDs seen attached to the message.
 
 type: keyword
 
@@ -2622,9 +2567,7 @@ type: keyword
 
 
 **`zeek.ssh.direction`**
-:   Direction of the connection. If the client was a local host logging into
-an external host, this would be OUTBOUND. INBOUND would be set for the
-opposite situation.
+:   Direction of the connection. If the client was a local host logging into an external host, this would be OUTBOUND. INBOUND would be set for the opposite situation.
 
 type: keyword
 
@@ -2684,10 +2627,7 @@ type: keyword
 
 
 **`zeek.ssh.auth.attempts`**
-:   The number of authentication attemps we observed. There's always at
-least one, since some servers might support no authentication at all.
-It's important to note that not all of these are failures, since some
-servers require two-factor auth (e.g. password AND pubkey).
+:   The number of authentication attemps we observed. There's always at least one, since some servers might support no authentication at all. It's important to note that not all of these are failures, since some servers require two-factor auth (e.g. password AND pubkey).
 
 type: integer
 
@@ -2722,8 +2662,7 @@ type: keyword
 
 
 **`zeek.ssl.resumed`**
-:   Flag to indicate if the session was resumed reusing the key material exchanged in an
-earlier connection.
+:   Flag to indicate if the session was resumed reusing the key material exchanged in an earlier connection.
 
 type: boolean
 
@@ -2761,8 +2700,7 @@ type: keyword
 
 
 **`zeek.ssl.server.name`**
-:   Value of the Server Name Indicator SSL/TLS extension. It indicates the server name
-that the client was requesting.
+:   Value of the Server Name Indicator SSL/TLS extension. It indicates the server name that the client was requesting.
 
 type: keyword
 
@@ -3420,8 +3358,7 @@ type: integer
 
 
 **`zeek.x509.log_cert`**
-:   Present if policy/protocols/ssl/log-hostcerts-only.bro is loaded
-Logging of certificate is suppressed if set to F.
+:   Present if policy/protocols/ssl/log-hostcerts-only.bro is loaded Logging of certificate is suppressed if set to F.
 
 type: boolean
 

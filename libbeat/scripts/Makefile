@@ -354,7 +354,7 @@ endif
 ifneq ($(shell [[ $(BEAT_NAME) == libbeat || $(BEAT_NAME) == metricbeat ]] && echo true ),true)
 	@# Update docs
 	@mkdir -p docs
-	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS}
+	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/generate_fields_docs.py $(PWD)/fields.yml ${BEAT_TITLE} ${ES_BEATS} --output_path $(ES_BEATS)/docs/reference/${BEAT_TITLE}
 endif
 
 	@mkdir -p $(PWD)/_meta/kibana.generated

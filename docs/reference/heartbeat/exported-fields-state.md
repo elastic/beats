@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-state.html
+  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-state.html
 ---
 
 # Monitor state fields [exported-fields-state]

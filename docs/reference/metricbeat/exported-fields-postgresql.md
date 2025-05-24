@@ -99,17 +99,7 @@ type: boolean
 
 
 **`postgresql.activity.state`**
-:   Current overall state of this backend. Possible values are:
-
-  * active: The backend is executing a query.
-  * idle: The backend is waiting for a new client command.
-  * idle in transaction: The backend is in a transaction, but is not
-    currently executing a query.
-  * idle in transaction (aborted): This state is similar to idle in
-    transaction, except one of the statements in the transaction caused
-    an error.
-  * fastpath function call: The backend is executing a fast-path function.
-  * disabled: This state is reported if track_activities is disabled in this backend.
+:   Current overall state of this backend. Possible values are:   * active: The backend is executing a query.   * idle: The backend is waiting for a new client command.   * idle in transaction: The backend is in a transaction, but is not     currently executing a query.   * idle in transaction (aborted): This state is similar to idle in     transaction, except one of the statements in the transaction caused     an error.   * fastpath function call: The backend is executing a fast-path function.   * disabled: This state is reported if track_activities is disabled in this backend.
 
 
 **`postgresql.activity.query`**

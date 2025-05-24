@@ -857,8 +857,6 @@ type: long
 
 
 **`redis.keyspace.expires`**
-:   
-
-type: long
+:   type: long
 
 

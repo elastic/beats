@@ -87,12 +87,12 @@ func (docsBuilder) FieldDocs(fieldsYML string) error {
 	outputPath := filepath.Join(DocsDir(), "reference", BeatName)
 
 	// TODO: Port this script to Go.
-	log.Println(">> Generating docs/fields.asciidoc for", BeatName)
+	log.Println(">> Generating exported-fields.md for", BeatName)
 	return sh.Run(python, LibbeatDir("scripts/generate_fields_docs.py"),
 		fieldsYML,                   // Path to fields.yml.
 		BeatName,                    // Beat title.
 		esBeats,                     // Path to general beats folder.
-		"--output_path", outputPath) // It writes to {output_path}/docs/fields.asciidoc.
+		"--output_path", outputPath) // It writes to {output_path}/exported-fields.md.
 }
 
 func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {

@@ -410,17 +410,13 @@ Young GC
 
 
 **`elasticsearch.server.gc.young.one`**
-:   
-
-type: long
+:   type: long
 
 example: 
 
 
 **`elasticsearch.server.gc.young.two`**
-:   
-
-type: long
+:   type: long
 
 example: 
 
