@@ -203,6 +203,30 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 	}
 }
 
+func TestDurationIsAddedToEvent(t *testing.T) {
+	hosts := []string{"alpha"}
+	config := newConfig(t, map[string]interface{}{
+		"module":     moduleName,
+		"metricsets": []string{reportingFetcherName},
+		"hosts":      hosts,
+	})
+
+	registry := newTestRegistry(t)
+	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), module.WithMetricSetInfo())
+	require.NoError(t, err)
+
+	done := make(chan struct{})
+	defer close(done)
+
+	output := m.Start(done)
+
+	event := <-output
+
+	fields := event.Fields.Flatten()
+	assert.Contains(t, fields, "event.duration", "event.duration should be present in event")
+	assert.Greater(t, fields["event.duration"], time.Duration(0), "event.duration should be greater than 0")
+}
+
 func TestNewWrapperForMetricSet(t *testing.T) {
 	hosts := []string{"alpha"}
 	c := newConfig(t, map[string]interface{}{
