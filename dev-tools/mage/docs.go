@@ -66,7 +66,7 @@ func DocsIndexFile(file string) DocsOption {
 // Docs holds the utilities for building documentation.
 var Docs = docsBuilder{}
 
-// FieldDocs generates docs/fields.asciidoc from the specified fields.yml file.
+// FieldDocs generates exported-fields.md from the specified fields.yml file.
 func (docsBuilder) FieldDocs(fieldsYML string) error {
 	// Run the docs_collector.py script.
 	ve, err := PythonVirtualenv(false)
