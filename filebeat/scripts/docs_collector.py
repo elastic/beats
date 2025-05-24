@@ -42,9 +42,6 @@ def collect(beat_name):
 
         module_file = generated_note
 
-        # module_file += ":edit_url: https://github.com/elastic/beats/edit/main/" + module_rel_path + "/_meta/docs.asciidoc\n\n"
-
-        # module_file += "[[filebeat-module-" + module + "]]\n"
         module_file += """---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-{}.html
@@ -68,7 +65,8 @@ For a description of each field in the module, see the [exported fields](/refere
 """.format(module)
 
         # Write module docs
-        docs_path = os.path.join(os.path.abspath("../docs"), "reference/filebeat", "filebeat-module-{}.md".format(module))
+        docs_path = os.path.join(os.path.abspath("../docs"), "reference/filebeat",
+                                 "filebeat-module-{}.md".format(module))
         with open(docs_path, 'w', encoding='utf_8') as f:
             f.write(module_file)
 

@@ -32,7 +32,7 @@ def collect(base_paths):
 
         module_doc = os.path.join(module_dir, "_meta/docs.md")
 
-        # Only check folders where docs.asciidoc exists
+        # Only check folders where docs.md exists
         if os.path.isfile(module_doc) == False:
             continue
 
@@ -42,7 +42,6 @@ def collect(base_paths):
         with open(beat_path + "/fields.yml") as f:
             fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
-
 
         module_file = """---
 mapped_pages:
