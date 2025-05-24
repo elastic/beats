@@ -74,7 +74,7 @@ def document_field(output, field, field_path):
 
     if "description" in field and field["description"] is not None and len(field["description"].strip()) > 0:
         output.write("{}".format(" ".join(x for x in field["description"].split("\n") if x)).strip()+"\n\n")
-    
+
     if "deprecated" in field:
         output.write("deprecated:[{}]\n\n".format(field["deprecated"]))
 
@@ -172,7 +172,8 @@ This document describes the fields that are exported by {title}. They are groupe
             section["anchor"] = section["key"]
 
         if "skipdocs" not in section:
-            output.write("* [*{} fields*](/reference/{}/exported-fields-{}.md)\n".format(section["title"], beat, section["anchor"]))
+            output.write(
+                "* [*{} fields*](/reference/{}/exported-fields-{}.md)\n".format(section["title"], beat, section["anchor"]))
     output.close()
     # Sort alphabetically by key
     for section in sorted(docs, key=lambda field: field["key"]):
@@ -181,7 +182,8 @@ This document describes the fields that are exported by {title}. They are groupe
             section["anchor"] = section["key"]
         if "fields" not in section or not section["fields"]:
             continue
-        output_fields = open(os.path.join(output_path, "exported-fields-{}.md".format(section["anchor"])), 'w', encoding='utf-8')
+        output_fields = open(os.path.join(
+            output_path, "exported-fields-{}.md".format(section["anchor"])), 'w', encoding='utf-8')
         document_fields(output_fields, section, sections, "", beat)
 
 
@@ -205,6 +207,5 @@ if __name__ == "__main__":
     # Read fields.yml
     with open(fields_yml, encoding='utf-8') as f:
         fields = f.read()
-
 
     fields_to_asciidoc(fields, args.output_path, beat_title)
