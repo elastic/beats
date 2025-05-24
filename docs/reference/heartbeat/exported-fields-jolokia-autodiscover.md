@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-jolokia-autodiscover.html
+  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-jolokia-autodiscover.html
 ---
 
 # Jolokia Discovery autodiscover provider fields [exported-fields-jolokia-autodiscover]

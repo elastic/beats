@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-beat-common.html
+  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-beat-common.html
 ---
 
 # Beat fields [exported-fields-beat-common]

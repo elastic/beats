@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-summary.html
+  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-summary.html
 ---
 
 # Monitor summary fields [exported-fields-summary]

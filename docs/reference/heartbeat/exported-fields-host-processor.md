@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-host-processor.html
+  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-host-processor.html
 ---
 
 # Host fields [exported-fields-host-processor]

@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-service.html
+  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-service.html
 ---
 
 # APM Service fields [exported-fields-service]

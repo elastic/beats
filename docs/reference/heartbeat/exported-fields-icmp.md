@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-icmp.html
+  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-icmp.html
 ---
 
 # ICMP fields [exported-fields-icmp]

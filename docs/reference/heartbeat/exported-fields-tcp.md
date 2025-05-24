@@ -1,6 +1,6 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/Heartbeat/current/exported-fields-tcp.html
+  - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-tcp.html
 ---
 
 # TCP layer fields [exported-fields-tcp]
