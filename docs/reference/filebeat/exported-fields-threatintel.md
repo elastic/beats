@@ -7,8 +7,6 @@ mapped_pages:
 
 Threat intelligence Filebeat Module.
 
-
-
 **`threat.indicator.file.hash.tlsh`**
 :   The file's import tlsh, if available.
 
@@ -32,7 +30,6 @@ type: keyword
 ## abusech.malware [_abusech.malware]
 
 Fields for AbuseCH Malware Threat Intel
-
 
 **`abusech.malware.file_type`**
 :   File type guessed by URLhaus.
@@ -73,7 +70,6 @@ type: keyword
 ## abusech.url [_abusech.url]
 
 Fields for AbuseCH Malware Threat Intel
-
 
 **`abusech.url.id`**
 :   The ID of the url.
@@ -132,7 +128,6 @@ type: keyword
 ## anomali.limo [_anomali.limo]
 
 Fields for Anomali Threat Intel
-
 
 **`anomali.limo.id`**
 :   The ID of the indicator.
@@ -209,7 +204,6 @@ type: keyword
 ## anomali.threatstream [_anomali.threatstream]
 
 Fields for Anomali ThreatStream
-
 
 **`anomali.threatstream.classification`**
 :   Indicates whether an indicator is private or from a public feed and available publicly. Possible values: private, public.
@@ -325,7 +319,6 @@ type: keyword
 
 Fields for Malware Bazaar Threat Intel
 
-
 **`abusech.malwarebazaar.file_type`**
 :   File type guessed by Malware Bazaar.
 
@@ -344,7 +337,6 @@ type: keyword
 type: keyword
 
 
-
 **`abusech.malwarebazaar.intelligence.downloads`**
 :   Number of downloads from MalwareBazaar.
 
@@ -355,7 +347,6 @@ type: long
 :   Number of uploads from MalwareBazaar.
 
 type: long
-
 
 
 **`abusech.malwarebazaar.intelligence.mail.Generic`**
@@ -385,7 +376,6 @@ type: nested
 ## misp [_misp]
 
 Fields for MISP Threat Intel
-
 
 **`misp.id`**
 :   Attribute ID.
@@ -721,7 +711,6 @@ type: keyword
 
 Fields for OTX Threat Intel
 
-
 **`otx.id`**
 :   The ID of the indicator.
 
@@ -761,7 +750,6 @@ type: keyword
 ## threatq [_threatq]
 
 Fields for ThreatQ Threat Library
-
 
 **`threatq.updated_at`**
 :   Last modification time

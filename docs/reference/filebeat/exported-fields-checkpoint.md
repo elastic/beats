@@ -7,11 +7,9 @@ mapped_pages:
 
 Some checkpoint module
 
-
 ## checkpoint [_checkpoint]
 
 Module for parsing Checkpoint syslog.
-
 
 **`checkpoint.confidence_level`**
 :   Confidence level determined by ThreatCloud.

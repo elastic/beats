@@ -7,9 +7,7 @@ mapped_pages:
 
 Redis metrics collected from Redis Enterprise Server.
 
-
 ## redisenterprise [_redisenterprise]
 
 `redisenterprise` contains the information and statistics from Redis Enterprise Server.
-
 

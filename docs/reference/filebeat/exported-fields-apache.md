@@ -7,16 +7,13 @@ mapped_pages:
 
 Apache Module
 
-
 ## apache [_apache]
 
 Apache fields.
 
-
 ## access [_access]
 
 Contains fields for the Apache HTTP Server access logs.
-
 
 **`apache.access.ssl.protocol`**
 :   SSL protocol version.
@@ -33,7 +30,6 @@ type: keyword
 ## error [_error]
 
 Fields from the Apache error logs.
-
 
 **`apache.error.module`**
 :   The module producing the logged message.

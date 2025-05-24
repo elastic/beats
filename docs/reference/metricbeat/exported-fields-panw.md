@@ -7,26 +7,20 @@ mapped_pages:
 
 PAN-OS module
 
-
 ## panw [_panw]
 
 PAN-OS module
 
-
-
 **`panw.interfaces.example`**
 :   type: keyword
-
 
 
 **`panw.routing.example`**
 :   type: keyword
 
 
-
 **`panw.system.example`**
 :   type: keyword
-
 
 
 **`panw.vpn.example`**

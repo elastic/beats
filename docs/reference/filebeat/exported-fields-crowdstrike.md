@@ -7,16 +7,13 @@ mapped_pages:
 
 Module for collecting Crowdstrike events.
 
-
 ## crowdstrike [_crowdstrike]
 
 Fields for Crowdstrike Falcon event and alert data.
 
-
 ## metadata [_metadata]
 
 Meta data fields for each event that include type and timestamp.
-
 
 **`crowdstrike.metadata.eventType`**
 :   DetectionSummaryEvent, FirewallMatchEvent, IncidentSummaryEvent, RemoteResponseSessionStartEvent, RemoteResponseSessionEndEvent, AuthActivityAuditEvent, or UserActivityAuditEvent
@@ -51,7 +48,6 @@ type: keyword
 ## event [_event]
 
 Event data fields for each event and alert.
-
 
 **`crowdstrike.event.ProcessStartTime`**
 :   The process start time in UTC UNIX_MS format.

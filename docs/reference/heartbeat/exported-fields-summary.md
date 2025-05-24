@@ -7,11 +7,9 @@ mapped_pages:
 
 None
 
-
 ## summary [_summary]
 
 Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`.
-
 
 **`summary.up`**
 :   The number of endpoints that succeeded

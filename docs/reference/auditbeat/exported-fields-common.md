@@ -7,11 +7,9 @@ mapped_pages:
 
 Contains common fields available in all event types.
 
-
 ## file [_file]
 
 File attributes.
-
 
 **`file.setuid`**
 :   Set if the file has the `setuid` bit set. Omitted otherwise.
@@ -45,7 +43,6 @@ type: text
 
 The SELinux identity of the file.
 
-
 **`file.selinux.user`**
 :   The owner of the object.
 
@@ -76,11 +73,9 @@ example: s0
 
 User information.
 
-
 ## audit [_audit]
 
 Audit user information.
-
 
 **`user.audit.id`**
 :   Audit user ID.
@@ -98,7 +93,6 @@ type: keyword
 
 Filesystem user information.
 
-
 **`user.filesystem.id`**
 :   Filesystem user ID.
 
@@ -114,7 +108,6 @@ type: keyword
 ## group [_group]
 
 Filesystem group information.
-
 
 **`user.filesystem.group.id`**
 :   Filesystem group ID.
@@ -132,7 +125,6 @@ type: keyword
 
 Saved user information.
 
-
 **`user.saved.id`**
 :   Saved user ID.
 
@@ -148,7 +140,6 @@ type: keyword
 ## group [_group]
 
 Saved group information.
-
 
 **`user.saved.group.id`**
 :   Saved group ID.

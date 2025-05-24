@@ -7,8 +7,6 @@ mapped_pages:
 
 DNS-specific event fields.
 
-
-
 **`dns.flags.authoritative`**
 :   A DNS flag specifying that the responding server is an authority for the domain name used in the question.
 

@@ -7,16 +7,13 @@ mapped_pages:
 
 Redis Module
 
-
 ## redis [_redis]
-
 
 
 
 ## log [_log]
 
 Redis log files
-
 
 **`redis.log.role`**
 :   The role of the Redis instance. Can be one of `master`, `slave`, `child` (for RDF/AOF writing child), or `sentinel`.
@@ -45,7 +42,6 @@ alias to: message
 ## slowlog [_slowlog]
 
 Slow logs are retrieved from Redis via a network connection.
-
 
 **`redis.slowlog.cmd`**
 :   The command executed.

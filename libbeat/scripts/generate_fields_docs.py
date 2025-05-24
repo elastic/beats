@@ -46,7 +46,6 @@ See the [ECS reference](ecs://reference/index.md) for more information.
     if "fields" not in section or not section["fields"]:
         return
 
-    output.write("\n")
     for field in section["fields"]:
         if "description" in field and field["description"] is None:
             field["description"] = "None"

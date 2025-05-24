@@ -7,16 +7,13 @@ mapped_pages:
 
 Memcached module
 
-
 ## memcached [_memcached]
-
 
 
 
 ## stats [_stats]
 
 stats
-
 
 **`memcached.stats.pid`**
 :   Current process ID of the Memcached task.

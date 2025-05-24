@@ -7,16 +7,13 @@ mapped_pages:
 
 graphite Module
 
-
 ## graphite [_graphite]
-
 
 
 
 ## server [_server]
 
 server
-
 
 **`graphite.server.example`**
 :   Example field

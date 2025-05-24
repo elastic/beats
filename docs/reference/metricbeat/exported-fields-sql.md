@@ -7,8 +7,6 @@ mapped_pages:
 
 SQL module fetches metrics from a SQL database
 
-
-
 **`sql.driver`**
 :   Driver used to execute the query.
 

@@ -7,9 +7,7 @@ mapped_pages:
 
 Aerospike module
 
-
 ## aerospike [_aerospike]
-
 
 
 
@@ -17,16 +15,13 @@ Aerospike module
 
 namespace
 
-
 ## client [_client]
 
 Client stats.
 
-
 ## delete [_delete]
 
 Client delete transactions stats.
-
 
 **`aerospike.namespace.client.delete.error`**
 :   Number of client delete transactions that failed with an error.
@@ -56,7 +51,6 @@ type: long
 
 Client read transactions stats.
 
-
 **`aerospike.namespace.client.read.error`**
 :   Number of client read transaction errors.
 
@@ -85,7 +79,6 @@ type: long
 
 Client write transactions stats.
 
-
 **`aerospike.namespace.client.write.error`**
 :   Number of client write transactions that failed with an error.
 
@@ -107,7 +100,6 @@ type: long
 ## device [_device]
 
 Disk storage stats
-
 
 **`aerospike.namespace.device.available.pct`**
 :   Measures the minimum contiguous disk space across all disks in a namespace.
@@ -150,7 +142,6 @@ type: boolean
 ## memory [_memory]
 
 Memory storage stats.
-
 
 **`aerospike.namespace.memory.free.pct`**
 :   Percentage of memory capacity free for this namespace on this node.
@@ -213,7 +204,6 @@ type: keyword
 ## objects [_objects]
 
 Records stats.
-
 
 **`aerospike.namespace.objects.master`**
 :   Number of records on this node which are active masters.

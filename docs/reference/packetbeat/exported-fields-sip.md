@@ -7,11 +7,9 @@ mapped_pages:
 
 SIP-specific event fields.
 
-
 ## sip [_sip]
 
 Information about SIP traffic.
-
 
 **`sip.code`**
 :   Response status code.

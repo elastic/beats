@@ -7,16 +7,13 @@ mapped_pages:
 
 openai module
 
-
 ## openai [_openai]
-
 
 
 
 ## usage [_usage]
 
 OpenAI API usage metrics and statistics
-
 
 **`openai.usage.organization_id`**
 :   Organization identifier
@@ -70,7 +67,6 @@ type: keyword
 
 General usage data metrics
 
-
 **`openai.usage.data.requests_total`**
 :   Number of requests made
 
@@ -123,7 +119,6 @@ type: keyword
 
 DALL-E API usage metrics
 
-
 **`openai.usage.dalle.num_images`**
 :   Number of images generated
 
@@ -164,7 +159,6 @@ type: keyword
 
 Whisper API usage metrics
 
-
 **`openai.usage.whisper.model_id`**
 :   Model identifier
 
@@ -192,7 +186,6 @@ type: keyword
 ## tts [_tts]
 
 Text-to-Speech API usage metrics
-
 
 **`openai.usage.tts.model_id`**
 :   Model identifier
@@ -222,7 +215,6 @@ type: keyword
 
 Fine-tuning data metrics
 
-
 **`openai.usage.ft_data.original`**
 :   Raw fine-tuning data
 
@@ -233,7 +225,6 @@ type: object
 
 Assistant Code Interpreter usage metrics
 
-
 **`openai.usage.assistant_code_interpreter.original`**
 :   Raw assistant code interpreter data
 
@@ -243,7 +234,6 @@ type: object
 ## retrieval_storage [_retrieval_storage]
 
 Retrieval storage usage metrics
-
 
 **`openai.usage.retrieval_storage.original`**
 :   Raw retrieval storage data

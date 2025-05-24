@@ -7,11 +7,9 @@ mapped_pages:
 
 None
 
-
 ## resolve [_resolve]
 
 Host lookup fields.
-
 
 **`resolve.host`**
 :   Hostname of service being monitored.
@@ -30,7 +28,6 @@ type: ip
 ## rtt [_rtt]
 
 Duration required to resolve an IP from hostname.
-
 
 **`resolve.rtt.us`**
 :   Duration in microseconds

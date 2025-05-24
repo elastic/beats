@@ -7,17 +7,13 @@ mapped_pages:
 
 vSphere module
 
-
 ## vsphere [_vsphere]
-
 
 
 
 ## cluster [_cluster]
 
 Cluster information.
-
-
 
 **`vsphere.cluster.datastore.names`**
 :   List of all the datastore names associated with the cluster.
@@ -31,7 +27,6 @@ type: keyword
 type: long
 
 
-
 **`vsphere.cluster.das_config.admission.control.enabled`**
 :   Indicates whether strict admission control is enabled.
 
@@ -42,7 +37,6 @@ type: boolean
 :   Indicates whether vSphere HA feature is enabled.
 
 type: boolean
-
 
 
 **`vsphere.cluster.host.count`**
@@ -69,7 +63,6 @@ type: keyword
 type: keyword
 
 
-
 **`vsphere.cluster.network.count`**
 :   Number of networks associated with the cluster.
 
@@ -91,7 +84,6 @@ type: object
 ## datastore [_datastore]
 
 datastore
-
 
 **`vsphere.datastore.capacity.free.bytes`**
 :   Free bytes of the datastore.
@@ -223,7 +215,6 @@ format: bytes
 
 Datastore Cluster
 
-
 **`vsphere.datastorecluster.id`**
 :   Unique datastore cluster ID.
 
@@ -273,7 +264,6 @@ type: object
 ## host [_host]
 
 Host information from vSphere environment.
-
 
 **`vsphere.host.cpu.used.mhz`**
 :   Used CPU in MHz.
@@ -527,7 +517,6 @@ type: long
 
 Network-related information.
 
-
 **`vsphere.network.accessible`**
 :   Indicates whether at least one host is configured to provide this network.
 
@@ -538,7 +527,6 @@ type: boolean
 :   Indicates whether the system has detected a configuration issue.
 
 type: keyword
-
 
 
 **`vsphere.network.host.names`**
@@ -577,7 +565,6 @@ type: keyword
 type: keyword
 
 
-
 **`vsphere.network.vm.names`**
 :   Names of the virtual machines connected to this network.
 
@@ -600,8 +587,6 @@ type: object
 
 Resource pool information from vSphere environment.
 
-
-
 **`vsphere.resourcepool.cpu.usage.mhz`**
 :   Basic CPU performance statistics, in MHz.
 
@@ -612,7 +597,6 @@ type: long
 :   Basic CPU performance statistics, in MHz.
 
 type: long
-
 
 
 **`vsphere.resourcepool.cpu.entitlement.mhz`**
@@ -633,8 +617,6 @@ type: long
 type: keyword
 
 
-
-
 **`vsphere.resourcepool.memory.usage.guest.bytes`**
 :   Guest memory utilization statistics, in bytes.
 
@@ -649,7 +631,6 @@ format: bytes
 type: long
 
 format: bytes
-
 
 
 **`vsphere.resourcepool.memory.entitlement.bytes`**
@@ -700,7 +681,6 @@ type: long
 format: bytes
 
 
-
 **`vsphere.resourcepool.memory.overhead.bytes`**
 :   The amount of memory resource (in bytes) that will be used by a virtual machine above its guest memory requirements.
 
@@ -737,7 +717,6 @@ type: keyword
 type: keyword
 
 
-
 **`vsphere.resourcepool.vm.count`**
 :   Number of virtual machines on the resource pool.
 
@@ -759,8 +738,6 @@ type: object
 ## virtualmachine [_virtualmachine]
 
 virtualmachine
-
-
 
 **`vsphere.virtualmachine.host.id`**
 :   Host id.
@@ -854,7 +831,6 @@ type: object
 type: keyword
 
 
-
 **`vsphere.virtualmachine.datastore.names`**
 :   Names of the datastore associated to this virtualmachine.
 
@@ -865,7 +841,6 @@ type: keyword
 :   Number of datastores associated to this virtualmachine.
 
 type: long
-
 
 
 **`vsphere.virtualmachine.network.names`**
@@ -890,7 +865,6 @@ type: keyword
 :   The uptime of the VM in seconds.
 
 type: long
-
 
 
 **`vsphere.virtualmachine.snapshot.info.*`**

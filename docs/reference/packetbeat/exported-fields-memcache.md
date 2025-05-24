@@ -7,8 +7,6 @@ mapped_pages:
 
 Memcached-specific event fields
 
-
-
 **`memcache.protocol_type`**
 :   The memcache protocol implementation. The value can be "binary" for binary-based, "text" for text-based, or "unknown" for an unknown memcache protocol type.
 

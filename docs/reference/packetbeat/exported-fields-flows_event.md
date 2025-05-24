@@ -7,7 +7,6 @@ mapped_pages:
 
 These fields contain data about the flow itself.
 
-
 **`flow.final`**
 :   Indicates if event is last event in flow. If final is false, the event reports an intermediate flow state only.
 

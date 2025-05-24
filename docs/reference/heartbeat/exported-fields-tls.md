@@ -7,11 +7,9 @@ mapped_pages:
 
 None
 
-
 ## tls [_tls]
 
 TLS layer related fields.
-
 
 **`tls.certificate_not_valid_before`**
 :   Deprecated in favor of `tls.server.x509.not_before`. Earliest time at which the connection's certificates are valid.
@@ -33,11 +31,9 @@ type: date
 
 TLS layer round trip times.
 
-
 ## handshake [_handshake]
 
 Time required to finish TLS handshake based on already available network connection.
-
 
 **`tls.rtt.handshake.us`**
 :   Duration in microseconds
@@ -48,7 +44,6 @@ type: long
 ## server [_server]
 
 Detailed x509 certificate metadata
-
 
 **`tls.server.version_number`**
 :   Version of x509 format.

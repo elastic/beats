@@ -7,11 +7,9 @@ mapped_pages:
 
 None
 
-
 ## tcp [_tcp]
 
 TCP network layer related fields.
-
 
 **`tcp.port`**
 :   Service port number.
@@ -25,11 +23,9 @@ alias to: url.port
 
 TCP layer round trip times.
 
-
 ## connect [_connect]
 
 Duration required to establish a TCP connection based on already available IP address.
-
 
 **`tcp.rtt.connect.us`**
 :   Duration in microseconds
@@ -40,7 +36,6 @@ type: long
 ## validate [_validate]
 
 Duration of validation step based on existing TCP connection.
-
 
 **`tcp.rtt.validate.us`**
 :   Duration in microseconds

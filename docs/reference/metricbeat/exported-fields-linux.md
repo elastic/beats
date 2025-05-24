@@ -7,21 +7,17 @@ mapped_pages:
 
 linux module
 
-
 ## linux [_linux]
 
 linux system metrics
-
 
 ## conntrack [_conntrack]
 
 conntrack
 
-
 ## summary [_summary]
 
 summary of nf_conntrack statistics, summed across CPU cores
-
 
 **`linux.conntrack.summary.drop`**
 :   packets dropped due to conntrack failiure
@@ -74,7 +70,6 @@ type: long
 ## iostat [_iostat]
 
 iostat
-
 
 **`linux.iostat.read.request.merges_per_sec`**
 :   The number of read requests merged per second that were queued to the device.
@@ -162,11 +157,9 @@ type: float
 
 ksm
 
-
 ## stats [_stats]
 
 KSM statistics
-
 
 **`linux.ksm.stats.pages_shared`**
 :   Shared pages in use.
@@ -208,11 +201,9 @@ type: long
 
 Linux memory data
 
-
 ## page_stats [_page_stats]
 
 memory page statistics
-
 
 **`linux.memory.page_stats.pgscan_kswapd.pages`**
 :   pages scanned by kswapd
@@ -274,7 +265,6 @@ format: percent
 
 This group contains statistics related to huge pages usage on the system.
 
-
 **`linux.memory.hugepages.total`**
 :   Number of huge pages in the pool.
 
@@ -334,7 +324,6 @@ format: bytes
 ## swap [_swap]
 
 This group contains statistics related to the swap memory usage on the system.
-
 
 **`linux.memory.swap.total`**
 :   Total swap memory.
@@ -396,16 +385,13 @@ type: long
 
 pageinfo
 
-
 ## buddy_info [_buddy_info]
 
 Data from /proc/buddyinfo grouping used pages by order
 
-
 ## DMA [_DMA]
 
 DMA page Data
-
 
 **`linux.pageinfo.buddy_info.DMA.0`**
 :   free chunks of 2^0*PAGE_SIZE
@@ -482,7 +468,6 @@ type: object
 ## pressure [_pressure]
 
 Linux pressure stall information metrics for cpu, memory, and io
-
 
 **`linux.pressure.cpu.some.10.pct`**
 :   The average share of time in which at least some tasks were stalled on CPU over a ten second window.
@@ -637,7 +622,6 @@ type: long
 ## rapl [_rapl]
 
 Wattage as reported by Intel RAPL
-
 
 **`linux.rapl.core`**
 :   The core where the RAPL request originated from. Only one core is queried per hardware CPU.

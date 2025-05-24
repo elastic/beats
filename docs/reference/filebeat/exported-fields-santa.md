@@ -7,9 +7,7 @@ mapped_pages:
 
 Santa Module
 
-
 ## santa [_santa]
-
 
 
 
@@ -48,7 +46,6 @@ example: M
 ## disk [_disk]
 
 Fields for DISKAPPEAR actions.
-
 
 **`santa.disk.volume`**
 :   The volume name.

@@ -7,8 +7,6 @@ mapped_pages:
 
 MySQL-specific event fields.
 
-
-
 **`mysql.affected_rows`**
 :   If the MySQL command is successful, this field contains the affected number of rows of the last statement.
 

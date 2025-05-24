@@ -7,7 +7,6 @@ mapped_pages:
 
 S3 fields from s3 input.
 
-
 **`bucket.name`**
 :   Name of the S3 bucket that this log retrieved from.
 

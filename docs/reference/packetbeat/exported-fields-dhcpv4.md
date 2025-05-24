@@ -7,8 +7,6 @@ mapped_pages:
 
 DHCPv4 event fields
 
-
-
 **`dhcpv4.transaction_id`**
 :   Transaction ID, a random number chosen by the client, used by the client and server to associate messages and responses between a client and a server.
 
@@ -81,7 +79,6 @@ type: long
 :   The type of hardware used for the local network (Ethernet, LocalTalk, etc).
 
 type: keyword
-
 
 
 **`dhcpv4.option.message_type`**

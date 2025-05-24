@@ -7,7 +7,6 @@ mapped_pages:
 
 Cassandra v4/3 specific event fields.
 
-
 **`no_request`**
 :   type: alias
 
@@ -17,7 +16,6 @@ alias to: cassandra.no_request
 ## cassandra [_cassandra]
 
 Information about the Cassandra request and response.
-
 
 **`cassandra.no_request`**
 :   Indicates that there is no request because this is a PUSH message.
@@ -29,11 +27,9 @@ type: boolean
 
 Cassandra request.
 
-
 ## headers [_headers]
 
 Cassandra request headers.
-
 
 **`cassandra.request.headers.version`**
 :   The version of the protocol.
@@ -75,11 +71,9 @@ type: keyword
 
 Cassandra response.
 
-
 ## headers [_headers]
 
 Cassandra response headers, the structure is as same as request's header.
-
 
 **`cassandra.response.headers.version`**
 :   The version of the protocol.
@@ -115,7 +109,6 @@ type: long
 
 Details about the returned result.
 
-
 **`cassandra.response.result.type`**
 :   Cassandra result type.
 
@@ -126,7 +119,6 @@ type: keyword
 
 Details about the rows.
 
-
 **`cassandra.response.result.rows.num_rows`**
 :   Representing the number of rows present in this result.
 
@@ -136,7 +128,6 @@ type: long
 ## meta [_meta]
 
 Composed of result metadata.
-
 
 **`cassandra.response.result.rows.meta.keyspace`**
 :   Only present after set Global_tables_spec, the keyspace name.
@@ -184,7 +175,6 @@ type: keyword
 
 The result to a schema_change message.
 
-
 **`cassandra.response.result.schema_change.change`**
 :   Representing the type of changed involved.
 
@@ -231,7 +221,6 @@ type: keyword
 
 The result to a PREPARE message.
 
-
 **`cassandra.response.result.prepared.prepared_id`**
 :   Representing the prepared query ID.
 
@@ -241,7 +230,6 @@ type: keyword
 ## req_meta [_req_meta]
 
 This describes the request metadata.
-
 
 **`cassandra.response.result.prepared.req_meta.keyspace`**
 :   Only present after set Global_tables_spec, the keyspace name.
@@ -282,7 +270,6 @@ type: keyword
 ## resp_meta [_resp_meta]
 
 This describes the metadata for the result set.
-
 
 **`cassandra.response.result.prepared.resp_meta.keyspace`**
 :   Only present after set Global_tables_spec, the keyspace name.
@@ -330,7 +317,6 @@ type: object
 
 Indicates that the server requires authentication, and which authentication mechanism to use.
 
-
 **`cassandra.response.authentication.class`**
 :   Indicates the full class name of the IAuthenticator in use
 
@@ -346,7 +332,6 @@ type: keyword
 ## event [_event]
 
 Event pushed by the server. A client will only receive events for the types it has REGISTERed to.
-
 
 **`cassandra.response.event.type`**
 :   Representing the event type.
@@ -375,7 +360,6 @@ type: long
 ## schema_change [_schema_change]
 
 The events details related to schema change.
-
 
 **`cassandra.response.event.schema_change.change`**
 :   Representing the type of changed involved.
@@ -423,7 +407,6 @@ type: keyword
 
 Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
 
-
 **`cassandra.response.error.code`**
 :   The error code of the Cassandra response.
 
@@ -445,7 +428,6 @@ type: keyword
 ## details [_details]
 
 The details of the error.
-
 
 **`cassandra.response.error.details.read_consistency`**
 :   Representing the consistency level of the query that triggered the exception.

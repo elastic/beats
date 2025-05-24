@@ -7,16 +7,13 @@ mapped_pages:
 
 pensando Module
 
-
 ## pensando [_pensando]
 
 Fields from Pensando logs.
 
-
 ## dfw [_dfw]
 
 Fields for Pensando DFW
-
 
 **`pensando.dfw.action`**
 :   Action on the flow.

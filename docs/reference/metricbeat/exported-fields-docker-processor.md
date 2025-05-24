@@ -7,8 +7,6 @@ mapped_pages:
 
 Docker stats collected from Docker.
 
-
-
 **`docker.container.id`**
 :   type: alias
 

@@ -7,16 +7,13 @@ mapped_pages:
 
 Kafka module
 
-
 ## kafka [_kafka]
-
 
 
 
 ## log [_log]
 
 Kafka log lines.
-
 
 **`kafka.log.component`**
 :   Component the log is coming from.
@@ -39,7 +36,6 @@ type: keyword
 ## trace [_trace]
 
 Trace in the log line.
-
 
 **`kafka.log.trace.class`**
 :   Java class the trace is coming from.

@@ -7,9 +7,7 @@ mapped_pages:
 
 Cloud Foundry module
 
-
 ## cloudfoundry [_cloudfoundry]
-
 
 
 
@@ -23,7 +21,6 @@ type: keyword
 
 The application the metric is associated with.
 
-
 **`cloudfoundry.app.id`**
 :   The ID of the application.
 
@@ -33,7 +30,6 @@ type: keyword
 ## container [_container]
 
 `container` contains container metrics from Cloud Foundry.
-
 
 **`cloudfoundry.container.instance_index`**
 :   Index of the instance the metric belongs to.
@@ -75,7 +71,6 @@ type: long
 
 `counter` contains counter metrics from Cloud Foundry.
 
-
 **`cloudfoundry.counter.name`**
 :   The name of the counter.
 
@@ -97,7 +92,6 @@ type: long
 ## value [_value]
 
 `value` contains counter metrics from Cloud Foundry.
-
 
 **`cloudfoundry.value.name`**
 :   The name of the value.

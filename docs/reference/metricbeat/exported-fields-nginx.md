@@ -7,16 +7,13 @@ mapped_pages:
 
 Nginx server status metrics collected from various modules.
 
-
 ## nginx [_nginx]
 
 `nginx` contains the metrics that were scraped from nginx.
 
-
 ## stubstatus [_stubstatus]
 
 `stubstatus` contains the metrics that were scraped from the ngx_http_stub_status_module status page.
-
 
 **`nginx.stubstatus.hostname`**
 :   Nginx hostname.

@@ -7,16 +7,13 @@ mapped_pages:
 
 Metrics collected from PostgreSQL servers.
 
-
 ## postgresql [_postgresql]
 
 PostgreSQL metrics.
 
-
 ## activity [_activity]
 
 One document per server process, showing information related to the current activity of that process, such as state and current query. Collected by querying pg_stat_activity.
-
 
 **`postgresql.activity.database.oid`**
 :   OID of the database this backend is connected to.
@@ -118,7 +115,6 @@ type: boolean
 
 Statistics about the background writer process's activity. Collected using the pg_stat_bgwriter query.
 
-
 **`postgresql.bgwriter.checkpoints.scheduled`**
 :   Number of scheduled checkpoints that have been performed.
 
@@ -188,7 +184,6 @@ type: date
 ## database [_database]
 
 One row per database, showing database-wide statistics. Collected by querying pg_stat_database
-
 
 **`postgresql.database.oid`**
 :   OID of the database this backend is connected to, or 0 for shared resources.
@@ -307,7 +302,6 @@ type: date
 ## statement [_statement]
 
 One document per query per user per database, showing information related invocation of that query, such as cpu usage and total time. Collected by querying pg_stat_statements.
-
 
 **`postgresql.statement.user.id`**
 :   OID of the user logged into the backend that ran the query.

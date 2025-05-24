@@ -7,9 +7,7 @@ mapped_pages:
 
 Azure Module
 
-
 ## azure [_azure]
-
 
 
 
@@ -34,7 +32,6 @@ type: keyword
 ## resource [_resource]
 
 Resource
-
 
 **`azure.resource.id`**
 :   Resource ID
@@ -76,7 +73,6 @@ type: keyword
 
 Fields for Azure activity logs.
 
-
 **`azure.activitylogs.identity_name`**
 :   identity name
 
@@ -87,11 +83,9 @@ type: keyword
 
 Identity
 
-
 ## claims_initiated_by_user [_claims_initiated_by_user]
 
 Claims initiated by user
-
 
 **`azure.activitylogs.identity.claims_initiated_by_user.name`**
 :   Name
@@ -133,7 +127,6 @@ type: object
 
 Authorization
 
-
 **`azure.activitylogs.identity.authorization.scope`**
 :   Scope
 
@@ -149,7 +142,6 @@ type: keyword
 ## evidence [_evidence]
 
 Evidence
-
 
 **`azure.activitylogs.identity.authorization.evidence.role_assignment_scope`**
 :   Role assignment scope
@@ -245,7 +237,6 @@ type: flattened
 
 Fields for Azure audit logs.
 
-
 **`azure.auditlogs.category`**
 :   The category of the operation.  Currently, Audit is the only supported value.
 
@@ -285,7 +276,6 @@ type: keyword
 ## properties [_properties]
 
 The audit log properties
-
 
 **`azure.auditlogs.properties.result`**
 :   Log result
@@ -345,7 +335,6 @@ type: keyword
 
 Target resources
 
-
 **`azure.auditlogs.properties.target_resources.*.display_name`**
 :   Display name
 
@@ -380,7 +369,6 @@ type: keyword
 
 Modified properties
 
-
 **`azure.auditlogs.properties.target_resources.*.modified_properties.*.new_value`**
 :   New value
 
@@ -403,11 +391,9 @@ type: keyword
 
 Information regarding the initiator
 
-
 ## app [_app]
 
 App
-
 
 **`azure.auditlogs.properties.initiated_by.app.servicePrincipalName`**
 :   Service principal name
@@ -437,7 +423,6 @@ type: keyword
 
 User
 
-
 **`azure.auditlogs.properties.initiated_by.user.userPrincipalName`**
 :   User principal name
 
@@ -465,7 +450,6 @@ type: keyword
 ## platformlogs [_platformlogs]
 
 Fields for Azure platform logs.
-
 
 **`azure.platformlogs.operation_name`**
 :   Operation name
@@ -561,7 +545,6 @@ type: flattened
 
 Fields for Azure sign-in logs.
 
-
 **`azure.signinlogs.operation_name`**
 :   The operation name
 
@@ -608,7 +591,6 @@ type: keyword
 :   Category
 
 type: keyword
-
 
 
 **`azure.signinlogs.properties.id`**
@@ -737,12 +719,10 @@ type: keyword
 type: keyword
 
 
-
 **`azure.signinlogs.properties.status.error_code`**
 :   Error code
 
 type: long
-
 
 
 **`azure.signinlogs.properties.device_detail.device_id`**

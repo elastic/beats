@@ -7,21 +7,17 @@ mapped_pages:
 
 Redis metrics collected from Redis.
 
-
 ## redis [_redis]
 
 `redis` contains the information and statistics from Redis.
-
 
 ## info [_info]
 
 `info` contains the information and statistics returned by the `INFO` command.
 
-
 ## clients [_clients]
 
 Redis client stats.
-
 
 **`redis.info.clients.connected`**
 :   Number of client connections (excluding connections from slaves).
@@ -51,7 +47,6 @@ type: long
 
 Redis cluster information.
 
-
 **`redis.info.cluster.enabled`**
 :   Indicates that the Redis cluster is enabled.
 
@@ -61,7 +56,6 @@ type: boolean
 ## cpu [_cpu]
 
 Redis CPU stats
-
 
 **`redis.info.cpu.used.sys`**
 :   System CPU consumed by the Redis server.
@@ -90,7 +84,6 @@ type: scaled_float
 ## memory [_memory]
 
 Redis memory stats.
-
 
 **`redis.info.memory.used.value`**
 :   Total number of bytes allocated by Redis.
@@ -172,7 +165,6 @@ type: boolean
 type: keyword
 
 
-
 **`redis.info.memory.allocator_stats.allocated`**
 :   Allocated memory
 
@@ -229,7 +221,6 @@ format: bytes
 
 Redis CPU stats.
 
-
 **`redis.info.persistence.loading`**
 :   Flag indicating if the load of a dump file is on-going
 
@@ -239,7 +230,6 @@ type: boolean
 ## rdb [_rdb]
 
 Provides information about RDB persistence
-
 
 **`redis.info.persistence.rdb.last_save.changes_since`**
 :   Number of changes since the last dump
@@ -292,7 +282,6 @@ format: bytes
 ## aof [_aof]
 
 Provides information about AOF persitence
-
 
 **`redis.info.persistence.aof.enabled`**
 :   Flag indicating AOF logging is activated
@@ -395,7 +384,6 @@ type: long
 ## replication [_replication]
 
 Replication
-
 
 **`redis.info.replication.role`**
 :   Role of the instance (can be "master", or "slave").
@@ -505,7 +493,6 @@ type: boolean
 
 Server info
 
-
 **`redis.info.server.version`**
 :   None
 
@@ -611,7 +598,6 @@ type: keyword
 ## stats [_stats]
 
 Redis stats.
-
 
 **`redis.info.stats.connections.received`**
 :   Total number of connections received.
@@ -767,7 +753,6 @@ type: long
 
 Redis command statistics
 
-
 **`redis.info.commandstats.*.calls`**
 :   The number of calls that reached command execution (not rejected).
 
@@ -802,7 +787,6 @@ type: long
 
 `key` contains information about keys.
 
-
 **`redis.key.name`**
 :   Key name.
 
@@ -836,7 +820,6 @@ type: long
 ## keyspace [_keyspace]
 
 `keyspace` contains the information about the keyspaces returned by the `INFO` command.
-
 
 **`redis.keyspace.id`**
 :   Keyspace identifier.

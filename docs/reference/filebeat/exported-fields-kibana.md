@@ -7,7 +7,6 @@ mapped_pages:
 
 kibana Module
 
-
 **`service.node.roles`**
 :   type: keyword
 
@@ -15,7 +14,6 @@ kibana Module
 ## kibana [_kibana]
 
 Module for parsing Kibana logs.
-
 
 **`kibana.session_id`**
 :   The ID of the user session associated with this event. Each login attempt results in a unique session id.
@@ -108,7 +106,6 @@ example: native
 ## log [_log]
 
 Kibana log lines.
-
 
 **`kibana.log.tags`**
 :   Kibana logging tags.

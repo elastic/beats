@@ -7,21 +7,17 @@ mapped_pages:
 
 MySQL server status metrics collected from MySQL.
 
-
 ## mysql [_mysql]
 
 `mysql` contains the metrics that were obtained from MySQL query.
-
 
 ## galera_status [_galera_status]
 
 `galera_status` contains the metrics that were obtained by the status SQL query on Galera.
 
-
 ## apply [_apply]
 
 Apply status fields.
-
 
 **`mysql.galera_status.apply.oooe`**
 :   How often applier started write-set applying out-of-order (parallelization efficiency).
@@ -45,7 +41,6 @@ type: double
 
 Certification status fields.
 
-
 **`mysql.galera_status.cert.deps_distance`**
 :   Average distance between highest and lowest seqno value that can be possibly applied in parallel (potential degree of parallelization).
 
@@ -67,7 +62,6 @@ type: double
 ## cluster [_cluster]
 
 Cluster status fields.
-
 
 **`mysql.galera_status.cluster.conf_id`**
 :   Total number of cluster membership changes happened.
@@ -91,7 +85,6 @@ type: keyword
 
 Commit status fields.
 
-
 **`mysql.galera_status.commit.oooe`**
 :   How often a transaction was committed out of order.
 
@@ -114,7 +107,6 @@ type: keyword
 
 Evs Fields.
 
-
 **`mysql.galera_status.evs.evict`**
 :   Lists the UUID's of all nodes evicted from the cluster. Evicted nodes cannot rejoin the cluster until you restart their mysqld processes.
 
@@ -130,7 +122,6 @@ type: keyword
 ## flow_ctl [_flow_ctl]
 
 Flow Control fields.
-
 
 **`mysql.galera_status.flow_ctl.paused`**
 :   The fraction of time since the last FLUSH STATUS command that replication was paused due to flow control. In other words, how much the slave lag is slowing down the cluster.
@@ -166,7 +157,6 @@ type: long
 
 Node specific Cluster status fields.
 
-
 **`mysql.galera_status.local.bf_aborts`**
 :   Total number of local transactions that were aborted by slave transactions while in execution.
 
@@ -188,7 +178,6 @@ type: long
 ## recv [_recv]
 
 Node specific recv fields.
-
 
 **`mysql.galera_status.local.recv.queue`**
 :   Current (instantaneous) length of the recv queue.
@@ -223,7 +212,6 @@ type: long
 ## send [_send]
 
 Node specific sent fields.
-
 
 **`mysql.galera_status.local.send.queue`**
 :   Current (instantaneous) length of the send queue.
@@ -265,7 +253,6 @@ type: keyword
 
 Write-Set receive status fields.
 
-
 **`mysql.galera_status.received.count`**
 :   Total number of write-sets received from other nodes.
 
@@ -281,7 +268,6 @@ type: long
 ## repl [_repl]
 
 Replication status fields.
-
 
 **`mysql.galera_status.repl.data_bytes`**
 :   Total size of data replicated.
@@ -323,11 +309,9 @@ type: long
 
 `performance` contains metrics related to the performance of a MySQL instance
 
-
 ## events_statements [_events_statements]
 
 Records statement events summarized by schema and digest
-
 
 **`mysql.performance.events_statements.max.timer.wait`**
 :   Maximum wait time of the summarized events that are timed
@@ -375,8 +359,6 @@ type: keyword
 
 Records table I/O waits by index
 
-
-
 **`mysql.performance.table_io_waits.object.schema`**
 :   Schema name
 
@@ -409,11 +391,9 @@ type: long
 
 `status` contains the metrics that were obtained by the status SQL query.
 
-
 ## aborted [_aborted]
 
 Aborted status fields.
-
 
 **`mysql.status.aborted.clients`**
 :   The number of connections that were aborted because the client died without closing the connection properly.
@@ -431,9 +411,7 @@ type: long
 
 
 
-
 ## errors [_errors]
-
 
 
 
@@ -477,11 +455,9 @@ type: long
 
 
 
-
 ## ssl [_ssl]
 
 SSL session cache hits and misses.
-
 
 **`mysql.status.cache.ssl.hits`**
 :   The number of SSL session cache hits.
@@ -505,9 +481,7 @@ type: long
 
 
 
-
 ## open_cache [_open_cache]
-
 
 
 
@@ -533,7 +507,6 @@ type: long
 
 
 
-
 **`mysql.status.binlog.cache.disk_use`**
 :   type: long
 
@@ -545,7 +518,6 @@ type: long
 ## bytes [_bytes]
 
 Bytes stats.
-
 
 **`mysql.status.bytes.received`**
 :   The number of bytes received from all clients.
@@ -566,7 +538,6 @@ format: bytes
 ## threads [_threads]
 
 Threads stats.
-
 
 **`mysql.status.threads.cached`**
 :   The number of cached threads.
@@ -600,7 +571,6 @@ type: long
 
 
 
-
 **`mysql.status.created.tmp.disk_tables`**
 :   type: long
 
@@ -614,7 +584,6 @@ type: long
 
 
 ## delayed [_delayed]
-
 
 
 
@@ -642,7 +611,6 @@ type: long
 
 
 
-
 **`mysql.status.open.files`**
 :   type: long
 
@@ -660,7 +628,6 @@ type: long
 
 
 ## command [_command]
-
 
 
 
@@ -704,7 +671,6 @@ type: long
 
 
 
-
 **`mysql.status.handler.commit`**
 :   The number of internal COMMIT statements.
 
@@ -736,7 +702,6 @@ type: long
 
 
 ## read [_read]
-
 
 
 
@@ -816,9 +781,7 @@ type: long
 
 
 
-
 ## rows [_rows]
-
 
 
 
@@ -850,7 +813,6 @@ type: long
 
 
 
-
 **`mysql.status.innodb.buffer_pool.dump_status`**
 :   The progress of an operation to record the pages held in the InnoDB buffer pool, triggered by the setting of innodb_buffer_pool_dump_at_shutdown or innodb_buffer_pool_dump_now.
 
@@ -867,7 +829,6 @@ type: long
 
 
 
-
 **`mysql.status.innodb.buffer_pool.bytes.data`**
 :   The total number of bytes in the InnoDB buffer pool containing data.
 
@@ -881,7 +842,6 @@ type: long
 
 
 ## pages [_pages]
-
 
 
 
@@ -931,7 +891,6 @@ type: long
 
 
 
-
 **`mysql.status.innodb.buffer_pool.read.ahead`**
 :   The number of pages read into the InnoDB buffer pool by the read-ahead background thread.
 
@@ -957,7 +916,6 @@ type: long
 
 
 ## pool [_pool]
-
 
 
 

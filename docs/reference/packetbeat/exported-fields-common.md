@@ -7,7 +7,6 @@ mapped_pages:
 
 These fields contain data about the environment in which the transaction or flow was captured.
 
-
 **`type`**
 :   The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" in case of flows.
 

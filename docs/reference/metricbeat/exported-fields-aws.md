@@ -7,9 +7,7 @@ mapped_pages:
 
 `aws` module collects AWS monitoring metrics from AWS Cloudwatch.
 
-
 ## aws [_aws]
-
 
 
 
@@ -37,7 +35,6 @@ type: object
 type: object
 
 
-
 **`aws.linked_account.id`**
 :   ID used to identify linked account.
 
@@ -53,7 +50,6 @@ type: keyword
 ## awshealth [_awshealth]
 
 AWS Health metrics
-
 
 **`aws.awshealth.affected_entities_others`**
 :   The number of affected resources related to the event whose status cannot be verified.
@@ -185,7 +181,6 @@ type: keyword
 
 `billing` contains the estimated charges for your AWS account in Cloudwatch.
 
-
 **`aws.billing.EstimatedCharges`**
 :   Maximum estimated charges for AWS acccount.
 
@@ -204,7 +199,6 @@ type: keyword
 type: keyword
 
 
-
 **`aws.billing.AmortizedCost.amount`**
 :   Amortized cost amount
 
@@ -215,7 +209,6 @@ type: double
 :   Amortized cost unit
 
 type: keyword
-
 
 
 **`aws.billing.BlendedCost.amount`**
@@ -230,7 +223,6 @@ type: double
 type: keyword
 
 
-
 **`aws.billing.NormalizedUsageAmount.amount`**
 :   Normalized usage amount
 
@@ -243,7 +235,6 @@ type: double
 type: keyword
 
 
-
 **`aws.billing.UnblendedCost.amount`**
 :   Unblended cost amount
 
@@ -254,7 +245,6 @@ type: double
 :   Unblended cost unit
 
 type: keyword
-
 
 
 **`aws.billing.UsageQuantity.amount`**
@@ -281,7 +271,6 @@ type: keyword
 type: keyword
 
 
-
 **`aws.billing.group_definition.key`**
 :   The string that represents a key for a specified group
 
@@ -304,7 +293,6 @@ type: object
 
 `cloudwatch` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by different namespaces.
 
-
 **`aws.cloudwatch.namespace`**
 :   The namespace specified when query cloudwatch api.
 
@@ -314,8 +302,6 @@ type: keyword
 ## dynamodb [_dynamodb]
 
 `dynamodb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS DynamoDB.
-
-
 
 **`aws.dynamodb.metrics.SuccessfulRequestLatency.avg`**
 :   The average latency of successful requests to DynamoDB or Amazon DynamoDB Streams during the specified time period.
@@ -483,8 +469,6 @@ type: double
 
 `ebs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EBS.
 
-
-
 **`aws.ebs.metrics.VolumeReadBytes.avg`**
 :   Average size of each read operation during the period, except on volumes attached to a Nitro-based instance, where the average represents the average over the specified period.
 
@@ -554,7 +538,6 @@ type: double
 ## ec2 [_ec2]
 
 `ec2` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS EC2.
-
 
 **`aws.ec2.cpu.total.pct`**
 :   The percentage of allocated EC2 compute units that are currently in use on the instance.
@@ -772,8 +755,6 @@ type: integer
 
 `elb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ELB.
 
-
-
 **`aws.elb.metrics.BackendConnectionErrors.sum`**
 :   The number of connections that were not successfully established between the load balancer and the registered instances.
 
@@ -879,8 +860,6 @@ type: double
 ## applicationelb [_applicationelb]
 
 `applicationelb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS ApplicationELB.
-
-
 
 **`aws.applicationelb.metrics.ActiveConnectionCount.sum`**
 :   The total number of concurrent TCP connections active from clients to the load balancer and from the load balancer to targets.
@@ -1018,8 +997,6 @@ type: long
 
 `networkelb` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS NetworkELB.
 
-
-
 **`aws.networkelb.metrics.ActiveFlowCount.avg`**
 :   The total number of concurrent flows (or connections) from clients to targets.
 
@@ -1119,8 +1096,6 @@ type: long
 ## kinesis [_kinesis]
 
 `kinesis` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by Amazon Kinesis.
-
-
 
 **`aws.kinesis.metrics.GetRecords_Bytes.avg`**
 :   The average number of bytes retrieved from the Kinesis stream, measured over the specified time period.
@@ -1276,8 +1251,6 @@ type: long
 
 `lambda` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS Lambda.
 
-
-
 **`aws.lambda.metrics.Invocations.avg`**
 :   The number of times your function code is executed, including successful executions and executions that result in a function error.
 
@@ -1359,8 +1332,6 @@ type: long
 ## natgateway [_natgateway]
 
 `natgateway` contains the metrics from Cloudwatch to track usage of NAT gateway related resources.
-
-
 
 **`aws.natgateway.metrics.BytesInFromDestination.sum`**
 :   The number of bytes received by the NAT gateway from the destination.
@@ -1449,7 +1420,6 @@ type: long
 ## rds [_rds]
 
 `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
-
 
 **`aws.rds.burst_balance.pct`**
 :   The percent of General Purpose SSD (gp2) burst-bucket I/O credits available.
@@ -1945,7 +1915,6 @@ type: long
 
 `s3_daily_storage` contains the daily storage metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
 
-
 **`aws.s3_daily_storage.bucket.size.bytes`**
 :   The amount of data in bytes stored in a bucket.
 
@@ -1963,7 +1932,6 @@ type: long
 ## s3_request [_s3_request]
 
 `s3_request` contains request metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS S3.
-
 
 **`aws.s3_request.requests.total`**
 :   The total number of HTTP requests made to an Amazon S3 bucket, regardless of type.
@@ -2077,8 +2045,6 @@ format: duration
 
 `sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.
 
-
-
 **`aws.sns.metrics.PublishSize.avg`**
 :   The size of messages published.
 
@@ -2149,7 +2115,6 @@ type: long
 
 `sqs` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SQS.
 
-
 **`aws.sqs.oldest_message_age.sec`**
 :   The maximum approximate age of the oldest non-deleted message in the queue.
 
@@ -2218,8 +2183,6 @@ type: keyword
 
 `transitgateway` contains the metrics from Cloudwatch to track usage of transit gateway related resources.
 
-
-
 **`aws.transitgateway.metrics.BytesIn.sum`**
 :   The number of bytes received by the transit gateway.
 
@@ -2272,8 +2235,6 @@ type: long
 
 `usage` contains the metrics from Cloudwatch to track usage of some AWS resources.
 
-
-
 **`aws.usage.metrics.CallCount.sum`**
 :   The number of specified API operations performed in your account.
 
@@ -2289,8 +2250,6 @@ type: long
 ## vpn [_vpn]
 
 `vpn` contains the metrics from Cloudwatch to track usage of VPN related resources.
-
-
 
 **`aws.vpn.metrics.TunnelState.avg`**
 :   The state of the tunnel. For static VPNs, 0 indicates DOWN and 1 indicates UP. For BGP VPNs, 1 indicates ESTABLISHED and 0 is used for all other states.

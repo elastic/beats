@@ -7,8 +7,6 @@ mapped_pages:
 
 azure module
 
-
-
 **`azure.timegrain`**
 :   The Azure metric timegrain
 
@@ -18,7 +16,6 @@ type: keyword
 ## resource [_resource]
 
 The resource specified
-
 
 **`azure.resource.type`**
 :   The type of the resource
@@ -84,7 +81,6 @@ type: object
 
 application insights
 
-
 **`azure.app_insights.start_date`**
 :   The start date
 
@@ -106,7 +102,6 @@ type: object
 ## app_state [_app_state]
 
 application state
-
 
 **`azure.app_state.start_date`**
 :   The start date
@@ -231,7 +226,6 @@ type: float
 ## billing [_billing]
 
 billing and usage details
-
 
 **`azure.billing.currency`**
 :   Billing Currency.

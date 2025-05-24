@@ -7,13 +7,9 @@ mapped_pages:
 
 Consul module
 
-
-
 ## agent [_agent]
 
 Agent Metricset fetches metrics information from a Consul instance running as Agent
-
-
 
 **`consul.agent.autopilot.healthy`**
 :   Overall health of the local server cluster
@@ -24,8 +20,6 @@ type: boolean
 ## runtime [_runtime]
 
 Runtime related metrics
-
-
 
 **`consul.agent.runtime.sys.bytes`**
 :   Number of bytes of memory obtained from the OS.
@@ -51,7 +45,6 @@ type: long
 type: long
 
 
-
 **`consul.agent.runtime.alloc.bytes`**
 :   Bytes allocated by the Consul process.
 
@@ -61,7 +54,6 @@ type: long
 ## garbage_collector [_garbage_collector]
 
 Garbage collector metrics
-
 
 **`consul.agent.runtime.garbage_collector.runs`**
 :   Garbage collector total executions
@@ -73,13 +65,10 @@ type: long
 
 Time that the garbage collector has paused the app
 
-
-
 **`consul.agent.runtime.garbage_collector.pause.current.ns`**
 :   Garbage collector pause time in nanoseconds
 
 type: long
-
 
 
 **`consul.agent.runtime.garbage_collector.pause.total.ns`**

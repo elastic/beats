@@ -7,16 +7,13 @@ mapped_pages:
 
 ZooKeeper metrics collected by the four-letter monitoring commands.
 
-
 ## zookeeper [_zookeeper]
 
 `zookeeper` contains the metrics reported by ZooKeeper commands.
 
-
 ## connection [_connection]
 
 connections
-
 
 **`zookeeper.connection.interest_ops`**
 :   Interest ops
@@ -45,7 +42,6 @@ type: long
 ## mntr [_mntr]
 
 `mntr` contains the metrics reported by the four-letter `mntr` command.
-
 
 **`zookeeper.mntr.approximate_data_size`**
 :   Approximate size of ZooKeeper data.
@@ -167,12 +163,10 @@ type: long
 
 server contains the metrics reported by the four-letter `srvr` command.
 
-
 **`zookeeper.server.connections`**
 :   Number of clients currently connected to the server
 
 type: long
-
 
 
 **`zookeeper.server.latency.avg`**

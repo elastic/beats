@@ -7,7 +7,6 @@ mapped_pages:
 
 These are the event fields specific to the module for the Microsoft-Windows-PowerShell/Operational and Windows PowerShell logs.
 
-
 **`powershell.id`**
 :   Shell Id.
 
@@ -51,7 +50,6 @@ example: 10
 ## powershell.command [_powershell.command]
 
 Data related to the executed command.
-
 
 **`powershell.command.path`**
 :   Path of the executed command.
@@ -127,7 +125,6 @@ example: System.IO.Compression.FileSystem
 
 Data related to the connected user executing the command.
 
-
 **`powershell.connected_user.domain`**
 :   User domain.
 
@@ -147,7 +144,6 @@ example: vagrant
 ## powershell.engine [_powershell.engine]
 
 Data related to the PowerShell engine.
-
 
 **`powershell.engine.version`**
 :   Version of the PowerShell engine version used to execute the command.
@@ -177,7 +173,6 @@ example: Stopped
 
 Data related to the executed script file.
 
-
 **`powershell.file.script_block_id`**
 :   Id of the executed script block.
 
@@ -205,7 +200,6 @@ example: 5.1.17763.1007
 ## powershell.provider [_powershell.provider]
 
 Data related to the PowerShell engine host.
-
 
 **`powershell.provider.new_state`**
 :   New state of the PowerShell provider.

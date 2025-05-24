@@ -7,16 +7,13 @@ mapped_pages:
 
 uwsgi module
 
-
 ## uwsgi [_uwsgi]
-
 
 
 
 ## status [_status]
 
 uwsgi.status metricset fields
-
 
 **`uwsgi.status.total.requests`**
 :   Total requests handled

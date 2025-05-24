@@ -7,16 +7,13 @@ mapped_pages:
 
 Module for handling the EVE JSON logs produced by Suricata.
 
-
 ## suricata [_suricata]
 
 Fields from the Suricata EVE log file.
 
-
 ## eve [_eve]
 
 Fields exported by the EVE JSON logs
-
 
 **`suricata.eve.event_type`**
 :   type: keyword
@@ -24,7 +21,6 @@ Fields exported by the EVE JSON logs
 
 **`suricata.eve.app_proto_orig`**
 :   type: keyword
-
 
 
 **`suricata.eve.tcp.tcp_flags`**
@@ -63,7 +59,6 @@ Fields exported by the EVE JSON logs
 :   type: boolean
 
 
-
 **`suricata.eve.fileinfo.sha1`**
 :   type: keyword
 
@@ -98,7 +93,6 @@ Fields exported by the EVE JSON logs
 
 **`suricata.eve.pcap_cnt`**
 :   type: long
-
 
 
 **`suricata.eve.dns.type`**
@@ -137,14 +131,12 @@ Fields exported by the EVE JSON logs
 :   type: keyword
 
 
-
 **`suricata.eve.email.status`**
 :   type: keyword
 
 
 **`suricata.eve.icmp_code`**
 :   type: long
-
 
 
 **`suricata.eve.http.redirect`**
@@ -161,7 +153,6 @@ Fields exported by the EVE JSON logs
 
 **`suricata.eve.in_iface`**
 :   type: keyword
-
 
 
 **`suricata.eve.alert.metadata`**
@@ -290,8 +281,6 @@ type: flattened
 :   type: keyword
 
 
-
-
 **`suricata.eve.ssh.client.proto_version`**
 :   type: keyword
 
@@ -300,15 +289,12 @@ type: flattened
 :   type: keyword
 
 
-
 **`suricata.eve.ssh.server.proto_version`**
 :   type: keyword
 
 
 **`suricata.eve.ssh.server.software_version`**
 :   type: keyword
-
-
 
 
 **`suricata.eve.stats.capture.kernel_packets`**
@@ -327,10 +313,8 @@ type: flattened
 :   type: long
 
 
-
 **`suricata.eve.stats.detect.alert`**
 :   type: long
-
 
 
 **`suricata.eve.stats.http.memcap`**
@@ -341,15 +325,12 @@ type: flattened
 :   type: long
 
 
-
 **`suricata.eve.stats.file_store.open_files`**
 :   type: long
 
 
-
 **`suricata.eve.stats.defrag.max_frag_hits`**
 :   type: long
-
 
 
 **`suricata.eve.stats.defrag.ipv4.timeouts`**
@@ -364,7 +345,6 @@ type: flattened
 :   type: long
 
 
-
 **`suricata.eve.stats.defrag.ipv6.timeouts`**
 :   type: long
 
@@ -375,7 +355,6 @@ type: flattened
 
 **`suricata.eve.stats.defrag.ipv6.reassembled`**
 :   type: long
-
 
 
 **`suricata.eve.stats.flow.tcp_reuse`**
@@ -416,7 +395,6 @@ type: flattened
 
 **`suricata.eve.stats.flow.memuse`**
 :   type: long
-
 
 
 **`suricata.eve.stats.tcp.pseudo_failed`**
@@ -495,7 +473,6 @@ type: flattened
 :   type: long
 
 
-
 **`suricata.eve.stats.decoder.avg_pkt_size`**
 :   type: long
 
@@ -522,7 +499,6 @@ type: flattened
 
 **`suricata.eve.stats.decoder.null`**
 :   type: long
-
 
 
 **`suricata.eve.stats.decoder.ltnull.unsupported_type`**
@@ -557,7 +533,6 @@ type: flattened
 :   type: long
 
 
-
 **`suricata.eve.stats.decoder.ipraw.invalid_ip_version`**
 :   type: long
 
@@ -568,7 +543,6 @@ type: flattened
 
 **`suricata.eve.stats.decoder.udp`**
 :   type: long
-
 
 
 **`suricata.eve.stats.decoder.dce.pkt_too_small`**
@@ -623,7 +597,6 @@ type: flattened
 :   type: long
 
 
-
 **`suricata.eve.stats.dns.memcap_global`**
 :   type: long
 
@@ -634,7 +607,6 @@ type: flattened
 
 **`suricata.eve.stats.dns.memuse`**
 :   type: long
-
 
 
 **`suricata.eve.stats.flow_mgr.rows_busy`**
@@ -693,8 +665,6 @@ type: flattened
 :   type: long
 
 
-
-
 **`suricata.eve.stats.app_layer.flow.tls`**
 :   type: long
 
@@ -751,7 +721,6 @@ type: flattened
 :   type: long
 
 
-
 **`suricata.eve.stats.app_layer.tx.tls`**
 :   type: long
 
@@ -792,7 +761,6 @@ type: flattened
 :   type: long
 
 
-
 **`suricata.eve.tls.notbefore`**
 :   type: date
 
@@ -829,14 +797,12 @@ type: flattened
 :   type: keyword
 
 
-
 **`suricata.eve.tls.ja3s.string`**
 :   type: keyword
 
 
 **`suricata.eve.tls.ja3s.hash`**
 :   type: keyword
-
 
 
 **`suricata.eve.tls.ja3.string`**
@@ -849,7 +815,6 @@ type: flattened
 
 **`suricata.eve.app_proto_ts`**
 :   type: keyword
-
 
 
 **`suricata.eve.flow.age`**
@@ -874,7 +839,6 @@ type: flattened
 
 **`suricata.eve.app_proto_tc`**
 :   type: keyword
-
 
 
 **`suricata.eve.smtp.rcpt_to`**

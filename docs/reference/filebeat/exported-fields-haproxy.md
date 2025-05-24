@@ -7,9 +7,7 @@ mapped_pages:
 
 haproxy Module
 
-
 ## haproxy [_haproxy]
-
 
 
 
@@ -97,7 +95,6 @@ type: keyword
 
 Contains various counts of connections active in the process.
 
-
 **`haproxy.connections.active`**
 :   Total number of concurrent connections on the process when the session was logged.
 
@@ -132,7 +129,6 @@ type: long
 
 Information about the client doing the request
 
-
 **`haproxy.client.ip`**
 :   type: alias
 
@@ -161,7 +157,6 @@ alias to: process.pid
 
 Destination information
 
-
 **`haproxy.destination.port`**
 :   type: alias
 
@@ -177,7 +172,6 @@ alias to: destination.ip
 ## geoip [_geoip]
 
 Contains GeoIP information gathered based on the client.ip field. Only present if the GeoIP Elasticsearch plugin is available and used.
-
 
 **`haproxy.geoip.continent_name`**
 :   type: alias
@@ -219,11 +213,9 @@ alias to: source.geo.region_iso_code
 
 Please add description
 
-
 ## response [_response]
 
 Fields related to the HTTP response
-
 
 **`haproxy.http.response.captured_cookie`**
 :   Optional "name=value" entry indicating that the client had this cookie in the response.
@@ -244,7 +236,6 @@ alias to: http.response.status_code
 ## request [_request]
 
 Fields related to the HTTP request
-
 
 **`haproxy.http.request.captured_cookie`**
 :   Optional "name=value" entry indicating that the server has returned a cookie with its request.
@@ -277,7 +268,6 @@ type: long
 ## tcp [_tcp]
 
 TCP log format
-
 
 **`haproxy.tcp.connection_waiting_time_ms`**
 :   Total time in milliseconds elapsed between the accept and the last close

@@ -7,11 +7,9 @@ mapped_pages:
 
 Containerd stats collected from containerd
 
-
 ## containerd [_containerd]
 
 Information and statistics about containerd's running containers.
-
 
 **`containerd.namespace`**
 :   Containerd namespace
@@ -23,7 +21,6 @@ type: keyword
 
 Block I/O metrics.
 
-
 **`containerd.blkio.device`**
 :   Name of block device
 
@@ -33,7 +30,6 @@ type: keyword
 ## read [_read]
 
 Accumulated reads during the life of the container
-
 
 **`containerd.blkio.read.ops`**
 :   Number of reads during the life of the container
@@ -53,7 +49,6 @@ format: bytes
 
 Accumulated writes during the life of the container
 
-
 **`containerd.blkio.write.ops`**
 :   Number of writes during the life of the container
 
@@ -71,7 +66,6 @@ format: bytes
 ## summary [_summary]
 
 Accumulated reads and writes during the life of the container
-
 
 **`containerd.blkio.summary.ops`**
 :   Number of I/O operations during the life of the container
@@ -91,13 +85,10 @@ format: bytes
 
 Containerd Runtime CPU metrics.
 
-
 **`containerd.cpu.system.total`**
 :   Total user and system CPU time spent in seconds.
 
 type: double
-
-
 
 
 **`containerd.cpu.usage.kernel.ns`**
@@ -106,12 +97,10 @@ type: double
 type: double
 
 
-
 **`containerd.cpu.usage.user.ns`**
 :   CPU User usage nanoseconds
 
 type: double
-
 
 
 **`containerd.cpu.usage.total.ns`**
@@ -153,7 +142,6 @@ type: object
 ## memory [_memory]
 
 memory
-
 
 **`containerd.memory.workingset.pct`**
 :   Memory working set percentage.
@@ -199,7 +187,6 @@ format: bytes
 
 Usage memory stats.
 
-
 **`containerd.memory.usage.max`**
 :   Max memory usage.
 
@@ -242,7 +229,6 @@ format: bytes
 
 Kernel memory stats.
 
-
 **`containerd.memory.kernel.max`**
 :   Kernel max memory usage.
 
@@ -276,7 +262,6 @@ format: bytes
 ## swap [_swap]
 
 Swap memory stats.
-
 
 **`containerd.memory.swap.max`**
 :   Swap max memory usage.

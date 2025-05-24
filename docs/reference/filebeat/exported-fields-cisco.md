@@ -7,11 +7,9 @@ mapped_pages:
 
 Module for handling Cisco network device logs.
 
-
 ## cisco.amp [_cisco.amp]
 
 Module for parsing Cisco AMP logs.
-
 
 **`cisco.amp.timestamp_nanoseconds`**
 :   The timestamp in Epoch nanoseconds.
@@ -359,7 +357,6 @@ type: flattened
 
 Fields for Cisco ASA Firewall.
 
-
 **`cisco.asa.message_id`**
 :   The Cisco ASA message identifier.
 
@@ -594,7 +591,6 @@ type: keyword
 
 Fields for Cisco Firepower Threat Defense Firewall.
 
-
 **`cisco.ftd.message_id`**
 :   The Cisco FTD message identifier.
 
@@ -745,7 +741,6 @@ type: keyword
 
 Fields for Cisco IOS logs.
 
-
 **`cisco.ios.access_list`**
 :   Name of the IP access list.
 
@@ -763,7 +758,6 @@ example: SEC
 ## cisco.umbrella [_cisco.umbrella]
 
 Fields for Cisco Umbrella.
-
 
 **`cisco.umbrella.identities`**
 :   An array of the different identities related to the event.

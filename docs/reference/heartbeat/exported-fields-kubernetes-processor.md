@@ -7,8 +7,6 @@ mapped_pages:
 
 Kubernetes metadata added by the kubernetes processor
 
-
-
 **`kubernetes.pod.name`**
 :   Kubernetes pod name
 

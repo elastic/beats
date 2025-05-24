@@ -7,16 +7,13 @@ mapped_pages:
 
 Golang module
 
-
 ## golang [_golang]
-
 
 
 
 ## expvar [_expvar]
 
 expvar
-
 
 **`golang.expvar.cmdline`**
 :   The cmdline of this Go program start with.
@@ -28,7 +25,6 @@ type: keyword
 
 The Go program heap information exposed by expvar.
 
-
 **`golang.heap.cmdline`**
 :   The cmdline of this Go program start with.
 
@@ -39,11 +35,9 @@ type: keyword
 
 Garbage collector summary.
 
-
 ## total_pause [_total_pause]
 
 Total GC pause duration over lifetime of process.
-
 
 **`golang.heap.gc.total_pause.ns`**
 :   Duration in Ns.
@@ -75,7 +69,6 @@ type: float
 
 Last GC pause durations during the monitoring period.
 
-
 **`golang.heap.gc.pause.count`**
 :   Count of GC pause duration during this collect period.
 
@@ -85,7 +78,6 @@ type: long
 ## sum [_sum]
 
 Total GC pause duration during this collect period.
-
 
 **`golang.heap.gc.pause.sum.ns`**
 :   Duration in Ns.
@@ -97,7 +89,6 @@ type: long
 
 Max GC pause duration during this collect period.
 
-
 **`golang.heap.gc.pause.max.ns`**
 :   Duration in Ns.
 
@@ -108,7 +99,6 @@ type: long
 
 Average GC pause duration during this collect period.
 
-
 **`golang.heap.gc.pause.avg.ns`**
 :   Duration in Ns.
 
@@ -118,7 +108,6 @@ type: long
 ## system [_system]
 
 Heap summary,which bytes was obtained from system.
-
 
 **`golang.heap.system.total`**
 :   Total bytes obtained from system (sum of XxxSys below).
@@ -155,7 +144,6 @@ format: bytes
 ## allocations [_allocations]
 
 Heap allocations summary.
-
 
 **`golang.heap.allocations.mallocs`**
 :   Number of mallocs.

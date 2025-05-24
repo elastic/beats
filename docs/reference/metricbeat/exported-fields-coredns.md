@@ -7,16 +7,13 @@ mapped_pages:
 
 coredns Module
 
-
 ## coredns [_coredns]
 
 `coredns` contains statistics that were read from coreDNS
 
-
 ## stats [_stats]
 
 Contains statistics related to the coreDNS service
-
 
 **`coredns.stats.panic.count`**
 :   Total number of panics

@@ -7,16 +7,13 @@ mapped_pages:
 
 logstash Module
 
-
 ## logstash [_logstash]
-
 
 
 
 ## log [_log]
 
 Fields from the Logstash logs.
-
 
 **`logstash.log.module`**
 :   The module or class where the event originate.
@@ -67,7 +64,6 @@ alias to: log.level
 ## slowlog [_slowlog]
 
 slowlog
-
 
 **`logstash.slowlog.module`**
 :   The module or class where the event originate.

@@ -7,16 +7,13 @@ mapped_pages:
 
 Oracle Module
 
-
 ## oracle [_oracle]
 
 Fields from Oracle logs.
 
-
 ## database_audit [_database_audit]
 
 Module for parsing Oracle Database audit logs
-
 
 **`oracle.database_audit.priv_used`**
 :   System privilege used to execute the action.

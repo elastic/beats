@@ -7,7 +7,6 @@ mapped_pages:
 
 Metadata from cloud providers added by the add_cloud_metadata processor.
 
-
 **`cloud.image.id`**
 :   Image ID for the cloud instance.
 

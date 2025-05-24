@@ -7,16 +7,13 @@ mapped_pages:
 
 Module for parsing the PostgreSQL log files.
 
-
 ## postgresql [_postgresql]
 
 Fields from PostgreSQL logs.
 
-
 ## log [_log]
 
 Fields from the PostgreSQL log files.
-
 
 **`postgresql.log.timestamp`**
 :   The timestamp from the log line.

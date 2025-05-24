@@ -7,8 +7,6 @@ mapped_pages:
 
 GCP module
 
-
-
 **`gcp.labels`**
 :   GCP monitoring metrics labels
 
@@ -24,7 +22,6 @@ type: object
 ## billing [_billing]
 
 Google Cloud Billing metrics
-
 
 **`gcp.billing.cost_type`**
 :   Cost types include regular, tax, adjustment, and rounding_error.
@@ -90,7 +87,6 @@ type: float
 
 Google Cloud Carbon Footprint metrics
 
-
 **`gcp.carbon.project_id`**
 :   Project ID the carbon footprint report belongs to.
 
@@ -154,7 +150,6 @@ type: float
 ## compute [_compute]
 
 Google Cloud Compute metrics
-
 
 **`gcp.compute.firewall.dropped.bytes`**
 :   Incoming bytes dropped by the firewall
@@ -273,7 +268,6 @@ type: long
 ## dataproc [_dataproc]
 
 Google Cloud Dataproc metrics
-
 
 **`gcp.dataproc.cluster.hdfs.datanodes.count`**
 :   Indicates the number of HDFS DataNodes that are running inside a cluster.
@@ -405,7 +399,6 @@ type: object
 
 Google Cloud Firestore metrics
 
-
 **`gcp.firestore.document.delete.count`**
 :   The number of successful document deletes.
 
@@ -427,7 +420,6 @@ type: long
 ## gke [_gke]
 
 `gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE
-
 
 **`gcp.gke.container.cpu.core_usage_time.sec`**
 :   Cumulative CPU usage on all cores used by the container in seconds. Sampled every 60 seconds.
@@ -673,7 +665,6 @@ type: double
 
 Google Cloud Load Balancing metrics
 
-
 **`gcp.loadbalancing.https.backend_request.bytes`**
 :   The number of bytes sent as requests from HTTP/S load balancer to backends.
 
@@ -851,7 +842,6 @@ type: object
 ## pubsub [_pubsub]
 
 Google Cloud PubSub metrics
-
 
 **`gcp.pubsub.snapshot.backlog.bytes`**
 :   Total byte size of the messages retained in a snapshot.
@@ -1150,7 +1140,6 @@ type: object
 ## storage [_storage]
 
 Google Cloud Storage metrics
-
 
 **`gcp.storage.api.request.count`**
 :   Delta count of API calls, grouped by the API method name and response code.

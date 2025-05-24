@@ -7,11 +7,9 @@ mapped_pages:
 
 nats Module
 
-
 ## nats [_nats]
 
 `nats` contains statistics that were read from Nats
-
 
 **`nats.server.id`**
 :   The server ID
@@ -30,7 +28,6 @@ type: date
 ## connection [_connection]
 
 Contains nats connection related metrics
-
 
 **`nats.connection.id`**
 :   The ID of the connection
@@ -126,7 +123,6 @@ format: duration
 
 The amount of incoming data
 
-
 **`nats.connection.in.messages`**
 :   The amount of incoming messages
 
@@ -144,7 +140,6 @@ format: bytes
 ## out [_out]
 
 The amount of outgoing data
-
 
 **`nats.connection.out.messages`**
 :   The amount of outgoing messages
@@ -164,7 +159,6 @@ format: bytes
 
 Contains nats connection related metrics
 
-
 **`nats.connections.total`**
 :   The number of currently active clients
 
@@ -175,7 +169,6 @@ type: integer
 
 Information pertaining to a NATS JetStream server
 
-
 **`nats.jetstream.category`**
 :   The category of metrics represented in this event (stats, account, stream, or consumer).
 
@@ -185,7 +178,6 @@ type: keyword
 ## stats [_stats]
 
 General stats about the NATS JetStream server.
-
 
 **`nats.jetstream.stats.streams`**
 :   The total number of streams on the JetStream server.
@@ -255,7 +247,6 @@ type: long
 
 Configuration of the JetStream server.
 
-
 **`nats.jetstream.stats.config.max_memory`**
 :   The maximum amount of memory (bytes) the JetStream server can use.
 
@@ -287,7 +278,6 @@ type: long
 ## account [_account]
 
 Information about a NATS JetStream account.
-
 
 **`nats.jetstream.account.id`**
 :   The ID of the JetStream account.
@@ -349,7 +339,6 @@ format: bytes
 
 API stats pertaining to this account.
 
-
 **`nats.jetstream.account.api.total`**
 :   The total number of JetStream API calls made by this account.
 
@@ -365,7 +354,6 @@ type: long
 ## stream [_stream]
 
 Information about a NATS JetStream stream.
-
 
 **`nats.jetstream.stream.name`**
 :   The name of the JetStream stream.
@@ -383,7 +371,6 @@ type: date
 
 Cluster information for the stream.
 
-
 **`nats.jetstream.stream.cluster.leader`**
 :   The ID of the leader in the cluster.
 
@@ -393,7 +380,6 @@ type: keyword
 ## state [_state]
 
 The state of the stream.
-
 
 **`nats.jetstream.stream.state.messages`**
 :   The number of messages on the stream.
@@ -455,7 +441,6 @@ type: date
 
 Information about the account for this stream.
 
-
 **`nats.jetstream.stream.account.id`**
 :   The ID of the account.
 
@@ -471,7 +456,6 @@ type: keyword
 ## config [_config]
 
 Information regarding how the stream is configured.
-
 
 **`nats.jetstream.stream.config.description`**
 :   The description of the stream.
@@ -547,7 +531,6 @@ type: keyword
 
 Information about a NATS JetStream consumer.
 
-
 **`nats.jetstream.consumer.name`**
 :   The name of the consumer.
 
@@ -564,7 +547,6 @@ type: date
 
 Information about the stream for this consumer.
 
-
 **`nats.jetstream.consumer.stream.name`**
 :   The name of the stream.
 
@@ -575,7 +557,6 @@ type: keyword
 
 Cluster information for the consumer.
 
-
 **`nats.jetstream.consumer.cluster.leader`**
 :   The ID of the leader in the cluster.
 
@@ -585,7 +566,6 @@ type: keyword
 ## ack_floor [_ack_floor]
 
 Information about message acknowledgements pertaining to AckFloor, which indicates the highest contiguous sequence number that has been fully acknowledged.
-
 
 **`nats.jetstream.consumer.ack_floor.consumer_seq`**
 :   The lowest contiguous consumer sequence number that has been acknowledged.
@@ -608,7 +588,6 @@ type: date
 ## delivered [_delivered]
 
 Information about delivered messages.
-
 
 **`nats.jetstream.consumer.delivered.consumer_seq`**
 :   The number of messages delivered to this consumer, starting from 1 when the consumer was created.
@@ -662,7 +641,6 @@ type: date
 
 Information about the account for this consumer.
 
-
 **`nats.jetstream.consumer.account.id`**
 :   The ID of the account.
 
@@ -678,7 +656,6 @@ type: keyword
 ## config [_config]
 
 Information about the configuration for this consumer.
-
 
 **`nats.jetstream.consumer.config.name`**
 :   The name of the consumer.
@@ -750,7 +727,6 @@ type: long
 
 Contains nats route related metrics
 
-
 **`nats.route.subscriptions`**
 :   The number of subscriptions in this connection
 
@@ -785,7 +761,6 @@ type: ip
 
 The amount of incoming data
 
-
 **`nats.route.in.messages`**
 :   The amount of incoming messages
 
@@ -803,7 +778,6 @@ format: bytes
 ## out [_out]
 
 The amount of outgoing data
-
 
 **`nats.route.out.messages`**
 :   The amount of outgoing messages
@@ -823,7 +797,6 @@ format: bytes
 
 Contains nats route related metrics
 
-
 **`nats.routes.total`**
 :   The number of registered routes
 
@@ -833,7 +806,6 @@ type: integer
 ## stats [_stats]
 
 Contains nats var related metrics
-
 
 **`nats.stats.server_name`**
 :   The name of the NATS server
@@ -893,7 +865,6 @@ type: integer
 
 The amount of incoming data
 
-
 **`nats.stats.in.messages`**
 :   The amount of incoming messages
 
@@ -911,7 +882,6 @@ format: bytes
 ## out [_out]
 
 The amount of outgoing data
-
 
 **`nats.stats.out.messages`**
 :   The amount of outgoing messages
@@ -937,16 +907,13 @@ type: long
 
 The http metrics of NATS server
 
-
 ## req_stats [_req_stats]
 
 The requests statistics
 
-
 ## uri [_uri]
 
 The request distribution on monitoring URIS
-
 
 **`nats.stats.http.req_stats.uri.routez`**
 :   The number of hits on routez monitoring uri
@@ -1017,7 +984,6 @@ type: long
 ## subscriptions [_subscriptions]
 
 Contains nats subscriptions related metrics
-
 
 **`nats.subscriptions.total`**
 :   The number of active subscriptions

@@ -7,16 +7,13 @@ mapped_pages:
 
 Traefik reverse proxy / load balancer metrics
 
-
 ## traefik [_traefik]
 
 Traefik reverse proxy / load balancer metrics
 
-
 ## health [_health]
 
 Metrics obtained from Traefik's health API endpoint
-
 
 **`traefik.health.uptime.sec`**
 :   Uptime of Traefik instance in seconds
@@ -27,7 +24,6 @@ type: long
 ## response [_response]
 
 Response metrics
-
 
 **`traefik.health.response.count`**
 :   Number of responses

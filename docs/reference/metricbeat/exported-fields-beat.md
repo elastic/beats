@@ -7,22 +7,16 @@ mapped_pages:
 
 Beat module
 
-
-
-
-
 **`beats_stats.apm-server.acm.request.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.acm.request.count
 
 
-
 **`beats_stats.apm-server.acm.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.acm.response.count
-
 
 
 **`beats_stats.apm-server.acm.response.errors.closed`**
@@ -115,7 +109,6 @@ alias to: beat.stats.apm_server.acm.response.errors.unavailable
 alias to: beat.stats.apm_server.acm.response.errors.validate
 
 
-
 **`beats_stats.apm-server.acm.response.valid.accepted`**
 :   type: alias
 
@@ -144,8 +137,6 @@ alias to: beat.stats.apm_server.acm.response.valid.ok
 :   type: alias
 
 alias to: beat.stats.apm_server.acm.unset
-
-
 
 
 **`beats_stats.apm-server.agentcfg.elasticsearch.cache.entries.count`**
@@ -190,21 +181,16 @@ alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.invalid
 alias to: beat.stats.apm_server.agentcfg.elasticsearch.fetch.unavailable
 
 
-
-
-
 **`beats_stats.apm-server.jaeger.grpc.collect.request.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.jaeger.grpc.collect.request.count
 
 
-
 **`beats_stats.apm-server.jaeger.grpc.collect.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.jaeger.grpc.collect.response.count
-
 
 
 **`beats_stats.apm-server.jaeger.grpc.collect.response.errors.count`**
@@ -237,7 +223,6 @@ alias to: beat.stats.apm_server.jaeger.grpc.collect.response.errors.unauthorized
 alias to: beat.stats.apm_server.jaeger.grpc.collect.response.valid.count
 
 
-
 **`beats_stats.apm-server.jaeger.grpc.sampling.event.received.count`**
 :   type: alias
 
@@ -248,7 +233,6 @@ alias to: beat.stats.apm_server.jaeger.grpc.sampling.event.received.count
 :   type: alias
 
 alias to: beat.stats.apm_server.jaeger.grpc.sampling.request.count
-
 
 
 **`beats_stats.apm-server.jaeger.grpc.sampling.response.count`**
@@ -269,21 +253,16 @@ alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.errors.count
 alias to: beat.stats.apm_server.jaeger.grpc.sampling.response.valid.count
 
 
-
-
-
 **`beats_stats.apm-server.otlp.grpc.logs.request.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.grpc.logs.request.count
 
 
-
 **`beats_stats.apm-server.otlp.grpc.logs.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.grpc.logs.response.count
-
 
 
 **`beats_stats.apm-server.otlp.grpc.logs.response.errors.count`**
@@ -316,7 +295,6 @@ alias to: beat.stats.apm_server.otlp.grpc.logs.response.errors.unauthorized
 alias to: beat.stats.apm_server.otlp.grpc.logs.response.valid.count
 
 
-
 **`beats_stats.apm-server.otlp.grpc.metrics.consumer.unsupported_dropped`**
 :   type: alias
 
@@ -329,12 +307,10 @@ alias to: beat.stats.apm_server.otlp.grpc.metrics.consumer.unsupported_dropped
 alias to: beat.stats.apm_server.otlp.grpc.metrics.request.count
 
 
-
 **`beats_stats.apm-server.otlp.grpc.metrics.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.grpc.metrics.response.count
-
 
 
 **`beats_stats.apm-server.otlp.grpc.metrics.response.errors.count`**
@@ -367,19 +343,16 @@ alias to: beat.stats.apm_server.otlp.grpc.metrics.response.errors.unauthorized
 alias to: beat.stats.apm_server.otlp.grpc.metrics.response.valid.count
 
 
-
 **`beats_stats.apm-server.otlp.grpc.traces.request.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.grpc.traces.request.count
 
 
-
 **`beats_stats.apm-server.otlp.grpc.traces.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.grpc.traces.response.count
-
 
 
 **`beats_stats.apm-server.otlp.grpc.traces.response.errors.count`**
@@ -412,20 +385,16 @@ alias to: beat.stats.apm_server.otlp.grpc.traces.response.errors.unauthorized
 alias to: beat.stats.apm_server.otlp.grpc.traces.response.valid.count
 
 
-
-
 **`beats_stats.apm-server.otlp.http.logs.request.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.http.logs.request.count
 
 
-
 **`beats_stats.apm-server.otlp.http.logs.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.http.logs.response.count
-
 
 
 **`beats_stats.apm-server.otlp.http.logs.response.errors.count`**
@@ -458,7 +427,6 @@ alias to: beat.stats.apm_server.otlp.http.logs.response.errors.unauthorized
 alias to: beat.stats.apm_server.otlp.http.logs.response.valid.count
 
 
-
 **`beats_stats.apm-server.otlp.http.metrics.consumer.unsupported_dropped`**
 :   type: alias
 
@@ -471,12 +439,10 @@ alias to: beat.stats.apm_server.otlp.http.metrics.consumer.unsupported_dropped
 alias to: beat.stats.apm_server.otlp.http.metrics.request.count
 
 
-
 **`beats_stats.apm-server.otlp.http.metrics.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.http.metrics.response.count
-
 
 
 **`beats_stats.apm-server.otlp.http.metrics.response.errors.count`**
@@ -509,19 +475,16 @@ alias to: beat.stats.apm_server.otlp.http.metrics.response.errors.unauthorized
 alias to: beat.stats.apm_server.otlp.http.metrics.response.valid.count
 
 
-
 **`beats_stats.apm-server.otlp.http.traces.request.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.http.traces.request.count
 
 
-
 **`beats_stats.apm-server.otlp.http.traces.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.otlp.http.traces.response.count
-
 
 
 **`beats_stats.apm-server.otlp.http.traces.response.errors.count`**
@@ -554,7 +517,6 @@ alias to: beat.stats.apm_server.otlp.http.traces.response.errors.unauthorized
 alias to: beat.stats.apm_server.otlp.http.traces.response.valid.count
 
 
-
 **`beats_stats.apm-server.processor.error.transformations`**
 :   type: alias
 
@@ -573,12 +535,10 @@ alias to: beat.stats.apm_server.processor.metric.transformations
 alias to: beat.stats.apm_server.processor.span.transformations
 
 
-
 **`beats_stats.apm-server.processor.stream.accepted`**
 :   type: alias
 
 alias to: beat.stats.apm_server.processor.stream.accepted
-
 
 
 **`beats_stats.apm-server.processor.stream.errors.invalid`**
@@ -599,19 +559,16 @@ alias to: beat.stats.apm_server.processor.stream.errors.toolarge
 alias to: beat.stats.apm_server.processor.transaction.transformations
 
 
-
 **`beats_stats.apm-server.root.request.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.root.request.count
 
 
-
 **`beats_stats.apm-server.root.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.root.response.count
-
 
 
 **`beats_stats.apm-server.root.response.errors.closed`**
@@ -704,7 +661,6 @@ alias to: beat.stats.apm_server.root.response.errors.unavailable
 alias to: beat.stats.apm_server.root.response.errors.validate
 
 
-
 **`beats_stats.apm-server.root.response.valid.accepted`**
 :   type: alias
 
@@ -735,13 +691,10 @@ alias to: beat.stats.apm_server.root.response.valid.ok
 alias to: beat.stats.apm_server.root.unset
 
 
-
-
 **`beats_stats.apm-server.sampling.tail.dynamic_service_groups`**
 :   type: alias
 
 alias to: beat.stats.apm_server.sampling.tail.dynamic_service_groups
-
 
 
 **`beats_stats.apm-server.sampling.tail.events.dropped`**
@@ -780,7 +733,6 @@ alias to: beat.stats.apm_server.sampling.tail.events.sampled
 alias to: beat.stats.apm_server.sampling.tail.events.stored
 
 
-
 **`beats_stats.apm-server.sampling.tail.storage.lsm_size`**
 :   type: alias
 
@@ -799,19 +751,16 @@ alias to: beat.stats.apm_server.sampling.tail.storage.value_log_size
 alias to: beat.stats.apm_server.sampling.transactions_dropped
 
 
-
 **`beats_stats.apm-server.server.request.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.server.request.count
 
 
-
 **`beats_stats.apm-server.server.response.count`**
 :   type: alias
 
 alias to: beat.stats.apm_server.server.response.count
-
 
 
 **`beats_stats.apm-server.server.response.errors.closed`**
@@ -904,7 +853,6 @@ alias to: beat.stats.apm_server.server.response.errors.unavailable
 alias to: beat.stats.apm_server.server.response.errors.validate
 
 
-
 **`beats_stats.apm-server.server.response.valid.accepted`**
 :   type: alias
 
@@ -933,7 +881,6 @@ alias to: beat.stats.apm_server.server.response.valid.ok
 :   type: alias
 
 alias to: beat.stats.apm_server.server.unset
-
 
 
 **`beats_stats.beat.host`**
@@ -966,8 +913,6 @@ alias to: beat.stats.info.uuid
 alias to: beat.stats.info.version
 
 
-
-
 **`beats_stats.metrics.system.cpu.cores`**
 :   type: alias
 
@@ -992,7 +937,6 @@ alias to: beat.stats.system.load.5
 alias to: beat.stats.system.load.15
 
 
-
 **`beats_stats.metrics.system.load.norm.1`**
 :   type: alias
 
@@ -1011,8 +955,6 @@ alias to: beat.stats.system.load.norm.15
 alias to: beat.stats.system.load.norm.5
 
 
-
-
 **`beats_stats.metrics.libbeat.pipeline.clients`**
 :   type: alias
 
@@ -1023,7 +965,6 @@ alias to: beat.stats.libbeat.pipeline.clients
 :   type: alias
 
 alias to: beat.stats.libbeat.pipeline.queue.acked
-
 
 
 **`beats_stats.metrics.libbeat.pipeline.event.active`**
@@ -1066,8 +1007,6 @@ alias to: beat.stats.libbeat.pipeline.events.retry
 :   type: alias
 
 alias to: beat.stats.libbeat.pipeline.events.total
-
-
 
 
 **`beats_stats.metrics.libbeat.output.events.acked`**
@@ -1148,7 +1087,6 @@ alias to: beat.stats.libbeat.output.write.bytes
 alias to: beat.stats.libbeat.output.write.errors
 
 
-
 **`beats_stats.metrics.libbeat.config.module.running`**
 :   type: alias
 
@@ -1167,7 +1105,6 @@ alias to: beat.stats.libbeat.config.starts
 alias to: beat.stats.libbeat.config.stops
 
 
-
 **`beats_stats.metrics.beat.info.ephemeral_id`**
 :   type: alias
 
@@ -1178,7 +1115,6 @@ alias to: beat.stats.info.ephemeral_id
 :   type: alias
 
 alias to: beat.stats.info.uptime.ms
-
 
 
 **`beats_stats.metrics.beat.handles.limit.hard`**
@@ -1197,7 +1133,6 @@ alias to: beat.stats.handles.limit.soft
 :   type: alias
 
 alias to: beat.stats.handles.open
-
 
 
 **`beats_stats.metrics.beat.memstats.gc_next`**
@@ -1224,8 +1159,6 @@ alias to: beat.stats.memstats.memory.total
 alias to: beat.stats.memstats.rss
 
 
-
-
 **`beats_stats.metrics.beat.cgroup.cpu.id`**
 :   type: alias
 
@@ -1242,7 +1175,6 @@ alias to: beat.stats.cgroup.cpu.cfs.period.us
 :   type: alias
 
 alias to: beat.stats.cgroup.cpu.cfs.quota.us
-
 
 
 **`beats_stats.metrics.beat.cgroup.cpu.stats.periods`**
@@ -1293,7 +1225,6 @@ alias to: beat.stats.cgroup.memory.mem.limit.bytes
 alias to: beat.stats.cgroup.memory.mem.usage.bytes
 
 
-
 **`beats_stats.metrics.beat.cpu.system.ticks`**
 :   type: alias
 
@@ -1336,9 +1267,6 @@ alias to: beat.stats.cpu.user.ticks
 alias to: beat.stats.cpu.user.time.ms
 
 
-
-
-
 **`beats_stats.output.elasticsearch.bulk_requests.available`**
 :   type: alias
 
@@ -1349,7 +1277,6 @@ alias to: beat.stats.output.elasticsearch.bulk_requests.available
 :   type: alias
 
 alias to: beat.stats.output.elasticsearch.bulk_requests.completed
-
 
 
 **`beats_stats.output.elasticsearch.indexers.active`**
@@ -1368,8 +1295,6 @@ alias to: beat.stats.output.elasticsearch.indexers.created
 :   type: alias
 
 alias to: beat.stats.output.elasticsearch.indexers.destroyed
-
-
 
 
 **`beats_state.beat.host`**
@@ -1408,12 +1333,10 @@ alias to: beat.state.beat.version
 alias to: @timestamp
 
 
-
 **`beats_state.state.beat.name`**
 :   type: alias
 
 alias to: beat.state.beat.name
-
 
 
 **`beats_state.state.host.architecture`**
@@ -1432,7 +1355,6 @@ alias to: host.hostname
 :   type: alias
 
 alias to: host.name
-
 
 
 **`beats_state.state.host.os.platform`**
@@ -1477,7 +1399,6 @@ alias to: beat.state.module.names
 alias to: beat.state.output.name
 
 
-
 **`beats_state.state.service.id`**
 :   type: alias
 
@@ -1497,7 +1418,6 @@ alias to: beat.state.service.version
 
 
 ## beat [_beat]
-
 
 
 
@@ -1521,8 +1441,6 @@ type: keyword
 
 Beat state
 
-
-
 **`beat.state.service.id`**
 :   type: keyword
 
@@ -1535,14 +1453,12 @@ Beat state
 :   type: keyword
 
 
-
 **`beat.state.input.count`**
 :   type: long
 
 
 **`beat.state.input.names`**
 :   type: keyword
-
 
 
 **`beat.state.beat.host`**
@@ -1569,10 +1485,8 @@ Beat state
 :   type: keyword
 
 
-
 **`beat.state.host.containerized`**
 :   type: keyword
-
 
 
 **`beat.state.host.os.kernel`**
@@ -1623,17 +1537,12 @@ type: keyword
 
 Beat stats
 
-
-
-
 **`beat.stats.apm_server.acm.request.count`**
 :   type: long
 
 
-
 **`beat.stats.apm_server.acm.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.acm.response.errors.closed`**
@@ -1696,7 +1605,6 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.acm.response.valid.accepted`**
 :   type: long
 
@@ -1715,8 +1623,6 @@ Beat stats
 
 **`beat.stats.apm_server.acm.unset`**
 :   type: long
-
-
 
 
 **`beat.stats.apm_server.agentcfg.elasticsearch.cache.entries.count`**
@@ -1747,17 +1653,12 @@ Beat stats
 :   type: long
 
 
-
-
-
 **`beat.stats.apm_server.jaeger.grpc.collect.request.count`**
 :   type: long
 
 
-
 **`beat.stats.apm_server.jaeger.grpc.collect.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.jaeger.grpc.collect.response.errors.count`**
@@ -1780,14 +1681,12 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.jaeger.grpc.sampling.event.received.count`**
 :   type: long
 
 
 **`beat.stats.apm_server.jaeger.grpc.sampling.request.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.jaeger.grpc.sampling.response.count`**
@@ -1802,17 +1701,12 @@ Beat stats
 :   type: long
 
 
-
-
-
 **`beat.stats.apm_server.otlp.grpc.logs.request.count`**
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.grpc.logs.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.otlp.grpc.logs.response.errors.count`**
@@ -1835,7 +1729,6 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.grpc.metrics.consumer.unsupported_dropped`**
 :   type: long
 
@@ -1844,10 +1737,8 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.grpc.metrics.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.otlp.grpc.metrics.response.errors.count`**
@@ -1870,15 +1761,12 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.grpc.traces.request.count`**
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.grpc.traces.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.otlp.grpc.traces.response.errors.count`**
@@ -1901,16 +1789,12 @@ Beat stats
 :   type: long
 
 
-
-
 **`beat.stats.apm_server.otlp.http.logs.request.count`**
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.http.logs.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.otlp.http.logs.response.errors.count`**
@@ -1933,7 +1817,6 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.http.metrics.consumer.unsupported_dropped`**
 :   type: long
 
@@ -1942,10 +1825,8 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.http.metrics.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.otlp.http.metrics.response.errors.count`**
@@ -1968,15 +1849,12 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.http.traces.request.count`**
 :   type: long
 
 
-
 **`beat.stats.apm_server.otlp.http.traces.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.otlp.http.traces.response.errors.count`**
@@ -1999,7 +1877,6 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.processor.error.transformations`**
 :   type: long
 
@@ -2012,10 +1889,8 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.processor.stream.accepted`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.processor.stream.errors.invalid`**
@@ -2030,15 +1905,12 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.root.request.count`**
 :   type: long
 
 
-
 **`beat.stats.apm_server.root.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.root.response.errors.closed`**
@@ -2101,7 +1973,6 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.root.response.valid.accepted`**
 :   type: long
 
@@ -2122,11 +1993,8 @@ Beat stats
 :   type: long
 
 
-
-
 **`beat.stats.apm_server.sampling.tail.dynamic_service_groups`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.sampling.tail.events.dropped`**
@@ -2153,7 +2021,6 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.sampling.tail.storage.lsm_size`**
 :   type: long
 
@@ -2166,15 +2033,12 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.server.request.count`**
 :   type: long
 
 
-
 **`beat.stats.apm_server.server.response.count`**
 :   type: long
-
 
 
 **`beat.stats.apm_server.server.response.errors.closed`**
@@ -2237,7 +2101,6 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.apm_server.server.response.valid.accepted`**
 :   type: long
 
@@ -2256,7 +2119,6 @@ Beat stats
 
 **`beat.stats.apm_server.server.unset`**
 :   type: long
-
 
 
 **`beat.stats.info.name`**
@@ -2279,7 +2141,6 @@ Beat stats
 :   type: keyword
 
 
-
 **`beat.stats.beat.name`**
 :   type: keyword
 
@@ -2300,10 +2161,8 @@ Beat stats
 :   type: keyword
 
 
-
 **`beat.stats.system.cpu.cores`**
 :   type: long
-
 
 
 **`beat.stats.system.load.1`**
@@ -2318,7 +2177,6 @@ Beat stats
 :   type: double
 
 
-
 **`beat.stats.system.load.norm.1`**
 :   type: double
 
@@ -2329,7 +2187,6 @@ Beat stats
 
 **`beat.stats.system.load.norm.5`**
 :   type: double
-
 
 
 **`beat.stats.cpu.system.ticks`**
@@ -2360,15 +2217,12 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.info.ephemeral_id`**
 :   type: keyword
 
 
 **`beat.stats.info.uptime.ms`**
 :   type: long
-
-
 
 
 **`beat.stats.cgroup.cpu.cfs.period.us`**
@@ -2381,7 +2235,6 @@ Beat stats
 
 **`beat.stats.cgroup.cpu.id`**
 :   type: keyword
-
 
 
 **`beat.stats.cgroup.cpu.stats.periods`**
@@ -2404,7 +2257,6 @@ Beat stats
 :   type: long
 
 
-
 **`beat.stats.cgroup.memory.id`**
 :   type: keyword
 
@@ -2415,7 +2267,6 @@ Beat stats
 
 **`beat.stats.cgroup.memory.mem.usage.bytes`**
 :   type: long
-
 
 
 **`beat.stats.memstats.gc_next`**
@@ -2432,7 +2283,6 @@ Beat stats
 
 **`beat.stats.memstats.rss`**
 :   type: long
-
 
 
 **`beat.stats.handles.open`**
@@ -2463,11 +2313,8 @@ type: long
 
 Fields common to all Beats
 
-
-
 **`beat.stats.libbeat.pipeline.clients`**
 :   type: long
-
 
 
 **`beat.stats.libbeat.pipeline.queue.acked`**
@@ -2536,7 +2383,6 @@ type: long
 type: long
 
 
-
 **`beat.stats.libbeat.pipeline.events.active`**
 :   type: long
 
@@ -2565,7 +2411,6 @@ type: long
 :   type: long
 
 
-
 **`beat.stats.libbeat.config.running`**
 :   type: long
 
@@ -2586,7 +2431,6 @@ type: long
 
 Output stats
 
-
 **`beat.stats.libbeat.output.type`**
 :   Type of output
 
@@ -2596,7 +2440,6 @@ type: keyword
 ## events [_events]
 
 Event counters
-
 
 **`beat.stats.libbeat.output.events.acked`**
 :   Number of events acknowledged
@@ -2650,7 +2493,6 @@ type: long
 
 Read stats
 
-
 **`beat.stats.libbeat.output.read.bytes`**
 :   Number of bytes read
 
@@ -2667,7 +2509,6 @@ type: long
 
 Write stats
 
-
 **`beat.stats.libbeat.output.write.bytes`**
 :   Number of bytes written
 
@@ -2678,8 +2519,6 @@ type: long
 :   Number of write errors
 
 type: long
-
-
 
 
 **`beat.stats.libbeat.output.write.latency.histogram.count`**
@@ -2702,16 +2541,12 @@ type: long
 :   type: float
 
 
-
-
-
 **`beat.stats.output.elasticsearch.bulk_requests.available`**
 :   type: long
 
 
 **`beat.stats.output.elasticsearch.bulk_requests.completed`**
 :   type: long
-
 
 
 **`beat.stats.output.elasticsearch.indexers.active`**

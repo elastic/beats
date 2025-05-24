@@ -7,11 +7,9 @@ mapped_pages:
 
 Module for collecting container logs from Amazon ECS Fargate.
 
-
 ## awsfargate [_awsfargate]
 
 Fields from Amazon ECS Fargate logs.
-
 
 ## log [_log]
 

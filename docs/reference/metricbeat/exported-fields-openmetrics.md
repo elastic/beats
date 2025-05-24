@@ -7,11 +7,9 @@ mapped_pages:
 
 Openmetrics module
 
-
 ## openmetrics [_openmetrics]
 
 `openmetrics` contains metrics from endpoints that are following Openmetrics format.
-
 
 **`openmetrics.help`**
 :   Brief description of the MetricFamily

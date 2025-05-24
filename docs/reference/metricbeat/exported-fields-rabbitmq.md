@@ -7,9 +7,7 @@ mapped_pages:
 
 RabbitMQ module
 
-
 ## rabbitmq [_rabbitmq]
-
 
 
 
@@ -22,7 +20,6 @@ type: keyword
 ## connection [_connection]
 
 connection
-
 
 **`rabbitmq.connection.name`**
 :   The name of the connection with non-ASCII characters escaped as in C.
@@ -150,7 +147,6 @@ type: keyword
 
 exchange
 
-
 **`rabbitmq.exchange.name`**
 :   The name of the queue with non-ASCII characters escaped as in C.
 
@@ -218,7 +214,6 @@ type: float
 ## node [_node]
 
 node
-
 
 **`rabbitmq.node.disk.free.bytes`**
 :   Disk free space in bytes.
@@ -458,7 +453,6 @@ type: long
 
 queue
 
-
 **`rabbitmq.queue.name`**
 :   The name of the queue with non-ASCII characters escaped as in C.
 
@@ -590,7 +584,6 @@ type: long
 ## shovel [_shovel]
 
 shovel
-
 
 **`rabbitmq.shovel.name`**
 :   The name of the shovel with non-ASCII characters escaped as in C.

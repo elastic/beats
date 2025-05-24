@@ -7,16 +7,13 @@ mapped_pages:
 
 Module for Windows
 
-
 ## windows [_windows]
-
 
 
 
 ## perfmon [_perfmon]
 
 perfmon
-
 
 **`windows.perfmon.instance`**
 :   Instance value.
@@ -33,7 +30,6 @@ type: object
 ## service [_service]
 
 `service` contains the status for Windows services.
-
 
 **`windows.service.id`**
 :   A unique ID for the service. It is a hash of the machine's GUID and the service name.

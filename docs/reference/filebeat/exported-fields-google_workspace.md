@@ -7,12 +7,10 @@ mapped_pages:
 
 Google Workspace Module
 
-
 ## google_workspace [_google_workspace]
 
 Google Workspace specific fields.
 More information about specific fields can be found at https://developers.google.com/admin-sdk/reports/v1/reference/activities/list
-
 
 **`google_workspace.actor.type`**
 :   The type of actor. Values can be:   *USER*: Another user in the same domain.   *EXTERNAL_USER*: A user outside the domain.   *KEY*: A non-human actor.
@@ -46,7 +44,6 @@ example: audit#activity
 :   The domain that is affected by the report's event.
 
 type: keyword
-
 
 
 **`google_workspace.admin.application.edition`**
@@ -539,7 +536,6 @@ type: keyword
 type: keyword
 
 
-
 **`google_workspace.drive.billable`**
 :   Whether this activity is billable.
 
@@ -672,7 +668,6 @@ type: keyword
 type: keyword
 
 
-
 **`google_workspace.groups.acl_permission`**
 :   Group permission setting updated. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
 
@@ -739,7 +734,6 @@ type: keyword
 type: keyword
 
 
-
 **`google_workspace.login.affected_email_address`**
 :   type: keyword
 
@@ -768,7 +762,6 @@ type: keyword
 
 **`google_workspace.login.is_suspicious`**
 :   type: boolean
-
 
 
 **`google_workspace.saml.application_name`**

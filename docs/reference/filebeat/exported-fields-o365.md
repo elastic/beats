@@ -7,11 +7,9 @@ mapped_pages:
 
 Module for handling logs from Office 365.
 
-
 ## o365.audit [_o365.audit]
 
 Fields from Office 365 Management API audit logs.
-
 
 **`o365.audit.AADGroupId`**
 :   type: keyword

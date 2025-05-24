@@ -7,11 +7,9 @@ mapped_pages:
 
 None
 
-
 ## monitor [_monitor]
 
 Common monitor fields.
-
 
 **`monitor.type`**
 :   The monitor type.
@@ -42,7 +40,6 @@ type: keyword
 ## duration [_duration]
 
 Total monitoring test duration
-
 
 **`monitor.duration.us`**
 :   Duration in microseconds
@@ -101,7 +98,6 @@ type: keyword
 ## project [_project]
 
 Project info for this monitor
-
 
 **`monitor.project.id`**
 :   Project ID

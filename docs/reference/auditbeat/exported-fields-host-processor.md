@@ -7,8 +7,6 @@ mapped_pages:
 
 Info collected for the host machine.
 
-
-
 **`host.containerized`**
 :   If the host is a container.
 

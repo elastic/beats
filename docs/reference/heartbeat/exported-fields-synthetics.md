@@ -7,11 +7,9 @@ mapped_pages:
 
 None
 
-
 ## synthetics [_synthetics]
 
 Synthetics related fields.
-
 
 **`synthetics.type`**
 :   type: keyword
@@ -45,7 +43,6 @@ type: binary
 type: keyword
 
 
-
 **`synthetics.step.name`**
 :   type: text
 
@@ -66,12 +63,10 @@ type: keyword
 
 Duration required to complete the step.
 
-
 **`synthetics.step.duration.us`**
 :   Duration in microseconds
 
 type: integer
-
 
 
 **`synthetics.journey.name`**
@@ -92,12 +87,10 @@ type: keyword
 
 Duration required to complete the journey.
 
-
 **`synthetics.journey.duration.us`**
 :   Duration in microseconds
 
 type: integer
-
 
 
 **`synthetics.error.name`**
@@ -110,7 +103,6 @@ type: integer
 
 **`synthetics.error.stack`**
 :   type: text
-
 
 
 **`synthetics.screenshot_ref.width`**
@@ -128,7 +120,6 @@ type: integer
 ## blocks [_blocks]
 
 Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
-
 
 **`synthetics.screenshot_ref.blocks.hash`**
 :   Hash that uniquely identifies this image by content. Corresponds to block document id.

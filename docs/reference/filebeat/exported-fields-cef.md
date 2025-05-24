@@ -7,11 +7,9 @@ mapped_pages:
 
 Common Event Format (CEF) data.
 
-
 ## cef [_cef]
 
 By default the `decode_cef` processor writes all data from the CEF message to this `cef` object. It contains the CEF header fields and the extension data.
-
 
 **`cef.version`**
 :   Version of the CEF specification used by the message.
@@ -60,7 +58,6 @@ type: keyword
 ## extensions [_extensions]
 
 Collection of key-value pairs carried in the CEF extension field.
-
 
 **`cef.extensions.agentAddress`**
 :   The IP address of the ArcSight connector that processed the event.

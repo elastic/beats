@@ -7,11 +7,9 @@ mapped_pages:
 
 System status metrics, like CPU and memory usage, that are collected from the operating system.
 
-
 ## process [_process]
 
 Process metrics.
-
 
 **`process.state`**
 :   The process state. For example: "running".
@@ -45,11 +43,9 @@ format: percent
 
 `system` contains local system metrics.
 
-
 ## core [_core]
 
 `system-core` contains CPU metrics for a single core of a multi-core system.
-
 
 **`system.core.id`**
 :   CPU Core number.
@@ -210,7 +206,6 @@ type: keyword
 ## cpu [_cpu]
 
 `cpu` contains local CPU stats.
-
 
 **`system.cpu.cores`**
 :   The number of CPU cores present on the host. The non-normalized percentages will have a maximum value of `100% * cores`. The normalized percentages already take this value into account and have a maximum value of 100%.
@@ -414,7 +409,6 @@ type: long
 
 `disk` contains disk IO metrics collected from the operating system.
 
-
 **`system.diskio.name`**
 :   The disk name.
 
@@ -485,7 +479,6 @@ type: long
 
 Available system entropy
 
-
 **`system.entropy.available_bits`**
 :   The available bits of entropy
 
@@ -503,7 +496,6 @@ format: percent
 ## filesystem [_filesystem]
 
 `filesystem` contains local filesystem stats.
-
 
 **`system.filesystem.available`**
 :   The disk space available to an unprivileged user in bytes.
@@ -585,7 +577,6 @@ format: percent
 
 `system.fsstat` contains filesystem metrics aggregated from all mounted filesystems.
 
-
 **`system.fsstat.count`**
 :   Number of file systems found.
 
@@ -601,7 +592,6 @@ type: long
 ## total_size [_total_size]
 
 Nested file system docs.
-
 
 **`system.fsstat.total_size.free`**
 :   Total free space.
@@ -630,7 +620,6 @@ format: bytes
 ## load [_load]
 
 CPU load averages.
-
 
 **`system.load.1`**
 :   Load average for the last minute.
@@ -678,7 +667,6 @@ type: long
 
 `memory` contains local memory stats.
 
-
 **`system.memory.total`**
 :   Total memory.
 
@@ -723,7 +711,6 @@ format: percent
 
 Actual memory used and free.
 
-
 **`system.memory.actual.used.bytes`**
 :   Actual used memory in bytes. It represents the difference between the total and the available memory. The available memory depends on the OS. For more details, please check `system.actual.free`.
 
@@ -751,7 +738,6 @@ format: percent
 ## swap [_swap]
 
 This group contains statistics related to the swap memory usage on the system.
-
 
 **`system.memory.swap.total`**
 :   Total swap memory.
@@ -788,7 +774,6 @@ format: percent
 ## network [_network]
 
 `network` contains network IO metrics for a single network interface.
-
 
 **`system.network.name`**
 :   The network interface name.
@@ -854,7 +839,6 @@ type: long
 
 Metrics relating to global network activity
 
-
 **`system.network_summary.ip.*`**
 :   IP counters
 
@@ -888,7 +872,6 @@ type: object
 ## process [_process]
 
 `process` contains process metadata, CPU metrics, and memory metrics.
-
 
 **`system.process.name`**
 :   type: alias
@@ -954,7 +937,6 @@ type: object
 
 CPU-specific statistics per process.
 
-
 **`system.process.cpu.user.ticks`**
 :   The amount of CPU time the process spent in user space.
 
@@ -1005,7 +987,6 @@ type: date
 
 Memory-specific statistics per process.
 
-
 **`system.process.memory.size`**
 :   The total virtual memory the process has. On Windows this represents the Commit Charge (the total amount of memory that the memory manager has committed for a running process) value in bytes for this process.
 
@@ -1041,7 +1022,6 @@ format: bytes
 ## io [_io]
 
 Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.
-
 
 **`system.process.io.cancelled_write_bytes`**
 :   The number of bytes this process cancelled, or caused not to be written.
@@ -1089,7 +1069,6 @@ type: long
 
 File descriptor usage metrics. This set of metrics is available for Linux and FreeBSD.
 
-
 **`system.process.fd.open`**
 :   The number of file descriptors open by the process.
 
@@ -1111,7 +1090,6 @@ type: long
 ## cgroup [_cgroup]
 
 Metrics and limits from the cgroup of which the task is a member. cgroup metrics are reported when the process has membership in a non-root cgroup. These metrics are only available on Linux.
-
 
 **`system.process.cgroup.id`**
 :   The ID common to all cgroups associated with this task. If there isn't a common ID used by all cgroups this field will be absent.
@@ -1135,7 +1113,6 @@ type: long
 
 The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period. In CPU under cgroups V2, the cgroup is merged with many of the metrics from cpuacct. In addition, per-scheduler metrics are gone in V2.
 
-
 **`system.process.cgroup.cpu.id`**
 :   ID of the cgroup.
 
@@ -1151,7 +1128,6 @@ type: keyword
 ## stats [_stats]
 
 cgroupv2 stats
-
 
 **`system.process.cgroup.cpu.stats.usage.ns`**
 :   cgroups v2 usage in nanoseconds
@@ -1265,11 +1241,9 @@ type: long
 
 Pressure (resource contention) stats.
 
-
 ## some [_some]
 
 Share of time in which at least some tasks are stalled on a given resource
-
 
 **`system.process.cgroup.cpu.pressure.some.10.pct`**
 :   Pressure over 10 seconds
@@ -1307,7 +1281,6 @@ format: percent
 
 Share of time in which all non-idle tasks are stalled on a given resource simultaneously
 
-
 **`system.process.cgroup.cpu.pressure.full.10.pct`**
 :   Pressure over 10 seconds
 
@@ -1341,7 +1314,6 @@ type: long
 ## cpuacct [_cpuacct]
 
 CPU accounting metrics.
-
 
 **`system.process.cgroup.cpuacct.id`**
 :   ID of the cgroup.
@@ -1419,7 +1391,6 @@ type: object
 
 Memory limits and metrics.
 
-
 **`system.process.cgroup.memory.id`**
 :   ID of the cgroup.
 
@@ -1489,7 +1460,6 @@ format: bytes
 ## mem.events [_mem.events]
 
 number of times the controller tripped a given usage level
-
 
 **`system.process.cgroup.memory.mem.events.low`**
 :   low threshold
@@ -1584,7 +1554,6 @@ type: long
 ## memsw.events [_memsw.events]
 
 number of times the controller tripped a given usage level
-
 
 **`system.process.cgroup.memory.memsw.events.low`**
 :   low threshold
@@ -1818,7 +1787,6 @@ format: bytes
 
 Block IO metrics.
 
-
 **`system.process.cgroup.blkio.id`**
 :   ID of the cgroup.
 
@@ -1848,7 +1816,6 @@ type: long
 ## io [_io]
 
 cgroup V2 IO Metrics, replacing blkio.
-
 
 **`system.process.cgroup.io.id`**
 :   ID of the cgroup.
@@ -1888,11 +1855,9 @@ type: object
 
 Pressure (resource contention) stats.
 
-
 ## full [_full]
 
 Share of time in which at least some tasks are stalled on a given resource
-
 
 **`system.process.cgroup.io.pressure.full.10.pct`**
 :   Pressure over 10 seconds
@@ -1928,7 +1893,6 @@ type: long
 
 Share of time in which all tasks are stalled on a given resource
 
-
 **`system.process.cgroup.io.pressure.some.10.pct`**
 :   Pressure over 10 seconds
 
@@ -1960,7 +1924,6 @@ type: long
 ## process.summary [_process.summary]
 
 Summary metrics for the processes running on the host.
-
 
 **`system.process.summary.total`**
 :   Total number of processes on this host.
@@ -2032,7 +1995,6 @@ type: long
 
 Counts of individual threads on a system.
 
-
 **`system.process.summary.threads.running`**
 :   Count of currently running threads.
 
@@ -2048,7 +2010,6 @@ type: long
 ## raid [_raid]
 
 raid
-
 
 **`system.raid.name`**
 :   Name of the device.
@@ -2120,7 +2081,6 @@ type: long
 
 metrics for system services
 
-
 **`system.service.name`**
 :   The name of the service
 
@@ -2173,7 +2133,6 @@ type: keyword
 
 system metrics associated with the service
 
-
 **`system.service.resources.cpu.usage.ns`**
 :   CPU usage in nanoseconds
 
@@ -2195,7 +2154,6 @@ type: long
 ## network [_network]
 
 network resource usage
-
 
 **`system.service.resources.network.in.bytes`**
 :   bytes in
@@ -2228,7 +2186,6 @@ type: long
 ## socket [_socket]
 
 TCP sockets that are active.
-
 
 **`system.socket.direction`**
 :   type: alias
@@ -2336,11 +2293,9 @@ alias to: user.full_name
 
 Summary metrics of open sockets in the host system
 
-
 ## all [_all]
 
 All connections
-
 
 **`system.socket.summary.all.count`**
 :   All open connections
@@ -2358,7 +2313,6 @@ type: integer
 
 All TCP connections
 
-
 **`system.socket.summary.tcp.memory`**
 :   Memory used by TCP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/tcp_mem. Only available on Linux.
 
@@ -2370,7 +2324,6 @@ format: bytes
 ## all [_all]
 
 All TCP connections
-
 
 **`system.socket.summary.tcp.all.orphan`**
 :   A count of all orphaned tcp sockets. Only available on Linux.
@@ -2448,7 +2401,6 @@ type: integer
 
 All UDP connections
 
-
 **`system.socket.summary.udp.memory`**
 :   Memory used by UDP sockets in bytes, based on number of allocated pages and system page size. Corresponds to limits set in /proc/sys/net/ipv4/udp_mem. Only available on Linux.
 
@@ -2461,7 +2413,6 @@ format: bytes
 
 All UDP connections
 
-
 **`system.socket.summary.udp.all.count`**
 :   All open UDP connections
 
@@ -2471,7 +2422,6 @@ type: integer
 ## uptime [_uptime]
 
 `uptime` contains the operating system uptime metric.
-
 
 **`system.uptime.duration.ms`**
 :   The OS uptime in milliseconds.
@@ -2484,7 +2434,6 @@ format: duration
 ## users [_users]
 
 Logged-in user session data
-
 
 **`system.users.id`**
 :   The ID of the session

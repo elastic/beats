@@ -7,8 +7,6 @@ mapped_pages:
 
 `awsfargate` module collects AWS fargate metrics from task metadata endpoint.
 
-
-
 **`awsfargate.container.labels.com_amazonaws_ecs_cluster`**
 :   ECS Cluster name
 
@@ -42,7 +40,6 @@ type: keyword
 ## task_stats [_task_stats]
 
 `task_stats` contains the metrics that were scraped from AWS fargate task stats ${ECS_CONTAINER_METADATA_URI_V4}/task/stats metadata endpoint.
-
 
 **`awsfargate.task_stats.cluster_name`**
 :   Cluster name (Pippero)
@@ -83,7 +80,6 @@ type: scaled_float
 ## cpu [_cpu]
 
 Runtime CPU metrics.
-
 
 **`awsfargate.task_stats.cpu.kernel.pct`**
 :   Percentage of time in kernel space, expressed as a value between 0 and 1.
@@ -171,11 +167,9 @@ format: percent
 
 Disk I/O metrics.
 
-
 ## read [_read]
 
 Accumulated reads during the life of the container
-
 
 **`awsfargate.task_stats.diskio.read.ops`**
 :   Number of reads during the life of the container
@@ -227,7 +221,6 @@ type: scaled_float
 
 Accumulated writes during the life of the container
 
-
 **`awsfargate.task_stats.diskio.write.ops`**
 :   Number of writes during the life of the container
 
@@ -277,7 +270,6 @@ type: scaled_float
 ## summary [_summary]
 
 Accumulated reads and writes during the life of the container
-
 
 **`awsfargate.task_stats.diskio.summary.ops`**
 :   Number of I/O operations during the life of the container
@@ -329,7 +321,6 @@ type: scaled_float
 
 Memory metrics.
 
-
 **`awsfargate.task_stats.memory.stats`**
 :   Raw memory stats from the cgroups memory.stat interface
 
@@ -339,7 +330,6 @@ type: object
 ## commit [_commit]
 
 Committed bytes on Windows
-
 
 **`awsfargate.task_stats.memory.commit.total`**
 :   Total bytes
@@ -383,7 +373,6 @@ format: bytes
 
 RSS memory stats.
 
-
 **`awsfargate.task_stats.memory.rss.total`**
 :   Total memory resident set size.
 
@@ -404,7 +393,6 @@ format: percent
 
 Usage memory stats.
 
-
 **`awsfargate.task_stats.memory.usage.max`**
 :   Max memory usage.
 
@@ -419,7 +407,6 @@ format: bytes
 type: long
 
 format: bytes
-
 
 
 **`awsfargate.task_stats.network.*.inbound.bytes`**
@@ -446,7 +433,6 @@ type: long
 :   Total number of incoming packets.
 
 type: long
-
 
 
 **`awsfargate.task_stats.network.*.outbound.bytes`**

@@ -7,16 +7,13 @@ mapped_pages:
 
 ZooKeeper Module
 
-
 ## zookeeper [_zookeeper]
-
 
 
 
 ## audit [_audit]
 
 ZooKeeper Audit logs.
-
 
 **`zookeeper.audit.session`**
 :   Client session id

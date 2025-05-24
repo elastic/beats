@@ -7,16 +7,13 @@ mapped_pages:
 
 MySQL Enterprise Audit module
 
-
 ## mysqlenterprise [_mysqlenterprise]
 
 Fields from MySQL Enterprise Logs
 
-
 ## audit [_audit]
 
 Module for parsing MySQL Enterprise Audit Logs
-
 
 **`mysqlenterprise.audit.class`**
 :   A string representing the event class. The class defines the type of event, when taken together with the event item that specifies the event subclass.

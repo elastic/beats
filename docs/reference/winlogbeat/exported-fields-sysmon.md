@@ -7,7 +7,6 @@ mapped_pages:
 
 These are the event fields specific to the Sysmon module.
 
-
 **`sysmon.dns.status`**
 :   Windows status code returned for the DNS query.
 

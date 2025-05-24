@@ -7,11 +7,9 @@ mapped_pages:
 
 Module for handling system logs from Okta.
 
-
 ## okta [_okta]
 
 Fields from Okta.
-
 
 **`okta.uuid`**
 :   The unique identifier of the Okta LogEvent.
@@ -47,7 +45,6 @@ type: keyword
 
 Fields that let you store information of the actor for the LogEvent.
 
-
 **`okta.actor.id`**
 :   Identifier of the actor.
 
@@ -76,7 +73,6 @@ type: keyword
 
 Fields that let you store information about the client of the actor.
 
-
 **`okta.client.ip`**
 :   The IP address of the client.
 
@@ -86,7 +82,6 @@ type: ip
 ## user_agent [_user_agent]
 
 Fields about the user agent information of the client.
-
 
 **`okta.client.user_agent.raw_user_agent`**
 :   The raw informaton of the user agent.
@@ -128,7 +123,6 @@ type: keyword
 
 Fields that let you store information about the outcome.
 
-
 **`okta.outcome.reason`**
 :   The reason of the outcome.
 
@@ -151,7 +145,6 @@ type: flattened
 
 Fields that let you store information about related transaction.
 
-
 **`okta.transaction.id`**
 :   Identifier of the transaction.
 
@@ -168,11 +161,9 @@ type: keyword
 
 Fields that let you store information about the debug context.
 
-
 ## debug_data [_debug_data]
 
 The debug data.
-
 
 **`okta.debug_context.debug_data.device_fingerprint`**
 :   The fingerprint of the device.
@@ -237,7 +228,6 @@ type: flattened
 ## suspicious_activity [_suspicious_activity]
 
 The suspicious activity fields from the debug data.
-
 
 **`okta.debug_context.debug_data.suspicious_activity.browser`**
 :   The browser used.
@@ -315,7 +305,6 @@ type: date
 
 Fields that let you store information about authentication context.
 
-
 **`okta.authentication_context.authentication_provider`**
 :   The information about the authentication provider. Must be one of OKTA_AUTHENTICATION_PROVIDER, ACTIVE_DIRECTORY, LDAP, FEDERATION, SOCIAL, FACTOR_PROVIDER.
 
@@ -362,11 +351,9 @@ type: keyword
 
 Fields that let you store information about security context.
 
-
 ## as [_as]
 
 The autonomous system.
-
 
 **`okta.security_context.as.number`**
 :   The AS number.
@@ -377,7 +364,6 @@ type: integer
 ## organization [_organization]
 
 The organization that owns the AS number.
-
 
 **`okta.security_context.as.organization.name`**
 :   The organization name.
@@ -406,7 +392,6 @@ type: boolean
 ## request [_request]
 
 Fields that let you store information about the request, in the form of list of ip_chain.
-
 
 **`okta.request.ip_chain`**
 :   List of ip_chain objects.

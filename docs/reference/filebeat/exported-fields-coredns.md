@@ -7,11 +7,9 @@ mapped_pages:
 
 Module for handling logs produced by coredns
 
-
 ## coredns [_coredns]
 
 coredns fields after normalization
-
 
 **`coredns.query.size`**
 :   size of the DNS query

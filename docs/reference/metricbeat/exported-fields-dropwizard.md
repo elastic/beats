@@ -7,9 +7,7 @@ mapped_pages:
 
 Stats collected from Dropwizard.
 
-
 ## dropwizard [_dropwizard]
-
 
 
 

@@ -7,7 +7,6 @@ mapped_pages:
 
 Metadata from Jolokia Discovery added by the jolokia provider.
 
-
 **`jolokia.agent.version`**
 :   Version number of jolokia agent.
 

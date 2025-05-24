@@ -7,11 +7,9 @@ mapped_pages:
 
 fortinet Module
 
-
 ## fortinet [_fortinet]
 
 Fields from fortinet FortiOS
-
 
 **`fortinet.file.hash.crc32`**
 :   CRC32 Hash of file
@@ -22,7 +20,6 @@ type: keyword
 ## firewall [_firewall]
 
 Module for parsing Fortinet syslog.
-
 
 **`fortinet.firewall.acct_stat`**
 :   Accounting state (RADIUS)

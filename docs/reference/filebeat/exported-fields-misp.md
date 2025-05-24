@@ -7,16 +7,13 @@ mapped_pages:
 
 Module for handling threat information from MISP.
 
-
 ## misp [_misp]
 
 Fields from MISP threat information.
 
-
 ## attack_pattern [_attack_pattern]
 
 Fields provide support for specifying information about attack patterns.
-
 
 **`misp.attack_pattern.id`**
 :   Identifier of the threat indicator.
@@ -45,7 +42,6 @@ type: keyword
 ## campaign [_campaign]
 
 Fields provide support for specifying information about campaigns.
-
 
 **`misp.campaign.id`**
 :   Identifier of the campaign.
@@ -93,7 +89,6 @@ type: keyword
 
 A Course of Action is an action taken either to prevent an attack or to respond to an attack that is in progress.
 
-
 **`misp.course_of_action.id`**
 :   Identifier of the Course of Action.
 
@@ -115,7 +110,6 @@ type: text
 ## identity [_identity]
 
 Identity can represent actual individuals, organizations, or groups, as well as classes of individuals, organizations, or groups.
-
 
 **`misp.identity.id`**
 :   Identifier of the Identity.
@@ -165,7 +159,6 @@ type: text
 ## intrusion_set [_intrusion_set]
 
 An Intrusion Set is a grouped set of adversary behavior and resources with common properties that is believed to be orchestrated by a single organization.
-
 
 **`misp.intrusion_set.id`**
 :   Identifier of the Intrusion Set.
@@ -231,7 +224,6 @@ type: text
 
 Malware is a type of TTP that is also known as malicious code and malicious software, refers to a program that is inserted into a system, usually covertly, with the intent of compromising the confidentiality, integrity, or availability of the victim's data, applications, or operating system (OS) or of otherwise annoying or disrupting the victim.
 
-
 **`misp.malware.id`**
 :   Identifier of the Malware.
 
@@ -268,7 +260,6 @@ format: string
 
 A Note is a comment or note containing informative text to help explain the context of one or more STIX Objects (SDOs or SROs) or to provide additional analysis that is not contained in the original object.
 
-
 **`misp.note.id`**
 :   Identifier of the Note.
 
@@ -302,7 +293,6 @@ type: keyword
 ## threat_indicator [_threat_indicator]
 
 Fields provide support for specifying information about threat indicators, and related matching patterns.
-
 
 **`misp.threat_indicator.labels`**
 :   list of type open-vocab that specifies the type of indicator.
@@ -447,7 +437,6 @@ type: keyword
 
 Observed data conveys information that was observed on systems and networks, such as log data or network traffic, using the Cyber Observable specification.
 
-
 **`misp.observed_data.id`**
 :   Identifier of the Observed Data.
 
@@ -481,7 +470,6 @@ type: keyword
 ## report [_report]
 
 Reports are collections of threat intelligence focused on one or more topics, such as a description of a threat actor, malware, or attack technique, including context and related details.
-
 
 **`misp.report.id`**
 :   Identifier of the Report.
@@ -522,7 +510,6 @@ type: text
 ## threat_actor [_threat_actor]
 
 Threat Actors are actual individuals, groups, or organizations believed to be operating with malicious intent.
-
 
 **`misp.threat_actor.id`**
 :   Identifier of the Threat Actor.
@@ -600,7 +587,6 @@ type: text
 
 Tools are legitimate software that can be used by threat actors to perform attacks.
 
-
 **`misp.tool.id`**
 :   Identifier of the Tool.
 
@@ -640,7 +626,6 @@ type: text
 ## vulnerability [_vulnerability]
 
 A Vulnerability is a mistake in software that can be directly used by a hacker to gain access to a system or network.
-
 
 **`misp.vulnerability.id`**
 :   Identifier of the Vulnerability.

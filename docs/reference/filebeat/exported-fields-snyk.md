@@ -7,11 +7,9 @@ mapped_pages:
 
 Snyk module
 
-
 ## snyk [_snyk]
 
 Module for parsing Snyk project vulnerabilities.
-
 
 **`snyk.projects`**
 :   Array with all related projects objects.
@@ -28,7 +26,6 @@ type: keyword
 ## audit [_audit]
 
 Module for parsing Snyk audit logs.
-
 
 **`snyk.audit.org_id`**
 :   ID of the related Organization related to the event.
@@ -51,7 +48,6 @@ type: flattened
 ## vulnerabilities [_vulnerabilities]
 
 Module for parsing Snyk project vulnerabilities.
-
 
 **`snyk.vulnerabilities.cvss3`**
 :   CSSv3 scores.

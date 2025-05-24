@@ -7,16 +7,13 @@ mapped_pages:
 
 Ceph module
 
-
 ## ceph [_ceph]
 
 `ceph` contains the metrics that were scraped from CEPH.
 
-
 ## cluster_disk [_cluster_disk]
 
 cluster_disk
-
 
 **`ceph.cluster_disk.available.bytes`**
 :   Available bytes of the cluster
@@ -46,7 +43,6 @@ format: bytes
 
 cluster_health
 
-
 **`ceph.cluster_health.overall_status`**
 :   Overall status of the cluster
 
@@ -74,7 +70,6 @@ type: keyword
 ## cluster_status [_cluster_status]
 
 cluster_status
-
 
 **`ceph.cluster_status.version`**
 :   Ceph Status version
@@ -254,7 +249,6 @@ see: cluster_health
 
 OSD performance metrics of Ceph cluster
 
-
 **`ceph.mgr_osd_perf.id`**
 :   OSD ID
 
@@ -289,7 +283,6 @@ type: long
 
 OSD pool stats of Ceph cluster
 
-
 **`ceph.mgr_osd_pool_stats.pool_name`**
 :   Pool name
 
@@ -319,7 +312,6 @@ see: pool_disk
 ## monitor_health [_monitor_health]
 
 monitor_health stats data
-
 
 **`ceph.monitor_health.available.pct`**
 :   Available percent of the MON
@@ -405,7 +397,6 @@ type: long
 
 ceph osd disk usage information
 
-
 **`ceph.osd_df.id`**
 :   osd node id
 
@@ -465,7 +456,6 @@ format: percent
 ## osd_tree [_osd_tree]
 
 ceph osd tree info
-
 
 **`ceph.osd_tree.id`**
 :   osd or bucket node id
@@ -548,7 +538,6 @@ type: keyword
 ## pool_disk [_pool_disk]
 
 pool_disk
-
 
 **`ceph.pool_disk.id`**
 :   Id of the pool

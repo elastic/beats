@@ -7,16 +7,13 @@ mapped_pages:
 
 Apache HTTPD server metricsets collected from the Apache web server.
 
-
 ## apache [_apache]
 
 `apache` contains the metrics that were scraped from Apache.
 
-
 ## status [_status]
 
 `status` contains the metrics that were scraped from the Apache status page.
-
 
 **`apache.status.hostname`**
 :   Apache hostname.
@@ -70,7 +67,6 @@ type: long
 
 Uptime stats.
 
-
 **`apache.status.uptime.server_uptime`**
 :   Server uptime in seconds.
 
@@ -86,7 +82,6 @@ type: long
 ## cpu [_cpu]
 
 CPU stats.
-
 
 **`apache.status.cpu.load`**
 :   CPU Load.
@@ -122,7 +117,6 @@ type: scaled_float
 
 Connection stats.
 
-
 **`apache.status.connections.total`**
 :   Total connections.
 
@@ -151,7 +145,6 @@ type: long
 
 Load averages.
 
-
 **`apache.status.load.1`**
 :   Load average for the last minute.
 
@@ -173,7 +166,6 @@ type: scaled_float
 ## scoreboard [_scoreboard]
 
 Scoreboard metrics.
-
 
 **`apache.status.scoreboard.starting_up`**
 :   Starting up.

@@ -7,8 +7,6 @@ mapped_pages:
 
 NFS v4/3 specific event fields.
 
-
-
 **`nfs.version`**
 :   NFS protocol version number.
 
@@ -36,7 +34,6 @@ type: long
 ## rpc [_rpc]
 
 ONC RPC specific event fields.
-
 
 **`rpc.xid`**
 :   RPC message transaction identifier.

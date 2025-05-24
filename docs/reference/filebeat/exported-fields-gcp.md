@@ -7,16 +7,13 @@ mapped_pages:
 
 Module for handling logs from Google Cloud.
 
-
 ## gcp [_gcp]
 
 Fields from Google Cloud logs.
 
-
 ## destination.instance [_destination.instance]
 
 If the destination of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
-
 
 **`gcp.destination.instance.project_id`**
 :   ID of the project containing the VM.
@@ -40,7 +37,6 @@ type: keyword
 
 If the destination of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
 
-
 **`gcp.destination.vpc.project_id`**
 :   ID of the project containing the VM.
 
@@ -62,7 +58,6 @@ type: keyword
 ## source.instance [_source.instance]
 
 If the source of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
-
 
 **`gcp.source.instance.project_id`**
 :   ID of the project containing the VM.
@@ -86,7 +81,6 @@ type: keyword
 
 If the source of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
 
-
 **`gcp.source.vpc.project_id`**
 :   ID of the project containing the VM.
 
@@ -109,7 +103,6 @@ type: keyword
 
 Fields for Google Cloud audit logs.
 
-
 **`gcp.audit.type`**
 :   Type property.
 
@@ -119,7 +112,6 @@ type: keyword
 ## authentication_info [_authentication_info]
 
 Authentication information.
-
 
 **`gcp.audit.authentication_info.principal_email`**
 :   The email address of the authenticated user making the request.
@@ -155,7 +147,6 @@ type: long
 
 The operation request.
 
-
 **`gcp.audit.request.proto_name`**
 :   Type property of the request.
 
@@ -184,7 +175,6 @@ type: keyword
 
 Metadata about the request.
 
-
 **`gcp.audit.request_metadata.caller_ip`**
 :   The IP address of the caller.
 
@@ -201,7 +191,6 @@ type: keyword
 
 The operation response.
 
-
 **`gcp.audit.response.proto_name`**
 :   Type property of the response.
 
@@ -211,7 +200,6 @@ type: keyword
 ## details [_details]
 
 The details of the response.
-
 
 **`gcp.audit.response.details.group`**
 :   The name of the group.
@@ -253,7 +241,6 @@ type: keyword
 
 The location of the resource.
 
-
 **`gcp.audit.resource_location.current_locations`**
 :   Current locations of the resource.
 
@@ -269,7 +256,6 @@ type: keyword
 ## status [_status]
 
 The status of the overall operation.
-
 
 **`gcp.audit.status.code`**
 :   The status code, which should be an enum value of google.rpc.Code.
@@ -287,11 +273,9 @@ type: keyword
 
 Fields for Google Cloud Firewall logs.
 
-
 ## rule_details [_rule_details]
 
 Description of the firewall rule that matched this connection.
-
 
 **`gcp.firewall.rule_details.priority`**
 :   The priority for the firewall rule.
@@ -362,7 +346,6 @@ type: keyword
 ## vpcflow [_vpcflow]
 
 Fields for Google Cloud VPC flow logs.
-
 
 **`gcp.vpcflow.reporter`**
 :   The side which reported the flow. Can be either 'SRC' or 'DEST'.

@@ -7,9 +7,7 @@ mapped_pages:
 
 Jolokia module
 
-
 ## jolokia [_jolokia]
 
 jolokia contains metrics exposed via jolokia agent
-
 

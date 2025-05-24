@@ -7,8 +7,6 @@ mapped_pages:
 
 Process metadata fields
 
-
-
 **`process.exe`**
 :   type: alias
 
@@ -18,7 +16,6 @@ alias to: process.executable
 ## owner [_owner]
 
 Process owner information.
-
 
 **`process.owner.id`**
 :   Unique identifier of the user.

@@ -7,12 +7,9 @@ mapped_pages:
 
 Tomcat module
 
-
-
 ## cache [_cache]
 
 Catalina Cache metrics from the WebResourceRoot
-
 
 **`tomcat.cache.mbean`**
 :   Mbean that this event is related to
@@ -53,7 +50,6 @@ type: long
 ## memory [_memory]
 
 Memory metrics from java.lang JMX
-
 
 **`tomcat.memory.mbean`**
 :   Mbean that this event is related to
@@ -113,7 +109,6 @@ type: long
 
 Requests processor metrics from GlobalRequestProcessor JMX
 
-
 **`tomcat.requests.mbean`**
 :   Mbean that this event is related to
 
@@ -153,7 +148,6 @@ type: long
 ## threading [_threading]
 
 Threading metrics from the Catalina's ThreadPool JMX
-
 
 **`tomcat.threading.busy`**
 :   Current busy threads from the ThreadPool

@@ -7,12 +7,10 @@ mapped_pages:
 
 Stats scraped from a Prometheus endpoint.
 
-
 **`metrics_count`**
 :   Number of metrics per Elasticsearch document.
 
 type: long
-
 
 
 **`prometheus.labels.*`**

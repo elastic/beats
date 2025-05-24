@@ -7,11 +7,9 @@ mapped_pages:
 
 Microsoft Module
 
-
 ## microsoft.defender_atp [_microsoft.defender_atp]
 
 Module for ingesting Microsoft Defender ATP.
-
 
 **`microsoft.defender_atp.lastUpdateTime`**
 :   The date and time (in UTC) the alert was last updated.
@@ -118,7 +116,6 @@ type: keyword
 ## microsoft.m365_defender [_microsoft.m365_defender]
 
 Module for ingesting Microsoft Defender ATP.
-
 
 **`microsoft.m365_defender.incidentId`**
 :   Unique identifier to represent the incident.

@@ -7,9 +7,7 @@ mapped_pages:
 
 elasticsearch Module
 
-
 ## elasticsearch [_elasticsearch]
-
 
 
 
@@ -99,7 +97,6 @@ example: v7app
 type: keyword
 
 example: compatible_api
-
 
 
 **`elasticsearch.audit.layer`**
@@ -244,11 +241,9 @@ alias to: user.name
 
 GC fileset fields.
 
-
 ## phase [_phase]
 
 Fields specific to GC phase.
-
 
 **`elasticsearch.gc.phase.name`**
 :   Name of the GC collection phase.
@@ -296,7 +291,6 @@ type: float
 
 Process CPU time spent performing collections.
 
-
 **`elasticsearch.gc.phase.cpu_time.user_sec`**
 :   CPU time spent outside the kernel.
 
@@ -343,7 +337,6 @@ type: keyword
 
 Heap allocation and total size.
 
-
 **`elasticsearch.gc.heap.size_kb`**
 :   Total heap size in kilobytes.
 
@@ -359,7 +352,6 @@ type: integer
 ## old_gen [_old_gen]
 
 Old generation occupancy and total size.
-
 
 **`elasticsearch.gc.old_gen.size_kb`**
 :   Total size of old generation in kilobytes.
@@ -377,7 +369,6 @@ type: integer
 
 Young generation occupancy and total size.
 
-
 **`elasticsearch.gc.young_gen.size_kb`**
 :   Total size of young generation in kilobytes.
 
@@ -394,7 +385,6 @@ type: integer
 
 Server log file
 
-
 **`elasticsearch.server.stacktrace`**
 :   Field is not indexed.
 
@@ -403,11 +393,9 @@ Server log file
 
 GC log
 
-
 ## young [_young]
 
 Young GC
-
 
 **`elasticsearch.server.gc.young.one`**
 :   type: long
@@ -448,7 +436,6 @@ example: 1800
 ## slowlog [_slowlog]
 
 Slowlog events from Elasticsearch
-
 
 **`elasticsearch.slowlog.logger`**
 :   Logger name

@@ -7,16 +7,13 @@ mapped_pages:
 
 Module for handling logs from AWS.
 
-
 ## aws [_aws]
 
 Fields from AWS logs.
 
-
 ## cloudtrail [_cloudtrail]
 
 Fields for AWS CloudTrail logs.
-
 
 **`aws.cloudtrail.event_version`**
 :   The CloudTrail version of the log event format.
@@ -27,7 +24,6 @@ type: keyword
 ## user_identity [_user_identity]
 
 The userIdentity element contains details about the type of IAM identity that made the request, and which credentials were used. If temporary credentials were used, the element shows how the credentials were obtained.
-
 
 **`aws.cloudtrail.user_identity.type`**
 :   The type of the identity
@@ -51,7 +47,6 @@ type: keyword
 
 If the request was made with temporary security credentials, an element that provides information about the session that was created for those credentials
 
-
 **`aws.cloudtrail.user_identity.session_context.mfa_authenticated`**
 :   The value is true if the root user or IAM user whose credentials were used for the request also was authenticated with an MFA device; otherwise, false.
 
@@ -67,7 +62,6 @@ type: date
 ## session_issuer [_session_issuer]
 
 If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
-
 
 **`aws.cloudtrail.user_identity.session_context.session_issuer.type`**
 :   The source of the temporary security credentials, such as Root, IAMUser, or Role.
@@ -175,7 +169,6 @@ type: keyword
 
 A list of resources accessed in the event.
 
-
 **`aws.cloudtrail.resources.arn`**
 :   Resource ARNs
 
@@ -232,11 +225,9 @@ type: keyword
 
 Fields specific to ConsoleLogin events
 
-
 ## additional_eventdata [_additional_eventdata]
 
 Additional Event Data for ConsoleLogin events
-
 
 **`aws.cloudtrail.console_login.additional_eventdata.mobile_version`**
 :   Identifies whether ConsoleLogin was from mobile version
@@ -259,7 +250,6 @@ type: boolean
 ## flattened [_flattened]
 
 ES flattened datatype for objects where the subfields aren't known in advance.
-
 
 **`aws.cloudtrail.flattened.additional_eventdata`**
 :   Additional data about the event that was not part of the request or response.
@@ -288,7 +278,6 @@ type: flattened
 ## digest [_digest]
 
 Fields from Cloudtrail Digest Logs
-
 
 **`aws.cloudtrail.digest.log_files`**
 :   A list of Logfiles contained in the digest.
@@ -366,7 +355,6 @@ type: flattened
 
 Fields for AWS CloudWatch logs.
 
-
 **`aws.cloudwatch.message`**
 :   CloudWatch log message.
 
@@ -377,7 +365,6 @@ type: text
 
 Fields for AWS EC2 logs in CloudWatch.
 
-
 **`aws.ec2.ip_address`**
 :   The internet address of the requester.
 
@@ -387,7 +374,6 @@ type: keyword
 ## elb [_elb]
 
 Fields for AWS ELB logs.
-
 
 **`aws.elb.name`**
 :   The name of the load balancer.
@@ -561,7 +547,6 @@ type: keyword
 
 Fields for AWS S3 server access logs.
 
-
 **`aws.s3access.bucket_owner`**
 :   The canonical user ID of the owner of the source bucket.
 
@@ -703,7 +688,6 @@ type: keyword
 ## vpcflow [_vpcflow]
 
 Fields for AWS VPC flow logs.
-
 
 **`aws.vpcflow.version`**
 :   The VPC Flow Logs version. If you use the default format, the version is 2. If you specify a custom format, the version is 3.

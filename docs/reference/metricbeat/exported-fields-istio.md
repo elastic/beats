@@ -7,16 +7,13 @@ mapped_pages:
 
 istio Module
 
-
 ## istio [_istio]
 
 `istio` contains statistics that were read from Istio
 
-
 ## citadel [_citadel]
 
 Contains statistics related to the Istio Citadel service
-
 
 **`istio.citadel.grpc.method`**
 :   The grpc method
@@ -95,7 +92,6 @@ type: long
 ## galley [_galley]
 
 Contains statistics related to the Istio galley service
-
 
 **`istio.galley.name`**
 :   The name of the resource the metric is related to
@@ -297,7 +293,6 @@ type: long
 
 Contains statistics related to the Istio mesh service
 
-
 **`istio.mesh.instance`**
 :   The prometheus instance
 
@@ -478,7 +473,6 @@ type: keyword
 
 Contains statistics related to the Istio mixer service
 
-
 **`istio.mixer.istio.mcp.request.acks`**
 :   The number of request acks received by the source.
 
@@ -620,7 +614,6 @@ type: keyword
 ## pilot [_pilot]
 
 Contains statistics related to the Istio pilot service
-
 
 **`istio.pilot.xds.count`**
 :   Count of concurrent xDS client connections for Pilot.

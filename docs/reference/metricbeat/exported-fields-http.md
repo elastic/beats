@@ -7,16 +7,13 @@ mapped_pages:
 
 HTTP module
 
-
 ## http [_http]
-
 
 
 
 ## request [_request]
 
 HTTP request information
-
 
 **`http.request.headers`**
 :   The HTTP headers sent
@@ -27,7 +24,6 @@ type: object
 ## response [_response]
 
 HTTP response information
-
 
 **`http.response.headers`**
 :   The HTTP headers received

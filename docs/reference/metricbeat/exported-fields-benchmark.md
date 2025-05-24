@@ -7,16 +7,13 @@ mapped_pages:
 
 benchmark module
 
-
 ## benchmark [_benchmark]
-
 
 
 
 ## info [_info]
 
 info
-
 
 **`benchmark.info.counter`**
 :   The nth info metric emitted by the benchmark module

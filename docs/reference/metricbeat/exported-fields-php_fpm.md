@@ -7,16 +7,13 @@ mapped_pages:
 
 PHP-FPM server status metrics collected from PHP-FPM.
 
-
 ## php_fpm [_php_fpm]
 
 `php_fpm` contains the metrics that were obtained from PHP-FPM status page call.
 
-
 ## pool [_pool]
 
 `pool` contains the metrics that were obtained from the PHP-FPM process pool.
-
 
 **`php_fpm.pool.name`**
 :   The name of the pool.
@@ -28,7 +25,6 @@ type: keyword
 
 `pool` contains the metrics that were obtained from the PHP-FPM process pool.
 
-
 **`php_fpm.pool.process_manager`**
 :   Static, dynamic or ondemand.
 
@@ -38,7 +34,6 @@ type: keyword
 ## connections [_connections]
 
 Connection state specific statistics.
-
 
 **`php_fpm.pool.connections.accepted`**
 :   The number of incoming requests that the PHP-FPM server has accepted; when a connection is accepted it is removed from the listen queue.
@@ -67,7 +62,6 @@ type: long
 ## processes [_processes]
 
 Process state specific statistics.
-
 
 **`php_fpm.pool.processes.idle`**
 :   The number of servers in the `waiting to process` state (i.e. not currently serving a page). This value should fall between the `pm.min_spare_servers` and `pm.max_spare_servers` values when the process manager is `dynamic`.
@@ -120,7 +114,6 @@ type: date
 ## process [_process]
 
 process contains the metrics that were obtained from the PHP-FPM process.
-
 
 **`php_fpm.process.pid`**
 :   The PID of the process

@@ -7,16 +7,13 @@ mapped_pages:
 
 Metrics collected from Couchbase servers.
 
-
 ## couchbase [_couchbase]
 
 `couchbase` contains the metrics that were scraped from Couchbase.
 
-
 ## bucket [_bucket]
 
 Couchbase bucket metrics.
-
 
 **`couchbase.bucket.name`**
 :   Name of the bucket.
@@ -91,7 +88,6 @@ type: long
 ## cluster [_cluster]
 
 Couchbase cluster metrics.
-
 
 **`couchbase.cluster.hdd.free.bytes`**
 :   Free hard drive space in the cluster (bytes).
@@ -210,7 +206,6 @@ format: bytes
 ## node [_node]
 
 Couchbase node metrics.
-
 
 **`couchbase.node.cmd_get`**
 :   Number of get commands

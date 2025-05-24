@@ -7,21 +7,17 @@ mapped_pages:
 
 Module for parsing NATS log files.
 
-
 ## nats [_nats]
 
 Fields from NATS logs.
-
 
 ## log [_log]
 
 Nats log files
 
-
 ## client [_client]
 
 Fields from NATS logs client.
-
 
 **`nats.log.client.id`**
 :   The id of the client
@@ -32,7 +28,6 @@ type: integer
 ## msg [_msg]
 
 Fields from NATS logs message.
-
 
 **`nats.log.msg.bytes`**
 :   Size of the payload in bytes

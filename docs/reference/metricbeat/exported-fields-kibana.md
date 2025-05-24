@@ -7,8 +7,6 @@ mapped_pages:
 
 Kibana module
 
-
-
 **`kibana_stats.timestamp`**
 :   type: alias
 
@@ -129,7 +127,6 @@ alias to: kibana.stats.response_time.avg.ms
 alias to: service.id
 
 
-
 **`kibana.elasticsearch.cluster.id`**
 :   type: keyword
 
@@ -138,16 +135,12 @@ alias to: service.id
 
 Kibana cluster actions metrics.
 
-
-
 **`kibana.cluster_actions.kibana.status`**
 :   type: keyword
 
 
-
 **`kibana.cluster_actions.overdue.count`**
 :   type: long
-
 
 
 **`kibana.cluster_actions.overdue.delay.p50`**
@@ -162,16 +155,12 @@ Kibana cluster actions metrics.
 
 Kibana cluster rule metrics.
 
-
-
 **`kibana.cluster_rules.kibana.status`**
 :   type: keyword
 
 
-
 **`kibana.cluster_rules.overdue.count`**
 :   type: long
-
 
 
 **`kibana.cluster_rules.overdue.delay.p50`**
@@ -185,8 +174,6 @@ Kibana cluster rule metrics.
 ## node_actions [_node_actions]
 
 Kibana node actions metrics.
-
-
 
 **`kibana.node_actions.kibana.status`**
 :   type: keyword
@@ -208,8 +195,6 @@ Kibana node actions metrics.
 
 Kibana node rule metrics.
 
-
-
 **`kibana.node_rules.kibana.status`**
 :   type: keyword
 
@@ -230,11 +215,8 @@ Kibana node rule metrics.
 
 Kibana stats and run-time metrics.
 
-
-
 **`kibana.stats.kibana.status`**
 :   type: keyword
-
 
 
 **`kibana.stats.usage.index`**
@@ -295,7 +277,6 @@ type: boolean
 type: keyword
 
 
-
 **`kibana.stats.os.distro`**
 :   type: keyword
 
@@ -312,7 +293,6 @@ type: keyword
 :   type: keyword
 
 
-
 **`kibana.stats.os.memory.free_in_bytes`**
 :   type: long
 
@@ -325,7 +305,6 @@ type: keyword
 :   type: long
 
 
-
 **`kibana.stats.os.cpuacct.control_group`**
 :   type: keyword
 
@@ -334,14 +313,12 @@ type: keyword
 :   type: long
 
 
-
 **`kibana.stats.os.cgroup_memory.current_in_bytes`**
 :   type: long
 
 
 **`kibana.stats.os.cgroup_memory.swap_current_in_bytes`**
 :   type: long
-
 
 
 **`kibana.stats.os.load.1m`**
@@ -365,7 +342,6 @@ type: long
 ## process [_process]
 
 Process metrics
-
 
 **`kibana.stats.process.memory.resident_set_size.bytes`**
 :   type: long
@@ -393,7 +369,6 @@ type: scaled_float
 
 The ratio of time the event loop is not idling in the event provider to the total time the event loop is running.
 
-
 **`kibana.stats.process.event_loop_utilization.active`**
 :   Duration of time event loop has been active since last measurement.
 
@@ -415,7 +390,6 @@ type: scaled_float
 ## memory.heap [_memory.heap]
 
 Process heap metrics
-
 
 **`kibana.stats.process.memory.heap.total.bytes`**
 :   Total heap allocated to process in bytes
@@ -451,7 +425,6 @@ type: long
 
 Request count metrics
 
-
 **`kibana.stats.request.disconnects`**
 :   Number of requests that were disconnected
 
@@ -468,7 +441,6 @@ type: long
 
 Response times metrics
 
-
 **`kibana.stats.response_time.avg.ms`**
 :   Average response time in milliseconds
 
@@ -484,7 +456,6 @@ type: long
 ## elasticsearch_client [_elasticsearch_client]
 
 Elasticsearch Client's stats
-
 
 **`kibana.stats.elasticsearch_client.total_active_sockets`**
 :   Total number of active sockets
@@ -507,7 +478,6 @@ type: integer
 ## status [_status]
 
 Status fields
-
 
 **`kibana.status.name`**
 :   Kibana instance name.
@@ -577,7 +547,6 @@ type: text
 
 Metrics fields
 
-
 **`kibana.status.metrics.concurrent_connections`**
 :   Current concurrent connections.
 
@@ -587,7 +556,6 @@ type: long
 ## requests [_requests]
 
 Request statistics.
-
 
 **`kibana.status.metrics.requests.disconnects`**
 :   Total number of disconnected connections.

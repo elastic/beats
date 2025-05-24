@@ -7,7 +7,6 @@ mapped_pages:
 
 Contains log file lines.
 
-
 **`log.source.address`**
 :   Source address from which the log event was read / sent from.
 
@@ -88,8 +87,6 @@ required: False
 alias to: http.response.body.bytes
 
 
-
-
 **`user_agent.os.full_name`**
 :   type: keyword
 
@@ -136,7 +133,6 @@ type: keyword
 type: keyword
 
 
-
 **`azure.eventhub`**
 :   Name of the eventhub.
 
@@ -171,7 +167,6 @@ type: keyword
 :   The sequence number.
 
 type: long
-
 
 
 **`kafka.topic`**

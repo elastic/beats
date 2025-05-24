@@ -7,16 +7,13 @@ mapped_pages:
 
 HAProxy Module
 
-
 ## haproxy [_haproxy]
 
 HAProxy metrics.
 
-
 ## info [_info]
 
 General information about HAProxy processes.
-
 
 **`haproxy.info.processes`**
 :   Number of processes.
@@ -108,8 +105,6 @@ type: long
 format: bytes
 
 
-
-
 **`haproxy.info.bytes.out.total`**
 :   Number of bytes sent out.
 
@@ -122,7 +117,6 @@ type: long
 type: long
 
 
-
 **`haproxy.info.peers.active`**
 :   Number of active peers.
 
@@ -133,7 +127,6 @@ type: long
 :   Number of connected peers.
 
 type: long
-
 
 
 **`haproxy.info.pool.allocated`**
@@ -164,9 +157,7 @@ type: long
 
 
 
-
 ## bps [_bps]
-
 
 
 
@@ -192,9 +183,7 @@ type: long
 
 
 
-
 ## rate [_rate]
-
 
 
 
@@ -278,7 +267,6 @@ type: long
 
 
 
-
 **`haproxy.info.pipes.used`**
 :   Number of used pipes during kernel-based tcp splicing.
 
@@ -300,7 +288,6 @@ type: integer
 ## session [_session]
 
 None
-
 
 **`haproxy.info.session.rate.value`**
 :   Rate of session per seconds.
@@ -324,7 +311,6 @@ type: integer
 
 None
 
-
 **`haproxy.info.ssl.rate.value`**
 :   Rate of SSL requests.
 
@@ -346,7 +332,6 @@ type: integer
 ## frontend [_frontend]
 
 None
-
 
 **`haproxy.info.ssl.frontend.key_rate.value`**
 :   Key rate of SSL frontend.
@@ -371,7 +356,6 @@ format: percent
 ## backend [_backend]
 
 None
-
 
 **`haproxy.info.ssl.backend.key_rate.value`**
 :   Key rate of SSL backend sessions.
@@ -401,7 +385,6 @@ type: long
 
 
 
-
 **`haproxy.info.zlib_mem_usage.value`**
 :   Memory usage of zlib.
 
@@ -425,7 +408,6 @@ format: percent
 ## stat [_stat]
 
 Stats collected from HAProxy processes.
-
 
 **`haproxy.stat.status`**
 :   Status (UP, DOWN, NOLB, MAINT, or MAINT(via)...).
@@ -519,7 +501,6 @@ type: keyword
 type: keyword
 
 
-
 **`haproxy.stat.connection.total`**
 :   Cumulative number of connections.
 
@@ -562,7 +543,6 @@ type: long
 type: long
 
 
-
 **`haproxy.stat.connection.idle.total`**
 :   Number of idle connections available for reuse.
 
@@ -575,7 +555,6 @@ type: long
 type: long
 
 
-
 **`haproxy.stat.connection.cache.lookup.total`**
 :   Number of cache lookups.
 
@@ -586,7 +565,6 @@ type: long
 :   Number of cache hits.
 
 type: long
-
 
 
 **`haproxy.stat.request.denied`**
@@ -641,7 +619,6 @@ type: long
 
 
 
-
 **`haproxy.stat.request.rate.value`**
 :   Number of HTTP requests per second over the last elapsed second.
 
@@ -666,7 +643,6 @@ type: long
 type: long
 
 
-
 **`haproxy.stat.response.errors`**
 :   Number of response errors. This value includes the number of data transfers aborted by the server (haproxy.stat.server.aborted). Some other errors are: * write errors on the client socket (won't be counted for the server stat) * failure applying filters to the response
 
@@ -686,7 +662,6 @@ type: integer
 
 
 ## http [_http]
-
 
 
 
@@ -726,14 +701,10 @@ type: long
 type: long
 
 
-
-
-
 **`haproxy.stat.header.rewrite.failed.total`**
 :   Number of failed header rewrite warnings.
 
 type: long
-
 
 
 **`haproxy.stat.session.current`**
@@ -760,7 +731,6 @@ type: long
 type: long
 
 
-
 **`haproxy.stat.session.rate.value`**
 :   Number of sessions per second over the last elapsed second.
 
@@ -780,7 +750,6 @@ type: integer
 
 
 ## check [_check]
-
 
 
 
@@ -840,7 +809,6 @@ type: integer
 
 
 
-
 **`haproxy.stat.server.id`**
 :   Server ID (unique inside a proxy).
 
@@ -866,7 +834,6 @@ type: integer
 
 
 ## compressor [_compressor]
-
 
 
 
@@ -906,7 +873,6 @@ format: bytes
 
 
 
-
 **`haproxy.stat.proxy.id`**
 :   Unique proxy ID.
 
@@ -929,7 +895,6 @@ type: keyword
 
 
 
-
 **`haproxy.stat.queue.limit`**
 :   Configured queue limit (maxqueue) for the server, or nothing if the value of maxqueue is 0 (meaning no limit).
 
@@ -943,7 +908,6 @@ type: integer
 
 
 ## agent [_agent]
-
 
 
 
@@ -989,7 +953,6 @@ type: integer
 type: integer
 
 
-
 **`haproxy.stat.agent.check.rise`**
 :   Rise value of server.
 
@@ -1012,7 +975,6 @@ type: integer
 :   Human readable version of check.
 
 type: keyword
-
 
 
 **`haproxy.stat.source.address`**

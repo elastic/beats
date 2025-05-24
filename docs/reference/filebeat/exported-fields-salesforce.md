@@ -7,11 +7,9 @@ mapped_pages:
 
 Salesforce Module
 
-
 ## salesforce [_salesforce]
 
 Fileset for ingesting Salesforce Apex logs.
-
 
 **`salesforce.instance_url`**
 :   The Instance URL of the Salesforce instance.
@@ -22,7 +20,6 @@ type: keyword
 ## apex [_apex]
 
 Fileset for ingesting Salesforce Apex logs.
-
 
 **`salesforce.apex.document_id`**
 :   Unique ID of the Apex document.
@@ -310,7 +307,6 @@ type: keyword
 
 Fileset for ingesting Salesforce Login (REST) logs.
 
-
 **`salesforce.login.document_id`**
 :   Unique Id.
 
@@ -321,7 +317,6 @@ type: keyword
 :   The application used to access the organization.
 
 type: keyword
-
 
 
 **`salesforce.login.api.type`**
@@ -336,7 +331,6 @@ type: keyword
 type: keyword
 
 
-
 **`salesforce.login.auth.service_id`**
 :   The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol.
 
@@ -347,7 +341,6 @@ type: keyword
 :   The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol. This field is available in API version 51.0 and later.
 
 type: keyword
-
 
 
 **`salesforce.login.session.level`**
@@ -474,12 +467,10 @@ type: keyword
 
 Fileset for parsing Salesforce Logout (REST) logs.
 
-
 **`salesforce.logout.document_id`**
 :   Unique Id.
 
 type: keyword
-
 
 
 **`salesforce.logout.session.key`**
@@ -504,7 +495,6 @@ type: keyword
 :   The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
 
 type: keyword
-
 
 
 **`salesforce.logout.api.type`**
@@ -600,7 +590,6 @@ type: keyword
 ## salesforce.setup_audit_trail [_salesforce.setup_audit_trail]
 
 Fileset for ingesting Salesforce SetupAuditTrail logs.
-
 
 **`salesforce.setup_audit_trail.document_id`**
 :   Unique Id.

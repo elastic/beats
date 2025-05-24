@@ -7,7 +7,6 @@ mapped_pages:
 
 Fields from the Windows Event Log.
 
-
 **`event.original`**
 :   The raw XML representation of the event obtained from Windows. This field is only available on operating systems supporting the Windows Event Log API (Microsoft Windows Vista and newer). This field is not included by default and must be enabled by setting `include_xml: true` as a configuration option for an individual event log. The XML representation of the event is useful for troubleshooting purposes. The data in the fields reported by Winlogbeat can be compared to the data in the XML to diagnose problems.
 
@@ -15,7 +14,6 @@ Fields from the Windows Event Log.
 ## winlog [_winlog]
 
 All fields specific to the Windows Event Log are defined here.
-
 
 **`winlog.activity_id`**
 :   A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
@@ -68,7 +66,6 @@ required: False
 ## event_data [_event_data]
 
 This is a non-exhaustive list of parameters that are used in Windows events. By having these fields defined in the template they can be used in dashboards and machine-learning jobs.
-
 
 **`winlog.event_data.AuthenticationPackageName`**
 :   type: keyword

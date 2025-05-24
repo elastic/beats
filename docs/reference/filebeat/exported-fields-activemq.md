@@ -7,9 +7,7 @@ mapped_pages:
 
 Module for parsing ActiveMQ log files.
 
-
 ## activemq [_activemq]
-
 
 
 
@@ -38,7 +36,6 @@ Fields from ActiveMQ audit logs.
 ## log [_log]
 
 Fields from ActiveMQ application logs.
-
 
 **`activemq.log.stack_trace`**
 :   type: keyword
