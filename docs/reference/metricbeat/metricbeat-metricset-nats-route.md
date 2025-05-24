@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-nats-route.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # NATS route metricset [metricbeat-metricset-nats-route]
 
 This is the route metricset of the module nats collecting metrcis per connection.

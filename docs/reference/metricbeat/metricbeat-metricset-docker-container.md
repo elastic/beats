@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-container.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Docker container metricset [metricbeat-metricset-docker-container]
 
 The Docker `container` metricset collects information and statistics about running Docker containers.

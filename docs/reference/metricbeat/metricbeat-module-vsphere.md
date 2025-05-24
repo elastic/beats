@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-vsphere.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # vSphere module [metricbeat-module-vsphere]
 
 The vSphere module uses the [Govmomi](https://github.com/vmware/govmomi) library to collect metrics from any VMware SDK URL (ESXi/VCenter).

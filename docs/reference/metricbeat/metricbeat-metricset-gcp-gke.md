@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-gke.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Google Cloud Platform gke metricset [metricbeat-metricset-gcp-gke]
 
 `gke` metricset is designed for collecting metrics from [Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine). Google Cloud Monitoring supports Google Kubernetes Engine metrics, as listed in [Google Cloud Monitoring Kubernetes metrics](https://cloud.google.com/monitoring/api/metrics_kubernetes).

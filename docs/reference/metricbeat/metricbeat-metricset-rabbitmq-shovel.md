@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-rabbitmq-shovel.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # RabbitMQ shovel metricset [metricbeat-metricset-rabbitmq-shovel]
 
 ::::{warning}

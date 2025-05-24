@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mongodb.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # MongoDB module [metricbeat-module-mongodb]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

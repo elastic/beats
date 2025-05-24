@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-zookeeper-mntr.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # ZooKeeper mntr metricset [metricbeat-metricset-zookeeper-mntr]
 
 `mntr` Metricset fetches the data returned by the `mntr` admin keyword. It exposes the following metrics:

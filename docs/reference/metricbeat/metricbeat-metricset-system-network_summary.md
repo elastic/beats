@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-network_summary.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # System network_summary metricset [metricbeat-metricset-system-network_summary]
 
 ::::{warning}

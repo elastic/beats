@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-osd_tree.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Ceph osd_tree metricset [metricbeat-metricset-ceph-osd_tree]
 
 This is the `osd_tree` metricset of the Ceph module.

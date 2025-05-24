@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-couchbase-bucket.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Couchbase bucket metricset [metricbeat-metricset-couchbase-bucket]
 
 The Couchbase `bucket` metricset collects data from the Couchbase Buckets Rest API `http://couchbasehost:8091/pools/default/buckets`.

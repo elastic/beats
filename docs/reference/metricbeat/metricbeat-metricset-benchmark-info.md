@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-benchmark-info.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Benchmark info metricset [metricbeat-metricset-benchmark-info]
 
 ::::{warning}

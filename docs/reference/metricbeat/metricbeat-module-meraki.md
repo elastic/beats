@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-meraki.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Cisco Meraki module [metricbeat-module-meraki]
 
 ::::{warning}

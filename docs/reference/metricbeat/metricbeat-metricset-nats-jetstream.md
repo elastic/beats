@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-nats-jetstream.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # NATS jetstream metricset [metricbeat-metricset-nats-jetstream]
 
 This is the JetStream metricset of the NATS module. It supports gathering basic stats about a JetStream server as well as specific details about streams and consumers.

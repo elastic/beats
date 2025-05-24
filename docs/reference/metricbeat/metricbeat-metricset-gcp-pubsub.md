@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-pubsub.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Google Cloud Platform pubsub metricset [metricbeat-metricset-gcp-pubsub]
 
 PubSub metricsetf fetches metrics from [Pub/Sub](https://cloud.google.com/pubsub/) topics and subscriptions in Google Cloud Platform.

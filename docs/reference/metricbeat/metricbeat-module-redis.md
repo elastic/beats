@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-redis.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Redis module [metricbeat-module-redis]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

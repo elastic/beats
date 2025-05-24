@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-elb.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # AWS elb metricset [metricbeat-metricset-aws-elb]
 
 Elastic Load Balancing publishes data points to Amazon CloudWatch for your load balancers and your back-end instances. This aws `elb` metricset collects these Cloudwatch metrics for monitoring purposes.

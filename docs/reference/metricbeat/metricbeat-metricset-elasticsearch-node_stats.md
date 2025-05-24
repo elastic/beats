@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-node_stats.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Elasticsearch node_stats metricset [metricbeat-metricset-elasticsearch-node_stats]
 
 The `node_stats` metricset interrogates the [Cluster API endpoint](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-nodes-stats) of Elasticsearch to get the cluster nodes statistics. The data received is only for the local node so this Metricbeat has to be run on each Elasticsearch node.

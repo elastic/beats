@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-rabbitmq-connection.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # RabbitMQ connection metricset [metricbeat-metricset-rabbitmq-connection]
 
 This is the `connection` metricset of the RabbitMQ module.

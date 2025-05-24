@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-munin.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Munin module [metricbeat-module-munin]
 
 This is the munin module.

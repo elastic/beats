@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-process_summary.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # System process_summary metricset [metricbeat-metricset-system-process_summary]
 
 The `process_summary` metricset collects high level statistics about the running processes.

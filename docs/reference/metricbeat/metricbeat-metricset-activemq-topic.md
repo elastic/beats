@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-activemq-topic.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # ActiveMQ topic metricset [metricbeat-metricset-activemq-topic]
 
 This is the `topic` metricset of the ActiveMQ module.

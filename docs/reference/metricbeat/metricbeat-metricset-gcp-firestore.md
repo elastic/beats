@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-firestore.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Google Cloud Platform firestore metricset [metricbeat-metricset-gcp-firestore]
 
 Firestore metricset fetches metrics from [Firestore](https://cloud.google.com/firestore/) in Google Cloud Platform.

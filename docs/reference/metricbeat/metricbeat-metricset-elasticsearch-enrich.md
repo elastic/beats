@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-enrich.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Elasticsearch enrich metricset [metricbeat-metricset-elasticsearch-enrich]
 
 This is the `enrich` metricset of the Elasticsearch module. It interrogates the Enrich Stats API endpoint to fetch information about Enrich coordinator nodes in the Elasticsearch cluster that are participating in ingest-time enrichment.

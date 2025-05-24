@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-gcp.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Google Cloud Platform module [metricbeat-module-gcp]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-postgresql-database.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # PostgreSQL database metricset [metricbeat-metricset-postgresql-database]
 
 This is the `database` metricset of the PostgreSQL module.

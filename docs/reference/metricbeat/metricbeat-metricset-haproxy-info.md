@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-haproxy-info.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # HAProxy info metricset [metricbeat-metricset-haproxy-info]
 
 The HAProxy `info` metricset collects general information about HAProxy processes.

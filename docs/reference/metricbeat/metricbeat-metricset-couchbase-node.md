@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-couchbase-node.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Couchbase node metricset [metricbeat-metricset-couchbase-node]
 
 The Couchbase `node` metricset collects data from Couchbase pools Rest API `http://couchbasehost:8091/pools/default` and creates an event for each node in the cluster.

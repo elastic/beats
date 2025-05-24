@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-cluster_status.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Ceph cluster_status metricset [metricbeat-metricset-ceph-cluster_status]
 
 This is the `cluster_status` metricset of the Ceph module.

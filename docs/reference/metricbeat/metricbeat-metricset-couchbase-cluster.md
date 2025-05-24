@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-couchbase-cluster.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Couchbase cluster metricset [metricbeat-metricset-couchbase-cluster]
 
 The Couchbase `cluster` metricset collects data from Couchbase pools Rest API `http://couchbasehost:8091/pools/default` and creates an event containing cluster metrics.

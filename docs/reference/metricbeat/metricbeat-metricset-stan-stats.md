@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-stan-stats.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Stan stats metricset [metricbeat-metricset-stan-stats]
 
 Streaming server statistics (STAN)

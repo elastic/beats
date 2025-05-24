@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-load.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # System load metricset [metricbeat-metricset-system-load]
 
 The System `load` metricset provides load statistics.

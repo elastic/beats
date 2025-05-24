@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-couchbase.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Couchbase module [metricbeat-module-couchbase]
 
 This module periodically fetches metrics from [Couchbase](https://www.couchbase.com/) servers. The default metricsets are `bucket`, `cluster`, `node`.

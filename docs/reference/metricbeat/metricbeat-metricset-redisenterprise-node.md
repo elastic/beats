@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-redisenterprise-node.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Redis Enterprise node metricset [metricbeat-metricset-redisenterprise-node]
 
 ::::{warning}

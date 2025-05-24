@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-dropwizard-collector.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Dropwizard collector metricset [metricbeat-metricset-dropwizard-collector]
 
 This is the `collector` metricset of the Dropwizard module.

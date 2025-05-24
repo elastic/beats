@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-graphite.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Graphite module [metricbeat-module-graphite]
 
 This is the Graphite module.

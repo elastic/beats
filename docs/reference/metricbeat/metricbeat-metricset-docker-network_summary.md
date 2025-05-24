@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-network_summary.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Docker network_summary metricset [metricbeat-metricset-docker-network_summary]
 
 ::::{warning}

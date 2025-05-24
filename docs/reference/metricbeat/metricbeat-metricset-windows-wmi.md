@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-windows-wmi.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Windows wmi metricset [metricbeat-metricset-windows-wmi]
 
 ::::{warning}

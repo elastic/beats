@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-event.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Kubernetes event metricset [metricbeat-metricset-kubernetes-event]
 
 This is the `event` metricset of the Kubernetes module.

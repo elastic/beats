@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-golang.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Golang module [metricbeat-module-golang]
 
 The golang module collects metrics by submitting HTTP GET requests to [golang-expvar-api](https://golang.org/pkg/expvar/).

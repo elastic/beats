@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_storageclass.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Kubernetes state_storageclass metricset [metricbeat-metricset-kubernetes-state_storageclass]
 
 The `state_storageclass` metricset for kubernetes storage class related metrics from `kube-state-metrics`.

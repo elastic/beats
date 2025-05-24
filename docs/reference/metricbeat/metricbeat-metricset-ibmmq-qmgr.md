@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ibmmq-qmgr.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # IBM MQ qmgr metricset [metricbeat-metricset-ibmmq-qmgr]
 
 ::::{warning}

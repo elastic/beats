@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-volume.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Kubernetes volume metricset [metricbeat-metricset-kubernetes-volume]
 
 This is the `volume` metricset of the Kubernetes module.

@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-sql.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # SQL module [metricbeat-module-sql]
 
 The SQL module allows you to execute custom queries against an SQL database and store the results in {{es}}. It also enables the development of various SQL metrics integrations, using SQL query as input.

@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mysql-query.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # MySQL query metricset [metricbeat-metricset-mysql-query]
 
 ::::{warning}

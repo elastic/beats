@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-system.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # System module [metricbeat-module-system]
 
 The System module allows you to monitor your servers. Because the System module always applies to the local server, the `hosts` config option is not needed.

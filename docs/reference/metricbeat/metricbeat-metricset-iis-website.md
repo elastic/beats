@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-iis-website.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # IIS website metricset [metricbeat-metricset-iis-website]
 
 This is the website metricset of the module iis.

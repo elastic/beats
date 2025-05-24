@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-cloudfoundry.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Cloudfoundry module [metricbeat-module-cloudfoundry]
 
 ::::{warning}

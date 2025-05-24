@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-billing.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # AWS billing metricset [metricbeat-metricset-aws-billing]
 
 ::::{warning}

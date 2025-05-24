@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-oracle-performance.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Oracle performance metricset [metricbeat-metricset-oracle-performance]
 
 `performance` Metricset includes performance related events that might be correlated between them. It contains mainly cursor and cache based data and can generate 3 types of events.

@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-uwsgi.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # uWSGI module [metricbeat-module-uwsgi]
 
 This is the uwsgi module. By default collects the `stats` metricset, using [StatsServer](http://uwsgi-docs.readthedocs.io/en/latest/StatsServer.html).

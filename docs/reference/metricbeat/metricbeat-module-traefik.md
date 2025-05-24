@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-traefik.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Traefik module [metricbeat-module-traefik]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

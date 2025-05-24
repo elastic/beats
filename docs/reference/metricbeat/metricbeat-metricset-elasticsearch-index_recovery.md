@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-index_recovery.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Elasticsearch index_recovery metricset [metricbeat-metricset-elasticsearch-index_recovery]
 
 This is the index_recovery metricset of the module Elasticsearch.

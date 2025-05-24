@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-mgr_osd_perf.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Ceph mgr_osd_perf metricset [metricbeat-metricset-ceph-mgr_osd_perf]
 
 ::::{warning}

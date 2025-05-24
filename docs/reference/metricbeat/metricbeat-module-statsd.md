@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-statsd.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Statsd module [metricbeat-module-statsd]
 
 The `statsd` module is a Metricbeat module which spawns a UDP server and listens for metrics in StatsD compatible format.

@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-vsphere-resourcepool.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # vSphere resourcepool metricset [metricbeat-metricset-vsphere-resourcepool]
 
 ::::{warning}

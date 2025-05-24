@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-azure-monitor.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Azure monitor metricset [metricbeat-metricset-azure-monitor]
 
 This is the monitor metricset of the module azure.

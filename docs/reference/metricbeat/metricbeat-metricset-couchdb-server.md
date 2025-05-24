@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-couchdb-server.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # CouchDB server metricset [metricbeat-metricset-couchdb-server]
 
 This is the server metricset of the module couchdb.

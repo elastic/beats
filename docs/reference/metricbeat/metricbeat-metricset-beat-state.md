@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-beat-state.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Beat state metricset [metricbeat-metricset-beat-state]
 
 This is the state metricset of the beat module.

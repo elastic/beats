@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-redis-info.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Redis info metricset [metricbeat-metricset-redis-info]
 
 The Redis `info` metricset collects information and statistics from Redis by running the [`INFO`](http://redis.io/commands/INFO) command and parsing the returned result.

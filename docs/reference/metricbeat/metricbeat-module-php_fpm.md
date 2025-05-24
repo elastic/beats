@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-php_fpm.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # PHP_FPM module [metricbeat-module-php_fpm]
 
 This module periodically fetches metrics from [PHP-FPM](https://php-fpm.org) servers.

@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-cloudwatch.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # AWS cloudwatch metricset [metricbeat-metricset-aws-cloudwatch]
 
 The cloudwatch metricset of aws module allows you to monitor various services on AWS. `cloudwatch` metricset fetches metrics from given namespace periodically by calling `GetMetricData` api.

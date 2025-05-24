@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-filesystem.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # System filesystem metricset [metricbeat-metricset-system-filesystem]
 
 The System `filesystem` metricset provides file system statistics. For each file system, one document is provided.

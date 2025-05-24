@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-tomcat-memory.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Tomcat memory metricset [metricbeat-metricset-tomcat-memory]
 
 ::::{warning}

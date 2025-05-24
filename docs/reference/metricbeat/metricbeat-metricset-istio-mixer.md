@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-istio-mixer.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Istio mixer metricset [metricbeat-metricset-istio-mixer]
 
 ::::{warning}

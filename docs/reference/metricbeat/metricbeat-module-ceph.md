@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-ceph.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Ceph module [metricbeat-module-ceph]
 
 The Ceph module collects metrics by submitting HTTP GET requests to the [ceph-rest-api](https://docs.ceph.com/docs/jewel/man/8/ceph-rest-api/). The default metricsets are `cluster_disk`, `cluster_health`, `monitor_health`, `pool_disk`, `osd_tree`.

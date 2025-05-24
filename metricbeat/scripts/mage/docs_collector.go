@@ -360,7 +360,6 @@ func gatherData(modules []string) ([]moduleData, error) {
 // writeModuleDocs writes the module-level docs
 func writeModuleDocs(modules []moduleData, t *template.Template) error {
 	for _, mod := range modules {
-		// filename := mage.OSSBeatDir("docs", "modules", fmt.Sprintf("%s.md", mod.Base))
 		filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-module-%s.md", mod.Base))
 		err := writeTemplate(filename, t.Lookup("moduleDoc.tmpl"), mod)
 		if err != nil {
@@ -383,7 +382,6 @@ func writeMetricsetDocs(modules []moduleData, t *template.Template) error {
 			}
 			filename := filepath.Join(mage.DocsDir(), "reference", "metricbeat", fmt.Sprintf("metricbeat-metricset-%s-%s.md", mod.Base, metricset.Title))
 
-			// filename := mage.OSSBeatDir("docs", "modules", mod.Base, fmt.Sprintf("%s.md", metricset.Title))
 			err := writeTemplate(filename, t.Lookup("metricsetDoc.tmpl"), modData)
 			if err != nil {
 				return fmt.Errorf("error opening file at %s: %w", filename, err)

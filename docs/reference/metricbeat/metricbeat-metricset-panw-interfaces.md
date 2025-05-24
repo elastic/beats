@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-panw-interfaces.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Panw interfaces metricset [metricbeat-metricset-panw-interfaces]
 
 ::::{warning}

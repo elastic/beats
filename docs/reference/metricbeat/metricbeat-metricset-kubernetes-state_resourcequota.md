@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_resourcequota.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Kubernetes state_resourcequota metricset [metricbeat-metricset-kubernetes-state_resourcequota]
 
 The `state_resourcequota` metricset for kubernetes reads from `kube-state-metrics`.

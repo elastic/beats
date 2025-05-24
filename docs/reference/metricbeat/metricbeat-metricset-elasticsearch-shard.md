@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-shard.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Elasticsearch shard metricset [metricbeat-metricset-elasticsearch-shard]
 
 The `shard` metricset interrogates the [Cluster State API endpoint](https://www.elastic.co/docs/api/doc/elasticsearch/operation/operation-cluster-state) to fetch information about all shards.

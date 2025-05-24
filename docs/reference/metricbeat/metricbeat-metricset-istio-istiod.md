@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-istio-istiod.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Istio istiod metricset [metricbeat-metricset-istio-istiod]
 
 ::::{warning}

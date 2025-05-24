@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-linux-pageinfo.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Linux pageinfo metricset [metricbeat-metricset-linux-pageinfo]
 
 ::::{warning}

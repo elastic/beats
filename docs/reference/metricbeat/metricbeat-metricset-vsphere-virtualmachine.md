@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-vsphere-virtualmachine.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # vSphere virtualmachine metricset [metricbeat-metricset-vsphere-virtualmachine]
 
 This is the `virtualmachine` metricset of the vSphere module.

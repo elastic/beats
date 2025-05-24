@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-iis-application_pool.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # IIS application_pool metricset [metricbeat-metricset-iis-application_pool]
 
 This is the application_pool metricset of the module iis.

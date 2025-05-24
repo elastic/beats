@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-etcd-store.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Etcd store metricset [metricbeat-metricset-etcd-store]
 
 This is the store metricset of the module etcd. This metrics is being read from the Etcd V2 endpoint and won’t show any activity regarding Etcd V3.

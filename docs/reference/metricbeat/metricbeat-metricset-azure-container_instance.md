@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-azure-container_instance.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Azure container_instance metricset [metricbeat-metricset-azure-container_instance]
 
 This is the container_instance metricset of the module azure.

@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-azure-storage.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Azure storage metricset [metricbeat-metricset-azure-storage]
 
 This is the storage metricset of the module azure.

@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-traefik-health.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # Traefik health metricset [metricbeat-metricset-traefik-health]
 
 This is the health metricset of the module traefik.

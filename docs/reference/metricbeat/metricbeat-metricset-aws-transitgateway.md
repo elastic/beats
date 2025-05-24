@@ -3,8 +3,6 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-transitgateway.html
 ---
 
-<!-- This file is generated! See scripts/mage/docs_collector.go -->
-
 # AWS transitgateway metricset [metricbeat-metricset-aws-transitgateway]
 
 ::::{warning}
