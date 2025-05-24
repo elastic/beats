@@ -12,6 +12,7 @@ Module for handling system logs from Okta.
 
 Fields from Okta.
 
+
 **`okta.uuid`**
 :   The unique identifier of the Okta LogEvent.
 
@@ -42,10 +43,10 @@ type: keyword
 type: keyword
 
 
-
 ## actor [_actor]
 
 Fields that let you store information of the actor for the LogEvent.
+
 
 **`okta.actor.id`**
 :   Identifier of the actor.
@@ -71,10 +72,10 @@ type: keyword
 type: keyword
 
 
-
-## client [_client_4]
+## client [_client]
 
 Fields that let you store information about the client of the actor.
+
 
 **`okta.client.ip`**
 :   The IP address of the client.
@@ -82,10 +83,10 @@ Fields that let you store information about the client of the actor.
 type: ip
 
 
-
-## user_agent [_user_agent_2]
+## user_agent [_user_agent]
 
 Fields about the user agent information of the client.
+
 
 **`okta.client.user_agent.raw_user_agent`**
 :   The raw informaton of the user agent.
@@ -123,10 +124,10 @@ type: keyword
 type: keyword
 
 
-
 ## outcome [_outcome]
 
 Fields that let you store information about the outcome.
+
 
 **`okta.outcome.reason`**
 :   The reason of the outcome.
@@ -146,10 +147,10 @@ type: keyword
 type: flattened
 
 
-
 ## transaction [_transaction]
 
 Fields that let you store information about related transaction.
+
 
 **`okta.transaction.id`**
 :   Identifier of the transaction.
@@ -163,7 +164,6 @@ type: keyword
 type: keyword
 
 
-
 ## debug_context [_debug_context]
 
 Fields that let you store information about the debug context.
@@ -172,6 +172,7 @@ Fields that let you store information about the debug context.
 ## debug_data [_debug_data]
 
 The debug data.
+
 
 **`okta.debug_context.debug_data.device_fingerprint`**
 :   The fingerprint of the device.
@@ -233,10 +234,10 @@ type: keyword
 type: flattened
 
 
-
 ## suspicious_activity [_suspicious_activity]
 
 The suspicious activity fields from the debug data.
+
 
 **`okta.debug_context.debug_data.suspicious_activity.browser`**
 :   The browser used.
@@ -310,10 +311,10 @@ type: keyword
 type: date
 
 
-
 ## authentication_context [_authentication_context]
 
 Fields that let you store information about authentication context.
+
 
 **`okta.authentication_context.authentication_provider`**
 :   The information about the authentication provider. Must be one of OKTA_AUTHENTICATION_PROVIDER, ACTIVE_DIRECTORY, LDAP, FEDERATION, SOCIAL, FACTOR_PROVIDER.
@@ -357,15 +358,15 @@ type: keyword
 type: keyword
 
 
-
 ## security_context [_security_context]
 
 Fields that let you store information about security context.
 
 
-## as [_as_2]
+## as [_as]
 
 The autonomous system.
+
 
 **`okta.security_context.as.number`**
 :   The AS number.
@@ -373,10 +374,10 @@ The autonomous system.
 type: integer
 
 
-
-## organization [_organization_2]
+## organization [_organization]
 
 The organization that owns the AS number.
+
 
 **`okta.security_context.as.organization.name`**
 :   The organization name.
@@ -402,10 +403,10 @@ type: keyword
 type: boolean
 
 
-
-## request [_request_3]
+## request [_request]
 
 Fields that let you store information about the request, in the form of list of ip_chain.
+
 
 **`okta.request.ip_chain`**
 :   List of ip_chain objects.

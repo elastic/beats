@@ -7,6 +7,8 @@ mapped_pages:
 
 MySQL-specific event fields.
 
+
+
 **`mysql.affected_rows`**
 :   If the MySQL command is successful, this field contains the affected number of rows of the last statement.
 
@@ -26,7 +28,7 @@ type: long
 
 
 **`mysql.query`**
-:   The row mysql query as read from the transaction’s request.
+:   The row mysql query as read from the transaction's request.
 
 
 **`mysql.error_code`**

@@ -12,16 +12,17 @@ None
 
 IP ping fields.
 
+
 **`icmp.requests`**
 :   Number if ICMP EchoRequests send.
 
 type: integer
 
 
-
-## rtt [_rtt_2]
+## rtt [_rtt]
 
 ICMP Echo Request and Reply round trip time
+
 
 **`icmp.rtt.us`**
 :   Duration in microseconds

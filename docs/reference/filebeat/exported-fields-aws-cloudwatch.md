@@ -8,9 +8,10 @@ mapped_pages:
 Fields from AWS CloudWatch logs.
 
 
-## aws.cloudwatch [_aws_cloudwatch]
+## aws.cloudwatch [_aws.cloudwatch]
 
 Fields from AWS CloudWatch logs.
+
 
 **`aws.cloudwatch.log_group`**
 :   The name of the log group to which this event belongs.

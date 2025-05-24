@@ -10,10 +10,16 @@ Google Workspace Module
 
 ## google_workspace [_google_workspace]
 
-Google Workspace specific fields. More information about specific fields can be found at [https://developers.google.com/admin-sdk/reports/v1/reference/activities/list](https://developers.google.com/admin-sdk/reports/v1/reference/activities/list)
+Google Workspace specific fields.
+More information about specific fields can be found at https://developers.google.com/admin-sdk/reports/v1/reference/activities/list
+
 
 **`google_workspace.actor.type`**
-:   The type of actor. Values can be: **USER**: Another user in the same domain. **EXTERNAL_USER**: A user outside the domain. **KEY**: A non-human actor.
+:   The type of actor.
+Values can be:
+  *USER*: Another user in the same domain.
+  *EXTERNAL_USER*: A user outside the domain.
+  *KEY*: A non-human actor.
 
 type: keyword
 
@@ -25,7 +31,7 @@ type: keyword
 
 
 **`google_workspace.event.type`**
-:   The type of Google Workspace event, mapped from `items[].events[].type` in the original payload. Each fileset can have a different set of values for it, more details can be found at [https://developers.google.com/admin-sdk/reports/v1/reference/activities/list](https://developers.google.com/admin-sdk/reports/v1/reference/activities/list)
+:   The type of Google Workspace event, mapped from `items[].events[].type` in the original payload. Each fileset can have a different set of values for it, more details can be found at https://developers.google.com/admin-sdk/reports/v1/reference/activities/list
 
 type: keyword
 
@@ -33,7 +39,7 @@ example: audit#activity
 
 
 **`google_workspace.kind`**
-:   The type of API resource, mapped from `kind` in the original payload. More details can be found at [https://developers.google.com/admin-sdk/reports/v1/reference/activities/list](https://developers.google.com/admin-sdk/reports/v1/reference/activities/list)
+:   The type of API resource, mapped from `kind` in the original payload. More details can be found at https://developers.google.com/admin-sdk/reports/v1/reference/activities/list
 
 type: keyword
 
@@ -41,9 +47,10 @@ example: audit#activity
 
 
 **`google_workspace.organization.domain`**
-:   The domain that is affected by the report’s event.
+:   The domain that is affected by the report's event.
 
 type: keyword
+
 
 
 **`google_workspace.admin.application.edition`**
@@ -53,7 +60,7 @@ type: keyword
 
 
 **`google_workspace.admin.application.name`**
-:   The application’s name.
+:   The application's name.
 
 type: keyword
 
@@ -95,7 +102,7 @@ type: keyword
 
 
 **`google_workspace.admin.group.email`**
-:   The group’s primary email address.
+:   The group's primary email address.
 
 type: keyword
 
@@ -173,7 +180,7 @@ type: keyword
 
 
 **`google_workspace.admin.non_featured_services_selection`**
-:   Non-featured services selection. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings#FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings#FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED)
+:   Non-featured services selection. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-application-settings#FLASHLIGHT_EDU_NON_FEATURED_SERVICES_SELECTED
 
 type: keyword
 
@@ -191,19 +198,19 @@ type: keyword
 
 
 **`google_workspace.admin.user.email`**
-:   The user’s primary email address.
+:   The user's primary email address.
 
 type: keyword
 
 
 **`google_workspace.admin.user.nickname`**
-:   The user’s nickname.
+:   The user's nickname.
 
 type: keyword
 
 
 **`google_workspace.admin.user.birthdate`**
-:   The user’s birth date.
+:   The user's birth date.
 
 type: date
 
@@ -261,7 +268,7 @@ type: keyword
 
 
 **`google_workspace.admin.role.name`**
-:   The role name. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-delegated-admin-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-delegated-admin-settings)
+:   The role name. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-delegated-admin-settings
 
 type: keyword
 
@@ -321,61 +328,61 @@ type: keyword
 
 
 **`google_workspace.admin.email.log_search_filter.message_id`**
-:   The log search filter’s email message ID.
+:   The log search filter's email message ID.
 
 type: keyword
 
 
 **`google_workspace.admin.email.log_search_filter.start_date`**
-:   The log search filter’s start date.
+:   The log search filter's start date.
 
 type: date
 
 
 **`google_workspace.admin.email.log_search_filter.end_date`**
-:   The log search filter’s ending date.
+:   The log search filter's ending date.
 
 type: date
 
 
 **`google_workspace.admin.email.log_search_filter.recipient.value`**
-:   The log search filter’s email recipient.
+:   The log search filter's email recipient.
 
 type: keyword
 
 
 **`google_workspace.admin.email.log_search_filter.sender.value`**
-:   The log search filter’s email sender.
+:   The log search filter's email sender.
 
 type: keyword
 
 
 **`google_workspace.admin.email.log_search_filter.recipient.ip`**
-:   The log search filter’s email recipient’s IP address.
+:   The log search filter's email recipient's IP address.
 
 type: ip
 
 
 **`google_workspace.admin.email.log_search_filter.sender.ip`**
-:   The log search filter’s email sender’s IP address.
+:   The log search filter's email sender's IP address.
 
 type: ip
 
 
 **`google_workspace.admin.chrome_licenses.enabled`**
-:   Licences enabled. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings)
+:   Licences enabled. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings
 
 type: keyword
 
 
 **`google_workspace.admin.chrome_licenses.allowed`**
-:   Licences enabled. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings)
+:   Licences enabled. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-org-settings
 
 type: keyword
 
 
 **`google_workspace.admin.oauth2.service.name`**
-:   OAuth2 service name. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings)
+:   OAuth2 service name. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings
 
 type: keyword
 
@@ -393,13 +400,13 @@ type: keyword
 
 
 **`google_workspace.admin.oauth2.application.type`**
-:   OAuth2 application type. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings)
+:   OAuth2 application type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings
 
 type: keyword
 
 
 **`google_workspace.admin.verification_method`**
-:   Related verification method. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings) and [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings)
+:   Related verification method. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-security-settings and https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings
 
 type: keyword
 
@@ -435,13 +442,13 @@ type: keyword
 
 
 **`google_workspace.admin.mdm.vendor`**
-:   The MDM vendor’s name.
+:   The MDM vendor's name.
 
 type: keyword
 
 
 **`google_workspace.admin.info_type`**
-:   This will be used to state what kind of information was changed. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings)
+:   This will be used to state what kind of information was changed. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-domain-settings
 
 type: keyword
 
@@ -501,13 +508,13 @@ type: keyword
 
 
 **`google_workspace.admin.mobile.action.id`**
-:   The mobile device action’s ID.
+:   The mobile device action's ID.
 
 type: keyword
 
 
 **`google_workspace.admin.mobile.action.type`**
-:   The mobile device action’s type. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings)
+:   The mobile device action's type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings
 
 type: keyword
 
@@ -525,15 +532,16 @@ type: long
 
 
 **`google_workspace.admin.distribution.entity.name`**
-:   The distribution entity value, which can be a group name or an org-unit name. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings)
+:   The distribution entity value, which can be a group name or an org-unit name. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings
 
 type: keyword
 
 
 **`google_workspace.admin.distribution.entity.type`**
-:   The distribution entity type, which can be a group or an org-unit. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings)
+:   The distribution entity type, which can be a group or an org-unit. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/admin-mobile-settings
 
 type: keyword
+
 
 
 **`google_workspace.drive.billable`**
@@ -563,7 +571,7 @@ type: boolean
 
 
 **`google_workspace.drive.file.type`**
-:   Document Drive type. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive)
+:   Document Drive type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
 
 type: keyword
 
@@ -597,7 +605,7 @@ type: keyword
 
 
 **`google_workspace.drive.visibility`**
-:   Visibility of target file. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive)
+:   Visibility of target file. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
 
 type: keyword
 
@@ -639,25 +647,25 @@ type: keyword
 
 
 **`google_workspace.drive.added_role`**
-:   Added membership role of a user/group in a Team Drive. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive)
+:   Added membership role of a user/group in a Team Drive. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
 
 type: keyword
 
 
 **`google_workspace.drive.membership_change_type`**
-:   Type of change in Team Drive membership of a user/group. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive)
+:   Type of change in Team Drive membership of a user/group. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
 
 type: keyword
 
 
 **`google_workspace.drive.shared_drive_settings_change_type`**
-:   Type of change in Team Drive settings. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive)
+:   Type of change in Team Drive settings. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
 
 type: keyword
 
 
 **`google_workspace.drive.removed_role`**
-:   Removed membership role of a user/group in a Team Drive. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive)
+:   Removed membership role of a user/group in a Team Drive. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/drive
 
 type: keyword
 
@@ -668,8 +676,9 @@ type: keyword
 type: keyword
 
 
+
 **`google_workspace.groups.acl_permission`**
-:   Group permission setting updated. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups)
+:   Group permission setting updated. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
 
 type: keyword
 
@@ -687,31 +696,31 @@ type: keyword
 
 
 **`google_workspace.groups.member.role`**
-:   Member role. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups)
+:   Member role. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
 
 type: keyword
 
 
 **`google_workspace.groups.setting`**
-:   Group setting updated. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups)
+:   Group setting updated. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
 
 type: keyword
 
 
 **`google_workspace.groups.new_value`**
-:   New value(s) of the group setting. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups)
+:   New value(s) of the group setting. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
 
 type: keyword
 
 
 **`google_workspace.groups.old_value`**
-:   Old value(s) of the group setting. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups)
+:   Old value(s) of the group setting. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
 
 type: keyword
 
 
 **`google_workspace.groups.value`**
-:   Value of the group setting. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups)
+:   Value of the group setting. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/groups
 
 type: keyword
 
@@ -734,24 +743,25 @@ type: keyword
 type: keyword
 
 
+
 **`google_workspace.login.affected_email_address`**
 :   type: keyword
 
 
 **`google_workspace.login.challenge_method`**
-:   Login challenge method. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login).
+:   Login challenge method. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login.
 
 type: keyword
 
 
 **`google_workspace.login.failure_type`**
-:   Login failure type. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login).
+:   Login failure type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login.
 
 type: keyword
 
 
 **`google_workspace.login.type`**
-:   Login credentials type. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login).
+:   Login credentials type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/login.
 
 type: keyword
 
@@ -764,6 +774,7 @@ type: keyword
 :   type: boolean
 
 
+
 **`google_workspace.saml.application_name`**
 :   Saml SP application name.
 
@@ -771,7 +782,7 @@ type: keyword
 
 
 **`google_workspace.saml.failure_type`**
-:   Login failure type. For a list of possible values refer to [https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml](https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml).
+:   Login failure type. For a list of possible values refer to https://developers.google.com/admin-sdk/reports/v1/appendix/activity/saml.
 
 type: keyword
 

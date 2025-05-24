@@ -8,14 +8,15 @@ mapped_pages:
 HTTP-specific event fields.
 
 
-## http [_http_2]
+## http [_http]
 
 Information about the HTTP request and response.
 
 
-## request [_request_2]
+## request [_request]
 
 HTTP request
+
 
 **`http.request.headers`**
 :   A map containing the captured header fields from the request. Which headers to capture is configurable. If headers with the same header name are present in the message, they will be separated by commas.
@@ -29,10 +30,10 @@ type: object
 alias to: url.query
 
 
-
-## response [_response_2]
+## response [_response]
 
 HTTP response
+
 
 **`http.response.status_phrase`**
 :   The HTTP status phrase.

@@ -12,6 +12,7 @@ None
 
 Common monitor fields.
 
+
 **`monitor.type`**
 :   The monitor type.
 
@@ -38,10 +39,10 @@ type: keyword
 :   type: text
 
 
-
-## duration [_duration_2]
+## duration [_duration]
 
 Total monitoring test duration
+
 
 **`monitor.duration.us`**
 :   Duration in microseconds
@@ -97,10 +98,10 @@ type: date_range
 type: keyword
 
 
-
 ## project [_project]
 
 Project info for this monitor
+
 
 **`monitor.project.id`**
 :   Project ID

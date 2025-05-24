@@ -12,6 +12,7 @@ None
 
 TCP network layer related fields.
 
+
 **`tcp.port`**
 :   Service port number.
 
@@ -20,15 +21,15 @@ type: alias
 alias to: url.port
 
 
-
-## rtt [_rtt_5]
+## rtt [_rtt]
 
 TCP layer round trip times.
 
 
-## connect [_connect_2]
+## connect [_connect]
 
 Duration required to establish a TCP connection based on already available IP address.
+
 
 **`tcp.rtt.connect.us`**
 :   Duration in microseconds
@@ -36,10 +37,10 @@ Duration required to establish a TCP connection based on already available IP ad
 type: long
 
 
-
-## validate [_validate_2]
+## validate [_validate]
 
 Duration of validation step based on existing TCP connection.
+
 
 **`tcp.rtt.validate.us`**
 :   Duration in microseconds

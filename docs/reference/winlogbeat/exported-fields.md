@@ -20,4 +20,3 @@ This document describes the fields that are exported by Winlogbeat. They are gro
 * [*Security module fields*](/reference/winlogbeat/exported-fields-security.md)
 * [*Sysmon module fields*](/reference/winlogbeat/exported-fields-sysmon.md)
 * [*Winlogbeat fields*](/reference/winlogbeat/exported-fields-winlog.md)
-

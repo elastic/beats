@@ -7,6 +7,10 @@ mapped_pages:
 
 Detailed TLS-specific event fields.
 
+
+
+
+
 **`tls.client.x509.version`**
 :   Version of x509 format.
 
@@ -27,6 +31,8 @@ type: keyword
 type: keyword
 
 
+
+
 **`tls.server.x509.version`**
 :   Version of x509 format.
 
@@ -45,6 +51,7 @@ type: keyword
 :   Province or region within country.
 
 type: keyword
+
 
 
 **`tls.detailed.version`**
@@ -73,6 +80,7 @@ type: boolean
 type: keyword
 
 
+
 **`tls.detailed.client_hello.version`**
 :   The version of the TLS protocol by which the client wishes to communicate during this session.
 
@@ -92,15 +100,15 @@ type: keyword
 
 
 **`tls.detailed.client_hello.supported_compression_methods`**
-:   The list of compression methods the client supports. See [https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml](https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml)
+:   The list of compression methods the client supports. See https://www.iana.org/assignments/comp-meth-ids/comp-meth-ids.xhtml
 
 type: keyword
-
 
 
 ## extensions [_extensions]
 
 The hello extensions provided by the client.
+
 
 **`tls.detailed.client_hello.extensions.server_name_indication`**
 :   List of hostnames
@@ -144,10 +152,10 @@ type: keyword
 type: keyword
 
 
-
 ## status_request [_status_request]
 
 Status request made to the server.
+
 
 **`tls.detailed.client_hello.extensions.status_request.type`**
 :   The type of the status request. Always "ocsp" if present.
@@ -171,6 +179,7 @@ type: short
 :   List of extensions that were left unparsed by Packetbeat.
 
 type: keyword
+
 
 
 **`tls.detailed.server_hello.version`**
@@ -197,10 +206,10 @@ type: keyword
 type: keyword
 
 
-
-## extensions [_extensions_2]
+## extensions [_extensions]
 
 The hello extensions provided by the server.
+
 
 **`tls.detailed.server_hello.extensions.application_layer_protocol_negotiation`**
 :   Negotiated application layer protocol
@@ -226,10 +235,10 @@ type: keyword
 type: keyword
 
 
-
-## status_request [_status_request_2]
+## status_request [_status_request]
 
 Status request made to the server.
+
 
 **`tls.detailed.server_hello.extensions.status_request.response`**
 :   Whether a certificate status request response was made.

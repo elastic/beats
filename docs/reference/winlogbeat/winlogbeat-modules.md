@@ -58,4 +58,3 @@ output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing
 * [Powershell](/reference/winlogbeat/winlogbeat-module-powershell.md)
 * [Security](/reference/winlogbeat/winlogbeat-module-security.md)
 * [Sysmon](/reference/winlogbeat/winlogbeat-module-sysmon.md)
-

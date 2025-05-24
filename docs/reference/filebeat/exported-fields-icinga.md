@@ -11,9 +11,12 @@ Icinga Module
 ## icinga [_icinga]
 
 
-## debug [_debug_2]
+
+
+## debug [_debug]
 
 Contains fields for the Icinga debug logs.
+
 
 **`icinga.debug.facility`**
 :   Specifies what component of Icinga logged the message.
@@ -33,10 +36,10 @@ alias to: log.level
 alias to: message
 
 
-
 ## main [_main]
 
 Contains fields for the Icinga main logs.
+
 
 **`icinga.main.facility`**
 :   Specifies what component of Icinga logged the message.
@@ -56,10 +59,10 @@ alias to: log.level
 alias to: message
 
 
-
 ## startup [_startup]
 
 Contains fields for the Icinga startup logs.
+
 
 **`icinga.startup.facility`**
 :   Specifies what component of Icinga logged the message.

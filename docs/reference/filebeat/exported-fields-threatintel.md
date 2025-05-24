@@ -7,14 +7,16 @@ mapped_pages:
 
 Threat intelligence Filebeat Module.
 
+
+
 **`threat.indicator.file.hash.tlsh`**
-:   The file’s import tlsh, if available.
+:   The file's import tlsh, if available.
 
 type: keyword
 
 
 **`threat.indicator.file.hash.sha384`**
-:   The file’s sha384 hash, if available.
+:   The file's sha384 hash, if available.
 
 type: keyword
 
@@ -27,10 +29,10 @@ type: keyword
 :   type: keyword
 
 
-
-## abusech.malware [_abusech_malware]
+## abusech.malware [_abusech.malware]
 
 Fields for AbuseCH Malware Threat Intel
+
 
 **`abusech.malware.file_type`**
 :   File type guessed by URLhaus.
@@ -68,10 +70,10 @@ type: float
 type: keyword
 
 
-
-## abusech.url [_abusech_url]
+## abusech.url [_abusech.url]
 
 Fields for AbuseCH Malware Threat Intel
+
 
 **`abusech.url.id`**
 :   The ID of the url.
@@ -127,10 +129,10 @@ type: boolean
 type: keyword
 
 
-
-## anomali.limo [_anomali_limo]
+## anomali.limo [_anomali.limo]
 
 Fields for Anomali Threat Intel
+
 
 **`anomali.limo.id`**
 :   The ID of the indicator.
@@ -204,10 +206,10 @@ type: keyword
 type: keyword
 
 
-
-## anomali.threatstream [_anomali_threatstream]
+## anomali.threatstream [_anomali.threatstream]
 
 Fields for Anomali ThreatStream
+
 
 **`anomali.threatstream.classification`**
 :   Indicates whether an indicator is private or from a public feed and available publicly. Possible values: private, public.
@@ -218,7 +220,7 @@ example: private
 
 
 **`anomali.threatstream.confidence`**
-:   The measure of the accuracy (from 0 to 100) assigned by ThreatStream’s predictive analytics technology to indicators.
+:   The measure of the accuracy (from 0 to 100) assigned by ThreatStream's predictive analytics technology to indicators.
 
 type: short
 
@@ -319,10 +321,10 @@ type: keyword
 type: keyword
 
 
-
-## abusech.malwarebazaar [_abusech_malwarebazaar]
+## abusech.malwarebazaar [_abusech.malwarebazaar]
 
 Fields for Malware Bazaar Threat Intel
+
 
 **`abusech.malwarebazaar.file_type`**
 :   File type guessed by Malware Bazaar.
@@ -342,6 +344,7 @@ type: keyword
 type: keyword
 
 
+
 **`abusech.malwarebazaar.intelligence.downloads`**
 :   Number of downloads from MalwareBazaar.
 
@@ -352,6 +355,7 @@ type: long
 :   Number of uploads from MalwareBazaar.
 
 type: long
+
 
 
 **`abusech.malwarebazaar.intelligence.mail.Generic`**
@@ -378,10 +382,10 @@ type: long
 type: nested
 
 
-
-## misp [_misp_2]
+## misp [_misp]
 
 Fields for MISP Threat Intel
+
 
 **`misp.id`**
 :   Attribute ID.
@@ -713,10 +717,10 @@ type: keyword
 type: keyword
 
 
-
 ## otx [_otx]
 
 Fields for OTX Threat Intel
+
 
 **`otx.id`**
 :   The ID of the indicator.
@@ -754,10 +758,10 @@ type: keyword
 type: keyword
 
 
-
 ## threatq [_threatq]
 
 Fields for ThreatQ Threat Library
+
 
 **`threatq.updated_at`**
 :   Last modification time

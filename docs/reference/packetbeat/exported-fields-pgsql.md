@@ -7,6 +7,8 @@ mapped_pages:
 
 PostgreSQL-specific event fields.
 
+
+
 **`pgsql.error_code`**
 :   The PostgreSQL error code.
 

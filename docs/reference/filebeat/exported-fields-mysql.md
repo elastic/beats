@@ -12,16 +12,17 @@ Module for parsing the MySQL log files.
 
 Fields from the MySQL log files.
 
+
 **`mysql.thread_id`**
 :   The connection or thread ID for the query.
 
 type: long
 
 
-
-## error [_error_4]
+## error [_error]
 
 Contains fields from the MySQL error logs.
+
 
 **`mysql.error.thread_id`**
 :   type: alias
@@ -41,10 +42,10 @@ alias to: log.level
 alias to: message
 
 
-
-## slowlog [_slowlog_3]
+## slowlog [_slowlog]
 
 Contains fields from the MySQL slow logs.
+
 
 **`mysql.slowlog.lock_time.sec`**
 :   The amount of time the query waited for the lock to be available. The value is in seconds, as a floating point number.
@@ -272,10 +273,10 @@ type: long
 type: long
 
 
-
 ## innodb [_innodb]
 
 Contains fields relative to InnoDB engine
+
 
 **`mysql.slowlog.innodb.trx_id`**
 :   Transaction ID

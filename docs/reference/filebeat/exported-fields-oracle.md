@@ -17,6 +17,7 @@ Fields from Oracle logs.
 
 Module for parsing Oracle Database audit logs
 
+
 **`oracle.database_audit.priv_used`**
 :   System privilege used to execute the action.
 
@@ -72,7 +73,7 @@ type: keyword
 
 
 **`oracle.database_audit.entryid`**
-:   Numeric ID for each audit trail entry in the session. The entry ID is an index of a session’s audit entries that starts at 1 and increases to the number of entries that are written.
+:   Numeric ID for each audit trail entry in the session. The entry ID is an index of a session's audit entries that starts at 1 and increases to the number of entries that are written.
 
 type: integer
 
@@ -90,7 +91,7 @@ type: keyword
 
 
 **`oracle.database_audit.terminal`**
-:   Identifier of the user’s terminal.
+:   Identifier of the user's terminal.
 
 type: text
 

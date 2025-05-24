@@ -13,9 +13,10 @@ Module for parsing the Traefik log files.
 Fields from the Traefik log files.
 
 
-## access [_access_4]
+## access [_access]
 
 Contains fields for the Traefik access logs.
+
 
 **`traefik.access.user_identifier`**
 :   Is the RFC 1413 identity of the client
@@ -95,6 +96,7 @@ alias to: http.request.referrer
 alias to: user_agent.original
 
 
+
 **`traefik.access.user_agent.name`**
 :   type: alias
 
@@ -117,6 +119,7 @@ alias to: user_agent.os.name
 :   type: alias
 
 alias to: user_agent.original
+
 
 
 **`traefik.access.geoip.continent_name`**

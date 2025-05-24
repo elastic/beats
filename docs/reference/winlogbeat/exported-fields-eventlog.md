@@ -7,6 +7,7 @@ mapped_pages:
 
 Field aliases based on Winlogbeat 6.x that point to the fields for this version of Winlogbeat. These are added to the index template when `migration.6_to_7.enable: true` is set in the configuration.
 
+
 **`activity_id`**
 :   type: alias
 

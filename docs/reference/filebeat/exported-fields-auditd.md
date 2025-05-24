@@ -7,10 +7,13 @@ mapped_pages:
 
 Module for parsing auditd logs.
 
+
+
 **`user.terminal`**
 :   Terminal or tty device on which the user is performing the observed activity.
 
 type: keyword
+
 
 
 **`user.audit.id`**
@@ -39,6 +42,7 @@ type: keyword
 type: keyword
 
 
+
 **`user.filesystem.id`**
 :   One or multiple unique identifiers of the user.
 
@@ -63,6 +67,7 @@ type: keyword
 :   Name of the group.
 
 type: keyword
+
 
 
 **`user.owner.id`**
@@ -91,6 +96,7 @@ type: keyword
 type: keyword
 
 
+
 **`user.saved.id`**
 :   One or multiple unique identifiers of the user.
 
@@ -117,15 +123,15 @@ type: keyword
 type: keyword
 
 
-
 ## auditd [_auditd]
 
 Fields from the auditd logs.
 
 
-## log [_log_2]
+## log [_log]
 
 Fields from the Linux audit log. Not all fields are documented here because they are dynamic and vary by audit event type.
+
 
 **`auditd.log.old_auid`**
 :   For login events this is the old audit ID used for the user prior to this login.
@@ -209,6 +215,7 @@ alias to: event.outcome
 :   type: alias
 
 alias to: event.action
+
 
 
 **`auditd.log.geoip.continent_name`**

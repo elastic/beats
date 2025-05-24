@@ -10,6 +10,9 @@ elasticsearch Module
 
 ## elasticsearch [_elasticsearch]
 
+
+
+
 **`elasticsearch.component`**
 :   Elasticsearch component from where the log event originated
 
@@ -98,6 +101,7 @@ type: keyword
 example: compatible_api
 
 
+
 **`elasticsearch.audit.layer`**
 :   The layer from which this event originated: rest, transport or ip_filter
 
@@ -129,7 +133,7 @@ type: keyword
 
 
 **`elasticsearch.audit.user.realm`**
-:   The user’s authentication realm, if authenticated
+:   The user's authentication realm, if authenticated
 
 type: keyword
 
@@ -139,7 +143,7 @@ type: keyword
 
 type: keyword
 
-example: [*kibana_admin*, *beats_admin*]
+example: ['kibana_admin', 'beats_admin']
 
 
 **`elasticsearch.audit.user.run_as.name`**
@@ -173,7 +177,7 @@ example: {username=jacknich2}
 
 type: keyword
 
-example: [*foo-2019.01.04*, *foo-2019.01.03*, *foo-2019.01.06*]
+example: ['foo-2019.01.04', 'foo-2019.01.03', 'foo-2019.01.06']
 
 
 **`elasticsearch.audit.request.id`**
@@ -232,8 +236,8 @@ alias to: user.name
 :   type: text
 
 
-
 ## deprecation [_deprecation]
+
 
 
 ## gc [_gc]
@@ -244,6 +248,7 @@ GC fileset fields.
 ## phase [_phase]
 
 Fields specific to GC phase.
+
 
 **`elasticsearch.gc.phase.name`**
 :   Name of the GC collection phase.
@@ -287,10 +292,10 @@ type: float
 type: float
 
 
-
 ## cpu_time [_cpu_time]
 
 Process CPU time spent performing collections.
+
 
 **`elasticsearch.gc.phase.cpu_time.user_sec`**
 :   CPU time spent outside the kernel.
@@ -334,10 +339,10 @@ type: float
 type: keyword
 
 
-
 ## heap [_heap]
 
 Heap allocation and total size.
+
 
 **`elasticsearch.gc.heap.size_kb`**
 :   Total heap size in kilobytes.
@@ -351,10 +356,10 @@ type: integer
 type: integer
 
 
-
 ## old_gen [_old_gen]
 
 Old generation occupancy and total size.
+
 
 **`elasticsearch.gc.old_gen.size_kb`**
 :   Total size of old generation in kilobytes.
@@ -368,10 +373,10 @@ type: integer
 type: integer
 
 
-
 ## young_gen [_young_gen]
 
 Young generation occupancy and total size.
+
 
 **`elasticsearch.gc.young_gen.size_kb`**
 :   Total size of young generation in kilobytes.
@@ -385,17 +390,16 @@ type: integer
 type: integer
 
 
-
-## server [_server_2]
+## server [_server]
 
 Server log file
+
 
 **`elasticsearch.server.stacktrace`**
 :   Field is not indexed.
 
 
-
-## gc [_gc_2]
+## gc [_gc]
 
 GC log
 
@@ -404,16 +408,21 @@ GC log
 
 Young GC
 
-**`elasticsearch.server.gc.young.one`**
-:   type: long
 
-example:
+**`elasticsearch.server.gc.young.one`**
+:   
+
+type: long
+
+example: 
 
 
 **`elasticsearch.server.gc.young.two`**
-:   type: long
+:   
 
-example:
+type: long
+
+example: 
 
 
 **`elasticsearch.server.gc.overhead_seq`**
@@ -440,10 +449,10 @@ type: float
 example: 1800
 
 
-
 ## slowlog [_slowlog]
 
 Slowlog events from Elasticsearch
+
 
 **`elasticsearch.slowlog.logger`**
 :   Logger name
@@ -466,7 +475,7 @@ example: 300ms
 
 type: keyword
 
-example:
+example: 
 
 
 **`elasticsearch.slowlog.stats`**
@@ -498,7 +507,7 @@ example: {"query":{"match_all":{"boost":1.0}}}
 
 type: keyword
 
-example:
+example: 
 
 
 **`elasticsearch.slowlog.total_hits`**
@@ -530,7 +539,7 @@ example: s01HZ2QBk9jw4gtgaFtn
 
 type: keyword
 
-example:
+example: 
 
 
 **`elasticsearch.slowlog.type`**

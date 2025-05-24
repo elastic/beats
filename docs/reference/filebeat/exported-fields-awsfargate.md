@@ -13,7 +13,7 @@ Module for collecting container logs from Amazon ECS Fargate.
 Fields from Amazon ECS Fargate logs.
 
 
-## log [_log_3]
+## log [_log]
 
 Fields for Amazon Fargate container logs.
 

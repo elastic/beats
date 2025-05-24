@@ -7,6 +7,8 @@ mapped_pages:
 
 ICMP specific event fields.
 
+
+
 **`icmp.version`**
 :   The version of the ICMP protocol.
 

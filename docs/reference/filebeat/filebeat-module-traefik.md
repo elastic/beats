@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-traefik.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Traefik module [filebeat-module-traefik]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -79,7 +81,6 @@ This module comes with sample dashboards. For example:
 % TO DO: Use `:class: screenshot`
 ![kibana traefik](images/kibana-traefik.png)
 
-
-## Fields [_fields_54]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-traefik.md) section.

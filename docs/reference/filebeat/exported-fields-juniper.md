@@ -8,9 +8,10 @@ mapped_pages:
 juniper fields.
 
 
-## juniper.srx [_juniper_srx]
+## juniper.srx [_juniper.srx]
 
 Module for parsing junipersrx syslog.
+
 
 **`juniper.srx.reason`**
 :   reason

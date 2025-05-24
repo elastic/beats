@@ -13,24 +13,21 @@ Module for parsing the PostgreSQL log files.
 Fields from PostgreSQL logs.
 
 
-## log [_log_11]
+## log [_log]
 
 Fields from the PostgreSQL log files.
 
-**`postgresql.log.timestamp`**
-:   :::{admonition} Deprecated in 7.3.0
-    The `postgresql.log.timestamp` field was deprecated in 7.3.0.
-    :::
 
-The timestamp from the log line.
+**`postgresql.log.timestamp`**
+:   The timestamp from the log line.
+
+deprecated:[7.3.0]
 
 
 **`postgresql.log.core_id`**
-:   :::{admonition} Deprecated in 8.0.0
-    The `postgresql.log.core_id` field was deprecated in 8.0.0.
-    :::
+:   Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
 
-Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
+deprecated:[8.0.0]
 
 type: alias
 
@@ -86,7 +83,7 @@ example: pdo_stmt_00000001
 
 
 **`postgresql.log.command_tag`**
-:   Type of session’s current command. The complete list can be found at: src/include/tcop/cmdtaglist.h
+:   Type of session's current command. The complete list can be found at: src/include/tcop/cmdtaglist.h
 
 example: SELECT
 
@@ -108,13 +105,13 @@ type: long
 
 
 **`postgresql.log.sql_state_code`**
-:   State code returned by Postgres (if any). See also [https://www.postgresql.org/docs/current/errcodes-appendix.html](https://www.postgresql.org/docs/current/errcodes-appendix.html)
+:   State code returned by Postgres (if any). See also https://www.postgresql.org/docs/current/errcodes-appendix.html
 
 type: keyword
 
 
 **`postgresql.log.detail`**
-:   More information about the message, parameters in case of a parametrized query. e.g. *Role \"user\" does not exist.*, *parameters: $1 = 42*, etc.
+:   More information about the message, parameters in case of a parametrized query. e.g. 'Role \"user\" does not exist.', 'parameters: $1 = 42', etc.
 
 
 **`postgresql.log.hint`**
@@ -156,11 +153,9 @@ example: client backend
 
 
 **`postgresql.log.error.code`**
-:   :::{admonition} Deprecated in 8.0.0
-    The `postgresql.log.error.code` field was deprecated in 8.0.0.
-    :::
+:   Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
 
-Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
+deprecated:[8.0.0]
 
 type: alias
 

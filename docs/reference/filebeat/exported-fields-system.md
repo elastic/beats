@@ -13,9 +13,10 @@ Module for parsing system log files.
 Fields from the system log files.
 
 
-## auth [_auth_2]
+## auth [_auth]
 
 Fields from the Linux authorization logs.
+
 
 **`system.auth.timestamp`**
 :   type: alias
@@ -53,6 +54,7 @@ alias to: message
 alias to: user.name
 
 
+
 **`system.auth.ssh.method`**
 :   The SSH authentication method. Can be one of "password" or "publickey".
 
@@ -83,6 +85,7 @@ alias to: source.ip
 :   type: alias
 
 alias to: source.port
+
 
 
 **`system.auth.ssh.geoip.continent_name`**
@@ -121,10 +124,10 @@ alias to: source.geo.city_name
 alias to: source.geo.region_iso_code
 
 
-
 ## sudo [_sudo]
 
 Fields specific to events created by the `sudo` command.
+
 
 **`system.auth.sudo.error`**
 :   The error message in case the sudo command failed.
@@ -150,10 +153,10 @@ example: root
 :   The command executed via sudo.
 
 
-
 ## useradd [_useradd]
 
 Fields specific to events created by the `useradd` command.
+
 
 **`system.auth.useradd.home`**
 :   The home folder for the new user.
@@ -181,10 +184,10 @@ alias to: user.id
 alias to: group.id
 
 
-
 ## groupadd [_groupadd]
 
 Fields specific to events created by the `groupadd` command.
+
 
 **`system.auth.groupadd.name`**
 :   type: alias
@@ -198,10 +201,10 @@ alias to: group.name
 alias to: group.id
 
 
-
-## syslog [_syslog_3]
+## syslog [_syslog]
 
 Contains fields from the syslog system logs.
+
 
 **`system.syslog.timestamp`**
 :   type: alias

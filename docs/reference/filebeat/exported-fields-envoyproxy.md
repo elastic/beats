@@ -12,6 +12,7 @@ Module for handling logs produced by envoy
 
 Fields from envoy proxy logs after normalization
 
+
 **`envoyproxy.log_type`**
 :   Envoy log type, normally ACCESS
 

@@ -12,6 +12,7 @@ Module for handling the iptables logs.
 
 Fields from the iptables logs.
 
+
 **`iptables.ether_type`**
 :   Value of the ethernet type field identifying the network layer protocol.
 
@@ -36,10 +37,10 @@ type: keyword
 type: long
 
 
-
 ## icmp [_icmp]
 
 ICMP fields.
+
 
 **`iptables.icmp.code`**
 :   ICMP code.
@@ -119,10 +120,10 @@ type: long
 type: keyword
 
 
-
-## tcp [_tcp_2]
+## tcp [_tcp]
 
 TCP fields.
+
 
 **`iptables.tcp.flags`**
 :   TCP flags.
@@ -160,10 +161,10 @@ type: long
 type: integer
 
 
-
 ## udp [_udp]
 
 UDP fields.
+
 
 **`iptables.udp.length`**
 :   Length of the UDP header and payload.
@@ -171,10 +172,10 @@ UDP fields.
 type: long
 
 
-
 ## ubiquiti [_ubiquiti]
 
 Fields for Ubiquiti network devices.
+
 
 **`iptables.ubiquiti.input_zone`**
 :   Input zone.

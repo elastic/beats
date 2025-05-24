@@ -7,16 +7,17 @@ mapped_pages:
 
 Cassandra v4/3 specific event fields.
 
+
 **`no_request`**
 :   type: alias
 
 alias to: cassandra.no_request
 
 
-
 ## cassandra [_cassandra]
 
 Information about the Cassandra request and response.
+
 
 **`cassandra.no_request`**
 :   Indicates that there is no request because this is a PUSH message.
@@ -24,15 +25,15 @@ Information about the Cassandra request and response.
 type: boolean
 
 
-
 ## request [_request]
 
 Cassandra request.
 
 
-## headers [_headers_3]
+## headers [_headers]
 
 Cassandra request headers.
+
 
 **`cassandra.request.headers.version`**
 :   The version of the protocol.
@@ -70,15 +71,15 @@ type: long
 type: keyword
 
 
-
 ## response [_response]
 
 Cassandra response.
 
 
-## headers [_headers_4]
+## headers [_headers]
 
-Cassandra response headers, the structure is as same as request’s header.
+Cassandra response headers, the structure is as same as request's header.
+
 
 **`cassandra.response.headers.version`**
 :   The version of the protocol.
@@ -110,10 +111,10 @@ type: keyword
 type: long
 
 
-
 ## result [_result]
 
 Details about the returned result.
+
 
 **`cassandra.response.result.type`**
 :   Cassandra result type.
@@ -121,10 +122,10 @@ Details about the returned result.
 type: keyword
 
 
-
 ## rows [_rows]
 
 Details about the rows.
+
 
 **`cassandra.response.result.rows.num_rows`**
 :   Representing the number of rows present in this result.
@@ -132,10 +133,10 @@ Details about the rows.
 type: long
 
 
-
 ## meta [_meta]
 
 Composed of result metadata.
+
 
 **`cassandra.response.result.rows.meta.keyspace`**
 :   Only present after set Global_tables_spec, the keyspace name.
@@ -179,10 +180,10 @@ type: keyword
 type: keyword
 
 
-
 ## schema_change [_schema_change]
 
 The result to a schema_change message.
+
 
 **`cassandra.response.result.schema_change.change`**
 :   Representing the type of changed involved.
@@ -226,10 +227,10 @@ type: keyword
 type: keyword
 
 
-
 ## prepared [_prepared]
 
 The result to a PREPARE message.
+
 
 **`cassandra.response.result.prepared.prepared_id`**
 :   Representing the prepared query ID.
@@ -237,10 +238,10 @@ The result to a PREPARE message.
 type: keyword
 
 
-
 ## req_meta [_req_meta]
 
 This describes the request metadata.
+
 
 **`cassandra.response.result.prepared.req_meta.keyspace`**
 :   Only present after set Global_tables_spec, the keyspace name.
@@ -278,10 +279,10 @@ type: long
 type: keyword
 
 
-
 ## resp_meta [_resp_meta]
 
 This describes the metadata for the result set.
+
 
 **`cassandra.response.result.prepared.resp_meta.keyspace`**
 :   Only present after set Global_tables_spec, the keyspace name.
@@ -325,10 +326,10 @@ type: keyword
 type: object
 
 
-
 ## authentication [_authentication]
 
 Indicates that the server requires authentication, and which authentication mechanism to use.
+
 
 **`cassandra.response.authentication.class`**
 :   Indicates the full class name of the IAuthenticator in use
@@ -342,10 +343,10 @@ type: keyword
 type: keyword
 
 
-
 ## event [_event]
 
 Event pushed by the server. A client will only receive events for the types it has REGISTERed to.
+
 
 **`cassandra.response.event.type`**
 :   Representing the event type.
@@ -371,10 +372,10 @@ type: keyword
 type: long
 
 
-
-## schema_change [_schema_change_2]
+## schema_change [_schema_change]
 
 The events details related to schema change.
+
 
 **`cassandra.response.event.schema_change.change`**
 :   Representing the type of changed involved.
@@ -418,10 +419,10 @@ type: keyword
 type: keyword
 
 
-
 ## error [_error]
 
 Indicates an error processing a request. The body of the message will be an  error code followed by a error message. Then, depending on the exception, more content may follow.
+
 
 **`cassandra.response.error.code`**
 :   The error code of the Cassandra response.
@@ -441,10 +442,10 @@ type: keyword
 type: keyword
 
 
-
 ## details [_details]
 
 The details of the error.
+
 
 **`cassandra.response.error.details.read_consistency`**
 :   Representing the consistency level of the query that triggered the exception.

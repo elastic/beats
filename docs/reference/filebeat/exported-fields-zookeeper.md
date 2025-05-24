@@ -11,9 +11,12 @@ ZooKeeper Module
 ## zookeeper [_zookeeper]
 
 
-## audit [_audit_6]
+
+
+## audit [_audit]
 
 ZooKeeper Audit logs.
+
 
 **`zookeeper.audit.session`**
 :   Client session id
@@ -51,8 +54,7 @@ type: keyword
 type: keyword
 
 
-
-## log [_log_14]
+## log [_log]
 
 ZooKeeper logs.
 

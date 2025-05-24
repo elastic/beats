@@ -8,9 +8,10 @@ mapped_pages:
 Module for handling Cisco network device logs.
 
 
-## cisco.amp [_cisco_amp]
+## cisco.amp [_cisco.amp]
 
 Module for parsing Cisco AMP logs.
+
 
 **`cisco.amp.timestamp_nanoseconds`**
 :   The timestamp in Epoch nanoseconds.
@@ -325,7 +326,7 @@ type: flattened
 
 
 **`cisco.amp.mitre_tactics`**
-:   Array of all related mitre tactic ID’s
+:   Array of all related mitre tactic ID's
 
 type: keyword
 
@@ -337,7 +338,7 @@ type: flattened
 
 
 **`cisco.amp.mitre_techniques`**
-:   Array of all related mitre technique ID’s
+:   Array of all related mitre technique ID's
 
 type: keyword
 
@@ -354,10 +355,10 @@ type: keyword
 type: flattened
 
 
-
-## cisco.asa [_cisco_asa]
+## cisco.asa [_cisco.asa]
 
 Fields for Cisco ASA Firewall.
+
 
 **`cisco.asa.message_id`**
 :   The Cisco ASA message identifier.
@@ -589,10 +590,10 @@ type: keyword
 type: keyword
 
 
-
-## cisco.ftd [_cisco_ftd]
+## cisco.ftd [_cisco.ftd]
 
 Fields for Cisco Firepower Threat Defense Firewall.
+
 
 **`cisco.ftd.message_id`**
 :   The Cisco FTD message identifier.
@@ -740,10 +741,10 @@ type: keyword
 type: keyword
 
 
-
-## cisco.ios [_cisco_ios]
+## cisco.ios [_cisco.ios]
 
 Fields for Cisco IOS logs.
+
 
 **`cisco.ios.access_list`**
 :   Name of the IP access list.
@@ -759,10 +760,10 @@ type: keyword
 example: SEC
 
 
-
-## cisco.umbrella [_cisco_umbrella]
+## cisco.umbrella [_cisco.umbrella]
 
 Fields for Cisco Umbrella.
+
 
 **`cisco.umbrella.identities`**
 :   An array of the different identities related to the event.

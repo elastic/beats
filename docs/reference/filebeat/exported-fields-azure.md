@@ -10,6 +10,9 @@ Azure Module
 
 ## azure [_azure]
 
+
+
+
 **`azure.subscription_id`**
 :   Azure subscription ID
 
@@ -28,10 +31,10 @@ type: keyword
 type: keyword
 
 
-
 ## resource [_resource]
 
 Resource
+
 
 **`azure.resource.id`**
 :   Resource ID
@@ -69,16 +72,15 @@ type: keyword
 type: keyword
 
 
-
 ## activitylogs [_activitylogs]
 
 Fields for Azure activity logs.
+
 
 **`azure.activitylogs.identity_name`**
 :   identity name
 
 type: keyword
-
 
 
 ## identity [_identity]
@@ -89,6 +91,7 @@ Identity
 ## claims_initiated_by_user [_claims_initiated_by_user]
 
 Claims initiated by user
+
 
 **`azure.activitylogs.identity.claims_initiated_by_user.name`**
 :   Name
@@ -126,10 +129,10 @@ type: keyword
 type: object
 
 
-
 ## authorization [_authorization]
 
 Authorization
+
 
 **`azure.activitylogs.identity.authorization.scope`**
 :   Scope
@@ -143,10 +146,10 @@ type: keyword
 type: keyword
 
 
-
 ## evidence [_evidence]
 
 Evidence
+
 
 **`azure.activitylogs.identity.authorization.evidence.role_assignment_scope`**
 :   Role assignment scope
@@ -238,10 +241,10 @@ type: keyword
 type: flattened
 
 
-
 ## auditlogs [_auditlogs]
 
 Fields for Azure audit logs.
+
 
 **`azure.auditlogs.category`**
 :   The category of the operation.  Currently, Audit is the only supported value.
@@ -279,10 +282,10 @@ type: keyword
 type: keyword
 
 
-
 ## properties [_properties]
 
 The audit log properties
+
 
 **`azure.auditlogs.properties.result`**
 :   Log result
@@ -338,10 +341,10 @@ type: date
 type: keyword
 
 
-
-## target_resources.* [_target_resources]
+## target_resources.* [_target_resources.*]
 
 Target resources
+
 
 **`azure.auditlogs.properties.target_resources.*.display_name`**
 :   Display name
@@ -373,10 +376,10 @@ type: keyword
 type: keyword
 
 
-
-## modified_properties.* [_modified_properties]
+## modified_properties.* [_modified_properties.*]
 
 Modified properties
+
 
 **`azure.auditlogs.properties.target_resources.*.modified_properties.*.new_value`**
 :   New value
@@ -396,7 +399,6 @@ type: keyword
 type: keyword
 
 
-
 ## initiated_by [_initiated_by]
 
 Information regarding the initiator
@@ -405,6 +407,7 @@ Information regarding the initiator
 ## app [_app]
 
 App
+
 
 **`azure.auditlogs.properties.initiated_by.app.servicePrincipalName`**
 :   Service principal name
@@ -430,10 +433,10 @@ type: keyword
 type: keyword
 
 
-
 ## user [_user]
 
 User
+
 
 **`azure.auditlogs.properties.initiated_by.user.userPrincipalName`**
 :   User principal name
@@ -459,10 +462,10 @@ type: keyword
 type: keyword
 
 
-
 ## platformlogs [_platformlogs]
 
 Fields for Azure platform logs.
+
 
 **`azure.platformlogs.operation_name`**
 :   Operation name
@@ -554,10 +557,10 @@ type: keyword
 type: flattened
 
 
-
 ## signinlogs [_signinlogs]
 
 Fields for Azure sign-in logs.
+
 
 **`azure.signinlogs.operation_name`**
 :   The operation name
@@ -605,6 +608,7 @@ type: keyword
 :   Category
 
 type: keyword
+
 
 
 **`azure.signinlogs.properties.id`**
@@ -733,10 +737,12 @@ type: keyword
 type: keyword
 
 
+
 **`azure.signinlogs.properties.status.error_code`**
 :   Error code
 
 type: long
+
 
 
 **`azure.signinlogs.properties.device_detail.device_id`**

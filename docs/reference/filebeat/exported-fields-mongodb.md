@@ -13,9 +13,10 @@ Module for parsing MongoDB log files.
 Fields from MongoDB logs.
 
 
-## log [_log_8]
+## log [_log]
 
 Contains fields from MongoDB logs.
+
 
 **`mongodb.log.component`**
 :   Functional categorization of message

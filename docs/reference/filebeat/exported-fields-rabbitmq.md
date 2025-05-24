@@ -11,9 +11,12 @@ RabbitMQ Module
 ## rabbitmq [_rabbitmq]
 
 
-## log [_log_12]
+
+
+## log [_log]
 
 RabbitMQ log files
+
 
 **`rabbitmq.log.pid`**
 :   The Erlang process id

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-iis.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # IIS module [filebeat-module-iis]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -99,7 +101,6 @@ This module comes with a sample dashboard. For example:
 % TO DO: Use `:class: screenshot`
 ![kibana iis](images/kibana-iis.png)
 
-
-## Fields [_fields_23]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-iis.md) section.

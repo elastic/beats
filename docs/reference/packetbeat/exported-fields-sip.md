@@ -12,6 +12,7 @@ SIP-specific event fields.
 
 Information about SIP traffic.
 
+
 **`sip.code`**
 :   Response status code.
 

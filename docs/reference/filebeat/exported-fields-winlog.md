@@ -12,6 +12,7 @@ Fields from the ETW input (Event Tracing for Windows).
 
 All fields specific to the Windows Event Tracing are defined here.
 
+
 **`winlog.activity_id`**
 :   A globally unique identifier that identifies the current activity. The events that are published with this identifier are part of the same activity.
 
@@ -45,7 +46,7 @@ required: False
 
 
 **`winlog.keywords`**
-:   The keywords are used to indicate an event’s membership in a set of event categories.
+:   The keywords are used to indicate an event's membership in a set of event categories.
 
 type: keyword
 

@@ -7,6 +7,7 @@ mapped_pages:
 
 These fields contain data about the transaction itself.
 
+
 **`status`**
 :   The high level status of the transaction. The way to compute this value depends on the protocol, but the result has a meaning independent of the protocol.
 

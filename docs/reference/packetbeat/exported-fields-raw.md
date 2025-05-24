@@ -7,6 +7,7 @@ mapped_pages:
 
 These fields contain the raw transaction data.
 
+
 **`request`**
 :   For text protocols, this is the request as seen on the wire (application layer only). For binary protocols this is our representation of the request.
 

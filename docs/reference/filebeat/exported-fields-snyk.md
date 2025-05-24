@@ -12,6 +12,7 @@ Snyk module
 
 Module for parsing Snyk project vulnerabilities.
 
+
 **`snyk.projects`**
 :   Array with all related projects objects.
 
@@ -19,15 +20,15 @@ type: flattened
 
 
 **`snyk.related.projects`**
-:   Array of all the related project ID’s.
+:   Array of all the related project ID's.
 
 type: keyword
 
 
-
-## audit [_audit_5]
+## audit [_audit]
 
 Module for parsing Snyk audit logs.
+
 
 **`snyk.audit.org_id`**
 :   ID of the related Organization related to the event.
@@ -47,10 +48,10 @@ type: keyword
 type: flattened
 
 
-
 ## vulnerabilities [_vulnerabilities]
 
 Module for parsing Snyk project vulnerabilities.
+
 
 **`snyk.vulnerabilities.cvss3`**
 :   CSSv3 scores.
@@ -107,7 +108,7 @@ type: boolean
 
 
 **`snyk.vulnerabilities.language`**
-:   The package’s programming language.
+:   The package's programming language.
 
 type: keyword
 

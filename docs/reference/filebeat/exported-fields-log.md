@@ -7,6 +7,7 @@ mapped_pages:
 
 Contains log file lines.
 
+
 **`log.source.address`**
 :   Source address from which the log event was read / sent from.
 
@@ -24,7 +25,7 @@ required: False
 
 
 **`stream`**
-:   Log stream when reading container logs, can be *stdout* or *stderr*
+:   Log stream when reading container logs, can be 'stdout' or 'stderr'
 
 type: keyword
 
@@ -87,6 +88,8 @@ required: False
 alias to: http.response.body.bytes
 
 
+
+
 **`user_agent.os.full_name`**
 :   type: keyword
 
@@ -110,7 +113,7 @@ alias to: event.created
 
 
 **`docker.attrs`**
-:   docker.attrs contains labels and environment variables written by docker’s JSON File logging driver. These fields are only available when they are configured in the logging driver options.
+:   docker.attrs contains labels and environment variables written by docker's JSON File logging driver. These fields are only available when they are configured in the logging driver options.
 
 type: object
 
@@ -131,6 +134,7 @@ type: keyword
 :   IGMP type.
 
 type: keyword
+
 
 
 **`azure.eventhub`**
@@ -167,6 +171,7 @@ type: keyword
 :   The sequence number.
 
 type: long
+
 
 
 **`kafka.topic`**

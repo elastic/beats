@@ -12,16 +12,17 @@ Module for receiving CEF logs over Syslog. The module adds vendor specific field
 
 Fields for Forcepoint Custom String mappings
 
+
 **`forcepoint.virus_id`**
 :   Virus ID
 
 type: keyword
 
 
-
 ## checkpoint [_checkpoint]
 
 Fields for Check Point custom string mappings.
+
 
 **`checkpoint.app_risk`**
 :   Application risk.
@@ -269,10 +270,10 @@ type: keyword
 type: keyword
 
 
-
-## cef.extensions [_cef_extensions]
+## cef.extensions [_cef.extensions]
 
 Extra vendor-specific extensions.
+
 
 **`cef.extensions.cp_app_risk`**
 :   type: keyword

@@ -11,9 +11,12 @@ Fields exported by the `osquery` module
 ## osquery [_osquery]
 
 
+
+
 ## result [_result]
 
 Common fields exported by the result metricset.
+
 
 **`osquery.result.name`**
 :   The name of the query that generated this event.

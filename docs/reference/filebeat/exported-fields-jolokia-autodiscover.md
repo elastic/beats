@@ -7,6 +7,7 @@ mapped_pages:
 
 Metadata from Jolokia Discovery added by the jolokia provider.
 
+
 **`jolokia.agent.version`**
 :   Version number of jolokia agent.
 
@@ -26,7 +27,7 @@ type: keyword
 
 
 **`jolokia.server.version`**
-:   The container’s version (if detected).
+:   The container's version (if detected).
 
 type: keyword
 

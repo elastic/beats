@@ -235,7 +235,6 @@ auditbeat.modules:
     -a always,exit -F arch=b64 -S open,truncate,ftruncate,creat,openat,open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -F key=access
 ```
 
-
 ## Example configuration [_example_configuration]
 
 The Auditd module supports the common configuration options that are described under [configuring Auditbeat](/reference/auditbeat/configuration-auditbeat.md). Here is an example configuration:
@@ -271,4 +270,5 @@ auditbeat.modules:
     #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
     #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 ```
+
 

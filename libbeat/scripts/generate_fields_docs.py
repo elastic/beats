@@ -23,6 +23,8 @@ mapped_pages:
     #     output.write("[float]\n")
 
     if "description" in section:
+        if section["description"] is None:
+            section["description"] = "None"
         if "anchor" in section and section["name"] == "ECS":
             output.write("== {} fields\n\n".format(section["name"]))
             output.write("""
@@ -72,8 +74,8 @@ def document_field(output, field, field_path):
     output.write("**`{}`**\n".format(field["field_path"]))
     output.write(":   ")
 
-    if "description" in field and field["description"] is not None:
-        output.write("{}\n\n".format(field["description"].strip()))
+    if "description" in field and field["description"] is not None and len(field["description"].strip()) > 0:
+        output.write("{}".format(" ".join(x for x in field["description"].split("\n") if x)).strip()+"\n\n")
     
     if "deprecated" in field:
         output.write("deprecated:[{}]\n\n".format(field["deprecated"]))
@@ -173,7 +175,7 @@ This document describes the fields that are exported by {title}. They are groupe
 
         if "skipdocs" not in section:
             # output.write("* <<exported-fields-{}>>\n".format(section["anchor"]))
-            output.write("* [*{} fields*](/reference/metricbeat/exported-fields-{}.md)\n".format(section["title"], section["anchor"]))
+            output.write("* [*{} fields*](/reference/{}/exported-fields-{}.md)\n".format(section["title"], beat, section["anchor"]))
     output.close()
     # Sort alphabetically by key
     for section in sorted(docs, key=lambda field: field["key"]):

@@ -8,9 +8,10 @@ mapped_pages:
 These are the event fields specific to the module for the Security log.
 
 
-## winlog.logon [_winlog_logon]
+## winlog.logon [_winlog.logon]
 
 Data related to a Windows logon.
+
 
 **`winlog.logon.type`**
 :   Logon type name. This is the descriptive version of the `winlog.event_data.LogonType` ordinal. This is an enrichment added by the Security module.

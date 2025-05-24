@@ -11,9 +11,12 @@ logstash Module
 ## logstash [_logstash]
 
 
-## log [_log_7]
+
+
+## log [_log]
 
 Fields from the Logstash logs.
+
 
 **`logstash.log.module`**
 :   The module or class where the event originate.
@@ -61,10 +64,10 @@ alias to: message
 alias to: log.level
 
 
-
-## slowlog [_slowlog_2]
+## slowlog [_slowlog]
 
 slowlog
+
 
 **`logstash.slowlog.module`**
 :   The module or class where the event originate.
@@ -121,7 +124,7 @@ type: keyword
 
 
 **`logstash.slowlog.plugin_params_object`**
-:   key → value of the configuration used by the plugin.
+:   key -> value of the configuration used by the plugin.
 
 type: object
 

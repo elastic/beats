@@ -7,6 +7,8 @@ mapped_pages:
 
 NFS v4/3 specific event fields.
 
+
+
 **`nfs.version`**
 :   NFS protocol version number.
 
@@ -31,10 +33,10 @@ type: long
 :   NFS operation reply status.
 
 
-
 ## rpc [_rpc]
 
 ONC RPC specific event fields.
+
 
 **`rpc.xid`**
 :   RPC message transaction identifier.
@@ -49,19 +51,19 @@ ONC RPC specific event fields.
 
 
 **`rpc.cred.uid`**
-:   RPC caller’s user id, in case of auth-unix.
+:   RPC caller's user id, in case of auth-unix.
 
 type: long
 
 
 **`rpc.cred.gid`**
-:   RPC caller’s group id, in case of auth-unix.
+:   RPC caller's group id, in case of auth-unix.
 
 type: long
 
 
 **`rpc.cred.gids`**
-:   RPC caller’s secondary group ids, in case of auth-unix.
+:   RPC caller's secondary group ids, in case of auth-unix.
 
 
 **`rpc.cred.stamp`**
@@ -71,7 +73,7 @@ type: long
 
 
 **`rpc.cred.machinename`**
-:   The name of the caller’s machine.
+:   The name of the caller's machine.
 
 
 **`rpc.call_size`**

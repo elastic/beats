@@ -13,9 +13,10 @@ MS SQL Filebeat Module
 Fields from the MSSQL log files
 
 
-## log [_log_9]
+## log [_log]
 
 Common log fields
+
 
 **`mssql.log.origin`**
 :   Origin of the message, usually the server but it can also be a recovery process

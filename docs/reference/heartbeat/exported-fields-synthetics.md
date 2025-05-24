@@ -12,6 +12,7 @@ None
 
 Synthetics related fields.
 
+
 **`synthetics.type`**
 :   type: keyword
 
@@ -44,6 +45,7 @@ type: binary
 type: keyword
 
 
+
 **`synthetics.step.name`**
 :   type: text
 
@@ -60,15 +62,16 @@ type: keyword
 :   type: keyword
 
 
-
-## duration [_duration_3]
+## duration [_duration]
 
 Duration required to complete the step.
+
 
 **`synthetics.step.duration.us`**
 :   Duration in microseconds
 
 type: integer
+
 
 
 **`synthetics.journey.name`**
@@ -85,15 +88,16 @@ type: integer
 type: keyword
 
 
-
-## duration [_duration_4]
+## duration [_duration]
 
 Duration required to complete the journey.
+
 
 **`synthetics.journey.duration.us`**
 :   Duration in microseconds
 
 type: integer
+
 
 
 **`synthetics.error.name`**
@@ -108,6 +112,7 @@ type: integer
 :   type: text
 
 
+
 **`synthetics.screenshot_ref.width`**
 :   Width of the full screenshot in pixels.
 
@@ -120,10 +125,10 @@ type: integer
 type: integer
 
 
-
 ## blocks [_blocks]
 
-Attributes representing individual screenshot blocks. Only hash is indexed since it’s the only one we’d query on.
+Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
+
 
 **`synthetics.screenshot_ref.blocks.hash`**
 :   Hash that uniquely identifies this image by content. Corresponds to block document id.

@@ -13,9 +13,10 @@ Module for parsing IIS log files.
 Fields from IIS log files.
 
 
-## access [_access_2]
+## access [_access]
 
 Contains fields for IIS access logs.
+
 
 **`iis.access.sub_status`**
 :   The HTTP substatus code.
@@ -125,6 +126,7 @@ alias to: http.version
 alias to: host.hostname
 
 
+
 **`iis.access.user_agent.device`**
 :   type: alias
 
@@ -153,6 +155,7 @@ alias to: user_agent.os.name
 :   type: alias
 
 alias to: user_agent.original
+
 
 
 **`iis.access.geoip.continent_name`**
@@ -191,10 +194,10 @@ alias to: source.geo.city_name
 alias to: source.geo.region_iso_code
 
 
-
-## error [_error_3]
+## error [_error]
 
 Contains fields for IIS error logs.
+
 
 **`iis.error.reason_phrase`**
 :   The HTTP reason phrase.
@@ -254,6 +257,7 @@ alias to: url.original
 :   type: alias
 
 alias to: http.response.status_code
+
 
 
 **`iis.error.geoip.continent_name`**

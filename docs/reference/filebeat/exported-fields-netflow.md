@@ -12,19 +12,20 @@ Fields from NetFlow and IPFIX flows.
 
 Fields from NetFlow and IPFIX.
 
+
 **`netflow.type`**
 :   The type of NetFlow record described by this event.
 
 type: keyword
 
 
-
 ## exporter [_exporter]
 
 Metadata related to the exporter device that generated this record.
 
+
 **`netflow.exporter.address`**
-:   Exporter’s network address in IP:port format.
+:   Exporter's network address in IP:port format.
 
 type: keyword
 

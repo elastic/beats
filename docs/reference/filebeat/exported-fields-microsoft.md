@@ -8,9 +8,10 @@ mapped_pages:
 Microsoft Module
 
 
-## microsoft.defender_atp [_microsoft_defender_atp]
+## microsoft.defender_atp [_microsoft.defender_atp]
 
 Module for ingesting Microsoft Defender ATP.
+
 
 **`microsoft.defender_atp.lastUpdateTime`**
 :   The date and time (in UTC) the alert was last updated.
@@ -19,7 +20,7 @@ type: date
 
 
 **`microsoft.defender_atp.resolvedTime`**
-:   The date and time in which the status of the alert was changed to *Resolved*.
+:   The date and time in which the status of the alert was changed to 'Resolved'.
 
 type: date
 
@@ -49,19 +50,19 @@ type: keyword
 
 
 **`microsoft.defender_atp.status`**
-:   Specifies the current status of the alert. Possible values are: *Unknown*, *New*, *InProgress* and *Resolved*.
+:   Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
 
 type: keyword
 
 
 **`microsoft.defender_atp.classification`**
-:   Specification of the alert. Possible values are: *Unknown*, *FalsePositive*, *TruePositive*.
+:   Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
 
 type: keyword
 
 
 **`microsoft.defender_atp.determination`**
-:   Specifies the determination of the alert. Possible values are: *NotAvailable*, *Apt*, *Malware*, *SecurityPersonnel*, *SecurityTesting*, *UnwantedSoftware*, *Other*.
+:   Specifies the determination of the alert. Possible values are: 'NotAvailable', 'Apt', 'Malware', 'SecurityPersonnel', 'SecurityTesting', 'UnwantedSoftware', 'Other'.
 
 type: keyword
 
@@ -114,10 +115,10 @@ type: keyword
 type: keyword
 
 
-
-## microsoft.m365_defender [_microsoft_m365_defender]
+## microsoft.m365_defender [_microsoft.m365_defender]
 
 Module for ingesting Microsoft Defender ATP.
+
 
 **`microsoft.m365_defender.incidentId`**
 :   Unique identifier to represent the incident.
@@ -162,13 +163,13 @@ type: keyword
 
 
 **`microsoft.m365_defender.status`**
-:   Specifies the current status of the alert. Possible values are: *Unknown*, *New*, *InProgress* and *Resolved*.
+:   Specifies the current status of the alert. Possible values are: 'Unknown', 'New', 'InProgress' and 'Resolved'.
 
 type: keyword
 
 
 **`microsoft.m365_defender.classification`**
-:   Specification of the alert. Possible values are: *Unknown*, *FalsePositive*, *TruePositive*.
+:   Specification of the alert. Possible values are: 'Unknown', 'FalsePositive', 'TruePositive'.
 
 type: keyword
 
@@ -234,7 +235,7 @@ type: keyword
 
 
 **`microsoft.m365_defender.alerts.investigationState`**
-:   Information on the investigation’s current status.
+:   Information on the investigation's current status.
 
 type: keyword
 

@@ -7,6 +7,8 @@ mapped_pages:
 
 Redis-specific event fields.
 
+
+
 **`redis.return_value`**
 :   The return value of the Redis command in a human readable format.
 

@@ -8,9 +8,11 @@ mapped_pages:
 cyberarkpas fields.
 
 
-## audit [_audit_2]
+
+## audit [_audit]
 
 Cyberark Privileged Access Security Audit fields.
+
 
 **`cyberarkpas.audit.action`**
 :   A description of the audit record.
@@ -18,10 +20,10 @@ Cyberark Privileged Access Security Audit fields.
 type: keyword
 
 
-
 ## ca_properties [_ca_properties]
 
 Account metadata.
+
 
 **`cyberarkpas.audit.ca_properties.address`**
 :   type: keyword
@@ -151,10 +153,10 @@ type: keyword
 type: keyword
 
 
-
 ## extra_details [_extra_details]
 
 Specific extra details of the audit records.
+
 
 **`cyberarkpas.audit.extra_details.ad_process_id`**
 :   type: keyword

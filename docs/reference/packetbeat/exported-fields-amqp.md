@@ -7,6 +7,8 @@ mapped_pages:
 
 AMQP specific event fields.
 
+
+
 **`amqp.reply-code`**
 :   AMQP reply code to an error, similar to http reply-code
 

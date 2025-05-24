@@ -13,9 +13,10 @@ Module for parsing the Nginx log files.
 Fields from the Nginx log files.
 
 
-## access [_access_3]
+## access [_access]
 
 Contains fields for the Nginx access logs.
+
 
 **`nginx.access.remote_ip_list`**
 :   An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. Real source IP is restored to `source.ip`.
@@ -71,6 +72,7 @@ alias to: http.request.referrer
 alias to: user_agent.original
 
 
+
 **`nginx.access.user_agent.device`**
 :   type: alias
 
@@ -99,6 +101,7 @@ alias to: user_agent.os.name
 :   type: alias
 
 alias to: user_agent.original
+
 
 
 **`nginx.access.geoip.continent_name`**
@@ -137,10 +140,10 @@ alias to: source.geo.city_name
 alias to: source.geo.region_iso_code
 
 
-
-## error [_error_5]
+## error [_error]
 
 Contains fields for the Nginx error logs.
+
 
 **`nginx.error.connection_id`**
 :   Connection identifier.
@@ -172,10 +175,10 @@ alias to: process.thread.id
 alias to: message
 
 
-
 ## ingress_controller [_ingress_controller]
 
 Contains fields for the Ingress Nginx controller access logs.
+
 
 **`nginx.ingress_controller.remote_ip_list`**
 :   An array of remote IP addresses. It is a list because it is common to include, besides the client IP address, IP addresses from headers like `X-Forwarded-For`. Real source IP is restored to `source.ip`.
@@ -323,6 +326,7 @@ alias to: http.request.referrer
 alias to: user_agent.original
 
 
+
 **`nginx.ingress_controller.user_agent.device`**
 :   type: alias
 
@@ -351,6 +355,7 @@ alias to: user_agent.os.name
 :   type: alias
 
 alias to: user_agent.original
+
 
 
 **`nginx.ingress_controller.geoip.continent_name`**

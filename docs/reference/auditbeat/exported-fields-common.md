@@ -12,6 +12,7 @@ Contains common fields available in all event types.
 
 File attributes.
 
+
 **`file.setuid`**
 :   Set if the file has the `setuid` bit set. Omitted otherwise.
 
@@ -40,10 +41,10 @@ type: keyword
 type: text
 
 
-
-## selinux [_selinux_2]
+## selinux [_selinux]
 
 The SELinux identity of the file.
+
 
 **`file.selinux.user`**
 :   The owner of the object.
@@ -52,24 +53,23 @@ type: keyword
 
 
 **`file.selinux.role`**
-:   The object’s SELinux role.
+:   The object's SELinux role.
 
 type: keyword
 
 
 **`file.selinux.domain`**
-:   The object’s SELinux domain or type.
+:   The object's SELinux domain or type.
 
 type: keyword
 
 
 **`file.selinux.level`**
-:   The object’s SELinux level.
+:   The object's SELinux level.
 
 type: keyword
 
 example: s0
-
 
 
 ## user [_user]
@@ -80,6 +80,7 @@ User information.
 ## audit [_audit]
 
 Audit user information.
+
 
 **`user.audit.id`**
 :   Audit user ID.
@@ -93,10 +94,10 @@ type: keyword
 type: keyword
 
 
-
 ## filesystem [_filesystem]
 
 Filesystem user information.
+
 
 **`user.filesystem.id`**
 :   Filesystem user ID.
@@ -110,10 +111,10 @@ type: keyword
 type: keyword
 
 
-
 ## group [_group]
 
 Filesystem group information.
+
 
 **`user.filesystem.group.id`**
 :   Filesystem group ID.
@@ -127,10 +128,10 @@ type: keyword
 type: keyword
 
 
-
 ## saved [_saved]
 
 Saved user information.
+
 
 **`user.saved.id`**
 :   Saved user ID.
@@ -144,10 +145,10 @@ type: keyword
 type: keyword
 
 
-
-## group [_group_2]
+## group [_group]
 
 Saved group information.
+
 
 **`user.saved.group.id`**
 :   Saved group ID.

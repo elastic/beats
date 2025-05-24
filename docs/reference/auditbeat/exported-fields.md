@@ -19,4 +19,3 @@ This document describes the fields that are exported by Auditbeat. They are grou
 * [*Kubernetes fields*](/reference/auditbeat/exported-fields-kubernetes-processor.md)
 * [*Process fields*](/reference/auditbeat/exported-fields-process.md)
 * [*System fields*](/reference/auditbeat/exported-fields-system.md)
-

@@ -12,6 +12,7 @@ Module for handling logs produced by coredns
 
 coredns fields after normalization
 
+
 **`coredns.query.size`**
 :   size of the DNS query
 

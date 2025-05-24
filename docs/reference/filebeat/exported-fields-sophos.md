@@ -8,9 +8,10 @@ mapped_pages:
 sophos Module
 
 
-## sophos.xg [_sophos_xg]
+## sophos.xg [_sophos.xg]
 
 Module for parsing sophosxg syslog.
+
 
 **`sophos.xg.action`**
 :   Event Action

@@ -8,9 +8,10 @@ mapped_pages:
 Some checkpoint module
 
 
-## checkpoint [_checkpoint_2]
+## checkpoint [_checkpoint]
 
 Module for parsing Checkpoint syslog.
+
 
 **`checkpoint.confidence_level`**
 :   Confidence level determined by ThreatCloud.
@@ -559,7 +560,7 @@ type: keyword
 
 
 **`checkpoint.sig_id`**
-:   Application’s signature ID which how it was detected by.
+:   Application's signature ID which how it was detected by.
 
 type: keyword
 
@@ -799,7 +800,7 @@ type: keyword
 
 
 **`checkpoint.special_properties`**
-:   If this field is set to *1* the log will not be shown (in use for monitoring scan progress).
+:   If this field is set to '1' the log will not be shown (in use for monitoring scan progress).
 
 type: integer
 
@@ -1291,7 +1292,7 @@ type: keyword
 
 
 **`checkpoint.mime_from`**
-:   Sender’s address.
+:   Sender's address.
 
 type: keyword
 
@@ -1435,7 +1436,7 @@ type: keyword
 
 
 **`checkpoint.developer_certificate_name`**
-:   Name of the developer’s certificate that was used to sign the mobile application.
+:   Name of the developer's certificate that was used to sign the mobile application.
 
 type: keyword
 
@@ -1489,7 +1490,7 @@ type: keyword
 
 
 **`checkpoint.email_status`**
-:   Describes the email’s state. Possible options: delivered, deferred, skipped, bounced, hold, new, scan_started, scan_ended
+:   Describes the email's state. Possible options: delivered, deferred, skipped, bounced, hold, new, scan_started, scan_ended
 
 type: keyword
 
@@ -1795,19 +1796,19 @@ type: keyword
 
 
 **`checkpoint.parent_file_hash`**
-:   Archive’s hash in case of extracted files.
+:   Archive's hash in case of extracted files.
 
 type: keyword
 
 
 **`checkpoint.parent_file_name`**
-:   Archive’s name in case of extracted files.
+:   Archive's name in case of extracted files.
 
 type: keyword
 
 
 **`checkpoint.parent_file_uid`**
-:   Archive’s UID in case of extracted files.
+:   Archive's UID in case of extracted files.
 
 type: keyword
 
@@ -2035,7 +2036,7 @@ type: keyword
 
 
 **`checkpoint.sip_reason`**
-:   Explains why *source_ip* isn’t allowed to redirect (handover).
+:   Explains why 'source_ip' isn't allowed to redirect (handover).
 
 type: keyword
 

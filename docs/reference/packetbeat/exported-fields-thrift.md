@@ -7,6 +7,8 @@ mapped_pages:
 
 Thrift-RPC specific event fields.
 
+
+
 **`thrift.params`**
 :   The RPC method call parameters in a human readable format. If the IDL files are available, the parameters use names whenever possible. Otherwise, the IDs from the message are used.
 

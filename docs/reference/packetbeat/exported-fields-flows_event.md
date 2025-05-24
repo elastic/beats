@@ -7,6 +7,7 @@ mapped_pages:
 
 These fields contain data about the flow itself.
 
+
 **`flow.final`**
 :   Indicates if event is last event in flow. If final is false, the event reports an intermediate flow state only.
 
@@ -18,7 +19,7 @@ type: boolean
 
 
 **`flow.vlan`**
-:   VLAN identifier from the 802.1q frame. In case of a multi-tagged frame this field will be an array with the outer tag’s VLAN identifier listed first.
+:   VLAN identifier from the 802.1q frame. In case of a multi-tagged frame this field will be an array with the outer tag's VLAN identifier listed first.
 
 type: long
 

@@ -3,7 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-haproxy.html
 ---
 
-# HAproxy module [filebeat-module-haproxy]
+<!-- This file is generated! See scripts/docs_collector.py -->
+
+# HAProxy module [filebeat-module-haproxy]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/haproxy/index.md).
@@ -94,7 +96,6 @@ This module comes with a sample dashboard showing geolocation, distribution of r
 % TO DO: Use `:class: screenshot`
 ![kibana haproxy overview](images/kibana-haproxy-overview.png)
 
-
-## Fields [_fields_20]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-haproxy.md) section.

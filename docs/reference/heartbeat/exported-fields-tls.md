@@ -8,32 +8,28 @@ mapped_pages:
 None
 
 
-## tls [_tls_2]
+## tls [_tls]
 
 TLS layer related fields.
 
-**`tls.certificate_not_valid_before`**
-:   :::{admonition} Deprecated in 7.8.0
-    Deprecated in favor of `tls.server.x509.not_before`.
-    :::
 
-Earliest time at which the connection’s certificates are valid.
+**`tls.certificate_not_valid_before`**
+:   Deprecated in favor of `tls.server.x509.not_before`. Earliest time at which the connection's certificates are valid.
+
+deprecated:[7.8.0]
 
 type: date
 
 
 **`tls.certificate_not_valid_after`**
-:   :::{admonition} Deprecated in 7.8.0
-    Deprecated in favor of `tls.server.x509.not_after`.
-    :::
+:   Deprecated in favor of `tls.server.x509.not_after`. Latest time at which the connection's certificates are valid.
 
-Latest time at which the connection’s certificates are valid.
+deprecated:[7.8.0]
 
 type: date
 
 
-
-## rtt [_rtt_6]
+## rtt [_rtt]
 
 TLS layer round trip times.
 
@@ -42,16 +38,17 @@ TLS layer round trip times.
 
 Time required to finish TLS handshake based on already available network connection.
 
+
 **`tls.rtt.handshake.us`**
 :   Duration in microseconds
 
 type: long
 
 
-
-## server [_server_2]
+## server [_server]
 
 Detailed x509 certificate metadata
+
 
 **`tls.server.version_number`**
 :   Version of x509 format.

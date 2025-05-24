@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-zookeeper.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # ZooKeeper module [filebeat-module-zookeeper]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -117,7 +119,6 @@ If logs are originated from systems or applications with a different time zone t
 
 See [Processors](/reference/filebeat/filtering-enhancing-data.md) for information about specifying processors in your config.
 
-
-## Fields [_fields_56]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-zookeeper.md) section.

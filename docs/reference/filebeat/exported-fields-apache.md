@@ -17,6 +17,7 @@ Apache fields.
 
 Contains fields for the Apache HTTP Server access logs.
 
+
 **`apache.access.ssl.protocol`**
 :   SSL protocol version.
 
@@ -29,10 +30,10 @@ type: keyword
 type: keyword
 
 
-
 ## error [_error]
 
 Fields from the Apache error logs.
+
 
 **`apache.error.module`**
 :   The module producing the logged message.

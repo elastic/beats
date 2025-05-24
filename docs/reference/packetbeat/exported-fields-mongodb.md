@@ -7,6 +7,8 @@ mapped_pages:
 
 MongoDB-specific event fields. These fields mirror closely the fields for the MongoDB wire protocol. The higher level fields (for example, `query` and `resource`) apply to MongoDB events as well.
 
+
+
 **`mongodb.error`**
 :   If the MongoDB request has resulted in an error, this field contains the error message returned by the server.
 

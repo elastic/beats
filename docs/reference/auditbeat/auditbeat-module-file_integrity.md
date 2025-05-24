@@ -120,7 +120,7 @@ You can specify the following options for any Auditbeat module.
 :   A name given by the user to the service the data is collected from. It can be used for example to identify information collected from nodes of different clusters with the same `service.type`.
 
 
-## Example configuration [_example_configuration_2]
+## Example configuration [_example_configuration]
 
 The File Integrity module supports the common configuration options that are described under [configuring Auditbeat](/reference/auditbeat/configuration-auditbeat.md). Here is an example configuration:
 
@@ -134,4 +134,5 @@ auditbeat.modules:
   - /usr/sbin
   - /etc
 ```
+
 

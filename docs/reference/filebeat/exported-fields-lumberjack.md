@@ -7,6 +7,7 @@ mapped_pages:
 
 Fields from Lumberjack input.
 
+
 **`lumberjack`**
 :   Structured data received in an event sent over the Lumberjack protocol.
 

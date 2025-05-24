@@ -12,16 +12,17 @@ Salesforce Module
 
 Fileset for ingesting Salesforce Apex logs.
 
+
 **`salesforce.instance_url`**
 :   The Instance URL of the Salesforce instance.
 
 type: keyword
 
 
-
 ## apex [_apex]
 
 Fileset for ingesting Salesforce Apex logs.
+
 
 **`salesforce.apex.document_id`**
 :   Unique ID of the Apex document.
@@ -48,7 +49,7 @@ type: keyword
 
 
 **`salesforce.apex.client_name`**
-:   The name of the client that’s using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didn’t specify a client in the CallOptions header.
+:   The name of the client that's using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didn't specify a client in the CallOptions header.
 
 type: keyword
 
@@ -120,7 +121,7 @@ type: keyword
 
 
 **`salesforce.apex.is_long_running_request`**
-:   Indicates whether the request is counted against your org’s concurrent long-running Apex request limit (true) or not (false).
+:   Indicates whether the request is counted against your org's concurrent long-running Apex request limit (true) or not (false).
 
 type: keyword
 
@@ -132,13 +133,13 @@ type: long
 
 
 **`salesforce.apex.limit_usage_pct`**
-:   The percentage of Apex SOAP calls that were made against the organization’s limit.
+:   The percentage of Apex SOAP calls that were made against the organization's limit.
 
 type: float
 
 
 **`salesforce.apex.login_key`**
-:   The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+:   The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
 
 type: keyword
 
@@ -216,7 +217,7 @@ type: keyword
 
 
 **`salesforce.apex.rows_total`**
-:   Total number of records in the result set. The value is always -1 if the custom adapter’s DataSource.Provider class doesn’t declare the QUERY_TOTAL_SIZE capability.
+:   Total number of records in the result set. The value is always -1 if the custom adapter's DataSource.Provider class doesn't declare the QUERY_TOTAL_SIZE capability.
 
 type: long
 
@@ -282,13 +283,13 @@ type: keyword
 
 
 **`salesforce.apex.uri`**
-:   The URI of the page that’s receiving the request.
+:   The URI of the page that's receiving the request.
 
 type: keyword
 
 
 **`salesforce.apex.uri_derived_id`**
-:   The 18-character case-safe ID of the URI of the page that’s receiving the request.
+:   The 18-character case-safe ID of the URI of the page that's receiving the request.
 
 type: keyword
 
@@ -300,15 +301,15 @@ type: keyword
 
 
 **`salesforce.apex.user_id_derived`**
-:   The 18-character case-safe ID of the user who’s using Salesforce services through the UI or the API.
+:   The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
 
 type: keyword
 
 
-
-## salesforce.login [_salesforce_login]
+## salesforce.login [_salesforce.login]
 
 Fileset for ingesting Salesforce Login (REST) logs.
+
 
 **`salesforce.login.document_id`**
 :   Unique Id.
@@ -322,6 +323,7 @@ type: keyword
 type: keyword
 
 
+
 **`salesforce.login.api.type`**
 :   The type of Salesforce API request.
 
@@ -329,9 +331,10 @@ type: keyword
 
 
 **`salesforce.login.api.version`**
-:   The version of the Salesforce API that’s being used.
+:   The version of the Salesforce API that's being used.
 
 type: keyword
+
 
 
 **`salesforce.login.auth.service_id`**
@@ -346,6 +349,7 @@ type: keyword
 type: keyword
 
 
+
 **`salesforce.login.session.level`**
 :   Session-level security controls user access to features that support it, such as connected apps and reporting. This field is available in API version 42.0 and later.
 
@@ -353,19 +357,19 @@ type: text
 
 
 **`salesforce.login.session.key`**
-:   The user’s unique session ID. Use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started. For LoginEvent, this field is often null because the event is captured before a session is created. For example, vMASKIU6AxEr+Op5. This field is available in API version 46.0 and later.
+:   The user's unique session ID. Use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started. For LoginEvent, this field is often null because the event is captured before a session is created. For example, vMASKIU6AxEr+Op5. This field is available in API version 46.0 and later.
 
 type: keyword
 
 
 **`salesforce.login.key`**
-:   The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+:   The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
 
 type: keyword
 
 
 **`salesforce.login.history_id`**
-:   Tracks a user session so you can correlate user activity with a particular login instance. This field is also available on the LoginHistory, AuthSession, and other objects, making it easier to trace events back to a user’s original authentication.
+:   Tracks a user session so you can correlate user activity with a particular login instance. This field is also available on the LoginHistory, AuthSession, and other objects, making it easier to trace events back to a user's original authentication.
 
 type: keyword
 
@@ -377,13 +381,13 @@ type: keyword
 
 
 **`salesforce.login.geo_id`**
-:   The Salesforce ID of the LoginGeo object associated with the login user’s IP address.
+:   The Salesforce ID of the LoginGeo object associated with the login user's IP address.
 
 type: keyword
 
 
 **`salesforce.login.additional_info`**
-:   JSON serialization of additional information that’s captured from the HTTP headers during a login request.
+:   JSON serialization of additional information that's captured from the HTTP headers during a login request.
 
 type: text
 
@@ -395,7 +399,7 @@ type: keyword
 
 
 **`salesforce.login.client_ip`**
-:   The IP address of the client that’s using Salesforce services. A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”.
+:   The IP address of the client that's using Salesforce services. A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”.
 
 type: keyword
 
@@ -407,7 +411,7 @@ type: long
 
 
 **`salesforce.login.db_time_total`**
-:   The time in nanoseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and DB’s CPU time. Compare this field to cpu_time to determine whether performance issues are occurring in the database layer or in your own code.
+:   The time in nanoseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and DB's CPU time. Compare this field to cpu_time to determine whether performance issues are occurring in the database layer or in your own code.
 
 type: double
 
@@ -443,13 +447,13 @@ type: long
 
 
 **`salesforce.login.user_id`**
-:   The 15-character ID of the user who’s using Salesforce services through the UI or the API.
+:   The 15-character ID of the user who's using Salesforce services through the UI or the API.
 
 type: keyword
 
 
 **`salesforce.login.uri_id_derived`**
-:   The 18-character case insensitive ID of the URI of the page that’s receiving the request.
+:   The 18-character case insensitive ID of the URI of the page that's receiving the request.
 
 type: keyword
 
@@ -466,10 +470,10 @@ type: float
 type: keyword
 
 
-
-## salesforce.logout [_salesforce_logout]
+## salesforce.logout [_salesforce.logout]
 
 Fileset for parsing Salesforce Logout (REST) logs.
+
 
 **`salesforce.logout.document_id`**
 :   Unique Id.
@@ -477,8 +481,9 @@ Fileset for parsing Salesforce Logout (REST) logs.
 type: keyword
 
 
+
 **`salesforce.logout.session.key`**
-:   The user’s unique session ID. You can use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started.
+:   The user's unique session ID. You can use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started.
 
 type: keyword
 
@@ -496,9 +501,10 @@ type: keyword
 
 
 **`salesforce.logout.login_key`**
-:   The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+:   The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
 
 type: keyword
+
 
 
 **`salesforce.logout.api.type`**
@@ -508,7 +514,7 @@ type: keyword
 
 
 **`salesforce.logout.api.version`**
-:   The version of the Salesforce API that’s being used.
+:   The version of the Salesforce API that's being used.
 
 type: keyword
 
@@ -556,19 +562,19 @@ type: keyword
 
 
 **`salesforce.logout.user_id`**
-:   The 15-character ID of the user who’s using Salesforce services through the UI or the API.
+:   The 15-character ID of the user who's using Salesforce services through the UI or the API.
 
 type: keyword
 
 
 **`salesforce.logout.user_id_derived`**
-:   The 18-character case-safe ID of the user who’s using Salesforce services through the UI or the API.
+:   The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
 
 type: keyword
 
 
 **`salesforce.logout.user_initiated_logout`**
-:   The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user’s session timed out due to inactivity or another implicit logout action, the value is 0.
+:   The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user's session timed out due to inactivity or another implicit logout action, the value is 0.
 
 type: keyword
 
@@ -591,10 +597,10 @@ type: keyword
 type: keyword
 
 
-
-## salesforce.setup_audit_trail [_salesforce_setup_audit_trail]
+## salesforce.setup_audit_trail [_salesforce.setup_audit_trail]
 
 Fileset for ingesting Salesforce SetupAuditTrail logs.
+
 
 **`salesforce.setup_audit_trail.document_id`**
 :   Unique Id.
@@ -621,7 +627,7 @@ type: keyword
 
 
 **`salesforce.setup_audit_trail.delegate_user`**
-:   The Login-As user who executed the action in Setup. If a Login-As user didn’t perform the action, this field is blank. This field is available in API version 35.0 and later.
+:   The Login-As user who executed the action in Setup. If a Login-As user didn't perform the action, this field is blank. This field is available in API version 35.0 and later.
 
 type: keyword
 

@@ -13,9 +13,10 @@ Module for handling logs from Google Cloud.
 Fields from Google Cloud logs.
 
 
-## destination.instance [_destination_instance]
+## destination.instance [_destination.instance]
 
 If the destination of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
+
 
 **`gcp.destination.instance.project_id`**
 :   ID of the project containing the VM.
@@ -35,10 +36,10 @@ type: keyword
 type: keyword
 
 
-
-## destination.vpc [_destination_vpc]
+## destination.vpc [_destination.vpc]
 
 If the destination of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
+
 
 **`gcp.destination.vpc.project_id`**
 :   ID of the project containing the VM.
@@ -58,10 +59,10 @@ type: keyword
 type: keyword
 
 
-
-## source.instance [_source_instance]
+## source.instance [_source.instance]
 
 If the source of the connection was a VM located on the same VPC, this field is populated with VM instance details. In a Shared VPC configuration, project_id corresponds to the project that owns the instance, usually the service project.
+
 
 **`gcp.source.instance.project_id`**
 :   ID of the project containing the VM.
@@ -81,10 +82,10 @@ type: keyword
 type: keyword
 
 
-
-## source.vpc [_source_vpc]
+## source.vpc [_source.vpc]
 
 If the source of the connection was a VM located on the same VPC, this field is populated with VPC network details. In a Shared VPC configuration, project_id corresponds to that of the host project.
+
 
 **`gcp.source.vpc.project_id`**
 :   ID of the project containing the VM.
@@ -104,10 +105,10 @@ type: keyword
 type: keyword
 
 
-
-## audit [_audit_3]
+## audit [_audit]
 
 Fields for Google Cloud audit logs.
+
 
 **`gcp.audit.type`**
 :   Type property.
@@ -115,10 +116,10 @@ Fields for Google Cloud audit logs.
 type: keyword
 
 
-
 ## authentication_info [_authentication_info]
 
 Authentication information.
+
 
 **`gcp.audit.authentication_info.principal_email`**
 :   The email address of the authenticated user making the request.
@@ -139,7 +140,7 @@ type: array
 
 
 **`gcp.audit.method_name`**
-:   The name of the service method or operation. For API calls, this  should be the name of the API method.  For example, *google.datastore.v1.Datastore.RunQuery*.
+:   The name of the service method or operation. For API calls, this  should be the name of the API method.  For example, 'google.datastore.v1.Datastore.RunQuery'.
 
 type: keyword
 
@@ -150,10 +151,10 @@ type: keyword
 type: long
 
 
-
 ## request [_request]
 
 The operation request.
+
 
 **`gcp.audit.request.proto_name`**
 :   Type property of the request.
@@ -179,10 +180,10 @@ type: keyword
 type: keyword
 
 
-
 ## request_metadata [_request_metadata]
 
 Metadata about the request.
+
 
 **`gcp.audit.request_metadata.caller_ip`**
 :   The IP address of the caller.
@@ -196,10 +197,10 @@ type: ip
 type: keyword
 
 
-
 ## response [_response]
 
 The operation response.
+
 
 **`gcp.audit.response.proto_name`**
 :   Type property of the response.
@@ -207,10 +208,10 @@ The operation response.
 type: keyword
 
 
-
 ## details [_details]
 
 The details of the response.
+
 
 **`gcp.audit.response.details.group`**
 :   The name of the group.
@@ -243,15 +244,15 @@ type: keyword
 
 
 **`gcp.audit.resource_name`**
-:   The resource or collection that is the target of the operation.  The name is a scheme-less URI, not including the API service name.  For example, *shelves/SHELF_ID/books*.
+:   The resource or collection that is the target of the operation.  The name is a scheme-less URI, not including the API service name.  For example, 'shelves/SHELF_ID/books'.
 
 type: keyword
-
 
 
 ## resource_location [_resource_location]
 
 The location of the resource.
+
 
 **`gcp.audit.resource_location.current_locations`**
 :   Current locations of the resource.
@@ -265,10 +266,10 @@ type: keyword
 type: keyword
 
 
-
 ## status [_status]
 
 The status of the overall operation.
+
 
 **`gcp.audit.status.code`**
 :   The status code, which should be an enum value of google.rpc.Code.
@@ -282,8 +283,7 @@ type: integer
 type: keyword
 
 
-
-## firewall [_firewall_2]
+## firewall [_firewall]
 
 Fields for Google Cloud Firewall logs.
 
@@ -291,6 +291,7 @@ Fields for Google Cloud Firewall logs.
 ## rule_details [_rule_details]
 
 Description of the firewall rule that matched this connection.
+
 
 **`gcp.firewall.rule_details.priority`**
 :   The priority for the firewall rule.
@@ -358,13 +359,13 @@ type: keyword
 type: keyword
 
 
-
-## vpcflow [_vpcflow_2]
+## vpcflow [_vpcflow]
 
 Fields for Google Cloud VPC flow logs.
 
+
 **`gcp.vpcflow.reporter`**
-:   The side which reported the flow. Can be either *SRC* or *DEST*.
+:   The side which reported the flow. Can be either 'SRC' or 'DEST'.
 
 type: keyword
 

@@ -7,6 +7,7 @@ mapped_pages:
 
 These fields contain data about the environment in which the transaction or flow was captured.
 
+
 **`type`**
 :   The type of the transaction (for example, HTTP, MySQL, Redis, or RUM) or "flow" in case of flows.
 
@@ -54,7 +55,8 @@ required: True
 
 
 **`real_ip`**
-:   If the server initiating the transaction is a proxy, this field contains the original client IP address. For HTTP, for example, the IP address extracted from a configurable HTTP header, by default `X-Forwarded-For`. Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
+:   If the server initiating the transaction is a proxy, this field contains the original client IP address. For HTTP, for example, the IP address extracted from a configurable HTTP header, by default `X-Forwarded-For`.
+Unless this field is disabled, it always has a value, and it matches the `client_ip` for non proxy clients.
 
 type: alias
 

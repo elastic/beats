@@ -7,6 +7,7 @@ mapped_pages:
 
 These fields contain measurements related to the transaction.
 
+
 **`bytes_in`**
 :   The number of bytes of the request. Note that this size is the application layer message length, without the length of the IP or TCP headers.
 

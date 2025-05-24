@@ -12,6 +12,7 @@ state related fields
 
 Present in the last event emitted during a check. If a monitor checks multiple endpoints, as is the case with `mode: all`.
 
+
 **`state.id`**
 :   ID of this state
 

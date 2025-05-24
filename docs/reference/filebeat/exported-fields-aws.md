@@ -17,16 +17,17 @@ Fields from AWS logs.
 
 Fields for AWS CloudTrail logs.
 
+
 **`aws.cloudtrail.event_version`**
 :   The CloudTrail version of the log event format.
 
 type: keyword
 
 
-
 ## user_identity [_user_identity]
 
 The userIdentity element contains details about the type of IAM identity that made the request, and which credentials were used. If temporary credentials were used, the element shows how the credentials were obtained.
+
 
 **`aws.cloudtrail.user_identity.type`**
 :   The type of the identity
@@ -46,10 +47,10 @@ type: keyword
 type: keyword
 
 
-
 ## session_context [_session_context]
 
 If the request was made with temporary security credentials, an element that provides information about the session that was created for those credentials
+
 
 **`aws.cloudtrail.user_identity.session_context.mfa_authenticated`**
 :   The value is true if the root user or IAM user whose credentials were used for the request also was authenticated with an MFA device; otherwise, false.
@@ -63,10 +64,10 @@ type: keyword
 type: date
 
 
-
 ## session_issuer [_session_issuer]
 
 If the request was made with temporary security credentials, an element that provides information about how the credentials were obtained.
+
 
 **`aws.cloudtrail.user_identity.session_context.session_issuer.type`**
 :   The source of the temporary security credentials, such as Root, IAMUser, or Role.
@@ -170,10 +171,10 @@ type: keyword
 type: keyword
 
 
-
 ## resources [_resources]
 
 A list of resources accessed in the event.
+
 
 **`aws.cloudtrail.resources.arn`**
 :   Resource ARNs
@@ -224,12 +225,11 @@ type: keyword
 **`aws.cloudtrail.event_category`**
 :   Shows the event category that is used in LookupEvents calls.
 
-* For management events, the value is management.
-* For data events, the value is data.
-* For Insights events, the value is insight.
+ - For management events, the value is management.
+ - For data events, the value is data.
+ - For Insights events, the value is insight.
 
 type: keyword
-
 
 
 ## console_login [_console_login]
@@ -240,6 +240,7 @@ Fields specific to ConsoleLogin events
 ## additional_eventdata [_additional_eventdata]
 
 Additional Event Data for ConsoleLogin events
+
 
 **`aws.cloudtrail.console_login.additional_eventdata.mobile_version`**
 :   Identifies whether ConsoleLogin was from mobile version
@@ -259,10 +260,10 @@ type: keyword
 type: boolean
 
 
-
 ## flattened [_flattened]
 
-ES flattened datatype for objects where the subfields aren’t known in advance.
+ES flattened datatype for objects where the subfields aren't known in advance.
+
 
 **`aws.cloudtrail.flattened.additional_eventdata`**
 :   Additional data about the event that was not part of the request or response.
@@ -288,10 +289,10 @@ type: flattened
 type: flattened
 
 
-
 ## digest [_digest]
 
 Fields from Cloudtrail Digest Logs
+
 
 **`aws.cloudtrail.digest.log_files`**
 :   A list of Logfiles contained in the digest.
@@ -365,10 +366,10 @@ type: keyword
 type: flattened
 
 
-
 ## cloudwatch [_cloudwatch]
 
 Fields for AWS CloudWatch logs.
+
 
 **`aws.cloudwatch.message`**
 :   CloudWatch log message.
@@ -376,10 +377,10 @@ Fields for AWS CloudWatch logs.
 type: text
 
 
-
 ## ec2 [_ec2]
 
 Fields for AWS EC2 logs in CloudWatch.
+
 
 **`aws.ec2.ip_address`**
 :   The internet address of the requester.
@@ -387,10 +388,10 @@ Fields for AWS EC2 logs in CloudWatch.
 type: keyword
 
 
-
 ## elb [_elb]
 
 Fields for AWS ELB logs.
+
 
 **`aws.elb.name`**
 :   The name of the load balancer.
@@ -519,7 +520,7 @@ type: keyword
 
 
 **`aws.elb.action_executed`**
-:   The action executed when processing the request (forward, fixed-response, authenticate…). It can contain several values.
+:   The action executed when processing the request (forward, fixed-response, authenticate...). It can contain several values.
 
 type: keyword
 
@@ -560,10 +561,10 @@ type: keyword
 type: keyword
 
 
-
 ## s3access [_s3access]
 
 Fields for AWS S3 server access logs.
+
 
 **`aws.s3access.bucket_owner`**
 :   The canonical user ID of the owner of the source bucket.
@@ -638,7 +639,7 @@ type: long
 
 
 **`aws.s3access.total_time`**
-:   The number of milliseconds the request was in flight from the server’s perspective.
+:   The number of milliseconds the request was in flight from the server's perspective.
 
 type: long
 
@@ -703,10 +704,10 @@ type: keyword
 type: keyword
 
 
-
 ## vpcflow [_vpcflow]
 
 Fields for AWS VPC flow logs.
+
 
 **`aws.vpcflow.version`**
 :   The VPC Flow Logs version. If you use the default format, the version is 2. If you specify a custom format, the version is 3.
@@ -739,7 +740,7 @@ type: keyword
 
 
 **`aws.vpcflow.instance_id`**
-:   The ID of the instance that’s associated with network interface for which the traffic is recorded, if the instance is owned by you.
+:   The ID of the instance that's associated with network interface for which the traffic is recorded, if the instance is owned by you.
 
 type: keyword
 
@@ -775,7 +776,7 @@ type: keyword
 
 
 **`aws.vpcflow.tcp_flags_array`**
-:   List of TCP flags: *fin, syn, rst, psh, ack, urg*
+:   List of TCP flags: 'fin, syn, rst, psh, ack, urg'
 
 type: keyword
 
