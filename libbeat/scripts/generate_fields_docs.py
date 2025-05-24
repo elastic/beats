@@ -26,17 +26,16 @@ mapped_pages:
         if section["description"] is None:
             section["description"] = "None"
         if "anchor" in section and section["name"] == "ECS":
-            output.write("== {} fields\n\n".format(section["name"]))
-            output.write("""
-This section defines Elastic Common Schema (ECS) fields—a common set of fields
-to be used when storing event data in {es}.
+            output.write("# {} fields [exported-fields-ecs]\n\n".format(section["name"]))
+            output.write("""This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {{{{es}}}}.
 
 This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
-The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+The goal of ECS is to enable and encourage users of {{{{es}}}} to normalize their event data,
 so that they can better analyze, visualize, and correlate the data represented in their events.
 
-See the {ecs-ref}[ECS reference] for more information.
-""")
+See the [ECS reference](ecs://reference/index.md) for more information.
+""".format_map({"beatname_uc": beat.title()}))
         elif "anchor" in section:
             output.write("# {} fields [exported-fields-{}]\n\n".format(section["title"], section["anchor"]))
             output.write("{}\n\n".format(section["description"].strip()))
