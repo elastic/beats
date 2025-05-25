@@ -17,6 +17,50 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 % ### Fixes [beats-versionext-fixes]
 
+## 9.0.2 [beats-9.0.2-release-notes]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling. {pull}44189[44189]
+
+*Auditbeat*
+
+- system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
+
+*Filebeat*
+
+- Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
+- Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
+
+*Metricbeat*
+
+- Add AWS OwningAccount support for cross account monitoring. {issue}40570[40570] {pull}40691[40691]
+- Use namespace for GetListMetrics when exists in AWS. {pull}41022[41022]
+- Only fetch cluster-level index stats summary. {issue}36019[36019] {pull}42901[42901]
+- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices. {pull}43637[43637]
+- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch. {pull}44307[44307]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.24.3. {pull}44270[44270]
+
+*Filebeat*
+
+- Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
+
+*Metricbeat*
+
+- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add latency config option to Azure Monitor module. {pull}44366[44366]
+
+*Osquerybeat*
+
+- Upgrade osquery version to 5.15.0 {pull}43426[43426]
+
 ## 9.0.1 [beats-9.0.1-release-notes]
 
 ### Features and enhancements [beats-9.0.1-features-enhancements]
