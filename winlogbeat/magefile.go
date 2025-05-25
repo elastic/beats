@@ -39,13 +39,15 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
-	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
+
 	// mage:import
 	winlogbeat "github.com/elastic/beats/v7/winlogbeat/scripts/mage"
 )
 
 func init() {
-	unittest.RegisterGoTestDeps(winlogbeat.Update.Fields)
+	// Commenting this out for now, as we are not using asciidoc anymore. Should probably be converted to Markdown.
+	// https://github.com/elastic/beats/issues/44478
+	// unittest.RegisterGoTestDeps(winlogbeat.Update.Fields)
 	winlogbeat.SelectLogic = devtools.OSSProject
 }
 

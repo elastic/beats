@@ -109,8 +109,16 @@ func TestPackages() error {
 
 // Update is an alias for running fields, dashboards, config, includes.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config,
-		devtools.GenerateModuleIncludeListGo, Docs)
+	mg.SerialDeps(
+		// Commenting this out for now, as we are not using asciidoc anymore. Should probably be converted to Markdown.
+		// https://github.com/elastic/beats/issues/44478
+		// Fields,
+		Dashboards, Config,
+		devtools.GenerateModuleIncludeListGo,
+		// Commenting this out for now, as we are not using asciidoc anymore. Should probably be converted to Markdown.
+		// https://github.com/elastic/beats/issues/44478
+		// Docs
+	)
 }
 
 // Config generates both the short/reference configs and populates the modules.d

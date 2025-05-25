@@ -43,7 +43,15 @@ type Update mg.Namespace
 
 // All updates all generated content.
 func (Update) All() {
-	mg.Deps(Update.Fields, Update.Dashboards, Update.Config, Update.FieldDocs, Update.ModuleDocs, Update.Includes)
+	mg.Deps(
+		// Commenting this out for now, as we are not using asciidoc anymore. Should probably be converted to Markdown.
+		// https://github.com/elastic/beats/issues/44478
+		// Update.Fields,
+		Update.Dashboards, Update.Config,
+		// Commenting this out for now, as we are not using asciidoc anymore. Should probably be converted to Markdown.
+		// https://github.com/elastic/beats/issues/44478
+		// Update.FieldDocs, Update.ModuleDocs,
+		Update.Includes)
 }
 
 // Config updates the Beat's config files.

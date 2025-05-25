@@ -24,13 +24,11 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// register kubernetes runner
@@ -172,7 +170,13 @@ func moduleFieldsGo() error {
 // Update is an alias for running fields, dashboards, config.
 func Update() {
 	mg.SerialDeps(
-		Fields, Dashboards, Config, CollectAll,
+		// Commenting this out for now, as we are not using asciidoc anymore. Should probably be converted to Markdown.
+		// https://github.com/elastic/beats/issues/44478
+		// Fields,
+		Dashboards, Config,
+		// Commenting this out for now, as we are not using asciidoc anymore. Should probably be converted to Markdown.
+		// https://github.com/elastic/beats/issues/44478
+		// CollectAll,
 		metricbeat.PrepareModulePackagingOSS,
 		metricbeat.GenerateOSSMetricbeatModuleIncludeListGo)
 }
@@ -256,27 +260,4 @@ func PythonIntegTest(ctx context.Context) error {
 		args.ForceCreateVenv = true
 		return devtools.PythonTestForModule(args)
 	})
-}
-
-// FIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests
-// Will also filter out packages that fail to run with the GODEBUG=fips140=only var set
-func FIPSOnlyUnitTest() error {
-	ctx := context.Background()
-
-	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
-	packages, err := gotool.ListProjectPackages()
-	if err != nil {
-		return err
-	}
-	filteredPackages := make([]string, 0, len(packages))
-	for _, pkg := range packages {
-		// Filter out tests from metricbeat/module/vsphere as the github.com/vmware/govmomi simulator uses SHA-1.
-		// This causes tests to panic on load before TestMain is ran.
-		if !strings.Contains(pkg, "github.com/elastic/beats/v7/metricbeat/module/vsphere") {
-			filteredPackages = append(filteredPackages, pkg)
-		}
-	}
-	fipsArgs.Packages = filteredPackages
-
-	return devtools.GoTest(ctx, fipsArgs)
 }
