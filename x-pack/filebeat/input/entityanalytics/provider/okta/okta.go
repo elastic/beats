@@ -732,6 +732,8 @@ func (p *oktaInput) publishUser(u *User, state *stateStore, inputID string, clie
 	_, _ = userDoc.Put("labels.identity_source", inputID)
 	_, _ = userDoc.Put("user.id", u.ID)
 	_, _ = userDoc.Put("groups", u.Groups)
+	_, _ = userDoc.Put("roles", u.Roles)
+	_, _ = userDoc.Put("factors", u.Factors)
 
 	switch u.State {
 	case Deleted:
