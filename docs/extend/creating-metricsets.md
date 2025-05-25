@@ -63,7 +63,7 @@ The first file is `{{metricset}}.go`. It contains the logic on how to fetch data
 
 The generated file looks like this:
 
-[https://github.com/elastic/beats/blob/main/metricbeat/scripts/module/metricset/metricset.go.tmpl](https://github.com/elastic/beats/blob/main/metricbeat/scripts/module/metricset/metricset.go.tmpl)
+[https://github.com/elastic/beats/blob/9.0/metricbeat/scripts/module/metricset/metricset.go.tmpl](https://github.com/elastic/beats/blob/9.0/metricbeat/scripts/module/metricset/metricset.go.tmpl)
 
 ```go
 package {metricset}

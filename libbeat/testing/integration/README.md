@@ -38,7 +38,7 @@ This framework:
 * supports testing cases when a Beat crashes with errors
 * has very detailed output for debugging a test failure
 * is generic and in theory can be used with any Beat
-* can be extended and specialized for each Beat, see the [example with Filebeat](https://github.com/elastic/beats/tree/main/filebeat/testing/integration).
+* can be extended and specialized for each Beat, see the [example with Filebeat](https://github.com/elastic/beats/tree/9.0/filebeat/testing/integration).
 
 ### Samples
 

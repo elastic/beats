@@ -64,12 +64,12 @@ The make command calls the following scripts to generate the docs:
 * `auditbeat/docs/modules_list.asciidoc`
 * `auditbeat/docs/modules/*.asciidoc`
 
-[filebeat/scripts/docs_collector.py](https://github.com/elastic/beats/blob/main/filebeat/scripts/docs_collector.py) generates:
+[filebeat/scripts/docs_collector.py](https://github.com/elastic/beats/blob/9.0/filebeat/scripts/docs_collector.py) generates:
 
 * `filebeat/docs/modules_list.asciidoc`
 * `filebeat/docs/modules/*.asciidoc`
 
-[metricbeat/scripts/mage/docs_collector.go](https://github.com/elastic/beats/blob/main/metricbeat/scripts/mage/docs_collector.go) generates:
+[metricbeat/scripts/mage/docs_collector.go](https://github.com/elastic/beats/blob/9.0/metricbeat/scripts/mage/docs_collector.go) generates:
 
 * `metricbeat/docs/modules_list.asciidoc`
 * `metricbeat/docs/modules/*.asciidoc`
