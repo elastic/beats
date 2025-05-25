@@ -11,7 +11,7 @@ You configure Heartbeat to write to a specific output by setting options in the 
 
 The following topics describe how to configure each supported output. If you’ve secured the {{stack}}, also read [Secure](/reference/heartbeat/securing-heartbeat.md) for more about security-related configuration options.
 
-* [{{ess}}](/reference/heartbeat/configure-cloud-id.md)
+* [{{ech}}](/reference/heartbeat/configure-cloud-id.md)
 * [Elasticsearch](/reference/heartbeat/elasticsearch-output.md)
 * [Logstash](/reference/heartbeat/logstash-output.md)
 * [Kafka](/reference/heartbeat/kafka-output.md)

@@ -20,8 +20,11 @@ package otelconsumer
 import (
 	"context"
 	"fmt"
+	"runtime"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/otelmap"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -52,19 +55,23 @@ type otelConsumer struct {
 }
 
 func makeOtelConsumer(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *config.C) (outputs.Group, error) {
-
-	out := &otelConsumer{
-		observer:     observer,
-		logsConsumer: beat.LogConsumer,
-		beatInfo:     beat,
-		log:          beat.Logger.Named("otelconsumer"),
-	}
-
 	ocConfig := defaultConfig()
 	if err := cfg.Unpack(&ocConfig); err != nil {
 		return outputs.Fail(err)
 	}
-	return outputs.Success(ocConfig.Queue, -1, 0, nil, out)
+
+	// Default to runtime.NumCPU() workers
+	clients := make([]outputs.Client, 0, runtime.NumCPU())
+	for range runtime.NumCPU() {
+		clients = append(clients, &otelConsumer{
+			observer:     observer,
+			logsConsumer: beat.LogConsumer,
+			beatInfo:     beat,
+			log:          beat.Logger.Named("otelconsumer"),
+		})
+	}
+
+	return outputs.Success(ocConfig.Queue, -1, 0, nil, clients...)
 }
 
 // Close is a noop for otelconsumer
@@ -119,6 +126,21 @@ func (out *otelConsumer) logsPublish(ctx context.Context, batch publisher.Batch)
 		}
 		beatEvent["@timestamp"] = event.Content.Timestamp
 		logRecord.SetTimestamp(pcommon.NewTimestampFromTime(event.Content.Timestamp))
+
+		// Set the timestamp for when the event was first seen by the pipeline.
+		observedTimestamp := logRecord.Timestamp()
+		if created, err := beatEvent.GetValue("event.created"); err == nil {
+			switch created := created.(type) {
+			case time.Time:
+				observedTimestamp = pcommon.NewTimestampFromTime(created)
+			case common.Time:
+				observedTimestamp = pcommon.NewTimestampFromTime(time.Time(created))
+			default:
+				out.log.Warnf("Invalid 'event.created' type (%T); using log timestamp as observed timestamp.", created)
+			}
+		}
+		logRecord.SetObservedTimestamp(observedTimestamp)
+
 		otelmap.ConvertNonPrimitive(beatEvent)
 
 		// if data_stream field is set on beatEvent. Add it to logrecord.Attributes to support dynamic indexing

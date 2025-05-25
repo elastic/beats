@@ -234,7 +234,7 @@ func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeo
 			} else {
 				tailMessage = fmt.Sprintf("with an error %v", err)
 			}
-			logger.Warn("%s %s", baseMessage, tailMessage)
+			logger.Warnf("%s %s", baseMessage, tailMessage)
 		}
 	}()
 

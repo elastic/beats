@@ -50,9 +50,8 @@ The aws transitgateway metricset comes with a predefined dashboard. For example:
 
 Metrics:
 
-|     |     |     |
-| --- | --- | --- |
 | Metric Name | Statistic Method | Description |
+| --- | --- | --- |
 | BytesIn | Sum | The number of bytes received by the transit gateway. |
 | BytesOut | Sum | The number of bytes sent from the transit gateway. |
 | PacketsIn | Sum | The number of packets received by the transit gateway. |
@@ -62,9 +61,8 @@ Metrics:
 
 Dimensions:
 
-|     |     |
-| --- | --- |
 | Dimension Name | Description |
+| --- | --- |
 | TransitGateway | Filters the metric data by transit gateway. |
 
 Please see [Transit Gateway Metrics](https://docs.aws.amazon.com/vpc/latest/tgw/transit-gateway-cloudwatch-metrics.html) for more details.

@@ -55,7 +55,7 @@ jobs:
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (slack)
-        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
+        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
         with:
           method: chat.postMessage
           token: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -78,7 +78,7 @@ jobs:
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (email)
-        uses: dawidd6/action-send-mail@611879133a9569642c41be66f4a323286e9b8a3b
+        uses: dawidd6/action-send-mail@7ac0fb1e367721ffc3985c672ba2e7659379bc00
         with:
           server_address: ${{ secrets.MAIL_SERVER }}
           username: ${{ secrets.MAIL_USERNAME }}

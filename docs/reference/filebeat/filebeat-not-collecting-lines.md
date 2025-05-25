@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-not-collecting-lines.html
 ---
 
-# Filebeat isn���t collecting lines from a file [filebeat-not-collecting-lines]
+# Filebeat isn't collecting lines from a file [filebeat-not-collecting-lines]
 
 Filebeat might be incorrectly configured or unable to send events to the output. To resolve the issue:
 

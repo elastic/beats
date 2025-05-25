@@ -64,7 +64,8 @@ PS > .\metricbeat.exe setup --dashboards
 ::::::
 
 :::::::
-For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](http://www.elastic.co/guide/en/beats/devguide/master/import-dashboards.md). If you’ve configured the Logstash output, see [Load dashboards for Logstash output](#load-dashboards-logstash).
+For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](../../extend/import-dashboards.md).
+If you’ve configured the Logstash output, see [Load dashboards for Logstash output](#load-dashboards-logstash).
 
 
 ## Load dashboards for Logstash output [load-dashboards-logstash]

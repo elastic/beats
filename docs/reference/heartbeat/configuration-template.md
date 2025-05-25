@@ -10,7 +10,7 @@ mapped_pages:
 The `setup.template` section of the `heartbeat.yml` config file specifies the [index template](docs-content://manage-data/data-store/templates.md) to use for setting mappings in Elasticsearch. If template loading is enabled (the default), Heartbeat loads the index template automatically after successfully connecting to Elasticsearch.
 
 ::::{note}
-A connection to Elasticsearch is required to load the index template. If the configured output is not Elasticsearch (or {{ess}}), you must [load the template manually](/reference/heartbeat/heartbeat-template.md#load-template-manually).
+A connection to Elasticsearch is required to load the index template. If the configured output is not Elasticsearch (or {{ech}}), you must [load the template manually](/reference/heartbeat/heartbeat-template.md#load-template-manually).
 ::::
 
 

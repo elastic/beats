@@ -11,8 +11,9 @@ scms:
       user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       username: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      branch: main
+      branch: '{{ .scm.branch }}'
       commitusingapi: true
+      force: false
 
 actions:
   beats:
@@ -157,16 +158,6 @@ targets:
         keyword: "FROM"
         matcher: "golang"
       file: ./packetbeat/Dockerfile
-  update-nats-module-dockerfile:
-    name: "Update NATS module Dockerfile"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: dockerfile
-    spec:
-      instruction:
-        keyword: "FROM"
-        matcher: "golang"
-      file: ./metricbeat/module/nats/_meta/Dockerfile
   update-http-module-dockerfile:
     name: "Update HTTP module Dockerfile"
     sourceid: latestGoVersion
