@@ -1,0 +1,113 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: mssql
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/mssql/_meta/docs.asciidoc
+
+
+[[metricbeat-module-mssql]]
+[role="xpack"]
+== MSSQL module
+
+This is the https://www.microsoft.com/en-us/sql-server/sql-server-2017[Microsoft SQL 2017] Metricbeat module. It is still under active development to add new Metricsets and introduce enhancements.
+
+[float]
+=== Compatibility
+
+The module is being tested with https://hub.docker.com/r/microsoft/mssql-server-linux/[2017 GA] version under Linux
+
+[float]
+=== Permission/Access required for tables
+
+1.`transaction_log` :
+
+* sys.databases
+* sys.dm_db_log_space_usage
+* sys.dm_db_log_stats(DB_ID)
+
+2.`performance` :
+
+* sys.dm_os_performance_counters
+
+If you browse MSDN for above tables, you will find "Permissions" section which defines the permission needed, e.g https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-db-log-space-usage-transact-sql?view=sql-server-ver15[Permissions]
+
+[float]
+=== Metricsets
+
+The following Metricsets are already included:
+
+[float]
+==== `transaction_log`
+
+`transaction_log` Metricset fetches information about the operation and transaction log of each MSSQL database in the monitored instance. All data is extracted from the https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/database-related-dynamic-management-views-transact-sql?view=sql-server-2017[Database Dynamic Management Views]
+
+[float]
+==== `performance`
+
+`performance` Metricset fetches information from what's commonly known as https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-performance-counters-transact-sql?view=sql-server-2017[Performance Counters] in MSSQL.
+
+[float]
+=== Module-specific configuration notes
+
+When configuring the `hosts` option, you can specify native user credentials
+as part of the host string with the following format:
+
+----
+hosts: ["sqlserver://sa@localhost"]]
+----
+
+To use Active Directory domain credentials, you can separately specify the username and password
+using the respective configuration options to allow the domain to be included in the username:
+
+----
+metricbeat.modules:
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
+  period: 10
+----
+
+Store sensitive values like passwords in the <<keystore,secrets keystore>>.
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The MSSQL module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: mssql
+  metricsets:
+    - "transaction_log"
+    - "performance"
+  hosts: ["sqlserver://localhost"]
+  username: domain\username
+  password: verysecurepassword
+  period: 10s
+
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-mssql-performance,performance>>
+
+* <<metricbeat-metricset-mssql-transaction_log,transaction_log>>
+
+include::mssql/performance.asciidoc[]
+
+include::mssql/transaction_log.asciidoc[]
+
+:edit_url!:

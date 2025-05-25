@@ -1,0 +1,82 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: aerospike
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/aerospike/_meta/docs.asciidoc
+
+
+[[metricbeat-module-aerospike]]
+== Aerospike module
+
+The Aerospike module uses the http://www.aerospike.com/docs/reference/info[Info command] to collect metrics. The default metricset is `namespace`.
+
+[float]
+=== Compatibility
+
+The Aerospike metricsets were tested with Aerospike Enterprise Edition 7.2.0.1 and are expected to work with all versions >= 4.9.
+
+
+[float]
+=== Dashboard
+
+The Aerospike module comes with a predefined dashboard for Aerospike namespace, node specific stats. For example:
+
+image::./images/metricbeat-aerospike-overview.png[]
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Aerospike module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: aerospike
+  metricsets: ["namespace"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:3000"]
+
+  # Aerospike Cluster Name
+  #cluster_name: myclustername
+
+  # Username of hosts. Empty by default.
+  #username: root
+
+  # Password of hosts. Empty by default.
+  #password: secret
+
+  # Authentication modes: https://aerospike.com/docs/server/guide/security/access-control
+  # Possible values: internal (default), external, pki
+  #auth_mode: internal
+
+  # Optional SSL/TLS (disabled by default)
+  #ssl.enabled: true
+
+  # List of root certificates for SSL/TLS server verification
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+
+  # Certificate for SSL/TLS client authentication
+  #ssl.certificate: "/etc/pki/client/cert.crt"
+
+  # Client certificate key file
+  #ssl.key: "/etc/pki/client/cert.key"
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-aerospike-namespace,namespace>>
+
+include::aerospike/namespace.asciidoc[]
+
+:edit_url!:
