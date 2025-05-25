@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 
 *Affecting all Beats*
 
-- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
+- 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling. {pull}44189[44189]
 
 *Auditbeat*
 
@@ -26,8 +26,8 @@ https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
 *Metricbeat*
 
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
-- Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
-- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
+- Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch API. {pull}41790[41790]
+- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch. {pull}44307[44307]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
 
 
