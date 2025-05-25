@@ -2,7 +2,7 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
-:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/mongodb/_meta/docs.asciidoc
+:edit_url: https://github.com/elastic/beats/edit/9.0/filebeat/module/mongodb/_meta/docs.asciidoc
 
 [[filebeat-module-mongodb]]
 :modulename: mongodb
