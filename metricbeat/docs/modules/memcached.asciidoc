@@ -1,0 +1,49 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: memcached
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/memcached/_meta/docs.asciidoc
+
+
+[[metricbeat-module-memcached]]
+== Memcached module
+
+This is the Memcached module. These metricsets were tested with Memcached version 1.4.35.
+
+The default metricset is `stats`.
+
+[float]
+=== Compatibility
+
+The memcached module is tested with memcached 1.4.35.
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Memcached module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: memcached
+  metricsets: ["stats"]
+  period: 10s
+  hosts: ["localhost:11211"]
+  enabled: true
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-memcached-stats,stats>>
+
+include::memcached/stats.asciidoc[]
+
+:edit_url!:

@@ -1,0 +1,72 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: beat
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/beat/_meta/docs.asciidoc
+
+
+[[metricbeat-module-beat]]
+== Beat module
+
+The `beat` module collects metrics about any Beat or other software based on libbeat.
+
+[float]
+=== Compatibility
+
+The `beat` module works with {beats} 7.3.0 and later.
+
+[float]
+=== Usage for {stack} Monitoring
+
+The `beat` module can be used to collect metrics shown in our {stack-monitor-app}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+from the module's configuration. Alternatively, run `metricbeat modules disable beat` and
+`metricbeat modules enable beat-xpack`.
+
+NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
+monitoring index instead of the default index typically used by {metricbeat}.
+For more details about the monitoring index, see
+{ref}/config-monitoring-indices.html[Configuring indices for monitoring].
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Beat module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: beat
+  metricsets:
+    - stats
+    - state
+  period: 10s
+  hosts: ["http://localhost:5066"]
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
+
+  # Set to true to send data collected by module to X-Pack
+  # Monitoring instead of metricbeat-* indices.
+  #xpack.enabled: false
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-beat-state,state>>
+
+* <<metricbeat-metricset-beat-stats,stats>>
+
+include::beat/state.asciidoc[]
+
+include::beat/stats.asciidoc[]
+
+:edit_url!:

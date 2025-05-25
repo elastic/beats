@@ -1,0 +1,96 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: nats
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/nats/_meta/docs.asciidoc
+
+
+[[metricbeat-module-nats]]
+== NATS module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+The Nats module uses https://nats.io/documentation/managing_the_server/monitoring/[Nats monitoring server APIs] to collect metrics.
+
+The default metricsets are `stats`, `connections`, `routes` and `subscriptions` while `connection` and `route`
+metricsets can be enabled to collect detailed metrics per connection/route.
+
+[float]
+=== Compatibility
+
+The Nats module is tested with Nats 1.3.0, 2.0.4 and 2.1.4
+
+
+[float]
+=== Dashboard
+
+The Nats module comes with a predefined dashboard. For example:
+
+image::./images/metricbeat_nats_dashboard.png[]
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The NATS module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: nats
+  metricsets:
+    - "connections"
+    - "routes"
+    - "stats"
+    - "subscriptions"
+    #- "connection"
+    #- "route"
+  period: 10s
+  hosts: ["localhost:8222"]
+  #stats.metrics_path: "/varz"
+  #connections.metrics_path: "/connz"
+  #routes.metrics_path: "/routez"
+  #subscriptions.metrics_path: "/subsz"
+  #connection.metrics_path: "/connz"
+  #route.metrics_path: "/routez"
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-nats-connection,connection>>
+
+* <<metricbeat-metricset-nats-connections,connections>>
+
+* <<metricbeat-metricset-nats-route,route>>
+
+* <<metricbeat-metricset-nats-routes,routes>>
+
+* <<metricbeat-metricset-nats-stats,stats>>
+
+* <<metricbeat-metricset-nats-subscriptions,subscriptions>>
+
+include::nats/connection.asciidoc[]
+
+include::nats/connections.asciidoc[]
+
+include::nats/route.asciidoc[]
+
+include::nats/routes.asciidoc[]
+
+include::nats/stats.asciidoc[]
+
+include::nats/subscriptions.asciidoc[]
+
+:edit_url!:

@@ -1,0 +1,71 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+:modulename: logstash
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/logstash/_meta/docs.asciidoc
+
+
+[[metricbeat-module-logstash]]
+== Logstash module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+The `logstash` module collects metrics about {ls}.
+
+[float]
+=== Compatibility
+
+The `logstash` module works with {ls} 7.3.0 and later.
+
+[float]
+=== Usage for Stack Monitoring
+
+The `logstash` module can be used to collect metrics shown in our {stack-monitor-app}
+UI in {kib}. To enable this usage, set `xpack.enabled: true` and remove any `metricsets`
+from the module's configuration. Alternatively, run `metricbeat modules disable logstash` and
+`metricbeat modules enable logstash-xpack`.
+
+NOTE: When this module is used for {stack} Monitoring, it sends metrics to the
+monitoring index instead of the default index typically used by {metricbeat}.
+For more details about the monitoring index, see
+{ref}/config-monitoring-indices.html[Configuring indices for monitoring].
+
+
+:edit_url:
+
+[float]
+=== Example configuration
+
+The Logstash module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: logstash
+  metricsets: ["node", "node_stats"]
+  enabled: true
+  period: 10s
+  hosts: ["localhost:9600"]
+----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-logstash-node,node>>
+
+* <<metricbeat-metricset-logstash-node_stats,node_stats>>
+
+include::logstash/node.asciidoc[]
+
+include::logstash/node_stats.asciidoc[]
+
+:edit_url!:
