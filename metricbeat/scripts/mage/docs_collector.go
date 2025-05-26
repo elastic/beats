@@ -166,7 +166,7 @@ func getDefaultMetricsets() (map[string][]string, error) {
 
 // loadModuleFields loads the module-specific fields.yml file
 func loadModuleFields(file string) (moduleData, error) {
-	fd, err := ioutil.ReadFile(file)
+	fd, err := os.ReadFile(file)
 	if err != nil {
 		return moduleData{}, fmt.Errorf("failed to read from spec file: %w", err)
 	}
@@ -188,7 +188,7 @@ func loadModuleFields(file string) (moduleData, error) {
 
 // getReleaseState gets the release tag in the metricset-level fields.yml, since that's all we need from that file
 func getReleaseState(metricsetPath string) (string, error) {
-	raw, err := ioutil.ReadFile(metricsetPath)
+	raw, err := os.ReadFile(metricsetPath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read from spec file: %w", err)
 	}
@@ -253,7 +253,7 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		if !isMetricset {
 			continue
 		}
-		metricsetDoc, err := ioutil.ReadFile(filepath.Join(metricset, "_meta/docs.md"))
+		metricsetDoc, err := os.ReadFile(filepath.Join(metricset, "_meta/docs.md"))
 		if err != nil {
 			return nil, err
 		}
@@ -271,7 +271,10 @@ func gatherMetricsets(modulePath string, moduleName string, defaultMetricSets []
 		data := []byte{}
 		_, err = os.Stat(filepath.Join(metricset, "_meta/data.json"))
 		if err == nil {
-			data, _ = ioutil.ReadFile(filepath.Join(metricset, "_meta/data.json"))
+			data, err = os.ReadFile(filepath.Join(metricset, "_meta/data.json"))
+			if err != nil {
+				return nil, err
+			}
 			hasData = true
 		}
 
@@ -307,7 +310,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 		return nil, fmt.Errorf("error getting default metricsets: %w", err)
 	}
 	moduleList := make([]moduleData, 0)
-	//iterate over all the modules, checking to make sure we have an docs.md file
+	//iterate over all the modules, checking to make sure we have a docs.md file
 	for _, module := range modules {
 
 		isModule := testIfDocsInDir(module)
@@ -337,7 +340,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 		}
 
 		//dump the contents of the module markdown
-		moduleDoc, err := ioutil.ReadFile(filepath.Join(module, "_meta/docs.md"))
+		moduleDoc, err := os.ReadFile(filepath.Join(module, "_meta/docs.md"))
 		if err != nil {
 			return moduleList, err
 		}
