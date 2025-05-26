@@ -87,8 +87,13 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
+<<<<<<< HEAD
 	github.com/google/flatbuffers v24.3.25+incompatible
 	github.com/google/go-cmp v0.6.0
+=======
+	github.com/google/flatbuffers v25.2.10+incompatible
+	github.com/google/go-cmp v0.7.0
+>>>>>>> f5408f46d (chore: update badger package to 4.6.0 (#43321))
 	github.com/google/gopacket v1.1.19
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
@@ -176,6 +181,7 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/Azure/go-autorest/autorest/adal v0.9.24
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
+<<<<<<< HEAD
 	github.com/apache/arrow/go/v14 v14.0.2
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.12
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.13
@@ -184,6 +190,16 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/health v1.26.4
 	github.com/aws/smithy-go v1.20.4
 	github.com/dgraph-io/badger/v4 v4.4.0
+=======
+	github.com/apache/arrow/go/v17 v17.0.0
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.22
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.44
+	github.com/aws/aws-sdk-go-v2/service/apigateway v1.28.2
+	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.24.8
+	github.com/aws/aws-sdk-go-v2/service/health v1.29.2
+	github.com/aws/smithy-go v1.22.1
+	github.com/dgraph-io/badger/v4 v4.6.0
+>>>>>>> f5408f46d (chore: update badger package to 4.6.0 (#43321))
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
@@ -275,7 +291,7 @@ require (
 	github.com/coreos/go-systemd v0.0.0-20180511133405-39ca1b05acc7 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/dgraph-io/ristretto/v2 v2.0.0 // indirect
+	github.com/dgraph-io/ristretto/v2 v2.1.0 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/dnephin/pflag v1.0.7 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
