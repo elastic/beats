@@ -51,7 +51,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Filebeat**
 
 - Fix endpoint path typo in the Okta entity analytics provider. [44147]({{beats-pull}}44147)
-- Fix a websocket panic scenario that occured after exhausting the maximum number of retries. [44342]({{beats-pull}}44342)
+- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. [44342]({{beats-pull}}44342)
 
 **Metricbeat**
 
@@ -74,7 +74,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 ### Fixes [beats-9.0.1-fixes]
 
 * For all Beats: Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services. [#40765]({{beats-issue}}40765) [#43665]({{beats-pull}}43665).
-* Fixed websocket input panic on sudden network error or server crash in Filebeat. [#44063]({{beats-issue}}44063) [44068]({{beats-pull}}44068).
+* Fixed WebSocket input panic on sudden network error or server crash in Filebeat. [#44063]({{beats-issue}}44063) [44068]({{beats-pull}}44068).
 * [Filestream] Log the "reader closed" message on the debug level to avoid log spam in Filebeat. [#44051]({{beats-pull}}44051)
 * Fix links to CEL mito extension functions in input documentation in Filebeat. [#44098]({{beats-pull}}44098)
 
