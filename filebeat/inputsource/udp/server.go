@@ -35,11 +35,12 @@ type Server struct {
 	config *Config
 
 	localaddress string
+	logger       *logp.Logger
 }
 
 // New returns a new UDPServer instance.
 func New(config *Config, callback inputsource.NetworkFunc, logger *logp.Logger) *Server {
-	server := &Server{config: config}
+	server := &Server{config: config, logger: logger}
 	factory := dgram.DatagramReaderFactory(inputsource.FamilyUDP, logger, callback)
 	server.Listener = dgram.NewListener(inputsource.FamilyUDP, config.Host, factory, server.createConn, &dgram.ListenerConfig{
 		Timeout:        config.Timeout,
