@@ -137,12 +137,12 @@ func newStateStore(store *kvstore.Store) (*stateStore, error) {
 // as modified.
 func (s *stateStore) storeUser(u okta.User) *User {
 	su := User{User: u}
-	if u.Status == "DEPROVISIONED" {
-		su.State = Deleted
-		return &su
-	}
 	if existing, ok := s.users[u.ID]; ok {
-		su.State = Modified
+		if u.Status == "DEPROVISIONED" {
+			su.State = Deleted
+		} else {
+			su.State = Modified
+		}
 		*existing = su
 	} else {
 		su.State = Discovered
@@ -156,12 +156,12 @@ func (s *stateStore) storeUser(u okta.User) *User {
 // as modified.
 func (s *stateStore) storeDevice(d okta.Device) *Device {
 	du := Device{Device: d}
-	if d.Status == "DEPROVISIONED" {
-		du.State = Deleted
-		return &du
-	}
 	if existing, ok := s.devices[d.ID]; ok {
-		du.State = Modified
+		if d.Status == "DEPROVISIONED" {
+			du.State = Deleted
+		} else {
+			du.State = Modified
+		}
 		*existing = du
 	} else {
 		du.State = Discovered
@@ -217,13 +217,22 @@ func (s *stateStore) close(commit bool) (err error) {
 		}
 	}
 
+	// Do not store deleted users/devices. They should already have
+	// been published to the ES index. If they change state from
+	// DEPROVISIONED they will be marked as newly discovered.
 	for key, value := range s.users {
+		if value.State == Deleted {
+			continue
+		}
 		err = s.tx.Set(usersBucket, []byte(key), value)
 		if err != nil {
 			return fmt.Errorf("unable to save user %q to state: %w", key, err)
 		}
 	}
 	for key, value := range s.devices {
+		if value.State == Deleted {
+			continue
+		}
 		err = s.tx.Set(devicesBucket, []byte(key), value)
 		if err != nil {
 			return fmt.Errorf("unable to save device %q to state: %w", key, err)
