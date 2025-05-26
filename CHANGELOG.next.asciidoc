@@ -267,6 +267,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Osquerybeat*
 
+- Fix bug preventing installation of osqueryd. Preserve the osquery.app/ directory and its contents when installing the Elastic Agent. {agent-issue}8245[8245] {pull}44501[44501]
 
 *Packetbeat*
 
