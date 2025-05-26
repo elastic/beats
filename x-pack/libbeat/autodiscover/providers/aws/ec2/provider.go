@@ -35,6 +35,7 @@ type Provider struct {
 	templates *template.Mapper
 	watcher   *watcher
 	uuid      uuid.UUID
+	logger    *logp.Logger
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
@@ -44,6 +45,7 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
+	_ *logp.Logger,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("aws_ec2 autodiscover is experimental")
 

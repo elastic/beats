@@ -38,14 +38,14 @@ type Server struct {
 }
 
 // New returns a new UDPServer instance.
-func New(config *Config, callback inputsource.NetworkFunc) *Server {
+func New(config *Config, callback inputsource.NetworkFunc, logger *logp.Logger) *Server {
 	server := &Server{config: config}
-	log := logp.NewLogger("udp").With("address", config.Host)
+	log := logger.Named("udp").With("address", config.Host)
 	factory := dgram.DatagramReaderFactory(inputsource.FamilyUDP, log, callback)
 	server.Listener = dgram.NewListener(inputsource.FamilyUDP, config.Host, factory, server.createConn, &dgram.ListenerConfig{
 		Timeout:        config.Timeout,
 		MaxMessageSize: config.MaxMessageSize,
-	})
+	}, log)
 	return server
 }
 

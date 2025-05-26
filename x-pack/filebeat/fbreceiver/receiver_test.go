@@ -176,9 +176,9 @@ func TestMultipleReceivers(t *testing.T) {
 			// instance and does not interfere with others. Previously, the
 			// logger in Beats was global, causing logger fields to be
 			// overwritten when multiple receivers started in the same process.
-			r1StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r1"))
+			r1StartLogs := zapLogs.FilterMessageSnippet("Enabled modules/filesets:").FilterField(zap.String("otelcol.component.id", "r1"))
 			assert.Equal(c, 1, r1StartLogs.Len(), "r1 should have a single start log")
-			r2StartLogs := zapLogs.FilterMessageSnippet("Beat ID").FilterField(zap.String("otelcol.component.id", "r2"))
+			r2StartLogs := zapLogs.FilterMessageSnippet("Enabled modules/filesets:").FilterField(zap.String("otelcol.component.id", "r2"))
 			assert.Equal(c, 1, r2StartLogs.Len(), "r2 should have a single start log")
 		},
 	})
