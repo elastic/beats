@@ -4,7 +4,7 @@
 
 // Package cel implements an input that uses the Common Expression Language to
 // perform requests and do endpoint processing of events. The cel package exposes
-// the github.com/elastic/mito/lib CEL extension library.
+// the https://github.com/elastic/mito/tree/dev/lib CEL extension library.
 package cel
 
 import (
