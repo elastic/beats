@@ -91,6 +91,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
 - Updated list of supported vSphere versions in the documentation. {pull}43642[43642]
 - Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
+- Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 
 *Osquerybeat*
 
@@ -500,6 +501,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
 - Upgrade Prometheus Library to v0.300.1. {pull}43540[43540]
 - Add GCP Dataproc metadata collector in GCP module. {pull}43518[43518]
+- Add new metrics to vSphere Virtual Machine dataset (CPU usage percentage, disk average usage, disk read/write rate, number of disk reads/writes, memory usage percentage). {pull}44205[44205]
 - Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
 - Add latency config option to Azure Monitor module. {pull}44366[44366]
 
