@@ -256,9 +256,6 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-<<<<<<< HEAD
-			name: "hmac_hex",
-=======
 			name: "options_with_headers",
 			conf: func() config {
 				c := defaultConfig()
@@ -305,9 +302,7 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message":"OPTIONS requests are only allowed with options_headers set"}`,
 		},
 		{
-			name:  "hmac_hex",
-			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
->>>>>>> 9382cc205 (x-pack/filebeat/input/http_endpoint: add support for OPTIONS requests (#44387))
+			name: "hmac_hex",
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
