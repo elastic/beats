@@ -385,6 +385,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
 - Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
 
+- Add Fleet status update functionality to lumberjack input. {issue}44283[44283] {pull}44339[44339]
 
 *Auditbeat*
 
