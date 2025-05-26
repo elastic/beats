@@ -1,4 +1,6 @@
 project: 'Beats docs'
+products:
+  - id: beats
 cross_links:
   - docs-content
   - ecs

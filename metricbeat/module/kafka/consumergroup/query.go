@@ -34,7 +34,9 @@ type client interface {
 func fetchGroupInfo(
 	emit func(mapstr.M),
 	b client,
-	groupsFilter, topicsFilter func(string) bool,
+	groupsFilter,
+	topicsFilter func(string) bool,
+	logger *logp.Logger,
 ) error {
 	type result struct {
 		err    error
@@ -45,18 +47,18 @@ func fetchGroupInfo(
 
 	groups, err := listGroups(b, groupsFilter)
 	if err != nil {
-		logp.Err("failed to list known kafka groups: %v", err)
+		logger.Errorf("failed to list known kafka groups: %v", err)
 		return err
 	}
 	if len(groups) == 0 {
 		return nil
 	}
 
-	debugf("known consumer groups: ", groups)
+	logger.Named("kafka").Debugf("known consumer groups: ", groups)
 
 	assignments, err := fetchGroupAssignments(b, groups)
 	if err != nil {
-		logp.Err("failed to fetch kafka group assignments: %v", err)
+		logger.Errorf("failed to fetch kafka group assignments: %v", err)
 		return err
 	}
 	if len(assignments) == 0 {
@@ -95,7 +97,7 @@ func fetchGroupInfo(
 		go func(group string, partitions map[string][]int32, assign map[string]map[int32]groupAssignment) {
 			resp, err := fetchGroupOffset(b, group, partitions)
 			if err != nil {
-				logp.Err("failed to fetch '%v' group offset: %v", group, err)
+				logger.Errorf("failed to fetch '%v' group offset: %v", group, err)
 			}
 			results <- result{err, group, assign, resp}
 		}(group, queryTopics, topics)
@@ -115,7 +117,7 @@ func fetchGroupInfo(
 			for partition, info := range partitions {
 				partitionOffset, err := getPartitionOffsetFromTheLeader(b, topic, partition)
 				if err != nil {
-					logp.Err("failed to fetch offset for (topic, partition): ('%v', %v)", topic, partition)
+					logger.Errorf("failed to fetch offset for (topic, partition): ('%v', %v)", topic, partition)
 					continue
 				}
 				consumerLag := partitionOffset - info.Offset

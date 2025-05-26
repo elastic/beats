@@ -591,7 +591,7 @@ func checkDockerImageRun(t *testing.T, p *packageFile, imagePath string) {
 			t.Fatalf("failed to get a Docker client: %s", err)
 		}
 
-		loadResp, err := c.ImageLoad(ctx, f, true)
+		loadResp, err := c.ImageLoad(ctx, f, client.ImageLoadWithQuiet(true))
 		if err != nil {
 			t.Fatalf("error loading docker image: %s", err)
 		}
@@ -842,6 +842,7 @@ func checkFIPS(t *testing.T, beatName, path string) {
 		case "-tags":
 			foundTags = true
 			require.Contains(t, setting.Value, "requirefips")
+			require.Contains(t, setting.Value, "ms_tls13kdf")
 			continue
 		case "GOEXPERIMENT":
 			foundExperiment = true

@@ -23,7 +23,10 @@ type switchport struct {
 func getDeviceSwitchports(client *meraki.Client, organizationID string, devices map[Serial]*Device, period time.Duration) error {
 	switches, res, err := client.Switch.GetOrganizationSwitchPortsBySwitch(organizationID, &meraki.GetOrganizationSwitchPortsBySwitchQueryParams{})
 	if err != nil {
-		return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		if res != nil {
+			return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+		}
+		return fmt.Errorf("GetOrganizationSwitchPortsBySwitch failed; %w", err)
 	}
 
 	if switches == nil {
@@ -44,7 +47,10 @@ func getDeviceSwitchports(client *meraki.Client, organizationID string, devices 
 			Timespan: period.Seconds(),
 		})
 		if err != nil {
-			return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+			if res != nil {
+				return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; [%d] %s. %w", res.StatusCode(), res.Body(), err)
+			}
+			return fmt.Errorf("GetDeviceSwitchPortsStatuses failed; %w", err)
 		}
 
 		// match status to the port attributes found earlier using the shared port ID

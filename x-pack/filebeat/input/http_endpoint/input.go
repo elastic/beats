@@ -75,7 +75,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 		return nil, err
 	}
 
-	addr := fmt.Sprintf("%v:%v", config.ListenAddress, config.ListenPort)
+	addr := net.JoinHostPort(config.ListenAddress, config.ListenPort)
 
 	var tlsConfig *tls.Config
 	tlsConfigBuilder, err := tlscommon.LoadTLSServerConfig(config.TLS)
@@ -335,18 +335,20 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		publish: pub,
 		metrics: metrics,
 		validator: apiValidator{
-			basicAuth:    c.BasicAuth,
-			username:     c.Username,
-			password:     c.Password,
-			method:       c.Method,
-			contentType:  c.ContentType,
-			secretHeader: c.SecretHeader,
-			secretValue:  c.SecretValue,
-			hmacHeader:   c.HMACHeader,
-			hmacKey:      c.HMACKey,
-			hmacType:     c.HMACType,
-			hmacPrefix:   c.HMACPrefix,
-			maxBodySize:  -1,
+			basicAuth:      c.BasicAuth,
+			username:       c.Username,
+			password:       c.Password,
+			method:         c.Method,
+			contentType:    c.ContentType,
+			secretHeader:   c.SecretHeader,
+			secretValue:    c.SecretValue,
+			hmacHeader:     c.HMACHeader,
+			hmacKey:        c.HMACKey,
+			hmacType:       c.HMACType,
+			hmacPrefix:     c.HMACPrefix,
+			maxBodySize:    -1,
+			optionsHeaders: c.OptionsHeaders,
+			optionsStatus:  c.OptionsStatus,
 		},
 		maxInFlight:           c.MaxInFlight,
 		retryAfter:            c.RetryAfter,
@@ -374,7 +376,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 			zap.DebugLevel,
 		)
 		h.reqLogger = zap.New(core)
-		h.host = c.ListenAddress + ":" + c.ListenPort
+		h.host = net.JoinHostPort(c.ListenAddress, c.ListenPort)
 		if c.TLS != nil && c.TLS.IsEnabled() {
 			h.scheme = "https"
 		} else {
