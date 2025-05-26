@@ -5,7 +5,7 @@ component_files:
  - module/*
  - "osquery-extension.ext"
  - "osquery-extension.exe"
- - osqueryd 
+ - osqueryd
  - "osqueryd.exe"
 inputs:
   - name: audit/auditd
