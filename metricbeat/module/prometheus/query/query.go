@@ -97,6 +97,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			return err
 		}
 
+		if response.StatusCode > 399 {
+			reporter.Error(fmt.Errorf("unexpected status code %d from server: %s", response.StatusCode, string(body)))
+			continue
+		}
+
 		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
 			reporter.Error(fmt.Errorf("error parsing response from %v: %w", url, parseErr))
