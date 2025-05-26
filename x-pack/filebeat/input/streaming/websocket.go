@@ -32,9 +32,9 @@ import (
 
 const (
 	// spread is the induced jitter for the backoff logic. This is not user configurable
-	// as it is not a common use case. The value of 0.2 is chosen as it produces a smooth
-	// backoff curve.
-	spread = 0.2
+	// as it is not a common use case. The value of 1.0 is chosen as it produces a relatively
+	// smooth backoff curve.
+	spread = 1.0
 )
 
 type websocketStream struct {
