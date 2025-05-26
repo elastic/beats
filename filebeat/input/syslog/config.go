@@ -134,7 +134,8 @@ func factory(
 		if err := cfg.Unpack(&config); err != nil {
 			return nil, err
 		}
-		return udp.New(&config, nf, logger), nil
+		udpLogger := logger.Named("input.syslog.udp").With("address", config.Host)
+		return udp.New(&config, nf, udpLogger), nil
 	default:
 		return nil, fmt.Errorf("you must choose between TCP or UDP")
 	}
