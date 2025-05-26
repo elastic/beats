@@ -7,6 +7,7 @@ component_files:
  - "osquery-extension.exe"
  - osqueryd
  - "osqueryd.exe"
+ - "osquery.app/*"
 inputs:
   - name: audit/auditd
     description: "Auditd"
