@@ -32,6 +32,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
@@ -616,8 +617,9 @@ func run(t *testing.T, cfg *conf.C, client *beattest.ChanClient) (*kafkaInput, f
 
 func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
+	logger, _ := logp.NewDevelopmentLogger("kafka_test")
 	return v2.Context{
-		Logger:      logptest.NewTestingLogger(t, "kafka_test"),
+		Logger:      logger,
 		ID:          "test_id",
 		Cancelation: ctx,
 	}, cancel
