@@ -31,12 +31,27 @@ import (
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/object"
+	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/property"
 	"github.com/vmware/govmomi/view"
 	"github.com/vmware/govmomi/vim25"
 	"github.com/vmware/govmomi/vim25/mo"
 	"github.com/vmware/govmomi/vim25/types"
 )
+
+var metricSet = map[string]struct{}{
+	"cpu.usage.average": {},
+
+	"disk.usage.average": {},
+
+	"disk.read.average":  {},
+	"disk.write.average": {},
+
+	"disk.numberRead.summation":  {},
+	"disk.numberWrite.summation": {},
+
+	"mem.usage.average": {},
+}
 
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "virtualmachine", New,
@@ -68,6 +83,7 @@ type VMData struct {
 	DatastoreNames  []string
 	CustomFields    mapstr.M
 	Snapshots       []VMSnapshotData
+	PerformanceData map[string]interface{}
 	triggeredAlarms []triggeredAlarm
 }
 
@@ -154,6 +170,15 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		return fmt.Errorf("virtualmachine: error in Retrieve: %w", err)
 	}
 
+	// Create a performance manager
+	perfManager := performance.NewManager(c)
+
+	// Retrieve all available metrics
+	metrics, err := perfManager.CounterInfoByName(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve metrics: %w", err)
+	}
+
 	pc := property.DefaultCollector(c)
 	for _, vm := range vmt {
 		var hostID, hostName string
@@ -173,6 +198,13 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			m.Logger().Debug("'Host', 'Runtime' or 'Summary' data not found. This is either a parsing error " +
 				"from vsphere library, an error trying to reach host/guest or incomplete information returned " +
 				"from host/guest")
+		}
+
+		perfFetcher := vSphereClientUtil.NewPerformanceDataFetcher(m.Logger(), perfManager)
+
+		metricMap, err := perfFetcher.GetPerfMetrics(ctx, int32(m.Module().Config().Period.Seconds()), "virtualMachine", vm.Name, vm.Reference(), metrics, metricSet)
+		if err != nil {
+			m.Logger().Errorf("Failed to retrieve performance metrics from virtual machine %s: %v", vm.Name, err)
 		}
 
 		// Retrieve custom fields if enabled
@@ -220,6 +252,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 			DatastoreNames:  datastoreNames,
 			CustomFields:    customFields,
 			Snapshots:       snapshots,
+			PerformanceData: metricMap,
 			triggeredAlarms: triggeredAlarm,
 		}
 

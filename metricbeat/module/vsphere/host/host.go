@@ -160,7 +160,8 @@ func (m *HostMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error
 			m.Logger().Errorf("Failed to retrieve object from host %s: %v", hst[i].Name, err)
 		}
 
-		metricMap, err := m.getPerfMetrics(ctx, perfManager, hst[i], metrics)
+		perfFetcher := vSphereClientUtil.NewPerformanceDataFetcher(m.Logger(), perfManager)
+		metricMap, err := perfFetcher.GetPerfMetrics(ctx, int32(m.Module().Config().Period.Seconds()), "host", hst[i].Name, hst[i].Reference(), metrics, metricSet)
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve performance metrics from host %s: %v", hst[i].Name, err)
 		}
@@ -262,73 +263,4 @@ func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAla
 	}
 
 	return triggeredAlarms, nil
-}
-
-func (m *HostMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, hst mo.HostSystem, metrics map[string]*types.PerfCounterInfo) (metricMap map[string]interface{}, err error) {
-	metricMap = make(map[string]interface{})
-
-	period := int32(m.Module().Config().Period.Seconds())
-	availableMetric, err := perfManager.AvailableMetric(ctx, hst.Reference(), period)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get available metrics: %w", err)
-	}
-
-	availableMetricByKey := availableMetric.ByKey()
-
-	// Filter for required metrics
-	var metricIDs []types.PerfMetricId
-	for key, metric := range metricSet {
-		if counter, ok := metrics[key]; ok {
-			if _, exists := availableMetricByKey[counter.Key]; exists {
-				metricIDs = append(metricIDs, types.PerfMetricId{
-					CounterId: counter.Key,
-					Instance:  "*",
-				})
-			}
-		} else {
-			m.Logger().Warnf("Metric %s not found", metric)
-		}
-	}
-
-	spec := types.PerfQuerySpec{
-		Entity:     hst.Reference(),
-		MetricId:   metricIDs,
-		MaxSample:  1,
-		IntervalId: period,
-	}
-
-	// Query performance data
-	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
-	if err != nil {
-		if strings.Contains(err.Error(), "ServerFaultCode: A specified parameter was not correct: querySpec.interval") {
-			return metricMap, fmt.Errorf("failed to query performance data: use one of the system's supported interval. consider adjusting period: %w", err)
-		}
-
-		return metricMap, fmt.Errorf("failed to query performance data: %w", err)
-	}
-
-	if len(samples) == 0 {
-		m.Logger().Debug("No samples returned from performance manager")
-		return metricMap, nil
-	}
-
-	results, err := perfManager.ToMetricSeries(ctx, samples)
-	if err != nil {
-		return metricMap, fmt.Errorf("failed to convert performance data to metric series: %w", err)
-	}
-
-	if len(results) == 0 {
-		m.Logger().Debug("No results returned from metric series conversion")
-		return metricMap, nil
-	}
-
-	for _, result := range results[0].Value {
-		if len(result.Value) > 0 {
-			metricMap[result.Name] = result.Value[0]
-			continue
-		}
-		m.Logger().Debugf("For host %s, Metric %s: No result found", hst.Name, result.Name)
-	}
-
-	return metricMap, nil
 }
