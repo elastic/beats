@@ -122,6 +122,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
+- Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 
 *Heartbeat*
 
@@ -150,6 +151,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Fix bug preventing installation of osqueryd. Preserve the osquery.app/ directory and its contents when installing the Elastic Agent. {agent-issue}8245[8245] {pull}44501[44501]
 
 *Packetbeat*
 
@@ -225,6 +227,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Allow cross-region bucket configuration in s3 input. {issue}22161[22161] {pull}40309[40309]
 - Disable event normalization for netflow input {pull}40635[40635]
 - Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
+- Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
+- Add Fleet status update functionality to lumberjack input. {issue}44283[44283] {pull}44339[44339]
+- Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
 
 *Auditbeat*
 

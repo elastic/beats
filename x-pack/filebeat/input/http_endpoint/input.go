@@ -32,6 +32,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -104,6 +105,9 @@ func (e *httpEndpoint) Test(_ v2.TestContext) error {
 }
 
 func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
+	ctx.UpdateStatus(status.Starting, "")
+	ctx.UpdateStatus(status.Configuring, "")
+
 	metrics := newInputMetrics(ctx.ID)
 	defer metrics.Close()
 
@@ -116,6 +120,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		EventListener: newEventACKHandler(),
 	})
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, "failed to create pipeline client: "+err.Error())
 		return fmt.Errorf("failed to create pipeline client: %w", err)
 	}
 	defer client.Close()
@@ -124,6 +129,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
+	ctx.UpdateStatus(status.Stopped, "")
 	return nil
 }
 
@@ -157,6 +163,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 
 	u, err := url.Parse(pattern)
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, "configured URL is invalid: "+err.Error())
 		return err
 	}
 	metrics.route.Set(u.Path)
@@ -166,6 +173,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 	if e.config.Program != "" {
 		prg, err = newProgram(e.config.Program, log)
 		if err != nil {
+			ctx.UpdateStatus(status.Failed, "unable to compile CEL program: "+err.Error())
 			return err
 		}
 	}
@@ -176,6 +184,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 		err = checkTLSConsistency(e.addr, s.tls, e.config.TLS)
 		if err != nil {
 			p.mu.Unlock()
+			ctx.UpdateStatus(status.Failed, err.Error())
 			return err
 		}
 
@@ -185,10 +194,11 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 			s.setErr(err)
 			s.cancel()
 			p.mu.Unlock()
+			ctx.UpdateStatus(status.Failed, err.Error())
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, log, metrics))
+		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx.StatusReporter, log, metrics))
 		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
@@ -204,10 +214,11 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
-	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, log, metrics))
+	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, ctx.StatusReporter, log, metrics))
 	p.servers[e.addr] = s
 	p.mu.Unlock()
 
+	ctx.UpdateStatus(status.Running, "")
 	if e.tlsConfig != nil {
 		log.Infof("Starting HTTPS server on %s with %s end point", srv.Addr, pattern)
 		// The certificate is already loaded so we do not need
@@ -216,6 +227,14 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metr
 	} else {
 		log.Infof("Starting HTTP server on %s with %s end point", srv.Addr, pattern)
 		err = listenAndServe(s.srv, metrics)
+	}
+	switch err {
+	case nil:
+		// This will never happen.
+	case http.ErrServerClosed:
+		ctx.UpdateStatus(status.Stopping, "")
+	default:
+		ctx.UpdateStatus(status.Failed, "server exited unexpectedly: "+err.Error())
 	}
 	p.mu.Lock()
 	delete(p.servers, e.addr)
@@ -326,27 +345,30 @@ func (s *server) getErr() error {
 	return s.err
 }
 
-func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event), log *logp.Logger, metrics *inputMetrics) http.Handler {
+func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event), stat status.StatusReporter, log *logp.Logger, metrics *inputMetrics) http.Handler {
 	h := &handler{
 		ctx:      ctx,
 		log:      log,
 		txBaseID: newID(),
 
+		status:  stat,
 		publish: pub,
 		metrics: metrics,
 		validator: apiValidator{
-			basicAuth:    c.BasicAuth,
-			username:     c.Username,
-			password:     c.Password,
-			method:       c.Method,
-			contentType:  c.ContentType,
-			secretHeader: c.SecretHeader,
-			secretValue:  c.SecretValue,
-			hmacHeader:   c.HMACHeader,
-			hmacKey:      c.HMACKey,
-			hmacType:     c.HMACType,
-			hmacPrefix:   c.HMACPrefix,
-			maxBodySize:  -1,
+			basicAuth:      c.BasicAuth,
+			username:       c.Username,
+			password:       c.Password,
+			method:         c.Method,
+			contentType:    c.ContentType,
+			secretHeader:   c.SecretHeader,
+			secretValue:    c.SecretValue,
+			hmacHeader:     c.HMACHeader,
+			hmacKey:        c.HMACKey,
+			hmacType:       c.HMACType,
+			hmacPrefix:     c.HMACPrefix,
+			maxBodySize:    -1,
+			optionsHeaders: c.OptionsHeaders,
+			optionsStatus:  c.OptionsStatus,
 		},
 		maxInFlight:           c.MaxInFlight,
 		retryAfter:            c.RetryAfter,
@@ -357,6 +379,9 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
+	}
+	if h.status == nil {
+		h.status = noopReporter{}
 	}
 	if c.MaxBodySize != nil {
 		h.validator.maxBodySize = *c.MaxBodySize
@@ -402,6 +427,10 @@ func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event
 	}
 	return h
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // lumberjackTimestamp is a glob expression matching the time format string used
 // by lumberjack when rolling over logs, "2006-01-02T15-04-05.000".
