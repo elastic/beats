@@ -18,6 +18,7 @@
 package look
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -56,7 +57,7 @@ func TestReason(t *testing.T) {
 
 func TestReasonGenericError(t *testing.T) {
 	msg := "An error"
-	res := Reason(fmt.Errorf(msg))
+	res := Reason(errors.New(msg))
 	assert.Equal(t, common.MapStr{
 		"type":    "io",
 		"message": msg,

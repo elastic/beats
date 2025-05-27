@@ -321,8 +321,8 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		if b.Manager.Enabled() {
 			logp.Info("Output is configured through Central Management")
 		} else {
-			msg := "No outputs are defined. Please define one under the output section."
-			logp.Info(msg)
+			msg := "no outputs are defined, please define one under the output section"
+			logp.Info("%s", msg)
 			return nil, errors.New(msg)
 		}
 	}
@@ -695,7 +695,7 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// log paths values to help with troubleshooting
-	logp.Info(paths.Paths.String())
+	logp.Info("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.loadMeta(metaPath)
