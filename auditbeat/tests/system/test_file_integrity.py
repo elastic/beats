@@ -320,11 +320,13 @@ class Test(BaseTest):
             with open(f, "w") as fd:
                 # Event 3: write
                 fd.write("data")
+                fd.flush()
                 # FSNotify can't catch the events if operations happens too fast
                 time.sleep(1)
 
                 # Event 4: truncate
                 fd.truncate(0)
+                fd.flush()
                 # FSNotify can't catch the events if operations happens too fast
                 time.sleep(1)
 
