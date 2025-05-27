@@ -17,12 +17,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-<<<<<<< HEAD
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
-=======
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
->>>>>>> a9203c76a (Don't create kprobes with more than 128 args in auditbeat's guess subsystem (#40490))
 )
 
 /*
