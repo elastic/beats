@@ -116,6 +116,81 @@ var serverPoolTests = []struct {
 		},
 	},
 	{
+		name:   "options_with_headers",
+		method: http.MethodOptions,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				ResponseCode:   http.StatusOK,
+				ResponseBody:   `{"message": "success"}`,
+				OptionsStatus:  http.StatusOK,
+				OptionsHeaders: http.Header{"option-header": {"options-header-value"}},
+				ListenAddress:  "127.0.0.1",
+				ListenPort:     "9001",
+				URL:            "/",
+				Prefix:         "json",
+				ContentType:    "application/json",
+			},
+		}},
+		events: []target{
+			{
+				url: "http://127.0.0.1:9001/", wantHeader: http.Header{
+					"Content-Length": {"0"},
+					"Option-Header":  {"options-header-value"},
+				},
+			},
+		},
+		wantStatus: http.StatusOK,
+	},
+	{
+		name:   "options_empty_headers",
+		method: http.MethodOptions,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				ResponseCode:   http.StatusOK,
+				ResponseBody:   `{"message": "success"}`,
+				OptionsStatus:  http.StatusOK,
+				OptionsHeaders: http.Header{},
+				ListenAddress:  "127.0.0.1",
+				ListenPort:     "9001",
+				URL:            "/",
+				Prefix:         "json",
+				ContentType:    "application/json",
+			},
+		}},
+		events: []target{
+			{
+				url: "http://127.0.0.1:9001/", wantHeader: http.Header{
+					"Content-Length": {"0"},
+				},
+			},
+		},
+		wantStatus: http.StatusOK,
+	},
+	{
+		name:   "options_no_headers",
+		method: http.MethodOptions,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				ResponseCode:   http.StatusOK,
+				ResponseBody:   `{"message": "success"}`,
+				OptionsStatus:  http.StatusOK,
+				OptionsHeaders: nil,
+				ListenAddress:  "127.0.0.1",
+				ListenPort:     "9001",
+				URL:            "/",
+				Prefix:         "json",
+				ContentType:    "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", wantBody: `{"message":"OPTIONS requests are only allowed with options_headers set"}` + "\n"},
+		},
+		wantStatus: http.StatusBadRequest,
+	},
+	{
 		name: "distinct_ports",
 		cfgs: []*httpEndpoint{
 			{
