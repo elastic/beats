@@ -66,7 +66,7 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 		t.Fatalf("cannot write log file '%s': %s", logFile, err)
 	}
 
-	fileWatcher := NewFileWatcher(t, logFile, true)
+	fileWatcher := NewFileWatcher(t, logFile)
 	fileWatcher.SetEventCallback(func(event fsnotify.Event) {
 		if event.Has(fsnotify.Remove) {
 			t.Errorf("File %s should not have been removed, removal happened at %s",
@@ -80,7 +80,7 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 	esURL := integration.GetESURL(t, "http")
 
 	// Create and start the proxy server
-	proxy := &ProxyController{target: &esURL, enabled: true}
+	proxy := &DisablingProxy{target: &esURL, enabled: true}
 	server := &http.Server{
 		Addr:    "localhost:9201",
 		Handler: proxy,
@@ -196,6 +196,9 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 	}
 }
 
+// getEventsMsgFromES gets the 'message' field from all documents
+// in `index`. If Elasticsearch returns an status code other than 200
+// nil is returned. `size` sets the number of documents returned
 func getEventsMsgFromES(t *testing.T, index string, size int) []string {
 	t.Helper()
 	// Step 1: Get the Elasticsearch URL
@@ -205,14 +208,23 @@ func getEventsMsgFromES(t *testing.T, index string, size int) []string {
 	searchURL, err := integration.FormatDataStreamSearchURL(t, esURL, index)
 	require.NoError(t, err, "Failed to format datastream search URL")
 
-	// Step 3: Add the `size` parameter to fetch up to 200 messages
+	// Step 3: Add query parameters
 	queryParams := searchURL.Query()
+
+	// Add the `size` (the number of documents returned) parameter
 	queryParams.Set("size", strconv.Itoa(size))
+	// Order the events in ascending order
+	queryParams.Set("sort", "@timestamp:asc")
+	// Only request the field we need
+	queryParams.Set("_source", "message")
 	searchURL.RawQuery = queryParams.Encode()
 
 	// Step 4: Perform the HTTP GET request using integration.HttpDo
-	_, body, err := integration.HttpDo(t, "GET", searchURL)
+	statusCode, body, err := integration.HttpDo(t, "GET", searchURL)
 	require.NoError(t, err, "Failed to perform HTTP request")
+	if statusCode != 200 {
+		return nil
+	}
 
 	// Step 5: Parse the response body to extract events
 	var searchResult struct {
@@ -236,39 +248,40 @@ func getEventsMsgFromES(t *testing.T, index string, size int) []string {
 	return messages
 }
 
-// ProxyController controls the state of the proxy (enabled/disabled).
-type ProxyController struct {
+// DisablingProxy is a HTTP proxy that can be disabled/enabled at runtime
+type DisablingProxy struct {
 	mu      sync.RWMutex
 	enabled bool
 	target  *url.URL
 }
 
-// ServeHTTP handles incoming requests and forwards them to the target if enabled.
-func (p *ProxyController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
+// ServeHTTP handles incoming requests and forwards them to the target if
+// the proxy is enabled.
+func (d *DisablingProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	d.mu.RLock()
+	defer d.mu.RUnlock()
 
-	if !p.enabled {
+	if !d.enabled {
 		http.Error(w, "Proxy is disabled", http.StatusServiceUnavailable)
 		return
 	}
 
-	proxy := httputil.NewSingleHostReverseProxy(p.target)
+	proxy := httputil.NewSingleHostReverseProxy(d.target)
 	proxy.ServeHTTP(w, r)
 }
 
 // Enable enables the proxy.
-func (p *ProxyController) Enable() {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.enabled = true
+func (d *DisablingProxy) Enable() {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.enabled = true
 }
 
 // Disable disables the proxy.
-func (p *ProxyController) Disable() {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.enabled = false
+func (d *DisablingProxy) Disable() {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.enabled = false
 }
 
 type FileWatcher struct {
@@ -281,7 +294,7 @@ type FileWatcher struct {
 }
 
 // NewFileWatcher creates a new FileWatcher instance.
-func NewFileWatcher(t testing.TB, targetFile string, failOnDelete bool) *FileWatcher {
+func NewFileWatcher(t testing.TB, targetFile string) *FileWatcher {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		t.Fatalf("failed to create watcher: %s", err)
@@ -295,56 +308,58 @@ func NewFileWatcher(t testing.TB, targetFile string, failOnDelete bool) *FileWat
 	}
 }
 
-// Start begins watching the file and its directory for changes.
-func (fw *FileWatcher) Start() {
-	dir := filepath.Dir(fw.targetFile)
+// Start begins watching the file's directory for changes.
+func (f *FileWatcher) Start() {
+	dir := filepath.Dir(f.targetFile)
 
-	err := fw.watcher.Add(dir)
+	err := f.watcher.Add(dir)
 	if err != nil {
-		fw.t.Fatalf("failed to add directory to watcher: %s", err)
+		f.t.Fatalf("failed to add directory to watcher: %s", err)
 	}
 
-	go fw.watch()
+	go f.watch()
 }
 
 // Stop stops the file-watching process.
-func (fw *FileWatcher) Stop() {
-	close(fw.stopChan)
-	fw.watcher.Close()
+func (f *FileWatcher) Stop() {
+	close(f.stopChan)
+	f.watcher.Close()
 }
 
 // SetEventCallback sets a callback function for file events.
 // To check the event that happened, use event.Has.
-func (fw *FileWatcher) SetEventCallback(callback func(event fsnotify.Event)) {
-	fw.mu.Lock()
-	defer fw.mu.Unlock()
-	fw.eventCallback = callback
+func (f *FileWatcher) SetEventCallback(callback func(event fsnotify.Event)) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.eventCallback = callback
 }
 
 // watch processes file events and errors.
-func (fw *FileWatcher) watch() {
+func (f *FileWatcher) watch() {
 	for {
 		select {
-		case event, ok := <-fw.watcher.Events:
+		case event, ok := <-f.watcher.Events:
 			if !ok {
 				return
 			}
 
-			if event.Name == fw.targetFile {
-				fw.mu.Lock()
-				if fw.eventCallback != nil {
-					fw.eventCallback(event)
+			if event.Name == f.targetFile {
+				f.mu.Lock()
+				if f.eventCallback != nil {
+					f.eventCallback(event)
 				}
-				fw.mu.Unlock()
+				f.mu.Unlock()
 			}
 
-		case err, ok := <-fw.watcher.Errors:
+		case err, ok := <-f.watcher.Errors:
 			if !ok {
 				return
 			}
 
-			fw.t.Errorf("FileWatcher failed: %s", err)
-		case <-fw.stopChan:
+			f.t.Errorf("FileWatcher failed: %s", err)
+			return
+
+		case <-f.stopChan:
 			return
 		}
 	}
