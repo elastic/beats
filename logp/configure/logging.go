@@ -162,6 +162,24 @@ func applyFlags(cfg *logp.Config) {
 	if len(debugSelectors) > 0 {
 		cfg.Level = logp.DebugLevel
 	}
+
+	// fix ToFiles and ToStderr
+	if cfg.ToFiles && cfg.ToStderr {
+		// This scenario is possible when user has selected an environment and has manually set a new logging config.
+		// The resulting config i.e. defaultConfig + userConfig can have both ToFiles and ToStderr enabled.
+		// We can't have both ToFiles and ToStderr enabled, so we need to fix this with some additional steps.
+
+		defaultConfig := logp.DefaultConfig(environment)
+
+		// We'll use the default configuration to decide which option should be active.
+		if defaultConfig.ToFiles != cfg.ToFiles {
+			// The User has enabled ToFiles in the config. So, that takes precedence.
+			cfg.ToStderr = !cfg.ToFiles
+		} else if defaultConfig.ToStderr != cfg.ToStderr {
+			// The User has enabled ToStderr in the config. So, that takes precedence.
+			cfg.ToFiles = !cfg.ToStderr
+		}
+	}
 }
 
 func (v *environmentVar) Set(in string) error {
