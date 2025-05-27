@@ -1005,8 +1005,9 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	// Create and start the proxy server
 	proxy := &DisablingProxy{target: &esURL, enabled: true}
 	server := &http.Server{
-		Addr:    "localhost:9201",
-		Handler: proxy,
+		Addr:              "localhost:9201",
+		Handler:           proxy,
+		ReadHeaderTimeout: time.Second / 2,
 	}
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
