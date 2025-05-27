@@ -25,12 +25,11 @@ filebeat.inputs:
   id: my-filestream-id
 
   # Change to true to enable this input configuration.
-  enabled: false
+  enabled: true
 
   # Paths that should be crawled and fetched. Glob based paths.
   paths:
-    - /var/log/*.log
-    #- c:\programdata\elasticsearch\logs\*
+    - ./haproxy.log
 
   # Exclude lines. A list of regular expressions to match. It drops the lines that are
   # matching any regular expression from the list.
@@ -168,12 +167,14 @@ output.elasticsearch:
   preset: balanced
 
   # Protocol - either `http` (default) or `https`.
-  #protocol: "https"
+  protocol: "https"
+  ssl:
+    verification_mode: "none"
 
   # Authentication credentials - either API key or username/password.
   #api_key: "id:api_key"
-  #username: "elastic"
-  #password: "changeme"
+  username: "elastic"
+  password: "changeme"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
@@ -192,11 +193,17 @@ output.elasticsearch:
 
 # ================================= Processors =================================
 processors:
-  - add_host_metadata:
-      when.not.contains.tags: forwarded
-  - add_cloud_metadata: ~
-  - add_docker_metadata: ~
-  - add_kubernetes_metadata: ~
+  #- add_host_metadata:
+  #    when.not.contains.tags: forwarded
+  #- add_cloud_metadata: ~
+  #- add_docker_metadata: ~
+  #- add_kubernetes_metadata: ~
+  - grok:
+      field: "message"
+      pattern: '%{IP:source.address}:%{NUMBER:source.port} \[%{HAPROXYDATE:haproxy.request_date}\] %{NOTSPACE:haproxy.frontend_name} %{USERNAME:haproxy.backend_name}/%{NOTSPACE:haproxy.server_name} %{NUMBER:haproxy.http.request.time_wait_ms:long}/%{NUMBER:haproxy.total_waiting_time_ms:long}/%{NUMBER:haproxy.connection_wait_time_ms:long}/%{NUMBER:haproxy.http.request.time_wait_without_data_ms:long}/%{NUMBER:temp.duration:long} %{NUMBER:http.response.status_code:long} %{NUMBER:haproxy.bytes_read:long} %{NOTSPACE:haproxy.http.request.captured_cookie} %{NOTSPACE:haproxy.http.response.captured_cookie} %{NOTSPACE:haproxy.termination_state} %{NUMBER:haproxy.connections.active:long}/%{NUMBER:haproxy.connections.frontend:long}/%{NUMBER:haproxy.connections.backend:long}/%{NUMBER:haproxy.connections.server:long}/%{NUMBER:haproxy.connections.retries:long} %{NUMBER:haproxy.server_queue:long}/%{NUMBER:haproxy.backend_queue:long} "%{GREEDYDATA:haproxy.http.request.raw_request_line}"'
+      customPatterns:
+        HAPROXYDATE: '%{MONTHDAY}/%{MONTH}/%{YEAR}:%{HOUR}:%{MINUTE}:%{SECOND}.%{INT}'
+      
 
 # ================================== Logging ===================================
 
