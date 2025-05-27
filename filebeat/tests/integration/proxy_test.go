@@ -21,7 +21,6 @@ package integration
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -61,7 +60,7 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 	workDir := filebeat.TempDir()
 
 	logFile := filepath.Join(workDir, "log.log")
-	logData := strings.Join(logFileLines, "\n")
+	logData := strings.Join(logFileLines[:5], "\n")
 	logData += "\n" // Filebeat needs the '\n' to read the last line
 	if err := os.WriteFile(logFile, []byte(logData), 0o644); err != nil {
 		t.Fatalf("cannot write log file '%s': %s", logFile, err)
@@ -71,7 +70,8 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 	fileWatcher.SetEventCallback(func(event fsnotify.Event) {
 		if event.Has(fsnotify.Remove) {
 			t.Errorf("File %s should not have been removed, removal happened at %s",
-				time.Now().Format(time.RFC3339Nano), event.Name)
+				event.Name,
+				time.Now().Format(time.RFC3339Nano))
 		}
 	})
 	fileWatcher.Start()
@@ -118,32 +118,63 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 	msgs := []string{}
 	require.Eventually(t, func() bool {
 		msgs = getEventsMsgFromES(t, index, 200)
+		return len(msgs) == len(logFileLines)/2
+	}, time.Second*10, time.Millisecond*100, "not all log messages have been found on ES")
+
+	// Wait for 1/2 of the grace period and add more data
+	time.Sleep(gracePeriod / 2)
+
+	// Add more data to the file
+	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_APPEND, 0644)
+	if err != nil {
+		t.Fatalf("cannot open logfile to append data: %s", err)
+	}
+	logData2 := strings.Join(logFileLines[5:], "\n")
+	logData2 += "\n"
+	if _, err := f.WriteString(logData2); err != nil {
+		t.Fatalf("could not append data to log file: %s", err)
+	}
+	if err := f.Sync(); err != nil {
+		t.Fatalf("cannot flush log file: %s", err)
+	}
+	if err := f.Close(); err != nil {
+		t.Fatalf("cannot close log file: %s", err)
+	}
+
+	// Disable (aka block) the output
+	proxy.Disable()
+
+	// Wait twice the grace period before unblocking the output
+	blockedTimer := time.NewTimer(gracePeriod * 2)
+	<-blockedTimer.C
+
+	// Ensure log file still exists
+	if !fileExists(t, logFile) {
+		t.Fatal("file was removed while output was blocked")
+	}
+
+	// Unblock the output
+	proxy.Enable()
+
+	// Wait for the remaining data to be ingested
+	msgs = []string{}
+	require.Eventually(t, func() bool {
+		msgs = getEventsMsgFromES(t, index, 200)
 		return len(msgs) == len(logFileLines)
 	}, time.Second*10, time.Millisecond*100, "not all log messages have been found on ES")
 
 	dataShippedTs := time.Now()
 	fileRemovedChan := make(chan time.Time)
 	// All events have been found, allow file to be removed
+	// and get the removal timestamp
 	fileWatcher.SetEventCallback(func(event fsnotify.Event) {
 		if event.Has(fsnotify.Remove) {
 			fileRemovedChan <- time.Now()
 		}
 	})
 
-	// Wait for the file to be removed
-	require.Eventually(t, func() bool {
-		_, err := os.Stat(logFile)
-		if err != nil {
-			if errors.Is(err, os.ErrNotExist) {
-				return false
-			}
-			t.Fatalf("cannot stat file: %s", err)
-		}
-
-		return true
-	}, 10*time.Second, time.Second, "file has not been removed")
-
-	timeout := time.NewTimer(time.Second * 15)
+	deleteTimeout := gracePeriod * 3
+	timeout := time.NewTimer(deleteTimeout)
 	select {
 	case fileRemovedTs := <-fileRemovedChan:
 		timeElapsed := fileRemovedTs.Sub(dataShippedTs)
@@ -154,12 +185,13 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 				gracePeriod)
 		}
 	case <-timeout.C:
-		t.Fatalf("file was not removed within 15s")
+		t.Fatalf("file was not removed within %d", deleteTimeout)
 	}
 
+	// Ensure the messages were ingested in the correct order
 	for i, msg := range msgs {
 		if msg != logFileLines[i] {
-			t.Errorf("want: %q, have: %q", logFileLines[i], msg)
+			t.Errorf("Line %d: want: %q, have: %q", i, logFileLines[i], msg)
 		}
 	}
 }
@@ -299,7 +331,6 @@ func (fw *FileWatcher) watch() {
 			}
 
 			if event.Name == fw.targetFile {
-				fw.t.Logf("[%s] Event %s", time.Now().Format(time.RFC3339Nano), event.Op.String())
 				fw.mu.Lock()
 				if fw.eventCallback != nil {
 					fw.eventCallback(event)
