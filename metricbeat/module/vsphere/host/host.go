@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/vmware/govmomi"
