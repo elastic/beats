@@ -9,7 +9,7 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
 
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_WIN_2022: "platform-ingest-beats-windows-2022-1748253140"
+  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
@@ -115,7 +115,7 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          imageProject: "elastic-images-qa"
+#          imageProject: "elastic-images-qa"
           image: "${IMAGE_WIN_2022}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
