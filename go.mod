@@ -87,13 +87,8 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
-<<<<<<< HEAD
-	github.com/google/flatbuffers v24.3.25+incompatible
-	github.com/google/go-cmp v0.6.0
-=======
 	github.com/google/flatbuffers v25.2.10+incompatible
 	github.com/google/go-cmp v0.7.0
->>>>>>> f5408f46d (chore: update badger package to 4.6.0 (#43321))
 	github.com/google/gopacket v1.1.19
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
