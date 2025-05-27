@@ -35,7 +35,6 @@ type Provider struct {
 	templates *template.Mapper
 	watcher   *watcher
 	uuid      uuid.UUID
-	logger    *logp.Logger
 }
 
 // AutodiscoverBuilder is the main builder for this provider.
