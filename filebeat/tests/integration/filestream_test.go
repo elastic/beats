@@ -24,6 +24,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -32,6 +34,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/fsnotify/fsnotify"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -958,45 +962,161 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 	}
 }
 
-func timeBetweenLogEntries(t *testing.T, l1, l2 string) time.Duration {
-	type entry struct {
-		TS string `json:"@timestamp"`
-	}
-
-	e1 := entry{}
-	if err := json.Unmarshal([]byte(l1), &e1); err != nil {
-		t.Fatalf("cannot parse log entry. Err: %s. Entry: %s", err, l1)
-	}
-
-	e2 := entry{}
-	if err := json.Unmarshal([]byte(l2), &e2); err != nil {
-		t.Fatalf("cannot parse log entry. Err: %s. Entry: %s", err, l1)
-	}
-
-	t1, err := time.Parse("2006-01-02T15:04:05Z0700", e1.TS)
+func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
+	gracePeriod, err := time.ParseDuration("5s")
 	if err != nil {
-		t.Fatalf("cannot parse time from first log entry: %s", err)
+		t.Fatalf("cannot parse grace period duration: %s", err)
+	}
+	delta := time.Second
+
+	index := "test-delete" + uuid.Must(uuid.NewV4()).String()
+	testDataPath, err := filepath.Abs("./testdata")
+	if err != nil {
+		t.Fatalf("cannot get absolute path for 'testdata': %s", err)
 	}
 
-	t2, err := time.Parse("2006-01-02T15:04:05Z0700", e2.TS)
-	if err != nil {
-		t.Fatalf("cannot parse time from second log entry: %s", err)
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	workDir := filebeat.TempDir()
+
+	logFile := filepath.Join(workDir, "log.log")
+	logData := strings.Join(logFileLines[:5], "\n")
+	logData += "\n" // Filebeat needs the '\n' to read the last line
+	if err := os.WriteFile(logFile, []byte(logData), 0o644); err != nil {
+		t.Fatalf("cannot write log file '%s': %s", logFile, err)
 	}
 
-	return t2.Sub(t1)
-}
-
-func fileExists(t *testing.T, path string) bool {
-	t.Helper()
-	_, err := os.Stat(path)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return false
+	fileWatcher := NewFileWatcher(t, logFile)
+	fileWatcher.SetEventCallback(func(event fsnotify.Event) {
+		if event.Has(fsnotify.Remove) {
+			t.Errorf("File %s should not have been removed, removal happened at %s",
+				event.Name,
+				time.Now().Format(time.RFC3339Nano))
 		}
-		t.Fatalf("cannot stat file: %s", err)
+	})
+	fileWatcher.Start()
+	defer fileWatcher.Stop()
+
+	esURL := integration.GetESURL(t, "http")
+
+	// Create and start the proxy server
+	proxy := &DisablingProxy{target: &esURL, enabled: true}
+	server := &http.Server{
+		Addr:    "localhost:9201",
+		Handler: proxy,
+	}
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			t.Errorf("Proxy server failed: %s", err)
+		}
+	}()
+	defer server.Close()
+
+	proxyURL, err := url.Parse(server.Addr)
+	if err != nil {
+		t.Fatalf("cannot parse proxy URL: %s", err)
 	}
 
-	return true
+	user := esURL.User.Username()
+	pass, _ := esURL.User.Password()
+	vars := map[string]any{
+		"homePath":    workDir,
+		"logfile":     logFile,
+		"testdata":    testDataPath,
+		"esHost":      proxyURL.String(),
+		"user":        user,
+		"pass":        pass,
+		"index":       index,
+		"gracePeriod": gracePeriod.String(),
+	}
+
+	cfgYAML := getConfig(t, vars, "delete", "real-es.yml")
+	filebeat.WriteConfigFile(cfgYAML)
+	filebeat.Start()
+
+	// Wait for data in ES
+	msgs := []string{}
+	require.Eventually(t, func() bool {
+		msgs = getEventsMsgFromES(t, index, 200)
+		return len(msgs) == len(logFileLines)/2
+	}, time.Second*10, time.Millisecond*100, "not all log messages have been found on ES")
+
+	// Wait for 1/2 of the grace period and add more data
+	time.Sleep(gracePeriod / 2)
+
+	// Add more data to the file
+	f, err := os.OpenFile(logFile, os.O_RDWR|os.O_APPEND, 0644)
+	if err != nil {
+		t.Fatalf("cannot open logfile to append data: %s", err)
+	}
+	logData2 := strings.Join(logFileLines[5:], "\n")
+	logData2 += "\n"
+	if _, err := f.WriteString(logData2); err != nil {
+		t.Fatalf("could not append data to log file: %s", err)
+	}
+	if err := f.Sync(); err != nil {
+		t.Fatalf("cannot flush log file: %s", err)
+	}
+	if err := f.Close(); err != nil {
+		t.Fatalf("cannot close log file: %s", err)
+	}
+
+	// Disable (aka block) the output
+	proxy.Disable()
+
+	// Wait twice the grace period before unblocking the output
+	blockedTimer := time.NewTimer(gracePeriod * 2)
+	<-blockedTimer.C
+
+	// Ensure log file still exists
+	if !fileExists(t, logFile) {
+		t.Fatal("file was removed while output was blocked")
+	}
+
+	// Unblock the output
+	proxy.Enable()
+
+	// Wait for the remaining data to be ingested
+	msgs = []string{}
+	require.Eventually(t, func() bool {
+		msgs = getEventsMsgFromES(t, index, 200)
+		return len(msgs) == len(logFileLines)
+	}, time.Second*10, time.Millisecond*100, "not all log messages have been found on ES")
+
+	dataShippedTs := time.Now()
+	fileRemovedChan := make(chan time.Time)
+	// All events have been found, allow file to be removed
+	// and get the removal timestamp
+	fileWatcher.SetEventCallback(func(event fsnotify.Event) {
+		if event.Has(fsnotify.Remove) {
+			fileRemovedChan <- time.Now()
+		}
+	})
+
+	deleteTimeout := gracePeriod * 3
+	timeout := time.NewTimer(deleteTimeout)
+	select {
+	case fileRemovedTs := <-fileRemovedChan:
+		timeElapsed := fileRemovedTs.Sub(dataShippedTs)
+		if timeElapsed < gracePeriod-delta {
+			t.Fatalf("file was removed %s after data ingested (%s acceptable delta), but grace period was set to %s",
+				timeElapsed,
+				delta,
+				gracePeriod)
+		}
+	case <-timeout.C:
+		t.Fatalf("file was not removed within %d", deleteTimeout)
+	}
+
+	// Ensure the messages were ingested in the correct order
+	for i, msg := range msgs {
+		if msg != logFileLines[i] {
+			t.Errorf("Line %d: want: %q, have: %q", i, logFileLines[i], msg)
+		}
+	}
 }
 
 // getConfig renders the template in testdata/<folder>/<tmplPath> using vars
@@ -1073,41 +1193,6 @@ func createFileAndWaitIngestion(
 	eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", msgLogFilepath)
 	fb.WaitForLogs(eofMsg, time.Second*10, "EOF was not reached")
 	requirePublishedEvents(t, fb, outputTotal, outputFilepath)
-}
-
-func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
-	for _, path := range files {
-		if runtime.GOOS == "windows" {
-			path = strings.ReplaceAll(path, `\`, `\\`)
-		}
-		eofMsg := fmt.Sprintf("End of file reached: %s; Backoff now.", path)
-
-		require.Eventuallyf(
-			t,
-			func() bool {
-				return filebeat.GetLogLine(eofMsg) != ""
-			},
-			5*time.Second,
-			100*time.Millisecond,
-			"EOF log not found for %q", path,
-		)
-	}
-}
-
-func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []string) {
-	for _, path := range files {
-		eofMsg := fmt.Sprintf("File didn't change: %s", path)
-
-		require.Eventuallyf(
-			t,
-			func() bool {
-				return filebeat.GetLogLine(eofMsg) != ""
-			},
-			5*time.Second,
-			100*time.Millisecond,
-			"'File didn't change' log not found for %q", path,
-		)
-	}
 }
 
 func parseRegistry(entries []registryEntry) map[string]registryEntry {
