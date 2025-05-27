@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 /*
@@ -101,7 +102,7 @@ import (
 	INET_SOCK_V6_LADDR_B: +80
 */
 
-const inetSockDumpSize = 8 * 256
+const inetSockDumpSize = 4 * 256
 
 func init() {
 	if err := Registry.AddGuess(func() Guesser { return &guessInetSockIPv6{} }); err != nil {
@@ -192,7 +193,7 @@ func (g *guessInetSockIPv6) Probes() (probes []helper.ProbeDef, err error) {
 	raddrOffsets := g.offsets
 	g.offsets = nil
 	const sizePtr = int(sizeOfPtr)
-	var fetch []string
+	fetch := make([]string, 0)
 	for _, off := range raddrOffsets {
 		// the pointer we're looking for is after a field of sizeof(struct sock)
 		if off < sizePtr*2 {
@@ -238,7 +239,11 @@ func (g *guessInetSockIPv6) Prepare(ctx Context) (err error) {
 	}
 	defer func() {
 		if err != nil {
-			g.loopback.Cleanup()
+			err := g.loopback.Cleanup()
+			if err != nil {
+				logp.L().Errorf("error cleaning up loopback addresses: %s", err)
+			}
+
 		}
 	}()
 	clientIP, err := g.loopback.AddRandomAddress()
