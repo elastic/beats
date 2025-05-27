@@ -27,7 +27,7 @@ import (
 	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/vim25/types"
 	"go.uber.org/mock/gomock"
-	
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
