@@ -88,7 +88,7 @@ require (
 	github.com/golang/snappy v0.0.4
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v25.2.10+incompatible
-	github.com/google/go-cmp v0.7.0
+	github.com/google/go-cmp v0.6.0
 	github.com/google/gopacket v1.1.19
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
@@ -121,8 +121,8 @@ require (
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/shopspring/decimal v1.3.1 // indirect
-	github.com/spf13/cobra v1.8.1
-	github.com/spf13/pflag v1.0.5
+	github.com/spf13/cobra v1.9.1
+	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
@@ -144,7 +144,7 @@ require (
 	google.golang.org/api v0.191.0
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
 	google.golang.org/grpc v1.66.0
-	google.golang.org/protobuf v1.34.2
+	google.golang.org/protobuf v1.36.5
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
@@ -176,7 +176,6 @@ require (
 	github.com/Azure/azure-storage-blob-go v0.15.0
 	github.com/Azure/go-autorest/autorest/adal v0.9.24
 	github.com/aerospike/aerospike-client-go/v7 v7.7.1
-<<<<<<< HEAD
 	github.com/apache/arrow/go/v14 v14.0.2
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.12
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.13
@@ -184,17 +183,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.22.8
 	github.com/aws/aws-sdk-go-v2/service/health v1.26.4
 	github.com/aws/smithy-go v1.20.4
-	github.com/dgraph-io/badger/v4 v4.4.0
-=======
-	github.com/apache/arrow/go/v17 v17.0.0
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.22
-	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.44
-	github.com/aws/aws-sdk-go-v2/service/apigateway v1.28.2
-	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.24.8
-	github.com/aws/aws-sdk-go-v2/service/health v1.29.2
-	github.com/aws/smithy-go v1.22.1
 	github.com/dgraph-io/badger/v4 v4.6.0
->>>>>>> f5408f46d (chore: update badger package to 4.6.0 (#43321))
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.0
@@ -218,7 +207,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/icholy/digest v0.1.22
-	github.com/klauspost/compress v1.17.11
+	github.com/klauspost/compress v1.18.0
 	github.com/meraki/dashboard-api-go/v3 v3.0.9
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.18
@@ -372,7 +361,7 @@ require (
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/prometheus/client_golang v1.20.2 // indirect
-	github.com/rogpeppe/go-internal v1.12.0 // indirect
+	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/shirou/gopsutil/v4 v4.24.7 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
@@ -388,15 +377,16 @@ require (
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.elastic.co/fastjson v1.4.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
+	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/collector/config/configtelemetry v0.109.0 // indirect
 	go.opentelemetry.io/collector/consumer/consumerprofiles v0.109.0 // indirect
 	go.opentelemetry.io/collector/pdata/pprofile v0.109.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.53.0 // indirect
-	go.opentelemetry.io/otel v1.32.0 // indirect
-	go.opentelemetry.io/otel/metric v1.32.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.32.0 // indirect
-	go.opentelemetry.io/otel/trace v1.32.0 // indirect
+	go.opentelemetry.io/otel v1.34.0 // indirect
+	go.opentelemetry.io/otel/metric v1.34.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.34.0 // indirect
+	go.opentelemetry.io/otel/trace v1.34.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
 	golang.org/x/exp v0.0.0-20240205201215-2c58cdc269a3 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
