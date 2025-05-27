@@ -219,26 +219,14 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 					return err
 				}
 				s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
-<<<<<<< HEAD
+				s.status.UpdateStatus(status.Degraded, "websocket connection encountered an error: "+err.Error())
 				// close the old connection and reconnect
 				if err := c.Close(); err != nil {
 					s.metrics.errorsTotal.Inc()
 					s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
 				}
 				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
-				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
-=======
-				s.status.UpdateStatus(status.Degraded, "websocket connection encountered an error: "+err.Error())
-				if c != nil {
-					if err := c.Close(); err != nil {
-						s.metrics.errorsTotal.Inc()
-						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
-					}
-				}
-				// Since c is already a pointer, we can reassign it to the new connection
-				// and the defer func will still handle it.
 				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
->>>>>>> 43d3992cd (x-pack/filebeat/input/streaming: add fleet status update functionality (#44340))
 				handleConnectionResponse(resp, s.metrics, s.log)
 				if err != nil {
 					s.metrics.errorsTotal.Inc()
