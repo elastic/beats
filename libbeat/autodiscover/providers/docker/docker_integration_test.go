@@ -31,13 +31,13 @@ import (
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/keystore"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Test docker start emits an autodiscover event
 func TestDockerStart(t *testing.T) {
-	log := logp.NewTestingLogger(t, "docker")
+	log := logptest.NewTestingLogger(t, "docker")
 
 	d, err := dk.NewClient()
 	if err != nil {
