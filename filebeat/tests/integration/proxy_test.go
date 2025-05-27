@@ -23,6 +23,12 @@ import (
 )
 
 func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
+	gracePeriod, err := time.ParseDuration("5s")
+	if err != nil {
+		t.Fatalf("cannot parse grace period duration: %s", err)
+	}
+	delta := time.Second
+
 	index := "test-delete" + uuid.Must(uuid.NewV4()).String()
 	testDataPath, err := filepath.Abs("./testdata")
 	if err != nil {
@@ -44,8 +50,14 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 	}
 
 	fileWatcher := NewFileWatcher(t, logFile, true)
-	defer fileWatcher.Stop()
+	fileWatcher.SetEventCallback(func(event fsnotify.Event) {
+		if event.Has(fsnotify.Remove) {
+			t.Errorf("File %s should not have been removed, removal happened at %s",
+				time.Now().Format(time.RFC3339Nano), event.Name)
+		}
+	})
 	fileWatcher.Start()
+	defer fileWatcher.Stop()
 
 	esURL := integration.GetESURL(t, "http")
 
@@ -70,13 +82,14 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 	user := esURL.User.Username()
 	pass, _ := esURL.User.Password()
 	vars := map[string]any{
-		"homePath": workDir,
-		"logfile":  logFile,
-		"testdata": testDataPath,
-		"esHost":   proxyURL.String(),
-		"user":     user,
-		"pass":     pass,
-		"index":    index,
+		"homePath":    workDir,
+		"logfile":     logFile,
+		"testdata":    testDataPath,
+		"esHost":      proxyURL.String(),
+		"user":        user,
+		"pass":        pass,
+		"index":       index,
+		"gracePeriod": gracePeriod.String(),
 	}
 
 	cfgYAML := getConfig(t, vars, "delete", "real-es.yml")
@@ -90,7 +103,15 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 		return len(msgs) == len(logFileLines)
 	}, time.Second*10, time.Millisecond*100, "not all log messages have been found on ES")
 
-	fileWatcher.SetFailOnDelete(false)
+	dataShippedTs := time.Now()
+	fileRemovedChan := make(chan time.Time)
+	// All events have been found, allow file to be removed
+	fileWatcher.SetEventCallback(func(event fsnotify.Event) {
+		if event.Has(fsnotify.Remove) {
+			fileRemovedChan <- time.Now()
+		}
+	})
+
 	// Wait for the file to be removed
 	require.Eventually(t, func() bool {
 		_, err := os.Stat(logFile)
@@ -104,9 +125,22 @@ func TestFilestreamDeleteRealESFSNotify(t *testing.T) {
 		return true
 	}, 10*time.Second, time.Second, "file has not been removed")
 
+	timeout := time.NewTimer(time.Second * 15)
+	select {
+	case fileRemovedTs := <-fileRemovedChan:
+		timeElapsed := fileRemovedTs.Sub(dataShippedTs)
+		if timeElapsed < gracePeriod-delta {
+			t.Fatalf("file was removed %s after data ingested (%s acceptable delta), but grace period was set to %s",
+				timeElapsed,
+				delta,
+				gracePeriod)
+		}
+	case <-timeout.C:
+		t.Fatalf("file was not removed within 15s")
+	}
+
 	for i, msg := range msgs {
 		if msg != logFileLines[i] {
-			t.Errorf("Log entry %d is different than expected", i)
 			t.Errorf("want: %q, have: %q", logFileLines[i], msg)
 		}
 	}
@@ -190,11 +224,9 @@ func (p *ProxyController) Disable() {
 type FileWatcher struct {
 	watcher       *fsnotify.Watcher
 	targetFile    string
-	failOnDelete  bool
 	mu            sync.Mutex
 	stopChan      chan struct{}
 	eventCallback func(event fsnotify.Event)
-	errorCallback func(err error)
 	t             testing.TB
 }
 
@@ -206,11 +238,10 @@ func NewFileWatcher(t testing.TB, targetFile string, failOnDelete bool) *FileWat
 	}
 
 	return &FileWatcher{
-		watcher:      watcher,
-		targetFile:   targetFile,
-		failOnDelete: failOnDelete,
-		stopChan:     make(chan struct{}),
-		t:            t,
+		watcher:    watcher,
+		targetFile: targetFile,
+		stopChan:   make(chan struct{}),
+		t:          t,
 	}
 }
 
@@ -233,27 +264,11 @@ func (fw *FileWatcher) Stop() {
 }
 
 // SetEventCallback sets a callback function for file events.
+// To check the event that happened, use event.Has.
 func (fw *FileWatcher) SetEventCallback(callback func(event fsnotify.Event)) {
 	fw.mu.Lock()
 	defer fw.mu.Unlock()
 	fw.eventCallback = callback
-}
-
-// SetErrorCallback sets a callback function for errors.
-func (fw *FileWatcher) SetErrorCallback(callback func(err error)) {
-	fw.mu.Lock()
-	defer fw.mu.Unlock()
-	fw.errorCallback = callback
-}
-
-// SetFailOnDelete dynamically updates the behavior of the FileWatcher
-// to determine whether the test should fail if the watched file is deleted.
-//
-// This method is thread-safe and can be called at any time during the test.
-func (fw *FileWatcher) SetFailOnDelete(fail bool) {
-	fw.mu.Lock()
-	defer fw.mu.Unlock()
-	fw.failOnDelete = fail
 }
 
 // watch processes file events and errors.
@@ -266,11 +281,7 @@ func (fw *FileWatcher) watch() {
 			}
 
 			if event.Name == fw.targetFile {
-				// TODO: Update to use the callback
-				if event.Has(fsnotify.Remove) && fw.failOnDelete {
-					fw.t.Errorf("[%s] File %s could not have been removed", time.Now().Format(time.RFC3339Nano), event.Name)
-				}
-
+				fw.t.Logf("[%s] Event %s", time.Now().Format(time.RFC3339Nano), event.Op.String())
 				fw.mu.Lock()
 				if fw.eventCallback != nil {
 					fw.eventCallback(event)
@@ -283,14 +294,7 @@ func (fw *FileWatcher) watch() {
 				return
 			}
 
-			fw.mu.Lock()
-			if fw.errorCallback != nil {
-				fw.errorCallback(err)
-			} else {
-				fw.t.Errorf("Watcher error: %s", err)
-			}
-			fw.mu.Unlock()
-
+			fw.t.Errorf("FileWatcher failed: %s", err)
 		case <-fw.stopChan:
 			return
 		}
