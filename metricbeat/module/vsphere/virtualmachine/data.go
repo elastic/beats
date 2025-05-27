@@ -23,6 +23,7 @@ import (
 
 func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	const bytesMultiplier = int64(1024 * 1024)
+	const kilobytesToBytesMultiplier = int64(1024)
 	usedMemory := int64(data.VM.Summary.QuickStats.GuestMemoryUsage) * bytesMultiplier
 	usedCPU := data.VM.Summary.QuickStats.OverallCpuUsage
 	totalCPU := data.VM.Summary.Config.CpuReservation
@@ -77,6 +78,36 @@ func (m *MetricSet) mapEvent(data VMData) mapstr.M {
 	}
 	if len(data.triggeredAlarms) > 0 {
 		event.Put("triggered_alarms", data.triggeredAlarms)
+	}
+	if val, ok := data.PerformanceData["cpu.usage.average"]; ok {
+		event.Put("cpu.usage.percent", val)
+	}
+	if val, ok := data.PerformanceData["disk.usage.average"]; ok {
+		intVal, assertOk := val.(int64)
+		if assertOk {
+			event.Put("disk.average.bytes", intVal*kilobytesToBytesMultiplier)
+		}
+	}
+	if val, ok := data.PerformanceData["disk.read.average"]; ok {
+		intVal, assertOk := val.(int64)
+		if assertOk {
+			event.Put("disk.read.average.bytes", intVal*kilobytesToBytesMultiplier)
+		}
+	}
+	if val, ok := data.PerformanceData["disk.write.average"]; ok {
+		intVal, assertOk := val.(int64)
+		if assertOk {
+			event.Put("disk.write.average.bytes", intVal*kilobytesToBytesMultiplier)
+		}
+	}
+	if val, ok := data.PerformanceData["disk.numberRead.summation"]; ok {
+		event.Put("disk.numberRead.count", val)
+	}
+	if val, ok := data.PerformanceData["disk.numberWrite.summation"]; ok {
+		event.Put("disk.numberWrite.count", val)
+	}
+	if val, ok := data.PerformanceData["mem.usage.average"]; ok {
+		event.Put("memory.usage.percent", val)
 	}
 
 	return event
