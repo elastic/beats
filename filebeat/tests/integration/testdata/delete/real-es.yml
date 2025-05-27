@@ -23,6 +23,8 @@ queue.mem:
 output.elasticsearch:
   hosts:
     - {{ .esHost }}
+  username: {{ .user }}
+  password: {{ .pass }}
 
 logging:
   level: debug
