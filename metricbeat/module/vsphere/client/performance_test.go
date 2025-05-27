@@ -27,8 +27,8 @@ import (
 	"github.com/vmware/govmomi/performance"
 	"github.com/vmware/govmomi/vim25/types"
 	"go.uber.org/mock/gomock"
-
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Run 'go generate' to create mocks that are used in tests.
@@ -235,7 +235,7 @@ func TestGetPerfMetrics(t *testing.T) {
 			}
 
 			manager := &PerformanceDataFetcher{
-				logger:      logptest.NewTestingLogger(t, ""),
+				logger:      logp.NewTestingLogger(t, ""),
 				perfManager: mPerfManager,
 			}
 
