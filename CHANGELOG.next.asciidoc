@@ -433,6 +433,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
 - Add Fleet status update functionality to lumberjack input. {issue}44283[44283] {pull}44339[44339]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
+- Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
 
 *Auditbeat*
 
