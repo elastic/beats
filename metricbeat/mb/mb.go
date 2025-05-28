@@ -126,14 +126,12 @@ func (m *BaseModule) calculateStatus() (status.Status, string) {
 	for _, ms := range m.statuses {
 		switch ms.state {
 		case status.Degraded:
-			if reportedStatus != status.Degraded {
-				reportedStatus = status.Degraded
-				if reportedMsg != "" {
-					// combine multiple messages if multile metricsets are degraded
-					reportedMsg = fmt.Sprintf("%s; %s", reportedMsg, ms.msg)
-				} else {
-					reportedMsg = ms.msg
-				}
+			reportedStatus = status.Degraded
+			if reportedMsg != "" {
+				// combine multiple messages if multile metricsets are degraded
+				reportedMsg = fmt.Sprintf("%s; %s", reportedMsg, ms.msg)
+			} else {
+				reportedMsg = ms.msg
 			}
 		case status.Failed:
 			// return the first failed metricset
