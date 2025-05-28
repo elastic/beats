@@ -246,7 +246,7 @@ func (s *Stats) ErrTooMany(evs []publisher.Event) {
 }
 
 // WriteError increases the write I/O error metrics.
-func (s *Stats) WriteError(error) {
+func (s *Stats) WriteError(_ error) {
 	if s == nil {
 		return
 	}
@@ -264,7 +264,7 @@ func (s *Stats) WriteBytes(n int) {
 }
 
 // ReadError increases the read I/O error metrics.
-func (s *Stats) ReadError(error) {
+func (s *Stats) ReadError(_ error) {
 	if s == nil {
 		return
 	}
