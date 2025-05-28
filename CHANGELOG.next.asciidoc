@@ -92,6 +92,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Updated list of supported vSphere versions in the documentation. {pull}43642[43642]
 - Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
+- Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 
 *Osquerybeat*
 
@@ -239,6 +240,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
+- Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 
 *Heartbeat*
 
@@ -267,6 +269,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 
 *Osquerybeat*
 
+- Fix bug preventing installation of osqueryd. Preserve the osquery.app/ directory and its contents when installing the Elastic Agent. {agent-issue}8245[8245] {pull}44501[44501]
 
 *Packetbeat*
 
@@ -430,7 +433,10 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add milliseconds to document timestamp from awscloudwatch Filebeat input {pull}44306[44306]
 - Add support to the Active Directory entity analytics provider for device entities. {pull}44309[44309]
 - Add support for OPTIONS request to HTTP Endpoint input. {issue}43930[43930] {pull}44387[44387]
-
+- Add Fleet status update functionality to lumberjack input. {issue}44283[44283] {pull}44339[44339]
+- Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
+- Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
+- Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
 
 *Auditbeat*
 
