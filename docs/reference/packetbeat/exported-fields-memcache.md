@@ -174,7 +174,7 @@ type: long
 
 
 **`memcache.request.raw_args`**
-:   The text protocol raw arguments for the "stats …​" and "lru crawl …​" commands.
+:   The text protocol raw arguments for the "stats …" and "lru crawl …" commands.
 
 type: keyword
 
