@@ -173,6 +173,7 @@ func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 		name:      m.name,
 		rawConfig: &config,
 		Logger:    m.Logger,
+		statuses:  make(map[string]metricsetStatus),
 	}
 
 	if err := config.Unpack(&newBM.config); err != nil {
