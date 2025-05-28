@@ -195,3 +195,91 @@ class Test(BaseTest):
 
             file_events(objs, file1, ['created'])
             file_events(objs, file2, ['created'])
+<<<<<<< HEAD
+=======
+
+            self._assert_process_data(objs[0], backend)
+
+    def test_recursive__fsnotify(self):
+        self._test_recursive("fsnotify")
+
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_recursive__ebpf(self):
+        self._test_recursive("ebpf")
+
+    @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_recursive__kprobes(self):
+        self._test_recursive("kprobes")
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
+    def _test_file_modified(self, backend):
+        """
+        file_integrity tests for file modifications (chmod, chown, write, truncate, xattrs).
+        """
+
+        dirs = [self.temp_dir("auditbeat_test")]
+
+        with PathCleanup(dirs):
+            self.render_config_template(
+                modules=[{
+                    "name": "file_integrity",
+                    "extras": {
+                        "paths": dirs,
+                        "scan_at_start": False,
+                        "recursive": False,
+                        "backend": backend
+                    }
+                }],
+            )
+            proc = self.start_beat()
+            self.wait_startup(backend, dirs[0])
+
+            # Event 1: file create
+            f = os.path.join(dirs[0], f'file_{backend}.txt')
+            self.create_file(f, "hello world!")
+
+            # Wait for file creation to be reported
+            self.wait_output(1)
+
+            # Event 2: chmod
+            os.chmod(f, 0o777)
+
+            # Wait for mode change to be reported
+            self.wait_output(2)
+
+            with open(f, "w") as fd:
+                # Event 3: write
+                fd.write("data")
+                fd.flush()
+                # Wait for write to be reported
+                self.wait_output(3)
+
+                # Event 4: truncate
+                fd.truncate(0)
+                fd.flush()
+                # Wait for truncate to be reported
+                self.wait_output(4)
+
+            proc.check_kill_and_wait()
+            self.assert_no_logged_warnings()
+
+            # Ensure all Beater stages are used.
+            assert self.log_contains("Setup Beat: auditbeat")
+            assert self.log_contains("auditbeat start running")
+            assert self.log_contains("auditbeat stopped")
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
+    def test_file_modified__fsnotify(self):
+        self._test_file_modified("fsnotify")
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_file_modified__ebpf(self):
+        self._test_file_modified("ebpf")
+
+    @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_file_modified__kprobes(self):
+        self._test_file_modified("kprobes")
+>>>>>>> 5c653f5fb ([Flaky test] Prevent event coalescing in auditbeat file integrity test (#44521))
