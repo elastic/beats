@@ -241,7 +241,7 @@ func (r *msgRef) customizedCallback() func(uint32, error) {
 }
 
 func (r *msgRef) callback(start time.Time, n uint32, err error) {
-	r.client.observer.AckedEvents(make([]publisher.Event, n))
+	r.client.observer.AckedEvents(r.slice[:n])
 	r.slice = r.slice[n:]
 	r.deadlockListener.ack(int(n))
 	if r.err == nil {
