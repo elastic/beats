@@ -33,6 +33,15 @@ import (
 
 var _ resolver = (*miekgResolver)(nil)
 
+func TestNewMiekgResolverWithIPv6(t *testing.T) {
+	// This test ensures that we handle properly IPv6 addresses, inclding ones with zone indices.
+	const addr = `fe80::1%en0` // Example IPv6 address with zone index.
+
+	reg := monitoring.NewRegistry()
+	_, err := newMiekgResolver(reg.NewRegistry(logName), 0, "udp", addr)
+	assert.NoError(t, err)
+}
+
 func TestMiekgResolverLookupPTR(t *testing.T) {
 	stop, addr, err := serveDNS(fakeDNSHandler)
 	if err != nil {
