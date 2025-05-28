@@ -36,6 +36,14 @@ const (
 	metricEventsPipelineTotal     = "events_pipeline_total"
 	metricEventsPipelineFiltered  = "events_pipeline_filtered_total"
 	metricEventsPipelinePublished = "events_pipeline_published_total"
+
+	metricEventOutputTotal           = "events_output_total"
+	metricEventOutputAckedTotal      = "events_output_acked_total"
+	metricEventOutputDroppedTotal    = "events_output_dropped_total"
+	metricEventOutputDeadLetterTotal = "events_output_dead_letter_total"
+	metricEventOutputDuplicateTotal  = "events_output_duplicate_events_total"
+	metricEventOutputErrTooManyTotal = "events_output_err_too_many_total"
+	metricEventOutputRetryableTotal  = "events_output_retryable_errors_total"
 )
 
 // InputManager creates and maintains actions and background processes for an
@@ -129,6 +137,29 @@ func NewPipelineClientListener(reg *monitoring.Registry) *PipelineClientListener
 	}
 }
 
+// NewPipelineOutputListener returns a new OutputListener which implements
+// beat.OutputListener
+// The OutputListener collects output metrics for an input. If the registry is
+// nil, the metrics will be added on a new, unregistered registry.
+// created. If there is already a metric with the same name in the registry,
+// the existing metric will be used.
+func NewPipelineOutputListener(reg *monitoring.Registry) *OutputListener {
+	rreg := reg
+	if rreg == nil {
+		rreg = monitoring.NewRegistry()
+	}
+
+	return &OutputListener{
+		eventsTotal:           monitoring.NewUint(rreg, metricEventOutputTotal),
+		eventsAcked:           monitoring.NewUint(rreg, metricEventOutputAckedTotal),
+		eventsDropped:         monitoring.NewUint(rreg, metricEventOutputDroppedTotal),
+		eventsDeadLetter:      monitoring.NewUint(rreg, metricEventOutputDeadLetterTotal),
+		eventsDuplicateEvents: monitoring.NewUint(rreg, metricEventOutputDuplicateTotal),
+		eventsErrTooMany:      monitoring.NewUint(rreg, metricEventOutputErrTooManyTotal),
+		eventsRetryableErrors: monitoring.NewUint(rreg, metricEventOutputRetryableTotal),
+	}
+}
+
 // PrepareInputMetrics creates a new monitoring.Registry on parent for the given
 // inputID and a PipelineClientListener using the new monitoring.Registry.
 // Then it wrappers the given beat.PipelineConnector to add the newly created
@@ -167,8 +198,6 @@ func PrepareInputMetrics(
 			inputID, name, parent, log)
 	}
 }
-
-var _ beat.OutputListener = (*OutputListener)(nil)
 
 type OutputListener struct {
 	eventsAcked,
