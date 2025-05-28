@@ -309,31 +309,26 @@ class Test(BaseTest):
             f = os.path.join(dirs[0], f'file_{backend}.txt')
             self.create_file(f, "hello world!")
 
+            # Wait for file creation to be reported
             self.wait_output(1)
-
-            # FSNotify can't catch the events if operations happens too fast
-            # time.sleep(1)
 
             # Event 2: chmod
             os.chmod(f, 0o777)
-            self.wait_output(2)
 
-            # FSNotify can't catch the events if operations happens too fast
-            # time.sleep(1)
+            # Wait for mode change to be reported
+            self.wait_output(2)
 
             with open(f, "w") as fd:
                 # Event 3: write
                 fd.write("data")
-                # fd.flush()
-                # FSNotify can't catch the events if operations happens too fast
-                # time.sleep(1)
+                fd.flush()
+                # Wait for write to be reported
                 self.wait_output(3)
 
                 # Event 4: truncate
                 fd.truncate(0)
-                # fd.flush()
-                # FSNotify can't catch the events if operations happens too fast
-                # time.sleep(1)
+                fd.flush()
+                # Wait for truncate to be reported
                 self.wait_output(4)
 
             proc.check_kill_and_wait()
