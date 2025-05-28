@@ -165,4 +165,3 @@ func (c *Config) WithFileSupport(enabled bool) *Config {
 func (c *Config) FileSupport() bool {
 	return c.inputFromFile
 }
-
