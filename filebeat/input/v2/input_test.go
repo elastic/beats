@@ -179,3 +179,91 @@ func TestPrepareInputMetrics_safeConcurrentPipelineClientCreation(t *testing.T) 
 		})
 	}
 }
+
+var _ beat.OutputListener = (*OutputListener)(nil)
+
+func TestNewPipelineOutputListener_nilReg(t *testing.T) {
+	listener := NewPipelineOutputListener(nil)
+	require.NotNil(t, listener, "Listener should not be nil")
+
+	assert.NotNilf(t, listener.eventsTotal,
+		"%q metric should be created", metricEventOutputTotal)
+	assert.NotNilf(t, listener.eventsAcked,
+		"%q metric should be created", metricEventOutputAckedTotal)
+	assert.NotNilf(t, listener.eventsDropped,
+		"%q metric should be created", metricEventOutputDroppedTotal)
+	assert.NotNilf(t, listener.eventsDeadLetter,
+		"%q metric should be created", metricEventOutputDeadLetterTotal)
+	assert.NotNilf(t, listener.eventsDuplicateEvents,
+		"%q metric should be created", metricEventOutputDuplicateTotal)
+	assert.NotNilf(t, listener.eventsErrTooMany,
+		"%q metric should be created", metricEventOutputErrTooManyTotal)
+	assert.NotNilf(t, listener.eventsRetryableErrors,
+		"%q metric should be created", metricEventOutputRetryableTotal)
+
+	// ensure the metrics aren't created on monitoring.Default
+	defaultReg := monitoring.Default
+	assert.Nil(t, defaultReg.Get(metricEventOutputTotal),
+		"%q metric should NOT be created on monitoring.Default",
+		metricEventOutputTotal)
+	assert.Nil(t, defaultReg.Get(metricEventOutputAckedTotal),
+		"%q metric should NOT be created on monitoring.Default",
+		metricEventOutputAckedTotal)
+	assert.Nil(t, defaultReg.Get(metricEventOutputDroppedTotal),
+		"%q metric should NOT be created on monitoring.Default",
+		metricEventOutputDroppedTotal)
+	assert.Nil(t, defaultReg.Get(metricEventOutputDeadLetterTotal),
+		"%q metric should NOT be created on monitoring.Default",
+		metricEventOutputDeadLetterTotal)
+	assert.Nil(t, defaultReg.Get(metricEventOutputDuplicateTotal),
+		"%q metric should NOT be created on monitoring.Default",
+		metricEventOutputDuplicateTotal)
+	assert.Nil(t, defaultReg.Get(metricEventOutputErrTooManyTotal),
+		"%q metric should NOT be created on monitoring.Default",
+		metricEventOutputErrTooManyTotal)
+	assert.Nil(t, defaultReg.Get(metricEventOutputRetryableTotal),
+		"%q metric should NOT be created on monitoring.Default",
+		metricEventOutputRetryableTotal)
+}
+
+var _ beat.OutputListener = (*OutputListener)(nil)
+
+func TestOutputListener(t *testing.T) {
+	reg := monitoring.NewRegistry()
+	listener := NewPipelineOutputListener(reg)
+
+	initialTotal := listener.eventsTotal.Get()
+	listener.NewEvent()
+	assert.Equal(t, initialTotal+1, listener.eventsTotal.Get(),
+		"NewEvent should increment eventsTotal")
+
+	initialAcked := listener.eventsAcked.Get()
+	listener.Acked()
+	assert.Equal(t, initialAcked+1, listener.eventsAcked.Get(),
+		"Acked should increment eventsAcked")
+
+	initialDropped := listener.eventsDropped.Get()
+	listener.Dropped()
+	assert.Equal(t, initialDropped+1, listener.eventsDropped.Get(),
+		"Dropped should increment eventsDropped")
+
+	initialDeadLetter := listener.eventsDeadLetter.Get()
+	listener.DeadLetter()
+	assert.Equal(t, initialDeadLetter+1, listener.eventsDeadLetter.Get(),
+		"DeadLetter should increment eventsDeadLetter")
+
+	initialDuplicateEvents := listener.eventsDuplicateEvents.Get()
+	listener.DuplicateEvents()
+	assert.Equal(t, initialDuplicateEvents+1, listener.eventsDuplicateEvents.Get(),
+		"DuplicateEvents should increment eventsDuplicateEvents")
+
+	initialErrTooMany := listener.eventsErrTooMany.Get()
+	listener.ErrTooMany()
+	assert.Equal(t, initialErrTooMany+1, listener.eventsErrTooMany.Get(),
+		"ErrTooMany should increment eventsErrTooMany")
+
+	initialRetryableErrors := listener.eventsRetryableErrors.Get()
+	listener.RetryableError()
+	assert.Equal(t, initialRetryableErrors+1, listener.eventsRetryableErrors.Get(),
+		"RetryableError should increment eventsRetryableErrors")
+}
