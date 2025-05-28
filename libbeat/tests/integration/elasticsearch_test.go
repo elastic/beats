@@ -59,12 +59,12 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 	mockbeat := NewBeat(t, "mockbeat", "../../libbeat.test")
 	mockbeat.WriteConfigFile(esCfg)
 
-	s, mprovider := startMockES(t, "localhost:4242")
+	s, mr := startMockES(t, "localhost:4242")
 
 	mockbeat.Start()
 
 	// 1. Wait for one _bulk call
-	waitForEventToBePublished(t, mprovider)
+	waitForEventToBePublished(t, mr)
 
 	// 2. Stop the mock-es server
 	if err := s.Close(); err != nil {
@@ -83,7 +83,7 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 		"did not find two tries to reconnect")
 
 	// 4. Restart mock-es on the same port
-	s, mprovider = startMockES(t, "localhost:4242")
+	s, mr = startMockES(t, "localhost:4242")
 
 	// 5. Wait for reconnection logs
 	mockbeat.WaitForLogs(
@@ -92,7 +92,7 @@ func TestESOutputRecoversFromNetworkError(t *testing.T) {
 		"did not find re connection confirmation")
 
 	// 6. Ensure one new call to _bulk is made
-	waitForEventToBePublished(t, mprovider)
+	waitForEventToBePublished(t, mr)
 	s.Close()
 }
 
@@ -121,9 +121,9 @@ func startMockES(t *testing.T, addr string) (*http.Server, *sdkmetric.ManualRead
 	}()
 
 	require.Eventually(t, func() bool {
-		resp, err := http.Get("http://" + addr) // nolint: noctx // It's just a test
+		resp, err := http.Get("http://" + addr) //nolint: noctx // It's just a test
 		if err != nil {
-			// nolint: errcheck // We're just draining the body, we can ignore the error
+			//nolint: errcheck // We're just draining the body, we can ignore the error
 			io.Copy(io.Discard, resp.Body)
 			resp.Body.Close()
 			return false

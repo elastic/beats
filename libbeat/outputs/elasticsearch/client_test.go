@@ -59,6 +59,8 @@ import (
 	"github.com/elastic/mock-es/pkg/api"
 )
 
+var _ beat.OutputListener = (*beat.CountOutputListener)(nil)
+
 type batchMock struct {
 	events      []publisher.Event
 	ack         bool
@@ -1315,5 +1317,3 @@ func TestSetDeadLetter(t *testing.T) {
 	assert.Equal(t, errType, errFields.ErrType, "encoded error.type should match value in setDeadLetter")
 	assert.Equal(t, errStr, errFields.ErrMessage, "encoded error.message should match value in setDeadLetter")
 }
-
-var _ beat.OutputListener = (*beat.CountOutputListener)(nil)

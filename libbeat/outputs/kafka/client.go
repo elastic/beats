@@ -269,10 +269,8 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 }
 
 func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
-	defer func() {
-		c.log.Debug("Stop kafka ack worker")
-		c.wg.Done()
-	}()
+	defer c.wg.Done()
+	defer c.log.Debug("Stop kafka ack worker")
 
 	for libMsg := range ch {
 		msg, ok := libMsg.Metadata.(*message)
@@ -286,10 +284,8 @@ func (c *client) successWorker(ch <-chan *sarama.ProducerMessage) {
 
 func (c *client) errorWorker(ch <-chan *sarama.ProducerError) {
 	breakerOpen := false
-	defer func() {
-		c.log.Debug("Stop kafka error handler")
-		c.wg.Done()
-	}()
+	defer c.wg.Done()
+	defer c.log.Debug("Stop kafka error handler")
 
 	for errMsg := range ch {
 		msg, ok := errMsg.Msg.Metadata.(*message)

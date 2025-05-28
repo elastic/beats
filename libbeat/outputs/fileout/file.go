@@ -123,27 +123,6 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	for i := range events {
 		event := &events[i]
 
-		// switch rand.IntN(10) {
-		// case 0:
-		// 	msg := "forced failure to simulate PermanentError"
-		// 	if event.Guaranteed() {
-		// 		out.log.Error(msg)
-		// 	} else {
-		// 		out.log.Warn(msg)
-		// 	}
-		// 	st.PermanentError(events[i])
-		// 	continue
-		// case 1:
-		// 	msg := "forced failure to simulate DeadLetterEvents"
-		// 	if event.Guaranteed() {
-		// 		out.log.Error(msg)
-		// 	} else {
-		// 		out.log.Warn(msg)
-		// 	}
-		// 	st.DeadLetterEvents([]publisher.Event{events[i]})
-		// 	continue
-		// }
-
 		serializedEvent, err := out.codec.Encode(out.beat.Beat, &event.Content)
 		if err != nil {
 			if event.Guaranteed() {

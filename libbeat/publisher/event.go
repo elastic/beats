@@ -71,8 +71,6 @@ type Event struct {
 	EncodedEvent interface{}
 }
 
-var _ beat.OutputListener = (*OutputListener)(nil)
-
 // OutputListener is a helper around a beat.OutputListener to make it safe to
 // call methods on Event.OutputListener without requiring a nil check.
 type OutputListener struct {
