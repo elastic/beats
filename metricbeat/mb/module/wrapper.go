@@ -171,7 +171,7 @@ func (mw *Wrapper) Start(done <-chan struct{}) <-chan beat.Event {
 			registry.Add(metricsPath, msw.Metrics(), monitoring.Full)
 			monitoring.NewString(msw.Metrics(), "starttime").Set(common.Time(time.Now()).String())
 
-			msw.module.UpdateStatus(status.Starting, fmt.Sprintf("%s/%s is starting", msw.module.Name(), msw.Name()))
+			msw.UpdateStatus(status.Starting, fmt.Sprintf("%s/%s is starting", msw.module.Name(), msw.Name()))
 			msw.run(done, out)
 		}(msw)
 	}
@@ -314,13 +314,13 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 	switch {
 	case err == nil:
 		msw.stats.consecutiveFailures.Set(0)
-		msw.module.UpdateStatus(status.Running, "")
+		msw.UpdateStatus(status.Running, "")
 
 	case errors.As(err, &mb.PartialMetricsError{}):
 		reporter.Error(err)
 		msw.stats.consecutiveFailures.Set(0)
 		// mark module as running if metrics are partially available and display the error message
-		msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
+		msw.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
 		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 
 	default:
@@ -328,11 +328,15 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 		msw.stats.consecutiveFailures.Inc()
 		if msw.failureThreshold > 0 && msw.stats.consecutiveFailures != nil && uint(msw.stats.consecutiveFailures.Get()) >= msw.failureThreshold {
 			// mark it as degraded for any other issue encountered
-			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
+			msw.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
 		}
 		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 
 	}
+}
+
+func (msw *metricSetWrapper) UpdateStatus(s status.Status, message string) {
+	msw.module.UpdateStatus(msw.ID(), s, message)
 }
 
 type reporter interface {

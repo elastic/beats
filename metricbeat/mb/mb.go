@@ -63,11 +63,16 @@ const (
 
 // Module is the common interface for all Module implementations.
 type Module interface {
-	Name() string                                           // Name returns the name of the Module.
-	Config() ModuleConfig                                   // Config returns the ModuleConfig used to create the Module.
-	UnpackConfig(to interface{}) error                      // UnpackConfig unpacks the raw module config to the given object.
-	UpdateStatus(status status.Status, msg string)          // UpdateStatus updates the status of the module. Reflected on elastic-agent.
-	SetStatusReporter(statusReporter status.StatusReporter) // SetStatusReporter updates the status reporter for the given module.
+	Name() string                                             // Name returns the name of the Module.
+	Config() ModuleConfig                                     // Config returns the ModuleConfig used to create the Module.
+	UnpackConfig(to interface{}) error                        // UnpackConfig unpacks the raw module config to the given object.
+	UpdateStatus(id string, status status.Status, msg string) // UpdateStatus updates the status of the module. Reflected on elastic-agent.
+	SetStatusReporter(statusReporter status.StatusReporter)   // SetStatusReporter updates the status reporter for the given module.
+}
+
+type metricsetStatus struct {
+	state status.Status // Status is the status of the module.
+	msg   string        // Msg is the message associated with the status.
 }
 
 // BaseModule implements the Module interface.
@@ -81,6 +86,8 @@ type BaseModule struct {
 	rawConfig      *conf.C
 	statusReporter status.StatusReporter
 	Logger         *logp.Logger
+
+	statuses map[string]metricsetStatus // Map of statuses for the module. Key is the ID of the MetricSet.
 }
 
 func (m *BaseModule) String() string {
@@ -101,10 +108,40 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 }
 
 // UpdateStatus updates the status of the module. Reflected on elastic-agent.
-func (m *BaseModule) UpdateStatus(status status.Status, msg string) {
+func (m *BaseModule) UpdateStatus(id string, state status.Status, msg string) {
 	if m.statusReporter != nil {
-		m.statusReporter.UpdateStatus(status, msg)
+		m.statuses[id] = metricsetStatus{
+			state: state,
+			msg:   msg,
+		}
+		calState, calMsg := m.calculateStatus()
+		m.statusReporter.UpdateStatus(calState, calMsg)
 	}
+}
+
+func (m *BaseModule) calculateStatus() (status.Status, string) {
+	reportedStatus := status.Running
+	reportedMsg := "Healthy"
+
+	for _, ms := range m.statuses {
+		switch ms.state {
+		case status.Degraded:
+			if reportedStatus != status.Degraded {
+				reportedStatus = status.Degraded
+				if reportedMsg != "" {
+					// combine multiple messages if multile metricsets are degraded
+					reportedMsg = fmt.Sprintf("%s; %s", reportedMsg, ms.msg)
+				} else {
+					reportedMsg = ms.msg
+				}
+			}
+		case status.Failed:
+			// return the first failed metricset
+			return ms.state, ms.msg
+		}
+	}
+
+	return reportedStatus, reportedMsg
 }
 
 // SetStatusReporter sets the status repoter of the module.
