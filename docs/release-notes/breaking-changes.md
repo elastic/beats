@@ -14,7 +14,8 @@ Breaking changes can impact your Elastic applications, potentially disrupting no
 
 ::::{dropdown} The default data and logs path for the Windows service installation has changed.
 The base folder has changed from `C:\ProgramData\` to `C:\Program
-Files\` because the latter has more strict permissions.
+Files\` because the latter has more strict permissions. Now the state
+and logs are stored in `C:\Program Files\<Beat Name>-Data`.
 
 When the installation script runs, it looks for the previous default
 data path, if it is found, the data is moved to the new path.

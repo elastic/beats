@@ -56,7 +56,7 @@ If ($ForceLegacyPath -eq $True) {
 }
 
 $HomePath = "$BasePath\{{.BeatName}}"
-$LogsPath = "$HomePath\log"
+$LogsPath = "$HomePath\logs"
 $KeystorePath = "$WorkDir\data\{{.BeatName}}.keystore"
 
 $FullCmd = "`"$WorkDir\{{.BeatName}}.exe`" " +
