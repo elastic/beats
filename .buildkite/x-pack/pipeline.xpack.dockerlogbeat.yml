@@ -83,7 +83,7 @@ steps:
               context: "x-pack/dockerlogbeat: Ubuntu x86_64 Unit Tests"
 
       # x-pack/dockerlogbeat has no modules yet
-      - label: "x-pack/dockerlogbeat: Go Integration Tests/{{matrix}}"
+      - label: ":ubuntu: x-pack/dockerlogbeat: Go Integration Tests"
         command: |
           cd x-pack/dockerlogbeat
           mage goIntegTest
@@ -92,11 +92,8 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-          image: "{{matrix}}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        matrix:
-          - "${IMAGE_UBUNTU_X86_64}"
-          - "${IMAGE_WIN_2022}"
         artifact_paths:
           - "x-pack/dockerlogbeat/build/*.xml"
           - "x-pack/dockerlogbeat/build/*.json"
@@ -105,7 +102,7 @@ steps:
           - "x-pack/dockerlogbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Go Integration Tests/{{matrix}}"
+              context: "x-pack/dockerlogbeat: Go Integration Tests/ Ubuntu x86_64"
 
 #       x-pack/dockerlogbeat has no modules yet
       - label: ":windows: x-pack/dockerlogbeat: Go Integration Tests"

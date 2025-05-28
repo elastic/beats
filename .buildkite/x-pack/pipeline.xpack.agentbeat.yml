@@ -73,7 +73,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/agentbeat: Win 2022 System Tests"
-
       - label: ":linux: Agentbeat packaging Linux"
         key: "agentbeat-package-linux"
         depends_on:
@@ -100,7 +99,6 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: Packaging"
-
       - label: ":linux: Agentbeat packaging linux/amd64 FIPS"
         key: "agentbeat-package-linux-x86-fips"
         depends_on:
@@ -128,7 +126,6 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: Packaging linux/amd64 FIPS"
-
       - label: ":linux: Agentbeat packaging linux/arm64 FIPS"
         key: "agentbeat-package-linux-arm-fips"
         depends_on:
