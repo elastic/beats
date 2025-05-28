@@ -98,8 +98,8 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 
 		if response.StatusCode > 399 {
-			m.Logger().Debug("error received from prometheus endpoint: ", string(body))
-			reporter.Error(fmt.Errorf("unexpected status code %d from server", response.StatusCode))
+			m.Logger().Debugf("error received from prometheus endpoint %v: %v", url, string(body))
+			reporter.Error(fmt.Errorf("unexpected status code %d from %v", response.StatusCode, url))
 			continue
 		}
 
