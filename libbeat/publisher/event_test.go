@@ -20,8 +20,11 @@ package publisher
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/stretchr/testify/assert"
 )
+
+var _ beat.OutputListener = (*OutputListener)(nil)
 
 func TestOutputListener_NoNilCheckRequired(t *testing.T) {
 	o := OutputListener{}
@@ -32,6 +35,9 @@ func TestOutputListener_NoNilCheckRequired(t *testing.T) {
 			o.Acked()
 			o.Dropped()
 			o.DeadLetter()
+			o.DuplicateEvents()
+			o.ErrTooMany()
+			o.RetryableError()
 		},
 		"Calling methods on a zero value OutputListener must not panic")
 }
