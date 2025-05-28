@@ -197,7 +197,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
-#          imageProject: "elastic-images-qa"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"

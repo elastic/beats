@@ -195,7 +195,6 @@ steps:
             - limit: 1
         agents:
           provider: "gcp"
-#          imageProject: "elastic-images-qa"
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200

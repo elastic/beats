@@ -78,8 +78,7 @@ func saveLogs(env map[string]string, root, target string) error {
 		env,
 		f, // stdout
 		f, // stderr
-		"docker",
-		"compose",
+		"docker-compose",
 		"-p", devtools.DockerComposeProjectName(),
 		"logs",
 		"--no-color",
@@ -114,12 +113,11 @@ services:
 `
 )
 
-// dockerCompose runs docker compose with the provided environment.
+// dockerCompose runs docker-compose with the provided environment.
 // It is aware of DOCKER_NOCACHE and DOCKER_PULL. If verbose is true
-// the stderr output of docker compose is written to the terminal.
+// the stderr output of docker-compose is written to the terminal.
 func dockerCompose(env map[string]string, verbose bool) error {
 	args := []string{
-		"compose",
 		"-p", devtools.DockerComposeProjectName(),
 		"build",
 		"--force-rm",
@@ -142,7 +140,7 @@ func dockerCompose(env map[string]string, verbose bool) error {
 			env,
 			out,
 			os.Stderr,
-			"docker", args...,
+			"docker-compose", args...,
 		)
 		if err == nil {
 			break
