@@ -205,8 +205,6 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        env:
-          FIPS: "true"
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"

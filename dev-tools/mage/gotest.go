@@ -189,6 +189,7 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 // with the GODEBUG=fips140=only arg set.
 func FIPSOnlyGoTestIntegrationFromHostArgs() GoTestArgs {
 	args := DefaultGoTestIntegrationArgs()
+	args.Tags = append(args.Tags, "requirefips")
 	args.Env = WithGoIntegTestHostEnv(args.Env)
 	args.Env["GODEBUG"] = "fips140=only"
 	return args
@@ -200,6 +201,11 @@ func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
+
+	// add the requirefips tag when doing fips140 testing
+	if v, ok := os.LookupEnv("GODEBUG"); ok && strings.Contains(v, "fips140=only") {
+		args.Tags = append(args.Tags, "requirefips")
+	}
 	return args
 }
 

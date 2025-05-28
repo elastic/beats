@@ -187,7 +187,6 @@ steps:
         key: "mandatory-int-fipsonly-test"
         env:
           TEST_TAGS: "oracle"
-          FIPS: "true"
         command: |
           cd x-pack/metricbeat
           mage goFIPSOnlyIntegTest
