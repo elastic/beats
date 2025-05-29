@@ -10,13 +10,20 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/filebeat/cmd"
+<<<<<<< HEAD
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
+=======
+>>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
+<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/config"
+=======
+	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
+>>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/component"
@@ -47,18 +54,18 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
-	b, err := instance.NewBeatReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
 	beatCreator := beater.New(inputs.Init)
-
-	beatConfig, err := b.BeatConfig()
+	br, err := xpInstance.NewBeatReceiver(b, beatCreator, set.Logger)
 	if err != nil {
-		return nil, fmt.Errorf("error getting beat config: %w", err)
+		return nil, fmt.Errorf("error creating %s:%w", Name, err)
 	}
 
+<<<<<<< HEAD
 	fbBeater, err := beatCreator(&b.Beat, beatConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
@@ -79,6 +86,9 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	}
 
 	return &filebeatReceiver{BeatReceiver: base}, nil
+=======
+	return &filebeatReceiver{BeatReceiver: br}, nil
+>>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 }
 
 // copied from filebeat cmd.

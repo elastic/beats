@@ -35,9 +35,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid/v5"
-	"go.opentelemetry.io/collector/consumer"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/asset"
@@ -263,6 +261,7 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 	return &Beat{Beat: b}, nil
 }
 
+<<<<<<< HEAD
 // NewBeatReceiver creates a Beat that will be used in the context of an otel receiver
 func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, useDefaultProcessors bool, consumer consumer.Logs, core zapcore.Core) (*Beat, error) {
 	b, err := NewBeat(settings.Name,
@@ -500,6 +499,8 @@ func NewBeatReceiver(settings Settings, receiverConfig map[string]interface{}, u
 	return b, nil
 }
 
+=======
+>>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 // InitWithSettings does initialization of things common to all actions (read confs, flags)
 func (b *Beat) InitWithSettings(settings Settings) error {
 	err := b.handleFlags()
@@ -543,6 +544,21 @@ func (b *Beat) BeatConfig() (*config.C, error) {
 // Keystore return the configured keystore for this beat
 func (b *Beat) Keystore() keystore.Keystore {
 	return b.keystore
+}
+
+// SetKeystore sets the keystore for this beat
+func (b *Beat) SetKeystore(keystore keystore.Keystore) {
+	b.keystore = keystore
+}
+
+// SetProcessors sets the processing supporter for the beat
+func (b *Beat) SetProcessors(processors processing.Supporter) {
+	b.processors = processors
+}
+
+// GetProcessors returns the configured processing supporter
+func (b *Beat) GetProcessors() processing.Supporter {
+	return b.processors
 }
 
 // create and return the beater, this method also initializes all needed items,
@@ -602,7 +618,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		Logger:    logp.L().Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
-	outputFactory := b.makeOutputFactory(b.Config.Output)
+	outputFactory := b.MakeOutputFactory(b.Config.Output)
 	settings := pipeline.Settings{
 		// Since now publisher is closed on Stop, we want to give some
 		// time to ack any pending events by default to avoid
@@ -616,7 +632,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	b.Registry.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
+	b.Registry.MustRegisterOutput(b.MakeOutputReloader(publisher.OutputReloader()))
 
 	b.Publisher = publisher
 	beater, err := bt(&b.Beat, sub)
@@ -982,7 +998,7 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Info.Monitoring.SetupRegistries()
 
-	if err := initPaths(cfg); err != nil {
+	if err := InitPaths(cfg); err != nil {
 		return err
 	}
 
@@ -1020,7 +1036,19 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+<<<<<<< HEAD
 	if err := promoteOutputQueueSettings(&b.Config); err != nil {
+=======
+	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
+	if err != nil {
+		return fmt.Errorf("error initializing logging: %w", err)
+	}
+
+	// extracting here for ease of use
+	logger := b.Info.Logger
+
+	if err := PromoteOutputQueueSettings(b); err != nil {
+>>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 		return fmt.Errorf("could not promote output queue settings: %w", err)
 	}
 
@@ -1047,7 +1075,7 @@ func (b *Beat) configure(settings Settings) error {
 	logp.Info("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
-	err = b.loadMeta(metaPath)
+	err = b.LoadMeta(metaPath)
 	if err != nil {
 		return err
 	}
@@ -1162,7 +1190,7 @@ func (b *Beat) agentDiagnosticHook() []byte {
 	return debugBytes
 }
 
-func (b *Beat) loadMeta(metaPath string) error {
+func (b *Beat) LoadMeta(metaPath string) error {
 	type meta struct {
 		UUID       uuid.UUID `json:"uuid"`
 		FirstStart time.Time `json:"first_start"`
@@ -1360,7 +1388,7 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	}
 }
 
-func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
+func (b *Beat) MakeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
 	return reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
 		if update == nil {
 			return nil
@@ -1386,7 +1414,7 @@ func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Re
 	})
 }
 
-func (b *Beat) makeOutputFactory(
+func (b *Beat) MakeOutputFactory(
 	cfg config.Namespace,
 ) func(outputs.Observer) (string, outputs.Group, error) {
 	return func(outStats outputs.Observer) (string, outputs.Group, error) {
@@ -1711,7 +1739,7 @@ func isElasticsearchOutput(name string) bool {
 	return name == "elasticsearch"
 }
 
-func initPaths(cfg *config.C) error {
+func InitPaths(cfg *config.C) error {
 	// To Fix the chicken-egg problem with the Keystore and the loading of the configuration
 	// files we are doing a partial unpack of the configuration file and only take into consideration
 	// the paths field. After we will unpack the complete configuration and keystore reference
@@ -1757,8 +1785,13 @@ func sanitizeIPs(ips []string) []string {
 // to the top level queue settings.  This is done to allow existing
 // behavior of specifying queue settings at the top level or like
 // elastic-agent that specifies queue settings under the output
+<<<<<<< HEAD
 func promoteOutputQueueSettings(bc *beatConfig) error {
 	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+=======
+func PromoteOutputQueueSettings(b *Beat) error {
+	if b.Config.Output.IsSet() && b.Config.Output.Config().Enabled() {
+>>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 		pc := pipeline.Config{}
 		err := bc.Output.Config().Unpack(&pc)
 		if err != nil {
