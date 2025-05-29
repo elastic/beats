@@ -25,6 +25,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/management/status"
@@ -33,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid/v5"
@@ -122,6 +124,8 @@ func TestInitKibanaConfig(t *testing.T) {
 
 func TestEmptyMetaJson(t *testing.T) {
 	b, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	b.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
@@ -143,6 +147,8 @@ func TestEmptyMetaJson(t *testing.T) {
 
 func TestMetaJsonWithTimestamp(t *testing.T) {
 	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	firstBeat.Info.Logger = logger
 	if err != nil {
 		panic(err)
 	}
@@ -162,6 +168,7 @@ func TestMetaJsonWithTimestamp(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	secondBeat.Info.Logger = logger
 	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
 	err = secondBeat.LoadMeta(metaPath)
 	require.NoError(t, err)
@@ -330,9 +337,6 @@ output:
 			err = cfg.Unpack(&config)
 			require.NoError(t, err)
 
-<<<<<<< HEAD
-			err = promoteOutputQueueSettings(&config)
-=======
 			logger := logptest.NewTestingLogger(t, "")
 
 			b := &Beat{Config: config, Beat: beat.Beat{
@@ -342,10 +346,9 @@ output:
 			}}
 
 			err = PromoteOutputQueueSettings(b)
->>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 			require.NoError(t, err)
 
-			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
+			ms, err := memqueue.SettingsForUserConfig(b.Config.Pipeline.Queue.Config())
 			require.NoError(t, err)
 			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
 		})
@@ -471,10 +474,11 @@ func TestLogSystemInfo(t *testing.T) {
 			},
 		},
 	}
-	log, buff := logp.NewInMemory("beat", logp.ConsoleEncoderConfig())
+	log, buff := logp.NewInMemoryLocal("beat", logp.ConsoleEncoderConfig())
 	log.WithOptions()
 
 	b, err := NewBeat("testingbeat", "test-idx", "42", false, nil)
+	b.Info.Logger = log
 	require.NoError(t, err, "could not create beat")
 
 	for _, tc := range tcs {

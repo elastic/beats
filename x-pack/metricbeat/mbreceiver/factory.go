@@ -12,11 +12,6 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-<<<<<<< HEAD
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
-=======
->>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
@@ -58,30 +53,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
-<<<<<<< HEAD
-
-	mbBeater, err := beatCreator(&b.Beat, beatConfig)
-	if err != nil {
-		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
-	}
-
-	httpConf := struct {
-		HTTP *config.C `config:"http"`
-	}{}
-	if err := b.RawConfig.Unpack(&httpConf); err != nil {
-		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
-	}
-
-	beatReceiver := beatreceiver.BeatReceiver{
-		Beat:     b,
-		Beater:   mbBeater,
-		Logger:   set.Logger,
-		HttpConf: httpConf.HTTP,
-	}
-	return &metricbeatReceiver{BeatReceiver: beatReceiver}, nil
-=======
 	return &metricbeatReceiver{BeatReceiver: br}, nil
->>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 }
 
 // copied from metricbeat cmd.
