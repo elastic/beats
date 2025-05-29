@@ -31,6 +31,7 @@ import (
 )
 
 type Config struct {
+	IncludeQueryClass            bool                     `config:"wmi.include_query_class"`             // Determines if the queried class should be included in the output document (Useful if querying super-classes)
 	IncludeQueries               bool                     `config:"wmi.include_queries"`                 // Determines if the query string should be included in the output document
 	IncludeNullProperties        bool                     `config:"wmi.include_null_properties"`         // Specifies whether to include properties with nil values in the final document
 	IncludeEmptyStringProperties bool                     `config:"wmi.include_empty_string_properties"` // Specifies whether to include properties with empty string values in the final document
@@ -57,6 +58,7 @@ type QueryConfig struct {
 
 func NewDefaultConfig() Config {
 	return Config{
+		IncludeQueryClass:            false,
 		IncludeQueries:               false,
 		IncludeNullProperties:        false,
 		IncludeEmptyStringProperties: false,
