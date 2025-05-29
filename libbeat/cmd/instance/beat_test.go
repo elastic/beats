@@ -342,7 +342,6 @@ output:
 			}}
 
 			err = PromoteOutputQueueSettings(b)
->>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 			require.NoError(t, err)
 
 			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
