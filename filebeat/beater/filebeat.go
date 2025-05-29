@@ -438,7 +438,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 		fb.logger.Debug("modules", "Existing Ingest pipelines will be updated")
 	}
 
-	err = crawler.Start(fb.pipeline, config.ConfigInput, config.ConfigModules)
+	err = crawler.Start(fb.pipeline, config.ConfigInput, config.ConfigModules, b.OtelStatusReporter)
 	if err != nil {
 		crawler.Stop()
 		cancelPipelineFactoryCtx()

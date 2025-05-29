@@ -26,6 +26,8 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	otelstatus "github.com/elastic/beats/v7/libbeat/otelbeat/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -66,14 +68,18 @@ func (c *crawler) Start(
 	pipeline beat.PipelineConnector,
 	configInputs *conf.C,
 	configModules *conf.C,
+	reporter status.StatusReporter,
 ) error {
 	log := c.log
 
 	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
 
+	groupReporter := otelstatus.NewGroupStatusReporter(reporter)
+
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
-		err := c.startInput(pipeline, inputConfig)
+		err := c.startInput(pipeline, inputConfig, groupReporter)
+
 		if err != nil {
 			return fmt.Errorf("starting input failed: %w", err)
 		}
@@ -112,6 +118,7 @@ func (c *crawler) Start(
 func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *conf.C,
+	reporter otelstatus.Reporter,
 ) error {
 	// TODO: Either use debug or remove it after https://github.com/elastic/beats/pull/30534
 	// is fixed.
@@ -143,7 +150,9 @@ func (c *crawler) startInput(
 	if inputRunner, ok := runner.(*input.Runner); ok {
 		inputRunner.Once = c.once
 	}
-
+	if r, ok := runner.(status.WithStatusReporter); ok {
+		r.SetStatusReporter(reporter.GetReporterForRunner(runner.String()))
+	}
 	c.inputs[id] = runner
 
 	c.log.Infof("Starting input (ID: %d)", id)

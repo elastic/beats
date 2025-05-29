@@ -26,6 +26,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
+	otelstatus "github.com/elastic/beats/v7/libbeat/otelbeat/status"
+
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
@@ -55,10 +57,6 @@ type Metricbeat struct {
 	// Options
 	moduleOptions []module.Option
 	logger        *logp.Logger
-
-	// otel status reporting
-	moduleStatus       map[string]moduleState
-	otelStatusReporter status.StatusReporter
 }
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -320,72 +318,16 @@ func (bt *Metricbeat) injectOtelStatusReporter(otelStatusReporter status.StatusR
 	if otelStatusReporter == nil {
 		return
 	}
-	bt.otelStatusReporter = otelStatusReporter
+	reporter := otelstatus.NewGroupStatusReporter(otelStatusReporter)
 	// If the otelStatusReporter is set, we need to set the status reporter
 	for _, r := range bt.runners {
 		if status, ok := r.(status.WithStatusReporter); ok {
-			status.SetStatusReporter(&moduleStatusReporter{
-				bt: bt,
-				id: r.String(),
-			})
+			status.SetStatusReporter(reporter.GetReporterForRunner(r.String()))
 		}
 	}
-}
-
-func (bt *Metricbeat) updateStatusForModule(id string, state status.Status, msg string) {
-	if bt.moduleStatus == nil {
-		bt.moduleStatus = make(map[string]moduleState)
-	}
-
-	// add status for the runner to the map
-	bt.moduleStatus[id] = moduleState{
-		state: state,
-		msg:   msg,
-	}
-
-	// calculate the overall state of Metricbeat based on the module states
-	calcState, calcMsg := bt.calculateState()
-
-	// report status to collector component.Host
-	bt.otelStatusReporter.UpdateStatus(calcState, calcMsg)
-}
-
-func (bt *Metricbeat) calculateState() (status.Status, string) {
-	reportedState := status.Running
-	reportedMsg := ""
-	for _, s := range bt.moduleStatus {
-		switch s.state {
-		case status.Degraded:
-			if reportedMsg != "" {
-				// if multiple modules report degraded state, concatenate the messages
-				reportedMsg = fmt.Sprintf("%s; %s", reportedMsg, s.msg)
-			} else {
-				reportedMsg = s.msg
-			}
-			reportedState = status.Degraded
-		case status.Failed:
-			// return the first failed runner
-			return s.state, s.msg
-		}
-	}
-	return reportedState, reportedMsg
 }
 
 // Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
 	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.logger)
-}
-
-type moduleStatusReporter struct {
-	id string
-	bt *Metricbeat
-}
-
-func (m *moduleStatusReporter) UpdateStatus(status status.Status, msg string) {
-	m.bt.updateStatusForModule(m.id, status, msg)
-}
-
-type moduleState struct {
-	state status.Status
-	msg   string
 }
