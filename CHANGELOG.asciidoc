@@ -3,6 +3,47 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.18.2]]
+=== Beats version 8.18.2
+https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix the 'add_cloud_metadata' processor to better support custom certificate bundles by improving how the AWS provider HTTP client is overridden. {pull}44189[44189]
+
+*Auditbeat*
+
+- Fix a potential error in the system/package component that could occur during internal package database schema migration. {issue}44294[44294] {pull}44296[44296]
+
+*Filebeat*
+
+- Fix endpoint path typo in the Okta entity analytics provider. {pull}44147[44147]
+- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
+
+*Osquerybeat*
+
+- Disable the allow_unsafe osquery configuration. {pull}40130[40130]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to v1.24.3. {pull}44270[44270]
+
+*Metricbeat*
+
+- Add checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add `enable_batch_api` option in the Azure monitor module to allow metrics collection of multiple resources using Azure batch API. {pull}41790[41790]
+- Add support for `_nodes/stats` URIs compatible with legacy Elasticsearch versions. {pull}44307[44307]
+- Add a latency configuration option to the Azure Monitor module. {pull}44366[44366]
+
+*Osquerybeat*
+
+- Update osquery version to v5.15.0. {pull}43426[43426]
+
+
 [[release-notes-8.18.1]]
 === Beats version 8.18.1
 https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
