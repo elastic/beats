@@ -118,7 +118,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	github.com/ugorji/go/codec v1.1.8
-	github.com/vmware/govmomi v0.39.0
+	github.com/vmware/govmomi v0.51.0
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.7.0
 	go.etcd.io/bbolt v1.4.0
@@ -130,7 +130,7 @@ require (
 	golang.org/x/oauth2 v0.27.0
 	golang.org/x/sync v0.14.0
 	golang.org/x/sys v0.33.0
-	golang.org/x/text v0.23.0
+	golang.org/x/text v0.25.0
 	golang.org/x/time v0.8.0
 	golang.org/x/tools v0.27.0
 	google.golang.org/api v0.214.0
