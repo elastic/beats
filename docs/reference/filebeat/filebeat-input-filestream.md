@@ -821,7 +821,7 @@ Example configuration:
 :   If this setting is enabled, Filebeat adds an "error.message" and "error.type: json" key in case of JSON unmarshalling errors or when a `message_key` is defined in the configuration but cannot be used.
 
 **`message_key`**
-:   An optional configuration setting that specifies a JSON key on which to apply the line filtering and multiline settings. If specified the key must be at the top level in the JSON object and the value associated with the key must be a string, otherwise no filtering or multiline aggregation will occur.
+:   An optional configuration setting that specifies a JSON key on which to apply the line filtering and multiline settings. The specified key must be at the top level in the JSON object and the value associated with the key must be a string, otherwise no filtering or multiline aggregation will occur.
 
 **`document_id`**
 :   Option configuration setting that specifies the JSON key to set the document id. If configured, the field will be removed from the original JSON document and stored in `@metadata._id`
