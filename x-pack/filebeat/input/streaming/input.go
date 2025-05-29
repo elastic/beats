@@ -20,6 +20,8 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/mito/lib"
@@ -42,7 +44,7 @@ const (
 	root      string = "state"
 )
 
-func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func Plugin(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
 		Stability:  feature.Experimental,
@@ -53,7 +55,7 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	}
 }
 
-func PluginWebsocketAlias(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
+func PluginWebsocketAlias(log *logp.Logger, store statestore.States) v2.Plugin {
 	return v2.Plugin{
 		Name:       "websocket",
 		Stability:  feature.Experimental,
@@ -73,10 +75,13 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 // Run starts the input and blocks as long as websocket connections are alive. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
+	env.UpdateStatus(status.Starting, "")
 	var cursor map[string]interface{}
 	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
+		env.UpdateStatus(status.Configuring, "")
 		err := crsr.Unpack(&cursor)
 		if err != nil {
+			env.UpdateStatus(status.Failed, "failed to unpack cursor: "+err.Error())
 			return err
 		}
 	}
@@ -96,17 +101,23 @@ func (i input) run(env v2.Context, src *source, cursor map[string]any, pub input
 	// want to be a registry. Until then, let's keep this simple.
 	switch cfg.Type {
 	case "", "websocket":
-		s, err = NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+		s, err = NewWebsocketFollower(ctx, env.ID, cfg, cursor, pub, env.StatusReporter, log, i.time)
 	case "crowdstrike":
-		s, err = NewFalconHoseFollower(ctx, env.ID, cfg, cursor, pub, log, i.time)
+		s, err = NewFalconHoseFollower(ctx, env.ID, cfg, cursor, pub, env.StatusReporter, log, i.time)
 	}
 	if err != nil {
 		return err
 	}
 	defer s.Close()
 
-	return s.FollowStream(ctx)
+	err = s.FollowStream(ctx)
+	env.UpdateStatus(status.Stopped, "")
+	return err
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // getURL initializes the input URL with the help of the url_program.
 func getURL(ctx context.Context, name, src, url string, state map[string]any, redaction *redact, log *logp.Logger, now func() time.Time) (string, error) {

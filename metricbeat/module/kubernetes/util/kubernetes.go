@@ -118,19 +118,20 @@ const selector = "kubernetes"
 const StateMetricsetPrefix = "state_"
 
 const (
-	PodResource                   = "pod"
-	ServiceResource               = "service"
-	DeploymentResource            = "deployment"
-	ReplicaSetResource            = "replicaset"
-	StatefulSetResource           = "statefulset"
-	DaemonSetResource             = "daemonset"
-	JobResource                   = "job"
-	NodeResource                  = "node"
-	CronJobResource               = "cronjob"
-	PersistentVolumeResource      = "persistentvolume"
-	PersistentVolumeClaimResource = "persistentvolumeclaim"
-	StorageClassResource          = "storageclass"
-	NamespaceResource             = "state_namespace"
+	PodResource                     = "pod"
+	ServiceResource                 = "service"
+	DeploymentResource              = "deployment"
+	ReplicaSetResource              = "replicaset"
+	StatefulSetResource             = "statefulset"
+	DaemonSetResource               = "daemonset"
+	JobResource                     = "job"
+	NodeResource                    = "node"
+	CronJobResource                 = "cronjob"
+	PersistentVolumeResource        = "persistentvolume"
+	PersistentVolumeClaimResource   = "persistentvolumeclaim"
+	StorageClassResource            = "storageclass"
+	NamespaceResource               = "state_namespace"
+	HorizontalPodAutoscalerResource = "horizontalpodautoscaler"
 )
 
 func NewWatchers() *Watchers {
@@ -253,6 +254,12 @@ func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddReso
 		return []string{}
 	case NamespaceResource:
 		return []string{}
+	case HorizontalPodAutoscalerResource:
+		extra := []string{}
+		if addResourceMetadata.Namespace.Enabled() {
+			extra = append(extra, NamespaceResource)
+		}
+		return extra
 	default:
 		return []string{}
 	}
@@ -701,7 +708,7 @@ func NewResourceMetadataEnricher(
 	metricsRepo *MetricsRepo,
 	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
-	log := logp.NewLogger(selector)
+	log := base.Logger().Named(selector)
 
 	// metricset configuration
 	config, err := GetValidatedConfig(base)
@@ -824,7 +831,7 @@ func NewContainerMetadataEnricher(
 	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
 
-	log := logp.NewLogger(selector)
+	log := base.Logger().Named(selector)
 
 	config, err := GetValidatedConfig(base)
 	if err != nil {
@@ -1246,18 +1253,18 @@ func GetClusterECSMeta(cfg *conf.C, client k8sclient.Interface, logger *logp.Log
 func AddClusterECSMeta(base mb.BaseMetricSet) mapstr.M {
 	config, err := GetValidatedConfig(base)
 	if err != nil {
-		logp.Info("could not retrieve validated config")
+		base.Logger().Info("could not retrieve validated config")
 		return mapstr.M{}
 	}
 	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, config.KubeClientOptions)
 	if err != nil {
-		logp.Err("fail to get kubernetes client: %s", err)
+		base.Logger().Errorf("fail to get kubernetes client: %s", err)
 		return mapstr.M{}
 	}
 	cfg, _ := conf.NewConfigFrom(&config)
 	ecsClusterMeta, err := GetClusterECSMeta(cfg, client, base.Logger())
 	if err != nil {
-		logp.Info("could not retrieve cluster metadata: %s", err)
+		base.Logger().Infof("could not retrieve cluster metadata: %s", err)
 		return mapstr.M{}
 	}
 	return ecsClusterMeta

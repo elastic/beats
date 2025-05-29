@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -23,6 +24,7 @@ import (
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -30,12 +32,18 @@ const (
 	logName           = "processor." + processorName
 	procfsType        = "procfs"
 	kernelTracingType = "kernel_tracing"
+
+	regNameProcessDB     = "processor.add_session_metadata.processdb"
+	regNameKernelTracing = "processor.add_session_metadata.kernel_tracing"
 )
 
 // InitializeModule initializes this module.
 func InitializeModule() {
 	processors.RegisterPlugin(processorName, New)
 }
+
+// instanceID assigns a uniqueID to every instance of the metrics handler for the procfs DB
+var instanceID atomic.Uint32
 
 type addSessionMetadata struct {
 	ctx          context.Context
@@ -48,6 +56,31 @@ type addSessionMetadata struct {
 	providerType string
 }
 
+func genRegistry(reg *monitoring.Registry, base string) *monitoring.Registry {
+	// if more than one instance of the DB is running, start to increment the metrics keys.
+	// This is kind of an edge case, but best to handle it so monitoring does not explode.
+	// This seems like awkward code, but NewRegistry() loves to panic, so we need to be careful.
+	id := 0
+	if reg.GetRegistry(base) != nil {
+		current := int(instanceID.Load())
+		// because we call genRegistry() multiple times, make sure the registry doesn't exist before we iterate the counter
+		if current > 0 && reg.GetRegistry(fmt.Sprintf("%s.%d", base, current)) == nil {
+			id = current
+		} else {
+			id = int(instanceID.Add(1))
+		}
+
+	}
+
+	regName := base
+	if id > 0 {
+		regName = fmt.Sprintf("%s.%d", base, id)
+	}
+
+	metricsReg := reg.NewRegistry(regName)
+	return metricsReg
+}
+
 func New(cfg *cfg.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
@@ -55,10 +88,10 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	}
 
 	logger := logp.NewLogger(logName)
-
+	procDBReg := genRegistry(monitoring.Default, regNameProcessDB)
 	ctx, cancel := context.WithCancel(context.Background())
 	reader := procfs.NewProcfsReader(*logger)
-	db, err := processdb.NewDB(reader, *logger)
+	db, err := processdb.NewDB(ctx, procDBReg, reader, logger, c.DBReaperPeriod, c.ReapProcesses)
 	if err != nil {
 		cancel()
 		return nil, fmt.Errorf("failed to create DB: %w", err)
@@ -69,7 +102,8 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	switch c.Backend {
 	case "auto":
-		p, err = kerneltracingprovider.NewProvider(ctx, logger)
+		procDBReg := genRegistry(monitoring.Default, regNameKernelTracing)
+		p, err = kerneltracingprovider.NewProvider(ctx, logger, procDBReg)
 		if err != nil {
 			// Most likely cause of error is not supporting ebpf or kprobes on system, try procfs
 			backfilledPIDs := db.ScrapeProcfs()
@@ -95,7 +129,8 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 		}
 		pType = procfsType
 	case "kernel_tracing":
-		p, err = kerneltracingprovider.NewProvider(ctx, logger)
+		procDBReg := genRegistry(monitoring.Default, regNameKernelTracing)
+		p, err = kerneltracingprovider.NewProvider(ctx, logger, procDBReg)
 		if err != nil {
 			cancel()
 			return nil, fmt.Errorf("failed to create kernel_tracing provider: %w", err)
@@ -182,7 +217,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		fullProcess, err = p.db.GetProcess(pid)
 		if err != nil {
 			e := fmt.Errorf("pid %v not found in db: %w", pid, err)
-			p.logger.Debugw("PID not found in provider", "pid", pid, "error", err)
+			p.logger.Debugf("PID %d not found in provider: %s", pid, err)
 			return nil, e
 		}
 	}

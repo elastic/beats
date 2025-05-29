@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	vSphereClientUtil "github.com/elastic/beats/v7/metricbeat/module/vsphere/client"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere/security"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/performance"
@@ -52,6 +54,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	security.WarnIfInsecure(ms.Logger(), "datastore", ms.Insecure)
 	return &DataStoreMetricSet{ms}, nil
 }
 
@@ -96,7 +100,9 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 		return fmt.Errorf("error in NewClient: %w", err)
 	}
 	defer func() {
-		if err := client.Logout(ctx); err != nil {
+		err := vSphereClientUtil.Logout(ctx, client)
+
+		if err != nil {
 			m.Logger().Errorf("error trying to logout from vSphere: %v", err)
 		}
 	}()
@@ -144,7 +150,9 @@ func (m *DataStoreMetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) 
 			m.Logger().Errorf("Failed to retrieve object from datastore %s: %v", dst[i].Name, err)
 		}
 
-		metricMap, err := m.getPerfMetrics(ctx, perfManager, dst[i], metrics)
+		perfFetcher := vSphereClientUtil.NewPerformanceDataFetcher(m.Logger(), perfManager)
+		metricMap, err := perfFetcher.GetPerfMetrics(ctx, int32(m.Module().Config().Period.Seconds()), "datastore", dst[i].Name, dst[i].Reference(), metrics, metricSet)
+
 		if err != nil {
 			m.Logger().Errorf("Failed to retrieve performance metrics from datastore %s: %v", dst[i].Name, err)
 		}
@@ -251,73 +259,4 @@ func getTriggeredAlarm(ctx context.Context, pc *property.Collector, triggeredAla
 	}
 
 	return triggeredAlarms, nil
-}
-
-func (m *DataStoreMetricSet) getPerfMetrics(ctx context.Context, perfManager *performance.Manager, dst mo.Datastore, metrics map[string]*types.PerfCounterInfo) (metricMap map[string]interface{}, err error) {
-	metricMap = make(map[string]interface{})
-
-	period := int32(m.Module().Config().Period.Seconds())
-	availableMetric, err := perfManager.AvailableMetric(ctx, dst.Reference(), period)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get available metrics: %w", err)
-	}
-
-	availableMetricByKey := availableMetric.ByKey()
-
-	// Filter for required metrics
-	var metricIDs []types.PerfMetricId
-	for key, metric := range metricSet {
-		if counter, ok := metrics[key]; ok {
-			if _, exists := availableMetricByKey[counter.Key]; exists {
-				metricIDs = append(metricIDs, types.PerfMetricId{
-					CounterId: counter.Key,
-					Instance:  "*",
-				})
-			}
-		} else {
-			m.Logger().Warnf("Metric %s not found", metric)
-		}
-	}
-
-	spec := types.PerfQuerySpec{
-		Entity:     dst.Reference(),
-		MetricId:   metricIDs,
-		MaxSample:  1,
-		IntervalId: period, // using refreshRate as interval
-	}
-
-	// Query performance data
-	samples, err := perfManager.Query(ctx, []types.PerfQuerySpec{spec})
-	if err != nil {
-		if strings.Contains(err.Error(), "ServerFaultCode: A specified parameter was not correct: querySpec.interval") {
-			return metricMap, fmt.Errorf("failed to query performance data: use one of the system's supported interval. consider adjusting period: %w", err)
-		}
-
-		return metricMap, fmt.Errorf("failed to query performance data: %w", err)
-	}
-
-	if len(samples) == 0 {
-		m.Logger().Debug("No samples returned from performance manager")
-		return metricMap, nil
-	}
-
-	results, err := perfManager.ToMetricSeries(ctx, samples)
-	if err != nil {
-		return metricMap, fmt.Errorf("failed to convert performance data to metric series: %w", err)
-	}
-
-	if len(results) == 0 {
-		m.Logger().Debug("No results returned from metric series conversion")
-		return metricMap, nil
-	}
-
-	for _, result := range results[0].Value {
-		if len(result.Value) > 0 {
-			metricMap[result.Name] = result.Value[0]
-			continue
-		}
-		m.Logger().Debugf("For datastore %s, Metric %s: No result found", dst.Name, result.Name)
-	}
-
-	return metricMap, nil
 }

@@ -53,6 +53,7 @@ type Metricbeat struct {
 
 	// Options
 	moduleOptions []module.Option
+	logger        *logp.Logger
 }
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -152,13 +153,15 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		done:     make(chan struct{}),
 		config:   config,
 		registry: registry,
+		logger:   b.Info.Logger,
 	}
+
 	for _, applyOption := range options {
 		applyOption(metricbeat)
 	}
 
 	// List all registered modules and metricsets.
-	logp.Debug("modules", "Available modules and metricsets: %s", registry.String())
+	b.Info.Logger.Named("modules").Debugf("Available modules and metricsets: %s", registry.String())
 
 	if b.InSetupCmd {
 		// Return without instantiating the metricsets.
@@ -166,7 +169,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	if b.API != nil {
-		if err := inputmon.AttachHandler(b.API.Router()); err != nil {
+		if err := inputmon.AttachHandler(b.API.Router(), nil); err != nil {
 			return nil, fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
 		}
 	}
@@ -174,9 +177,9 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	if b.Manager != nil {
 		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
 			"input_metrics.json", "application/json", func() []byte {
-				data, err := inputmon.MetricSnapshotJSON()
+				data, err := inputmon.MetricSnapshotJSON(nil)
 				if err != nil {
-					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					b.Info.Logger.Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
 					return []byte(err.Error())
 				}
 				return data
@@ -214,6 +217,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 			factory, autodiscover.QueryConfig(),
 			config.Autodiscover,
 			b.Keystore,
+			b.Info.Logger,
 		)
 		if err != nil {
 			return nil, err
@@ -246,7 +250,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Centrally managed modules
 	factory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
-	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
+	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)
 	go func() {
@@ -264,7 +268,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 
 	// Dynamic file based modules (metricbeat.config.modules)
 	if bt.config.ConfigModules.Enabled() {
-		moduleReloader := cfgfile.NewReloader(logp.L().Named("module.reload"), b.Publisher, bt.config.ConfigModules)
+		moduleReloader := cfgfile.NewReloader(bt.logger.Named("module.reload"), b.Publisher, bt.config.ConfigModules)
 
 		if err := moduleReloader.Check(factory); err != nil {
 			return err
@@ -307,5 +311,5 @@ func (bt *Metricbeat) Stop() {
 
 // Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
-	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions)
+	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions, bt.logger)
 }

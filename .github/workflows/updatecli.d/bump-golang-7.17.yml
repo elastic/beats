@@ -13,6 +13,7 @@ scms:
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: "7.17"
       commitusingapi: true
+      force: false
 
 actions:
   beats:
@@ -98,15 +99,6 @@ targets:
     spec:
       content: '{{ source "latestGoVersion" }}'
       file: .go-version
-      matchpattern: '\d+.\d+.\d+'
-  update-golang.ci:
-    name: "Update .golangci.yml"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: file
-    spec:
-      content: '{{ source "latestGoVersion" }}'
-      file: .golangci.yml
       matchpattern: '\d+.\d+.\d+'
   update-version.asciidoc:
     name: "Update version.asciidoc"

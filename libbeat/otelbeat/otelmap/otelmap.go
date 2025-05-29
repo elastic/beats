@@ -20,8 +20,10 @@ package otelmap
 
 import (
 	"fmt"
+	"reflect"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"go.opentelemetry.io/collector/pdata/pcommon"
@@ -32,145 +34,56 @@ func ToMapstr(m pcommon.Map) mapstr.M {
 	return m.AsRaw()
 }
 
-// FromMapstr converts a [mapstr.M] to a [pcommon.Map].
-func FromMapstr(m mapstr.M) pcommon.Map {
-	out := pcommon.NewMap()
-	for k, v := range m {
-		switch x := v.(type) {
-		case string:
-			out.PutStr(k, x)
-		case []string:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]string) {
-				newVal := dest.AppendEmpty()
-				newVal.SetStr(i)
-			}
-		case int:
-			out.PutInt(k, int64(v.(int)))
-		case []int:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]int) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case int8:
-			out.PutInt(k, int64(v.(int8)))
-		case []int8:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]int8) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case int16:
-			out.PutInt(k, int64(v.(int16)))
-		case []int16:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]int16) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case int32:
-			out.PutInt(k, int64(v.(int32)))
-		case []int32:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]int32) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case int64:
-			out.PutInt(k, v.(int64))
-		case []int64:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]int64) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(i)
-			}
-		case uint:
-			out.PutInt(k, int64(v.(uint)))
-		case []uint:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]uint) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case uint8:
-			out.PutInt(k, int64(v.(uint8)))
-		case []uint8:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]uint8) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case uint16:
-			out.PutInt(k, int64(v.(uint16)))
-		case []uint16:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]uint16) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case uint32:
-			out.PutInt(k, int64(v.(uint32)))
-		case []uint32:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]uint32) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case uint64:
-			out.PutInt(k, int64(v.(uint64)))
-		case []uint64:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]uint64) {
-				newVal := dest.AppendEmpty()
-				newVal.SetInt(int64(i))
-			}
-		case float32:
-			out.PutDouble(k, float64(v.(float32)))
-		case []float32:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]float32) {
-				newVal := dest.AppendEmpty()
-				newVal.SetDouble(float64(i))
-			}
-		case float64:
-			out.PutDouble(k, v.(float64))
-		case []float64:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]float64) {
-				newVal := dest.AppendEmpty()
-				newVal.SetDouble(i)
-			}
-		case bool:
-			out.PutBool(k, x)
-		case []bool:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]bool) {
-				newVal := dest.AppendEmpty()
-				newVal.SetBool(i)
-			}
+// ConvertNonPrimitive handles the conversion of non-primitive data types to pcommon-primitive types.
+// The conversion is performed in place.
+// Notes:
+//  1. Slices require special handling when converting a map[string]any to pcommon.Map.
+//     The pcommon.Map expects all slices to be of type []any.
+//     If you attempt to use other slice types (e.g., []string or []int),
+//     pcommon.Map.FromRaw(...) will return an "invalid type" error.
+//     To overcome this, we use "reflect" to transform []T into []any.
+func ConvertNonPrimitive(m mapstr.M) {
+	for key, val := range m {
+		switch x := val.(type) {
 		case mapstr.M:
-			dest := out.PutEmptyMap(k)
-			newMap := FromMapstr(x)
-			newMap.CopyTo(dest)
+			ConvertNonPrimitive(x)
+			m[key] = map[string]any(x)
 		case []mapstr.M:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]mapstr.M) {
-				newVal := dest.AppendEmpty()
-				newMap := FromMapstr(i)
-				newMap.CopyTo(newVal.SetEmptyMap())
+			s := make([]any, len(x))
+			for i, val := range x {
+				ConvertNonPrimitive(val)
+				s[i] = map[string]any(val)
 			}
+			m[key] = s
 		case time.Time:
-			out.PutStr(k, x.UTC().Format("2006-01-02T15:04:05.000Z"))
+			m[key] = x.UTC().Format("2006-01-02T15:04:05.000Z")
+		case common.Time:
+			m[key] = time.Time(x).UTC().Format("2006-01-02T15:04:05.000Z")
 		case []time.Time:
-			dest := out.PutEmptySlice(k)
-			for _, i := range v.([]time.Time) {
-				newVal := dest.AppendEmpty()
-				newVal.SetStr(i.UTC().Format("2006-01-02T15:04:05.000Z"))
+			s := make([]any, 0, len(x))
+			for _, i := range x {
+				s = append(s, i.UTC().Format("2006-01-02T15:04:05.000Z"))
 			}
+			m[key] = s
+		case []common.Time:
+			s := make([]any, 0, len(x))
+			for _, i := range x {
+				s = append(s, time.Time(i).UTC().Format("2006-01-02T15:04:05.000Z"))
+			}
+			m[key] = s
+		case []bool, []string, []float32, []float64, []int, []int8, []int16, []int32, []int64,
+			[]uint, []uint8, []uint16, []uint32, []uint64:
+			ref := reflect.ValueOf(x)
+			if ref.Kind() == reflect.Slice || ref.Kind() == reflect.Array {
+				slice := make([]any, ref.Len())
+				for i := 0; i < ref.Len(); i++ {
+					slice[i] = ref.Index(i).Interface()
+				}
+				m[key] = slice
+			}
+		case nil, string, int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64, bool, []any, map[string]any:
 		default:
-			out.PutStr(k, fmt.Sprintf("unknown type: %T", x))
+			m[key] = fmt.Sprintf("unknown type: %T", x)
 		}
 	}
-	return out
 }

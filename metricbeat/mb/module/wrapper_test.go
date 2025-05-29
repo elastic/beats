@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -108,7 +109,7 @@ func TestWrapperOfReportingFetcher(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t))
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -139,7 +140,7 @@ func TestWrapperOfPushMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	m, err := module.NewWrapper(c, newTestRegistry(t))
+	m, err := module.NewWrapper(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	done := make(chan struct{})
@@ -186,7 +187,7 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 				"hosts":      hosts,
 			})
 
-			m, err := module.NewWrapper(config, registry, module.WithMetricSetInfo())
+			m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), module.WithMetricSetInfo())
 			require.NoError(t, err)
 
 			done := make(chan struct{})
@@ -202,6 +203,30 @@ func TestPeriodIsAddedToEvent(t *testing.T) {
 	}
 }
 
+func TestDurationIsAddedToEvent(t *testing.T) {
+	hosts := []string{"alpha"}
+	config := newConfig(t, map[string]interface{}{
+		"module":     moduleName,
+		"metricsets": []string{reportingFetcherName},
+		"hosts":      hosts,
+	})
+
+	registry := newTestRegistry(t)
+	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), module.WithMetricSetInfo())
+	require.NoError(t, err)
+
+	done := make(chan struct{})
+	defer close(done)
+
+	output := m.Start(done)
+
+	event := <-output
+
+	fields := event.Fields.Flatten()
+	assert.Contains(t, fields, "event.duration", "event.duration should be present in event")
+	assert.Greater(t, fields["event.duration"], time.Duration(0), "event.duration should be greater than 0")
+}
+
 func TestNewWrapperForMetricSet(t *testing.T) {
 	hosts := []string{"alpha"}
 	c := newConfig(t, map[string]interface{}{
@@ -210,7 +235,7 @@ func TestNewWrapperForMetricSet(t *testing.T) {
 		"hosts":      hosts,
 	})
 
-	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t))
+	aModule, metricSets, err := mb.NewModule(c, newTestRegistry(t), logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 
 	m, err := module.NewWrapperForMetricSet(aModule, metricSets[0], module.WithMetricSetInfo())

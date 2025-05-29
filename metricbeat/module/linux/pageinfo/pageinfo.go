@@ -57,7 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		mod:           sys,
-		log:           logp.NewLogger("pageinfo"),
+		log:           base.Logger().Named("pageinfo"),
 	}, nil
 }
 

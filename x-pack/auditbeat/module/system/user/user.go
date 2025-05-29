@@ -21,7 +21,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid/v5"
-	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
@@ -230,7 +229,7 @@ type MetricSet struct {
 	system.SystemMetricSet
 	config    config
 	log       *logp.Logger
-	cache     *cache.Cache
+	cache     *cache.Cache[*User]
 	bucket    datastore.Bucket
 	lastState time.Time
 	userFiles []string
@@ -258,7 +257,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		config:          config,
 		log:             logp.NewLogger(metricsetName),
-		cache:           cache.New(),
+		cache:           cache.New[*User](),
 		bucket:          bucket,
 	}
 
@@ -291,7 +290,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	ms.log.Debugf("Restored %d users from disk", len(users))
 
-	ms.cache.DiffAndUpdateCache(convertToCacheable(users))
+	ms.cache.DiffAndUpdateCache(users)
 
 	return ms, nil
 }
@@ -326,7 +325,7 @@ func (ms *MetricSet) Fetch(report mb.ReporterV2) {
 
 // reportState reports all existing users on the system.
 func (ms *MetricSet) reportState(report mb.ReporterV2) error {
-	var errs multierror.Errors
+	var errs []error
 	ms.lastState = time.Now()
 
 	users, err := GetUsers(ms.config.DetectPasswordChanges)
@@ -349,7 +348,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 
 		if ms.cache != nil {
 			// This will initialize the cache with the current processes
-			ms.cache.DiffAndUpdateCache(convertToCacheable(users))
+			ms.cache.DiffAndUpdateCache(users)
 		}
 
 		// Save time so we know when to send the state again (config.StatePeriod)
@@ -369,12 +368,12 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // reportChanges detects and reports any changes to users on this system since the last call.
 func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
-	var errs multierror.Errors
+	var errs []error
 	currentTime := time.Now()
 
 	// If this is not the first call to Fetch/reportChanges,
@@ -397,17 +396,17 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	ms.log.Debugf("Found %v users", len(users))
 
 	if len(users) > 0 {
-		newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(users))
+		newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(users)
 
 		if len(newInCache) > 0 && len(missingFromCache) > 0 {
 			// Check for changes to users
 			missingUserMap := make(map[string](*User))
 			for _, missingUser := range missingFromCache {
-				missingUserMap[missingUser.(*User).UID] = missingUser.(*User)
+				missingUserMap[missingUser.UID] = missingUser
 			}
 
 			for _, userFromCache := range newInCache {
-				newUser := userFromCache.(*User)
+				newUser := userFromCache
 				oldUser, found := missingUserMap[newUser.UID]
 
 				if found {
@@ -444,11 +443,11 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		} else {
 			// No changes to users
 			for _, user := range newInCache {
-				report.Event(ms.userEvent(user.(*User), eventTypeEvent, eventActionUserAdded))
+				report.Event(ms.userEvent(user, eventTypeEvent, eventActionUserAdded))
 			}
 
 			for _, user := range missingFromCache {
-				report.Event(ms.userEvent(user.(*User), eventTypeEvent, eventActionUserRemoved))
+				report.Event(ms.userEvent(user, eventTypeEvent, eventActionUserRemoved))
 			}
 		}
 
@@ -460,7 +459,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		}
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 func (ms *MetricSet) userEvent(user *User, eventType string, action eventAction) mb.Event {
@@ -534,16 +533,6 @@ func fmtGroups(groups []*user.Group) string {
 	}
 
 	return b.String()
-}
-
-func convertToCacheable(users []*User) []cache.Cacheable {
-	c := make([]cache.Cacheable, 0, len(users))
-
-	for _, u := range users {
-		c = append(c, u)
-	}
-
-	return c
 }
 
 // restoreUsersFromDisk loads the user cache from disk.

@@ -64,6 +64,7 @@ steps:
       - label: ":ubuntu: x-pack/dockerlogbeat: Ubuntu x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
+          source .buildkite/scripts/qemu.sh
           cd x-pack/dockerlogbeat
           mage build unitTest
         retry:
@@ -96,6 +97,9 @@ steps:
         artifact_paths:
           - "x-pack/dockerlogbeat/build/*.xml"
           - "x-pack/dockerlogbeat/build/*.json"
+          - "x-pack/dockerlogbeat/build/integration-tests/*"
+          - "x-pack/dockerlogbeat/build/integration-tests/Test*/*"
+          - "x-pack/dockerlogbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: Go Integration Tests"
@@ -115,10 +119,9 @@ steps:
       - label: ":ubuntu: x-pack/dockerlogbeat: Packaging Linux"
         key: "auditbeat-package-linux-x86"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
-          cd x-pack/dockerlogbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/dockerlogbeat
         retry:
           automatic:
             - limit: 1
@@ -134,11 +137,9 @@ steps:
       - label: ":ubuntu: x-pack/dockerlogbeat: Packaging Linux arm64"
         key: "auditbeat-package-linux-arm"
         env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+          PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
-          cd x-pack/dockerlogbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/dockerlogbeat
         retry:
           automatic:
             - limit: 1

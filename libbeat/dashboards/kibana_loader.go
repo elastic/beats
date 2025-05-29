@@ -20,14 +20,14 @@ package dashboards
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/joeshaw/multierror"
-
+	"github.com/elastic/beats/v7/libbeat/beat"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/kibana"
@@ -48,35 +48,35 @@ var (
 
 // KibanaLoader loads Kibana files
 type KibanaLoader struct {
-	client        *kibana.Client
-	config        *Config
-	version       version.V
-	hostname      string
-	msgOutputter  MessageOutputter
-	defaultLogger *logp.Logger
+	client       *kibana.Client
+	config       *Config
+	version      version.V
+	hostname     string
+	msgOutputter MessageOutputter
+	logger       *logp.Logger
 
 	loadedAssets map[string]bool
 }
 
 // NewKibanaLoader creates a new loader to load Kibana files
-func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
+func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Config, msgOutputter MessageOutputter, beatInfo beat.Info) (*KibanaLoader, error) {
 	if cfg == nil || !cfg.Enabled() {
 		return nil, fmt.Errorf("kibana is not configured or enabled")
 	}
 
-	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatname)
+	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatInfo.Beat)
 	if err != nil {
 		return nil, fmt.Errorf("Error creating Kibana client: %w", err)
 	}
 
 	loader := KibanaLoader{
-		client:        client,
-		config:        dashboardsConfig,
-		version:       client.GetVersion(),
-		hostname:      hostname,
-		msgOutputter:  msgOutputter,
-		defaultLogger: logp.NewLogger("dashboards"),
-		loadedAssets:  make(map[string]bool, 0),
+		client:       client,
+		config:       dashboardsConfig,
+		version:      client.GetVersion(),
+		hostname:     beatInfo.Hostname,
+		msgOutputter: msgOutputter,
+		logger:       beatInfo.Logger.Named("dashboards"),
+		loadedAssets: make(map[string]bool, 0),
 	}
 
 	version := client.GetVersion()
@@ -104,7 +104,7 @@ func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryA
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String()) //nolint:staticcheck //Keep old behavior
 	}
 
 	loader.statusMsg("Importing index file from %s", file)
@@ -130,7 +130,7 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 		return fmt.Errorf("kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
 	}
 
-	var errs multierror.Errors
+	var errs []error
 
 	params := url.Values{}
 	params.Set("overwrite", "true")
@@ -143,13 +143,13 @@ func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
 	if err != nil {
 		errs = append(errs, fmt.Errorf("error loading index pattern: %w", err))
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
 	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("Kibana version must be at least %s", minimumRequiredVersionSavedObjects.String()) //nolint:staticcheck //Keep old behavior
 	}
 
 	loader.statusMsg("Importing dashboard from %s", file)
@@ -256,6 +256,6 @@ func (loader KibanaLoader) statusMsg(msg string, a ...interface{}) {
 	if loader.msgOutputter != nil {
 		loader.msgOutputter(msg, a...)
 	} else {
-		loader.defaultLogger.Debugf(msg, a...)
+		loader.logger.Debugf(msg, a...)
 	}
 }

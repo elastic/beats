@@ -33,7 +33,7 @@ Metricbeat will call the following Elasticsearch API endpoints corresponding to 
 - [mb exported fields](https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html#_index_recovery)
 
 ### index_summary
-- `/_stats`
+- `/_stats?level=cluster`
 - [api reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-stats.html)
 - [mb exported fields](https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html#_index_summary)
 
@@ -48,7 +48,7 @@ Metricbeat will call the following Elasticsearch API endpoints corresponding to 
 - [mb exported fields](https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html#_node_2)
 
 ### node_stats
-- `/_nodes/{_local|_all}/stats`
+- `/_nodes/{_local|_all}/stats/jvm,indices,fs,os,process,transport,thread_pool,indexing_pressure,ingest/bulk,docs,get,merge,translog,fielddata,indexing,query_cache,request_cache,search,shard_stats,store,segments,refresh,flush`
 - `_local` | `_all` from [`scope`](https://www.elastic.co/guide/en/elasticsearch/reference/current/configuring-metricbeat.html#CO490-2) setting
 - [api reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-nodes-info.html)
 - [mb exported fields](https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-elasticsearch.html#_node_stats)

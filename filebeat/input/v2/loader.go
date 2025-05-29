@@ -80,9 +80,9 @@ func (l *Loader) Init(group unison.Group) error {
 // the type does not exist. Error values for Configuration errors do depend on
 // the InputManager.
 func (l *Loader) Configure(cfg *conf.C) (Input, error) {
-	name, p, input, err := l.loadFromCfg(cfg)
+	name, p, err := l.loadFromCfg(cfg)
 	if err != nil {
-		return input, err
+		return nil, err
 	}
 
 	log := l.log.With("input", name, "stability", p.Stability, "deprecated", p.Deprecated)
@@ -99,11 +99,11 @@ func (l *Loader) Configure(cfg *conf.C) (Input, error) {
 	return p.Manager.Create(cfg)
 }
 
-func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, Input, error) {
+func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, error) {
 	name, err := cfg.String(l.typeField, -1)
 	if err != nil {
 		if l.defaultType == "" {
-			return "", Plugin{}, nil, &LoadError{
+			return "", Plugin{}, &LoadError{
 				Reason:  ErrNoInputConfigured,
 				Message: fmt.Sprintf("%v setting is missing", l.typeField),
 			}
@@ -113,13 +113,13 @@ func (l *Loader) loadFromCfg(cfg *conf.C) (string, Plugin, Input, error) {
 
 	p, exists := l.registry[name]
 	if !exists {
-		return "", Plugin{}, nil, &LoadError{Name: name, Reason: ErrUnknownInput}
+		return "", Plugin{}, &LoadError{Name: name, Reason: ErrUnknownInput}
 	}
-	return name, p, nil, nil
+	return name, p, nil
 }
 
 func (l *Loader) Delete(cfg *conf.C) error {
-	_, p, _, err := l.loadFromCfg(cfg)
+	_, p, err := l.loadFromCfg(cfg)
 	if err != nil {
 		return err
 	}

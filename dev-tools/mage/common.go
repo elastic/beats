@@ -47,6 +47,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/blakesmith/ar"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/magefile/mage/target"
@@ -319,9 +320,65 @@ func Extract(sourceFile, destinationDir string) error {
 		return untar(sourceFile, destinationDir)
 	case ext == ".zip":
 		return unzip(sourceFile, destinationDir)
+	case ext == ".deb" || ext == ".ar":
+		return unarchive(sourceFile, destinationDir)
 	default:
 		return fmt.Errorf("failed to extract %v, unhandled file extension", sourceFile)
 	}
+}
+
+func unarchive(sourceFile string, destinationDir string) error {
+	file, err := os.Open(sourceFile)
+	if err != nil {
+		return fmt.Errorf("opening source archive file %s: %w", sourceFile, err)
+	}
+	defer file.Close()
+
+	if err = os.MkdirAll(destinationDir, 0755); err != nil {
+		return fmt.Errorf("creating destination directory %s: %w", destinationDir, err)
+	}
+
+	archiveReader := ar.NewReader(file)
+	for {
+		arHeader, err := archiveReader.Next()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return fmt.Errorf("reading next header: %w", err)
+		}
+		path, err := sanitizeFilePath(arHeader.Name, destinationDir)
+		if err != nil {
+			return err
+		}
+
+		// create containing folder if it doesn't exist yet
+		targetContainingDir := filepath.Dir(filepath.FromSlash(path))
+		if mkDirErr := os.MkdirAll(targetContainingDir, 0755); mkDirErr != nil {
+			return fmt.Errorf("creating container directory for file %s: %w", arHeader.Name, mkDirErr)
+		}
+
+		writer, err := os.Create(path)
+		if err != nil {
+			return fmt.Errorf("creating output file %s: %w", path, err)
+		}
+
+		if _, err = io.Copy(writer, archiveReader); err != nil {
+			return fmt.Errorf("copying bytes of file %s: %w", path, err)
+		}
+
+		if arHeader.Mode != 0 {
+			if err = os.Chmod(path, os.FileMode(arHeader.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
+				return fmt.Errorf("changing mode for file %s: %w", path, err)
+			}
+		}
+
+		if err = writer.Close(); err != nil {
+			return fmt.Errorf("closing writer for file %s: %w", path, err)
+		}
+	}
+
+	return nil
 }
 
 func unzip(sourceFile, destinationDir string) error {
@@ -502,15 +559,27 @@ func untar(sourceFile, destinationDir string) error {
 
 		path, err := sanitizeFilePath(header.Name, destinationDir)
 		if err != nil {
+			if header.Name == "./" && header.Typeflag == tar.TypeDir {
+				// When extracting from data.tar.gz coming from a .deb artifact we encounter a ./ directory entry which
+				// will fail the sanitizeFilePath check. Only for this case skip the entry and continue to the next header
+				log.Printf("skipping directory: %s\n", header.Name)
+				continue
+			}
 			return err
 		}
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 		case tar.TypeReg:
+			// create containing folder if it doesn't exist yet
+			targetContainingDir := filepath.Dir(filepath.FromSlash(path))
+			if mkDirErr := os.MkdirAll(targetContainingDir, 0755); mkDirErr != nil {
+				return fmt.Errorf("creating container directory for file %s: %w", header.Name, mkDirErr)
+			}
+
 			writer, err := os.Create(path)
 			if err != nil {
 				return err
@@ -520,7 +589,7 @@ func untar(sourceFile, destinationDir string) error {
 				return err
 			}
 
-			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 

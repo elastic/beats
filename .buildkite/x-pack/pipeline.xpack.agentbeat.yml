@@ -1,5 +1,7 @@
 env:
   ASDF_MAGE_VERSION: 1.15.0
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
@@ -7,6 +9,10 @@ env:
 
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+
+  # Platforms to be used for FIPS packaging nodes
+  PLATFORMS_AMD64_FIPS: "+all linux/amd64"
+  PLATFORMS_ARM64_FIPS: "+all linux/arm64"
 
 steps:
   - group: "Check/Update"
@@ -38,7 +44,6 @@ steps:
       - label: ":windows: x-pack/agentbeat: Win 2022 System Tests"
         key: "mandatory-win-2022-system-tests"
         command: |
-          .buildkite/scripts/gcp_auth.ps1
           Set-Location -Path x-pack/agentbeat
           mage systemTest
         retry:
@@ -59,6 +64,12 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-gcp-buildkite-oidc.tf
+          # This plugin authenticates to Google Cloud using the OIDC token.
+          - elastic/oblt-google-auth#v1.3.0:
+              lifetime: 10800 # seconds
+              project-id: "elastic-observability-ci"
+              project-number: "911195782929"
         notify:
           - github_commit_status:
               context: "x-pack/agentbeat: Win 2022 System Tests"
@@ -67,12 +78,10 @@ steps:
         depends_on:
           - mandatory-win-2022-system-tests
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
           SNAPSHOT: true
         command: |
-          set -euo pipefail
-          cd x-pack/agentbeat
-          mage package
+          .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
         artifact_paths:
           - x-pack/agentbeat/build/distributions/**/*
           - "x-pack/agentbeat/build/*.xml"
@@ -90,6 +99,58 @@ steps:
         notify:
           - github_commit_status:
               context: "agentbeat: Packaging"
+      - label: ":linux: Agentbeat packaging linux/amd64 FIPS"
+        key: "agentbeat-package-linux-x86-fips"
+        depends_on:
+          - mandatory-win-2022-system-tests
+        env:
+          PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
+          SNAPSHOT: true
+          FIPS: true
+        command: |
+          .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
+        artifact_paths:
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        retry:
+          automatic:
+            - limit: 2
+        timeout_in_minutes: 60
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Packaging linux/amd64 FIPS"
+      - label: ":linux: Agentbeat packaging linux/arm64 FIPS"
+        key: "agentbeat-package-linux-arm-fips"
+        depends_on:
+          - mandatory-win-2022-system-tests
+        env:
+          PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
+          SNAPSHOT: true
+          FIPS: true
+        command: |
+          .buildkite/scripts/packaging/packaging.sh x-pack/agentbeat
+        artifact_paths:
+          - x-pack/agentbeat/build/distributions/**/*
+          - "x-pack/agentbeat/build/*.xml"
+          - "x-pack/agentbeat/build/*.json"
+        retry:
+          automatic:
+            - limit: 2
+        timeout_in_minutes: 60
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "agentbeat: Packaging linux/arm64 FIPS"
 
       - label: ":linux: Agentbeat/Integration tests Linux"
         key: "agentbeat-it-linux"
@@ -97,7 +158,7 @@ steps:
           - agentbeat-package-linux
         env:
           ASDF_NODEJS_VERSION: 18.17.1
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
           SNAPSHOT: true
         command: |
           set -euo pipefail
