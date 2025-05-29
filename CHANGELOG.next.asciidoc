@@ -438,6 +438,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44281[44281] {pull}44310[44310]
 - Add Fleet status updating to streaming input. {issue}44284[44284] {pull}44340[44340]
 - Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
+- Add Fleet status updating to HTTP Endpoint input. {issue}44273[44273] {pull}44508[44508]
 
 *Auditbeat*
 
