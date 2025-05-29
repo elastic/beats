@@ -69,6 +69,8 @@ A warning is logged indicating that the query execution has exceeded the thresho
 The default is equal to the period. See <<wmi-arbitrator-and-query-execution, WMI Arbitrator and Query Execution>>
 for more details.
 
+*`wmi.include_query_class`*:: If set to `true` the metricset include the queried class. Useful if superclasses are queried. The default value is `false`.
+
 *`wmi.include_queries`*:: If set to `true` the metricset includes the query in the output document. The default value is `false`.
 
 *`wmi.include_null_properties`*:: If set to `true` the metricset includes the properties that have null value in the output document.

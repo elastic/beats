@@ -85,6 +85,10 @@ warning is logged indicating that the query execution has exceeded the
 threshold. The default is equal to the period. See [WMI Arbitrator and
 Query Execution](#wmi-arbitrator-and-query-execution) for more details.
 
+**`wmi.include_query_class`**
+:   If set to `true` the metricset include the queried class.
+Useful if superclasses are queried. The default value is `false`.
+
 **`wmi.include_queries`**
 :   If set to `true` the metricset includes the query in the output
 document. The default value is `false`.
