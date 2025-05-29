@@ -1,4 +1,4 @@
-- name: cat_template
+- name: index_template
   type: group
   release: beta
   description: >
