@@ -21,15 +21,15 @@ var (
 	templatePathPrefix = "/_component_template/"
 	templateSchema     = s.Schema{
 		// https://www.elastic.co/docs/api/doc/elasticsearch/v8/operation/operation-cluster-get-component-template-1
-		"template": c.Ifc("template", s.Required), // map[string]interface{}
+		"template": c.Ifc("template", s.Required), // map[string]any
 		"version":  c.Int("version", s.Optional),  // int64
-		"_meta":    c.Ifc("_meta", s.Optional),    // map[string]interface{}
+		"_meta":    c.Ifc("_meta", s.Optional),    // map[string]any
 	}
 )
 
 type ComponentTemplate struct {
-	Name              string                 `json:"name"`
-	ComponentTemplate map[string]interface{} `json:"component_template"`
+	Name              string         `json:"name"`
+	ComponentTemplate map[string]any `json:"component_template"`
 }
 
 type ComponentTemplates struct {
@@ -83,9 +83,15 @@ func isTemplateNotManaged(template *ComponentTemplate) bool {
 	managed := false
 
 	if template.ComponentTemplate != nil && template.ComponentTemplate["_meta"] != nil {
-		meta := template.ComponentTemplate["_meta"].(map[string]interface{})
+		meta, ok := template.ComponentTemplate["_meta"].(map[string]any)
 
-		managed = meta["managed"] != nil && meta["managed"].(bool)
+		if ok && meta["managed"] != nil {
+			managed, ok = meta["managed"].(bool)
+
+			if !ok {
+				managed = false
+			}
+		}
 	}
 
 	return !managed
