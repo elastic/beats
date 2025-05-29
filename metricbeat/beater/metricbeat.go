@@ -47,9 +47,9 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}    // Channel used to initiate shutdown.
-	stopOnce     sync.Once        // wraps the Stop() method
-	runners      []cfgfile.Runner // Active list of module runners.
+	done         chan struct{}             // Channel used to initiate shutdown.
+	stopOnce     sync.Once                 // wraps the Stop() method
+	runners      map[uint64]cfgfile.Runner // Active list of module runners.
 	config       Config
 	registry     *mb.Register
 	autodiscover *autodiscover.Autodiscover
@@ -205,7 +205,12 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 			return nil, err
 		}
 
-		metricbeat.runners = append(metricbeat.runners, runner)
+		hash, err := cfgfile.HashConfig(moduleCfg)
+		if err != nil {
+			return nil, fmt.Errorf("error hashing module config: %w", err)
+		}
+
+		metricbeat.runners[hash] = runner
 	}
 
 	if len(metricbeat.runners) == 0 && !dynamicCfgEnabled {
@@ -238,10 +243,15 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
-	bt.injectOtelStatusReporter(b.OtelStatusReporter)
+	reporter := otelstatus.NewGroupStatusReporter(b.OtelStatusReporter)
 
 	// Static modules (metricbeat.runners)
-	for _, r := range bt.runners {
+	for hash, r := range bt.runners {
+		// If the otelStatusReporter is set, we need to set the status reporter
+		if status, ok := r.(status.WithStatusReporter); ok {
+			status.SetStatusReporter(reporter.GetReporterForRunner(hash))
+		}
+
 		r.Start()
 		wg.Add(1)
 
@@ -312,19 +322,6 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 func (bt *Metricbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
 
-}
-
-func (bt *Metricbeat) injectOtelStatusReporter(otelStatusReporter status.StatusReporter) {
-	if otelStatusReporter == nil {
-		return
-	}
-	reporter := otelstatus.NewGroupStatusReporter(otelStatusReporter)
-	// If the otelStatusReporter is set, we need to set the status reporter
-	for _, r := range bt.runners {
-		if status, ok := r.(status.WithStatusReporter); ok {
-			status.SetStatusReporter(reporter.GetReporterForRunner(r.String()))
-		}
-	}
 }
 
 // Modules return a list of all configured modules.

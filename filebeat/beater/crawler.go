@@ -151,7 +151,7 @@ func (c *crawler) startInput(
 		inputRunner.Once = c.once
 	}
 	if r, ok := runner.(status.WithStatusReporter); ok {
-		r.SetStatusReporter(reporter.GetReporterForRunner(runner.String()))
+		r.SetStatusReporter(reporter.GetReporterForRunner(id))
 	}
 	c.inputs[id] = runner
 

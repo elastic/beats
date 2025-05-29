@@ -7,15 +7,15 @@ import (
 )
 
 type Reporter interface {
-	GetReporterForRunner(id string) status.StatusReporter
+	GetReporterForRunner(id uint64) status.StatusReporter
 }
 
 type reporter struct {
-	runnerStates map[string]runnerState
+	runnerStates map[uint64]runnerState
 	reporter     status.StatusReporter
 }
 
-func (s *reporter) GetReporterForRunner(id string) status.StatusReporter {
+func (s *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
 	return &subReporter{
 		id: id,
 		s:  s,
@@ -33,13 +33,13 @@ func NewGroupStatusReporter(r status.StatusReporter) Reporter {
 	}
 	return &reporter{
 		reporter:     r,
-		runnerStates: make(map[string]runnerState),
+		runnerStates: make(map[uint64]runnerState),
 	}
 }
 
-func (r *reporter) updateStatusForRunner(id string, state status.Status, msg string) {
+func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg string) {
 	if r.runnerStates == nil {
-		r.runnerStates = make(map[string]runnerState)
+		r.runnerStates = make(map[uint64]runnerState)
 	}
 
 	// add status for the runner to the map
@@ -78,12 +78,12 @@ func (r *reporter) calculateState() (status.Status, string) {
 
 type nopStatus struct{}
 
-func (s *nopStatus) GetReporterForRunner(id string) status.StatusReporter {
+func (s *nopStatus) GetReporterForRunner(id uint64) status.StatusReporter {
 	return nil
 }
 
 type subReporter struct {
-	id string
+	id uint64
 	s  *reporter
 }
 
