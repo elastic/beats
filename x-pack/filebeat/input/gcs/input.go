@@ -15,6 +15,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -126,6 +127,13 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	st := newState()
 	currentSource := src.(*Source)
 
+	stat := inputCtx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
+	stat.UpdateStatus(status.Configuring, "")
+
 	log := inputCtx.Logger.With("project_id", currentSource.ProjectId).With("bucket", currentSource.BucketName)
 	log.Infof("Running google cloud storage for project: %s", input.config.ProjectId)
 	// create a new inputMetrics instance
@@ -137,6 +145,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	if !cursor.IsNew() {
 		if err := cursor.Unpack(&cp); err != nil {
 			metrics.errorsTotal.Inc()
+			stat.UpdateStatus(status.Failed, "failed to configure input: "+err.Error())
 			return err
 		}
 
@@ -152,6 +161,7 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 	client, err := fetchStorageClient(ctx, input.config)
 	if err != nil {
 		metrics.errorsTotal.Inc()
+		stat.UpdateStatus(status.Failed, "failed to get storage client: "+err.Error())
 		return err
 	}
 
@@ -168,7 +178,11 @@ func (input *gcsInput) Run(inputCtx v2.Context, src cursor.Source,
 		// Since we are only reading, the operation is always idempotent
 		storage.WithPolicy(storage.RetryAlways),
 	)
-	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, metrics, log)
+	scheduler := newScheduler(publisher, bucket, currentSource, &input.config, st, stat, metrics, log)
 
 	return scheduler.schedule(ctx)
 }
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
