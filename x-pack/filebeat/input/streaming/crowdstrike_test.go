@@ -29,23 +29,23 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 
 	feedURL, ok := os.LookupEnv("CROWDSTRIKE_URL")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_URL} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_URL} to be set")
 	}
 	tokenURL, ok := os.LookupEnv("CROWDSTRIKE_TOKEN_URL")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_TOKEN_URL} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_TOKEN_URL} to be set")
 	}
 	clientID, ok := os.LookupEnv("CROWDSTRIKE_CLIENT_ID")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_CLIENT_ID} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_CLIENT_ID} to be set")
 	}
 	clientSecret, ok := os.LookupEnv("CROWDSTRIKE_CLIENT_SECRET")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_CLIENT_SECRET} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_CLIENT_SECRET} to be set")
 	}
 	appID, ok := os.LookupEnv("CROWDSTRIKE_APPID")
 	if !ok {
-		t.Skip("okta tests require ${CROWDSTRIKE_APPID} to be set")
+		t.Skip("crowdstrike tests require ${CROWDSTRIKE_APPID} to be set")
 	}
 
 	u, err := url.Parse(feedURL)
@@ -58,10 +58,9 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 		Program: `
 				state.response.decode_json().as(body,{
 					"events": [body],
-					?"cursor": has(body.?metadata.offset) ?
-						optional.of({"offset": body.metadata.offset})
-					:
-						optional.none(),
+					"cursor": state.cursor.with({
+						?state.feed: body.?metadata.optMap(m, {"offset": m.offset}),
+					}),
 				})`,
 		Auth: authConfig{
 			OAuth2: oAuth2Config{
