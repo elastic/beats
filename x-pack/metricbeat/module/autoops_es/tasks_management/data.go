@@ -79,7 +79,9 @@ func eventsMapping(r mb.ReporterV2, info *utils.ClusterInfo, nodeTasks *GroupedT
 		if !ok || children == nil {
 			task["node"] = [1]string{node}
 		} else {
-			nodeMap := parseChildNodes(children.([]any))
+			innerChildren, ok := children.([]any)
+
+			nodeMap := parseChildNodes(innerChildren, ok)
 			// guarantee the parent node is in the list (it may not be)
 			nodeMap[node] = true
 
