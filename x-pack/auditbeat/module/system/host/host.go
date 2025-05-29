@@ -118,6 +118,12 @@ func (host *Host) changeDetectionHash() uint64 {
 }
 
 func (host *Host) toMapStr() mapstr.M {
+	var containerized bool
+
+	if host.Info.Containerized != nil {
+		containerized = *host.Info.Containerized
+	}
+
 	mapstr := mapstr.M{
 		// https://github.com/elastic/ecs#-host-fields
 		"uptime":              host.Uptime,
@@ -127,6 +133,7 @@ func (host *Host) toMapStr() mapstr.M {
 		"hostname":            host.Info.Hostname,
 		"id":                  host.Info.UniqueID,
 		"architecture":        host.Info.Architecture,
+		"containerized":       containerized,
 
 		// https://github.com/elastic/ecs#-operating-system-fields
 		"os": mapstr.M{
@@ -136,10 +143,6 @@ func (host *Host) toMapStr() mapstr.M {
 			"version":  host.Info.OS.Version,
 			"kernel":   host.Info.KernelVersion,
 		},
-	}
-
-	if host.Info.Containerized != nil {
-		mapstr.Put("containerized", host.Info.Containerized)
 	}
 
 	if host.Info.OS.Codename != "" {
