@@ -29,6 +29,7 @@ import (
 func TestNewDefaultConfig(t *testing.T) {
 	cfg := NewDefaultConfig()
 
+	assert.False(t, cfg.IncludeQueryClass, "IncludeQueryClass should default to false")
 	assert.False(t, cfg.IncludeQueries, "IncludeQueries should default to false")
 	assert.False(t, cfg.IncludeNullProperties, "IncludeNullProperties should default to false")
 	assert.False(t, cfg.IncludeEmptyStringProperties, "IncludeEmptyStringProperties should default to false")
