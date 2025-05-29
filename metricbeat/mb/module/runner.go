@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/google/uuid"
 )
 
 var moduleList = monitoring.NewUniqueList()
@@ -65,10 +66,12 @@ func NewRunner(client beat.Client, mod *Wrapper) cfgfile.Runner {
 		done:   make(chan struct{}),
 		mod:    mod,
 		client: client,
+		id:     uuid.NewString(),
 	}
 }
 
 type runner struct {
+	id        string
 	done      chan struct{}
 	wg        sync.WaitGroup
 	startOnce sync.Once
@@ -122,7 +125,7 @@ func (mr *runner) Diagnostics() []diagnostics.DiagnosticSetup {
 }
 
 func (mr *runner) String() string {
-	return fmt.Sprintf("%s [metricsets=%d]", mr.mod.Name(), len(mr.mod.metricSets))
+	return fmt.Sprintf("%s/%s [metricsets=%d]", mr.id, mr.mod.Name(), len(mr.mod.metricSets))
 }
 
 func (mr *runner) SetStatusReporter(reporter status.StatusReporter) {

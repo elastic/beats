@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -86,6 +87,9 @@ type Beat struct {
 
 	API      *api.Server      // API server. This is nil unless the http endpoint is enabled.
 	Registry *reload.Registry // input, & output registry for configuration manager, should be instantiated in NewBeat
+
+	// OtelStatusReporter is used to report the status for beatsreceivers.
+	OtelStatusReporter status.StatusReporter
 }
 
 // GenerateUserAgent populates the UserAgent field on the beat.Info struct

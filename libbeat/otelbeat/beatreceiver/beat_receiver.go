@@ -18,10 +18,14 @@
 package beatreceiver
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 
 	"go.uber.org/zap"
 )
@@ -33,8 +37,32 @@ type BeatReceiver struct {
 	Logger *zap.Logger
 }
 
+// reporter implements the status.StatusReporter interface and maps beat statuses to collector statuses.
+type reporter struct {
+	host component.Host
+}
+
+func (r *reporter) UpdateStatus(s status.Status, msg string) {
+	switch s {
+	case status.Starting:
+		componentstatus.ReportStatus(r.host, componentstatus.NewEvent(componentstatus.StatusStarting))
+	case status.Running:
+		componentstatus.ReportStatus(r.host, componentstatus.NewEvent(componentstatus.StatusOK))
+	case status.Degraded:
+		componentstatus.ReportStatus(r.host, componentstatus.NewRecoverableErrorEvent(errors.New(msg)))
+	case status.Failed:
+		componentstatus.ReportStatus(r.host, componentstatus.NewPermanentErrorEvent(errors.New(msg)))
+	case status.Stopping:
+		componentstatus.ReportStatus(r.host, componentstatus.NewEvent(componentstatus.StatusStopped))
+	case status.Stopped:
+		componentstatus.ReportStatus(r.host, componentstatus.NewEvent(componentstatus.StatusStopped))
+	}
+}
+
 // BeatReceiver.Stop() starts the beat receiver.
-func (b *BeatReceiver) Start() error {
+func (b *BeatReceiver) Start(host component.Host) error {
+	b.Beat.OtelStatusReporter = &reporter{host: host}
+
 	if err := b.Beater.Run(&b.Beat.Beat); err != nil {
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
