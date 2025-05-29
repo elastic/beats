@@ -76,7 +76,6 @@ func newBaseModuleFromConfig(rawConfig *conf.C, logger *logp.Logger) (BaseModule
 		config:    DefaultModuleConfig(),
 		rawConfig: rawConfig,
 		Logger:    logger,
-		statuses:  make(map[string]metricsetStatus),
 	}
 	err := rawConfig.Unpack(&baseModule.config)
 	if err != nil {
