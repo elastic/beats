@@ -356,7 +356,7 @@ func (bt *Metricbeat) calculateState() (status.Status, string) {
 	for _, s := range bt.moduleStatus {
 		switch s.state {
 		case status.Degraded:
-			if s.msg != "" {
+			if reportedMsg != "" {
 				// if multiple modules report degraded state, concatenate the messages
 				reportedMsg = fmt.Sprintf("%s; %s", reportedMsg, s.msg)
 			} else {
