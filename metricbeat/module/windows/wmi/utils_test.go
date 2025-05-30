@@ -126,7 +126,7 @@ const TEST_DATE_FORMAT string = "2006-01-02T15:04:05.999999-07:00"
 func Test_ConversionFunctions(t *testing.T) {
 	tests := []struct {
 		name        string
-		conversion  WmiStringConversionFunction
+		conversion  WmiConversionFunction
 		input       string
 		expected    interface{}
 		expectErr   bool
@@ -193,10 +193,10 @@ func Test_ConversionFunctions(t *testing.T) {
 			expectErr:   true,
 			description: "Should return error for invalid datetime string",
 		},
-		// Test cases for ConvertString
+		// Test cases for ConvertIdentity
 		{
-			name:        "ConvertString - valid input",
-			conversion:  ConvertString,
+			name:        "ConvertIdentity - valid input",
+			conversion:  ConvertIdentity,
 			input:       "test string",
 			expected:    "test string",
 			expectErr:   false,
@@ -225,4 +225,44 @@ func mustParseTime(layout, value string) time.Time {
 		panic(err)
 	}
 	return parsed
+}
+
+func TestWMISchema_Get_BaseAndSubclass(t *testing.T) {
+	// Set up base and subclass schema
+	base := map[string]WmiConversionFunction{
+		"BaseFieldA": ConvertIdentity,
+		"BaseFieldB": ConvertSint64,
+	}
+
+	schema := NewWMISchema(base)
+	schema.Put("SubClass", "SubClassField", ConvertSint64)
+
+	// Base key should resolve
+	if fn, ok := schema.Get("SubClass", "BaseFieldA"); !ok || fn == nil {
+		t.Errorf("expected to get 'BaseFieldA' key from base class")
+	}
+
+	// Subclass key should resolve
+	if fn, ok := schema.Get("SubClass", "SubClassField"); !ok || fn == nil {
+		t.Errorf("expected to get SubOnly key from subclass")
+	}
+
+	// Missing key should fail
+	if _, ok := schema.Get("SubClass", "Missing"); ok {
+		t.Errorf("did not expect to find missing key")
+	}
+}
+
+func TestWMISchema_Put_AddsToSubClass(t *testing.T) {
+	schema := NewWMISchema(make(map[string]WmiConversionFunction))
+
+	if _, ok := schema.Get("NewClass", "Key"); ok {
+		t.Errorf("expected key to be missing before Put")
+	}
+
+	schema.Put("NewClass", "Key", ConvertIdentity)
+
+	if fn, ok := schema.Get("NewClass", "Key"); !ok || fn == nil {
+		t.Errorf("expected key to be present after Put")
+	}
 }
