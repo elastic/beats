@@ -141,7 +141,7 @@ func (b *Broker) Connect() error {
 	other := finder.findBroker(brokerAddress(b.broker), meta.Brokers)
 	if other == nil { // no broker found
 		closeBroker(b.broker)
-		return fmt.Errorf("No advertised broker with address %v found", b.Addr())
+		return fmt.Errorf("no advertised broker with address %v found", b.Addr())
 	}
 
 	b.logger.Named("kafka").Debugf("found matching broker %v with id %v", other.Addr(), other.ID())
