@@ -8,6 +8,9 @@ import (
 	"errors"
 	"fmt"
 
+	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
@@ -15,8 +18,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
-	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/component/componentstatus"
 
 	"go.uber.org/zap"
 )

@@ -23,13 +23,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
-type Reporter interface {
-	GetReporterForRunner(id uint64) status.StatusReporter
-}
-
 type runnerState struct {
 	state status.Status
 	msg   string
+}
+
+type Reporter interface {
+	GetReporterForRunner(id uint64) status.StatusReporter
 }
 
 func NewGroupStatusReporter(r status.StatusReporter) Reporter {
