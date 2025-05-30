@@ -157,6 +157,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		config:   config,
 		registry: registry,
 		logger:   b.Info.Logger,
+		runners:  make(map[uint64]cfgfile.Runner),
 	}
 
 	for _, applyOption := range options {
@@ -243,13 +244,13 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
-	reporter := otelstatus.NewGroupStatusReporter(b.OtelStatusReporter)
+	groupReporter := otelstatus.NewGroupStatusReporter(b.OtelStatusReporter)
 
 	// Static modules (metricbeat.runners)
 	for hash, r := range bt.runners {
 		// If the otelStatusReporter is set, we need to set the status reporter
 		if status, ok := r.(status.WithStatusReporter); ok {
-			status.SetStatusReporter(reporter.GetReporterForRunner(hash))
+			status.SetStatusReporter(groupReporter.GetReporterForRunner(hash))
 		}
 
 		r.Start()

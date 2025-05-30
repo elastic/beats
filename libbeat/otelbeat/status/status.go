@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package status
 
 import (
@@ -8,18 +25,6 @@ import (
 
 type Reporter interface {
 	GetReporterForRunner(id uint64) status.StatusReporter
-}
-
-type reporter struct {
-	runnerStates map[uint64]runnerState
-	reporter     status.StatusReporter
-}
-
-func (s *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
-	return &subReporter{
-		id: id,
-		s:  s,
-	}
 }
 
 type runnerState struct {
@@ -34,6 +39,18 @@ func NewGroupStatusReporter(r status.StatusReporter) Reporter {
 	return &reporter{
 		reporter:     r,
 		runnerStates: make(map[uint64]runnerState),
+	}
+}
+
+type reporter struct {
+	runnerStates map[uint64]runnerState
+	reporter     status.StatusReporter
+}
+
+func (r *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
+	return &subReporter{
+		id:     id,
+		parent: r,
 	}
 }
 
@@ -83,10 +100,10 @@ func (s *nopStatus) GetReporterForRunner(id uint64) status.StatusReporter {
 }
 
 type subReporter struct {
-	id uint64
-	s  *reporter
+	id     uint64
+	parent *reporter
 }
 
 func (m *subReporter) UpdateStatus(status status.Status, msg string) {
-	m.s.updateStatusForRunner(m.id, status, msg)
+	m.parent.updateStatusForRunner(m.id, status, msg)
 }
