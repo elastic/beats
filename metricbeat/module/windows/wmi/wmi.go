@@ -179,7 +179,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				// }
 
 				if m.config.IncludeQueryClass {
-					event.MetricSetFields.Put("query_class", query)
+					event.MetricSetFields.Put("query_class", queryConfig.Class)
 				}
 
 				if m.config.IncludeQueries {
