@@ -125,19 +125,8 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
 
-	// get number of workers
-	workers := 1 // Default value is 1
-	if escfg.NumWorkers() > 1 {
-		workers = escfg.NumWorkers()
-	}
 	otelYAMLCfg := map[string]any{
-<<<<<<< HEAD
-		"logs_index":  escfg.Index, // index
-		"endpoints":   hosts,       // hosts, protocol, path, port
-		"num_workers": workers,     // worker/workers
-=======
 		"endpoints": hosts, // hosts, protocol, path, port
->>>>>>> 32c0284b6 ([Chore] Update otel collector version to v1.31.0/v0.125.0 (#44549))
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
