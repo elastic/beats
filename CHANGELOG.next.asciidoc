@@ -43,7 +43,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 - Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
 
-
 *Osquerybeat*
 
 - Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
