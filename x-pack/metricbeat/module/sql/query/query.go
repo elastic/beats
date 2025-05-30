@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -212,7 +213,8 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
-		return fmt.Errorf("cannot open connection: %w", err)
+		msg := strings.Join(strings.Split(err.Error(), m.HostData().URI), "(redacted)")
+		return fmt.Errorf("cannot open connection: %s", msg)
 	}
 	defer db.Close()
 
