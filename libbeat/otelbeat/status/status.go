@@ -32,25 +32,25 @@ type Reporter interface {
 	GetReporterForRunner(id uint64) status.StatusReporter
 }
 
-func NewGroupStatusReporter(r status.StatusReporter) Reporter {
-	if r == nil {
+func NewGroupStatusReporter(parent status.StatusReporter) Reporter {
+	if parent == nil {
 		return &nopStatus{}
 	}
 	return &reporter{
-		reporter:     r,
+		parent:       parent,
 		runnerStates: make(map[uint64]runnerState),
 	}
 }
 
 type reporter struct {
 	runnerStates map[uint64]runnerState
-	reporter     status.StatusReporter
+	parent       status.StatusReporter
 }
 
 func (r *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
 	return &subReporter{
-		id:     id,
-		parent: r,
+		id: id,
+		r:  r,
 	}
 }
 
@@ -69,7 +69,7 @@ func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg str
 	calcState, calcMsg := r.calculateState()
 
 	// report status to parent reporter
-	r.reporter.UpdateStatus(calcState, calcMsg)
+	r.parent.UpdateStatus(calcState, calcMsg)
 }
 
 func (r *reporter) calculateState() (status.Status, string) {
@@ -100,10 +100,10 @@ func (s *nopStatus) GetReporterForRunner(id uint64) status.StatusReporter {
 }
 
 type subReporter struct {
-	id     uint64
-	parent *reporter
+	id uint64
+	r  *reporter
 }
 
 func (m *subReporter) UpdateStatus(status status.Status, msg string) {
-	m.parent.updateStatusForRunner(m.id, status, msg)
+	m.r.updateStatusForRunner(m.id, status, msg)
 }
