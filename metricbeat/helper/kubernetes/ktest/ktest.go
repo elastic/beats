@@ -43,6 +43,11 @@ func getFiles(folder string) ([]string, error) {
 }
 
 // GetMetricInputFiles returns the metric files from the _meta/test folder located in root.
+// Metric test files are expected to be named as "metrics.{id}" and their corresponding expected
+// files are named as "metrics.{id}.expected".
+//
+// For example, if root is "." then it will return the files from "_meta/test"
+// in the current directory of the test.
 func GetMetricInputFiles(t *testing.T, root string) []string {
 	t.Helper()
 	allFiles, err := filepath.Glob(filepath.Join(root, "_meta/test/metrics.*"))
