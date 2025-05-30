@@ -1,0 +1,56 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.node",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "node": {
+                "cpu": {
+                    "allocatable": {
+                        "cores": 32
+                    },
+                    "capacity": {
+                        "cores": 32
+                    }
+                },
+                "kubelet": {
+                    "version": "v1.32.0"
+                },
+                "memory": {
+                    "allocatable": {
+                        "bytes": 67285303296
+                    },
+                    "capacity": {
+                        "bytes": 67285303296
+                    }
+                },
+                "name": "kind-control-plane",
+                "pod": {
+                    "allocatable": {
+                        "total": 110
+                    },
+                    "capacity": {
+                        "total": 110
+                    }
+                },
+                "status": {
+                    "disk_pressure": "false",
+                    "memory_pressure": "false",
+                    "pid_pressure": "false",
+                    "ready": "true",
+                    "unschedulable": false
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_node",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

@@ -26,7 +26,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 )
 
 func TestNewInputMonitor(t *testing.T) {
@@ -218,6 +220,42 @@ func TestNewMetricsRegistry(t *testing.T) {
 	vals := monitoring.CollectFlatSnapshot(got, monitoring.Full, false)
 	assert.Equal(t, inputID, vals.Strings["id"])
 	assert.Equal(t, inputType, vals.Strings["input"])
+}
+
+func TestNewMetricsRegistry_duplicatedInputID(t *testing.T) {
+	parent := monitoring.NewRegistry()
+	inputID := "input-inputID"
+	inputType := "input-type"
+	metricName := "foo_total"
+	goMetricsRegistryName := "bar_registry"
+
+	// 1st call, create the registry
+	got := NewMetricsRegistry(
+		inputID,
+		inputType,
+		parent,
+		logptest.NewTestingLogger(t, "test"))
+
+	require.NotNil(t, got, "new metrics registry should not be nil")
+	assert.Equal(t, parent.GetRegistry(inputID), got)
+	// register a metric to the registry
+	monitoring.NewInt(got, metricName)
+	adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+
+	// 2nd call, return an unregistered registry
+	got = NewMetricsRegistry(
+		inputID,
+		inputType,
+		parent,
+		logptest.NewTestingLogger(t, "test"))
+	require.NotNil(t, got, "new metrics registry should not be nil")
+	assert.NotEqual(t, parent.GetRegistry(inputID), got,
+		"should get an unregistered registry, but found the registry on parent")
+	assert.NotPanics(t, func() {
+		// register the same metric again
+		monitoring.NewInt(got, metricName)
+		adapter.NewGoMetrics(got, goMetricsRegistryName, adapter.Accept)
+	}, "the registry should be a new and empty registry")
 }
 
 func TestCancelMetricsRegistry(t *testing.T) {

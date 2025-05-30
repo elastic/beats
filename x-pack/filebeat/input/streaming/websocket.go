@@ -25,6 +25,7 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -36,6 +37,7 @@ type websocketStream struct {
 	id          string
 	cfg         config
 	cursor      map[string]any
+	status      status.StatusReporter
 	tokenSource oauth2.TokenSource
 	tokenExpiry <-chan time.Time
 	time        func() time.Time
@@ -61,11 +63,16 @@ func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 // NewWebsocketFollower performs environment construction including CEL
 // program and regexp compilation, and input metrics set-up for a websocket
 // stream follower.
-func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Configuring, "")
 	s := websocketStream{
 		id:     id,
 		cfg:    cfg,
 		cursor: cursor,
+		status: stat,
 		processor: processor{
 			ns:      "websocket",
 			pub:     pub,
@@ -99,7 +106,9 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 		if err != nil {
 			s.metrics.errorsTotal.Inc()
 			s.Close()
-			return nil, fmt.Errorf("failed to obtain oauth2 token: %w", err)
+			err = fmt.Errorf("failed to obtain oauth2 token: %w", err)
+			stat.UpdateStatus(status.Failed, err.Error())
+			return nil, err
 		}
 		// set the initial token in the config if oauth2 is enabled
 		// this allows seamless header creation in formHeader() for the initial connection
@@ -111,6 +120,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 	patterns, err := regexpsFromConfig(cfg)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
+		stat.UpdateStatus(status.Failed, "invalid regular expression: "+err.Error())
 		s.Close()
 		return nil, err
 	}
@@ -118,6 +128,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
+		stat.UpdateStatus(status.Failed, err.Error())
 		s.Close()
 		return nil, err
 	}
@@ -140,15 +151,17 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 	url, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
+		s.status.UpdateStatus(status.Failed, "failed to get url: "+err.Error())
 		return err
 	}
 
 	// websocket client
-	c, resp, err := connectWebSocket(ctx, s.cfg, url, s.log)
+	c, resp, err := connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 	handleConnectionResponse(resp, s.metrics, s.log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		s.log.Errorw("failed to establish websocket connection", "error", err)
+		s.status.UpdateStatus(status.Failed, "failed to establish websocket connection: "+err.Error())
 		return err
 	}
 
@@ -166,6 +179,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 		select {
 		case <-ctx.Done():
 			s.log.Debugw("context cancelled, closing websocket connection")
+			s.status.UpdateStatus(status.Stopping, "")
 			return ctx.Err()
 		// s.tokenExpiry channel will only trigger if oauth2 is enabled and the token is about to expire
 		case <-s.tokenExpiry:
@@ -174,6 +188,7 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.log.Errorw("failed to obtain oauth2 token during token refresh", "error", err)
+				s.status.UpdateStatus(status.Failed, "failed to obtain oauth2 token during token refresh: "+err.Error())
 				return err
 			}
 			// gracefully close current connection
@@ -186,10 +201,11 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			// set the new token expiry channel with 2 mins buffer
 			s.tokenExpiry = time.After(time.Until(token.Expiry) - s.cfg.Auth.OAuth2.TokenExpiryBuffer)
 			// establish a new connection with the new token
-			c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+			c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 			handleConnectionResponse(resp, s.metrics, s.log)
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to establish a new websocket connection on token refresh: "+err.Error())
 				s.log.Errorw("failed to establish a new websocket connection on token refresh", "error", err)
 				return err
 			}
@@ -198,20 +214,23 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				if !s.cfg.Retry.BlanketRetries && !isRetryableError(err) {
+					s.status.UpdateStatus(status.Failed, "failed to read websocket data: "+err.Error())
 					s.log.Errorw("failed to read websocket data", "error", err)
 					return err
 				}
 				s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
+				s.status.UpdateStatus(status.Degraded, "websocket connection encountered an error: "+err.Error())
 				// close the old connection and reconnect
 				if err := c.Close(); err != nil {
 					s.metrics.errorsTotal.Inc()
 					s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
 				}
 				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
-				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 				handleConnectionResponse(resp, s.metrics, s.log)
 				if err != nil {
 					s.metrics.errorsTotal.Inc()
+					s.status.UpdateStatus(status.Failed, "failed to reconnect websocket connection: "+err.Error())
 					s.log.Errorw("failed to reconnect websocket connection", "error", err)
 					return err
 				}
@@ -223,10 +242,12 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
 				s.log.Errorw("failed to process and publish data", "error", err)
 				return err
 			}
 		}
+		s.status.UpdateStatus(status.Running, "")
 	}
 }
 
@@ -301,7 +322,7 @@ func handleConnectionResponse(resp *http.Response, metrics *inputMetrics, log *l
 }
 
 // connectWebSocket attempts to connect to the websocket server with exponential backoff if retry config is available else it connects without retry.
-func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Logger) (*websocket.Conn, *http.Response, error) {
+func connectWebSocket(ctx context.Context, cfg config, url string, stat status.StatusReporter, log *logp.Logger) (*websocket.Conn, *http.Response, error) {
 	var conn *websocket.Conn
 	var response *http.Response
 	var err error
@@ -316,8 +337,10 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 			for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
 				conn, response, err = dialer.DialContext(ctx, url, headers)
 				if err == nil {
+					stat.UpdateStatus(status.Running, "")
 					return conn, response, nil
 				}
+				stat.UpdateStatus(status.Degraded, "attempting to reconnect websocket")
 				// in case of sudden network errors or server crashes the response will be nil and logging should be done gracefully
 				if response != nil {
 					//nolint:errorlint // it will never be a wrapped error at this point
@@ -332,13 +355,18 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
 				time.Sleep(waitTime)
 			}
+			if response == nil {
+				return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
+			}
 			return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w and (status %d)", retryConfig.MaxAttempts, err, response.StatusCode)
 		} else {
 			for attempt := 1; ; attempt++ {
 				conn, response, err = dialer.DialContext(ctx, url, headers)
 				if err == nil {
+					stat.UpdateStatus(status.Running, "")
 					return conn, response, nil
 				}
+				stat.UpdateStatus(status.Degraded, "attempting to reconnect websocket")
 				// in case of sudden network errors or server crashes the response will be nil and logging should be done gracefully
 				if response != nil {
 					//nolint:errorlint // it will never be a wrapped error at this point

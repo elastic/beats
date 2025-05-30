@@ -33,6 +33,8 @@ var files = []string{
 	"./_meta/test/metrics.1.29",
 	"./_meta/test/metrics.1.30",
 	"./_meta/test/metrics.1.31",
+	"./_meta/test/metrics.1.32",
+	"./_meta/test/metrics.1.33",
 }
 
 func TestEventMapping(t *testing.T) {
