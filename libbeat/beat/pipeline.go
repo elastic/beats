@@ -187,65 +187,6 @@ const (
 	DropIfFull
 )
 
-type CombinedClientListener struct {
-	A, B ClientListener
-}
-
-func (c *CombinedClientListener) Closing() {
-	c.A.Closing()
-	c.B.Closing()
-}
-
-func (c *CombinedClientListener) Closed() {
-	c.A.Closed()
-	c.B.Closed()
-}
-
-func (c *CombinedClientListener) NewEvent() {
-	c.A.NewEvent()
-	c.B.NewEvent()
-}
-
-func (c *CombinedClientListener) Filtered() {
-	c.A.Filtered()
-	c.B.Filtered()
-}
-
-func (c *CombinedClientListener) Published() {
-	c.A.Published()
-	c.B.Published()
-}
-
-func (c *CombinedClientListener) DroppedOnPublish(event Event) {
-	c.A.DroppedOnPublish(event)
-	c.B.DroppedOnPublish(event)
-}
-
-// NoopClientListener is a no-op ClientListener.
-type NoopClientListener struct{}
-
-func (n NoopClientListener) Closing()               {}
-func (n NoopClientListener) Closed()                {}
-func (n NoopClientListener) NewEvent()              {}
-func (n NoopClientListener) Filtered()              {}
-func (n NoopClientListener) Published()             {}
-func (n NoopClientListener) DroppedOnPublish(Event) {}
-
-var _ OutputListener = (*NoopOutputListener)(nil)
-
-// NoopOutputListener is a no-op OutputListener.
-type NoopOutputListener struct{}
-
-func (n NoopOutputListener) DuplicateEvents() {}
-func (n NoopOutputListener) ErrTooMany()      {}
-func (n NoopOutputListener) RetryableError()  {}
-func (n NoopOutputListener) NewEvent()        {}
-func (n NoopOutputListener) Acked()           {}
-func (n NoopOutputListener) Dropped()         {}
-func (n NoopOutputListener) DeadLetter()      {}
-
-var _ OutputListener = (*CountOutputListener)(nil)
-
 // CountOutputListener is a simple implementation of OutputListener that uses
 // atomic counters. It's intended for use in tests.
 type CountOutputListener struct {
@@ -320,3 +261,105 @@ func (c *CountOutputListener) String() string {
 		c.new.Load(), c.acked.Load(), c.dropped.Load(), c.deadLetter.Load(),
 		c.duplicateEvents.Load(), c.errTooMany.Load(), c.retryableErrors.Load())
 }
+
+type CombinedClientListener struct {
+	A, B ClientListener
+}
+
+func (c *CombinedClientListener) Closing() {
+	c.A.Closing()
+	c.B.Closing()
+}
+
+func (c *CombinedClientListener) Closed() {
+	c.A.Closed()
+	c.B.Closed()
+}
+
+func (c *CombinedClientListener) NewEvent() {
+	c.A.NewEvent()
+	c.B.NewEvent()
+}
+
+func (c *CombinedClientListener) Filtered() {
+	c.A.Filtered()
+	c.B.Filtered()
+}
+
+func (c *CombinedClientListener) Published() {
+	c.A.Published()
+	c.B.Published()
+}
+
+func (c *CombinedClientListener) DroppedOnPublish(event Event) {
+	c.A.DroppedOnPublish(event)
+	c.B.DroppedOnPublish(event)
+}
+
+// CombinedOutputListener combines two OutputListeners.
+type CombinedOutputListener struct {
+	A, B OutputListener
+}
+
+// NewEvent calls NewEvent on the underlying listeners.
+func (c *CombinedOutputListener) NewEvent() {
+	c.A.NewEvent()
+	c.B.NewEvent()
+}
+
+// Acked calls Acked on the underlying listeners.
+func (c *CombinedOutputListener) Acked() {
+	c.A.Acked()
+	c.B.Acked()
+}
+
+// DeadLetter calls DeadLetter on the underlying listeners.
+func (c *CombinedOutputListener) DeadLetter() {
+	c.A.DeadLetter()
+	c.B.DeadLetter()
+}
+
+// Dropped calls Dropped on the underlying listeners.
+func (c *CombinedOutputListener) Dropped() {
+	c.A.Dropped()
+	c.B.Dropped()
+}
+
+// DuplicateEvents calls DuplicateEvents on the underlying listeners.
+func (c *CombinedOutputListener) DuplicateEvents() {
+	c.A.DuplicateEvents()
+	c.B.DuplicateEvents()
+}
+
+// ErrTooMany calls ErrTooMany on the underlying listeners.
+func (c *CombinedOutputListener) ErrTooMany() {
+	c.A.ErrTooMany()
+	c.B.ErrTooMany()
+}
+
+// RetryableError calls RetryableError on the underlying listeners.
+func (c *CombinedOutputListener) RetryableError() {
+	c.A.RetryableError()
+	c.B.RetryableError()
+}
+
+// NoopClientListener is a no-op ClientListener.
+type NoopClientListener struct{}
+
+func (n NoopClientListener) Closing()               {}
+func (n NoopClientListener) Closed()                {}
+func (n NoopClientListener) NewEvent()              {}
+func (n NoopClientListener) Filtered()              {}
+func (n NoopClientListener) Published()             {}
+func (n NoopClientListener) DroppedOnPublish(Event) {}
+
+// NoopOutputListener is a no-op OutputListener.
+type NoopOutputListener struct{}
+
+func (n NoopOutputListener) DuplicateEvents() {}
+func (n NoopOutputListener) ErrTooMany()      {}
+func (n NoopOutputListener) RetryableError()  {}
+func (n NoopOutputListener) NewEvent()        {}
+func (n NoopOutputListener) Acked()           {}
+func (n NoopOutputListener) Dropped()         {}
+func (n NoopOutputListener) DeadLetter()      {}
