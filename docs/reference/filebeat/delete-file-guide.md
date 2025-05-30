@@ -7,11 +7,13 @@ Enabling this feature will remove files, which could lead to data loss.
 The Filestream input can remove files after they have been fully
 ingested, three requirements need to be met before the Filestream
 input can remove a file:
-1. The reader for the file needs to be closed;
-2. All events from the file have been published (acknowledged by the
-   output);
-3. No data has been added to the file since the last event was
-   published.
+1. Conditions have been met for filestream to close the file. This is
+   controlled by the close.* options.
+2. Events from the file have been received by the configured output
+   without error. (example elasticsearch output has indexed event or
+   logstash has written event to persistent queue).
+3. The `delete.grace_period` has expired and there is no new data on
+   the file.
 
 ## How it works
 Once a reader for a file is closed, either by reaching EOF (end of

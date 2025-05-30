@@ -48,9 +48,8 @@ var operationNames = map[Operation]string{
 // Operation describes what happened to a file.
 type Operation uint8
 
-// TODO (Tiago): remove the pointer syntax
-func (o *Operation) String() string {
-	name, ok := operationNames[*o]
+func (o Operation) String() string {
+	name, ok := operationNames[o]
 	if !ok {
 		return ""
 	}

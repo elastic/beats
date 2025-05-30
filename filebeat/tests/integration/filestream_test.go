@@ -963,6 +963,7 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 }
 
 func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
+	integration.EnsureESIsRunning(t)
 	gracePeriod, err := time.ParseDuration("5s")
 	if err != nil {
 		t.Fatalf("cannot parse grace period duration: %s", err)
