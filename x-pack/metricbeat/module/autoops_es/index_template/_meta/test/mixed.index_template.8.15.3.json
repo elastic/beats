@@ -1,0 +1,31 @@
+{
+    "index_templates": [
+        {
+            "name": "broken-response",
+            "index_template": {
+                "index_patterns": [
+                    "index-pattern1-*",
+                    "index-pattern2-*"
+                ]
+            }
+        },
+        {
+            "name": "simple-response",
+            "index_template": {
+                "index_patterns": [
+                    "index-pattern1-*",
+                    "index-pattern2-*"
+                ]
+            }
+        },
+        {
+            "name": "failed-response",
+            "index_template": {
+                "index_patterns": [
+                    "index-pattern1-*",
+                    "index-pattern2-*"
+                ]
+            }
+        }
+    ]
+}

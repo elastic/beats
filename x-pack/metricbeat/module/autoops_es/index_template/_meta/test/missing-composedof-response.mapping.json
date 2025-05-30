@@ -1,0 +1,55 @@
+{
+    "name": "detailed-response",
+    "index_template": {
+        "priority": 789,
+        "version": 123456,
+        "index_patterns": ["a", "b", "c", "d*"],
+        "allow_auto_create": true,
+        "data_stream": {
+            "hidden": true,
+            "allow_custom_routing": true
+        },
+        "deprecated": true,
+        "ignore_missing_component_templates": ["composed-2"],
+        "template": {
+            "settings": {
+                "index": {
+                    "lifecycle": {
+                        "name": "operator",
+                        "rollover_alias": "rolloveralias"
+                    }
+                }
+            },
+            "mappings": {
+                "dynamic": false,
+                "properties": {
+                    "@timestamp": {
+                        "type": "date"
+                    },
+                    "message": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "metadata": {
+                        "properties": {
+                            "count": {
+                                "type": "long"
+                            }
+                        }
+                    }
+                }
+            },
+            "aliases": {
+                "alias1": {},
+                "alias2": {}
+            }
+        },
+        "_meta": {
+            "property1": 456
+        }
+    }
+}
