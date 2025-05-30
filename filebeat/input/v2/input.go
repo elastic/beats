@@ -143,21 +143,40 @@ func NewPipelineClientListener(reg *monitoring.Registry) *PipelineClientListener
 // nil, the metrics will be added on a new, unregistered registry.
 // created. If there is already a metric with the same name in the registry,
 // the existing metric will be used.
-func NewPipelineOutputListener(reg *monitoring.Registry) *OutputListener {
+func NewPipelineOutputListener(
+	reg *monitoring.Registry,
+	outputListener beat.OutputListener) beat.OutputListener {
+
 	rreg := reg
 	if rreg == nil {
 		rreg = monitoring.NewRegistry()
 	}
 
-	return &OutputListener{
-		eventsTotal:           monitoring.NewUint(rreg, metricEventOutputTotal),
-		eventsAcked:           monitoring.NewUint(rreg, metricEventOutputAckedTotal),
-		eventsDropped:         monitoring.NewUint(rreg, metricEventOutputDroppedTotal),
-		eventsDeadLetter:      monitoring.NewUint(rreg, metricEventOutputDeadLetterTotal),
-		eventsDuplicateEvents: monitoring.NewUint(rreg, metricEventOutputDuplicateTotal),
-		eventsErrTooMany:      monitoring.NewUint(rreg, metricEventOutputErrTooManyTotal),
-		eventsRetryableErrors: monitoring.NewUint(rreg, metricEventOutputRetryableTotal),
+	var ol beat.OutputListener = &OutputListener{
+		eventsTotal: monitoring.NewUint(
+			rreg, metricEventOutputTotal),
+		eventsAcked: monitoring.NewUint(
+			rreg, metricEventOutputAckedTotal),
+		eventsDropped: monitoring.NewUint(
+			rreg, metricEventOutputDroppedTotal),
+		eventsDeadLetter: monitoring.NewUint(
+			rreg, metricEventOutputDeadLetterTotal),
+		eventsDuplicateEvents: monitoring.NewUint(
+			rreg, metricEventOutputDuplicateTotal),
+		eventsErrTooMany: monitoring.NewUint(
+			rreg, metricEventOutputErrTooManyTotal),
+		eventsRetryableErrors: monitoring.NewUint(
+			rreg, metricEventOutputRetryableTotal),
 	}
+
+	if outputListener != nil {
+		ol = &beat.CombinedOutputListener{
+			A: outputListener,
+			B: ol,
+		}
+	}
+	
+	return ol
 }
 
 // PrepareInputMetrics creates a new monitoring.Registry on parent for the given
