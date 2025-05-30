@@ -20,8 +20,9 @@ package publisher
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
 var _ beat.OutputListener = (*OutputListener)(nil)
