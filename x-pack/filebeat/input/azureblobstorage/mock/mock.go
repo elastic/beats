@@ -94,6 +94,35 @@ func AzureStorageFileServer() http.Handler {
 }
 
 //nolint:errcheck // We can ignore as response writer errors cannot be handled in this scenario
+func AzureFileServerNoContentType() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")
+		if r.Method == http.MethodGet {
+			switch len(path) {
+			case 1:
+				if fileContainers[path[0]] {
+					w.Write([]byte(fetchFilesContainer[path[0]]))
+					return
+				}
+			case 2:
+				if fileContainers[path[0]] && availableFileBlobs[path[0]][path[1]] {
+					absPath, _ := filepath.Abs("testdata/" + path[1])
+					data, _ := os.ReadFile(absPath)
+					w.Write(data)
+					return
+				}
+
+			default:
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+		}
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("resource not found"))
+	})
+}
+
+//nolint:errcheck // We can ignore as response writer errors cannot be handled in this scenario
 func AzureConcurrencyServer() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := strings.Split(strings.TrimLeft(r.URL.Path, "/"), "/")

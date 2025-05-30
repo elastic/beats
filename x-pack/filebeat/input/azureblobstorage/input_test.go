@@ -473,6 +473,111 @@ func Test_StorageClient(t *testing.T) {
 				mock.Beatscontainer_2_blob_data3_json:  true,
 			},
 		},
+		{
+			name: "CustomContentTypeUnsupported",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":                  beatsGzJSONContainer,
+						"content_type":          "application/xyz-plain",
+						"override_content_type": true,
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				"job with jobId beatsgzjsoncontainer-multiline.json.gz-worker-0 encountered an error: content-type application/xyz-plain not supported": true,
+			},
+		},
+		{
+			name: "CustomEncodingUnsupported",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":     beatsGzJSONContainer,
+						"encoding": "utf-8",
+					},
+				},
+			},
+			mockHandler: mock.AzureFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
+		{
+			name: "CustomContentTypeIgnored",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":         beatsNdJSONContainer,
+						"content_type": "application/xyz-plain",
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_log_ndjson[0]: true,
+				mock.BeatsFilesContainer_log_ndjson[1]: true,
+			},
+		},
+		{
+			name: "CustomContentTypeSupported",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":         beatsGzJSONContainer,
+						"content_type": "application/x-gzip",
+					},
+				},
+			},
+			mockHandler: mock.AzureFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
+		{
+			name: "CustomEncodingSupported",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":     beatsGzJSONContainer,
+						"encoding": "gzip",
+					},
+				},
+			},
+			mockHandler: mock.AzureFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
