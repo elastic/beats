@@ -22,16 +22,16 @@ func (item CacheTestItem) Hash() uint64 {
 }
 
 func TestCache(t *testing.T) {
-	c := New()
+	c := New[CacheTestItem]()
 
 	assert.True(t, c.IsEmpty())
 
-	oldItems := []Cacheable{
+	oldItems := []CacheTestItem{
 		CacheTestItem{"item1"},
 		CacheTestItem{"item2"},
 	}
 
-	newItems := []Cacheable{
+	newItems := []CacheTestItem{
 		CacheTestItem{"item1"},
 		CacheTestItem{"item3"},
 	}
@@ -47,7 +47,7 @@ func TestCache(t *testing.T) {
 	assert.Equal(t, 1, len(new))
 	assert.Equal(t, 1, len(missing))
 
-	new, missing = c.DiffAndUpdateCache([]Cacheable{})
+	new, missing = c.DiffAndUpdateCache([]CacheTestItem{})
 
 	assert.Equal(t, 0, len(new))
 	assert.Equal(t, 2, len(missing))

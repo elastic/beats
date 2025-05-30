@@ -5,6 +5,7 @@
 package pipelinemanager
 
 import (
+	"context"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -159,7 +160,8 @@ func (pm *PipelineManager) CreateReaderForContainer(info logger.Info, config log
 	}
 
 	go func() {
-		watcher := logReader.ReadLogs(config)
+		ctx := context.Background()
+		watcher := logReader.ReadLogs(ctx, config)
 
 		enc := protoio.NewUint32DelimitedWriter(pipeWriter, binary.BigEndian)
 		defer enc.Close()

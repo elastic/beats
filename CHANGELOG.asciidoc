@@ -180,6 +180,27 @@ https://github.com/elastic/beats/compare/v8.17.2\...v9.0.0-beta1[View commits]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
 
 
+[[release-notes-8.18.1]]
+=== Beats version 8.18.1
+https://github.com/elastic/beats/compare/v8.18.0\...v8.18.1[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Journald input now works on Docker containers (except Wolfi). {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+- [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
+- Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
+
+==== Added
+
+*Filebeat*
+
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+- Update CEL mito extensions to v1.19.0. {pull}44098[44098]
+
+
 [[release-notes-8.18.0]]
 === Beats version 8.18.0
 https://github.com/elastic/beats/compare/v8.17.4\...v8.18.0[View commits]
@@ -278,6 +299,64 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Make the experimental API GA and rename it to winlogbeat-raw. {issue}39580[39580] {pull}41770[41770]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
+
+
+[[release-notes-8.17.6]]
+=== Beats version 8.17.6
+https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Journald input is again usable in the Filebeat Docker container (except Wolfi) by including journalctl by default. The included version of journalctl must be compatible with the one on that wrote the journal files being ingested. The Wolfi container remains distroless and does not contain journalctl or any part of systemd. {issue}41278[41278] {issue}44040[44040] {pull}44056[44056]
+- Fixed websocket input panic on sudden network error or server crash. {issue}44063[44063] {pull}44068[44068]
+
+==== Added
+
+*Filebeat*
+
+- Add pagination batch size support to Entity Analytics input's Okta provider. {pull}43655[43655]
+
+
+[[release-notes-8.17.5]]
+=== Beats version 8.17.5
+https://github.com/elastic/beats/compare/v8.17.4\...v8.17.5[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+
+- Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected service. {issue}40765[40765] {pull}43665[43665]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Restore `maintainer` label for container images. {pull}43683[43683]
+
+*Metricbeat*
+
+- Fix the function to determine CPU cores on windows. {issue}42593[42593] {pull}43409[43409]
+- Changed `tier_preference`, `creation_date` and `version` fields to be omitted from the resulting documents when not pulled from source indices. {pull}43637[43637]
+
+==== Added
+
+*Filebeat*
+
+- Allow a grace time for awss3 input shutdown to enable incomplete SQS message processing to be completed. {pull}43369[43369]
+
+*Heartbeat*
+
+- Upgrade node version to latest LTS v18.20.7. {pull}43511[43511]
+
+*Metricbeat*
+
+- Add a warning log to metricbeat.vsphere in case vSphere connection has been configured as insecure. {pull}43104[43104]
+- Updated Meraki API endpoint for Channel Utilization data. Switched to `GetOrganizationWirelessDevicesChannelUtilizationByDevice`. {pull}43485[43485]
+
+*Packetbeat*
+- Add `tls.server.ja3s` tls fingerprint. {pull}43284[43284]
 
 
 [[release-notes-8.17.4]]

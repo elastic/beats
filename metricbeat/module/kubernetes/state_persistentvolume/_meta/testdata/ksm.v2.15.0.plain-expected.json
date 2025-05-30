@@ -1,0 +1,27 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.persistentvolume",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "persistentvolume": {
+                "capacity": {
+                    "bytes": 1048576
+                },
+                "name": "pvc-bdf9afc1-c19e-44db-b169-fdcb423338d2",
+                "phase": "Bound",
+                "storage_class": "standard"
+            }
+        },
+        "metricset": {
+            "name": "state_persistentvolume",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

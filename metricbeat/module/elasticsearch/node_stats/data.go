@@ -19,12 +19,11 @@ package node_stats
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/joeshaw/multierror"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -444,7 +443,7 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 		return err
 	}
 
-	var errs multierror.Errors
+	var errs []error
 	for nodeID, node := range nodeData.Nodes {
 		isMaster := nodeID == masterNodeID
 
@@ -521,5 +520,5 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 
 		r.Event(event)
 	}
-	return errs.Err()
+	return errors.Join(errs...)
 }

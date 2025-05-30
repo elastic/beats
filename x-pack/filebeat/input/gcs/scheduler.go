@@ -17,6 +17,7 @@ import (
 	"google.golang.org/api/iterator"
 
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
@@ -34,6 +35,7 @@ type scheduler struct {
 	src       *Source
 	cfg       *config
 	state     *state
+	status    status.StatusReporter
 	log       *logp.Logger
 	limiter   *limiter
 	metrics   *inputMetrics
@@ -41,7 +43,7 @@ type scheduler struct {
 
 // newScheduler, returns a new scheduler instance
 func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src *Source, cfg *config,
-	state *state, metrics *inputMetrics, log *logp.Logger,
+	state *state, stat status.StatusReporter, metrics *inputMetrics, log *logp.Logger,
 ) *scheduler {
 	if metrics == nil {
 		// metrics are optional, initialize a stub if not provided
@@ -53,6 +55,7 @@ func newScheduler(publisher cursor.Publisher, bucket *storage.BucketHandle, src 
 		src:       src,
 		cfg:       cfg,
 		state:     state,
+		status:    stat,
 		log:       log,
 		limiter:   &limiter{limit: make(chan struct{}, src.MaxWorkers)},
 		metrics:   metrics,
@@ -96,13 +99,14 @@ func (l *limiter) release() {
 
 func (s *scheduler) scheduleOnce(ctx context.Context) error {
 	defer s.limiter.wait()
-	pager := s.fetchObjectPager(ctx, s.src.MaxWorkers)
+	pager := s.fetchObjectPager(ctx, s.src.BatchSize)
 	var numObs, numJobs int
 	for {
 		var objects []*storage.ObjectAttrs
 		nextPageToken, err := pager.NextPage(&objects)
 		if err != nil {
 			s.metrics.errorsTotal.Inc()
+			s.status.UpdateStatus(status.Failed, "failed to get page token from storage: "+err.Error())
 			return err
 		}
 		numObs += len(objects)
@@ -174,7 +178,7 @@ func (s *scheduler) createJobs(objects []*storage.ObjectAttrs, log *logp.Logger)
 		}
 
 		objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.metrics, log, false)
+		job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.status, s.metrics, log, false)
 		jobs = append(jobs, job)
 	}
 
@@ -235,7 +239,7 @@ func (s *scheduler) addFailedJobs(ctx context.Context, jobs []*job) []*job {
 			}
 
 			objectURI := "gs://" + s.src.BucketName + "/" + obj.Name
-			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.metrics, s.log, true)
+			job := newJob(s.bucket, obj, objectURI, s.state, s.src, s.publisher, s.status, s.metrics, s.log, true)
 			jobs = append(jobs, job)
 			s.log.Debugf("scheduler: adding failed job number %d with name %s to job current list", fj, job.Name())
 			fj++
