@@ -586,15 +586,17 @@ func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 
 		switch field.Interface().(type) {
 		case time.Time:
-			if timeVal := field.Interface().(time.Time); !timeVal.IsZero() {
-				allMeta[headerName] = timeVal.Format(time.RFC1123)
+			if val, ok := field.Interface().(time.Time); ok && !val.IsZero() {
+				allMeta[headerName] = val.Format(time.RFC1123)
 			}
 		case string:
 			allMeta[headerName] = field.String()
 		case int64:
 			allMeta[headerName] = field.Int()
 		case int32:
-			allMeta[headerName] = field.Interface().(int32)
+			if val, ok := field.Interface().(int32); ok {
+				allMeta[headerName] = val
+			}
 		case bool:
 			allMeta[headerName] = field.Bool()
 		default:

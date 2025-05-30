@@ -355,6 +355,7 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 
 			// since we processed a single object, total and current process size is same
 			require.Equal(t, test.objectSize, values[0])
+			require.GreaterOrEqual(t, test.objectSize, int64(0))
 			require.Equal(t, uint64(test.objectSize), metricRecorder.s3BytesProcessedTotal.Get())
 		})
 	}
@@ -493,6 +494,7 @@ func TestS3Metadata(t *testing.T) {
 	assert.Equal(t, "foo", meta["x-amz-meta-owner"])
 	assert.Equal(t, "boo", meta["x-amz-meta-region"])
 	assert.Equal(t, "etag1", meta["etag"])
+	assert.Equal(t, int64(12345), meta["content-length"])
 
 	// Test requesting a user metadata key with its full S3 name
 	metaWithPrefix := s3Metadata(resp, "x-amz-meta-owner")
