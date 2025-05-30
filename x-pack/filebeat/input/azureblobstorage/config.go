@@ -52,8 +52,12 @@ type fileSelectorConfig struct {
 
 // readerConfig defines the options for reading the content of an azure container.
 type readerConfig struct {
-	Parsers  parser.Config `config:",inline"`
-	Decoding decoderConfig `config:"decoding"`
+	Parsers             parser.Config `config:",inline"`
+	Decoding            decoderConfig `config:"decoding"`
+	ContentType         string        `config:"content_type"`
+	Encoding            string        `config:"encoding"`
+	OverrideContentType bool          `config:"override_content_type"`
+	OverrideEncoding    bool          `config:"override_encoding"`
 }
 
 type authConfig struct {
