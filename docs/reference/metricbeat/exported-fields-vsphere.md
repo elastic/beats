@@ -787,6 +787,12 @@ type: long
 type: long
 
 
+**`vsphere.virtualmachine.cpu.usage.percent`**
+:   CPU usage as a percentage.
+
+type: scaled_float
+
+
 **`vsphere.virtualmachine.memory.used.guest.bytes`**
 :   Used memory of Guest in bytes.
 
@@ -817,6 +823,12 @@ format: bytes
 type: long
 
 format: bytes
+
+
+**`vsphere.virtualmachine.memory.usage.percent`**
+:   Memory usage as percent of total configured or available memory.
+
+type: scaled_float
 
 
 **`vsphere.virtualmachine.custom_fields`**
@@ -883,5 +895,35 @@ type: long
 :   List of all the triggered alarms.
 
 type: object
+
+
+**`vsphere.virtualmachine.disk.average.bytes`**
+:   Aggregated disk I/O rate.
+
+type: long
+
+
+**`vsphere.virtualmachine.disk.read.average.bytes`**
+:   Rate at which data is read from each virtual disk on the virtual machine.
+
+type: long
+
+
+**`vsphere.virtualmachine.disk.write.average.bytes`**
+:   Rate at which data is written to each virtual disk on the virtual machine.
+
+type: long
+
+
+**`vsphere.virtualmachine.disk.numberRead.count`**
+:   Number of times data was read.
+
+type: long
+
+
+**`vsphere.virtualmachine.disk.numberWrite.count`**
+:   Number of disk writes.
+
+type: long
 
 
