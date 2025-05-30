@@ -46,10 +46,6 @@ code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a h1:8rqv2w8xEceN
 code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a/go.mod h1:tkZo8GtzBjySJ7USvxm4E36lNQw1D3xM6oKHGqdaAJ4=
 github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 h1:He8afgbRMd7mFxO99hRNu+6tazq8nFF9lIwo9JFroBk=
 github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6/go.mod h1:8o94RPi1/7XTJvwPpRSzSUedZrtlirdB3r9Z20bi2f8=
-github.com/AndersonQ/elastic-sarama v0.0.0-20250429162615-fdeb5fa8a25d h1:gkU9oGXG2cLCM7MgMYWkHRh6pHM5dadYWUqRfeYoDvA=
-github.com/AndersonQ/elastic-sarama v0.0.0-20250429162615-fdeb5fa8a25d/go.mod h1:Ua/oXS4NS+U/pp/urxgzEGWd1MvocHA+yd4Bu4+Eb80=
-github.com/AndersonQ/mock-es v0.0.0-20250505090225-06a210347250 h1:zD8pkz1AOPMTQS5ALkC4fOG7fwlCuB5laDS6SwDGA8M=
-github.com/AndersonQ/mock-es v0.0.0-20250505090225-06a210347250/go.mod h1:cXqWcLnmu5y4QveTb2hjk7rgzkHMuZsqeXtbJpNAcu0=
 github.com/Azure/azure-amqp-common-go/v4 v4.2.0 h1:q/jLx1KJ8xeI8XGfkOWMN9XrXzAfVTkyvCxPvHCjd2I=
 github.com/Azure/azure-amqp-common-go/v4 v4.2.0/go.mod h1:GD3m/WPPma+621UaU6KNjKEo5Hl09z86viKwQjTpV0Q=
 github.com/Azure/azure-event-hubs-go/v3 v3.6.1 h1:vSiMmn3tOwgiLyfnmhT5K6Of/3QWRLaaNZPI0hFvZyU=
@@ -414,8 +410,12 @@ github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/u
 github.com/elastic/gosigar v0.14.3/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
 github.com/elastic/mito v1.19.0 h1:rrJ8GR6SniJ/KieB5j8kDTNf5vAIJOtKiAz4hcfP1LU=
 github.com/elastic/mito v1.19.0/go.mod h1:f+W7LJ18FGwjVGmbXlOLVYsAbuVAtqqMkgdh0Sf00W0=
+github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6 h1:JVNuBrmOoqLJgp9o68YBMnOrXCzQI3mCppW+suwRSlw=
+github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6/go.mod h1:cXqWcLnmu5y4QveTb2hjk7rgzkHMuZsqeXtbJpNAcu0=
 github.com/elastic/pkcs8 v1.0.0 h1:HhitlUKxhN288kcNcYkjW6/ouvuwJWd9ioxpjnD9jVA=
 github.com/elastic/pkcs8 v1.0.0/go.mod h1:ipsZToJfq1MxclVTwpG7U/bgeDtf+0HkUiOxebk95+0=
+github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6 h1:2COw7kzXkIyS4hKNUl5qw0KolrwncrY4VVNpngVNo8I=
+github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6/go.mod h1:Ua/oXS4NS+U/pp/urxgzEGWd1MvocHA+yd4Bu4+Eb80=
 github.com/elastic/tk-btf v0.1.0 h1:T4rbsnfaRH/MZKSLwZFd3sndt/NexsQb0IXWtMQ9PAA=
 github.com/elastic/tk-btf v0.1.0/go.mod h1:caLQPEcMbyKmPUQb2AsbX3ZAj1yCz06lOxfhn0esLR8=
 github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb h1:8SvKmGOYyxKi6jB0nvV1lpxEHfIS6tQ40x1BXBhKMsE=

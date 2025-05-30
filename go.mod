@@ -180,7 +180,7 @@ require (
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.19.0
-	github.com/elastic/mock-es v0.0.0-20240712014503-e5b47ece0015
+	github.com/elastic/mock-es v0.0.0-20250530054253-8c3b6053f9b6
 	github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
@@ -226,6 +226,7 @@ require (
 	go.opentelemetry.io/collector/otelcol v0.127.0
 	go.opentelemetry.io/collector/pdata v1.33.0
 	go.opentelemetry.io/collector/receiver v1.33.0
+	go.opentelemetry.io/otel/sdk/metric v1.35.0
 	go.uber.org/mock v0.5.0
 	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
 	golang.org/x/term v0.32.0
@@ -475,7 +476,6 @@ require (
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.35.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.11.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v1.35.0 // indirect
 	go.opentelemetry.io/otel/trace v1.35.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
 	go.uber.org/ratelimit v0.3.1 // indirect
@@ -512,7 +512,3 @@ replace (
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/meraki/dashboard-api-go/v3 => github.com/tommyers-elastic/dashboard-api-go/v3 v3.0.0-20250514220331-e52c94766b6f
 )
-
-replace github.com/elastic/sarama => github.com/AndersonQ/elastic-sarama v0.0.0-20250429162615-fdeb5fa8a25d
-
-replace github.com/elastic/mock-es => github.com/AndersonQ/mock-es v0.0.0-20250505090225-06a210347250
