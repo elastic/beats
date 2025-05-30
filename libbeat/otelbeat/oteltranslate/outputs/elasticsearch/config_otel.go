@@ -131,13 +131,7 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		workers = escfg.NumWorkers()
 	}
 	otelYAMLCfg := map[string]any{
-<<<<<<< HEAD
-		"logs_index":  escfg.Index, // index
-		"endpoints":   hosts,       // hosts, protocol, path, port
-		"num_workers": workers,     // worker/workers
-=======
 		"endpoints": hosts, // hosts, protocol, path, port
->>>>>>> 32c0284b6 ([Chore] Update otel collector version to v1.31.0/v0.125.0 (#44549))
 
 		// ClientConfig
 		"timeout":           escfg.Transport.Timeout,         // timeout
