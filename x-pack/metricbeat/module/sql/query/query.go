@@ -210,11 +210,16 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 // of an error set the Error field of mb.Event or simply call report.Error().
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("%s", redactConnectionString(err, m.HostData().URI))
+		}
+	}()
+
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
 	if err != nil {
-		msg := strings.Join(strings.Split(err.Error(), m.HostData().URI), "(redacted)")
-		return fmt.Errorf("cannot open connection: %s", msg)
+		return fmt.Errorf("cannot open connection: %w", err)
 	}
 	defer db.Close()
 
@@ -384,4 +389,15 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	}
 
 	return ret
+}
+
+// redactConnectionString replaces all occurences of URI in err.Error() with "(redacted)"
+func redactConnectionString(err error, URI string) string {
+	msg := err.Error()
+
+	if strings.Contains(msg, URI) {
+		return strings.ReplaceAll(msg, URI, "(redacted)")
+	}
+
+	return msg
 }
