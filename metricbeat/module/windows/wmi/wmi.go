@@ -178,8 +178,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					continue
 				}
 
-				m.Logger().Warnf("The query '%s' did not return any results. This can be expected in case of a too strict WHERE clause, it may also indicate an invalid query. Ensure the query is correct or check the WMI-Activity Operational Log for further details.", query)
-
 				schema := make(map[string]WmiConversionFunction)
 				for _, property := range metaRows[0].GetClass().GetPropertiesNames() {
 					convertFunction, err := GetConvertFunction(metaRows[0], property, m.Logger())
