@@ -395,6 +395,10 @@ func sanitizeError(err error, sensitive string) error {
 		return nil
 	}
 
+	if sensitive == "" {
+		return err
+	}
+
 	sanitizedMessage := strings.ReplaceAll(err.Error(), sensitive, "(redacted)")
 
 	return errors.New(sanitizedMessage)
