@@ -158,6 +158,26 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 		for i, job := range jobs {
 			id := fetchJobID(i, s.src.ContainerName, job.name())
 			job := job
+			// sets the content type and encoding for the job blob properties based on the reader configuration.
+			// If the override flags are set, it will use the provided content type and encoding. If not,
+			// it will only set them if they are not already defined.
+			readerCfg := s.src.ReaderConfig
+			if readerCfg.ContentType != "" {
+				if readerCfg.OverrideContentType {
+					job.blob.Properties.ContentType = &readerCfg.ContentType
+				} else if job.blob.Properties.ContentType == nil || *job.blob.Properties.ContentType == "" {
+					job.blob.Properties.ContentType = &readerCfg.ContentType
+				}
+			}
+			if readerCfg.Encoding != "" {
+				if readerCfg.OverrideEncoding {
+					job.blob.Properties.ContentEncoding = &readerCfg.Encoding
+				} else if job.blob.Properties.ContentEncoding == nil || *job.blob.Properties.ContentEncoding == "" {
+					job.blob.Properties.ContentEncoding = &readerCfg.Encoding
+				}
+			}
+			// acquire a worker thread from the limiter, and schedule the job
+			// to be executed in a goroutine.
 			s.limiter.acquire()
 			go func() {
 				defer s.limiter.release()
