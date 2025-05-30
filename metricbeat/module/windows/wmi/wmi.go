@@ -133,7 +133,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		for i, _ := range m.config.NamespaceQueryIndex[namespace] {
 
-			// Get the queryConfig by reference to allow modifications
+			// Get the queryConfig by reference to allow the initialization
 			queryConfig := &m.config.NamespaceQueryIndex[namespace][i]
 
 			// If we encountered an unrecoverable error before we do not attempt to perform the query again
@@ -157,7 +157,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
 
 			if err != nil {
-				m.Logger().Warn("Could not execute query: %v", err)
+				m.reportError(report, fmt.Errorf("%v", err))
 				continue
 			}
 
@@ -189,8 +189,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 				// Get only the required properties
 				properties := queryConfig.Properties
 
-				// If the Properties array is empty we retrieve all properties available in the class of the instance
-				// Note that an instance class may extend the queried class properties
+				// If the Properties array is empty, we retrieve all available properties from the instance's class.
+				// Note: due to inheritance, the instance's actual class may differ from the queried class
 				if len(queryConfig.Properties) == 0 {
 					properties = instance.GetClass().GetPropertiesNames()
 				}
@@ -248,10 +248,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 // The WMI library does not differentiate between a genuinely empty result set and actual query errors.
 // See this issue for more context: https://github.com/microsoft/wmi/issues/156
 //
-// To improve troubleshooting, we attempt to rule out the two most common causes early by validating
+// To improve troubleshooting, we rule out the two most common causes early by validating
 // the existence of the class and its required properties during the initial query.
 //
-// Since we already fetch the __meta_class table, we also build the schema for the requested base class.
+// Since we already fetch the meta_class table, we also build the schema for the requested base class.
 // Subclasses may extend this schema as needed.
 func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfig) error {
 	query := fmt.Sprintf("SELECT * FROM meta_class WHERE __Class = '%s'", queryConfig.Class)
@@ -264,7 +264,6 @@ func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfi
 	defer wmi.CloseAllInstances(rows)
 
 	err = errorOnClassDoesNotExist(rows, queryConfig.Class, queryConfig.Namespace)
-
 	if err != nil {
 		queryConfig.UnrecoverableError = err
 		return err
