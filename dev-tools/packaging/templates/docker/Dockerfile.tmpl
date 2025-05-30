@@ -243,6 +243,16 @@ done; \
         (exit $exit_code)
     {{- end}}
 
+    {{- if contains .from "ubuntu" }}
+      RUN for iter in {1..10}; do \
+          apt-get update -y && \
+          DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes \
+          systemd && \
+          exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
+      done; \
+      (exit $exit_code)
+    {{- end}}
+
 {{- end }}
 
 {{- if eq .user "root" }}
