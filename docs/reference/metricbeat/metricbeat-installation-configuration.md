@@ -25,12 +25,15 @@ This guide describes how to get started quickly with metrics collection. You’l
 You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
 :::::::{tab-set}
+:group: deployment
 
-::::::{tab-item} Elasticsearch Service
-To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+::::::{tab-item} {{ech}}
+:sync: hosted
+To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
 ::::::{tab-item} Self-managed
+:sync: self
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
@@ -43,8 +46,10 @@ Install Metricbeat as close as possible to the service you want to monitor. For 
 To download and install Metricbeat, use the commands that work with your system:
 
 :::::::{tab-set}
+:group: platform
 
 ::::::{tab-item} DEB
+:sync: deb
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-amd64.deb
 sudo dpkg -i metricbeat-{{stack-version}}-amd64.deb
@@ -52,6 +57,7 @@ sudo dpkg -i metricbeat-{{stack-version}}-amd64.deb
 ::::::
 
 ::::::{tab-item} RPM
+:sync: rpm
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-x86_64.rpm
 sudo rpm -vi metricbeat-{{stack-version}}-x86_64.rpm
@@ -59,6 +65,7 @@ sudo rpm -vi metricbeat-{{stack-version}}-x86_64.rpm
 ::::::
 
 ::::::{tab-item} MacOS
+:sync: macos
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-darwin-x86_64.tar.gz
 tar xzvf metricbeat-{{stack-version}}-darwin-x86_64.tar.gz
@@ -66,6 +73,7 @@ tar xzvf metricbeat-{{stack-version}}-darwin-x86_64.tar.gz
 ::::::
 
 ::::::{tab-item} Linux
+:sync: linux
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-linux-x86_64.tar.gz
 tar xzvf metricbeat-{{stack-version}}-linux-x86_64.tar.gz
@@ -73,6 +81,7 @@ tar xzvf metricbeat-{{stack-version}}-linux-x86_64.tar.gz
 ::::::
 
 ::::::{tab-item} Windows
+:sync: windows
 1. Download the [Metricbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-{{stack-version}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
@@ -113,9 +122,11 @@ Connections to {{es}} and {{kib}} are required to set up Metricbeat.
 Set the connection information in `metricbeat.yml`. To locate this configuration file, see [Directory layout](/reference/metricbeat/directory-layout.md).
 
 :::::::{tab-set}
+:group: deployment
 
-::::::{tab-item} Elasticsearch Service
-Specify the [cloud.id](/reference/metricbeat/configure-cloud-id.md) of your {{ess}}, and set [cloud.auth](/reference/metricbeat/configure-cloud-id.md) to a user who is authorized to set up Metricbeat. For example:
+::::::{tab-item} {{ech}}
+:sync: hosted
+Specify the [cloud.id](/reference/metricbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/metricbeat/configure-cloud-id.md) to a user who is authorized to set up Metricbeat. For example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
@@ -126,6 +137,7 @@ cloud.auth: "metricbeat_setup:YOUR_PASSWORD" <1>
 ::::::
 
 ::::::{tab-item} Self-managed
+:sync: self
 1. Set the host and port where Metricbeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Metricbeat. For example:
 
     ```yaml
@@ -171,155 +183,231 @@ Metricbeat uses modules to collect metrics. Each module defines the basic logic 
 1. Identify the modules you need to enable. To see the list of available [modules](/reference/metricbeat/metricbeat-modules.md), run:
 
     :::::::{tab-set}
+    :group: platform
 
     ::::::{tab-item} DEB
+    :sync: deb
     ```sh
     metricbeat modules list
     ```
     ::::::
 
     ::::::{tab-item} RPM
+    :sync: rpm
     ```sh
     metricbeat modules list
     ```
     ::::::
 
     ::::::{tab-item} MacOS
+    :sync: macos
     ```sh
     ./metricbeat modules list
     ```
     ::::::
 
     ::::::{tab-item} Linux
+    :sync: linux
     ```sh
     ./metricbeat modules list
     ```
     ::::::
 
     ::::::{tab-item} Windows
+    :sync: windows
     ```sh
     PS > .\metricbeat.exe modules list
     ```
     ::::::
 
+    :::::::
+
+2. From the installation directory, enable one or more modules. If you accept the default configuration without enabling additional modules, Metricbeat collects system metrics only.
+
+    The following command enables the nginx config in the `modules.d` directory:
+
+    :::::::{tab-set}
+    :group: platform
+
     ::::::{tab-item} DEB
+    :sync: deb
     ```sh
     metricbeat modules enable nginx
     ```
     ::::::
 
     ::::::{tab-item} RPM
+    :sync: rpm
     ```sh
     metricbeat modules enable nginx
     ```
     ::::::
 
     ::::::{tab-item} MacOS
+    :sync: macos
     ```sh
     ./metricbeat modules enable nginx
     ```
     ::::::
 
     ::::::{tab-item} Linux
+    :sync: linux
     ```sh
     ./metricbeat modules enable nginx
     ```
     ::::::
 
     ::::::{tab-item} Windows
+    :sync: windows
     ```sh
     PS > .\metricbeat.exe modules enable nginx
     ```
     ::::::
 
+    :::::::
+
+    See the [`modules` command](/reference/metricbeat/command-line-options.md#modules-command) to learn more about this command. If you are using a Docker image, see [Run Metricbeat on Docker](/reference/metricbeat/running-on-docker.md).
+
+3. In the module config under `modules.d`, change the module settings to match your environment. See [Standard config options](/reference/metricbeat/configuration-metricbeat.md#module-config-options) for more about available settings.
+
+:::{tip}
+To test your configuration file, change to the directory where the Metricbeat binary is installed, and run Metricbeat in the foreground with the following options specified: `./metricbeat test config -e`. Make sure your config files are in the path expected by Metricbeat (see [Directory layout](/reference/metricbeat/directory-layout.md)), or use the `-c` flag to specify the path to the config file.
+:::
+
+For more information about configuring Metricbeat, also see:
+
+* [Configure Metricbeat](/reference/metricbeat/configuring-howto-metricbeat.md)
+* [Config file format](/reference/libbeat/config-file-format.md)
+* [`metricbeat.reference.yml`](/reference/metricbeat/metricbeat-reference-yml.md): This reference configuration file shows all non-deprecated options. You’ll find it in the same location as `metricbeat.yml`.
+
+## Step 4: Set up assets
+
+Metricbeat comes with predefined assets for parsing, indexing, and visualizing your data. To load these assets:
+
+1. Make sure the user specified in `metricbeat.yml` is [authorized to set up Metricbeat](/reference/metricbeat/privileges-to-setup-beats.md).
+2. From the installation directory, run:
+
+    :::::::{tab-set}
+    :group: platform
+
     ::::::{tab-item} DEB
+    :sync: deb
     ```sh
     metricbeat setup -e
     ```
     ::::::
 
     ::::::{tab-item} RPM
+    :sync: rpm
     ```sh
     metricbeat setup -e
     ```
     ::::::
 
     ::::::{tab-item} MacOS
+    :sync: macos
     ```sh
     ./metricbeat setup -e
     ```
     ::::::
 
     ::::::{tab-item} Linux
+    :sync: linux
     ```sh
     ./metricbeat setup -e
     ```
     ::::::
 
     ::::::{tab-item} Windows
+    :sync: windows
     ```sh
     PS > .\metricbeat.exe setup -e
     ```
     ::::::
 
-    ::::::{tab-item} DEB
-    ```sh
-    sudo service metricbeat start
-    ```
-
-    ::::{note}
-    If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
-    ::::
-
-
-    Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} RPM
-    ```sh
-    sudo service metricbeat start
-    ```
-
-    ::::{note}
-    If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
-    ::::
-
-
-    Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
-    ::::::
-
-    ::::::{tab-item} MacOS
-    ```sh
-    sudo chown root metricbeat.yml <1>
-    sudo chown root modules.d/nginx.yml <1>
-    sudo ./metricbeat -e
-    ```
-
-    1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Linux
-    ```sh
-    sudo chown root metricbeat.yml <1>
-    sudo chown root modules.d/nginx.yml <1>
-    sudo ./metricbeat -e
-    ```
-
-    1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Windows
-    ```sh
-    PS C:\Program Files\metricbeat> Start-Service metricbeat
-    ```
-
-    By default, Windows log files are stored in `C:\ProgramData\metricbeat\Logs`.
-
-    ::::{note}
-    On Windows, statistics about system load and swap usage are currently not captured
-    ::::
-    ::::::
     :::::::
+
+    `-e` is optional and sends output to standard error instead of the configured log output.
+
+This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to Elasticsearch and deploys the sample dashboards for visualizing the data in Kibana.
+
+:::{tip}
+A connection to Elasticsearch (or {{ech}}) is required to set up the initial environment. If you’re using a different output, such as Logstash, see [Load the index template manually](/reference/metricbeat/metricbeat-template.md#load-template-manually) and [Load Kibana dashboards](/reference/metricbeat/load-kibana-dashboards.md).
+:::
+
+## Step 5: Start Metricbeat
+
+Before starting Metricbeat, modify the user credentials in metricbeat.yml and specify a user who is [authorized to publish events](/reference/metricbeat/privileges-to-publish-events.md).
+
+To start Metricbeat, run:
+
+:::::::{tab-set}
+:group: platform
+
+::::::{tab-item} DEB
+:sync: deb
+```sh
+sudo service metricbeat start
+```
+
+::::{note}
+If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
+::::
+
+
+Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} RPM
+:sync: rpm
+```sh
+sudo service metricbeat start
+```
+
+::::{note}
+If you use an `init.d` script to start Metricbeat, you can’t specify command line flags (see [Command reference](/reference/metricbeat/command-line-options.md)). To specify flags, start Metricbeat in the foreground.
+::::
+
+
+Also see [Metricbeat and systemd](/reference/metricbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} MacOS
+:sync: macos
+```sh
+sudo chown root metricbeat.yml <1>
+sudo chown root modules.d/nginx.yml <1>
+sudo ./metricbeat -e
+```
+
+1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Linux
+:sync: linux
+```sh
+sudo chown root metricbeat.yml <1>
+sudo chown root modules.d/nginx.yml <1>
+sudo ./metricbeat -e
+```
+
+1. You’ll be running Metricbeat as root, so you need to change ownership of the configuration file and any configurations enabled in the `modules.d` directory, or run Metricbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
+
+::::::{tab-item} Windows
+:sync: windows
+```sh
+PS C:\Program Files\metricbeat> Start-Service metricbeat
+```
+
+By default, Windows log files are stored in `C:\ProgramData\metricbeat\Logs`.
+
+::::{note}
+On Windows, statistics about system load and swap usage are currently not captured
+::::
+::::::
+
+:::::::
 
 Metricbeat should begin streaming metrics to {{es}}.
 
@@ -333,11 +421,14 @@ To open the dashboards:
 1. Launch {{kib}}:
 
     :::::::{tab-set}
-    ::::::{tab-item} Elasticsearch Service
+    :group: deployment
+    ::::::{tab-item} {{ech}}
+    :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
     ::::::{tab-item} Self-managed
+    :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
     :::::::

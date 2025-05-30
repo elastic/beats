@@ -23,12 +23,15 @@ This guide describes how to get started quickly collecting uptime data about you
 You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
 :::::::{tab-set}
+:group: deployment
 
-::::::{tab-item} Elasticsearch Service
-To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+::::::{tab-item} {{ech}}
+:sync: hosted
+To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
 ::::::{tab-item} Self-managed
+:sync: self
 To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
@@ -41,8 +44,10 @@ Unlike most Beats, which you install on edge nodes, you typically install Heartb
 To download and install Heartbeat, use the commands that work with your system:
 
 :::::::{tab-set}
+:group: platform
 
 ::::::{tab-item} DEB
+:sync: deb
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-amd64.deb
 sudo dpkg -i heartbeat-{{stack-version}}-amd64.deb
@@ -50,6 +55,7 @@ sudo dpkg -i heartbeat-{{stack-version}}-amd64.deb
 ::::::
 
 ::::::{tab-item} RPM
+:sync: rpm
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-x86_64.rpm
 sudo rpm -vi heartbeat-{{stack-version}}-x86_64.rpm
@@ -57,6 +63,7 @@ sudo rpm -vi heartbeat-{{stack-version}}-x86_64.rpm
 ::::::
 
 ::::::{tab-item} MacOS
+:sync: macos
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-darwin-x86_64.tar.gz
 tar xzvf heartbeat-{{stack-version}}-darwin-x86_64.tar.gz
@@ -64,6 +71,7 @@ tar xzvf heartbeat-{{stack-version}}-darwin-x86_64.tar.gz
 ::::::
 
 ::::::{tab-item} Linux
+:sync: linux
 ```shell subs=true
 curl -L -O https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-linux-x86_64.tar.gz
 tar xzvf heartbeat-{{stack-version}}-linux-x86_64.tar.gz
@@ -71,6 +79,7 @@ tar xzvf heartbeat-{{stack-version}}-linux-x86_64.tar.gz
 ::::::
 
 ::::::{tab-item} Windows
+:sync: windows
 1. Download the [Heartbeat Windows zip file](https://artifacts.elastic.co/downloads/beats/heartbeat/heartbeat-{{stack-version}}-windows-x86_64.zip).
 
 2. Extract the contents of the zip file into `C:\Program Files`.
@@ -109,9 +118,11 @@ Connections to {{es}} and {{kib}} are required to set up Heartbeat.
 Set the connection information in `heartbeat.yml`. To locate this configuration file, see [Directory layout](/reference/heartbeat/directory-layout.md).
 
 :::::::{tab-set}
+:group: deployment
 
-::::::{tab-item} Elasticsearch Service
-Specify the [cloud.id](/reference/heartbeat/configure-cloud-id.md) of your {{ess}}, and set [cloud.auth](/reference/heartbeat/configure-cloud-id.md) to a user who is authorized to set up Heartbeat. For example:
+::::::{tab-item} {{ech}}
+:sync: hosted
+Specify the [cloud.id](/reference/heartbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/heartbeat/configure-cloud-id.md) to a user who is authorized to set up Heartbeat. For example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
@@ -122,6 +133,7 @@ cloud.auth: "heartbeat_setup:YOUR_PASSWORD" <1>
 ::::::
 
 ::::::{tab-item} Self-managed
+:sync: self
 1. Set the host and port where Heartbeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Heartbeat. For example:
 
     ```yaml
@@ -247,93 +259,112 @@ Heartbeat comes with predefined assets for parsing, indexing, and visualizing yo
 1. Make sure the user specified in `heartbeat.yml` is [authorized to set up Heartbeat](/reference/heartbeat/privileges-to-setup-beats.md).
 2. From the installation directory, run:
 
-    :::::::{tab-set}
+:::::::{tab-set}
+:group: platform
 
-    ::::::{tab-item} DEB
-    ```sh
-    heartbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} DEB
+:sync: deb
+```sh
+heartbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} RPM
-    ```sh
-    heartbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} RPM
+:sync: rpm
+```sh
+heartbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} MacOS
-    ```sh
-    ./heartbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} MacOS
+:sync: macos
+```sh
+./heartbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} Linux
-    ```sh
-    ./heartbeat setup -e
-    ```
-    ::::::
+::::::{tab-item} Linux
+:sync: linux
+```sh
+./heartbeat setup -e
+```
+::::::
 
-    ::::::{tab-item} Windows
-    ```sh
-    PS > .\heartbeat.exe setup -e
-    ```
-    ::::::
+::::::{tab-item} Windows
+:sync: windows
+```sh
+PS > .\heartbeat.exe setup -e
+```
+::::::
+:::::::
 
-    ::::::{tab-item} DEB
-    ```sh
-    sudo service heartbeat-elastic start
-    ```
+## Step 6: Start Heartbeat [start]
 
-    ::::{note}
-    If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
-    ::::
+Before starting Heartbeat, modify the user credentials in heartbeat.yml and specify a user who is [authorized to publish events](/reference/heartbeat/privileges-to-publish-events.md).
+
+To start Heartbeat, run:
+
+:::::::{tab-set}
+:group: platform
+
+::::::{tab-item} DEB
+:sync: deb
+```sh
+sudo service heartbeat-elastic start
+```
+
+::::{note}
+If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
+::::
+
+Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
+::::::
+
+::::::{tab-item} RPM
+:sync: rpm
+```sh
+sudo service heartbeat-elastic start
+```
+
+::::{note}
+If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
+::::
 
 
-    Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
-    ::::::
+Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
+::::::
 
-    ::::::{tab-item} RPM
-    ```sh
-    sudo service heartbeat-elastic start
-    ```
+::::::{tab-item} MacOS
+:sync: macos
+```sh
+sudo chown root heartbeat.yml <1>
+sudo ./heartbeat -e
+```
 
-    ::::{note}
-    If you use an `init.d` script to start Heartbeat, you can’t specify command line flags (see [Command reference](/reference/heartbeat/command-line-options.md)). To specify flags, start Heartbeat in the foreground.
-    ::::
+1. You’ll be running Heartbeat as root, so you need to change ownership of the configuration file, or run Heartbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
 
+::::::{tab-item} Linux
+:sync: linux
+```sh
+sudo chown root heartbeat.yml <1>
+sudo ./heartbeat -e
+```
 
-    Also see [Heartbeat and systemd](/reference/heartbeat/running-with-systemd.md).
-    ::::::
+1. You’ll be running Heartbeat as root, so you need to change ownership of the configuration file, or run Heartbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
+::::::
 
-    ::::::{tab-item} MacOS
-    ```sh
-    sudo chown root heartbeat.yml <1>
-    sudo ./heartbeat -e
-    ```
+::::::{tab-item} Windows
+:sync: windows
+```sh
+PS C:\Program Files\heartbeat> Start-Service heartbeat
+```
 
-    1. You’ll be running Heartbeat as root, so you need to change ownership of the configuration file, or run Heartbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Linux
-    ```sh
-    sudo chown root heartbeat.yml <1>
-    sudo ./heartbeat -e
-    ```
-
-    1. You’ll be running Heartbeat as root, so you need to change ownership of the configuration file, or run Heartbeat with `--strict.perms=false` specified. See [Config File Ownership and Permissions](/reference/libbeat/config-file-permissions.md).
-    ::::::
-
-    ::::::{tab-item} Windows
-    ```sh
-    PS C:\Program Files\heartbeat> Start-Service heartbeat
-    ```
-
-    By default, Windows log files are stored in `C:\ProgramData\heartbeat\Logs`.
-    ::::::
-    :::::::
+By default, Windows log files are stored in `C:\ProgramData\heartbeat\Logs`.
+::::::
+:::::::
 
 Heartbeat is now ready to check the status of your services and send events to your defined output.
-
 
 ## Step 7: View your data in {{kib}} [view-data]
 
@@ -346,11 +377,14 @@ To open the dashboards:
 1. Launch {{kib}}:
 
     :::::::{tab-set}
-    ::::::{tab-item} Elasticsearch Service
+    :group: deployment
+    ::::::{tab-item} {{ech}}
+    :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
     ::::::
     ::::::{tab-item} Self-managed
+    :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
     ::::::
     :::::::

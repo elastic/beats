@@ -1834,6 +1834,36 @@ SOFTWARE.
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/Azure/azure-sdk-for-go/sdk/monitor/query/azmetrics
+Version: v1.1.0
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go/sdk/monitor/query/azmetrics@v1.1.0/LICENSE.txt:
+
+MIT License
+
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE
+
+--------------------------------------------------------------------------------
 Dependency : github.com/elastic/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
 Version: v1.1.0-elastic
 Licence type (autodetected): MIT
@@ -10227,11 +10257,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/dgraph-io/badger/v4
-Version: v4.4.0
+Version: v4.6.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/badger/v4@v4.4.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/badger/v4@v4.6.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -12287,11 +12317,11 @@ SOFTWARE
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.19.1
+Version: v0.19.5
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.19.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.19.5/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -15315,11 +15345,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/mito
-Version: v1.18.0
+Version: v1.19.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.18.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.19.0/LICENSE:
 
 
                                  Apache License
@@ -17126,11 +17156,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/golang-jwt/jwt/v5
-Version: v5.2.1
+Version: v5.2.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/golang-jwt/jwt/v5@v5.2.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/golang-jwt/jwt/v5@v5.2.2/LICENSE:
 
 Copyright (c) 2012 Dave Grijalva
 Copyright (c) 2021 golang-jwt maintainers
@@ -17612,11 +17642,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/flatbuffers
-Version: v24.3.25+incompatible
+Version: v25.2.10+incompatible
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v24.3.25+incompatible/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/flatbuffers@v25.2.10+incompatible/LICENSE:
 
 
                                  Apache License
@@ -20554,11 +20584,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/tommyers-elastic/dashboard-api-go/v3
-Version: v3.0.0-20240913150833-a945473a8f25
+Version: v3.0.0-20250514220331-e52c94766b6f
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/tommyers-elastic/dashboard-api-go/v3@v3.0.0-20240913150833-a945473a8f25/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/tommyers-elastic/dashboard-api-go/v3@v3.0.0-20250514220331-e52c94766b6f/LICENSE:
 
 MIT License
 
@@ -26825,11 +26855,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/oauth2
-Version: v0.25.0
+Version: v0.27.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/oauth2@v0.25.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/oauth2@v0.27.0/LICENSE:
 
 Copyright 2009 The Go Authors.
 
@@ -40733,11 +40763,11 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/dgraph-io/ristretto/v2
-Version: v2.0.0
+Version: v2.1.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/ristretto/v2@v2.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/dgraph-io/ristretto/v2@v2.1.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -41704,11 +41734,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/ebitengine/purego
-Version: v0.8.2
+Version: v0.9.0-alpha.3.0.20250507171635-5047c08daa38
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/ebitengine/purego@v0.8.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/ebitengine/purego@v0.9.0-alpha.3.0.20250507171635-5047c08daa38/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -45696,11 +45726,11 @@ Contents of probable licence file $GOMODCACHE/github.com/godror/knownpb@v0.1.0/L
 
 --------------------------------------------------------------------------------
 Dependency : github.com/golang-jwt/jwt/v4
-Version: v4.5.0
+Version: v4.5.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/golang-jwt/jwt/v4@v4.5.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/golang-jwt/jwt/v4@v4.5.2/LICENSE:
 
 Copyright (c) 2012 Dave Grijalva
 Copyright (c) 2021 golang-jwt maintainers

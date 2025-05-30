@@ -197,7 +197,7 @@ Some built-in helper functions are provided to work with the input state inside 
 * `base64Decode`: Decodes the base64 string. Any binary output will be converted to a UTF8 string.
 * `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
 * `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
-* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns `{{version}}`.
+* `beatInfo`: returns a map containing information about the Beat.  Available keys in the map are `goos` (running operating system), `goarch` (running system architecture), `commit` (git commit of current build), `buildtime` (compile time of current build), `version` (version of current build). Example: `[[ beatInfo.version ]]` returns _{{version}}_.
 * `div`: does the integer division of two integer values.
 * `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 * `getRFC5988Link`: extracts a specific relation from a list of [RFC5988](https://tools.ietf.org/html/rfc5988) links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
@@ -539,7 +539,7 @@ Optionally start rate-limiting prior to the value specified in the Response.
 
 Under the default behavior, Requests will continue while the `remaining` value is non-zero. Specifying an `early_limit` will mean that rate-limiting will occur prior to reaching `0`.
 
-* If the value specified for `early_limit` is less than `1`, the value is treated as a percentage of the Response provided `limit`. e.g. specifying `0.9` will mean that Requests will continue until reaching 90% of the rate-limit — for a `limit` value of `120`, the rate-limit starts when the `remaining` reaches `12`. If the `limit` header is missing from the Response, default rate-limiting will occur (when `remaining` reaches `0`).
+* If the value specified for `early_limit` is less than `1`, the value is treated as a percentage of the Response provided `limit`. e.g. specifying `0.9` will mean that Requests will continue until reaching 90% of the rate-limit — for a `limit` value of `120`, the rate-limit starts when the `remaining` reaches `12`. If the `limit` header is missing from the Response, default rate-limiting will occur (when `remaining` reaches `0`).
 * If the value specified for `early_limit` is greater than or equal to `1`, the value is treated as the target value for `remaining`. e.g. instead of rate-limiting when `remaining` hits `0`, rate-limiting will occur when `remaining` hits the value specified.
 
 It is not set by default (by default the rate-limiting as specified in the Response is followed).
@@ -1073,8 +1073,6 @@ Third call: https://example.com/services/data/v1.0/export_ids/file_1/info
 
 See [response split parameter](#response-split).
 
-+
-
 
 ### `chain[].step.replace` [chain-step-replace]
 
@@ -1269,7 +1267,7 @@ Example:
     This behaviour of targeted fixed pattern replacement in the url helps solve various use cases.
 
 
-**Some useful points to remember:- **
+**Some useful points to remember:**
 
 1. If you want the `value` to be treated as an expression to be evaluated for data extraction from context variables, it should always have a **single *.* (dot) prefix**. Example: `replace_with: '$.exportId,.first_response.body.exportId'`. Anything more or less will have the internal processor treat it as a hard coded value, `replace_with: '$.exportId,..first_response.body.exportId'` (more than one *.* (dot) as prefix) or `replace_with:'$.exportId,first_response.body.exportId'` (no *.* dot as prefix)
 2. Incomplete `value expressions` will cause an error while processing. Example: `replace_with: '$.exportId,.first_response.'`, `replace_with: '$.exportId,.last_response.'` etc. These expressions are incomplete because they do not evaluate down to a valid key that can be extracted from the context variables. The value expression: `.first_response.`, on processing, will result in an array `[first_response ""]` where the key to be extrated becomes `"" (an empty string)`, which has no definition within any context variable.
