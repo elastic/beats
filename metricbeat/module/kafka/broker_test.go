@@ -18,6 +18,7 @@
 package kafka
 
 import (
+	"github.com/stretchr/testify/require"
 	"net"
 	"testing"
 
@@ -26,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
+	"github.com/elastic/sarama"
 )
 
 type dummyNet struct{}
@@ -156,6 +158,71 @@ func TestFindMatchingAddress(t *testing.T) {
 				}
 			} else {
 				assert.False(t, found, "broker shouldn't be found")
+			}
+		})
+	}
+}
+
+func Test_getMember(t *testing.T) {
+	tests := []struct {
+		name             string
+		inputMemberDescr *sarama.GroupMemberDescription
+
+		expectedErrMsg string
+		expectedResult MemberDescription
+	}{
+		{
+			name: "success",
+			inputMemberDescr: &sarama.GroupMemberDescription{
+				ClientId:         "test-client",
+				ClientHost:       "test-host",
+				MemberAssignment: []byte{0, 0, 0, 0, 0, 1, 0, 10, 116, 101, 115, 116, 45, 116, 111, 112, 105, 99, 0, 0, 0, 1, 0, 0, 0, 0, 255, 255, 255, 255},
+			},
+
+			expectedErrMsg: "",
+			expectedResult: MemberDescription{
+				Err:        nil,
+				ClientID:   "test-client",
+				ClientHost: "test-host",
+				Topics: map[string][]int32{
+					"test-topic": {0},
+				},
+			},
+		},
+		{
+			name:             "nil sarama GroupMemberDescription",
+			inputMemberDescr: nil,
+
+			expectedErrMsg: "nil GroupMemberDescription",
+			expectedResult: MemberDescription{},
+		},
+		{
+			name: "0 members in the group",
+			inputMemberDescr: &sarama.GroupMemberDescription{
+				ClientId:         "test-client",
+				ClientHost:       "test-host",
+				MemberAssignment: nil,
+			},
+
+			expectedErrMsg: "",
+			expectedResult: MemberDescription{
+				Err:        nil,
+				ClientID:   "test-client",
+				ClientHost: "test-host",
+				Topics:     map[string][]int32{},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := fromSaramaGroupMemberDescription(tt.inputMemberDescr)
+			if tt.expectedErrMsg == "" {
+				require.NoError(t, err)
+
+				assert.Equal(t, tt.expectedResult, result)
+			} else {
+				assert.Error(t, err, tt.expectedErrMsg)
 			}
 		})
 	}

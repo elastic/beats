@@ -247,21 +247,13 @@ func (b *Broker) DescribeGroups(
 
 		members := map[string]MemberDescription{}
 		for memberID, memberDescr := range descr.Members {
-			assignment, err := memberDescr.GetMemberAssignment()
+			b.logger.Infof("memb_bytes: %v", memberDescr.MemberAssignment)
+			memberDescription, err := fromSaramaGroupMemberDescription(memberDescr)
 			if err != nil {
-				members[memberID] = MemberDescription{
-					ClientID:   memberDescr.ClientId,
-					ClientHost: memberDescr.ClientHost,
-					Err:        err,
-				}
+				b.logger.Debugf("error converting member description: %v", err)
 				continue
 			}
-
-			members[memberID] = MemberDescription{
-				ClientID:   memberDescr.ClientId,
-				ClientHost: memberDescr.ClientHost,
-				Topics:     assignment.Topics,
-			}
+			members[memberID] = memberDescription
 		}
 		groups[descr.GroupId] = GroupDescription{Members: members}
 	}
@@ -540,6 +532,31 @@ func (m *brokerFinder) lookupHosts(ips []net.IP) []string {
 		hosts = append(hosts, host)
 	}
 	return hosts
+}
+
+func fromSaramaGroupMemberDescription(memberDescr *sarama.GroupMemberDescription) (MemberDescription, error) {
+	if memberDescr == nil {
+		return MemberDescription{}, errors.New("nil GroupMemberDescription")
+	}
+
+	assignment, err := memberDescr.GetMemberAssignment()
+	if err != nil {
+		return MemberDescription{
+			ClientID:   memberDescr.ClientId,
+			ClientHost: memberDescr.ClientHost,
+			Err:        err,
+		}, err
+	}
+
+	assignmentTopics := make(map[string][]int32)
+	if assignment != nil {
+		assignmentTopics = assignment.Topics
+	}
+	return MemberDescription{
+		ClientID:   memberDescr.ClientId,
+		ClientHost: memberDescr.ClientHost,
+		Topics:     assignmentTopics,
+	}, nil
 }
 
 func anyIPsMatch(as, bs []net.IP) bool {
