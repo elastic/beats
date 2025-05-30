@@ -67,7 +67,7 @@ func AzureStorageFileServer() http.Handler {
 				}
 			case 2:
 				if fileContainers[path[0]] && availableFileBlobs[path[0]][path[1]] {
-					absPath, _ := filepath.Abs("mock/testdata/" + path[1])
+					absPath, _ := filepath.Abs("testdata/" + path[1])
 					data, _ := os.ReadFile(absPath)
 					switch path[1] {
 					case "multiline.json":
