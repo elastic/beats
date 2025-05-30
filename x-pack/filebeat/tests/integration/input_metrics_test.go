@@ -162,6 +162,14 @@ logging.level: debug
 		EventsPipelineFilteredTotal  int `json:"events_pipeline_filtered_total"`
 		EventsPipelinePublishedTotal int `json:"events_pipeline_published_total"`
 
+		EventsOutputAckedTotal           int `json:"events_output_acked_total"`
+		EventsOutputDeadLetterTotal      int `json:"events_output_dead_letter_total"`
+		EventsOutputDroppedTotal         int `json:"events_output_dropped_total"`
+		EventsOutputDuplicateEventsTotal int `json:"events_output_duplicate_events_total"`
+		EventsOutputErrTooManyTotal      int `json:"events_output_err_too_many_total"`
+		EventsOutputRetryableErrorsTotal int `json:"events_output_retryable_errors_total"`
+		EventsOutputTotal                int `json:"events_output_total"`
+
 		// EventsProcessedTotal is used by: filestream
 		EventsProcessedTotal int `json:"events_processed_total"`
 		// EventsPublishedTotal is used by: cel
