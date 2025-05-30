@@ -57,6 +57,11 @@ filebeat.inputs:
     paths:
       - {{.log_path}}
     processors:
+      - decode_json_fields:
+          fields: ["message"]
+          target: ""
+          overwrite_keys: true
+          add_error_key: true
       - drop_event:
           when:
             contains:
@@ -157,10 +162,15 @@ logging.level: debug
 
 	// 5. Now that the file was fully read, we can make the assertions.
 	type inputMetric struct {
+		ID    string `json:"id"`
+		Input string `json:"input"`
+
+		// Pipeline metrics
 		EventsPipelineTotal          int `json:"events_pipeline_total"`
 		EventsPipelineFilteredTotal  int `json:"events_pipeline_filtered_total"`
 		EventsPipelinePublishedTotal int `json:"events_pipeline_published_total"`
 
+		// Output metrics
 		EventsOutputAckedTotal           int `json:"events_output_acked_total"`
 		EventsOutputDeadLetterTotal      int `json:"events_output_dead_letter_total"`
 		EventsOutputDroppedTotal         int `json:"events_output_dropped_total"`
@@ -172,13 +182,11 @@ logging.level: debug
 		// EventsProcessedTotal is used by: filestream
 		EventsProcessedTotal int `json:"events_processed_total"`
 		// EventsPublishedTotal is used by: cel
-		EventsPublishedTotal int    `json:"events_published_total"`
-		ID                   string `json:"id"`
-		Input                string `json:"input"`
+		EventsPublishedTotal int `json:"events_published_total"`
 	}
 
 	totalEventsByInput := map[string]int{
-		filestreamInputID: 10,
+		filestreamInputID: 12,
 		celInputID:        2,
 		httpsjonInputID:   1,
 	}
@@ -196,22 +204,34 @@ logging.level: debug
 			assert.Equal(t, metrics.EventsProcessedTotal,
 				metrics.EventsPipelineTotal,
 				"filestream EventsPipelineTotal != EventsProcessedTotal")
-			assert.Equal(t, 10, metrics.EventsProcessedTotal,
+			assert.Equal(t, 12, metrics.EventsProcessedTotal,
 				"filestream EventsProcessedTotal")
-			assert.Equal(t, 9, metrics.EventsPipelinePublishedTotal,
+			assert.Equal(t, 11, metrics.EventsPipelinePublishedTotal,
 				"filestream EventsPipelinePublishedTotal")
 			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
 				"filestream EventsPipelineFilteredTotal")
 
 			// Assert output metrics
-			assert.Equal(t, metrics.EventsPipelinePublishedTotal,
+			assert.Equal(t,
+				metrics.EventsPipelinePublishedTotal+1, // +1 as the 429 is retried
 				metrics.EventsOutputTotal,
-				"EventsOutputTotal should equal EventsPipelinePublishedTotal for %s",
-				metrics.ID)
-			assert.Equal(t, metrics.EventsPipelinePublishedTotal,
+				"EventsOutputTotal should equal EventsPipelinePublishedTotal")
+			assert.Equal(t,
+				9,
 				metrics.EventsOutputAckedTotal,
-				"EventsOutputAckedTotal should equal EventsPipelinePublishedTotal for %s",
-				metrics.ID)
+				"EventsOutputAckedTotal should equal EventsPipelinePublishedTotal")
+			assert.Equal(t,
+				1,
+				metrics.EventsOutputDroppedTotal,
+				"unexpected EventsOutputDroppedTotal")
+			assert.Equal(t,
+				1,
+				metrics.EventsOutputDuplicateEventsTotal,
+				"unexpected EventsOutputDuplicateEventsTotal")
+			assert.Equal(t,
+				1,
+				metrics.EventsOutputErrTooManyTotal,
+				"unexpected EventsOutputErrTooManyTotal")
 		},
 		celInputID: func(t *testing.T, metrics inputMetric) {
 			assert.Equal(t, "cel", metrics.Input)
@@ -377,6 +397,8 @@ func makeServer() *httptest.Server {
 }
 
 func newMockESServer(t *testing.T) *httptest.Server {
+	repliedWith429 := false
+
 	mockESHandler := api.NewDeterministicAPIHandler(
 		uuid.Must(uuid.NewV4()),
 		"",
@@ -385,7 +407,33 @@ func newMockESServer(t *testing.T) *httptest.Server {
 		0,
 		100,
 		func(action api.Action, event []byte) int {
-			return http.StatusOK
+			resp := http.StatusOK
+
+			type logline struct {
+				RespondWith int `json:"respond-with"`
+			}
+
+			var l logline
+			err := json.Unmarshal(event, &l)
+			if err != nil {
+				t.Errorf("failed to unmarshal event: %v. Raw event %s",
+					err, string(event))
+				return http.StatusInternalServerError
+			}
+			if l.RespondWith != 0 {
+				resp = l.RespondWith
+
+				// HTTP 429 - TooMany are tried, so let's respond 429 only once.
+				if repliedWith429 {
+					resp = http.StatusOK
+				}
+
+				if l.RespondWith == http.StatusTooManyRequests {
+					repliedWith429 = true
+				}
+			}
+
+			return resp
 		})
 	esMock := httptest.NewServer(mockESHandler)
 	t.Cleanup(esMock.Close)
