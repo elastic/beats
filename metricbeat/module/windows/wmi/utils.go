@@ -34,17 +34,24 @@ import (
 )
 
 // Utilities related to Type conversion
+type WmiConversionFunction func(interface{}) (interface{}, error)
 
-// WmiStringConversionFunction defines a function type for converting string values
-// into other data types, such as integers or timestamps.
-type WmiStringConversionFunction func(string) (interface{}, error)
-
-func ConvertUint64(v string) (interface{}, error) {
-	return strconv.ParseUint(v, 10, 64)
+func ConvertUint64(v interface{}) (interface{}, error) {
+	switch v.(type) {
+	case string:
+		return strconv.ParseUint(v.(string), 10, 64)
+	default:
+		return nil, fmt.Errorf("Expect string")
+	}
 }
 
-func ConvertSint64(v string) (interface{}, error) {
-	return strconv.ParseInt(v, 10, 64)
+func ConvertSint64(v interface{}) (interface{}, error) {
+	switch v.(type) {
+	case string:
+		return strconv.ParseInt(v.(string), 10, 64)
+	default:
+		return nil, fmt.Errorf("Expect string")
+	}
 }
 
 const WMI_DATETIME_LAYOUT string = "20060102150405.999999"
@@ -64,7 +71,16 @@ const TIMEZONE_LAYOUT string = "-07:00"
 // 2. Normalize the offset from minutes to the standard `hh:mm` format.
 // 3. Concatenate the "yyyyMMddHHmmSS.mmmmmm" part with the normalized offset.
 // 4. Parse the combined string using time.Parse to return a time.Date object.
-func ConvertDatetime(v string) (interface{}, error) {
+func ConvertDatetime(vi interface{}) (interface{}, error) {
+	switch vi.(type) {
+	case string:
+		break
+	default:
+		return nil, fmt.Errorf("Expect string")
+	}
+
+	v := vi.(string)
+
 	if len(v) != 25 {
 		return nil, fmt.Errorf("datetime is invalid: the datetime is expected to be exactly 25 characters long, got: %s", v)
 	}
@@ -97,8 +113,41 @@ func ConvertDatetime(v string) (interface{}, error) {
 	return date, err
 }
 
-func ConvertString(v string) (interface{}, error) {
+func ConvertIdentity(v interface{}) (interface{}, error) {
 	return v, nil
+}
+
+type WMISchema struct {
+	BaseClassSchema map[string]WmiConversionFunction
+	SubClassSchemas map[string]map[string]WmiConversionFunction
+}
+
+func (ws WMISchema) Get(class string, key string) (WmiConversionFunction, bool) {
+	if val, ok := ws.BaseClassSchema[key]; ok {
+		return val, true
+	}
+	val, ok := ws.SubClassSchemas[class][key]
+	return val, ok
+}
+
+func (ws *WMISchema) Put(class string, key string, wcf WmiConversionFunction) {
+	// If no subclass map exists for this class, create it
+	if ws.SubClassSchemas == nil {
+		ws.SubClassSchemas = make(map[string]map[string]WmiConversionFunction)
+	}
+
+	if _, ok := ws.SubClassSchemas[class]; !ok {
+		ws.SubClassSchemas[class] = make(map[string]WmiConversionFunction)
+	}
+
+	ws.SubClassSchemas[class][key] = wcf
+}
+
+func NewWMISchema(base map[string]WmiConversionFunction) *WMISchema {
+	return &WMISchema{
+		BaseClassSchema: base,
+		SubClassSchemas: make(map[string]map[string]WmiConversionFunction),
+	}
 }
 
 // Function that determines if a given value requires additional conversion
@@ -172,7 +221,7 @@ func getProperty(instance *wmi.WmiInstance, propertyName string, logger *logp.Lo
 }
 
 // Given an instance and a property Name, it returns the appropriate conversion function
-func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *logp.Logger) (WmiStringConversionFunction, error) {
+func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *logp.Logger) (WmiConversionFunction, error) {
 	rawProperty, err := getProperty(instance, propertyName, logger)
 	if err != nil {
 		return nil, err
@@ -182,7 +231,7 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 		return nil, fmt.Errorf("could not fetch CIMType for property '%s' with error %w", propertyName, err)
 	}
 
-	var f WmiStringConversionFunction
+	var f WmiConversionFunction
 
 	switch propType {
 	case base.WbemCimtypeDatetime:
@@ -192,7 +241,7 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 	case base.WbemCimtypeSint64:
 		f = ConvertSint64
 	default: // For all other types we return the identity function
-		f = ConvertString
+		f = ConvertIdentity
 	}
 	return f, err
 }
@@ -247,4 +296,66 @@ func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeo
 		// Query completed in time either successfully or with an error
 	}
 	return rows, err
+}
+
+func errorOnClassDoesNotExist(rows []*wmi.WmiInstance, class string, namespace string) error {
+	switch len(rows) {
+	case 0:
+		return fmt.Errorf("Class '%s' not found in namespace '%s'", class, namespace)
+	case 1:
+		return nil
+	default:
+		return fmt.Errorf("Unexpected case: Metaclass should return only a single entry for the class %s", class)
+	}
+}
+
+// Given an instance a list of desired properties, it returns two arrays:
+//
+// Valid Properties: the list of properties that it's both desired and in the class
+// Invalid properties the list of properties that are desired but are not part of the class
+func filterValidProperties(instance_properties []string, properties []string) ([]string, []string) {
+	if len(properties) == 0 {
+		return instance_properties, []string{}
+	}
+
+	// Create the map for membership checks
+	set := make(map[string]struct{})
+	for _, item := range instance_properties {
+		set[item] = struct{}{} // struct{} takes 0 bytes
+	}
+
+	validProperties := []string{}
+	invalidProperties := []string{}
+	for _, p := range properties {
+		if _, exists := set[p]; exists {
+			validProperties = append(validProperties, p)
+		} else {
+			invalidProperties = append(invalidProperties, p)
+		}
+	}
+	return validProperties, invalidProperties
+}
+
+func validateQueryFields(instance *wmi.WmiInstance, queryConfig *QueryConfig, logger *logp.Logger) error {
+
+	// We are using '*', so we don't modify the queryConfig
+	if len(queryConfig.Properties) == 0 {
+		return nil
+	}
+
+	// Valid Properties contains the properties that are both contained in the
+	// user-provided lists and in the properties of the class
+	validProperties, invalidProperties := filterValidProperties(instance.GetClass().GetPropertiesNames(), queryConfig.Properties)
+
+	if len(validProperties) == 0 {
+		return fmt.Errorf("All the properties listed are invalid %v. We are skipping the query.", invalidProperties)
+	}
+
+	if len(invalidProperties) > 0 {
+		logger.Warnf("We are going to ignore the properties '%v' because '%s' class in namespace '%s' does not contain those properties. Please amend your configuration or check why it's the case", invalidProperties, queryConfig.Class, queryConfig.Namespace)
+	}
+
+	queryConfig.Properties = validProperties
+
+	return nil
 }
