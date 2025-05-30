@@ -5,16 +5,14 @@
 package instance
 
 import (
-	"errors"
 	"fmt"
 
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/component/componentstatus"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/management/status"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/manager"
 	"github.com/elastic/beats/v7/libbeat/version"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
@@ -27,28 +25,6 @@ type BeatReceiver struct {
 	beat   *instance.Beat
 	beater beat.Beater
 	Logger *zap.Logger
-}
-
-// reporter implements the status.StatusReporter interface and maps beat statuses to collector statuses.
-type reporter struct {
-	host component.Host
-}
-
-func (r *reporter) UpdateStatus(s status.Status, msg string) {
-	switch s {
-	case status.Starting:
-		componentstatus.ReportStatus(r.host, componentstatus.NewEvent(componentstatus.StatusStarting))
-	case status.Running:
-		componentstatus.ReportStatus(r.host, componentstatus.NewEvent(componentstatus.StatusOK))
-	case status.Degraded:
-		componentstatus.ReportStatus(r.host, componentstatus.NewRecoverableErrorEvent(errors.New(msg)))
-	case status.Failed:
-		componentstatus.ReportStatus(r.host, componentstatus.NewPermanentErrorEvent(errors.New(msg)))
-	case status.Stopping:
-		componentstatus.ReportStatus(r.host, componentstatus.NewEvent(componentstatus.StatusStopped))
-	case status.Stopped:
-		componentstatus.ReportStatus(r.host, componentstatus.NewEvent(componentstatus.StatusStopped))
-	}
 }
 
 // NewBeatReceiver creates a BeatReceiver.  This will also create the beater and start the monitoring server if configured
@@ -101,7 +77,7 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 // BeatReceiver.Stop() starts the beat receiver.
 func (br *BeatReceiver) Start(host component.Host) error {
-	br.beat.OtelStatusReporter = &reporter{host: host}
+	br.beat.Manager = manager.NewOtelManager(br.beat.Manager, host)
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}
