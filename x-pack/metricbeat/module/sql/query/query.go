@@ -212,9 +212,7 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 // format of the query.
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
 	defer func() {
-		if err != nil {
-			err = fmt.Errorf("%s", redactConnectionString(err, m.HostData().URI))
-		}
+		err = sanitizeError(err, m.HostData().URI)
 	}()
 
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
@@ -391,13 +389,13 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	return ret
 }
 
-// redactConnectionString replaces all occurences of URI in err.Error() with "(redacted)"
-func redactConnectionString(err error, URI string) string {
-	msg := err.Error()
-
-	if strings.Contains(msg, URI) {
-		return strings.ReplaceAll(msg, URI, "(redacted)")
+// sanitizeError replaces all occurrences of 'sensitive' in err.Error() with "(redacted)"
+func sanitizeError(err error, sensitive string) error {
+	if err == nil {
+		return nil
 	}
 
-	return msg
+	sanitizedMessage := strings.ReplaceAll(err.Error(), sensitive, "(redacted)")
+
+	return errors.New(sanitizedMessage)
 }
