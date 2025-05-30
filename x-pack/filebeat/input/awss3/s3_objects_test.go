@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectOutput) {
@@ -56,7 +57,7 @@ func newS3GetObjectResponse(filename string, data []byte, contentType string) *s
 }
 
 func TestS3ObjectProcessor(t *testing.T) {
-	logp.TestingSetup()
+	_ = logptest.NewTestingLogger(t, "aws-s3")
 
 	t.Run("download text/plain file", func(t *testing.T) {
 		testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
@@ -355,8 +356,11 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 
 			// since we processed a single object, total and current process size is same
 			require.Equal(t, test.objectSize, values[0])
-			require.GreaterOrEqual(t, test.objectSize, int64(0))
-			require.Equal(t, uint64(test.objectSize), metricRecorder.s3BytesProcessedTotal.Get())
+			var expectedSize uint64
+			if test.objectSize >= 0 {
+				expectedSize = uint64(test.objectSize)
+			}
+			require.Equal(t, expectedSize, metricRecorder.s3BytesProcessedTotal.Get())
 		})
 	}
 }
