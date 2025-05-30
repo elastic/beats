@@ -37,18 +37,18 @@ import (
 type WmiConversionFunction func(interface{}) (interface{}, error)
 
 func ConvertUint64(v interface{}) (interface{}, error) {
-	switch v.(type) {
+	switch val := v.(type) {
 	case string:
-		return strconv.ParseUint(v.(string), 10, 64)
+		return strconv.ParseUint(val, 10, 64)
 	default:
 		return nil, fmt.Errorf("expect string")
 	}
 }
 
 func ConvertSint64(v interface{}) (interface{}, error) {
-	switch v.(type) {
+	switch val := v.(type) {
 	case string:
-		return strconv.ParseInt(v.(string), 10, 64)
+		return strconv.ParseInt(val, 10, 64)
 	default:
 		return nil, fmt.Errorf("expect string")
 	}
@@ -72,14 +72,11 @@ const TIMEZONE_LAYOUT string = "-07:00"
 // 3. Concatenate the "yyyyMMddHHmmSS.mmmmmm" part with the normalized offset.
 // 4. Parse the combined string using time.Parse to return a time.Date object.
 func ConvertDatetime(vi interface{}) (interface{}, error) {
-	switch vi.(type) {
-	case string:
-		break
-	default:
-		return nil, fmt.Errorf("Expect string")
-	}
 
-	v := vi.(string)
+	v, ok := vi.(string)
+	if !ok {
+		return nil, fmt.Errorf("expect string")
+	}
 
 	if len(v) != 25 {
 		return nil, fmt.Errorf("datetime is invalid: the datetime is expected to be exactly 25 characters long, got: %s", v)
