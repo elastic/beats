@@ -228,6 +228,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 - Log bad handshake details when websocket connection fails {pull}41300[41300]
 - Fix aws region in aws-s3 input s3 polling mode.  {pull}41572[41572]
+- Fix s3 metadata extraction in aws-s3 input. {pull}0[0]
 
 
 *Heartbeat*
