@@ -472,3 +472,42 @@ func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []types.Obj
 
 	return mockS3Pager
 }
+
+func TestS3Metadata(t *testing.T) {
+	now := time.Now()
+	resp := &s3.GetObjectOutput{
+		ContentEncoding: awssdk.String("gzip"),
+		Metadata: map[string]string{
+			"Owner":  "foo",
+			"Region": "boo",
+		},
+		ETag:          awssdk.String("etag1"),
+		LastModified:  awssdk.Time(now),
+		ContentLength: awssdk.Int64(12345),
+	}
+
+	meta := s3Metadata(resp, "content-encoding", "etag", "last-modified", "content-length", "x-amz-meta-owner", "x-amz-meta-region")
+	assert.Len(t, meta, 6)
+	assert.Equal(t, "gzip", meta["content-encoding"])
+	assert.Equal(t, now.Format(time.RFC1123), meta["last-modified"], 1.0)
+	assert.Equal(t, "foo", meta["x-amz-meta-owner"])
+	assert.Equal(t, "boo", meta["x-amz-meta-region"])
+	assert.Equal(t, "etag1", meta["etag"])
+
+	// Test requesting a user metadata key with its full S3 name
+	metaWithPrefix := s3Metadata(resp, "x-amz-meta-owner")
+	assert.Len(t, metaWithPrefix, 1)
+	assert.Equal(t, "foo", metaWithPrefix["x-amz-meta-owner"])
+
+	// Test requesting a non-existent key
+	metaNonExistent := s3Metadata(resp, "non-existent-key")
+	assert.Empty(t, metaNonExistent)
+
+	// Test with no keys
+	metaNoKeys := s3Metadata(resp)
+	assert.Nil(t, metaNoKeys)
+
+	// Test with nil response
+	metaNilResp := s3Metadata(nil, "content-encoding")
+	assert.Nil(t, metaNilResp)
+}

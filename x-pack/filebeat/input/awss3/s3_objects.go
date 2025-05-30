@@ -519,7 +519,7 @@ func isStreamGzipped(r *bufio.Reader) (bool, error) {
 
 // s3Metadata returns a map containing the selected S3 object metadata keys.
 func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
-	if len(keys) == 0 {
+	if resp == nil || len(keys) == 0 {
 		return nil
 	}
 
@@ -530,40 +530,76 @@ func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 
 	allMeta := map[string]interface{}{}
 
-	// Get headers using AWS SDK struct tags.
-	fields := reflect.TypeOf(resp).Elem()
-	values := reflect.ValueOf(resp).Elem()
-	for i := 0; i < fields.NumField(); i++ {
-		f := fields.Field(i)
+	fieldToHeader := map[string]string{
+		"AcceptRanges":              "accept-ranges",
+		"CacheControl":              "cache-control",
+		"ContentDisposition":        "content-disposition",
+		"ContentEncoding":           "content-encoding",
+		"ContentLanguage":           "content-language",
+		"ContentLength":             "content-length",
+		"ContentRange":              "content-range",
+		"ContentType":               "content-type",
+		"ETag":                      "etag",
+		"Expires":                   "expires",
+		"LastModified":              "last-modified",
+		"VersionId":                 "x-amz-version-id",
+		"ServerSideEncryption":      "x-amz-server-side-encryption",
+		"SSEKMSKeyId":               "x-amz-server-side-encryption-aws-kms-key-id",
+		"StorageClass":              "x-amz-storage-class",
+		"WebsiteRedirectLocation":   "x-amz-website-redirect-location",
+		"DeleteMarker":              "x-amz-delete-marker",
+		"RequestCharged":            "x-amz-request-charged",
+		"ReplicationStatus":         "x-amz-replication-status",
+		"Expiration":                "x-amz-expiration",
+		"Restore":                   "x-amz-restore",
+		"ObjectLockMode":            "x-amz-object-lock-mode",
+		"ObjectLockRetainUntilDate": "x-amz-object-lock-retain-until-date",
+		"ObjectLockLegalHoldStatus": "x-amz-object-lock-legal-hold",
+		"TagCount":                  "x-amz-tagging-count",
+	}
 
-		if loc, _ := f.Tag.Lookup("location"); loc != "header" {
+	v := reflect.ValueOf(resp).Elem()
+	t := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		fieldName := t.Field(i).Name
+
+		// Check if this field has a known header mapping
+		headerName, ok := fieldToHeader[fieldName]
+		if !ok {
 			continue
 		}
 
-		name, found := f.Tag.Lookup("locationName")
-		if !found {
-			continue
-		}
-		name = strings.ToLower(name)
-
-		if name == userMetaPrefix {
-			continue
-		}
-
-		v := values.Field(i)
-		switch v.Kind() {
-		case reflect.Ptr:
-			if v.IsNil() {
+		// Handle pointer fields
+		if field.Kind() == reflect.Ptr {
+			if field.IsNil() {
 				continue
 			}
-			v = v.Elem()
+			field = field.Elem()
+		}
+
+		// Skip zero values for non-pointer types
+		if field.IsZero() {
+			continue
+		}
+
+		switch field.Interface().(type) {
+		case time.Time:
+			if timeVal := field.Interface().(time.Time); !timeVal.IsZero() {
+				allMeta[headerName] = timeVal.Format(time.RFC1123)
+			}
+		case string:
+			allMeta[headerName] = field.String()
+		case int64:
+			allMeta[headerName] = field.Int()
+		case int32:
+			allMeta[headerName] = field.Interface().(int32)
+		case bool:
+			allMeta[headerName] = field.Bool()
 		default:
-			if v.IsZero() {
-				continue
-			}
+			allMeta[headerName] = fmt.Sprintf("%v", field.Interface())
 		}
-
-		allMeta[name] = v.Interface()
 	}
 
 	// Add in the user defined headers.
@@ -583,6 +619,10 @@ func s3Metadata(resp *s3.GetObjectOutput, keys ...string) mapstr.M {
 		}
 
 		metadata[key] = v
+	}
+
+	if len(metadata) == 0 {
+		return nil
 	}
 
 	return metadata
