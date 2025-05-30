@@ -156,7 +156,6 @@ logging.level: debug
 		10*time.Second, "Filebeat did not close the file")
 
 	// 5. Now that the file was fully read, we can make the assertions.
-
 	type inputMetric struct {
 		EventsPipelineTotal          int `json:"events_pipeline_total"`
 		EventsPipelineFilteredTotal  int `json:"events_pipeline_filtered_total"`
@@ -183,7 +182,92 @@ logging.level: debug
 		celInputID:        2,
 		httpsjonInputID:   1,
 	}
-	wantInputMetricsCount := 4
+
+	assertionsByInputID := map[string]func(t *testing.T, metrics inputMetric){
+		filestreamInputID: func(t *testing.T, metrics inputMetric) {
+			assert.Equal(t, "filestream", metrics.Input)
+
+			// Assert pipeline metrics
+			assert.Equal(t,
+				metrics.EventsPipelineTotal,
+				metrics.EventsPipelinePublishedTotal+
+					metrics.EventsPipelineFilteredTotal,
+				"filestream EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
+			assert.Equal(t, metrics.EventsProcessedTotal,
+				metrics.EventsPipelineTotal,
+				"filestream EventsPipelineTotal != EventsProcessedTotal")
+			assert.Equal(t, 10, metrics.EventsProcessedTotal,
+				"filestream EventsProcessedTotal")
+			assert.Equal(t, 9, metrics.EventsPipelinePublishedTotal,
+				"filestream EventsPipelinePublishedTotal")
+			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
+				"filestream EventsPipelineFilteredTotal")
+
+			// Assert output metrics
+			assert.Equal(t, metrics.EventsPipelinePublishedTotal,
+				metrics.EventsOutputTotal,
+				"EventsOutputTotal should equal EventsPipelinePublishedTotal for %s",
+				metrics.ID)
+			assert.Equal(t, metrics.EventsPipelinePublishedTotal,
+				metrics.EventsOutputAckedTotal,
+				"EventsOutputAckedTotal should equal EventsPipelinePublishedTotal for %s",
+				metrics.ID)
+		},
+		celInputID: func(t *testing.T, metrics inputMetric) {
+			assert.Equal(t, "cel", metrics.Input)
+
+			// Assert pipeline metrics
+			assert.Equal(t,
+				metrics.EventsPipelineTotal,
+				metrics.EventsPipelinePublishedTotal+
+					metrics.EventsPipelineFilteredTotal,
+				"cel EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
+			assert.Equal(t, metrics.EventsPublishedTotal,
+				metrics.EventsPipelineTotal,
+				"cel EventsPublishedTotal != EventsPipelineTotal")
+			assert.Equal(t, 2, metrics.EventsPublishedTotal)
+			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal,
+				"cel EventsPipelinePublishedTotal")
+			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
+				"cel EventsPipelineFilteredTotal")
+
+			// Assert output metrics
+			assert.Equal(t, metrics.EventsPipelinePublishedTotal,
+				metrics.EventsOutputTotal,
+				"EventsOutputTotal should equal EventsPipelinePublishedTotal for %s",
+				metrics.ID)
+			assert.Equal(t, metrics.EventsPipelinePublishedTotal,
+				metrics.EventsOutputAckedTotal,
+				"EventsOutputAckedTotal should equal EventsPipelinePublishedTotal for %s",
+				metrics.ID)
+		},
+		httpsjonInputID: func(t *testing.T, metrics inputMetric) {
+			assert.Equal(t, "httpjson", metrics.Input)
+
+			// Assert pipeline metrics
+			assert.Equal(t,
+				metrics.EventsPipelineTotal,
+				metrics.EventsPipelinePublishedTotal+
+					metrics.EventsPipelineFilteredTotal,
+				"httpjson EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
+			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal,
+				"httpjson EventsPipelinePublishedTotal")
+			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
+				"httpjson EventsPipelineFilteredTotal")
+
+			// Assert output metrics
+			assert.Equal(t, metrics.EventsPipelinePublishedTotal,
+				metrics.EventsOutputTotal,
+				"EventsOutputTotal should equal EventsPipelinePublishedTotal for %s",
+				metrics.ID)
+			assert.Equal(t, metrics.EventsPipelinePublishedTotal,
+				metrics.EventsOutputAckedTotal,
+				"EventsOutputAckedTotal should equal EventsPipelinePublishedTotal for %s",
+				metrics.ID)
+		},
+	}
+
+	wantInputMetricsCount := len(assertionsByInputID) + 1 // +1 for the filestream input without ID
 	var inputMetrics []inputMetric
 	var body []byte
 	errMsg := strings.Builder{}
@@ -260,54 +344,6 @@ logging.level: debug
 		return true
 	}, 10*time.Second, 1*time.Second, "did not get necessary input metrics: %s", &errMsg)
 
-	assertionsByInputID := map[string]func(t *testing.T, metrics inputMetric){
-		filestreamInputID: func(t *testing.T, metrics inputMetric) {
-			assert.Equal(t, "filestream", metrics.Input)
-			assert.Equal(t,
-				metrics.EventsPipelineTotal,
-				metrics.EventsPipelinePublishedTotal+
-					metrics.EventsPipelineFilteredTotal,
-				"filestream EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
-			assert.Equal(t, metrics.EventsProcessedTotal,
-				metrics.EventsPipelineTotal,
-				"filestream EventsPipelineTotal != EventsProcessedTotal")
-			assert.Equal(t, 10, metrics.EventsProcessedTotal,
-				"filestream EventsProcessedTotal")
-			assert.Equal(t, 9, metrics.EventsPipelinePublishedTotal,
-				"filestream EventsPipelinePublishedTotal")
-			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
-				"filestream EventsPipelineFilteredTotal")
-		},
-		celInputID: func(t *testing.T, metrics inputMetric) {
-			assert.Equal(t, "cel", metrics.Input)
-			assert.Equal(t,
-				metrics.EventsPipelineTotal,
-				metrics.EventsPipelinePublishedTotal+
-					metrics.EventsPipelineFilteredTotal,
-				"cel EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
-			assert.Equal(t, metrics.EventsPublishedTotal,
-				metrics.EventsPipelineTotal,
-				"cel EventsPublishedTotal != EventsPipelineTotal")
-			assert.Equal(t, 2, metrics.EventsPublishedTotal)
-			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal,
-				"cel EventsPipelinePublishedTotal")
-			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
-				"cel EventsPipelineFilteredTotal")
-		},
-		httpsjonInputID: func(t *testing.T, metrics inputMetric) {
-			assert.Equal(t, "httpjson", metrics.Input)
-			assert.Equal(t,
-				metrics.EventsPipelineTotal,
-				metrics.EventsPipelinePublishedTotal+
-					metrics.EventsPipelineFilteredTotal,
-				"httpjson EventsPipelineTotal != EventsPipelinePublishedTotal+EventsPipelineFilteredTotal")
-			assert.Equal(t, 1, metrics.EventsPipelinePublishedTotal,
-				"httpjson EventsPipelinePublishedTotal")
-			assert.Equal(t, 1, metrics.EventsPipelineFilteredTotal,
-				"httpjson EventsPipelineFilteredTotal")
-		},
-	}
-
 	count := 0
 	for _, inpMetric := range inputMetrics {
 		assertions, ok := assertionsByInputID[inpMetric.ID]
@@ -349,9 +385,6 @@ func newMockESServer(t *testing.T) *httptest.Server {
 		0,
 		100,
 		func(action api.Action, event []byte) int {
-			// For this test, we only care that events are sent to ES.
-			// We can inspect 'action' and 'event' if needed for more complex assertions.
-			t.Logf("mock-es received action: %v, event: %s", action.Action, string(event))
 			return http.StatusOK
 		})
 	esMock := httptest.NewServer(mockESHandler)
