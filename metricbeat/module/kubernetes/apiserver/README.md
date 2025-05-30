@@ -72,7 +72,7 @@ In order to support a new Kubernetes releases you'll have to generate new expect
 kind create cluster --image kindest/node:v1.32.0
 ```
 
-After that, you can apply the `kubernetes.yml` file from the root of the kubernetes module:
+After that, you can apply the [`kubernetes.yml`](https://github.com/elastic/beats/blob/main/metricbeat/module/kubernetes/kubernetes.yml) file from the root of the kubernetes module:
 
 ```bash
 kubectl apply -f kubernetes.yml
