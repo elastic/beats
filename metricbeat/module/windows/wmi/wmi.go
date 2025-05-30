@@ -152,7 +152,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
 
 			if err != nil {
-				m.reportError(report, fmt.Errorf("%v", err))
+				m.reportError(report, err)
 				continue
 			}
 
@@ -267,7 +267,7 @@ func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfi
 	rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
 
 	if err != nil {
-		return fmt.Errorf("Could not execute the meta_class query '%s' with the error: '%v'. We will try in the next iteration", err)
+		return fmt.Errorf("Could not execute the meta_class query '%s' with the error: '%w'. We will try in the next iteration", err)
 	}
 
 	defer wmi.CloseAllInstances(rows)
@@ -290,7 +290,7 @@ func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfi
 	for _, property := range rows[0].GetClass().GetPropertiesNames() {
 		convertFunction, err := GetConvertFunction(instance, property, m.Logger())
 		if err != nil {
-			return fmt.Errorf("Could not fetch convert function for property %s: %v", property, err)
+			return fmt.Errorf("Could not fetch convert function for property %s: %w", property, err)
 		}
 		BaseClassSchema[property] = convertFunction
 	}

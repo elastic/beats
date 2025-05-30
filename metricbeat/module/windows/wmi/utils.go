@@ -41,7 +41,7 @@ func ConvertUint64(v interface{}) (interface{}, error) {
 	case string:
 		return strconv.ParseUint(v.(string), 10, 64)
 	default:
-		return nil, fmt.Errorf("Expect string")
+		return nil, fmt.Errorf("expect string")
 	}
 }
 
@@ -50,7 +50,7 @@ func ConvertSint64(v interface{}) (interface{}, error) {
 	case string:
 		return strconv.ParseInt(v.(string), 10, 64)
 	default:
-		return nil, fmt.Errorf("Expect string")
+		return nil, fmt.Errorf("expect string")
 	}
 }
 
