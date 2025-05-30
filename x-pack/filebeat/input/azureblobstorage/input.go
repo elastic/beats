@@ -122,7 +122,9 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
-	c.ReaderConfig = cfg.ReaderConfig
+	if isConfigEmpty(c.ReaderConfig) {
+		c.ReaderConfig = cfg.ReaderConfig
+	}
 	return c
 }
 
