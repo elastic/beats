@@ -20,6 +20,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/elastic/mock-es/pkg/api"
+	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -90,10 +92,8 @@ queue.mem:
 
 path.home: {{.path_home}}
 
-output.file:
-  path: ${path.home}
-  filename: output-file
-  rotate_every_kb: 10000
+output.elasticsearch:
+  hosts: ["{{.es_url}}"]
 
 logging.level: debug
 `
@@ -103,6 +103,8 @@ logging.level: debug
 	defer celSrv.Close()
 	httpjsonSrv := makeServer()
 	defer httpjsonSrv.Close()
+
+	esMock := newMockESServer(t)
 
 	filebeat := NewFilebeat(t)
 	tempDir := filebeat.TempDir()
@@ -137,6 +139,7 @@ logging.level: debug
 		"httpjson_requestURL": httpjsonSrv.URL,
 		"path_home":           tempDir,
 		"port":                port,
+		"es_url":              esMock.URL,
 	}), "failed to execute config template")
 
 	filebeat.WriteConfigFile(cgfSB.String())
@@ -327,6 +330,25 @@ func makeServer() *httptest.Server {
 		eventsIdx++
 	}))
 	return srv
+}
+
+func newMockESServer(t *testing.T) *httptest.Server {
+	mockESHandler := api.NewDeterministicAPIHandler(
+		uuid.Must(uuid.NewV4()),
+		"",
+		nil, // No need for otel provider in this test
+		time.Now().Add(24*time.Hour),
+		0,
+		100,
+		func(action api.Action, event []byte) int {
+			// For this test, we only care that events are sent to ES.
+			// We can inspect 'action' and 'event' if needed for more complex assertions.
+			t.Logf("mock-es received action: %v, event: %s", action.Action, string(event))
+			return http.StatusOK
+		})
+	esMock := httptest.NewServer(mockESHandler)
+	t.Cleanup(esMock.Close)
+	return esMock
 }
 
 func randomPort(t *testing.T) string {
