@@ -49,11 +49,13 @@ type Config struct {
 }
 
 type QueryConfig struct {
-	QueryStr   string   // The compiled query string generated internally (not user-configurable)
-	Class      string   `config:"class"`      // WMI class to query (used in the FROM clause)
-	Properties []string `config:"properties"` // List of properties to retrieve (used in the SELECT clause). If omitted, all properties of the class are fetched
-	Where      string   `config:"where"`      // Custom WHERE clause to filter query results. The provided string is used directly in the query
-	Namespace  string   `config:"namespace"`  // WMI namespace for the query. This takes precedence over the globally configured namespace
+	QueryStr           string    // The compiled query string generated internally (not user-configurable)
+	UnrecoverableError error     // An unrecoverable error. When different from nil, the query execution will be skipped (not user-configurable)
+	WmiSchema          WMISchema // The list of conversion functions to apply (not user-configurable)
+	Class              string    `config:"class"`      // WMI class to query (used in the FROM clause)
+	Properties         []string  `config:"properties"` // List of properties to retrieve (used in the SELECT clause). If omitted, all properties of the class are fetched
+	Where              string    `config:"where"`      // Custom WHERE clause to filter query results. The provided string is used directly in the query
+	Namespace          string    `config:"namespace"`  // WMI namespace for the query. This takes precedence over the globally configured namespace
 }
 
 func NewDefaultConfig() Config {
