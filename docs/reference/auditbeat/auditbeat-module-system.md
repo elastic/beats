@@ -28,7 +28,7 @@ Event information is sent as the events occur (e.g. a process starts or stops). 
 
 ### Entity IDs [_entity_ids]
 
-This module populates `entity_id` fields to uniquely identify entities (users, packages, processes…​) within a host. This requires Auditbeat to obtain a unique identifier for the host:
+This module populates `entity_id` fields to uniquely identify entities (users, packages, processes…) within a host. This requires Auditbeat to obtain a unique identifier for the host:
 
 * Windows: Uses the `HKLM\Software\Microsoft\Cryptography\MachineGuid` registry key.
 * macOS: Uses the value returned by `gethostuuid(2)` system call.

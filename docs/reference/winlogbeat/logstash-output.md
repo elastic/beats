@@ -120,12 +120,16 @@ The default value is `false`.
 
 ### `worker` or `workers` [_worker_or_workers]
 
-The number of workers per configured host publishing events to {{ls}}. This is best used with load balancing mode enabled. Example: If you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
+`worker` or `workers` specifies the number of connections created per host for publishing events.
+Refer to the `loadblance` setting for details about how the load balancing works to distribute requests across the Elasticsearch cluster nodes.
+
+The default value is `1`.
 
 
 ### `loadbalance` [loadbalance]
 
 When `loadbalance: true` is set, Winlogbeat connects to all configured hosts and sends data through all connections in parallel. If a connection fails, data is sent to the remaining hosts until it can be reestablished. Data will still be sent as long as Winlogbeat can connect to at least one of its configured hosts.
+Use the `worker` or `workers` setting to specify the number of connections per host.
 
 When `loadbalance: false` is set, Winlogbeat sends data to a single host at a time. The target host is chosen at random from the list of configured hosts, and all data is sent to that target until the connection fails, when a new target is selected. Data will still be sent as long as Winlogbeat can connect to at least one of its configured hosts. To rotate through the list of configured hosts over time, use this option in conjunction with the `ttl` setting to close the connection at the configured interval and choose a new target host.
 
