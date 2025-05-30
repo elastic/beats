@@ -23,13 +23,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/gofrs/uuid/v5"
+
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/kafka"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/redis"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/outputs/otelconsumer"
-	"github.com/gofrs/uuid/v5"
 )
 
 func TestOutputsMetricsIntegration(t *testing.T) {
