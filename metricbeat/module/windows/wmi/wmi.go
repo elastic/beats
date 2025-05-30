@@ -137,59 +137,19 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			queryConfig := &m.config.NamespaceQueryIndex[namespace][i]
 
 			// If we encountered an unrecoverable error before we do not attempt to perform the query again
-			// We report the same error as a document
+			// We report the same error as in the first iteration
 			if queryConfig.UnrecoverableError != nil {
 				m.reportError(report, queryConfig.UnrecoverableError)
 				continue
 			}
 
-			// The wmi library does not distinguish between the genuine empty result set and actual errors
-			// More information in this issue: https://github.com/microsoft/wmi/issues/156
-			//
-			// Thus, to enhance the troubleshooting we try to exclude the two most obvious cases by first
-			// validating the existance of the class and of the required properties in the first run.
-			//
-			// Given that we already fetch the meta_class table we also create the schema for the class required.
-			// Subclasses can extend the schema
+			// We initialize the query lazily if not yet initialized
 			if queryConfig.QueryStr == "" {
-				query := fmt.Sprintf("SELECT * FROM meta_class WHERE __Class = '%s'", queryConfig.Class)
-				metaRows, metaErr := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
-
-				if metaErr != nil {
-					m.reportError(report, fmt.Errorf("Could not execute metaclass query: %v. We will try in the next iteration"))
-					continue
-				}
-
-				defer wmi.CloseAllInstances(metaRows)
-
-				err = errorOnClassDoesNotExist(metaRows, queryConfig.Class, queryConfig.Namespace)
-
+				err = m.initQuery(session, queryConfig)
 				if err != nil {
-					queryConfig.UnrecoverableError = err
-					m.Logger().Warn("%v. The query will be skipped in the future", err)
 					m.reportError(report, err)
 					continue
 				}
-
-				err = validateQueryFields(metaRows[0], queryConfig, m.Logger())
-				if err != nil {
-					queryConfig.UnrecoverableError = err
-					m.reportError(report, err)
-					continue
-				}
-
-				schema := make(map[string]WmiConversionFunction)
-				for _, property := range metaRows[0].GetClass().GetPropertiesNames() {
-					convertFunction, err := GetConvertFunction(metaRows[0], property, m.Logger())
-					if err != nil {
-						return fmt.Errorf("Could not fetch convert function for property %s: %v", property, err)
-					}
-					schema[property] = convertFunction
-				}
-
-				queryConfig.WmiSchema = *NewWMISchema(schema)
-				queryConfig.compileQuery()
-
 			}
 
 			query := queryConfig.QueryStr
@@ -246,28 +206,89 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						continue
 					}
 
-					convertFun, ok := queryConfig.WmiSchema.Get(instance.GetClassName(), propertyName)
+					finalValue := propertyValue
 
-					if !ok {
-						convertFun, err = GetConvertFunction(instance, propertyName, m.Logger())
+					// The script API of WMI returns strings for uint64, sint64, datetime
+					// Link: https://learn.microsoft.com/en-us/windows/win32/wmisdk/querying-wmi
+					// As a user, I want to have the right CIM_TYPE in the final document
+					//
+					// Example: in the query: SELECT * FROM Win32_OperatingSystem
+					// FreePhysicalMemory is a string, but it should be an uint64
+					if RequiresExtraConversion(propertyValue) {
+
+						convertFun, ok := queryConfig.WmiSchema.Get(instance.GetClassName(), propertyName)
+
+						if !ok {
+							convertFun, err = GetConvertFunction(instance, propertyName, m.Logger())
+							if err != nil {
+								m.Logger().Warn("Skipping addition of property %s. Cannot convert: %v", propertyName, err)
+								continue
+							}
+							queryConfig.WmiSchema.Put(instance.GetClassName(), propertyName, convertFun)
+						}
+
+						convertedValue, err := convertFun(propertyValue)
 						if err != nil {
 							m.Logger().Warn("Skipping addition of property %s. Cannot convert: %v", propertyName, err)
 							continue
 						}
-						queryConfig.WmiSchema.Put(instance.GetClassName(), propertyName, convertFun)
+
+						finalValue = convertedValue
 					}
 
-					convertedValue, err := convertFun(propertyValue)
-					if err != nil {
-						m.Logger().Warn("Skipping addition of property %s. Cannot convert: %v", propertyName, err)
-						continue
-					}
-
-					event.MetricSetFields.Put(propertyName, convertedValue)
+					event.MetricSetFields.Put(propertyName, finalValue)
 				}
 				report.Event(event)
 			}
 		}
 	}
+	return nil
+}
+
+// The WMI library does not differentiate between a genuinely empty result set and actual query errors.
+// See this issue for more context: https://github.com/microsoft/wmi/issues/156
+//
+// To improve troubleshooting, we attempt to rule out the two most common causes early by validating
+// the existence of the class and its required properties during the initial query.
+//
+// Since we already fetch the __meta_class table, we also build the schema for the requested base class.
+// Subclasses may extend this schema as needed.
+func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfig) error {
+	query := fmt.Sprintf("SELECT * FROM meta_class WHERE __Class = '%s'", queryConfig.Class)
+	rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
+
+	if err != nil {
+		return fmt.Errorf("Could not execute metaclass query: %v. We will try in the next iteration")
+	}
+
+	defer wmi.CloseAllInstances(rows)
+
+	err = errorOnClassDoesNotExist(rows, queryConfig.Class, queryConfig.Namespace)
+
+	if err != nil {
+		queryConfig.UnrecoverableError = err
+		return err
+	}
+
+	instance := rows[0]
+
+	err = validateQueryFields(instance, queryConfig, m.Logger())
+	if err != nil {
+		queryConfig.UnrecoverableError = err
+		return err
+	}
+
+	BaseClassSchema := make(map[string]WmiConversionFunction)
+	for _, property := range rows[0].GetClass().GetPropertiesNames() {
+		convertFunction, err := GetConvertFunction(instance, property, m.Logger())
+		if err != nil {
+			return fmt.Errorf("Could not fetch convert function for property %s: %v", property, err)
+		}
+		BaseClassSchema[property] = convertFunction
+	}
+
+	queryConfig.WmiSchema = *NewWMISchema(BaseClassSchema)
+	queryConfig.compileQuery()
+
 	return nil
 }
