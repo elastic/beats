@@ -63,11 +63,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
-	// err = config.CompileQueries()
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	err = config.ApplyDefaultNamespaceToQueries(config.Namespace)
 	if err != nil {
 		return nil, err
