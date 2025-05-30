@@ -244,7 +244,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
-	groupReporter := otelstatus.NewGroupStatusReporter(b.OtelStatusReporter)
+	groupReporter := otelstatus.NewGroupStatusReporter(b.Manager)
 
 	// Static modules (metricbeat.runners)
 	for hash, r := range bt.runners {
