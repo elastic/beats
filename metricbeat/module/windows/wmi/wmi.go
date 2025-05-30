@@ -158,6 +158,20 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 			defer wmi.CloseAllInstances(rows)
 
+			if len(rows) == 0 {
+				message := fmt.Sprintf(
+					"The query '%s' did not return any results. "+
+						"This can happen if the where clause is too restrictive, "+
+						"but it might also indicate an invalid query. "+
+						"Note: the class and property names are validated, but the where clause is not. "+
+						"Ensure the full query is valid (e.g., using `Get-CimInstance -Query \"%s\" -Namespace \"%s\"`), "+
+						"and check the WMI-Activity Operational Log for further details.",
+					query, query, namespace,
+				)
+				m.Logger().Warn(message)
+				m.reportError(report, fmt.Errorf(message))
+			}
+
 			for _, instance := range rows {
 				event := mb.Event{
 					MetricSetFields: mapstr.M{
