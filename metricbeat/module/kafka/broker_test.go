@@ -18,9 +18,10 @@
 package kafka
 
 import (
-	"github.com/stretchr/testify/require"
 	"net"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"errors"
 
