@@ -1,0 +1,7 @@
+{
+    "component_templates": [
+        { "name": "broken-response" },
+        { "name": "simple-response" },
+        { "name": "failed-response" }
+    ]
+}

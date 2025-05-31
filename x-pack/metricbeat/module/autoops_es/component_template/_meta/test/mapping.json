@@ -1,0 +1,15 @@
+{
+    "name": "$name",
+    "component_template": {
+        "template": {
+            "settings": {
+                "index": {
+                    "lifecycle": {
+                        "name": "my-lifecycle"
+                    }
+                }
+            }
+        },
+        "ignored_field": true
+    }
+}
