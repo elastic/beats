@@ -237,6 +237,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add Fleet status update functionality to gcppubsub input. {issue}44272[44272] {pull}44507[44507]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44273[44273] {pull}44508[44508]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 
 *Auditbeat*
 
