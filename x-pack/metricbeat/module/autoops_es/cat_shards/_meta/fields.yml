@@ -1,0 +1,70 @@
+- name: cat_shards
+  type: group
+  release: beta
+  description: >
+    cat shards information from the cluster
+  fields:
+    - name: ip
+      type: keyword
+      description: >
+        Shard id
+    - name: index
+      type: keyword
+      description: >
+        Shard index
+    - name: shard
+      type: keyword
+      description: >
+        Shard number
+    - name: prirep
+      type: keyword
+      description: >
+        Primary / Replica shard
+    - name: state
+      type: keyword
+      description: >
+        State of the shard
+    - name: docs
+      type: long
+      description: >
+        Docs count
+    - name: store
+      type: long
+      description: >
+        Shard size in bytes
+    - name: segments_count
+      type: long
+      description: >
+        Shard segments count
+    - name: search_query_total
+      type: long
+      description: >
+        Shard search count
+    - name: search_query_time
+      type: long
+      description: >
+        Shard search time in millis
+    - name: indexing_index_total
+      type: long
+      description: >
+        Shard indexing total
+    - name: indexing_index_time
+      type: long
+      description: >
+        Shard indexing time
+    - name: indexing_index_failed
+      type: long
+      description: >
+        Shard indexing failed
+    - name: merges_total
+      type: long
+      description: >
+        Shard merges total
+    - name: merges_total_size
+      type: long
+      description: >
+        Shard merges size in bytes
+    - name: merges_total_time
+      type: long
+      description: >
+        Shard merges time in millis
