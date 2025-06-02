@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - [Filestream] Log the "reader closed" message on the debug level to avoid log spam. {pull}44051[44051]
 - Fix links to CEL mito extension functions in input documentation. {pull}44098[44098]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
+- Journald input now works on Docker containers, all image variants except Wolfi. {issue}41278[41278] {issue}44040[44040] {pull}44295[44295]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 
@@ -244,6 +245,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add ability to remove request trace logs from http_endpoint input. {pull}40005[40005]
 - Add ability to remove request trace logs from entityanalytics input. {pull}40004[40004]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 
 *Auditbeat*
 

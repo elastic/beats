@@ -24,8 +24,10 @@ in Filebeat's image run the following, adjusting the image name/tag
 according to the version that you are running:
 
 ```sh
-docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat-wolfi:<VERSION> --version
+docker run --rm -it --entrypoint "journalctl" docker.elastic.co/beats/filebeat:<VERSION> --version
 ```
+
+The Wolfi docker image variant does not contain the `jouranlctl` binary.
 
 The simplest configuration example is one that reads all logs from the default
 journal.
