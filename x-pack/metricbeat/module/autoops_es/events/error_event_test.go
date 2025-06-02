@@ -6,36 +6,105 @@ package events
 
 import (
 	"errors"
-	"fmt"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 )
 
-func TestGetErrorCodeHTTPError(t *testing.T) {
-	httpErr := &utils.HTTPResponse{StatusCode: 404}
-	err := fmt.Errorf("wrapped error: %w", httpErr)
+func TestExtractPathAndQuery(t *testing.T) {
+	tests := []struct {
+		name          string
+		input         string
+		expectedPath  string
+		expectedQuery string
+	}{
+		{
+			name:          "Valid URL with path and query",
+			input:         "https://example.com/path/to/resource?param1=value1&param2=value2",
+			expectedPath:  "/path/to/resource",
+			expectedQuery: "param1=value1&param2=value2",
+		},
+		{
+			name:          "Valid URL with path only",
+			input:         "https://example.com/path/to/resource",
+			expectedPath:  "/path/to/resource",
+			expectedQuery: "",
+		},
+		{
+			name:          "Valid URL with query only",
+			input:         "https://example.com/?param1=value1",
+			expectedPath:  "/",
+			expectedQuery: "param1=value1",
+		},
+		{
+			name:          "Invalid URL",
+			input:         "://invalid-url",
+			expectedPath:  "",
+			expectedQuery: "",
+		},
+		{
+			name:          "Empty URL",
+			input:         "",
+			expectedPath:  "",
+			expectedQuery: "",
+		},
+	}
 
-	result := getErrorCode(err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			path, query := extractPathAndQuery(tt.input)
 
-	assert.Equal(t, "HTTP_404", result, "Expected HTTP_404 for HTTPResponse with status code 404")
+			assert.Equal(t, tt.expectedPath, path)
+			assert.Equal(t, tt.expectedQuery, query)
+		})
+	}
 }
 
-func TestGetErrorCodeUnknownError(t *testing.T) {
-	err := errors.New("some generic error")
+func TestGetHTTPResponseBodyInfo(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputError     error
+		expectedStatus int
+		expectedCode   string
+		expectedBody   string
+	}{
+		{
+			name: "Error is of type HTTPResponse",
+			inputError: &utils.HTTPResponse{
+				StatusCode: 404,
+				Body:       "Not Found",
+			},
+			expectedStatus: 404,
+			expectedCode:   "HTTP_404",
+			expectedBody:   "Not Found",
+		},
+		{
+			name:           "Error is not of type HTTPResponse",
+			inputError:     errors.New("some other error"),
+			expectedStatus: 0,
+			expectedCode:   "UNKNOWN_ERROR",
+			expectedBody:   "",
+		},
+		{
+			name:           "Error is nil",
+			inputError:     nil,
+			expectedStatus: 0,
+			expectedCode:   "UNKNOWN_ERROR",
+			expectedBody:   "",
+		},
+	}
 
-	result := getErrorCode(err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			status, code, body := getHTTPResponseBodyInfo(tt.inputError)
 
-	assert.Equal(t, "UNKNOWN_ERROR", result, "Expected UNKNOWN_ERROR for non-HTTPResponse")
-}
-
-func TestGetErrorCodeNilError(t *testing.T) {
-	result := getErrorCode(nil)
-
-	assert.Equal(t, "UNKNOWN_ERROR", result, "Expected UNKNOWN_ERROR for nil error")
+			assert.Equal(t, tt.expectedStatus, status)
+			assert.Equal(t, tt.expectedCode, code)
+			assert.Equal(t, tt.expectedBody, body)
+		})
+	}
 }
 
 func TestGetSurfaceErrorWithColon(t *testing.T) {

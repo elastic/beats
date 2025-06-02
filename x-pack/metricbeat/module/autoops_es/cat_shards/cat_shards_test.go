@@ -181,10 +181,14 @@ func Test500FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.Equal(t, "HTTP_500", errorField.ErrorCode)
 		require.Contains(t, errorField.ErrorMessage, "failed to load resolved index details failed to fetch data")
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
-		require.Equal(t, "/_cat/shards?s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Path)
+		require.Equal(t, "/_cat/shards", errorField.URLPath)
+		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error with body: Server Error", errorField.Context)
+		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error with body: Server Error", errorField.StackTrace)
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
+		require.Equal(t, "GET", errorField.HTTPMethod)
+		require.Equal(t, 500, errorField.HTTPStatusCode)
+		require.Equal(t, "Server Error", errorField.HTTPResponse) // checking the HTTP response body
 	})
 }
 
@@ -201,10 +205,14 @@ func Test404FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.Equal(t, "HTTP_404", errorField.ErrorCode)
 		require.Contains(t, errorField.ErrorMessage, "failed to load resolved index details failed to fetch data")
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
-		require.Equal(t, "/_cat/shards?s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Path)
+		require.Equal(t, "/_cat/shards", errorField.URLPath)
+		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Contains(t, errorField.Context, "failed to load resolved index details failed to fetch data: HTTP error 404 Not Found")
+		require.Contains(t, errorField.StackTrace, "failed to load resolved index details failed to fetch data: HTTP error 404 Not Found")
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
+		require.Equal(t, "GET", errorField.HTTPMethod)
+		require.Equal(t, 404, errorField.HTTPStatusCode)
+		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }
 
@@ -222,9 +230,13 @@ func Test405FailedToResolveIndexesWhileFetching(t *testing.T) {
 		require.Equal(t, "failed to load resolved index details failed to fetch data", errorField.ErrorMessage)
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
-		require.Equal(t, "/_cat/shards?s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Path)
+		require.Equal(t, "/_cat/shards", errorField.URLPath)
+		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Contains(t, errorField.Context, "failed to load resolved index details failed to fetch data: HTTP error 405 Method Not Allowed")
+		require.Contains(t, errorField.StackTrace, "failed to load resolved index details failed to fetch data: HTTP error 405 Method Not Allowed")
+		require.Equal(t, "GET", errorField.HTTPMethod)
+		require.Equal(t, 405, errorField.HTTPStatusCode)
+		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }
 
@@ -242,8 +254,12 @@ func Test500FailedToResolveIndexesWhileFetchingEmptyResponse(t *testing.T) {
 		require.Equal(t, "failed to load resolved index details failed to fetch data", errorField.ErrorMessage)
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
-		require.Equal(t, "/_cat/shards?s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Path)
+		require.Equal(t, "/_cat/shards", errorField.URLPath)
+		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Contains(t, errorField.Context, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error")
+		require.Contains(t, errorField.StackTrace, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error")
+		require.Equal(t, "GET", errorField.HTTPMethod)
+		require.Equal(t, 500, errorField.HTTPStatusCode)
+		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
 	})
 }
