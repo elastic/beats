@@ -195,7 +195,6 @@ steps:
         command: |
           set -euo pipefail
           echo "~~~ Running tests"
-          export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat
           mage goFIPSOnlyIntegTest
         retry:
