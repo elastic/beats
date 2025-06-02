@@ -578,6 +578,27 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
 			},
 		},
+		{
+			name: "CustomContentTypeAtRootLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"content_type":                        "application/x-gzip",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsGzJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -128,7 +128,7 @@ $$$supported-attributes$$$
 11. [file_selectors](#attrib-file_selectors)
 12. [expand_event_list_from_field](#attrib-expand_event_list_from_field)
 13. [timestamp_epoch](#attrib-timestamp_epoch)
-
+14. [custom_properties](#attrib-custom-properties)
 
 ## `account_name` [attrib-account-name]
 
@@ -335,6 +335,87 @@ filebeat.inputs:
 ```
 
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
+
+## `Custom Properties` [custom_properties]
+
+Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set/override custom blob properties
+provides more flexibility when reading blobs from a remote storage where the user might only have read access.
+
+The currently supported `Custom Properties` are :-  
+
+1. [content_type](#attrib-content-type)
+2. [encoding](#attrib-encoding)
+
+## `content_type` [content_type]
+
+This configuration attribute can be used to set a user-defined `content_type` for the blob property. Setting a custom `content_type` will only set the `content-type` property of a blob if it's missing/empty. If you want to override an already existing `content-type` value, you will need to set the `override_content_type` flag to `true`. These attributes can be defined at the `root` or `container` level in the configuration. Container level definitions will always take precedence.
+
+**Example Configuration:**
+
+**At root level**
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  content_type: `application/x-gzip`
+  override_content_type: true
+  containers:
+  - name: container_1
+```
+
+**At container level**
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    content_type: `application/x-gzip`
+    override_content_type: true
+```
+
+## `encoding` [encoding]
+This configuration attribute can be used to set a user-defined `encoding` for the blob property. Setting a custom `encoding` will only set the `encoding` property of a blob if it's missing/empty. If you want to override an already existing `encoding` value, you will need to set the `override_encoding` flag to `true`. These attributes can be defined at the `root` or `container` level in the configuration. Container level definitions will always take precedence.
+
+**Example Configuration:**
+
+**At root level**
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  encoding: `gzip`
+  override_encoding: true
+  containers:
+  - name: container_1
+```
+
+**At container level**
+```yaml
+filebeat.inputs:
+- type: azure-blob-storage
+  id: my-azureblobstorage-id
+  enabled: true
+  account_name: some_account
+  auth.shared_credentials.account_key: some_key
+  containers:
+  - name: container_1
+    encoding: `gzip`
+    override_encoding: true
+```
+
+::::{note}
+The custom property configurations are bounded by the current input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and throw an appropriate error.
+::::
 
 $$$container-overrides$$$
 **The sample configs below will explain the container level overriding of attributes a bit further :-**
