@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-index.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Elasticsearch index metricset [metricbeat-metricset-elasticsearch-index]
 
 This is the index metricset of the module elasticsearch.

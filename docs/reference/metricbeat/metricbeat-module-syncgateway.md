@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-syncgateway.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # SyncGateway module [metricbeat-module-syncgateway]
 
 ::::{warning}

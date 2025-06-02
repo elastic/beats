@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-file_integrity.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # File Integrity Module [auditbeat-module-file_integrity]
 
 The `file_integrity` module sends events when a file is changed (created, updated, or deleted) on disk. The events contain file metadata and hashes.

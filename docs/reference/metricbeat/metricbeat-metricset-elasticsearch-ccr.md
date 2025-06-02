@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-ccr.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Elasticsearch ccr metricset [metricbeat-metricset-elasticsearch-ccr]
 
 This is the `ccr` metricset of the {{es}} module. It uses the Cross-Cluster Replication Stats API endpoint to fetch metrics about cross-cluster replication from the {{es}} clusters that are participating in cross-cluster replication.

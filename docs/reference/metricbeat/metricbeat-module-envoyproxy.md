@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-envoyproxy.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Envoyproxy module [metricbeat-module-envoyproxy]
 
 This is the envoyproxy module.

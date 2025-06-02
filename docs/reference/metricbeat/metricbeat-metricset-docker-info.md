@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-info.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Docker info metricset [metricbeat-metricset-docker-info]
 
 The Docker `info` metricset collects system-wide information based on the [Docker Remote API](https://docs.docker.com/engine/reference/api/docker_remote_api_v1.24/#/display-system-wide-information).

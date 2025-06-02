@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-containerd-blkio.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Containerd blkio metricset [metricbeat-metricset-containerd-blkio]
 
 ::::{warning}

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-dataproc.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Google Cloud Platform dataproc metricset [metricbeat-metricset-gcp-dataproc]
 
 Dataproc metricset fetches metrics from [Dataproc](https://cloud.google.com/dataproc/) in Google Cloud Platform.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-nginx.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Nginx module [metricbeat-module-nginx]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

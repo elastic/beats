@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-fsstat.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System fsstat metricset [metricbeat-metricset-system-fsstat]
 
 The System `fsstat` metricset provides overall file system statistics.

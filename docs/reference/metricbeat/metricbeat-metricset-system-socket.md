@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-socket.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System socket metricset [metricbeat-metricset-system-socket]
 
 This metricset is available on Linux only and requires kernel 2.6.14 or newer.

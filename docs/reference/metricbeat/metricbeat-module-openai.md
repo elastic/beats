@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-openai.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # openai module [metricbeat-module-openai]
 
 ::::{warning}

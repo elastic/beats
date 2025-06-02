@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-sql-query.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # SQL query metricset [metricbeat-metricset-sql-query]
 
 The sql `query` metricset collects rows returned by a query.

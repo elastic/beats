@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-system-socket.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System socket dataset [auditbeat-dataset-system-socket]
 
 ::::{warning}

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-cluster_disk.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Ceph cluster_disk metricset [metricbeat-metricset-ceph-cluster_disk]
 
 This is the `cluster_disk` metricset of the Ceph module.

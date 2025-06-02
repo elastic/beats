@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-vsphere-datastore.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # vSphere datastore metricset [metricbeat-metricset-vsphere-datastore]
 
 This is the `datastore` metricset of the vSphere module.

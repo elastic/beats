@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_service.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kubernetes state_service metricset [metricbeat-metricset-kubernetes-state_service]
 
 The `state_service` metricset for kubernetes service related metrics from `kube-state-metrics`.

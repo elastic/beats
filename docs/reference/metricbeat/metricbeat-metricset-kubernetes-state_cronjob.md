@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_cronjob.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kubernetes state_cronjob metricset [metricbeat-metricset-kubernetes-state_cronjob]
 
 This is the `state_cronjob` metricset of the Kubernetes module.

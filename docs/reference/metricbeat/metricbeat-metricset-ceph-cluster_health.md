@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-cluster_health.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Ceph cluster_health metricset [metricbeat-metricset-ceph-cluster_health]
 
 This is the `cluster_health` metricset of the Ceph module.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-diskio.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Docker diskio metricset [metricbeat-metricset-docker-diskio]
 
 The Docker `diskio` metricset collects disk I/O metrics.

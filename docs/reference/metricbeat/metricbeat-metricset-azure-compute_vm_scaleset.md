@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-azure-compute_vm_scaleset.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Azure compute_vm_scaleset metricset [metricbeat-metricset-azure-compute_vm_scaleset]
 
 This is the compute_vm_scaleset metricset of the module azure.

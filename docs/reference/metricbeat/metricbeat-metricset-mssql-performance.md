@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mssql-performance.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # MSSQL performance metricset [metricbeat-metricset-mssql-performance]
 
 `performance` Metricset fetches information from what’s commonly known as [Performance Counters](https://docs.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/sys-dm-os-performance-counters-transact-sql?view=sql-server-2017) in MSSQL.

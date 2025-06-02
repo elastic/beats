@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-modules.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Modules [winlogbeat-modules]
 
 ::::{note}

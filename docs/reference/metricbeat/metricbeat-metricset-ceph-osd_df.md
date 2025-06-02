@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-osd_df.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Ceph osd_df metricset [metricbeat-metricset-ceph-osd_df]
 
 This is the `osd_df` metricset of the Ceph module.

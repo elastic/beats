@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-system.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System Module [auditbeat-module-system]
 
 ::::{warning}

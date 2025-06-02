@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kafka-broker.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kafka broker metricset [metricbeat-metricset-kafka-broker]
 
 ::::{warning}

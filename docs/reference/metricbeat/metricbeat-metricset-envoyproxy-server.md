@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-envoyproxy-server.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Envoyproxy server metricset [metricbeat-metricset-envoyproxy-server]
 
 This is the server metricset of the module envoyproxy.

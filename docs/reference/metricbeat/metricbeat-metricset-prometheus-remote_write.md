@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-prometheus-remote_write.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Prometheus remote_write metricset [metricbeat-metricset-prometheus-remote_write]
 
 This is the remote_write metricset of the module prometheus. This metricset can receive metrics from a Prometheus server that has configured [remote_write](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#remote_write) setting accordingly, for instance:

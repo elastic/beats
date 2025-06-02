@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-postgresql.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # PostgreSQL module [metricbeat-module-postgresql]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

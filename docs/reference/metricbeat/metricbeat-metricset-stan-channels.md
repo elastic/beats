@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-stan-channels.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Stan channels metricset [metricbeat-metricset-stan-channels]
 
 Top-level streaming server (STAN) channel statistics

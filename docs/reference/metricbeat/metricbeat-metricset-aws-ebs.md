@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-ebs.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # AWS ebs metricset [metricbeat-metricset-aws-ebs]
 
 Amazon Elastic Block Store (Amazon EBS) sends data points to CloudWatch for several metrics. Most EBS volumes automatically send five-minute metrics to CloudWatch only when the volume is attached to an instance. This aws `ebs` metricset collects these Cloudwatch metrics for monitoring purposes.

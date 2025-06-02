@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-state_deployment.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kubernetes state_deployment metricset [metricbeat-metricset-kubernetes-state_deployment]
 
 This is the `state_deployment` metricset of the Kubernetes module.

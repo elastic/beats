@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-logstash-node.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Logstash node metricset [metricbeat-metricset-logstash-node]
 
 This is the node metricset of the module Logstash.

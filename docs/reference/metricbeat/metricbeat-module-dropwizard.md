@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-dropwizard.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Dropwizard module [metricbeat-module-dropwizard]
 
 This is the [Dropwizard](http://dropwizard.io) module. The default metricset is `collector`.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-ceph-pool_disk.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Ceph pool_disk metricset [metricbeat-metricset-ceph-pool_disk]
 
 This is the `pool_disk` metricset of the Ceph module.

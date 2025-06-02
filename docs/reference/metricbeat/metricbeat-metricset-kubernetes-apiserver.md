@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-apiserver.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kubernetes apiserver metricset [metricbeat-metricset-kubernetes-apiserver]
 
 This is the `apiserver` metricset of the Kubernetes module, in charge of retrieving metrics from the Kubernetes API (available at `/metrics`).

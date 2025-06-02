@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kafka-consumergroup.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kafka consumergroup metricset [metricbeat-metricset-kafka-consumergroup]
 
 This is the `consumergroup` metricset of the Kafka module.

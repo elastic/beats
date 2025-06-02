@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-rabbitmq.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # RabbitMQ module [metricbeat-module-rabbitmq]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

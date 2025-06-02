@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-aws.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # AWS module [metricbeat-module-aws]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

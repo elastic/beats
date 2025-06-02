@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-http.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # HTTP module [metricbeat-module-http]
 
 The HTTP module is a Metricbeat module used to call arbitrary HTTP endpoints for which a dedicated Metricbeat module is not available.

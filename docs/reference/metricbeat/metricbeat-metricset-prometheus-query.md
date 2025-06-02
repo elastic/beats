@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-prometheus-query.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Prometheus query metricset [metricbeat-metricset-prometheus-query]
 
 This is the `query` metricset to query from [querying API of Prometheus](https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries).

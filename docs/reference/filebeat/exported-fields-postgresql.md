@@ -18,13 +18,13 @@ Fields from the PostgreSQL log files.
 **`postgresql.log.timestamp`**
 :   The timestamp from the log line.
 
-deprecated:[7.3.0]
+{applies_to}`product: deprecated 7.3.0`
 
 
 **`postgresql.log.core_id`**
 :   Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
 
-deprecated:[8.0.0]
+{applies_to}`product: deprecated 8.0.0`
 
 type: alias
 
@@ -152,7 +152,7 @@ example: client backend
 **`postgresql.log.error.code`**
 :   Error code returned by Postgres (if any). Deprecated: errors can have letters. Use sql_state_code instead.
 
-deprecated:[8.0.0]
+{applies_to}`product: deprecated 8.0.0`
 
 type: alias
 

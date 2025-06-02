@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-oracle.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Oracle module [metricbeat-module-oracle]
 
 This is the [Oracle](https://www.oracle.com) module for Metricbeat. It is under active development with feedback from the community. A single Metricset for Tablespace monitoring is added so the community can start gathering metrics from their nodes and contributing to the module.

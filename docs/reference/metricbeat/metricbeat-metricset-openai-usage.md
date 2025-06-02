@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-openai-usage.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # openai usage metricset [metricbeat-metricset-openai-usage]
 
 ::::{warning}

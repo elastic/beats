@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-modules.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Modules [metricbeat-modules]
 
 This section contains detailed information about the metric collecting modules contained in Metricbeat. Each module contains one or multiple metricsets. More details about each module can be found under the links below.

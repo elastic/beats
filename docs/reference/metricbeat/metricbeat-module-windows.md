@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-windows.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Windows module [metricbeat-module-windows]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

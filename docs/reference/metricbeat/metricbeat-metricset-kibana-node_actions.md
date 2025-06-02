@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kibana-node_actions.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kibana node_actions metricset [metricbeat-metricset-kibana-node_actions]
 
 ::::{warning}

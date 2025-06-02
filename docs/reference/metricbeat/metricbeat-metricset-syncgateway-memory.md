@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-syncgateway-memory.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # SyncGateway memory metricset [metricbeat-metricset-syncgateway-memory]
 
 ::::{warning}

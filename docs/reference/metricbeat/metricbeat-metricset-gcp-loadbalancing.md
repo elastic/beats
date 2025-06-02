@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-loadbalancing.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Google Cloud Platform loadbalancing metricset [metricbeat-metricset-gcp-loadbalancing]
 
 Load Balancing metricset fetches metrics from [Load Balancing](https://cloud.google.com/load-balancing/) in Google Cloud Platform.

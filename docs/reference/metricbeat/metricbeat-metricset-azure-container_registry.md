@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-azure-container_registry.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Azure container_registry metricset [metricbeat-metricset-azure-container_registry]
 
 This is the container_registry metricset of the module azure.

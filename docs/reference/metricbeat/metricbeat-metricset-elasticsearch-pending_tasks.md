@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-pending_tasks.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Elasticsearch pending_tasks metricset [metricbeat-metricset-elasticsearch-pending_tasks]
 
 This is the `pending_tasks` metricset of the Elasticsearch module.

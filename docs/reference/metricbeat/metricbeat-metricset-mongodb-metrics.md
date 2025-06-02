@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mongodb-metrics.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # MongoDB metrics metricset [metricbeat-metricset-mongodb-metrics]
 
 This is the `metrics` metricset of the MongoDB module.

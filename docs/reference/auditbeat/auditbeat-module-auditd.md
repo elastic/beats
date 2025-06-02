@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-auditd.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Auditd Module [auditbeat-module-auditd]
 
 The `auditd` module receives audit events from the Linux Audit Framework that is a part of the Linux kernel.

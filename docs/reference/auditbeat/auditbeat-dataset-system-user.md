@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-system-user.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System user dataset [auditbeat-dataset-system-user]
 
 ::::{warning}

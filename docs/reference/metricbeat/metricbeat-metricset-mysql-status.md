@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mysql-status.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # MySQL status metricset [metricbeat-metricset-mysql-status]
 
 The MySQL `status` metricset collects data from MySQL by running a [`SHOW GLOBAL STATUS;`](http://dev.mysql.com/doc/refman/5.7/en/show-status.md) SQL query. This query returns a large number of metrics.

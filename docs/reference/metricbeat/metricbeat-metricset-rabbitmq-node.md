@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-rabbitmq-node.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # RabbitMQ node metricset [metricbeat-metricset-rabbitmq-node]
 
 This is the `node` metricset of the RabbitMQ module and collects metrics about RabbitMQ nodes.

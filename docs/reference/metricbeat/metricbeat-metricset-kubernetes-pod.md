@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-pod.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kubernetes pod metricset [metricbeat-metricset-kubernetes-pod]
 
 This is the `pod` metricset of the Kubernetes module.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-network.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Docker network metricset [metricbeat-metricset-docker-network]
 
 The Docker `network` metricset collects network metrics.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-image.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Docker image metricset [metricbeat-metricset-docker-image]
 
 This is the `image` metricset of the Docker module.

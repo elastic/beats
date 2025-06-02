@@ -48,6 +48,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-{}.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # {} Module [auditbeat-module-{}]
 
 """.format(module, title, module)
@@ -95,6 +97,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-{module}-{dataset}.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # {module_title} {dataset} dataset [auditbeat-dataset-{module}-{dataset}]
 
 """.format(module_title=title, module=module, dataset=dataset)
@@ -140,6 +144,8 @@ The following datasets are available:\n\n"""
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-modules.html
 ---
+
+<!-- This file is generated! See scripts/docs_collector.py -->
 
 # Modules [auditbeat-modules]
 

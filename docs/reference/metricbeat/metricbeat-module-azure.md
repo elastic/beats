@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-azure.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Azure module [metricbeat-module-azure]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

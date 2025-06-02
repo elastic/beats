@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-system-package.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System package dataset [auditbeat-dataset-system-package]
 
 This is the `package` dataset of the system module.

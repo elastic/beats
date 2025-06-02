@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-golang-expvar.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Golang expvar metricset [metricbeat-metricset-golang-expvar]
 
 This is the `expvar` metricset of the Golang module. Go can expose its variables by the expvar API. With this metricset, you can collect all the expvar-exposed variables.

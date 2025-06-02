@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-jolokia.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Jolokia module [metricbeat-module-jolokia]
 
 This module collects metrics from [Jolokia agents](https://jolokia.org/reference/html/agents.md) running on a target JMX server or dedicated proxy server. The default metricset is `jmx`.

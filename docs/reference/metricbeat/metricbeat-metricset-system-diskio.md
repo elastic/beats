@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-diskio.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System diskio metricset [metricbeat-metricset-system-diskio]
 
 The System `diskio` metricset provides disk IO metrics collected from the operating system. One event is created for each disk mounted on the system.

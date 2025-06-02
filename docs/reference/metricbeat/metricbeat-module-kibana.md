@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-kibana.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kibana module [metricbeat-module-kibana]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

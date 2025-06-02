@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mongodb-status.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # MongoDB status metricset [metricbeat-metricset-mongodb-status]
 
 This is the `status` metricset of the MongoDB module.

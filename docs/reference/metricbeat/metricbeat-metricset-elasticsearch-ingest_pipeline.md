@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-elasticsearch-ingest_pipeline.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Elasticsearch ingest_pipeline metricset [metricbeat-metricset-elasticsearch-ingest_pipeline]
 
 ::::{warning}

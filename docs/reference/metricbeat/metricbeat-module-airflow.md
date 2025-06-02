@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-airflow.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Airflow module [metricbeat-module-airflow]
 
 ::::{warning}

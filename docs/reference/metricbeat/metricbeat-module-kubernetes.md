@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-kubernetes.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kubernetes module [metricbeat-module-kubernetes]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

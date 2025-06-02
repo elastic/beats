@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-golang-heap.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Golang heap metricset [metricbeat-metricset-golang-heap]
 
 The `heap` metricset of the Golang module collects the memstats information from the expvar API.

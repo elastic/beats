@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-syncgateway-replication.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # SyncGateway replication metricset [metricbeat-metricset-syncgateway-replication]
 
 ::::{warning}

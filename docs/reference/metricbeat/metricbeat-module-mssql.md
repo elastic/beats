@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mssql.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # MSSQL module [metricbeat-module-mssql]
 
 This is the [Microsoft SQL 2017](https://www.microsoft.com/en-us/sql-server/sql-server-2017) Metricbeat module. It is still under active development to add new Metricsets and introduce enhancements.

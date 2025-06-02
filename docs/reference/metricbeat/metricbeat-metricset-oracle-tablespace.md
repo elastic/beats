@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-oracle-tablespace.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Oracle tablespace metricset [metricbeat-metricset-oracle-tablespace]
 
 `tablespace` Metricset includes information about data files and temp files, grouped by Tablespace with free space available, used space, status of the data files, status of the Tablespace, etc.

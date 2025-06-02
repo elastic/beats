@@ -907,7 +907,7 @@
       data stream name forms part of the backing indices names. Due to this convention,
       data streams must also follow index naming restrictions. For example, data stream
       names cannot include `\`, `/`, `*`, `?`, `"`, `<`, `>`, `|`, ` ` (space character),
-      `,`, or `#`. Please see the Elasticsearch reference for additional https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params[restrictions].'
+      `,`, or `#`. Please see the Elasticsearch reference for additional [restrictions](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params).'
     type: group
     default_field: true
     fields:

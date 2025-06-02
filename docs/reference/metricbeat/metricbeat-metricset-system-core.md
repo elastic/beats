@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-system-core.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System core metricset [metricbeat-metricset-system-core]
 
 The System `core` metricset provides usage statistics for each CPU core.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-cockroachdb.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # CockroachDB module [metricbeat-module-cockroachdb]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?

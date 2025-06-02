@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-nats-subscriptions.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # NATS subscriptions metricset [metricbeat-metricset-nats-subscriptions]
 
 This is the subscriptions metricset of the module nats collecting metrics about subscriptions.

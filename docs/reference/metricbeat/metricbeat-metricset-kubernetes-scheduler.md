@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-scheduler.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kubernetes scheduler metricset [metricbeat-metricset-kubernetes-scheduler]
 
 `scheduler` metricset for the Kubernetes module.

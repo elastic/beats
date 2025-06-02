@@ -212,7 +212,7 @@ type: long
 **`awsfargate.task_stats.diskio.reads`**
 :   Number of current reads per second
 
-deprecated:[6.4]
+{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
 
@@ -262,7 +262,7 @@ type: long
 **`awsfargate.task_stats.diskio.writes`**
 :   Number of current writes per second
 
-deprecated:[6.4]
+{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
 
@@ -312,7 +312,7 @@ type: long
 **`awsfargate.task_stats.diskio.total`**
 :   Number of reads and writes per second
 
-deprecated:[6.4]
+{applies_to}`product: deprecated 6.4`
 
 type: scaled_float
 

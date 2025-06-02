@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-storage.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Google Cloud Platform storage metricset [metricbeat-metricset-gcp-storage]
 
 Storage metricset fetches metrics from [Storage](https://cloud.google.com/storage/) in Google Cloud Platform.

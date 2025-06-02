@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-aerospike.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Aerospike module [metricbeat-module-aerospike]
 
 The Aerospike module uses the [Info command](http://www.aerospike.com/docs/reference/info) to collect metrics. The default metricset is `namespace`.

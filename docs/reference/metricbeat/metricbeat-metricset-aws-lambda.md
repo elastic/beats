@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aws-lambda.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # AWS lambda metricset [metricbeat-metricset-aws-lambda]
 
 AWS Lambda monitors functions and sends metrics to Amazon CloudWatch. These metrics include total invocations, errors, duration, throttles, dead-letter queue errors, and iterator age for stream-based invocations.

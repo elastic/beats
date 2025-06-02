@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-coredns.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Coredns module [metricbeat-module-coredns]
 
 This is the CoreDNS module. The CoreDNS module collects metrics from the CoreDNS [prometheus exporter endpoint](https://github.com/coredns/coredns/tree/master/plugin/metrics).

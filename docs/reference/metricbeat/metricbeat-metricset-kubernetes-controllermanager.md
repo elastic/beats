@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kubernetes-controllermanager.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Kubernetes controllermanager metricset [metricbeat-metricset-kubernetes-controllermanager]
 
 `controllermanager` metricset for the Kubernetes module.

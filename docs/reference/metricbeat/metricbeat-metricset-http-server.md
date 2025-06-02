@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-http-server.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # HTTP server metricset [metricbeat-metricset-http-server]
 
 This is the server metricset of the module http.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-aerospike-namespace.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Aerospike namespace metricset [metricbeat-metricset-aerospike-namespace]
 
 This is the `namespace` metricset of the Aerospike module.

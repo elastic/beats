@@ -76,7 +76,7 @@ def document_field(output, field, field_path):
         output.write("{}".format(" ".join(x for x in field["description"].split("\n") if x)).strip()+"\n\n")
 
     if "deprecated" in field:
-        output.write("deprecated:[{}]\n\n".format(field["deprecated"]))
+        output.write("{{applies_to}}`product: deprecated {}`\n\n".format(field["deprecated"]))
 
     if "type" in field:
         output.write("type: {}\n\n".format(field["type"]))
@@ -134,6 +134,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/{beat}/current/exported-fields.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+                 
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by {title}. They are grouped in the following categories:

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-munin-node.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Munin node metricset [metricbeat-metricset-munin-node]
 
 This is the node metricset of the module munin.

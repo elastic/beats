@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-docker-cpu.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Docker cpu metricset [metricbeat-metricset-docker-cpu]
 
 The Docker `cpu` metricset collects runtime CPU metrics.

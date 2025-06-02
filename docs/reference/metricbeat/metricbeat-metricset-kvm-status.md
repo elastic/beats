@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-kvm-status.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # KVM status metricset [metricbeat-metricset-kvm-status]
 
 ::::{warning}

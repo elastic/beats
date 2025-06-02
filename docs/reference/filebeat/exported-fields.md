@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+                 
 # Exported fields [exported-fields]
 
 This document describes the fields that are exported by Filebeat. They are grouped in the following categories:

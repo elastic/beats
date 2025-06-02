@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-dataset-system-host.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # System host dataset [auditbeat-dataset-system-host]
 
 ::::{warning}

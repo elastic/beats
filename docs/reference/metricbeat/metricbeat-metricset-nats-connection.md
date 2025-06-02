@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-nats-connection.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # NATS connection metricset [metricbeat-metricset-nats-connection]
 
 This is the connections metricset of the module nats collecting metrics per connection.

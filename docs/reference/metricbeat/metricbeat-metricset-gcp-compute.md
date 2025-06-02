@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-gcp-compute.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Google Cloud Platform compute metricset [metricbeat-metricset-gcp-compute]
 
 Compute metricset to fetch metrics from [Compute Engine](https://cloud.google.com/compute/) Virtual Machines in Google Cloud Platform. No Monitoring or Logging agent is required in your instances to use this metricset.

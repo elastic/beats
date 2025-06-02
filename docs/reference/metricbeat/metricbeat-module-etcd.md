@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-etcd.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Etcd module [metricbeat-module-etcd]
 
 This module targets Etcd V2 and V3.

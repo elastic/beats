@@ -20,7 +20,7 @@ type: keyword
 **`nats.server.time`**
 :   Server time of metric creation
 
-deprecated:[8.0.0]
+{applies_to}`product: deprecated 8.0.0`
 
 type: date
 

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-memcached.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Memcached module [metricbeat-module-memcached]
 
 This is the Memcached module. These metricsets were tested with Memcached version 1.4.35.

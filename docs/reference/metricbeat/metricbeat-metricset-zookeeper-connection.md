@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-zookeeper-connection.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # ZooKeeper connection metricset [metricbeat-metricset-zookeeper-connection]
 
 `connection` Metricset fetches the data returned by the `cons` admin keyword. It exposes the following metrics:
