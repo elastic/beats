@@ -386,7 +386,6 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		"host.ip",
 		"host.mac",
 		"host.name",
-		"host.os.build",
 		"host.os.family",
 		"host.os.kernel",
 		"host.os.name",
@@ -397,8 +396,13 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 
 	// Optional fields that may or may not be present depending on the environment or OS.
 	optionalFields := []string{
-		"host.os.codename",   // not every OS provide this
-		"host.containerized", // not available on windows
+		// not every OS provide this
+		"host.os.build",
+		"host.os.codename",
+
+		// not available on windows
+		"host.containerized",
+
 		// depends on add_cloud_metadata
 		"cloud.account.id",
 		"cloud.availability_zone",
