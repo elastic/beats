@@ -202,7 +202,6 @@ func testOutputMetrics(t *testing.T,
 	assert.Equal(t, evTooMany, counter.ErrTooManyLoad())
 	assert.Equal(t, evRetrieable, counter.RetryableErrorsLoad())
 
-	t.Logf("output metrics: %s", counter)
 	if t.Failed() {
 		t.Log("OutputListener metrics: ", counter)
 
