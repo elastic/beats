@@ -336,17 +336,17 @@ filebeat.inputs:
 
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
-## `Custom Properties` [custom_properties]
+## `custom_properties` [attrib-custom-properties]
 
 Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set/override custom blob properties
 provides more flexibility when reading blobs from a remote storage where the user might only have read access.
 
-The currently supported `Custom Properties` are :-  
+The currently supported `custom_properties` are :-  
 
 1. [content_type](#attrib-content-type)
 2. [encoding](#attrib-encoding)
 
-## `content_type` [content_type]
+## `content_type` [attrib-content-type]
 
 This configuration attribute can be used to set a user-defined `content_type` for the blob property. Setting a custom `content_type` will only set the `content-type` property of a blob if it's missing/empty. If you want to override an already existing `content-type` value, you will need to set the `override_content_type` flag to `true`. These attributes can be defined at the `root` or `container` level in the configuration. Container level definitions will always take precedence.
 
@@ -380,7 +380,7 @@ filebeat.inputs:
     override_content_type: true
 ```
 
-## `encoding` [encoding]
+## `encoding` [attrib-encoding]
 This configuration attribute can be used to set a user-defined `encoding` for the blob property. Setting a custom `encoding` will only set the `encoding` property of a blob if it's missing/empty. If you want to override an already existing `encoding` value, you will need to set the `override_encoding` flag to `true`. These attributes can be defined at the `root` or `container` level in the configuration. Container level definitions will always take precedence.
 
 **Example Configuration:**
