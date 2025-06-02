@@ -1,0 +1,158 @@
+- name: node.stats
+  type: group
+  description: >
+    node_stats
+  release: ga
+  fields:
+    - name: indices
+      type: group
+      description: >
+        Node indices stats
+      fields:
+        - name: docs.count
+          type: long
+          description: >
+            Total number of existing documents.
+        - name: docs.deleted
+          type: long
+          description: >
+            Total number of deleted documents.
+        - name: segments.count
+          type: long
+          description: >
+            Total number of segments.
+        - name: segments.memory.bytes
+          type: long
+          format: bytes
+          description: >
+            Total size of segments in bytes.
+        - name: store.size.bytes
+          type: long
+          description: >
+            Total size of the store in bytes.
+    - name: jvm.mem.pools
+      type: group
+      description: >
+        JVM memory pool stats
+      fields:
+        - name: old
+          type: group
+          description: >
+            Old memory pool stats.
+          fields:
+            - name: max.bytes
+              type: long
+              format: bytes
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+        - name: young
+          type: group
+          description: >
+            Young memory pool stats.
+          fields:
+            - name: max.bytes
+              type: long
+              format: bytes
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+        - name: survivor
+          type: group
+          description: >
+            Survivor memory pool stats.
+          fields:
+            - name: max.bytes
+              type: long
+              format: bytes
+              description:
+                Max bytes.
+            - name: peak.bytes
+              type: long
+              format: bytes
+              description:
+                Peak bytes.
+            - name: peak_max.bytes
+              type: long
+              format: bytes
+              description:
+                Peak max bytes.
+            - name: used.bytes
+              type: long
+              format: bytes
+              description:
+                Used bytes.
+
+    - name: jvm.gc.collectors
+      type: group
+      description: >
+        GC collector stats.
+      fields:
+        - name: old.collection
+          type: group
+          description: >
+            Old collection gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
+        - name: young.collection
+          type: group
+          description: >
+            Young collection gc.
+          fields:
+            - name: count
+              type: long
+              description: >
+            - name: ms
+              type: long
+              description: >
+
+    - name: fs.summary
+      type: group
+      description: >
+        File system summary
+      fields:
+        - name: total.bytes
+          type: long
+          format: bytes
+          description: >
+        - name: free.bytes
+          type: long
+          format: bytes
+          description: >
+        - name: available.bytes
+          type: long
+          format: bytes
+          description: >
