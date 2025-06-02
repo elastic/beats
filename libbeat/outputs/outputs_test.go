@@ -75,8 +75,6 @@ func TestOutputsMetrics(t *testing.T) {
 					return http.StatusInternalServerError
 				}
 
-				t.Logf("\naction: %v\n\tmeta: %s\n\tevent: %s", action.Action, action.Meta, string(event))
-
 				httpStatus, err := strconv.Atoi(ev["http_status"])
 				if err != nil {
 					t.Errorf("failed to parse %s to int: %v", ev["http_status"], err)
@@ -210,9 +208,9 @@ func testOutputMetrics(t *testing.T,
 
 		snapshotJson, err := json.Marshal(snapshot)
 		require.NoErrorf(t, err,
-			"could not marshal metrics snapshot. Raw metrics snapshot: %v",
+			"could not marshal metrics snapshot. Raw metrics snapshot: \n%v",
 			snapshot)
-		t.Logf("metrics registry snapshot: %s", snapshotJson)
+		t.Logf("metrics registry snapshot: \n%s", snapshotJson)
 	}
 }
 
