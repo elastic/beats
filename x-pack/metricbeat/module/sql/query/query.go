@@ -210,9 +210,9 @@ func (m *MetricSet) fetch(ctx context.Context, db *sql.DbClient, reporter mb.Rep
 // of an error set the Error field of mb.Event or simply call report.Error().
 // It calls m.fetchTableMode() or m.fetchVariableMode() depending on the response
 // format of the query.
-func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err error) {
+func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (fetchErr error) {
 	defer func() {
-		err = sanitizeError(err, m.HostData().URI)
+		fetchErr = sanitizeError(fetchErr, m.HostData().URI)
 	}()
 
 	db, err := sql.NewDBClient(m.Config.Driver, m.HostData().URI, m.Logger())
