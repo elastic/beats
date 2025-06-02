@@ -540,7 +540,7 @@ func fromSaramaGroupMemberDescription(memberDescr *sarama.GroupMemberDescription
 
 	assignment, err := memberDescr.GetMemberAssignment()
 	if err != nil {
-		return MemberDescription{
+		return MemberDescription{ //nolint:nilerr // in this case we should return no error and the error is reported in MemberDescription
 			ClientID:   memberDescr.ClientId,
 			ClientHost: memberDescr.ClientHost,
 			Err:        err,

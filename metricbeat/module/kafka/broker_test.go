@@ -18,12 +18,11 @@
 package kafka
 
 import (
+	"errors"
 	"net"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"errors"
 
 	"github.com/stretchr/testify/assert"
 
