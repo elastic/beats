@@ -226,8 +226,6 @@ func TestNewPipelineOutputListener_nilReg(t *testing.T) {
 		metricEventOutputRetryableTotal)
 }
 
-var _ beat.OutputListener = (*OutputListener)(nil)
-
 func TestOutputListener(t *testing.T) {
 	reg := monitoring.NewRegistry()
 	listener := NewPipelineOutputListener(reg)
