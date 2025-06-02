@@ -404,6 +404,7 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		"host.containerized",
 
 		// depends on add_cloud_metadata
+		// not available locally
 		"cloud.account.id",
 		"cloud.availability_zone",
 		"cloud.instance.id",
@@ -415,7 +416,6 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		"cloud.service.name",
 	}
 
-	// TODO: figure out why filesystem metricset does not ingest any logs
 	testCases := map[string][]string{
 		"cpu": {
 			"host.cpu.usage",
