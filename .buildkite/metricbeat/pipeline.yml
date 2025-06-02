@@ -130,7 +130,7 @@ steps:
         key: "mandatory-linux-unit-test-fips-only"
         command: |
           cd metricbeat
-          mage fipsOnlyUnitTest
+          mage goFIPSOnlyUnitTest
         retry:
           automatic:
             - limit: 1
