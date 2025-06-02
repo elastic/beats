@@ -99,14 +99,18 @@ kubectl -n kube-system port-forward pod/kube-scheduler-kind-control-plane 10259
 
 Save the metrics output from `https://localhost:10259/metrics` to a new `_meta/test/metrics.x.xx` file.
 
-After that, you can run the following commands to generate and test the expected files:
+```bash
+curl -k https://localhost:10259/metrics > _meta/test/metrics.x.xx
+```
+
+Run the following commands to generate and test the expected files:
 
 ```bash
 cd metricbeat/module/kubernetes/scheduler
 # generate the expected files
-go test ./state... --data
+go test ./... --data
 # test the expected files
-go test ./state...
+go test ./...
 ```
 
 
