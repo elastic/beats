@@ -47,14 +47,14 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 		systemReg = statsReg.NewRegistry("system")
 	}
 
-	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
+	err = metricreport.SetupMetrics(logp.NewLogger("metrics"), b.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
 	if err != nil {
 		return BeatReceiver{}, fmt.Errorf("error setting up metrics report: %w", err)
 	}
 
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(b.Info.Logger.Named("metrics.http"), b.Config.HTTP, api.RegistryLookupFunc(b.Info.Monitoring.Namespace))
+		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http")), b.Config.HTTP, api.RegistryLookupFunc(b.Info.Monitoring.Namespace))
 		if err != nil {
 			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
