@@ -27049,19 +27049,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/text
-<<<<<<< HEAD
-Version: v0.23.0
-Licence type (autodetected): BSD-3-Clause
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.23.0/LICENSE:
-=======
 Version: v0.25.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/golang.org/x/text@v0.25.0/LICENSE:
->>>>>>> 1d00d2040 (Update github.com/vmware/govmomi to v0.51.0 (#44566))
 
 Copyright 2009 The Go Authors.
 

@@ -131,11 +131,7 @@ require (
 	golang.org/x/oauth2 v0.27.0
 	golang.org/x/sync v0.14.0
 	golang.org/x/sys v0.33.0
-<<<<<<< HEAD
-	golang.org/x/text v0.23.0
-=======
 	golang.org/x/text v0.25.0
->>>>>>> 1d00d2040 (Update github.com/vmware/govmomi to v0.51.0 (#44566))
 	golang.org/x/time v0.8.0
 	golang.org/x/tools v0.27.0
 	google.golang.org/api v0.214.0
