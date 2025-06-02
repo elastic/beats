@@ -93,7 +93,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	b.Info.Monitoring.Namespace = monitoring.GetNamespace(b.Info.Beat + "-" + b.Info.ID.String())
 
-	b.Info.Monitoring.SetupRegistries()
+	b.SetupRegistry()
 
 	b.SetKeystore(store)
 	b.Beat.Keystore = store
