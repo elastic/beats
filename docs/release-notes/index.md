@@ -94,3 +94,4 @@ To check for security updates, go to [Security announcements for the Elastic sta
 * Reset EventLog if error EOF is encountered in Winlogbeat. [#42826]({{beats-pull}}42826)
 * Implement backoff on error retrial in Winlogbeat. [#42826]({{beats-pull}}42826)
 * Fix boolean key in security pipelines and sync pipelines with integration in Winlogbeat. [#43027]({{beats-pull}}43027)
+* Fix panic in kafka consumergroup member assignment fetching when there are 0 members in consumer group in Metricbeat. [#44576]({{beats-pull}}44576)
