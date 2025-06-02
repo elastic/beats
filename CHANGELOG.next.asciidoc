@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
+- Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 
 *Heartbeat*
 
