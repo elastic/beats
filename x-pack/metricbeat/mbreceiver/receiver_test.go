@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/google/go-cmp/cmp"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -375,8 +376,11 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		"event.dataset",
 		"event.duration",
 		"event.module",
+		"metricset.name",
+		"metricset.period",
+		"service.type",
+		// add_host_metadata
 		"host.architecture",
-		"host.containerized",
 		"host.hostname",
 		"host.id",
 		"host.ip",
@@ -389,9 +393,22 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		"host.os.platform",
 		"host.os.type",
 		"host.os.version",
-		"metricset.name",
-		"metricset.period",
-		"service.type",
+	}
+
+	// Optional fields that may or may not be present depending on the environment or OS.
+	optionalFields := []string{
+		"host.os.codename",   // not every OS provide this
+		"host.containerized", // not available on windows
+		// depends on add_cloud_metadata
+		"cloud.account.id",
+		"cloud.availability_zone",
+		"cloud.instance.id",
+		"cloud.instance.name",
+		"cloud.machine.type",
+		"cloud.project.id",
+		"cloud.provider",
+		"cloud.region",
+		"cloud.service.name",
 	}
 
 	// TODO: figure out why filesystem metricset does not ingest any logs
@@ -482,6 +499,17 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 			fields := *doc.FlattenKeys()
 			slices.Sort(fields)
 			wantFields := append(wantFields, commonFields...)
+			// Remove optional fields before comparing, in case they cause a mismatch.
+			if diff := cmp.Diff(fields, wantFields); diff != "" {
+				// Filter out optional fields
+				var filtered []string
+				for _, field := range fields {
+					if !slices.Contains(optionalFields, field) {
+						filtered = append(filtered, field)
+					}
+				}
+				fields = filtered
+			}
 			slices.Sort(wantFields)
 			assert.Equal(c, wantFields, fields, msg+": unexpected fields for metricset %s: got %v, want %v", testName, fields, wantFields)
 		}
