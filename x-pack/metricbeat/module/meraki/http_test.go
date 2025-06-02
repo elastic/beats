@@ -118,6 +118,32 @@ func TestPaginatorGetAllPagesWithMalformedLinkHeader(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestPaginatorGetAllPagesWithMissingLinkHeader(t *testing.T) {
+	setStart := func(_ string) {}
+
+	doRequest := func() (*T, *resty.Response, error) {
+		return &T{thing: "val"}, &resty.Response{RawResponse: &http.Response{Header: http.Header{}}}, nil
+	}
+
+	onSuccess := func(val *T) error {
+		assert.Equal(t, val.thing, "val")
+		return nil
+	}
+
+	onError := func(err error, _ *resty.Response) error {
+		return err
+	}
+
+	err := NewPaginator(
+		setStart,
+		doRequest,
+		onError,
+		onSuccess,
+	).GetAllPages()
+
+	assert.NoError(t, err)
+}
+
 func TestPaginatorGetAllPagesWithErrorOnSuccess(t *testing.T) {
 	setStart := func(_ string) {}
 
