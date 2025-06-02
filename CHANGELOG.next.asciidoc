@@ -221,6 +221,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Jounrald input now supports filtering by facilities {pull}41061[41061]
 - Refactor & cleanup with updates to default values and documentation. {pull}41834[41834]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
+- Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 
 *Auditbeat*
 
