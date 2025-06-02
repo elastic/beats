@@ -1,19 +1,6 @@
-// Licensed to Elasticsearch B.V. under one or more contributor
-// license agreements. See the NOTICE file distributed with
-// this work for additional information regarding copyright
-// ownership. Elasticsearch B.V. licenses this file to you under
-// the Apache License, Version 2.0 (the "License"); you may
-// not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
 
 package otelconsumer
 
@@ -111,13 +98,12 @@ func TestPublish(t *testing.T) {
 		assert.Len(t, batch.Signals, 1)
 		assert.Equal(t, outest.BatchACK, batch.Signals[0].Tag)
 
-		var subFields = []string{"dataset", "namespace", "type"}
+		subFields := []string{"dataset", "namespace", "type"}
 		for _, subField := range subFields {
 			gotValue, ok := attributes.Get("data_stream." + subField)
 			require.True(t, ok, fmt.Sprintf("data_stream.%s not found on log record attribute", subField))
 			assert.EqualValues(t, dataStreamField[subField], gotValue.AsRaw())
 		}
-
 	})
 
 	t.Run("retries the batch on non-permanent consumer error", func(t *testing.T) {
