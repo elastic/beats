@@ -104,139 +104,7 @@ func TestNewReceiver(t *testing.T) {
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
 
-			metricsetLogs := func(l []mapstr.M, mset string) []mapstr.M {
-				var filtered []mapstr.M
-				for _, log := range l {
-					flat := log.Flatten()
-					if flat["event.dataset"] == mset {
-						filtered = append(filtered, flat)
-					}
-				}
-				return filtered
-			}
-
-			commonFields := []string{
-				"@timestamp",
-				"agent.ephemeral_id",
-				"agent.id",
-				"agent.name",
-				"agent.type",
-				"agent.version",
-				"ecs.version",
-				"event.dataset",
-				"event.duration",
-				"event.module",
-				"host.architecture",
-				"host.containerized",
-				"host.hostname",
-				"host.id",
-				"host.ip",
-				"host.mac",
-				"host.name",
-				"host.os.build",
-				"host.os.family",
-				"host.os.kernel",
-				"host.os.name",
-				"host.os.platform",
-				"host.os.type",
-				"host.os.version",
-				"metricset.name",
-				"metricset.period",
-				"service.type",
-			}
-
-			// TODO: figure out why filesystem metricset does not ingest any logs
-			testCases := map[string][]string{
-				"cpu": {
-					"host.cpu.usage",
-					"system.cpu.cores",
-					"system.cpu.idle.norm.pct",
-					"system.cpu.idle.pct",
-					"system.cpu.iowait.norm.pct",
-					"system.cpu.iowait.pct",
-					"system.cpu.irq.norm.pct",
-					"system.cpu.irq.pct",
-					"system.cpu.nice.norm.pct",
-					"system.cpu.nice.pct",
-					"system.cpu.softirq.norm.pct",
-					"system.cpu.softirq.pct",
-					"system.cpu.steal.norm.pct",
-					"system.cpu.steal.pct",
-					"system.cpu.system.norm.pct",
-					"system.cpu.system.pct",
-					"system.cpu.total.norm.pct",
-					"system.cpu.total.pct",
-					"system.cpu.user.norm.pct",
-					"system.cpu.user.pct",
-				},
-				"memory": {
-					"system.memory.actual.free",
-					"system.memory.actual.used.bytes",
-					"system.memory.actual.used.pct",
-					"system.memory.cached",
-					"system.memory.free",
-					"system.memory.swap.free",
-					"system.memory.swap.total",
-					"system.memory.swap.used.bytes",
-					"system.memory.swap.used.pct",
-					"system.memory.total",
-					"system.memory.used.bytes",
-					"system.memory.used.pct",
-				},
-				"network/interface-card": {
-					"system.network.in.bytes",
-					"system.network.in.dropped",
-					"system.network.in.errors",
-					"system.network.in.packets",
-					"system.network.name",
-					"system.network.out.bytes",
-					"system.network.out.dropped",
-					"system.network.out.errors",
-					"system.network.out.packets",
-				},
-				"network/host": {
-					"host.network.egress.bytes",
-					"host.network.egress.packets",
-					"host.network.ingress.bytes",
-					"host.network.ingress.packets",
-				},
-				"filesystem": {
-					"system.filesystem.available",
-					"system.filesystem.device_name",
-					"system.filesystem.files",
-					"system.filesystem.free",
-					"system.filesystem.free_files",
-					"system.filesystem.mount_point",
-					"system.filesystem.options",
-					"system.filesystem.total",
-					"system.filesystem.type",
-					"system.filesystem.used.bytes",
-					"system.filesystem.used.pct",
-				},
-			}
-
-			for testName, wantFields := range testCases {
-				parts := strings.Split(testName, "/")
-				mset := parts[0]
-
-				var msetLogs []mapstr.M
-				require.Conditionf(c, func() bool {
-					msetLogs = metricsetLogs(logs["r1"], fmt.Sprintf("system.%s", mset))
-					return len(msetLogs) > 0
-				}, "expected at least one ingest log for metricset %s, got 0: %v", testName, logs["r1"])
-
-				for _, doc := range msetLogs {
-					if _, ok := doc[wantFields[0]]; !ok {
-						continue
-					}
-
-					fields := *doc.FlattenKeys()
-					slices.Sort(fields)
-					wantFields := append(wantFields, commonFields...)
-					slices.Sort(wantFields)
-					assert.Equal(c, wantFields, fields, "unexpected fields for metricset %s: got %v, want %v", testName, fields, wantFields)
-				}
-			}
+			assertSystemMetricFields(c, logs["r1"], "expected r1 to have system metric fields in ingested logs")
 		},
 	})
 }
@@ -265,7 +133,7 @@ func TestMultipleReceivers(t *testing.T) {
 						"enabled":    true,
 						"period":     "1s",
 						"processes":  []string{".*"},
-						"metricsets": []string{"cpu"},
+						"metricsets": []string{"cpu", "memory", "network", "filesystem"},
 					},
 				},
 			},
@@ -293,7 +161,7 @@ func TestMultipleReceivers(t *testing.T) {
 						"enabled":    true,
 						"period":     "1s",
 						"processes":  []string{".*"},
-						"metricsets": []string{"cpu"},
+						"metricsets": []string{"cpu", "memory", "network", "filesystem"},
 					},
 				},
 			},
@@ -345,6 +213,9 @@ func TestMultipleReceivers(t *testing.T) {
 				}
 				return true
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+
+			assertSystemMetricFields(c, logs["r1"], "expected r1 to have system metric fields in ingested logs")
+			assertSystemMetricFields(c, logs["r2"], "expected r2 to have system metric fields in ingested logs")
 		},
 	})
 }
@@ -478,5 +349,141 @@ func BenchmarkFactory(b *testing.B) {
 	for b.Loop() {
 		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
+	}
+}
+
+func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
+	metricsetLogs := func(l []mapstr.M, mset string) []mapstr.M {
+		var filtered []mapstr.M
+		for _, log := range l {
+			flat := log.Flatten()
+			if flat["event.dataset"] == mset {
+				filtered = append(filtered, flat)
+			}
+		}
+		return filtered
+	}
+
+	commonFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"agent.name",
+		"agent.type",
+		"agent.version",
+		"ecs.version",
+		"event.dataset",
+		"event.duration",
+		"event.module",
+		"host.architecture",
+		"host.containerized",
+		"host.hostname",
+		"host.id",
+		"host.ip",
+		"host.mac",
+		"host.name",
+		"host.os.build",
+		"host.os.family",
+		"host.os.kernel",
+		"host.os.name",
+		"host.os.platform",
+		"host.os.type",
+		"host.os.version",
+		"metricset.name",
+		"metricset.period",
+		"service.type",
+	}
+
+	// TODO: figure out why filesystem metricset does not ingest any logs
+	testCases := map[string][]string{
+		"cpu": {
+			"host.cpu.usage",
+			"system.cpu.cores",
+			"system.cpu.idle.norm.pct",
+			"system.cpu.idle.pct",
+			"system.cpu.iowait.norm.pct",
+			"system.cpu.iowait.pct",
+			"system.cpu.irq.norm.pct",
+			"system.cpu.irq.pct",
+			"system.cpu.nice.norm.pct",
+			"system.cpu.nice.pct",
+			"system.cpu.softirq.norm.pct",
+			"system.cpu.softirq.pct",
+			"system.cpu.steal.norm.pct",
+			"system.cpu.steal.pct",
+			"system.cpu.system.norm.pct",
+			"system.cpu.system.pct",
+			"system.cpu.total.norm.pct",
+			"system.cpu.total.pct",
+			"system.cpu.user.norm.pct",
+			"system.cpu.user.pct",
+		},
+		"memory": {
+			"system.memory.actual.free",
+			"system.memory.actual.used.bytes",
+			"system.memory.actual.used.pct",
+			"system.memory.cached",
+			"system.memory.free",
+			"system.memory.swap.free",
+			"system.memory.swap.total",
+			"system.memory.swap.used.bytes",
+			"system.memory.swap.used.pct",
+			"system.memory.total",
+			"system.memory.used.bytes",
+			"system.memory.used.pct",
+		},
+		"network/interface-card": {
+			"system.network.in.bytes",
+			"system.network.in.dropped",
+			"system.network.in.errors",
+			"system.network.in.packets",
+			"system.network.name",
+			"system.network.out.bytes",
+			"system.network.out.dropped",
+			"system.network.out.errors",
+			"system.network.out.packets",
+		},
+		"network/host": {
+			"host.network.egress.bytes",
+			"host.network.egress.packets",
+			"host.network.ingress.bytes",
+			"host.network.ingress.packets",
+		},
+		"filesystem": {
+			"system.filesystem.available",
+			"system.filesystem.device_name",
+			"system.filesystem.files",
+			"system.filesystem.free",
+			"system.filesystem.free_files",
+			"system.filesystem.mount_point",
+			"system.filesystem.options",
+			"system.filesystem.total",
+			"system.filesystem.type",
+			"system.filesystem.used.bytes",
+			"system.filesystem.used.pct",
+		},
+	}
+
+	for testName, wantFields := range testCases {
+		parts := strings.Split(testName, "/")
+		mset := parts[0]
+
+		var msetLogs []mapstr.M
+		require.Conditionf(c, func() bool {
+			msetLogs = metricsetLogs(logs, fmt.Sprintf("system.%s", mset))
+			return len(msetLogs) > 0
+		}, msg+": expected at least one ingest log for metricset %s, got 0: %v", testName, logs)
+
+		for _, doc := range msetLogs {
+			if _, ok := doc[wantFields[0]]; !ok {
+				continue
+			}
+
+			fields := *doc.FlattenKeys()
+			slices.Sort(fields)
+			wantFields := append(wantFields, commonFields...)
+			slices.Sort(wantFields)
+			assert.Equal(c, wantFields, fields, msg+": unexpected fields for metricset %s: got %v, want %v", testName, fields, wantFields)
+		}
 	}
 }
