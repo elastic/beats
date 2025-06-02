@@ -13,6 +13,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -20,10 +21,11 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/elastic/mock-es/pkg/api"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/mock-es/pkg/api"
 )
 
 func TestInputMetricsFromPipelineAndOutput(t *testing.T) {
@@ -99,6 +101,7 @@ path.home: {{.path_home}}
 
 output.elasticsearch:
   hosts: ["{{.es_url}}"]
+  non_indexable_policy.dead_letter_index.index: "deadletter"
 
 logging.level: debug
 `
@@ -213,15 +216,15 @@ logging.level: debug
 
 			// Assert output metrics
 			assert.Equal(t,
-				metrics.EventsPipelinePublishedTotal+1, // +1 as the 429 is retried
+				metrics.EventsPipelinePublishedTotal+2, // +2 retried events
 				metrics.EventsOutputTotal,
-				"EventsOutputTotal should equal EventsPipelinePublishedTotal")
+				"EventsOutputTotal should equal EventsPipelinePublishedTotal +2 retried events")
 			assert.Equal(t,
 				9,
 				metrics.EventsOutputAckedTotal,
 				"EventsOutputAckedTotal should equal EventsPipelinePublishedTotal")
 			assert.Equal(t,
-				1,
+				0,
 				metrics.EventsOutputDroppedTotal,
 				"unexpected EventsOutputDroppedTotal")
 			assert.Equal(t,
@@ -232,6 +235,11 @@ logging.level: debug
 				1,
 				metrics.EventsOutputErrTooManyTotal,
 				"unexpected EventsOutputErrTooManyTotal")
+			assert.Equal(t,
+				1,
+				metrics.EventsOutputDeadLetterTotal,
+				"unexpected EventsOutputDeadLetterTotal")
+
 		},
 		celInputID: func(t *testing.T, metrics inputMetric) {
 			assert.Equal(t, "cel", metrics.Input)
@@ -293,7 +301,13 @@ logging.level: debug
 	errMsg := strings.Builder{}
 	defer func() {
 		if t.Failed() {
-			t.Errorf("test faild: input metrics response used for the assertions:\n%s",
+			inputsJSONFile := filepath.Join(filebeat.TempDir(), "inputs.json")
+			if err := os.WriteFile(inputsJSONFile, body, 0o644); err != nil {
+				t.Logf("failed to save response body to %s: %v",
+					inputsJSONFile, err)
+			}
+
+			t.Errorf("test failed: input metrics response used for the assertions:\n%s",
 				body)
 		}
 	}()
@@ -406,31 +420,36 @@ func newMockESServer(t *testing.T) *httptest.Server {
 		time.Now().Add(24*time.Hour),
 		0,
 		100,
-		func(action api.Action, event []byte) int {
-			resp := http.StatusOK
-
-			type logline struct {
-				RespondWith int `json:"respond-with"`
-			}
-
-			var l logline
-			err := json.Unmarshal(event, &l)
-			if err != nil {
-				t.Errorf("failed to unmarshal event: %v. Raw event %s",
-					err, string(event))
+		func(action api.Action, rawEvent []byte) int {
+			var meta map[string]any
+			if err := json.Unmarshal(action.Meta, &meta); err != nil {
+				t.Errorf(
+					"newMockESServer: failed to unmarshal action.Meta: %v. Raw meta: %s",
+					err, string(action.Meta),
+				)
 				return http.StatusInternalServerError
 			}
-			if l.RespondWith != 0 {
-				resp = l.RespondWith
 
-				// HTTP 429 - TooMany are tried, so let's respond 429 only once.
-				if repliedWith429 {
-					resp = http.StatusOK
-				}
+			type esEvent struct {
+				RespondWith int `json:"respond-with"`
+			}
+			var event esEvent
 
-				if l.RespondWith == http.StatusTooManyRequests {
-					repliedWith429 = true
-				}
+			err := json.Unmarshal(rawEvent, &event)
+			if err != nil {
+				t.Errorf(
+					"newMockESServer: failed to unmarshal event: %v. Raw event: %s",
+					err, string(rawEvent),
+				)
+				return http.StatusInternalServerError
+			}
+
+			var resp int
+			if index, ok := meta["_index"].(string); ok && index == "deadletter" {
+				// It keeps retrying if deadletter fails, so we always return OK
+				resp = http.StatusOK
+			} else {
+				resp, repliedWith429 = handleEvent(event, repliedWith429)
 			}
 
 			return resp
@@ -438,6 +457,28 @@ func newMockESServer(t *testing.T) *httptest.Server {
 	esMock := httptest.NewServer(mockESHandler)
 	t.Cleanup(esMock.Close)
 	return esMock
+}
+
+// handleEvent processes regular events, managing rate limiting responses.
+// It modifies repliedWith429 to ensure StatusTooManyRequests is sent only once.
+func handleEvent(event esEvent, repliedWith429 bool) (int, bool) {
+	resp := http.StatusOK
+	repWith429 := repliedWith429
+
+	if event.RespondWith == 0 {
+		return resp, repWith429
+	}
+
+	resp = event.RespondWith
+	if event.RespondWith == http.StatusTooManyRequests {
+		if repWith429 {
+			resp = http.StatusOK
+		} else {
+			repWith429 = true
+		}
+	}
+
+	return resp, repWith429
 }
 
 func randomPort(t *testing.T) string {
