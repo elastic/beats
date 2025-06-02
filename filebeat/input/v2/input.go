@@ -143,16 +143,13 @@ func NewPipelineClientListener(reg *monitoring.Registry) *PipelineClientListener
 // nil, the metrics will be added on a new, unregistered registry.
 // created. If there is already a metric with the same name in the registry,
 // the existing metric will be used.
-func NewPipelineOutputListener(
-	reg *monitoring.Registry,
-	outputListener beat.OutputListener) beat.OutputListener {
-
+func NewPipelineOutputListener(reg *monitoring.Registry) *OutputListener {
 	rreg := reg
 	if rreg == nil {
 		rreg = monitoring.NewRegistry()
 	}
 
-	var ol beat.OutputListener = &OutputListener{
+	return &OutputListener{
 		eventsTotal: monitoring.NewUint(
 			rreg, metricEventOutputTotal),
 		eventsAcked: monitoring.NewUint(
@@ -168,15 +165,6 @@ func NewPipelineOutputListener(
 		eventsRetryableErrors: monitoring.NewUint(
 			rreg, metricEventOutputRetryableTotal),
 	}
-
-	if outputListener != nil {
-		ol = &beat.CombinedOutputListener{
-			A: outputListener,
-			B: ol,
-		}
-	}
-	
-	return ol
 }
 
 // PrepareInputMetrics creates a new monitoring.Registry on parent for the given
@@ -195,23 +183,34 @@ func PrepareInputMetrics(
 
 	reg := inputmon.NewMetricsRegistry(
 		inputID, name, parent, log)
-	listener := NewPipelineClientListener(reg)
 
-	pc := pipetool.WithClientConfigEdit(pconnector,
+	clientListener := NewPipelineClientListener(reg)
+	outputListener := NewPipelineOutputListener(reg)
+
+	pipeConnector := pipetool.WithClientConfigEdit(pconnector,
 		func(orig beat.ClientConfig) (beat.ClientConfig, error) {
-			var pcl beat.ClientListener = listener
+			var cl beat.ClientListener = clientListener
 			if orig.ClientListener != nil {
-				pcl = &beat.CombinedClientListener{
+				cl = &beat.CombinedClientListener{
 					A: orig.ClientListener,
-					B: listener,
+					B: clientListener,
 				}
 			}
 
-			orig.ClientListener = pcl
+			var ol beat.OutputListener = outputListener
+			if orig.OutputListener != nil {
+				ol = &beat.CombinedOutputListener{
+					A: orig.OutputListener,
+					B: outputListener,
+				}
+			}
+
+			orig.ClientListener = cl
+			orig.OutputListener = ol
 			return orig, nil
 		})
 
-	return reg, pc, func() {
+	return reg, pipeConnector, func() {
 		// Unregister the metrics when the input finishes running.
 		defer inputmon.CancelMetricsRegistry(
 			inputID, name, parent, log)

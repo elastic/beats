@@ -26,7 +26,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestInputMetricsFromPipeline(t *testing.T) {
+func TestInputMetricsFromPipelineAndOutput(t *testing.T) {
 	var tmplCfg = `
 http:
   enabled: true
