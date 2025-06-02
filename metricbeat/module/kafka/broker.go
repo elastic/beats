@@ -247,7 +247,6 @@ func (b *Broker) DescribeGroups(
 
 		members := map[string]MemberDescription{}
 		for memberID, memberDescr := range descr.Members {
-			b.logger.Infof("memb_bytes: %v", memberDescr.MemberAssignment)
 			memberDescription, err := fromSaramaGroupMemberDescription(memberDescr)
 			if err != nil {
 				b.logger.Debugf("error converting member description: %v", err)
@@ -545,7 +544,7 @@ func fromSaramaGroupMemberDescription(memberDescr *sarama.GroupMemberDescription
 			ClientID:   memberDescr.ClientId,
 			ClientHost: memberDescr.ClientHost,
 			Err:        err,
-		}, err
+		}, nil
 	}
 
 	assignmentTopics := make(map[string][]int32)

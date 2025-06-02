@@ -213,6 +213,22 @@ func Test_getMember(t *testing.T) {
 				Topics:     map[string][]int32{},
 			},
 		},
+		{
+			name: "ignore sarama error",
+			inputMemberDescr: &sarama.GroupMemberDescription{
+				ClientId:         "test-client",
+				ClientHost:       "test-host",
+				MemberAssignment: []byte{1, 2, 3},
+			},
+
+			expectedErrMsg: "",
+			expectedResult: MemberDescription{
+				Err:        errors.New("kafka: insufficient data to decode packet, more bytes expected"),
+				ClientID:   "test-client",
+				ClientHost: "test-host",
+				Topics:     nil,
+			},
+		},
 	}
 
 	for _, tt := range tests {
