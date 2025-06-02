@@ -260,8 +260,6 @@ func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func
 	return &Beat{Beat: b}, nil
 }
 
-=======
->>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
 // InitWithSettings does initialization of things common to all actions (read confs, flags)
 func (b *Beat) InitWithSettings(settings Settings) error {
 	err := b.handleFlags()
@@ -831,18 +829,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
-<<<<<<< HEAD
-	if err := promoteOutputQueueSettings(&b.Config); err != nil {
-=======
-	b.Info.Logger, err = configure.LoggingWithTypedOutputsLocal(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType)
-	if err != nil {
-		return fmt.Errorf("error initializing logging: %w", err)
-	}
-
-	// extracting here for ease of use
-	logger := b.Info.Logger
-
-	if err := PromoteOutputQueueSettings(b); err != nil {
+	if err := PromoteOutputQueueSettings(&b.Config); err != nil {
 		return fmt.Errorf("could not promote output queue settings: %w", err)
 	}
 
@@ -1579,9 +1566,8 @@ func sanitizeIPs(ips []string) []string {
 // to the top level queue settings.  This is done to allow existing
 // behavior of specifying queue settings at the top level or like
 // elastic-agent that specifies queue settings under the output
-func PromoteOutputQueueSettings(b *Beat) error {
-	if b.Config.Output.IsSet() && b.Config.Output.Config().Enabled() {
->>>>>>> 1ed0a6065 (move otel receiver pieces to x-pack (#44547))
+func PromoteOutputQueueSettings(bc *beatConfig) error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
 		pc := pipeline.Config{}
 		err := bc.Output.Config().Unpack(&pc)
 		if err != nil {

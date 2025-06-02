@@ -330,18 +330,7 @@ output:
 			err = cfg.Unpack(&config)
 			require.NoError(t, err)
 
-<<<<<<< HEAD
-			err = promoteOutputQueueSettings(&config)
-=======
-			logger := logptest.NewTestingLogger(t, "")
-
-			b := &Beat{Config: config, Beat: beat.Beat{
-				Info: beat.Info{
-					Logger: logger,
-				},
-			}}
-
-			err = PromoteOutputQueueSettings(b)
+			err = PromoteOutputQueueSettings(&config)
 			require.NoError(t, err)
 
 			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
