@@ -5,6 +5,11 @@ mapped_pages:
 
 # Advanced usage [configuration-autodiscover-advanced]
 
+::::{warning}
+If you still have `log`  or `container` inputs in your autodiscover templates please follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log` inputs to `filestream` inputs.
+
+The `log` input is deprecated in version 7.16 and disabled in version 9.0.
+::::
 
 ## Appenders [_appenders]
 
@@ -29,4 +34,3 @@ filebeat.autodiscover:
             fields:
               type: monitoring
 ```
-

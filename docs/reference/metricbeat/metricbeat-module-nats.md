@@ -6,7 +6,7 @@ mapped_pages:
 # NATS module [metricbeat-module-nats]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/nats.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/nats/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -31,9 +31,7 @@ The Nats module is tested with Nats 1.3.0, 2.0.4 and 2.1.4
 
 The Nats module comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat_nats_dashboard.png
-:alt: metricbeat nats dashboard
-:::
+![metricbeat nats dashboard](images/metricbeat_nats_dashboard.png)
 
 
 ## Example configuration [_example_configuration_47]

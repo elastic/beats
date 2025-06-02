@@ -74,6 +74,9 @@ LABEL \
   org.opencontainers.image.title="{{ .BeatName | title }}" \
   org.opencontainers.image.vendor="{{ .BeatVendor }}" \
   org.opencontainers.image.authors="infra@elastic.co" \
+  # The maintainer label is deprecated, but RedHat still checks for it in their preflight validation. If we don't set
+  # it here, we inherit it from the base image, and fail said validation.
+  maintainer="infra@elastic.co" \
   name="{{ .BeatName }}" \
   vendor="{{ .BeatVendor }}" \
   version="{{ beat_version }}{{if .Snapshot}}-SNAPSHOT{{end}}" \
@@ -130,7 +133,7 @@ USER root
 # Install required dependencies from wolfi repository
 RUN for iter in {1..10}; do \
         apk update && \
-        apk add --no-interactive --no-progress --no-cache nodejs-18=18.20.6-r0 npm=11.1.0-r0 glib dbus-glib libatk-1.0 \
+        apk add --no-interactive --no-progress --no-cache nodejs-18=18.20.7-r0 npm=10.9.2-r0 glib dbus-glib libatk-1.0 \
         libatk-bridge-2.0 cups-libs libxcomposite libxdamage libxrandr libxkbcommon pango alsa-lib \
         font-opensans fontconfig gtk icu-data-full libnss mesa font-noto-cjk font-noto-emoji && \
         exit_code=0 && break || exit_code=$? && echo "apk error: retry $iter in 10s" && sleep 10; \
@@ -169,7 +172,7 @@ RUN echo \
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
-ENV NODE_VERSION=18.20.6
+ENV NODE_VERSION=18.20.7
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites
@@ -225,6 +228,21 @@ RUN for iter in {1..10}; do \
     exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \
 done; \
 (exit $exit_code)
+{{- end }}
+
+# Journald input
+{{- if (eq .BeatName "filebeat") }}
+
+    {{- if (contains .from "ubi") }}
+    RUN for iter in {1..10}; do \
+            microdnf -y update && \
+            microdnf -y install systemd && \
+            microdnf clean all && \
+            exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \
+        done; \
+        (exit $exit_code)
+    {{- end}}
+
 {{- end }}
 
 {{- if eq .user "root" }}

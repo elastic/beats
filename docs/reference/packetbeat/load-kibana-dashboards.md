@@ -48,8 +48,8 @@ packetbeat setup --dashboards
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/packetbeat:9.0.0-beta1 setup --dashboards
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{stack-version}} setup --dashboards
 ```
 ::::::
 
@@ -64,7 +64,8 @@ PS > .\packetbeat.exe setup --dashboards
 ::::::
 
 :::::::
-For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](http://www.elastic.co/guide/en/beats/devguide/master/import-dashboards.md). If you’ve configured the Logstash output, see [Load dashboards for Logstash output](#load-dashboards-logstash).
+For more options, such as loading customized dashboards, see [Importing Existing Beat Dashboards](../../extend/import-dashboards.md).
+If you’ve configured the Logstash output, see [Load dashboards for Logstash output](#load-dashboards-logstash).
 
 
 ## Load dashboards for Logstash output [load-dashboards-logstash]
@@ -84,7 +85,7 @@ packetbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=packetbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -95,7 +96,7 @@ packetbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=packetbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -106,7 +107,7 @@ packetbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=packetbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -117,18 +118,18 @@ packetbeat setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=packetbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
 
 ::::::{tab-item} Docker
-```sh
-docker run --rm --net="host" docker.elastic.co/beats/packetbeat:9.0.0-beta1 setup -e \
+```sh subs=true
+docker run --rm --net="host" docker.elastic.co/beats/packetbeat:{{stack-version}} setup -e \
   -E output.logstash.enabled=false \
   -E output.elasticsearch.hosts=['localhost:9200'] \
   -E output.elasticsearch.username=packetbeat_internal \
-  -E output.elasticsearch.password={pwd} \
+  -E output.elasticsearch.password=YOUR_PASSWORD \
   -E setup.kibana.host=localhost:5601
 ```
 ::::::
@@ -143,7 +144,7 @@ PS > .\packetbeat.exe setup -e `
   -E output.logstash.enabled=false `
   -E output.elasticsearch.hosts=['localhost:9200'] `
   -E output.elasticsearch.username=packetbeat_internal `
-  -E output.elasticsearch.password={pwd} `
+  -E output.elasticsearch.password=YOUR_PASSWORD `
   -E setup.kibana.host=localhost:5601
 ```
 ::::::

@@ -17,9 +17,7 @@ Oracle Metricbeat module is being tested version 12c R2 by using the store/oracl
 
 An overview dashboard for Kibana is already included:
 
-:::{image} images/metricbeat-oracle-overview.png
-:alt: metricbeat oracle overview
-:::
+![metricbeat oracle overview](images/metricbeat-oracle-overview.png)
 
 
 ## Requirements [_requirements]

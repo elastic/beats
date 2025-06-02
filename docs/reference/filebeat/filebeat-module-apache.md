@@ -6,7 +6,7 @@ mapped_pages:
 # Apache module [filebeat-module-apache]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/apache.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/apache/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -115,10 +115,8 @@ See customlog documentation  [https://httpd.apache.org/docs/2.4/en/mod/mod_log_c
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/kibana-apache.png
-:alt: kibana apache
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana apache](images/kibana-apache.png)
 
 
 ## Fields [_fields_4]

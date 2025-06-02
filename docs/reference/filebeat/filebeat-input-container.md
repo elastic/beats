@@ -6,9 +6,13 @@ mapped_pages:
 
 # Container input [filebeat-input-container]
 
-[7.16.0]
+::::{warning}
+The container input is just a preset for the [`log`](/reference/filebeat/filebeat-input-log.md) input. The `log` input is deprecated in version 7.16 and disabled in version 9.0.
 
-The container input is just a preset for the [`log`](/reference/filebeat/filebeat-input-log.md) input. The [`log`](/reference/filebeat/filebeat-input-log.md) input has been deprecated since 7.16.0, therefore the container input is also deprecated. Please use the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input and its [`container`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-parsers-container) parser instead.
+Please use the the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input with its [`container`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-parsers-container) parser instead. Follow [our official guide](/reference/filebeat/migrate-to-filestream.md) to migrate existing `log`/`container` inputs to `filestream` inputs.
+
+After deprecation it’s possible to use this input type (e.g. for migration to `filestream`) only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
+
 
 Example configuration of using the [`container`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-parsers-container) parser with the [`filestream`](/reference/filebeat/filebeat-input-filestream.md) input:
 
@@ -28,10 +32,7 @@ filebeat.inputs:
 1. all [`filestream`](/reference/filebeat/filebeat-input-filestream.md) inputs require a [`unique ID`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-id).
 2. container logs use symlinks, so they need to be [`enabled`](/reference/filebeat/filebeat-input-filestream.md#filebeat-input-filestream-prospector-scanner-symlinks).
 3. `paths` is required.
-
-
-
-Due to deprecation of this input, it’s possible to use it only in combination with the `allow_deprecated_use: true` setting as a part of the input configuration.
+::::
 
 This input searches for container logs under the given path, and parse them into common message lines, extracting timestamps too. Everything happens before line filtering, multiline, and JSON decoding, so this input can be used in combination with those settings.
 
@@ -48,7 +49,7 @@ filebeat.inputs:
 
 
 ::::{note}
-*/var/log/containers/**.log* is normally a symlink to */var/log/pods/**/*/.log*, so above path can be edited accordingly
+*/var/log/containers/\*\*.log* is normally a symlink to */var/log/pods/\*\*/\*/.log*, so above path can be edited accordingly
 ::::
 
 
@@ -596,5 +597,3 @@ Example value: `"%{[agent.name]}-myindex-%{+yyyy.MM.dd}"` might expand to `"file
 #### `publisher_pipeline.disable_host` [_publisher_pipeline_disable_host_6]
 
 By default, all events contain `host.name`. This option can be set to `true` to disable the addition of this field to all events. The default value is `false`.
-
-
