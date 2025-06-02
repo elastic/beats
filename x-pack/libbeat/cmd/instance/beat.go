@@ -240,7 +240,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
 	if !outputEnabled {
 		if b.Manager.Enabled() {
-			logger.Info("Output is configured through Central Management")
+			logp.Info("Output is configured through Central Management")
 		} else {
 			return nil, fmt.Errorf("no outputs are defined, please define one under the output section")
 		}
@@ -254,7 +254,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
 		Telemetry: b.Info.Monitoring.StateRegistry,
-		Logger:    logp.L().Named("publisher"),,
+		Logger:    logp.L().Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 

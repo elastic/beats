@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/version"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	"github.com/elastic/elastic-agent-libs/logp"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.uber.org/zap"
@@ -54,7 +55,7 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http")), b.Config.HTTP, api.RegistryLookupFunc(b.Info.Monitoring.Namespace))
+		b.API, err = api.NewWithDefaultRoutes(logp.NewLogger("metrics.http"), b.Config.HTTP, api.RegistryLookupFunc(b.Info.Monitoring.Namespace))
 		if err != nil {
 			return BeatReceiver{}, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
