@@ -338,8 +338,7 @@ The Azure Blob Storage APIs don’t provide a direct way to filter files based o
 
 ## `custom_properties` [attrib-custom-properties]
 
-Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set/override custom blob properties
-provides more flexibility when reading blobs from a remote storage where the user might only have read access.
+Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set/override custom blob properties provides more flexibility when reading blobs from a remote storage where the user might only have read access.
 
 The currently supported `custom_properties` are :-  
 
