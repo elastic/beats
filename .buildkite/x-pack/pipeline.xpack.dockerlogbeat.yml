@@ -125,7 +125,7 @@ steps:
           - "x-pack/dockerlogbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Go Integration Tests / Win 2022"
+              context: "x-pack/dockerlogbeat: Go Integration Tests / Windows"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed

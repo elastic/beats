@@ -201,7 +201,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "libbeat: Go Integration Tests / Win 2022"
+              context: "libbeat: Go Integration Tests / Windows"
 
       - label: ":ubuntu: Libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"

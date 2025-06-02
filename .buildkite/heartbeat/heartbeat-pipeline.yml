@@ -190,7 +190,7 @@ steps:
           - "heartbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "heartbeat: Go Integration Tests / Win 2022"
+              context: "heartbeat: Go Integration Tests / Windows"
 
       # Heartbeat has no modules yet
       - label: ":ubuntu: Heartbeat: Python Integration Tests"

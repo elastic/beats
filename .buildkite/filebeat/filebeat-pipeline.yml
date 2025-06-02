@@ -204,7 +204,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "filebeat: Go Integration Tests / Win 2022"
+              context: "filebeat: Go Integration Tests / Windows"
 
       - label: ":ubuntu: Filebeat: Python Integration Tests"
         command: |

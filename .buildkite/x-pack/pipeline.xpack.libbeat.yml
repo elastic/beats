@@ -171,7 +171,7 @@ steps:
           - "x-pack/libbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Go Integration Tests / Win 2022"
+              context: "x-pack/libbeat: Go Integration Tests / Windows"
 
       - label: ":ubuntu: x-pack/libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"

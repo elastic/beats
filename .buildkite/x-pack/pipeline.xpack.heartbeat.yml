@@ -162,7 +162,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/heartbeat: Go Integration Tests / Win 2022"
+              context: "x-pack/heartbeat: Go Integration Tests / Windows"
 
       - label: ":windows: x-pack/heartbeat: Win 2016 Unit Tests"
         key: "mandatory-win-2016-unit-tests"

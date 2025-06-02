@@ -127,7 +127,7 @@ steps:
           - "x-pack/osquerybeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "x-pack/osquerybeat: Go Integration Tests / Win 2022"
+              context: "x-pack/osquerybeat: Go Integration Tests / Windows"
 
       - label: ":windows: x-pack/osquerybeat: Win 2016 Unit Tests"
         command: |
