@@ -51,6 +51,12 @@ type inputMetric struct {
 	EventsProcessedTotal int `json:"events_processed_total"`
 	// EventsPublishedTotal is used by: cel
 	EventsPublishedTotal int `json:"events_published_total"`
+	// PagesPublishedTotal is used by httpjson
+	PagesPublishedTotal int `json:"pages_published_total"`
+}
+
+type esEvent struct {
+	RespondWith int `json:"respond-with"`
 }
 
 func TestInputMetricsFromPipelineAndOutput(t *testing.T) {
@@ -132,12 +138,6 @@ logging.level: debug
 `
 	port, filebeat, filestreamInputID, celInputID, httpsjonInputID :=
 		initInputMetricsTest(t, tmplCfg)
-
-	totalEventsByInput := map[string]int{
-		filestreamInputID: 12,
-		celInputID:        2,
-		httpsjonInputID:   1,
-	}
 
 	assertionsByInputID := map[string]func(t *testing.T, metrics inputMetric){
 		filestreamInputID: func(t *testing.T, metrics inputMetric) {
@@ -240,7 +240,38 @@ logging.level: debug
 		},
 	}
 
-	wantInputMetricsCount := len(assertionsByInputID) + 1 // +1 for the filestream input without ID
+	wantInputMetricsCount := map[string]func(metrics inputMetric) error{
+		filestreamInputID: func(metrics inputMetric) error {
+			want := 12
+			got := metrics.EventsProcessedTotal
+			if got != want {
+				return fmt.Errorf(
+					"%q events_processed_total: want %d, got %d",
+					filestreamInputID, want, got)
+			}
+			return nil
+		},
+		celInputID: func(metrics inputMetric) error {
+			want := 2
+			got := metrics.EventsPublishedTotal
+			if got != want {
+				return fmt.Errorf(
+					"%q events_published_total: want %d, got %d",
+					celInputID, want, got)
+			}
+			return nil
+		},
+		httpsjonInputID: func(metrics inputMetric) error {
+			want := 2
+			got := metrics.PagesPublishedTotal
+			if got != want {
+				return fmt.Errorf(
+					"%q pages_published_total: want %d, got %d",
+					httpsjonInputID, want, got)
+			}
+			return nil
+		},
+	}
 	var inputMetrics []inputMetric
 	var body []byte
 	var err error
@@ -251,49 +282,14 @@ logging.level: debug
 
 	require.Eventuallyf(t, func() bool {
 		errMsg.Reset()
-		inputMetrics, body, err = fetchInputMetrics(
-			inputMetrics, port, wantInputMetricsCount)
+		err, inputMetrics, body = findInputMetrics(port, wantInputMetricsCount, 1)
 		if err != nil {
 			errMsg.WriteString(err.Error())
 			return false
 		}
 
-		for _, metrics := range inputMetrics {
-			want, ok := totalEventsByInput[metrics.ID]
-			if !ok {
-				continue
-			}
-
-			switch metrics.ID {
-			case filestreamInputID:
-				if want != metrics.EventsProcessedTotal {
-					errMsg.WriteString(
-						fmt.Sprintf("input %q wants %d events, got %d",
-							filestreamInputID, want, metrics.EventsProcessedTotal))
-
-					return false
-				}
-			case httpsjonInputID:
-				if want != metrics.EventsPipelineFilteredTotal {
-					errMsg.WriteString(
-						fmt.Sprintf("input %q wants %d events, got %d",
-							httpsjonInputID, want, metrics.EventsPipelineFilteredTotal))
-
-					return false
-				}
-			case celInputID:
-				if want != metrics.EventsPublishedTotal {
-					errMsg.WriteString(
-						fmt.Sprintf("input %q wants %d events, got %d",
-							celInputID, want, metrics.EventsPublishedTotal))
-
-					return false
-				}
-			}
-		}
-
 		return true
-	}, 10*time.Second, 1*time.Second, "did not get necessary input metrics: %s", &errMsg)
+	}, 10*time.Second, 1*time.Second, "aaaaa did not get necessary input metrics: %s", &errMsg)
 
 	count := 0
 	for _, inpMetric := range inputMetrics {
@@ -347,10 +343,6 @@ logging.level: debug
 	port, filebeat, filestreamInputID, _, _ :=
 		initInputMetricsTest(t, tmplCfg)
 
-	totalEventsByInput := map[string]int{
-		filestreamInputID: 12,
-	}
-
 	assertionsByInputID := map[string]func(t *testing.T, metrics inputMetric){
 		filestreamInputID: func(t *testing.T, metrics inputMetric) {
 			assert.Equal(t, "filestream", metrics.Input)
@@ -387,44 +379,35 @@ logging.level: debug
 		},
 	}
 
-	wantInputMetricsCount := len(assertionsByInputID)
 	var inputMetrics []inputMetric
-
-	errMsg := strings.Builder{}
+	var errMsg strings.Builder
 	var body []byte
 	var err error
 	defer func() {
 		saveInputMetricsOnFailure(t, filebeat, body)
 	}()
+
+	wantInputMetricsCount := map[string]func(metrics inputMetric) error{
+		filestreamInputID: func(metrics inputMetric) error {
+			if metrics.EventsProcessedTotal != 12 {
+				return fmt.Errorf(
+					"%q events_processed_total should be 12, got %d",
+					filestreamInputID, 12)
+			}
+			return nil
+		},
+	}
 	require.Eventuallyf(t, func() bool {
 		errMsg.Reset()
-		inputMetrics, body, err = fetchInputMetrics(
-			inputMetrics, port, wantInputMetricsCount)
+		err, inputMetrics, body = findInputMetrics(port, wantInputMetricsCount, 0)
 		if err != nil {
 			errMsg.WriteString(err.Error())
 			return false
 		}
 
-		for _, metrics := range inputMetrics {
-			want, ok := totalEventsByInput[metrics.ID]
-			if !ok {
-				continue
-			}
-
-			switch metrics.ID {
-			case filestreamInputID:
-				if want != metrics.EventsProcessedTotal {
-					errMsg.WriteString(
-						fmt.Sprintf("input %q wants %d events, got %d",
-							filestreamInputID, want, metrics.EventsProcessedTotal))
-
-					return false
-				}
-			}
-		}
-
 		return true
-	}, 10*time.Second, 1*time.Second, "did not get necessary input metrics: %s", &errMsg)
+	}, 10*time.Second, 1*time.Second,
+		"did not get necessary input metrics: %s", &errMsg)
 
 	count := 0
 	for _, inpMetric := range inputMetrics {
@@ -438,48 +421,6 @@ logging.level: debug
 	assert.Equalf(t, len(assertionsByInputID), count,
 		"%d assertions should have run, but only %d run",
 		len(assertionsByInputID), count)
-}
-func saveInputMetricsOnFailure(t *testing.T, filebeat *integration.BeatProc, body []byte) {
-	if t.Failed() {
-		inputsJSONFile := filepath.Join(filebeat.TempDir(), "inputs.json")
-		if err := os.WriteFile(inputsJSONFile, body, 0o644); err != nil {
-			t.Logf("failed to save response body to %s: %v",
-				inputsJSONFile, err)
-		}
-
-		t.Errorf("test failed: input metrics response used for the assertions:\n%s",
-			body)
-	}
-}
-func fetchInputMetrics(
-	inputMetrics []inputMetric,
-	port string,
-	wantInputMetricsCount int) ([]inputMetric, []byte, error) {
-
-	inputMetrics = []inputMetric{}
-
-	//nolint:noctx // on a test, it's ok
-	resp, err := http.Get(fmt.Sprintf("http://localhost:%s/inputs/", port))
-	if err != nil {
-		return nil, nil, fmt.Errorf("request to /inputs/ failed: %v", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read response body: %v", err)
-	}
-	err = json.Unmarshal(body, &inputMetrics)
-	if err != nil {
-		return nil, body, fmt.Errorf("failed unmarshalling response body: %v", err)
-	}
-
-	if len(inputMetrics) != wantInputMetricsCount {
-		return nil, body, fmt.Errorf("want %d inputs, got %d",
-			wantInputMetricsCount, len(inputMetrics))
-	}
-
-	return inputMetrics, body, nil
 }
 
 func initInputMetricsTest(t *testing.T, tmplCfg string) (string, *integration.BeatProc, string, string, string) {
@@ -542,6 +483,71 @@ func initInputMetricsTest(t *testing.T, tmplCfg string) (string, *integration.Be
 	return port, filebeat, filestreamInputID, celInputID, httpsjonInputID
 }
 
+func saveInputMetricsOnFailure(t *testing.T, filebeat *integration.BeatProc, body []byte) {
+	if t.Failed() {
+		inputsJSONFile := filepath.Join(filebeat.TempDir(), "inputs.json")
+		if err := os.WriteFile(inputsJSONFile, body, 0o644); err != nil {
+			t.Logf("failed to save response body to %s: %v",
+				inputsJSONFile, err)
+		}
+
+		t.Errorf("test failed: input metrics response used for the assertions:\n%s",
+			body)
+	}
+}
+
+func findInputMetrics(
+	port string,
+	assertInputMetricCount map[string]func(metrics inputMetric) error,
+	extraInputsWant int) (error, []inputMetric, []byte) {
+
+	inputMetrics, body, err := fetchInputMetrics(port)
+	if err != nil {
+		return err, nil, nil
+	}
+
+	var extraInputsGot int
+	for _, metric := range inputMetrics {
+		f, ok := assertInputMetricCount[metric.ID]
+		if !ok {
+			extraInputsGot++
+			continue
+		}
+
+		if err = f(metric); err != nil {
+			return err, inputMetrics, body
+		}
+	}
+
+	if extraInputsWant != extraInputsGot {
+		return fmt.Errorf("want %d extra inputs, got %d",
+			extraInputsWant, extraInputsGot), inputMetrics, body
+	}
+
+	return nil, inputMetrics, body
+}
+func fetchInputMetrics(port string) ([]inputMetric, []byte, error) {
+	var inputMetrics []inputMetric
+
+	//nolint:noctx // on a test, it's ok
+	resp, err := http.Get(fmt.Sprintf("http://localhost:%s/inputs/", port))
+	if err != nil {
+		return nil, nil, fmt.Errorf("request to /inputs/ failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read response body: %v", err)
+	}
+	err = json.Unmarshal(body, &inputMetrics)
+	if err != nil {
+		return nil, body, fmt.Errorf("failed unmarshalling response body: %v", err)
+	}
+
+	return inputMetrics, body, nil
+}
+
 // makeServer returns a *httptest.Server to mock a server called by an input.
 // It reruns 2 successful responses then all following responses are an HTTP 500.
 func makeServer() *httptest.Server {
@@ -559,18 +565,13 @@ func makeServer() *httptest.Server {
 	}))
 	return srv
 }
-
-type esEvent struct {
-	RespondWith int `json:"respond-with"`
-}
-
 func newMockESServer(t *testing.T) *httptest.Server {
 	repliedWith429 := false
 
 	mockESHandler := api.NewDeterministicAPIHandler(
 		uuid.Must(uuid.NewV4()),
 		"",
-		nil, // No need for otel provider in this test
+		nil,
 		time.Now().Add(24*time.Hour),
 		0,
 		100,
@@ -597,7 +598,7 @@ func newMockESServer(t *testing.T) *httptest.Server {
 
 			var resp int
 			if index, ok := meta["_index"].(string); ok && index == "deadletter" {
-				// It keeps retrying if deadletter fails, so we always return OK
+				// It keeps retrying if dead letter fails, so we always return OK
 				resp = http.StatusOK
 			} else {
 				resp, repliedWith429 = handleEvent(event, repliedWith429)
@@ -610,8 +611,6 @@ func newMockESServer(t *testing.T) *httptest.Server {
 	return esMock
 }
 
-// handleEvent processes regular events, managing rate limiting responses.
-// It modifies repliedWith429 to ensure StatusTooManyRequests is sent only once.
 func handleEvent(event esEvent, repliedWith429 bool) (int, bool) {
 	resp := http.StatusOK
 	repWith429 := repliedWith429
