@@ -22,7 +22,7 @@ type HTTPResponse struct {
 
 // Error implements the error interface for HTTPResponse, providing a formatted error message.
 func (e HTTPResponse) Error() string {
-	return fmt.Sprintf("%s: HTTP error %s with body: %s", e.Err.Error(), e.Status, e.Body)
+	return fmt.Sprintf("%s: HTTP error %s", e.Err.Error(), e.Status)
 }
 
 // FetchAPIData fetches data from the specified path using the provided MetricSet and deserializes it into the specified type T.
