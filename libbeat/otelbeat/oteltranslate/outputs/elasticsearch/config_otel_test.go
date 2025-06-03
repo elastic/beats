@@ -47,7 +47,6 @@ proxy_url: "https://proxy.url"
 backoff:
   init: 42s
   max: 420s
-workers: 30
 headers:
   X-Header-1: foo
   X-Bar-Header: bar`
@@ -58,7 +57,6 @@ endpoints:
   - http://localhost:9300/foo/bar
 idle_conn_timeout: 3s
 logs_index: some-index
-num_workers: 30
 password: changeme
 pipeline: some-ingest-pipeline
 proxy_url: https://proxy.url
@@ -101,7 +99,6 @@ endpoints:
   - http://localhost:9200
 idle_conn_timeout: 3s
 logs_index: some-index
-num_workers: 1
 retry:
   enabled: true
   initial_interval: 1s
@@ -161,7 +158,6 @@ mapping:
 				presetName: "balanced",
 				output: commonOTelCfg + `
 idle_conn_timeout: 3s
-num_workers: 1
 batcher:
   enabled: true
   max_size: 1600
@@ -172,7 +168,6 @@ batcher:
 				presetName: "throughput",
 				output: commonOTelCfg + `
 idle_conn_timeout: 15s
-num_workers: 4
 batcher:
   enabled: true
   max_size: 1600
@@ -194,7 +189,6 @@ password: changeme
 user: elastic
 timeout: 1m30s
 idle_conn_timeout: 1s
-num_workers: 1
 batcher:
   enabled: true
   max_size: 1600
@@ -207,7 +201,6 @@ mapping:
 				presetName: "latency",
 				output: commonOTelCfg + `
 idle_conn_timeout: 1m0s
-num_workers: 1
 batcher:
   enabled: true
   max_size: 50
@@ -218,7 +211,6 @@ batcher:
 				presetName: "custom",
 				output: commonOTelCfg + `
 idle_conn_timeout: 3s
-num_workers: 1
 batcher:
   enabled: true
   max_size: 1600
