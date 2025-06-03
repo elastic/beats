@@ -132,7 +132,7 @@ func NewInput(
 
 	forwarder := harvester.NewForwarder(out)
 	cb := GetCbByConfig(config, forwarder, log)
-	server, err := factory(cb, config.Protocol)
+	server, err := factory(cb, config.Protocol, logger)
 	if err != nil {
 		return nil, err
 	}
