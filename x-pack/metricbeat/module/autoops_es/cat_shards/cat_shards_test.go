@@ -176,15 +176,14 @@ func Test500FailedToResolveIndexesWhileFetching(t *testing.T) {
 
 		// Check error event
 		event := data.Reporter.GetEvents()[1]
-		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrEvent)
-		require.True(t, ok, "error field should be of type *error.ErrEvent")
+		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
+		require.True(t, ok, "error field should be of type *error.ErrorEvent")
 		require.Equal(t, "HTTP_500", errorField.ErrorCode)
-		require.Contains(t, errorField.ErrorMessage, "failed to load resolved index details failed to fetch data")
+		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error", errorField.ErrorMessage)
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
 		require.Equal(t, "/_cat/shards", errorField.URLPath)
 		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error with body: Server Error", errorField.StackTrace)
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 500, errorField.HTTPStatusCode)
@@ -200,15 +199,14 @@ func Test404FailedToResolveIndexesWhileFetching(t *testing.T) {
 
 		// Check error event
 		event := data.Reporter.GetEvents()[1]
-		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrEvent)
-		require.True(t, ok, "error field should be of type error.ErrEvent")
+		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
+		require.True(t, ok, "error field should be of type error.ErrorEvent")
 		require.Equal(t, "HTTP_404", errorField.ErrorCode)
-		require.Contains(t, errorField.ErrorMessage, "failed to load resolved index details failed to fetch data")
+		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 404 Not Found", errorField.ErrorMessage)
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
 		require.Equal(t, "/_cat/shards", errorField.URLPath)
 		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Contains(t, errorField.StackTrace, "failed to load resolved index details failed to fetch data: HTTP error 404 Not Found")
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 404, errorField.HTTPStatusCode)
@@ -224,16 +222,15 @@ func Test405FailedToResolveIndexesWhileFetching(t *testing.T) {
 
 		// Check error event
 		event := data.Reporter.GetEvents()[1]
-		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrEvent)
-		require.True(t, ok, "error field should be of type error.ErrEvent")
+		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
+		require.True(t, ok, "error field should be of type error.ErrorEvent")
 		require.Equal(t, "HTTP_405", errorField.ErrorCode)
-		require.Equal(t, "failed to load resolved index details failed to fetch data", errorField.ErrorMessage)
+		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 405 Method Not Allowed", errorField.ErrorMessage)
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
 		require.Equal(t, "/_cat/shards", errorField.URLPath)
 		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Contains(t, errorField.StackTrace, "failed to load resolved index details failed to fetch data: HTTP error 405 Method Not Allowed")
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 405, errorField.HTTPStatusCode)
 		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested
@@ -248,16 +245,15 @@ func Test500FailedToResolveIndexesWhileFetchingEmptyResponse(t *testing.T) {
 
 		// Check error event
 		event := data.Reporter.GetEvents()[1]
-		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrEvent)
-		require.True(t, ok, "error field should be of type error.ErrEvent")
+		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
+		require.True(t, ok, "error field should be of type error.ErrorEvent")
 		require.Equal(t, "HTTP_500", errorField.ErrorCode)
-		require.Equal(t, "failed to load resolved index details failed to fetch data", errorField.ErrorMessage)
+		require.Equal(t, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error", errorField.ErrorMessage)
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, "GZbSUUMQQI-A7UcGS6vCMa", errorField.ClusterID)
 		require.Equal(t, "/_cat/shards", errorField.URLPath)
 		require.Equal(t, "s=i&h=n,i,id,s,p,st,d,sto,sc,sqto,sqti,iito,iiti,iif,mt,mtt,gmto,gmti,ur,ud&bytes=b&time=ms&format=json", errorField.Query)
 		require.Equal(t, "cat_shards", errorField.MetricSet)
-		require.Contains(t, errorField.StackTrace, "failed to load resolved index details failed to fetch data: HTTP error 500 Internal Server Error")
 		require.Equal(t, "GET", errorField.HTTPMethod)
 		require.Equal(t, 500, errorField.HTTPStatusCode)
 		// avoiding the HTTP response body check on purpose, as the error response is a JSON string, and it's already tested

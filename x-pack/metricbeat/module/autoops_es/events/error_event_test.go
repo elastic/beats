@@ -81,7 +81,16 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			expectedBody:   "Not Found",
 		},
 		{
-			name:           "Error is not of type HTTPResponse",
+			name: "Error is of type ClusterInfoError",
+			inputError: &utils.ClusterInfoError{
+				Message: "Cluster not ready",
+			},
+			expectedStatus: 0,
+			expectedCode:   "CLUSTER_NOT_READY",
+			expectedBody:   "Cluster not ready",
+		},
+		{
+			name:           "Error is not of a known type",
 			inputError:     errors.New("some other error"),
 			expectedStatus: 0,
 			expectedCode:   "UNKNOWN_ERROR",
@@ -105,23 +114,6 @@ func TestGetHTTPResponseBodyInfo(t *testing.T) {
 			assert.Equal(t, tt.expectedBody, body)
 		})
 	}
-}
-
-func TestGetSurfaceErrorWithColon(t *testing.T) {
-	err := errors.New("root error: additional context")
-	result := getSurfaceError(err)
-	assert.Equal(t, "root error", result)
-}
-
-func TestGetSurfaceErrorWithoutColon(t *testing.T) {
-	err := errors.New("root error")
-	result := getSurfaceError(err)
-	assert.Equal(t, "root error", result)
-}
-
-func TestGetSurfaceErrorNilError(t *testing.T) {
-	result := getSurfaceError(nil)
-	assert.Equal(t, "", result)
 }
 
 func TestGetResourceID(t *testing.T) {

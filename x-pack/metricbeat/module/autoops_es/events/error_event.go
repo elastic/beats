@@ -7,22 +7,19 @@ package events
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
-	"os"
-	"strings"
-
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
+	"net/http"
+	"net/url"
+	"os"
 )
 
-// ErrEvent represents an error event in the system.
-type ErrEvent struct {
+// ErrorEvent represents an error event in the system.
+type ErrorEvent struct {
 	ErrorCode      string `json:"error.code"`                 // Code identifying the specific error type
-	ErrorMessage   string `json:"error.message"`              // Main error message
-	StackTrace     string `json:"error.stack_trace"`          // All errors concatenated similar to a stack trace
+	ErrorMessage   string `json:"error.message"`              // Full error message
 	ResourceID     string `json:"orchestrator.resource.id"`   // Cloud Resource ID (deployment, project, or cloud connected resource)
 	ClusterID      string `json:"orchestrator.cluster.id"`    // Optional cluster identifier (can be unknown for authentication errors)
 	URLPath        string `json:"url.path"`                   // API path of the request (without DNS/host portion)
@@ -43,12 +40,10 @@ func SendErrorEvent(err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, 
 	path, query := extractPathAndQuery(path)
 	status, errorCode, body := getHTTPResponseBodyInfo(err)
 	resourceId := getResourceID()
-	lastError := getSurfaceError(err)
 
-	errEvent := ErrEvent{
+	errEvent := ErrorEvent{
 		ErrorCode:      errorCode,
-		ErrorMessage:   lastError,
-		StackTrace:     err.Error(),
+		ErrorMessage:   err.Error(),
 		ResourceID:     resourceId,
 		ClusterID:      clusterInfo.ClusterID,
 		URLPath:        path,
@@ -64,10 +59,8 @@ func SendErrorEvent(err error, clusterInfo *utils.ClusterInfo, r mb.ReporterV2, 
 
 // SendErrorEventWithoutClusterInfo sends an error event without cluster info to the reporter with the provided details.
 func SendErrorEventWithoutClusterInfo(err error, r mb.ReporterV2, metricSetName string) {
-	status, _, body := getHTTPResponseBodyInfo(err)
-	errorCode := "CLUSTER_NOT_READY"
+	status, errorCode, body := getHTTPResponseBodyInfo(err)
 	resourceId := getResourceID()
-	lastError := getSurfaceError(err)
 
 	emptyClusterInfo := &utils.ClusterInfo{
 		ClusterName: "",
@@ -78,10 +71,9 @@ func SendErrorEventWithoutClusterInfo(err error, r mb.ReporterV2, metricSetName 
 		},
 	}
 
-	errEvent := ErrEvent{
+	errEvent := ErrorEvent{
 		ErrorCode:      errorCode,
-		ErrorMessage:   lastError,
-		StackTrace:     err.Error(),
+		ErrorMessage:   err.Error(),
 		ResourceID:     resourceId,
 		ClusterID:      emptyClusterInfo.ClusterID,
 		URLPath:        "/",
@@ -111,15 +103,13 @@ func getHTTPResponseBodyInfo(err error) (int, string, string) {
 	if errors.As(err, &httpErr) {
 		return httpErr.StatusCode, fmt.Sprintf("HTTP_%d", httpErr.StatusCode), httpErr.Body
 	}
-	return 0, "UNKNOWN_ERROR", ""
-}
 
-func getSurfaceError(err error) string {
-	if err != nil {
-		parts := strings.SplitN(err.Error(), ":", 2) // Split the error message at the first colon
-		return strings.TrimSpace(parts[0])           // Return the first part, trimmed of whitespace
+	var clusterErr *utils.ClusterInfoError
+	if errors.As(err, &clusterErr) {
+		return 0, "CLUSTER_NOT_READY", clusterErr.Message
 	}
-	return ""
+
+	return 0, "UNKNOWN_ERROR", ""
 }
 
 func getResourceID() string {

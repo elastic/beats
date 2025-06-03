@@ -45,14 +45,13 @@ func TestNestedFailedClusterInfoNoId(t *testing.T) {
 
 		// Check error event
 		event := data.Reporter.GetEvents()[0]
-		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrEvent)
-		require.True(t, ok, "error field should be of type error.ErrEvent")
+		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
+		require.True(t, ok, "error field should be of type error.ErrorEvent")
 		require.Equal(t, "CLUSTER_NOT_READY", errorField.ErrorCode)
 		require.Contains(t, errorField.ErrorMessage, "failed to get cluster info from cluster, test_nested_metricset metricset")
 		require.Equal(t, "", errorField.ClusterID)
 		require.Equal(t, "/", errorField.URLPath)
 		require.Equal(t, "test_nested_metricset", errorField.MetricSet)
-		require.Contains(t, errorField.StackTrace, "")
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
 		require.Equal(t, http.MethodGet, errorField.HTTPMethod)
 		require.Equal(t, 0, errorField.HTTPStatusCode) // status code vary based on the server response for cluster not ready
@@ -67,14 +66,13 @@ func TestNestedFailedClusterInfoNAId(t *testing.T) {
 
 		// Check error event
 		event := data.Reporter.GetEvents()[0]
-		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrEvent)
-		require.True(t, ok, "error field should be of type error.ErrEvent")
+		errorField, ok := event.MetricSetFields["error"].(autoopsevents.ErrorEvent)
+		require.True(t, ok, "error field should be of type error.ErrorEvent")
 		require.Equal(t, "CLUSTER_NOT_READY", errorField.ErrorCode)
 		require.Contains(t, errorField.ErrorMessage, "failed to get cluster info from cluster, test_metricset metricset")
 		require.Equal(t, "", errorField.ClusterID)
 		require.Equal(t, "/", errorField.URLPath)
 		require.Equal(t, "test_metricset", errorField.MetricSet)
-		require.Contains(t, errorField.StackTrace, "")
 		require.Equal(t, "test-resource-id", errorField.ResourceID)
 	})
 }
