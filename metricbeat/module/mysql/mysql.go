@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 /*
 Package mysql is Metricbeat module for MySQL server.
 */

@@ -117,7 +117,7 @@ func NewInput(
 	if err := cfg.Unpack(&inputConfig); err != nil {
 		return nil, err
 	}
-	if err := inputConfig.resolveRecursiveGlobs(); err != nil {
+	if err := inputConfig.resolveRecursiveGlobs(logger); err != nil {
 		return nil, fmt.Errorf("Failed to resolve recursive globs in config: %w", err) //nolint:staticcheck //Keep old behavior
 	}
 	if err := inputConfig.normalizeGlobPatterns(); err != nil {

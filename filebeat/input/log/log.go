@@ -176,7 +176,7 @@ func (f *Log) checkFileDisappearedErrors() error {
 
 	if f.config.CloseRenamed {
 		// Check if the file can still be found under the same path
-		if !file.IsSameFile(f.fs.Name(), info) {
+		if !file.IsSameFile(f.fs.Name(), info, f.logger) {
 			f.logger.Debugf("close_renamed is enabled and file %s has been renamed", f.fs.Name())
 			return ErrRenamed
 		}
