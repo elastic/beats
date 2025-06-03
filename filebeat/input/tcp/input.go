@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -98,12 +99,16 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("starting tcp socket input")
 	defer log.Info("tcp input stopped")
 
+	ctx.UpdateStatus(status.Starting, "")
+	ctx.UpdateStatus(status.Configuring, "")
+
 	const pollInterval = time.Minute
 	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.config.Host, pollInterval, log)
 	defer metrics.Close()
 
 	split, err := streaming.SplitFunc(s.config.Framing, []byte(s.config.LineDelimiter))
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Failed to configure split function: "+err.Error())
 		return err
 	}
 
@@ -133,15 +138,24 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		split,
 	), log)
 	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Failed to configure input: "+err.Error())
 		return err
 	}
 
 	log.Debug("tcp input initialized")
+	ctx.UpdateStatus(status.Running, "")
 
 	err = server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 	// Ignore error from 'Run' in case shutdown was signaled.
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
 	}
+
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
+	} else {
+		ctx.UpdateStatus(status.Stopped, "")
+	}
+
 	return err
 }
