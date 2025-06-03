@@ -112,7 +112,7 @@ steps:
               context: "heartbeat: RHEL9 Unit Tests"
 
       - label: ":windows: Heartbeat: Win 2016 Unit Tests"
-        key: "windows-2016"
+        key: "heartbeat-windows-2016"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
@@ -132,7 +132,7 @@ steps:
               context: "heartbeat: Win 2016 Unit Tests"
 
       - label: ":windows: Heartbeat: Win 2022 Unit Test"
-        key: "windows-2022"
+        key: "heartbeat-windows-2022"
         command: |
           Set-Location -Path heartbeat
           mage build unitTest
@@ -201,7 +201,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Heartbeat: Ubuntu arm64 Unit Tests"
-        key: "arm-extended"
+        key: "heartbeat-arm-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
           cd heartbeat

@@ -83,7 +83,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/auditbeat: Build Tests (Module)"
-        key: "mandatory-linux-unit-test"
+        key: "x-pack-auditbeat-mandatory-linux-unit-test"
         command: |
           cd x-pack/auditbeat
           mage update build test
@@ -108,7 +108,7 @@ steps:
               context: "x-pack/auditbeat: Build Tests (Module)"
 
       - label: ":ubuntu: x-pack/auditbeat: Ubuntu Unit Tests with requirefips build tag"
-        key: "mandatory-linux-unit-test-fips-tag"
+        key: "x-pack-auditbeat-mandatory-linux-unit-test-fips-tag"
         command: |
           cd x-pack/auditbeat
           mage unitTest
@@ -135,7 +135,7 @@ steps:
               context: "x-pack/auditbeat: Ubuntu Unit Tests with requirefips build tag"
 
       - label: ":ubuntu: x-pack/auditbeat: Ubuntu fips140=only Unit Tests"
-        key: "mandatory-linux-unit-test-fips-only"
+        key: "x-pack-auditbeat-mandatory-linux-unit-test-fips-only"
         command: |
           cd x-pack/auditbeat
           mage goFIPSOnlyUnitTest
@@ -162,7 +162,7 @@ steps:
               context: "x-pack/auditbeat: Ubuntu fips140=only Unit Tests"
 
       - label: ":rhel: x-pack/auditbeat: RHEL9 Unit Tests"
-        key: "mandatory-rhel9-unit-test"
+        key: "x-pack-auditbeat-mandatory-rhel9-unit-test"
         command: |
           cd x-pack/auditbeat
           mage build unitTest
@@ -187,7 +187,7 @@ steps:
               context: "x-pack/auditbeat: RHEL9 Unit Tests"
 
       - label: ":windows: x-pack/auditbeat: Win 2022 Unit Tests"
-        key: "mandatory-win-2022-unit-tests"
+        key: "x-pack-auditbeat-mandatory-win-2022-unit-tests"
         command: |
           Set-Location -Path x-pack/auditbeat
           mage build unitTest
@@ -214,7 +214,7 @@ steps:
               context: "x-pack/auditbeat: Win 2022 Unit Tests"
 
       - label: ":windows: x-pack/auditbeat: Win 2025 Unit Tests"
-        key: "mandatory-win-2025-unit-tests"
+        key: "x-pack-auditbeat-mandatory-win-2025-unit-tests"
         command: |
           Set-Location -Path x-pack/auditbeat
           mage build unitTest
@@ -244,7 +244,7 @@ steps:
         command: |
           Set-Location -Path x-pack/auditbeat
           mage build unitTest
-        key: "mandatory-win-2016-unit-tests"
+        key: "x-pack-auditbeat-mandatory-win-2016-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -276,7 +276,7 @@ steps:
         command: |
           Set-Location -Path x-pack/auditbeat
           mage build unitTest
-        key: "extended-win-2019-unit-tests"
+        key: "x-pack-auditbeat-extended-win-2019-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -303,7 +303,7 @@ steps:
         command: |
           Set-Location -Path x-pack/auditbeat
           mage build unitTest
-        key: "extended-win-10-unit-tests"
+        key: "x-pack-auditbeat-extended-win-10-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -330,7 +330,7 @@ steps:
         command: |
           Set-Location -Path x-pack/auditbeat
           mage build unitTest
-        key: "extended-win-11-unit-tests"
+        key: "x-pack-auditbeat-extended-win-11-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -396,7 +396,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/auditbeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "x-pack-auditbeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -416,7 +416,7 @@ steps:
               context: "x-pack/auditbeat: Packaging Linux"
 
       - label: ":ubuntu: x-pack/auditbeat: Packaging Linux arm64"
-        key: "packaging-arm"
+        key: "x-pack-auditbeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
@@ -434,7 +434,7 @@ steps:
               context: "x-pack/auditbeat: Packaging Linux arm64"
 
       - label: ":ubuntu: x-pack/auditbeat: Packaging Linux amd64 FIPS"
-        key: "packaging-linux-fips"
+        key: "x-pack-auditbeat-packaging-linux-fips"
         env:
           PLATFORMS: "${PLATFORMS_AMD64_FIPS}"
           FIPS: true
@@ -455,7 +455,7 @@ steps:
               context: "x-pack/auditbeat: Packaging Linux amd64 FIPS"
 
       - label: ":ubuntu: x-pack/auditbeat: Packaging Linux arm64 FIPS"
-        key: "packaging-arm-fips"
+        key: "x-pack-auditbeat-packaging-arm-fips"
         env:
           PLATFORMS: "${PLATFORMS_ARM64_FIPS}"
           FIPS: true

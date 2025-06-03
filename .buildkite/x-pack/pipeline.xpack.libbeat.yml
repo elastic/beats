@@ -70,7 +70,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 Unit Tests"
-        key: "mandatory-linux-unit-test"
+        key: "x-pack-libbeat-mandatory-linux-unit-test"
         command: |
           cd x-pack/libbeat
           mage build unitTest
@@ -89,7 +89,7 @@ steps:
               context: "x-pack/libbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
-        key: "mandatory-linux-unit-test-fips-tag"
+        key: "x-pack-libbeat-mandatory-linux-unit-test-fips-tag"
         command: |
           cd x-pack/libbeat
           mage unitTest
@@ -110,7 +110,7 @@ steps:
               context: "x-pack/libbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
 
       - label: ":ubuntu: x-pack/libbeat: Ubuntu x86_64 fips140=only Unit Tests"
-        key: "mandatory-linux-unit-test-fips-only"
+        key: "x-pack-libbeat-mandatory-linux-unit-test-fips-only"
         command: |
           cd x-pack/libbeat
           mage goFIPSOnlyUnitTest
@@ -131,7 +131,7 @@ steps:
               context: "x-pack/libbeat: Ubuntu x86_64 fips140=only Unit Tests"
 
       - label: ":ubuntu: x-pack/libbeat: Go Integration Tests"
-        key: "mandatory-int-test"
+        key: "x-pack-libbeat-mandatory-int-test"
         command: |
           cd x-pack/libbeat
           mage goIntegTest
@@ -153,7 +153,7 @@ steps:
               context: "x-pack/libbeat: Go Integration Tests"
 
       - label: ":ubuntu: x-pack/libbeat: Python Integration Tests"
-        key: "mandatory-python-int-test"
+        key: "x-pack-libbeat-mandatory-python-int-test"
         command: |
           cd x-pack/libbeat
           mage pythonIntegTest
@@ -178,7 +178,7 @@ steps:
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
-        key: "mandatory-win-2016-unit-tests"
+        key: "x-pack-libbeat-mandatory-win-2016-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -199,7 +199,7 @@ steps:
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
-        key: "mandatory-win-2022-unit-tests"
+        key: "x-pack-libbeat-mandatory-win-2022-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -225,7 +225,7 @@ steps:
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
-        key: "extended-win-10-unit-tests"
+        key: "x-pack-libbeat-extended-win-10-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -246,7 +246,7 @@ steps:
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
-        key: "extended-win-11-unit-tests"
+        key: "x-pack-libbeat-extended-win-11-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -267,7 +267,7 @@ steps:
         command: |
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
-        key: "extended-win-2019-unit-tests"
+        key: "x-pack-libbeat-extended-win-2019-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -290,7 +290,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/libbeat: Ubuntu arm64 Unit Tests"
-        key: "extended-arm64-unit-tests"
+        key: "x-pack-libbeat-extended-arm64-unit-tests"
         command: |
           cd x-pack/libbeat
           mage build unitTest

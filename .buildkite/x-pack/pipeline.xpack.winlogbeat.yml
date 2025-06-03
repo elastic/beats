@@ -64,7 +64,7 @@ steps:
 
     steps:
       - label: ":windows: x-pack/winlogbeat Win 2019 Unit Tests"
-        key: "mandatory-win-2019-unit-tests"
+        key: "x-pack-winlogbeat-mandatory-win-2019-unit-tests"
         command: |
           .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
@@ -96,7 +96,7 @@ steps:
           .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        key: "mandatory-win-2016-unit-tests"
+        key: "x-pack-winlogbeat-mandatory-win-2016-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -124,7 +124,7 @@ steps:
           .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        key: "mandatory-win-2022-unit-tests"
+        key: "x-pack-winlogbeat-mandatory-win-2022-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -152,7 +152,7 @@ steps:
           .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        key: "mandatory-win-2025-unit-tests"
+        key: "x-pack-winlogbeat-mandatory-win-2025-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -176,7 +176,7 @@ steps:
               context: "x-pack/winlogbeat: Win 2025 Unit Tests"
 
   - group: "Extended Windows Tests"
-    key: "extended-win-tests"
+    key: "x-pack-winlogbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
@@ -185,7 +185,7 @@ steps:
           .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        key: "extended-win-10-unit-tests"
+        key: "x-pack-winlogbeat-extended-win-10-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -213,7 +213,7 @@ steps:
           .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        key: "extended-win-11-unit-tests"
+        key: "x-pack-winlogbeat-extended-win-11-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -241,7 +241,7 @@ steps:
           .buildkite/scripts/install_sysmon.ps1
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        key: "extended-win-2019-unit-tests"
+        key: "x-pack-winlogbeat-extended-win-2019-unit-tests"
         retry:
           automatic:
             - limit: 1
@@ -277,7 +277,7 @@ steps:
 
     steps:
       - label: ":ubuntu: x-pack/winlogbeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "x-pack-winlogbeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |

@@ -208,7 +208,7 @@ steps:
               context: "filebeat: Python Integration Tests"
 
       - label: ":windows: Filebeat: Win 2016 Unit Tests"
-        key: "windows-2016-unit-tests"
+        key: "filebeat-windows-2016-unit-tests"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -238,7 +238,7 @@ steps:
               context: "filebeat: Win 2016 Unit Tests"
 
       - label: ":windows: Filebeat: Win 2022 Unit Tests"
-        key: "windows-2022-unit-tests"
+        key: "filebeat-windows-2022-unit-tests"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -270,7 +270,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Filebeat: Ubuntu arm64 Unit Tests"
-        key: "extended-arm64-unit-test"
+        key: "filebeat-extended-arm64-unit-test"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
           cd filebeat
@@ -301,7 +301,7 @@ steps:
 
     steps:
       - label: ":windows: Filebeat: Win 2025 Unit Tests"
-        key: "windows-extended-2025"
+        key: "filebeat-windows-extended-2025"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -328,7 +328,7 @@ steps:
               context: "filebeat: Win 2025 Unit Tests"
 
       - label: ":windows: Filebeat: Win 2019 Unit Tests"
-        key: "windows-extended-2019"
+        key: "filebeat-windows-extended-2019"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -355,7 +355,7 @@ steps:
               context: "filebeat: Win 2019 Unit Tests"
 
       - label: ":windows: Filebeat: Win 11 Unit Tests"
-        key: "windows-extended-11"
+        key: "filebeat-windows-extended-11"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -382,7 +382,7 @@ steps:
               context: "filebeat: Win 11 Unit Tests"
 
       - label: ":windows: Filebeat: Win 10 Unit Tests"
-        key: "windows-extended-10"
+        key: "filebeat-windows-extended-10"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -416,10 +416,10 @@ steps:
     depends_on: "filebeat-mandatory-tests"
 
   - group: "Packaging"
-    key: "packaging"
+    key: "filebeat-packaging"
     steps:
       - label: ":ubuntu: Filebeat: Packaging Linux"
-        key: "packaging-linux"
+        key: "filebeat-packaging-linux"
         env:
           PLATFORMS: "+all linux/amd64 windows/amd64 darwin/amd64"
         command: |
@@ -439,7 +439,7 @@ steps:
               context: "filebeat: Packaging Linux"
 
       - label: ":ubuntu: Filebeat: Packaging arm64"
-        key: "packaging-arm"
+        key: "filebeat-packaging-arm"
         env:
           PLATFORMS: "+all linux/arm64 darwin/arm64"
         command: |
