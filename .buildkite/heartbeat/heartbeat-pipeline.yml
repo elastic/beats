@@ -146,7 +146,6 @@ steps:
           - github_commit_status:
               context: "heartbeat: Win 2022 Unit Tests"
 
-      # Heartbeat has no modules
       - label: ":ubuntu: Heartbeat: Go Integration Tests"
         command: |
           cd heartbeat
@@ -192,7 +191,6 @@ steps:
           - github_commit_status:
               context: "heartbeat: Go Integration Tests / Windows"
 
-      # Heartbeat has no modules yet
       - label: ":ubuntu: Heartbeat: Python Integration Tests"
         command: |
           cd heartbeat
