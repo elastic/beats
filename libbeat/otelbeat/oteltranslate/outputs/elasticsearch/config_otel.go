@@ -125,11 +125,6 @@ func ToOTelConfig(output *config.C) (map[string]any, error) {
 		return nil, fmt.Errorf("cannot convert SSL config into OTel: %w", err)
 	}
 
-	// get number of workers
-	workers := 1 // Default value is 1
-	if escfg.NumWorkers() > 1 {
-		workers = escfg.NumWorkers()
-	}
 	otelYAMLCfg := map[string]any{
 		"endpoints": hosts, // hosts, protocol, path, port
 
