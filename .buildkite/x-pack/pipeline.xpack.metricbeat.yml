@@ -215,6 +215,35 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Go Integration Tests (Module) / Windows"
 
+      - label: ":ubuntu: x-pack/metricbeat: Go fips140=only Integration Tests (Module)"
+        env:
+          TEST_TAGS: "oracle"
+        command: |
+          cd x-pack/metricbeat
+          mage goFIPSOnlyIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+          - "x-pack/metricbeat/build/integration-tests/*"
+          - "x-pack/metricbeat/build/integration-tests/Test*/*"
+          - "x-pack/metricbeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: Go fips140=only Integration Tests (Module)"
+
       - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
         env:
