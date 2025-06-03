@@ -75,7 +75,7 @@ func (w *cwWorker) Start(ctx context.Context, workReq chan struct{}, workRsp cha
 		}
 
 		w.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", work.logGroupId)
-		workedCount := w.run(work.logGroupId, work.startTime, work.endTime)
+		workedCount := w.run(ctx, work.logGroupId, work.startTime, work.endTime)
 		w.log.Infof("aws-cloudwatch input worker for log group '%v' has completed.", work.logGroupId)
 
 		select {
@@ -88,8 +88,8 @@ func (w *cwWorker) Start(ctx context.Context, workReq chan struct{}, workRsp cha
 	}
 }
 
-func (w *cwWorker) run(logGroupId string, startTime, endTime time.Time) int {
-	count, err := w.getLogEventsFromCloudWatch(logGroupId, startTime, endTime)
+func (w *cwWorker) run(ctx context.Context, logGroupId string, startTime, endTime time.Time) int {
+	count, err := w.getLogEventsFromCloudWatch(ctx, logGroupId, startTime, endTime)
 	if err != nil {
 		var errRequestCanceled *awssdk.RequestCanceledError
 		if errors.As(err, &errRequestCanceled) {
@@ -102,13 +102,13 @@ func (w *cwWorker) run(logGroupId string, startTime, endTime time.Time) int {
 }
 
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
-func (w *cwWorker) getLogEventsFromCloudWatch(logGroupId string, startTime, endTime time.Time) (int, error) {
+func (w *cwWorker) getLogEventsFromCloudWatch(ctx context.Context, logGroupId string, startTime, endTime time.Time) (int, error) {
 	var logCount int
 	// construct FilterLogEventsInput
 	filterLogEventsInput := w.constructFilterLogEventsInput(startTime, endTime, logGroupId)
 	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(w.svc, filterLogEventsInput)
-	for paginator.HasMorePages() {
-		filterLogEventsOutput, err := paginator.NextPage(context.TODO())
+	for paginator.HasMorePages() && ctx.Err() != nil {
+		filterLogEventsOutput, err := paginator.NextPage(ctx)
 		if err != nil {
 			return 0, fmt.Errorf("error FilterLogEvents with Paginator: %w", err)
 		}
@@ -154,16 +154,18 @@ func (w *cwWorker) constructFilterLogEventsInput(startTime, endTime time.Time, l
 type ackTracker struct {
 	increment  chan int
 	checkTotal chan int
-	complete   chan interface{}
-	done       chan interface{}
+	// Emits tracking completion once total and increment count matches
+	complete chan struct{}
+	// Chan responsible to distribute shutdown signal.
+	shutdown chan struct{}
 }
 
 func newACKTracker() *ackTracker {
 	tracker := &ackTracker{
 		increment:  make(chan int, 1),
 		checkTotal: make(chan int, 1),
-		complete:   make(chan interface{}, 1),
-		done:       make(chan interface{}, 1),
+		complete:   make(chan struct{}, 1),
+		shutdown:   make(chan struct{}),
 	}
 
 	go tracker.runner()
@@ -172,18 +174,21 @@ func newACKTracker() *ackTracker {
 }
 
 func (ac *ackTracker) close() {
-	close(ac.done)
+	close(ac.shutdown)
 }
 
 // increaseAck allows to increase acknowledged count.
 // See runner for internal work.
 func (ac *ackTracker) increaseAck(by int) {
-	ac.increment <- by
+	select {
+	case ac.increment <- by:
+	case <-ac.shutdown: // Make sure to not block during a shutdown
+	}
 }
 
 // waitFor accepts a total value to be completed where completion will be communicated through returned channel.
 // See runner for internal work.
-func (ac *ackTracker) waitFor(total int) <-chan interface{} {
+func (ac *ackTracker) waitFor(total int) <-chan struct{} {
 	ac.checkTotal <- total
 
 	return ac.complete
@@ -197,7 +202,7 @@ func (ac *ackTracker) runner() {
 	count := 0
 	for {
 		select {
-		case <-ac.done:
+		case <-ac.shutdown:
 			return
 		case t := <-ac.checkTotal:
 			total = t
@@ -208,7 +213,7 @@ func (ac *ackTracker) runner() {
 		if total >= 0 && count >= total {
 			count -= total
 			total = -1
-			ac.complete <- nil
+			ac.complete <- struct{}{}
 		}
 	}
 }
