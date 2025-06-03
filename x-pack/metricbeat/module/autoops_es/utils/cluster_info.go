@@ -19,3 +19,13 @@ type ClusterInfo struct {
 	ClusterID   string             `json:"cluster_uuid"`
 	Version     ClusterInfoVersion `json:"version"`
 }
+
+// ClusterInfoError represents an error related to cluster information retrieval.
+type ClusterInfoError struct {
+	Message string
+}
+
+// Error implements the error interface for ClusterInfoError.
+func (e *ClusterInfoError) Error() string {
+	return e.Message
+}
