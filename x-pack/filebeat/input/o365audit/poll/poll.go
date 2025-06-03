@@ -82,13 +82,19 @@ func (r *Poller) fetch(item Transaction) error {
 
 func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error {
 	r.log.Debugf("* Fetch %s", item)
+
+	// Delay before getting the token, so it doesn't become stale.
+	delay := max(item.Delay(), minDelay)
+	r.log.Debugf(" -- wait %s for %s", delay, item)
+	time.Sleep(delay)
+
 	// The order here is important. item's decorators must come first as those
 	// set the URL, which is required by other decorators (WithQueryParameters).
 	decorators := append(
 		append([]autorest.PrepareDecorator{}, item.RequestDecorators()...),
 		r.decorators...)
 	if r.tp != nil {
-		token, err := r.tp.Token()
+		token, err := r.tp.Token(r.ctx)
 		if err != nil {
 			return fmt.Errorf("failed getting a token: %w", err)
 		}
@@ -99,12 +105,8 @@ func (r *Poller) fetchWithDelay(item Transaction, minDelay time.Duration) error 
 	if err != nil {
 		return fmt.Errorf("failed preparing request: %w", err)
 	}
-	delay := max(item.Delay(), minDelay)
-	r.log.Debugf(" -- wait %s for %s", delay, request.URL.String())
-
 	response, err := autorest.Send(request,
-		autorest.DoCloseIfError(),
-		autorest.AfterDelay(delay))
+		autorest.DoCloseIfError())
 	if err != nil {
 		r.log.Warnf("-- error sending request: %v", err)
 		return r.fetchWithDelay(item, max(time.Minute, r.interval))
@@ -215,7 +217,6 @@ func (p *transactionList) pop() Transaction {
 // Enqueuer is the interface provided to actions so they can act on a Poller.
 type Enqueuer interface {
 	Enqueue(item Transaction) error
-	RenewToken() error
 }
 
 // Action is an operation returned by a transaction.
@@ -225,15 +226,6 @@ type Action func(q Enqueuer) error
 func (r *Poller) Enqueue(item Transaction) error {
 	r.list.push(item)
 	return nil
-}
-
-// RenewToken renews the token provider's master token in the case of an
-// authorization error.
-func (r *Poller) RenewToken() error {
-	if r.tp == nil {
-		return errors.New("can't renew token: no token provider set")
-	}
-	return r.tp.Renew()
 }
 
 // Terminate action causes the poll loop to finish with the given error.
@@ -250,14 +242,6 @@ func Terminate(err error) Action {
 func Fetch(item Transaction) Action {
 	return func(q Enqueuer) error {
 		return q.Enqueue(item)
-	}
-}
-
-// RenewToken will renew the token provider's master token in the case of an
-// authorization error.
-func RenewToken() Action {
-	return func(q Enqueuer) error {
-		return q.RenewToken()
 	}
 }
 

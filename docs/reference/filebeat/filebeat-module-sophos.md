@@ -6,7 +6,7 @@ mapped_pages:
 # Sophos module [filebeat-module-sophos]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/sophos.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/sophos/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -96,61 +96,61 @@ Below you will see an example configuration file, that sets the default hostname
 
 This is a list of SophosXG fields that are mapped to ECS.
 
-| SophosXG Fields | ECS Fields |  |
-| --- | --- | --- |
-| application | network.protocol |  |
-| classification | rule.category |  |
-| device_id | observer.serial_number |  |
-| domainname | url.domain |  |
-| dst_host | destination.address |  |
-| dst_int | observer.egress.interface.name |  |
-| dstzonetype | observer.egress.zone |  |
-| dst_ip | destination.ip |  |
-| destinationip | destination.ip |  |
-| dst_mac | destination.mac |  |
-| dstname | destination.address |  |
-| dst_port | destination.port |  |
-| dst_domainname | url.domain |  |
-| duration | event.duration |  |
-| filename | file.name |  |
-| filetype | file.extension |  |
-| file_size | file.size |  |
-| file_path | file.directory |  |
-| fw_rule_id | rule.id |  |
-| from_email_address | source.user.email |  |
-| httpstatus | http.response.status_code |  |
-| in_interface | observer.ingress.interface.name |  |
-| log_id | event.code |  |
-| log_subtype | event.action |  |
-| message | message |  |
-| method | http.request.method |  |
-| policy_type | rule.ruleset |  |
-| protocol | network.transport |  |
-| recv_bytes | destination.bytes |  |
-| recv_pkts | destination.packets |  |
-| referer | http.request.referrer |  |
-| sent_bytes | source.bytes |  |
-| sent_pkts | source.packets |  |
-| sha1sum | file.hash.sha1 |  |
-| srczonetype | observer.ingress.zone |  |
-| src_ip | source.ip |  |
-| src_domainname | url.domain |  |
-| sourceip | source.ip |  |
-| src_mac | source.mac |  |
-| src_port | source.port |  |
-| status_code | http.response.status_code |  |
-| time_zone | event.timezone |  |
-| to_email_address | destination.user.email |  |
-| tran_dst_ip | destination.nat.ip |  |
-| tran_dst_port | destination.nat.port |  |
-| tran_src_ip | source.nat.ip |  |
-| tran_src_port | source.nat.port |  |
-| url | url.original |  |
-| user_agent | user_agent.original |  |
-| useragent | user_agent.original |  |
-| user_gp | source.user.group |  |
-| user_name | source.user.name |  |
-| ws_protocol | http.version |  |
+| SophosXG Fields | ECS Fields |
+| --- | --- |
+| application | network.protocol |
+| classification | rule.category |
+| device_id | observer.serial_number |
+| domainname | url.domain |
+| dst_host | destination.address |
+| dst_int | observer.egress.interface.name |
+| dstzonetype | observer.egress.zone |
+| dst_ip | destination.ip |
+| destinationip | destination.ip |
+| dst_mac | destination.mac |
+| dstname | destination.address |
+| dst_port | destination.port |
+| dst_domainname | url.domain |
+| duration | event.duration |
+| filename | file.name |
+| filetype | file.extension |
+| file_size | file.size |
+| file_path | file.directory |
+| fw_rule_id | rule.id |
+| from_email_address | source.user.email |
+| httpstatus | http.response.status_code |
+| in_interface | observer.ingress.interface.name |
+| log_id | event.code |
+| log_subtype | event.action |
+| message | message |
+| method | http.request.method |
+| policy_type | rule.ruleset |
+| protocol | network.transport |
+| recv_bytes | destination.bytes |
+| recv_pkts | destination.packets |
+| referer | http.request.referrer |
+| sent_bytes | source.bytes |
+| sent_pkts | source.packets |
+| sha1sum | file.hash.sha1 |
+| srczonetype | observer.ingress.zone |
+| src_ip | source.ip |
+| src_domainname | url.domain |
+| sourceip | source.ip |
+| src_mac | source.mac |
+| src_port | source.port |
+| status_code | http.response.status_code |
+| time_zone | event.timezone |
+| to_email_address | destination.user.email |
+| tran_dst_ip | destination.nat.ip |
+| tran_dst_port | destination.nat.port |
+| tran_src_ip | source.nat.ip |
+| tran_src_port | source.nat.port |
+| url | url.original |
+| user_agent | user_agent.original |
+| useragent | user_agent.original |
+| user_gp | source.user.group |
+| user_name | source.user.name |
+| ws_protocol | http.version |
 
 
 ## Fields [_fields_50]

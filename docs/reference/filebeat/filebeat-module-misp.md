@@ -35,10 +35,8 @@ Read the [quick start](/reference/filebeat/filebeat-installation-configuration.m
 
 This module comes with a sample dashboard. For example:
 
-:::{image} images/kibana-misp.png
-:alt: kibana misp
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana misp](images/kibana-misp.png)
 
 
 ## Fields [_fields_30]

@@ -11,13 +11,11 @@ This guide describes how to get started quickly with Windows log monitoring. You
 
 * install Winlogbeat on each system you want to monitor
 * specify the location of your log files
-* parse log data into fields and send it to {es}
-* visualize the log data in {kib}
+* parse log data into fields and send it to {{es}}
+* visualize the log data in {{kib}}
 
-:::{image} images/winlogbeat-dashboard.png
-:alt: Winlogbeat dashboard
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![Winlogbeat dashboard](images/winlogbeat-dashboard.png)
 
 
 ## Before you begin [_before_you_begin]
@@ -25,13 +23,16 @@ This guide describes how to get started quickly with Windows log monitoring. You
 You need {{es}} for storing and searching your data, and {{kib}} for visualizing and managing it.
 
 :::::::{tab-set}
+:group: deployment
 
-::::::{tab-item} Elasticsearch Service
-To get started quickly, spin up a deployment of our [hosted {{ess}}](https://www.elastic.co/cloud/elasticsearch-service). The {{ess}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
+::::::{tab-item} {{ech}}
+:sync: hosted
+To get started quickly, spin up an [{{ech}}](https://www.elastic.co/cloud?page=docs&placement=docs-body) deployment. {{ech}} is available on AWS, GCP, and Azure. [Try it out for free](https://cloud.elastic.co/registration?page=docs&placement=docs-body).
 ::::::
 
 ::::::{tab-item} Self-managed
-To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/deploy-cluster.md).
+:sync: self
+To install and run {{es}} and {{kib}}, see [Installing the {{stack}}](docs-content://deploy-manage/deploy/self-managed/installing-elasticsearch.md).
 ::::::
 
 :::::::
@@ -78,26 +79,29 @@ Connections to {{es}} and {{kib}} are required to set up Winlogbeat.
 Set the connection information in `winlogbeat.yml`. To locate this configuration file, see [Directory layout](/reference/winlogbeat/directory-layout.md).
 
 :::::::{tab-set}
+:group: deployment
 
-::::::{tab-item} Elasticsearch Service
-Specify the [cloud.id](/reference/winlogbeat/configure-cloud-id.md) of your {{ess}}, and set [cloud.auth](/reference/winlogbeat/configure-cloud-id.md) to a user who is authorized to set up Winlogbeat. For example:
+::::::{tab-item} {{ech}}
+:sync: hosted
+Specify the [cloud.id](/reference/winlogbeat/configure-cloud-id.md) of your {{ech}} deployment, and set [cloud.auth](/reference/winlogbeat/configure-cloud-id.md) to a user who is authorized to set up Winlogbeat. For example:
 
 ```yaml
 cloud.id: "staging:dXMtZWFzdC0xLmF3cy5mb3VuZC5pbyRjZWM2ZjI2MWE3NGJmMjRjZTMzYmI4ODExYjg0Mjk0ZiRjNmMyY2E2ZDA0MjI0OWFmMGNjN2Q3YTllOTYyNTc0Mw=="
-cloud.auth: "winlogbeat_setup:{pwd}" <1>
+cloud.auth: "winlogbeat_setup:YOUR_PASSWORD" <1>
 ```
 
 1. This examples shows a hard-coded password, but you should store sensitive values in the [secrets keystore](/reference/winlogbeat/keystore.md).
 ::::::
 
 ::::::{tab-item} Self-managed
+:sync: self
 1. Set the host and port where Winlogbeat can find the {{es}} installation, and set the username and password of a user who is authorized to set up Winlogbeat. For example:
 
     ```yaml
     output.elasticsearch:
       hosts: ["https://myEShost:9200"]
       username: "winlogbeat_internal"
-      password: "{pwd}" <1>
+      password: "YOUR_PASSWORD" <1>
       ssl:
         enabled: true
         ca_trusted_fingerprint: "b9a10bbe64ee9826abeda6546fc988c8bf798b41957c33d05db736716513dc9c" <2>
@@ -112,7 +116,7 @@ cloud.auth: "winlogbeat_setup:{pwd}" <1>
       setup.kibana:
         host: "mykibanahost:5601" <1>
         username: "my_kibana_user" <2> <3>
-        password: "{pwd}"
+        password: "YOUR_PASSWORD"
     ```
 
     1. The hostname and port of the machine where {{kib}} is running, for example, `mykibanahost:5601`. If you specify a path after the port number, include the scheme and port: `http://mykibanahost:5601/path`.
@@ -177,7 +181,7 @@ Winlogbeat comes with predefined assets for parsing, indexing, and visualizing y
 This step loads the recommended [index template](docs-content://manage-data/data-store/templates.md) for writing to {{es}} , loads the ingest pipelines to parse the events (x-pack only), and deploys the sample dashboards for visualizing the data in {{kib}}.
 
 ::::{tip}
-A connection to {{es}} (or {{ess}}) is required to set up the initial environment. If you’re using a different output, such as {{ls}}, see:
+A connection to {{es}} (or {{ech}}) is required to set up the initial environment. If you’re using a different output, such as {{ls}}, see:
 
 * [Load the index template manually](/reference/winlogbeat/winlogbeat-template.md#load-template-manually)
 * [*Load {{kib}} dashboards*](/reference/winlogbeat/load-kibana-dashboards.md)
@@ -223,39 +227,19 @@ To open the dashboards:
 
 1. Launch {{kib}}:
 
-    <div class="tabs" data-tab-group="host">
-      <div role="tablist" aria-label="Open Kibana">
-        <button role="tab"
-                aria-selected="true"
-                aria-controls="cloud-tab-open-kibana"
-                id="cloud-open-kibana">
-          Elasticsearch Service
-        </button>
-        <button role="tab"
-                aria-selected="false"
-                aria-controls="self-managed-tab-open-kibana"
-                id="self-managed-open-kibana"
-                tabindex="-1">
-          Self-managed
-        </button>
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="cloud-tab-open-kibana"
-           aria-labelledby="cloud-open-kibana">
+    :::::::{tab-set}
+    :group: deployment
+    ::::::{tab-item} {{ech}}
+    :sync: hosted
     1. [Log in](https://cloud.elastic.co/) to your {{ecloud}} account.
     2. Navigate to the {{kib}} endpoint in your deployment.
-
-      </div>
-      <div tabindex="0"
-           role="tabpanel"
-           id="self-managed-tab-open-kibana"
-           aria-labelledby="self-managed-open-kibana"
-           hidden="">
+    ::::::
+    ::::::{tab-item} Self-managed
+    :sync: self
     Point your browser to [http://localhost:5601](http://localhost:5601), replacing `localhost` with the name of the {{kib}} host.
+    ::::::
+    :::::::
 
-      </div>
-    </div>
 
 2. In the side navigation, click **Discover**. To see Winlogbeat data, make sure the predefined `winlogbeat-*` data view is selected.
 
@@ -301,7 +285,7 @@ Now that you have your logs streaming into {{es}}, learn how to unify your logs,
     | [{{metricbeat}}](/reference/metricbeat/metricbeat-installation-configuration.md) | Infrastructure metrics |
     | [{{filebeat}}](/reference/filebeat/filebeat-installation-configuration.md) | Logs |
     | [{{heartbeat}}](/reference/heartbeat/heartbeat-installation-configuration.md) | Uptime information |
-    | [APM](docs-content://solutions/observability/apps/application-performance-monitoring-apm.md) | Application performance metrics |
+    | [APM](docs-content://solutions/observability/apm/index.md) | Application performance metrics |
     | [{{auditbeat}}](/reference/auditbeat/auditbeat-installation-configuration.md) | Audit events |
 
 2. Use the Observability apps in {{kib}} to search across all your data:
@@ -310,8 +294,8 @@ Now that you have your logs streaming into {{es}}, learn how to unify your logs,
     | --- | --- |
     | [{{metrics-app}}](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) | Explore metrics about systems and services across your ecosystem |
     | [{{logs-app}}](docs-content://solutions/observability/logs/explore-logs.md) | Tail related log data in real time |
-    | [{{uptime-app}}](docs-content://solutions/observability/apps/synthetic-monitoring.md#monitoring-uptime) | Monitor availability issues across your apps and services |
-    | [APM app](docs-content://solutions/observability/apps/overviews.md) | Monitor application performance |
+    | [{{uptime-app}}](docs-content://solutions/observability/synthetics/index.md#monitoring-uptime) | Monitor availability issues across your apps and services |
+    | [APM app](docs-content://solutions/observability/apm/overviews.md) | Monitor application performance |
     | [{{siem-app}}](docs-content://solutions/security.md) | Analyze security events |
 
 

@@ -1,0 +1,83 @@
+name: xpack-heartbeat-macos-unit-tests
+
+env:
+  BEAT: "x-pack/heartbeat"
+  NODEJS_VERSION: "18.20.3"
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - heartbeat/**
+      - x-pack/heartbeat/**
+      # OSS
+      - go.mod
+      - dev-tools/**
+      - libbeat/**
+      - x-pack/libbeat/**
+      # Workflow
+      - .github/workflows/xpack-heartbeat-macos-unit-tests.yml
+      - .github/actions/unit-test/action.yml
+  push:
+    branches:
+      - main
+    paths:
+      - heartbeat/**
+      - x-pack/heartbeat/**
+      # OSS
+      - go.mod
+      - dev-tools/**
+      - libbeat/**
+      - x-pack/libbeat/**
+      # Workflow
+      - .github/workflows/xpack-heartbeat-macos-unit-tests.yml
+      - .github/actions/unit-test/action.yml
+
+permissions:
+  contents: read
+
+## Concurrency only allowed in the main branch.
+## So old builds running for old commits within the same Pull Request are cancelled
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  unit-tests-push:
+    name: Unit tests ${{ matrix.os }}
+    if: github.event_name == 'push'
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        os: [macos-13, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
+      - run: npm i -g @elastic/synthetics
+
+      - uses: ./.github/actions/unit-test
+        with:
+          beat:  ${{ env.BEAT }}
+
+  unit-tests-pr:
+    name: Unit tests macos-15
+    if: github.event_name == 'pull_request'
+    runs-on: [ macos-15 ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
+      - run: npm i -g @elastic/synthetics
+
+      - uses: ./.github/actions/unit-test
+        with:
+          beat:  ${{ env.BEAT }}

@@ -11,7 +11,7 @@ This functionality is in beta and is subject to change. The design and code is l
 
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
-Refer to the [Elastic Integrations documentation](integration-docs://reference/tomcat.md).
+Refer to the [Elastic Integrations documentation](integration-docs://reference/tomcat/index.md).
 
 ::::{dropdown} Learn more
 {{agent}} is a single, unified way to add monitoring for logs, metrics, and other types of data to a host. It can also protect hosts from security threats, query data from operating systems, forward data from remote services or hardware, and more. Refer to the documentation for a detailed [comparison of {{beats}} and {{agent}}](docs-content://reference/fleet/index.md).
@@ -34,9 +34,7 @@ The module has been tested with Tomcat 7.0.24 and 9.0.24. Other versions are exp
 
 An overview dashboard for Kibana is already included:
 
-:::{image} images/metricbeat-tomcat-overview.png
-:alt: metricbeat tomcat overview
-:::
+![metricbeat tomcat overview](images/metricbeat-tomcat-overview.png)
 
 
 ### Usage [_usage_9]

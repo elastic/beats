@@ -126,7 +126,7 @@ The scheduler is responsible for scheduling jobs, and uses the `maximum availabl
 
 As we can see from the response above, the `message` field contains the original stringified data while the `gcs.storage.object.data` contains the objectified data.
 
-**Some of the key attributes are as follows :-**
+**Some of the key attributes are as follows:**
 
 1. **message** : Original stringified object data.
 2. **log.file.path** : Path of the object in google cloud.
