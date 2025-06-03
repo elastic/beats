@@ -26,7 +26,7 @@ If you’re upgrading other products in the stack, also read the {{stack}} [upgr
 
 We recommend that you fully upgrade {{es}} and {{kib}} to version 9.0 before upgrading {{beats}}. The {{beats}} version must be lower than or equal to the {{es}} version. {{beats}} cannot send data to older versions of {{es}}.
 
-If you use the Uptime app in {{kib}}, make sure you add `heartbeat-9*` and `synthetics-*` to **Uptime indices** on the [Settings page](docs-content://solutions/observability/apps/configure-settings.md). The first index is used by newer versions of a Beat, while the latter is used by {{fleet}}.
+If you use the Uptime app in {{kib}}, make sure you add `heartbeat-9*` and `synthetics-*` to **Uptime indices** on the [Settings page](docs-content://solutions/observability/uptime/configure-settings.md). The first index is used by newer versions of a Beat, while the latter is used by {{fleet}}.
 
 ::::{important}
 Please read through all upgrade steps before proceeding. These steps are required before running the software for the first time.
