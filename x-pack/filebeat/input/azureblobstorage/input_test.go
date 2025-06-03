@@ -495,7 +495,7 @@ func Test_StorageClient(t *testing.T) {
 			},
 		},
 		{
-			name: "CustomEncodingUnsupported",
+			name: "CustomContentTypeSupported",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
 				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
@@ -504,8 +504,8 @@ func Test_StorageClient(t *testing.T) {
 				"poll_interval":                       "10s",
 				"containers": []map[string]interface{}{
 					{
-						"name":     beatsGzJSONContainer,
-						"encoding": "utf-8",
+						"name":         beatsGzJSONContainer,
+						"content_type": "application/x-gzip",
 					},
 				},
 			},
@@ -515,6 +515,7 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
 			},
 		},
+		// Here the content-type specified is ignored since a content-type already exists and we are not overriding it.
 		{
 			name: "CustomContentTypeIgnored",
 			baseConfig: map[string]interface{}{
@@ -536,48 +537,7 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_log_ndjson[1]: true,
 			},
 		},
-		{
-			name: "CustomContentTypeSupported",
-			baseConfig: map[string]interface{}{
-				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"max_workers":                         2,
-				"poll":                                true,
-				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
-					{
-						"name":         beatsGzJSONContainer,
-						"content_type": "application/x-gzip",
-					},
-				},
-			},
-			mockHandler: mock.AzureFileServerNoContentType,
-			expected: map[string]bool{
-				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
-				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
-			},
-		},
-		{
-			name: "CustomEncodingSupported",
-			baseConfig: map[string]interface{}{
-				"account_name":                        "beatsblobnew",
-				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
-				"max_workers":                         2,
-				"poll":                                true,
-				"poll_interval":                       "10s",
-				"containers": []map[string]interface{}{
-					{
-						"name":     beatsGzJSONContainer,
-						"encoding": "gzip",
-					},
-				},
-			},
-			mockHandler: mock.AzureFileServerNoContentType,
-			expected: map[string]bool{
-				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
-				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
-			},
-		},
+		// This checks if the root level content-type specifications are respected.
 		{
 			name: "CustomContentTypeAtRootLevel",
 			baseConfig: map[string]interface{}{

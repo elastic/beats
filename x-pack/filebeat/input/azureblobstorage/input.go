@@ -127,7 +127,9 @@ func tryOverrideOrDefault(cfg config, c container) container {
 	if len(c.FileSelectors) == 0 && len(cfg.FileSelectors) != 0 {
 		c.FileSelectors = cfg.FileSelectors
 	}
-
+	// If the container level ReaderConfig is empty, use the root level ReaderConfig
+	// Partial definition of ReaderConfig at both the root and container level
+	// is not allowed, it's an either or scenario.
 	if isConfigEmpty(c.ReaderConfig) {
 		c.ReaderConfig = cfg.ReaderConfig
 	}

@@ -336,11 +336,11 @@ filebeat.inputs:
 
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
-## `custom_properties` [attrib-custom-properties]
+## `Custom properties` [attrib-custom-properties]
 
 Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set/override custom blob properties provides more flexibility when reading blobs from a remote storage where the user might only have read access.
 
-The currently supported `custom_properties` are :-  
+The currently supported custom properties are:  
 
 1. [content_type](#attrib-content-type)
 2. [encoding](#attrib-encoding)
@@ -413,7 +413,7 @@ filebeat.inputs:
 ```
 
 ::::{note}
-The custom property configurations are bounded by the current input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and throw an appropriate error.
+The custom property configurations are bounded by the current input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and report an error.
 ::::
 
 $$$container-overrides$$$

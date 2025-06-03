@@ -163,16 +163,12 @@ func (s *scheduler) scheduleOnce(ctx context.Context) error {
 			// it will only set them if they are not already defined.
 			readerCfg := s.src.ReaderConfig
 			if readerCfg.ContentType != "" {
-				if readerCfg.OverrideContentType {
-					job.blob.Properties.ContentType = &readerCfg.ContentType
-				} else if job.blob.Properties.ContentType == nil || *job.blob.Properties.ContentType == "" {
+				if readerCfg.OverrideContentType || isStringUnset(job.blob.Properties.ContentType) {
 					job.blob.Properties.ContentType = &readerCfg.ContentType
 				}
 			}
 			if readerCfg.Encoding != "" {
-				if readerCfg.OverrideEncoding {
-					job.blob.Properties.ContentEncoding = &readerCfg.Encoding
-				} else if job.blob.Properties.ContentEncoding == nil || *job.blob.Properties.ContentEncoding == "" {
+				if readerCfg.OverrideEncoding || isStringUnset(job.blob.Properties.ContentEncoding) {
 					job.blob.Properties.ContentEncoding = &readerCfg.Encoding
 				}
 			}
@@ -246,4 +242,8 @@ func (s *scheduler) isFileSelected(name string) bool {
 		}
 	}
 	return false
+}
+
+func isStringUnset(s *string) bool {
+	return s == nil || *s == ""
 }

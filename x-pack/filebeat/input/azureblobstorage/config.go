@@ -136,12 +136,8 @@ type OAuth2Config struct {
 
 // isConfigEmpty checks if the provided configuration value is empty.
 // It uses reflection to determine if the value is empty based on its kind.
-// This function is generic and can handle any type T.
-// Since this runs only once per source during initialization,
-// it should not be a performance concern.
 func isConfigEmpty[T any](value T) bool {
-	v := reflect.ValueOf(value)
-	return isEmpty(v)
+	return isEmpty(reflect.ValueOf(value))
 }
 
 // isEmpty checks if a reflect.Value is empty.
