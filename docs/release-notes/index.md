@@ -33,7 +33,6 @@ To check for security updates, go to [Security announcements for the Elastic sta
 * Fixed WebSocket input panic on sudden network error or server crash in Filebeat. [#44063]({{beats-issue}}44063) [44068]({{beats-pull}}44068).
 * [Filestream] Log the "reader closed" message on the debug level to avoid log spam in Filebeat. [#44051]({{beats-pull}}44051)
 * Fix links to CEL mito extension functions in input documentation in Filebeat. [#44098]({{beats-pull}}44098)
-* Sanitize error messages in Fetch method of SQL module [#44577]({{beats-pull}}44577)
 
 ## 9.0.0 [beats-900-release-notes]
 
