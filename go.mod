@@ -206,7 +206,7 @@ require (
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.22
 	github.com/pkg/xattr v0.4.9
-	github.com/prometheus/prometheus v0.300.1
+	github.com/prometheus/prometheus v0.54.1
 	github.com/shirou/gopsutil/v4 v4.25.3
 	github.com/tklauser/go-sysconf v0.3.12
 	github.com/xdg-go/scram v1.1.2
