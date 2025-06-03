@@ -76,12 +76,28 @@ func TestStateHandler(t *testing.T) {
 		// pause for backgroundRunner to run
 		<-time.After(100 * time.Millisecond)
 
+		// Validation #1 : State is not updated as oldest is not complete
 		state, err := st.GetState()
 		assert.NoError(t, err)
 		assert.NotNil(t, state)
 
 		// we get zero so that sync starts from epoch zero
 		assert.Equal(t, int64(0), state.LastSyncEpoch)
+
+		// complete the oldest
+		st.WorkComplete(100)
+
+		// pause for backgroundRunner to run
+		<-time.After(100 * time.Millisecond)
+
+		// Validation #2 : State is updated to the latest once completion get registered
+		state, err = st.GetState()
+		assert.NoError(t, err)
+		assert.NotNil(t, state)
+
+		// we get most recent completion
+		assert.Equal(t, int64(200), state.LastSyncEpoch)
+
 	})
 }
 

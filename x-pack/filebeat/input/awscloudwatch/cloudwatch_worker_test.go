@@ -79,7 +79,7 @@ func TestAckTracker(t *testing.T) {
 		// delay the wait call
 		<-time.After(200 * time.Millisecond)
 
-		// verify increments are done
+		// verify increments are shutdown
 		select {
 		case <-time.After(50 * time.Millisecond):
 			t.Errorf("increments have not completed")

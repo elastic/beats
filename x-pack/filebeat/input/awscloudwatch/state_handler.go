@@ -39,7 +39,7 @@ type stateHandler struct {
 
 	registerReceiver chan tracker
 	completeReceiver chan int64
-	done             chan struct{}
+	shutdown         chan struct{}
 
 	lock sync.Mutex
 }
@@ -60,7 +60,7 @@ func newStateHandler(log *logp.Logger, cfg config, store statestore.States) (*st
 		log:              log,
 		registerReceiver: make(chan tracker),
 		completeReceiver: make(chan int64),
-		done:             make(chan struct{}),
+		shutdown:         make(chan struct{}),
 	}
 
 	go sh.backgroundRunner()
@@ -102,7 +102,10 @@ func (s *stateHandler) WorkRegister(timestamp int64, workCount int) {
 
 // WorkComplete accepts an individual work tracked at the given timestamp.
 func (s *stateHandler) WorkComplete(timestamp int64) {
-	s.completeReceiver <- timestamp
+	select {
+	case s.completeReceiver <- timestamp:
+	case <-s.shutdown: // Make sure to not block during a shutdown
+	}
 }
 
 // backgroundRunner tracks registered work and completed work.
@@ -115,7 +118,7 @@ func (s *stateHandler) backgroundRunner() {
 
 	for {
 		select {
-		case <-s.done:
+		case <-s.shutdown:
 			return
 		case r := <-s.registerReceiver:
 			trackingMap[r.timeStamp] = &r
@@ -125,14 +128,24 @@ func (s *stateHandler) backgroundRunner() {
 			got := trackingMap[cmp]
 			got.count -= 1
 
-			// check if oldest entry completed all work
-			minElement, _ := bHeap.Peek()
-			if minElement.count == 0 {
-				bHeap.Pop()
-				delete(trackingMap, minElement.timeStamp)
-				if err := s.storeState(storableState{LastSyncEpoch: minElement.timeStamp}); err != nil {
-					s.log.Errorf("error storing state: %v", err)
+			// check if oldest entry completed and select most recent oldest entry to store
+			var toStore *tracker
+			for {
+				minElement, _ := bHeap.Peek()
+				if minElement == nil || minElement.count != 0 {
+					break
 				}
+
+				toStore, _ = bHeap.Pop()
+				delete(trackingMap, toStore.timeStamp)
+			}
+
+			if toStore == nil {
+				continue
+			}
+
+			if err := s.storeState(storableState{LastSyncEpoch: toStore.timeStamp}); err != nil {
+				s.log.Errorf("error storing state: %v", err)
 			}
 		}
 	}
@@ -155,7 +168,7 @@ func (s *stateHandler) Close() {
 	defer s.lock.Unlock()
 
 	s.store.Close()
-	close(s.done)
+	close(s.shutdown)
 }
 
 // generateID is a helper to derive state registry identifier matching provided configurations.
