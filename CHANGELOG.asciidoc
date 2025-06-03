@@ -3,6 +3,34 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.17.7]]
+=== Beats version 8.17.7
+https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix the 'add_cloud_metadata' processor to better support custom certificate bundles by improving how the AWS provider HTTP client is overridden. {pull}44189[44189]
+
+*Auditbeat*
+
+- Fix a potential error in the system/package component that could occur during internal package database schema migration. {issue}44294[44294] {pull}44296[44296]
+
+*Filebeat*
+
+- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
+
+==== Added
+
+*Metricbeat*
+
+- Add checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
+- Add `enable_batch_api` option in the Azure monitor module to allow metrics collection of multiple resources using Azure batch API. {pull}41790[41790]
+- Add support for `_nodes/stats` URIs compatible with legacy Elasticsearch versions. {pull}44307[44307]
+- Add a latency configuration option to the Azure Monitor module. {pull}44366[44366]
+
+
 [[release-notes-8.17.6]]
 === Beats version 8.17.6
 https://github.com/elastic/beats/compare/v8.17.5\...v8.17.6[View commits]

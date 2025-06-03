@@ -36,7 +36,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Add support for `_nodes/stats` URIs that work with legacy versions of Elasticsearch {pull}44307[44307]
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 - Remove fallback to the node limit for the `kubernetes.pod.cpu.usage.limit.pct` and `kubernetes.pod.memory.usage.limit.pct` metrics calculation
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
@@ -83,7 +82,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 
-- system/package: Fix an error that can occur while migrating the internal package database schema. {issue}44294[44294] {pull}44296[44296]
 
 *Filebeat*
 
@@ -117,7 +115,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix publication of group data from the Okta entity analytics provider. {pull}40681[40681]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
-- Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 
 *Heartbeat*
 
@@ -268,9 +265,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added Cisco Meraki module {pull}40836[40836]
 - Added Palo Alto Networks module {pull}40686[40686]
 - Restore docker.network.in.* and docker.network.out.* fields in docker module {pull}40968[40968]
-- Added checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
-- Add `enable_batch_api` option in azure monitor to allow metrics collection of multiple resources using azure batch Api {pull}41790[41790]
-- Add latency config option to Azure Monitor module. {pull}44366[44366]
 
 *Metricbeat*
 
@@ -321,6 +315,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
