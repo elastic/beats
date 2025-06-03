@@ -15,12 +15,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !requirefips
+
 /*
 Package status fetches MySQL server status metrics.
 
 For more information on the query it uses, see:
 http://dev.mysql.com/doc/refman/5.7/en/show-status.html
 */
+
 package query
 
 import (
