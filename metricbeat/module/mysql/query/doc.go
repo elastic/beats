@@ -15,22 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package file
-
-import (
-	"os"
-
-	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-// IsSameFile checks if the given File path corresponds with the FileInfo given
-// It is used to check if the file has been renamed.
-func IsSameFile(path string, info os.FileInfo, logger *logp.Logger) bool {
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		logger.Errorf("Error during file comparison: %s with %s - Error: %s", path, info.Name(), err)
-		return false
-	}
-
-	return os.SameFile(fileInfo, info)
-}
+// Package query is a metricset of the mysql module.
+package query

@@ -95,8 +95,9 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *config.C,
 	keystore keystore.Keystore,
+	logger *logp.Logger,
 ) (autodiscover.Provider, error) {
-	logger := logp.NewLogger("autodiscover")
+	logger = logger.Named("kubernetes")
 
 	errWrap := func(err error) error {
 		return fmt.Errorf("error setting up kubernetes autodiscover provider: %w", err)
@@ -143,7 +144,7 @@ func AutodiscoverBuilder(
 	if p.config.Unique {
 		p.eventManager, err = NewLeaderElectionManager(uuid, config, client, p.startLeading, p.stopLeading, logger)
 	} else {
-		p.eventManager, err = NewEventerManager(uuid, c, config, client, p.publish)
+		p.eventManager, err = NewEventerManager(uuid, c, config, client, p.publish, logger)
 	}
 
 	if err != nil {
@@ -236,16 +237,17 @@ func NewEventerManager(
 	cfg *Config,
 	client k8s.Interface,
 	publish func(event []bus.Event),
+	logger *logp.Logger,
 ) (EventManager, error) {
 	var err error
 	em := &eventerManager{}
 	switch cfg.Resource {
 	case "pod":
-		em.eventer, err = NewPodEventer(uuid, c, client, publish)
+		em.eventer, err = NewPodEventer(uuid, c, client, publish, logger)
 	case "node":
-		em.eventer, err = NewNodeEventer(uuid, c, client, publish)
+		em.eventer, err = NewNodeEventer(uuid, c, client, publish, logger)
 	case "service":
-		em.eventer, err = NewServiceEventer(uuid, c, client, publish)
+		em.eventer, err = NewServiceEventer(uuid, c, client, publish, logger)
 	default:
 		return nil, fmt.Errorf("unsupported autodiscover resource %s", cfg.Resource)
 	}
