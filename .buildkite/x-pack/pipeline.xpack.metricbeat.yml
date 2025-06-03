@@ -213,7 +213,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "x-pack/metricbeat: Go Integration Tests (Module) / Win 2022"
+              context: "x-pack/metricbeat: Go Integration Tests (Module) / Windows"
 
       - label: ":ubuntu: x-pack/metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"

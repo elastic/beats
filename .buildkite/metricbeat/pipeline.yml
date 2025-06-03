@@ -188,7 +188,6 @@ steps:
         skip: "Skipped due to https://github.com/elastic/beats/issues/44537"
         if: build.env("BUILDKITE_PULL_REQUEST") != "false"
         command: |
-          set KUBECONFIG=%CD%\kubecfg
           cd metricbeat
           mage goIntegTest
         retry:
@@ -214,7 +213,7 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "metricbeat: Go Integration Tests (Module) / Win 2022"
+              context: "metricbeat: Go Integration Tests (Module) / Windows"
 
       - label: ":ubuntu: Metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
