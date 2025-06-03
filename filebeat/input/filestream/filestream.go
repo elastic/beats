@@ -138,6 +138,11 @@ func (f *logFile) Read(buf []byte) (int, error) {
 		f.backoff.Wait()
 	}
 
+	// `f.isInactive` is set in a different goroutine, however it is the same
+	// goroutine that cancels `f.readerCtx`. The timer goroutine that checks
+	// for inactivity first sets `f.isInactive`, then it cancels `f.readerCtx`,
+	// once the execution comes back to this method, the for loop condition
+	// evaluates to false and the correct value from `f.isInactive` is read.
 	if f.isInactive {
 		return 0, ErrInactive
 	}
@@ -280,6 +285,6 @@ func (f *logFile) Close() error {
 	f.readerCtx.Cancel()
 	err := f.file.Close()
 	_ = f.tg.Stop() // Wait until all resources are released for sure.
-	f.log.Infof("Closed reader. Path='%s'", f.file.Name())
+	f.log.Debugf("Closed reader. Path='%s'", f.file.Name())
 	return err
 }
