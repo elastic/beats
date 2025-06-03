@@ -216,7 +216,6 @@ steps:
               context: "x-pack/metricbeat: Go Integration Tests (Module) / Windows"
 
       - label: ":ubuntu: x-pack/metricbeat: Go fips140=only Integration Tests (Module)"
-        key: "mandatory-int-fipsonly-test"
         env:
           TEST_TAGS: "oracle"
         command: |

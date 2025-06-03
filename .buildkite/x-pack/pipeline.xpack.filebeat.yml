@@ -181,7 +181,6 @@ steps:
               context: "x-pack/filebeat: Go Integration Tests"
 
       - label: ":ubuntu: x-pack/filebeat: Go fips140=only Integration Tests"
-        key: "x-pack-filebeat-mandatory-int-fipsonly-test"
         command: |
           cd x-pack/filebeat
           mage goFIPSOnlyIntegTest

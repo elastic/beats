@@ -216,10 +216,7 @@ steps:
               context: "metricbeat: Go Integration Tests (Module) / Windows"
 
       - label: ":ubuntu: Metricbeat: Go fips140=only Integration Tests (Module)"
-        key: "mandatory-int-fipsonly-test"
         command: |
-          set -euo pipefail
-          echo "~~~ Running tests"
           cd metricbeat
           mage goFIPSOnlyIntegTest
         retry:
