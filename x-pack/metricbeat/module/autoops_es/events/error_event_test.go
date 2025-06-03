@@ -6,9 +6,10 @@ package events
 
 import (
 	"errors"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"os"
 	"testing"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 
 	"github.com/stretchr/testify/assert"
 )

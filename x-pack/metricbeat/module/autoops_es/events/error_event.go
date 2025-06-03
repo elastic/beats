@@ -7,13 +7,14 @@ package events
 import (
 	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
+	"os"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/autoops_es/utils"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/version"
-	"net/http"
-	"net/url"
-	"os"
 )
 
 // ErrorEvent represents an error event in the system.
