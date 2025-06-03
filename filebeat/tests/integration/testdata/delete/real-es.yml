@@ -24,6 +24,10 @@ output.elasticsearch:
     - {{ .esHost }}
   username: {{ .user }}
   password: {{ .pass }}
+  allow_older_versions: true
+  backoff:
+    init: 100ms
+    max: 100ms
 
 logging:
   level: debug

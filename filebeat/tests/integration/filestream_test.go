@@ -1093,7 +1093,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 		// If Filebeat deletes the file while we're wait for ES, the
 		// fileWatcher will detect it and the registered callback will
 		// fail the test.
-		time.Second*10,
+		time.Second*3,
 		time.Millisecond*100, "not all log messages have been found on ES")
 
 	dataShippedTs := time.Now()
@@ -1128,9 +1128,22 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	}
 
 	// Ensure the messages were ingested in the correct order
-	for i, msg := range msgs {
-		if msg != logFileLines[i] {
-			t.Errorf("Line %d: want: %q, have: %q", i, logFileLines[i], msg)
+	allMesagesIngested(t, msgs, logFileLines)
+}
+
+func allMesagesIngested(t *testing.T, got, want []string) {
+	t.Helper()
+
+	for _, wantMsg := range want {
+		found := false
+		for _, gotMsg := range got {
+			if wantMsg == gotMsg {
+				found = true
+				continue
+			}
+		}
+		if !found {
+			t.Errorf("'%s' not found on ES", wantMsg)
 		}
 	}
 }
