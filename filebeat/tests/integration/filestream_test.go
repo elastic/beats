@@ -964,10 +964,7 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 
 func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	integration.EnsureESIsRunning(t)
-	gracePeriod, err := time.ParseDuration("5s")
-	if err != nil {
-		t.Fatalf("cannot parse grace period duration: %s", err)
-	}
+	gracePeriod := 5 * time.Second
 	delta := time.Second
 
 	index := "test-delete" + uuid.Must(uuid.NewV4()).String()
@@ -1083,10 +1080,21 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 
 	// Wait for the remaining data to be ingested
 	msgs = []string{}
-	require.Eventually(t, func() bool {
-		msgs = getEventsMsgFromES(t, index, 200)
-		return len(msgs) == len(logFileLines)
-	}, time.Second*10, time.Millisecond*100, "not all log messages have been found on ES")
+	require.Eventually(
+		t,
+		func() bool {
+			msgs = getEventsMsgFromES(t, index, 200)
+			return len(msgs) == len(logFileLines)
+		},
+		// This is the maximum time we will wait for the documents to
+		// be query-able in Elasticserach. The documents might be fully
+		// ingested and acknowledged by ES before we manage to query them,
+		// hence this timeout might be equal or larger than the grace period.
+		// If Filebeat deletes the file while we're wait for ES, the
+		// fileWatcher will detect it and the registered callback will
+		// fail the test.
+		time.Second*10,
+		time.Millisecond*100, "not all log messages have been found on ES")
 
 	dataShippedTs := time.Now()
 	fileRemovedChan := make(chan time.Time)
@@ -1103,6 +1111,12 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	select {
 	case fileRemovedTs := <-fileRemovedChan:
 		timeElapsed := fileRemovedTs.Sub(dataShippedTs)
+		// We need to use a delta here because there is a delay between
+		// Filebeat receiving the last acknowledgement, thus starting to count
+		// the grace period, and the test being able to access that all events
+		// have been correctly ingested by Elasticsearch. We also query
+		// Elasticsearch with an interval of 100ms, which only increases
+		// the delay from when we capture 'dataShippedTs.'
 		if timeElapsed < gracePeriod-delta {
 			t.Fatalf("file was removed %s after data ingested (%s acceptable delta), but grace period was set to %s",
 				timeElapsed,
