@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -94,6 +95,9 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("starting udp socket input")
 	defer log.Info("udp input stopped")
 
+	ctx.UpdateStatus(status.Starting, "")
+	ctx.UpdateStatus(status.Configuring, "")
+
 	const pollInterval = time.Minute
 	metrics := netmetrics.NewUDP("udp", ctx.ID, s.config.Host, uint64(s.config.ReadBuffer), pollInterval, log)
 	defer metrics.Close()
@@ -125,11 +129,19 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}, log)
 
 	log.Debug("udp input initialized")
+	ctx.UpdateStatus(status.Running, "")
 
 	err := server.Run(ctxtool.FromCanceller(ctx.Cancelation))
 	// Ignore error from 'Run' in case shutdown was signaled.
 	if ctxerr := ctx.Cancelation.Err(); ctxerr != nil {
 		err = ctxerr
 	}
+
+	if err != nil {
+		ctx.UpdateStatus(status.Failed, "Input exited unexpectedly: "+err.Error())
+	} else {
+		ctx.UpdateStatus(status.Stopped, "")
+	}
+
 	return err
 }
