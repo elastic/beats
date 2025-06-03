@@ -25,8 +25,33 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/mock-es/pkg/api"
 )
+
+type inputMetric struct {
+	ID    string `json:"id"`
+	Input string `json:"input"`
+
+	// Pipeline metrics
+	EventsPipelineTotal          int `json:"events_pipeline_total"`
+	EventsPipelineFilteredTotal  int `json:"events_pipeline_filtered_total"`
+	EventsPipelinePublishedTotal int `json:"events_pipeline_published_total"`
+
+	// Output metrics
+	EventsOutputAckedTotal           int `json:"events_output_acked_total"`
+	EventsOutputDeadLetterTotal      int `json:"events_output_dead_letter_total"`
+	EventsOutputDroppedTotal         int `json:"events_output_dropped_total"`
+	EventsOutputDuplicateEventsTotal int `json:"events_output_duplicate_events_total"`
+	EventsOutputErrTooManyTotal      int `json:"events_output_err_too_many_total"`
+	EventsOutputRetryableErrorsTotal int `json:"events_output_retryable_errors_total"`
+	EventsOutputTotal                int `json:"events_output_total"`
+
+	// EventsProcessedTotal is used by: filestream
+	EventsProcessedTotal int `json:"events_processed_total"`
+	// EventsPublishedTotal is used by: cel
+	EventsPublishedTotal int `json:"events_published_total"`
+}
 
 func TestInputMetricsFromPipelineAndOutput(t *testing.T) {
 	var tmplCfg = `
@@ -105,88 +130,8 @@ output.elasticsearch:
 
 logging.level: debug
 `
-
-	port := randomPort(t)
-	celSrv := makeServer()
-	defer celSrv.Close()
-	httpjsonSrv := makeServer()
-	defer httpjsonSrv.Close()
-
-	esMock := newMockESServer(t)
-
-	filebeat := NewFilebeat(t)
-	tempDir := filebeat.TempDir()
-
-	// 1. Generate the log file path
-
-	relativePath := filepath.Join("testdata", "input_metrics.log")
-	logFilePath, err := filepath.Abs(relativePath)
-	require.NoError(t, err, "Failed to get absolute path for", relativePath)
-
-	relativePath = filepath.Join("testdata", "input_metrics-no-id.log")
-	logFileNoIDPath, err := filepath.Abs(relativePath)
-	require.NoError(t, err, "Failed to get absolute path for", relativePath)
-
-	// 2. Write configuration file and start Filebeat
-	cgfSB := strings.Builder{}
-	tmpl, err := template.New("filebeatConfig").Parse(tmplCfg)
-	require.NoErrorf(t, err, "Failed to parse config template")
-
-	filestreamInputID := "a-filestream-id"
-	celBaseInputID := "a-cel-input-id"
-	celInputID := fmt.Sprintf("%s::%s", celBaseInputID, celSrv.URL)
-	httpsjonInputID := "a-httpjson-input-id"
-
-	require.NoError(t, tmpl.Execute(&cgfSB, map[string]string{
-		"filestream_id":       filestreamInputID,
-		"cel_id":              celBaseInputID,
-		"httpjson_id":         httpsjonInputID,
-		"log_path":            logFilePath,
-		"log_path_no_id":      logFileNoIDPath,
-		"cel_resource_url":    celSrv.URL,
-		"httpjson_requestURL": httpjsonSrv.URL,
-		"path_home":           tempDir,
-		"port":                port,
-		"es_url":              esMock.URL,
-	}), "failed to execute config template")
-
-	filebeat.WriteConfigFile(cgfSB.String())
-	filebeat.Start()
-
-	// 4. Wait for Filebeat to start scanning for files
-	filebeat.WaitForLogs(
-		fmt.Sprintf("A new file %s has been found", logFilePath),
-		30*time.Second,
-		"Filebeat did not start looking for files to ingest")
-
-	filebeat.WaitForLogs(
-		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath),
-		10*time.Second, "Filebeat did not close the file")
-
-	// 5. Now that the file was fully read, we can make the assertions.
-	type inputMetric struct {
-		ID    string `json:"id"`
-		Input string `json:"input"`
-
-		// Pipeline metrics
-		EventsPipelineTotal          int `json:"events_pipeline_total"`
-		EventsPipelineFilteredTotal  int `json:"events_pipeline_filtered_total"`
-		EventsPipelinePublishedTotal int `json:"events_pipeline_published_total"`
-
-		// Output metrics
-		EventsOutputAckedTotal           int `json:"events_output_acked_total"`
-		EventsOutputDeadLetterTotal      int `json:"events_output_dead_letter_total"`
-		EventsOutputDroppedTotal         int `json:"events_output_dropped_total"`
-		EventsOutputDuplicateEventsTotal int `json:"events_output_duplicate_events_total"`
-		EventsOutputErrTooManyTotal      int `json:"events_output_err_too_many_total"`
-		EventsOutputRetryableErrorsTotal int `json:"events_output_retryable_errors_total"`
-		EventsOutputTotal                int `json:"events_output_total"`
-
-		// EventsProcessedTotal is used by: filestream
-		EventsProcessedTotal int `json:"events_processed_total"`
-		// EventsPublishedTotal is used by: cel
-		EventsPublishedTotal int `json:"events_published_total"`
-	}
+	port, filebeat, filestreamInputID, celInputID, httpsjonInputID :=
+		initInputMetricsTest(t, tmplCfg)
 
 	totalEventsByInput := map[string]int{
 		filestreamInputID: 12,
@@ -298,46 +243,18 @@ logging.level: debug
 	wantInputMetricsCount := len(assertionsByInputID) + 1 // +1 for the filestream input without ID
 	var inputMetrics []inputMetric
 	var body []byte
+	var err error
 	errMsg := strings.Builder{}
 	defer func() {
-		if t.Failed() {
-			inputsJSONFile := filepath.Join(filebeat.TempDir(), "inputs.json")
-			if err := os.WriteFile(inputsJSONFile, body, 0o644); err != nil {
-				t.Logf("failed to save response body to %s: %v",
-					inputsJSONFile, err)
-			}
-
-			t.Errorf("test failed: input metrics response used for the assertions:\n%s",
-				body)
-		}
+		saveInputMetricsOnFailure(t, filebeat, body)
 	}()
+
 	require.Eventuallyf(t, func() bool {
 		errMsg.Reset()
-		inputMetrics = []inputMetric{}
-
-		//nolint:noctx // on a test, it's ok
-		resp, err := http.Get(fmt.Sprintf("http://localhost:%s/inputs/", port))
+		inputMetrics, body, err = fetchInputMetrics(
+			inputMetrics, port, wantInputMetricsCount)
 		if err != nil {
-			errMsg.WriteString(fmt.Sprintf("request to /inputs/ failed: %v", err))
-			return false
-		}
-		defer resp.Body.Close()
-
-		body, err = io.ReadAll(resp.Body)
-		if err != nil {
-			errMsg.WriteString(fmt.Sprintf("failed to read response body: %v", err))
-			return false
-		}
-		err = json.Unmarshal(body, &inputMetrics)
-		if err != nil {
-			errMsg.WriteString(fmt.Sprintf("failed unmarshalling response body: %v", err))
-			return false
-		}
-
-		if len(inputMetrics) != wantInputMetricsCount {
-			errMsg.WriteString(
-				fmt.Sprintf("want %d inputs, got %d",
-					wantInputMetricsCount, len(inputMetrics)))
+			errMsg.WriteString(err.Error())
 			return false
 		}
 
@@ -391,6 +308,108 @@ logging.level: debug
 		"%d assertions should have run, but only %d run",
 		len(assertionsByInputID), count)
 }
+func saveInputMetricsOnFailure(t *testing.T, filebeat *integration.BeatProc, body []byte) {
+	if t.Failed() {
+		inputsJSONFile := filepath.Join(filebeat.TempDir(), "inputs.json")
+		if err := os.WriteFile(inputsJSONFile, body, 0o644); err != nil {
+			t.Logf("failed to save response body to %s: %v",
+				inputsJSONFile, err)
+		}
+
+		t.Errorf("test failed: input metrics response used for the assertions:\n%s",
+			body)
+	}
+}
+func fetchInputMetrics(
+	inputMetrics []inputMetric,
+	port string,
+	wantInputMetricsCount int) ([]inputMetric, []byte, error) {
+
+	inputMetrics = []inputMetric{}
+
+	//nolint:noctx // on a test, it's ok
+	resp, err := http.Get(fmt.Sprintf("http://localhost:%s/inputs/", port))
+	if err != nil {
+		return nil, nil, fmt.Errorf("request to /inputs/ failed: %v", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read response body: %v", err)
+	}
+	err = json.Unmarshal(body, &inputMetrics)
+	if err != nil {
+		return nil, body, fmt.Errorf("failed unmarshalling response body: %v", err)
+	}
+
+	if len(inputMetrics) != wantInputMetricsCount {
+		return nil, body, fmt.Errorf("want %d inputs, got %d",
+			wantInputMetricsCount, len(inputMetrics))
+	}
+
+	return inputMetrics, body, nil
+}
+
+func initInputMetricsTest(t *testing.T, tmplCfg string) (string, *integration.BeatProc, string, string, string) {
+	port := randomPort(t)
+	celSrv := makeServer()
+	t.Cleanup(celSrv.Close)
+	httpjsonSrv := makeServer()
+	t.Cleanup(httpjsonSrv.Close)
+
+	esMock := newMockESServer(t)
+
+	filebeat := NewFilebeat(t)
+	tempDir := filebeat.TempDir()
+
+	// 1. Generate the log file path
+
+	relativePath := filepath.Join("testdata", "input_metrics.log")
+	logFilePath, err := filepath.Abs(relativePath)
+	require.NoError(t, err, "Failed to get absolute path for", relativePath)
+
+	relativePath = filepath.Join("testdata", "input_metrics-no-id.log")
+	logFileNoIDPath, err := filepath.Abs(relativePath)
+	require.NoError(t, err, "Failed to get absolute path for", relativePath)
+
+	// 2. Write configuration file and start Filebeat
+	cgfSB := strings.Builder{}
+	tmpl, err := template.New("filebeatConfig").Parse(tmplCfg)
+	require.NoErrorf(t, err, "Failed to parse config template")
+
+	filestreamInputID := "a-filestream-id"
+	celBaseInputID := "a-cel-input-id"
+	celInputID := fmt.Sprintf("%s::%s", celBaseInputID, celSrv.URL)
+	httpsjonInputID := "a-httpjson-input-id"
+
+	require.NoError(t, tmpl.Execute(&cgfSB, map[string]string{
+		"filestream_id":       filestreamInputID,
+		"cel_id":              celBaseInputID,
+		"httpjson_id":         httpsjonInputID,
+		"log_path":            logFilePath,
+		"log_path_no_id":      logFileNoIDPath,
+		"cel_resource_url":    celSrv.URL,
+		"httpjson_requestURL": httpjsonSrv.URL,
+		"path_home":           tempDir,
+		"port":                port,
+		"es_url":              esMock.URL,
+	}), "failed to execute config template")
+
+	filebeat.WriteConfigFile(cgfSB.String())
+	filebeat.Start()
+
+	// 4. Wait for Filebeat to start scanning for files
+	filebeat.WaitForLogs(
+		fmt.Sprintf("A new file %s has been found", logFilePath),
+		30*time.Second,
+		"Filebeat did not start looking for files to ingest")
+
+	filebeat.WaitForLogs(
+		fmt.Sprintf("End of file reached: %s; Backoff now.", logFilePath),
+		10*time.Second, "Filebeat did not close the file")
+	return port, filebeat, filestreamInputID, celInputID, httpsjonInputID
+}
 
 // makeServer returns a *httptest.Server to mock a server called by an input.
 // It reruns 2 successful responses then all following responses are an HTTP 500.
@@ -408,6 +427,10 @@ func makeServer() *httptest.Server {
 		eventsIdx++
 	}))
 	return srv
+}
+
+type esEvent struct {
+	RespondWith int `json:"respond-with"`
 }
 
 func newMockESServer(t *testing.T) *httptest.Server {
@@ -430,9 +453,6 @@ func newMockESServer(t *testing.T) *httptest.Server {
 				return http.StatusInternalServerError
 			}
 
-			type esEvent struct {
-				RespondWith int `json:"respond-with"`
-			}
 			var event esEvent
 
 			err := json.Unmarshal(rawEvent, &event)
