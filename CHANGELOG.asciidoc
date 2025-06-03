@@ -3,6 +3,7 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+<<<<<<< HEAD
 [[release-notes-8.18.5]]
 === Beats version 8.18.5
 https://github.com/elastic/beats/compare/v8.18.4\...v8.18.5[View commits]
@@ -121,6 +122,11 @@ https://github.com/elastic/beats/compare/v8.18.2\...v8.18.3[View commits]
 [[release-notes-8.18.2]]
 === Beats version 8.18.2
 https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
+=======
+[[release-notes-8.17.7]]
+=== Beats version 8.17.7
+https://github.com/elastic/beats/compare/v8.17.6\...v8.17.7[View commits]
+>>>>>>> f8a5c55e8 (docs: Prepare Changelog for 8.17.7 (#44468))
 
 ==== Bugfixes
 
@@ -134,6 +140,7 @@ https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
 
 *Filebeat*
 
+<<<<<<< HEAD
 - Fix endpoint path typo in the Okta entity analytics provider. {pull}44147[44147]
 - Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
 
@@ -147,6 +154,12 @@ https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
 
 - Update Go version to v1.24.3. {pull}44270[44270]
 
+=======
+- Fix a WebSocket panic scenario that occured after exhausting the maximum number of retries. {pull}44342[44342]
+
+==== Added
+
+>>>>>>> f8a5c55e8 (docs: Prepare Changelog for 8.17.7 (#44468))
 *Metricbeat*
 
 - Add checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. {pull}44193[44193]
@@ -154,6 +167,7 @@ https://github.com/elastic/beats/compare/v8.18.1\...v8.18.2[View commits]
 - Add support for `_nodes/stats` URIs compatible with legacy Elasticsearch versions. {pull}44307[44307]
 - Add a latency configuration option to the Azure Monitor module. {pull}44366[44366]
 
+<<<<<<< HEAD
 *Osquerybeat*
 
 - Update osquery version to v5.15.0. {pull}43426[43426]
@@ -279,6 +293,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Remove 22 clause limitation. {issue}35047[35047] {pull}42187[42187]
 - Add handling for recoverable publisher disabled errors. {issue}35316[35316] {pull}42187[42187]
 
+=======
+>>>>>>> f8a5c55e8 (docs: Prepare Changelog for 8.17.7 (#44468))
 
 [[release-notes-8.17.6]]
 === Beats version 8.17.6
