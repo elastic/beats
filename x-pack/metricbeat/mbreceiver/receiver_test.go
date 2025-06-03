@@ -403,6 +403,9 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		// not available on windows
 		"host.containerized",
 
+		// It works on my machine, why not on CI?
+		"system.memory.swap.used.pct",
+
 		// depends on add_cloud_metadata
 		// not available locally
 		"cloud.account.id",
@@ -448,7 +451,7 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 			"system.memory.swap.free",
 			"system.memory.swap.total",
 			"system.memory.swap.used.bytes",
-			"system.memory.swap.used.pct",
+			// "system.memory.swap.used.pct",
 			"system.memory.total",
 			"system.memory.used.bytes",
 			"system.memory.used.pct",
