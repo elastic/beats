@@ -30,11 +30,6 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
-
 steps:
   - group: "Check/Update"
     key: "x-pack-heartbeat-check-update"
@@ -102,7 +97,6 @@ steps:
               context: "x-pack/heartbeat: Ubuntu x86_64 Unit Tests"
 
       - label: ":ubuntu: x-pack/heartbeat: Go Integration Tests"
-        key: "mandatory-int-test"
         command: |
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics"
@@ -122,7 +116,38 @@ steps:
           - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/heartbeat: Go Integration Tests"
+              context: "x-pack/heartbeat: Go Integration Tests / Ubuntu x86_64"
+
+      - label: ":windows: x-pack/heartbeat: Go Integration Tests"
+        skip: "Skipped due to https://github.com/elastic/beats/issues/44537"
+        if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+        command: |
+          cd x-pack/heartbeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+          - "x-pack/heartbeat/build/integration-tests/*"
+          - "x-pack/heartbeat/build/integration-tests/Test*/*"
+          - "x-pack/heartbeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/heartbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: Go Integration Tests / Windows"
 
       - label: ":windows: x-pack/heartbeat: Win 2016 Unit Tests"
         key: "mandatory-win-2016-unit-tests"
