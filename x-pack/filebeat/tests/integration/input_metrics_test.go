@@ -308,6 +308,137 @@ logging.level: debug
 		"%d assertions should have run, but only %d run",
 		len(assertionsByInputID), count)
 }
+
+// TestInputMetricsFromPipelineAndOutput_Dropped tests verifies the dropped
+// metric is correct. Due to ES output design, it either drops events or  it
+// indefinitely retries to send the to te dead letter index. Thus, a test for
+// each case is required.
+func TestInputMetricsFromPipelineAndOutput_Dropped(t *testing.T) {
+	var tmplCfg = `
+http:
+  enabled: true
+  port: {{.port}}
+filebeat.inputs:
+  - type: filestream
+    id: {{.filestream_id}}
+    enabled: true
+    paths:
+      - {{.log_path}}
+    processors:
+      - decode_json_fields:
+          fields: ["message"]
+          target: ""
+          overwrite_keys: true
+          add_error_key: true
+    close.reader.after_interval: 10m
+
+queue.mem:
+  events: 32
+  flush.min_events: 8
+  flush.timeout: 0.1s
+
+path.home: {{.path_home}}
+
+output.elasticsearch:
+  hosts: ["{{.es_url}}"]
+
+logging.level: debug
+`
+	port, filebeat, filestreamInputID, _, _ :=
+		initInputMetricsTest(t, tmplCfg)
+
+	totalEventsByInput := map[string]int{
+		filestreamInputID: 12,
+	}
+
+	assertionsByInputID := map[string]func(t *testing.T, metrics inputMetric){
+		filestreamInputID: func(t *testing.T, metrics inputMetric) {
+			assert.Equal(t, "filestream", metrics.Input)
+
+			// Assert output metrics
+			assert.Equal(t,
+				10,
+				metrics.EventsOutputAckedTotal,
+				"EventsOutputAckedTotal should equal EventsPipelinePublishedTotal")
+			assert.Equal(t,
+				0,
+				metrics.EventsOutputDeadLetterTotal,
+				"unexpected EventsOutputDeadLetterTotal")
+			assert.Equal(t,
+				1,
+				metrics.EventsOutputDroppedTotal,
+				"unexpected EventsOutputDroppedTotal")
+			assert.Equal(t,
+				1,
+				metrics.EventsOutputDuplicateEventsTotal,
+				"unexpected EventsOutputDuplicateEventsTotal")
+			assert.Equal(t,
+				1,
+				metrics.EventsOutputErrTooManyTotal,
+				"unexpected EventsOutputErrTooManyTotal")
+			assert.Equal(t,
+				1,
+				metrics.EventsOutputRetryableErrorsTotal,
+				"unexpected EventsOutputRetryableErrorsTotal")
+			assert.Equal(t,
+				metrics.EventsPipelinePublishedTotal+1, // +1 retried event
+				metrics.EventsOutputTotal,
+				"EventsOutputTotal should equal EventsPipelinePublishedTotal +1 retried event")
+		},
+	}
+
+	wantInputMetricsCount := len(assertionsByInputID)
+	var inputMetrics []inputMetric
+
+	errMsg := strings.Builder{}
+	var body []byte
+	var err error
+	defer func() {
+		saveInputMetricsOnFailure(t, filebeat, body)
+	}()
+	require.Eventuallyf(t, func() bool {
+		errMsg.Reset()
+		inputMetrics, body, err = fetchInputMetrics(
+			inputMetrics, port, wantInputMetricsCount)
+		if err != nil {
+			errMsg.WriteString(err.Error())
+			return false
+		}
+
+		for _, metrics := range inputMetrics {
+			want, ok := totalEventsByInput[metrics.ID]
+			if !ok {
+				continue
+			}
+
+			switch metrics.ID {
+			case filestreamInputID:
+				if want != metrics.EventsProcessedTotal {
+					errMsg.WriteString(
+						fmt.Sprintf("input %q wants %d events, got %d",
+							filestreamInputID, want, metrics.EventsProcessedTotal))
+
+					return false
+				}
+			}
+		}
+
+		return true
+	}, 10*time.Second, 1*time.Second, "did not get necessary input metrics: %s", &errMsg)
+
+	count := 0
+	for _, inpMetric := range inputMetrics {
+		assertions, ok := assertionsByInputID[inpMetric.ID]
+		if !ok {
+			continue
+		}
+		count++
+		assertions(t, inpMetric)
+	}
+	assert.Equalf(t, len(assertionsByInputID), count,
+		"%d assertions should have run, but only %d run",
+		len(assertionsByInputID), count)
+}
 func saveInputMetricsOnFailure(t *testing.T, filebeat *integration.BeatProc, body []byte) {
 	if t.Failed() {
 		inputsJSONFile := filepath.Join(filebeat.TempDir(), "inputs.json")
