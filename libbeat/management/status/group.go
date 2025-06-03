@@ -19,20 +19,18 @@ package status
 
 import (
 	"fmt"
-
-	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 type runnerState struct {
-	state status.Status
+	state Status
 	msg   string
 }
 
-type Reporter interface {
-	GetReporterForRunner(id uint64) status.StatusReporter
+type RunnerReporter interface {
+	GetReporterForRunner(id uint64) StatusReporter
 }
 
-func NewGroupStatusReporter(parent status.StatusReporter) Reporter {
+func NewGroupStatusReporter(parent StatusReporter) RunnerReporter {
 	if parent == nil {
 		return &nopStatus{}
 	}
@@ -44,17 +42,17 @@ func NewGroupStatusReporter(parent status.StatusReporter) Reporter {
 
 type reporter struct {
 	runnerStates map[uint64]runnerState
-	parent       status.StatusReporter
+	parent       StatusReporter
 }
 
-func (r *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
+func (r *reporter) GetReporterForRunner(id uint64) StatusReporter {
 	return &subReporter{
 		id: id,
 		r:  r,
 	}
 }
 
-func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg string) {
+func (r *reporter) updateStatusForRunner(id uint64, state Status, msg string) {
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[uint64]runnerState)
 	}
@@ -72,20 +70,20 @@ func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg str
 	r.parent.UpdateStatus(calcState, calcMsg)
 }
 
-func (r *reporter) calculateState() (status.Status, string) {
-	reportedState := status.Running
+func (r *reporter) calculateState() (Status, string) {
+	reportedState := Running
 	reportedMsg := ""
 	for _, s := range r.runnerStates {
 		switch s.state {
-		case status.Degraded:
+		case Degraded:
 			if reportedMsg != "" {
 				// if multiple modules report degraded state, concatenate the messages
 				reportedMsg = fmt.Sprintf("%s; %s", reportedMsg, s.msg)
 			} else {
 				reportedMsg = s.msg
 			}
-			reportedState = status.Degraded
-		case status.Failed:
+			reportedState = Degraded
+		case Failed:
 			// return the first failed runner
 			return s.state, s.msg
 		}
@@ -95,7 +93,7 @@ func (r *reporter) calculateState() (status.Status, string) {
 
 type nopStatus struct{}
 
-func (s *nopStatus) GetReporterForRunner(id uint64) status.StatusReporter {
+func (s *nopStatus) GetReporterForRunner(id uint64) StatusReporter {
 	return nil
 }
 
@@ -104,6 +102,6 @@ type subReporter struct {
 	r  *reporter
 }
 
-func (m *subReporter) UpdateStatus(status status.Status, msg string) {
+func (m *subReporter) UpdateStatus(status Status, msg string) {
 	m.r.updateStatusForRunner(m.id, status, msg)
 }

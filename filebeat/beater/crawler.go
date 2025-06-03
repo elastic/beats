@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	otelstatus "github.com/elastic/beats/v7/libbeat/otelbeat/status"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -74,7 +74,7 @@ func (c *crawler) Start(
 
 	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
 
-	groupReporter := otelstatus.NewGroupStatusReporter(reporter)
+	groupReporter := status.NewGroupStatusReporter(reporter)
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
@@ -118,7 +118,7 @@ func (c *crawler) Start(
 func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *conf.C,
-	reporter otelstatus.Reporter,
+	reporter status.RunnerReporter,
 ) error {
 	// TODO: Either use debug or remove it after https://github.com/elastic/beats/pull/30534
 	// is fixed.

@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
-	otelstatus "github.com/elastic/beats/v7/libbeat/otelbeat/status"
 
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -244,7 +243,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
-	groupReporter := otelstatus.NewGroupStatusReporter(b.Manager)
+	groupReporter := status.NewGroupStatusReporter(b.Manager)
 
 	// Static modules (metricbeat.runners)
 	for hash, r := range bt.runners {
