@@ -1,8 +1,3 @@
----
-mapped_pages:
-  - https://www.elastic.co/guide/en/beats/filebeat/current/file-identity.html
----
-
 # How to choose file identity for filestream [file-identity]
 
 ## What is file identity?
