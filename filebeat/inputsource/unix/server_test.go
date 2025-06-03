@@ -37,7 +37,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func defaultConfig() Config {
@@ -57,7 +57,7 @@ func TestErrorOnInvalidSocketType(t *testing.T) {
 	config := &Config{
 		SocketType: SocketType(7),
 	}
-	_, err := New(logp.L(), config, nil)
+	_, err := New(logptest.NewTestingLogger(t, ""), config, nil)
 	assert.Error(t, err)
 }
 
@@ -66,7 +66,7 @@ func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 		SocketType:    StreamSocket,
 		LineDelimiter: "",
 	}
-	_, err := New(logp.L(), config, nil)
+	_, err := New(logptest.NewTestingLogger(t, ""), config, nil)
 	assert.Error(t, err)
 }
 
@@ -182,7 +182,7 @@ func TestReceiveEventsAndMetadata(t *testing.T) {
 				return
 			}
 
-			server, err := New(logp.L(), &config, to)
+			server, err := New(logptest.NewTestingLogger(t, ""), &config, to)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -242,7 +242,7 @@ func TestSocketOwnershipAndMode(t *testing.T) {
 	err = cfg.Unpack(&config)
 	require.NoError(t, err)
 
-	server, err := New(logp.L(), &config, nil)
+	server, err := New(logptest.NewTestingLogger(t, ""), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.NoError(t, err)
@@ -273,7 +273,7 @@ func TestSocketCleanup(t *testing.T) {
 	})
 	config := defaultConfig()
 	require.NoError(t, cfg.Unpack(&config))
-	server, err := New(logp.L(), &config, nil)
+	server, err := New(logptest.NewTestingLogger(t, ""), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.NoError(t, err)
@@ -297,7 +297,7 @@ func TestSocketCleanupRefusal(t *testing.T) {
 	})
 	config := defaultConfig()
 	require.NoError(t, cfg.Unpack(&config))
-	server, err := New(logp.L(), &config, nil)
+	server, err := New(logptest.NewTestingLogger(t, ""), &config, nil)
 	require.NoError(t, err)
 	err = server.Start()
 	require.Error(t, err)
@@ -339,7 +339,7 @@ func TestReceiveNewEventsConcurrently(t *testing.T) {
 				return
 			}
 
-			server, err := New(logp.L(), &config, to)
+			server, err := New(logptest.NewTestingLogger(t, ""), &config, to)
 			if !assert.NoError(t, err) {
 				return
 			}

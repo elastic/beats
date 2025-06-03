@@ -43,6 +43,7 @@ func AutodiscoverBuilder(
 	uuid uuid.UUID,
 	c *conf.C,
 	keystore keystore.Keystore,
+	_ *logp.Logger,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Deprecate("", "aws_elb autodiscover is now deprecated and will be removed in a future release.")
 
