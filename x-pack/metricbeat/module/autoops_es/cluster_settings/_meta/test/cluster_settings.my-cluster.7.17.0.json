@@ -1,0 +1,464 @@
+{
+    "persistent": {
+        "action": {
+            "auto_create_index": "true"
+        },
+        "cluster": {
+            "indices": {
+                "close": {
+                    "enable": "true"
+                }
+            },
+            "metadata": {
+                "display_name": "my-cluster"
+            }
+        }
+    },
+    "transient": {
+        "action": {
+            "auto_create_index": "false"
+        }
+    },
+    "defaults": {
+        "cluster": {
+            "max_voting_config_exclusions": "10",
+            "metadata": {
+                "managed_index_templates": ".cloud-",
+                "managed_repository": "found-snapshots",
+                "managed_policies": "[cloud-snapshot-policy]"
+            },
+            "auto_shrink_voting_configuration": "true",
+            "election": {
+                "duration": "500ms",
+                "initial_timeout": "100ms",
+                "max_timeout": "10s",
+                "back_off_time": "100ms",
+                "strategy": "supports_voting_only"
+            },
+            "no_master_block": "write",
+            "persistent_tasks": {
+                "allocation": {
+                    "enable": "all",
+                    "recheck_interval": "30s"
+                }
+            },
+            "blocks": {
+                "read_only_allow_delete": "false",
+                "read_only": "false"
+            },
+            "remote": {
+                "node": {
+                    "attr": ""
+                },
+                "initial_connect_timeout": "30s",
+                "connect": "true",
+                "connections_per_cluster": "3"
+            },
+            "follower_lag": {
+                "timeout": "90000ms"
+            },
+            "routing": {
+                "use_adaptive_replica_selection": "true",
+                "rebalance": {
+                    "enable": "all"
+                },
+                "allocation": {
+                    "enforce_default_tier_preference": "false",
+                    "node_concurrent_incoming_recoveries": "2",
+                    "include": {
+                        "_tier": ""
+                    },
+                    "node_initial_primaries_recoveries": "4",
+                    "same_shard": {
+                        "host": "false"
+                    },
+                    "total_shards_per_node": "-1",
+                    "require": {
+                        "_tier": ""
+                    },
+                    "shard_state": {
+                        "reroute": {
+                            "priority": "NORMAL"
+                        }
+                    },
+                    "type": "balanced",
+                    "disk": {
+                        "threshold_enabled": "true",
+                        "watermark": {
+                            "flood_stage.frozen.max_headroom": "20GB",
+                            "flood_stage": "95%",
+                            "high": "90%",
+                            "low": "85%",
+                            "enable_for_single_data_node": "true",
+                            "flood_stage.frozen": "95%"
+                        },
+                        "include_relocations": "true",
+                        "reroute_interval": "60s"
+                    },
+                    "awareness": {
+                        "attributes": ["region", "logical_availability_zone"]
+                    },
+                    "balance": {
+                        "index": "0.55",
+                        "threshold": "1.0",
+                        "shard": "0.45"
+                    },
+                    "enable": "all",
+                    "node_concurrent_outgoing_recoveries": "2",
+                    "allow_rebalance": "indices_all_active",
+                    "cluster_concurrent_rebalance": "2",
+                    "node_concurrent_recoveries": "2",
+                    "exclude": {
+                        "_tier": ""
+                    }
+                }
+            },
+            "indices": {
+                "tombstones": {
+                    "size": "500"
+                }
+            },
+            "max_shards_per_node.frozen": "3000",
+            "nodes": {
+                "reconnect_interval": "10s"
+            },
+            "service": {
+                "master_service_starvation_logging_threshold": "5m",
+                "slow_master_task_logging_threshold": "10s",
+                "slow_task_logging_threshold": "30s"
+            },
+            "publish": {
+                "timeout": "30000ms",
+                "info_timeout": "10000ms"
+            },
+            "name": "496dabc9c5c44c1dba8e755b75f4cfc8",
+            "fault_detection": {
+                "leader_check": {
+                    "interval": "1000ms",
+                    "timeout": "10000ms",
+                    "retry_count": "3"
+                },
+                "follower_check": {
+                    "interval": "1000ms",
+                    "timeout": "10000ms",
+                    "retry_count": "3"
+                }
+            },
+            "join": {
+                "timeout": "60000ms"
+            },
+            "max_shards_per_node": "1000",
+            "initial_master_nodes": ["instance-0000000000"],
+            "deprecation_indexing": {
+                "enabled": "true",
+                "x_opaque_id_used": {
+                    "enabled": "true"
+                }
+            },
+            "snapshot": {
+                "info": {
+                    "max_concurrent_fetches": "5"
+                }
+            },
+            "info": {
+                "update": {
+                    "interval": "30s",
+                    "timeout": "15s"
+                }
+            }
+        },
+        "bootstrap": {
+            "memory_lock": "false",
+            "system_call_filter": "true",
+            "ctrlhandler": "true"
+        },
+        "search": {
+            "default_search_timeout": "-1",
+            "max_open_scroll_context": "500",
+            "max_buckets": "65536",
+            "max_async_search_response_size": "-1b",
+            "keep_alive_interval": "1m",
+            "remote": {
+                "node": {
+                    "attr": ""
+                },
+                "initial_connect_timeout": "30s",
+                "connect": "true",
+                "connections_per_cluster": "3"
+            },
+            "max_keep_alive": "24h",
+            "highlight": {
+                "term_vector_multi_value": "true"
+            },
+            "default_allow_partial_results": "true",
+            "low_level_cancellation": "true",
+            "allow_expensive_queries": "true",
+            "default_keep_alive": "5m",
+            "aggs": {
+                "rewrite_to_filter_by_filter": "true"
+            }
+        },
+        "path": {
+            "data": ["/app/data"]
+        },
+        "ccr": {
+            "indices": {
+                "recovery": {
+                    "recovery_activity_timeout": "60s",
+                    "chunk_size": "1mb",
+                    "internal_action_timeout": "60s",
+                    "max_bytes_per_sec": "40mb",
+                    "max_concurrent_file_chunks": "5"
+                }
+            }
+        },
+        "repositories": {
+            "fs": {
+                "compress": "false",
+                "chunk_size": "9223372036854775807b",
+                "location": ""
+            },
+            "url": {
+                "supported_protocols": ["http", "https", "ftp", "file", "jar"],
+                "allowed_urls": [],
+                "url": "http:"
+            }
+        },
+        "action": {
+            "search": {
+                "pre_filter_shard_size": {
+                    "default": "128"
+                },
+                "shard_count": {
+                    "limit": "9223372036854775807"
+                }
+            },
+            "destructive_requires_name": "false"
+        },
+        "xpack": {
+            "watcher": {
+                "internal": {
+                    "ops": {
+                        "search": {
+                            "default_timeout": ""
+                        }
+                    }
+                },
+                "input": {
+                    "search": {
+                        "default_timeout": ""
+                    }
+                },
+                "transform": {
+                    "search": {
+                        "default_timeout": ""
+                    }
+                }
+            },
+            "monitoring": {
+                "collection": {
+                    "cluster": {
+                        "stats": {
+                            "timeout": "10s"
+                        }
+                    }
+                }
+            },
+            "security": {
+                "authz": {
+                    "timer": {
+                        "indices": {
+                            "enabled": "false",
+                            "threshold": {
+                                "warn": "200ms",
+                                "debug": "20ms",
+                                "info": "100ms"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "rest": {
+            "action": {
+                "multi": {
+                    "allow_explicit_index": "true"
+                }
+            }
+        },
+        "thread_pool": {
+            "search": {
+                "max_queue_size": "1000",
+                "queue_size": "1000",
+                "size": "4",
+                "auto_queue_frame_size": "2000",
+                "target_response_time": "1s",
+                "min_queue_size": "1000"
+            }
+        },
+        "indices": {
+            "replication": {
+                "retry_timeout": "60s",
+                "initial_retry_backoff_bound": "50ms"
+            },
+            "cache": {
+                "cleanup_interval": "1m"
+            },
+            "mapping": {
+                "dynamic_timeout": "30s",
+                "max_in_flight_updates": "10"
+            },
+            "memory": {
+                "interval": "5s",
+                "max_index_buffer_size": "-1",
+                "shard_inactive_time": "5m",
+                "index_buffer_size": "10%",
+                "min_index_buffer_size": "48mb"
+            },
+            "breaker": {
+                "request": {
+                    "limit": "60%",
+                    "type": "memory",
+                    "overhead": "1.0"
+                },
+                "total": {
+                    "limit": "95%",
+                    "use_real_memory": "true"
+                },
+                "accounting": {
+                    "limit": "100%",
+                    "overhead": "1.0"
+                },
+                "fielddata": {
+                    "limit": "40%",
+                    "type": "memory",
+                    "overhead": "1.03"
+                },
+                "type": "hierarchy"
+            },
+            "query": {
+                "bool": {
+                    "max_nested_depth": "20",
+                    "max_clause_count": "1024"
+                },
+                "query_string": {
+                    "analyze_wildcard": "false",
+                    "allowLeadingWildcard": "true"
+                }
+            },
+            "id_field_data": {
+                "enabled": "true"
+            },
+            "recovery": {
+                "recovery_activity_timeout": "1800000ms",
+                "retry_delay_network": "5s",
+                "internal_action_timeout": "15m",
+                "max_concurrent_snapshot_file_downloads_per_node": "25",
+                "retry_delay_state_sync": "500ms",
+                "max_concurrent_snapshot_file_downloads": "5",
+                "internal_action_long_timeout": "1800000ms",
+                "max_concurrent_operations": "1",
+                "use_snapshots": "true",
+                "max_bytes_per_sec": "40mb",
+                "max_concurrent_file_chunks": "2"
+            },
+            "requests": {
+                "cache": {
+                    "size": "1%",
+                    "expire": "0ms"
+                }
+            },
+            "store": {
+                "delete": {
+                    "shard": {
+                        "timeout": "30s"
+                    }
+                }
+            },
+            "analysis": {
+                "hunspell": {
+                    "dictionary": {
+                        "ignore_case": "false",
+                        "lazy": "false"
+                    }
+                }
+            },
+            "queries": {
+                "cache": {
+                    "count": "10000",
+                    "size": "10%",
+                    "all_segments": "false"
+                }
+            },
+            "lifecycle": {
+                "history_index_enabled": "true",
+                "poll_interval": "10m",
+                "step": {
+                    "master_timeout": "30s"
+                }
+            },
+            "fielddata": {
+                "cache": {
+                    "size": "-1b"
+                }
+            }
+        },
+        "discovery": {
+            "seed_hosts": [],
+            "unconfigured_bootstrap_timeout": "3s",
+            "request_peers_timeout": "3000ms",
+            "zen": {
+                "commit_timeout": "30s",
+                "no_master_block": "write",
+                "join_retry_delay": "100ms",
+                "join_retry_attempts": "3",
+                "ping": {
+                    "unicast": {
+                        "concurrent_connects": "10",
+                        "hosts": [],
+                        "hosts.resolve_timeout": "5s"
+                    }
+                },
+                "master_election": {
+                    "ignore_non_master_pings": "false",
+                    "wait_for_joins_timeout": "30000ms"
+                },
+                "send_leave_request": "true",
+                "ping_timeout": "3s",
+                "bwc_ping_timeout": "3s",
+                "join_timeout": "60000ms",
+                "publish_diff": {
+                    "enable": "true"
+                },
+                "publish": {
+                    "max_pending_cluster_states": "25"
+                },
+                "minimum_master_nodes": "-1",
+                "unsafe_rolling_upgrades_enabled": "true",
+                "hosts_provider": [],
+                "publish_timeout": "30s",
+                "fd": {
+                    "connect_on_network_disconnect": "false",
+                    "ping_interval": "1s",
+                    "ping_retries": "3",
+                    "register_connection_listener": "true",
+                    "ping_timeout": "30s"
+                },
+                "max_pings_from_another_master": "3"
+            },
+            "initial_state_timeout": "30s",
+            "cluster_formation_warning_timeout": "10000ms",
+            "seed_providers": ["file"],
+            "type": "zen",
+            "seed_resolver": {
+                "max_concurrent_resolvers": "10",
+                "timeout": "5s"
+            },
+            "find_peers_interval": "1000ms",
+            "probe": {
+                "connect_timeout": "30s",
+                "handshake_timeout": "30s"
+            }
+        }
+    }
+}

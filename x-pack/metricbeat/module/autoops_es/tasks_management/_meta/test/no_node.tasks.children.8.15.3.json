@@ -1,0 +1,27 @@
+{
+    "tasks": {
+        "node1:45": {
+            "id": 45,
+            "type": "transport",
+            "action": "cluster:monitor/tasks/lists",
+            "start_time_in_millis": 1513823752749,
+            "running_time_in_nanos": 60000293139,
+            "cancellable": false,
+            "headers": {
+                "X-Opaque-Id": "123456"
+            }
+        },
+        "not-long-running:47": {
+            "node": "not-long-running",
+            "id": 48,
+            "type": "transport",
+            "action": "cluster:fake",
+            "start_time_in_millis": 1513823752749,
+            "running_time_in_nanos": 1,
+            "cancellable": false,
+            "headers": {
+                "X-Opaque-Id": "456789"
+            }
+        }
+    }
+}
