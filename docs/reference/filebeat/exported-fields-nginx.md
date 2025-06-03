@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-nginx.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Nginx fields [exported-fields-nginx]
 
 Module for parsing the Nginx log files.

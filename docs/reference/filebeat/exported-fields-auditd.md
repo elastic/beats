@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-auditd.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Auditd fields [exported-fields-auditd]
 
 Module for parsing auditd logs.

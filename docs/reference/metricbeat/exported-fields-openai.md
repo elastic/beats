@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-openai.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # openai fields [exported-fields-openai]
 
 openai module

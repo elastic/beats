@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-zeek.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Zeek fields [exported-fields-zeek]
 
 Module for handling logs produced by Zeek/Bro

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-okta.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Okta fields [exported-fields-okta]
 
 Module for handling system logs from Okta.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-nats.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # NATS fields [exported-fields-nats]
 
 Module for parsing NATS log files.

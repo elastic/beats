@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-aws.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # AWS fields [exported-fields-aws]
 
 `aws` module collects AWS monitoring metrics from AWS Cloudwatch.

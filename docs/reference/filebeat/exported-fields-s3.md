@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-s3.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # s3 fields [exported-fields-s3]
 
 S3 fields from s3 input.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-winlog.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Winlogbeat fields [exported-fields-winlog]
 
 Fields from the Windows Event Log.

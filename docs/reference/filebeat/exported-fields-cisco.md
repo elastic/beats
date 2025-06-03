@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cisco.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Cisco fields [exported-fields-cisco]
 
 Module for handling Cisco network device logs.

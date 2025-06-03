@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/exported-fields-process.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Process fields [exported-fields-process]
 
 Process metadata fields

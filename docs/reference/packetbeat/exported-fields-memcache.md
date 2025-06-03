@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-memcache.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Memcache fields [exported-fields-memcache]
 
 Memcached-specific event fields

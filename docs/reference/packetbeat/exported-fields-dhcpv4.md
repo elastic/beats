@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-dhcpv4.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # DHCPv4 fields [exported-fields-dhcpv4]
 
 DHCPv4 event fields

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-pgsql.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # PostgreSQL fields [exported-fields-pgsql]
 
 PostgreSQL-specific event fields.

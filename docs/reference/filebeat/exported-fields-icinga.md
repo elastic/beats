@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-icinga.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Icinga fields [exported-fields-icinga]
 
 Icinga Module

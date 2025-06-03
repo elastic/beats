@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-tls_detailed.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Detailed TLS fields [exported-fields-tls_detailed]
 
 Detailed TLS-specific event fields.

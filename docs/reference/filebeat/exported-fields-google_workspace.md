@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-google_workspace.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # google_workspace fields [exported-fields-google_workspace]
 
 Google Workspace Module

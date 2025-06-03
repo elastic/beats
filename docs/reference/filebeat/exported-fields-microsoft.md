@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-microsoft.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Microsoft fields [exported-fields-microsoft]
 
 Microsoft Module

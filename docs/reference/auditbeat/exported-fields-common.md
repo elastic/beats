@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/exported-fields-common.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Common fields [exported-fields-common]
 
 Contains common fields available in all event types.

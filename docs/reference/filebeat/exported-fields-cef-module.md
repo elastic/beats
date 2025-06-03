@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-cef-module.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # CEF fields [exported-fields-cef-module]
 
 Module for receiving CEF logs over Syslog. The module adds vendor specific fields in addition to the fields the decode_cef processor provides.

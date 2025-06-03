@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-consul.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Consul fields [exported-fields-consul]
 
 Consul module

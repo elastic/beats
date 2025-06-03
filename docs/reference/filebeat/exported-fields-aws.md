@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-aws.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # AWS fields [exported-fields-aws]
 
 Module for handling logs from AWS.

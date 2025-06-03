@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-trans_measurements.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Measurements (Transactions) fields [exported-fields-trans_measurements]
 
 These fields contain measurements related to the transaction.

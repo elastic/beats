@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-tls.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # TLS encryption layer fields [exported-fields-tls]
 
 None

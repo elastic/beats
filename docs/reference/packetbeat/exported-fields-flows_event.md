@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-flows_event.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Flow Event fields [exported-fields-flows_event]
 
 These fields contain data about the flow itself.

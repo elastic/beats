@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-mongodb.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # MongoDB fields [exported-fields-mongodb]
 
 Metrics collected from MongoDB servers.

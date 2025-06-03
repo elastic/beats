@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-checkpoint.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Checkpoint fields [exported-fields-checkpoint]
 
 Some checkpoint module

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-misp.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # MISP fields [exported-fields-misp]
 
 Module for handling threat information from MISP.

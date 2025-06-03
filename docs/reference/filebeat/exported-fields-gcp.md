@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-gcp.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Google Cloud Platform (GCP) fields [exported-fields-gcp]
 
 Module for handling logs from Google Cloud.

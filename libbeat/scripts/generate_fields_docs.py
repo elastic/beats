@@ -15,7 +15,9 @@ def document_fields(output, section, sections, path, beat):
         output.write('''---
 mapped_pages:
   - https://www.elastic.co/guide/en/beats/{}/current/exported-fields-{}.html
----\n\n'''.format(beat, section["anchor"]))
+---
+
+<!-- This file is generated! See scripts/generate_fields_docs.py -->\n\n'''.format(beat, section["anchor"]))
 
     # Intermediate level titles
     # if ("description" in section and "prefix" not in section and
@@ -134,7 +136,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/{beat}/current/exported-fields.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
                  
 # Exported fields [exported-fields]
 

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-winlog.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Windows ETW fields [exported-fields-winlog]
 
 Fields from the ETW input (Event Tracing for Windows).

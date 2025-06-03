@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-dns.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # DNS fields [exported-fields-dns]
 
 DNS-specific event fields.

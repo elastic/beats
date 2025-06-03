@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields-summary.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Monitor summary fields [exported-fields-summary]
 
 None

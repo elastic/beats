@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
                  
 # Exported fields [exported-fields]
 
@@ -13,6 +13,7 @@ This document describes the fields that are exported by Metricbeat. They are gro
 * [*Aerospike fields*](/reference/metricbeat/exported-fields-aerospike.md)
 * [*Airflow fields*](/reference/metricbeat/exported-fields-airflow.md)
 * [*Apache fields*](/reference/metricbeat/exported-fields-apache.md)
+* [*AutoOps ES fields*](/reference/metricbeat/exported-fields-autoops_es.md)
 * [*AWS fields*](/reference/metricbeat/exported-fields-aws.md)
 * [*AWS Fargate fields*](/reference/metricbeat/exported-fields-awsfargate.md)
 * [*Azure fields*](/reference/metricbeat/exported-fields-azure.md)

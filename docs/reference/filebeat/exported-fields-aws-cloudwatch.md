@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-aws-cloudwatch.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # AWS CloudWatch fields [exported-fields-aws-cloudwatch]
 
 Fields from AWS CloudWatch logs.

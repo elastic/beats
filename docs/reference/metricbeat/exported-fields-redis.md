@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-redis.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Redis fields [exported-fields-redis]
 
 Redis metrics collected from Redis.

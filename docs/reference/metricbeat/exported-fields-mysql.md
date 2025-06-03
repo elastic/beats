@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-mysql.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # MySQL fields [exported-fields-mysql]
 
 MySQL server status metrics collected from MySQL.

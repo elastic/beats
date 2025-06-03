@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-containerd.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Containerd fields [exported-fields-containerd]
 
 Containerd stats collected from containerd

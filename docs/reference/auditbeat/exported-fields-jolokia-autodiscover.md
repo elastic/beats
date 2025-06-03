@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/exported-fields-jolokia-autodiscover.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Jolokia Discovery autodiscover provider fields [exported-fields-jolokia-autodiscover]
 
 Metadata from Jolokia Discovery added by the jolokia provider.

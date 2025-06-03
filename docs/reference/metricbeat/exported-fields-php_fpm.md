@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-php_fpm.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # PHP_FPM fields [exported-fields-php_fpm]
 
 PHP-FPM server status metrics collected from PHP-FPM.

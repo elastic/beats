@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-ecs.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # ECS fields [exported-fields-ecs]
 
 This section defines Elastic Common Schema (ECS) fields—a common set of fields

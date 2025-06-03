@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-powershell.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # PowerShell module fields [exported-fields-powershell]
 
 These are the event fields specific to the module for the Microsoft-Windows-PowerShell/Operational and Windows PowerShell logs.

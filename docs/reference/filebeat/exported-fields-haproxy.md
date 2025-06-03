@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-haproxy.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # HAProxy fields [exported-fields-haproxy]
 
 haproxy Module

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-traefik.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Traefik fields [exported-fields-traefik]
 
 Module for parsing the Traefik log files.

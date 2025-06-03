@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-cloud.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Cloud provider metadata fields [exported-fields-cloud]
 
 Metadata from cloud providers added by the add_cloud_metadata processor.

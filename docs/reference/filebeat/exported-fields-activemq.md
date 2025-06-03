@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/exported-fields-activemq.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # ActiveMQ fields [exported-fields-activemq]
 
 Module for parsing ActiveMQ log files.

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-traefik.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Traefik fields [exported-fields-traefik]
 
 Traefik reverse proxy / load balancer metrics

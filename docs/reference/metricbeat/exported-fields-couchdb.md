@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-couchdb.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # CouchDB fields [exported-fields-couchdb]
 
 couchdb module

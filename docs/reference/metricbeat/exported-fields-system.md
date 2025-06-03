@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-system.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # System fields [exported-fields-system]
 
 System status metrics, like CPU and memory usage, that are collected from the operating system.

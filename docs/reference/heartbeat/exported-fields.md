@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/heartbeat/current/exported-fields.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
                  
 # Exported fields [exported-fields]
 
