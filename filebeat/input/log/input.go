@@ -128,7 +128,7 @@ func NewInput(
 		return nil, fmt.Errorf("each input must have at least one path defined")
 	}
 
-	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity)
+	identifier, err := file.NewStateIdentifier(inputConfig.FileIdentity, logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize file identity generator: %w", err)
 	}
@@ -157,16 +157,16 @@ func NewInput(
 	}
 
 	uuid, _ := uuid.NewV4()
-	logger = logger.Named("input").With("input_id", uuid)
+	inputlogger := logger.Named("input").With("input_id", uuid)
 
 	p := &Input{
-		logger:              logger,
+		logger:              inputlogger,
 		config:              inputConfig,
 		cfg:                 cfg,
 		harvesters:          harvester.NewRegistry(),
 		outlet:              out,
 		stateOutlet:         stateOut,
-		states:              file.NewStates(),
+		states:              file.NewStates(logger),
 		done:                context.Done,
 		meta:                meta,
 		fileStateIdentifier: identifier,
@@ -177,7 +177,7 @@ func NewInput(
 
 	// Create empty harvester to check if configs are fine
 	// TODO: Do config validation instead
-	_, err = p.createHarvester(logger, file.State{}, nil)
+	_, err = p.createHarvester(inputlogger, file.State{}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func NewInput(
 		return nil, err
 	}
 
-	logger.Infof("Configured paths: %v", p.config.Paths)
+	inputlogger.Infof("Configured paths: %v", p.config.Paths)
 
 	cleanupNeeded = false
 	go p.stopWhenDone()
@@ -775,7 +775,7 @@ func (p *Input) startHarvester(logger *logp.Logger, state file.State, offset int
 	// This is synchronous state update as part of the scan
 	h.SendStateUpdate()
 
-	if err = p.harvesters.Start(h); err != nil {
+	if err = p.harvesters.Start(h, p.logger); err != nil {
 		p.numHarvesters.Add(^uint32(0))
 	}
 	return err

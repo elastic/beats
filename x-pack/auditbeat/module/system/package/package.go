@@ -219,7 +219,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		config:          config,
-		log:             logp.NewLogger(metricsetName),
+		log:             base.Logger().Named(metricsetName),
 		cache:           cache.New[*Package](),
 		bucket:          bucket,
 	}

@@ -21,9 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGCStore(t *testing.T) {
@@ -34,7 +33,7 @@ func TestGCStore(t *testing.T) {
 		store := testOpenStore(t, "test", backend)
 		defer store.Release()
 
-		gcStore(logp.NewLogger("test"), started, store)
+		gcStore(logptest.NewTestingLogger(t, "test"), started, store)
 
 		want := map[string]state{}
 		checkEqualStoreState(t, want, backend.snapshot())
@@ -55,7 +54,7 @@ func TestGCStore(t *testing.T) {
 		store := testOpenStore(t, "test", backend)
 		defer store.Release()
 
-		gcStore(logp.NewLogger("test"), started, store)
+		gcStore(logptest.NewTestingLogger(t, "test"), started, store)
 
 		checkEqualStoreState(t, initState, backend.snapshot())
 	})
@@ -75,7 +74,7 @@ func TestGCStore(t *testing.T) {
 		store := testOpenStore(t, "test", backend)
 		defer store.Release()
 
-		gcStore(logp.NewLogger("test"), started, store)
+		gcStore(logptest.NewTestingLogger(t, "test"), started, store)
 
 		want := map[string]state{}
 		checkEqualStoreState(t, want, backend.snapshot())
@@ -96,7 +95,7 @@ func TestGCStore(t *testing.T) {
 		store := testOpenStore(t, "test", backend)
 		defer store.Release()
 
-		gcStore(logp.NewLogger("test"), started, store)
+		gcStore(logptest.NewTestingLogger(t, "test"), started, store)
 
 		checkEqualStoreState(t, initState, backend.snapshot())
 	})
@@ -118,13 +117,13 @@ func TestGCStore(t *testing.T) {
 
 		// access resource and check it is not gc'ed
 		res := store.Get("test::key")
-		gcStore(logp.NewLogger("test"), started, store)
+		gcStore(logptest.NewTestingLogger(t, "test"), started, store)
 		checkEqualStoreState(t, initState, backend.snapshot())
 
 		// release resource and check it gets gc'ed
 		res.Release()
 		want := map[string]state{}
-		gcStore(logp.NewLogger("test"), started, store)
+		gcStore(logptest.NewTestingLogger(t, "test"), started, store)
 		checkEqualStoreState(t, want, backend.snapshot())
 	})
 
@@ -150,12 +149,12 @@ func TestGCStore(t *testing.T) {
 		res.Release()
 
 		// cleanup fails
-		gcStore(logp.NewLogger("test"), started, store)
+		gcStore(logptest.NewTestingLogger(t, "test"), started, store)
 		checkEqualStoreState(t, initState, backend.snapshot())
 
 		// cancel operation (no more pending operations) and try to gc again
 		op.done(1)
-		gcStore(logp.NewLogger("test"), started, store)
+		gcStore(logptest.NewTestingLogger(t, "test"), started, store)
 		want := map[string]state{}
 		checkEqualStoreState(t, want, backend.snapshot())
 	})

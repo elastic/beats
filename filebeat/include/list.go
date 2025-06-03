@@ -22,7 +22,6 @@ package include
 import (
 	// Import packages to perform 'func InitializeModule()' when in-use.
 	m0 "github.com/elastic/beats/v7/filebeat/autodiscover"
-	m1 "github.com/elastic/beats/v7/filebeat/autodiscover/builder/hints"
 	m2 "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 
 	// Import packages that perform 'func init()'.
@@ -59,6 +58,5 @@ import (
 // InitializeModules initialize all of the modules.
 func InitializeModule() {
 	m0.InitializeModule()
-	m1.InitializeModule()
 	m2.InitializeModule()
 }

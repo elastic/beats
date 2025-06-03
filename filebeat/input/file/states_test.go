@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,7 +82,7 @@ func TestCleanup(t *testing.T) {
 	for _, test := range cleanupTests {
 		test := test
 		t.Run(test.title, func(t *testing.T) {
-			states := NewStates()
+			states := NewStates(logptest.NewTestingLogger(t, ""))
 			states.SetStates([]State{test.state})
 
 			assert.Equal(t, test.countBefore, states.Count())

@@ -39,7 +39,7 @@ type inodeMarkerIdentifier struct {
 	markerTxt                 string
 }
 
-func newINodeMarkerIdentifier(cfg *conf.C) (StateIdentifier, error) {
+func newINodeMarkerIdentifier(cfg *conf.C, logger *logp.Logger) (StateIdentifier, error) {
 	var config struct {
 		MarkerPath string `config:"path" validate:"required"`
 	}
@@ -57,7 +57,7 @@ func newINodeMarkerIdentifier(cfg *conf.C) (StateIdentifier, error) {
 		return nil, fmt.Errorf("error while reading marker file at %s: %v", config.MarkerPath, err)
 	}
 	return &inodeMarkerIdentifier{
-		log:                       logp.NewLogger("inode_marker_identifier_" + filepath.Base(config.MarkerPath)),
+		log:                       logger.Named("inode_marker_identifier_" + filepath.Base(config.MarkerPath)),
 		name:                      inodeMarkerName,
 		markerPath:                config.MarkerPath,
 		markerFileLastModifitaion: fi.ModTime(),
