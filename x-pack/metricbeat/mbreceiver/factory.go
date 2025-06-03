@@ -12,14 +12,12 @@ import (
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/receiver"
 
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/beatreceiver"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
-	"github.com/elastic/elastic-agent-libs/config"
+	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -45,37 +43,17 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	settings.ElasticLicensed = true
 	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
-	b, err := instance.NewBeatReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
+	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
 	if err != nil {
 		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
 
 	beatCreator := beater.DefaultCreator()
-
-	beatConfig, err := b.BeatConfig()
+	br, err := xpInstance.NewBeatReceiver(b, beatCreator, set.Logger)
 	if err != nil {
-		return nil, fmt.Errorf("error getting beat config: %w", err)
+		return nil, fmt.Errorf("error creating %s: %w", Name, err)
 	}
-
-	mbBeater, err := beatCreator(&b.Beat, beatConfig)
-	if err != nil {
-		return nil, fmt.Errorf("error getting %s creator:%w", Name, err)
-	}
-
-	httpConf := struct {
-		HTTP *config.C `config:"http"`
-	}{}
-	if err := b.RawConfig.Unpack(&httpConf); err != nil {
-		return nil, fmt.Errorf("error unpacking monitoring config: %w", err)
-	}
-
-	beatReceiver := beatreceiver.BeatReceiver{
-		Beat:     b,
-		Beater:   mbBeater,
-		Logger:   set.Logger,
-		HttpConf: httpConf.HTTP,
-	}
-	return &metricbeatReceiver{BeatReceiver: beatReceiver}, nil
+	return &metricbeatReceiver{BeatReceiver: br}, nil
 }
 
 // copied from metricbeat cmd.
