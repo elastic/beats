@@ -200,7 +200,7 @@ func (mw *Wrapper) MetricSets() []*metricSetWrapper {
 // metricSetWrapper methods
 
 func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
-	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
+	defer msw.Logger().Recover(fmt.Sprintf("recovered from panic while fetching "+
 		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
 
 	// Start each metricset randomly over a period of MaxDelayPeriod.
@@ -214,8 +214,8 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		}
 	}
 
-	debugf("Starting %s", msw)
-	defer debugf("Stopped %s", msw)
+	msw.Logger().Named("module").Debugf("Starting %s", msw)
+	defer msw.Logger().Named("module").Debugf("Stopped %s", msw)
 
 	// Events and errors are reported through this.
 	reporter := &eventReporter{
@@ -235,7 +235,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
-		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
+		msw.Logger().Errorf("MetricSet '%s/%s' does not implement an event producing interface",
 			msw.Module().Name(), msw.Name())
 	}
 }
@@ -330,7 +330,7 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 			// mark it as degraded for any other issue encountered
 			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
 		}
-		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		msw.Logger().Errorf("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 
 	}
 }

@@ -57,9 +57,10 @@ func NewListener(
 	connect HandlerFactory,
 	listenerFactory ListenerFactory,
 	config *ListenerConfig,
+	logger *logp.Logger,
 ) *Listener {
 	return &Listener{
-		log:      logp.NewLogger(f.String()),
+		log:      logger.Named(f.String()),
 		family:   f,
 		config:   config,
 		listener: listenerFactory,

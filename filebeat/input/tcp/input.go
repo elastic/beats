@@ -130,7 +130,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 			metrics.Log(data, evt.Timestamp)
 		},
 		split,
-	))
+	), log)
 	if err != nil {
 		return err
 	}

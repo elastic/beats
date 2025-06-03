@@ -20,6 +20,7 @@ package blockinfo
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -102,7 +103,7 @@ func newMD(path string) (MDDevice, error) {
 	dev.Size = size
 
 	//RAID array state
-	state, err := ioutil.ReadFile(filepath.Join(path, "md", "array_state"))
+	state, err := os.ReadFile(filepath.Join(path, "md", "array_state"))
 	if err != nil {
 		return dev, fmt.Errorf("could not open array_state: %w", err)
 	}
@@ -115,7 +116,7 @@ func newMD(path string) (MDDevice, error) {
 	}
 	dev.DiskStates = disks
 
-	level, err := ioutil.ReadFile(filepath.Join(path, "md", "level"))
+	level, err := os.ReadFile(filepath.Join(path, "md", "level"))
 	if err != nil {
 		return dev, fmt.Errorf("could not get raid level: %w", err)
 	}
@@ -126,7 +127,7 @@ func newMD(path string) (MDDevice, error) {
 
 		//Get the sync action
 		//Will be idle if nothing is going on
-		syncAction, err := ioutil.ReadFile(filepath.Join(path, "md", "sync_action"))
+		syncAction, err := os.ReadFile(filepath.Join(path, "md", "sync_action"))
 		if err != nil {
 			return dev, fmt.Errorf("could not open sync_action: %w", err)
 		}
