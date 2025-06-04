@@ -138,6 +138,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 
 	in := &pubsubInput{
 		config:       conf,
+		status:       stat,
 		log:          logger,
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
