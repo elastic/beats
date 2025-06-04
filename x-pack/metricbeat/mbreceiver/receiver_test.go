@@ -403,8 +403,14 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		// not available on windows
 		"host.containerized",
 
-		// It works on my machine, why not on CI?
+		// missing on Ubuntu on CI
 		"system.memory.swap.used.pct",
+
+		// missing on Windows on CI
+		"system.memory.cached",
+		"system.filesystem.files",
+		"system.filesystem.free_files",
+		"system.filesystem.options",
 
 		// depends on add_cloud_metadata
 		// not available locally
@@ -446,7 +452,7 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 			"system.memory.actual.free",
 			"system.memory.actual.used.bytes",
 			"system.memory.actual.used.pct",
-			"system.memory.cached",
+			// "system.memory.cached",
 			"system.memory.free",
 			"system.memory.swap.free",
 			"system.memory.swap.total",
@@ -476,11 +482,11 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		"filesystem": {
 			"system.filesystem.available",
 			"system.filesystem.device_name",
-			"system.filesystem.files",
+			// "system.filesystem.files",
 			"system.filesystem.free",
-			"system.filesystem.free_files",
+			// "system.filesystem.free_files",
 			"system.filesystem.mount_point",
-			"system.filesystem.options",
+			// "system.filesystem.options",
 			"system.filesystem.total",
 			"system.filesystem.type",
 			"system.filesystem.used.bytes",
