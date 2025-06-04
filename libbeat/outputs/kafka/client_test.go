@@ -40,7 +40,7 @@ import (
 	"github.com/elastic/sarama/mocks"
 )
 
-func TestClientOutputListener_saramaMock(t *testing.T) {
+func TestClientOutputListener(t *testing.T) {
 	logger := logptest.NewTestingLogger(t, "",
 		// only print stacktrace for errors above ErrorLevel.
 		zap.AddStacktrace(zapcore.ErrorLevel+1))

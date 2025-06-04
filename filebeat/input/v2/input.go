@@ -141,7 +141,7 @@ func NewPipelineClientListener(reg *monitoring.Registry) *PipelineClientListener
 // beat.OutputListener
 // The OutputListener collects output metrics for an input. If the registry is
 // nil, the metrics will be added on a new, unregistered registry.
-// created. If there is already a metric with the same name in the registry,
+// If there is already a metric with the same name in the registry,
 // the existing metric will be used.
 func NewPipelineOutputListener(reg *monitoring.Registry) *OutputListener {
 	rreg := reg
