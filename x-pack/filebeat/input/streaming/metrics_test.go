@@ -10,31 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
-
-// TestInputMetricsClose asserts that metrics registered by this input are
-// removed after Close() is called. This is important because an input with
-// the same ID could be re-registered, and that ID cannot exist in the
-// monitoring registry.
-func TestInputMetricsClose(t *testing.T) {
-	t.Skip("with https://github.com/elastic/beats/pull/42618 I don't believe this test is needed anymore. I'm letting it here so it's confirmed if the test is indeed needed or not before merging the PR.")
-	reg := inputmon.NewMetricsRegistry(
-		"", "", monitoring.NewRegistry(), logp.NewLogger("test"))
-	env := v2.Context{
-		ID:              "streaming-8b312b5f-9f99-492c-b035-3dff354a1f01",
-		MetricsRegistry: monitoring.NewRegistry(),
-	}
-
-	// TODO:(AndersonQ): what is actually tested here?
-	_ = newInputMetrics(env)
-
-	reg.Do(monitoring.Full, func(s string, _ interface{}) {
-		t.Errorf("registry should be empty, but found %v", s)
-	})
-}
 
 // TestNewInputMetricsInstance asserts that all the metrics are initialized
 // when a newInputMetrics method is invoked. This avoids nil hit panics when

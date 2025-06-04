@@ -64,7 +64,7 @@ func TestNewInputMonitor(t *testing.T) {
 			tc.ID != "", tc.Input != "", tc.OptionalParent != nil, tc.PublicMetrics)
 
 		t.Run(testName, func(t *testing.T) {
-			reg, unreg := NewInputRegistry(tc.Input, tc.ID, tc.OptionalParent)
+			reg, unreg := NewInputV1MetricsRegistry(tc.Input, tc.ID, tc.OptionalParent)
 			defer unreg()
 			assert.NotNil(t, reg)
 
@@ -120,7 +120,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 
 	// now the input also register its metrics with the deprecated
 	// NewInputRegistry.
-	reg, cancel := NewInputRegistry(
+	reg, cancel := NewInputV1MetricsRegistry(
 		inputType, inputID, nil)
 	defer cancel()
 	monitoring.NewInt(reg, "foo_total").Set(20)
@@ -130,7 +130,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	// input which does not use the metrics registry from filebeat
 	// input/v2.Context.
 	inputOldAPI := "input-without-pipeline-metrics"
-	reg, cancel = NewInputRegistry(
+	reg, cancel = NewInputV1MetricsRegistry(
 		inputType, inputOldAPI, nil)
 	defer cancel()
 	monitoring.NewInt(reg, "foo_total").Set(30)

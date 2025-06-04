@@ -33,7 +33,7 @@ type inputMetrics struct {
 }
 
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+	reg, unreg := inputmon.NewInputV1MetricsRegistry(inputName, id, optionalParent)
 	out := &inputMetrics{
 		unregister:        unreg,
 		url:               monitoring.NewString(reg, "url"),

@@ -129,7 +129,7 @@ func TestPrepareInputMetrics_reusedReg_deprecatedNewInputRegistry(t *testing.T) 
 	require.NotNil(t, reg, "input metrics registry should not be nil")
 	require.NotNil(t, wrappedconnector, "wrapped connector should not be nil")
 
-	got, cancel := inputmon.NewInputRegistry(inputType, inputID, parent)
+	got, cancel := inputmon.NewInputV1MetricsRegistry(inputType, inputID, parent)
 	defer cancel()
 	assert.Equal(t, reg, got, "metrics registry should be the same")
 }

@@ -36,10 +36,10 @@ type inputMetrics struct {
 }
 
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
-	// TODO: use NewMetricsRegistry instead of inputmon.NewInputRegistry.
+	// TODO:(AndersonQ): it's a v2 input, find out why the ID is different
 	// The id isn't the same as the v2.Context.ID, thus the pipeline metrics
 	// won't be in the same registry as the input metrics.
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+	reg, unreg := inputmon.NewInputV1MetricsRegistry(inputName, id, optionalParent)
 	out := &inputMetrics{
 		unregister:        unreg,
 		url:               monitoring.NewString(reg, "url"),

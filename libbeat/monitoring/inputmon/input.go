@@ -26,7 +26,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-// NewInputRegistry returns the *monitoring.Registry for metrics related to
+// NewInputV1MetricsRegistry is deprecated and exists only for backwards
+// compatibility as there are v1 inputs registering metrics.
+// It returns the *monitoring.Registry for metrics related to
 // an input instance, identified by ID. If a registry with the given ID
 // already exists, it is returned. Otherwise, a new registry is created.
 //
@@ -40,8 +42,8 @@ import (
 // The returned cancel function *must* be called when the input stops to
 // unregister the metrics and prevent resource leaks.
 //
-// Deprecated. Use NewMetricsRegistry instead.
-func NewInputRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
+// Deprecated. v2 inputs should use NewMetricsRegistry instead.
+func NewInputV1MetricsRegistry(inputType, inputID string, optionalParent *monitoring.Registry) (reg *monitoring.Registry, cancel func()) {
 	// Log the registration to ease tracking down duplicate ID registrations.
 	// Logged at INFO rather than DEBUG since it is not in a hot path and having
 	// the information available by default can short-circuit requests for debug
@@ -98,6 +100,9 @@ func sanitizeID(id string) string {
 	return strings.ReplaceAll(id, ".", "_")
 }
 
+// globalRegistry returns the metric registry for the global 'dataset'
+// monitoring namespace.
+// Deprecated: There is a v1 input registering metrics
 func globalRegistry() *monitoring.Registry {
 	return monitoring.GetNamespace("dataset").GetRegistry()
 }

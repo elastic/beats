@@ -23,6 +23,10 @@ import (
 // the same ID could be re-registered, and that ID cannot exist in the
 // monitoring registry.
 func TestInputMetricsClose(t *testing.T) {
+	// Question for the codeowners: do you think it's still necessary as the
+	// lifecycle management of the metrics registry is now part of the v2 input?
+	// I don't think it's needed anymore.
+
 	// Replicates how the v2 input creates the metrics registry for a context
 	agent := beat.Info{Monitoring: beat.Monitoring{
 		Namespace: monitoring.GetNamespace("TestInputMetricsClose")}}
