@@ -8,15 +8,7 @@ import glob
 
 
 def collect(beat_name):
-
-    base_dir = "module"
-    path = os.path.abspath("module")
-
-    generated_note = """////
-This file is generated! See scripts/docs_collector.py
-////
-
-"""
+    generated_note = ""
 
     # Include both OSS and Elastic licensed modules.
     modules = []
@@ -28,23 +20,12 @@ This file is generated! See scripts/docs_collector.py
     # Iterate over all modules
     for module in sorted(modules):
         module_dir = os.path.abspath(module)
-        start = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        module_rel_path = os.path.relpath(module, start)
         module = os.path.basename(module)
-        module_doc = os.path.join(module_dir, "_meta/docs.asciidoc")
+        module_doc = os.path.join(module_dir, "_meta/docs.md")
 
-        # Only check folders where docs.asciidoc exists
+        # Only check folders where docs.md exists
         if not os.path.isfile(module_doc):
             continue
-
-        module_file = generated_note
-
-        module_file += ":edit_url: https://github.com/elastic/beats/edit/main/" + module_rel_path + "/_meta/docs.asciidoc\n\n"
-
-        module_file += "[[filebeat-module-" + module + "]]\n"
-
-        with open(module_doc, encoding='utf_8') as f:
-            module_file += f.read()
 
         beat_path = os.path.join(module_dir, "_meta")
 
@@ -53,37 +34,68 @@ This file is generated! See scripts/docs_collector.py
             fields = yaml.load(f.read(), Loader=yaml.FullLoader)
             title = fields[0]["title"]
 
+        module_file = generated_note
+
+        module_file += """---
+mapped_pages:
+  - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-{}.html
+---
+
+<!-- This file is generated! See scripts/docs_collector.py -->
+
+# {} module [filebeat-module-{}]
+
+""".format(module, title, module)
+
+        with open(module_doc, encoding='utf_8') as f:
+            module_file += f.read()
+
         modules_list[module] = title
 
         module_file += """
+## Fields [_fields]
 
-[float]
-=== Fields
-
-For a description of each field in the module, see the
-<<exported-fields-""" + module + """,exported fields>> section.
-
-"""
-
-        module_file += ":edit_url!:"
+For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-{}.md) section.
+""".format(module)
 
         # Write module docs
-        docs_path = os.path.join(os.path.abspath("docs"), "modules", module + ".asciidoc")
+        docs_path = os.path.join(os.path.abspath("../docs"), "reference/filebeat",
+                                 "filebeat-module-{}.md".format(module))
         with open(docs_path, 'w', encoding='utf_8') as f:
             f.write(module_file)
 
-    module_list_output = generated_note
-    module_list_output += "  * <<filebeat-modules-overview>>\n"
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "  * <<filebeat-module-" + m + ">>\n"
+        # TODO: Uncomment following when all the asciidocs are converted to markdown
+        # As of now, this will not work and it will generate incomplete list.
 
-    module_list_output += "\n\n--\n\n"
-    module_list_output += "include::modules-overview.asciidoc[]\n"
-    for m, title in sorted(six.iteritems(modules_list)):
-        module_list_output += "include::modules/" + m + ".asciidoc[]\n"
-    # Write module link list
-    with open(os.path.abspath("docs") + "/modules_list.asciidoc", 'w', encoding='utf_8') as f:
-        f.write(module_list_output)
+#     module_list_output = """---
+# mapped_pages:
+#   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
+# ---
+
+# <!-- This file is generated! See scripts/docs_collector.py -->
+
+# # Modules [filebeat-modules]
+
+# This section contains an [overview](/reference/filebeat/filebeat-modules-overview.md) of the Filebeat modules feature as well as details about each of the currently supported modules.
+
+# Filebeat modules require Elasticsearch 5.2 or later.
+
+# ::::{note}
+# While {{filebeat}} modules are still supported, we recommend {{agent}} integrations over {{filebeat}} modules. Integrations provide a streamlined way to connect data from a variety of vendors to the {{stack}}. Refer to the [full list of integrations](https://www.elastic.co/integrations/data-integrations). For more information, please refer to the [{{beats}} vs {{agent}} comparison documentation](docs-content://reference/fleet/index.md).
+# ::::
+
+
+# * [*Modules overview*](/reference/filebeat/filebeat-modules-overview.md)
+# """
+
+#     for m, title in sorted(six.iteritems(modules_list)):
+#         module_list_output += "* [*{} module*](/reference/filebeat/filebeat-module-{}.md)\n".format(title.title(), m)
+
+#     module_list_output += "\n"
+
+#     # Write module link list
+#     with open(os.path.join(os.path.abspath("../docs"), "reference/filebeat", "filebeat-modules.md"), 'w', encoding='utf_8') as f:
+#         f.write(module_list_output)
 
 
 if __name__ == "__main__":
