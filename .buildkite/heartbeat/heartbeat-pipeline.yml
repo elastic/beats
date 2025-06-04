@@ -27,11 +27,6 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
-
 steps:
   - group: "Check/Update"
     key: "heartbeat-check-update"
@@ -151,7 +146,6 @@ steps:
           - github_commit_status:
               context: "heartbeat: Win 2022 Unit Tests"
 
-      # Heartbeat has no modules
       - label: ":ubuntu: Heartbeat: Go Integration Tests"
         command: |
           cd heartbeat
@@ -168,9 +162,32 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: Go Integration Tests"
+              context: "heartbeat: Go Integration Tests / Ubuntu x86_64"
 
-      # Heartbeat has no modules yet
+      - label: ":windows: Heartbeat: Go Integration Tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+        command: |
+          cd heartbeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+          - "heartbeat/build/integration-tests/*"
+          - "heartbeat/build/integration-tests/Test*/*"
+          - "heartbeat/build/integration-tests/Test*/data/**/*"
+        notify:
+          - github_commit_status:
+              context: "heartbeat: Go Integration Tests / Windows"
+
       - label: ":ubuntu: Heartbeat: Python Integration Tests"
         command: |
           cd heartbeat
