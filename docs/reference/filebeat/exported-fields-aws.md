@@ -519,7 +519,7 @@ type: keyword
 
 
 **`aws.elb.action_executed`**
-:   The action executed when processing the request (forward, fixed-response, authenticate…​). It can contain several values.
+:   The action executed when processing the request (forward, fixed-response, authenticate…). It can contain several values.
 
 type: keyword
 

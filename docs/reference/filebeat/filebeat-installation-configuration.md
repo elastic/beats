@@ -176,8 +176,8 @@ You can send data to other [outputs](/reference/filebeat/configuring-output.md),
 
 There are several ways to collect log data with Filebeat:
 
-* Data collection modules — simplify the collection, parsing, and visualization of common log formats
-* ECS loggers — structure and format application logs into ECS-compatible JSON
+* Data collection modules — simplify the collection, parsing, and visualization of common log formats
+* ECS loggers — structure and format application logs into ECS-compatible JSON
 * Manual Filebeat configuration
 
 

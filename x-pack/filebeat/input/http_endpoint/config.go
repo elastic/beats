@@ -32,6 +32,8 @@ type config struct {
 	Password              string                  `config:"password"`
 	ResponseCode          int                     `config:"response_code" validate:"positive"`
 	ResponseBody          string                  `config:"response_body"`
+	OptionsHeaders        http.Header             `config:"options_headers"`
+	OptionsStatus         int                     `config:"options_response_code"`
 	ListenAddress         string                  `config:"listen_address"`
 	ListenPort            string                  `config:"listen_port"`
 	URL                   string                  `config:"url" validate:"required"`
@@ -69,6 +71,7 @@ func defaultConfig() config {
 		BasicAuth:     false,
 		ResponseCode:  200,
 		ResponseBody:  `{"message": "success"}`,
+		OptionsStatus: 200,
 		RetryAfter:    10,
 		ListenAddress: "127.0.0.1",
 		ListenPort:    "8000",
