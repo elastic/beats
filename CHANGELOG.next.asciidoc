@@ -242,6 +242,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
+- Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
 
 *Heartbeat*
 

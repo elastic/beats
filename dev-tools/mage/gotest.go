@@ -102,6 +102,7 @@ func makeGoTestArgsForPackage(name, pkg string) GoTestArgs {
 //
 //	[kafka kafka/broker kafka/consumer kafka/consumergroup kafka/partition kafka/producer]
 func fetchGoPackages(module string) ([]string, error) {
+	//nolint:gosec // G204 can be ignored as we don't send any input
 	cmd := execabs.Command(
 		"go", "list", "-tags", "integration", fmt.Sprintf("./%s/...", module))
 	output, err := cmd.Output()
@@ -183,12 +184,28 @@ func DefaultGoTestIntegrationFromHostArgs() GoTestArgs {
 	return args
 }
 
+// FIPSOnlyGoTestIngrationFromHostArgs returns a default set of arguments for running
+// all integration tests from the host system (outside the docker network) along
+// with the GODEBUG=fips140=only arg set.
+func FIPSOnlyGoTestIntegrationFromHostArgs() GoTestArgs {
+	args := DefaultGoTestIntegrationArgs()
+	args.Tags = append(args.Tags, "requirefips")
+	args.Env = WithGoIntegTestHostEnv(args.Env)
+	args.Env["GODEBUG"] = "fips140=only"
+	return args
+}
+
 // GoTestIntegrationArgsForPackage returns a default set of arguments for running
 // module integration tests. We tag integration test files with 'integration'.
 func GoTestIntegrationArgsForPackage(pkg string) GoTestArgs {
 	args := makeGoTestArgsForPackage("Integration", pkg)
 
 	args.Tags = append(args.Tags, "integration")
+
+	// add the requirefips tag when doing fips140 testing
+	if v, ok := os.LookupEnv("GODEBUG"); ok && strings.Contains(v, "fips140=only") {
+		args.Tags = append(args.Tags, "requirefips")
+	}
 	return args
 }
 
