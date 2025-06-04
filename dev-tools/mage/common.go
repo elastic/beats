@@ -497,7 +497,7 @@ func untar(sourceFile, destinationDir string) error {
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 		case tar.TypeReg:
