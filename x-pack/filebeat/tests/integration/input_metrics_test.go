@@ -389,10 +389,12 @@ logging.level: debug
 
 	wantInputMetricsCount := map[string]func(metrics inputMetric) error{
 		filestreamInputID: func(metrics inputMetric) error {
-			if metrics.EventsProcessedTotal != 12 {
+			want := 12
+			got := metrics.EventsProcessedTotal
+			if got != want {
 				return fmt.Errorf(
-					"%q events_processed_total should be 12, got %d",
-					filestreamInputID, 12)
+					"%q events_processed_total: want %d, got %d",
+					filestreamInputID, want, got)
 			}
 			return nil
 		},
