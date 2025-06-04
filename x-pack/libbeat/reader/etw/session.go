@@ -31,12 +31,14 @@ type Session struct {
 	// properties of the session that are initialized in newSessionProperties()
 	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties for more information
 	properties *EventTraceProperties
+	// Enable properties for the session
+	enableProperty []string
 	// handler of the event tracing session for which the provider is being configured.
 	// It is obtained from StartTrace when a new trace is started.
 	// This handler is needed to enable, query or stop the trace.
 	handler uintptr
 	// Realtime is a flag to know if the consumer reads from a logfile or real-time session.
-	Realtime bool // Real-time flag
+	Realtime bool
 	// NewSession is a flag to indicate whether a new session has been created or attached to an existing one.
 	NewSession bool
 	// TraceLevel sets the maximum level of events that we want the provider to write.
@@ -56,6 +58,8 @@ type Session struct {
 	Callback func(*EventRecord) uintptr
 	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers (optional).
 	BufferCallback func(*EventTraceLogfile) uintptr
+
+	providerCache *providerCache
 
 	// Pointers to functions that make calls to the Windows API.
 	// In tests, these pointers can be replaced with mock functions to simulate API behavior without making actual calls to the Windows API.
@@ -157,7 +161,9 @@ func newSessionProperties(sessionName string) *EventTraceProperties {
 
 // NewSession initializes and returns a new ETW Session based on the provided configuration.
 func NewSession(conf Config) (*Session, error) {
-	session := &Session{}
+	session := &Session{
+		enableProperty: conf.EnableProperty,
+	}
 
 	// Assign ETW Windows API functions
 	session.startTrace = _StartTrace
@@ -187,6 +193,12 @@ func NewSession(conf Config) (*Session, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error when initializing session '%s': %w", session.Name, err)
 	}
+
+	cache, err := newProviderCache(session.GUID)
+	if err != nil {
+		return nil, fmt.Errorf("error creating provider cache: %w", err)
+	}
+	session.providerCache = cache
 
 	// Initialize additional session properties.
 	session.properties = newSessionProperties(session.Name)
@@ -245,4 +257,19 @@ func (s *Session) StartConsumer() error {
 		return fmt.Errorf("failed to process trace: %w", err)
 	}
 	return nil
+}
+
+// GetEventProperties extracts and returns properties from an ETW event record.
+func (s *Session) RenderEvent(r *EventRecord) (RenderedEtwEvent, error) {
+	// Initialize a new property parser for the event record.
+	p := newEventRenderer(s.providerCache, r)
+	event, err := p.render()
+	if err != nil {
+		return RenderedEtwEvent{}, fmt.Errorf("failed to parse event properties: %w", err)
+	}
+	return event, nil
+}
+
+func uintptrToBytes(ptr uintptr, length uint16) []byte {
+	return unsafe.Slice((*byte)(unsafe.Pointer(ptr)), length)
 }

@@ -9,29 +9,47 @@ package etw
 import (
 	"errors"
 	"fmt"
-	"syscall"
+	"time"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
 )
 
-// utf16AtOffsetToString converts a UTF-16 encoded string
-// at a specific offset in a struct to a Go string.
-func utf16AtOffsetToString(pstruct uintptr, offset uintptr) string {
-	// Initialize a slice to store UTF-16 characters.
-	out := make([]uint16, 0, 64)
+type RenderedEtwEvent struct {
+	ProviderGUID      windows.GUID
+	ProviderName      string
+	EventID           uint16
+	Version           uint8
+	Level             string
+	LevelRaw          uint8
+	Task              string
+	TaskRaw           uint16
+	Opcode            string
+	OpcodeRaw         uint8
+	Keywords          []string
+	KeywordsRaw       uint64
+	Channel           string
+	Timestamp         time.Time
+	ProcessID         uint32
+	ThreadID          uint32
+	ActivityID        string
+	RelatedActivityID string
+	EventMessage      string
+	ProviderMessage   string
+	Properties        []RenderedProperty
+	ExtendedData      []RenderedExtendedData
+}
 
-	// Start reading at the given offset.
-	wc := (*uint16)(unsafe.Pointer(pstruct + offset))
+type RenderedProperty struct {
+	Name  string
+	Value any
+}
 
-	// Iterate over the UTF-16 characters until a null terminator is encountered.
-	for i := uintptr(2); *wc != 0; i += 2 {
-		out = append(out, *wc)
-		wc = (*uint16)(unsafe.Pointer(pstruct + offset + i))
-	}
-
-	// Convert the UTF-16 slice to a Go string and return.
-	return syscall.UTF16ToString(out)
+type RenderedExtendedData struct {
+	ExtType    string
+	ExtTypeRaw uint16
+	DataSize   uint16
+	Data       any
 }
 
 // guidFromProviderName searches for a provider by name and returns its GUID.
@@ -41,28 +59,24 @@ func guidFromProviderName(providerName string) (windows.GUID, error) {
 		return windows.GUID{}, fmt.Errorf("empty provider name")
 	}
 
-	var buf *ProviderEnumerationInfo
-	size := uint32(1)
-
-	// Attempt to retrieve provider information with a buffer that increases in size until it's sufficient.
-	for {
-		tmp := make([]byte, size)
-		buf = (*ProviderEnumerationInfo)(unsafe.Pointer(&tmp[0]))
-		if err := enumerateProvidersFunc(buf, &size); !errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
-			break
-		}
+	var err error
+	var bufSize uint32
+	var buf []byte
+	var pEnum *ProviderEnumerationInfo
+	if err = enumerateProvidersFunc(nil, &bufSize); errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
+		buf = make([]byte, bufSize)
+		pEnum = ((*ProviderEnumerationInfo)(unsafe.Pointer(&buf[0])))
+		err = enumerateProvidersFunc(pEnum, &bufSize)
 	}
 
-	if buf.NumberOfProviders == 0 {
+	if pEnum.NumberOfProviders == 0 {
 		return windows.GUID{}, fmt.Errorf("no providers found")
 	}
 
-	// Iterate through the list of providers to find a match by name.
-	startProvEnumInfo := uintptr(unsafe.Pointer(buf))
-	it := uintptr(unsafe.Pointer(&buf.TraceProviderInfoArray[0]))
-	for i := uintptr(0); i < uintptr(buf.NumberOfProviders); i++ {
-		pInfo := (*TraceProviderInfo)(unsafe.Pointer(it + i*unsafe.Sizeof(buf.TraceProviderInfoArray[0])))
-		name := utf16AtOffsetToString(startProvEnumInfo, uintptr(pInfo.ProviderNameOffset))
+	it := uintptr(unsafe.Pointer(&pEnum.TraceProviderInfoArray[0]))
+	for i := uintptr(0); i < uintptr(pEnum.NumberOfProviders); i++ {
+		pInfo := (*TraceProviderInfo)(unsafe.Pointer(it + i*unsafe.Sizeof(pEnum.TraceProviderInfoArray[0])))
+		name := getStringFromBufferOffset(buf, pInfo.ProviderNameOffset)
 
 		// If a match is found, return the corresponding GUID.
 		if name == providerName {

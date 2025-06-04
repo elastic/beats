@@ -9,7 +9,6 @@ package etw
 import (
 	"errors"
 	"fmt"
-	"math"
 	"strconv"
 	"sync"
 	"time"
@@ -187,33 +186,42 @@ var (
 )
 
 // buildEvent builds the final beat.Event emitted by this input.
-func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cfg config) beat.Event {
+func buildEvent(etwEvent etw.RenderedEtwEvent, h etw.EventHeader, session *etw.Session, cfg config) beat.Event {
 	winlog := map[string]any{
-		"activity_id":   h.ActivityId.String(),
-		"channel":       strconv.FormatUint(uint64(h.EventDescriptor.Channel), 10),
-		"event_data":    data,
-		"flags":         strconv.FormatUint(uint64(h.Flags), 10),
-		"keywords":      strconv.FormatUint(h.EventDescriptor.Keyword, 10),
-		"opcode":        strconv.FormatUint(uint64(h.EventDescriptor.Opcode), 10),
-		"process_id":    strconv.FormatUint(uint64(h.ProcessId), 10),
-		"provider_guid": h.ProviderId.String(),
-		"session":       session.Name,
-		"task":          strconv.FormatUint(uint64(h.EventDescriptor.Task), 10),
-		"thread_id":     strconv.FormatUint(uint64(h.ThreadId), 10),
-		"version":       h.EventDescriptor.Version,
+		"activity_id":              h.ActivityId.String(),
+		"activity_id_name":         etwEvent.ActivityID,
+		"related_activity_id_name": etwEvent.RelatedActivityID,
+		"channel":                  etwEvent.Channel,
+		"flags":                    fmt.Sprintf("0x%X", h.Flags),
+		"keywords_raw":             fmt.Sprintf("0x%X", etwEvent.KeywordsRaw),
+		"keywords":                 etwEvent.Keywords,
+		"opcode_raw":               etwEvent.OpcodeRaw,
+		"opcode":                   etwEvent.Opcode,
+		"process_id":               strconv.FormatUint(uint64(etwEvent.ProcessID), 10),
+		"provider_guid":            etwEvent.ProviderGUID.String(),
+		"session":                  session.Name,
+		"task_raw":                 strconv.FormatUint(uint64(etwEvent.TaskRaw), 10),
+		"task":                     etwEvent.Task,
+		"level_raw":                etwEvent.LevelRaw,
+		"level":                    etwEvent.Level,
+		"thread_id":                strconv.FormatUint(uint64(etwEvent.ThreadID), 10),
+		"version":                  etwEvent.Version,
 	}
 	// Fallback to the session GUID if there is no provider GUID.
 	if h.ProviderId == zeroGUID {
 		winlog["provider_guid"] = session.GUID.String()
 	}
 
+	winlog["event_data"] = mapstr.M{}
 	event := mapstr.M{
 		"code":     strconv.FormatUint(uint64(h.EventDescriptor.Id), 10),
 		"created":  time.Now().UTC(),
 		"kind":     "event",
 		"severity": h.EventDescriptor.Level,
 	}
-	if cfg.ProviderName != "" {
+	if etwEvent.ProviderName != "" {
+		event["provider"] = etwEvent.ProviderName
+	} else if cfg.ProviderName != "" {
 		event["provider"] = cfg.ProviderName
 	}
 
@@ -229,26 +237,9 @@ func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cf
 	}
 
 	return beat.Event{
-		Timestamp: convertFileTimeToGoTime(uint64(h.TimeStamp)),
+		Timestamp: etwEvent.Timestamp,
 		Fields:    fields,
 	}
-}
-
-// convertFileTimeToGoTime converts a Windows FileTime to a Go time.Time structure.
-func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
-	// Define the offset between Windows epoch (1601) and Unix epoch (1970)
-	const epochDifference = 116444736000000000
-	if fileTime64 < epochDifference {
-		// Time is before the Unix epoch, adjust accordingly
-		return time.Time{}
-	}
-
-	fileTime := windows.Filetime{
-		HighDateTime: uint32(fileTime64 >> 32),
-		LowDateTime:  uint32(fileTime64 & math.MaxUint32),
-	}
-
-	return time.Unix(0, fileTime.Nanoseconds()).UTC()
 }
 
 func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
@@ -264,7 +255,7 @@ func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
 		e.metrics.processingTime.Update(elapsed.Nanoseconds())
 	}()
 
-	data, err := etw.GetEventProperties(record)
+	etwEvent, err := e.etwSession.RenderEvent(record)
 	if err != nil {
 		e.log.Errorw("failed to read event properties", "error", err)
 		e.metrics.errors.Inc()
@@ -272,7 +263,7 @@ func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
 		return 1
 	}
 
-	evt := buildEvent(data, record.EventHeader, e.etwSession, e.config)
+	evt := buildEvent(etwEvent, record.EventHeader, e.etwSession, e.config)
 	e.publisher.Publish(evt)
 
 	e.metrics.events.Inc()
