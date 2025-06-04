@@ -18,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/include"
 	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
@@ -77,14 +78,14 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 		systemReg = statsReg.NewRegistry("system")
 	}
 
-	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
+	err = metricreport.SetupMetrics(logp.L().Named("metrics"), b.Info.Beat, version.GetDefaultVersion(), metricreport.WithProcessRegistry(processReg), metricreport.WithSystemRegistry(systemReg))
 	if err != nil {
 		return nil, fmt.Errorf("error setting up metrics report: %w", err)
 	}
 
 	if b.Config.HTTP.Enabled() {
 		var err error
-		b.API, err = api.NewWithDefaultRoutes(b.Info.Logger.Named("metrics.http"), b.Config.HTTP, api.NamespaceLookupFunc())
+		b.API, err = api.NewWithDefaultRoutes(logp.L().Named("metrics.http"), b.Config.HTTP, api.NamespaceLookupFunc())
 		if err != nil {
 			return nil, fmt.Errorf("could not start the HTTP server for the API: %w", err)
 		}
