@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectOutput) {
@@ -56,7 +57,7 @@ func newS3GetObjectResponse(filename string, data []byte, contentType string) *s
 }
 
 func TestS3ObjectProcessor(t *testing.T) {
-	logp.TestingSetup()
+	_ = logptest.NewTestingLogger(t, "aws-s3")
 
 	t.Run("download text/plain file", func(t *testing.T) {
 		testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
@@ -355,7 +356,11 @@ func TestProcessObjectMetricCollection(t *testing.T) {
 
 			// since we processed a single object, total and current process size is same
 			require.Equal(t, test.objectSize, values[0])
-			require.Equal(t, uint64(test.objectSize), metricRecorder.s3BytesProcessedTotal.Get())
+			var expectedSize uint64
+			if test.objectSize >= 0 {
+				expectedSize = uint64(test.objectSize)
+			}
+			require.Equal(t, expectedSize, metricRecorder.s3BytesProcessedTotal.Get())
 		})
 	}
 }
@@ -471,4 +476,44 @@ func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []types.Obj
 	})
 
 	return mockS3Pager
+}
+
+func TestS3Metadata(t *testing.T) {
+	now := time.Now()
+	resp := &s3.GetObjectOutput{
+		ContentEncoding: awssdk.String("gzip"),
+		Metadata: map[string]string{
+			"Owner":  "foo",
+			"Region": "boo",
+		},
+		ETag:          awssdk.String("etag1"),
+		LastModified:  awssdk.Time(now),
+		ContentLength: awssdk.Int64(12345),
+	}
+
+	meta := s3Metadata(resp, "content-encoding", "etag", "last-modified", "content-length", "x-amz-meta-owner", "x-amz-meta-region")
+	assert.Len(t, meta, 6)
+	assert.Equal(t, "gzip", meta["content-encoding"])
+	assert.Equal(t, now.Format(time.RFC1123), meta["last-modified"], 1.0)
+	assert.Equal(t, "foo", meta["x-amz-meta-owner"])
+	assert.Equal(t, "boo", meta["x-amz-meta-region"])
+	assert.Equal(t, "etag1", meta["etag"])
+	assert.Equal(t, int64(12345), meta["content-length"])
+
+	// Test requesting a user metadata key with its full S3 name
+	metaWithPrefix := s3Metadata(resp, "x-amz-meta-owner")
+	assert.Len(t, metaWithPrefix, 1)
+	assert.Equal(t, "foo", metaWithPrefix["x-amz-meta-owner"])
+
+	// Test requesting a non-existent key
+	metaNonExistent := s3Metadata(resp, "non-existent-key")
+	assert.Empty(t, metaNonExistent)
+
+	// Test with no keys
+	metaNoKeys := s3Metadata(resp)
+	assert.Nil(t, metaNoKeys)
+
+	// Test with nil response
+	metaNilResp := s3Metadata(nil, "content-encoding")
+	assert.Nil(t, metaNilResp)
 }
