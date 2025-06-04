@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -51,7 +52,7 @@ func TestNew(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			config := conf.MustNewConfigFrom(test.config)
-			_, err := new(config)
+			_, err := new(config, logptest.NewTestingLogger(t, ""))
 			if test.err == "" {
 				require.NoError(t, err)
 			} else {
@@ -152,7 +153,7 @@ func TestRateLimit(t *testing.T) {
 
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
-			p, err := new(conf.MustNewConfigFrom(test.config))
+			p, err := new(conf.MustNewConfigFrom(test.config), logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			fakeClock := clockwork.NewFakeClock()
@@ -180,7 +181,7 @@ func TestRateLimit(t *testing.T) {
 func TestAllocs(t *testing.T) {
 	p, err := new(conf.MustNewConfigFrom(mapstr.M{
 		"limit": "100/s",
-	}))
+	}), logptest.NewTestingLogger(t, ""))
 	require.NoError(t, err)
 	event := beat.Event{Fields: mapstr.M{"field": 1}}
 
@@ -195,7 +196,7 @@ func TestAllocs(t *testing.T) {
 func BenchmarkRateLimit(b *testing.B) {
 	p, err := new(conf.MustNewConfigFrom(mapstr.M{
 		"limit": "100/s",
-	}))
+	}), logptest.NewTestingLogger(b, ""))
 	require.NoError(b, err)
 	event := beat.Event{Fields: mapstr.M{"field": 1}}
 

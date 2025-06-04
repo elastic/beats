@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -61,7 +62,7 @@ func TestNetworkDirection(t *testing.T) {
 				"destination":       "destination",
 				"target":            "direction",
 				"internal_networks": tt.InternalNetworks,
-			}))
+			}), logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 			observed, err := p.Run(&evt)
 			if tt.Error {
@@ -92,7 +93,7 @@ func TestNetworkDirection(t *testing.T) {
 			"destination":       "destination",
 			"target":            "@metadata.direction",
 			"internal_networks": "private",
-		}))
+		}), logptest.NewTestingLogger(t, ""))
 		require.NoError(t, err)
 
 		expectedMeta := mapstr.M{

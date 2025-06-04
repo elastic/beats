@@ -62,13 +62,15 @@ func NewList(log *logp.Logger) *Processors {
 }
 
 // New creates a list of processors from a list of free user configurations.
-func New(config PluginConfig) (*Processors, error) {
-	procs := NewList(nil)
+func New(config PluginConfig, logger *logp.Logger) (*Processors, error) {
+	// procs creates a global logger in case provided logger is nil
+	// always use procs.log from here
+	procs := NewList(logger)
 
 	for _, procConfig := range config {
 		// Handle if/then/else processor which has multiple top-level keys.
 		if procConfig.HasField("if") {
-			p, err := NewIfElseThenProcessor(procConfig)
+			p, err := NewIfElseThenProcessor(procConfig, procs.log)
 			if err != nil {
 				return nil, fmt.Errorf("failed to make if/then/else processor: %w", err)
 			}
@@ -101,7 +103,7 @@ func New(config PluginConfig) (*Processors, error) {
 
 		common.PrintConfigDebugf(actionCfg, "Configure processor action '%v' with:", actionName)
 		constructor := gen.Plugin()
-		plugin, err := constructor(actionCfg)
+		plugin, err := constructor(actionCfg, logger)
 		if err != nil {
 			return nil, err
 		}
