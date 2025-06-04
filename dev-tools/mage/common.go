@@ -510,7 +510,7 @@ func untar(sourceFile, destinationDir string) error {
 				return err
 			}
 
-			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 
