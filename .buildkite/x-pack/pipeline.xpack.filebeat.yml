@@ -25,11 +25,6 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
-
 steps:
   - group: "Check/Update"
     key: "x-pack-filebeat-check-update"
