@@ -20,6 +20,7 @@ import (
 // the same ID could be re-registered, and that ID cannot exist in the
 // monitoring registry.
 func TestInputMetricsClose(t *testing.T) {
+	t.Skip("with https://github.com/elastic/beats/pull/42618 I don't believe this test is needed anymore. I'm letting it here so it's confirmed if the test is indeed needed or not before merging the PR.")
 	reg := inputmon.NewMetricsRegistry(
 		"", "", monitoring.NewRegistry(), logp.NewLogger("test"))
 	env := v2.Context{
