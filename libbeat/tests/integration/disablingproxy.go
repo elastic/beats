@@ -26,13 +26,21 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"sync"
+	"testing"
 )
 
 // NewDisabledProxy returns an enabled `DisablingProxy` that proxies
 // requests to `target`.
-func NewDisabledProxy(target *url.URL) *DisablingProxy {
+func NewDisabledProxy(t *testing.T, target string) *DisablingProxy {
+	t.Helper()
+
+	serverURL, err := url.Parse(target)
+	if err != nil {
+		t.Fatalf("could not parse targetan URL: %s", err)
+	}
+
 	return &DisablingProxy{
-		target:  target,
+		target:  serverURL,
 		enabled: true,
 	}
 }

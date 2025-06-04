@@ -385,7 +385,7 @@ func TestFilestreamDeleteRealESFSAndNotify(t *testing.T) {
 	esURL := integration.GetESURL(t, "http")
 
 	// Create and start the proxy server
-	proxy := integration.NewDisabledProxy(&esURL)
+	proxy := integration.NewDisabledProxy(t, esURL.String())
 	server := &http.Server{
 		Addr:              "localhost:9201",
 		Handler:           proxy,
