@@ -336,22 +336,23 @@ filebeat.inputs:
 
 The Azure Blob Storage APIs don’t provide a direct way to filter files based on timestamp, so the input will download all the files and then filter them based on the timestamp. This can cause a bottleneck in processing if the number of files are very high. It is recommended to use this attribute only when the number of files are limited or ample resources are available.
 
-## `Custom Properties` [attrib-custom-properties]
+## `Custom properties` [attrib-custom-properties]
 
-Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set/override custom blob properties provides more flexibility when reading blobs from a remote storage where the user might only have read access.
+Some blob properties can be `set` or `overridden` at the input level with the help of certain configuration options. Allowing users to set or override custom blob properties provides more flexibility when reading blobs from a remote storage where the user might only have read access.
 
-**The currently supported custom properties are:**  
+**The supported custom properties are:**
 
 1. [`content_type`](#attrib-content-type)
 2. [`encoding`](#attrib-encoding)
 
 ## `content_type` [attrib-content-type]
 
-This configuration attribute can be used to set a user-defined `content_type` for the blob property. Setting a custom `content_type` will only set the `content-type` property of a blob if it's missing/empty. If you want to override an already existing `content-type` value, you will need to set the `override_content_type` flag to `true`. These attributes can be defined at the `root` or `container` level in the configuration. Container level definitions will always take precedence.
+Use the `content_type` configuration attribute to set a user-defined content type for the blob property. Setting a custom content type only sets the `content-type` property of a blob if it's missing or empty. If you want to override an already existing `content-type` value, set the `override_content_type` flag to `true`. You can define these attributes at the `root` or `container` level in the configuration. Container level definitions always take precedence.
 
-**Example Configuration:**
+### Example configuration
 
-**At root level**
+This is a sample configuration at root level:
+
 ```yaml
 filebeat.inputs:
 - type: azure-blob-storage
@@ -365,7 +366,8 @@ filebeat.inputs:
   - name: container_1
 ```
 
-**At container level**
+This is a sample configuration at container level:
+
 ```yaml
 filebeat.inputs:
 - type: azure-blob-storage
@@ -380,11 +382,13 @@ filebeat.inputs:
 ```
 
 ## `encoding` [attrib-encoding]
-This configuration attribute can be used to set a user-defined `encoding` for the blob property. Setting a custom `encoding` will only set the `encoding` property of a blob if it's missing/empty. If you want to override an already existing `encoding` value, you will need to set the `override_encoding` flag to `true`. These attributes can be defined at the `root` or `container` level in the configuration. Container level definitions will always take precedence.
 
-**Example Configuration:**
+Use the `encoding` configuration attribute to set a user-defined encoding for the blob property. Setting a custom encoding only sets the `encoding` property of a blob if it's missing or empty. If you want to override an already existing encoding value, set the `override_encoding` flag to `true`. You can define these attributes at the `root` or `container` level in the configuration. Container level definitions always take precedence.
 
-**At root level**
+### Example configuration
+
+This is a sample configuration at root level:
+
 ```yaml
 filebeat.inputs:
 - type: azure-blob-storage
@@ -398,7 +402,8 @@ filebeat.inputs:
   - name: container_1
 ```
 
-**At container level**
+This is a sample configuration at container level:
+
 ```yaml
 filebeat.inputs:
 - type: azure-blob-storage
@@ -413,7 +418,7 @@ filebeat.inputs:
 ```
 
 ::::{note}
-The custom property configurations are bounded by the current input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and report an error.
+Custom property configurations are affected by input restrictions. For example, you can set an unsupported content-type or encoding but the input will reject it and report an error.
 ::::
 
 $$$container-overrides$$$
