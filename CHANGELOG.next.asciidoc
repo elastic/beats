@@ -93,6 +93,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
+- Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
 
 *Osquerybeat*
 
