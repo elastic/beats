@@ -592,7 +592,7 @@ func waitForEOF(t *testing.T, filebeat *integration.BeatProc, files []string) {
 	}
 }
 
-func waitForDidnotChange(t *testing.T, filebeat *integration.BeatProc, files []string) {
+func waitForDidNotChange(t *testing.T, filebeat *integration.BeatProc, files []string) {
 	for _, path := range files {
 		eofMsg := fmt.Sprintf("File didn't change: %s", path)
 

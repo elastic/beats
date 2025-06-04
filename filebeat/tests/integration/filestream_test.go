@@ -649,7 +649,7 @@ func TestFilestreamTakeOverFromLogInput(t *testing.T) {
 	waitForEOF(t, filebeat, logFiles[:2])
 	// The log input logs a different entry for files that have
 	// not changed, since Filebeat started. Wait for them.
-	waitForDidnotChange(t, filebeat, logFiles[2:])
+	waitForDidNotChange(t, filebeat, logFiles[2:])
 
 	// Ensure no new data has been published
 	requirePublishedEvents(t, filebeat, 8, outputFile)
