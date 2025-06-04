@@ -20,7 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
@@ -127,7 +127,7 @@ func TestMetrics(t *testing.T) {
 			t.Cleanup(cancel)
 
 			parent := monitoring.NewRegistry()
-			logger := logp.NewTestingLogger(t, "httpjson")
+			logger := logptest.NewTestingLogger(t, "httpjson")
 			reg := inputmon.NewMetricsRegistry(
 				ctx.ID, "httpjson-test", parent, logger)
 			t.Cleanup(func() {
