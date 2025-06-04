@@ -19,6 +19,7 @@ package status
 
 import (
 	"fmt"
+	"sync"
 )
 
 type runnerState struct {
@@ -43,9 +44,12 @@ func NewGroupStatusReporter(parent StatusReporter) RunnerReporter {
 type reporter struct {
 	runnerStates map[uint64]runnerState
 	parent       StatusReporter
+	mtx          sync.Mutex
 }
 
 func (r *reporter) GetReporterForRunner(id uint64) StatusReporter {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
 	return &subReporter{
 		id: id,
 		r:  r,
@@ -53,6 +57,8 @@ func (r *reporter) GetReporterForRunner(id uint64) StatusReporter {
 }
 
 func (r *reporter) updateStatusForRunner(id uint64, state Status, msg string) {
+	r.mtx.Lock()
+	defer r.mtx.Unlock()
 	if r.runnerStates == nil {
 		r.runnerStates = make(map[uint64]runnerState)
 	}
