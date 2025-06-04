@@ -16,9 +16,10 @@ import (
 	"google.golang.org/api/dataproc/v1"
 	"google.golang.org/api/sqladmin/v1"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestCacheEntry_IsExpired(t *testing.T) {
