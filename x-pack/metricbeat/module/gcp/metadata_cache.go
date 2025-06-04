@@ -152,6 +152,8 @@ func (r *CacheRegistry) GetComputeCache() map[string]*computepb.Instance {
 
 // UpdateComputeCache appends the provided map to the Compute instance cache.
 func (r *CacheRegistry) UpdateComputeCache(update map[string]*computepb.Instance) {
+	r.dataMutex.Lock()
+	defer r.dataMutex.Unlock()
 	updateCache(r.compute, update)
 }
 
@@ -162,6 +164,8 @@ func (r *CacheRegistry) GetCloudSQLCache() map[string]*sqladmin.DatabaseInstance
 
 // UpdateCloudSQLCache appends the provided map to the CloudSQL instance cache.
 func (r *CacheRegistry) UpdateCloudSQLCache(update map[string]*sqladmin.DatabaseInstance) {
+	r.dataMutex.Lock()
+	defer r.dataMutex.Unlock()
 	updateCache(r.cloudsql, update)
 }
 
@@ -172,6 +176,8 @@ func (r *CacheRegistry) GetRedisCache() map[string]*redispb.Instance {
 
 // UpdateRedisCache appends the provided map to the Redis instance cache.
 func (r *CacheRegistry) UpdateRedisCache(update map[string]*redispb.Instance) {
+	r.dataMutex.Lock()
+	defer r.dataMutex.Unlock()
 	updateCache(r.redis, update)
 }
 
@@ -182,6 +188,8 @@ func (r *CacheRegistry) GetDataprocCache() map[string]*dataproc.Cluster {
 
 // UpdateDataprocCache appends the provided map to the dataproc instance cache.
 func (r *CacheRegistry) UpdateDataprocCache(update map[string]*dataproc.Cluster) {
+	r.dataMutex.Lock()
+	defer r.dataMutex.Unlock()
 	updateCache(r.dataproc, update)
 }
 
