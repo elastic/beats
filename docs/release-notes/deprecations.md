@@ -17,19 +17,8 @@ To learn how to upgrade, check out [Upgrade](docs-content://deploy-manage/upgrad
 % **Action**<br> Steps for mitigating deprecation impact.
 % ::::
 
-<<<<<<< HEAD
 % ## Going forward, please use this format for the ID: 9.0.x [beats-9.0.x-deprecations]
 
 ## 9.0.0 [beats-900-deprecations]
 
-% ::::{dropdown} Deprecation title
-% Description of the deprecation.
-% For more information, check [PR #](PR link).
-% **Impact**<br> Impact of deprecation.
-% **Action**<br> Steps for mitigating deprecation impact.
-% ::::
-=======
-## 9.0.0 [beats-900-deprecations]
-
 _No deprecations_
->>>>>>> ce9f95531 ([DOCS] Specifies no deprecations and known issues for 9.0.0 (#43900))
