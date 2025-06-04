@@ -292,19 +292,17 @@ func (inp *filestream) deleteFile(
 	if err := os.Remove(fs.newPath); err != nil {
 		// The first try at removing the file failed,
 		// retry with a constant backoff
-		lastTry := time.Now()
 		lastErr := err
 
-		maxWait := 10 * time.Second
 		ticker := time.NewTicker(2 * time.Second)
 		defer ticker.Stop()
 
 		retries := 0
-		for maxWait >= 0 {
+		for retries < 5 {
 			logger.Errorf(
 				"could not remove '%s', retrying in 2s. Error: %s",
 				fs.newPath,
-				err,
+				lastErr,
 			)
 
 			select {
@@ -318,10 +316,6 @@ func (inp *filestream) deleteFile(
 					logger.Infof("'%s' removed", fs.newPath)
 					return nil
 				}
-				// Calculate the wait using monotonic clock
-				now := time.Now()
-				maxWait -= now.Sub(lastTry)
-				lastTry = now
 			}
 		}
 

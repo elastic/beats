@@ -339,7 +339,7 @@ func (p *fileProspector) onFSEvent(
 			log.Debugf("File %s has been updated", event.NewPath)
 
 		case loginp.OpNotChanged:
-			log.Debugf("File %s has not changed, trying to start new harvester because 'delete' is enabled", event.NewPath)
+			log.Debugf("File %s has not changed, trying to start new harvester", event.NewPath)
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
