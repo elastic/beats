@@ -71,16 +71,20 @@ func NewCacheRegistry(logger *logp.Logger, refreshInterval time.Duration) *Cache
 	}
 }
 
+// cacheCopy creates a copy of a map
+func cacheCopy[T any](instance map[string]T) map[string]T {
+	c := make(map[string]T, len(instance))
+	for k, v := range instance {
+		c[k] = v
+	}
+	return c
+}
+
 // GetComputeCache returns a copy of the compute instance cache.
 func (r *CacheRegistry) GetComputeCache() map[string]*computepb.Instance {
 	r.dataMutex.RLock()
 	defer r.dataMutex.RUnlock()
-
-	cacheCopy := make(map[string]*computepb.Instance, len(r.compute))
-	for k, v := range r.compute {
-		cacheCopy[k] = v
-	}
-	return cacheCopy
+	return cacheCopy(r.compute)
 }
 
 // UpdateComputeCache appends the provided map to the Compute instance cache.
@@ -100,12 +104,7 @@ func (r *CacheRegistry) UpdateComputeCache(update map[string]*computepb.Instance
 func (r *CacheRegistry) GetCloudSQLCache() map[string]*sqladmin.DatabaseInstance {
 	r.dataMutex.RLock()
 	defer r.dataMutex.RUnlock()
-
-	cacheCopy := make(map[string]*sqladmin.DatabaseInstance, len(r.cloudsql))
-	for k, v := range r.cloudsql {
-		cacheCopy[k] = v
-	}
-	return cacheCopy
+	return cacheCopy(r.cloudsql)
 }
 
 // UpdateCloudSQLCache appends the provided map to the CloudSQL instance cache.
@@ -125,12 +124,7 @@ func (r *CacheRegistry) UpdateCloudSQLCache(update map[string]*sqladmin.Database
 func (r *CacheRegistry) GetRedisCache() map[string]*redispb.Instance {
 	r.dataMutex.RLock()
 	defer r.dataMutex.RUnlock()
-
-	cacheCopy := make(map[string]*redispb.Instance, len(r.redis))
-	for k, v := range r.redis {
-		cacheCopy[k] = v
-	}
-	return cacheCopy
+	return cacheCopy(r.redis)
 }
 
 // UpdateRedisCache appends the provided map to the Redis instance cache.
@@ -150,12 +144,7 @@ func (r *CacheRegistry) UpdateRedisCache(update map[string]*redispb.Instance) {
 func (r *CacheRegistry) GetDataprocCache() map[string]*dataproc.Cluster {
 	r.dataMutex.RLock()
 	defer r.dataMutex.RUnlock()
-
-	cacheCopy := make(map[string]*dataproc.Cluster, len(r.dataproc))
-	for k, v := range r.dataproc {
-		cacheCopy[k] = v
-	}
-	return cacheCopy
+	return cacheCopy(r.dataproc)
 }
 
 // UpdateDataprocCache appends the provided map to the dataproc instance cache.
