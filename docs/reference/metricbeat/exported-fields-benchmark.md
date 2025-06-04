@@ -1,6 +1,8 @@
 ---
 mapped_pages:
-  - https://www.elastic.co/guide/en/beats/metricbeat/master/exported-fields-benchmark.html
+  - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-benchmark.html
+  # That link will 404 until 8.18 is current
+  # (see https://www.elastic.co/guide/en/beats/metricbeat/8.18/exported-fields-benchmark.html)
 ---
 
 # Benchmark fields [exported-fields-benchmark]
