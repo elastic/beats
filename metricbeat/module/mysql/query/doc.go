@@ -15,16 +15,5 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package otelconsumer
-
-import (
-	"github.com/elastic/elastic-agent-libs/config"
-)
-
-type otelConsumerConfig struct {
-	Queue config.Namespace `config:"queue"`
-}
-
-func defaultConfig() otelConsumerConfig {
-	return otelConsumerConfig{}
-}
+// Package query is a metricset of the mysql module.
+package query
