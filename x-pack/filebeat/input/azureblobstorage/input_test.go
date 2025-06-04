@@ -515,8 +515,10 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
 			},
 		},
-		// Here the content-type specified is ignored since a content-type already exists and we are not overriding it.
 		{
+			// The invalid content-type specified is ignored since a
+			// content-type already exists and we are not overriding it.
+			// So we expect a successful run.
 			name: "CustomContentTypeIgnored",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
@@ -537,8 +539,8 @@ func Test_StorageClient(t *testing.T) {
 				mock.BeatsFilesContainer_log_ndjson[1]: true,
 			},
 		},
-		// This checks if the root level content-type specifications are respected.
 		{
+			// This checks if the root level content-type specifications are respected.
 			name: "CustomContentTypeAtRootLevel",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
