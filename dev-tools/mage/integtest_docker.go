@@ -48,7 +48,7 @@ func init() {
 }
 
 // DockerIntegrationTester is an integration tester that executes integration tests
-// using docker-compose. The tests are run from inside a special beat container.
+// using docker compose. The tests are run from inside a special beat container.
 // Prefer using GoIntegTest and PythonIntegTest below which run the tests directly
 // from the host system, avoiding the need to compile beats inside a test container.
 type DockerIntegrationTester struct {
@@ -68,12 +68,9 @@ func (d *DockerIntegrationTester) Use(dir string) (bool, error) {
 	return false, nil
 }
 
-// HasRequirements ensures that the required docker and docker-compose are installed.
+// HasRequirements ensures that the required docker is installed.
 func (d *DockerIntegrationTester) HasRequirements() error {
 	if err := HaveDocker(); err != nil {
-		return err
-	}
-	if err := HaveDockerCompose(); err != nil {
 		return err
 	}
 	return nil
@@ -84,7 +81,7 @@ func (d *DockerIntegrationTester) StepRequirements() IntegrationTestSteps {
 	return IntegrationTestSteps{&MageIntegrationTestStep{}}
 }
 
-// Test performs the tests with docker-compose. The compose file must define a "beat" container,
+// Test performs the tests with docker compose. The compose file must define a "beat" container,
 // containing the beats development environment. The tests are executed from within this container.
 func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[string]string) error {
 	var err error
@@ -102,8 +99,8 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 	goPkgCache := filepath.Join(filepath.SplitList(build.Default.GOPATH)[0], "pkg/mod")
 	dockerGoPkgCache := "/go/pkg/mod"
 
-	// Execute the inside of docker-compose.
-	args := []string{"-p", DockerComposeProjectName(), "run",
+	// Execute the inside of docker compose.
+	args := []string{"compose", "-p", DockerComposeProjectName(), "run",
 		"-e", "DOCKER_COMPOSE_PROJECT_NAME=" + DockerComposeProjectName(),
 		// Disable strict.perms because we mount host dirs inside containers
 		// and the UID/GID won't meet the strict requirements.
@@ -136,14 +133,14 @@ func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[st
 		composeEnv,
 		os.Stdout,
 		os.Stderr,
-		"docker-compose",
+		"docker",
 		args...,
 	)
 
 	err = saveDockerComposeLogs(dir, mageTarget)
 	if err != nil {
 		// Just log the error, need to make sure the containers are stopped.
-		fmt.Printf("Failed to save docker-compose logs: %s\n", err)
+		fmt.Printf("Failed to save docker compose logs: %s\n", err)
 	}
 
 	err = StopIntegTestContainers()
@@ -205,7 +202,7 @@ func WithPythonIntegTestHostEnv(env map[string]string) map[string]string {
 	return WithGoIntegTestHostEnv(env)
 }
 
-// GoIntegTestFromHost starts docker-compose, waits for services to be healthy, and then runs "go test" on
+// GoIntegTestFromHost starts docker compose, waits for services to be healthy, and then runs "go test" on
 // the host system with the arguments set to enable integration tests. The test results are printed
 // to stdout and the container logs are saved in the build/system-test directory.
 func GoIntegTestFromHost(ctx context.Context, params GoTestArgs) error {
@@ -231,7 +228,7 @@ func GoIntegTestFromHost(ctx context.Context, params GoTestArgs) error {
 	err = saveDockerComposeLogs(cwd, "goIntegTest")
 	if err != nil {
 		// Just log the error, need to make sure the containers are stopped.
-		fmt.Printf("Failed to save docker-compose logs: %s\n", err)
+		fmt.Printf("Failed to save docker compose logs: %s\n", err)
 	}
 
 	err = StopIntegTestContainers()
@@ -243,7 +240,7 @@ func GoIntegTestFromHost(ctx context.Context, params GoTestArgs) error {
 	return testErr
 }
 
-// PythonIntegTest starts docker-compose, waits for services to be healthy, and then runs "pytest" on
+// PythonIntegTest starts docker compose, waits for services to be healthy, and then runs "pytest" on
 // the host system with the arguments set to enable integration tests. The test results are printed
 // to stdout and the container logs are saved in the build/system-test directory.
 func PythonIntegTestFromHost(params PythonTestArgs) error {
@@ -269,7 +266,7 @@ func PythonIntegTestFromHost(params PythonTestArgs) error {
 	err = saveDockerComposeLogs(cwd, "pythonIntegTest")
 	if err != nil {
 		// Just log the error, need to make sure the containers are stopped.
-		fmt.Printf("Failed to save docker-compose logs: %s\n", err)
+		fmt.Printf("Failed to save docker compose logs: %s\n", err)
 	}
 
 	err = StopIntegTestContainers()
@@ -281,7 +278,7 @@ func PythonIntegTestFromHost(params PythonTestArgs) error {
 	return testErr
 }
 
-// dockerComposeBuildImages builds all images in the docker-compose.yml file.
+// dockerComposeBuildImages builds all images in the docker compose.yml file.
 func BuildIntegTestContainers() error {
 	fmt.Println(">> Building docker images")
 
@@ -290,7 +287,7 @@ func BuildIntegTestContainers() error {
 		return err
 	}
 
-	args := []string{"-p", DockerComposeProjectName(), "build", "--force-rm"}
+	args := []string{"compose", "-p", DockerComposeProjectName(), "build", "--force-rm"}
 	if _, noCache := os.LookupEnv("DOCKER_NOCACHE"); noCache {
 		args = append(args, "--no-cache")
 	}
@@ -308,7 +305,7 @@ func BuildIntegTestContainers() error {
 		composeEnv,
 		out,
 		os.Stderr,
-		"docker-compose", args...,
+		"docker", args...,
 	)
 
 	// This sleep is to avoid hitting the docker build issues when resources are not available.
@@ -319,17 +316,17 @@ func BuildIntegTestContainers() error {
 			composeEnv,
 			out,
 			os.Stderr,
-			"docker-compose", args...,
+			"docker", args...,
 		)
 	}
 	return err
 }
 
 func StartIntegTestContainers() error {
-	// Start the docker-compose services and wait for them to become healthy.
+	// Start the docker compose services and wait for them to become healthy.
 	// Using --detach causes the command to exit successfully only if the proxy_dep for health
 	// completed successfully.
-	args := []string{"-p", DockerComposeProjectName(),
+	args := []string{"compose", "-p", DockerComposeProjectName(),
 		"up",
 		"--detach",
 	}
@@ -343,14 +340,14 @@ func StartIntegTestContainers() error {
 		composeEnv,
 		os.Stdout,
 		os.Stderr,
-		"docker-compose",
+		"docker",
 		args...,
 	)
 	return err
 }
 
 func StopIntegTestContainers() error {
-	// Docker-compose rm is noisy. So only pass through stderr when in verbose.
+	// Docker compose rm is noisy. So only pass through stderr when in verbose.
 	out := io.Discard
 	if mg.Verbose() {
 		out = os.Stderr
@@ -365,16 +362,16 @@ func StopIntegTestContainers() error {
 		composeEnv,
 		io.Discard,
 		out,
-		"docker-compose",
-		"-p", DockerComposeProjectName(),
+		"docker",
+		"compose", "-p", DockerComposeProjectName(),
 		"rm", "--stop", "--force",
 	)
 
 	return err
 }
 
-// DockerComposeProjectName returns the project name to use with docker-compose.
-// It is passed to docker-compose using the `-p` flag. And is passed to our
+// DockerComposeProjectName returns the project name to use with docker compose.
+// It is passed to docker compose using the `-p` flag. And is passed to our
 // Go and Python testing libraries through the DOCKER_COMPOSE_PROJECT_NAME
 // environment variable.
 func DockerComposeProjectName() string {
@@ -423,21 +420,21 @@ func saveDockerComposeLogs(rootDir string, mageTarget string) error {
 		composeEnv,
 		composeLogFile, // stdout
 		composeLogFile, // stderr
-		"docker-compose",
-		"-p", DockerComposeProjectName(),
+		"docker",
+		"compose", "-p", DockerComposeProjectName(),
 		"logs",
 		"--no-color",
 	)
 	if err != nil {
-		return fmt.Errorf("executing docker-compose logs: %w", err)
+		return fmt.Errorf("executing docker compose logs: %w", err)
 	}
 
 	return nil
 }
 
 // integTestDockerComposeEnvVars returns the environment variables used for
-// executing docker-compose (not the variables passed into the containers).
-// docker-compose uses these when evaluating docker-compose.yml files.
+// executing docker compose (not the variables passed into the containers).
+// docker compose uses these when evaluating docker-compose.yml files.
 func integTestDockerComposeEnvVars() (map[string]string, error) {
 	esBeatsDir, err := ElasticBeatsDir()
 	if err != nil {
@@ -452,10 +449,10 @@ func integTestDockerComposeEnvVars() (map[string]string, error) {
 	}, nil
 }
 
-// WriteDockerComposeEnvFile generates a docker-compose environment variable file.
+// WriteDockerComposeEnvFile generates a docker compose environment variable file.
 func WriteDockerComposeEnvFile() (string, error) {
 	envFileContent := []string{
-		"# Environment variable file to pass to docker-compose with the --env-file option.",
+		"# Environment variable file to pass to docker compose with the --env-file option.",
 	}
 	envVarMap, err := integTestDockerComposeEnvVars()
 	if err != nil {
