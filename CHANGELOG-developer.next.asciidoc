@@ -234,6 +234,7 @@ unregister input metrics without relaying on the global 'dataset' namespace.{pul
 - Improved Filebeat Websocket input exponential backoff logic to produce a smoother backoff curve. {pull}44069[44069]
 - Added `autoops_es` module to x-pack/metricbeat. {pull}44565[44565]
 - Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
+- Add output metrics aggregated per-input reported on the input metrics. Metrics added: `"events_output_total"`, `"events_output_acked_total"`, `"events_output_dropped_total"`, `"events_output_dead_letter_total"`, `"events_output_duplicate_events_total"`, `"events_output_err_too_many_total"`, `"events_output_retryable_errors_total"` {pull}44125[44125] {issue}42762[42762]
 
 ==== Deprecated
 
