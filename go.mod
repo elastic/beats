@@ -118,7 +118,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	github.com/ugorji/go/codec v1.1.8
-	github.com/vmware/govmomi v0.39.0
+	github.com/vmware/govmomi v0.51.0
 	go.elastic.co/ecszap v1.0.2
 	go.elastic.co/go-licence-detector v0.7.0
 	go.etcd.io/bbolt v1.4.0
@@ -130,7 +130,7 @@ require (
 	golang.org/x/oauth2 v0.27.0
 	golang.org/x/sync v0.14.0
 	golang.org/x/sys v0.33.0
-	golang.org/x/text v0.24.0
+	golang.org/x/text v0.25.0
 	golang.org/x/time v0.8.0
 	golang.org/x/tools v0.30.0
 	google.golang.org/api v0.214.0
@@ -174,14 +174,14 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.7.0
 	github.com/elastic/elastic-agent-autodiscover v0.9.2
-	github.com/elastic/elastic-agent-libs v0.19.4
+	github.com/elastic/elastic-agent-libs v0.19.6
 	github.com/elastic/elastic-agent-system-metrics v0.11.11
 	github.com/elastic/go-elasticsearch/v8 v8.18.0
 	github.com/elastic/go-quark v0.3.0
 	github.com/elastic/go-sfdc v0.0.0-20241010131323-8e176480d727
 	github.com/elastic/mito v1.19.0
 	github.com/elastic/mock-es v0.0.0-20250324153755-573fc6c0ac4b
-	github.com/elastic/sarama v1.19.1-0.20250304185506-df6449b5c996
+	github.com/elastic/sarama v1.19.1-0.20250603175145-7672917f26b6
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20240626215117-76e39db18dfb
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
