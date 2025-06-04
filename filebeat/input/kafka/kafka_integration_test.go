@@ -31,6 +31,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/beats/v7/testing/testutils"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
@@ -335,6 +336,7 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 }
 
 func TestSASLAuthentication(t *testing.T) {
+	testutils.SkipIfFIPSOnly(t, "SASL disabled when in fips140=only mode.")
 	testTopic := createTestTopicName()
 	groupID := "filebeat"
 
