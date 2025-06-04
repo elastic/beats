@@ -42,6 +42,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 - Fix the function to determine CPU cores on windows {issue}42593[42593] {pull}43409[43409]
+- Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
 
 *Osquerybeat*
 
