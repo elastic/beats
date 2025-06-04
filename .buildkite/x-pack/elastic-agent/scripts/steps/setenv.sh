@@ -9,8 +9,8 @@ SETUP_WIN_PYTHON_VERSION="3.11.0"
 NMAP_WIN_VERSION="7.12"           # Earlier versions of NMap provide WinPcap (the winpcap packages don't install nicely because they pop-up a UI)
 GO_VERSION=$(cat .go-version)
 ASDF_MAGE_VERSION="1.15.0"
-PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-PACKAGING_ARM_PLATFORMS="linux/arm64"
+PACKAGING_PLATFORMS="+all linux/amd64 windows/amd64 darwin/amd64"
+PACKAGING_ARM_PLATFORMS="+all linux/arm64"
 
 export SETUP_GVM_VERSION
 export DOCKER_COMPOSE_VERSION
