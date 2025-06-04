@@ -285,7 +285,7 @@ Now that you have your logs streaming into {{es}}, learn how to unify your logs,
     | [{{metricbeat}}](/reference/metricbeat/metricbeat-installation-configuration.md) | Infrastructure metrics |
     | [{{filebeat}}](/reference/filebeat/filebeat-installation-configuration.md) | Logs |
     | [{{heartbeat}}](/reference/heartbeat/heartbeat-installation-configuration.md) | Uptime information |
-    | [APM](docs-content://solutions/observability/apps/application-performance-monitoring-apm.md) | Application performance metrics |
+    | [APM](docs-content://solutions/observability/apm/index.md) | Application performance metrics |
     | [{{auditbeat}}](/reference/auditbeat/auditbeat-installation-configuration.md) | Audit events |
 
 2. Use the Observability apps in {{kib}} to search across all your data:
@@ -294,8 +294,8 @@ Now that you have your logs streaming into {{es}}, learn how to unify your logs,
     | --- | --- |
     | [{{metrics-app}}](docs-content://solutions/observability/infra-and-hosts/analyze-infrastructure-host-metrics.md) | Explore metrics about systems and services across your ecosystem |
     | [{{logs-app}}](docs-content://solutions/observability/logs/explore-logs.md) | Tail related log data in real time |
-    | [{{uptime-app}}](docs-content://solutions/observability/apps/synthetic-monitoring.md#monitoring-uptime) | Monitor availability issues across your apps and services |
-    | [APM app](docs-content://solutions/observability/apps/overviews.md) | Monitor application performance |
+    | [{{uptime-app}}](docs-content://solutions/observability/synthetics/index.md#monitoring-uptime) | Monitor availability issues across your apps and services |
+    | [APM app](docs-content://solutions/observability/apm/overviews.md) | Monitor application performance |
     | [{{siem-app}}](docs-content://solutions/security.md) | Analyze security events |
 
 

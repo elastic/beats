@@ -411,7 +411,7 @@ format: percent
 Stats collected from HAProxy processes.
 
 **`haproxy.stat.status`**
-:   Status (UP, DOWN, NOLB, MAINT, or MAINT(via)…​).
+:   Status (UP, DOWN, NOLB, MAINT, or MAINT(via)…).
 
 type: keyword
 

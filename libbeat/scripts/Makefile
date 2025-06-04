@@ -95,7 +95,7 @@ TESTING_ENVIRONMENT?=snapshot## @testing The name of the environment under test
 BEAT_VERSION=$(shell head -n 1 ${ES_BEATS}/libbeat/docs/version.asciidoc | cut -c 17- )
 COMMIT_ID=$(shell git rev-parse HEAD)
 DOCKER_COMPOSE_PROJECT_NAME?=${BEAT_NAME}${TESTING_ENVIRONMENT//-}${BEAT_VERSION//-}${COMMIT_ID} ## @testing The name of the docker-compose project used by the integration and system tests
-DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker-compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
+DOCKER_COMPOSE?=TESTING_ENVIRONMENT=${TESTING_ENVIRONMENT} ES_BEATS=${ES_BEATS} docker compose -p ${DOCKER_COMPOSE_PROJECT_NAME} -f docker-compose.yml
 DOCKER_CACHE?=1 ## @miscellaneous If set to 0, all docker images are created without cache
 DOCKER_PULL?=1 ## @miscellaneous If set to 0, disable the force pull on docker-compose build
 GOPACKAGES_COMMA_SEP=$(subst $(space),$(comma),$(strip ${GOPACKAGES}))

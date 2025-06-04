@@ -215,16 +215,6 @@ func dockerInfo() (*DockerInfo, error) {
 	return &info, nil
 }
 
-// HaveDockerCompose returns an error if docker-compose is not found on the
-// PATH.
-func HaveDockerCompose() error {
-	_, err := exec.LookPath("docker-compose")
-	if err != nil {
-		return fmt.Errorf("docker-compose is not available")
-	}
-	return nil
-}
-
 // HaveKubectl returns an error if kind is not found on the PATH.
 func HaveKubectl() error {
 	_, err := exec.LookPath("kubectl")
@@ -507,7 +497,7 @@ func untar(sourceFile, destinationDir string) error {
 
 		switch header.Typeflag {
 		case tar.TypeDir:
-			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.MkdirAll(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 		case tar.TypeReg:
@@ -526,7 +516,7 @@ func untar(sourceFile, destinationDir string) error {
 				return err
 			}
 
-			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil {
+			if err = os.Chmod(path, os.FileMode(header.Mode)); err != nil { //nolint:gosec // G115 Conversion from int to uint32 is safe here.
 				return err
 			}
 
