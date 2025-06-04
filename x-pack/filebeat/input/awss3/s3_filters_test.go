@@ -8,8 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func Test_filterProvider(t *testing.T) {
