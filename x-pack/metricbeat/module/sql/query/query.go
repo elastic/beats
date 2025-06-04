@@ -391,11 +391,13 @@ func inferTypeFromMetrics(ms mapstr.M) mapstr.M {
 	return ret
 }
 
-// sanitizeError replaces all occurrences of 'sensitive' in err.Error() with "(redacted)"
+// sanitizeError replaces all occurrences of 'sensitive' parameter in err.Error() with "(redacted)"
 func sanitizeError(err error, sensitive string) error {
 	if err == nil {
 		return nil
 	}
+
+	sensitive = strings.TrimSpace(sensitive)
 
 	if sensitive == "" {
 		return err

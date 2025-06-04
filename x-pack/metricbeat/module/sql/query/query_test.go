@@ -39,6 +39,13 @@ func TestSanitizeError(t *testing.T) {
 			expectNilErr: false,
 		},
 		{
+			name:         "Error with sensitive data (sensitive param contains leading/trailing whitespace)",
+			err:          errors.New("Connection failed: invalid password 'super_secret'"),
+			sensitive:    "   super_secret ",
+			expectedErr:  "Connection failed: invalid password '(redacted)'",
+			expectNilErr: false,
+		},
+		{
 			name:         "Sensitive data not found",
 			err:          errors.New("No sensitive data present here"),
 			sensitive:    "super_secret",
