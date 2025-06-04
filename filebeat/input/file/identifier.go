@@ -40,7 +40,7 @@ const (
 var identifierFactories = map[string]IdentifierFactory{
 	nativeName:      newINodeDeviceIdentifier,
 	pathName:        newPathIdentifier,
-	inodeMarkerName: newINodeMarkerIdentifier,
+	inodeMarkerName: IdentifierFactory(newINodeMarkerIdentifier),
 }
 
 type IdentifierFactory func(*conf.C, *logp.Logger) (StateIdentifier, error)
