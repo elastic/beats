@@ -30,7 +30,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	var events []mbtest.Event
+	var events []mbtest.mb.Event
 	var errs []error
 	config := test.GetKubeStateMetricsConfig(t, "state_job")
 	metricSet := mbtest.NewFetcher(t, config)
