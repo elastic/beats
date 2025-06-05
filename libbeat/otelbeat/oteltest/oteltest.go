@@ -29,6 +29,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/consumer"
 	"go.opentelemetry.io/collector/pdata/plog"
 	"go.opentelemetry.io/collector/receiver"
@@ -37,6 +38,18 @@ import (
 	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
 )
+
+type MockHost struct {
+	Evt *componentstatus.Event
+}
+
+func (_ *MockHost) GetExtensions() map[component.ID]component.Component {
+	return nil
+}
+
+func (h *MockHost) Report(evt *componentstatus.Event) {
+	h.Evt = evt
+}
 
 type ReceiverConfig struct {
 	Name    string
@@ -51,6 +64,10 @@ type CheckReceiversParams struct {
 	// AssertFunc is a function that asserts the test conditions.
 	// The function is called periodically until the assertions are met or the timeout is reached.
 	AssertFunc func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs)
+
+	// Host is passed to receiver.Start and is an implementation of collector's component.Host
+	// It is used by individual receviers to report status.
+	Host component.Host
 }
 
 // CheckReceivers creates receivers using the provided configuration.
@@ -112,7 +129,7 @@ func CheckReceivers(params CheckReceiversParams) {
 	}
 
 	for i, r := range receivers {
-		err := r.Start(ctx, nil)
+		err := r.Start(ctx, params.Host)
 		require.NoErrorf(t, err, "Error starting receiver %d", i)
 		defer func() {
 			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)

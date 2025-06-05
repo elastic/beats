@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
+	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/receiver"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -244,6 +245,51 @@ func TestMultipleReceivers(t *testing.T) {
 			assert.Conditionf(c, func() bool {
 				return getFromSocket(t, &lastError, monitorSocket2, "inputs")
 			}, "failed to connect to monitoring socket2, inputs endpoint, last error was: %s", &lastError)
+		},
+	})
+}
+
+func TestStatusReporter(t *testing.T) {
+	cfg := Config{
+		Beatconfig: map[string]any{
+			"filebeat": map[string]any{
+				"inputs": []map[string]any{
+					{
+						"type":    "benchmark",
+						"enabled": true,
+						"message": "test",
+						"count":   10,
+					},
+				},
+			},
+			"output": map[string]any{
+				"otelconsumer": map[string]any{},
+			},
+			"logging": map[string]any{
+				"level": "info",
+				"selectors": []string{
+					"*",
+				},
+			},
+			"path.home": t.TempDir(),
+		},
+	}
+
+	host := &oteltest.MockHost{}
+	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
+		T:    t,
+		Host: host,
+		Receivers: []oteltest.ReceiverConfig{
+			{
+				Name:    "r1",
+				Config:  &cfg,
+				Factory: NewFactory(),
+			},
+		},
+		AssertFunc: func(c *assert.CollectT, _ map[string][]mapstr.M, _ *observer.ObservedLogs) {
+			require.NotNil(t, host.Evt)
+			require.Nil(t, host.Evt.Err())
+			require.Equal(t, host.Evt.Status(), componentstatus.StatusOK)
 		},
 	})
 }
