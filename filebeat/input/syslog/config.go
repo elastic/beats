@@ -99,6 +99,7 @@ var defaultUDP = udp.Config{
 func factory(
 	nf inputsource.NetworkFunc,
 	config conf.Namespace,
+	logger *logp.Logger,
 ) (inputsource.Network, error) {
 	n, cfg := config.Name(), config.Config()
 
@@ -114,26 +115,27 @@ func factory(
 			return nil, err
 		}
 
-		logger := logp.NewLogger("input.syslog.tcp").With("address", config.Config.Host)
-		factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logger, tcp.MetadataCallback, nf, splitFunc)
+		tcpLogger := logger.Named("input.syslog.tcp").With("address", config.Config.Host)
+		factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, tcpLogger, tcp.MetadataCallback, nf, splitFunc)
 
-		return tcp.New(&config.Config, factory)
+		return tcp.New(&config.Config, factory, tcpLogger)
 	case unix.Name:
 		config := defaultUnix()
 		if err := cfg.Unpack(&config); err != nil {
 			return nil, err
 		}
 
-		logger := logp.NewLogger("input.syslog.unix").With("path", config.Config.Path)
+		unixLogger := logger.Named("input.syslog.unix").With("path", config.Config.Path)
 
-		return unix.New(logger, &config.Config, nf)
+		return unix.New(unixLogger, &config.Config, nf)
 
 	case udp.Name:
 		config := defaultUDP
 		if err := cfg.Unpack(&config); err != nil {
 			return nil, err
 		}
-		return udp.New(&config, nf), nil
+		udpLogger := logger.Named("input.syslog.udp").With("address", config.Host)
+		return udp.New(&config, nf, udpLogger), nil
 	default:
 		return nil, fmt.Errorf("you must choose between TCP or UDP")
 	}

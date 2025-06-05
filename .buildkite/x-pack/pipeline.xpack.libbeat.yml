@@ -41,6 +41,8 @@ steps:
           image: "${IMAGE_BEATS_WITH_HOOKS_LATEST}"
           cpu: "4000m"
           memory: "8Gi"
+          # 10GB storage was not enough for check/update.
+          ephemeralStorage: "40G"
           useCustomGlobalHooks: true
         notify:
           - github_commit_status:
@@ -129,7 +131,6 @@ steps:
               context: "x-pack/libbeat: Ubuntu x86_64 fips140=only Unit Tests"
 
       - label: ":ubuntu: x-pack/libbeat: Go Integration Tests"
-        key: "mandatory-int-test"
         command: |
           cd x-pack/libbeat
           mage goIntegTest
@@ -148,7 +149,29 @@ steps:
           - "x-pack/libbeat/build/integration-tests/Test*/data/**/*"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Go Integration Tests"
+              context: "x-pack/libbeat: Go Integration Tests / Ubuntu x86_64"
+
+      - label: ":windows: x-pack/libbeat: Go Integration Tests"
+        skip: "Skipped due to https://github.com/elastic/beats/issues/44537"
+        command: |
+          cd x-pack/libbeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/libbeat/build/*.xml"
+          - "x-pack/libbeat/build/*.json"
+          - "x-pack/libbeat/build/integration-tests/*"
+          - "x-pack/libbeat/build/integration-tests/Test*/*"
+          - "x-pack/libbeat/build/integration-tests/Test*/data/**/*"
+        notify:
+          - github_commit_status:
+              context: "x-pack/libbeat: Go Integration Tests / Windows"
 
       - label: ":ubuntu: x-pack/libbeat: Python Integration Tests"
         key: "mandatory-python-int-test"

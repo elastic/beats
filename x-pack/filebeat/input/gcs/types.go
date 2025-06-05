@@ -13,6 +13,7 @@ import (
 type Source struct {
 	BucketName               string
 	ProjectId                string
+	BatchSize                int
 	MaxWorkers               int
 	Poll                     bool
 	PollInterval             time.Duration

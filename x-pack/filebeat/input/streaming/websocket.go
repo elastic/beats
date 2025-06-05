@@ -25,9 +25,17 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+)
+
+const (
+	// spread is the induced jitter for the backoff logic. This is not user configurable
+	// as it is not a common use case. The value of 1.0 is chosen as it produces a relatively
+	// smooth backoff curve.
+	spread = 1.0
 )
 
 type websocketStream struct {
@@ -36,14 +44,23 @@ type websocketStream struct {
 	id          string
 	cfg         config
 	cursor      map[string]any
+	status      status.StatusReporter
 	tokenSource oauth2.TokenSource
 	tokenExpiry <-chan time.Time
 	time        func() time.Time
+	keepAlive   *keepAlive
 }
 
 type loggingRoundTripper struct {
 	rt  http.RoundTripper
 	log *logp.Logger
+}
+
+// keepAlive manages the configuration and metrics for WebSocket keep-alive functionality
+type keepAlive struct {
+	cfg     keepAliveConfig
+	metrics *inputMetrics
+	log     *logp.Logger
 }
 
 func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -58,20 +75,64 @@ func (l *loggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 	return resp, err
 }
 
+// heartBeat sends a ping message to the websocket server at regular intervals
+func (k *keepAlive) heartBeat(ctx context.Context, conn *websocket.Conn, start time.Time) context.CancelFunc {
+	ctx, cancel := context.WithCancel(ctx)
+	// set initial read deadline
+	conn.SetReadDeadline(time.Now().Add(k.cfg.readControlDeadline))
+	// set pong handler to update read deadline
+	conn.SetPongHandler(func(pongData string) error {
+		k.log.Debugw("received pong message from websocket server", "pong_data", pongData)
+		k.metrics.pongMessageReceivedTime.Update(time.Since(start).Nanoseconds())
+		return conn.SetReadDeadline(time.Now().Add(k.cfg.readControlDeadline))
+	})
+
+	// set heartbeat ping routine
+	go func() {
+		ticker := time.NewTicker(k.cfg.Interval)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ctx.Done():
+				k.log.Debugw("heartbeat stopped")
+				return
+			case now := <-ticker.C:
+				err := conn.WriteControl(websocket.PingMessage, nil, now.Add(k.cfg.WriteControlDeadline))
+				if err != nil {
+					k.log.Debugw("error sending ping control frame to websocket server", "error", err)
+					k.metrics.writeControlErrors.Inc()
+					k.metrics.errorsTotal.Inc()
+				} else {
+					k.log.Debugw("sent ping control frame to websocket server")
+					k.metrics.pingMessageSendTime.Update(time.Since(start).Nanoseconds())
+				}
+			}
+		}
+	}()
+
+	return cancel
+}
+
 // NewWebsocketFollower performs environment construction including CEL
 // program and regexp compilation, and input metrics set-up for a websocket
 // stream follower.
-func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map[string]any, pub inputcursor.Publisher, stat status.StatusReporter, log *logp.Logger, now func() time.Time) (StreamFollower, error) {
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Configuring, "")
 	s := websocketStream{
 		id:     id,
 		cfg:    cfg,
 		cursor: cursor,
+		status: stat,
 		processor: processor{
 			ns:      "websocket",
 			pub:     pub,
 			log:     log,
 			redact:  cfg.Redact,
-			metrics: newInputMetrics(id),
+			metrics: newInputMetrics(id, nil),
 		},
 		// the token expiry handler will never trigger unless a valid expiry time is assigned
 		tokenExpiry: nil,
@@ -99,7 +160,9 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 		if err != nil {
 			s.metrics.errorsTotal.Inc()
 			s.Close()
-			return nil, fmt.Errorf("failed to obtain oauth2 token: %w", err)
+			err = fmt.Errorf("failed to obtain oauth2 token: %w", err)
+			stat.UpdateStatus(status.Failed, err.Error())
+			return nil, err
 		}
 		// set the initial token in the config if oauth2 is enabled
 		// this allows seamless header creation in formHeader() for the initial connection
@@ -108,9 +171,21 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 		s.tokenExpiry = time.After(time.Until(token.Expiry) - cfg.Auth.OAuth2.TokenExpiryBuffer)
 	}
 
+	// set and assign KeepAlive if enabled
+	if cfg.KeepAlive.Enable {
+		// create a new keepAlive instance
+		k := &keepAlive{
+			cfg:     cfg.KeepAlive,
+			metrics: s.metrics,
+			log:     log,
+		}
+		s.keepAlive = k
+	}
+
 	patterns, err := regexpsFromConfig(cfg)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
+		stat.UpdateStatus(status.Failed, "invalid regular expression: "+err.Error())
 		s.Close()
 		return nil, err
 	}
@@ -118,6 +193,7 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 	s.prg, s.ast, err = newProgram(ctx, cfg.Program, root, patterns, log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
+		stat.UpdateStatus(status.Failed, err.Error())
 		s.Close()
 		return nil, err
 	}
@@ -128,7 +204,9 @@ func NewWebsocketFollower(ctx context.Context, id string, cfg config, cursor map
 // FollowStream receives, processes and publishes events from the subscribed
 // websocket stream.
 func (s *websocketStream) FollowStream(ctx context.Context) error {
+	var heartBeatCancel context.CancelFunc
 	state := s.cfg.State
+
 	if state == nil {
 		state = make(map[string]any)
 	}
@@ -140,16 +218,24 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 	url, err := getURL(ctx, "websocket", s.cfg.URLProgram, s.cfg.URL.String(), state, s.cfg.Redact, s.log, s.now)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
+		s.status.UpdateStatus(status.Failed, "failed to get url: "+err.Error())
 		return err
 	}
 
 	// websocket client
-	c, resp, err := connectWebSocket(ctx, s.cfg, url, s.log)
+	c, resp, err := connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 	handleConnectionResponse(resp, s.metrics, s.log)
 	if err != nil {
 		s.metrics.errorsTotal.Inc()
 		s.log.Errorw("failed to establish websocket connection", "error", err)
+		s.status.UpdateStatus(status.Failed, "failed to establish websocket connection: "+err.Error())
 		return err
+	}
+	// Start the keep-alive routine if enabled and the connection is established successfully
+	// this is for the initial connection only, the keep-alive will be restarted during the reconnect
+	// logic/token refresh.
+	if s.keepAlive != nil {
+		heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
 	}
 
 	// ensures this is the last connection closed when the function returns
@@ -164,69 +250,104 @@ func (s *websocketStream) FollowStream(ctx context.Context) error {
 
 	for {
 		select {
+		// If the keep-alive is enabled, heartbeat will be automatically cancelled when
+		// the parent context is done().
 		case <-ctx.Done():
 			s.log.Debugw("context cancelled, closing websocket connection")
+			s.status.UpdateStatus(status.Stopping, "")
 			return ctx.Err()
 		// s.tokenExpiry channel will only trigger if oauth2 is enabled and the token is about to expire
 		case <-s.tokenExpiry:
+			// Cancel the keep-alive routine if enabled since we need to establish a new
+			// connection instance with the refreshed token.
+			if s.keepAlive != nil {
+				heartBeatCancel()
+			}
 			// get the new token
 			token, err := s.tokenSource.Token()
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
 				s.log.Errorw("failed to obtain oauth2 token during token refresh", "error", err)
+				s.status.UpdateStatus(status.Failed, "failed to obtain oauth2 token during token refresh: "+err.Error())
 				return err
 			}
 			// gracefully close current connection
-			if err := c.Close(); err != nil {
-				s.metrics.errorsTotal.Inc()
-				s.log.Errorw("encountered an error while closing the existing websocket connection during token refresh", "error", err)
+			if c != nil {
+				if err := c.Close(); err != nil {
+					s.metrics.errorsTotal.Inc()
+					s.log.Errorw("encountered an error while closing the existing websocket connection during token refresh", "error", err)
+				}
 			}
 			// set the new token in the config
 			s.cfg.Auth.OAuth2.accessToken = token.AccessToken
 			// set the new token expiry channel with 2 mins buffer
 			s.tokenExpiry = time.After(time.Until(token.Expiry) - s.cfg.Auth.OAuth2.TokenExpiryBuffer)
 			// establish a new connection with the new token
-			c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+			c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 			handleConnectionResponse(resp, s.metrics, s.log)
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to establish a new websocket connection on token refresh: "+err.Error())
 				s.log.Errorw("failed to establish a new websocket connection on token refresh", "error", err)
 				return err
+			}
+			// Restart the keep-alive routine on a token refresh if enabled and the
+			// connection is established successfully.
+			if s.keepAlive != nil {
+				heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
 			}
 		default:
 			_, message, err := c.ReadMessage()
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
+				// Cancel the keep-alive routine if enabled since we need to establish a
+				// new connection via our reconnect logic.
+				if s.keepAlive != nil {
+					heartBeatCancel()
+				}
 				if !s.cfg.Retry.BlanketRetries && !isRetryableError(err) {
+					s.status.UpdateStatus(status.Failed, "failed to read websocket data: "+err.Error())
 					s.log.Errorw("failed to read websocket data", "error", err)
 					return err
 				}
 				s.log.Debugw("websocket connection encountered an error, attempting to reconnect...", "error", err)
-				// close the old connection and reconnect
-				if err := c.Close(); err != nil {
-					s.metrics.errorsTotal.Inc()
-					s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+				s.status.UpdateStatus(status.Degraded, "websocket connection encountered an error: "+err.Error())
+				if c != nil {
+					if err := c.Close(); err != nil {
+						s.metrics.errorsTotal.Inc()
+						s.log.Errorw("encountered an error while closing the websocket connection", "error", err)
+					}
 				}
-				// since c is already a pointer, we can reassign it to the new connection and the defer func will still handle it
-				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.log)
+				// Since c is already a pointer, we can reassign it to the new connection
+				// and the defer func will still handle it.
+				c, resp, err = connectWebSocket(ctx, s.cfg, url, s.status, s.log)
 				handleConnectionResponse(resp, s.metrics, s.log)
 				if err != nil {
 					s.metrics.errorsTotal.Inc()
+					s.status.UpdateStatus(status.Failed, "failed to reconnect websocket connection: "+err.Error())
 					s.log.Errorw("failed to reconnect websocket connection", "error", err)
 					return err
 				}
+				// Restart the keep-alive routine if enabled after a successful reconnection.
+				if s.keepAlive != nil {
+					heartBeatCancel = s.keepAlive.heartBeat(ctx, c, s.now().In(time.UTC))
+				}
+
 				continue
 			}
+
 			s.metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
 			s.log.Debugw("received websocket message", logp.Namespace(s.ns), "msg", string(message))
 			err = s.process(ctx, state, s.cursor, s.now().In(time.UTC))
 			if err != nil {
 				s.metrics.errorsTotal.Inc()
+				s.status.UpdateStatus(status.Failed, "failed to process and publish data: "+err.Error())
 				s.log.Errorw("failed to process and publish data", "error", err)
 				return err
 			}
 		}
+		s.status.UpdateStatus(status.Running, "")
 	}
 }
 
@@ -301,7 +422,7 @@ func handleConnectionResponse(resp *http.Response, metrics *inputMetrics, log *l
 }
 
 // connectWebSocket attempts to connect to the websocket server with exponential backoff if retry config is available else it connects without retry.
-func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Logger) (*websocket.Conn, *http.Response, error) {
+func connectWebSocket(ctx context.Context, cfg config, url string, stat status.StatusReporter, log *logp.Logger) (*websocket.Conn, *http.Response, error) {
 	var conn *websocket.Conn
 	var response *http.Response
 	var err error
@@ -316,8 +437,10 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 			for attempt := 1; attempt <= retryConfig.MaxAttempts; attempt++ {
 				conn, response, err = dialer.DialContext(ctx, url, headers)
 				if err == nil {
+					stat.UpdateStatus(status.Running, "")
 					return conn, response, nil
 				}
+				stat.UpdateStatus(status.Degraded, "attempting to reconnect websocket")
 				// in case of sudden network errors or server crashes the response will be nil and logging should be done gracefully
 				if response != nil {
 					//nolint:errorlint // it will never be a wrapped error at this point
@@ -329,16 +452,21 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				} else {
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
-				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
+				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
 				time.Sleep(waitTime)
+			}
+			if response == nil {
+				return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w", retryConfig.MaxAttempts, err)
 			}
 			return nil, nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts with error %w and (status %d)", retryConfig.MaxAttempts, err, response.StatusCode)
 		} else {
 			for attempt := 1; ; attempt++ {
 				conn, response, err = dialer.DialContext(ctx, url, headers)
 				if err == nil {
+					stat.UpdateStatus(status.Running, "")
 					return conn, response, nil
 				}
+				stat.UpdateStatus(status.Degraded, "attempting to reconnect websocket")
 				// in case of sudden network errors or server crashes the response will be nil and logging should be done gracefully
 				if response != nil {
 					//nolint:errorlint // it will never be a wrapped error at this point
@@ -350,7 +478,7 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 				} else {
 					log.Errorf("attempt %d: webSocket connection failed with error %v and no response, retrying...\n", attempt, err)
 				}
-				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt)
+				waitTime := calculateWaitTime(retryConfig.WaitMin, retryConfig.WaitMax, attempt, retryConfig.MaxAttempts)
 				time.Sleep(waitTime)
 			}
 		}
@@ -360,22 +488,37 @@ func connectWebSocket(ctx context.Context, cfg config, url string, log *logp.Log
 }
 
 // calculateWaitTime calculates the wait time for the next attempt based on the exponential backoff algorithm.
-func calculateWaitTime(waitMin, waitMax time.Duration, attempt int) time.Duration {
+func calculateWaitTime(waitMin, waitMax time.Duration, attempt, maxAttempts int) time.Duration {
 	// calculate exponential backoff
-	base := float64(waitMin)
-	backoff := base * math.Pow(2, float64(attempt-1))
-
-	// calculate jitter proportional to the backoff
-	maxJitter := float64(waitMax-waitMin) * math.Pow(2, float64(attempt-1))
-	jitter := rand.Float64() * maxJitter
-
-	waitTime := time.Duration(backoff + jitter)
+	waitTime := wait(waitMin, waitMax, attempt, maxAttempts, spread)
 	// caps the wait time to the maximum wait time
 	if waitTime > waitMax {
 		waitTime = waitMax
 	}
 
 	return waitTime
+}
+
+// wait returns a logistic backoff duration with jitter. The duration increases
+// from min to max in n steps, with i indicating the step. Jitter is added around
+// the logistic based on the value of spread. Zero spread results in no jitter,
+// and unit spread is maximal. Spread values above one may result in durations
+// outside [min, max]. min must not be greater than max.
+func wait(min, max time.Duration, i, n int, spread float64) time.Duration {
+	l := logistic(i, n-1) // n-1 because of fence posts.
+	return min + time.Duration(float64(max-min)*(l+spread*jitter(l)))
+}
+
+// logistic returns the ith value of n of the logistic function shifted
+// n/2 right. The returned value is in (0, 1) for all sensible values.
+func logistic(i, n int) float64 {
+	return 1 / (1 + math.Exp(float64(n)/2-float64(i)))
+}
+
+// jitter returns a jittered value around f, f±eps, where eps is f(1-f).
+// f must be in [0, 1].
+func jitter(f float64) float64 {
+	return (rand.Float64() - 0.5) * f * (1 - f)
 }
 
 // now is time.Now with a modifiable time source.

@@ -21,7 +21,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"sync"
 	"time"
 
@@ -200,12 +200,12 @@ func (mw *Wrapper) MetricSets() []*metricSetWrapper {
 // metricSetWrapper methods
 
 func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
-	defer logp.Recover(fmt.Sprintf("recovered from panic while fetching "+
+	defer msw.Logger().Recover(fmt.Sprintf("recovered from panic while fetching "+
 		"'%s/%s' for host '%s'", msw.module.Name(), msw.Name(), msw.Host()))
 
 	// Start each metricset randomly over a period of MaxDelayPeriod.
 	if msw.module.maxStartDelay > 0 {
-		delay := time.Duration(rand.Int63n(int64(msw.module.maxStartDelay)))
+		delay := rand.N(msw.module.maxStartDelay)
 		debugf("%v/%v will start after %v", msw.module.Name(), msw.Name(), delay)
 		select {
 		case <-done:
@@ -214,8 +214,8 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		}
 	}
 
-	debugf("Starting %s", msw)
-	defer debugf("Stopped %s", msw)
+	msw.Logger().Named("module").Debugf("Starting %s", msw)
+	defer msw.Logger().Named("module").Debugf("Stopped %s", msw)
 
 	// Events and errors are reported through this.
 	reporter := &eventReporter{
@@ -235,7 +235,7 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
-		logp.Err("MetricSet '%s/%s' does not implement an event producing interface",
+		msw.Logger().Errorf("MetricSet '%s/%s' does not implement an event producing interface",
 			msw.Module().Name(), msw.Name())
 	}
 }
@@ -320,7 +320,7 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 		reporter.Error(err)
 		msw.stats.consecutiveFailures.Set(0)
 		// mark module as running if metrics are partially available and display the error message
-		msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+		msw.module.UpdateStatus(status.Running, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
 		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 
 	default:
@@ -328,9 +328,9 @@ func (msw *metricSetWrapper) handleFetchError(err error, reporter mb.PushReporte
 		msw.stats.consecutiveFailures.Inc()
 		if msw.failureThreshold > 0 && msw.stats.consecutiveFailures != nil && uint(msw.stats.consecutiveFailures.Get()) >= msw.failureThreshold {
 			// mark it as degraded for any other issue encountered
-			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.MetricSet.Name(), err))
+			msw.module.UpdateStatus(status.Degraded, fmt.Sprintf("Error fetching data for metricset %s.%s: %v", msw.module.Name(), msw.Name(), err))
 		}
-		logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+		msw.Logger().Errorf("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 
 	}
 }
@@ -401,7 +401,8 @@ func (r reporterV2) Done() <-chan struct{} { return r.done }
 func (r reporterV2) Error(err error) bool  { return r.Event(mb.Event{Error: err}) }
 func (r reporterV2) Event(event mb.Event) bool {
 	if event.Took == 0 && !r.start.IsZero() {
-		event.Took = time.Since(r.start)
+		// ensure elapsed time is always > 0
+		event.Took = max(time.Since(r.start), time.Microsecond)
 	}
 	if r.msw.periodic {
 		event.Period = r.msw.Module().Config().Period
@@ -428,7 +429,7 @@ func (r reporterV2) Event(event mb.Event) bool {
 	if event.Namespace == "" {
 		event.Namespace = r.msw.Registration().Namespace
 	}
-	beatEvent := event.BeatEvent(r.msw.module.Name(), r.msw.MetricSet.Name(), r.msw.module.eventModifiers...)
+	beatEvent := event.BeatEvent(r.msw.module.Name(), r.msw.Name(), r.msw.module.eventModifiers...)
 	if !writeEvent(r.done, r.out, beatEvent) {
 		return false
 	}

@@ -339,7 +339,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	}
 
 	// Setup registrar to persist state
-	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout)
+	registrar, err := registrar.New(stateStore, finishedLogger, config.Registry.FlushTimeout, fb.logger)
 	if err != nil {
 		fb.logger.Errorf("Could not init registrar: %v", err)
 		return err
