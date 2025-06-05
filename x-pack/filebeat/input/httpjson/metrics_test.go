@@ -125,7 +125,7 @@ func TestMetrics(t *testing.T) {
 			ctx, cancel := newV2Context("httpjson-foo-eb837d4c-5ced-45ed-b05c-de658135e248::https://somesource/someapi")
 			t.Cleanup(cancel)
 
-			reg, unreg := inputmon.NewInputV1MetricsRegistry("httpjson-test", ctx.ID, nil)
+			reg, unreg := inputmon.NewDeprecatedMetricsRegistry("httpjson-test", ctx.ID, nil)
 			t.Cleanup(unreg)
 
 			var g errgroup.Group

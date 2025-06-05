@@ -28,7 +28,7 @@ type inputMetrics struct {
 func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
 	// It's a v1 input, thus it does not have access to the v2.Context with the
 	// metrics registry.
-	reg, unreg := inputmon.NewInputV1MetricsRegistry(inputName, id, optionalParent)
+	reg, unreg := inputmon.NewDeprecatedMetricsRegistry(inputName, id, optionalParent)
 
 	out := &inputMetrics{
 		unregister:              unreg,

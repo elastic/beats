@@ -171,7 +171,7 @@ func test(url *url.URL) error {
 func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
 	// TODO(AndersonQ): investigate why it isn't working with the new API:
 	//   - `TestInputMetricsFromPipeline` fails
-	reg, unreg := inputmon.NewInputV1MetricsRegistry("httpjson", ctx.ID, nil)
+	reg, unreg := inputmon.NewDeprecatedMetricsRegistry("httpjson", ctx.ID, nil)
 	defer unreg()
 	return run(ctx, cfg, pub, crsr, reg)
 }
