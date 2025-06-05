@@ -28,10 +28,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/beats/v7/libbeat/processors/actions/addfields"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -87,7 +89,7 @@ func TestProcessorsForConfig(t *testing.T) {
 		"Set field in ClientConfig": {
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+					Processor: makeProcessors(addfields.NewAddFields(mapstr.M{
 						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
@@ -100,7 +102,7 @@ func TestProcessorsForConfig(t *testing.T) {
 			configStr: `processors: [add_fields: {fields: {testField: inputConfig}}]`,
 			clientCfg: beat.ClientConfig{
 				Processing: beat.ProcessingConfig{
-					Processor: makeProcessors(actions.NewAddFields(mapstr.M{
+					Processor: makeProcessors(addfields.NewAddFields(mapstr.M{
 						"fields": mapstr.M{"testField": "clientConfig"},
 					}, false, true)),
 				},
@@ -185,7 +187,7 @@ func TestProcessorsForConfigIsFlat(t *testing.T) {
 	require.NoError(t, err)
 
 	lst := clientCfg.Processing.Processor
-	assert.Equal(t, 2, len(lst.(*processors.Processors).List))
+	assert.Equal(t, 2, len(lst.(*processors.Processors).List)) //nolint:errcheck //Safe to ignore in tests
 }
 
 // setRawIndex is a bare-bones processor to set the raw_index field to a
@@ -209,7 +211,8 @@ func (p *setRawIndex) String() string {
 
 // makeProcessors wraps one or more bare Processor objects in Processors.
 func makeProcessors(procs ...beat.Processor) *processors.Processors {
-	procList := processors.NewList(nil)
+	logger, _ := logp.NewDevelopmentLogger("")
+	procList := processors.NewList(logger)
 	procList.List = procs
 	return procList
 }

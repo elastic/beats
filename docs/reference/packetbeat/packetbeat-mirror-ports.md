@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-mirror-ports.html
 ---
 
-# Packetbeat doesn���t see any packets when using mirror ports [packetbeat-mirror-ports]
+# Packetbeat doesn't see any packets when using mirror ports [packetbeat-mirror-ports]
 
 The interface needs to be set to promiscuous mode. Run the following command:
 

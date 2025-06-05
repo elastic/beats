@@ -26,7 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -38,7 +38,7 @@ func TestWhenPriorityIsSet(t *testing.T) {
 	e.SetPid([]byte("123"))
 
 	m := dummyMetadata()
-	event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+	event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 
 	expected := mapstr.M{
 		"log": mapstr.M{
@@ -72,7 +72,7 @@ func TestWhenPriorityIsNotSet(t *testing.T) {
 	e.SetPid([]byte("123"))
 
 	m := dummyMetadata()
-	event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+	event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 	expected := mapstr.M{
 		"log": mapstr.M{
 			"source": mapstr.M{
@@ -97,7 +97,7 @@ func TestPid(t *testing.T) {
 		e.SetMessage([]byte("hello world"))
 		e.SetPid([]byte("123"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 		v, err := event.GetValue("process")
 		if !assert.NoError(t, err) {
 			return
@@ -109,7 +109,7 @@ func TestPid(t *testing.T) {
 		e := newEvent()
 		e.SetMessage([]byte("hello world"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 
 		_, err := event.GetValue("process")
 		assert.Equal(t, mapstr.ErrKeyNotFound, err)
@@ -122,7 +122,7 @@ func TestHostname(t *testing.T) {
 		e.SetMessage([]byte("hello world"))
 		e.SetHostname([]byte("wopr"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 		v, err := event.GetValue("hostname")
 		if !assert.NoError(t, err) {
 			return
@@ -134,7 +134,7 @@ func TestHostname(t *testing.T) {
 		e := newEvent()
 		e.SetMessage([]byte("hello world"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 
 		_, err := event.GetValue("hostname")
 		if !assert.Error(t, err) {
@@ -149,7 +149,7 @@ func TestProgram(t *testing.T) {
 		e.SetMessage([]byte("hello world"))
 		e.SetProgram([]byte("sudo"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 		v, err := event.GetValue("process")
 		if !assert.NoError(t, err) {
 			return
@@ -161,7 +161,7 @@ func TestProgram(t *testing.T) {
 		e := newEvent()
 		e.SetMessage([]byte("hello world"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 
 		_, err := event.GetValue("process")
 		assert.Equal(t, mapstr.ErrKeyNotFound, err)
@@ -175,7 +175,7 @@ func TestSequence(t *testing.T) {
 		e.SetProgram([]byte("sudo"))
 		e.SetSequence([]byte("123"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 		v, err := event.GetValue("event.sequence")
 		if !assert.NoError(t, err) {
 			return
@@ -187,7 +187,7 @@ func TestSequence(t *testing.T) {
 		e := newEvent()
 		e.SetMessage([]byte("hello world"))
 		m := dummyMetadata()
-		event := createEvent(e, m, time.Local, logp.NewLogger("syslog"))
+		event := createEvent(e, m, time.Local, logptest.NewTestingLogger(t, "syslog"))
 
 		_, err := event.GetValue("event.sequence")
 		assert.Error(t, err)
@@ -234,7 +234,7 @@ func TestParseAndCreateEvent3164(t *testing.T) {
 	}
 
 	tz := time.Local
-	log := logp.NewLogger("syslog")
+	log := logptest.NewTestingLogger(t, "syslog")
 	metadata := dummyMetadata()
 
 	for title, c := range cases {
@@ -337,7 +337,7 @@ func TestParseAndCreateEvent5424(t *testing.T) {
 	}
 
 	tz := time.Local
-	log := logp.NewLogger("syslog")
+	log := logptest.NewTestingLogger(t, "syslog")
 	metadata := dummyMetadata()
 
 	for title, c := range cases {

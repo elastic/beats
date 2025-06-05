@@ -110,15 +110,11 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This module comes with two sample dashboards.
 
-:::{image} images/kibana-logstash-log.png
-:alt: kibana logstash log
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana logstash log](images/kibana-logstash-log.png)
 
-:::{image} images/kibana-logstash-slowlog.png
-:alt: kibana logstash slowlog
-:class: screenshot
-:::
+% TO DO: Use `:class: screenshot`
+![kibana logstash slowlog](images/kibana-logstash-slowlog.png)
 
 
 ## Known issues [_known_issues]

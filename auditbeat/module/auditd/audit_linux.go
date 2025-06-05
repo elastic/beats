@@ -147,34 +147,10 @@ func newAuditClient(c *Config, log *logp.Logger) (*libaudit.AuditClient, error) 
 	return libaudit.NewAuditClient(nil)
 }
 
-func closeAuditClient(client *libaudit.AuditClient, log *logp.Logger) {
-	discard := func(bytes []byte) ([]syscall.NetlinkMessage, error) {
-		return nil, nil
-	}
-	// Drain the netlink channel in parallel to Close() to prevent a deadlock.
-	// This goroutine will terminate once receive from netlink errors (EBADF,
-	// EBADFD, or any other error). This happens because the fd is closed.
-	go func() {
-		for {
-			_, err := client.Netlink.Receive(true, discard)
-			switch {
-			case err == nil, errors.Is(err, syscall.EINTR):
-			case errors.Is(err, syscall.EAGAIN):
-				time.Sleep(50 * time.Millisecond)
-			default:
-				return
-			}
-		}
-	}()
-	if err := client.Close(); err != nil {
-		log.Errorw("Error closing audit monitoring client", "error", err)
-	}
-}
-
 // Run initializes the audit client and receives audit messages from the
 // kernel until the reporter's done channel is closed.
 func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
-	defer closeAuditClient(ms.client, ms.log)
+	defer ms.client.Close()
 	defer ms.control.Close()
 
 	// Don't attempt to change configuration if audit rules are locked (enabled == 2).
@@ -189,7 +165,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 	}
 
 	if status.Enabled == auditLocked {
-		err := errors.New("Skipping rule configuration: Audit rules are locked")
+		err := errors.New("skipping rule configuration: Audit rules are locked")
 		reporter.Error(err)
 	} else if err := ms.addRules(reporter); err != nil {
 		reporter.Error(err)
@@ -221,7 +197,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 		go func() {
 			defer func() { // Close the most recently allocated "client" instance.
 				if client != nil {
-					closeAuditClient(client, ms.log)
+					ms.client.Close()
 				}
 			}()
 			timer := time.NewTicker(lostEventsUpdateInterval)
@@ -235,7 +211,7 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 						ms.updateKernelLostMetric(status.Lost)
 					} else {
 						ms.log.Error("get status request failed:", err)
-						closeAuditClient(client, ms.log)
+						client.Close()
 						client, err = libaudit.NewAuditClient(nil)
 						if err != nil {
 							ms.log.Errorw("Failure creating audit monitoring client", "error", err)
@@ -288,7 +264,7 @@ func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("failed to create audit client for adding rules: %w", err)
 	}
-	defer closeAuditClient(client, ms.log)
+	defer client.Close()
 
 	// Delete existing rules.
 	n, err := client.DeleteRules()
@@ -416,17 +392,49 @@ func (ms *MetricSet) initClient() error {
 }
 
 func (ms *MetricSet) setPID(retries int) (err error) {
-	if err = ms.client.SetPID(libaudit.WaitForReply); err == nil || !errors.Is(err, syscall.ENOBUFS) || retries == 0 {
-		return err
+	noParse := func([]byte) ([]syscall.NetlinkMessage, error) {
+		return nil, nil
 	}
-	// At this point the netlink channel is congested (ENOBUFS).
-	// Drain and close the client, then retry with a new client.
-	closeAuditClient(ms.client, ms.log)
-	if ms.client, err = newAuditClient(&ms.config, ms.log); err != nil {
-		return fmt.Errorf("failed to recover from ENOBUFS: %w", err)
+
+	// run the SetPID logic in a retry loop, since the startup process can be fragile.
+	for i := 0; i < retries; i++ {
+		// This call will block on send, which isn't great, but the reply can *also* time out
+		// or return something like ENOBUFS.
+		err = ms.client.SetPID(libaudit.WaitForReply)
+		switch {
+		case err == nil:
+			return nil
+		case errors.Is(err, syscall.EINTR):
+			// SetPID wraps a lot of logic, so we'll only ever get an EINTR on a send, the receive will always retry
+			continue
+		case errors.Is(err, syscall.ENOBUFS):
+			ms.log.Info("Recovering from ENOBUFS during setup...")
+			// the netlink connection is losing data. Try to drain and send again.
+			// This is technically dropping data, but auditbeat is configured as best-effort anyway, and we'll drop events under high load anyway.
+			maxRecv := 10000
+			for i := 0; i < maxRecv; i++ {
+				var retryOuter bool // hack because of how switch/break statements work
+				_, err = ms.client.Netlink.Receive(true, noParse)
+				switch {
+				case err == nil, errors.Is(err, syscall.EINTR), errors.Is(err, syscall.ENOBUFS):
+					continue
+				case errors.Is(err, syscall.EAGAIN):
+					// means receive would block, try to set our PID again
+					retryOuter = true
+				default:
+					return fmt.Errorf("failed to recover from ENOBUFS: %w", err)
+				}
+
+				if retryOuter {
+					break
+				}
+			}
+		default:
+			return fmt.Errorf("failed to set PID for auditbeat, got %w", err)
+		}
 	}
-	ms.log.Info("Recovering from ENOBUFS ...")
-	return ms.setPID(retries - 1)
+
+	return fmt.Errorf("could not set PID for audit process after %d attempts", retries)
 }
 
 func (ms *MetricSet) updateKernelLostMetric(lost uint32) {

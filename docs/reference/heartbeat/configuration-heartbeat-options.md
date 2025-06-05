@@ -85,7 +85,7 @@ The `tcp` and `http` monitor types both support SSL/TLS and some proxy settings.
 ::::{note}
 **Looking for browser monitor options?**  {{heartbeat}} browser checks are in beta and will never be made generally available.
 
-If you want to set up browser checks, we highly recommend using Synthetics via [Projects](docs-content://solutions/observability/apps/create-monitors-with-project-monitors.md) or the [Synthetics app in {{kib}}](docs-content://solutions/observability/apps/create-monitors-in-synthetics-app.md) to create and manage browser monitors.
+If you want to set up browser checks, we highly recommend using Synthetics via [Projects](docs-content://solutions/observability/synthetics/create-monitors-with-projects.md) or the [Synthetics app in {{kib}}](docs-content://solutions/observability/synthetics/create-monitors-ui.md) to create and manage browser monitors.
 
 If you need to refer to how beta {{heartbeat}} browser checks were set up previously, refer to the [Browser options documentation for 8.7](https://www.elastic.co/guide/en/beats/heartbeat/8.7/monitor-browser-options.html).
 ::::

@@ -78,22 +78,20 @@ func CheckReceivers(params CheckReceiversParams) {
 		// Replicate the behavior of the collector logger
 		receiverCore := core.
 			With([]zapcore.Field{
-				zap.String("name", rc.Name),
-				zap.String("kind", "receiver"),
-				zap.String("data_type", "logs"),
+				zap.String("otelcol.component.id", rc.Name),
+				zap.String("otelcol.component.kind", "receiver"),
+				zap.String("otelcol.signal", "logs"),
 			})
 
 		receiverSettings.Logger = zap.New(receiverCore)
+		receiverSettings.ID = component.NewIDWithName(rc.Factory.Type(), rc.Name)
 
 		logConsumer, err := consumer.NewLogs(func(ctx context.Context, ld plog.Logs) error {
-			for i := 0; i < ld.ResourceLogs().Len(); i++ {
-				rl := ld.ResourceLogs().At(i)
-				for j := 0; j < rl.ScopeLogs().Len(); j++ {
-					sl := rl.ScopeLogs().At(j)
-					for k := 0; k < sl.LogRecords().Len(); k++ {
-						log := sl.LogRecords().At(k)
+			for _, rl := range ld.ResourceLogs().All() {
+				for _, sl := range rl.ScopeLogs().All() {
+					for _, lr := range sl.LogRecords().All() {
 						logsMu.Lock()
-						logs[rc.Name] = append(logs[rc.Name], log.Body().Map().AsRaw())
+						logs[rc.Name] = append(logs[rc.Name], lr.Body().Map().AsRaw())
 						logsMu.Unlock()
 					}
 				}
@@ -121,18 +119,27 @@ func CheckReceivers(params CheckReceiversParams) {
 		}()
 	}
 
+	t.Cleanup(func() {
+		if t.Failed() {
+			logsMu.Lock()
+			defer logsMu.Unlock()
+			t.Logf("Ingested Logs: %v", logs)
+		}
+	})
+
 	require.EventuallyWithT(t, func(ct *assert.CollectT) {
 		logsMu.Lock()
 		defer logsMu.Unlock()
 
 		// Ensure the logger fields from the otel collector are present in the logs.
 		for _, zl := range zapLogs.All() {
-			require.Contains(t, zl.ContextMap(), "name")
-			require.Equal(t, zl.ContextMap()["kind"], "receiver")
-			require.Equal(t, zl.ContextMap()["data_type"], "logs")
+			require.Contains(t, zl.ContextMap(), "otelcol.component.id")
+			require.Equal(t, zl.ContextMap()["otelcol.component.kind"], "receiver")
+			require.Equal(t, zl.ContextMap()["otelcol.signal"], "logs")
 			break
 		}
 
 		params.AssertFunc(ct, logs, zapLogs)
-	}, time.Minute, 100*time.Millisecond, "timeout waiting for assertion to pass")
+	}, 2*time.Minute, 100*time.Millisecond,
+		"timeout waiting for logger fields from the OTel collector are present in the logs and other assertions to be met")
 }

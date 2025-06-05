@@ -29,11 +29,13 @@ import (
 
 const (
 	defaultScheme = "http"
+	defaultport   = "9090"
 )
 
 var (
 	hostParser = parse.URLHostParserBuilder{
 		DefaultScheme: defaultScheme,
+		DefaultPort:   defaultport,
 	}.Build()
 )
 
@@ -93,6 +95,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
 			return err
+		}
+
+		if response.StatusCode > 399 {
+			m.Logger().Debugf("error received from prometheus endpoint %v: %v", url, string(body))
+			reporter.Error(fmt.Errorf("unexpected status code %d from %v", response.StatusCode, url))
+			continue
 		}
 
 		events, parseErr := parseResponse(body, pathConfig)

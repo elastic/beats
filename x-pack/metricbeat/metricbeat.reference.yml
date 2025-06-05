@@ -213,6 +213,29 @@ metricbeat.modules:
   # Password of hosts. Empty by default
   #password: password
 
+#------------------------------ AutoOps ES Module ------------------------------
+- module: autoops_es
+  metricsets:
+    - cat_shards
+    - cluster_health
+    - cluster_settings
+    - hot_threads
+    - license
+    - node_stats
+    - tasks_management
+  period: 10s
+  enabled: true
+  hosts: ["http://localhost:9200"]
+
+- module: autoops_es
+  metricsets:
+    - cat_template
+    - component_template
+    - index_template
+  period: 1d
+  enabled: true
+  hosts: ["http://localhost:9200"]
+
 #--------------------------------- AWS Module ---------------------------------
 - module: aws
   period: 300s
@@ -603,7 +626,6 @@ metricbeat.modules:
     - pubsub
     - loadbalancing
     - firestore
-    - dataproc
   zone: "us-central1-a"
   project_id: "your project id"
   credentials_file_path: "your JSON credentials file path"
@@ -662,6 +684,16 @@ metricbeat.modules:
   endpoint: http://your-endpoint
   dataset_id: "dataset id"
   table_pattern: "table pattern"
+
+- module: gcp
+  metricsets:
+    - dataproc
+  zone: "us-central1-a"
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  collect_dataproc_user_labels: true
 
 #-------------------------------- Golang Module --------------------------------
 - module: golang
@@ -1255,6 +1287,7 @@ metricbeat.modules:
     - "subscriptions"
     #- "connection"
     #- "route"
+    #- "jetstream"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
@@ -1263,6 +1296,24 @@ metricbeat.modules:
   #subscriptions.metrics_path: "/subsz"
   #connection.metrics_path: "/connz"
   #route.metrics_path: "/routez"
+  #jetstream:
+  #  stats:
+  #    enabled: true
+  #  account:
+  #    enabled: true
+  #    names:
+  #      - default
+  #  stream:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1
+  #      - another-stream
+  #  consumer:
+  #    enabled: true
+  #    names:
+  #      - my-stream-1-consumer-1
+  #      - my-stream-1-consumer-2
+  #      - another-stream-consumer-1
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -1400,6 +1451,67 @@ metricbeat.modules:
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
 
+#------------------------------ Prometheus Module ------------------------------
+# Metrics collected from a Prometheus endpoint
+- module: prometheus
+  period: 10s
+  metricsets: ["collector"]
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  #metrics_filters:
+  #  include: []
+  #  exclude: []
+  #username: "user"
+  #password: "secret"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
+  # This can be used for service account based authorization:
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+
+# Metrics sent by a Prometheus server using remote_write option
+#- module: prometheus
+#  metricsets: ["remote_write"]
+#  host: "localhost"
+#  port: "9201"
+
+  # Count number of metrics present in Elasticsearch document (default: false)
+  #metrics_count: false
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+#- module: prometheus
+#  metricsets: ["query"]
+#  hosts: ["localhost:9090"]
+#  period: 10s
+#  queries:
+#  - name: "instant_vector"
+#    path: "/api/v1/query"
+#    params:
+#      query: "sum(rate(prometheus_http_requests_total[1m]))"
+#  - name: "range_vector"
+#    path: "/api/v1/query_range"
+#    params:
+#      query: "up"
+#      start: "2019-12-20T00:00:00.000Z"
+#      end:  "2019-12-21T00:00:00.000Z"
+#      step: 1h
+#  - name: "scalar"
+#    path: "/api/v1/query"
+#    params:
+#      query: "100"
+#  - name: "string"
+#    path: "/api/v1/query"
+#    params:
+#      query: "some_value"
+
 #----------------------- Prometheus Typed Metrics Module -----------------------
 - module: prometheus
   period: 10s
@@ -1450,67 +1562,6 @@ metricbeat.modules:
   #types_patterns:
   #  counter_patterns: []
   #  histogram_patterns: []
-
-# Metrics that will be collected using a PromQL
-#- module: prometheus
-#  metricsets: ["query"]
-#  hosts: ["localhost:9090"]
-#  period: 10s
-#  queries:
-#  - name: "instant_vector"
-#    path: "/api/v1/query"
-#    params:
-#      query: "sum(rate(prometheus_http_requests_total[1m]))"
-#  - name: "range_vector"
-#    path: "/api/v1/query_range"
-#    params:
-#      query: "up"
-#      start: "2019-12-20T00:00:00.000Z"
-#      end:  "2019-12-21T00:00:00.000Z"
-#      step: 1h
-#  - name: "scalar"
-#    path: "/api/v1/query"
-#    params:
-#      query: "100"
-#  - name: "string"
-#    path: "/api/v1/query"
-#    params:
-#      query: "some_value"
-
-#------------------------------ Prometheus Module ------------------------------
-# Metrics collected from a Prometheus endpoint
-- module: prometheus
-  period: 10s
-  metricsets: ["collector"]
-  hosts: ["localhost:9090"]
-  metrics_path: /metrics
-  #metrics_filters:
-  #  include: []
-  #  exclude: []
-  #username: "user"
-  #password: "secret"
-
-  # Count number of metrics present in Elasticsearch document (default: false)
-  #metrics_count: false
-
-  # This can be used for service account based authorization:
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  #ssl.certificate_authorities:
-  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-
-
-# Metrics sent by a Prometheus server using remote_write option
-#- module: prometheus
-#  metricsets: ["remote_write"]
-#  host: "localhost"
-#  port: "9201"
-
-  # Count number of metrics present in Elasticsearch document (default: false)
-  #metrics_count: false
-
-  # Secure settings for the server using TLS/SSL:
-  #ssl.certificate: "/etc/pki/server/cert.pem"
-  #ssl.key: "/etc/pki/server/cert.key"
 
 # Metrics that will be collected using a PromQL
 #- module: prometheus
@@ -1716,24 +1767,28 @@ metricbeat.modules:
 
 - module: windows
   metricsets: ["wmi"]
-  period: 60s
+  period: 10m
   wmi:
-    include_null: false          # Exclude fields with null values from the output
-    include_queries: false       # Do not include the query string in the output
-    include_empty_string: false  # Exclude fields with empty string values from the output
-    warning_threshold: 30s       # Maximum time to wait for a query result before logging a warning (defaults to period)
+    # Do not include the query string in the output
+    include_queries: false
+    # Exclude properties with null values from the output
+    include_null_properties: false
+    # Exclude properties with empty string values from the output
+    include_empty_string_properties: false
+    # Maximum time to wait for a query result before logging a warning (defaults to period)
+    warning_threshold: 10m
     # Default WMI namespace for all queries (if not specified per query)
     # Uncomment to override the default, which is "root\\cimv2".
     # namespace: "root\\cimv2"
     queries:
-    - class: Win32_OperatingSystem # FROM: Class to fetch
-      fields:                      # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
+    - class: Win32_OperatingSystem          # FROM: Class to fetch
+      properties:                           # SELECT: Fields to retrieve for this WMI class. Omit the setting to fetch all properties
        - FreePhysicalMemory
        - FreeSpaceInPagingFiles
        - FreeVirtualMemory
        - LocalDateTime
        - NumberOfUsers
-      where: ""                   # Optional WHERE clause to filter query results
+      where: ""                             # Optional WHERE clause to filter query results
       # Override the WMI namespace for this specific query (optional).
       # If set, this takes precedence over the default namespace above.
       # namespace: "root\\cimv2" # Overrides the metric

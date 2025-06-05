@@ -30,9 +30,7 @@ For example the following configuration will collect information about all keys 
 
 The Redis key metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat_redis_key_dashboard.png
-:alt: metricbeat redis key dashboard
-:::
+![metricbeat redis key dashboard](images/metricbeat_redis_key_dashboard.png)
 
 ## Fields [_fields_219]
 

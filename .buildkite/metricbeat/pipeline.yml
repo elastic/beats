@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -22,8 +20,8 @@ env:
   IMAGE_BEATS_WITH_HOOKS_LATEST: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:latest"
 
   # Integration Tests
-  K8S_VERSION: "v1.31.0"
-  ASDF_KIND_VERSION: "0.24.0"
+  K8S_VERSION: "v1.33.0"
+  ASDF_KIND_VERSION: "0.27.0"
 
   # Module Tests
   BEAT_PATH: "metricbeat"
@@ -34,11 +32,6 @@ env:
   # Unit tests
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
-
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
 
 steps:
   - group: "Check/Update"
@@ -107,8 +100,61 @@ steps:
           - github_commit_status:
               context: "metricbeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: Metricbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "mandatory-linux-unit-test-fips-tag"
+        command: |
+          cd metricbeat
+          mage unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+
+      - label: ":ubuntu: Metricbeat: Ubuntu x86_64 fips140=only Unit Tests"
+        key: "mandatory-linux-unit-test-fips-only"
+        command: |
+          cd metricbeat
+          mage goFIPSOnlyUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Ubuntu x86_64 fips140=only Unit Tests"
+
       - label: ":ubuntu: Metricbeat: Go Integration Tests (Module)"
-        key: "mandatory-int-test"
         command: |
           set -euo pipefail
           echo "~~~ Running tests"
@@ -125,6 +171,9 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+          - "metricbeat/build/integration-tests/*"
+          - "metricbeat/build/integration-tests/Test*/*"
+          - "metricbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
@@ -133,7 +182,65 @@ steps:
               debug: true
         notify:
           - github_commit_status:
-              context: "metricbeat: Go Integration Tests (Module)"
+              context: "metricbeat: Go Integration Tests (Module) / Ubuntu x86_64"
+
+      - label: ":windows: Metricbeat: Go Integration Tests (Module)"
+        skip: "Skipped due to https://github.com/elastic/beats/issues/44537"
+        if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+        command: |
+          cd metricbeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+          - "metricbeat/build/integration-tests/*"
+          - "metricbeat/build/integration-tests/Test*/*"
+          - "metricbeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Go Integration Tests (Module) / Windows"
+
+      - label: ":ubuntu: Metricbeat: Go fips140=only Integration Tests (Module)"
+        command: |
+          cd metricbeat
+          mage goFIPSOnlyIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+          - "metricbeat/build/integration-tests/*"
+          - "metricbeat/build/integration-tests/Test*/*"
+          - "metricbeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "metricbeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Go fips140=only Integration Tests (Module)"
 
       - label: ":ubuntu: Metricbeat: Python Integration Tests (Module)"
         key: "mandatory-python-int-test"
@@ -153,6 +260,9 @@ steps:
         artifact_paths:
           - "metricbeat/build/*.xml"
           - "metricbeat/build/*.json"
+          - "metricbeat/build/integration-tests/*"
+          - "metricbeat/build/integration-tests/Test*/*"
+          - "metricbeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "metricbeat/build/TEST-*.xml"
@@ -329,71 +439,6 @@ steps:
         notify:
           - github_commit_status:
               context: "metricbeat: Win 2025 Unit Tests"
-
-  - group: "Extended Tests"
-    key: "metricbeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-
-    steps:
-      - label: ":mac: Metricbeat: macOS x64_64 Unit Tests"
-        key: "extended-macos-x64-64-unit-tests"
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd metricbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "metricbeat/build/*.xml"
-          - "metricbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "metricbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "metricbeat: macOS x86_64 Unit Tests"
-
-      - label: ":mac: Metricbeat: macOS arm64 Unit Tests"
-        key: "extended-macos-arm64-unit-tests"
-        skip: "Skipping due to elastic/beats#33035"
-        # https://github.com/elastic/beats/issues/33035
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd metricbeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "metricbeat/build/*.xml"
-          - "metricbeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "metricbeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "metricbeat: macOS arm64 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed

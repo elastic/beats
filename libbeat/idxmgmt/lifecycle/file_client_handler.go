@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -63,7 +62,7 @@ func NewFileClientHandler(c FileClient, info beat.Info, cfg RawConfig) (*FileCli
 		lifecycleCfg = DefaultILMConfig(info).ILM
 		err = cfg.ILM.Unpack(&lifecycleCfg)
 	} else {
-		logp.L().Infof("No lifecycle config has been explicitly enabled, defauling to ILM")
+		info.Logger.Infof("No lifecycle config has been explicitly enabled, defauling to ILM")
 	}
 
 	if err != nil {

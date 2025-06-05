@@ -13,7 +13,7 @@ mapped_pages:
 The recommended index template file for Packetbeat is installed by the Packetbeat packages. If you accept the default configuration in the `packetbeat.yml` config file, Packetbeat loads the template automatically after successfully connecting to {{es}}. If the template already exists, it’s not overwritten unless you configure Packetbeat to do so.
 
 ::::{note}
-A connection to {{es}} is required to load the index template. If the output is not {{es}} (or {{ess}}), you must [load the template manually](#load-template-manually).
+A connection to {{es}} is required to load the index template. If the output is not {{es}} (or {{ech}}), you must [load the template manually](#load-template-manually).
 ::::
 
 

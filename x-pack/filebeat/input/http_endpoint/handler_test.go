@@ -25,6 +25,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/testing/testutils"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -210,12 +211,13 @@ func Test_apiResponse(t *testing.T) {
 		}
 	}
 	testCases := []struct {
-		name         string        // Sub-test name.
-		conf         config        // Load configuration.
-		request      *http.Request // Input request.
-		events       []mapstr.M    // Expected output events.
-		wantStatus   int           // Expected response code.
-		wantResponse string        // Expected response message.
+		name         string             // Sub-test name.
+		setup        func(t *testing.T) // setup function
+		conf         config             // Load configuration.
+		request      *http.Request      // Input request.
+		events       []mapstr.M         // Expected output events.
+		wantStatus   int                // Expected response code.
+		wantResponse string             // Expected response message.
 	}{
 		{
 			name: "single_event",
@@ -256,7 +258,54 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_hex",
+			name: "options_with_headers",
+			conf: func() config {
+				c := defaultConfig()
+				c.OptionsHeaders = http.Header{
+					"optional-response-header": {"Optional-response-value"},
+				}
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusOK,
+			wantResponse: "",
+		},
+		{
+			name: "options_empty_headers",
+			conf: func() config {
+				c := defaultConfig()
+				c.OptionsHeaders = http.Header{}
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusOK,
+			wantResponse: "",
+		},
+		{
+			name: "options_no_header",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodOptions, "/", nil)
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events:       []mapstr.M{},
+			wantStatus:   http.StatusBadRequest,
+			wantResponse: `{"message":"OPTIONS requests are only allowed with options_headers set"}`,
+		},
+		{
+			name:  "hmac_hex",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -281,7 +330,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_base64",
+			name:  "hmac_base64",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -306,7 +356,8 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
-			name: "hmac_raw_base64",
+			name:  "hmac_raw_base64",
+			setup: func(t *testing.T) { testutils.SkipIfFIPSOnly(t, "test HMAC uses SHA-1.") },
 			conf: func() config {
 				c := defaultConfig()
 				c.Prefix = "."
@@ -541,10 +592,13 @@ func Test_apiResponse(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Setup
+			if tc.setup != nil {
+				tc.setup(t)
+			}
 			pub := new(publisher)
 			metrics := newInputMetrics("")
 			defer metrics.Close()
-			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
+			apiHandler := newHandler(ctx, newTracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, nil, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()
