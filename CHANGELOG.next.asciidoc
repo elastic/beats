@@ -93,6 +93,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
+- Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
 
 *Osquerybeat*
 
@@ -138,6 +139,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 - Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
+- Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
 
 *Auditbeat*
 
@@ -243,6 +245,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 - Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
+- Fix a logging regression that ignored to_files and logged to stdout. {pull}44573[44573]
 
 *Heartbeat*
 
