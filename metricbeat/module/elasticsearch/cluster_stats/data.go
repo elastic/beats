@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -215,7 +216,13 @@ func getClusterMetadataSettings(httpClient *helper.HTTP) (mapstr.M, error) {
 	return clusterSettings, nil
 }
 
-func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
+func eventMapping(
+	r mb.ReporterV2,
+	httpClient *helper.HTTP,
+	info elasticsearch.Info,
+	content []byte,
+	isXpack bool,
+	log *logp.Logger) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {

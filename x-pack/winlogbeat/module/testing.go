@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/winlogbeat/module"
 	"github.com/elastic/beats/v7/x-pack/winlogbeat/module/wintest"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -100,7 +101,7 @@ func testIngestPipeline(t *testing.T, pipeline, pattern string, p *params) {
 		Password:         pass,
 		CompressionLevel: 3,
 		Transport:        httpcommon.HTTPTransportSettings{Timeout: time.Minute},
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("unexpected error making connection: %v", err)
 	}

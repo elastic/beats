@@ -45,7 +45,7 @@ type processorFn struct {
 
 func newGeneralizeProcessor(keepNull bool, logger *logp.Logger) *processorFn {
 	logger = logger.Named("publisher_processing")
-	g := common.NewGenericEventConverter(keepNull)
+	g := common.NewGenericEventConverter(keepNull, logger)
 	return newProcessor("generalizeEvent", func(event *beat.Event) (*beat.Event, error) {
 		// Filter out empty events. Empty events are still reported by ACK callbacks.
 		if len(event.Fields) == 0 {

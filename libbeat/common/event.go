@@ -42,9 +42,9 @@ type GenericEventConverter struct {
 }
 
 // NewGenericEventConverter creates an EventConverter with the given configuration options
-func NewGenericEventConverter(keepNull bool) *GenericEventConverter {
+func NewGenericEventConverter(keepNull bool, logger *logp.Logger) *GenericEventConverter {
 	return &GenericEventConverter{
-		log:      logp.NewLogger("event"),
+		log:      logger.Named("event"),
 		keepNull: keepNull,
 	}
 }

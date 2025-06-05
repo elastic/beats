@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -65,7 +66,7 @@ func newServerClientPair(t *testing.T, handler http.HandlerFunc) (*httptest.Serv
 
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL: server.URL,
-	})
+	}, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatalf("could not create the elasticsearch client, error: %s", err)
 	}

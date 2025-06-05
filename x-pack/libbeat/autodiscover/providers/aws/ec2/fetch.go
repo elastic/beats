@@ -61,12 +61,13 @@ func (amf *apiMultiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 // apiFetcher is a concrete implementation of fetcher that hits the real AWS API.
 type apiFetcher struct {
 	client ec2.DescribeInstancesAPIClient
+	log    *logp.Logger
 }
 
-func newAPIFetcher(clients []ec2.DescribeInstancesAPIClient) fetcher {
+func newAPIFetcher(clients []ec2.DescribeInstancesAPIClient, log *logp.Logger) fetcher {
 	fetchers := make([]fetcher, len(clients))
 	for idx, client := range clients {
-		fetchers[idx] = &apiFetcher{client}
+		fetchers[idx] = &apiFetcher{client, log}
 	}
 	return &apiMultiFetcher{fetchers}
 }
@@ -90,7 +91,7 @@ func (f *apiFetcher) fetch(ctx context.Context) ([]*ec2Instance, error) {
 		taskPool:  sync.Pool{},
 		context:   ctx,
 		cancel:    cancel,
-		logger:    logp.NewLogger("autodiscover-ec2-fetch"),
+		logger:    f.log.Named("autodiscover-ec2-fetch"),
 	}
 
 	// Limit concurrency against the AWS API by creating a pool of objects

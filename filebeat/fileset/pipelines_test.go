@@ -31,6 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
@@ -99,7 +100,7 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 				Transport: httpcommon.HTTPTransportSettings{
 					Timeout: 90 * time.Second,
 				},
-			})
+			}, logptest.NewTestingLogger(t, ""))
 			require.NoError(t, err)
 
 			ctx, cancel := context.WithCancel(context.Background())

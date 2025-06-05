@@ -181,9 +181,13 @@ type bulkStats struct {
 	AvgSizeInBytes    int `json:"avg_size_in_bytes"`
 }
 
-var logger = logp.NewLogger("elasticsearch.index")
-
-func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.Info, content []byte, isXpack bool) error {
+func eventsMapping(
+	r mb.ReporterV2,
+	httpClient *helper.HTTP,
+	info elasticsearch.Info,
+	content []byte,
+	isXpack bool,
+	log *logp.Logger) error {
 	clusterStateMetrics := []string{"routing_table"}
 	clusterStateFilterPaths := []string{"routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics, clusterStateFilterPaths)
@@ -225,7 +229,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		if err != nil {
 			// Failure to add index settings is sometimes expected and won't be breaking,
 			// so we log it as debug and carry on with regular processing.
-			logger.Debugf("failure adding index settings: %v", err)
+			log.Named("elasticsearch.index").Debugf("failure adding index settings: %v", err)
 		}
 
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
