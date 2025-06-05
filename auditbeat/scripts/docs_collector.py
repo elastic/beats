@@ -140,7 +140,7 @@ The following datasets are available:\n\n"""
         with open(os.path.join(docs_path, "reference", "auditbeat", "auditbeat-module-{}.md".format(module)), 'w') as f:
             f.write(module_file)
 
-        # TODO: Uncomment following when all the asciidocs are converted to markdown
+        # TODO(@VihasMakwana): Uncomment following when all the asciidocs are converted to markdown
         # As of now, this will not work and it will generate incomplete list.
 
 #     module_list_output = """---

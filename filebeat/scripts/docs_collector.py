@@ -64,7 +64,7 @@ For a description of each field in the module, see the [exported fields](/refere
         with open(docs_path, 'w', encoding='utf_8') as f:
             f.write(module_file)
 
-        # TODO: Uncomment following when all the asciidocs are converted to markdown
+        # TODO(@VihasMakwana): Uncomment following when all the asciidocs are converted to markdown
         # As of now, this will not work and it will generate incomplete list.
 
 #     module_list_output = """---

@@ -49,5 +49,4 @@ output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing <1>
 
 This module comes with a sample dashboard.
 
-% TO DO: Use `:class: screenshot`
 ![kibana powershell](images/kibana-powershell.jpg)
