@@ -25,12 +25,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/test"
 )
 
 func TestFetchMetricset(t *testing.T) {
-	var events []mbtest.mb.Event
+	var events []mb.Event
 	var errs []error
 	config := test.GetKubeStateMetricsConfig(t, "state_job")
 	metricSet := mbtest.NewFetcher(t, config)
