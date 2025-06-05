@@ -314,11 +314,6 @@ inputs:
     platforms: *platforms
     outputs: *outputs
     command: *heartbeat_command
-  - name: autoops_es/metrics
-    description: "AutoOps Elasticsearch metrics"
-    platforms: *platforms
-    outputs: *outputs
-    command: *metricbeat_command
   - name: beat/metrics
     description: "Beat metrics"
     platforms: *platforms
@@ -351,6 +346,11 @@ inputs:
         - "logging.event_data.to_stderr=true"
         - "-E"
         - "logging.event_data.to_files=false"
+  - name: autoops_es/metrics
+    description: "AutoOps Elasticsearch metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
   - name: docker/metrics
     description: "Docker metrics"
     platforms: *platforms
