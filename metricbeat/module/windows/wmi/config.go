@@ -31,32 +31,37 @@ import (
 )
 
 type Config struct {
-	IncludeQueries      bool                     `config:"wmi.include_queries"`      // Determines if the query string should be included in the output document
-	IncludeNull         bool                     `config:"wmi.include_null"`         // Specifies whether to include fields with nil values in the final document
-	IncludeEmptyString  bool                     `config:"wmi.include_empty_string"` // Specifies whether to include fields with empty string values in the final document
-	Host                string                   `config:"wmi.host"`                 // Hostname or IP address of the remote WMI server
-	User                string                   `config:"wmi.username"`             // Username for authentication on the remote WMI server
-	Password            string                   `config:"wmi.password"`             // Password for authentication on the remote WMI server
-	Namespace           string                   `config:"wmi.namespace"`            // Default WMI namespace for executing queries, used if not overridden by individual query configurations
-	Queries             []QueryConfig            `config:"wmi.queries"`              // List of WMI query configurations
-	WarningThreshold    time.Duration            `config:"wmi.warning_threshold"`    // Maximum duration to wait for query results before logging a warning. The query will continue running in WMI but will no longer be awaited
-	NamespaceQueryIndex map[string][]QueryConfig // Internal structure indexing queries by namespace to reduce the number of WMI connections required per execution
+	IncludeQueries               bool                     `config:"wmi.include_queries"`                 // Determines if the query string should be included in the output document
+	IncludeNullProperties        bool                     `config:"wmi.include_null_properties"`         // Specifies whether to include properties with nil values in the final document
+	IncludeEmptyStringProperties bool                     `config:"wmi.include_empty_string_properties"` // Specifies whether to include properties with empty string values in the final document
+	Namespace                    string                   `config:"wmi.namespace"`                       // Default WMI namespace for executing queries, used if not overridden by individual query configurations
+	Queries                      []QueryConfig            `config:"wmi.queries"`                         // List of WMI query configurations
+	WarningThreshold             time.Duration            `config:"wmi.warning_threshold"`               // Maximum duration to wait for query results before logging a warning. The query will continue running in WMI but will no longer be awaited
+	NamespaceQueryIndex          map[string][]QueryConfig // Internal structure indexing queries by namespace to reduce the number of WMI connections required per execution
+	// Remote WMI Parameters
+	// These parameters are intentionally hidden to discourage their use.
+	// If you need access, please open a support ticket to request exposure.
+	Host     string // Hostname of the remote WMI server
+	Domain   string // Domain of the remote WMI Server
+	User     string // Username for authentication on the remote WMI server
+	Password string // Password for authentication on the remote WMI server
 }
 
 type QueryConfig struct {
-	QueryStr  string   // The compiled query string generated internally (not user-configurable)
-	Class     string   `config:"class"`     // WMI class to query (used in the FROM clause)
-	Fields    []string `config:"fields"`    // List of properties to retrieve (used in the SELECT clause). If omitted, all properties of the class are fetched
-	Where     string   `config:"where"`     // Custom WHERE clause to filter query results. The provided string is used directly in the query
-	Namespace string   `config:"namespace"` // WMI namespace for the query. This takes precedence over the globally configured namespace
+	QueryStr   string   // The compiled query string generated internally (not user-configurable)
+	Class      string   `config:"class"`      // WMI class to query (used in the FROM clause)
+	Properties []string `config:"properties"` // List of properties to retrieve (used in the SELECT clause). If omitted, all properties of the class are fetched
+	Where      string   `config:"where"`      // Custom WHERE clause to filter query results. The provided string is used directly in the query
+	Namespace  string   `config:"namespace"`  // WMI namespace for the query. This takes precedence over the globally configured namespace
 }
 
 func NewDefaultConfig() Config {
 	return Config{
-		IncludeQueries: false,
-		IncludeNull:    false,
-		Host:           "localhost",
-		Namespace:      WMIDefaultNamespace,
+		IncludeQueries:               false,
+		IncludeNullProperties:        false,
+		IncludeEmptyStringProperties: false,
+		Host:                         "localhost",
+		Namespace:                    WMIDefaultNamespace,
 	}
 }
 
@@ -72,11 +77,11 @@ func (c *Config) ValidateConnectionParameters() error {
 func (qc *QueryConfig) compileQuery() {
 	// Let us normalize the case where the array is ['*']
 	// To the Empty Array
-	if len(qc.Fields) == 1 && qc.Fields[0] == "*" {
-		qc.Fields = []string{}
+	if len(qc.Properties) == 1 && qc.Properties[0] == "*" {
+		qc.Properties = []string{}
 	}
 
-	query := wmiquery.NewWmiQueryWithSelectList(qc.Class, qc.Fields, []string{}...)
+	query := wmiquery.NewWmiQueryWithSelectList(qc.Class, qc.Properties, []string{}...)
 	queryStr := query.String()
 	// Concatenating the where clause manually, because the library supports only a subset of where clauses
 	// while we want to leverage all filtering capabilities

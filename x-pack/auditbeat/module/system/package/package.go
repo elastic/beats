@@ -25,7 +25,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid/v5"
-	"github.com/joeshaw/multierror"
 	"go.etcd.io/bbolt"
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
@@ -106,7 +105,7 @@ type MetricSet struct {
 	system.SystemMetricSet
 	config    config
 	log       *logp.Logger
-	cache     *cache.Cache
+	cache     *cache.Cache[*Package]
 	bucket    datastore.Bucket
 	lastState time.Time
 
@@ -221,7 +220,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		config:          config,
 		log:             logp.NewLogger(metricsetName),
-		cache:           cache.New(),
+		cache:           cache.New[*Package](),
 		bucket:          bucket,
 	}
 
@@ -248,14 +247,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	ms.log.Debugf("Loaded %d packages from disk", len(packages))
 
-	ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+	ms.cache.DiffAndUpdateCache(packages)
 
 	return ms, nil
 }
 
 // Close cleans up the MetricSet when it finishes.
 func (ms *MetricSet) Close() error {
-	var errs multierror.Errors
+	var errs []error
 
 	errs = append(errs, closeDataset())
 
@@ -263,7 +262,7 @@ func (ms *MetricSet) Close() error {
 		errs = append(errs, ms.bucket.Close())
 	}
 
-	return errs.Err()
+	return errors.Join(errs...)
 }
 
 // Fetch collects data about the host. It is invoked periodically.
@@ -307,7 +306,7 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	}
 
 	// This will initialize the cache with the current packages
-	ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
+	ms.cache.DiffAndUpdateCache(packages)
 
 	if err = storeStateTimestamp(ms.bucket, ms.lastState); err != nil {
 		return fmt.Errorf("error persisting state timestamp: %w", err)
@@ -322,9 +321,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 		return fmt.Errorf("failed to get packages: %w", err)
 	}
 
-	newInCache, missingFromCache := ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
-	newPackages := convertToPackage(newInCache)
-	missingPackages := convertToPackage(missingFromCache)
+	newPackages, missingPackages := ms.cache.DiffAndUpdateCache(packages)
 
 	// Package names of updated packages
 	updated := make(map[string]struct{})
@@ -359,16 +356,6 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	return nil
-}
-
-func convertToPackage(cacheValues []interface{}) []*Package {
-	packages := make([]*Package, 0, len(cacheValues))
-
-	for _, c := range cacheValues {
-		packages = append(packages, c.(*Package))
-	}
-
-	return packages
 }
 
 func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
@@ -415,16 +402,6 @@ func packageMessage(pkg *Package, action eventAction) string {
 
 	return fmt.Sprintf("Package %v (%v) %v",
 		pkg.Name, pkg.Version, actionString)
-}
-
-func convertToCacheable(packages []*Package) []cache.Cacheable {
-	c := make([]cache.Cacheable, 0, len(packages))
-
-	for _, p := range packages {
-		c = append(c, p)
-	}
-
-	return c
 }
 
 // loadStateTimestamp loads state timestamp from a bucket. This is the time
@@ -758,11 +735,6 @@ func migrateDatastoreSchema(tx *bbolt.Tx) error {
 	log := logp.NewLogger(metricsetName)
 	log.Debugf("Migrating data from %v to %v bucket.", bucketNameV1, bucketNameV2)
 
-	var timestampGob []byte
-	if timestampGob = v1Bucket.Get([]byte(bucketKeyStateTimestamp)); len(timestampGob) == 0 {
-		return fmt.Errorf("error migrating %v data: no timestamp found", bucketNameV1)
-	}
-
 	var packages []*Package
 	if data := v1Bucket.Get([]byte(bucketKeyPackages)); len(data) > 0 {
 		dec := gob.NewDecoder(bytes.NewReader(data))
@@ -795,8 +767,11 @@ func migrateDatastoreSchema(tx *bbolt.Tx) error {
 		return fmt.Errorf("error migrating data: failed to create %v bucket: %w", bucketNameV2, err)
 	}
 
-	if err = v2Bucket.Put([]byte(bucketKeyStateTimestamp), timestampGob); err != nil {
-		return fmt.Errorf("error migrating data: failed to write %v to %v bucket: %w", bucketKeyStateTimestamp, bucketNameV2, err)
+	// Copy the gob encoded state timestamp from the v1 bucket to the v2 bucket.
+	if timestampGob := v1Bucket.Get([]byte(bucketKeyStateTimestamp)); timestampGob != nil {
+		if err = v2Bucket.Put([]byte(bucketKeyStateTimestamp), timestampGob); err != nil {
+			return fmt.Errorf("error migrating data: failed to write %v to %v bucket: %w", bucketKeyStateTimestamp, bucketNameV2, err)
+		}
 	}
 
 	builder, release := fbGetBuilder()

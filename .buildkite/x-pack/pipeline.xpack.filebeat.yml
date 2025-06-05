@@ -9,8 +9,6 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -26,11 +24,6 @@ env:
   # Unit tests
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
-
-  # Concurrency definition
-  CONCURRENCY_GROUP: "orka-concurrency-group"
-  CONCURRENCY_COUNT: 10
-  CONCURRENCY_METHOD: eager
 
   # Platforms to be used for FIPS packaging nodes
   PLATFORMS_AMD64_FIPS: "+all linux/amd64"
@@ -105,6 +98,60 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests"
 
+      - label: ":ubuntu: x-pack/filebeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+        key: "x-pack-filebeat-mandatory-linux-unit-test-FIPS-tag"
+        command: |
+          cd x-pack/filebeat
+          mage unitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Ubuntu x86_64 Unit Tests with requirefips build tag"
+
+      - label: ":ubuntu: x-pack/filebeat: Ubuntu x86_64 fips140=only Unit Tests"
+        key: "x-pack-filebeat-mandatory-linux-unit-test-FIPS-only"
+        command: |
+          cd x-pack/filebeat
+          mage goFIPSOnlyUnitTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        env:
+          FIPS: "true"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Ubuntu x86_64 fips140=only Unit Tests"
+
       - label: ":ubuntu: x-pack/filebeat: Go Integration Tests"
         key: "x-pack-filebeat-mandatory-int-test"
         command: |
@@ -120,6 +167,9 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"
@@ -129,6 +179,33 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Go Integration Tests"
+
+      - label: ":ubuntu: x-pack/filebeat: Go fips140=only Integration Tests"
+        command: |
+          cd x-pack/filebeat
+          mage goFIPSOnlyIntegTest
+        retry:
+          automatic:
+            - limit: 1
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
+        plugins:
+          - test-collector#v1.10.2:
+              files: "x-pack/filebeat/build/TEST-*.xml"
+              format: "junit"
+              branches: "main"
+              debug: true
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Go fips140=only Integration Tests"
 
       - label: ":ubuntu: x-pack/filebeat: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
@@ -145,6 +222,9 @@ steps:
         artifact_paths:
           - "x-pack/filebeat/build/*.xml"
           - "x-pack/filebeat/build/*.json"
+          - "x-pack/filebeat/build/integration-tests/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/*"
+          - "x-pack/filebeat/build/integration-tests/Test*/data/**/*"
         plugins:
           - test-collector#v1.10.2:
               files: "x-pack/filebeat/build/TEST-*.xml"
@@ -325,64 +405,6 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Ubuntu arm64 Unit Tests"
 
-      - label: ":mac: x-pack/filebeat: macOS x86_64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/filebeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-            - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths:
-          - "x-pack/filebeat/build/*.xml"
-          - "x-pack/filebeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/filebeat: macOS x86_64 Unit Tests"
-
-      - label: ":mac: x-pack/filebeat: macOS arm64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/filebeat
-          mage build unitTest
-        concurrency_group: "${CONCURRENCY_GROUP}"
-        concurrency: "${CONCURRENCY_COUNT}"
-        concurrency_method: "${CONCURRENCY_METHOD}"
-        retry:
-          automatic:
-          - limit: 3  # using higher retries for now due to lack of custom vm images and vendor instability
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "x-pack/filebeat/build/*.xml"
-          - "x-pack/filebeat/build/*.json"
-        plugins:
-          - test-collector#v1.10.2:
-              files: "x-pack/filebeat/build/TEST-*.xml"
-              format: "junit"
-              branches: "main"
-              debug: true
-        notify:
-          - github_commit_status:
-              context: "x-pack/filebeat: macOS arm64 Unit Tests"
-
       - label: ":ubuntu: x-pack/filebeat: AWS Tests"
         key: "x-pack-filebeat-extended-cloud-test"
         skip: "skipping: elastic/ingest-dev#3467"
@@ -413,6 +435,9 @@ steps:
               format: "junit"
               branches: "main"
               debug: true
+          # See https://github.com/elastic/oblt-infra/blob/main/conf/resources/repos/beats/01-aws-buildkite-oidc.tf
+          - elastic/oblt-aws-auth#v0.2.0:
+              duration: 3600 # seconds
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: AWS Tests"

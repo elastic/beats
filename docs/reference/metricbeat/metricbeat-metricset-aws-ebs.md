@@ -26,9 +26,7 @@ iam:ListAccountAliases
 
 The aws ebs metricset comes with a predefined dashboard. For example:
 
-:::{image} images/metricbeat-aws-ebs-overview.png
-:alt: metricbeat aws ebs overview
-:::
+![metricbeat aws ebs overview](images/metricbeat-aws-ebs-overview.png)
 
 
 ## Configuration example [_configuration_example_4]
@@ -47,9 +45,8 @@ The aws ebs metricset comes with a predefined dashboard. For example:
 
 Please see more details for each metric in [ebs-cloudwatch-metric](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html).
 
-|     |     |
-| --- | --- |
 | Metric Name | Statistic Method |
+| --- | --- |
 | VolumeReadBytes | Average |
 | VolumeWriteBytes | Average |
 | VolumeReadOps | Average |

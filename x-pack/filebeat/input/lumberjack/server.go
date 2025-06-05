@@ -14,6 +14,7 @@ import (
 	"golang.org/x/net/netutil"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -23,6 +24,7 @@ import (
 
 type server struct {
 	config         config
+	status         status.StatusReporter
 	log            *logp.Logger
 	publish        func(beat.Event)
 	metrics        *inputMetrics
@@ -31,9 +33,13 @@ type server struct {
 	bindAddress    string
 }
 
-func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputMetrics) (*server, error) {
+func newServer(c config, log *logp.Logger, pub func(beat.Event), stat status.StatusReporter, metrics *inputMetrics) (*server, error) {
+	if stat == nil {
+		stat = noopReporter{}
+	}
 	ljSvr, bindAddress, err := newLumberjack(c)
 	if err != nil {
+		stat.UpdateStatus(status.Failed, "failed to start lumberjack server: "+err.Error())
 		return nil, err
 	}
 
@@ -50,6 +56,7 @@ func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputM
 
 	return &server{
 		config:      c,
+		status:      stat,
 		log:         log,
 		publish:     pub,
 		metrics:     metrics,
@@ -58,20 +65,27 @@ func newServer(c config, log *logp.Logger, pub func(beat.Event), metrics *inputM
 	}, nil
 }
 
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
+
 func (s *server) Close() error {
+	s.status.UpdateStatus(status.Stopping, "")
 	var err error
 	s.ljSvrCloseOnce.Do(func() {
 		err = s.ljSvr.Close()
 	})
+	s.status.UpdateStatus(status.Stopped, "")
 	return err
 }
 
 func (s *server) Run() error {
 	// Process batches until the input is stopped.
+	s.status.UpdateStatus(status.Running, "")
 	for batch := range s.ljSvr.ReceiveChan() {
 		s.processBatch(batch)
 	}
-
+	s.status.UpdateStatus(status.Stopped, "")
 	return nil
 }
 

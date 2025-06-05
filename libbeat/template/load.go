@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -77,23 +76,23 @@ type templateBuilder struct {
 }
 
 // NewESLoader creates a new template loader for ES
-func NewESLoader(client ESClient, lifecycleClient lifecycle.ClientHandler) (*ESLoader, error) {
+func NewESLoader(client ESClient, lifecycleClient lifecycle.ClientHandler, logger *logp.Logger) (*ESLoader, error) {
 	if client == nil {
 		return nil, errors.New("can not load template without active Elasticsearch client")
 	}
 	return &ESLoader{client: client, lifecycleClient: lifecycleClient,
-		builder: newTemplateBuilder(client.IsServerless()), log: logp.NewLogger("template_loader")}, nil
+		builder: newTemplateBuilder(client.IsServerless(), logger), log: logger.Named("template_loader")}, nil
 }
 
 // NewFileLoader creates a new template loader for the given file.
-func NewFileLoader(c FileClient, isServerless bool) *FileLoader {
+func NewFileLoader(c FileClient, isServerless bool, logger *logp.Logger) *FileLoader {
 	// other components of the file loader will fail if both ILM and DSL are set,
 	// so at this point it's fairly safe to just pass cfg.DSL.Enabled
-	return &FileLoader{client: c, builder: newTemplateBuilder(isServerless), log: logp.NewLogger("file_template_loader")}
+	return &FileLoader{client: c, builder: newTemplateBuilder(isServerless, logger), log: logger.Named("file_template_loader")}
 }
 
-func newTemplateBuilder(serverlessMode bool) *templateBuilder {
-	return &templateBuilder{log: logp.NewLogger("template"), isServerless: serverlessMode}
+func newTemplateBuilder(serverlessMode bool, logger *logp.Logger) *templateBuilder {
+	return &templateBuilder{log: logger.Named("template"), isServerless: serverlessMode}
 }
 
 // Load checks if the index mapping template should be loaded.
@@ -282,7 +281,7 @@ func (b *templateBuilder) buildBodyFromJSON(config TemplateConfig) (mapstr.M, er
 		return nil, fmt.Errorf("error checking json file %s for template: %w", jsonPath, err)
 	}
 	b.log.Debugf("Loading json template from file %s", jsonPath)
-	content, err := ioutil.ReadFile(jsonPath)
+	content, err := os.ReadFile(jsonPath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading file %s for template: %w", jsonPath, err)
 

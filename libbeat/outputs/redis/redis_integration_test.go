@@ -30,6 +30,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -37,6 +38,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -133,9 +135,17 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 	total := batches & batchSize
 
 	db := 0
-	key := cfg["key"].(string)
+	key, ok := cfg["key"].(string)
+	if !ok {
+		t.Fatalf("expected string for key, but got %T", cfg["key"])
+	}
+
 	if v, ok := cfg["db"]; ok {
-		db = v.(int)
+		if dbValue, ok := v.(int); ok {
+			db = dbValue
+		} else {
+			t.Fatalf("expected int for db, but got %T", v)
+		}
 	}
 
 	conn, err := redis.Dial("tcp", getRedisAddr(), redis.DialDatabase(db))
@@ -145,7 +155,8 @@ func testPublishList(t *testing.T, cfg map[string]interface{}) {
 
 	// delete old key if present
 	defer conn.Close()
-	conn.Do("DEL", key)
+	_, err = conn.Do("DEL", key)
+	require.NoError(t, err)
 
 	out := newRedisTestingOutput(t, cfg)
 	err = sendTestEvents(out, batches, batchSize)
@@ -225,9 +236,17 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	total := batches & batchSize
 
 	db := 0
-	key := cfg["key"].(string)
+	key, ok := cfg["key"].(string)
+	if !ok {
+		t.Fatalf("expected string for key, but got %T", cfg["key"])
+	}
+
 	if v, ok := cfg["db"]; ok {
-		db = v.(int)
+		if dbValue, ok := v.(int); ok {
+			db = dbValue
+		} else {
+			t.Fatalf("expected int for db, but got %T", v)
+		}
 	}
 
 	conn, err := redis.Dial("tcp", getRedisAddr(), redis.DialDatabase(db))
@@ -237,14 +256,15 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 
 	// delete old key if present
 	defer conn.Close()
-	conn.Do("DEL", key)
+	_, err = conn.Do("DEL", key)
+	require.NoError(t, err)
 
 	// subscribe to packetbeat channel
 	psc := redis.PubSubConn{Conn: conn}
 	if err := psc.Subscribe(key); err != nil {
 		t.Fatal(err)
 	}
-	defer psc.Unsubscribe(key)
+	defer psc.Unsubscribe(key) //nolint:errcheck //This is a test file
 
 	// connect and publish events
 	var wg sync.WaitGroup
@@ -330,12 +350,16 @@ func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Cli
 		t.Fatalf("redis output module not registered")
 	}
 
-	out, err := plugin(nil, beat.Info{Beat: testBeatname, Version: testBeatversion}, outputs.NewNilObserver(), config)
+	logger := logptest.NewTestingLogger(t, "")
+	out, err := plugin(nil, beat.Info{Beat: testBeatname, Version: testBeatversion, Logger: logger}, outputs.NewNilObserver(), config)
 	if err != nil {
 		t.Fatalf("Failed to initialize redis output: %v", err)
 	}
 
-	client := out.Clients[0].(outputs.NetworkClient)
+	client, ok := out.Clients[0].(outputs.NetworkClient)
+	if !ok {
+		t.Fatalf("expected outputs.NetworkClient, but got %T", out.Clients[0])
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 	if err := client.Connect(ctx); err != nil {

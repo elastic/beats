@@ -55,7 +55,7 @@ func InitializeModule() {
 }
 
 // NewHeartbeatHints builds a heartbeat hints builder
-func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
+func NewHeartbeatHints(cfg *conf.C, logger *logp.Logger) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(config)
 
@@ -63,7 +63,7 @@ func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &heartbeatHints{config, logp.L()}, nil
+	return &heartbeatHints{config, logger}, nil
 }
 
 // Create config based on input hints in the bus event

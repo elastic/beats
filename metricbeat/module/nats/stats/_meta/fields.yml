@@ -4,6 +4,14 @@
     Contains nats var related metrics
   release: ga
   fields:
+    - name: server_name
+      type: keyword
+      description: >
+        The name of the NATS server
+    - name: version
+      type: keyword
+      description: >
+        The version of the NATS server
     - name: uptime
       type: long
       format: duration
@@ -98,3 +106,27 @@
                   type: long
                   description: >
                     The number of hits on root monitoring uri
+                - name: jsz
+                  type: long
+                  description: >
+                    The number of hits on jsz monitoring uri
+                - name: accountz
+                  type: long
+                  description: >
+                    The number of hits on accountz monitoring uri
+                - name: accstatz
+                  type: long
+                  description: >
+                    The number of hits on accstatz monitoring uri
+                - name: gatewayz
+                  type: long
+                  description: >
+                    The number of hits on gatewayz monitoring uri
+                - name: healthz
+                  type: long
+                  description: >
+                    The number of hits on healthz monitoring uri
+                - name: leafz
+                  type: long
+                  description: >
+                    The number of hits on leafz monitoring uri

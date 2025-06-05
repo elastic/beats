@@ -402,12 +402,22 @@ WINDOWS: If your Windows log rotation system shows errors because it can’t rot
 
 #### `close.on_state_change.removed` [filebeat-input-filestream-close-removed]
 
-When this option is enabled, Filebeat closes the harvester when a file is removed. Normally a file should only be removed after it’s inactive for the duration specified by `close.on_state_change.inactive`. However, if a file is removed early and you don’t enable `close.on_state_change.removed`, Filebeat keeps the file open to make sure the harvester has completed. If this setting results in files that are not completely read because they are removed from disk too early, disable this option.
+When this option is enabled, Filebeat closes the harvester when a file
+is removed. Normally a file should only be removed after it’s inactive
+for the duration specified by
+`close.on_state_change.inactive`. However, if a file is removed early
+and you don’t enable `close.on_state_change.removed`, Filebeat keeps
+the file open to make sure the harvester has completed. If this
+setting results in files that are not completely read because they are
+removed from disk too early, disable this option.
 
-This option is enabled by default. If you disable this option, you must also disable `clean_removed`.
+This option is enabled by default on Windows and disabled by default
+on all other OSes.
 
-WINDOWS: If your Windows log rotation system shows errors because it can’t rotate files, make sure this option is enabled.
-
+::::{warning}
+If your Windows log rotation system shows errors because it
+can’t rotate files, make sure this option is enabled.
+::::
 
 #### `close.reader.on_eof` [filebeat-input-filestream-close-eof]
 
@@ -506,6 +516,8 @@ This configuration option applies per input. You can use this option to indirect
 #### `file_identity` [filebeat-input-filestream-file-identity]
 
 Different `file_identity` methods can be configured to suit the environment where you are collecting log messages.
+
+Follow [this comprehensive guide](/reference/filebeat/file-identity.md) on how to choose a file identity option right for your use-case.
 
 ::::{important}
 Changing `file_identity` is only supported from `native` or `path` to `fingerprint`. On those cases Filebeat will automatically migrate the state of the file when filestream starts.

@@ -20,7 +20,6 @@
             "LocalDateTime": "2024-12-12T15:46:39.62Z",
             "NumberOfUsers": 1,
             "class": "Win32_OperatingSystem",
-            "host": "localhost",
             "namespace": "root\\cimv2"
         }
     }

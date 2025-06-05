@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !requirefips
+
 package gcppubsub
 
 import (
@@ -25,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/version"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -76,6 +79,7 @@ func configID(config *conf.C) (string, error) {
 type pubsubInput struct {
 	config
 
+	status   status.StatusReporter
 	log      *logp.Logger
 	outlet   channel.Outleter // Output of received pubsub messages.
 	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
@@ -91,19 +95,25 @@ type pubsubInput struct {
 
 // NewInput creates a new Google Cloud Pub/Sub input that consumes events from
 // a topic subscription.
-func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context) (inp input.Input, err error) {
+func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Context, logger *logp.Logger) (inp input.Input, err error) {
+	stat := getStatusReporter(inputContext)
+	stat.UpdateStatus(status.Starting, "")
+
 	// Extract and validate the input's configuration.
+	stat.UpdateStatus(status.Configuring, "")
 	conf := defaultConfig()
 	if err = cfg.Unpack(&conf); err != nil {
+		stat.UpdateStatus(status.Failed, "failed to configure input: "+err.Error())
 		return nil, err
 	}
 
 	id, err := configID(cfg)
 	if err != nil {
+		stat.UpdateStatus(status.Failed, "failed to get input ID: "+err.Error())
 		return nil, err
 	}
 
-	logger := logp.NewLogger("gcp.pubsub").With(
+	logger = logger.Named("gcp.pubsub").With(
 		"pubsub_project", conf.ProjectID,
 		"pubsub_topic", conf.Topic,
 		"pubsub_subscription", conf.Subscription)
@@ -121,6 +131,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 		case <-inputContext.Done:
 		case <-inputCtx.Done():
 		}
+		stat.UpdateStatus(status.Stopping, "")
 	}()
 
 	// If the input ever needs to be made restartable, then context would need
@@ -129,6 +140,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 
 	in := &pubsubInput{
 		config:       conf,
+		status:       stat,
 		log:          logger,
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
@@ -161,11 +173,27 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 		},
 	})
 	if err != nil {
+		stat.UpdateStatus(status.Failed, "failed to configure Elasticsearch connection: "+err.Error())
 		return nil, err
 	}
 	in.log.Info("Initialized GCP Pub/Sub input.")
 	return in, nil
 }
+
+func getStatusReporter(ctx input.Context) status.StatusReporter {
+	if ctx.GetStatusReporter == nil {
+		return noopReporter{}
+	}
+	stat := ctx.GetStatusReporter()
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	return stat
+}
+
+type noopReporter struct{}
+
+func (noopReporter) UpdateStatus(status.Status, string) {}
 
 // Run starts the pubsub input worker then returns. Only the first invocation
 // will ever start the pubsub worker.
@@ -175,9 +203,12 @@ func (in *pubsubInput) Run() {
 		in.workerWg.Add(1)
 		go func() {
 			in.log.Info("Pub/Sub input worker has started.")
-			defer in.log.Info("Pub/Sub input worker has stopped.")
-			defer in.workerWg.Done()
-			defer in.workerCancel()
+			defer func() {
+				in.workerCancel()
+				in.workerWg.Done()
+				in.log.Info("Pub/Sub input worker has stopped.")
+				in.status.UpdateStatus(status.Stopped, "")
+			}()
 
 			// Throttle pubsub client restarts.
 			rt := rate.NewLimiter(rate.Every(retryInterval), 1)
@@ -211,21 +242,26 @@ func (in *pubsubInput) run() error {
 
 	client, err := in.newPubsubClient(ctx)
 	if err != nil {
+		in.status.UpdateStatus(status.Degraded, err.Error())
 		return err
 	}
 	defer client.Close()
 
+	in.status.UpdateStatus(status.Running, "")
+
 	// Setup our subscription to the topic.
 	sub, err := in.getOrCreateSubscription(ctx, client)
 	if err != nil {
-		return fmt.Errorf("failed to subscribe to pub/sub topic: %w", err)
+		err = fmt.Errorf("failed to subscribe to pub/sub topic: %w", err)
+		in.status.UpdateStatus(status.Degraded, err.Error())
+		return err
 	}
 	sub.ReceiveSettings.NumGoroutines = in.Subscription.NumGoroutines
 	sub.ReceiveSettings.MaxOutstandingMessages = in.Subscription.MaxOutstandingMessages
 
 	// Start receiving messages.
 	topicID := makeTopicID(in.ProjectID, in.Topic)
-	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
 			msg.Nack()
 			in.metrics.nackedMessageCount.Inc()
@@ -233,6 +269,10 @@ func (in *pubsubInput) run() error {
 			cancel()
 		}
 	})
+	if err != nil {
+		in.status.UpdateStatus(status.Degraded, fmt.Sprintf("failed to receive message from pub/sub topic %s/%s: %v", in.ProjectID, in.Topic, err))
+	}
+	return err
 }
 
 // Stop stops the pubsub input and waits for it to fully stop.
@@ -312,7 +352,7 @@ func (in *pubsubInput) newPubsubClient(ctx context.Context) (*pubsub.Client, err
 
 	if in.AlternativeHost != "" {
 		// This will be typically set because we want to point the input to a testing pubsub emulator.
-		conn, err := grpc.Dial(in.AlternativeHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		conn, err := grpc.NewClient(in.AlternativeHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			return nil, fmt.Errorf("cannot connect to alternative host %q: %w", in.AlternativeHost, err)
 		}
