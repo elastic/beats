@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -181,7 +182,7 @@ func TestRateLimit(t *testing.T) {
 func TestAllocs(t *testing.T) {
 	p, err := new(conf.MustNewConfigFrom(mapstr.M{
 		"limit": "100/s",
-	}), logptest.NewTestingLogger(t, ""))
+	}), logp.NewLogger("testing"))
 	require.NoError(t, err)
 	event := beat.Event{Fields: mapstr.M{"field": 1}}
 
