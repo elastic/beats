@@ -43,7 +43,7 @@ type MockHost struct {
 	Evt *componentstatus.Event
 }
 
-func (_ *MockHost) GetExtensions() map[component.ID]component.Component {
+func (*MockHost) GetExtensions() map[component.ID]component.Component {
 	return nil
 }
 
