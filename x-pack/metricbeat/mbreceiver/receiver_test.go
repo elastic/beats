@@ -406,12 +406,6 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		// missing on Ubuntu on CI
 		"system.memory.swap.used.pct",
 
-		// missing on Windows on CI
-		"system.memory.cached",
-		"system.filesystem.files",
-		"system.filesystem.free_files",
-		"system.filesystem.options",
-
 		// depends on add_cloud_metadata
 		// not available locally
 		"cloud.account.id",
@@ -425,76 +419,87 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 		"cloud.service.name",
 	}
 
-	testCases := map[string][]string{
-		"cpu": {
-			"host.cpu.usage",
-			"system.cpu.cores",
-			"system.cpu.idle.norm.pct",
-			"system.cpu.idle.pct",
-			"system.cpu.iowait.norm.pct",
-			"system.cpu.iowait.pct",
-			"system.cpu.irq.norm.pct",
-			"system.cpu.irq.pct",
-			"system.cpu.nice.norm.pct",
-			"system.cpu.nice.pct",
-			"system.cpu.softirq.norm.pct",
-			"system.cpu.softirq.pct",
-			"system.cpu.steal.norm.pct",
-			"system.cpu.steal.pct",
-			"system.cpu.system.norm.pct",
-			"system.cpu.system.pct",
-			"system.cpu.total.norm.pct",
-			"system.cpu.total.pct",
-			"system.cpu.user.norm.pct",
-			"system.cpu.user.pct",
-		},
-		"memory": {
-			"system.memory.actual.free",
-			"system.memory.actual.used.bytes",
-			"system.memory.actual.used.pct",
+	testCases := mapstr.M{
+		"cpu": mapstr.M{
+			"system.memory.actual.free":       nil,
+			"system.memory.actual.used.bytes": nil,
+			"system.memory.actual.used.pct":   nil,
 			// "system.memory.cached",
-			"system.memory.free",
-			"system.memory.swap.free",
-			"system.memory.swap.total",
-			"system.memory.swap.used.bytes",
-			// "system.memory.swap.used.pct",
-			"system.memory.total",
-			"system.memory.used.bytes",
-			"system.memory.used.pct",
+			"system.memory.free":            nil,
+			"system.memory.swap.free":       nil,
+			"system.memory.swap.total":      nil,
+			"system.memory.swap.used.bytes": nil,
+			// "system.memory.swap.used.pct": nil,
+			"system.memory.total":      nil,
+			"system.memory.used.bytes": nil,
+			"system.memory.used.pct":   nil,
 		},
-		"network/interface-card": {
-			"system.network.in.bytes",
-			"system.network.in.dropped",
-			"system.network.in.errors",
-			"system.network.in.packets",
-			"system.network.name",
-			"system.network.out.bytes",
-			"system.network.out.dropped",
-			"system.network.out.errors",
-			"system.network.out.packets",
+		"memory": mapstr.M{
+			"system.memory.actual.free":       nil,
+			"system.memory.actual.used.bytes": nil,
+			"system.memory.actual.used.pct":   nil,
+			// "system.memory.cached",
+			"system.memory.free":            nil,
+			"system.memory.swap.free":       nil,
+			"system.memory.swap.total":      nil,
+			"system.memory.swap.used.bytes": nil,
+			// "system.memory.swap.used.pct": nil,
+			"system.memory.total":      nil,
+			"system.memory.used.bytes": nil,
+			"system.memory.used.pct":   nil,
 		},
-		"network/host": {
-			"host.network.egress.bytes",
-			"host.network.egress.packets",
-			"host.network.ingress.bytes",
-			"host.network.ingress.packets",
+		"network/interface-card": mapstr.M{
+			"system.network.in.bytes":    nil,
+			"system.network.in.dropped":  nil,
+			"system.network.in.errors":   nil,
+			"system.network.in.packets":  nil,
+			"system.network.name":        nil,
+			"system.network.out.bytes":   nil,
+			"system.network.out.dropped": nil,
+			"system.network.out.errors":  nil,
+			"system.network.out.packets": nil,
 		},
-		"filesystem": {
-			"system.filesystem.available",
-			"system.filesystem.device_name",
-			// "system.filesystem.files",
-			"system.filesystem.free",
-			// "system.filesystem.free_files",
-			"system.filesystem.mount_point",
-			// "system.filesystem.options",
-			"system.filesystem.total",
-			"system.filesystem.type",
-			"system.filesystem.used.bytes",
-			"system.filesystem.used.pct",
+		"network/host": mapstr.M{
+			"host.network.egress.bytes":    nil,
+			"host.network.egress.packets":  nil,
+			"host.network.ingress.bytes":   nil,
+			"host.network.ingress.packets": nil,
+		},
+		"filesystem": mapstr.M{
+			"system.filesystem.available":   nil,
+			"system.filesystem.device_name": nil,
+			"system.filesystem.files":       nil,
+			"system.filesystem.free":        nil,
+			"system.filesystem.free_files":  nil,
+			"system.filesystem.mount_point": nil,
+			"system.filesystem.options":     nil,
+			"system.filesystem.total":       nil,
+			"system.filesystem.type":        nil,
+			"system.filesystem.used.bytes":  nil,
+			"system.filesystem.used.pct":    nil,
 		},
 	}
 
-	for testName, wantFields := range testCases {
+	if runtime.GOOS == "windows" {
+		cpu := testCases["cpu"].(mapstr.M)
+		cpu.Delete("system.cpu.iowait.norm.pct")
+		cpu.Delete("system.cpu.iowait.pct")
+		cpu.Delete("system.cpu.irq.norm.pct")
+		cpu.Delete("system.cpu.irq.pct")
+		cpu.Delete("system.cpu.nice.norm.pct")
+		cpu.Delete("system.cpu.nice.pct")
+		cpu.Delete("system.cpu.softirq.norm.pct")
+		cpu.Delete("system.cpu.softirq.pct")
+		cpu.Delete("system.cpu.steal.norm.pct")
+		cpu.Delete("system.cpu.steal.pct")
+
+		fs := testCases["filesystem"].(mapstr.M)
+		fs.Delete("system.filesystem.files")
+		fs.Delete("system.filesystem.free_files")
+		fs.Delete("system.filesystem.options")
+	}
+
+	for testName, expectedFields := range testCases {
 		parts := strings.Split(testName, "/")
 		mset := parts[0]
 
@@ -504,14 +509,17 @@ func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
 			return len(msetLogs) > 0
 		}, msg+": expected at least one ingest log for metricset %s, got 0: %v", testName, logs)
 
+		wantKeys := *expectedFields.(mapstr.M).FlattenKeys()
+		slices.Sort(wantKeys)
+
 		for _, doc := range msetLogs {
-			if _, ok := doc[wantFields[0]]; !ok {
+			if _, ok := doc[wantKeys[0]]; !ok {
 				continue
 			}
 
 			fields := *doc.FlattenKeys()
 			slices.Sort(fields)
-			wantFields := append(wantFields, commonFields...)
+			wantFields := append(wantKeys, commonFields...)
 			// Remove optional fields before comparing, in case they cause a mismatch.
 			if diff := cmp.Diff(fields, wantFields); diff != "" {
 				// Filter out optional fields
