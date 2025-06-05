@@ -21,8 +21,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/url"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -92,13 +92,13 @@ func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, r
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
 	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("Kibana version must be at least %s", kibana.MinimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing index file from %s", file)
 
 	// read json file
-	reader, err := ioutil.ReadFile(file)
+	reader, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
 	}
@@ -115,7 +115,7 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 // ImportIndex imports the passed index pattern to Kibana
 func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("kibana version must be at least %s", kibana.MinimumRequiredVersionSavedObjects.String())
 	}
 
 	var errs multierror.Errors
@@ -136,7 +136,7 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
 	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+		return fmt.Errorf("Kibana version must be at least %s", kibana.MinimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing dashboard from %s", file)
@@ -145,7 +145,7 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	params.Set("overwrite", "true")
 
 	// read json file
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read dashboard from file %s: %v", file, err)
 	}
@@ -190,7 +190,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 		if _, ok := loader.loadedAssets[referencePath]; ok {
 			continue
 		}
-		refContents, err := ioutil.ReadFile(referencePath)
+		refContents, err := os.ReadFile(referencePath)
 		if err != nil {
 			return "", fmt.Errorf("fail to read referenced asset from file %s: %v", referencePath, err)
 		}
