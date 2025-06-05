@@ -12,6 +12,7 @@ import (
 	"syscall"
 	"unsafe"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/sys/windows"
 )
 
@@ -20,6 +21,17 @@ import (
 var (
 	guidFromProviderNameFunc = guidFromProviderName
 	setSessionGUIDFunc       = setSessionGUID
+
+	// EventTraceGuid is the well-known GUID for ETW trace header events.
+	// {68FDD900-4A3E-11D1-84F4-0000F80464E3}
+	// We need this GUID to identify the event trace session and be able to
+	// ignore it when reading an ETL file.
+	eventTraceGUID = windows.GUID{
+		Data1: 0x68fdd900,
+		Data2: 0x4a3e,
+		Data3: 0x11d1,
+		Data4: [8]byte{0x84, 0xf4, 0x00, 0x00, 0xf8, 0x04, 0x64, 0xe3},
+	}
 )
 
 type Session struct {
@@ -59,7 +71,7 @@ type Session struct {
 	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers (optional).
 	BufferCallback func(*EventTraceLogfile) uintptr
 
-	providerCache *providerCache
+	metadataCache *metadataCache
 
 	// Pointers to functions that make calls to the Windows API.
 	// In tests, these pointers can be replaced with mock functions to simulate API behavior without making actual calls to the Windows API.
@@ -173,6 +185,7 @@ func NewSession(conf Config) (*Session, error) {
 	session.processTrace = _ProcessTrace
 	session.closeTrace = _CloseTrace
 
+	session.metadataCache = newMetadataCache(logp.NewLogger("etw_session"))
 	session.Name = setSessionName(conf)
 	session.Realtime = true
 
@@ -193,12 +206,6 @@ func NewSession(conf Config) (*Session, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error when initializing session '%s': %w", session.Name, err)
 	}
-
-	cache, err := newProviderCache(session.GUID)
-	if err != nil {
-		return nil, fmt.Errorf("error creating provider cache: %w", err)
-	}
-	session.providerCache = cache
 
 	// Initialize additional session properties.
 	session.properties = newSessionProperties(session.Name)
@@ -259,10 +266,22 @@ func (s *Session) StartConsumer() error {
 	return nil
 }
 
+var ErrUnprocessableEvent = errors.New("unprocessable event")
+
 // GetEventProperties extracts and returns properties from an ETW event record.
-func (s *Session) RenderEvent(r *EventRecord) (RenderedEtwEvent, error) {
+func (s *Session) RenderEvent(r *EventRecord) (e RenderedEtwEvent, err error) {
+	if !s.Realtime {
+		if r.EventHeader.ProviderId == eventTraceGUID {
+			// Ignore event trace session events when reading from a logfile.
+			return RenderedEtwEvent{}, ErrUnprocessableEvent
+		}
+	}
+	providerCache, err := s.metadataCache.getProviderCache(r.EventHeader.ProviderId)
+	if err != nil {
+		return RenderedEtwEvent{}, fmt.Errorf("failed to get provider cache: %w", err)
+	}
 	// Initialize a new property parser for the event record.
-	p := newEventRenderer(s.providerCache, r)
+	p := newEventRenderer(providerCache, r)
 	event, err := p.render()
 	if err != nil {
 		return RenderedEtwEvent{}, fmt.Errorf("failed to parse event properties: %w", err)

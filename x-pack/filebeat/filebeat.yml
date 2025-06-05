@@ -3,6 +3,7 @@ filebeat.inputs:
   id: etw-test-file
   enabled: true
   session_name: Elastic-test
+  # file: C:\Users\Marc\Downloads\PerfViewData.etl
   provider.guid: "{EDD08927-9CC4-4E65-B970-C2560FB5C289}"
   trace_level: verbose
   match_any_keyword: 0x8000000004000030

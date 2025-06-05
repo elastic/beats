@@ -192,7 +192,7 @@ func buildEvent(etwEvent etw.RenderedEtwEvent, h etw.EventHeader, session *etw.S
 		"activity_id_name":         etwEvent.ActivityID,
 		"related_activity_id_name": etwEvent.RelatedActivityID,
 		"channel":                  etwEvent.Channel,
-		"flags":                    fmt.Sprintf("0x%X", h.Flags),
+		"flags_raw":                fmt.Sprintf("0x%X", h.Flags),
 		"keywords_raw":             fmt.Sprintf("0x%X", etwEvent.KeywordsRaw),
 		"keywords":                 etwEvent.Keywords,
 		"opcode_raw":               etwEvent.OpcodeRaw,
@@ -200,7 +200,7 @@ func buildEvent(etwEvent etw.RenderedEtwEvent, h etw.EventHeader, session *etw.S
 		"process_id":               strconv.FormatUint(uint64(etwEvent.ProcessID), 10),
 		"provider_guid":            etwEvent.ProviderGUID.String(),
 		"session":                  session.Name,
-		"task_raw":                 strconv.FormatUint(uint64(etwEvent.TaskRaw), 10),
+		"task_raw":                 etwEvent.TaskRaw,
 		"task":                     etwEvent.Task,
 		"level_raw":                etwEvent.LevelRaw,
 		"level":                    etwEvent.Level,
@@ -212,7 +212,41 @@ func buildEvent(etwEvent etw.RenderedEtwEvent, h etw.EventHeader, session *etw.S
 		winlog["provider_guid"] = session.GUID.String()
 	}
 
-	winlog["event_data"] = mapstr.M{}
+	eventData := mapstr.M{}
+	for _, prop := range etwEvent.Properties {
+		if prop.Value == nil {
+			continue
+		}
+		switch v := prop.Value.(type) {
+		case []byte:
+			eventData.Put(prop.Name, fmt.Sprintf("0x%X", v))
+		default:
+			eventData.Put(prop.Name, v)
+		}
+	}
+
+	extended := mapstr.M{}
+	for _, ext := range etwEvent.ExtendedData {
+		if ext.Data == nil {
+			continue
+		}
+		switch v := ext.Data.(type) {
+		case []byte:
+			extended.Put(ext.ExtType, fmt.Sprintf("0x%X", v))
+		default:
+			extended.Put(ext.ExtType, v)
+		}
+
+	}
+
+	if len(extended) > 0 {
+		eventData.Put("extended_data", extended)
+	}
+
+	if len(eventData) > 0 {
+		winlog["event_data"] = eventData
+	}
+
 	event := mapstr.M{
 		"code":     strconv.FormatUint(uint64(h.EventDescriptor.Id), 10),
 		"created":  time.Now().UTC(),
@@ -257,9 +291,11 @@ func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
 
 	etwEvent, err := e.etwSession.RenderEvent(record)
 	if err != nil {
-		e.log.Errorw("failed to read event properties", "error", err)
-		e.metrics.errors.Inc()
-		e.metrics.dropped.Inc()
+		if !errors.Is(err, etw.ErrUnprocessableEvent) {
+			e.log.Errorw("failed to read event properties", "error", err)
+			e.metrics.errors.Inc()
+			e.metrics.dropped.Inc()
+		}
 		return 1
 	}
 

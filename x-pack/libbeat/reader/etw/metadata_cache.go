@@ -25,12 +25,51 @@ import (
 	"sync"
 	"unsafe"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/sys/windows"
 )
 
-// providerCache stores metadata from a publisher.
+type metadataCache struct {
+	mutex         sync.RWMutex
+	providerCache map[windows.GUID]*providerCache
+	log           *logp.Logger
+}
+
+func newMetadataCache(log *logp.Logger) *metadataCache {
+	log = log.Named("metadata_cache")
+	return &metadataCache{
+		providerCache: make(map[windows.GUID]*providerCache),
+		log:           log,
+	}
+}
+
+func (cache *metadataCache) getProviderCache(guid windows.GUID) (*providerCache, error) {
+	cache.mutex.RLock()
+	effectiveGUID := findEffectiveGUID(guid)
+	provider, found := cache.providerCache[effectiveGUID]
+	cache.mutex.RUnlock()
+	if found {
+		return provider, nil
+	}
+	cache.mutex.Lock()
+	defer cache.mutex.Unlock()
+	provider, found = cache.providerCache[effectiveGUID]
+	if found {
+		return provider, nil
+	}
+	// If not found, create a new provider cache
+	provider, err := newProviderCache(effectiveGUID, cache.log)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create provider cache for %s: %w", effectiveGUID, err)
+	}
+	cache.providerCache[effectiveGUID] = provider
+	return provider, nil
+}
+
+// providerCache stores metadata from a provider.
 type providerCache struct {
 	mutex sync.RWMutex
+	log   *logp.Logger
 
 	guid windows.GUID
 
@@ -39,9 +78,11 @@ type providerCache struct {
 	propertyMapsCache map[string]*cachedEventMapInfo
 }
 
-func newProviderCache(guid windows.GUID) (*providerCache, error) {
+func newProviderCache(guid windows.GUID, log *logp.Logger) (*providerCache, error) {
+	log = log.Named("provider_cache").With("guid", guid)
 	cache := &providerCache{
 		guid:              guid,
+		log:               log,
 		einfoCache:        make(map[EventDescriptor]*cachedEventInfo),
 		keywords:          make(map[uint64]*cachedProviderKeyword),
 		propertyMapsCache: make(map[string]*cachedEventMapInfo),
@@ -61,12 +102,13 @@ func (cache *providerCache) init() error {
 	}
 
 	if err := cache.initKeywords(); err != nil {
-		return fmt.Errorf("failed to initialize keywords for provider %s: %w", cache.guid, err)
+		cache.log.Errorf("failed to initialize keywords for provider %s: %v", cache.guid, err)
 	}
 
 	descriptors, err := getProviderEventDescriptors(&cache.guid)
 	if err != nil {
-		return fmt.Errorf("failed to get event descriptors for provider %s: %w", cache.guid, err)
+		cache.log.Errorf("failed to get event descriptors for provider %s: %v", cache.guid, err)
+		return nil
 	}
 
 	for _, desc := range descriptors {
@@ -77,7 +119,7 @@ func (cache *providerCache) init() error {
 			},
 		}
 		if err := cache.initEvent(r); err != nil {
-			return fmt.Errorf("failed to initialize event for provider %s: %w", cache.guid, err)
+			cache.log.Errorf("failed to initialize event for provider %s: %v", cache.guid, err)
 		}
 	}
 

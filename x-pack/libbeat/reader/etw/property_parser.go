@@ -129,9 +129,6 @@ func renderPropertyValue(cache *providerCache, eventInfo *cachedEventInfo, propI
 			// Fallback: If parsing fails, try to describe the complex/unsupported property
 			value = describeComplexProperty(propInfo)
 		}
-		if propInfo.Name == "Irp" || propInfo.MapName == "Irp" {
-			panic(value)
-		}
 		result[j] = value
 	}
 
@@ -247,8 +244,12 @@ func getPropertyLength(eventInfo *cachedEventInfo, propInfo *cachedPropertyInfo,
 	// Check if the length of the property is defined by another property.
 	if !propInfo.IsFixedLen {
 		var dataDescriptor PropertyDataDescriptor
+		nameProp := eventInfo.ParsedInfo.getEventPropertyInfoAtIndex(uint32(propInfo.Length))
+		if nameProp == nil {
+			return 0, fmt.Errorf("property length is not defined by another property, but no property found at index %d", propInfo.Length)
+		}
 		// Read the property name that contains the length information.
-		dataDescriptor.PropertyName = unsafe.Pointer(windows.StringToUTF16Ptr(eventInfo.Properties[int(propInfo.Length)].Name))
+		dataDescriptor.PropertyName = unsafe.Pointer(windows.StringToUTF16Ptr(getStringFromBufferOffset(eventInfo.InfoBuf, nameProp.NameOffset)))
 		dataDescriptor.ArrayIndex = 0xFFFFFFFF
 		// Retrieve the length from the specified property.
 		return getLengthFromProperty(r, &dataDescriptor)
