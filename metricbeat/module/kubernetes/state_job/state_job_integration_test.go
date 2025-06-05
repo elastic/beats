@@ -30,10 +30,12 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
+	var events []mbtest.Event
+	var errs []error
 	config := test.GetKubeStateMetricsConfig(t, "state_job")
 	metricSet := mbtest.NewFetcher(t, config)
 	for retries := 0; retries < 5; retries++ {
-		events, errs := metricSet.FetchEvents()
+		events, errs = metricSet.FetchEvents()
 		if len(errs) == 0 && len(events) > 0 {
 			break
 		}
