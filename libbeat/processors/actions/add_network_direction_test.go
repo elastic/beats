@@ -49,6 +49,7 @@ func TestNetworkDirection(t *testing.T) {
 		{"192.168.1.218", "", []string{"private"}, "", false},
 	}
 
+	logger := logptest.NewTestingLogger(t, "")
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%v -> %v : %v", tt.Source, tt.Destination, tt.Direction), func(t *testing.T) {
 			evt := beat.Event{
@@ -62,7 +63,7 @@ func TestNetworkDirection(t *testing.T) {
 				"destination":       "destination",
 				"target":            "direction",
 				"internal_networks": tt.InternalNetworks,
-			}), logptest.NewTestingLogger(t, ""))
+			}), logger)
 			require.NoError(t, err)
 			observed, err := p.Run(&evt)
 			if tt.Error {
@@ -93,7 +94,7 @@ func TestNetworkDirection(t *testing.T) {
 			"destination":       "destination",
 			"target":            "@metadata.direction",
 			"internal_networks": "private",
-		}), logptest.NewTestingLogger(t, ""))
+		}), logger)
 		require.NoError(t, err)
 
 		expectedMeta := mapstr.M{

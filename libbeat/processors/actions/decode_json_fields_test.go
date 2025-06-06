@@ -45,7 +45,8 @@ func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 			MaxDepth: 1,
 		},
 	})
-	_, err := processors.New(processors.PluginConfig([]*conf.C{cfg}), logptest.NewTestingLogger(t, ""))
+	logger := logptest.NewTestingLogger(t, "")
+	_, err := processors.New(processors.PluginConfig([]*conf.C{cfg}), logger)
 	assert.NoError(t, err)
 
 	// Unknown fields should not be allowed.
@@ -55,7 +56,7 @@ func TestDecodeJSONFieldsCheckConfig(t *testing.T) {
 			"extraneous": "field",
 		},
 	})
-	_, err = processors.New(processors.PluginConfig([]*conf.C{cfg}), logptest.NewTestingLogger(t, ""))
+	_, err = processors.New(processors.PluginConfig([]*conf.C{cfg}), logger)
 	assert.Error(t, err)
 	assert.EqualError(t, err, "unexpected extraneous option in decode_json_fields")
 }
@@ -132,7 +133,7 @@ func TestDocumentID(t *testing.T) {
 		"document_id": "myid",
 	})
 
-	p, err := NewDecodeJSONFields(config, logptest.NewTestingLogger(t, ""))
+	p, err := NewDecodeJSONFields(config, log)
 	if err != nil {
 		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)
@@ -276,7 +277,7 @@ func TestTargetMetadata(t *testing.T) {
 
 	log := logptest.NewTestingLogger(t, "decode_json_fields_test")
 
-	p, err := NewDecodeJSONFields(testConfig, logptest.NewTestingLogger(t, ""))
+	p, err := NewDecodeJSONFields(testConfig, log)
 	if err != nil {
 		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)
@@ -582,7 +583,7 @@ func TestAddErrorToEventOnUnmarshalError(t *testing.T) {
 func getActualValue(t *testing.T, config *conf.C, input mapstr.M) mapstr.M {
 	log := logptest.NewTestingLogger(t, "decode_json_fields_test")
 
-	p, err := NewDecodeJSONFields(config, logptest.NewTestingLogger(t, ""))
+	p, err := NewDecodeJSONFields(config, log)
 	if err != nil {
 		log.Error("Error initializing decode_json_fields")
 		t.Fatal(err)

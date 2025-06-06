@@ -197,7 +197,7 @@ func TestAllocs(t *testing.T) {
 func BenchmarkRateLimit(b *testing.B) {
 	p, err := new(conf.MustNewConfigFrom(mapstr.M{
 		"limit": "100/s",
-	}), logptest.NewTestingLogger(b, ""))
+	}), logp.NewLogger("testing"))
 	require.NoError(b, err)
 	event := beat.Event{Fields: mapstr.M{"field": 1}}
 
