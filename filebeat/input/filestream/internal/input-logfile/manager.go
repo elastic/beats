@@ -144,7 +144,7 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
+func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
@@ -167,18 +167,21 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
+	defer func() {
+		//If there is any error creating the input, remove it from the IDs list
+		if retErr != nil {
+			cim.idsMux.Lock()
+			delete(cim.ids, settings.ID)
+			cim.idsMux.Unlock()
+		}
+	}()
+
 	if settings.ID == "" {
 		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
 	}
 
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
-		duplicatedInput := map[string]any{}
-		unpackErr := config.Unpack(&duplicatedInput)
-		if unpackErr != nil {
-			duplicatedInput["error"] = fmt.Errorf("failed to unpack duplicated input config: %w", unpackErr).Error()
-		}
-
 		// Keep old behaviour so users can upgrade to 9.0 without
 		// having their inputs not starting.
 		if settings.AllowIDDuplication {
