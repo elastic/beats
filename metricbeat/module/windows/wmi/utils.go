@@ -22,6 +22,7 @@ package wmi
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -34,24 +35,16 @@ import (
 )
 
 // Utilities related to Type conversion
-type WmiConversionFunction func(interface{}) (interface{}, error)
 
-func ConvertUint64(v interface{}) (interface{}, error) {
-	switch val := v.(type) {
-	case string:
-		return strconv.ParseUint(val, 10, 64)
-	default:
-		return nil, fmt.Errorf("expect string")
-	}
+// Function that convert single strings
+type internalWmiConversionFunction[T any] func(string) (interface{}, error)
+
+func internalConvertDatetime(v string) (interface{}, error) {
+	return strconv.ParseUint(v, 10, 64)
 }
 
-func ConvertSint64(v interface{}) (interface{}, error) {
-	switch val := v.(type) {
-	case string:
-		return strconv.ParseInt(val, 10, 64)
-	default:
-		return nil, fmt.Errorf("expect string")
-	}
+func InternalConvertSint64(v string) (interface{}, error) {
+	return strconv.ParseInt(v, 10, 64)
 }
 
 const WMI_DATETIME_LAYOUT string = "20060102150405.999999"
@@ -71,12 +64,7 @@ const TIMEZONE_LAYOUT string = "-07:00"
 // 2. Normalize the offset from minutes to the standard `hh:mm` format.
 // 3. Concatenate the "yyyyMMddHHmmSS.mmmmmm" part with the normalized offset.
 // 4. Parse the combined string using time.Parse to return a time.Date object.
-func ConvertDatetime(vi interface{}) (interface{}, error) {
-
-	v, ok := vi.(string)
-	if !ok {
-		return nil, fmt.Errorf("expect string")
-	}
+func internalConvertDateTime(v string) (interface{}, error) {
 
 	if len(v) != 25 {
 		return nil, fmt.Errorf("datetime is invalid: the datetime is expected to be exactly 25 characters long, got: %s", v)
@@ -108,6 +96,50 @@ func ConvertDatetime(vi interface{}) (interface{}, error) {
 	}
 
 	return date, err
+}
+
+func internalUnsupportedType(v interface{}) (interface{}, error) {
+	return nil, fmt.Errorf("the type %s is not supported", reflect.TypeOf(v))
+}
+
+// Type conversion that applies to both arrays and scalars
+type WmiConversionFunction func(interface{}) (interface{}, error)
+
+// Generic function that applies the internal wmi conversion function to both
+// strings and arrays and avoids repeating the same logic all over the place
+func GenericWmiConversionFunction[T any](v interface{}, f internalWmiConversionFunction[T]) (interface{}, error) {
+	switch val := v.(type) {
+	case string:
+		return f(val)
+	case []interface{}:
+		out := make([]T, 0, len(val))
+		for i, s := range val {
+			if _, ok := s.(string); !ok {
+				return nil, fmt.Errorf("we expect the array to be of type string %v", s)
+			}
+			result, err := f(s.(string))
+			if err != nil {
+				return nil, fmt.Errorf("invalid string at index %d: %v", i, err)
+			}
+			out = append(out, result.(T))
+		}
+		return out, nil
+	default:
+		typ := reflect.TypeOf(v)
+		return nil, fmt.Errorf("expected string or []string, got %T", typ)
+	}
+}
+
+func ConvertUint64(v interface{}) (interface{}, error) {
+	return GenericWmiConversionFunction[uint64](v, internalConvertDatetime)
+}
+
+func ConvertSint64(v interface{}) (interface{}, error) {
+	return GenericWmiConversionFunction[int64](v, InternalConvertSint64)
+}
+
+func ConvertDatetime(v interface{}) (interface{}, error) {
+	return GenericWmiConversionFunction[time.Time](v, internalConvertDateTime)
 }
 
 func ConvertIdentity(v interface{}) (interface{}, error) {
@@ -147,19 +179,8 @@ func NewWMISchema(base map[string]WmiConversionFunction) *WMISchema {
 	}
 }
 
-// Function that determines if a given value requires additional conversion
-// This holds true for strings that encode uint64, sint64 and datetime format
 func RequiresExtraConversion(propertyValue interface{}) bool {
-	stringValue, isString := propertyValue.(string)
-	if !isString {
-		return false
-	}
-	isEmptyString := len(stringValue) == 0
-
-	// Heuristic to avoid fetching the raw properties for every string property
-	//   If the string is empty, no need to convert the string
-	//   If the string does not end with a digit, it's not an uint64, sint64, datetime
-	return !isEmptyString && stringValue[len(stringValue)-1] >= '0' && stringValue[len(stringValue)-1] <= '9'
+	return true
 }
 
 // Given a Property it returns its CIM Type Qualifier
@@ -237,9 +258,20 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 		f = ConvertUint64
 	case base.WbemCimtypeSint64:
 		f = ConvertSint64
+	case base.WbemCimtypeObject:
+		// NOTE: The WMI CIM type 'object' is intentionally not supported here.
+		//
+		// Supporting embedded object types would require complex COM marshaling,
+		// and without further processing can cause go panic during (JSON) marshalling
+		//
+		// If you have a real-world need for this, please open a GitHub issue to discuss.
+		f = func(v interface{}) (interface{}, error) {
+			return nil, fmt.Errorf("The Type %s is unsupported. Consider flattening your class", "CIM Type Object")
+		}
 	default: // For all other types we return the identity function
 		f = ConvertIdentity
 	}
+
 	return f, err
 }
 
@@ -298,11 +330,11 @@ func ExecuteGuardedQueryInstances(session WmiQueryInterface, query string, timeo
 func errorOnClassDoesNotExist(rows []*wmi.WmiInstance, class string, namespace string) error {
 	switch len(rows) {
 	case 0:
-		return fmt.Errorf("Class '%s' not found in namespace '%s'", class, namespace)
+		return fmt.Errorf("class '%s' not found in namespace '%s'", class, namespace)
 	case 1:
 		return nil
 	default:
-		return fmt.Errorf("Unexpected case: Metaclass should return only a single entry for the class %s", class)
+		return fmt.Errorf("unexpected case: Metaclass should return only a single entry for the class %s", class)
 	}
 }
 
@@ -345,7 +377,7 @@ func validateQueryFields(instance *wmi.WmiInstance, queryConfig *QueryConfig, lo
 	validProperties, invalidProperties := filterValidProperties(instance.GetClass().GetPropertiesNames(), queryConfig.Properties)
 
 	if len(validProperties) == 0 {
-		return fmt.Errorf("All the properties listed are invalid %v. We are skipping the query.", invalidProperties)
+		return fmt.Errorf("All the properties listed are invalid %v. We are skipping the query", invalidProperties)
 	}
 
 	if len(invalidProperties) > 0 {
