@@ -15,11 +15,13 @@ import (
 func GetOracleConnectionDetails(host string) string {
 	params := godror.ConnectionParams{
 		CommonParams: dsn.CommonParams{
-			Username: GetOracleEnvUsername(),
-			Password: dsn.NewPassword((GetOracleEnvPassword())),
+			CommonSimpleParams: dsn.CommonSimpleParams{
+				Username: GetOracleEnvUsername(),
+				Password: dsn.NewPassword((GetOracleEnvPassword())),
+			},
 		},
 		ConnParams: dsn.ConnParams{
-			IsSysDBA: true,
+			AdminRole: dsn.SysDBA,
 		},
 	}
 
