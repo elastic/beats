@@ -26,10 +26,16 @@ type runnerState struct {
 	msg   string
 }
 
+// RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
+// This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
 	GetReporterForRunner(id uint64) StatusReporter
 }
 
+// NewGroupStatusReporter creates a reporter that aggregates the statuses of multiple runners
+// and reports the combined status to the parent StatusReporter.
+// This is needed because multiple modules can report different statuses, and we want to avoid
+// repeatedly flipping the parent's status.
 func NewGroupStatusReporter(parent StatusReporter) RunnerReporter {
 	if parent == nil {
 		return &nopStatus{}
@@ -68,7 +74,7 @@ func (r *reporter) updateStatusForRunner(id uint64, state Status, msg string) {
 		msg:   msg,
 	}
 
-	// calculate the overall state of Metricbeat based on the module states
+	// calculate the aggregate state of beat based on the module states
 	calcState, calcMsg := r.calculateState()
 
 	// report status to parent reporter
@@ -86,7 +92,8 @@ func (r *reporter) calculateState() (Status, string) {
 				reportedMsg = s.msg
 			}
 		case Failed:
-			// return the first failed runner
+			// we've encountered a failed runner.
+			// short-circuit and return, as Failed state takes precedence over other states
 			return s.state, s.msg
 		}
 	}
@@ -95,15 +102,21 @@ func (r *reporter) calculateState() (Status, string) {
 
 type nopStatus struct{}
 
+type noopReporter struct{}
+
+func (*noopReporter) UpdateStatus(Status, string) {}
+
 func (s *nopStatus) GetReporterForRunner(id uint64) StatusReporter {
-	return nil
+	return &noopReporter{}
 }
 
+// subReporter implements status.StatusReporter
 type subReporter struct {
 	id uint64
 	r  *reporter
 }
 
 func (m *subReporter) UpdateStatus(status Status, msg string) {
+	// report status to its parent
 	m.r.updateStatusForRunner(m.id, status, msg)
 }
