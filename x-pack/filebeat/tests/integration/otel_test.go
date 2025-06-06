@@ -131,11 +131,12 @@ setup.template.pattern: logs-filebeat-default
 func TestHTTPJSONInputOTel(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
+	// The request url is a http mock server started using streams
 	configFile := `
 filebeat.inputs:
   - type: httpjson
     id: httpjson-e2e-otel
-    request.url: https://api.ipify.org/?format=json
+    request.url: https://localhost:8090/test
 
 output:
   elasticsearch:

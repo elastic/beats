@@ -33,3 +33,18 @@ services:
     healthcheck:
       test: [ "CMD-SHELL", "curl -u beats:testing -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'" ]
       retries: 600
+
+## stream is a mock http service - required for integration testing
+  beatStreams:
+    image: docker.elastic.co/observability/stream:v0.15.0
+    hostname: testStreams
+    ports:
+      - 8090:8090
+    volumes:
+      - ./tests/integration/testdata/:/files:ro
+    environment:
+      PORT: '8090'
+    command:
+      - http-server
+      - --addr=:8090
+      - --config=/files/config.yaml
