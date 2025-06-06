@@ -21,6 +21,8 @@ package wmi
 
 import (
 	"fmt"
+	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
@@ -56,78 +58,64 @@ func TestExecuteGuardedQueryInstances(t *testing.T) {
 	assert.Equal(t, err, expectedError, "Expected the returned error to match the expected error")
 }
 
-func Test_RequiresExtraConversion(t *testing.T) {
-	tests := []struct {
-		name          string
-		propertyValue interface{}
-		expected      bool
-		description   string
-	}{
+const TEST_DATE_FORMAT string = "2006-01-02T15:04:05.999999-07:00"
+
+// Dummy internal conversion function for tests: converts string to uint64
+func dummyUint64Converter(s string) (interface{}, error) {
+	return strconv.ParseUint(s, 10, 64)
+}
+
+func TestGenericWmiConversionFunction(t *testing.T) {
+	type testCase struct {
+		name        string
+		input       interface{}
+		want        interface{}
+		expectError bool
+	}
+
+	tests := []testCase{
 		{
-			name:          "Valid numeric string - ends with a digit",
-			propertyValue: "12345",
-			expected:      true,
-			description:   "Should require conversion as the string ends with a digit",
+			name:  "single string",
+			input: "123",
+			want:  uint64(123),
 		},
 		{
-			name:          "Empty string",
-			propertyValue: "",
-			expected:      false,
-			description:   "Should not require conversion as the string is empty",
+			name:  "slice of strings as []interface{}",
+			input: []interface{}{"1", "2", "3"},
+			want:  []uint64{1, 2, 3},
 		},
 		{
-			name:          "Non-numeric string - no digits",
-			propertyValue: "abcdef",
-			expected:      false,
-			description:   "Should not require conversion as the string does not end with a digit",
+			name:        "slice contains non-string",
+			input:       []interface{}{"1", 2, "3"},
+			expectError: true,
 		},
 		{
-			name:          "Mixed string - ends with a digit. Let us fetch the type",
-			propertyValue: "abc123",
-			expected:      true,
-			description:   "Should require conversion as the string ends with a digit",
-		},
-		{
-			name:          "String ending with a non-digit",
-			propertyValue: "123abc",
-			expected:      false,
-			description:   "Should not require conversion as the string ends with a non-digit",
-		},
-		{
-			name:          "Nil input",
-			propertyValue: nil,
-			expected:      false,
-			description:   "Should not require conversion as the input is nil",
-		},
-		{
-			name:          "Non-string input",
-			propertyValue: 12345,
-			expected:      false,
-			description:   "Should not require conversion as the input is not a string",
-		},
-		{
-			name:          "Datetime input - requires a conversion",
-			propertyValue: "20240925192747.000000+000",
-			expected:      true,
-			description:   "Should not require conversion as the input is not a string",
+			name:        "unsupported type (int)",
+			input:       42,
+			expectError: true,
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := RequiresExtraConversion(tt.propertyValue)
-			assert.Equal(t, tt.expected, result, tt.description)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := GenericWmiConversionFunction[uint64](tc.input, dummyUint64Converter)
+			if (err != nil) != tc.expectError {
+				t.Fatalf("unexpected error state: got err %v, want error? %v", err, tc.expectError)
+			}
+			if err == nil {
+				if !reflect.DeepEqual(got, tc.want) {
+					t.Errorf("unexpected result: got %#v, want %#v", got, tc.want)
+				}
+			}
 		})
 	}
 }
-
-const TEST_DATE_FORMAT string = "2006-01-02T15:04:05.999999-07:00"
 
 func Test_ConversionFunctions(t *testing.T) {
 	tests := []struct {
 		name        string
 		conversion  WmiConversionFunction
-		input       string
+		input       interface{}
 		expected    interface{}
 		expectErr   bool
 		description string
@@ -142,6 +130,14 @@ func Test_ConversionFunctions(t *testing.T) {
 			description: "Should convert string to uint64",
 		},
 		{
+			name:        "ConvertUint64 - valid array input",
+			conversion:  ConvertUint64,
+			input:       []interface{}{"12345", "345"},
+			expected:    []uint64{12345, 345},
+			expectErr:   false,
+			description: "Should convert string to uint64",
+		},
+		{
 			name:        "ConvertUint64 - invalid input",
 			conversion:  ConvertUint64,
 			input:       "notANumber",
@@ -149,7 +145,6 @@ func Test_ConversionFunctions(t *testing.T) {
 			expectErr:   true,
 			description: "Should return error for invalid uint64 string",
 		},
-
 		// Test cases for ConvertSint64
 		{
 			name:        "ConvertSint64 - valid input",
@@ -158,6 +153,14 @@ func Test_ConversionFunctions(t *testing.T) {
 			expected:    int64(-12345),
 			expectErr:   false,
 			description: "Should convert string to sint64",
+		},
+		{
+			name:        "ConvertSint64 - valid array input",
+			conversion:  ConvertSint64,
+			input:       []interface{}{"-12345", "345"},
+			expected:    []int64{-12345, 345},
+			expectErr:   false,
+			description: "Should convert string to uint64",
 		},
 		{
 			name:        "ConvertSint64 - invalid input",
@@ -227,7 +230,7 @@ func mustParseTime(layout, value string) time.Time {
 	return parsed
 }
 
-func TestWMISchema_Get_BaseAndSubclass(t *testing.T) {
+func Test_WMISchema_Get_BaseAndSubclass(t *testing.T) {
 	// Set up base and subclass schema
 	base := map[string]WmiConversionFunction{
 		"BaseFieldA": ConvertIdentity,
@@ -253,7 +256,7 @@ func TestWMISchema_Get_BaseAndSubclass(t *testing.T) {
 	}
 }
 
-func TestWMISchema_Put_AddsToSubClass(t *testing.T) {
+func Test_WMISchema_Put_AddsToSubClass(t *testing.T) {
 	schema := NewWMISchema(make(map[string]WmiConversionFunction))
 
 	if _, ok := schema.Get("NewClass", "Key"); ok {
