@@ -75,13 +75,12 @@ func (*testOutput) Close() error { return nil }
 func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	config := &t.config
 
-	n := len(batch.Events())
-	t.observer.NewBatch(n)
+	t.observer.NewBatch(batch.Events())
 
-	min := int64(config.MinWait)
-	max := int64(config.MaxWait)
-	if max > 0 && min < max {
-		waitFor := rand.Int64N(max-min) + min
+	minWait := int64(config.MinWait)
+	maxWait := int64(config.MaxWait)
+	if maxWait > 0 && minWait < maxWait {
+		waitFor := rand.Int64N(maxWait-minWait) + minWait
 
 		// TODO: make wait interruptable via `Close`
 		time.Sleep(time.Duration(waitFor))
@@ -93,7 +92,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 		if config.Fail.EveryBatch == t.batchCount {
 			t.batchCount = 0
-			t.observer.RetryableErrors(n)
+			t.observer.RetryableErrors(batch.Events())
 			batch.Retry()
 			return nil
 		}
@@ -104,7 +103,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 	// ack complete batch
 	batch.ACK()
-	t.observer.AckedEvents(n)
+	t.observer.AckedEvents(batch.Events())
 
 	return nil
 }
