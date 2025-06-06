@@ -7,11 +7,14 @@ package instance
 import (
 	"fmt"
 
+	"go.opentelemetry.io/collector/component"
+
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/version"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	metricreport "github.com/elastic/elastic-agent-system-metrics/report"
 
 	"go.uber.org/zap"
@@ -73,7 +76,8 @@ func NewBeatReceiver(b *instance.Beat, creator beat.Creator, logger *zap.Logger)
 }
 
 // BeatReceiver.Stop() starts the beat receiver.
-func (br *BeatReceiver) Start() error {
+func (br *BeatReceiver) Start(host component.Host) error {
+	br.beat.Manager = management.NewOtelManager(br.beat.Manager, host)
 	if err := br.beater.Run(&br.beat.Beat); err != nil {
 		return fmt.Errorf("beat receiver run error: %w", err)
 	}

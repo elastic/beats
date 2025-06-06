@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/management/status"
+
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
@@ -44,9 +46,9 @@ import (
 
 // Metricbeat implements the Beater interface for metricbeat.
 type Metricbeat struct {
-	done         chan struct{}    // Channel used to initiate shutdown.
-	stopOnce     sync.Once        // wraps the Stop() method
-	runners      []cfgfile.Runner // Active list of module runners.
+	done         chan struct{}             // Channel used to initiate shutdown.
+	stopOnce     sync.Once                 // wraps the Stop() method
+	runners      map[uint64]cfgfile.Runner // Active list of module runners.
 	config       Config
 	registry     *mb.Register
 	autodiscover *autodiscover.Autodiscover
@@ -154,6 +156,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		config:   config,
 		registry: registry,
 		logger:   b.Info.Logger,
+		runners:  make(map[uint64]cfgfile.Runner),
 	}
 
 	for _, applyOption := range options {
@@ -202,7 +205,12 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 			return nil, err
 		}
 
-		metricbeat.runners = append(metricbeat.runners, runner)
+		hash, err := cfgfile.HashConfig(moduleCfg)
+		if err != nil {
+			return nil, fmt.Errorf("error hashing module config: %w", err)
+		}
+
+		metricbeat.runners[hash] = runner
 	}
 
 	if len(metricbeat.runners) == 0 && !dynamicCfgEnabled {
@@ -235,8 +243,15 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 func (bt *Metricbeat) Run(b *beat.Beat) error {
 	var wg sync.WaitGroup
 
+	groupReporter := status.NewGroupStatusReporter(b.Manager)
+
 	// Static modules (metricbeat.runners)
-	for _, r := range bt.runners {
+	for hash, r := range bt.runners {
+		// If the otelStatusReporter is set, we need to set the status reporter
+		if status, ok := r.(status.WithStatusReporter); ok {
+			status.SetStatusReporter(groupReporter.GetReporterForRunner(hash))
+		}
+
 		r.Start()
 		wg.Add(1)
 

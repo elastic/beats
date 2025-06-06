@@ -14,6 +14,7 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -62,6 +63,8 @@ func (bi *benchmarkInput) Run(ctx v2.Context, publisher stateless.Publisher) err
 	var wg sync.WaitGroup
 	metrics := newInputMetrics(ctx)
 
+	ctx.UpdateStatus(status.Running, "")
+
 	for i := uint8(0); i < bi.cfg.Threads; i++ {
 		wg.Add(1)
 		go func(thread uint8) {
@@ -96,7 +99,7 @@ func runThread(ctx v2.Context, publisher stateless.Publisher, thread uint8, cfg 
 		}
 	case cfg.Eps > 0:
 		ticker := time.NewTicker(1 * time.Second)
-		pubChan := make(chan bool, int(cfg.Eps))
+		pubChan := make(chan bool, int(cfg.Eps)) //nolint:gosec // disable G115
 		for {
 			select {
 			case <-ctx.Cancelation.Done():
