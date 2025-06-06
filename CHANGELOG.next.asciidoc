@@ -132,6 +132,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 
+- Added maintenance windows support for Heartbeat. {pull}41508[41508]
+- Add missing dependencies to ubi9-minimal distro. {pull}44556[44556]
 
 
 *Metricbeat*
