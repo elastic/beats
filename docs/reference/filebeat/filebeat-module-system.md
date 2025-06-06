@@ -114,7 +114,6 @@ See [Processors](/reference/filebeat/filtering-enhancing-data.md) for informatio
 
 This module comes with sample dashboards. For example:
 
-% TO DO: Use `:class: screenshot`
 ![kibana system](images/kibana-system.png)
 
 ## Fields [_fields]
