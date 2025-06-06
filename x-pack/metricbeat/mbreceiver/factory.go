@@ -16,7 +16,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd"
-	"github.com/elastic/beats/v7/x-pack/filebeat/include"
+
+	// Import OSS modules.
+	_ "github.com/elastic/beats/v7/metricbeat/include"
+	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
+
+	// Import X-Pack modules.
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
+
 	xpInstance "github.com/elastic/beats/v7/x-pack/libbeat/cmd/instance"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -41,7 +49,6 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	}
 	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
-	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
 	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
 	if err != nil {
