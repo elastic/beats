@@ -41,7 +41,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
@@ -192,7 +192,7 @@ func newTestElasticsearchOutput(t *testing.T, test string) *testOutputer {
 		"template.enabled": false,
 	})
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	info := beat.Info{Beat: "libbeat"}
 	im, err := idxmgmt.DefaultSupport(logger, info, conf.MustNewConfigFrom(
 		map[string]interface{}{
