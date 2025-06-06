@@ -27,7 +27,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
-	"go.opentelemetry.io/collector/component/componentstatus"
 	"go.opentelemetry.io/collector/receiver"
 
 	"go.uber.org/zap"
@@ -211,51 +210,6 @@ func TestMultipleReceivers(t *testing.T) {
 				}
 				return true
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
-		},
-	})
-}
-
-func TestStatusReporter(t *testing.T) {
-	cfg := Config{
-		Beatconfig: map[string]any{
-			"metricbeat": map[string]any{
-				"modules": []map[string]any{
-					{
-						"module":     "system",
-						"enabled":    true,
-						"period":     "1s",
-						"processes":  []string{".*"},
-						"metricsets": []string{"cpu"},
-					},
-				},
-			},
-			"output": map[string]any{
-				"otelconsumer": map[string]any{},
-			},
-			"logging": map[string]any{
-				"level": "debug",
-				"selectors": []string{
-					"*",
-				},
-			},
-			"path.home": t.TempDir(),
-		},
-	}
-	host := &oteltest.MockHost{}
-	oteltest.CheckReceivers(oteltest.CheckReceiversParams{
-		T:    t,
-		Host: host,
-		Receivers: []oteltest.ReceiverConfig{
-			{
-				Name:    "r1",
-				Config:  &cfg,
-				Factory: NewFactory(),
-			},
-		},
-		AssertFunc: func(c *assert.CollectT, _ map[string][]mapstr.M, _ *observer.ObservedLogs) {
-			require.NotNil(t, host.Evt)
-			require.Nil(t, host.Evt.Err())
-			require.Equal(t, host.Evt.Status(), componentstatus.StatusOK)
 		},
 	})
 }

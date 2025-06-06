@@ -64,10 +64,6 @@ type CheckReceiversParams struct {
 	// AssertFunc is a function that asserts the test conditions.
 	// The function is called periodically until the assertions are met or the timeout is reached.
 	AssertFunc func(t *assert.CollectT, logs map[string][]mapstr.M, zapLogs *observer.ObservedLogs)
-
-	// Host is passed to receiver.Start and is an implementation of collector's component.Host
-	// It is used by individual receviers to report status.
-	Host component.Host
 }
 
 // CheckReceivers creates receivers using the provided configuration.
@@ -77,6 +73,8 @@ func CheckReceivers(params CheckReceiversParams) {
 
 	var logsMu sync.Mutex
 	logs := make(map[string][]mapstr.M)
+
+	host := &MockHost{}
 
 	zapCore := zapcore.NewCore(
 		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
@@ -129,7 +127,7 @@ func CheckReceivers(params CheckReceiversParams) {
 	}
 
 	for i, r := range receivers {
-		err := r.Start(ctx, params.Host)
+		err := r.Start(ctx, host)
 		require.NoErrorf(t, err, "Error starting receiver %d", i)
 		defer func() {
 			require.NoErrorf(t, r.Shutdown(ctx), "Error shutting down receiver %d", i)
@@ -155,6 +153,9 @@ func CheckReceivers(params CheckReceiversParams) {
 			require.Equal(t, zl.ContextMap()["otelcol.signal"], "logs")
 			break
 		}
+		require.NotNil(t, host.Evt)
+		require.Nil(t, host.Evt.Err())
+		require.Equal(t, host.Evt.Status(), componentstatus.StatusOK)
 
 		params.AssertFunc(ct, logs, zapLogs)
 	}, 2*time.Minute, 100*time.Millisecond,
