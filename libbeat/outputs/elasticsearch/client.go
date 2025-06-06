@@ -43,7 +43,7 @@ import (
 var (
 	errPayloadTooLarge = errors.New("the bulk payload is too large for the server. Consider to adjust `http.max_content_length` parameter in Elasticsearch or `bulk_max_size` in the beat. The batch has been dropped")
 
-	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true.")
+	ErrTooOld = errors.New("Elasticsearch is too old. Please upgrade the instance. If you would like to connect to older instances set output.elasticsearch.allow_older_versions to true") //nolint:staticcheck //false positive
 )
 
 // Client is an elasticsearch client.
@@ -122,6 +122,7 @@ var bulkRequestParams = map[string]string{
 func NewClient(
 	s clientSettings,
 	onConnect *callbacksRegistry,
+	logger *logp.Logger,
 ) (*Client, error) {
 	pipeline := s.pipelineSelector
 	if pipeline != nil && pipeline.IsEmpty() {
@@ -164,7 +165,7 @@ func NewClient(
 		observer = outputs.NewNilObserver()
 	}
 
-	log := logp.NewLogger("elasticsearch")
+	log := logger.Named("elasticsearch")
 
 	pLogDeadLetter := periodic.NewDoer(10*time.Second,
 		func(count uint64, d time.Duration) {
@@ -236,6 +237,7 @@ func (client *Client) Clone() *Client {
 			deadLetterIndex:  client.deadLetterIndex,
 		},
 		nil, // XXX: do not pass connection callback?
+		client.log,
 	)
 	return c
 }
@@ -351,7 +353,7 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 			client.log.Error("Elasticsearch output received unencoded publisher.Event")
 			continue
 		}
-		event := data[i].EncodedEvent.(*encodedEvent)
+		event := data[i].EncodedEvent.(*encodedEvent) //nolint:errcheck //safe to ignore type check
 		if event.err != nil {
 			// This means there was an error when encoding the event and it isn't
 			// ingestable, so report the error and continue.
@@ -477,7 +479,7 @@ func (client *Client) applyItemStatus(
 	itemMessage []byte,
 	stats *bulkResultStats,
 ) bool {
-	encodedEvent := event.EncodedEvent.(*encodedEvent)
+	encodedEvent := event.EncodedEvent.(*encodedEvent) //nolint:errcheck //safe to ignore type check
 	if itemStatus < 300 {
 		if encodedEvent.deadLetter {
 			// This was ingested into the dead letter index, not the original target

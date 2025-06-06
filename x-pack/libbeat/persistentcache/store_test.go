@@ -5,29 +5,21 @@
 package persistentcache
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestStandaloneStore(t *testing.T) {
-	type valueType struct {
-		Something string
-	}
 
 	var key = []byte("somekey")
 	var value = []byte("somevalue")
 
-	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
-	require.NoError(t, err)
-	t.Cleanup(func() { os.RemoveAll(tempDir) })
+	tempDir := t.TempDir()
 
-	store, err := newStore(logp.NewLogger("test"), tempDir, "store-cache")
+	store, err := newStore(logptest.NewTestingLogger(t, ""), tempDir, "store-cache")
 	require.NoError(t, err)
 
 	err = store.Set(key, value, 0)

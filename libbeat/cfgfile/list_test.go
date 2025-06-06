@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -115,7 +116,8 @@ func (r *testDiagHandler) Register(_ string, _ string, _ string, _ string, callb
 
 func TestDiagnostics(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	list := NewRunnerList("", factory, nil, logger)
 	cfg := createConfig(1)
 	callback := &testDiagHandler{}
 	cfg.DiagCallback = callback
@@ -129,7 +131,8 @@ func TestDiagnostics(t *testing.T) {
 
 func TestNewConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -143,7 +146,9 @@ func TestNewConfigs(t *testing.T) {
 
 func TestReloadSameConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	logger := logptest.NewTestingLogger(t, "")
+
+	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -168,7 +173,8 @@ func TestReloadSameConfigs(t *testing.T) {
 
 func TestReloadDuplicateConfig(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -192,7 +198,8 @@ func TestReloadDuplicateConfig(t *testing.T) {
 
 func TestReloadStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	logger := logptest.NewTestingLogger(t, "")
+	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -214,7 +221,9 @@ func TestReloadStopConfigs(t *testing.T) {
 
 func TestReloadStartStopConfigs(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	logger := logptest.NewTestingLogger(t, "")
+
+	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -239,7 +248,9 @@ func TestReloadStartStopConfigs(t *testing.T) {
 
 func TestStopAll(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	logger := logptest.NewTestingLogger(t, "")
+
+	list := NewRunnerList("", factory, nil, logger)
 
 	err := list.Reload([]*reload.ConfigWithMeta{
 		createConfig(1),
@@ -253,13 +264,15 @@ func TestStopAll(t *testing.T) {
 	assert.Equal(t, len(list.copyRunnerList()), 0)
 
 	for _, r := range list.runners {
-		assert.False(t, r.(*runner).stopped)
+		assert.False(t, r.(*runner).stopped) //nolint:errcheck //false positive
 	}
 }
 
 func TestHas(t *testing.T) {
 	factory := &runnerFactory{}
-	list := NewRunnerList("", factory, nil)
+	logger := logptest.NewTestingLogger(t, "")
+
+	list := NewRunnerList("", factory, nil, logger)
 	config := createConfig(1)
 
 	hash, err := HashConfig(config.Config)
