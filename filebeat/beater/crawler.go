@@ -80,14 +80,14 @@ func (c *crawler) Start(
 	}
 
 	if configInputs.Enabled() {
-		c.inputReloader = cfgfile.NewReloader(pipeline, configInputs)
+		c.inputReloader = cfgfile.NewReloader(log, pipeline, configInputs)
 		if err := c.inputReloader.Check(c.inputsFactory); err != nil {
 			return fmt.Errorf("creating input reloader failed: %w", err)
 		}
 	}
 
 	if configModules.Enabled() {
-		c.modulesReloader = cfgfile.NewReloader(pipeline, configModules)
+		c.modulesReloader = cfgfile.NewReloader(log, pipeline, configModules)
 		if err := c.modulesReloader.Check(c.modulesFactory); err != nil {
 			return fmt.Errorf("creating module reloader failed: %w", err)
 		}
