@@ -7,12 +7,15 @@
 package integration
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+	"text/template"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
@@ -22,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
+	"github.com/google/uuid"
 )
 
 var beatsCfgFile = `
@@ -130,6 +134,16 @@ setup.template.pattern: logs-filebeat-default
 
 func TestHTTPJSONInputOTel(t *testing.T) {
 	integration.EnsureESIsRunning(t)
+	host := integration.GetESURL(t, "http")
+	user := host.User.Username()
+	password, _ := host.User.Password()
+
+	type options struct {
+		namespace string
+		esURL     string
+		username  string
+		password  string
+	}
 
 	// The request url is a http mock server started using streams
 	configFile := `
@@ -141,13 +155,18 @@ filebeat.inputs:
 output:
   elasticsearch:
     hosts:
-      - localhost:9200
-    protocol: http
-    username: admin
-    password: testing
-	index: logs-integration-default
+      - {{ .esURL }}
+    username: {{ .username }}
+    password: {{ .password }}
+
+processors:
+- add_fields:
+	fields:
+		dataset: integration
+		namespace: {{ .namespace}}
+		type: logs
+	target: data_stream
 `
-	// TODO Add data stream processor
 
 	// start filebeat in otel mode
 	filebeatOTel := integration.NewBeat(
@@ -157,8 +176,28 @@ output:
 		"otel",
 	)
 
-	filebeatOTel.WriteConfigFile(configFile)
+	var configBuffer bytes.Buffer
+
+	template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer,
+		options{
+			namespace: strings.ReplaceAll(uuid.New().String(), "-", ""), // create a random uuid and make sure it doesn't contain dashes
+			esURL:     host.String(),
+			username:  user,
+			password:  password,
+		})
+
+	filebeatOTel.WriteConfigFile(configBuffer.String())
+	// reset buffer
+	configBuffer.Reset()
 	filebeatOTel.Start()
+
+	template.Must(template.New("config").Parse(configFile)).Execute(&configBuffer,
+		options{
+			namespace: strings.ReplaceAll(uuid.New().String(), "-", ""), // create a random uuid and make sure it doesn't contain dashes
+			esURL:     host.String(),
+			username:  user,
+			password:  password,
+		})
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -166,18 +205,16 @@ output:
 		"filebeat",
 		"../../filebeat.test",
 	)
-	s := configFile + `
-setup.template.name: logs-filebeat-default
-setup.template.pattern: logs-filebeat-default
-`
 
-	filebeat.WriteConfigFile(s)
+	filebeat.WriteConfigFile(configBuffer.String())
 	filebeat.Start()
 
 	t.Cleanup(func() {
 		filebeatOTel.Stop()
 		filebeat.Stop()
 	})
+
+	// Get ES client
 	es, err := integration.GetESClient(t)
 	if err != nil {
 		t.Fatalf("could not get es client due to: %v", err)
@@ -191,10 +228,10 @@ setup.template.pattern: logs-filebeat-default
 			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer findCancel()
 
-			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration*")
 			require.NoError(t, err)
 
-			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-*")
 			require.NoError(t, err)
 
 			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
