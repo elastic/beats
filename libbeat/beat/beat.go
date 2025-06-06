@@ -60,6 +60,8 @@ type Beat struct {
 	Info      Info     // beat metadata.
 	Publisher Pipeline // Publisher pipeline
 
+	Monitoring Monitoring
+
 	InSetupCmd bool // this is set to true when the `setup` command is called
 
 	OverwritePipelinesCallback OverwritePipelinesCallback // ingest pipeline loader callback

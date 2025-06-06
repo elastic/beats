@@ -190,7 +190,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
 		metricbeat.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, registry, moduleOptions...)
+	factory := module.NewFactory(b.Info, b.Monitoring, registry, moduleOptions...)
 
 	for _, moduleCfg := range config.Modules {
 		if !moduleCfg.Enabled() {
@@ -249,7 +249,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
+	factory := module.NewFactory(b.Info, b.Monitoring, bt.registry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher, bt.logger)
 	b.Registry.MustRegisterInput(modules)
 	wg.Add(1)

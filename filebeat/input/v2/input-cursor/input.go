@@ -24,7 +24,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -110,18 +109,6 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	// The metrics from the parent v2.Context needs to be canceled otherwise
-	// there will be a set of metrics being published for this context by the
-	// HTTP monitoring endpoint. There would be an "empty registry", only with
-	// 'id' and 'input' and also the registries for the 'child' contexts being
-	// published. E.g.:
-	//  - registry from parent context:
-	//    - {"id": "my-cel-id", "input": "cel"}
-	//  - registry from child context:
-	//    - {"id": "my-cel-id::source-name", "input": "cel", [ ... ] }
-	inputmon.CancelMetricsRegistry(
-		ctx.ID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), ctx.Logger)
-
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
 		source := source
@@ -133,7 +120,7 @@ func (inp *managedInput) Run(
 			reg, pc, cancelMetrics := input.PrepareInputMetrics(
 				inpCtxID,
 				ctx.Name,
-				ctx.Agent.Monitoring.NamespaceRegistry(),
+				ctx.MetricsRegistry,
 				pipeline,
 				log)
 			defer cancelMetrics()

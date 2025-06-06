@@ -48,10 +48,7 @@ func NewMetrics(reg *monitoring.Registry) *Metrics {
 	// variable, so it should always exist before this function runs.
 	// However, at least on testing scenarios this does not hold true, so
 	// if needed, we create the registry ourselves.
-	harvesterMetrics := monitoring.Default.GetRegistry("filebeat.harvester")
-	if harvesterMetrics == nil {
-		harvesterMetrics = monitoring.Default.NewRegistry("filebeat.harvester")
-	}
+	harvesterMetrics := monitoring.Default.GetOrCreateRegistry("filebeat.harvester")
 
 	m := Metrics{
 		FilesOpened:       monitoring.NewUint(reg, "files_opened_total"),
