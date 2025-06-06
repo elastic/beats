@@ -12,6 +12,7 @@ import (
 
 	"cloud.google.com/go/compute/apiv1/computepb"
 	"cloud.google.com/go/redis/apiv1/redispb"
+	"github.com/cenkalti/backoff/v4"
 	"google.golang.org/api/dataproc/v1"
 	"google.golang.org/api/sqladmin/v1"
 
@@ -26,10 +27,7 @@ type CacheEntry struct {
 
 // IsExpired checks if the cache entry has exceeded its refresh interval.
 func (e *CacheEntry) IsExpired() bool {
-	if e.RefreshInterval <= 0 {
-		return true
-	}
-	if e.LastRefreshed.IsZero() {
+	if e.RefreshInterval <= 0 || e.LastRefreshed.IsZero() {
 		return true
 	}
 	return time.Since(e.LastRefreshed) > e.RefreshInterval
@@ -131,9 +129,28 @@ func ensureCacheFresh[T any](
 	}
 
 	r.logger.Infof("%s cache expired, executing fetch function...", cacheName)
-	newData, err := fetchFunc(ctx)
+
+	expBackoff := backoff.NewExponentialBackOff()
+	expBackoff.InitialInterval = 1 * time.Second
+	expBackoff.MaxInterval = 30 * time.Second
+	expBackoff.MaxElapsedTime = 2 * time.Minute
+
+	backoffWithRetry := backoff.WithMaxRetries(expBackoff, 3)
+
+	var newData map[string]T
+	operation := func() error {
+		var err error
+		newData, err = fetchFunc(ctx)
+		if err != nil {
+			r.logger.Warnf("%s cache fetch attempt failed: %v", cacheName, err)
+			return err
+		}
+		return nil
+	}
+
+	err := backoff.Retry(operation, backoff.WithContext(backoffWithRetry, ctx))
 	if err != nil {
-		r.logger.Errorf("%s cache fetch function failed: %v", cacheName, err)
+		r.logger.Errorf("%s cache fetch function failed after retries: %v", cacheName, err)
 		return fmt.Errorf("%s cache fetch failed: %w", cacheName, err)
 	}
 
@@ -145,21 +162,11 @@ func ensureCacheFresh[T any](
 	return nil
 }
 
-// GetComputeCache returns a copy of the compute instance cache.
-func (r *CacheRegistry) GetComputeCache() map[string]*computepb.Instance {
-	return getCache(r, r.compute)
-}
-
 // UpdateComputeCache appends the provided map to the Compute instance cache.
 func (r *CacheRegistry) UpdateComputeCache(update map[string]*computepb.Instance) {
 	r.dataMutex.Lock()
 	defer r.dataMutex.Unlock()
 	updateCache(r.compute, update)
-}
-
-// GetCloudSQLCache returns a copy of the CloudSQL instance cache.
-func (r *CacheRegistry) GetCloudSQLCache() map[string]*sqladmin.DatabaseInstance {
-	return getCache(r, r.cloudsql)
 }
 
 // UpdateCloudSQLCache appends the provided map to the CloudSQL instance cache.
@@ -169,21 +176,11 @@ func (r *CacheRegistry) UpdateCloudSQLCache(update map[string]*sqladmin.Database
 	updateCache(r.cloudsql, update)
 }
 
-// GetRedisCache returns a copy of the Redis instance cache.
-func (r *CacheRegistry) GetRedisCache() map[string]*redispb.Instance {
-	return getCache(r, r.redis)
-}
-
 // UpdateRedisCache appends the provided map to the Redis instance cache.
 func (r *CacheRegistry) UpdateRedisCache(update map[string]*redispb.Instance) {
 	r.dataMutex.Lock()
 	defer r.dataMutex.Unlock()
 	updateCache(r.redis, update)
-}
-
-// GetDataprocCache returns a copy of the Dataproc cluster cache.
-func (r *CacheRegistry) GetDataprocCache() map[string]*dataproc.Cluster {
-	return getCache(r, r.dataproc)
 }
 
 // UpdateDataprocCache appends the provided map to the dataproc instance cache.
@@ -207,6 +204,34 @@ func (r *CacheRegistry) isCloudSQLCacheExpired() bool {
 
 func (r *CacheRegistry) isDataprocCacheExpired() bool {
 	return r.dataproc.meta.IsExpired()
+}
+
+// getInstanceByID is a generic helper to get a single instance by ID from cache
+func getInstanceByID[T any](r *CacheRegistry, cache *Cache[T], id string) (T, bool) {
+	r.dataMutex.RLock()
+	defer r.dataMutex.RUnlock()
+	instance, found := cache.data[id]
+	return instance, found
+}
+
+// GetComputeInstanceByID returns a compute instance by ID from cache
+func (r *CacheRegistry) GetComputeInstanceByID(id string) (*computepb.Instance, bool) {
+	return getInstanceByID(r, r.compute, id)
+}
+
+// GetCloudSQLInstanceByID returns a CloudSQL instance by ID from cache
+func (r *CacheRegistry) GetCloudSQLInstanceByID(id string) (*sqladmin.DatabaseInstance, bool) {
+	return getInstanceByID(r, r.cloudsql, id)
+}
+
+// GetRedisInstanceByID returns a Redis instance by ID from cache
+func (r *CacheRegistry) GetRedisInstanceByID(id string) (*redispb.Instance, bool) {
+	return getInstanceByID(r, r.redis, id)
+}
+
+// GetDataprocClusterByID returns a Dataproc cluster by ID from cache
+func (r *CacheRegistry) GetDataprocClusterByID(id string) (*dataproc.Cluster, bool) {
+	return getInstanceByID(r, r.dataproc, id)
 }
 
 // EnsureComputeCacheFresh checks if the cache is fresh. If not, it acquires a

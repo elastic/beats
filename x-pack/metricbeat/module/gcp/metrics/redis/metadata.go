@@ -154,8 +154,7 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*r
 		return nil, err
 	}
 
-	cache := s.cacheRegistry.GetRedisCache()
-	instance, ok := cache[instanceID]
+	instance, ok := s.cacheRegistry.GetRedisInstanceByID(instanceID)
 	if !ok {
 		s.logger.Debugf("Instance %s not found in redis cache.", instanceID)
 		return nil, nil // Instance not found is not necessarily an error here

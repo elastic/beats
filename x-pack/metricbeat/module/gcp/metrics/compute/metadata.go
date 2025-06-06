@@ -172,8 +172,7 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*c
 		return nil, err
 	}
 
-	computeCache := s.cacheRegistry.GetComputeCache()
-	computeInstance, ok := computeCache[instanceID]
+	computeInstance, ok := s.cacheRegistry.GetComputeInstanceByID(instanceID)
 	if !ok {
 		s.logger.Debugf("Instance %s not found in compute cache.", instanceID)
 		return nil, nil // Instance not found is not necessarily an error here

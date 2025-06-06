@@ -154,8 +154,7 @@ func (s *metadataCollector) instance(ctx context.Context, clusterUUID string) (*
 		return nil, err
 	}
 
-	dataprocCache := s.cacheRegistry.GetDataprocCache()
-	cluster, ok := dataprocCache[clusterUUID]
+	cluster, ok := s.cacheRegistry.GetDataprocClusterByID(clusterUUID)
 	if !ok {
 		s.logger.Debugf("Cluster UUID %s not found in Dataproc cache.", clusterUUID)
 		return nil, nil // Cluster not found is not necessarily an error here
