@@ -121,18 +121,21 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error unpacking beats logging config: %w\n%v", err, b.Config.Logging)
 	}
 
-	err = logp.ConfigureWithCore(logpConfig, core)
+	b.Info.Logger, err = logp.ConfigureWithCoreLocal(logpConfig, core)
 	if err != nil {
 		return nil, fmt.Errorf("error configuring beats logp: %w", err)
 	}
 
-	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version)
+	// extracting it here for ease of use
+	logger := b.Info.Logger
+
+	instrumentation, err := instrumentation.New(cfg, b.Info.Beat, b.Info.Version, logger)
 	if err != nil {
 		return nil, fmt.Errorf("error setting up instrumentation: %w", err)
 	}
 	b.Instrumentation = instrumentation
 
-	if err := instance.PromoteOutputQueueSettings(&b.Config); err != nil {
+	if err := instance.PromoteOutputQueueSettings(b); err != nil {
 		return nil, fmt.Errorf("could not promote output queue settings: %w", err)
 	}
 
@@ -152,7 +155,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	}
 
 	// log paths values to help with troubleshooting
-	logp.Info("%s", paths.Paths.String())
+	logger.Infof("%s", paths.Paths.String())
 
 	metaPath := paths.Resolve(paths.Data, "meta.json")
 	err = b.LoadMeta(metaPath)
@@ -160,7 +163,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		return nil, fmt.Errorf("error loading meta data: %w", err)
 	}
 
-	logp.Info("Beat ID: %v", b.Info.ID)
+	logger.Infof("Beat ID: %v", b.Info.ID)
 
 	// Try to get the host's FQDN and set it.
 	h, err := sysinfo.Host()
@@ -175,7 +178,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
-		logp.Warn("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
+		logger.Warnf("unable to lookup FQDN: %s, using hostname = %s as FQDN", err.Error(), b.Info.Hostname)
 		b.Info.FQDN = b.Info.Hostname
 	} else {
 		b.Info.FQDN = fqdn
@@ -216,9 +219,9 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 
 	imFactory := settings.IndexManagement
 	if imFactory == nil {
-		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM)
+		imFactory = idxmgmt.MakeDefaultSupport(settings.ILM, logger)
 	}
-	b.IdxSupporter, err = imFactory(nil, b.Info, b.RawConfig)
+	b.IdxSupporter, err = imFactory(logger, b.Info, b.RawConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error setting index supporter: %w", err)
 	}
@@ -229,7 +232,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 		processingFactory = processing.MakeDefaultBeatSupport(true)
 	}
 
-	processors, err := processingFactory(b.Info, logp.L().Named("processors"), b.RawConfig)
+	processors, err := processingFactory(b.Info, logger.Named("processors"), b.RawConfig)
 	if err != nil {
 		return nil, fmt.Errorf("error creating processors: %w", err)
 	}
@@ -240,7 +243,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	outputEnabled := b.Config.Output.IsSet() && b.Config.Output.Config().Enabled()
 	if !outputEnabled {
 		if b.Manager.Enabled() {
-			logp.Info("Output is configured through Central Management")
+			logger.Info("Output is configured through Central Management")
 		} else {
 			return nil, fmt.Errorf("no outputs are defined, please define one under the output section")
 		}
@@ -254,7 +257,7 @@ func NewBeatForReceiver(settings instance.Settings, receiverConfig map[string]an
 	monitors := pipeline.Monitors{
 		Metrics:   reg,
 		Telemetry: b.Info.Monitoring.StateRegistry,
-		Logger:    logp.L().Named("publisher"),
+		Logger:    logger.Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
 
