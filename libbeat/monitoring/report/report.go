@@ -23,7 +23,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type config struct {
@@ -40,7 +39,7 @@ type Reporter interface {
 	Stop()
 }
 
-type ReporterFactory func(beat.Info, *monitoring.Registry, Settings, *conf.C) (Reporter, error)
+type ReporterFactory func(beat.Info, beat.Monitoring, Settings, *conf.C) (Reporter, error)
 
 type hostsCfg struct {
 	Hosts []string `config:"hosts"`
@@ -61,7 +60,7 @@ func RegisterReporterFactory(name string, f ReporterFactory) {
 
 func New(
 	beat beat.Info,
-	monitoringReg *monitoring.Registry,
+	mon beat.Monitoring,
 	settings Settings,
 	cfg *conf.C,
 	outputs conf.Namespace,
@@ -76,7 +75,7 @@ func New(
 		return nil, fmt.Errorf("unknown reporter type '%v'", name)
 	}
 
-	return f(beat, monitoringReg, settings, cfg)
+	return f(beat, mon, settings, cfg)
 }
 
 func getReporterConfig(

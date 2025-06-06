@@ -1333,8 +1333,7 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 			ClusterUUID:     monitoringClusterUUID,
 		}
-		monitoringReg := b.Monitoring.StatsRegistry.GetOrCreateRegistry("monitoring")
-		reporter, err := report.New(b.Info, monitoringReg, settings, monitoringCfg, b.Config.Output)
+		reporter, err := report.New(b.Info, b.Monitoring, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return nil, err
 		}

@@ -40,8 +40,9 @@ import (
 )
 
 type reporter struct {
-	done   *stopper
-	logger *logp.Logger
+	done       *stopper
+	logger     *logp.Logger
+	monitoring beat.Monitoring
 
 	checkRetry time.Duration
 
@@ -96,7 +97,7 @@ func defaultConfig(settings report.Settings) config {
 	return c
 }
 
-func makeReporter(beat beat.Info, monitoring *monitoring.Registry, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
+func makeReporter(beat beat.Info, mon beat.Monitoring, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
 	log := beat.Logger.Named(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
@@ -159,7 +160,7 @@ func makeReporter(beat beat.Info, monitoring *monitoring.Registry, settings repo
 	pipeline, err := pipeline.New(
 		beat,
 		pipeline.Monitors{
-			Metrics: monitoring,
+			Metrics: mon.StatsRegistry.GetOrCreateRegistry("monitoring"),
 			Logger:  log,
 		},
 		queueConfig,
@@ -185,6 +186,7 @@ func makeReporter(beat beat.Info, monitoring *monitoring.Registry, settings repo
 
 	r := &reporter{
 		logger:     log,
+		monitoring: mon,
 		done:       newStopper(),
 		beatMeta:   makeMeta(beat),
 		tags:       config.Tags,
@@ -238,12 +240,12 @@ func (r *reporter) initLoop(c config) {
 	log.Info("Successfully connected to X-Pack Monitoring endpoint.")
 
 	// Start collector and send loop if monitoring endpoint has been found.
-	go r.snapshotLoop("state", "state", c.StatePeriod, c.ClusterUUID)
+	go r.snapshotLoop(r.monitoring.StateRegistry, "state", "state", c.StatePeriod, c.ClusterUUID)
 	// For backward compatibility stats is named to metrics.
-	go r.snapshotLoop("stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
+	go r.snapshotLoop(r.monitoring.StatsRegistry, "stats", "metrics", c.MetricsPeriod, c.ClusterUUID)
 }
 
-func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, clusterUUID string) {
+func (r *reporter) snapshotLoop(registry *monitoring.Registry, namespace, prefix string, period time.Duration, clusterUUID string) {
 	ticker := time.NewTicker(period)
 	defer ticker.Stop()
 
@@ -261,7 +263,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 		case ts = <-ticker.C:
 		}
 
-		snapshot := makeSnapshot(monitoring.GetNamespace(namespace).GetRegistry())
+		snapshot := makeSnapshot(registry)
 		if snapshot == nil {
 			log.Debug("Empty snapshot.")
 			continue
@@ -283,7 +285,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 		}
 
 		if clusterUUID == "" {
-			clusterUUID = getClusterUUID()
+			clusterUUID = getClusterUUID(r.monitoring)
 		}
 		if clusterUUID != "" {
 			_, _ = meta.Put("cluster_uuid", clusterUUID)
@@ -338,8 +340,8 @@ func makeMeta(beat beat.Info) mapstr.M {
 	}
 }
 
-func getClusterUUID() string {
-	stateRegistry := monitoring.GetNamespace("state").GetRegistry()
+func getClusterUUID(mon beat.Monitoring) string {
+	stateRegistry := mon.StateRegistry
 	outputsRegistry := stateRegistry.GetRegistry("outputs")
 	if outputsRegistry == nil {
 		return ""

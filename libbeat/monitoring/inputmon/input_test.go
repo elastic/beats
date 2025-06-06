@@ -97,7 +97,7 @@ func TestMetricSnapshotJSON(t *testing.T) {
 	inputID := "input-with-pipeline-metrics-new-inputAPI"
 	inputType := "test"
 
-	parentLocalReg := monitoring.GetNamespace("beat-x").GetRegistry()
+	parentLocalReg := monitoring.NewRegistry()
 	reg := NewMetricsRegistry(inputID, inputType, parentLocalReg, log)
 	monitoring.NewInt(reg, "foo_total").Set(10)
 	monitoring.NewInt(reg, "events_pipeline_total").Set(10)

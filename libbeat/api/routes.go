@@ -38,13 +38,6 @@ func RegistryLookupFunc(root *monitoring.Registry) LookupFunc {
 	}
 }
 
-// NamespaceLookupFunc is used for looking up root registry of a given namespace
-func NamespaceLookupFunc() LookupFunc {
-	return func(s string) *monitoring.Registry {
-		return monitoring.GetNamespace(s).GetRegistry()
-	}
-}
-
 type LookupFunc func(string) *monitoring.Registry
 
 // NewWithDefaultRoutes creates a new server with default API routes.
