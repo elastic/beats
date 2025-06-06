@@ -343,10 +343,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	b.registerClusterUUIDFetching()
 
-	reg := monitoring.Default.GetRegistry("libbeat")
-	if reg == nil {
-		reg = monitoring.Default.NewRegistry("libbeat")
-	}
+	reg := b.Monitoring.StatsRegistry.GetOrCreateRegistry("libbeat")
 
 	err = metricreport.SetupMetrics(b.Info.Logger.Named("metrics"), b.Info.Beat, version.GetDefaultVersion())
 	if err != nil {
@@ -916,7 +913,7 @@ func (b *Beat) configure(settings Settings) error {
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
 	b.Manager.RegisterDiagnosticHook("beat_metrics", "Metrics from the default monitoring namespace and expvar.",
 		"beat_metrics.json", "application/json", func() []byte {
-			m := monitoring.CollectStructSnapshot(monitoring.Default, monitoring.Full, true)
+			m := monitoring.CollectStructSnapshot(b.Monitoring.StatsRegistry, monitoring.Full, true)
 			data, err := json.MarshalIndent(m, "", "  ")
 			if err != nil {
 				logger.Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
@@ -1336,7 +1333,8 @@ func (b *Beat) setupMonitoring(settings Settings) (report.Reporter, error) {
 			DefaultUsername: settings.Monitoring.DefaultUsername,
 			ClusterUUID:     monitoringClusterUUID,
 		}
-		reporter, err := report.New(b.Info, settings, monitoringCfg, b.Config.Output)
+		monitoringReg := b.Monitoring.StatsRegistry.GetOrCreateRegistry("monitoring")
+		reporter, err := report.New(b.Info, monitoringReg, settings, monitoringCfg, b.Config.Output)
 		if err != nil {
 			return nil, err
 		}

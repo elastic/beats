@@ -96,7 +96,7 @@ func defaultConfig(settings report.Settings) config {
 	return c
 }
 
-func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
+func makeReporter(beat beat.Info, monitoring *monitoring.Registry, settings report.Settings, cfg *conf.C) (report.Reporter, error) {
 	log := beat.Logger.Named(logSelector)
 	config := defaultConfig(settings)
 	if err := cfg.Unpack(&config); err != nil {
@@ -134,8 +134,6 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		}
 		clients[i] = client
 	}
-
-	monitoring := monitoring.Default.GetRegistry("monitoring")
 
 	outClient := outputs.NewFailoverClient(clients)
 	outClient = outputs.WithBackoff(outClient, config.Backoff.Init, config.Backoff.Max)
