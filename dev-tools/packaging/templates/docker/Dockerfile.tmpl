@@ -158,8 +158,34 @@ USER {{ .user }}
 RUN (npm i -g --loglevel verbose --production --engine-strict  @elastic/synthetics@stack_release || sh -c 'tail -n +1 ${NPM_CONFIG_PREFIX}/_logs/* && exit 1')
 {{- end }}
 
-{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi-minimal")) }}
+{{- if (and (eq .BeatName "heartbeat") (contains .from "ubi9-minimal")) }}
 USER root
+
+# Install the deps as needed by the exact version of playwright elastic synthetics uses
+# We don't use npx playwright install-deps because that could pull a newer version
+# Install additional fonts as well
+RUN for iter in {1..10}; do \
+    microdnf -y update && \
+    microdnf -y install fontconfig freetype cairo glib2 gtk3 pango xorg-x11-fonts-misc xorg-x11-fonts-Type1 \
+    at-spi2-atk atk at-spi2-core alsa-lib cups-libs dbus-libs libdrm mesa-libEGL mesa-libgbm nspr nss libX11 \
+    libX11-xcb libxcb libXcomposite libXdamage libXext libXfixes libXrandr libxkbcommon libxshmfence glib2 \
+    dbus-glib libicu mesa-libGL unzip \
+    findutils shadow-utils ca-certificates gawk libcap xz tar -y && \
+    mkdir -p /usr/share/fonts/google-noto && \
+    curl -LO https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip && \
+    unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/google-noto && \
+    rm -f NotoSansCJKjp-hinted.zip && \
+    microdnf -y remove unzip && \
+    curl -LO https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf && \
+    mv NotoSans-Regular.ttf /usr/share/fonts/google-noto && \
+    curl -LO https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf && \
+    mv NotoColorEmoji.ttf /usr/share/fonts/google-noto && \
+    fc-cache -fv && \
+    microdnf clean all && \
+    exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \
+done; \
+(exit $exit_code)
+
 ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
@@ -205,29 +231,7 @@ RUN npm i -g --loglevel verbose --production --engine-strict @elastic/synthetics
 RUN chmod ug+rwX -R $NODE_PATH
 
 USER root
-# Install the deps as needed by the exact version of playwright elastic synthetics uses
-# We don't use npx playwright install-deps because that could pull a newer version
-# Install additional fonts as well
-RUN for iter in {1..10}; do \
-    microdnf -y update && \
-    microdnf -y install fontconfig freetype cairo glib2 gtk3 pango xorg-x11-fonts-misc xorg-x11-fonts-Type1 \
-    at-spi2-atk atk at-spi2-core alsa-lib cups-libs dbus-libs libdrm mesa-libEGL mesa-libgbm nspr nss libX11 \
-    libX11-xcb libxcb libXcomposite libXdamage libXext libXfixes libXrandr libxkbcommon libxshmfence glib2 \
-    dbus-glib libicu mesa-libGL unzip -y && \
-    mkdir -p /usr/share/fonts/google-noto && \
-    curl -LO https://noto-website-2.storage.googleapis.com/pkgs/NotoSansCJKjp-hinted.zip && \
-    unzip NotoSansCJKjp-hinted.zip -d /usr/share/fonts/google-noto && \
-    rm -f NotoSansCJKjp-hinted.zip && \
-    microdnf -y remove unzip && \
-    curl -LO https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSans/NotoSans-Regular.ttf && \
-    mv NotoSans-Regular.ttf /usr/share/fonts/google-noto && \
-    curl -LO https://github.com/googlefonts/noto-emoji/raw/main/fonts/NotoColorEmoji.ttf && \
-    mv NotoColorEmoji.ttf /usr/share/fonts/google-noto && \
-    fc-cache -fv && \
-    microdnf clean all && \
-    exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; \
-done; \
-(exit $exit_code)
+
 {{- end }}
 
 # Journald input
