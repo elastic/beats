@@ -74,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		for _, ifc := range config.Interfaces {
 			interfaceSet[strings.ToLower(ifc)] = struct{}{}
 		}
-		debugf("network io stats will be included for %v", interfaceSet)
+		base.Logger().Named("system-network").Debugf("network io stats will be included for %v", interfaceSet)
 	}
 
 	return &MetricSet{
@@ -119,10 +119,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 		// create current set of gauges
 		currentDiff := networkCounter{
-			NetworkInBytes:    createGaugeWithRollover(counters.BytesRecv, prevCounters.NetworkInBytes),
-			NetworkInPackets:  createGaugeWithRollover(counters.PacketsRecv, prevCounters.NetworkInPackets),
-			NetworkOutBytes:   createGaugeWithRollover(counters.BytesSent, prevCounters.NetworkOutBytes),
-			NetworkOutPackets: createGaugeWithRollover(counters.PacketsSent, prevCounters.NetworkOutPackets),
+			NetworkInBytes:    createGaugeWithRollover(counters.BytesRecv, prevCounters.NetworkInBytes, m.Logger()),
+			NetworkInPackets:  createGaugeWithRollover(counters.PacketsRecv, prevCounters.NetworkInPackets, m.Logger()),
+			NetworkOutBytes:   createGaugeWithRollover(counters.BytesSent, prevCounters.NetworkOutBytes, m.Logger()),
+			NetworkOutPackets: createGaugeWithRollover(counters.PacketsSent, prevCounters.NetworkOutPackets, m.Logger()),
 		}
 
 		m.currentGaugeCounter[counters.Name] = currentDiff
@@ -183,7 +183,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 // On windows: This uses GetIfEntry: https://learn.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-mib_if_row2 which uses ulong64.
 // On Darwin we just call netstat.
 // I'm assuming rollover behavior is similar.
-func createGaugeWithRollover(current uint64, prev uint64) uint64 {
+func createGaugeWithRollover(current uint64, prev uint64, logger *logp.Logger) uint64 {
 	// base case: no rollover
 	if current >= prev {
 		return current - prev
@@ -192,12 +192,12 @@ func createGaugeWithRollover(current uint64, prev uint64) uint64 {
 	// case: rollover
 	// case: we rolled over at 64 bits
 	if prev > math.MaxUint32 {
-		debugf("Warning: Rollover 64 bit gauge detected. Current value: %d, previous: %d", current, prev)
+		logger.Named("system-network").Debugf("Warning: Rollover 64 bit gauge detected. Current value: %d, previous: %d", current, prev)
 		remaining := math.MaxUint64 - prev
 		return current + remaining + 1 // the +1 counts the actual "rollover" increment.
 	}
 	// case: we rolled over at 32 bits
-	debugf("Warning: Rollover 32 bit gauge detected. Current value: %d, previous: %d", current, prev)
+	logger.Named("system-network").Debugf("Warning: Rollover 32 bit gauge detected. Current value: %d, previous: %d", current, prev)
 	remaining := math.MaxUint32 - prev
 	return current + remaining + 1
 
