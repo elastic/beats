@@ -169,7 +169,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					query, query, namespace,
 				)
 				m.Logger().Warn(message)
-				m.reportError(report, fmt.Errorf(message))
+				m.reportError(report, fmt.Errorf("%s", message))
 			}
 
 			for _, instance := range rows {
@@ -223,27 +223,27 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 					//
 					// Example: in the query: SELECT * FROM Win32_OperatingSystem
 					// FreePhysicalMemory is a string, but it should be an uint64
-					if RequiresExtraConversion(propertyValue) {
 
-						convertFun, ok := queryConfig.WmiSchema.Get(instance.GetClassName(), propertyName)
+					// We explicitly decide to perform a conversion on all fields because we do not support
+					// the object type
+					convertFun, ok := queryConfig.WmiSchema.Get(instance.GetClassName(), propertyName)
 
-						if !ok {
-							convertFun, err = GetConvertFunction(instance, propertyName, m.Logger())
-							if err != nil {
-								m.Logger().Warnf("Skipping addition of property '%s'. Cannot fetch conversion function: '%v'", propertyName, err)
-								continue
-							}
-							queryConfig.WmiSchema.Put(instance.GetClassName(), propertyName, convertFun)
-						}
-
-						convertedValue, err := convertFun(propertyValue)
+					if !ok {
+						convertFun, err = GetConvertFunction(instance, propertyName, m.Logger())
 						if err != nil {
-							m.Logger().Warnf("Skipping addition of property %s. Error during conversion: %v", propertyName, err)
+							m.Logger().Warnf("Skipping addition of property '%s'. Cannot fetch conversion function: '%v'", propertyName, err)
 							continue
 						}
-
-						finalValue = convertedValue
+						queryConfig.WmiSchema.Put(instance.GetClassName(), propertyName, convertFun)
 					}
+
+					convertedValue, err := convertFun(propertyValue)
+					if err != nil {
+						m.Logger().Warnf("Skipping addition of property %s. Error during conversion: %v", propertyName, err)
+						continue
+					}
+
+					finalValue = convertedValue
 
 					event.MetricSetFields.Put(propertyName, finalValue)
 				}
