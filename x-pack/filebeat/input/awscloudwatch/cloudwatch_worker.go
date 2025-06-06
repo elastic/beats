@@ -107,7 +107,7 @@ func (w *cwWorker) getLogEventsFromCloudWatch(ctx context.Context, logGroupId st
 	// construct FilterLogEventsInput
 	filterLogEventsInput := w.constructFilterLogEventsInput(startTime, endTime, logGroupId)
 	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(w.svc, filterLogEventsInput)
-	for paginator.HasMorePages() && ctx.Err() != nil {
+	for paginator.HasMorePages() && ctx.Err() == nil {
 		filterLogEventsOutput, err := paginator.NextPage(ctx)
 		if err != nil {
 			return 0, fmt.Errorf("error FilterLogEvents with Paginator: %w", err)
