@@ -9,8 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestStandaloneStore(t *testing.T) {
@@ -20,7 +18,7 @@ func TestStandaloneStore(t *testing.T) {
 
 	tempDir := t.TempDir()
 
-	log := logp.NewTestingLogger(t, "")
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	store, err := newStore(log, tempDir, "store-cache")
 	require.NoError(t, err)
 

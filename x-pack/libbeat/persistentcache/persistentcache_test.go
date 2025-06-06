@@ -16,12 +16,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestPutGet(t *testing.T) {
 	t.Parallel()
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 
 	cache, err := New("test", testOptions(t), logger)
 	require.NoError(t, err)
@@ -47,7 +47,7 @@ func TestPutGet(t *testing.T) {
 }
 
 func TestPersist(t *testing.T) {
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	t.Parallel()
 
 	options := testOptions(t)
@@ -85,7 +85,7 @@ func TestExpired(t *testing.T) {
 
 	options := testOptions(t)
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	cache, err := New("test", options, logger)
 	require.NoError(t, err)
 	defer cache.Close()
@@ -125,7 +125,7 @@ func TestRefreshOnAccess(t *testing.T) {
 	options.Timeout = 2 * time.Second
 	options.RefreshOnAccess = true
 
-	logger := logp.NewTestingLogger(t, "")
+	logger := logptest.NewTestingLogger(t, "")
 	cache, err := New("test", options, logger)
 	require.NoError(t, err)
 	defer cache.Close()
