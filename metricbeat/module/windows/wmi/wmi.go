@@ -113,7 +113,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	// To optimize performance and reduce overhead, we create a single session
 	// for each unique WMI namespace. This minimizes the number of session creations
-	for namespace, _ := range m.config.NamespaceQueryIndex {
+	for namespace := range m.config.NamespaceQueryIndex {
 
 		session, err := sm.GetSession(namespace, m.config.Host, m.config.Domain, m.config.User, m.config.Password)
 
@@ -126,7 +126,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		defer session.Dispose()
 
-		for i, _ := range m.config.NamespaceQueryIndex[namespace] {
+		for i := range m.config.NamespaceQueryIndex[namespace] {
 
 			// Get the queryConfig by reference to allow the initialization
 			queryConfig := &m.config.NamespaceQueryIndex[namespace][i]
@@ -230,7 +230,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						if !ok {
 							convertFun, err = GetConvertFunction(instance, propertyName, m.Logger())
 							if err != nil {
-								m.Logger().Warn("Skipping addition of property %s. Cannot convert: %v", propertyName, err)
+								m.Logger().Warnf("Skipping addition of property '%s'. Cannot fetch conversion function: '%v'", propertyName, err)
 								continue
 							}
 							queryConfig.WmiSchema.Put(instance.GetClassName(), propertyName, convertFun)
@@ -238,7 +238,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 						convertedValue, err := convertFun(propertyValue)
 						if err != nil {
-							m.Logger().Warn("Skipping addition of property %s. Cannot convert: %v", propertyName, err)
+							m.Logger().Warnf("Skipping addition of property %s. Error during conversion: %v", propertyName, err)
 							continue
 						}
 
@@ -267,7 +267,7 @@ func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfi
 	rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
 
 	if err != nil {
-		return fmt.Errorf("Could not execute the meta_class query '%s' with the error: '%w'. We will try in the next iteration", err)
+		return fmt.Errorf("Could not execute the meta_class query '%s' with the error: '%w'. We will try in the next iteration", query, err)
 	}
 
 	defer wmi.CloseAllInstances(rows)
@@ -290,7 +290,7 @@ func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfi
 	for _, property := range rows[0].GetClass().GetPropertiesNames() {
 		convertFunction, err := GetConvertFunction(instance, property, m.Logger())
 		if err != nil {
-			return fmt.Errorf("Could not fetch convert function for property %s: %w", property, err)
+			return fmt.Errorf("could not fetch convert function for property %s: %w", property, err)
 		}
 		BaseClassSchema[property] = convertFunction
 	}
