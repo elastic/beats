@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-postgresql.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # PostgreSQL module [filebeat-module-postgresql]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -148,7 +150,6 @@ The second one shows the slowlogs of PostgreSQL. If `log_min_duration_statement`
 % TO DO: Use `:class: screenshot`
 ![filebeat postgresql slowlog overview](images/filebeat-postgresql-slowlog-overview.png)
 
-
-## Fields [_fields_44]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-postgresql.md) section.

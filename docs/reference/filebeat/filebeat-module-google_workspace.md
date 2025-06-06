@@ -3,7 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-google_workspace.html
 ---
 
-# Google Workspace module [filebeat-module-google_workspace]
+<!-- This file is generated! See scripts/docs_collector.py -->
+
+# google_workspace module [filebeat-module-google_workspace]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/google_workspace/index.md).
@@ -128,8 +130,6 @@ This is a list of Google Workspace Reports fields that are mapped to ECS.
 
 These are the common ones to all filesets.
 
-
-## Fields [_fields_19]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-google_workspace.md) section.
-

@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/packetbeat/current/exported-fields-mongodb.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # MongoDb fields [exported-fields-mongodb]
 
 MongoDB-specific event fields. These fields mirror closely the fields for the MongoDB wire protocol. The higher level fields (for example, `query` and `resource`) apply to MongoDB events as well.

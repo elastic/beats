@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-airflow.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Airflow fields [exported-fields-airflow]
 
 Airflow module

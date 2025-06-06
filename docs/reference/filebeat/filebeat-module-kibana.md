@@ -3,7 +3,9 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-kibana.html
 ---
 
-# Kibana module [filebeat-module-kibana]
+<!-- This file is generated! See scripts/docs_collector.py -->
+
+# kibana module [filebeat-module-kibana]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
 Refer to the [Elastic Integrations documentation](integration-docs://reference/kibana/index.md).
@@ -66,7 +68,6 @@ When you specify a setting at the command line, remember to prefix the setting w
 **`var.paths`**
 :   An array of glob-based paths that specify where to look for the log files. All patterns supported by [Go Glob](https://golang.org/pkg/path/filepath/#Glob) are also supported here. For example, you can use wildcards to fetch all files from a predefined level of subdirectories: `/path/to/log/*/*.log`. This fetches all `.log` files from the subfolders of `/path/to/log`. It does not fetch log files from the `/path/to/log` folder itself. If this setting is left empty, Filebeat will choose log paths based on your operating system.
 
-
-## Fields [_fields_27]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-kibana.md) section.

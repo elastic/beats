@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-metricset-mysql-query.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # MySQL query metricset [metricbeat-metricset-mysql-query]
 
 ::::{warning}
@@ -12,8 +14,7 @@ This functionality is in beta and is subject to change. The design and code is l
 
 `query` metricset allows for custom execution of metric related queries in MySQL
 
-## Fields [_fields_186]
+## Fields [_fields]
 
 For a description of each field in the metricset, see the [exported fields](/reference/metricbeat/exported-fields-mysql.md) section.
-
 

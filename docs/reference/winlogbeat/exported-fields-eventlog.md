@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/exported-fields-eventlog.html
 ---
 
+<!-- This file is generated! See scripts/generate_fields_docs.py -->
+
 # Legacy Winlogbeat alias fields [exported-fields-eventlog]
 
 Field aliases based on Winlogbeat 6.x that point to the fields for this version of Winlogbeat. These are added to the index template when `migration.6_to_7.enable: true` is set in the configuration.
