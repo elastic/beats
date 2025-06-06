@@ -93,7 +93,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.11"
+    go: "1.23.9"
 
 
   nakedret:
@@ -114,17 +114,17 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.11"
+    go: "1.23.9"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.11"
+    go: "1.23.9"
     checks: ["all"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.22.11"
+    go: "1.23.9"
 
   gosec:
     excludes:
