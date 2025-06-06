@@ -65,7 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("create state manager: %w", err)
 	}
 
-	logger := logp.NewLogger("openai.usage")
+	logger := base.Logger().Named("openai.usage")
 
 	httpClient := newClient(
 		logger,

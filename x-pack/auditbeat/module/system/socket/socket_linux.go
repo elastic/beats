@@ -124,7 +124,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error) {
 	cfgwarn.Beta("The %s dataset is beta.", fullName)
-	logger := logp.NewLogger(metricsetName)
+	logger := base.Logger().Named(metricsetName)
 	sniffer, err := dns.NewSniffer(base, logger)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create DNS sniffer: %w", err)
@@ -135,7 +135,7 @@ func newSocketMetricset(config Config, base mb.BaseMetricSet) (*MetricSet, error
 		config:          config,
 		log:             logger,
 		isDebug:         logp.IsDebug(metricsetName),
-		detailLog:       logp.NewLogger(detailSelector),
+		detailLog:       base.Logger().Named(detailSelector),
 		isDetailed:      logp.HasSelector(detailSelector),
 		sniffer:         sniffer,
 	}
