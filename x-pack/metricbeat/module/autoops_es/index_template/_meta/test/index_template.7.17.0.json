@@ -1,0 +1,153 @@
+{
+    "index_templates": [
+        {
+            "name": ".ml-state",
+            "index_template": {
+                "index_patterns": [
+                    ".ml-state*",
+                    ".ml2-state*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "ilm-history",
+            "index_template": {
+                "index_patterns": [
+                    "ilm-history-5*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".kibana-event-log-7.17.0-template",
+            "index_template": {
+                "index_patterns": [
+                    ".kibana-event-log-7.17.0-*"
+                ]
+            }
+        },
+        {
+            "name": ".slm-history",
+            "index_template": {
+                "index_patterns": [
+                    ".slm-history-5*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "synthetics",
+            "index_template": {
+                "index_patterns": [
+                    "synthetics-*-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".ml-anomalies-",
+            "index_template": {
+                "index_patterns": [
+                    ".ml-anomalies-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "metrics",
+            "index_template": {
+                "index_patterns": [
+                    "metrics-*-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".ml-notifications-000002",
+            "index_template": {
+                "index_patterns": [
+                    ".ml-notifications-000002"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".deprecation-indexing-template",
+            "index_template": {
+                "index_patterns": [
+                    ".logs-deprecation.*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".watch-history-13",
+            "index_template": {
+                "index_patterns": [
+                    ".watcher-history-13*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "logs",
+            "index_template": {
+                "index_patterns": [
+                    "logs-*-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": ".ml-stats",
+            "index_template": {
+                "index_patterns": [
+                    ".ml-stats-*"
+                ],
+                "_meta": {
+                    "managed": true
+                }
+            }
+        },
+        {
+            "name": "my-index-template-1",
+            "index_template": {
+                "index_patterns": [
+                    "my-index-*"
+                ]
+            }
+        },
+        {
+            "name": "my-index-template-2",
+            "index_template": {
+                "index_patterns": [
+                    ".my-other-index-*"
+                ]
+            }
+        },
+        {
+            "name": "my-index-template-3"
+        }
+    ]
+}

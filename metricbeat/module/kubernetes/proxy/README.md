@@ -65,7 +65,7 @@ Then you can fetch the metrics from the url provided in the output and save it t
 curl 127.0.0.1:8001/metrics > _meta/test/metrics.x.xx
 ```
 
-After that, you need to add the new expectation file to `proxy_test.go` and then run the following commands to generate and test the expected files:
+Run the following commands to generate and test the expected files:
 
 ```bash
 cd metricbeat/module/kubernetes/proxy
