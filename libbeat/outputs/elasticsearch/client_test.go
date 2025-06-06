@@ -49,6 +49,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	libversion "github.com/elastic/elastic-agent-libs/version"
@@ -870,13 +871,14 @@ func TestBulkEncodeEvents(t *testing.T) {
 	for name, test := range cases {
 		test := test
 		t.Run(name, func(t *testing.T) {
+			logger := logptest.NewTestingLogger(t, "")
 			cfg := c.MustNewConfigFrom(test.config)
 			info := beat.Info{
 				IndexPrefix: "test",
 				Version:     test.version,
 			}
 
-			im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
+			im, err := idxmgmt.DefaultSupport(logger, info, c.NewConfig())
 			require.NoError(t, err)
 
 			index, pipeline, err := buildSelectors(im, info, cfg)
@@ -944,7 +946,8 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		Version:     version.GetDefaultVersion(),
 	}
 
-	im, err := idxmgmt.DefaultSupport(nil, info, c.NewConfig())
+	logger := logptest.NewTestingLogger(t, "")
+	im, err := idxmgmt.DefaultSupport(logger, info, c.NewConfig())
 	require.NoError(t, err)
 
 	index, pipeline, err := buildSelectors(im, info, cfg)
