@@ -99,7 +99,7 @@ func runThread(ctx v2.Context, publisher stateless.Publisher, thread uint8, cfg 
 		}
 	case cfg.Eps > 0:
 		ticker := time.NewTicker(1 * time.Second)
-		pubChan := make(chan bool, int(cfg.Eps))
+		pubChan := make(chan bool, int(cfg.Eps)) //nolint:gosec // disable G115
 		for {
 			select {
 			case <-ctx.Cancelation.Done():
