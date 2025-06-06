@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -42,6 +43,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gofrs/uuid/v5"
 	"github.com/stretchr/testify/require"
 )
@@ -714,6 +716,31 @@ func EnsureESIsRunning(t *testing.T) {
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("unexpected HTTP status: %d, expecting 200 - OK", resp.StatusCode)
 	}
+}
+
+func GetESClient(t *testing.T) (*elasticsearch.Client, error) {
+	esURL := GetESURL(t, "http")
+
+	u := esURL.User.Username()
+	p, _ := esURL.User.Password()
+
+	// prepare to query ES
+	esCfg := elasticsearch.Config{
+		Addresses: []string{esURL.String()},
+		Username:  u,
+		Password:  p,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
+			},
+		},
+	}
+	es, err := elasticsearch.NewClient(esCfg)
+	if err != nil {
+		return nil, err
+	}
+	return es, nil
+
 }
 
 func (b *BeatProc) FileContains(filename string, match string) string {
