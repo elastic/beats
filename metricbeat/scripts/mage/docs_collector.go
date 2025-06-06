@@ -319,7 +319,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 			return moduleList, err
 		}
 
-		//dump the contents of the module markdown
+		// dump the contents of the module markdown
 		moduleDoc, err := os.ReadFile(filepath.Join(module, "_meta/docs.md"))
 		if err != nil {
 			return moduleList, err
