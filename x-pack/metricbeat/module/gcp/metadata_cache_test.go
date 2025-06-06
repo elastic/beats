@@ -98,8 +98,8 @@ func TestComputeCache(t *testing.T) {
 	logger := logp.NewLogger("test")
 	registry := NewCacheRegistry(logger, 5*time.Minute)
 
-	cache := registry.GetComputeCache()
-	assert.Empty(t, cache)
+	_, found := registry.GetComputeInstanceByID("instance-1")
+	assert.False(t, found)
 
 	testData := map[string]*computepb.Instance{
 		"instance-1": {Name: stringPtr("test-instance-1")},
@@ -108,22 +108,24 @@ func TestComputeCache(t *testing.T) {
 
 	registry.UpdateComputeCache(testData)
 
-	cache = registry.GetComputeCache()
-	assert.Len(t, cache, 2)
-	assert.Equal(t, "test-instance-1", *cache["instance-1"].Name)
-	assert.Equal(t, "test-instance-2", *cache["instance-2"].Name)
+	instance1, found := registry.GetComputeInstanceByID("instance-1")
+	assert.True(t, found)
+	assert.Equal(t, "test-instance-1", *instance1.Name)
 
-	cache["instance-3"] = &computepb.Instance{Name: stringPtr("test-instance-3")}
-	newCache := registry.GetComputeCache()
-	assert.Len(t, newCache, 2) // Original cache should still have 2 items
+	instance2, found := registry.GetComputeInstanceByID("instance-2")
+	assert.True(t, found)
+	assert.Equal(t, "test-instance-2", *instance2.Name)
+
+	_, found = registry.GetComputeInstanceByID("instance-3")
+	assert.False(t, found)
 }
 
 func TestRedisCache(t *testing.T) {
 	logger := logp.NewLogger("test")
 	registry := NewCacheRegistry(logger, 5*time.Minute)
 
-	cache := registry.GetRedisCache()
-	assert.Empty(t, cache)
+	_, found := registry.GetRedisInstanceByID("redis-1")
+	assert.False(t, found)
 
 	testData := map[string]*redispb.Instance{
 		"redis-1": {Name: "projects/test/locations/us-central1/instances/redis-1"},
@@ -132,9 +134,13 @@ func TestRedisCache(t *testing.T) {
 
 	registry.UpdateRedisCache(testData)
 
-	cache = registry.GetRedisCache()
-	assert.Len(t, cache, 2)
-	assert.Equal(t, "projects/test/locations/us-central1/instances/redis-1", cache["redis-1"].Name)
+	instance1, found := registry.GetRedisInstanceByID("redis-1")
+	assert.True(t, found)
+	assert.Equal(t, "projects/test/locations/us-central1/instances/redis-1", instance1.Name)
+
+	instance2, found := registry.GetRedisInstanceByID("redis-2")
+	assert.True(t, found)
+	assert.Equal(t, "projects/test/locations/us-central1/instances/redis-2", instance2.Name)
 }
 
 func TestCloudSQLCache(t *testing.T) {
@@ -147,9 +153,14 @@ func TestCloudSQLCache(t *testing.T) {
 	}
 
 	registry.UpdateCloudSQLCache(testData)
-	cache := registry.GetCloudSQLCache()
-	assert.Len(t, cache, 2)
-	assert.Equal(t, "sql-instance-1", cache["sql-1"].Name)
+
+	instance1, found := registry.GetCloudSQLInstanceByID("sql-1")
+	assert.True(t, found)
+	assert.Equal(t, "sql-instance-1", instance1.Name)
+
+	instance2, found := registry.GetCloudSQLInstanceByID("sql-2")
+	assert.True(t, found)
+	assert.Equal(t, "sql-instance-2", instance2.Name)
 }
 
 func TestDataprocCache(t *testing.T) {
@@ -162,9 +173,14 @@ func TestDataprocCache(t *testing.T) {
 	}
 
 	registry.UpdateDataprocCache(testData)
-	cache := registry.GetDataprocCache()
-	assert.Len(t, cache, 2)
-	assert.Equal(t, "dataproc-cluster-1", cache["cluster-1"].ClusterName)
+
+	cluster1, found := registry.GetDataprocClusterByID("cluster-1")
+	assert.True(t, found)
+	assert.Equal(t, "dataproc-cluster-1", cluster1.ClusterName)
+
+	cluster2, found := registry.GetDataprocClusterByID("cluster-2")
+	assert.True(t, found)
+	assert.Equal(t, "dataproc-cluster-2", cluster2.ClusterName)
 }
 
 func TestEnsureComputeCacheFresh(t *testing.T) {
@@ -183,6 +199,10 @@ func TestEnsureComputeCacheFresh(t *testing.T) {
 	err := registry.EnsureComputeCacheFresh(context.Background(), fetchFunc)
 	require.NoError(t, err)
 	assert.Equal(t, 1, fetchCallCount)
+
+	instance, found := registry.GetComputeInstanceByID("instance-1")
+	assert.True(t, found)
+	assert.Equal(t, "fetched-instance", *instance.Name)
 
 	// Second call should not fetch (cache is fresh)
 	err = registry.EnsureComputeCacheFresh(context.Background(), fetchFunc)
@@ -219,15 +239,19 @@ func TestConcurrentAccess(t *testing.T) {
 	var wg sync.WaitGroup
 	iterations := 100
 
+	var addedIDs sync.Map
+
 	// Concurrent writers
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
 			for j := 0; j < iterations; j++ {
+				instanceID := fmt.Sprintf("instance-%d-%d", id, j)
 				registry.UpdateComputeCache(map[string]*computepb.Instance{
-					fmt.Sprintf("instance-%d-%d", id, j): {Name: stringPtr(fmt.Sprintf("test-%d-%d", id, j))},
+					instanceID: {Name: stringPtr(fmt.Sprintf("test-%d-%d", id, j))},
 				})
+				addedIDs.Store(instanceID, true)
 			}
 		}(i)
 	}
@@ -238,7 +262,8 @@ func TestConcurrentAccess(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			for j := 0; j < iterations; j++ {
-				_ = registry.GetComputeCache()
+				instanceID := fmt.Sprintf("instance-%d-%d", j%5, j)
+				_, _ = registry.GetComputeInstanceByID(instanceID)
 			}
 		}()
 	}
@@ -249,8 +274,10 @@ func TestConcurrentAccess(t *testing.T) {
 		go func(id int) {
 			defer wg.Done()
 			fetchFunc := func(ctx context.Context) (map[string]*computepb.Instance, error) {
+				instanceID := fmt.Sprintf("fresh-%d", id)
+				addedIDs.Store(instanceID, true)
 				return map[string]*computepb.Instance{
-					fmt.Sprintf("fresh-%d", id): {Name: stringPtr(fmt.Sprintf("fresh-instance-%d", id))},
+					instanceID: {Name: stringPtr(fmt.Sprintf("fresh-instance-%d", id))},
 				}, nil
 			}
 			for j := 0; j < iterations/10; j++ {
@@ -262,11 +289,14 @@ func TestConcurrentAccess(t *testing.T) {
 
 	wg.Wait()
 
-	// Verify cache is not corrupted
-	cache := registry.GetComputeCache()
-	assert.NotNil(t, cache)
-	// Should have some data
-	assert.NotEmpty(t, cache)
+	instancesFound := 0
+	addedIDs.Range(func(key, value interface{}) bool {
+		if instance, found := registry.GetComputeInstanceByID(key.(string)); found && instance != nil {
+			instancesFound++
+		}
+		return true
+	})
+	assert.Greater(t, instancesFound, 0, "Should have found at least some instances")
 }
 
 func TestMultipleCacheTypes(t *testing.T) {
@@ -287,21 +317,27 @@ func TestMultipleCacheTypes(t *testing.T) {
 	})
 
 	// Verify each cache is independent
-	computeCache := registry.GetComputeCache()
-	assert.Len(t, computeCache, 1)
-	assert.Contains(t, computeCache, "compute-1")
+	computeInstance, found := registry.GetComputeInstanceByID("compute-1")
+	assert.True(t, found)
+	assert.Equal(t, "compute-instance", *computeInstance.Name)
 
-	redisCache := registry.GetRedisCache()
-	assert.Len(t, redisCache, 1)
-	assert.Contains(t, redisCache, "redis-1")
+	redisInstance, found := registry.GetRedisInstanceByID("redis-1")
+	assert.True(t, found)
+	assert.Equal(t, "redis-instance", redisInstance.Name)
 
-	sqlCache := registry.GetCloudSQLCache()
-	assert.Len(t, sqlCache, 1)
-	assert.Contains(t, sqlCache, "sql-1")
+	sqlInstance, found := registry.GetCloudSQLInstanceByID("sql-1")
+	assert.True(t, found)
+	assert.Equal(t, "sql-instance", sqlInstance.Name)
 
-	dataprocCache := registry.GetDataprocCache()
-	assert.Len(t, dataprocCache, 1)
-	assert.Contains(t, dataprocCache, "cluster-1")
+	dataprocCluster, found := registry.GetDataprocClusterByID("cluster-1")
+	assert.True(t, found)
+	assert.Equal(t, "dataproc-cluster", dataprocCluster.ClusterName)
+
+	_, found = registry.GetComputeInstanceByID("redis-1")
+	assert.False(t, found)
+
+	_, found = registry.GetRedisInstanceByID("compute-1")
+	assert.False(t, found)
 }
 
 func TestCacheExpiredCheck(t *testing.T) {
@@ -333,6 +369,116 @@ func TestCacheExpiredCheck(t *testing.T) {
 	assert.True(t, registry.isRedisCacheExpired())
 	assert.True(t, registry.isCloudSQLCacheExpired())
 	assert.True(t, registry.isDataprocCacheExpired())
+}
+
+func TestGetInstanceByID_NotFound(t *testing.T) {
+	logger := logp.NewLogger("test")
+	registry := NewCacheRegistry(logger, 5*time.Minute)
+
+	_, found := registry.GetComputeInstanceByID("non-existent")
+	assert.False(t, found)
+
+	_, found = registry.GetRedisInstanceByID("non-existent")
+	assert.False(t, found)
+
+	_, found = registry.GetCloudSQLInstanceByID("non-existent")
+	assert.False(t, found)
+
+	_, found = registry.GetDataprocClusterByID("non-existent")
+	assert.False(t, found)
+}
+
+func TestEnsureCacheFresh_WithRetries(t *testing.T) {
+	tests := []struct {
+		name              string
+		failureCount      int
+		expectedAttempts  int
+		expectError       bool
+		contextTimeout    time.Duration
+		expectedErrString string
+	}{
+		{
+			name:             "succeeds on first attempt",
+			failureCount:     0,
+			expectedAttempts: 1,
+			expectError:      false,
+		},
+		{
+			name:             "succeeds after 1 retry",
+			failureCount:     1,
+			expectedAttempts: 2,
+			expectError:      false,
+		},
+		{
+			name:             "succeeds after 2 retries",
+			failureCount:     2,
+			expectedAttempts: 3,
+			expectError:      false,
+		},
+		{
+			name:             "succeeds on last retry (3rd attempt)",
+			failureCount:     3,
+			expectedAttempts: 4,
+			expectError:      false,
+		},
+		{
+			name:              "fails after max retries",
+			failureCount:      4,
+			expectedAttempts:  4, // 1 initial + 3 retries
+			expectError:       true,
+			expectedErrString: "fetch failed",
+		},
+		{
+			name:              "context cancelled during retry",
+			failureCount:      10,
+			expectedAttempts:  2,
+			expectError:       true,
+			contextTimeout:    1500 * time.Millisecond,
+			expectedErrString: "context deadline exceeded",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			logger := logp.NewLogger("test")
+			registry := NewCacheRegistry(logger, 5*time.Minute)
+
+			attemptCount := 0
+			fetchFunc := func(ctx context.Context) (map[string]*computepb.Instance, error) {
+				attemptCount++
+				if attemptCount <= tt.failureCount {
+					return nil, fmt.Errorf("simulated fetch error #%d", attemptCount)
+				}
+				return map[string]*computepb.Instance{
+					"instance-1": {Name: stringPtr("successful-instance")},
+				}, nil
+			}
+
+			ctx := context.Background()
+			if tt.contextTimeout > 0 {
+				var cancel context.CancelFunc
+				ctx, cancel = context.WithTimeout(ctx, tt.contextTimeout)
+				defer cancel()
+			}
+
+			err := registry.EnsureComputeCacheFresh(ctx, fetchFunc)
+
+			if tt.expectError {
+				assert.Error(t, err)
+				if tt.expectedErrString != "" {
+					assert.Contains(t, err.Error(), tt.expectedErrString)
+				}
+			} else {
+				assert.NoError(t, err)
+				instance, found := registry.GetComputeInstanceByID("instance-1")
+				assert.True(t, found)
+				assert.Equal(t, "successful-instance", *instance.Name)
+			}
+
+			assert.Equal(t, tt.expectedAttempts, attemptCount,
+				"Expected %d attempts but got %d", tt.expectedAttempts, attemptCount)
+		})
+	}
 }
 
 // Helper function for string pointers
