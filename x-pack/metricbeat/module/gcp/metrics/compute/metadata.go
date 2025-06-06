@@ -240,6 +240,6 @@ func (s *metadataCollector) fetchComputeInstances(ctx context.Context) (map[stri
 		}
 	}
 
-	s.logger.Infof("Compute AggregatedList finished in %s. Fetched %d instances across %d pages.", time.Since(start), instanceCount, pageCount)
+	s.logger.Debugf("Compute AggregatedList finished in %s. Fetched %d instances across %d pages.", time.Since(start), instanceCount, pageCount)
 	return fetchedInstances, nil
 }
