@@ -17,7 +17,7 @@ To start Winlogbeat, run:
 PS C:\Program Files\Winlogbeat> Start-Service winlogbeat
 ```
 
-Winlogbeat should now be running. If you used the logging configuration described here, you can view the log file at `C:\ProgramData\winlogbeat\Logs\winlogbeat`.
+Winlogbeat should now be running. If you used the logging configuration described here, you can view the log file at `C:\Program Files\winlogbeat-Data\Logs`.
 
 You can view the status of the service and control it from the Services management console in Windows. To launch the management console, run this command:
 
