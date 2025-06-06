@@ -109,7 +109,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 
 	assert.Equal(t, 1, resp.Count)
 
-	outputSnapshot := monitoring.CollectFlatSnapshot(monitoring.Default.GetRegistry("output-"+index), monitoring.Full, true)
+	outputSnapshot := monitoring.CollectFlatSnapshot(registry, monitoring.Full, true)
 	assert.Greater(t, outputSnapshot.Ints["write.bytes"], int64(0), "output.events.write.bytes must be greater than 0")
 	assert.Greater(t, outputSnapshot.Ints["read.bytes"], int64(0), "output.events.read.bytes must be greater than 0")
 	assert.Equal(t, int64(0), outputSnapshot.Ints["write.errors"])
