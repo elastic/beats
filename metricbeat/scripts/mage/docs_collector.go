@@ -295,7 +295,7 @@ func gatherData(modules []string) ([]moduleData, error) {
 		return nil, fmt.Errorf("error getting default metricsets: %w", err)
 	}
 	moduleList := make([]moduleData, 0)
-	//iterate over all the modules, checking to make sure we have a docs.md file
+	// iterate over all the modules, checking to make sure we have a docs.md file
 	for _, module := range modules {
 
 		isModule := testIfDocsInDir(module)
