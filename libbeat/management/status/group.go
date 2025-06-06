@@ -18,7 +18,6 @@
 package status
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -82,13 +81,10 @@ func (r *reporter) calculateState() (Status, string) {
 	for _, s := range r.runnerStates {
 		switch s.state {
 		case Degraded:
-			if reportedMsg != "" {
-				// if multiple modules report degraded state, concatenate the messages
-				reportedMsg = fmt.Sprintf("%s; %s", reportedMsg, s.msg)
-			} else {
+			if reportedState != Degraded {
+				reportedState = Degraded
 				reportedMsg = s.msg
 			}
-			reportedState = Degraded
 		case Failed:
 			// return the first failed runner
 			return s.state, s.msg
