@@ -41,7 +41,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-{}.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+% This file is generated! See scripts/docs_collector.py
 
 # {} module [filebeat-module-{}]
 
@@ -71,8 +71,6 @@ For a description of each field in the module, see the [exported fields](/refere
 # mapped_pages:
 #   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
 # ---
-
-# <!-- This file is generated! See scripts/docs_collector.py -->
 
 # # Modules [filebeat-modules]
 

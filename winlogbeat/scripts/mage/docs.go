@@ -64,7 +64,7 @@ func moduleDocs() error {
 		}
 	}
 
-	// TODO: Uncomment following when all the asciidocs are converted to markdown
+	// TODO(@VihasMakwana): Uncomment following when all the asciidocs are converted to markdown
 	// As of now, this will not work and it will generate incomplete list.
 
 	// fmt.Printf(">> update:moduleDocs: Collecting module documentation for %v.\n", strings.Join(names, ", "))

@@ -3,7 +3,7 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-file_integrity.html
 ---
 
-<!-- This file is generated! See scripts/docs_collector.py -->
+% This file is generated! See scripts/docs_collector.py
 
 # File Integrity Module [auditbeat-module-file_integrity]
 
