@@ -209,9 +209,12 @@ if __name__ == "__main__":
     with open(fields_yml, encoding='utf-8') as f:
         fields = f.read()
 
-    output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w', encoding='utf-8')
+    # TODO(@VihasMakwana): Following work to be in a follow-up PR.
+    # Uncomment and convert exported fields to markdown.
 
-    try:
-        fields_to_asciidoc(fields, output, beat_title)
-    finally:
-        output.close()
+    # output = open(os.path.join(args.output_path, "docs/fields.asciidoc"), 'w', encoding='utf-8')
+
+    # try:
+    #     fields_to_asciidoc(fields, output, beat_title)
+    # finally:
+    #     output.close()

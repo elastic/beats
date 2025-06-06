@@ -88,7 +88,7 @@ func ModuleDocs() error {
 	return sh.Run(python, args...)
 }
 
-// FieldDocs generates docs/fields.asciidoc containing all fields
+// FieldDocs generates exported-fields.md containing all fields
 // (including x-pack).
 func FieldDocs() error {
 	inputs := []string{
