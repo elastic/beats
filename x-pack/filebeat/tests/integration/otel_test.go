@@ -8,7 +8,6 @@ package integration
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -23,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/elastic/go-elasticsearch/v8"
 )
 
 var beatsCfgFile = `
@@ -88,19 +86,14 @@ setup.template.pattern: logs-filebeat-default
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 
-	// prepare to query ES
-	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Username:  "admin",
-		Password:  "testing",
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
-			},
-		},
+	t.Cleanup(func() {
+		filebeatOTel.Stop()
+		filebeat.Stop()
+	})
+	es, err := integration.GetESClient(t)
+	if err != nil {
+		t.Fatalf("could not get es client due to: %v", err)
 	}
-	es, err := elasticsearch.NewClient(esCfg)
-	require.NoError(t, err)
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
@@ -119,6 +112,93 @@ setup.template.pattern: logs-filebeat-default
 			return otelDocs.Hits.Total.Value >= numEvents && filebeatDocs.Hits.Total.Value >= numEvents
 		},
 		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, numEvents))
+
+	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
+	otelDoc := otelDocs.Hits.Hits[0].Source
+	ignoredFields := []string{
+		// Expected to change between agentDocs and OtelDocs
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"log.file.inode",
+		"log.file.path",
+	}
+
+	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
+	assertMonitoring(t)
+}
+
+func TestHTTPJSONInputOTel(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
+	configFile := `
+filebeat.inputs:
+  - type: httpjson
+    id: httpjson-e2e-otel
+    request.url: https://api.ipify.org/?format=json
+
+output:
+  elasticsearch:
+    hosts:
+      - localhost:9200
+    protocol: http
+    username: admin
+    password: testing
+	index: logs-integration-default
+`
+	// TODO Add data stream processor
+
+	// start filebeat in otel mode
+	filebeatOTel := integration.NewBeat(
+		t,
+		"filebeat-otel",
+		"../../filebeat.test",
+		"otel",
+	)
+
+	filebeatOTel.WriteConfigFile(configFile)
+	filebeatOTel.Start()
+
+	// start filebeat
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+	s := configFile + `
+setup.template.name: logs-filebeat-default
+setup.template.pattern: logs-filebeat-default
+`
+
+	filebeat.WriteConfigFile(s)
+	filebeat.Start()
+
+	t.Cleanup(func() {
+		filebeatOTel.Stop()
+		filebeat.Stop()
+	})
+	es, err := integration.GetESClient(t)
+	if err != nil {
+		t.Fatalf("could not get es client due to: %v", err)
+	}
+
+	var filebeatDocs estools.Documents
+	var otelDocs estools.Documents
+	// wait for logs to be published
+	require.Eventually(t,
+		func() bool {
+			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer findCancel()
+
+			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
+			require.NoError(t, err)
+
+			filebeatDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-filebeat-default*")
+			require.NoError(t, err)
+
+			return otelDocs.Hits.Total.Value >= 1 && filebeatDocs.Hits.Total.Value >= 1
+		},
+		2*time.Minute, 1*time.Second, fmt.Sprintf("Number of hits %d not equal to number of events for %d", filebeatDocs.Hits.Total.Value, 1))
 
 	filebeatDoc := filebeatDocs.Hits.Hits[0].Source
 	otelDoc := otelDocs.Hits.Hits[0].Source
