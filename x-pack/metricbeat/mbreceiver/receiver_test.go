@@ -18,12 +18,14 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/oteltest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/collector/component"
@@ -51,7 +53,7 @@ func TestNewReceiver(t *testing.T) {
 						"enabled":    true,
 						"period":     "1s",
 						"processes":  []string{".*"},
-						"metricsets": []string{"cpu"},
+						"metricsets": []string{"cpu", "memory", "network", "filesystem"},
 					},
 				},
 			},
@@ -102,6 +104,8 @@ func TestNewReceiver(t *testing.T) {
 				// Check that add_host_metadata works, other processors are not guaranteed to add fields in all environments
 				return assert.Contains(c, logs["r1"][0].Flatten(), "host.architecture")
 			}, "failed to check processors loaded")
+
+			assertSystemMetricFields(c, logs["r1"], "expected r1 to have system metric fields in ingested logs")
 		},
 	})
 }
@@ -130,7 +134,7 @@ func TestMultipleReceivers(t *testing.T) {
 						"enabled":    true,
 						"period":     "1s",
 						"processes":  []string{".*"},
-						"metricsets": []string{"cpu"},
+						"metricsets": []string{"cpu", "memory", "network", "filesystem"},
 					},
 				},
 			},
@@ -158,7 +162,7 @@ func TestMultipleReceivers(t *testing.T) {
 						"enabled":    true,
 						"period":     "1s",
 						"processes":  []string{".*"},
-						"metricsets": []string{"cpu"},
+						"metricsets": []string{"cpu", "memory", "network", "filesystem"},
 					},
 				},
 			},
@@ -210,6 +214,9 @@ func TestMultipleReceivers(t *testing.T) {
 				}
 				return true
 			}, "failed to connect to monitoring socket, last error was: %s", &lastError)
+
+			assertSystemMetricFields(c, logs["r1"], "expected r1 to have system metric fields in ingested logs")
+			assertSystemMetricFields(c, logs["r2"], "expected r2 to have system metric fields in ingested logs")
 		},
 	})
 }
@@ -343,5 +350,189 @@ func BenchmarkFactory(b *testing.B) {
 	for b.Loop() {
 		_, err := factory.CreateLogs(b.Context(), receiverSettings, cfg, nil)
 		require.NoError(b, err)
+	}
+}
+
+func assertSystemMetricFields(c *assert.CollectT, logs []mapstr.M, msg string) {
+	metricsetLogs := func(l []mapstr.M, mset string) []mapstr.M {
+		var filtered []mapstr.M
+		for _, log := range l {
+			flat := log.Flatten()
+			if flat["event.dataset"] == mset {
+				filtered = append(filtered, flat)
+			}
+		}
+		return filtered
+	}
+
+	commonFields := []string{
+		"@timestamp",
+		"agent.ephemeral_id",
+		"agent.id",
+		"agent.name",
+		"agent.type",
+		"agent.version",
+		"ecs.version",
+		"event.dataset",
+		"event.duration",
+		"event.module",
+		"metricset.name",
+		"metricset.period",
+		"service.type",
+		// add_host_metadata
+		"host.architecture",
+		"host.hostname",
+		"host.id",
+		"host.ip",
+		"host.mac",
+		"host.name",
+		"host.os.family",
+		"host.os.kernel",
+		"host.os.name",
+		"host.os.platform",
+		"host.os.type",
+		"host.os.version",
+	}
+
+	// Optional fields that may or may not be present depending on the environment or OS.
+	optionalFields := []string{
+		// not every OS provide this
+		"host.os.build",
+		"host.os.codename",
+
+		// not available on windows
+		"host.containerized",
+
+		// missing on Ubuntu on CI
+		"system.memory.swap.used.pct",
+
+		// depends on add_cloud_metadata
+		// not available locally
+		"cloud.account.id",
+		"cloud.availability_zone",
+		"cloud.instance.id",
+		"cloud.instance.name",
+		"cloud.machine.type",
+		"cloud.project.id",
+		"cloud.provider",
+		"cloud.region",
+		"cloud.service.name",
+	}
+
+	testCases := mapstr.M{
+		"cpu": mapstr.M{
+			"system.memory.actual.free":       nil,
+			"system.memory.actual.used.bytes": nil,
+			"system.memory.actual.used.pct":   nil,
+			// "system.memory.cached",
+			"system.memory.free":            nil,
+			"system.memory.swap.free":       nil,
+			"system.memory.swap.total":      nil,
+			"system.memory.swap.used.bytes": nil,
+			// "system.memory.swap.used.pct": nil,
+			"system.memory.total":      nil,
+			"system.memory.used.bytes": nil,
+			"system.memory.used.pct":   nil,
+		},
+		"memory": mapstr.M{
+			"system.memory.actual.free":       nil,
+			"system.memory.actual.used.bytes": nil,
+			"system.memory.actual.used.pct":   nil,
+			// "system.memory.cached",
+			"system.memory.free":            nil,
+			"system.memory.swap.free":       nil,
+			"system.memory.swap.total":      nil,
+			"system.memory.swap.used.bytes": nil,
+			// "system.memory.swap.used.pct": nil,
+			"system.memory.total":      nil,
+			"system.memory.used.bytes": nil,
+			"system.memory.used.pct":   nil,
+		},
+		"network/interface-card": mapstr.M{
+			"system.network.in.bytes":    nil,
+			"system.network.in.dropped":  nil,
+			"system.network.in.errors":   nil,
+			"system.network.in.packets":  nil,
+			"system.network.name":        nil,
+			"system.network.out.bytes":   nil,
+			"system.network.out.dropped": nil,
+			"system.network.out.errors":  nil,
+			"system.network.out.packets": nil,
+		},
+		"network/host": mapstr.M{
+			"host.network.egress.bytes":    nil,
+			"host.network.egress.packets":  nil,
+			"host.network.ingress.bytes":   nil,
+			"host.network.ingress.packets": nil,
+		},
+		"filesystem": mapstr.M{
+			"system.filesystem.available":   nil,
+			"system.filesystem.device_name": nil,
+			"system.filesystem.files":       nil,
+			"system.filesystem.free":        nil,
+			"system.filesystem.free_files":  nil,
+			"system.filesystem.mount_point": nil,
+			"system.filesystem.options":     nil,
+			"system.filesystem.total":       nil,
+			"system.filesystem.type":        nil,
+			"system.filesystem.used.bytes":  nil,
+			"system.filesystem.used.pct":    nil,
+		},
+	}
+
+	if runtime.GOOS == "windows" {
+		cpu := testCases["cpu"].(mapstr.M)
+		cpu.Delete("system.cpu.iowait.norm.pct")
+		cpu.Delete("system.cpu.iowait.pct")
+		cpu.Delete("system.cpu.irq.norm.pct")
+		cpu.Delete("system.cpu.irq.pct")
+		cpu.Delete("system.cpu.nice.norm.pct")
+		cpu.Delete("system.cpu.nice.pct")
+		cpu.Delete("system.cpu.softirq.norm.pct")
+		cpu.Delete("system.cpu.softirq.pct")
+		cpu.Delete("system.cpu.steal.norm.pct")
+		cpu.Delete("system.cpu.steal.pct")
+
+		fs := testCases["filesystem"].(mapstr.M)
+		fs.Delete("system.filesystem.files")
+		fs.Delete("system.filesystem.free_files")
+		fs.Delete("system.filesystem.options")
+	}
+
+	for testName, expectedFields := range testCases {
+		parts := strings.Split(testName, "/")
+		mset := parts[0]
+
+		var msetLogs []mapstr.M
+		require.Conditionf(c, func() bool {
+			msetLogs = metricsetLogs(logs, fmt.Sprintf("system.%s", mset))
+			return len(msetLogs) > 0
+		}, msg+": expected at least one ingest log for metricset %s, got 0: %v", testName, logs)
+
+		wantKeys := *expectedFields.(mapstr.M).FlattenKeys()
+		slices.Sort(wantKeys)
+
+		for _, doc := range msetLogs {
+			if _, ok := doc[wantKeys[0]]; !ok {
+				continue
+			}
+
+			fields := *doc.FlattenKeys()
+			slices.Sort(fields)
+			wantFields := append(wantKeys, commonFields...)
+			// Remove optional fields before comparing, in case they cause a mismatch.
+			if diff := cmp.Diff(fields, wantFields); diff != "" {
+				// Filter out optional fields
+				var filtered []string
+				for _, field := range fields {
+					if !slices.Contains(optionalFields, field) {
+						filtered = append(filtered, field)
+					}
+				}
+				fields = filtered
+			}
+			slices.Sort(wantFields)
+			assert.Equal(c, wantFields, fields, msg+": unexpected fields for metricset %s: got %v, want %v", testName, fields, wantFields)
+		}
 	}
 }
