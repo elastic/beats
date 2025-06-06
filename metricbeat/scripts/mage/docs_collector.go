@@ -20,7 +20,6 @@ package mage
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -218,7 +217,7 @@ func getConfigfile(modulePath string) (string, error) {
 		return "", fmt.Errorf("could not find a config file in %s", modulePath)
 	}
 
-	raw, err := ioutil.ReadFile(goodPath)
+	raw, err := os.ReadFile(goodPath)
 	return strings.TrimSpace(string(raw)), err
 
 }
