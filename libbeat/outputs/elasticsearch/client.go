@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -451,6 +452,9 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 	count := len(events)
 	eventsToRetry := events[:0]
 	stats := bulkResultStats{}
+	var dissectErrorMessage []byte
+	var dissectErrorEvent publisher.Event
+	dissectErrorUnrecoverable := false
 	for i := 0; i < count; i++ {
 		itemStatus, itemMessage, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
@@ -462,11 +466,68 @@ func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publishe
 
 		if client.applyItemStatus(events[i], itemStatus, itemMessage, &stats) {
 			eventsToRetry = append(eventsToRetry, events[i])
+
+			failMessage := fmt.Sprintf("Bulk item insert failed (i=%v, status=%v): %s", i, itemStatus, itemMessage)
+
 			client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, itemStatus, itemMessage)
+
+			// Check the item message for a dissect pattern failure, which can
+			// drop data and/or permanently stall ingestion.
+			// For dissect processor errors, Elasticsearch includes the plaintext
+			// event in the response message, so in that case send it to the event
+			// log to avoid exposing event data.
+			if isDissectError(itemMessage) {
+				client.log.Debugw(failMessage, logp.TypeKey, logp.EventType)
+
+				// Just attach the most recent failed event to the (non-debug) error
+				// logs, which is enough to troubleshoot the dissect config without
+				// potentially spamming the logs with every published event.
+				dissectErrorMessage = itemMessage
+				dissectErrorEvent = events[i]
+				if events[i].Guaranteed() {
+					// If the event is guaranteed-send, the pipeline will keep retrying
+					// it forever and the pipeline is wedged. We can't drop it, because
+					// then an invalid dissect pattern on the ES side could permanently
+					// drop user data on the ingest client-side, so instead we
+					// log an error explaining what went wrong and how to fix it.
+					dissectErrorUnrecoverable = true
+				}
+			} else {
+				client.log.Debug(failMessage)
+			}
 		}
 	}
 
+	if len(dissectErrorMessage) > 0 {
+		recoverableSubstr := "After retrying, failed events will be dropped. "
+		if dissectErrorUnrecoverable {
+			recoverableSubstr = "This will likely block all ingestion progress until the error is corrected. "
+		}
+		client.log.Error(
+			"Publishing to Elasticsearch has failed due to an error in the dissect processor for your ingest pipeline. ",
+			recoverableSubstr,
+			"Ingest dissect processors should apply to all ingested events; if your dissect pattern is not meant to apply to all events, update your ingest pipeline processor definition to include the ignore_failure or on_failure flags. To see the event that caused the failure, check the event logs.")
+
+		// Now log the full event + Elasticsearch response to the event log.
+		client.log.Errorw(
+			fmt.Sprintf("Publishing event has failed due to an error in the dissect processor for your Elasticsearch ingest pipeline. The event that caused the error is %s. The response from Elasticsearch was: %s", dissectErrorEvent.EncodedEvent, dissectErrorMessage),
+			logp.TypeKey, logp.EventType)
+	}
+
 	return eventsToRetry, stats
+}
+
+func isDissectError(itemMessage []byte) bool {
+	var response struct {
+		FailType string `json:"type"`
+		Reason   string `json:"reason"`
+	}
+	err := json.Unmarshal(itemMessage, &response)
+	if err != nil {
+		// If this wasn't a valid failure response, assume it's not a dissect error.
+		return false
+	}
+	return response.FailType == "find_match" && strings.Contains(response.Reason, "dissect pattern")
 }
 
 // applyItemStatus processes the ingestion status of one event from a bulk request.
