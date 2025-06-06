@@ -24,8 +24,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -119,11 +117,13 @@ func (inp *managedInput) Run(
 			inpCtxID := ctx.ID + "::" + source.Name()
 			log := ctx.Logger.With("input_source", source.Name())
 
-			reg := inputmon.NewMetricsRegistry(
-				inpCtxID, ctx.Name, ctx.MetricsRegistry, log)
-			// Unregister the metrics when input finishes running
-			defer inputmon.CancelMetricsRegistry(
-				inpCtxID, ctx.Name, ctx.MetricsRegistry, log)
+			reg, pc, cancelMetrics := input.PrepareInputMetrics(
+				inpCtxID,
+				ctx.Name,
+				ctx.MetricsRegistry,
+				pipeline,
+				log)
+			defer cancelMetrics()
 
 			inpCtx := input.Context{
 				ID:              inpCtxID,
@@ -135,14 +135,6 @@ func (inp *managedInput) Run(
 				MetricsRegistry: reg,
 				Logger:          log,
 			}
-
-			pc := pipetool.WithClientConfigEdit(pipeline,
-				func(orig beat.ClientConfig) (beat.ClientConfig, error) {
-					orig.ClientListener =
-						input.NewPipelineClientListener(
-							inpCtx.MetricsRegistry, orig.ClientListener)
-					return orig, nil
-				})
 
 			if err = inp.runSource(inpCtx, inp.manager.store, source, pc); err != nil {
 				cancel()

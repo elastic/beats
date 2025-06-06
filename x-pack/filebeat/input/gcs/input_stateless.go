@@ -15,6 +15,7 @@ import (
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 type statelessInput struct {
@@ -49,6 +50,13 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 	var source cursor.Source
 	var g errgroup.Group
 
+	stat := inputCtx.StatusReporter
+	if stat == nil {
+		stat = noopReporter{}
+	}
+	stat.UpdateStatus(status.Starting, "")
+	stat.UpdateStatus(status.Configuring, "")
+
 	for _, b := range in.config.Buckets {
 		bucket := tryOverrideOrDefault(in.config, b)
 		source = &Source{
@@ -76,6 +84,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 		ctx, cancel := context.WithCancel(context.Background())
 		go func() {
 			<-inputCtx.Cancelation.Done()
+			stat.UpdateStatus(status.Stopping, "")
 			cancel()
 		}()
 
@@ -92,7 +101,7 @@ func (in *statelessInput) Run(inputCtx v2.Context, publisher stateless.Publisher
 			// Since we are only reading, the operation is always idempotent
 			storage.WithPolicy(storage.RetryAlways),
 		)
-		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, metrics, log)
+		scheduler := newScheduler(pub, bkt, currentSource, &in.config, st, stat, metrics, log)
 		// allows multiple containers to be scheduled concurrently while testing
 		// the stateless input is triggered only while testing and till now it did not mimic
 		// the real world concurrent execution of multiple containers. This fix allows it to do so.

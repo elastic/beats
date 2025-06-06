@@ -122,7 +122,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 		// This must be called after publisher.Publish to measure
 		// the processing time metric.
 		metrics.Log(data, evt.Timestamp)
-	})
+	}, log)
 
 	log.Debug("udp input initialized")
 
