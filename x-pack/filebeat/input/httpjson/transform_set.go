@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -37,13 +38,14 @@ type set struct {
 
 	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
 
-	log *logp.Logger
+	status status.StatusReporter
+	log    *logp.Logger
 }
 
 func (set) transformName() string { return setName }
 
-func newSetRequestPagination(cfg *conf.C, log *logp.Logger) (transform, error) {
-	set, err := newSet(cfg, log)
+func newSetRequestPagination(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (transform, error) {
+	set, err := newSet(cfg, stat, log)
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +66,8 @@ func newSetRequestPagination(cfg *conf.C, log *logp.Logger) (transform, error) {
 	return &set, nil
 }
 
-func newSetResponse(cfg *conf.C, log *logp.Logger) (transform, error) {
-	set, err := newSet(cfg, log)
+func newSetResponse(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (transform, error) {
+	set, err := newSet(cfg, stat, log)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +82,7 @@ func newSetResponse(cfg *conf.C, log *logp.Logger) (transform, error) {
 	return &set, nil
 }
 
-func newSet(cfg *conf.C, log *logp.Logger) (set, error) {
+func newSet(cfg *conf.C, stat status.StatusReporter, log *logp.Logger) (set, error) {
 	c := &setConfig{}
 	if err := cfg.Unpack(c); err != nil {
 		return set{}, fmt.Errorf("fail to unpack the set configuration: %w", err)
@@ -97,6 +99,7 @@ func newSet(cfg *conf.C, log *logp.Logger) (set, error) {
 	}
 
 	return set{
+		status:              stat,
 		log:                 log,
 		targetInfo:          ti,
 		value:               c.Value,
@@ -108,7 +111,7 @@ func newSet(cfg *conf.C, log *logp.Logger) (set, error) {
 }
 
 func (set *set) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value, err := set.value.Execute(ctx, tr, set.targetInfo.Name, set.defaultValue, set.log)
+	value, err := set.value.Execute(ctx, tr, set.targetInfo.Name, set.defaultValue, set.status, set.log)
 	if err != nil && set.failOnTemplateError {
 		if set.doNotLogFailure {
 			err = notLogged{err}
