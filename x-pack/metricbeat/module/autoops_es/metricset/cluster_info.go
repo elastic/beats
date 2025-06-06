@@ -5,7 +5,6 @@
 package metricset
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"time"
@@ -27,7 +26,7 @@ func GetInfo(m *elasticsearch.MetricSet) (*utils.ClusterInfo, error) {
 	if err != nil {
 		return nil, err
 	} else if info.ClusterID == "" || info.ClusterID == "_na_" {
-		return nil, errors.New("cluster ID is unset, which means the cluster is not ready")
+		return nil, &utils.ClusterInfoError{Message: "cluster ID is unset, which means the cluster is not ready"}
 	}
 
 	// because different metricsets can call this function, we need to check the version only once
