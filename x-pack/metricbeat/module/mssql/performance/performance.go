@@ -45,7 +45,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	logger := logp.NewLogger("mssql.performance").With("host", base.HostData().SanitizedURI)
+	logger := base.Logger().Named("mssql.performance").With("host", base.HostData().SanitizedURI)
 
 	db, err := mssql.NewConnection(base.HostData().URI)
 	if err != nil {

@@ -59,7 +59,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
-		log:           logp.NewLogger(metricsetName),
+		log:           base.Logger().Named(metricsetName),
 		client:        client,
 	}, nil
 }

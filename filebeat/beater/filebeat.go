@@ -200,7 +200,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 	b.OverwritePipelinesCallback = func(esConfig *conf.C) error {
 		ctx, cancel := context.WithCancel(context.TODO())
 		defer cancel()
-		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat")
+		esClient, err := eslegclient.NewConnectedClient(ctx, esConfig, "Filebeat", fb.logger)
 		if err != nil {
 			return err
 		}
