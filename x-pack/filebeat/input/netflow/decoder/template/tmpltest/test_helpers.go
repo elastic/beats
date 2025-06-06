@@ -2,7 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package template
+// Package tmpltest provides shared template testing functions for netflow templates.
+package tmpltest
 
 import (
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
 var (
@@ -26,13 +28,13 @@ func buildDecoderByNameMap() {
 	}
 }
 
-func ValidateTemplate(t testing.TB, template *Template) bool {
+func ValidateTemplate(t testing.TB, tmpl *template.Template) bool {
 	once.Do(buildDecoderByNameMap)
 
 	sum := 0
 	seen := make(map[string]bool)
-	for idx, field := range template.Fields {
-		isVariable := template.VariableLength && field.Length == VariableLength
+	for idx, field := range tmpl.Fields {
+		isVariable := tmpl.VariableLength && field.Length == template.VariableLength
 		if !isVariable {
 			sum += int(field.Length)
 		} else {
@@ -55,11 +57,11 @@ func ValidateTemplate(t testing.TB, template *Template) bool {
 			}
 		}
 	}
-	return assert.Equal(t, template.Length, sum) &&
-		assert.Equal(t, 0, template.ScopeFields)
+	return assert.Equal(t, tmpl.Length, sum) &&
+		assert.Equal(t, 0, tmpl.ScopeFields)
 }
 
-func AssertFieldsEquals(t testing.TB, expected []FieldTemplate, actual []FieldTemplate) (succeeded bool) {
+func AssertFieldsEquals(t testing.TB, expected []template.FieldTemplate, actual []template.FieldTemplate) (succeeded bool) {
 	if succeeded = assert.Len(t, actual, len(expected)); succeeded {
 		for idx := range expected {
 			succeeded = assert.Equal(t, expected[idx].Length, actual[idx].Length, strconv.Itoa(idx)) && succeeded
@@ -69,7 +71,7 @@ func AssertFieldsEquals(t testing.TB, expected []FieldTemplate, actual []FieldTe
 	return
 }
 
-func AssertTemplateEquals(t testing.TB, expected *Template, actual *Template) bool {
+func AssertTemplateEquals(t testing.TB, expected *template.Template, actual *template.Template) bool {
 	if expected == nil && actual == nil {
 		return true
 	}
