@@ -70,22 +70,6 @@ func NewCacheRegistry(logger *logp.Logger, refreshInterval time.Duration) *Cache
 	}
 }
 
-// cacheCopy creates a copy of a map
-func cacheCopy[T any](instance map[string]T) map[string]T {
-	c := make(map[string]T, len(instance))
-	for k, v := range instance {
-		c[k] = v
-	}
-	return c
-}
-
-// getCache is a generic helper to get cache data
-func getCache[T any](r *CacheRegistry, cache *Cache[T]) map[string]T {
-	r.dataMutex.RLock()
-	defer r.dataMutex.RUnlock()
-	return cacheCopy(cache.data)
-}
-
 // updateCache is a generic helper to update cache
 func updateCache[T any](cache *Cache[T], update map[string]T) {
 	if cache.data == nil {

@@ -291,7 +291,11 @@ func TestConcurrentAccess(t *testing.T) {
 
 	instancesFound := 0
 	addedIDs.Range(func(key, value interface{}) bool {
-		if instance, found := registry.GetComputeInstanceByID(key.(string)); found && instance != nil {
+		keyString, ok := key.(string)
+		if !ok {
+			return false
+		}
+		if instance, found := registry.GetComputeInstanceByID(keyString); found && instance != nil {
 			instancesFound++
 		}
 		return true
