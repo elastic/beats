@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -40,7 +41,7 @@ func init() {
 			checks.AllowedFields("tags", "target", "when")))
 }
 
-func createAddTags(c *conf.C) (beat.Processor, error) {
+func createAddTags(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Tags   []string `config:"tags" validate:"required"`
 		Target string   `config:"target"`

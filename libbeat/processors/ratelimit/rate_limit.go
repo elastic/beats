@@ -58,7 +58,7 @@ type rateLimit struct {
 }
 
 // new constructs a new rate limit processor.
-func new(cfg *c.C) (beat.Processor, error) {
+func new(cfg *c.C, log *logp.Logger) (beat.Processor, error) {
 	var config config
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("could not unpack processor configuration: %w", err)
@@ -80,10 +80,10 @@ func new(cfg *c.C) (beat.Processor, error) {
 	// Logging and metrics (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Add(1))
-		log = logp.NewLogger(logName).With("instance_id", id)
 		reg = monitoring.Default.NewRegistry(logName+"."+strconv.Itoa(id), monitoring.DoNotReport)
 	)
 
+	log = log.Named(logName).With("instance_id", id)
 	p := &rateLimit{
 		config:    config,
 		algorithm: algo,

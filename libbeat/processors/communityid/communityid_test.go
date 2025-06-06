@@ -25,11 +25,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/testing/testutils"
 	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewDefaults(t *testing.T) {
-	_, err := New(cfg.NewConfig())
+	_, err := New(cfg.NewConfig(), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -159,7 +160,7 @@ func TestRun(t *testing.T) {
 		c := defaultConfig()
 		c.Target = "@metadata.community_id"
 		c.Seed = 0
-		p, err := newFromConfig(c)
+		p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 		assert.NoError(t, err)
 
 		out, err := p.Run(event)
@@ -177,7 +178,7 @@ func testProcessor(t testing.TB, seed uint16, fields mapstr.M, expectedHash inte
 
 	c := defaultConfig()
 	c.Seed = seed
-	p, err := newFromConfig(c)
+	p, err := newFromConfig(c, logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}

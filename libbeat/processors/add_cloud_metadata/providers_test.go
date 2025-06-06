@@ -28,7 +28,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func init() {
@@ -125,7 +125,7 @@ func TestProvidersFilter(t *testing.T) {
 }
 
 func Test_priorityResult(t *testing.T) {
-	tLogger := logp.NewLogger("add_cloud_metadata testing")
+	tLogger := logptest.NewTestingLogger(t, "add_cloud_metadata testing")
 	awsRsp := result{
 		provider: "aws",
 		metadata: map[string]interface{}{

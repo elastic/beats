@@ -60,7 +60,7 @@ func init() {
 }
 
 // NewTruncateFields returns a new truncate_fields processor.
-func NewTruncateFields(c *conf.C) (beat.Processor, error) {
+func NewTruncateFields(c *conf.C, log *logp.Logger) (beat.Processor, error) {
 	var config truncateFieldsConfig
 	err := c.Unpack(&config)
 	if err != nil {
@@ -77,7 +77,7 @@ func NewTruncateFields(c *conf.C) (beat.Processor, error) {
 	return &truncateFields{
 		config:   config,
 		truncate: truncateFunc,
-		logger:   logp.NewLogger("truncate_fields"),
+		logger:   log.Named("truncate_fields"),
 	}, nil
 }
 

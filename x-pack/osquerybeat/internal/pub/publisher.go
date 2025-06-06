@@ -215,7 +215,7 @@ func (p *Publisher) processorsForInputConfig(inCfg config.InputConfig, defaultDa
 
 		procs.AddProcessor(add_data_stream.New(ds))
 
-		userProcs, err := processors.New(inCfg.Processors)
+		userProcs, err := processors.New(inCfg.Processors, p.log)
 		if err != nil {
 			return nil, err
 		}

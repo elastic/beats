@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -36,7 +37,7 @@ type addFields struct {
 const FieldsKey = "fields"
 
 // CreateAddFields constructs an add_fields processor from config.
-func CreateAddFields(c *conf.C) (beat.Processor, error) {
+func CreateAddFields(c *conf.C, _ *logp.Logger) (beat.Processor, error) {
 	config := struct {
 		Fields mapstr.M `config:"fields" validate:"required"`
 		Target *string  `config:"target"`
