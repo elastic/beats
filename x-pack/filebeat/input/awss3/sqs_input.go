@@ -116,7 +116,7 @@ func (in *sqsReaderInput) setup(
 
 	in.s3 = newAWSs3API(s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier))
 
-	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.NumberOfWorkers)
+	in.metrics = newInputMetrics(inputContext, in.config.NumberOfWorkers)
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor()

@@ -18,7 +18,6 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -115,8 +114,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}
 	e.etwSession.Callback = e.consumeEvent
 	e.publisher = publisher
-	e.metrics = newInputMetrics(e.etwSession.Name, ctx.ID)
-	defer e.metrics.unregister()
+	e.metrics = newInputMetrics(e.etwSession.Name, ctx)
 
 	// Set up logger with session information
 	e.log = ctx.Logger.With("session", e.etwSession.Name)
@@ -297,8 +295,6 @@ func (e *etwInput) Close() {
 
 // inputMetrics handles event log metric reporting.
 type inputMetrics struct {
-	unregister func()
-
 	lastCallback time.Time
 
 	name           *monitoring.String // name of the etw session being read
@@ -312,10 +308,9 @@ type inputMetrics struct {
 
 // newInputMetrics returns an input metric for windows ETW.
 // If id is empty, a nil inputMetric is returned.
-func newInputMetrics(session, id string) *inputMetrics {
-	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+func newInputMetrics(session string, ctx input.Context) *inputMetrics {
+	reg := ctx.MetricsRegistry
 	out := &inputMetrics{
-		unregister:     unreg,
 		name:           monitoring.NewString(reg, "session"),
 		events:         monitoring.NewUint(reg, "received_events_total"),
 		dropped:        monitoring.NewUint(reg, "discarded_events_total"),

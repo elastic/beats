@@ -95,7 +95,7 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	defer log.Info("udp input stopped")
 
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewUDP("udp", ctx.ID, s.config.Host, uint64(s.config.ReadBuffer), pollInterval, log)
+	metrics := netmetrics.NewUDP(ctx, s.config.Host, uint64(s.config.ReadBuffer), pollInterval, log)
 	defer metrics.Close()
 
 	server := udp.New(&s.config.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
