@@ -22,6 +22,7 @@ package filestream
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
@@ -356,7 +357,7 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			line := []byte("first line\n")
 			buf := bytes.NewBuffer(nil)
 			writer := transform.NewWriter(buf, encoder)
-			writer.Write(line)
+			_, _ = writer.Write(line)
 			writer.Close()
 
 			env.mustWriteToFile(testlogName, buf.Bytes())
@@ -1106,7 +1107,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 		}
 		n := 0
 		for n <= iterations {
-			f.Write([]byte(fmt.Sprintf("hello world %d\n", r*iterations+n)))
+			fmt.Fprintf(f, "hello world %d\n", r*iterations+n)
 			n += 1
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -1160,4 +1161,54 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 
 	cancelInput()
 	env.waitUntilInputStops()
+}
+
+func TestFilestreamDelete(t *testing.T) {
+	testCases := map[string]map[string]any{
+		"on EOF": {
+			"prospector.scanner.check_interval":     "1s",
+			"close.reader.on_eof":                   true,
+			"delete.on_close.eof":                   true,
+			"prospector.scanner.fingerprint.length": 64,
+			"delete.grace_period":                   0,
+		},
+		"on Inactive": {
+			"prospector.scanner.check_interval":     "1s",
+			"close.on_state_change.inactive":        "1s",
+			"delete.on_close.inactive":              true,
+			"prospector.scanner.fingerprint.length": 64,
+			"delete.grace_period":                   0,
+		},
+	}
+
+	for name, conf := range testCases {
+		t.Run(name, func(t *testing.T) {
+			env := newInputTestingEnvironment(t)
+			logfile := strings.ReplaceAll(t.Name(), "/", "_") + ".log"
+			conf["id"] = "fake-ID-" + uuid.Must(uuid.NewV4()).String()
+			conf["paths"] = []string{env.abspath(logfile)}
+			inp := env.mustCreateInput(conf)
+
+			testlines := bytes.NewBuffer(nil)
+			for i := range 10 {
+				fmt.Fprintf(testlines, "[%02d] sample log line\n", i)
+			}
+			env.mustWriteToFile(logfile, testlines.Bytes())
+
+			ctx, cancelInput := context.WithCancel(context.Background())
+			env.startInput(ctx, t.Name(), inp)
+			defer cancelInput()
+
+			env.waitUntilEventCount(10)
+			logFile := env.abspath(logfile)
+			require.Eventuallyf(t,
+				func() bool {
+					_, err := os.Stat(logFile)
+					return errors.Is(err, os.ErrNotExist)
+				},
+				10*time.Second,
+				time.Second,
+				"%q was not deleted", logFile)
+		})
+	}
 }
