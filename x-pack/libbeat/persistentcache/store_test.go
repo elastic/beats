@@ -7,6 +7,7 @@ package persistentcache
 import (
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -18,8 +19,7 @@ func TestStandaloneStore(t *testing.T) {
 
 	tempDir := t.TempDir()
 
-	"github.com/elastic/elastic-agent-libs/logp/logptest"
-	store, err := newStore(log, tempDir, "store-cache")
+	store, err := newStore(logptest.NewTestingLogger(t, ""), tempDir, "store-cache")
 	require.NoError(t, err)
 
 	err = store.Set(key, value, 0)
