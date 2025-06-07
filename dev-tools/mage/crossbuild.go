@@ -202,11 +202,7 @@ func CrossBuildImage(platform string) (string, error) {
 	case platform == "darwin/arm64":
 		tagSuffix = "darwin-arm64-debian10"
 	case platform == "linux/arm64":
-		tagSuffix = "arm"
-		// when it runs on a ARM64 host/worker.
-		if runtime.GOARCH == "arm64" {
-			tagSuffix = "base-arm-debian9"
-		}
+		tagSuffix = "base-arm-debian9"
 	case platform == "linux/armv5":
 		tagSuffix = "armel"
 	case platform == "linux/armv6":
