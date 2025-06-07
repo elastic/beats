@@ -59,16 +59,21 @@ linters:
         - pattern: fmt.Print.*
     gomoddirectives:
       replace-allow-list:
-        - github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption
+        - github.com/Azure/azure-sdk-for-go
+        - github.com/Microsoft/go-winio
         - github.com/Shopify/sarama
         - github.com/apoydence/eachers
+        - github.com/cucumber/godog
+        - github.com/docker/docker
+        - github.com/docker/go-plugins-helpers
         - github.com/dop251/goja
         - github.com/dop251/goja_nodejs
         - github.com/fsnotify/fsevents
         - github.com/fsnotify/fsnotify
+        - github.com/golang/glog
         - github.com/google/gopacket
         - github.com/insomniacslk/dhcp
-        - github.com/meraki/dashboard-api-go/v3
+        - github.com/tonistiigi/fifo
         - github.com/snowflakedb/gosnowflake
       replace-local: false
     gomodguard:
