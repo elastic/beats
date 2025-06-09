@@ -39,7 +39,7 @@ import (
 // Function that convert single strings
 type internalWmiConversionFunction[T any] func(string) (interface{}, error)
 
-func internalConvertDatetime(v string) (interface{}, error) {
+func internalConvertUint64(v string) (interface{}, error) {
 	return strconv.ParseUint(v, 10, 64)
 }
 
@@ -131,7 +131,7 @@ func GenericWmiConversionFunction[T any](v interface{}, f internalWmiConversionF
 }
 
 func ConvertUint64(v interface{}) (interface{}, error) {
-	return GenericWmiConversionFunction[uint64](v, internalConvertDatetime)
+	return GenericWmiConversionFunction[uint64](v, internalConvertUint64)
 }
 
 func ConvertSint64(v interface{}) (interface{}, error) {
