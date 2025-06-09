@@ -215,8 +215,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						continue
 					}
 
-					finalValue := propertyValue
-
 					// The script API of WMI returns strings for uint64, sint64, datetime
 					// Link: https://learn.microsoft.com/en-us/windows/win32/wmisdk/querying-wmi
 					// As a user, I want to have the right CIM_TYPE in the final document
@@ -237,13 +235,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 						queryConfig.WmiSchema.Put(instance.GetClassName(), propertyName, convertFun)
 					}
 
-					convertedValue, err := convertFun(propertyValue)
+					finalValue, err := convertFun(propertyValue)
 					if err != nil {
 						m.Logger().Warnf("Skipping addition of property %s. Error during conversion: %v", propertyName, err)
 						continue
 					}
-
-					finalValue = convertedValue
 
 					event.MetricSetFields.Put(propertyName, finalValue)
 				}
