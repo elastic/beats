@@ -134,6 +134,7 @@ func TestSchedulerRun(t *testing.T) {
 	// Otherwise, we might only do 1 preAdd and 1 postRemove event
 	// We double the number of pre/post add events to account for their continuations
 	totalExpected := initialEvents*2 + removedEvents + postRemoveEvents*2
+	//nolint:gosec // G115 can be ignored as this input is static
 	for uint32(len(received)) < totalExpected {
 		select {
 		case got := <-executed:

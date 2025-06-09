@@ -53,7 +53,7 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 	// validate the frequency, we don't support less than daily
 	freq, err := rrule.StrToFreq(strings.ToUpper(mw.Freq))
 	if err != nil || freq > rrule.DAILY {
-		return nil, fmt.Errorf("Invalid frequency %s: only yearly, monthly, weekly, and daily are supported", mw.Freq)
+		return nil, fmt.Errorf("invalid frequency %s: only yearly, monthly, weekly, and daily are supported", mw.Freq)
 	}
 
 	dtstart, err := time.Parse(time.RFC3339, mw.Dtstart)
@@ -65,7 +65,7 @@ func (mw *MaintWin) Parse(validateDtStart bool) (r *rrule.RRule, err error) {
 	if dtstart.Before(time.Now().AddDate(-2, 0, 0)) && validateDtStart {
 		return nil, fmt.Errorf(
 			"invalid dtstart: %s is more than 2 years in the past. "+
-				"To prevent excessive iterations, please use a more recent date.",
+				"To prevent excessive iterations, please use a more recent date",
 			dtstart.Format(time.RFC3339),
 		)
 	}
