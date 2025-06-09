@@ -22,7 +22,6 @@ package wmi
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"strconv"
 	"time"
 
@@ -101,28 +100,28 @@ func internalConvertDateTime(v string) (interface{}, error) {
 // Type conversion that applies to both arrays and scalars
 type WmiConversionFunction func(interface{}) (interface{}, error)
 
-// Generic function that applies the internal wmi conversion function to both
-// strings and arrays and avoids repeating the same logic all over the place
-func GenericWmiConversionFunction[T any](v interface{}, f internalWmiConversionFunction[T]) (interface{}, error) {
-	switch val := v.(type) {
+// General-purpose function that invokes the internal WMI conversion on
+// both strings and arrays to avoid code duplication.
+func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConversionFunction[T]) (interface{}, error) {
+	switch value := v.(type) {
 	case string:
-		return f(val)
+		return convert(value)
 	case []interface{}:
-		out := make([]T, 0, len(val))
-		for i, s := range val {
-			if _, ok := s.(string); !ok {
-				return nil, fmt.Errorf("we expect the array to be of type string %v", s)
+		results := make([]T, 0, len(value))
+		for i, raw := range value {
+			str, ok := raw.(string)
+			if !ok {
+				return nil, fmt.Errorf("expected array of strings, got %v at index %d", raw, i)
 			}
-			result, err := f(s.(string))
+			result, err := convert(str)
 			if err != nil {
 				return nil, fmt.Errorf("invalid string at index %d: %v", i, err)
 			}
-			out = append(out, result.(T))
+			results = append(results, result.(T))
 		}
-		return out, nil
+		return results, nil
 	default:
-		typ := reflect.TypeOf(v)
-		return nil, fmt.Errorf("expected string or []string, got %T", typ)
+		return nil, fmt.Errorf("expected string or []string, got %T", v)
 	}
 }
 
