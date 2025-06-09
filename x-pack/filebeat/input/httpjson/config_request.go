@@ -60,10 +60,11 @@ func (c retryConfig) getWaitMax() time.Duration {
 }
 
 type rateLimitConfig struct {
-	Limit      *valueTpl `config:"limit"`
-	Reset      *valueTpl `config:"reset"`
-	Remaining  *valueTpl `config:"remaining"`
-	EarlyLimit *float64  `config:"early_limit"`
+	Limit          *valueTpl `config:"limit"`
+	Reset          *valueTpl `config:"reset"`
+	Remaining      *valueTpl `config:"remaining"`
+	EarlyLimit     *float64  `config:"early_limit"`
+	MaxNonDegraded *int      `config:"max_non_degraded"`
 }
 
 func (c rateLimitConfig) Validate() error {
