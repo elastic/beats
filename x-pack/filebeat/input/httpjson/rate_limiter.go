@@ -22,8 +22,10 @@ type rateLimiter struct {
 	remaining  *valueTpl
 	earlyLimit *float64
 
-	status status.StatusReporter
-	log    *logp.Logger
+	status         status.StatusReporter
+	maxNonDegraded int
+	limitedCount   int
+	log            *logp.Logger
 }
 
 func newRateLimiterFromConfig(config *rateLimitConfig, stat status.StatusReporter, log *logp.Logger) *rateLimiter {
@@ -31,13 +33,18 @@ func newRateLimiterFromConfig(config *rateLimitConfig, stat status.StatusReporte
 		return nil
 	}
 
+	maxNonDegraded := -1
+	if config.MaxNonDegraded != nil {
+		maxNonDegraded = *config.MaxNonDegraded
+	}
 	return &rateLimiter{
-		status:     stat,
-		log:        log,
-		limit:      config.Limit,
-		reset:      config.Reset,
-		remaining:  config.Remaining,
-		earlyLimit: config.EarlyLimit,
+		status:         stat,
+		log:            log,
+		limit:          config.Limit,
+		reset:          config.Reset,
+		remaining:      config.Remaining,
+		earlyLimit:     config.EarlyLimit,
+		maxNonDegraded: maxNonDegraded,
 	}
 }
 
@@ -75,10 +82,14 @@ func (r *rateLimiter) applyRateLimit(ctx context.Context, resp *http.Response) (
 	w := time.Until(t)
 	if resumeAt == 0 || w <= 0 {
 		r.log.Debugf("Rate Limit: No need to apply rate limit.")
+		r.limitedCount = 0
 		return limitReached, nil
 	}
+	r.limitedCount++
 	r.log.Debugf("Rate Limit: Wait until %v for the rate limit to reset.", t)
-	r.status.UpdateStatus(status.Degraded, "rate limited: waiting "+w.String())
+	if r.maxNonDegraded >= 0 && r.limitedCount >= r.maxNonDegraded {
+		r.status.UpdateStatus(status.Degraded, "rate limited: waiting "+w.String())
+	}
 	timer := time.NewTimer(w)
 	select {
 	case <-ctx.Done():
