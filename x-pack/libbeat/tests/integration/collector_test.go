@@ -2,8 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration && !agentbeat
-
 package integration
 
 import (
@@ -29,10 +27,12 @@ var schemeMap = map[string]string{
 }
 
 type TestCollector struct {
-	t       *testing.T
-	tempDir string
-	otelcol *otelcol.Collector
-	wg      sync.WaitGroup
+	t          *testing.T
+	tempDir    string
+	otelcol    *otelcol.Collector
+	wg         sync.WaitGroup
+	configFile string
+	beatname   string
 }
 
 // NewTestCollector configures and returns an otel collector intended for testing only
@@ -60,10 +60,12 @@ func NewTestCollector(t *testing.T, beatname string, config string) (*TestCollec
 	otelcol, err := otelcol.NewCollector(set)
 
 	return &TestCollector{
-		t:       t,
-		tempDir: tempDir,
-		otelcol: otelcol,
-		wg:      sync.WaitGroup{},
+		t:          t,
+		tempDir:    tempDir,
+		otelcol:    otelcol,
+		wg:         sync.WaitGroup{},
+		configFile: configFile,
+		beatname:   beatname,
 	}, err
 }
 
@@ -88,6 +90,23 @@ func NewTestStartCollector(t *testing.T, beatname string, config string) (*TestC
 	})
 
 	return otelcol, err
+}
+
+func (c *TestCollector) ReloadConfig(config string) error {
+	c.Shutdown()
+	// write configuration to a file
+	if err := os.WriteFile(c.configFile, []byte(config), 0o644); err != nil {
+		c.t.Fatalf("cannot create config file '%s': %s", c.configFile, err)
+	}
+	// adds scheme name as prefix to the configfile
+	beatCfg := schemeMap[c.beatname] + ":" + c.configFile
+	// get collector settings
+	set := getCollectorSettings(beatCfg)
+	// get new collector instance
+	otelcol, _ := otelcol.NewCollector(set)
+	c.otelcol = otelcol
+	return c.Run()
+
 }
 
 func (c *TestCollector) GetTempDir() string {

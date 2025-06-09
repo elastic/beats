@@ -57,25 +57,21 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	numEvents := 1
 
 	// Get collector with given config
-	col, err := NewTestCollector(t, "filebeat", beatsCfgFile)
+	col, err := NewTestCollector(t, "filebeat", "")
 	require.NoError(t, err, fmt.Sprintf("could not get new collector due to %v", err))
 
+	// start collector
 	logFilePath := filepath.Join(col.GetTempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
 
-	// start collector
-	go func() {
-		err := col.Run()
-		if err != nil {
-			t.Logf("could not start collector")
-		}
-	}()
+	col.ReloadConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
+	err = col.Run()
+	if err != nil {
+		t.Logf("could not start collector")
+	}
 
 	t.Cleanup(func() {
 		col.Shutdown()
-		if t.Failed() {
-
-		}
 	})
 
 	// start filebeat
@@ -131,7 +127,7 @@ setup.template.pattern: logs-filebeat-default
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
-	// assertMonitoring(t)
+	assertMonitoring(t)
 }
 
 func writeEventsToLogFile(t *testing.T, filename string, numEvents int) {
