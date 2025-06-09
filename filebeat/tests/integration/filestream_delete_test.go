@@ -58,59 +58,45 @@ var logFileLines = []string{
 func TestFilestreamDelete(t *testing.T) {
 	testCases := map[string]struct {
 		configTmpl          string
-		msgs                []string
+		msgs                string
 		resourceNotFinished bool
 		dataAdded           bool
 		gracePeriod         time.Duration
 	}{
 		"EOF": {
 			configTmpl: "eof.yml",
-			msgs: []string{
-				"EOF has been reached. Closing. Path='%s'",
-			},
+			msgs:       "EOF has been reached. Closing. Path='%s'",
 		},
 		"EOF and resource not finished": {
-			configTmpl: "eof.yml",
-			msgs: []string{
-				"EOF has been reached. Closing. Path='%s'",
-			},
+			configTmpl:          "eof.yml",
+			msgs:                "EOF has been reached. Closing. Path='%s'",
 			resourceNotFinished: true,
 		},
 		"EOF resource not finished and data added": {
-			configTmpl: "eof.yml",
-			msgs: []string{
-				"EOF has been reached. Closing. Path='%s'",
-			},
+			configTmpl:          "eof.yml",
+			msgs:                "EOF has been reached. Closing. Path='%s'",
 			resourceNotFinished: true,
 			dataAdded:           true,
 		},
 		"EOF resource not finished data added and grace priod": {
-			configTmpl: "eof.yml",
-			msgs: []string{
-				"EOF has been reached. Closing. Path='%s'",
-			},
+			configTmpl:          "eof.yml",
+			msgs:                "EOF has been reached. Closing. Path='%s'",
 			resourceNotFinished: true,
 			dataAdded:           true,
 			gracePeriod:         2 * time.Second,
 		},
 		"Inactive": {
 			configTmpl: "inactive.yml",
-			msgs: []string{
-				"'%s' is inactive",
-			},
+			msgs:       "'%s' is inactive",
 		},
 		"Inactive and resource not finished": {
-			configTmpl: "inactive.yml",
-			msgs: []string{
-				"'%s' is inactive",
-			},
+			configTmpl:          "inactive.yml",
+			msgs:                "'%s' is inactive",
 			resourceNotFinished: true,
 		},
 		"Inactive resource not finished and data added": {
-			configTmpl: "inactive.yml",
-			msgs: []string{
-				"'%s' is inactive",
-			},
+			configTmpl:          "inactive.yml",
+			msgs:                "'%s' is inactive",
 			resourceNotFinished: true,
 			dataAdded:           true,
 		},
@@ -158,15 +144,13 @@ func TestFilestreamDelete(t *testing.T) {
 			filebeat.WriteConfigFile(cfgYAML)
 			filebeat.Start()
 
-			for _, msgFmt := range tc.msgs {
-				msg := fmt.Sprintf(msgFmt, msgLogFilePath)
-				filebeat.WaitForLogs(
-					msg,
-					10*time.Second,
-					"did not find '%s' in the logs",
-					msg,
-				)
-			}
+			msg := fmt.Sprintf(tc.msgs, msgLogFilePath)
+			filebeat.WaitForLogs(
+				msg,
+				10*time.Second,
+				"did not find '%s' in the logs",
+				msg,
+			)
 
 			if tc.resourceNotFinished {
 				// Wait a few times for the 'not finished' logs
@@ -221,7 +205,7 @@ func TestFilestreamDelete(t *testing.T) {
 				}
 			}
 
-			msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
+			msg = fmt.Sprintf("'%s' removed", msgLogFilePath)
 			filebeat.WaitForLogs(msg, 30*time.Second, "file removed log entry not found")
 			removedMsg := filebeat.GetLastLogLine(msg)
 
@@ -246,23 +230,19 @@ func TestFilestreamDelete(t *testing.T) {
 func TestFilestreamDeleteRestart(t *testing.T) {
 	testCases := map[string]struct {
 		configTmpl          string
-		msgs                []string
+		msg                 string
 		resourceNotFinished bool
 		dataAdded           bool
 		gracePeriod         time.Duration
 	}{
 		"EOF and grace priod": {
-			configTmpl: "eof.yml",
-			msgs: []string{
-				"EOF has been reached. Closing. Path='%s'",
-			},
+			configTmpl:  "eof.yml",
+			msg:         "EOF has been reached. Closing. Path='%s'",
 			gracePeriod: 5 * time.Second,
 		},
 		"Inactive and grace period": {
-			configTmpl: "inactive.yml",
-			msgs: []string{
-				"'%s' is inactive",
-			},
+			configTmpl:  "inactive.yml",
+			msg:         "'%s' is inactive",
 			gracePeriod: 5 * time.Second,
 		},
 	}
@@ -303,15 +283,13 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 			filebeat.WriteConfigFile(cfgYAML)
 			filebeat.Start()
 
-			for _, msgFmt := range tc.msgs {
-				msg := fmt.Sprintf(msgFmt, msgLogFilePath)
-				filebeat.WaitForLogs(
-					msg,
-					10*time.Second,
-					"did not find '%s' in the logs",
-					msg,
-				)
-			}
+			msg := fmt.Sprintf(tc.msg, msgLogFilePath)
+			filebeat.WaitForLogs(
+				msg,
+				10*time.Second,
+				"did not find '%s' in the logs",
+				msg,
+			)
 
 			gracePeriodMsg := fmt.Sprintf(
 				"all events from '%s' have been published, waiting for %s grace period",
@@ -330,7 +308,7 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 			filebeat.Start()
 			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
 
-			msg := fmt.Sprintf("'%s' removed", msgLogFilePath)
+			msg = fmt.Sprintf("'%s' removed", msgLogFilePath)
 			filebeat.WaitForLogs(msg, 10*time.Second, "file removed log entry not found")
 
 			if fileExists(t, logFile) {
