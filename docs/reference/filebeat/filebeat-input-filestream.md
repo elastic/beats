@@ -384,9 +384,7 @@ Setting `close.on_state_change.inactive` to a lower value means that file handle
 The timestamp for closing a file does not depend on the modification time of the file. Instead, Filebeat uses an internal timestamp that reflects when the file was last harvested. For example, if `close.on_state_change.inactive` is set to 5 minutes, the countdown for the 5 minutes starts after the harvester reads the last line of the file.
 
 You can use time strings like 2h (2 hours) and 5m (5 minutes). The
-default is 5m. If `delete.on_close.inactive` is `true`, then the
-default is 30m (30 minutes).
-
+default is 5m.
 
 #### `close.on_state_change.renamed` [filebeat-input-filestream-close-renamed]
 
@@ -606,20 +604,10 @@ If you enabled removing files, it is recommended to keep
 
 Removing files is disabled by default.
 
-### `delete.on_close.eof` [filebeat-input-filestream-delete-eof]
-When set to `true`, files will be removed after EOF is reached and the
-reader is closed. If you set `delete.on_close.eof: ture`, then
-`close.reader.on_eof: true` is automatically set. This option is
-disabled by default.
-
-### `delete.on_close.inactive` [filebeat-input-filestream-delete-inactive]
-When set to `true`, files will be removed after the reader is closed
-due to inactivity. If you enable `delete.on_close.inactive`, then
-`close.on_state_change.inactive: true` is automatically set. This
-option is disabled by default.
-
-When `delete.on_close.inactive` is true,
-`close.on_state_change.inactive` defaults to 30 minutes.
+### `delete.enabled` [filebeat-input-filestream-delete-enabled]
+When set to `true`, files will be removed after EOF the reader is
+closed (the default is 5 minutes of inactivity). Files are only
+removed if all events have been ingested by the output.
 
 ### `delete.grace_period` [filebeat-input-filestream-delete-grace-period]
 An interval to wait after the reader is closed and all events have
