@@ -69,10 +69,9 @@ func NewTestCollector(t *testing.T, beatname string, config string) (*TestCollec
 	}, err
 }
 
-// NewTestCollector configures and returns an otel collector intended for testing only
+// NewTestStartCollector configures and returns an otel collector intended for testing only
 // It accepts beatname and configuration
 func NewTestStartCollector(t *testing.T, beatname string, config string) (*TestCollector, error) {
-
 	otelcol, err := NewTestCollector(t, beatname, config)
 	if err != nil {
 		return nil, err
@@ -93,6 +92,7 @@ func NewTestStartCollector(t *testing.T, beatname string, config string) (*TestC
 }
 
 func (c *TestCollector) ReloadConfig(config string) error {
+	// If collector is started, shut it down then reload
 	c.Shutdown()
 	// write configuration to a file
 	if err := os.WriteFile(c.configFile, []byte(config), 0o644); err != nil {
@@ -116,11 +116,10 @@ func (c *TestCollector) GetTempDir() string {
 func (c *TestCollector) Run() error {
 	wg := sync.WaitGroup{}
 	var err error
+	wg.Add(1)
 	go func() {
-		wg.Add(1)
 		defer wg.Done()
 		err = c.otelcol.Run(c.t.Context())
-
 	}()
 	return err
 }

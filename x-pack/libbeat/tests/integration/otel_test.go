@@ -47,6 +47,7 @@ processors:
     - add_cloud_metadata: ~
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
+path.home: %s
 http.enabled: true
 http.host: localhost
 http.port: %d
@@ -56,7 +57,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
 
-	// Get collector with given config
+	// Get collector with empty config
 	col, err := NewTestCollector(t, "filebeat", "")
 	require.NoError(t, err, fmt.Sprintf("could not get new collector due to %v", err))
 
@@ -64,11 +65,8 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	logFilePath := filepath.Join(col.GetTempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
 
-	col.ReloadConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
-	err = col.Run()
-	if err != nil {
-		t.Logf("could not start collector")
-	}
+	err := col.ReloadConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", col.GetTempDir(), 5066))
+	require.NoError(t, err)
 
 	t.Cleanup(func() {
 		col.Shutdown()
@@ -91,6 +89,10 @@ setup.template.pattern: logs-filebeat-default
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 
+	t.Cleanup(func() {
+		filebeat.Stop()
+	})
+
 	es, err := integration.GetESClient(t)
 	if err != nil {
 		t.Fatalf("could not get es client due to: %v", err)
@@ -101,7 +103,7 @@ setup.template.pattern: logs-filebeat-default
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
-			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
 
 			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
