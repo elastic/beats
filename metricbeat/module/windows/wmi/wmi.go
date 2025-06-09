@@ -263,7 +263,7 @@ func (m *MetricSet) initQuery(session WmiQueryInterface, queryConfig *QueryConfi
 	rows, err := ExecuteGuardedQueryInstances(session, query, m.config.WarningThreshold, m.Logger())
 
 	if err != nil {
-		return fmt.Errorf("Could not execute the meta_class query '%s' with the error: '%w'. We will try in the next iteration", query, err)
+		return fmt.Errorf("could not execute the meta_class query '%s' with the error: '%w'. We will try in the next iteration", query, err)
 	}
 
 	defer wmi.CloseAllInstances(rows)
