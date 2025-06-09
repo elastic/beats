@@ -277,7 +277,7 @@ paths:
 		}
 	})
 
-	t.Run("failed input has its ID remove from the IDs list", func(t *testing.T) {
+	t.Run("failed input has its ID removed from the IDs list", func(t *testing.T) {
 		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
 		testStore, err := storeReg.Get("test")
 		require.NoError(t, err)
@@ -322,13 +322,57 @@ paths:
   - /var/log/bar
 `)
 
-		// Attempt to create the first input with the invalid configuration
-		_, err = cim.Create(invalidCfg)
-		require.Error(t, err, "'/**/**' is not supported, input creation must fail")
+		// Happy path, if an input fails to start, it's ID is removed from cim.ids list and
+		// can be re-used.
+		t.Run("happy path", func(t *testing.T) {
+			// Attempt to create the first input with the invalid configuration
+			_, err = cim.Create(invalidCfg)
+			require.Error(
+				t,
+				err,
+				"'/**/**' is not supported, input creation must fail")
 
-		// Attempt to create the second input with the valid configuration
-		_, err = cim.Create(validCfg)
-		require.NoError(t, err, "The same ID can be re-used after an input fails to start")
+			require.Len(t, cim.ids, 0, "no ID must be present in cim.ids")
+			// Attempt to create the second input with the valid configuration
+			_, err = cim.Create(validCfg)
+			require.NoError(
+				t,
+				err,
+				"The same ID can be re-used after an input fails to start")
+			require.EqualValues(
+				t,
+				map[string]struct{}{"t-wing": {}},
+				cim.ids,
+				"only 't-wing' must be present in cim.ids")
+
+			// "Stop" the input to have the manager in a consistent state
+			// using the same flow as an actually running input would
+			cim.StopInput("t-wing")
+		})
+
+		// Failure scenario: an input with ID X is already running, then an invalid
+		// input configuration with the same ID is used while
+		// 'allow_deprecated_id_duplication: true'. In this case, the invalid input
+		// must fail to start, but the ID from the valid one must stay in cim.ids
+		t.Run("running input with the same ID as invalid one", func(t *testing.T) {
+			// Attempt to create the second input with the valid configuration
+			_, err = cim.Create(validCfg)
+			require.NoError(t, err, "This input must start")
+
+			require.NoError(t,
+				invalidCfg.SetBool("allow_deprecated_id_duplication", -1, true),
+				"setting config must not fail")
+
+			// Attempt to create an invalid input with the same ID
+			_, err = cim.Create(invalidCfg)
+			require.Error(t, err, "'/**/**' is not supported, input creation must fail")
+			// The ID of the valid input must still be in the ids list
+			require.EqualValues(
+				t,
+				map[string]struct{}{"t-wing": {}},
+				cim.ids,
+				"only 't-wing' must be present in cim.ids")
+		})
 	})
 
 	t.Run("allow duplicated IDs setting", func(t *testing.T) {
