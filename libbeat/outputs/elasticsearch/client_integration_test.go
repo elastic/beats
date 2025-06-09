@@ -22,7 +22,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"testing"
 	"time"
 
@@ -37,7 +37,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
 	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -118,8 +117,6 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 
 func TestClientPublishEventWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
-
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := "beat-int-pub-single-with-pipeline"
 	pipeline := "beat-int-pub-single-pipeline"
@@ -202,8 +199,6 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 	type obj map[string]interface{}
 
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := "beat-int-test-dli-index"
 	deadletterIndex := "beat-int-test-dli-dead-letter-index"
 
@@ -263,8 +258,6 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 
 func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
-
-	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := "beat-int-pub-bulk-with-pipeline"
 	pipeline := "beat-int-pub-bulk-pipeline"
@@ -416,10 +409,10 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		t.Fatal(err)
 	}
 
-	info := beat.Info{Beat: "libbeat"}
+	logger := logptest.NewTestingLogger(t, "elasticsearch")
+	info := beat.Info{Beat: "libbeat", Logger: logger}
 	// disable ILM if using specified index name
-	logger := logptest.NewTestingLogger(t, "")
-	im, _ := idxmgmt.DefaultSupport(logger, info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
+	im, _ := idxmgmt.DefaultSupport(info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
 	output, err := makeES(im, info, stats, config)
 	if err != nil {
 		t.Fatal(err)
@@ -429,7 +422,8 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 		outputs.NetworkClient
 		Client() outputs.NetworkClient
 	}
-	client := randomClient(output).(clientWrap).Client().(*Client)
+	client, ok := randomClient(output).(clientWrap).Client().(*Client)
+	assert.True(t, ok)
 
 	// Load version ctx
 	ctx, cancel := context.WithCancel(context.Background())
@@ -474,6 +468,6 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 		panic("no elasticsearch client")
 	}
 
-	client := grp.Clients[rand.Intn(L)]
-	return client.(outputs.NetworkClient)
+	client := grp.Clients[rand.IntN(L)]
+	return client.(outputs.NetworkClient) //nolint:errcheck //This is a test file, can ignore
 }
