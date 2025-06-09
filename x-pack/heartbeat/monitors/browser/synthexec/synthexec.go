@@ -281,11 +281,14 @@ func runCmd(
 				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
 				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, cmd.String()))
 			} else if errors.Is(ctx.Err(), context.Canceled) {
+				logp.L().Infof("synthexec: context canceled, generating CmdSkippedStatusErr: %v", ctx.Err())
 				cmdError = ECSErrToSynthError(ecserr.NewCmdSkippedStatusErr(ctx.Err().Error()))
 			} else {
 				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), cmd.String()))
 			}
 		}
+
+		logp.L().Infof("Command has completed(%d): %s, error: %s", cmd.ProcessState.ExitCode(), cmd, cmdError)
 
 		mpx.writeSynthEvent(&SynthEvent{
 			Type:                 CmdStatus,
