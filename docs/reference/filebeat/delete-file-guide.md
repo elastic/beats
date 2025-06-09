@@ -7,8 +7,10 @@ Enabling this feature will remove files, which could lead to data loss.
 The Filestream input can remove files after they have been fully
 ingested, three requirements need to be met before the Filestream
 input can remove a file:
-1. Conditions have been met for filestream to close the file. This is
-   controlled by the close.* options.
+1. Filestream has closed the file due to inactivity or because EOF has
+   been reached. This is controlled by:
+     - `close.on_state_change.inactive`
+     - `close.reader.on_eof`
 2. Events from the file have been received by the configured output
    without error. (example elasticsearch output has indexed event or
    logstash has written event to persistent queue).
@@ -60,8 +62,10 @@ configuration is:
     id: cronjobs-logs
     paths:
       - /var/log/cronjobs/*.log
-    delete.on_close.eof: true
-    delete.grace_period: 0s
+    close.reader.on_eof: true
+    delete:
+      enabled: true
+      grace_period: 30s
 ```
 
 ### Log files from long running tasks
@@ -81,22 +85,10 @@ period of inactivity, the simplest configuration is:
     id: long-tasks-logs
     paths:
       - /var/log/long-tasks/*.log
-    delete.on_close.inactive: true
-    delete.grace_period: 0s
-```
-
-Because `delete.on_close.inactive: true` the time to consider a file
-inactive and close the reader is automatically set to 30 minutes. This
-can be overwritten to a short or longer time, e.g: 5 minutes.
-
-```yaml
-  - type: filestream
-    id: long-tasks-logs
-    paths:
-      - /var/log/long-tasks/*.log
-    delete.on_close.inactive: true
-    close.on_state_change.inactive: 5m
-    delete.grace_period: 0s
+    close.on_state_change.inactive: 5m # That's the default, it can be omitted
+    delete:
+      enabled: true
+      grace_period: 30s
 ```
 
 ### Waiting before removing log files
@@ -116,8 +108,10 @@ configure a grace period.
     id: other-jobs
     paths:
       - /var/log/misc/*.log
-    delete.on_close.eof: true
-    delete.grace_period: 5m
+    close.reader.on_eof: true
+    delete:
+      enabled: true
+      grace_period: 5m
 ```
 
 The grace period will be counted after the harvester ensured all
