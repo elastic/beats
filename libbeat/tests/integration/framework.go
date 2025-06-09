@@ -103,7 +103,7 @@ type Total struct {
 // `args` will be passed as CLI arguments to the Beat
 func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
-	tempDir := createTempDir(t)
+	tempDir := CreateTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -142,7 +142,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 // See `NewBeat` for options and information for the parameters.
 func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "agentbeat binary must exists")
-	tempDir := createTempDir(t)
+	tempDir := CreateTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
@@ -648,7 +648,7 @@ func (b *BeatProc) openEventLogFile() *os.File {
 //
 // If the tests are run with -v, the temporary directory will
 // be logged.
-func createTempDir(t *testing.T) string {
+func CreateTempDir(t *testing.T) string {
 	rootDir, err := filepath.Abs("../../build/integration-tests")
 	if err != nil {
 		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
