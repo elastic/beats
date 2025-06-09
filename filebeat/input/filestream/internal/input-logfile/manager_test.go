@@ -19,7 +19,9 @@ package input_logfile
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"testing"
 
@@ -273,6 +275,60 @@ paths:
 					fmt.Sprintf("filestream input with ID '%s' already exists", tc.id))
 			})
 		}
+	})
+
+	t.Run("failed input has its ID remove from the IDs list", func(t *testing.T) {
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		testStore, err := storeReg.Get("test")
+		require.NoError(t, err)
+
+		log, _ := newBufferLogger()
+
+		cim := &InputManager{
+			Logger:     log,
+			StateStore: testStateStore{Store: testStore},
+			Configure: func(cfg *config.C) (Prospector, Harvester, error) {
+				var wg sync.WaitGroup
+
+				settings := struct {
+					ID    string   `config:"id"`
+					Paths []string `config:"paths"`
+				}{}
+
+				if err := cfg.Unpack(&settings); err != nil {
+					return nil, nil, err
+				}
+
+				for _, path := range settings.Paths {
+					if strings.Contains(path, "**/**") {
+						return nil, nil, errors.New("double ** is not allowed in a glob")
+					}
+				}
+
+				return &noopProspector{}, &mockHarvester{onRun: correctOnRun, wg: &wg}, nil
+			}}
+		invalidCfg := config.MustNewConfigFrom(`
+type: filestream
+id: t-wing
+paths:
+  - "/**/**/foo" # double ** is invalid for Filestream
+`)
+
+		// Create a valid config with the same ID
+		validCfg := config.MustNewConfigFrom(`
+type: filestream
+id: t-wing
+paths:
+  - /var/log/bar
+`)
+
+		// Attempt to create the first input with the invalid configuration
+		_, err = cim.Create(invalidCfg)
+		require.Error(t, err, "'/**/**' is not supported, input creation must fail")
+
+		// Attempt to create the second input with the valid configuration
+		_, err = cim.Create(validCfg)
+		require.NoError(t, err, "The same ID can be re-used after an input fails to start")
 	})
 
 	t.Run("allow duplicated IDs setting", func(t *testing.T) {
