@@ -106,7 +106,9 @@ func TestComputeCache(t *testing.T) {
 		"instance-2": {Name: stringPtr("test-instance-2")},
 	}
 
-	registry.UpdateComputeCache(testData)
+	registry.dataMutex.Lock()
+	updateCache(registry.compute, testData)
+	registry.dataMutex.Unlock()
 
 	instance1, found := registry.GetComputeInstanceByID("instance-1")
 	assert.True(t, found)
@@ -132,7 +134,9 @@ func TestRedisCache(t *testing.T) {
 		"redis-2": {Name: "projects/test/locations/us-central1/instances/redis-2"},
 	}
 
-	registry.UpdateRedisCache(testData)
+	registry.dataMutex.Lock()
+	updateCache(registry.redis, testData)
+	registry.dataMutex.Unlock()
 
 	instance1, found := registry.GetRedisInstanceByID("redis-1")
 	assert.True(t, found)
@@ -152,7 +156,9 @@ func TestCloudSQLCache(t *testing.T) {
 		"sql-2": {Name: "sql-instance-2"},
 	}
 
-	registry.UpdateCloudSQLCache(testData)
+	registry.dataMutex.Lock()
+	updateCache(registry.cloudsql, testData)
+	registry.dataMutex.Unlock()
 
 	instance1, found := registry.GetCloudSQLInstanceByID("sql-1")
 	assert.True(t, found)
@@ -172,7 +178,9 @@ func TestDataprocCache(t *testing.T) {
 		"cluster-2": {ClusterName: "dataproc-cluster-2"},
 	}
 
-	registry.UpdateDataprocCache(testData)
+	registry.dataMutex.Lock()
+	updateCache(registry.dataproc, testData)
+	registry.dataMutex.Unlock()
 
 	cluster1, found := registry.GetDataprocClusterByID("cluster-1")
 	assert.True(t, found)
@@ -248,9 +256,11 @@ func TestConcurrentAccess(t *testing.T) {
 			defer wg.Done()
 			for j := 0; j < iterations; j++ {
 				instanceID := fmt.Sprintf("instance-%d-%d", id, j)
-				registry.UpdateComputeCache(map[string]*computepb.Instance{
+				registry.dataMutex.Lock()
+				updateCache(registry.compute, map[string]*computepb.Instance{
 					instanceID: {Name: stringPtr(fmt.Sprintf("test-%d-%d", id, j))},
 				})
+				registry.dataMutex.Unlock()
 				addedIDs.Store(instanceID, true)
 			}
 		}(i)
@@ -307,18 +317,20 @@ func TestMultipleCacheTypes(t *testing.T) {
 	logger := logp.NewLogger("test")
 	registry := NewCacheRegistry(logger, 5*time.Minute)
 
-	registry.UpdateComputeCache(map[string]*computepb.Instance{
+	registry.dataMutex.Lock()
+	updateCache(registry.compute, map[string]*computepb.Instance{
 		"compute-1": {Name: stringPtr("compute-instance")},
 	})
-	registry.UpdateRedisCache(map[string]*redispb.Instance{
+	updateCache(registry.redis, map[string]*redispb.Instance{
 		"redis-1": {Name: "redis-instance"},
 	})
-	registry.UpdateCloudSQLCache(map[string]*sqladmin.DatabaseInstance{
+	updateCache(registry.cloudsql, map[string]*sqladmin.DatabaseInstance{
 		"sql-1": {Name: "sql-instance"},
 	})
-	registry.UpdateDataprocCache(map[string]*dataproc.Cluster{
+	updateCache(registry.dataproc, map[string]*dataproc.Cluster{
 		"cluster-1": {ClusterName: "dataproc-cluster"},
 	})
+	registry.dataMutex.Unlock()
 
 	// Verify each cache is independent
 	computeInstance, found := registry.GetComputeInstanceByID("compute-1")
@@ -355,10 +367,12 @@ func TestCacheExpiredCheck(t *testing.T) {
 	assert.True(t, registry.isDataprocCacheExpired())
 
 	// Update caches
-	registry.UpdateComputeCache(map[string]*computepb.Instance{"test": {}})
-	registry.UpdateRedisCache(map[string]*redispb.Instance{"test": {}})
-	registry.UpdateCloudSQLCache(map[string]*sqladmin.DatabaseInstance{"test": {}})
-	registry.UpdateDataprocCache(map[string]*dataproc.Cluster{"test": {}})
+	registry.dataMutex.Lock()
+	updateCache(registry.compute, map[string]*computepb.Instance{"test": {}})
+	updateCache(registry.redis, map[string]*redispb.Instance{"test": {}})
+	updateCache(registry.cloudsql, map[string]*sqladmin.DatabaseInstance{"test": {}})
+	updateCache(registry.dataproc, map[string]*dataproc.Cluster{"test": {}})
+	registry.dataMutex.Unlock()
 
 	// Now caches should not be expired
 	assert.False(t, registry.isComputeCacheExpired())

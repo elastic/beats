@@ -146,34 +146,6 @@ func ensureCacheFresh[T any](
 	return nil
 }
 
-// UpdateComputeCache appends the provided map to the Compute instance cache.
-func (r *CacheRegistry) UpdateComputeCache(update map[string]*computepb.Instance) {
-	r.dataMutex.Lock()
-	defer r.dataMutex.Unlock()
-	updateCache(r.compute, update)
-}
-
-// UpdateCloudSQLCache appends the provided map to the CloudSQL instance cache.
-func (r *CacheRegistry) UpdateCloudSQLCache(update map[string]*sqladmin.DatabaseInstance) {
-	r.dataMutex.Lock()
-	defer r.dataMutex.Unlock()
-	updateCache(r.cloudsql, update)
-}
-
-// UpdateRedisCache appends the provided map to the Redis instance cache.
-func (r *CacheRegistry) UpdateRedisCache(update map[string]*redispb.Instance) {
-	r.dataMutex.Lock()
-	defer r.dataMutex.Unlock()
-	updateCache(r.redis, update)
-}
-
-// UpdateDataprocCache appends the provided map to the dataproc instance cache.
-func (r *CacheRegistry) UpdateDataprocCache(update map[string]*dataproc.Cluster) {
-	r.dataMutex.Lock()
-	defer r.dataMutex.Unlock()
-	updateCache(r.dataproc, update)
-}
-
 func (r *CacheRegistry) isComputeCacheExpired() bool {
 	return r.compute.meta.IsExpired()
 }
