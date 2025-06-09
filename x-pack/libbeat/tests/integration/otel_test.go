@@ -8,7 +8,6 @@ package integration
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -23,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/elastic/go-elasticsearch/v8"
 )
 
 var beatsCfgFile = `
@@ -58,28 +56,24 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
 
-	tempDir := t.TempDir()
-	logFilePath := filepath.Join(tempDir, "log.log")
-	writeEventsToLogFile(t, logFilePath, numEvents)
-
-	cfgFile := filepath.Join(tempDir, "filebeat-otel.yml")
-	if err := os.WriteFile(cfgFile, []byte(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066)), 0o644); err != nil {
-		t.Fatalf("cannot create config file '%s': %s", cfgFile, err)
-	}
-
 	// Get collector with given config
-	col, err := NewTestCollector("filebeat", cfgFile)
+	col, err := NewTestCollector(t, "filebeat", beatsCfgFile)
 	require.NoError(t, err, fmt.Sprintf("could not get new collector due to %v", err))
+
+	logFilePath := filepath.Join(col.GetTempDir(), "log.log")
+	writeEventsToLogFile(t, logFilePath, numEvents)
 
 	// start collector
 	go func() {
-		col.Run(t.Context())
+		err := col.Run()
+		if err != nil {
+			t.Logf("could not start collector")
+		}
 	}()
 
 	t.Cleanup(func() {
 		col.Shutdown()
 		if t.Failed() {
-			fmt.Println("shutting down")
 
 		}
 	})
@@ -101,19 +95,10 @@ setup.template.pattern: logs-filebeat-default
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 
-	// prepare to query ES
-	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Username:  "admin",
-		Password:  "testing",
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
-			},
-		},
+	es, err := integration.GetESClient(t)
+	if err != nil {
+		t.Fatalf("could not get es client due to: %v", err)
 	}
-	es, err := elasticsearch.NewClient(esCfg)
-	require.NoError(t, err)
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
