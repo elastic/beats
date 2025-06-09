@@ -115,7 +115,7 @@ func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConve
 			}
 			result, err := convert(str)
 			if err != nil {
-				return nil, fmt.Errorf("invalid string at index %d: %v", i, err)
+				return nil, fmt.Errorf("invalid string at index %d: %w", i, err)
 			}
 			results = append(results, result)
 		}
@@ -261,7 +261,7 @@ func GetConvertFunction(instance *wmi.WmiInstance, propertyName string, logger *
 		//
 		// If you have a real-world need for this, please open a GitHub issue to discuss.
 		f = func(v interface{}) (interface{}, error) {
-			return nil, fmt.Errorf("The Type %s is unsupported. Consider flattening your class", "CIM Type Object")
+			return nil, fmt.Errorf("the Type %s is unsupported. Consider flattening your class", "CIM Type Object")
 		}
 	default: // For all other types we return the identity function
 		f = ConvertIdentity
@@ -372,7 +372,7 @@ func validateQueryFields(instance *wmi.WmiInstance, queryConfig *QueryConfig, lo
 	validProperties, invalidProperties := filterValidProperties(instance.GetClass().GetPropertiesNames(), queryConfig.Properties)
 
 	if len(validProperties) == 0 {
-		return fmt.Errorf("All the properties listed are invalid %v. We are skipping the query", invalidProperties)
+		return fmt.Errorf("all the properties listed are invalid %v. We are skipping the query", invalidProperties)
 	}
 
 	if len(invalidProperties) > 0 {
