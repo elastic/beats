@@ -43,7 +43,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		return nil, err
 	}
 
-	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher, config.Delete.Enabled())
+	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher, config.Delete.Enabled)
 	if err != nil {
 		return nil, fmt.Errorf("error while creating filewatcher %w", err)
 	}

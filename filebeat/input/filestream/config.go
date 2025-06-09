@@ -63,12 +63,8 @@ type takeOverConfig struct {
 }
 
 type deleterConfig struct {
-	OnClose     deleterReasonConfig `config:"on_close"`
-	GracePeriod time.Duration       `config:"grace_period"`
-}
-
-func (d deleterConfig) Enabled() bool {
-	return d.OnClose.EOF || d.OnClose.Inactive
+	Enabled     bool          `config:"enabled"`
+	GracePeriod time.Duration `config:"grace_period"`
 }
 
 type deleterReasonConfig struct {

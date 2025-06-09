@@ -4,9 +4,10 @@ filebeat.inputs:
     index: "{{ .index }}"
     paths:
       - {{ .logfile }}
-    delete.on_close.eof: true
-    delete.grace_period: {{ .gracePeriod }}
     close.reader.on_eof: true
+    delete:
+      enabled: true
+      grace_period: {{ .gracePeriod }}
 
     prospector:
       scanner:

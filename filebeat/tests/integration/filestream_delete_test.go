@@ -67,14 +67,12 @@ func TestFilestreamDelete(t *testing.T) {
 			configTmpl: "eof.yml",
 			msgs: []string{
 				"EOF has been reached. Closing. Path='%s'",
-				"'%s' will be removed because 'delete.on_close.eof' is set",
 			},
 		},
 		"EOF and resource not finished": {
 			configTmpl: "eof.yml",
 			msgs: []string{
 				"EOF has been reached. Closing. Path='%s'",
-				"'%s' will be removed because 'delete.on_close.eof' is set",
 			},
 			resourceNotFinished: true,
 		},
@@ -82,7 +80,6 @@ func TestFilestreamDelete(t *testing.T) {
 			configTmpl: "eof.yml",
 			msgs: []string{
 				"EOF has been reached. Closing. Path='%s'",
-				"'%s' will be removed because 'delete.on_close.eof' is set",
 			},
 			resourceNotFinished: true,
 			dataAdded:           true,
@@ -91,7 +88,6 @@ func TestFilestreamDelete(t *testing.T) {
 			configTmpl: "eof.yml",
 			msgs: []string{
 				"EOF has been reached. Closing. Path='%s'",
-				"'%s' will be removed because 'delete.on_close.eof' is set",
 			},
 			resourceNotFinished: true,
 			dataAdded:           true,
@@ -101,14 +97,12 @@ func TestFilestreamDelete(t *testing.T) {
 			configTmpl: "inactive.yml",
 			msgs: []string{
 				"'%s' is inactive",
-				"'%s' will be removed because 'delete.on_close.inactive' is set",
 			},
 		},
 		"Inactive and resource not finished": {
 			configTmpl: "inactive.yml",
 			msgs: []string{
 				"'%s' is inactive",
-				"'%s' will be removed because 'delete.on_close.inactive' is set",
 			},
 			resourceNotFinished: true,
 		},
@@ -116,7 +110,6 @@ func TestFilestreamDelete(t *testing.T) {
 			configTmpl: "inactive.yml",
 			msgs: []string{
 				"'%s' is inactive",
-				"'%s' will be removed because 'delete.on_close.inactive' is set",
 			},
 			resourceNotFinished: true,
 			dataAdded:           true,
@@ -262,7 +255,6 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 			configTmpl: "eof.yml",
 			msgs: []string{
 				"EOF has been reached. Closing. Path='%s'",
-				"'%s' will be removed because 'delete.on_close.eof' is set",
 			},
 			gracePeriod: 5 * time.Second,
 		},
@@ -270,7 +262,6 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 			configTmpl: "inactive.yml",
 			msgs: []string{
 				"'%s' is inactive",
-				"'%s' will be removed because 'delete.on_close.inactive' is set",
 			},
 			gracePeriod: 5 * time.Second,
 		},
@@ -322,7 +313,10 @@ func TestFilestreamDeleteRestart(t *testing.T) {
 				)
 			}
 
-			gracePeriodMsg := fmt.Sprintf("all events from '%s' have been published, waiting for %s grace period", msgLogFilePath, tc.gracePeriod)
+			gracePeriodMsg := fmt.Sprintf(
+				"all events from '%s' have been published, waiting for %s grace period",
+				msgLogFilePath,
+				tc.gracePeriod)
 			filebeat.WaitForLogs(gracePeriodMsg, 10*time.Second, "waiting for grace period log not found")
 
 			filebeat.Stop()

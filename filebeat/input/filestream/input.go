@@ -86,42 +86,11 @@ func Plugin(log *logp.Logger, store statestore.States) input.Plugin {
 	}
 }
 
-func applyDeleteOverrides(cfg config, inactiveSet bool) config {
-	if !inactiveSet {
-		logp.
-			L().
-			Named("filestream").
-			Info("setting 'close.on_state_change.inactive' to 30min" +
-				" because 'delete.on_close.inactive' is true.")
-		cfg.Close.OnStateChange.Inactive = 30 * time.Minute
-	}
-
-	if cfg.Delete.OnClose.EOF {
-		if !cfg.Close.Reader.OnEOF {
-			logp.
-				L().
-				Named("filestream").
-				Info("setting 'close.reader.on_eof: true'" +
-					" because 'delete.on_close.eof' is true.")
-		}
-		cfg.Close.Reader.OnEOF = true
-	}
-
-	return cfg
-}
-
 func configure(cfg *conf.C) (loginp.Prospector, loginp.Harvester, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, nil, err
 	}
-
-	inactiveSet, err := cfg.Has("close.on_state_change.inactive", -1)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot read 'close.on_state_change.inactive': %w", err)
-	}
-
-	c = applyDeleteOverrides(c, inactiveSet)
 
 	prospector, err := newProspector(c)
 	if err != nil {
@@ -208,24 +177,7 @@ func (inp *filestream) Run(
 			return fmt.Errorf("error reading from source: %w", err)
 		}
 
-		// Now handle EOF and inactive for file removal
-		deleteFile := false
-		switch {
-		case errors.Is(err, io.EOF) && inp.deleterConfig.OnClose.EOF:
-			log.Debugf(
-				"'%s' will be removed because 'delete.on_close.eof' is set",
-				fs.newPath,
-			)
-			deleteFile = true
-		case errors.Is(err, ErrInactive) && inp.deleterConfig.OnClose.Inactive:
-			log.Debugf(
-				"'%s' will be removed because 'delete.on_close.inactive' is set",
-				fs.newPath,
-			)
-			deleteFile = true
-		}
-
-		if deleteFile {
+		if inp.deleterConfig.Enabled {
 			if err := inp.deleteFile(ctx, log, cursor, fs); err != nil {
 				return fmt.Errorf("cannot remove file '%s': %w", fs.newPath, err)
 			}
@@ -529,7 +481,7 @@ func (inp *filestream) readFromSource(
 				log.Debugf("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
 				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
-				if inp.deleterConfig.OnClose.EOF {
+				if inp.deleterConfig.Enabled {
 					return err
 				}
 			} else if errors.Is(err, ErrInactive) {

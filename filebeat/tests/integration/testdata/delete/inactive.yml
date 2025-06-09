@@ -3,9 +3,10 @@ filebeat.inputs:
     id: delete-on-close
     paths:
       - {{ .logfile }}
-    delete.on_close.inactive: true
-    delete.grace_period: {{ .gracePeriod }}
     close.on_state_change.inactive: 1s
+    delete:
+      enabled: true
+      grace_period: {{ .gracePeriod }}
 
     prospector:
       scanner:
@@ -21,6 +22,9 @@ queue.mem:
 output.elasticsearch:
   hosts:
     - http://{{ .esHost }}
+  backoff:
+    init: 100ms
+    max: 100ms
 
 logging:
   level: debug
