@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
+	_ "github.com/elastic/beats/v7/heartbeat/security"
 	"github.com/elastic/beats/v7/heartbeat/tracer"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
