@@ -43,7 +43,7 @@ func internalConvertUint64(v string) (interface{}, error) {
 	return strconv.ParseUint(v, 10, 64)
 }
 
-func InternalConvertSint64(v string) (interface{}, error) {
+func internalConvertSint64(v string) (interface{}, error) {
 	return strconv.ParseInt(v, 10, 64)
 }
 
@@ -98,10 +98,6 @@ func internalConvertDateTime(v string) (interface{}, error) {
 	return date, err
 }
 
-func internalUnsupportedType(v interface{}) (interface{}, error) {
-	return nil, fmt.Errorf("the type %s is not supported", reflect.TypeOf(v))
-}
-
 // Type conversion that applies to both arrays and scalars
 type WmiConversionFunction func(interface{}) (interface{}, error)
 
@@ -135,7 +131,7 @@ func ConvertUint64(v interface{}) (interface{}, error) {
 }
 
 func ConvertSint64(v interface{}) (interface{}, error) {
-	return GenericWmiConversionFunction[int64](v, InternalConvertSint64)
+	return GenericWmiConversionFunction[int64](v, internalConvertSint64)
 }
 
 func ConvertDatetime(v interface{}) (interface{}, error) {
