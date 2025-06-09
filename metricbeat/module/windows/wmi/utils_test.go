@@ -61,7 +61,7 @@ func TestExecuteGuardedQueryInstances(t *testing.T) {
 const TEST_DATE_FORMAT string = "2006-01-02T15:04:05.999999-07:00"
 
 // Dummy internal conversion function for tests: converts string to uint64
-func dummyUint64Converter(s string) (interface{}, error) {
+func dummyUint64Converter(s string) (uint64, error) {
 	return strconv.ParseUint(s, 10, 64)
 }
 

@@ -36,13 +36,13 @@ import (
 // Utilities related to Type conversion
 
 // Function that convert single strings
-type internalWmiConversionFunction[T any] func(string) (interface{}, error)
+type internalWmiConversionFunction[T any] func(string) (T, error)
 
-func internalConvertUint64(v string) (interface{}, error) {
+func internalConvertUint64(v string) (uint64, error) {
 	return strconv.ParseUint(v, 10, 64)
 }
 
-func internalConvertSint64(v string) (interface{}, error) {
+func internalConvertSint64(v string) (int64, error) {
 	return strconv.ParseInt(v, 10, 64)
 }
 
@@ -63,23 +63,23 @@ const TIMEZONE_LAYOUT string = "-07:00"
 // 2. Normalize the offset from minutes to the standard `hh:mm` format.
 // 3. Concatenate the "yyyyMMddHHmmSS.mmmmmm" part with the normalized offset.
 // 4. Parse the combined string using time.Parse to return a time.Date object.
-func internalConvertDateTime(v string) (interface{}, error) {
+func internalConvertDateTime(v string) (time.Time, error) {
 
 	if len(v) != 25 {
-		return nil, fmt.Errorf("datetime is invalid: the datetime is expected to be exactly 25 characters long, got: %s", v)
+		return time.Time{}, fmt.Errorf("datetime is invalid: the datetime is expected to be exactly 25 characters long, got: %s", v)
 	}
 
 	// Extract the sign (either '+' or '-')
 	utcOffsetSign := v[21]
 	if utcOffsetSign != '+' && utcOffsetSign != '-' {
-		return nil, fmt.Errorf("datetime is invalid: the offset sign is expected to be either + or -")
+		return time.Time{}, fmt.Errorf("datetime is invalid: the offset sign is expected to be either + or -")
 	}
 
 	// Extract UTC offset (last 3 characters)
 	utcOffsetStr := v[22:]
 	utcOffset, err := strconv.ParseInt(utcOffsetStr, 10, 16)
 	if err != nil {
-		return nil, fmt.Errorf("datetime is invalid: error parsing UTC offset: %w", err)
+		return time.Time{}, fmt.Errorf("datetime is invalid: error parsing UTC offset: %w", err)
 	}
 	offsetHours := utcOffset / 60
 	offsetMinutes := utcOffset % 60
@@ -91,7 +91,7 @@ func internalConvertDateTime(v string) (interface{}, error) {
 	// Parse the combined datetime string using the defined layout
 	date, err := time.Parse(WMI_DATETIME_LAYOUT+TIMEZONE_LAYOUT, dateString)
 	if err != nil {
-		return nil, fmt.Errorf("datetime is invalid: error parsing the final datetime: %w", err)
+		return time.Time{}, fmt.Errorf("datetime is invalid: error parsing the final datetime: %w", err)
 	}
 
 	return date, err
@@ -117,7 +117,7 @@ func GenericWmiConversionFunction[T any](v interface{}, convert internalWmiConve
 			if err != nil {
 				return nil, fmt.Errorf("invalid string at index %d: %v", i, err)
 			}
-			results = append(results, result.(T))
+			results = append(results, result)
 		}
 		return results, nil
 	default:
