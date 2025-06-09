@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/log"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -39,6 +40,7 @@ func NewInput(
 	cfg *conf.C,
 	outletFactory channel.Connector,
 	context input.Context,
+	logger *logp.Logger,
 ) (input.Input, error) {
 	// Wrap log input with custom docker settings
 	config := defaultConfig
@@ -71,5 +73,5 @@ func NewInput(
 		context.Meta["stream"] = config.Stream
 	}
 
-	return log.NewInput(cfg, outletFactory, context)
+	return log.NewInput(cfg, outletFactory, context, logger)
 }
