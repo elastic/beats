@@ -29,6 +29,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 **Filebeat**
 
 - Add support for collecting device entities in the Active Directory entity analytics provider. [44309]({{beats-pull}}44309)
+- The `add_cloudfoundry_metadata` processor now uses `xxhash` instead of `SHA1` for sanitizing persistent cache filenames. Existing users will experience a one-time cache invalidation as the cache store will be recreated with the new filename format. [43964]({{beats-pull}}43964)
 
 **Metricbeat**
 
