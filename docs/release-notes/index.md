@@ -34,6 +34,7 @@ To check for security updates, go to [Security announcements for the Elastic sta
 
 - Add checks for the Resty response object in all Meraki module API calls to ensure proper handling of nil responses. [44193]({{beats-pull}}44193)
 - Add a latency configuration option to the Azure Monitor module. [44366]({{beats-pull}}44366)
+- Add GCP cache for metadata collectors. [44432]({{beats-pull}}44432)
 
 **Osquerybeat**
 
