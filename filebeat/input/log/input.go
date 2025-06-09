@@ -89,17 +89,9 @@ func NewInput(
 	context input.Context,
 	logger *logp.Logger,
 ) (input.Input, error) {
-<<<<<<< HEAD
 	deprecatedNotificationOnce.Do(func() {
 		cfgwarn.Deprecate("", "Log input. Use Filestream input instead.")
 	})
-=======
-	// we still allow the deprecated log input running under integrations and
-	// modules until they are all migrated to filestream
-	if !AllowDeprecatedUse(cfg) {
-		return nil, fmt.Errorf("Found log input configuration: %w\n%s", errDeprecated, conf.DebugString(cfg, true)) //nolint:staticcheck //Keep old behavior
-	}
->>>>>>> e2264dc60 ([Chore] Replace global logger with local logger instance #3 (#43657))
 
 	cleanupNeeded := true
 	cleanupIfNeeded := func(f func() error) {
