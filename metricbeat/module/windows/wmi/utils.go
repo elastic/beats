@@ -174,10 +174,6 @@ func NewWMISchema(base map[string]WmiConversionFunction) *WMISchema {
 	}
 }
 
-func RequiresExtraConversion(propertyValue interface{}) bool {
-	return true
-}
-
 // Given a Property it returns its CIM Type Qualifier
 // https://learn.microsoft.com/en-us/windows/win32/wmisdk/cimtype-qualifier
 func getPropertyType(property *ole.IDispatch) (base.WmiType, error) {
