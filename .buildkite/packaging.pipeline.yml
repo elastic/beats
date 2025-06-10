@@ -216,8 +216,6 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
-          - x-pack/osquerybeat
-          - x-pack/agentbeat
 
   - group: DRA publish
     key: dra
