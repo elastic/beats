@@ -6,6 +6,7 @@ package streaming
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"flag"
 	"net/url"
@@ -19,8 +20,9 @@ import (
 )
 
 var (
-	timeout = flag.Duration("crowdstrike_timeout", time.Minute, "time to allow Crowdstrike FalconHose test to run")
-	offset  = flag.Int("crowdstrike_offset", -1, "offset into stream (negative to ignore)")
+	timeout    = flag.Duration("crowdstrike_timeout", time.Minute, "time to allow Crowdstrike FalconHose test to run")
+	offset     = flag.Int("crowdstrike_offset", -1, "offset into stream (negative to ignore)")
+	cursorText = flag.String("cursor", "", "cursor JSON to inject into test")
 )
 
 func TestCrowdstrikeFalconHose(t *testing.T) {
@@ -48,6 +50,16 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 		t.Skip("crowdstrike tests require ${CROWDSTRIKE_APPID} to be set")
 	}
 
+	var state map[string]any
+	if *cursorText != "" {
+		var crsr any
+		err := json.Unmarshal([]byte(*cursorText), &crsr)
+		if err != nil {
+			t.Fatalf("failed to parse cursor text: %v", err)
+		}
+		state = map[string]any{"cursor": crsr}
+	}
+
 	u, err := url.Parse(feedURL)
 	if err != nil {
 		t.Fatalf("unexpected error parsing feed url: %v", err)
@@ -70,6 +82,7 @@ func TestCrowdstrikeFalconHose(t *testing.T) {
 			},
 		},
 		CrowdstrikeAppID: appID,
+		State:            state,
 	}
 
 	err = cfg.Validate()
