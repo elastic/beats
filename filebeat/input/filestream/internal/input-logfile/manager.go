@@ -143,7 +143,7 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
+func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
@@ -162,17 +162,57 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 			" duplication, please add an ID and restart Filebeat")
 	}
 
+	idAlreadyInUse := false
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
+<<<<<<< HEAD
 		cim.Logger.Errorf("filestream input with ID '%s' already exists, this "+
 			"will lead to data duplication, please use a different ID. Metrics "+
 			"collection has been disabled on this input.", settings.ID)
+=======
+		// Keep old behaviour so users can upgrade to 9.0 without
+		// having their inputs not starting.
+		if settings.AllowIDDuplication {
+			idAlreadyInUse = true
+			cim.Logger.Errorf("filestream input with ID '%s' already exists, "+
+				"this will lead to data duplication, please use a different "+
+				"ID. Metrics collection has been disabled on this input. The "+
+				" input will start only because "+
+				"'allow_deprecated_id_duplication' is set to true",
+				settings.ID)
+		} else {
+			cim.Logger.Errorw(
+				fmt.Sprintf(
+					"filestream input ID '%s' is duplicated: input will NOT start",
+					settings.ID,
+				),
+				"input.cfg", conf.DebugString(config, true))
+
+			cim.idsMux.Unlock()
+			return nil, &common.ErrNonReloadable{
+				Err: fmt.Errorf(
+					"filestream input with ID '%s' already exists, this "+
+						"will lead to data duplication, please use a different ID",
+					settings.ID,
+				)}
+		}
+>>>>>>> 017cc4fbc (Remove ID from list when Filestream inputs fail to be created (#44697))
 	}
 
 	// TODO: improve how inputs with empty IDs are tracked.
 	// https://github.com/elastic/beats/issues/35202
 	cim.ids[settings.ID] = struct{}{}
 	cim.idsMux.Unlock()
+
+	defer func() {
+		// If there is any error creating the input, remove it from the IDs list
+		// if there wasn't any other input running with this ID.
+		if retErr != nil && !idAlreadyInUse {
+			cim.idsMux.Lock()
+			delete(cim.ids, settings.ID)
+			cim.idsMux.Unlock()
+		}
+	}()
 
 	prospector, harvester, err := cim.Configure(config)
 	if err != nil {
