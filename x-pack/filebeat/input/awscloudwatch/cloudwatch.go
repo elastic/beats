@@ -6,22 +6,22 @@ package awscloudwatch
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"sync"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type cloudwatchPoller struct {
-	config               config
-	region               string
-	log                  *logp.Logger
-	metrics              *inputMetrics
+	config       config
+	region       string
+	log          *logp.Logger
+	metrics      *inputMetrics
+	stateHandler *stateHandler
+
 	workersListingMap    *sync.Map
 	workersProcessingMap *sync.Map
 
@@ -42,7 +42,7 @@ type workResponse struct {
 }
 
 func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
-	awsRegion string, config config) *cloudwatchPoller {
+	awsRegion string, config config, stateHandler *stateHandler) *cloudwatchPoller {
 	if metrics == nil {
 		metrics = newInputMetrics("", nil)
 	}
@@ -52,6 +52,7 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 		metrics:              metrics,
 		region:               awsRegion,
 		config:               config,
+		stateHandler:         stateHandler,
 		workersListingMap:    new(sync.Map),
 		workersProcessingMap: new(sync.Map),
 		// workRequestChan is unbuffered to guarantee that
@@ -64,85 +65,18 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 	}
 }
 
-func (p *cloudwatchPoller) run(svc *cloudwatchlogs.Client, logGroupId string, startTime, endTime time.Time, logProcessor *logProcessor) {
-	err := p.getLogEventsFromCloudWatch(svc, logGroupId, startTime, endTime, logProcessor)
-	if err != nil {
-		var errRequestCanceled *awssdk.RequestCanceledError
-		if errors.As(err, &errRequestCanceled) {
-			p.log.Error("getLogEventsFromCloudWatch failed with RequestCanceledError: ", errRequestCanceled)
-		}
-		p.log.Error("getLogEventsFromCloudWatch failed: ", err)
-	}
-}
-
-// getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
-func (p *cloudwatchPoller) getLogEventsFromCloudWatch(svc *cloudwatchlogs.Client, logGroupId string, startTime, endTime time.Time, logProcessor *logProcessor) error {
-	// construct FilterLogEventsInput
-	filterLogEventsInput := p.constructFilterLogEventsInput(startTime, endTime, logGroupId)
-	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(svc, filterLogEventsInput)
-	for paginator.HasMorePages() {
-		filterLogEventsOutput, err := paginator.NextPage(context.TODO())
-		if err != nil {
-			return fmt.Errorf("error FilterLogEvents with Paginator: %w", err)
-		}
-
-		p.metrics.apiCallsTotal.Inc()
-		logEvents := filterLogEventsOutput.Events
-		p.metrics.logEventsReceivedTotal.Add(uint64(len(logEvents)))
-
-		// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
-		p.log.Debugf("sleeping for %v before making FilterLogEvents API call again", p.config.APISleep)
-		time.Sleep(p.config.APISleep)
-		p.log.Debug("done sleeping")
-
-		p.log.Debugf("Processing #%v events", len(logEvents))
-		logProcessor.processLogEvents(logEvents, logGroupId, p.region)
-	}
-	return nil
-}
-
-func (p *cloudwatchPoller) constructFilterLogEventsInput(startTime, endTime time.Time, logGroupId string) *cloudwatchlogs.FilterLogEventsInput {
-	p.log.Debugf("FilterLogEventsInput for log group: '%s' with startTime = '%v' and endTime = '%v'", logGroupId, unixMsFromTime(startTime), unixMsFromTime(endTime))
-	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
-		LogGroupIdentifier: awssdk.String(logGroupId),
-		StartTime:          awssdk.Int64(unixMsFromTime(startTime)),
-		EndTime:            awssdk.Int64(unixMsFromTime(endTime)),
-	}
-
-	if len(p.config.LogStreams) > 0 {
-		for _, stream := range p.config.LogStreams {
-			filterLogEventsInput.LogStreamNames = append(filterLogEventsInput.LogStreamNames, *stream)
-		}
-	}
-
-	if p.config.LogStreamPrefix != "" {
-		filterLogEventsInput.LogStreamNamePrefix = awssdk.String(p.config.LogStreamPrefix)
-	}
-	return filterLogEventsInput
-}
-
-func (p *cloudwatchPoller) startWorkers(
-	ctx context.Context,
-	svc *cloudwatchlogs.Client,
-	logProcessor *logProcessor,
-) {
+func (p *cloudwatchPoller) startWorkers(ctx context.Context, svc *cloudwatchlogs.Client, pipeline beat.Pipeline) {
 	for i := 0; i < p.config.NumberOfWorkers; i++ {
 		p.workerWg.Add(1)
 		go func() {
 			defer p.workerWg.Done()
-			for {
-				var work workResponse
-				select {
-				case <-ctx.Done():
-					return
-				case p.workRequestChan <- struct{}{}:
-					work = <-p.workResponseChan
-				}
 
-				p.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", work.logGroupId)
-				p.run(svc, work.logGroupId, work.startTime, work.endTime, logProcessor)
-				p.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", work.logGroupId)
+			worker, err := newCWWorker(p.config, p.region, p.metrics, svc, pipeline, p.log)
+			if err != nil {
+				p.log.Error("Error creating CloudWatch worker: ", err)
+				return
 			}
+			worker.Start(ctx, p.workRequestChan, p.workResponseChan, p.stateHandler)
 		}()
 	}
 }
@@ -152,15 +86,33 @@ func (p *cloudwatchPoller) startWorkers(
 // equal time.Now) to allow deterministic unit tests.
 func (p *cloudwatchPoller) receive(ctx context.Context, logGroupIDs []string, clock func() time.Time) {
 	defer p.workerWg.Wait()
+
 	// startTime and endTime are the bounds of the current scanning interval.
-	// If we're starting at the end of the logs, advance the start time to the
-	// most recent scan window
-	var startTime time.Time
 	endTime := clock().Add(-p.config.Latency)
-	if p.config.StartPosition == "end" {
+
+	var startTime time.Time
+	// If we're starting at the end of the logs, advance the start time to the most recent scan window
+	if p.config.StartPosition == end {
 		startTime = endTime.Add(-p.config.ScanFrequency)
 	}
+
+	if p.config.StartPosition == beginning {
+		startTime = time.Unix(0, 0)
+	}
+
+	if p.config.StartPosition == lastSync {
+		state, err := p.stateHandler.GetState()
+		if err != nil {
+			p.log.Errorf("error retrieving state from stateHandler: %v, falling back to %s", err, beginning)
+			startTime = time.Unix(0, 0)
+		} else {
+			startTime = time.UnixMilli(state.LastSyncEpoch)
+		}
+	}
+
 	for ctx.Err() == nil {
+		p.stateHandler.WorkRegister(endTime.UnixMilli(), len(logGroupIDs))
+
 		for _, lg := range logGroupIDs {
 			select {
 			case <-ctx.Done():
