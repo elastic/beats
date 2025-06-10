@@ -246,6 +246,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 - Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
 - Fix a logging regression that ignored to_files and logged to stdout. {pull}44573[44573]
+- If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
 
 *Heartbeat*
 
