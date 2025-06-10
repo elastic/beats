@@ -250,6 +250,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 *Heartbeat*
 
 - Added maintenance windows support for Heartbeat. {pull}41508[41508]
+- Add missing dependencies to ubi9-minimal distro. {pull}44556[44556]
 
 
 *Metricbeat*
@@ -445,6 +446,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44273[44273] {pull}44508[44508]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
+- Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
 
 *Auditbeat*
 
