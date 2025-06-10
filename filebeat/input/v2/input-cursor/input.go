@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Input interface for cursor based inputs. This interface must be implemented
@@ -108,6 +109,15 @@ func (inp *managedInput) Run(
 	cancelCtx, cancel := context.WithCancel(ctxtool.FromCanceller(ctx.Cancelation))
 	defer cancel()
 	ctx.Cancelation = cancelCtx
+
+	// Override the reported type in the registry to a sentinel value so that
+	// metrics reporters that aggregate over inputs know to skip this registry
+	// and report its nested sources (instantiated below) as top-level inputs.
+	// (We need child inputs to be reported at the top level for backwards
+	// compatibility, but we want an input's metrics to be contained in its own
+	// registry passed in the context, so we don't have to expose the top-level
+	// inputs registry to every individual input.)
+	monitoring.NewString(ctx.MetricsRegistry, "input").Set("__NESTED__")
 
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
