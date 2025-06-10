@@ -97,6 +97,8 @@ func NewFalconHoseFollower(ctx context.Context, id string, cfg config, cursor ma
 	u.RawQuery = query.Encode()
 	s.discoverURL = u.String()
 
+	cfg.Transport.Timeout = 0
+	cfg.Transport.IdleConnTimeout = 0
 	s.plainClient, err = cfg.Transport.Client(httpcommon.WithAPMHTTPInstrumentation())
 	if err != nil {
 		stat.UpdateStatus(status.Failed, "failed to configure client: "+err.Error())
