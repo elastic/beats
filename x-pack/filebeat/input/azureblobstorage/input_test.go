@@ -477,6 +477,7 @@ func Test_StorageClient(t *testing.T) {
 			},
 		},
 		{
+<<<<<<< HEAD
 			name: "ReadCSV",
 			baseConfig: map[string]interface{}{
 				"account_name":                        "beatsblobnew",
@@ -489,13 +490,98 @@ func Test_StorageClient(t *testing.T) {
 				"containers": []map[string]interface{}{
 					{
 						"name": beatsCSVContainer,
+=======
+			name: "CustomContentTypeUnsupported",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":                  beatsGzJSONContainer,
+						"content_type":          "application/xyz-plain",
+						"override_content_type": true,
+>>>>>>> ac45d48f9 ([filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#44583))
 					},
 				},
 			},
 			mockHandler: mock.AzureStorageFileServer,
 			expected: map[string]bool{
+<<<<<<< HEAD
 				mock.BeatsFilesContainer_csv[0]: true,
 				mock.BeatsFilesContainer_csv[1]: true,
+=======
+				"job with jobId beatsgzjsoncontainer-multiline.json.gz-worker-0 encountered an error: content-type application/xyz-plain not supported": true,
+			},
+		},
+		{
+			name: "CustomContentTypeSupported",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":         beatsGzJSONContainer,
+						"content_type": "application/x-gzip",
+					},
+				},
+			},
+			mockHandler: mock.AzureFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+			},
+		},
+		{
+			// The invalid content-type specified is ignored since a
+			// content-type already exists and we are not overriding it.
+			// So we expect a successful run.
+			name: "CustomContentTypeIgnored",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"containers": []map[string]interface{}{
+					{
+						"name":         beatsNdJSONContainer,
+						"content_type": "application/xyz-plain",
+					},
+				},
+			},
+			mockHandler: mock.AzureStorageFileServer,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_log_ndjson[0]: true,
+				mock.BeatsFilesContainer_log_ndjson[1]: true,
+			},
+		},
+		{
+			// This checks if the root level content-type specifications are respected.
+			name: "CustomContentTypeAtRootLevel",
+			baseConfig: map[string]interface{}{
+				"account_name":                        "beatsblobnew",
+				"auth.shared_credentials.account_key": "7pfLm1betGiRyyABEM/RFrLYlafLZHbLtGhB52LkWVeBxE7la9mIvk6YYAbQKYE/f0GdhiaOZeV8+AStsAdr/Q==",
+				"max_workers":                         2,
+				"poll":                                true,
+				"poll_interval":                       "10s",
+				"content_type":                        "application/x-gzip",
+				"containers": []map[string]interface{}{
+					{
+						"name": beatsGzJSONContainer,
+					},
+				},
+			},
+			mockHandler: mock.AzureFileServerNoContentType,
+			expected: map[string]bool{
+				mock.BeatsFilesContainer_multiline_json_gz[0]: true,
+				mock.BeatsFilesContainer_multiline_json_gz[1]: true,
+>>>>>>> ac45d48f9 ([filebeat][ABS] - Relax content-type restrictions along with some basic cleanup and refactor (#44583))
 			},
 		},
 	}
