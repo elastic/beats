@@ -355,7 +355,7 @@ paths:
 		// 'allow_deprecated_id_duplication: true'. In this case, the invalid input
 		// must fail to start, but the ID from the valid one must stay in cim.ids
 		t.Run("running input with the same ID as invalid one", func(t *testing.T) {
-			// Attempt to create the second input with the valid configuration
+			// Attempt to create the input with the valid configuration
 			_, err = cim.Create(validCfg)
 			require.NoError(t, err, "This input must start")
 
