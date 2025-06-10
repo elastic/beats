@@ -233,6 +233,7 @@ unregister input metrics without relaying on the global 'dataset' namespace.{pul
 - Added exponential backoff retry logic for vSphere client logout operation in metricbeat. {issue}43449[43449]
 - Improved Filebeat Websocket input exponential backoff logic to produce a smoother backoff curve. {pull}44069[44069]
 - Added `autoops_es` module to x-pack/metricbeat. {pull}44565[44565]
+- Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
 
 ==== Deprecated
 
