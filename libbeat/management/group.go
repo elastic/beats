@@ -39,6 +39,8 @@ type RunnerReporter interface {
 // This is needed because multiple modules can report different statuses, and we want to avoid
 // repeatedly flipping the parent's status.
 func NewGroupStatusReporter(parent status.StatusReporter) RunnerReporter {
+	// If the parent is a "fallbackManager", we're operating in standard standalone mode,
+	// so setting a group reporter isn't necessary.
 	if _, ok := parent.(*fallbackManager); ok || parent == nil {
 		return &nopStatus{}
 	}
