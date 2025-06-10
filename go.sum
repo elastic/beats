@@ -908,6 +908,8 @@ github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e h1:hUGyBE/4CXRPTh
 github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e/go.mod h1:Sb6li54lXV0yYEjI4wX8cucdQ9gqUJV3+Ngg3l9g30I=
 github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54 h1:jbchLJWyhKcmOjkbC4zDvT/n5EEd7g6hnnF760rEyRA=
 github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54/go.mod h1:Vrkh1pnjV9Bl8c3P9zH0/D4NlOHWP5d4/hF4YTULaec=
+github.com/segmentio/fasthash v1.0.3 h1:EI9+KE1EwvMLBWwjpRDc+fEM+prwxDYbslddQGtrmhM=
+github.com/segmentio/fasthash v1.0.3/go.mod h1:waKX8l2N8yckOgmSsXJi7x1ZfdKZ4x7KRMzBtS3oedY=
 github.com/sergi/go-diff v1.1.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
 github.com/sergi/go-diff v1.3.1 h1:xkr+Oxo4BOQKmkn/B9eMK0g5Kg/983T9DqqPHwYqD+8=
 github.com/sergi/go-diff v1.3.1/go.mod h1:aMJSSKb2lpPvRNec0+w3fl7LP9IOFzdc9Pa4NFbPK1I=
