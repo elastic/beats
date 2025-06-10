@@ -64,8 +64,34 @@ func TestPaginatorGetAllPages(t *testing.T) {
 	).GetAllPages()
 
 	assert.NoError(t, err)
-	assert.Equal(t, requestCount, 3)
-	assert.Equal(t, len(results), 3)
+	assert.Equal(t, 3, requestCount)
+	assert.Equal(t, 3, len(results))
+}
+
+func TestPaginatorGetAllPagesWithMaxPageLimit(t *testing.T) {
+	setStart := func(_ string) {}
+
+	requestCount := 0
+	doRequest := func() (*T, *resty.Response, error) {
+		requestCount += 1
+		headers := http.Header{}
+		// simlulates a broken API that always returns the same link header
+		headers.Add("Link", "<https://api.meraki.com/api/v1/organizations/123456/appliance/uplink/statuses?startingAfter=0000-0000-0000>; rel=first, <https://api.meraki.com/api/v1/organizations/123456/appliance/uplink/statuses?startingAfter=1>; rel=next, <https://api.meraki.com/api/v1/organizations/123456/appliance/uplink/statuses?endingBefore=ZZZZ-ZZZZ-ZZZZ>; rel=last")
+		return &T{thing: "val"}, &resty.Response{RawResponse: &http.Response{Header: headers}}, nil
+	}
+
+	onSuccess := func(r *T) error { return nil }
+	onError := func(_ error, _ *resty.Response) error { return nil }
+
+	err := NewPaginator(
+		setStart,
+		doRequest,
+		onError,
+		onSuccess,
+	).GetAllPages()
+
+	assert.NoError(t, err)
+	assert.Equal(t, 100, requestCount)
 }
 
 func TestPaginatorGetAllPagesWithError(t *testing.T) {
@@ -107,6 +133,31 @@ func TestPaginatorGetAllPagesWithMalformedLinkHeader(t *testing.T) {
 	onSuccess := func(_ *T) error {
 		return nil
 	}
+
+	onError := func(err error, _ *resty.Response) error {
+		return err
+	}
+
+	err := NewPaginator(
+		setStart,
+		doRequest,
+		onError,
+		onSuccess,
+	).GetAllPages()
+
+	assert.Error(t, err)
+}
+
+func TestPaginatorGetAllPagesWithLinkHeaderURLWithoutStartingAfter(t *testing.T) {
+	setStart := func(_ string) {}
+
+	doRequest := func() (*T, *resty.Response, error) {
+		headers := http.Header{}
+		headers.Add("Link", "<https://api.meraki.com/api/v1/organizations/123456/appliance/uplink/statuses>; rel=next")
+		return nil, &resty.Response{RawResponse: &http.Response{Header: headers}}, nil
+	}
+
+	onSuccess := func(_ *T) error { return nil }
 
 	onError := func(err error, _ *resty.Response) error {
 		return err
