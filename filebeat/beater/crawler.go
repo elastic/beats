@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/management/status"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -74,7 +75,7 @@ func (c *crawler) Start(
 
 	log.Infof("Loading Inputs: %d", len(c.inputConfigs))
 
-	groupReporter := status.NewGroupStatusReporter(reporter)
+	groupReporter := management.NewGroupStatusReporter(reporter)
 
 	// Prospect the globs/paths given on the command line and launch harvesters
 	for _, inputConfig := range c.inputConfigs {
@@ -118,7 +119,7 @@ func (c *crawler) Start(
 func (c *crawler) startInput(
 	pipeline beat.PipelineConnector,
 	config *conf.C,
-	reporter status.RunnerReporter,
+	reporter management.RunnerReporter,
 ) error {
 
 	if !config.Enabled() {

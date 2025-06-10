@@ -15,20 +15,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package status
+package management
 
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/stretchr/testify/require"
 )
 
 type mockStatusReporter struct {
-	s   Status
+	s   status.Status
 	msg string
 }
 
-func (m *mockStatusReporter) UpdateStatus(s Status, msg string) {
+func (m *mockStatusReporter) UpdateStatus(s status.Status, msg string) {
 	m.s = s
 	m.msg = msg
 }
@@ -39,20 +40,28 @@ func TestGroupStatus(t *testing.T) {
 
 	subReporter1, subReporter2, subReporter3 := reporter.GetReporterForRunner(1), reporter.GetReporterForRunner(2), reporter.GetReporterForRunner(3)
 
-	subReporter1.UpdateStatus(Running, "")
-	subReporter2.UpdateStatus(Running, "")
-	subReporter3.UpdateStatus(Running, "")
+	subReporter1.UpdateStatus(status.Running, "")
+	subReporter2.UpdateStatus(status.Running, "")
+	subReporter3.UpdateStatus(status.Running, "")
 
-	require.Equal(t, m.s, Running)
+	require.Equal(t, m.s, status.Running)
 	require.Equal(t, m.msg, "")
 
-	subReporter1.UpdateStatus(Degraded, "Degrade Runner1")
-	require.Equal(t, m.s, Degraded)
+	subReporter1.UpdateStatus(status.Degraded, "Degrade Runner1")
+	require.Equal(t, m.s, status.Degraded)
 	require.Equal(t, m.msg, "Degrade Runner1")
 
-	subReporter3.UpdateStatus(Degraded, "Degrade Runner3")
-	subReporter2.UpdateStatus(Failed, "Failed Runner2")
+	subReporter3.UpdateStatus(status.Degraded, "Degrade Runner3")
+	subReporter2.UpdateStatus(status.Failed, "Failed Runner2")
 
-	require.Equal(t, m.s, Failed)
+	require.Equal(t, m.s, status.Failed)
 	require.Equal(t, m.msg, "Failed Runner2")
+}
+
+func TestNopReporter(t *testing.T) {
+	r := NewGroupStatusReporter(nil)
+	require.IsType(t, &nopStatus{}, r)
+
+	r = NewGroupStatusReporter(&fallbackManager{})
+	require.IsType(t, &nopStatus{}, r)
 }

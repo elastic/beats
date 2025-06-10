@@ -15,29 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package status
+package management
 
 import (
 	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 type runnerState struct {
-	state Status
+	state status.Status
 	msg   string
 }
 
 // RunnerReporter defines an interface that returns a StatusReporter for a specific runner.
 // This is used for grouping and managing statuses of multiple runners
 type RunnerReporter interface {
-	GetReporterForRunner(id uint64) StatusReporter
+	GetReporterForRunner(id uint64) status.StatusReporter
 }
 
 // NewGroupStatusReporter creates a reporter that aggregates the statuses of multiple runners
 // and reports the combined status to the parent StatusReporter.
 // This is needed because multiple modules can report different statuses, and we want to avoid
 // repeatedly flipping the parent's status.
-func NewGroupStatusReporter(parent StatusReporter) RunnerReporter {
-	if parent == nil {
+func NewGroupStatusReporter(parent status.StatusReporter) RunnerReporter {
+	if _, ok := parent.(*fallbackManager); ok || parent == nil {
 		return &nopStatus{}
 	}
 	return &reporter{
@@ -48,11 +50,11 @@ func NewGroupStatusReporter(parent StatusReporter) RunnerReporter {
 
 type reporter struct {
 	runnerStates map[uint64]runnerState
-	parent       StatusReporter
+	parent       status.StatusReporter
 	mtx          sync.Mutex
 }
 
-func (r *reporter) GetReporterForRunner(id uint64) StatusReporter {
+func (r *reporter) GetReporterForRunner(id uint64) status.StatusReporter {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	return &subReporter{
@@ -61,7 +63,7 @@ func (r *reporter) GetReporterForRunner(id uint64) StatusReporter {
 	}
 }
 
-func (r *reporter) updateStatusForRunner(id uint64, state Status, msg string) {
+func (r *reporter) updateStatusForRunner(id uint64, state status.Status, msg string) {
 	r.mtx.Lock()
 	defer r.mtx.Unlock()
 	if r.runnerStates == nil {
@@ -81,17 +83,17 @@ func (r *reporter) updateStatusForRunner(id uint64, state Status, msg string) {
 	r.parent.UpdateStatus(calcState, calcMsg)
 }
 
-func (r *reporter) calculateState() (Status, string) {
-	reportedState := Running
+func (r *reporter) calculateState() (status.Status, string) {
+	reportedState := status.Running
 	reportedMsg := ""
 	for _, s := range r.runnerStates {
 		switch s.state {
-		case Degraded:
-			if reportedState != Degraded {
-				reportedState = Degraded
+		case status.Degraded:
+			if reportedState != status.Degraded {
+				reportedState = status.Degraded
 				reportedMsg = s.msg
 			}
-		case Failed:
+		case status.Failed:
 			// we've encountered a failed runner.
 			// short-circuit and return, as Failed state takes precedence over other states
 			return s.state, s.msg
@@ -102,12 +104,12 @@ func (r *reporter) calculateState() (Status, string) {
 
 type nopStatus struct{}
 
-type noopReporter struct{}
+type nopReporter struct{}
 
-func (*noopReporter) UpdateStatus(Status, string) {}
+func (*nopReporter) UpdateStatus(status.Status, string) {}
 
-func (s *nopStatus) GetReporterForRunner(id uint64) StatusReporter {
-	return &noopReporter{}
+func (s *nopStatus) GetReporterForRunner(id uint64) status.StatusReporter {
+	return &nopReporter{}
 }
 
 // subReporter implements status.StatusReporter
@@ -116,7 +118,7 @@ type subReporter struct {
 	r  *reporter
 }
 
-func (m *subReporter) UpdateStatus(status Status, msg string) {
+func (m *subReporter) UpdateStatus(status status.Status, msg string) {
 	// report status to its parent
 	m.r.updateStatusForRunner(m.id, status, msg)
 }
