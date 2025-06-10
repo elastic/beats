@@ -115,12 +115,13 @@ func (f *factory) Create(
 	}
 
 	return &runner{
-		id:        id,
-		log:       f.log.Named(input.Name()).With("id", id),
-		agent:     &f.info,
-		sig:       ctxtool.WithCancelContext(context.Background()),
-		input:     input,
-		connector: p,
+		id:                 id,
+		log:                f.log.Named(input.Name()).With("id", id),
+		agent:              &f.info,
+		sig:                ctxtool.WithCancelContext(context.Background()),
+		input:              input,
+		connector:          p,
+		rootInputsRegistry: f.rootInputsRegistry,
 	}, nil
 }
 
