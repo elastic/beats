@@ -163,11 +163,9 @@ func (cim *InputManager) Create(config *conf.C) (inp v2.Input, retErr error) {
 		cim.Logger.Warn("filestream input without ID is discouraged, please add an ID and restart Filebeat")
 	}
 
-<<<<<<< HEAD
 	metricsID := settings.ID
-=======
 	idAlreadyInUse := false
->>>>>>> 017cc4fbc (Remove ID from list when Filestream inputs fail to be created (#44697))
+
 	cim.idsMux.Lock()
 	if _, exists := cim.ids[settings.ID]; exists {
 		// Keep old behaviour so users can upgrade to 9.0 without
