@@ -31,8 +31,7 @@ jobs:
       - name: Install npcap on Windows
         if: runner.os == 'Windows'
         run: |
-          Invoke-WebRequest -Uri 'https://npcap.com/dist/npcap-1.82.exe' -OutFile 'C:\npcap.exe'
-          C:\npcap.exe /S /winpcap_mode=yes
+          winget install npcap
 
       - name: golangci-lint
         env:
