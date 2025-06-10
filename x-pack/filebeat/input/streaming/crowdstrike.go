@@ -197,8 +197,9 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	// is in order to avoid allocating defers in a loop.
 	defer delete(state, "feed")
 	for _, r := range body.Resources {
+		feedName := r.FeedURL // Retain this since we will mutate it to set the offset.
 		var offset int
-		if cursor, ok := cursors[r.FeedURL].(map[string]any); ok {
+		if cursor, ok := cursors[feedName].(map[string]any); ok {
 			switch off := cursor["offset"].(type) {
 			case int:
 				offset = off
@@ -271,7 +272,7 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 
 		// Prepare state to understand which feed is being processed.
 		// This is cleared by the deferred delete above the loop.
-		state["feed"] = r.FeedURL
+		state["feed"] = feedName
 		dec := json.NewDecoder(resp.Body)
 		for {
 			var msg json.RawMessage
