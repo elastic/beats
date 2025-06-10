@@ -267,7 +267,10 @@ func runCmd(
 
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
+		logp.L().Info("synthexec: Goroutine waiting for command completion (<-cmdDone)...")
 		err := <-cmdDone
+		logp.L().Infof("synthexec: Command completion signaled via cmdDone. Error from cmd.Wait(): %v", err)
+
 		_ = jsonWriter.Close()
 		logp.L().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 
