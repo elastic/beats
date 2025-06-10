@@ -50,7 +50,9 @@ func TestGroupStatus(t *testing.T) {
 	require.Equal(t, m.s, Degraded)
 	require.Equal(t, m.msg, "Degrade Runner1")
 
+	subReporter3.UpdateStatus(Degraded, "Failed Runner3")
 	subReporter2.UpdateStatus(Failed, "Failed Runner2")
+
 	require.Equal(t, m.s, Failed)
 	require.Equal(t, m.msg, "Failed Runner2")
 }
