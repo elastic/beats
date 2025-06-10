@@ -20,8 +20,9 @@ package management
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/management/status"
 )
 
 type mockStatusReporter struct {
