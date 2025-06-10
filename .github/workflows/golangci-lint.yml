@@ -28,11 +28,12 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev librpm-dev libsystemd-dev
 
-      - name: Install npcap on Windows
+      # To please golangci-lint when linting https://github.com/tsg/gopacket
+      - name: Install pcap.h on Windows
         if: runner.os == 'Windows'
         run: |
-          Invoke-WebRequest -Uri 'https://npcap.com/dist/npcap-0.86.exe' -OutFile 'C:\npcap.exe'
-          C:\npcap.exe /S /winpcap_mode=yes
+          Invoke-WebRequest -UseBasicParsing https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip -OutFile "${Env:TEMP}\wpd.zip"
+          Expand-Archive -LiteralPath "${Env:TEMP}\wpd.zip" -DestinationPath "C:\"
 
       - name: golangci-lint
         env:
