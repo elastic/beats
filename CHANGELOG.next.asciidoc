@@ -131,6 +131,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
 - If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
+- Fix timeout handling by Crowdstrike streaming input. {pull}44720[44720]
 
 *Heartbeat*
 
