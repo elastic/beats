@@ -15,15 +15,19 @@ import (
 	"github.com/godror/godror/dsn"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // ConnectionDetails contains all possible data that can be used to create a connection with
 // an Oracle db
 type ConnectionDetails struct {
-	Username string `config:"username"`
-	Password string `config:"password"`
-	Driver   string `config:"driver"`
+	Username string            `config:"username"`
+	Password string            `config:"password"`
+	Driver   string            `config:"driver"`
+	TLS      *tlscommon.Config `config:"ssl"`
 }
+
+const TLSConfigKey = "custom"
 
 // ParseDSN tries to parse the host
 func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
@@ -32,6 +36,7 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 	if err := mod.UnpackConfig(&config); err != nil {
 		return mb.HostData{}, fmt.Errorf("error parsing config file: %w", err)
 	}
+
 	if config.Driver == "oracle" {
 		params, err := godror.ParseDSN(host)
 		if err != nil {
@@ -52,6 +57,11 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 			Password:     params.Password.Secret(),
 		}, nil
 	}
+
+	if config.Driver == "mysql" {
+		return mysqlParseDSN(config, host)
+	}
+
 	sanitized := sanitize(host)
 	return mb.HostData{
 		URI:          host,
@@ -66,12 +76,30 @@ func sanitize(host string) string {
 		return url.Host
 	}
 
-	// Host is a MySQL DSN
-	if config, err := mysql.ParseDSN(host); err == nil {
-		return config.Addr
+	return "(redacted)"
+}
+
+func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
+	c, err := mysql.ParseDSN(host)
+
+	if err != nil {
+		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
 	}
 
-	// TODO: Add support for PostgreSQL connection strings and other formats
+	sanitized := c.Addr
 
-	return "(redacted)"
+	if config.TLS.IsEnabled() {
+		c.TLSConfig = TLSConfigKey
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
+		}
+		mysql.RegisterTLSConfig(TLSConfigKey, tlsConfig.ToConfig())
+	}
+
+	return mb.HostData{
+		URI:          c.FormatDSN(),
+		SanitizedURI: sanitized,
+		Host:         sanitized,
+	}, nil
 }
