@@ -38,24 +38,7 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 	}
 
 	if config.Driver == "oracle" {
-		params, err := godror.ParseDSN(host)
-		if err != nil {
-			return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
-		}
-		if params.Username == "" {
-			params.Username = config.Username
-		}
-		if params.Password.Secret() == "" {
-			params.StandaloneConnection = true
-			params.Password = dsn.NewPassword(config.Password)
-		}
-		return mb.HostData{
-			URI:          params.StringWithPassword(),
-			SanitizedURI: params.ConnectString,
-			Host:         params.String(),
-			User:         params.Username,
-			Password:     params.Password.Secret(),
-		}, nil
+		return oracleParseDSN(config, host)
 	}
 
 	if config.Driver == "mysql" {
@@ -77,6 +60,27 @@ func sanitize(host string) string {
 	}
 
 	return "(redacted)"
+}
+
+func oracleParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
+	params, err := godror.ParseDSN(host)
+	if err != nil {
+		return mb.HostData{}, fmt.Errorf("error trying to parse connection string in field 'hosts': %w", err)
+	}
+	if params.Username == "" {
+		params.Username = config.Username
+	}
+	if params.Password.Secret() == "" {
+		params.StandaloneConnection = true
+		params.Password = dsn.NewPassword(config.Password)
+	}
+	return mb.HostData{
+		URI:          params.StringWithPassword(),
+		SanitizedURI: params.ConnectString,
+		Host:         params.String(),
+		User:         params.Username,
+		Password:     params.Password.Secret(),
+	}, nil
 }
 
 func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
