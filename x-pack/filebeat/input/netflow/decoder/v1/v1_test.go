@@ -15,7 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
-	template2 "github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template/tmpltest"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
@@ -118,5 +118,5 @@ func TestNetflowProtocol_BadPacket(t *testing.T) {
 }
 
 func TestTemplate(t *testing.T) {
-	template2.ValidateTemplate(t, &templateV1)
+	tmpltest.ValidateTemplate(t, &templateV1)
 }
