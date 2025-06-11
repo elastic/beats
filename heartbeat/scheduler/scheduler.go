@@ -171,6 +171,7 @@ func (s *Scheduler) Add(sched Schedule, pmws []maintwin.ParsedMaintWin, id strin
 		return nil, ErrAlreadyStopped
 	}
 
+	// TODO: propagate this context to the sourcejob
 	jobCtx, jobCtxCancel := context.WithCancel(s.ctx)
 
 	// lastRanAt stores the last runAt the task was invoked

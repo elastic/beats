@@ -272,7 +272,7 @@ func runCmd(
 		logp.L().Infof("synthexec: Command completion signaled via cmdDone. Error from cmd.Wait(): %v", err)
 
 		_ = jsonWriter.Close()
-		logp.L().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
+		logp.L().Infof("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 
 		var cmdError *SynthError = nil
 		if err != nil {
