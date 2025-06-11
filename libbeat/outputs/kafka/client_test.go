@@ -24,13 +24,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/outputs/outputtest"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -50,9 +50,14 @@ func TestClientOutputListener(t *testing.T) {
 	cfgSarama.Producer.Return.Errors = true
 
 	producer := mocks.NewAsyncProducer(t, cfgSarama)
+	// 1st event: succeed
 	producer.ExpectInputAndSucceed()
+	// 2nd event: permanent failure -> dropped
 	producer.ExpectInputAndFail(
 		fmt.Errorf("test permanent error: %w", sarama.ErrInvalidMessage))
+	// 3rd event: retryable failure -> will trigger retryable error metrics
+	producer.ExpectInputAndFail(
+		fmt.Errorf("test retryable error: %w", sarama.ErrRequestTimedOut))
 
 	cfg, err := config.NewConfigFrom(map[string]interface{}{
 		"hosts":   []string{"localhost:9094"},
@@ -108,6 +113,18 @@ func TestClientOutputListener(t *testing.T) {
 					TimeSeries: false,
 				},
 			},
+			{
+				OutputListener: observer,
+				Content: beat.Event{
+					Timestamp: time.Time{},
+					Meta:      nil,
+					Fields: map[string]interface{}{
+						"msg":      "message 3",
+						"to_retry": "true"},
+					Private:    nil,
+					TimeSeries: false,
+				},
+			},
 		},
 	}
 
@@ -116,22 +133,13 @@ func TestClientOutputListener(t *testing.T) {
 
 	require.NoError(t, c.Close(), "failed closing kafka client")
 
-	assertOutputMetrics(t, counter, reg)
-}
-
-func assertOutputMetrics(t *testing.T, counter *beat.CountOutputListener, reg *monitoring.Registry) {
-	assert.Equal(t, int64(2), counter.NewLoad())
-	assert.Equal(t, int64(2), counter.AckedLoad())
-	assert.Equal(t, int64(1), counter.DroppedLoad())
-
-	metrics := monitoring.CollectStructSnapshot(reg, monitoring.Full, false)
-	evs, ok := metrics["events"]
-	require.True(t, ok, "could not find 'events' in metrics")
-	parsedEvs, ok := evs.(map[string]any)
-	require.True(t, ok, "could not parse 'events' isn't map[string]int64, it's %T", evs)
-
-	assert.Equal(t, int64(2), parsedEvs["total"].(int64))
-	assert.Equal(t, int64(2), parsedEvs["acked"].(int64))
-	assert.Equal(t, int64(1), parsedEvs["dropped"].(int64))
-	assert.Equal(t, int64(1), parsedEvs["batches"].(int64))
+	outputtest.AssertOutputMetrics(t,
+		outputtest.Metrics{
+			Total:     3,
+			Acked:     1,
+			Dropped:   1,
+			Retryable: 1,
+			Batches:   1,
+		},
+		counter, reg)
 }
