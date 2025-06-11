@@ -369,6 +369,8 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	uniqueIDs := map[string]string{}
 	// used to filter out duplicate matches
 	uniqueFiles := map[string]struct{}{}
+
+	tooSmallFiles := 0
 	for _, path := range s.paths {
 		matches, err := filepath.Glob(path)
 		if err != nil {
@@ -391,6 +393,7 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 
 			fd, err := s.toFileDescriptor(&it)
 			if errors.Is(err, errFileTooSmall) {
+				tooSmallFiles++
 				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
 				continue
 			}
@@ -407,6 +410,17 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			uniqueIDs[fileID] = fd.Filename
 			fdByName[filename] = fd
 		}
+	}
+
+	if tooSmallFiles > 0 {
+		s.log.Warnf(
+			"%d files are too small to be ingested, files need to be at "+
+				"least %d in size for ingestion to start. To change this "+
+				"behaviour set 'prospector.scanner.fingerprint.length' and "+
+				"'prospector.scanner.fingerprint.offset'.",
+			tooSmallFiles,
+			s.cfg.Fingerprint.Offset+s.cfg.Fingerprint.Length,
+		)
 	}
 
 	return fdByName
