@@ -389,6 +389,7 @@ require (
 	github.com/prometheus/client_golang v1.22.0 // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
+	github.com/segmentio/fasthash v1.0.3 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect

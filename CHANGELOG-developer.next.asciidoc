@@ -230,6 +230,7 @@ client will aggregate metrics by input on this registry. It'll collect
 `events_pipeline_published_total`.{pull}42618[42618] {issue}42761[42761]
 - Add new API to libbeat/monitoring/inputmon. The API allows to register and
 unregister input metrics without relaying on the global 'dataset' namespace.{pull}42618[42618] {issue}42761[42761]
+- Make `x-pack/libbeat/management.BeatV2Manager.UpdateStatus` a no-op if there is no change in state. {pull}44716[44716]
 
 ==== Deprecated
 
