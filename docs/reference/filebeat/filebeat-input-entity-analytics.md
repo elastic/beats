@@ -468,6 +468,13 @@ filebeat.inputs:
   client_id: "CLIENT_ID"
   tenant_id: "TENANT_ID"
   secret: "SECRET"
+  expand:
+    users:
+      manager:
+        - displayName
+        - id
+      directReports:
+        - id
 ```
 
 The `azure-ad` provider supports the following configuration:
@@ -526,6 +533,21 @@ Override the default [group query selections](https://learn.microsoft.com/en-us/
 #### `select.devices` [_select_devices]
 
 Override the default [device query selections](https://learn.microsoft.com/en-us/graph/api/device-get?view=graph-rest-1.0&tabs=http#optional-query-parameters). This is a list of optional query parameters. The default is `["accountEnabled", "deviceId", "displayName", "operatingSystem", "operatingSystemVersion", "physicalIds", "extensionAttributes", "alternativeSecurityIds"]`.
+
+
+#### `expand.users` [_expand_users]
+
+Add [user query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/user?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the users query.
+
+
+#### `expand.groups` [_expand_groups]
+
+Add [group query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/group?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the groups query.
+
+
+#### `expand.devices` [_expand_devices]
+
+Add [device query relationship expansions](https://learn.microsoft.com/en-us/graph/api/resources/device?view=graph-rest-1.0#relationships). This is a map of relationship names to attribute lists. By default this is not set. If an empty relationship list is given, the relationship expansion is the same as the devices query.
 
 
 ### `tracer.enabled` [_tracer_enabled]
