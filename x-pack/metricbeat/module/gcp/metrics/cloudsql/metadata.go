@@ -29,6 +29,7 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 		region:           region,
 		regions:          regions,
 		opt:              opt,
+		instances:        make(map[string]*sqladmin.DatabaseInstance),
 		cacheRegistry:    cacheRegistry,
 		logger:           logp.NewLogger("metrics-cloudsql"),
 	}, nil
@@ -59,6 +60,7 @@ type metadataCollector struct {
 	opt              []option.ClientOption
 	// NOTE: instances holds data used for all metrics collected in a given period
 	// this avoids calling the remote endpoint for each metric, which would take a long time overall
+	instances     map[string]*sqladmin.DatabaseInstance
 	cacheRegistry *gcp.CacheRegistry
 	logger        *logp.Logger
 }
@@ -165,16 +167,15 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 
 func (s *metadataCollector) instance(ctx context.Context, instanceName string) (*sqladmin.DatabaseInstance, error) {
 	if s.cacheRegistry == nil {
-		s.logger.Warn("Metadata cache disabled, fetching instance directly (no caching).")
-		instanceDataMap, err := s.fetchCloudSQLInstances(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("direct fetch failed: %w", err)
+		s.logger.Debug("Metadata cache disabled, fetching instance directly (no caching).")
+		s.fetchCloudSQLInstancesNoCache(ctx)
+
+		instance, ok := s.instances[instanceName]
+		if ok {
+			return instance, nil
 		}
-		instanceData, ok := instanceDataMap[instanceName]
-		if !ok {
-			return nil, nil
-		}
-		return instanceData, nil
+
+		return nil, nil
 	}
 
 	err := s.cacheRegistry.EnsureCloudSQLCacheFresh(ctx, s.fetchCloudSQLInstances)
@@ -214,4 +215,28 @@ func (s *metadataCollector) fetchCloudSQLInstances(ctx context.Context) (map[str
 	}
 
 	return fetchedInstances, nil
+}
+
+func (s *metadataCollector) fetchCloudSQLInstancesNoCache(ctx context.Context) {
+	if len(s.instances) > 0 {
+		return
+	}
+
+	s.logger.Debug("sqladmin Instances.List API")
+
+	service, err := sqladmin.NewService(ctx, s.opt...)
+	if err != nil {
+		s.logger.Errorf("error getting client from sqladmin service: %v", err)
+		return
+	}
+
+	req := service.Instances.List(s.projectID)
+	if err := req.Pages(ctx, func(page *sqladmin.InstancesListResponse) error {
+		for _, instancesScopedList := range page.Items {
+			s.instances[fmt.Sprintf("%s:%s", instancesScopedList.Project, instancesScopedList.Name)] = instancesScopedList
+		}
+		return nil
+	}); err != nil {
+		s.logger.Errorf("sqladmin Instances.List error: %v", err)
+	}
 }

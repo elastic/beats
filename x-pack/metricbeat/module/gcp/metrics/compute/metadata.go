@@ -34,6 +34,7 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 		regions:          regions,
 		opt:              opt,
 		cacheRegistry:    cacheRegistry,
+		computeInstances: make(map[uint64]*computepb.Instance),
 		logger:           logp.NewLogger("metrics-compute"),
 	}, nil
 }
@@ -60,6 +61,7 @@ type metadataCollector struct {
 	region           string
 	regions          []string
 	opt              []option.ClientOption
+	computeInstances map[uint64]*computepb.Instance
 	cacheRegistry    *gcp.CacheRegistry
 	logger           *logp.Logger
 }
@@ -154,16 +156,16 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zo
 // instance returns data from an instance ID using the cache, ensuring it's fresh.
 func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*computepb.Instance, error) {
 	if s.cacheRegistry == nil {
-		s.logger.Warn("Metadata cache disabled, fetching instance directly (no caching).")
-		instanceDataMap, err := s.fetchComputeInstances(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("direct fetch failed: %w", err)
+		s.logger.Debug("Metadata cache disabled, fetching instance directly (no caching).")
+		s.fetchComputeInstancesNoCache(ctx)
+
+		instanceIdInt, _ := strconv.Atoi(instanceID)
+		computeInstance, ok := s.computeInstances[uint64(instanceIdInt)]
+		if ok {
+			return computeInstance, nil
 		}
-		instanceData, ok := instanceDataMap[instanceID]
-		if !ok {
-			return nil, nil
-		}
-		return instanceData, nil
+
+		return nil, nil
 	}
 
 	err := s.cacheRegistry.EnsureComputeCacheFresh(ctx, s.fetchComputeInstances)
@@ -198,7 +200,7 @@ func (s *metadataCollector) instanceZone(ts *monitoringpb.TimeSeries) string {
 }
 
 func (s *metadataCollector) fetchComputeInstances(ctx context.Context) (map[string]*computepb.Instance, error) {
-	s.logger.Info("Executing fetchComputeInstances via CacheRegistry request")
+	s.logger.Debug("Executing fetchComputeInstances via CacheRegistry request")
 
 	instancesClient, err := compute.NewInstancesRESTClient(ctx, s.opt...)
 	if err != nil {
@@ -242,4 +244,46 @@ func (s *metadataCollector) fetchComputeInstances(ctx context.Context) (map[stri
 
 	s.logger.Debugf("Compute AggregatedList finished in %s. Fetched %d instances across %d pages.", time.Since(start), instanceCount, pageCount)
 	return fetchedInstances, nil
+}
+
+func (s *metadataCollector) fetchComputeInstancesNoCache(ctx context.Context) {
+	if len(s.computeInstances) > 0 {
+		return
+	}
+
+	s.logger.Debug("Compute API Instances.AggregatedList")
+
+	instancesClient, err := compute.NewInstancesRESTClient(ctx, s.opt...)
+	if err != nil {
+		s.logger.Errorf("error getting client from compute service: %v", err)
+		return
+	}
+
+	defer instancesClient.Close()
+
+	start := time.Now()
+	defer func() {
+		s.logger.Debugf("Total time taken for compute AggregatedList request: %s", time.Since(start))
+	}()
+
+	it := instancesClient.AggregatedList(ctx, &computepb.AggregatedListInstancesRequest{
+		Project: s.projectID,
+	})
+
+	for {
+		instancesScopedListPair, err := it.Next()
+		if errors.Is(err, iterator.Done) {
+			break
+		}
+
+		if err != nil {
+			s.logger.Errorf("error getting next instance from InstancesScopedListPairIterator: %v", err)
+			break
+		}
+
+		instances := instancesScopedListPair.Value.GetInstances()
+		for _, instance := range instances {
+			s.computeInstances[instance.GetId()] = instance
+		}
+	}
 }

@@ -31,6 +31,7 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 		region:           region,
 		regions:          regions,
 		opt:              opt,
+		instances:        make(map[string]*redispb.Instance),
 		cacheRegistry:    cacheRegistry,
 		logger:           logp.NewLogger("metrics-redis"),
 	}, nil
@@ -61,6 +62,7 @@ type metadataCollector struct {
 	opt              []option.ClientOption
 	// NOTE: instances holds data used for all metrics collected in a given period
 	// this avoids calling the remote endpoint for each metric, which would take a long time overall
+	instances     map[string]*redispb.Instance
 	cacheRegistry *gcp.CacheRegistry
 	logger        *logp.Logger
 }
@@ -136,16 +138,15 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 // instance returns data from an instance ID using the cache or making a request
 func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*redispb.Instance, error) {
 	if s.cacheRegistry == nil {
-		s.logger.Warn("Metadata cache disabled, fetching instance directly (no caching).")
-		instanceDataMap, err := s.fetchRedisInstances(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("direct fetch failed: %w", err)
+		s.logger.Debug("Metadata cache disabled, fetching instance directly (no caching).")
+		s.fetchRedisInstancesNoCache(ctx)
+
+		instance, ok := s.instances[instanceID]
+		if ok {
+			return instance, nil
 		}
-		instanceData, ok := instanceDataMap[instanceID]
-		if !ok {
-			return nil, nil
-		}
-		return instanceData, nil
+
+		return nil, nil
 	}
 
 	err := s.cacheRegistry.EnsureRedisCacheFresh(ctx, s.fetchRedisInstances)
@@ -212,4 +213,39 @@ func (s *metadataCollector) fetchRedisInstances(ctx context.Context) (map[string
 	}
 
 	return fetchedInstances, nil
+}
+
+func (s *metadataCollector) fetchRedisInstancesNoCache(ctx context.Context) {
+	if len(s.instances) > 0 {
+		return
+	}
+
+	s.logger.Debug("get redis instances with ListInstances API")
+
+	client, err := redis.NewCloudRedisClient(ctx, s.opt...)
+	if err != nil {
+		s.logger.Errorf("error getting client from redis service: %v", err)
+		return
+	}
+
+	defer client.Close()
+
+	// Use locations - (wildcard) to fetch all instances.
+	// https://pkg.go.dev/cloud.google.com/go/redis@v1.10.0/apiv1#CloudRedisClient.ListInstances
+	it := client.ListInstances(ctx, &redispb.ListInstancesRequest{
+		Parent: fmt.Sprintf("projects/%s/locations/-", s.projectID),
+	})
+	for {
+		instance, err := it.Next()
+		if errors.Is(err, iterator.Done) {
+			break
+		}
+
+		if err != nil {
+			s.logger.Errorf("redis ListInstances error: %v", err)
+			break
+		}
+
+		s.instances[instance.Name] = instance
+	}
 }
