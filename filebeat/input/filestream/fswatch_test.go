@@ -938,8 +938,8 @@ func BenchmarkGetFiles(b *testing.B) {
 			Enabled: false,
 		},
 	}
-	logger := logptest.NewTestingLogger(b, "log-selector")
-	s, err := newFileScanner(logger, paths, cfg)
+
+	s, err := newFileScanner(logp.L(), paths, cfg)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -967,8 +967,7 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 		},
 	}
 
-	logger := logptest.NewTestingLogger(b, "log-selector")
-	s, err := newFileScanner(logger, paths, cfg)
+	s, err := newFileScanner(logp.L(), paths, cfg)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -1059,8 +1058,7 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 		},
 	}
 
-	logger := logptest.NewTestingLogger(b, "log-selector")
-	s, err := newFileScanner(logger, paths, cfg)
+	s, err := newFileScanner(logp.L(), paths, cfg)
 	require.NoError(b, err)
 
 	it, err := s.getIngestTarget(filename)
