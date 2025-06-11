@@ -7,7 +7,7 @@ mapped_pages:
 # filestream input [filebeat-input-filestream]
 
 ::::{important}
-Filestream, with default settings will only start ingesting files **when
+By default, Filestream will only start ingesting files **when
 their size is >= 1024 bytes**. To change this behaviour you can
 configure a different length for the fingerprint by setting
 [`prospector.scanner.fingerprint.length`](#filebeat-input-filestream-scan-fingerprint).
@@ -15,7 +15,7 @@ configure a different length for the fingerprint by setting
 
 Use the `filestream` input to read lines from active log files. It is the new, improved alternative to the `log` input. It comes with various improvements to the existing input:
 
-1. The default behaviour is to identify files based on their contents using the [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint) [`file_identity`](#filebeat-input-filestream-file-identity) This solves data duplication caused by inode reuse.
+1. The default behaviour is to identify files based on their contents using [`fingerprint`](#filebeat-input-filestream-file-identity-fingerprint) [`file_identity`](#filebeat-input-filestream-file-identity). This solves data duplication caused by inode reuse.
 2. Checking of `close.on_state_change.*` options happens out of band. Thus, if an output is blocked, Filebeat can close the reader and avoid keeping too many files open.
 3. Detailed metrics are available for all files that match the `paths` configuration regardless of the `harvester_limit`. This way, you can keep track of all files, even ones that are not actively read.
 4. The order of `parsers` is configurable. So it is possible to parse JSON lines and then aggregate the contents into a multiline event.
