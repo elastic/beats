@@ -7,8 +7,8 @@ mapped_pages:
 # filestream input [filebeat-input-filestream]
 
 ::::{important}
-Filestream, with default settings will only start ingesting files when
-their size is >= 1024 bytes. To change this behaviour you can
+Filestream, with default settings will only start ingesting files **when
+their size is >= 1024 bytes**. To change this behaviour you can
 configure a different length for the fingerprint by setting
 [`prospector.scanner.fingerprint.length`](#filebeat-input-filestream-scan-fingerprint).
 ::::
