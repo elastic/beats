@@ -126,6 +126,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Handle special values of accountExpires in the Activedirectory Entity Analytics provider. {pull}43364[43364]
 - Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
 - If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
+- Fix timeout handling by Crowdstrike streaming input. {pull}44720[44720]
 
 *Heartbeat*
 
