@@ -42,7 +42,7 @@ func HostParser(mod mb.Module, rawURL string) (mb.HostData, error) {
 	}
 
 	if params.Password.Secret() == "" {
-		params.StandaloneConnection = sql.NullBool{Bool: true, Valid: true}
+		params.StandaloneConnection = true
 		params.Password = dsn.NewPassword(config.Password)
 	}
 

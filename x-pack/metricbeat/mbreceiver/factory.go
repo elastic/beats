@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/cmd"
 
 	// Import OSS modules.
-	_ "github.com/elastic/beats/v7/metricbeat/include"
+	"github.com/elastic/beats/v7/metricbeat/include"
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 
 	// Import X-Pack modules.
@@ -49,6 +49,7 @@ func createReceiver(_ context.Context, set receiver.Settings, baseCfg component.
 	}
 	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
+	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 
 	b, err := xpInstance.NewBeatForReceiver(settings, cfg.Beatconfig, true, consumer, set.Logger.Core())
 	if err != nil {

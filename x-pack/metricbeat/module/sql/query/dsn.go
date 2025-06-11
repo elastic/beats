@@ -7,7 +7,6 @@
 package query
 
 import (
-	"database/sql"
 	"fmt"
 	"net/url"
 
@@ -42,7 +41,7 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 			params.Username = config.Username
 		}
 		if params.Password.Secret() == "" {
-			params.StandaloneConnection = sql.NullBool{Bool: true, Valid: true}
+			params.StandaloneConnection = true
 			params.Password = dsn.NewPassword(config.Password)
 		}
 		return mb.HostData{
