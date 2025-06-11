@@ -316,6 +316,7 @@ func (c *client) serializeEvents(
 		if err != nil {
 			c.log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
 			c.log.Errorw(fmt.Sprintf("Failed event: %v", d.Content), logp.TypeKey, logp.EventType)
+			c.observer.PermanentError(d)
 			goto failLoop
 		}
 
