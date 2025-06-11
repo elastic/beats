@@ -413,8 +413,12 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 	}
 
 	if tooSmallFiles > 0 {
+		prefix := "%d files are "
+		if tooSmallFiles == 1 {
+			prefix = "%d file is "
+		}
 		s.log.Warnf(
-			"%d files are too small to be ingested, files need to be at "+
+			prefix+"too small to be ingested, files need to be at "+
 				"least %d in size for ingestion to start. To change this "+
 				"behaviour set 'prospector.scanner.fingerprint.length' and "+
 				"'prospector.scanner.fingerprint.offset'.",

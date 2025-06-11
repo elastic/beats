@@ -439,9 +439,13 @@ func TestFileScanner(t *testing.T) {
 	normalSymlinkBasename := "normal_symlink.log"
 	exclSymlinkBasename := "excl_symlink.log"
 	travelerSymlinkBasename := "portal.log"
+	undersizedGlob := "undersized-*.txt"
 
 	normalFilename := filepath.Join(dir, normalBasename)
 	undersizedFilename := filepath.Join(dir, undersizedBasename)
+	undersized1Filename := filepath.Join(dir, "undersized-1.txt")
+	undersized2Filename := filepath.Join(dir, "undersized-2.txt")
+	undersized3Filename := filepath.Join(dir, "undersized-3.txt")
 	excludedFilename := filepath.Join(dir, excludedBasename)
 	excludedIncludedFilename := filepath.Join(dir, excludedIncludedBasename)
 	travelerFilename := filepath.Join(dir2, travelerBasename)
@@ -452,6 +456,9 @@ func TestFileScanner(t *testing.T) {
 	files := map[string]string{
 		normalFilename:           strings.Repeat("a", 1024),
 		undersizedFilename:       strings.Repeat("a", 128),
+		undersized1Filename:      strings.Repeat("1", 42),
+		undersized2Filename:      strings.Repeat("2", 42),
+		undersized3Filename:      strings.Repeat("3", 42),
 		excludedFilename:         strings.Repeat("nothing to see here", 1024),
 		excludedIncludedFilename: strings.Repeat("perhaps something to see here", 1024),
 		travelerFilename:         strings.Repeat("folks, I think I got lost", 1024),
@@ -806,7 +813,7 @@ scanner:
 		})
 	}
 
-	t.Run("does not issue warnings when file is too small", func(t *testing.T) {
+	t.Run("issue a single warning with the number of files that are too small", func(t *testing.T) {
 		cfgStr := `
 scanner:
   fingerprint:
@@ -817,12 +824,14 @@ scanner:
 		logp.DevelopmentSetup(logp.ToObserverOutput())
 
 		// this file is 128 bytes long
-		paths := []string{filepath.Join(dir, undersizedBasename)}
+		paths := []string{filepath.Join(dir, undersizedGlob)}
 		s := createScannerWithConfig(t, paths, cfgStr)
 		files := s.GetFiles()
 		require.Empty(t, files)
 		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
-		require.Empty(t, logs, "there must be no warning logs for files too small")
+		require.Len(t, logs, 1, "there must be one log at level warning with the number of files that are too small")
+		require.Equal(t, "warn", logs[0].Level.String(), "the message should be at warning level")
+		require.Contains(t, logs[0].Message, "3 files are too small to be ingested")
 	})
 
 	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
