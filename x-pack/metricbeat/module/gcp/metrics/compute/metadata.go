@@ -159,8 +159,12 @@ func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*c
 		s.logger.Debug("Metadata cache disabled, fetching instance directly (no caching).")
 		s.fetchComputeInstancesNoCache(ctx)
 
-		instanceIdInt, _ := strconv.Atoi(instanceID)
-		computeInstance, ok := s.computeInstances[uint64(instanceIdInt)]
+		instanceIdUint, err := strconv.ParseUint(instanceID, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+
+		computeInstance, ok := s.computeInstances[instanceIdUint]
 		if ok {
 			return computeInstance, nil
 		}
