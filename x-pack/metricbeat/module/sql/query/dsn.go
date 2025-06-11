@@ -90,11 +90,15 @@ func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 
 	if config.TLS.IsEnabled() {
 		c.TLSConfig = TLSConfigKey
+
 		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 		if err != nil {
 			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
 		}
-		mysql.RegisterTLSConfig(TLSConfigKey, tlsConfig.ToConfig())
+
+		if err := mysql.RegisterTLSConfig(TLSConfigKey, tlsConfig.ToConfig()); err != nil {
+			return mb.HostData{}, fmt.Errorf("registering custom tls config failed: %w", err)
+		}
 	}
 
 	return mb.HostData{
