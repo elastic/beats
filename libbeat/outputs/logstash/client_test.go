@@ -15,21 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !integration
+// go : bui ld !integration
 
 package logstash
 
 import (
+	"context"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
+	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/beats/v7/libbeat/outputs/outputtest"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/transport"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
@@ -152,7 +161,7 @@ func testSimpleEventWithTTL(t *testing.T, factory clientFactory) {
 	assert.Equal(t, "me", msg["name"])
 	assert.Equal(t, 10.0, msg["line"])
 
-	//wait 10 seconds (ttl: 5 seconds) then send the event again
+	// wait 10 seconds (ttl: 5 seconds) then send the event again
 	time.Sleep(10 * time.Second)
 
 	event = beat.Event{
@@ -228,4 +237,95 @@ func eventGet(event interface{}, path string) interface{} {
 		doc = doc[elems[i]].(map[string]interface{})
 	}
 	return doc[elems[len(elems)-1]]
+}
+
+func TestClientOutputListener(t *testing.T) {
+	tests := []struct {
+		name        string
+		newClient   func(beat.Info, *transport.Client, outputs.Observer, *Config) (outputs.NetworkClient, error)
+		expectedErr bool
+	}{
+		{
+			name: "syncClient",
+			newClient: func(bi beat.Info, tc *transport.Client, obs outputs.Observer, cfg *Config) (outputs.NetworkClient, error) {
+				return newSyncClient(bi, tc, obs, cfg)
+			},
+			expectedErr: true,
+		},
+		{
+			name: "asyncClient",
+			newClient: func(bi beat.Info, tc *transport.Client, obs outputs.Observer, cfg *Config) (outputs.NetworkClient, error) {
+				return newAsyncClient(bi, tc, obs, cfg)
+			},
+			expectedErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mock := transptest.NewMockServerTCP(t, 0, "", nil)
+			lumberSrv, err := v2.NewWithListener(mock.Listener)
+			defer mock.Close()
+
+			require.NoError(t, err, "failed to create lumberjack server")
+			transp, err := mock.Connect()
+			require.NoError(t, err, "failed to connect to mock server")
+
+			go func() {
+				// receive and ack 1st batch
+				for {
+					srvBatch := lumberSrv.Receive()
+					if srvBatch == nil {
+						continue
+					}
+					srvBatch.ACK()
+					break
+				}
+				// receive but don't ack 2nd batch
+				_ = lumberSrv.Receive()
+				return
+			}()
+
+			reg := monitoring.NewRegistry()
+			observer := outputs.NewStats(reg)
+			beatInfo := beat.Info{
+				Beat: "TestClientOutputListener_" + tt.name,
+				Logger: logptest.NewTestingLogger(t, "",
+					// only print stacktrace for errors above ErrorLevel.
+					zap.AddStacktrace(zapcore.ErrorLevel+1))}
+
+			cfg := defaultConfig()
+			cfg.Timeout = 100 * time.Millisecond
+
+			c, err := tt.newClient(beatInfo, transp, observer, &cfg)
+			require.NoError(t, err, "failed to create client")
+			defer c.Close() // Ensure client is closed eventually, e.g. on panic
+
+			counter := &beat.CountOutputListener{}
+			listener := publisher.OutputListener{Listener: counter}
+
+			batch := outest.NewBatchWithObserver(listener,
+				beat.Event{Fields: mapstr.M{"message": "event 1", "outcome": "success"}})
+
+			require.NoError(t, c.Connect(context.Background()), "client connect failed")
+			require.NoError(t, c.Publish(context.Background(), batch), "first publish (batch1) failed")
+
+			err = c.Publish(context.Background(), batch)
+			if tt.expectedErr {
+				assert.Error(t, err, "second publish should have failed")
+			} else {
+				assert.NoError(t, err, "second publish should have succeeded")
+			}
+
+			c.Close()
+			outputtest.AssertOutputMetrics(t,
+				outputtest.Metrics{
+					Total:     2,
+					Acked:     1,
+					Retryable: 1,
+					Batches:   2,
+				},
+				counter, reg)
+		})
+	}
 }
