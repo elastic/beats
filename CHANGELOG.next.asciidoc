@@ -450,6 +450,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
 - Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
 - Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
+- Filestream now logs at level warn the number of files that are too small to be ingested {pull}44751[44751]
 
 *Auditbeat*
 
