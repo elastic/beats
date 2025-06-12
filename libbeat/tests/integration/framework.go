@@ -936,7 +936,6 @@ func FormatRefreshURL(t *testing.T, srcURL url.URL) url.URL {
 
 func FormatDataStreamSearchURL(t *testing.T, srcURL url.URL, dataStream string) (url.URL, error) {
 	t.Helper()
-	t.Helper()
 	path, err := url.JoinPath("/", dataStream, "_search")
 	if err != nil {
 		return url.URL{}, fmt.Errorf("error joining ilm policy path: %w", err)
