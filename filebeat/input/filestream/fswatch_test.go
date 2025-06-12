@@ -55,7 +55,8 @@ scanner:
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	fw := createWatcherWithConfig(t, logp.L(), paths, cfgStr)
+	logger := logp.NewNopLogger()
+	fw := createWatcherWithConfig(t, logger, paths, cfgStr)
 
 	go fw.Run(ctx)
 
@@ -198,7 +199,9 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, logp.L(), paths, cfgStr)
+		logger := logp.NewNopLogger()
+		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -231,7 +234,9 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, logp.L(), paths, cfgStr)
+		logger := logp.NewNopLogger()
+		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -325,7 +330,9 @@ scanner:
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 		defer cancel()
 
-		fw := createWatcherWithConfig(t, logp.L(), paths, cfgStr)
+		logger := logp.NewNopLogger()
+		fw := createWatcherWithConfig(t, logger, paths, cfgStr)
+
 		go fw.Run(ctx)
 
 		basename := "created.log"
@@ -810,7 +817,8 @@ scanner:
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			s := createScannerWithConfig(t, logp.L(), paths, tc.cfgStr)
+			logger := logp.NewNopLogger()
+			s := createScannerWithConfig(t, logger, paths, tc.cfgStr)
 			requireEqualFiles(t, tc.expDesc, s.GetFiles())
 		})
 	}
@@ -939,7 +947,8 @@ func BenchmarkGetFiles(b *testing.B) {
 		},
 	}
 
-	s, err := newFileScanner(logp.L(), paths, cfg)
+	logger := logp.NewNopLogger()
+	s, err := newFileScanner(logger, paths, cfg)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -967,7 +976,8 @@ func BenchmarkGetFilesWithFingerprint(b *testing.B) {
 		},
 	}
 
-	s, err := newFileScanner(logp.L(), paths, cfg)
+	logger := logp.NewNopLogger()
+	s, err := newFileScanner(logger, paths, cfg)
 	require.NoError(b, err)
 
 	for i := 0; i < b.N; i++ {
@@ -1058,7 +1068,8 @@ func BenchmarkToFileDescriptor(b *testing.B) {
 		},
 	}
 
-	s, err := newFileScanner(logp.L(), paths, cfg)
+	logger := logp.NewNopLogger()
+	s, err := newFileScanner(logger, paths, cfg)
 	require.NoError(b, err)
 
 	it, err := s.getIngestTarget(filename)
