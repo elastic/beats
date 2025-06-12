@@ -24,7 +24,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 
@@ -32,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // Input interface for cursor based inputs. This interface must be implemented
@@ -110,17 +110,14 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
-	// The metrics from the parent v2.Context needs to be canceled otherwise
-	// there will be a set of metrics being published for this context by the
-	// HTTP monitoring endpoint. There would be an "empty registry", only with
-	// 'id' and 'input' and also the registries for the 'child' contexts being
-	// published. E.g.:
-	//  - registry from parent context:
-	//    - {"id": "my-cel-id", "input": "cel"}
-	//  - registry from child context:
-	//    - {"id": "my-cel-id::source-name", "input": "cel", [ ... ] }
-	inputmon.CancelMetricsRegistry(
-		ctx.ID, ctx.Name, ctx.Agent.Monitoring.NamespaceRegistry(), ctx.Logger)
+	// Override the reported type in the registry to a sentinel value so that
+	// metrics reporters that aggregate over inputs know to skip this registry
+	// and report its nested sources (instantiated below) as top-level inputs.
+	// (We need child inputs to be reported at the top level for backwards
+	// compatibility, but we want an input's metrics to be contained in its own
+	// registry passed in the context, so we don't have to expose the top-level
+	// inputs registry to every individual input.)
+	monitoring.NewString(ctx.MetricsRegistry, "input").Set("__NESTED__")
 
 	var grp unison.MultiErrGroup
 	for _, source := range inp.sources {
@@ -133,7 +130,7 @@ func (inp *managedInput) Run(
 			reg, pc, cancelMetrics := input.PrepareInputMetrics(
 				inpCtxID,
 				ctx.Name,
-				ctx.Agent.Monitoring.NamespaceRegistry(),
+				ctx.MetricsRegistry,
 				pipeline,
 				log)
 			defer cancelMetrics()

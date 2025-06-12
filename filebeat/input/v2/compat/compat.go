@@ -35,6 +35,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -44,6 +45,8 @@ type factory struct {
 	log    *logp.Logger
 	info   beat.Info
 	loader *v2.Loader
+
+	rootInputsRegistry *monitoring.Registry
 }
 
 // runner wraps a v2.Input, starting a go-routine
@@ -52,14 +55,15 @@ type factory struct {
 // On stop the runner triggers the shutdown signal and waits until the input
 // has returned.
 type runner struct {
-	id             string
-	log            *logp.Logger
-	agent          *beat.Info
-	wg             sync.WaitGroup
-	sig            ctxtool.CancelContext
-	input          v2.Input
-	connector      beat.PipelineConnector
-	statusReporter status.StatusReporter
+	id                 string
+	log                *logp.Logger
+	agent              *beat.Info
+	wg                 sync.WaitGroup
+	sig                ctxtool.CancelContext
+	input              v2.Input
+	connector          beat.PipelineConnector
+	statusReporter     status.StatusReporter
+	rootInputsRegistry *monitoring.Registry
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
@@ -68,9 +72,10 @@ type runner struct {
 func RunnerFactory(
 	log *logp.Logger,
 	info beat.Info,
+	rootInputsRegistry *monitoring.Registry,
 	loader *v2.Loader,
 ) cfgfile.RunnerFactory {
-	return &factory{log: log, info: info, loader: loader}
+	return &factory{log: log, info: info, rootInputsRegistry: rootInputsRegistry, loader: loader}
 }
 
 func (f *factory) CheckConfig(cfg *conf.C) error {
@@ -110,12 +115,13 @@ func (f *factory) Create(
 	}
 
 	return &runner{
-		id:        id,
-		log:       f.log.Named(input.Name()).With("id", id),
-		agent:     &f.info,
-		sig:       ctxtool.WithCancelContext(context.Background()),
-		input:     input,
-		connector: p,
+		id:                 id,
+		log:                f.log.Named(input.Name()).With("id", id),
+		agent:              &f.info,
+		sig:                ctxtool.WithCancelContext(context.Background()),
+		input:              input,
+		connector:          p,
+		rootInputsRegistry: f.rootInputsRegistry,
 	}, nil
 }
 
@@ -137,7 +143,7 @@ func (r *runner) Start() {
 		reg, pc, cancelMetrics := v2.PrepareInputMetrics(
 			r.id,
 			r.input.Name(),
-			r.agent.Monitoring.NamespaceRegistry(),
+			r.rootInputsRegistry,
 			r.connector,
 			r.log)
 		defer cancelMetrics()
