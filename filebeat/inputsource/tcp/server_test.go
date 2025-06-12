@@ -33,11 +33,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	conf "github.com/elastic/elastic-agent-libs/config"
-<<<<<<< HEAD
 	"github.com/elastic/elastic-agent-libs/logp"
-=======
+
 	"github.com/elastic/elastic-agent-libs/logp/logptest"
->>>>>>> 404bf2177 ([Chore] Replace global logger with local logger #7 (#44607))
 )
 
 var defaultConfig = Config{
@@ -238,13 +236,9 @@ func testReceiveEventsAndMetadata(t *testing.T, network string) {
 				return
 			}
 
-<<<<<<< HEAD
-			factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logp.NewLogger("test"), MetadataCallback, to, splitFunc)
+			logger := logptest.NewTestingLogger(t, "test")
+			factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logger, MetadataCallback, to, splitFunc)
 			server, err := New(&config, factory)
-=======
-			factory := streaming.SplitHandlerFactory(inputsource.FamilyTCP, logptest.NewTestingLogger(t, ""), MetadataCallback, to, splitFunc)
-			server, err := New(&config, factory, logptest.NewTestingLogger(t, ""))
->>>>>>> 404bf2177 ([Chore] Replace global logger with local logger #7 (#44607))
 			if !assert.NoError(t, err) {
 				return
 			}
