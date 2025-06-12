@@ -465,7 +465,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Do not load seccomp for osquerybeat, it was disabled before V2 in the configuration file
 	// https://github.com/elastic/beats/blob/7cf873fd340172c33f294500ccfec948afd7a47c/x-pack/osquerybeat/osquerybeat.yml#L16
 	if b.Info.Beat != "osquerybeat" {
-		if err := seccomp.LoadFilter(b.Config.Seccomp); err != nil {
+		if err := seccomp.LoadFilter(b.Config.Seccomp, logger); err != nil {
 			return err
 		}
 	}
@@ -657,7 +657,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			}
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
-			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat)
+			esClient, err := eslegclient.NewConnectedClient(ctx, outCfg.Config(), b.Info.Beat, b.Info.Logger)
 			if err != nil {
 				return err
 			}
