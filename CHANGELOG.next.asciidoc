@@ -94,7 +94,6 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
 - Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
-- Fixed histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
 
 *Osquerybeat*
 
@@ -278,6 +277,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
 - Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
+- Fixed histogram values of zero are filtered out on non-amd64 platforms for openmetrics and prometheus {pull}44750[44750]
 
 *Osquerybeat*
 
