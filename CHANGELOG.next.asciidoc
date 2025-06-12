@@ -151,9 +151,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor metric timespan to restore Storage Account PT1H metrics {issue}40376[40376] {pull}40367[40367]
 - Remove excessive info-level logs in cgroups setup {pull}40491[40491]
 - Add missing ECS Cloud fields in GCP `metrics` metricset when using `exclude_labels: true` {issue}40437[40437] {pull}40467[40467]
-- Add AWS OwningAccount support for cross account monitoring {issue}40570[40570] {pull}40691[40691]
-- Use namespace for GetListMetrics when exists in AWS {pull}41022[41022]
-- Only fetch cluster-level index stats summary {issue}36019[36019] {pull}42901[42901]
 - Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` to `v1.17.4` to fix connection leaks in MongoDB module {pull}44769[44769]
 
 *Osquerybeat*
