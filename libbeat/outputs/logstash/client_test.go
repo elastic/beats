@@ -318,6 +318,16 @@ func TestClientOutputListener(t *testing.T) {
 			}
 
 			c.Close()
+
+			// Wait for metrics to be updated asynchronously. The async client
+			// reports ACKs from a different goroutine, so depending on CPU
+			// scheduling the callback may not have completed by the time we
+			// reach this point. Give it a little time to avoid flakes in CI.
+			require.Eventually(t, func() bool {
+				return counter.AckedLoad() == 1
+			}, 2*time.Second, 10*time.Millisecond,
+				"timed out waiting for ACK to be processed")
+
 			outputtest.AssertOutputMetrics(t,
 				outputtest.Metrics{
 					Total:     2,
