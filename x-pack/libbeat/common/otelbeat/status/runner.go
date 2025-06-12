@@ -8,7 +8,9 @@ import (
 )
 
 type statusFactory struct {
-	f              cfgfile.RunnerFactory
+	f cfgfile.RunnerFactory
+
+	// TODO: implement the status reporter
 	statusReporter status.StatusReporter
 }
 
