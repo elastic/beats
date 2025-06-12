@@ -269,6 +269,15 @@ func runCmd(
 		if err != nil {
 			logp.L().Warn("could not kill synthetics process: %s", err)
 		}
+
+		// TODO: Maybe here is the best spot?
+		cmdError := ECSErrToSynthError(ecserr.NewCmdSkippedStatusErr(ctx.Err().Error()))
+		mpx.writeSynthEvent(&SynthEvent{
+			Type:                 CmdStatus,
+			Error:                cmdError,
+			TimestampEpochMicros: float64(time.Now().UnixMicro()),
+		})
+		logp.L().Info("skipped event emitted")
 	}()
 
 	// Close mpx after the process is done and all events have been sent / consumed
