@@ -13,6 +13,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/godror/godror"
 	"github.com/godror/godror/dsn"
+	"github.com/lib/pq"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
@@ -43,6 +44,14 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 
 	if config.Driver == "mysql" {
 		return mysqlParseDSN(config, host)
+	}
+
+	if config.Driver == "postgres" {
+		return postgresParseDSN(config, host)
+	}
+
+	if config.Driver == "mssql" {
+		return mssqlParseDSN(config, host)
 	}
 
 	sanitized := sanitize(host)
@@ -109,5 +118,104 @@ func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 		URI:          c.FormatDSN(),
 		SanitizedURI: sanitized,
 		Host:         sanitized,
+	}, nil
+}
+
+func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
+	u, err := url.Parse(host)
+	if err != nil {
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
+	}
+
+	if config.TLS.IsEnabled() {
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
+		}
+
+		q := u.Query()
+
+		if sslmode := postgresTranslateVerificationMode(tlsConfig.Verification); sslmode != "" {
+			q.Set("sslmode", sslmode)
+		}
+
+		if len(config.TLS.CAs) > 1 {
+			return mb.HostData{}, fmt.Errorf("postgres driver supports only one CA certificate, got %d CAs", len(config.TLS.CAs))
+		} else if len(config.TLS.CAs) == 1 {
+			q.Set("sslrootcert", config.TLS.CAs[0])
+		}
+
+		if config.TLS.Certificate.Key != "" {
+			q.Set("sslkey", config.TLS.Certificate.Key)
+		}
+
+		if config.TLS.Certificate.Certificate != "" {
+			q.Set("sslcert", config.TLS.Certificate.Certificate)
+		}
+
+		u.RawQuery = q.Encode()
+	}
+
+	connString, err := pq.ParseURL(u.String())
+	if err != nil {
+		return mb.HostData{}, fmt.Errorf("error parsing URL with pq: %v", err)
+	}
+
+	return mb.HostData{
+		URI:          connString,
+		SanitizedURI: u.Host,
+		Host:         u.Host,
+	}, nil
+}
+
+// rough translation of SSL modes
+func postgresTranslateVerificationMode(mode tlscommon.TLSVerificationMode) (sslmode string) {
+	switch mode {
+	case tlscommon.VerifyFull:
+		return "verify-full"
+	case tlscommon.VerifyStrict:
+		return "verify-full"
+	case tlscommon.VerifyCertificate:
+		return "verify-ca"
+	default:
+		return ""
+	}
+}
+
+func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
+	u, err := url.Parse(host)
+	if err != nil {
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
+	}
+
+	if config.TLS.IsEnabled() {
+		tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return mb.HostData{}, fmt.Errorf("could not load provided TLS configuration: %w", err)
+		}
+
+		q := u.Query()
+
+		q.Set("encrypt", "true")
+
+		if tlsConfig.Verification == tlscommon.VerifyNone {
+			q.Set("TrustServerCertificate", "true")
+		} else {
+			q.Set("TrustServerCertificate", "false")
+		}
+
+		if len(config.TLS.CAs) > 1 {
+			return mb.HostData{}, fmt.Errorf("mssql driver supports only one CA certificate, got %d CAs", len(config.TLS.CAs))
+		} else if len(config.TLS.CAs) == 1 {
+			q.Set("certificate", config.TLS.CAs[0])
+		}
+
+		u.RawQuery = q.Encode()
+	}
+
+	return mb.HostData{
+		URI:          u.String(),
+		SanitizedURI: u.Host,
+		Host:         u.Host,
 	}, nil
 }
