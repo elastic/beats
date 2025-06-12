@@ -124,7 +124,7 @@ func mysqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 	u, err := url.Parse(host)
 	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 	}
 
 	if config.TLS.IsEnabled() {
@@ -158,7 +158,7 @@ func postgresParseDSN(config ConnectionDetails, host string) (mb.HostData, error
 
 	connString, err := pq.ParseURL(u.String())
 	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL with pq: %v", err)
+		return mb.HostData{}, fmt.Errorf("error parsing URL with pq: %w", err)
 	}
 
 	return mb.HostData{
@@ -185,7 +185,7 @@ func postgresTranslateVerificationMode(mode tlscommon.TLSVerificationMode) (sslm
 func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 	u, err := url.Parse(host)
 	if err != nil {
-		return mb.HostData{}, fmt.Errorf("error parsing URL: %v", err)
+		return mb.HostData{}, fmt.Errorf("error parsing URL: %w", err)
 	}
 
 	if config.TLS.IsEnabled() {
