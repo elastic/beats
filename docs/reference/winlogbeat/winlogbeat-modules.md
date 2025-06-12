@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/winlogbeat/current/winlogbeat-modules.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Modules [winlogbeat-modules]
 
 ::::{note}
@@ -58,4 +60,3 @@ output.elasticsearch.pipeline: winlogbeat-%{[agent.version]}-routing
 * [Powershell](/reference/winlogbeat/winlogbeat-module-powershell.md)
 * [Security](/reference/winlogbeat/winlogbeat-module-security.md)
 * [Sysmon](/reference/winlogbeat/winlogbeat-module-sysmon.md)
-

@@ -1,5 +1,6 @@
 - key: meraki
   title: Cisco Meraki
+  description: Cisco Meraki Module
   release: beta
   fields:
    - name: meraki

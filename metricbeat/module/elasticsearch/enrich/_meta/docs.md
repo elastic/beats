@@ -1,0 +1,1 @@
+This is the `enrich` metricset of the Elasticsearch module. It interrogates the Enrich Stats API endpoint to fetch information about Enrich coordinator nodes in the Elasticsearch cluster that are participating in ingest-time enrichment.

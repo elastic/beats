@@ -1,2 +1,0 @@
-The container metricset of Cloud Foundry module allows you to collect container metrics that the
-loggregator sends to metricbeat.

@@ -66,7 +66,7 @@ func DocsIndexFile(file string) DocsOption {
 // Docs holds the utilities for building documentation.
 var Docs = docsBuilder{}
 
-// FieldDocs generates docs/fields.asciidoc from the specified fields.yml file.
+// FieldDocs generates exported-fields.md from the specified fields.yml file.
 func (docsBuilder) FieldDocs(fieldsYML string) error {
 	// Run the docs_collector.py script.
 	ve, err := PythonVirtualenv(false)
@@ -84,13 +84,15 @@ func (docsBuilder) FieldDocs(fieldsYML string) error {
 		return err
 	}
 
+	outputPath := filepath.Join(DocsDir(), "reference", BeatName)
+
 	// TODO: Port this script to Go.
-	log.Println(">> Generating docs/fields.asciidoc for", BeatName)
+	log.Println(">> Generating exported-fields.md for", BeatName)
 	return sh.Run(python, LibbeatDir("scripts/generate_fields_docs.py"),
-		fieldsYML,                     // Path to fields.yml.
-		BeatName,                      // Beat title.
-		esBeats,                       // Path to general beats folder.
-		"--output_path", OSSBeatDir()) // It writes to {output_path}/docs/fields.asciidoc.
+		fieldsYML,                   // Path to fields.yml.
+		BeatName,                    // Beat title.
+		esBeats,                     // Path to general beats folder.
+		"--output_path", outputPath) // It writes to {output_path}/exported-fields.md.
 }
 
 func (b docsBuilder) AsciidocBook(opts ...DocsOption) error {

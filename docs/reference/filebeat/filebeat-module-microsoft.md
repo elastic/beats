@@ -3,6 +3,8 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-module-microsoft.html
 ---
 
+<!-- This file is generated! See scripts/docs_collector.py -->
+
 # Microsoft module [filebeat-module-microsoft]
 
 :::::{admonition} Prefer to use {{agent}} for this use case?
@@ -219,7 +221,6 @@ For alerts, go to Detections → External alerts.
 
 And for all other Defender ATP event types, go to Host → Events.
 
-
-## Fields [_fields_29]
+## Fields [_fields]
 
 For a description of each field in the module, see the [exported fields](/reference/filebeat/exported-fields-microsoft.md) section.

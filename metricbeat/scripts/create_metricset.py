@@ -28,8 +28,8 @@ def generate_metricset(base_path, metricbeat_path, module, metricset):
     with open(meta_path + "/fields.yml", "w") as f:
         f.write(content)
 
-    content = load_file(templates + "docs.asciidoc", module, metricset)
-    with open(meta_path + "/docs.asciidoc", "w") as f:
+    content = load_file(templates + "docs.md", module, metricset)
+    with open(meta_path + "/docs.md", "w") as f:
         f.write(content)
 
     content = load_file(templates + "data.json", module, metricset)
@@ -57,8 +57,8 @@ def generate_module(base_path, metricbeat_path, module, metricset):
     with open(meta_path + "/fields.yml", "w") as f:
         f.write(content)
 
-    content = load_file(templates + "docs.asciidoc", module, "")
-    with open(meta_path + "/docs.asciidoc", "w") as f:
+    content = load_file(templates + "docs.md", module, "")
+    with open(meta_path + "/docs.md", "w") as f:
         f.write(content)
 
     content = load_file(templates + "config.yml", module, metricset)

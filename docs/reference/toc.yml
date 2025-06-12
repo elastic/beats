@@ -1006,6 +1006,7 @@ toc:
               - file: metricbeat/metricbeat-metricset-kubernetes-state_cronjob.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_daemonset.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_deployment.md
+              - file: metricbeat/metricbeat-metricset-kubernetes-state_horizontalpodautoscaler.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_job.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_node.md
               - file: metricbeat/metricbeat-metricset-kubernetes-state_persistentvolumeclaim.md
@@ -1197,6 +1198,7 @@ toc:
           - file: metricbeat/exported-fields-aerospike.md
           - file: metricbeat/exported-fields-airflow.md
           - file: metricbeat/exported-fields-apache.md
+          - file: metricbeat/exported-fields-autoops_es.md
           - file: metricbeat/exported-fields-aws.md
           - file: metricbeat/exported-fields-awsfargate.md
           - file: metricbeat/exported-fields-azure.md
@@ -1239,6 +1241,7 @@ toc:
           - file: metricbeat/exported-fields-linux.md
           - file: metricbeat/exported-fields-logstash.md
           - file: metricbeat/exported-fields-memcached.md
+          - file: metricbeat/exported-fields-meraki.md
           - file: metricbeat/exported-fields-mongodb.md
           - file: metricbeat/exported-fields-mssql.md
           - file: metricbeat/exported-fields-munin.md
