@@ -170,7 +170,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/apigatewayv2 v1.24.8
 	github.com/aws/aws-sdk-go-v2/service/health v1.29.2
 	github.com/aws/smithy-go v1.22.1
-	github.com/cenkalti/backoff/v4 v4.3.0
 	github.com/dgraph-io/badger/v4 v4.6.0
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.7.0
@@ -278,6 +277,7 @@ require (
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bluekeyes/go-gitdiff v0.7.1 // indirect
+	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cilium/ebpf v0.16.0 // indirect
