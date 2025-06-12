@@ -53,6 +53,12 @@ func NewLogger(selector string, options ...LogOption) *Logger {
 	return newLogger(loadLogger().rootLogger, selector, options...)
 }
 
+// NewNopLogger returns a no-op logger
+func NewNopLogger() *Logger {
+	logger := zap.NewNop()
+	return &Logger{logger, logger.Sugar()}
+}
+
 // NewProductionLogger returns a production suitable logp.Logger
 func NewProductionLogger(selector string, options ...LogOption) (*Logger, error) {
 	log, err := zap.NewProduction(options...)
