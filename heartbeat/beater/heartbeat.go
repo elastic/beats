@@ -324,6 +324,9 @@ func (bt *Heartbeat) makeAutodiscover(b *beat.Beat) (*autodiscover.Autodiscover,
 func (bt *Heartbeat) Stop() {
 	// TODO: propagate stop signal
 	bt.stopOnce.Do(func() { close(bt.done) })
+
+	// TODO: remove this atrocity
+	time.Sleep(5 * time.Second)
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
