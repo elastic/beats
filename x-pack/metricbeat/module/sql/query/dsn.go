@@ -204,8 +204,12 @@ func mssqlParseDSN(config ConnectionDetails, host string) (mb.HostData, error) {
 			q.Set("TrustServerCertificate", "false")
 		}
 
+		if config.TLS.Certificate.Certificate != "" || config.TLS.Certificate.Key != "" {
+			return mb.HostData{}, fmt.Errorf("mssql driver supports only CA certificate, but got client key and/or certificate")
+		}
+
 		if len(config.TLS.CAs) > 1 {
-			return mb.HostData{}, fmt.Errorf("mssql driver supports only one CA certificate, got %d CAs", len(config.TLS.CAs))
+			return mb.HostData{}, fmt.Errorf("mssql driver supports only one CA certificate, but got %d CAs", len(config.TLS.CAs))
 		} else if len(config.TLS.CAs) == 1 {
 			q.Set("certificate", config.TLS.CAs[0])
 		}
