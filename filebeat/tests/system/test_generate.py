@@ -33,7 +33,7 @@ class Test(filebeat.BaseTest):
         expected_created_template_files = [
             os.path.join(module_root, "module.yml"),
             os.path.join(module_meta_root, "config.yml"),
-            os.path.join(module_meta_root, "docs.asciidoc"),
+            os.path.join(module_meta_root, "docs.md"),
             os.path.join(module_meta_root, "fields.yml"),
         ]
         for template_file in expected_created_template_files:
