@@ -1,21 +1,21 @@
 <#
 .SYNOPSIS
-    Installs {{.BeatName}} Windows service.
+    Installs {{.BeatName | title}} Windows service.
 .DESCRIPTION
-    Installs {{.BeatName}} Windows service, the data and logs path are
+    Installs {{.BeatName | title}} Windows service, the data and logs path are
     set as part of the command for the service.
 
-    For {{.BeatName}} < 9.1.0 the data path used to be
-    'C:\ProgramData\{{.BeatName}}' (set from '$env:ProgramData) for >= 9.1.0
-    the new default is 'C:\Program Files\{{.BeatName}}-Data'
+    For {{.BeatName | title}} < 9.1.0 the data path used to be
+    'C:\ProgramData\{{.BeatName | title}}' (set from '$env:ProgramData) for >= 9.1.0
+    the new default is 'C:\Program Files\{{.BeatName | title}}-Data'
     (set from '$env:ProgramFiles').
 
     If the legacy data path exists, then the script will move it to the new place,
-    regardless of {{.BeatName}} version.
+    regardless of {{.BeatName | title}} version.
 
     You can pass ForceLegacyPath to use the legacy data path.
 
-    If the Windows service already exits, it will be stopped and deleted, then
+    If the Windows service already exists, it will be stopped and deleted, then
     the new one will be installed.
 #>
 
@@ -26,19 +26,19 @@ Param (
 )
 
 # Delete and stop the service if it already exists.
-if (Get-Service {{.BeatName}} -ErrorAction SilentlyContinue) {
-  Stop-Service {{.BeatName}}
-  (Get-Service {{.BeatName}}).WaitForStatus('Stopped')
+if (Get-Service {{.BeatName | title}} -ErrorAction SilentlyContinue) {
+  Stop-Service {{.BeatName | title}}
+  (Get-Service {{.BeatName | title}}).WaitForStatus('Stopped')
   Start-Sleep -s 1
-  sc.exe delete {{.BeatName}}
+  sc.exe delete {{.BeatName | title}}
 }
 
 # We need to support a new default path for the data folder, ideally
 # automatically detecting if the old one is used and keeping it
 
 $WorkDir = Split-Path $MyInvocation.MyCommand.Path
-$BasePath = "$env:ProgramFiles\{{.BeatName}}-Data"
-$LegacyDataPath = "$env:PROGRAMDATA\{{.BeatName}}"
+$BasePath = "$env:ProgramFiles\{{.BeatName | title}}-Data"
+$LegacyDataPath = "$env:PROGRAMDATA\{{.BeatName | title}}"
 
 # Move the data path from ProgramData to Program Files
 If ($ForceLegacyPath -eq $True) {
@@ -55,13 +55,13 @@ If ($ForceLegacyPath -eq $True) {
   }
 }
 
-$HomePath = "$BasePath\{{.BeatName}}"
+$HomePath = "$BasePath\{{.BeatName | title}}"
 $LogsPath = "$HomePath\logs"
-$KeystorePath = "$WorkDir\data\{{.BeatName}}.keystore"
+$KeystorePath = "$WorkDir\data\{{.BeatName | title}}.keystore"
 
-$FullCmd = "`"$WorkDir\{{.BeatName}}.exe`" " +
+$FullCmd = "`"$WorkDir\{{.BeatName | title}}.exe`" " +
            "--environment=windows_service " +
-           "-c `"$WorkDir\{{.BeatName}}.yml`" " +
+           "-c `"$WorkDir\{{.BeatName | title}}.yml`" " +
            "--path.home `"$WorkDir`" " +
            "--path.data `"$HomePath`" " +
            "--path.logs `"$LogsPath`" " +
@@ -75,6 +75,6 @@ New-Service -name {{.BeatName}} `
 
 # Attempt to set the service to delayed start using sc config.
 Try {
-  Start-Process -FilePath sc.exe -ArgumentList 'config {{.BeatName}} start= delayed-auto'
+  Start-Process -FilePath sc.exe -ArgumentList 'config {{.BeatName | title}} start= delayed-auto'
 }
 Catch { Write-Host -f red "An error occurred setting the service to delayed start." }
