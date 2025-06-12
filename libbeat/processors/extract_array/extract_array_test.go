@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -35,7 +36,7 @@ func TestExtractArrayProcessor_String(t *testing.T) {
 			"network.transport": 2,
 			"destination.ip":    99,
 		},
-	}))
+	}), logptest.NewTestingLogger(t, ""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -249,7 +250,7 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(tt.config)
-			processor, err := New(cfg)
+			processor, err := New(cfg, logptest.NewTestingLogger(t, ""))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -292,7 +293,7 @@ func TestExtractArrayProcessor_Run(t *testing.T) {
 		}
 
 		cfg := conf.MustNewConfigFrom(config)
-		processor, err := New(cfg)
+		processor, err := New(cfg, logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Fatal(err)
 		}

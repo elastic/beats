@@ -105,13 +105,13 @@ func kubernetesMetadataExist(event *beat.Event) bool {
 }
 
 // New constructs a new add_kubernetes_metadata processor.
-func New(cfg *config.C) (beat.Processor, error) {
+func New(cfg *config.C, log *logp.Logger) (beat.Processor, error) {
 	config, err := newProcessorConfig(cfg, Indexing)
 	if err != nil {
 		return nil, err
 	}
 
-	log := logp.NewLogger(selector).With("libbeat.processor", "add_kubernetes_metadata")
+	log = log.Named(selector).With("libbeat.processor", "add_kubernetes_metadata")
 	processor := &kubernetesAnnotator{
 		log:                 log,
 		cache:               newCache(config.CleanupTimeout),

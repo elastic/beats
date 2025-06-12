@@ -24,13 +24,11 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
 	// register kubernetes runner
@@ -226,6 +224,24 @@ func GoIntegTest(ctx context.Context) error {
 	return devtools.GoTestIntegrationForModule(ctx)
 }
 
+// GoFIPSOnlyIntegTest executes the Go integration tests.
+// Sets GODEBUG=fips140=only.
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+// Use TEST_TAGS=tag1,tag2 to add additional build tags.
+// Use MODULE=module to run only tests for `module`.
+func GoFIPSOnlyIntegTest(ctx context.Context) error {
+	if os.Getenv("CI") == "true" {
+		mg.Deps(devtools.DefineModules)
+	}
+
+	if !devtools.IsInIntegTestEnv() {
+		mg.SerialDeps(Fields, Dashboards)
+	}
+	os.Setenv("GODEBUG", "fips140=only")
+	return devtools.GoTestIntegrationForModule(ctx)
+}
+
 // PythonIntegTest executes the python system tests in the integration
 // environment (Docker).
 // Use MODULE=module to run only tests for `module`.
@@ -256,27 +272,4 @@ func PythonIntegTest(ctx context.Context) error {
 		args.ForceCreateVenv = true
 		return devtools.PythonTestForModule(args)
 	})
-}
-
-// FIPSOnlyUnitTest sets GODEBUG=fips140=only when running unit tests
-// Will also filter out packages that fail to run with the GODEBUG=fips140=only var set
-func FIPSOnlyUnitTest() error {
-	ctx := context.Background()
-
-	fipsArgs := devtools.DefaultGoFIPSOnlyTestArgs()
-	packages, err := gotool.ListProjectPackages()
-	if err != nil {
-		return err
-	}
-	filteredPackages := make([]string, 0, len(packages))
-	for _, pkg := range packages {
-		// Filter out tests from metricbeat/module/vsphere as the github.com/vmware/govmomi simulator uses SHA-1.
-		// This causes tests to panic on load before TestMain is ran.
-		if !strings.Contains(pkg, "github.com/elastic/beats/v7/metricbeat/module/vsphere") {
-			filteredPackages = append(filteredPackages, pkg)
-		}
-	}
-	fipsArgs.Packages = filteredPackages
-
-	return devtools.GoTest(ctx, fipsArgs)
 }

@@ -1,0 +1,14 @@
+This module collects metrics from Elasticsearch.
+
+[float]
+=== Compatibility
+
+The AutoOps Elasticsearch module is tested with Elasticsearch 7.17 and later. It will not work with
+any release before 7.17.
+
+[float]
+=== Usage
+
+The AutoOps Elasticsearch module is expected to be used by the
+[Elastic AutoOps Service](https://www.elastic.co/platform/autoops) and it is not intended to be
+used directly without AutoOps.

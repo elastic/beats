@@ -60,7 +60,7 @@ type cache struct {
 }
 
 // Resulting processor implements `Close()` to release the cache resources.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
 	if err != nil {
@@ -68,7 +68,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 	}
 	// Logging (each processor instance has a unique ID).
 	id := int(instanceID.Add(1))
-	log := logp.NewLogger(name).With("instance_id", id)
+	log = log.Named(name).With("instance_id", id)
 
 	src, cancel, err := getStoreFor(config, log)
 	if err != nil {
