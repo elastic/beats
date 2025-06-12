@@ -93,6 +93,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Handle permission errors while collecting data from Windows services and don't interrupt the overall collection by skipping affected services {issue}40765[40765] {pull}43665[43665]
 - Fixed a bug where `event.duration` could be missing from an event on Windows systems due to low-resolution clock. {pull}44440[44440]
 - Add check for http error codes in the Metricbeat's Prometheus query submodule {pull}44493[44493]
+- Sanitize error messages in Fetch method of SQL module {pull}44577[44577]
 
 *Osquerybeat*
 
@@ -138,6 +139,7 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - 'add_cloud_metadata' processor - improve AWS provider HTTP client overriding to support custom certificate bundle handling {pull}44189[44189]
 - Fix `dns` processor to handle IPv6 server addresses properly. {pull}44526[44526]
+- Fix an issue where the Kafka output could get stuck if a proxied connection to the Kafka cluster was reset. {issue}44606[44606]
 
 *Auditbeat*
 
@@ -242,10 +244,17 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Fix endpoint path typo in Okta entity analytics provider. {pull}44147[44147]
 - Fixed a websocket panic scenario which would occur after exhausting max retries. {pull}44342[44342]
 - Fix publishing Okta entity analytics enrichments. {pull}44483[44483]
+- Fix status reporting panic in GCP Pub/Sub input. {issue}44624[44624] {pull}44625[44625]
+- Fix a logging regression that ignored to_files and logged to stdout. {pull}44573[44573]
+- If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
+- Fix timeout handling by Crowdstrike streaming input. {pull}44720[44720]
+- Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. {issue}12658[12658] {pull}44719[44719]
+- Fix handling of cursors by the streaming input for Crowdstrike. {issue}44364[44364] {pull}44548[44548]
 
 *Heartbeat*
 
 - Added maintenance windows support for Heartbeat. {pull}41508[41508]
+- Add missing dependencies to ubi9-minimal distro. {pull}44556[44556]
 
 
 *Metricbeat*
@@ -441,6 +450,8 @@ otherwise no tag is added. {issue}42208[42208] {pull}42403[42403]
 - Add Fleet status updating to HTTP Endpoint input. {issue}44273[44273] {pull}44508[44508]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in HTTPJSON input. {issue}44349[44349] {pull}44436[44436]
 - Fix handling of ADC (Application Default Credentials) metadata server credentials in CEL input. {issue}44349[44349] {pull}44571[44571]
+- Added support for specifying custom content-types and encodings in azureblobstorage input. {issue}44330[44330] {pull}44402[44402]
+- Introduce lastSync start position to AWS CloudWatch input backed by state registry. {pull}43251[43251]
 
 *Auditbeat*
 
