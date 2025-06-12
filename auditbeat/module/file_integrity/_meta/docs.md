@@ -1,12 +1,3 @@
----
-mapped_pages:
-  - https://www.elastic.co/guide/en/beats/auditbeat/current/auditbeat-module-file_integrity.html
----
-
-% This file is generated! See scripts/docs_collector.py
-
-# File Integrity Module [auditbeat-module-file_integrity]
-
 The `file_integrity` module sends events when a file is changed (created, updated, or deleted) on disk. The events contain file metadata and hashes.
 
 The module is implemented for Linux, macOS (Darwin), and Windows.
@@ -120,19 +111,3 @@ You can specify the following options for any Auditbeat module.
 
 **`service.name`**
 :   A name given by the user to the service the data is collected from. It can be used for example to identify information collected from nodes of different clusters with the same `service.type`.
-
-## Example configuration [_example_configuration]
-
-The File Integrity module supports the common configuration options that are described under [configuring Auditbeat](/reference/auditbeat/configuration-auditbeat.md). Here is an example configuration:
-
-```yaml
-auditbeat.modules:
-- module: file_integrity
-  paths:
-  - /bin
-  - /usr/bin
-  - /sbin
-  - /usr/sbin
-  - /etc
-```
-
