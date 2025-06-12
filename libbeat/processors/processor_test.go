@@ -37,6 +37,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/processors/urldecode"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -62,7 +63,7 @@ func MakeProcessors(t testing.TB, yml []map[string]interface{}) (*processors.Pro
 		config = append(config, processorCfg)
 	}
 
-	return processors.New(config)
+	return processors.New(config, logptest.NewTestingLogger(t, ""))
 }
 
 func TestBadConfig(t *testing.T) {
