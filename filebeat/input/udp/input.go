@@ -82,7 +82,7 @@ func newServer(config config) (*server, error) {
 func (s *server) Name() string { return "udp" }
 
 func (s *server) Test(_ input.TestContext) error {
-	l, err := net.Listen("udp", s.config.Config.Host)
+	l, err := net.Listen("udp", s.Host)
 	if err != nil {
 		return err
 	}
@@ -90,7 +90,7 @@ func (s *server) Test(_ input.TestContext) error {
 }
 
 func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
-	log := ctx.Logger.With("host", s.config.Config.Host)
+	log := ctx.Logger.With("host", s.Host)
 
 	log.Info("starting udp socket input")
 	defer log.Info("udp input stopped")
@@ -99,10 +99,10 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	ctx.UpdateStatus(status.Configuring, "")
 
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewUDP("udp", ctx.ID, s.config.Host, uint64(s.config.ReadBuffer), pollInterval, log)
+	metrics := netmetrics.NewUDP("udp", ctx.ID, s.Host, uint64(s.ReadBuffer), pollInterval, log)
 	defer metrics.Close()
 
-	server := udp.New(&s.config.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
+	server := udp.New(&s.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
 		log.Debugw("Data received", "bytes", len(data), "remote_address", metadata.RemoteAddr.String(), "truncated", metadata.Truncated)
 		evt := beat.Event{
 			Timestamp: time.Now(),
