@@ -20,12 +20,12 @@ package netmetrics
 import (
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 func TestAddrs(t *testing.T) {
 	t.Run("ipv4", func(t *testing.T) {
-		addr4, addr6, err := addrs("0.0.0.0:9001", logp.L())
+		addr4, addr6, err := addrs("0.0.0.0:9001", logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -38,7 +38,7 @@ func TestAddrs(t *testing.T) {
 	})
 
 	t.Run("ipv6", func(t *testing.T) {
-		addr4, addr6, err := addrs("[::]:9001", logp.L())
+		addr4, addr6, err := addrs("[::]:9001", logptest.NewTestingLogger(t, ""))
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}

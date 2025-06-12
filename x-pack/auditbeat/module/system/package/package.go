@@ -220,8 +220,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms := &MetricSet{
 		SystemMetricSet: system.NewSystemMetricSet(base),
 		config:          config,
+<<<<<<< HEAD
 		log:             logp.NewLogger(metricsetName),
 		cache:           cache.New(),
+=======
+		log:             base.Logger().Named(metricsetName),
+		cache:           cache.New[*Package](),
+>>>>>>> 404bf2177 ([Chore] Replace global logger with local logger #7 (#44607))
 		bucket:          bucket,
 	}
 
