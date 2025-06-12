@@ -17,14 +17,15 @@ import (
 	"go.opentelemetry.io/collector/confmap"
 	"go.opentelemetry.io/collector/otelcol"
 
-	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
-	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
-	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest"
 	"go.uber.org/zap/zaptest/observer"
+
+	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
+	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
+	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat"
 )
 
 var schemeMap = map[string]string{
