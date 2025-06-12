@@ -5,6 +5,10 @@ mapped_pages:
 
 % This file is generated! See scripts/generate_fields_docs.py
 
+# Cisco Meraki fields [exported-fields-meraki]
+
+meraki
+
 **`meraki.device.serial`**
 :   type: keyword
 

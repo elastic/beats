@@ -184,6 +184,8 @@ This document describes the fields that are exported by {title}. They are groupe
         section["name"] = section["title"]
         if "anchor" not in section:
             section["anchor"] = section["key"]
+        if "description" not in section:
+            section["description"] = section["key"]
         if "fields" not in section or not section["fields"]:
             continue
         output_fields = open(os.path.join(
