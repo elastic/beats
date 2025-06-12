@@ -326,7 +326,7 @@ func (bt *Heartbeat) Stop() {
 	bt.stopOnce.Do(func() { close(bt.done) })
 
 	// TODO: remove this atrocity
-	time.Sleep(5 * time.Second)
+	// time.Sleep(5 * time.Second)
 }
 
 // makeESClient establishes an ES connection meant to load monitors' state
