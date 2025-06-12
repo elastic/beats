@@ -5,76 +5,178 @@
 package gcp
 
 import (
-	"context"
-	"fmt"
-	"sync"
+	"errors"
 	"testing"
 	"time"
 
 	"cloud.google.com/go/compute/apiv1/computepb"
 	"cloud.google.com/go/redis/apiv1/redispb"
-	"google.golang.org/api/dataproc/v1"
-	"google.golang.org/api/sqladmin/v1"
-
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/elastic/elastic-agent-libs/logp"
+	"google.golang.org/api/dataproc/v1"
+	"google.golang.org/api/sqladmin/v1"
 )
 
-func TestCacheEntry_IsExpired(t *testing.T) {
-	tests := []struct {
-		name     string
-		entry    CacheEntry
-		expected bool
-	}{
-		{
-			name: "zero refresh interval",
-			entry: CacheEntry{
-				RefreshInterval: 0,
-				LastRefreshed:   time.Now(),
-			},
-			expected: true,
-		},
-		{
-			name: "negative refresh interval",
-			entry: CacheEntry{
-				RefreshInterval: -1 * time.Hour,
-				LastRefreshed:   time.Now(),
-			},
-			expected: true,
-		},
-		{
-			name: "zero last refreshed",
-			entry: CacheEntry{
-				RefreshInterval: time.Hour,
-				LastRefreshed:   time.Time{},
-			},
-			expected: true,
-		},
-		{
-			name: "expired cache",
-			entry: CacheEntry{
-				RefreshInterval: time.Hour,
-				LastRefreshed:   time.Now().Add(-2 * time.Hour),
-			},
-			expected: true,
-		},
-		{
-			name: "fresh cache",
-			entry: CacheEntry{
-				RefreshInterval: time.Hour,
-				LastRefreshed:   time.Now().Add(-30 * time.Minute),
-			},
-			expected: false,
-		},
+func TestNewCache(t *testing.T) {
+	logger := logp.NewLogger("test")
+	refreshInterval := 5 * time.Minute
+
+	cache := NewCache[string](logger, refreshInterval)
+
+	require.NotNil(t, cache)
+	assert.NotNil(t, cache.data)
+	assert.Equal(t, refreshInterval, cache.refreshInterval)
+	assert.Equal(t, time.Time{}, cache.lastRefreshed)
+	assert.Equal(t, logger, cache.logger)
+}
+
+func TestCache_Get(t *testing.T) {
+	logger := logp.NewLogger("test")
+	cache := NewCache[string](logger, 5*time.Minute)
+
+	value, found := cache.Get("key1")
+	assert.False(t, found)
+	assert.Equal(t, "", value)
+
+	cache.data["key1"] = "value1"
+	cache.data["key2"] = "value2"
+
+	value, found = cache.Get("key1")
+	assert.True(t, found)
+	assert.Equal(t, "value1", value)
+
+	value, found = cache.Get("key3")
+	assert.False(t, found)
+	assert.Equal(t, "", value)
+}
+
+func TestCache_isExpired(t *testing.T) {
+	logger := logp.NewLogger("test")
+	cache := NewCache[string](logger, 100*time.Millisecond)
+
+	// initially should be expired (zero time)
+	assert.True(t, cache.isExpired())
+
+	// set last refreshed to now
+	cache.lastRefreshed = time.Now()
+	assert.False(t, cache.isExpired())
+
+	// wait for expiration
+	time.Sleep(150 * time.Millisecond)
+	assert.True(t, cache.isExpired())
+}
+
+func TestCache_EnsureFresh(t *testing.T) {
+	logger := logp.NewLogger("test")
+	cache := NewCache[string](logger, 1*time.Hour)
+
+	refreshCount := 0
+	refreshFunc := func() (map[string]string, error) {
+		refreshCount++
+		return map[string]string{
+			"key1": "value1",
+			"key2": "value2",
+		}, nil
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.expected, tt.entry.IsExpired())
-		})
+	// first call should refresh - cache is expired
+	err := cache.EnsureFresh(refreshFunc)
+	require.NoError(t, err)
+	assert.Equal(t, 1, refreshCount)
+	assert.Len(t, cache.data, 2)
+	assert.Equal(t, "value1", cache.data["key1"])
+	assert.Equal(t, "value2", cache.data["key2"])
+
+	// second call should not refresh - cache is fresh
+	err = cache.EnsureFresh(refreshFunc)
+	require.NoError(t, err)
+	assert.Equal(t, 1, refreshCount)
+}
+
+func TestCache_EnsureFresh_Error(t *testing.T) {
+	logger := logp.NewLogger("test")
+	cache := NewCache[string](logger, 1*time.Hour)
+
+	refreshFunc := func() (map[string]string, error) {
+		return nil, errors.New("refresh failed")
 	}
+
+	err := cache.EnsureFresh(refreshFunc)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to refresh cache data")
+	assert.Contains(t, err.Error(), "refresh failed")
+}
+
+func TestCache_EnsureFresh_UpdatesData(t *testing.T) {
+	logger := logp.NewLogger("test")
+	cache := NewCache[string](logger, 100*time.Millisecond)
+
+	cache.data["old"] = "oldValue"
+	cache.lastRefreshed = time.Now()
+
+	// wait for expiration
+	time.Sleep(150 * time.Millisecond)
+
+	refreshFunc := func() (map[string]string, error) {
+		return map[string]string{
+			"new": "newValue",
+		}, nil
+	}
+
+	err := cache.EnsureFresh(refreshFunc)
+	require.NoError(t, err)
+
+	_, found := cache.Get("old")
+	assert.False(t, found)
+
+	value, found := cache.Get("new")
+	assert.True(t, found)
+	assert.Equal(t, "newValue", value)
+}
+
+func TestCache_EnsureFresh_ZeroRefreshInterval(t *testing.T) {
+	// this test simulates how the cache's EnsureFresh call behaves
+	// when the cache is actually disabled. we still use the cache's map to store metadata,
+	// but with the refresh interval set to 0, the data always expires and gets cleared out,
+	// so it's repopulated every time.
+
+	logger := logp.NewLogger("test")
+	cache := NewCache[string](logger, 0)
+
+	cache.data["old"] = "oldValue"
+	cache.lastRefreshed = time.Now()
+
+	refreshFunc := func() (map[string]string, error) {
+		return map[string]string{
+			"new": "newValue",
+		}, nil
+	}
+
+	err := cache.EnsureFresh(refreshFunc)
+	require.NoError(t, err)
+
+	_, found := cache.Get("old")
+	assert.False(t, found)
+
+	refreshFunc = func() (map[string]string, error) {
+		return map[string]string{
+			"new2": "newValue",
+		}, nil
+	}
+
+	err = cache.EnsureFresh(refreshFunc)
+	require.NoError(t, err)
+
+	_, found = cache.Get("old")
+	assert.False(t, found)
+
+	_, found = cache.Get("new")
+	assert.False(t, found)
+
+	value, found := cache.Get("new2")
+	assert.True(t, found)
+	assert.Equal(t, "newValue", value)
 }
 
 func TestNewCacheRegistry(t *testing.T) {
@@ -83,420 +185,40 @@ func TestNewCacheRegistry(t *testing.T) {
 
 	registry := NewCacheRegistry(logger, refreshInterval)
 
-	assert.NotNil(t, registry)
-	assert.NotNil(t, registry.compute)
-	assert.NotNil(t, registry.cloudsql)
-	assert.NotNil(t, registry.redis)
-	assert.NotNil(t, registry.dataproc)
-	assert.Equal(t, refreshInterval, registry.compute.meta.RefreshInterval)
-	assert.Equal(t, refreshInterval, registry.cloudsql.meta.RefreshInterval)
-	assert.Equal(t, refreshInterval, registry.redis.meta.RefreshInterval)
-	assert.Equal(t, refreshInterval, registry.dataproc.meta.RefreshInterval)
+	require.NotNil(t, registry)
+	assert.NotNil(t, registry.Compute)
+	assert.NotNil(t, registry.CloudSQL)
+	assert.NotNil(t, registry.Redis)
+	assert.NotNil(t, registry.Dataproc)
 }
 
-func TestComputeCache(t *testing.T) {
+func TestCacheRegistry_TypedCaches(t *testing.T) {
 	logger := logp.NewLogger("test")
 	registry := NewCacheRegistry(logger, 5*time.Minute)
 
-	_, found := registry.GetComputeInstanceByID("instance-1")
-	assert.False(t, found)
-
-	testData := map[string]*computepb.Instance{
-		"instance-1": {Name: stringPtr("test-instance-1")},
-		"instance-2": {Name: stringPtr("test-instance-2")},
-	}
-
-	registry.dataMutex.Lock()
-	updateCache(registry.compute, testData)
-	registry.dataMutex.Unlock()
-
-	instance1, found := registry.GetComputeInstanceByID("instance-1")
+	computeInstance := &computepb.Instance{Name: stringPtr("test-instance")}
+	registry.Compute.data["instance1"] = computeInstance
+	retrieved, found := registry.Compute.Get("instance1")
 	assert.True(t, found)
-	assert.Equal(t, "test-instance-1", *instance1.Name)
+	assert.Equal(t, computeInstance, retrieved)
 
-	instance2, found := registry.GetComputeInstanceByID("instance-2")
+	sqlInstance := &sqladmin.DatabaseInstance{Name: "test-db"}
+	registry.CloudSQL.data["db1"] = sqlInstance
+	retrievedSQL, found := registry.CloudSQL.Get("db1")
 	assert.True(t, found)
-	assert.Equal(t, "test-instance-2", *instance2.Name)
+	assert.Equal(t, sqlInstance, retrievedSQL)
 
-	_, found = registry.GetComputeInstanceByID("instance-3")
-	assert.False(t, found)
-}
-
-func TestRedisCache(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 5*time.Minute)
-
-	_, found := registry.GetRedisInstanceByID("redis-1")
-	assert.False(t, found)
-
-	testData := map[string]*redispb.Instance{
-		"redis-1": {Name: "projects/test/locations/us-central1/instances/redis-1"},
-		"redis-2": {Name: "projects/test/locations/us-central1/instances/redis-2"},
-	}
-
-	registry.dataMutex.Lock()
-	updateCache(registry.redis, testData)
-	registry.dataMutex.Unlock()
-
-	instance1, found := registry.GetRedisInstanceByID("redis-1")
+	redisInstance := &redispb.Instance{Name: "test-redis"}
+	registry.Redis.data["redis1"] = redisInstance
+	retrievedRedis, found := registry.Redis.Get("redis1")
 	assert.True(t, found)
-	assert.Equal(t, "projects/test/locations/us-central1/instances/redis-1", instance1.Name)
+	assert.Equal(t, redisInstance, retrievedRedis)
 
-	instance2, found := registry.GetRedisInstanceByID("redis-2")
+	dataprocCluster := &dataproc.Cluster{ClusterName: "test-cluster"}
+	registry.Dataproc.data["cluster1"] = dataprocCluster
+	retrievedCluster, found := registry.Dataproc.Get("cluster1")
 	assert.True(t, found)
-	assert.Equal(t, "projects/test/locations/us-central1/instances/redis-2", instance2.Name)
-}
-
-func TestCloudSQLCache(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 5*time.Minute)
-
-	testData := map[string]*sqladmin.DatabaseInstance{
-		"sql-1": {Name: "sql-instance-1"},
-		"sql-2": {Name: "sql-instance-2"},
-	}
-
-	registry.dataMutex.Lock()
-	updateCache(registry.cloudsql, testData)
-	registry.dataMutex.Unlock()
-
-	instance1, found := registry.GetCloudSQLInstanceByID("sql-1")
-	assert.True(t, found)
-	assert.Equal(t, "sql-instance-1", instance1.Name)
-
-	instance2, found := registry.GetCloudSQLInstanceByID("sql-2")
-	assert.True(t, found)
-	assert.Equal(t, "sql-instance-2", instance2.Name)
-}
-
-func TestDataprocCache(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 5*time.Minute)
-
-	testData := map[string]*dataproc.Cluster{
-		"cluster-1": {ClusterName: "dataproc-cluster-1"},
-		"cluster-2": {ClusterName: "dataproc-cluster-2"},
-	}
-
-	registry.dataMutex.Lock()
-	updateCache(registry.dataproc, testData)
-	registry.dataMutex.Unlock()
-
-	cluster1, found := registry.GetDataprocClusterByID("cluster-1")
-	assert.True(t, found)
-	assert.Equal(t, "dataproc-cluster-1", cluster1.ClusterName)
-
-	cluster2, found := registry.GetDataprocClusterByID("cluster-2")
-	assert.True(t, found)
-	assert.Equal(t, "dataproc-cluster-2", cluster2.ClusterName)
-}
-
-func TestEnsureComputeCacheFresh(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 100*time.Millisecond)
-
-	fetchCallCount := 0
-	fetchFunc := func(ctx context.Context) (map[string]*computepb.Instance, error) {
-		fetchCallCount++
-		return map[string]*computepb.Instance{
-			"instance-1": {Name: stringPtr("fetched-instance")},
-		}, nil
-	}
-
-	// First call should fetch
-	err := registry.EnsureComputeCacheFresh(context.Background(), fetchFunc)
-	require.NoError(t, err)
-	assert.Equal(t, 1, fetchCallCount)
-
-	instance, found := registry.GetComputeInstanceByID("instance-1")
-	assert.True(t, found)
-	assert.Equal(t, "fetched-instance", *instance.Name)
-
-	// Second call should not fetch (cache is fresh)
-	err = registry.EnsureComputeCacheFresh(context.Background(), fetchFunc)
-	require.NoError(t, err)
-	assert.Equal(t, 1, fetchCallCount)
-
-	// Wait for cache to expire
-	time.Sleep(150 * time.Millisecond)
-
-	// Third call should fetch again
-	err = registry.EnsureComputeCacheFresh(context.Background(), fetchFunc)
-	require.NoError(t, err)
-	assert.Equal(t, 2, fetchCallCount)
-}
-
-func TestEnsureCacheFresh_Error(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 100*time.Millisecond)
-
-	expectedErr := fmt.Errorf("fetch failed")
-	fetchFunc := func(ctx context.Context) (map[string]*computepb.Instance, error) {
-		return nil, expectedErr
-	}
-
-	err := registry.EnsureComputeCacheFresh(context.Background(), fetchFunc)
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "fetch failed")
-}
-
-func TestConcurrentAccess(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 50*time.Millisecond)
-
-	var wg sync.WaitGroup
-	iterations := 100
-
-	var addedIDs sync.Map
-
-	// Concurrent writers
-	for i := 0; i < 5; i++ {
-		wg.Add(1)
-		go func(id int) {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
-				instanceID := fmt.Sprintf("instance-%d-%d", id, j)
-				registry.dataMutex.Lock()
-				updateCache(registry.compute, map[string]*computepb.Instance{
-					instanceID: {Name: stringPtr(fmt.Sprintf("test-%d-%d", id, j))},
-				})
-				registry.dataMutex.Unlock()
-				addedIDs.Store(instanceID, true)
-			}
-		}(i)
-	}
-
-	// Concurrent readers
-	for i := 0; i < 5; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for j := 0; j < iterations; j++ {
-				instanceID := fmt.Sprintf("instance-%d-%d", j%5, j)
-				_, _ = registry.GetComputeInstanceByID(instanceID)
-			}
-		}()
-	}
-
-	// Concurrent freshness checkers
-	for i := 0; i < 3; i++ {
-		wg.Add(1)
-		go func(id int) {
-			defer wg.Done()
-			fetchFunc := func(ctx context.Context) (map[string]*computepb.Instance, error) {
-				instanceID := fmt.Sprintf("fresh-%d", id)
-				addedIDs.Store(instanceID, true)
-				return map[string]*computepb.Instance{
-					instanceID: {Name: stringPtr(fmt.Sprintf("fresh-instance-%d", id))},
-				}, nil
-			}
-			for j := 0; j < iterations/10; j++ {
-				_ = registry.EnsureComputeCacheFresh(context.Background(), fetchFunc)
-				time.Sleep(10 * time.Millisecond)
-			}
-		}(i)
-	}
-
-	wg.Wait()
-
-	instancesFound := 0
-	addedIDs.Range(func(key, value interface{}) bool {
-		keyString, ok := key.(string)
-		if !ok {
-			return false
-		}
-		if instance, found := registry.GetComputeInstanceByID(keyString); found && instance != nil {
-			instancesFound++
-		}
-		return true
-	})
-	assert.Greater(t, instancesFound, 0, "Should have found at least some instances")
-}
-
-func TestMultipleCacheTypes(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 5*time.Minute)
-
-	registry.dataMutex.Lock()
-	updateCache(registry.compute, map[string]*computepb.Instance{
-		"compute-1": {Name: stringPtr("compute-instance")},
-	})
-	updateCache(registry.redis, map[string]*redispb.Instance{
-		"redis-1": {Name: "redis-instance"},
-	})
-	updateCache(registry.cloudsql, map[string]*sqladmin.DatabaseInstance{
-		"sql-1": {Name: "sql-instance"},
-	})
-	updateCache(registry.dataproc, map[string]*dataproc.Cluster{
-		"cluster-1": {ClusterName: "dataproc-cluster"},
-	})
-	registry.dataMutex.Unlock()
-
-	// Verify each cache is independent
-	computeInstance, found := registry.GetComputeInstanceByID("compute-1")
-	assert.True(t, found)
-	assert.Equal(t, "compute-instance", *computeInstance.Name)
-
-	redisInstance, found := registry.GetRedisInstanceByID("redis-1")
-	assert.True(t, found)
-	assert.Equal(t, "redis-instance", redisInstance.Name)
-
-	sqlInstance, found := registry.GetCloudSQLInstanceByID("sql-1")
-	assert.True(t, found)
-	assert.Equal(t, "sql-instance", sqlInstance.Name)
-
-	dataprocCluster, found := registry.GetDataprocClusterByID("cluster-1")
-	assert.True(t, found)
-	assert.Equal(t, "dataproc-cluster", dataprocCluster.ClusterName)
-
-	_, found = registry.GetComputeInstanceByID("redis-1")
-	assert.False(t, found)
-
-	_, found = registry.GetRedisInstanceByID("compute-1")
-	assert.False(t, found)
-}
-
-func TestCacheExpiredCheck(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 100*time.Millisecond)
-
-	// Initially all caches should be expired
-	assert.True(t, registry.isComputeCacheExpired())
-	assert.True(t, registry.isRedisCacheExpired())
-	assert.True(t, registry.isCloudSQLCacheExpired())
-	assert.True(t, registry.isDataprocCacheExpired())
-
-	// Update caches
-	registry.dataMutex.Lock()
-	updateCache(registry.compute, map[string]*computepb.Instance{"test": {}})
-	updateCache(registry.redis, map[string]*redispb.Instance{"test": {}})
-	updateCache(registry.cloudsql, map[string]*sqladmin.DatabaseInstance{"test": {}})
-	updateCache(registry.dataproc, map[string]*dataproc.Cluster{"test": {}})
-	registry.dataMutex.Unlock()
-
-	// Now caches should not be expired
-	assert.False(t, registry.isComputeCacheExpired())
-	assert.False(t, registry.isRedisCacheExpired())
-	assert.False(t, registry.isCloudSQLCacheExpired())
-	assert.False(t, registry.isDataprocCacheExpired())
-
-	time.Sleep(150 * time.Millisecond)
-
-	// Caches should be expired again
-	assert.True(t, registry.isComputeCacheExpired())
-	assert.True(t, registry.isRedisCacheExpired())
-	assert.True(t, registry.isCloudSQLCacheExpired())
-	assert.True(t, registry.isDataprocCacheExpired())
-}
-
-func TestGetInstanceByID_NotFound(t *testing.T) {
-	logger := logp.NewLogger("test")
-	registry := NewCacheRegistry(logger, 5*time.Minute)
-
-	_, found := registry.GetComputeInstanceByID("non-existent")
-	assert.False(t, found)
-
-	_, found = registry.GetRedisInstanceByID("non-existent")
-	assert.False(t, found)
-
-	_, found = registry.GetCloudSQLInstanceByID("non-existent")
-	assert.False(t, found)
-
-	_, found = registry.GetDataprocClusterByID("non-existent")
-	assert.False(t, found)
-}
-
-func TestEnsureCacheFresh_WithRetries(t *testing.T) {
-	tests := []struct {
-		name              string
-		failureCount      int
-		expectedAttempts  int
-		expectError       bool
-		contextTimeout    time.Duration
-		expectedErrString string
-	}{
-		{
-			name:             "succeeds on first attempt",
-			failureCount:     0,
-			expectedAttempts: 1,
-			expectError:      false,
-		},
-		{
-			name:             "succeeds after 1 retry",
-			failureCount:     1,
-			expectedAttempts: 2,
-			expectError:      false,
-		},
-		{
-			name:             "succeeds after 2 retries",
-			failureCount:     2,
-			expectedAttempts: 3,
-			expectError:      false,
-		},
-		{
-			name:             "succeeds on last retry (3rd attempt)",
-			failureCount:     3,
-			expectedAttempts: 4,
-			expectError:      false,
-		},
-		{
-			name:              "fails after max retries",
-			failureCount:      4,
-			expectedAttempts:  4, // 1 initial + 3 retries
-			expectError:       true,
-			expectedErrString: "fetch failed",
-		},
-		{
-			name:              "context cancelled during retry",
-			failureCount:      10,
-			expectedAttempts:  2,
-			expectError:       true,
-			contextTimeout:    1500 * time.Millisecond,
-			expectedErrString: "context deadline exceeded",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			logger := logp.NewLogger("test")
-			registry := NewCacheRegistry(logger, 5*time.Minute)
-
-			attemptCount := 0
-			fetchFunc := func(ctx context.Context) (map[string]*computepb.Instance, error) {
-				attemptCount++
-				if attemptCount <= tt.failureCount {
-					return nil, fmt.Errorf("simulated fetch error #%d", attemptCount)
-				}
-				return map[string]*computepb.Instance{
-					"instance-1": {Name: stringPtr("successful-instance")},
-				}, nil
-			}
-
-			ctx := context.Background()
-			if tt.contextTimeout > 0 {
-				var cancel context.CancelFunc
-				ctx, cancel = context.WithTimeout(ctx, tt.contextTimeout)
-				defer cancel()
-			}
-
-			err := registry.EnsureComputeCacheFresh(ctx, fetchFunc)
-
-			if tt.expectError {
-				assert.Error(t, err)
-				if tt.expectedErrString != "" {
-					assert.Contains(t, err.Error(), tt.expectedErrString)
-				}
-			} else {
-				assert.NoError(t, err)
-				instance, found := registry.GetComputeInstanceByID("instance-1")
-				assert.True(t, found)
-				assert.Equal(t, "successful-instance", *instance.Name)
-			}
-
-			assert.Equal(t, tt.expectedAttempts, attemptCount,
-				"Expected %d attempts but got %d", tt.expectedAttempts, attemptCount)
-		})
-	}
+	assert.Equal(t, dataprocCluster, retrievedCluster)
 }
 
 // Helper function for string pointers

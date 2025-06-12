@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	monitoringpb "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	redis "cloud.google.com/go/redis/apiv1"
@@ -16,13 +17,14 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Redis resource
-func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
-	return &metadataCollector{
+func NewMetadataService(ctx context.Context, projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
+	mc := &metadataCollector{
 		projectID:        projectID,
 		projectName:      projectName,
 		organizationID:   organizationID,
@@ -31,10 +33,25 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 		region:           region,
 		regions:          regions,
 		opt:              opt,
-		instances:        make(map[string]*redispb.Instance),
-		cacheRegistry:    cacheRegistry,
+		instanceCache:    cacheRegistry.Redis,
 		logger:           logp.NewLogger("metrics-redis"),
-	}, nil
+	}
+
+	// Freshen up the cache, later all we have to do is look up the instance
+	err := mc.instanceCache.EnsureFresh(func() (map[string]*redispb.Instance, error) {
+		instances := make(map[string]*redispb.Instance)
+		r := backoff.NewRetryer(3, time.Second, 30*time.Second)
+
+		err := r.Retry(ctx, func() error {
+			var err error
+			instances, err = mc.fetchRedisInstances(ctx)
+			return err
+		})
+
+		return instances, err
+	})
+
+	return mc, err
 }
 
 // redisMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
@@ -60,11 +77,8 @@ type metadataCollector struct {
 	region           string
 	regions          []string
 	opt              []option.ClientOption
-	// NOTE: instances holds data used for all metrics collected in a given period
-	// this avoids calling the remote endpoint for each metric, which would take a long time overall
-	instances     map[string]*redispb.Instance
-	cacheRegistry *gcp.CacheRegistry
-	logger        *logp.Logger
+	instanceCache    *gcp.Cache[*redispb.Instance]
+	logger           *logp.Logger
 }
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Redis TimeSeries single point of data.
@@ -104,14 +118,15 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 
 // instanceMetadata returns the labels of an instance
 func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, region string) (*redisMetadata, error) {
-	instance, err := s.instance(ctx, instanceID)
-	if err != nil {
-		return nil, fmt.Errorf("error trying to get data from instance '%s' %w", instanceID, err)
-	}
-
 	metadata := &redisMetadata{
 		instanceID: instanceID,
 		region:     region,
+	}
+
+	instance, ok := s.instanceCache.Get(instanceID)
+	if !ok {
+		s.logger.Warnf("Instance %s not found in redis cache.", instanceID)
+		return metadata, nil
 	}
 
 	if instance == nil {
@@ -133,35 +148,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 	}
 
 	return metadata, nil
-}
-
-// instance returns data from an instance ID using the cache or making a request
-func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*redispb.Instance, error) {
-	if s.cacheRegistry == nil {
-		s.logger.Debug("Metadata cache disabled, fetching instance directly (no caching).")
-		s.fetchRedisInstancesNoCache(ctx)
-
-		instance, ok := s.instances[instanceID]
-		if ok {
-			return instance, nil
-		}
-
-		return nil, nil
-	}
-
-	err := s.cacheRegistry.EnsureRedisCacheFresh(ctx, s.fetchRedisInstances)
-	if err != nil {
-		s.logger.Errorf("Error ensuring compute cache freshness (fetch might have failed): %v", err)
-		return nil, err
-	}
-
-	instance, ok := s.cacheRegistry.GetRedisInstanceByID(instanceID)
-	if !ok {
-		s.logger.Debugf("Instance %s not found in redis cache.", instanceID)
-		return nil, nil // Instance not found is not necessarily an error here
-	}
-
-	return instance, nil
 }
 
 func (s *metadataCollector) instanceID(ts *monitoringpb.TimeSeries) string {
@@ -213,39 +199,4 @@ func (s *metadataCollector) fetchRedisInstances(ctx context.Context) (map[string
 	}
 
 	return fetchedInstances, nil
-}
-
-func (s *metadataCollector) fetchRedisInstancesNoCache(ctx context.Context) {
-	if len(s.instances) > 0 {
-		return
-	}
-
-	s.logger.Debug("get redis instances with ListInstances API")
-
-	client, err := redis.NewCloudRedisClient(ctx, s.opt...)
-	if err != nil {
-		s.logger.Errorf("error getting client from redis service: %v", err)
-		return
-	}
-
-	defer client.Close()
-
-	// Use locations - (wildcard) to fetch all instances.
-	// https://pkg.go.dev/cloud.google.com/go/redis@v1.10.0/apiv1#CloudRedisClient.ListInstances
-	it := client.ListInstances(ctx, &redispb.ListInstancesRequest{
-		Parent: fmt.Sprintf("projects/%s/locations/-", s.projectID),
-	})
-	for {
-		instance, err := it.Next()
-		if errors.Is(err, iterator.Done) {
-			break
-		}
-
-		if err != nil {
-			s.logger.Errorf("redis ListInstances error: %v", err)
-			break
-		}
-
-		s.instances[instance.Name] = instance
-	}
 }

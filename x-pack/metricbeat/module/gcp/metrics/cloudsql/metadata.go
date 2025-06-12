@@ -8,19 +8,21 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/option"
 	sqladmin "google.golang.org/api/sqladmin/v1"
 
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP CloudSQL resource.
-func NewMetadataService(projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
-	return &metadataCollector{
+func NewMetadataService(ctx context.Context, projectID, zone string, region string, regions []string, organizationID, organizationName string, projectName string, cacheRegistry *gcp.CacheRegistry, opt ...option.ClientOption) (gcp.MetadataService, error) {
+	mc := &metadataCollector{
 		projectID:        projectID,
 		projectName:      projectName,
 		organizationID:   organizationID,
@@ -29,10 +31,25 @@ func NewMetadataService(projectID, zone string, region string, regions []string,
 		region:           region,
 		regions:          regions,
 		opt:              opt,
-		instances:        make(map[string]*sqladmin.DatabaseInstance),
-		cacheRegistry:    cacheRegistry,
+		instanceCache:    cacheRegistry.CloudSQL,
 		logger:           logp.NewLogger("metrics-cloudsql"),
-	}, nil
+	}
+
+	// Freshen up the cache, later all we have to do is look up the instance
+	err := mc.instanceCache.EnsureFresh(func() (map[string]*sqladmin.DatabaseInstance, error) {
+		instances := make(map[string]*sqladmin.DatabaseInstance)
+		r := backoff.NewRetryer(3, time.Second, 30*time.Second)
+
+		err := r.Retry(ctx, func() error {
+			var err error
+			instances, err = mc.fetchCloudSQLInstances(ctx)
+			return err
+		})
+
+		return instances, err
+	})
+
+	return mc, err
 }
 
 // cloudsqlMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
@@ -58,11 +75,8 @@ type metadataCollector struct {
 	region           string
 	regions          []string
 	opt              []option.ClientOption
-	// NOTE: instances holds data used for all metrics collected in a given period
-	// this avoids calling the remote endpoint for each metric, which would take a long time overall
-	instances     map[string]*sqladmin.DatabaseInstance
-	cacheRegistry *gcp.CacheRegistry
-	logger        *logp.Logger
+	instanceCache    *gcp.Cache[*sqladmin.DatabaseInstance]
+	logger           *logp.Logger
 }
 
 func getDatabaseNameAndVersion(db string) mapstr.M {
@@ -139,14 +153,15 @@ func (s *metadataCollector) instanceRegion(ts *monitoringpb.TimeSeries) string {
 
 // instanceMetadata returns the labels of an instance
 func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, region string) (*cloudsqlMetadata, error) {
-	instance, err := s.instance(ctx, instanceID)
-	if err != nil {
-		return nil, fmt.Errorf("error trying to get data from instance '%s' %w", instanceID, err)
-	}
-
 	cloudsqlMetadata := &cloudsqlMetadata{
 		instanceID: instanceID,
 		region:     region,
+	}
+
+	instance, ok := s.instanceCache.Get(instanceID)
+	if !ok {
+		s.logger.Warnf("Instance %s not found in cloudsql cache.", instanceID)
+		return cloudsqlMetadata, nil
 	}
 
 	if instance == nil {
@@ -163,34 +178,6 @@ func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, re
 	}
 
 	return cloudsqlMetadata, nil
-}
-
-func (s *metadataCollector) instance(ctx context.Context, instanceName string) (*sqladmin.DatabaseInstance, error) {
-	if s.cacheRegistry == nil {
-		s.logger.Debug("Metadata cache disabled, fetching instance directly (no caching).")
-		s.fetchCloudSQLInstancesNoCache(ctx)
-
-		instance, ok := s.instances[instanceName]
-		if ok {
-			return instance, nil
-		}
-
-		return nil, nil
-	}
-
-	err := s.cacheRegistry.EnsureCloudSQLCacheFresh(ctx, s.fetchCloudSQLInstances)
-	if err != nil {
-		s.logger.Errorf("Error ensuring cloudsql cache freshness (fetch might have failed): %v", err)
-		return nil, err
-	}
-
-	instance, ok := s.cacheRegistry.GetCloudSQLInstanceByID(instanceName)
-	if !ok {
-		s.logger.Debugf("Instance %s not found in compute cache.", instanceName)
-		return nil, nil // Instance not found is not necessarily an error here
-	}
-
-	return instance, nil
 }
 
 func (s *metadataCollector) fetchCloudSQLInstances(ctx context.Context) (map[string]*sqladmin.DatabaseInstance, error) {
@@ -215,28 +202,4 @@ func (s *metadataCollector) fetchCloudSQLInstances(ctx context.Context) (map[str
 	}
 
 	return fetchedInstances, nil
-}
-
-func (s *metadataCollector) fetchCloudSQLInstancesNoCache(ctx context.Context) {
-	if len(s.instances) > 0 {
-		return
-	}
-
-	s.logger.Debug("sqladmin Instances.List API")
-
-	service, err := sqladmin.NewService(ctx, s.opt...)
-	if err != nil {
-		s.logger.Errorf("error getting client from sqladmin service: %v", err)
-		return
-	}
-
-	req := service.Instances.List(s.projectID)
-	if err := req.Pages(ctx, func(page *sqladmin.InstancesListResponse) error {
-		for _, instancesScopedList := range page.Items {
-			s.instances[fmt.Sprintf("%s:%s", instancesScopedList.Project, instancesScopedList.Name)] = instancesScopedList
-		}
-		return nil
-	}); err != nil {
-		s.logger.Errorf("sqladmin Instances.List error: %v", err)
-	}
 }
