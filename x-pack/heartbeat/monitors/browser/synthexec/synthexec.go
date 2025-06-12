@@ -228,6 +228,7 @@ func runCmd(
 	// This use of channels for results is awkward, but required for the thread locking below
 	cmdStarted := make(chan error)
 	cmdDone := make(chan error)
+	cmdCleanUp := make(chan struct{})
 	go func() {
 		// We must idle this thread and ensure it is not killed while the external program is running
 		// see https://github.com/golang/go/issues/27505#issuecomment-713706104 . Otherwise, the Pdeathsig
@@ -240,6 +241,7 @@ func runCmd(
 
 		err := cmd.Wait()
 		cmdDone <- err
+		<-cmdCleanUp // Clean up is done at this point
 	}()
 
 	err = <-cmdStarted
@@ -253,6 +255,8 @@ func runCmd(
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	go func() {
 		<-ctx.Done()
+
+		logp.L().Info("job context has timed out or has been canceled")
 
 		// ProcessState can be null if it hasn't reported back yet
 		if cmd.ProcessState != nil && cmd.ProcessState.Exited() {
@@ -302,6 +306,8 @@ func runCmd(
 		wg.Wait()
 		mpx.Close()
 		cancel()
+
+		cmdCleanUp <- struct{}{} // trigger cleanup is finished
 	}()
 
 	return mpx, nil
