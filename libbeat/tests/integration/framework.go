@@ -651,6 +651,7 @@ func (b *BeatProc) openEventLogFile() *os.File {
 // If the tests are run with -v, the temporary directory will
 // be logged.
 func CreateTempDir(t *testing.T) string {
+	t.Helper()
 	rootDir, err := filepath.Abs("../../build/integration-tests")
 	if err != nil {
 		t.Fatalf("failed to determine absolute path for temp dir: %s", err)
@@ -667,7 +668,7 @@ func CreateTempDir(t *testing.T) string {
 	cleanup := func() {
 		if !t.Failed() {
 			if err := os.RemoveAll(tempDir); err != nil {
-				// Ungly workaround Windows limitations
+				// Ugly workaround Windows limitations
 				// Windows does not support the Interrup signal, so it might
 				// happen that Filebeat is still running, keeping it's registry
 				// file open, thus preventing the temporary folder from being
@@ -692,6 +693,7 @@ func CreateTempDir(t *testing.T) string {
 // using the default test credentials or the corresponding environment
 // variables.
 func EnsureESIsRunning(t *testing.T) {
+	t.Helper()
 	esURL := GetESURL(t, "http")
 
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(500*time.Second))
@@ -719,6 +721,7 @@ func EnsureESIsRunning(t *testing.T) {
 }
 
 func GetESClient(t *testing.T) (*elasticsearch.Client, error) {
+	t.Helper()
 	esURL := GetESURL(t, "http")
 
 	u := esURL.User.Username()
@@ -933,6 +936,7 @@ func FormatRefreshURL(t *testing.T, srcURL url.URL) url.URL {
 
 func FormatDataStreamSearchURL(t *testing.T, srcURL url.URL, dataStream string) (url.URL, error) {
 	t.Helper()
+	t.Helper()
 	path, err := url.JoinPath("/", dataStream, "_search")
 	if err != nil {
 		return url.URL{}, fmt.Errorf("error joining ilm policy path: %w", err)
@@ -994,6 +998,7 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 // GenerateLogFile writes count lines to path, each line is 50 bytes.
 // Each line contains the current time (RFC3339) and a counter
 func GenerateLogFile(t *testing.T, path string, count int, append bool) {
+	t.Helper()
 	var file *os.File
 	var err error
 	if !append {

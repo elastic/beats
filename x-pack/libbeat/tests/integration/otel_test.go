@@ -61,16 +61,15 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	col, err := NewTestCollector(t, "filebeat", "")
 	require.NoError(t, err, fmt.Sprintf("could not get new collector due to %v", err))
 
-	// start collector
+	// write to a log file
 	logFilePath := filepath.Join(col.GetTempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
 
-	err := col.ReloadConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", col.GetTempDir(), 5066))
+	// start collector
+	err = col.ReloadCollectorWithConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", col.GetTempDir(), 5066))
 	require.NoError(t, err)
 
-	t.Cleanup(func() {
-		col.Shutdown()
-	})
+	// TODO: check if collector is healthy before proceeding
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -80,7 +79,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", filebeat.TempDir(), 5067)
 	s = s + `
 setup.template.name: logs-filebeat-default
 setup.template.pattern: logs-filebeat-default

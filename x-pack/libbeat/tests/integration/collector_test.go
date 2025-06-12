@@ -2,24 +2,29 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build integration && !agentbeat
+
 package integration
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
 	"testing"
 
-	"github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter"
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/confmap"
-	"go.opentelemetry.io/collector/exporter/debugexporter"
 	"go.opentelemetry.io/collector/otelcol"
 
 	"github.com/elastic/beats/v7/libbeat/otelbeat/beatconverter"
 	"github.com/elastic/beats/v7/libbeat/otelbeat/providers/fbprovider"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/filebeat/fbreceiver"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/otelbeat"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zaptest"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 var schemeMap = map[string]string{
@@ -27,50 +32,37 @@ var schemeMap = map[string]string{
 }
 
 type TestCollector struct {
-	t          *testing.T
-	tempDir    string
-	otelcol    *otelcol.Collector
-	wg         sync.WaitGroup
-	configFile string
-	beatname   string
+	t            *testing.T
+	tempDir      string
+	otelcol      *otelcol.Collector
+	wg           sync.WaitGroup
+	configFile   string
+	beatname     string
+	observedLogs *observer.ObservedLogs
 }
 
-// NewTestCollector configures and returns an otel collector intended for testing only
-// It accepts beatname and configuration
+// NewTestCollector configures and returns an instance of otel collector intended for testing only
 func NewTestCollector(t *testing.T, beatname string, config string) (*TestCollector, error) {
-
-	// create a temp dir
+	// create a temp dir at beat/build/integration-tests
 	tempDir := integration.CreateTempDir(t)
-	// stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
-	// require.NoError(t, err, "error creating stdout file")
-	// stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
-	// require.NoError(t, err, "error creating stderr file")
 
-	// create a config file
+	// create a configfile
 	configFile := filepath.Join(tempDir, beatname+".yml")
-	// write configuration to a file
-	if err := os.WriteFile(configFile, []byte(config), 0o644); err != nil {
-		t.Fatalf("cannot create config file '%s': %s", configFile, err)
-	}
-	// adds scheme name as prefix to the configfile
-	beatCfg := schemeMap[beatname] + ":" + configFile
-	// get collector settings
-	set := getCollectorSettings(beatCfg)
-	// get new collector instance
-	otelcol, err := otelcol.NewCollector(set)
 
-	return &TestCollector{
+	testCol := &TestCollector{
 		t:          t,
 		tempDir:    tempDir,
-		otelcol:    otelcol,
 		wg:         sync.WaitGroup{},
 		configFile: configFile,
 		beatname:   beatname,
-	}, err
+	}
+
+	// write configuration to a file
+	err := testCol.reloadConfig(config)
+	return testCol, err
 }
 
-// NewTestStartCollector configures and returns an otel collector intended for testing only
-// It accepts beatname and configuration
+// NewTestStartCollector configures and starts an otel collector intended for testing only
 func NewTestStartCollector(t *testing.T, beatname string, config string) (*TestCollector, error) {
 	otelcol, err := NewTestCollector(t, beatname, config)
 	if err != nil {
@@ -81,39 +73,48 @@ func NewTestStartCollector(t *testing.T, beatname string, config string) (*TestC
 		return nil, err
 	}
 
-	t.Cleanup(func() {
-		otelcol.Shutdown()
-		if !t.Failed() {
-			return
-		}
-	})
-
 	return otelcol, err
 }
 
-func (c *TestCollector) ReloadConfig(config string) error {
-	// If collector is started, shut it down then reload
-	c.Shutdown()
+// reloadConfig reloads configuration with which collector should be started.
+// Note: A running collector will not pick the new config until it is stopped and started
+func (c *TestCollector) reloadConfig(config string) error {
 	// write configuration to a file
 	if err := os.WriteFile(c.configFile, []byte(config), 0o644); err != nil {
-		c.t.Fatalf("cannot create config file '%s': %s", c.configFile, err)
+		return fmt.Errorf("cannot create config file '%s': %s", c.configFile, err)
 	}
 	// adds scheme name as prefix to the configfile
 	beatCfg := schemeMap[c.beatname] + ":" + c.configFile
 	// get collector settings
-	set := getCollectorSettings(beatCfg)
-	// get new collector instance
-	otelcol, _ := otelcol.NewCollector(set)
-	c.otelcol = otelcol
-	return c.Run()
+	set, observedLogs := getCollectorSettings(beatCfg)
 
+	c.observedLogs = observedLogs
+	// get new collector instance
+	otelcol, err := otelcol.NewCollector(set)
+	c.otelcol = otelcol
+	return err
+}
+
+// ReloadCollectorWithConfig reloads the collector with given config
+func (c *TestCollector) ReloadCollectorWithConfig(config string) error {
+	c.t.Helper()
+	// shutdown collector if it is running
+	c.Shutdown()
+	err := c.reloadConfig(config)
+	if err != nil {
+		return err
+	}
+	return c.Run()
 }
 
 func (c *TestCollector) GetTempDir() string {
 	return c.tempDir
 }
 
+// Run starts the otel collector
 func (c *TestCollector) Run() error {
+	c.t.Helper()
+
 	wg := sync.WaitGroup{}
 	var err error
 	wg.Add(1)
@@ -121,47 +122,43 @@ func (c *TestCollector) Run() error {
 		defer wg.Done()
 		err = c.otelcol.Run(c.t.Context())
 	}()
+
+	c.t.Cleanup(func() {
+		c.Shutdown()
+		return
+	})
+
 	return err
 }
+
 func (c *TestCollector) Shutdown() {
 	c.otelcol.Shutdown()
 }
 
-// Component initializes collector components
-func getComponent() (otelcol.Factories, error) {
-	receivers, err := otelcol.MakeFactoryMap(
-		fbreceiver.NewFactory(),
-	)
-	if err != nil {
-		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
-	}
-
-	exporters, err := otelcol.MakeFactoryMap(
-		debugexporter.NewFactory(),
-		elasticsearchexporter.NewFactory(),
-	)
-	if err != nil {
-		return otelcol.Factories{}, nil //nolint:nilerr //ignoring this error
-	}
-
-	return otelcol.Factories{
-		Receivers: receivers,
-		Exporters: exporters,
-	}, nil
-
+// IsCollectorHealthy returns true if collector is healthy
+func (c *TestCollector) IsCollectorHealthy(config string) bool {
+	// TODO
+	return true
 }
 
-func getCollectorSettings(filename string) otelcol.CollectorSettings {
+func getCollectorSettings(filename string) (otelcol.CollectorSettings, *observer.ObservedLogs) {
 	// initialize collector settings
 	info := component.BuildInfo{
 		Command:     "otel-test",
 		Description: "Beats OTel",
-		Version:     "9.0.0",
+		Version:     "9.1.0",
 	}
+
+	zapCore := zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		&zaptest.Discarder{},
+		zapcore.DebugLevel,
+	)
+	observed, zapLogs := observer.New(zapcore.DebugLevel)
 
 	return otelcol.CollectorSettings{
 		BuildInfo: info,
-		Factories: getComponent,
+		Factories: otelbeat.GetComponent,
 		ConfigProviderSettings: otelcol.ConfigProviderSettings{
 			ResolverSettings: confmap.ResolverSettings{
 				URIs: []string{filename},
@@ -173,5 +170,8 @@ func getCollectorSettings(filename string) otelcol.CollectorSettings {
 				},
 			},
 		},
-	}
+		LoggingOptions: []zap.Option{zap.WrapCore(func(zapcore.Core) zapcore.Core {
+			return zapcore.NewTee(zapCore, observed)
+		})},
+	}, zapLogs
 }
