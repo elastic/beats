@@ -20,15 +20,17 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	quark "github.com/elastic/go-quark"
+	"regexp" // XXX REMOVE ME
 )
 
 var quarkMetrics = struct {
-	insertions      *monitoring.Uint
-	removals        *monitoring.Uint
-	aggregations    *monitoring.Uint
-	nonAggregations *monitoring.Uint
-	lost            *monitoring.Uint
-	backend         *monitoring.String
+	insertions         *monitoring.Uint
+	removals           *monitoring.Uint
+	aggregations       *monitoring.Uint
+	nonAggregations    *monitoring.Uint
+	garbageCollections *monitoring.Uint
+	lost               *monitoring.Uint
+	backend            *monitoring.String
 }{}
 
 func init() {
@@ -37,6 +39,7 @@ func init() {
 	quarkMetrics.removals = monitoring.NewUint(reg, "removals")
 	quarkMetrics.aggregations = monitoring.NewUint(reg, "aggregations")
 	quarkMetrics.nonAggregations = monitoring.NewUint(reg, "non_aggregations")
+	quarkMetrics.garbageCollections = monitoring.NewUint(reg, "garbage_collections")
 	quarkMetrics.lost = monitoring.NewUint(reg, "lost")
 	quarkMetrics.backend = monitoring.NewString(reg, "backend", monitoring.Report)
 }
@@ -76,7 +79,7 @@ func NewFromQuark(ms MetricSet) (mb.MetricSet, error) {
 		attr.Flags &= ^quark.QQ_ALL_BACKENDS
 		attr.Flags |= quark.QQ_KPROBE
 	}
-	qm.queue, err = quark.OpenQueue(attr, 1)
+	qm.queue, err = quark.OpenQueue(attr)
 	if err != nil {
 		qm.cachedHasher.Close()
 		return nil, fmt.Errorf("can't open quark queue: %w", err)
@@ -103,6 +106,14 @@ func (ms *QuarkMetricSet) Run(r mb.PushReporterV2) {
 
 	metricsStamp := time.Now()
 
+	for _, proc := range ms.queue.Snapshot() {
+		var fakeEvent quark.Event
+		fakeEvent.Process = proc
+		if event, ok := ms.toEvent(fakeEvent, true); ok {
+			r.Event(event)
+		}
+	}
+
 MainLoop:
 	for {
 		// Poll for done
@@ -115,29 +126,20 @@ MainLoop:
 		ms.maybeUpdateMetrics(&metricsStamp)
 
 		x := time.Now()
-		quarkEvents, err := ms.queue.GetEvents()
-		if len(quarkEvents) == 1 {
-			ms.log.Debugf("getevents took %v", time.Since(x))
-		}
-		if err != nil {
-			ms.log.Error("quark GetEvents, unrecoverable error", err)
-			break MainLoop
-		}
-		if len(quarkEvents) == 0 {
-			err = ms.queue.Block()
-			if err != nil {
+		quarkEvent, ok := ms.queue.GetEvent()
+		if !ok {
+			if err := ms.queue.Block(); err != nil {
 				ms.log.Error("quark Block, unrecoverable error", err)
 				break MainLoop
 			}
 			continue
 		}
-		for _, quarkEvent := range quarkEvents {
-			if !wantedEvent(quarkEvent) {
-				continue
-			}
-			if event, ok := ms.toEvent(quarkEvent); ok {
-				r.Event(event)
-			}
+		ms.log.Debugf("getevent took %v", time.Since(x))
+		if !wantedEvent(quarkEvent) {
+			continue
+		}
+		if event, ok := ms.toEvent(quarkEvent, false); ok {
+			r.Event(event)
 		}
 	}
 
@@ -148,10 +150,12 @@ MainLoop:
 	ms.queue = nil
 }
 
+var defaultCgroupRegex = regexp.MustCompile(`[-/]([0-9a-f]{64})(\.scope)?$`) // XXXXX REMOVE ME
+
 // toEvent converts a quark.Event to a mb.Event, returns true if we
 // were able to make an event.
-func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
-	action, evtype := actionAndTypeOfEvent(quarkEvent)
+func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event, snap bool) (mb.Event, bool) {
+	action, evtype := actionAndTypeOfEvent(quarkEvent, snap)
 	process := quarkEvent.Process
 	event := mb.Event{RootFields: mapstr.M{}}
 
@@ -174,11 +178,28 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 	event.RootFields.Put("event.kind", "event")
 	// Fill out process.*
 	event.RootFields.Put("process.name", process.Comm)
-	event.RootFields.Put("process.args", process.Cmdline)
-	event.RootFields.Put("process.args_count", len(process.Cmdline))
+	if len(process.Cmdline) > 0 {
+		event.RootFields.Put("process.args", process.Cmdline)
+		event.RootFields.Put("process.args_count", len(process.Cmdline))
+	}
 	event.RootFields.Put("process.pid", process.Pid)
-	event.RootFields.Put("process.working_directory", process.Cwd)
-	event.RootFields.Put("process.executable", process.Filename)
+	if len(process.Cwd) > 0 {
+		event.RootFields.Put("process.working_directory", process.Cwd)
+	}
+	if len(process.Filename) > 0 {
+		event.RootFields.Put("process.executable", process.Filename)
+	}
+	if len(process.Cgroup) > 0 {
+		event.RootFields.Put("process.cgroup", process.Cgroup)
+		rs := defaultCgroupRegex.FindStringSubmatch(process.Cgroup)
+		// rs := defaultCgroupRegex.FindStringSubmatch("docker-8026590b2252148ee4098886770bdd03f21d832997b7d01657490832f2c7ed71.scope")
+		// rs := defaultCgroupRegex.FindStringSubmatch("0::/system.slice/docker-8026590b2252148ee4098886770bdd03f21d832997b7d01657490832f2c7ed71.scope")
+
+		//		fmt.Printf("rs = %+v\n\n", rs);
+		if len(rs) > 1 {
+			event.RootFields.Put("process.container.id", rs[1])
+		}
+	}
 	if process.Exit.Valid {
 		event.RootFields.Put("process.exit_code", process.Exit.ExitCode)
 	}
@@ -258,8 +279,7 @@ func (ms *QuarkMetricSet) toEvent(quarkEvent quark.Event) (mb.Event, bool) {
 func wantedEvent(quarkEvent quark.Event) bool {
 	const wanted uint64 = quark.QUARK_EV_FORK |
 		quark.QUARK_EV_EXEC |
-		quark.QUARK_EV_EXIT |
-		quark.QUARK_EV_SNAPSHOT
+		quark.QUARK_EV_EXIT
 	if quarkEvent.Events&wanted == 0 ||
 		quarkEvent.Process.Pid == 2 ||
 		quarkEvent.Process.Proc.Ppid == 2 { // skip kthreads
@@ -271,8 +291,7 @@ func wantedEvent(quarkEvent quark.Event) bool {
 }
 
 // actionAndTypeOfEvent computes eventAction and event.type out of a quark.Event.
-func actionAndTypeOfEvent(quarkEvent quark.Event) (eventAction, []string) {
-	snap := quarkEvent.Events&quark.QUARK_EV_SNAPSHOT != 0
+func actionAndTypeOfEvent(quarkEvent quark.Event, snap bool) (eventAction, []string) {
 	fork := quarkEvent.Events&quark.QUARK_EV_FORK != 0
 	exec := quarkEvent.Events&quark.QUARK_EV_EXEC != 0
 	exit := quarkEvent.Events&quark.QUARK_EV_EXIT != 0
@@ -324,6 +343,7 @@ func (ms *QuarkMetricSet) maybeUpdateMetrics(stamp *time.Time) {
 	quarkMetrics.removals.Set(stats.Removals)
 	quarkMetrics.aggregations.Set(stats.Aggregations)
 	quarkMetrics.nonAggregations.Set(stats.NonAggregations)
+	quarkMetrics.garbageCollections.Set(stats.GarbageCollections)
 	quarkMetrics.lost.Set(stats.Lost)
 	if stats.Backend == quark.QQ_EBPF {
 		quarkMetrics.backend.Set("ebpf")

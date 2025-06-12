@@ -61,21 +61,12 @@ func TestQuarkMetricSetKprobe(t *testing.T) {
 	testQuarkMetricSet(t, Kprobe)
 }
 
-// testInitialSnapshot see if quark is generating snapshot events
+// testInitialSnapshot checks if the initial cache is built and retrieved via Snapshot
 func testInitialSnapshot(t *testing.T, be backend) {
 	qq := openQueue(t, be)
 	defer qq.Close()
 
-	// There should be events of kind quark.QUARK_EV_SNAPSHOT
-	qevs := drainFor(t, qq, 5*time.Millisecond)
-	var gotsnap bool
-	for _, qev := range qevs {
-		if qev.Events&quark.QUARK_EV_SNAPSHOT != 0 {
-			gotsnap = true
-		}
-	}
-
-	require.True(t, gotsnap)
+	require.True(t, len(qq.Snapshot()) > 0)
 }
 
 // testForkExecExit tests if a spawned process shows up in quark
@@ -185,7 +176,7 @@ func openQueue(t *testing.T, be backend) *quark.Queue {
 	} else if be == Kprobe {
 		attr.Flags |= quark.QQ_KPROBE
 	}
-	qq, err := quark.OpenQueue(attr, 1)
+	qq, err := quark.OpenQueue(attr)
 	require.NoError(t, err)
 
 	return qq
@@ -208,12 +199,8 @@ func drainFor(t *testing.T, qq *quark.Queue, d time.Duration) []quark.Event {
 	start := time.Now()
 
 	for {
-		qevs, err := qq.GetEvents()
-		require.NoError(t, err)
-		for _, qev := range qevs {
-			if !wantedEvent(qev) {
-				continue
-			}
+		qev, ok := qq.GetEvent()
+		if ok && wantedEvent(qev) {
 			allQevs = append(allQevs, qev)
 		}
 		if time.Since(start) > d {
@@ -221,7 +208,7 @@ func drainFor(t *testing.T, qq *quark.Queue, d time.Duration) []quark.Event {
 		}
 		// Intentionally placed at the end so that we always
 		// get one more try after the last block
-		if len(qevs) == 0 {
+		if !ok {
 			_ = qq.Block()
 		}
 	}
@@ -234,22 +221,16 @@ func drainFirstOfPid(t *testing.T, qq *quark.Queue, pid int) quark.Event {
 	start := time.Now()
 
 	for {
-		qevs, err := qq.GetEvents()
-		require.NoError(t, err)
-		for _, qev := range qevs {
-			if !wantedEvent(qev) {
-				continue
-			}
-			if qev.Process.Pid == uint32(pid) {
-				return qev
-			}
+		qev, ok := qq.GetEvent()
+		if ok && wantedEvent(qev) && qev.Process.Pid == uint32(pid) {
+			return qev
 		}
 		if time.Since(start) > time.Second {
 			break
 		}
 		// Intentionally placed at the end so that we always
 		// get one more try after the last block
-		if len(qevs) == 0 {
+		if !ok {
 			_ = qq.Block()
 		}
 	}

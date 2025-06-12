@@ -85,8 +85,8 @@ func readPIDNsInode() (uint64, error) {
 // NewProvider returns a new instance of kerneltracingprovider
 func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Registry) (provider.Provider, error) {
 	attr := quark.DefaultQueueAttr()
-	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER | quark.QQ_NO_SNAPSHOT
-	qq, err := quark.OpenQueue(attr, 64)
+	attr.Flags = quark.QQ_ALL_BACKENDS | quark.QQ_ENTRY_LEADER
+	qq, err := quark.OpenQueue(attr)
 	if err != nil {
 		return nil, fmt.Errorf("open queue: %w", err)
 	}
@@ -112,12 +112,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 		defer qq.Close()
 		for ctx.Err() == nil {
 			p.qqMtx.Lock()
-			events, err := qq.GetEvents()
+			// We just drive quark to populate the cache, not interested in the events
+			_, ok := qq.GetEvent()
 			p.qqMtx.Unlock()
-			if err != nil {
-				logger.Errorw("get events from quark, no more process enrichment from this processor will be done", "error", err)
-				break
-			}
+			// Is it time to update stats?
 			if time.Since(lastUpdate) > time.Second*5 {
 				p.qqMtx.Lock()
 				metrics := qq.Stats()
@@ -130,8 +128,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, reg *monitoring.Regis
 				stats.Removals.Set(metrics.Removals)
 				lastUpdate = time.Now()
 			}
-
-			if len(events) == 0 {
+			// Quark is idle, Block for a bit
+			if !ok {
 				err = qq.Block()
 				if err != nil {
 					logger.Errorw("quark block, no more process enrichment from this processor will be done", "error", err)
