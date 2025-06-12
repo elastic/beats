@@ -25,6 +25,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/logptest"
 )
 
 type testFilterRule struct {
@@ -52,7 +54,7 @@ func TestNamespace(t *testing.T) {
 			test.name: nil,
 		})
 
-		filter, err := ns.Plugin()(cfg)
+		filter, err := ns.Plugin()(cfg, logptest.NewTestingLogger(t, ""))
 
 		assert.NoError(t, err)
 		assert.NotNil(t, filter)
@@ -97,7 +99,7 @@ func TestNamespaceError(t *testing.T) {
 		},
 		{
 			"filter init fail",
-			func(_ *config.C) (beat.Processor, error) {
+			func(_ *config.C, _ *logp.Logger) (beat.Processor, error) {
 				return nil, errors.New("test")
 			},
 			map[string]interface{}{
@@ -116,12 +118,12 @@ func TestNamespaceError(t *testing.T) {
 		config, err := config.NewConfigFrom(test.config)
 		fatalError(t, err)
 
-		_, err = ns.Plugin()(config)
+		_, err = ns.Plugin()(config, logptest.NewTestingLogger(t, ""))
 		assert.Error(t, err)
 	}
 }
 
-func newTestFilterRule(_ *config.C) (beat.Processor, error) {
+func newTestFilterRule(_ *config.C, _ *logp.Logger) (beat.Processor, error) {
 	return &testFilterRule{}, nil
 }
 

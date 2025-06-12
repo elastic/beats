@@ -98,7 +98,7 @@ func init() {
 }
 
 // New constructs a new add_process_metadata processor.
-func New(cfg *conf.C) (beat.Processor, error) {
+func New(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
@@ -109,7 +109,7 @@ func New(cfg *conf.C) (beat.Processor, error) {
 
 // NewWithCache construct a new add_process_metadata processor with cache for container IDs.
 // Resulting processor implements `Close()` to release the cache resources.
-func NewWithCache(cfg *conf.C) (beat.Processor, error) {
+func NewWithCache(cfg *conf.C, log *logp.Logger) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
