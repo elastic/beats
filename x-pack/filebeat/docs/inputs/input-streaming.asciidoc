@@ -63,10 +63,15 @@ After completion of a program's execution it should return a single object with 
 }
 ----
 
+<<<<<<< HEAD:x-pack/filebeat/docs/inputs/input-streaming.asciidoc
 <1> The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements.
 The field could be an array or a single object that will be treated as an array with a single element. This depends completely on the streaming data source. The `events` field is the array of events to be published to the output. Each event must be a JSON object.
 
 <2> If `cursor` is present it must be either be a single object or an array with the same length as events; each element _i_ of the `cursor` will be the details for obtaining the events at and beyond event _i_ in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
+=======
+1. The `events` field must be present, but may be empty or null. If it is not empty, it must only have objects as elements. The field could be an array or a single object that will be treated as an array with a single element. This depends completely on the streaming data source. The `events` field is the array of events to be published to the output. Each event must be a JSON object.
+2. If `cursor` is present it must be either be a single object or an array with the same length as events; each element *i* of the `cursor` will be the details for obtaining the events at and beyond event *i* in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array. Note that the Crowdstrike streaming input does not support array cursors.
+>>>>>>> cdf235577 (x-pack/filebeat/input/streaming: fix crowdstrike cursor handling (#44548)):docs/reference/filebeat/filebeat-input-streaming.md
 
 
 Example configurations:

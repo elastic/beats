@@ -5,6 +5,7 @@
 package streaming
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -139,6 +140,15 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		var buf bytes.Buffer
+		io.Copy(&buf, resp.Body)
+		s.log.Errorw("unsuccessful request", "status_code", resp.StatusCode, "status", resp.Status, "body", buf.String())
+		err := fmt.Errorf("unsuccessful request: %s: %s", resp.Status, &buf)
+		s.status.UpdateStatus(status.Degraded, err.Error())
+		return nil, err
+	}
+
 	dec := json.NewDecoder(resp.Body)
 
 	type resource struct {
@@ -160,17 +170,21 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 	}
 	s.log.Debugw("stream discover metadata", logp.Namespace(s.ns), "meta", mapstr.M(body.Meta))
 
-	var offset int
-	if cursor, ok := state["cursor"].(map[string]any); ok {
-		switch off := cursor["offset"].(type) {
-		case int:
-			offset = off
-		case float64:
-			offset = int(off)
-		}
-	}
-
+	cursors, _ := state["cursor"].(map[string]any)
+	// Clean up state feed annotation. This unfortunate code placement
+	// is in order to avoid allocating defers in a loop.
+	defer delete(state, "feed")
 	for _, r := range body.Resources {
+		feedName := r.FeedURL // Retain this since we will mutate it to set the offset.
+		var offset int
+		if cursor, ok := cursors[feedName].(map[string]any); ok {
+			switch off := cursor["offset"].(type) {
+			case int:
+				offset = off
+			case float64:
+				offset = int(off)
+			}
+		}
 		refreshAfter := time.Duration(r.RefreshAfter) * time.Second
 		go func() {
 			const grace = 5 * time.Minute
@@ -231,6 +245,9 @@ func (s *falconHoseStream) followSession(ctx context.Context, cli *http.Client, 
 		}
 		defer resp.Body.Close()
 
+		// Prepare state to understand which feed is being processed.
+		// This is cleared by the deferred delete above the loop.
+		state["feed"] = feedName
 		dec := json.NewDecoder(resp.Body)
 		for {
 			var msg json.RawMessage
