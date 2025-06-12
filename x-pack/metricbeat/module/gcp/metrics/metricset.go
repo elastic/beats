@@ -188,13 +188,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		logger: logp.NewLogger(MetricsetName),
 	}
 
-	if m.config.MetadataCache {
-		refreshInterval := m.config.MetadataCacheRefreshPeriod
-		if refreshInterval <= 0 {
-			refreshInterval = time.Hour // Default to 1 hour if not specified
-		}
-	}
-
 	var metadataCacheRefreshPeriod time.Duration
 	if m.config.MetadataCache {
 		metadataCacheRefreshPeriod = m.config.MetadataCacheRefreshPeriod
