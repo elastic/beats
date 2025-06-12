@@ -3,20 +3,19 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-couchdb.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # CouchDB fields [exported-fields-couchdb]
 
 couchdb module
-
 
 ## couchdb [_couchdb]
 
 Couchdb metrics
 
-
-## server [_server_2]
+## server [_server]
 
 Contains CouchDB server stats
-
 
 ## httpd [_httpd]
 
@@ -50,7 +49,6 @@ type: long
 :   Number of HTTP requests
 
 type: long
-
 
 
 ## httpd_request_methods [_httpd_request_methods]
@@ -91,7 +89,6 @@ type: long
 :   Number of HTTP PUT requests
 
 type: long
-
 
 
 ## httpd_status_codes [_httpd_status_codes]
@@ -176,8 +173,7 @@ type: long
 type: long
 
 
-
-## couchdb [_couchdb_2]
+## couchdb [_couchdb]
 
 couchdb statistics
 

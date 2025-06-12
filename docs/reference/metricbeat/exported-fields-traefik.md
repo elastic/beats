@@ -3,19 +3,19 @@ mapped_pages:
   - https://www.elastic.co/guide/en/beats/metricbeat/current/exported-fields-traefik.html
 ---
 
+% This file is generated! See scripts/generate_fields_docs.py
+
 # Traefik fields [exported-fields-traefik]
 
 Traefik reverse proxy / load balancer metrics
-
 
 ## traefik [_traefik]
 
 Traefik reverse proxy / load balancer metrics
 
+## health [_health]
 
-## health [_health_2]
-
-Metrics obtained from Traefik’s health API endpoint
+Metrics obtained from Traefik's health API endpoint
 
 **`traefik.health.uptime.sec`**
 :   Uptime of Traefik instance in seconds
@@ -23,8 +23,7 @@ Metrics obtained from Traefik’s health API endpoint
 type: long
 
 
-
-## response [_response_2]
+## response [_response]
 
 Response metrics
 
