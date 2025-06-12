@@ -212,7 +212,7 @@ func TestDurationIsAddedToEvent(t *testing.T) {
 	})
 
 	registry := newTestRegistry(t)
-	m, err := module.NewWrapper(config, registry, module.WithMetricSetInfo())
+	m, err := module.NewWrapper(config, registry, logptest.NewTestingLogger(t, ""), module.WithMetricSetInfo())
 	require.NoError(t, err)
 
 	done := make(chan struct{})
