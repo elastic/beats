@@ -8,7 +8,6 @@ package integration
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -21,9 +20,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	oteltest "github.com/elastic/beats/v7/x-pack/libbeat/tests/integration"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/testing/estools"
-	"github.com/elastic/go-elasticsearch/v8"
 )
 
 var beatsCfgFile = `
@@ -49,6 +48,7 @@ processors:
     - add_cloud_metadata: ~
     - add_docker_metadata: ~
     - add_kubernetes_metadata: ~
+path.home: %s
 http.enabled: true
 http.host: localhost
 http.port: %d
@@ -58,18 +58,19 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 	numEvents := 1
 
-	// start filebeat in otel mode
-	filebeatOTel := integration.NewBeat(
-		t,
-		"filebeat-otel",
-		"../../filebeat.test",
-		"otel",
-	)
+	// Get collector with empty config
+	col, err := oteltest.NewTestCollector(t, "filebeat", "")
+	require.NoError(t, err, fmt.Sprintf("could not get new collector due to %v", err))
 
-	logFilePath := filepath.Join(filebeatOTel.TempDir(), "log.log")
-	filebeatOTel.WriteConfigFile(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", 5066))
+	// write to a log file
+	logFilePath := filepath.Join(col.GetTempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	filebeatOTel.Start()
+
+	// start collector
+	err = col.ReloadCollectorWithConfig(fmt.Sprintf(beatsCfgFile, logFilePath, "logs-integration-default", col.GetTempDir(), 5066))
+	require.NoError(t, err)
+
+	// TODO: check if collector is healthy before proceeding
 
 	// start filebeat
 	filebeat := integration.NewBeat(
@@ -79,7 +80,7 @@ func TestFilebeatOTelE2E(t *testing.T) {
 	)
 	logFilePath = filepath.Join(filebeat.TempDir(), "log.log")
 	writeEventsToLogFile(t, logFilePath, numEvents)
-	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", 5067)
+	s := fmt.Sprintf(beatsCfgFile, logFilePath, "logs-filebeat-default", filebeat.TempDir(), 5067)
 	s = s + `
 setup.template.name: logs-filebeat-default
 setup.template.pattern: logs-filebeat-default
@@ -88,26 +89,21 @@ setup.template.pattern: logs-filebeat-default
 	filebeat.WriteConfigFile(s)
 	filebeat.Start()
 
-	// prepare to query ES
-	esCfg := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-		Username:  "admin",
-		Password:  "testing",
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, //nolint:gosec // this is only for testing
-			},
-		},
+	t.Cleanup(func() {
+		filebeat.Stop()
+	})
+
+	es, err := integration.GetESClient(t)
+	if err != nil {
+		t.Fatalf("could not get es client due to: %v", err)
 	}
-	es, err := elasticsearch.NewClient(esCfg)
-	require.NoError(t, err)
 
 	var filebeatDocs estools.Documents
 	var otelDocs estools.Documents
 	// wait for logs to be published
 	require.Eventually(t,
 		func() bool {
-			findCtx, findCancel := context.WithTimeout(context.Background(), 10*time.Second)
+			findCtx, findCancel := context.WithTimeout(t.Context(), 10*time.Second)
 			defer findCancel()
 
 			otelDocs, err = estools.GetAllLogsForIndexWithContext(findCtx, es, ".ds-logs-integration-default*")
@@ -129,6 +125,7 @@ setup.template.pattern: logs-filebeat-default
 		"agent.id",
 		"log.file.inode",
 		"log.file.path",
+		"container.id",
 	}
 
 	assertMapsEqual(t, filebeatDoc, otelDoc, ignoredFields, "expected documents to be equal")
