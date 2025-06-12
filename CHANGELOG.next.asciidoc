@@ -117,6 +117,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure netflow custom field configuration is applied. {issue}40735[40735] {pull}40730[40730]
 - Fix a bug in Salesforce input to only handle responses with 200 status code {pull}41015[41015]
 - If a Filestream input fails to be created, its ID is removed from the list of running input IDs {pull}44697[44697]
+- Fix timeout handling by Crowdstrike streaming input. {pull}44720[44720]
+- Ensure DEPROVISIONED Okta entities are published by Okta entityanalytics provider. {issue}12658[12658] {pull}44719[44719]
 
 *Heartbeat*
 
