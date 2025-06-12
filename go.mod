@@ -213,9 +213,8 @@ require (
 	github.com/zyedidia/generic v1.2.1
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.3
 	go.elastic.co/apm/module/apmhttp/v2 v2.6.3
-<<<<<<< HEAD
 	go.elastic.co/apm/v2 v2.6.3
-	go.mongodb.org/mongo-driver v1.14.0
+	go.mongodb.org/mongo-driver v1.17.4
 	go.opentelemetry.io/collector/component v1.27.0
 	go.opentelemetry.io/collector/config/configtls v1.27.0
 	go.opentelemetry.io/collector/confmap v1.27.0
@@ -225,19 +224,6 @@ require (
 	go.opentelemetry.io/collector/otelcol v0.121.0
 	go.opentelemetry.io/collector/pdata v1.28.0
 	go.opentelemetry.io/collector/receiver v0.121.0
-=======
-	go.elastic.co/apm/v2 v2.7.0
-	go.mongodb.org/mongo-driver v1.17.4
-	go.opentelemetry.io/collector/component v1.31.0
-	go.opentelemetry.io/collector/config/configtls v1.31.0
-	go.opentelemetry.io/collector/confmap v1.31.0
-	go.opentelemetry.io/collector/consumer v1.31.0
-	go.opentelemetry.io/collector/consumer/consumererror v0.125.0
-	go.opentelemetry.io/collector/exporter/debugexporter v0.125.0
-	go.opentelemetry.io/collector/otelcol v0.125.0
-	go.opentelemetry.io/collector/pdata v1.31.0
-	go.opentelemetry.io/collector/receiver v1.31.0
->>>>>>> df335f363 (Upgrade `go.mongodb.org/mongo-driver` from `v1.14.0` -> `v1.17.4` (#44769))
 	go.uber.org/mock v0.5.0
 	golang.org/x/term v0.30.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250115164207-1a7da9e5054f
